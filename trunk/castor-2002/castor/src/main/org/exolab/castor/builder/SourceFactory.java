@@ -51,9 +51,8 @@ import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.types.BuiltInType;
+import org.exolab.castor.xml.schema.SimpleTypesFactory;
 import org.exolab.javasource.*;
-
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -68,95 +67,93 @@ import java.util.Vector;
 public class SourceFactory  {
 
 
-    /** 
+    /**
      * The type factory.
     **/
     private FieldInfoFactory infoFactory = null;
-    
 
-    /** 
+
+    /**
      * The member factory.
     **/
     private MemberFactory memberFactory = null;
 
-    
-    /** 
+
+    /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
     public SourceFactory() {
         this(null);
     } //-- SourceFactory
-    
 
-    /** 
+
+    /**
      * Creates a new SourceFactory with the given FieldInfoFactory
      * @param infoFactory the FieldInfoFactory to use
     */
     public SourceFactory(FieldInfoFactory infoFactory) {
-        super();    
-        if (infoFactory == null) 
+        super();
+        if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
             this.infoFactory = infoFactory;
-            
+
         this.memberFactory = new MemberFactory(infoFactory);
     } //-- SourceFactory
-    
+
 
     //------------------/
     //- Public Methods -/
     //------------------/
-    
+
     /**
      * Creates a new ClassInfo for the given XML Schema element declaration
-     * @param element the XML Schema element declaration to create the 
+     * @param element the XML Schema element declaration to create the
      * ClassInfo for
      * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to use when generating source
      * from this ClassInfo
     **/
     public JClass createSourceCode
-        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
+        (ElementDecl element, ClassInfoResolver resolver, String packageName)
     {
-        
+
         FactoryState state = null;
-        
+
         String elementName = element.getName();
         String className = JavaXMLNaming.toJavaClassName(elementName);
-        
+
         className = resolveClassName(className, packageName);
-        
+
         state = new FactoryState(className, resolver, packageName);
-        
+
         //-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
-        while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();        
+        while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();
         state.markAsProcessed(tmpDecl);
-        
+
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
-        
+
         initialize(jClass);
-        
+
         //-- name information
         classInfo.setNodeName(element.getName());
-        
+
         //-- namespace information
-        Schema  schema = element.getSchema();        
+        Schema  schema = element.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        
+
         //-- process annotation
         String comment  = processAnnotations(element);
-        if (comment != null) 
+        if (comment != null)
             jClass.getJDocComment().setComment(comment);
-        
-        
-        
+
         XMLType type = element.getType();
-        
+
         boolean derived = false;
-        
+
         // No Type?
         if (type == null) {
             // ???
@@ -166,16 +163,14 @@ public class SourceFactory  {
         else if (type.isComplexType()) {
             ComplexType complexType = (ComplexType)type;
 
-            if ((element.getTypeReference() == null) || 
-               (!complexType.isTopLevel()))
-            {
+            if ( ! element.hasTypeReference() ) {
                 processComplexType( (ComplexType)type, state);
             }
             else {
 
                 String typeName = complexType.getName();
                 String superClass = JavaXMLNaming.toJavaClassName(typeName);
-                
+
                 superClass = resolveClassName(superClass, packageName);
                 jClass.setSuperClass(superClass);
             }
@@ -189,111 +184,111 @@ public class SourceFactory  {
                 createSourceCode(simpleType, state, state.packageName);
             }
         }
-        
+
         //-- add imports required by the marshal methods
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
-        
+
         //-- #validate()
         createValidateMethods(jClass);
         //-- #marshal()
         createMarshalMethods(jClass);
         //-- #unmarshal()
         createUnmarshalMethods(jClass);
-        
+
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(element, classInfo);
         }
-        
+
         return jClass;
     } //-- createSourceCode
-    
+
     /**
      * Creates a new ClassInfo for the given XML Schema type declaration.
      * The type declaration must be a top-level declaration.
-     * @param type the XML Schema type declaration to create the 
+     * @param type the XML Schema type declaration to create the
      * ClassInfo for
      * @param resolver the ClassInfoResolver for resolving "derived" types.
      * @param packageName the package to which generated classes should
      * belong
     **/
     public JClass createSourceCode
-        (ComplexType type, ClassInfoResolver resolver, String packageName) 
+        (ComplexType type, ClassInfoResolver resolver, String packageName)
     {
         if (type == null)
             throw new IllegalArgumentException("null ComplexType");
-            
+
         if (!type.isTopLevel())
             throw new IllegalArgumentException("ComplexType is not top-level.");
-        
+
         String className = JavaXMLNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
-        
-        FactoryState state 
+
+        FactoryState state
             = new FactoryState(className, resolver, packageName);
-        
+
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
-        
+
         initialize(jClass);
-        
+
         //-- make class abstract
         jClass.getModifiers().setAbstract(true);
-        
-        
+
+
         //-- name information
         classInfo.setNodeName(type.getName());
-        
+
         //-- namespace information
-        Schema  schema = type.getSchema();        
+        Schema  schema = type.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        
+
         //-- process annotation
         String comment  = processAnnotations(type);
-        if (comment != null) 
+        if (comment != null)
             jClass.getJDocComment().setComment(comment);
-            
-        
+
+
         processComplexType(type, state);
-        
+
         //-- add imports required by the marshal methods
         jClass.addImport("java.io.Writer");
         jClass.addImport("java.io.Reader");
-        
+
         //-- #validate()
         createValidateMethods(jClass);
         //-- #marshal()
         //createMarshalMethods(jClass);
         //-- #unmarshal()
         //createUnmarshalMethods(jClass);
-        
+
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(type, classInfo);
         }
-        
+
         return jClass;
-        
+
     } //-- ClassInfo
-    
+
     /**
      * Creates the Java source code to support the given Simpletype
      * @param simpletype the Simpletype to create the Java source for
      * @return the JClass representation of the given Simpletype
     **/
     public JClass createSourceCode
-        (SimpleType simpleType, ClassInfoResolver resolver, String packageName) 
+        (SimpleType simpleType, ClassInfoResolver resolver, String packageName)
     {
-        
-        if (simpleType instanceof BuiltInType) {
+
+        if ( SimpleTypesFactory.isBuiltInType( simpleType.getTypeCode() ) ) {
             String err = "You cannot construct a ClassInfo for a " +
                 "built-in SimpleType.";
             throw new IllegalArgumentException(err);
         }
-        
+
         boolean enumeration = false;
-        
+
         //-- class name information
         String typeName = simpleType.getName();
         if (typeName == null) {
@@ -308,9 +303,9 @@ public class SourceFactory  {
             }
             typeName += "Type";
         }
-        
+
         String className = JavaXMLNaming.toJavaClassName(typeName);
-        
+
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
             //-- XXXX Fix packageName...this is a hack I know,
@@ -320,61 +315,60 @@ public class SourceFactory  {
             else
                 packageName = "types";
         }
-        
+
         className = resolveClassName(className, packageName);
-        
-        FactoryState state 
+
+        FactoryState state
             = new FactoryState(className, resolver, packageName);
-        
+
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
-        
+
         initialize(jClass);
-        
+
         //-- XML information
-        Schema  schema = simpleType.getSchema();        
+        Schema  schema = simpleType.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
         classInfo.setNodeName(typeName);
-        
-        
+
         //-- process annotation
         String comment  = processAnnotations(simpleType);
-        if (comment != null) 
+        if (comment != null)
             jClass.getJDocComment().setComment(comment);
-            
+
         XSClass xsClass = new XSClass(jClass, typeName);
-        
+
         classInfo.setSchemaType(xsClass);
-        
+
         //-- handle enumerated types
         if (enumeration) {
             xsClass.setAsEnumertated(true);
             processEnumeration(simpleType, state);
         }
-        
+
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(simpleType, classInfo);
         }
-        
+
         return jClass;
-        
+
     } //-- createClassSource
-    
-    
+
+
     /**
      *
     **
-    public JClass createSourceCode(ClassDescriptor descriptor) 
+    public JClass createSourceCode(ClassDescriptor descriptor)
     {
-        
+
         //-- handle null arguments
         if (descriptor == null) {
             String err = "ClassDescriptor passed as an argument to "+
                 " SourceFactory#createSourceCode cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        
+
         ClassDescriptor classDesc = descriptor;
         /*
         if (descriptor instanceof XMLClassDescriptor)
@@ -387,50 +381,50 @@ public class SourceFactory  {
                 throw new IllegalStateException(mx.toString());
             }
         }
-        *  
-         
+        *
+
         Class type = classDesc.getJavaClass();
         JClass jClass = new JClass(type.getName());
-        
+
         //-- Loop through fields and add members
         JMember field = null;
         FieldDescriptor[] fields = classDesc.getFields();
         for (int i = 0; i < fields.size(); i++) {
         }
-        
+
         return jClass;
-        
+
     } //-- createSourceCode
-    
-    //-------------------/        
-    //- Private Methods -/        
-    //-------------------/        
-    
+
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
+
     /**
      * Initializes the given JClass
     **/
     private void initialize(JClass jClass) {
-        
-        
+
+
         jClass.addInterface("java.io.Serializable");
-        
+
         //-- add default constructor
         JConstructor con = jClass.createConstructor();
         jClass.addConstructor(con);
         con.getSourceCode().add("super();");
-        
+
         //-- add default import list
         jClass.addImport("org.exolab.castor.xml.*");
         jClass.addImport("java.io.Serializable");
-        
+
     } //-- initialize
-    
+
     /**
      * Creates the #marshal methods for the given JClass
      * @param parent the JClass to create the #marshal methods for
     **/
     private void createMarshalMethods(JClass parent) {
-        
+
         //-- create main marshal method
         JMethod jMethod = new JMethod(null,"marshal");
         jMethod.addException(SGTypes.MarshalException);
@@ -442,8 +436,8 @@ public class SourceFactory  {
         jsc.add("//validate(false);");
         jsc.add("");
         jsc.add("Marshaller.marshal(this, out);");
-        
-        
+
+
         //-- create helper marshal method
         //-- start helper marshal method, this method will
         //-- be built up as we process the given ElementDecl
@@ -458,11 +452,11 @@ public class SourceFactory  {
         jsc.add("//validate(false);");
         jsc.add("");
         jsc.add("Marshaller.marshal(this, handler);");
-        
+
     } //-- createMarshalMethods
-    
+
     private void createUnmarshalMethods(JClass parent) {
-        
+
         //-- create main marshal method
         JMethod jMethod = new JMethod(parent,"unmarshal");
         jMethod.getModifiers().setStatic(true);
@@ -476,26 +470,26 @@ public class SourceFactory  {
         jsc.append(") Unmarshaller.unmarshal(");
         jsc.append(parent.getName());
         jsc.append(".class, reader);");
-        
+
     } //-- createUnmarshalMethods
-    
+
     /**
      * Creates the Validate methods for the given JClass
      * @param jClass the JClass to create the Validate methods for
     **/
     private void createValidateMethods(JClass jClass) {
-        
+
         JMethod     jMethod = null;
         JSourceCode jsc     = null;
-        
+
         //-- #validate
         jMethod = new JMethod(null, "validate");
         jMethod.addException(SGTypes.ValidationException);
-        
+
         jClass.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
         jsc.add("org.exolab.castor.xml.Validator.validate(this, null);");
-        
+
         //-- #isValid
         jMethod  = new JMethod(JType.Boolean, "isValid");
         jsc = jMethod.getSourceCode();
@@ -511,13 +505,13 @@ public class SourceFactory  {
         jsc.add("}");
         jsc.add("return true;");
         jClass.addMethod(jMethod);
-        
+
     } //-- createValidateMethods
-    
-    //-------------------/        
-    //- Private Methods -/        
-    //-------------------/        
-     
+
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
+
     /**
      * Resolves the className out of the given name and the packageName
     **/
@@ -527,49 +521,47 @@ public class SourceFactory  {
         }
         return name;
     } //-- resolveClassName
-    
+
     /**
      * @param complexType the ComplexType for this ClassInfo
      * @param resolver the ClassInfoResolver for resolving "derived" types.
-    **/    
+    **/
     private void processComplexType
-        (ComplexType complexType, FactoryState state) 
+        (ComplexType complexType, FactoryState state)
     {
-                
         String typeName = complexType.getName();
-        
+
         ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
-        
+
         Schema schema = complexType.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        
-        
-        
+
+
+
         //- Handle derived types
-        if (complexType.getBase() != null) {
-        
-            String baseName = complexType.getBase();
-            ComplexType base = schema.getComplexType(baseName);
+        if (complexType.getBaseType() != null) {
+
+            XMLType base = complexType.getBaseType();
             if (base != null) {
-                
+
                 String className = null;
-                
+
                 ClassInfo cInfo = state.resolve(base);
                 if (cInfo == null) {
-                    
+
                     String packageName = state.jClass.getPackageName();
-                    JClass jClass = createSourceCode(base, 
+                    JClass jClass = createSourceCode((ComplexType)base,
                                                      state,
                                                      packageName);
                     cInfo = state.resolve(base);
                     className = jClass.getName();
                 }
                 else className = cInfo.getJClass().getName();
-                
-                    
+
+
                 state.jClass.setSuperClass(className);
-                
+
                 //-- copy members from super class
                 classInfo.addFieldInfo(cInfo.getAttributeFields());
                 classInfo.addFieldInfo(cInfo.getElementFields());
@@ -581,10 +573,10 @@ public class SourceFactory  {
                 //-- ever see it.
                 System.out.print("ClassInfo#init: ");
                 System.out.print("A referenced complextype is null: ");
-                System.out.println(baseName);
+                System.out.println(base.getName());
             }
         }
-        
+
         //---------------------/
         //- handle attributes -/
         //---------------------/
@@ -592,106 +584,105 @@ public class SourceFactory  {
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
-            
+
             //-- if we have a new SimpleType...generate ClassInfo
             SimpleType sType = attr.getSimpleType();
             if (sType != null) {
-                if ( ! (sType instanceof BuiltInType) )
+                if ( ! (SimpleTypesFactory.isBuiltInType(sType.getTypeCode())) )
                 createSourceCode(sType, state, state.packageName);
             }
-                
+
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
             handleField(fieldInfo, state);
         }
-        
+
         //------------------------/
         //- handle content model -/
         //------------------------/
         //-- check contentType
         ContentType contentType = complexType.getContentType();
-            
+
         //-- create text member
         if ((contentType == ContentType.textOnly) ||
             (contentType == ContentType.mixed) ||
-            (contentType == ContentType.any)) 
+            (contentType == ContentType.any))
         {
-            
+
             FieldInfo fieldInfo = memberFactory.createFieldInfoForText();
             handleField(fieldInfo, state);
-            
+
             if (contentType == ContentType.any) {
                 fieldInfo = memberFactory.createFieldInfoForAny();
                 handleField(fieldInfo, state);
             }
-                
+
         }
         processContentModel(complexType, state);
     } //-- processComplextype
 
 
     private void handleField(FieldInfo fieldInfo, FactoryState state) {
-        
+
         if (fieldInfo == null) return;
-        
-        JSourceCode scInitializer 
+
+        JSourceCode scInitializer
             = state.jClass.getConstructor(0).getSourceCode();
-            
-        
+
+
         state.classInfo.addFieldInfo(fieldInfo);
-        
+
         //-- Have FieldInfo create the proper field
         fieldInfo.createJavaField(state.jClass);
-        
+
         //-- do not create access methods for transient fields
         if (!fieldInfo.isTransient()) {
             fieldInfo.createAccessMethods(state.jClass);
         }
-        
+
         //-- Add initialization code
         fieldInfo.generateInitializerCode(scInitializer);
-        
+
     } //-- handleField
-    
+
     /**
      * Processes the given ContentModelGroup
      * @param contentModel the ContentModelGroup to process
     **/
     private void processContentModel
-        (ContentModelGroup contentModel, FactoryState state) 
+        (ContentModelGroup contentModel, FactoryState state)
     {
-        
+
         //------------------------------/
         //- handle elements and groups -/
         //------------------------------/
-                
+
         Enumeration enum = contentModel.enumerate();
-                
+
         FieldInfo fieldInfo = null;
         while (enum.hasMoreElements()) {
-                    
+
             Structure struct = (Structure)enum.nextElement();
             switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
-                
+
                     ElementDecl eDecl = (ElementDecl)struct;
-                    
-                    
+
                     //-- make sure we haven't processed this element yet
                     //-- to prevent endless recursion.
                     ElementDecl tmpDecl = eDecl;
-                    while (tmpDecl.isReference()) 
+                    while (tmpDecl.isReference())
                         tmpDecl = tmpDecl.getReference();
-                        
+
                     boolean processed = state.processed(tmpDecl);
-                    
+
                     //-- make sure we process the element first
                     //-- so that it's available to the MemberFactory
                     if ((state.resolve(struct) == null) && (!processed))
                         createSourceCode((ElementDecl)struct,
                                           state,
                                           state.packageName);
-                    fieldInfo 
-                        = memberFactory.createFieldInfo((ElementDecl)struct, 
+                    fieldInfo
+                        = memberFactory.createFieldInfo((ElementDecl)struct,
                                                          state);
                     handleField(fieldInfo, state);
                     break;
@@ -702,9 +693,9 @@ public class SourceFactory  {
                     break;
             }
         }
-            
+
     } //-- process(ContentModelGroup)
-    
+
     /**
      * Creates Comments from Schema annotations
      * @param annotated the Annotated structure to process
@@ -719,7 +710,7 @@ public class SourceFactory  {
                 Annotation ann = (Annotation) enum.nextElement();
                 Enumeration documentations = ann.getDocumentation();
                 while (documentations.hasMoreElements()) {
-                    Documentation documentation = 
+                    Documentation documentation =
                         (Documentation) documentations.nextElement();
                     String content = documentation.getContent();
                     if ( content != null) comment.append(content);
@@ -729,26 +720,26 @@ public class SourceFactory  {
         }
         return null;
     } //-- processAnnotations
-    
+
     /**
-     * Creates all the necessary enumeration code from the given 
+     * Creates all the necessary enumeration code from the given
      * simpletype
     **/
     private void processEnumeration
-        (SimpleType simpleType, FactoryState state) 
+        (SimpleType simpleType, FactoryState state)
     {
-        
+
         Enumeration enum = simpleType.getFacets("enumeration");
-        
-        
-        
+
+
+
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
-        
+
         JMember     member = null;
         JDocComment jdc    = null;
         JSourceCode jsc    = null;
-        
+
         //-- modify constructor
         JConstructor constructor = jClass.getConstructor(0);
         constructor.getModifiers().makePrivate();
@@ -757,9 +748,9 @@ public class SourceFactory  {
         jsc = constructor.getSourceCode();
         jsc.add("this.type = type;");
         jsc.add("this.stringValue = value;");
-        
-        
-        
+
+
+
         //-- #valueOf method
         JMethod mValueOf = new JMethod(jClass, "valueOf");
         mValueOf.addParameter(new JParameter(SGTypes.String, "string"));
@@ -770,7 +761,7 @@ public class SourceFactory  {
         jdc.appendComment(" based on the given String value.");
 
         JSourceCode srcValueOf = mValueOf.getSourceCode();
-        
+
         //-- #toString method
         JMethod mToString = new JMethod(SGTypes.String, "toString");
         jClass.addMethod(mToString);
@@ -778,20 +769,20 @@ public class SourceFactory  {
         jdc.appendComment("Returns the String representation of this ");
         jdc.appendComment(className);
         mToString.getSourceCode().add("return this.stringValue;");
-        
+
         //-- Loop through "enumeration" facets
         int count = 0;
-        
+
         while (enum.hasMoreElements()) {
-            
+
             Facet facet = (Facet) enum.nextElement();
-            
+
             String value = facet.getValue();
             String typeName = value.toUpperCase() + "_TYPE";
             String objName = JavaXMLNaming.toJavaMemberName(value, false);
             objName = objName.toUpperCase();
-            
-            
+
+
             //-- handle int type
             member = new JMember(JType.Int, typeName);
             member.setComment("The " + value + " type");
@@ -801,17 +792,17 @@ public class SourceFactory  {
             modifiers.makePublic();
             member.setInitString(Integer.toString(count));
             jClass.addMember(member);
-            
+
             //-- handle Class type
             member = new JMember(jClass, objName);
             member.setComment("The instance of the " + value + " type");
-            
+
             modifiers = member.getModifiers();
-            
+
             modifiers.setFinal(true);
             modifiers.setStatic(true);
             modifiers.makePublic();
-            
+
             StringBuffer init = new StringBuffer();
             init.append("new ");
             init.append(className);
@@ -820,15 +811,15 @@ public class SourceFactory  {
             init.append(", \"");
             init.append(value);
             init.append("\")");
-            
+
             member.setInitString(init.toString());
             jClass.addMember(member);
-            
+
             //-- add #valueOf code
-            
+
             if (count != 0) srcValueOf.add("else if (\"");
             else srcValueOf.add("if (\"");
-            
+
             srcValueOf.append(value);
             srcValueOf.append("\".equals(string))");
             srcValueOf.indent();
@@ -836,39 +827,39 @@ public class SourceFactory  {
             srcValueOf.append(objName);
             srcValueOf.append(";");
             srcValueOf.unindent();
-            
+
             ++count;
         }
-        
+
         //-- add internal type
         member = new JMember(JType.Int, "type");
         member.setInitString("-1");
         jClass.addMember(member);
-        
+
         //-- add internal stringValue
         member = new JMember(SGTypes.String, "stringValue");
         member.setInitString("null");
         jClass.addMember(member);
-        
-        
+
+
         //-- finish #valueOf
         srcValueOf.add("String err = \"'\" + string + \"' is not a valid ");
         srcValueOf.append(className);
         srcValueOf.append("\";");
         srcValueOf.add("throw new IllegalArgumentException(err);");
-        
+
         //-- add #getType method
-        
+
         JMethod mGetType = new JMethod(JType.Int, "getType");
         mGetType.getSourceCode().add("return this.type;");
         jdc = mGetType.getJDocComment();
         jdc.appendComment("Returns the type of this " + className);
         jClass.addMethod(mGetType);
-        
-        
-        
+
+
+
     } //-- processEnumeration
-    
+
 } //-- SourceFactory
 
 
@@ -877,53 +868,53 @@ public class SourceFactory  {
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
 **/
 class FactoryState implements ClassInfoResolver {
-    
+
     //--------------------/
     //- Member Variables -/
     //--------------------/
-    
+
     JClass    jClass           = null;
     ClassInfo classInfo        = null;
-    
+
     String packageName         = null;
-    
+
     private ClassInfoResolver _resolver = null;
     private Vector            _processed = null;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
-    
+
     /**
-     * Creates a new FactoryState 
+     * Creates a new FactoryState
     **/
     protected FactoryState(String className, ClassInfoResolver resolver) {
         this(className, resolver, null);
     } //-- FactoryState
 
     /**
-     * Creates a new FactoryState 
+     * Creates a new FactoryState
     **/
     protected FactoryState
-        (String className, ClassInfoResolver resolver, String packageName) 
+        (String className, ClassInfoResolver resolver, String packageName)
     {
         _processed   = new Vector();
-        
+
         jClass       = new JClass(className);
         classInfo    = new ClassInfo(jClass);
-        
+
         if (resolver == null)
             _resolver = new ClassInfoResolverImpl();
         else
             _resolver = resolver;
-            
+
         this.packageName = packageName;
     } //-- FactoryState
-    
+
     //-----------/
     //- Methods -/
     //-----------/
-    
+
     /**
      * Adds the given Reference to this ClassInfo resolver
      * @param key the key to bind a reference to
@@ -932,7 +923,7 @@ class FactoryState implements ClassInfoResolver {
     public void bindReference(Object key, ClassInfo classInfo) {
         _resolver.bindReference(key, classInfo);
     } //-- bindReference
-    
+
     /**
      * Marks the given complexType as having been processed.
      * @param complexType the ComplexType to mark as having
@@ -941,7 +932,7 @@ class FactoryState implements ClassInfoResolver {
     void markAsProcessed(ElementDecl element) {
         _processed.addElement(element);
     } //-- markAsProcessed
-    
+
     /**
      * Returns true if the given ComplexType has been marked as processed
      * @param complexType the ComplexType to check for being marked as processed
@@ -949,7 +940,7 @@ class FactoryState implements ClassInfoResolver {
     boolean processed(ElementDecl element) {
         return _processed.contains(element);
     } //-- processed
-    
+
     /**
      * Returns the ClassInfo which has been bound to the given key
      * @param key the object to which the ClassInfo has been bound
@@ -958,5 +949,5 @@ class FactoryState implements ClassInfoResolver {
     public ClassInfo resolve(Object key) {
         return _resolver.resolve(key);
     } //-- resolve
-    
+
 } //-- FactoryState

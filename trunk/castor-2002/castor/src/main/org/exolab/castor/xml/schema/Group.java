@@ -60,7 +60,7 @@ public class Group extends Annotated
     implements ContentModelGroup, Referable
 {
 
-    
+
     /**
      * The type of collection
     **/
@@ -70,32 +70,32 @@ public class Group extends Annotated
      * the implementation of ContentModelGroup
     **/
     private ContentModelGroup _contentModel = null;
-    
+
     /**
      * The name of this Group
     **/
     private String    name       = null;
-    
+
     /**
      *
     **/
     private boolean   export     = false;
-    
-    
+
+
     private int _maxOccurs = -1;
-    
+
     private int _minOccurs = 1;
-    
-    
+
+
     private Order order = Order.seq;
-    
+
     /**
      * Creates a new Group, with no name
     **/
     public Group() {
         this(null);
     } //-- Group
-    
+
     /**
      * Creates a new Group with the given name
      * @param name of the Group
@@ -106,7 +106,7 @@ public class Group extends Annotated
         _contentModel = new ContentModelGroupImpl();
     } //-- Group
 
-    
+
     public Collection getCollection() {
         return this.collection;
     } //-- getCollection
@@ -119,7 +119,7 @@ public class Group extends Annotated
     public int getMaxOccurs() {
         return _maxOccurs;
     } //-- getMaxOccurs
-    
+
     /**
      * Returns the minimum number of occurances that this grouping must appear
      * @return the minimum number of occurances that this grouping must appear
@@ -129,7 +129,7 @@ public class Group extends Annotated
         return _minOccurs;
     } //-- getMinOccurs
 
-    
+
     /**
      * Returns the name of this Group, or null if no name was defined
      * @return the name of this Group, or null if no name was defined
@@ -137,7 +137,7 @@ public class Group extends Annotated
     public String getName() {
         return name;
     } //-- getName
-    
+
     /**
      * Returns the Id used to Refer to this Object
      * @return the Id used to Refer to this Object
@@ -147,7 +147,7 @@ public class Group extends Annotated
         if (name != null) return "group:"+name;
         return null;
     } //-- getReferenceId
-    
+
     /**
      * Sets the maximum occurance that this group may appear
      * @param max the maximum occurance that this group may appear
@@ -155,7 +155,7 @@ public class Group extends Annotated
     public void setMaxOccurs(int max) {
         _maxOccurs = max;
     } //-- setMaxOccurs
-    
+
     /**
      * Sets the minimum occurance that this group may appear
      * @param min the minimum occurance that this group may appear
@@ -163,7 +163,7 @@ public class Group extends Annotated
     public void setMinOccurs(int min) {
         _minOccurs = min;
     } //-- setMinOccurs
-    
+
     /**
      * Sets the name of this Group
      * @param name the new name for this Group
@@ -171,7 +171,7 @@ public class Group extends Annotated
     public void setName(String name) {
         this.name = name;
     } //--setName
-    
+
     /**
      * Sets the type of collection for this Group
      * @param collection the type of collection that this group represents
@@ -180,7 +180,7 @@ public class Group extends Annotated
         if (collection == null) this.collection = Collection.no;
         else this.collection = collection;
     } //-- setCollection
-    
+
     /**
      * Sets the Order option for this Group
      * @param order the type of order that this group is restricted to
@@ -189,43 +189,45 @@ public class Group extends Annotated
         if (order == null) this.order = Order.all;
         else this.order = order;
     } //-- setOrder
-    
+
     //---------------------------------------/
     //- Implementation of ContentModelGroup -/
     //---------------------------------------/
-    
+
     /**
      * Adds the given ElementDecl to this ContentModelGroup
      * @param elementDecl the ElementDecl to add
      * @exception SchemaException when an ElementDecl already
      * exists with the same name as the given ElementDecl
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
+    public void addElementDecl(ElementDecl elementDecl)
         throws SchemaException
     {
         _contentModel.addElementDecl(elementDecl);
     } //-- addElementDecl
-    
+
     /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
      * specified group already exists in the current scope
     **/
-    public void addGroup(Group group) 
+    public void addGroup(Group group)
         throws SchemaException
     {
         _contentModel.addGroup(group);
     } //-- addGroup
-    
+
     public Enumeration enumerate() {
         return _contentModel.enumerate();
     } //-- enumerate
-    
+
+    public int getChildrenCount() { return _contentModel.getChildrenCount(); }
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -233,7 +235,7 @@ public class Group extends Annotated
     public short getStructureType() {
         return Structure.GROUP;
     } //-- getStructureType
-    
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
@@ -244,5 +246,5 @@ public class Group extends Annotated
     {
         //-- do nothing
     } //-- validate
-    
+
 } //-- Group

@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling SimpleTypes
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
 
@@ -66,22 +66,22 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The Attribute reference for the Attribute we are constructing
     **/
     private SimpleType _simpleType = null;
-    
+
     /**
      * A reference to the Schema definition
     **/
     private Schema _schema = null;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -93,29 +93,34 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * @param resolver the resolver being used for reference resolving
     **/
     public SimpleTypeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver)
         throws SAXException
     {
         super();
         setResolver(resolver);
         this._schema = schema;
-        
-        
+
+
         //-- get name
         String name = atts.getValue(SchemaNames.NAME_ATTR);
-        
-        _simpleType = schema.createSimpleType(name);
+
+        //-- get base type
+        String base = atts.getValue(SchemaNames.BASE_ATTR);
+
+        //-- get derivation method
+        String derivation = atts.getValue(SchemaNames.DERIVED_BY);
+
+        _simpleType = schema.createUserSimpleType(name, base, derivation);
+
+        if (_simpleType == null) {
+            System.out.println("Error in SimpleTypeUnmarshaller: the simpleType could not be created");
+        }
+
         //_simpletype.useResolver(resolver);
-        
+
         //-- handle other attributes
         String attValue = null;
-            
-        
-        //-- source
-        String base = atts.getValue(SchemaNames.BASE_ATTR);
-        if ((base != null) && (base.length() > 0)) {
-            _simpleType.setBaseRef(base);
-        }
+
     } //-- SimpleTypeUnmarshaller
 
       //-----------/
@@ -148,11 +153,11 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
     } //-- getObject
 
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -161,32 +166,32 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else unmarshaller = new FacetUnmarshaller(name, atts);
-    
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
+
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation annotation = (Annotation)unmarshaller.getObject();
             _simpleType.addAnnotation(annotation);
@@ -195,11 +200,11 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
             Facet facet = (Facet)unmarshaller.getObject();
             if (facet != null) _simpleType.addFacet(facet);
         }
-    
+
         unmarshaller = null;
     } //-- endElement
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary

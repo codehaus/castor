@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling ComplexTypes
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 
@@ -66,23 +66,23 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The Attribute reference for the Attribute we are constructing
     **/
     private ComplexType _complexType = null;
-    
+
     private boolean allowRefines = true;
-    
+
     private boolean allowContentModel = true;
-    
+
     private Schema _schema = null;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -94,38 +94,43 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
      * @param resolver the resolver being used for reference resolving
     **/
     public ComplexTypeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver)
         throws SAXException
     {
         super();
         setResolver(resolver);
         this._schema = schema;
-        
+
         _complexType = schema.createComplexType();
-        
+
         _complexType.useResolver(resolver);
-        
+
         //-- handle attributes
         String attValue = null;
-            
+
         _complexType.setName(atts.getValue(SchemaNames.NAME_ATTR));
-        
+
         //-- read contentType
         String content = atts.getValue(SchemaNames.CONTENT_ATTR);
         if (content != null) {
             _complexType.setContentType(ContentType.valueOf(content));
         }
-        
+
         //-- base and derivedBy
         String base = atts.getValue(SchemaNames.BASE_ATTR);
         if ((base != null) && (base.length() > 0)) {
-            
+
             String derivedBy = atts.getValue("derivedBy");
-            if ((derivedBy == null) || 
+            _complexType.setDerivationMethod(derivedBy);
+            if ((derivedBy == null) ||
                 (derivedBy.length() == 0) ||
-                (derivedBy.equals("extension"))) 
+                (derivedBy.equals("extension")))
             {
-                _complexType.setBase(base);
+                XMLType baseType= schema.getType(base);
+                if (baseType == null)
+                    _complexType.setBase(base); //the base type has not been read
+                else
+                    _complexType.setBaseType(baseType);
             }
             else if (derivedBy.equals("restrictions")) {
                 String err = "restrictions not yet supported for <type>.";
@@ -136,9 +141,9 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
                 err += "<type>: " + derivedBy;
                 throw new SAXException(err);
             }
-        
+
         }
-        
+
     } //-- ComplexTypeUnmarshaller
 
       //-----------/
@@ -156,12 +161,12 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
 
     /**
-     * 
+     *
     **/
     public ComplexType getComplexType() {
         return _complexType;
     } //-- getComplexType
-    
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -171,11 +176,11 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
     } //-- getObject
 
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- Do delagation if necessary
@@ -184,28 +189,28 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         //-- Use JVM internal String
         name = name.intern();
-                
+
         if (name == SchemaNames.ATTRIBUTE) {
             allowRefines = false;
             allowContentModel = false;
-            unmarshaller 
+            unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
         else if (name == SchemaNames.ELEMENT) {
             allowRefines = false;
             if (allowContentModel)
-                unmarshaller 
+                unmarshaller
                     = new ElementUnmarshaller(_schema, atts, getResolver());
-            else 
+            else
                 outOfOrder(name);
         }
         else if (name == SchemaNames.GROUP) {
             allowRefines = false;
             if (allowContentModel)
-                unmarshaller 
+                unmarshaller
                     = new GroupUnmarshaller(_schema, atts, getResolver());
             else
                 outOfOrder(name);
@@ -218,40 +223,40 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else illegalElement(name);
-    
+
         unmarshaller.setDocumentLocator(getDocumentLocator());
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
+
         //-- Use JVM internal String
         name = name.intern();
-        
+
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
-        
+
         if (name == SchemaNames.ATTRIBUTE) {
             AttributeDecl attrDecl =
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
-                
+
             _complexType.addAttributeDecl(attrDecl);
-        } 
+        }
         else if (name == SchemaNames.ELEMENT) {
-            
-            ElementDecl element = 
+
+            ElementDecl element =
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _complexType.addElementDecl(element);
         }
@@ -262,12 +267,12 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.ANNOTATION) {
             Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
             _complexType.addAnnotation(ann);
-        } 
-    
+        }
+
         unmarshaller = null;
     } //-- endElement
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary

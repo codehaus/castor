@@ -42,7 +42,7 @@
  *
  * $Id$
  */
- 
+
 package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.ValidationException;
@@ -50,32 +50,76 @@ import org.exolab.castor.xml.ValidationException;
 /**
  * Represents the base type for XML Schema Facets
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
-public abstract class Facet extends Annotated {
-    
+public class Facet extends Annotated {
+
+    public static final String DURATION         = "duration";
+    public static final String ENCODING         = "encoding";
     public static final String ENUMERATION      = "enumeration";
     public static final String LENGTH           = "length";
+    public static final String PATTERN          = "pattern";
+    public static final String PRECISION        = "precision";
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
     public static final String MAX_LENGTH       = "maxLength";
     public static final String MIN_LENGTH       = "minLength";
-    
+    public static final String PERIOD           = "period";
+    public static final String SCALE            = "scale";
+
+
+    /**
+     * The name of this Facet
+    **/
+    private String _name    = null;
+
     /**
      * The character value of this Facet
     **/
-    private String  _value      = null;
-    
+    private String  _value  = null;
+
+
+    private static final String CLASSNAME =
+        Facet.class.getName();
+
+    private static final String NULL_ARGUMENT =
+        "A null argument was passed to " + CLASSNAME + "#";
+
+    private static final String ZERO_LENGTH_STRING =
+        "A zero-length String was passed to " + CLASSNAME + "#";
+
+
+    /**
+     * Creates a new Facet with the given name
+     * @param name the name of the Facet
+     * @param value the value of the Facet
+    **/
+    public Facet(String name, String value) {
+        if (name == null) {
+            String err = NULL_ARGUMENT;
+            err += "Facet: 'name' and 'value' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        if (name.length() == 0) {
+            String err = ZERO_LENGTH_STRING;
+            err += "Facet: 'name' and 'value' must not be zero-length.";
+            throw new IllegalArgumentException(err);
+        }
+        this._name = name;
+        this._value= value;
+    } //-- Facet
+
     /**
      * Returns the name of this Facet
      * @return the name of this Facet
     **/
-    public abstract String getName();
-    
-    
-    
+    public String getName() {
+        return _name;
+    } //-- getName
+
+
     /**
      * Returns the character (String) representation of this facet
      * @return the value of this facet
@@ -83,24 +127,26 @@ public abstract class Facet extends Annotated {
     public String getValue() {
         return this._value;
     } //-- getValue
-    
+
+
+   /**
+     * Sets the value of this facet
+     * @param value the new character value of this facet
+    **/
+//    public void setValue(String value) {
+//       this._value = value;
+//    } //-- setValue
+
+
     /**
      * Returns true if this Facet can occur more than once, such
      * as the "enumeration" facet.
      * @return true if this Facet can occur more than once.
     **/
     public boolean isMultivalued() {
-        return false;
-    } //-- isMultivalued
-    
-    /**
-     * Sets the value of this facet
-     * @param value the new character value of this facet
-    **/
-    public void setValue(String value) {
-        this._value = value;
-    } //-- setValue
-    
+        return _name.equals(Facet.ENUMERATION);
+    }
+
     /**
      * Returns an int representation of the value of this facet
      * @return an int representation of the value of this facet
@@ -108,7 +154,17 @@ public abstract class Facet extends Annotated {
     public int toInt() throws NumberFormatException {
         return Integer.parseInt(_value);
     } //-- toInt
-        
+
+
+    /**
+     * Returns a long representation of the value of this facet
+     * @return a long representation of the value of this facet
+    **/
+    public long toLong() throws NumberFormatException {
+        return Long.parseLong(_value);
+    } //-- toInt
+
+
     /**
      * Returns an short representation of the value of this facet
      * @return an short representation of the value of this facet
@@ -116,7 +172,8 @@ public abstract class Facet extends Annotated {
     public short toShort() throws NumberFormatException {
         return Short.parseShort(_value);
     } //-- toShort
-	
+
+
     /**
      * Returns a double representation of the value of this facet
      * @return a double representation of the value of this facet
@@ -124,7 +181,7 @@ public abstract class Facet extends Annotated {
     public double toDouble() throws NumberFormatException {
         return Double.valueOf(_value).doubleValue();
     } //-- toInt
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -132,17 +189,17 @@ public abstract class Facet extends Annotated {
     public short getStructureType() {
         return Structure.FACET;
     } //-- getStructureType
-    
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
      * is invalid.
     **/
-    public void validate() 
+    public void validate()
         throws ValidationException
     {
          //-- do nothing for now
     } //-- validate
-    
+
 } //-- Facet
 

@@ -60,36 +60,23 @@ public class ComplexType extends XMLType
    implements ContentModelGroup, Referable
 {
 
-    /**
-     * Error message for a null argument
-    **/
-    private static String NULL_ARGUMENT
-        = "A null argument was passed to the constructor of " +
-           ComplexType.class.getName();
-    
-    private String name = null;
-    
     private Hashtable attributes = null;
-    
+
     private ContentType content  = ContentType.elemOnly;
-    
+
     private String type = null;
-    
-    /**
-     * The owning schema document
-    **/
-    private Schema schema = null;
-    
+
+
     /**
      * The base type
     **/
     private String base = null;
-    
+
     /**
      * The ContentModel for this ComplexType
     **/
     private ContentModelGroup _contentModel = null;
-    
+
     /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
@@ -97,7 +84,7 @@ public class ComplexType extends XMLType
     public ComplexType(Schema schema) {
         this(schema,null);
     } //-- Complextype
-    
+
     /**
      * Creates a new Complextype with the given name
      * @param schema the owning Schema
@@ -109,31 +96,31 @@ public class ComplexType extends XMLType
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        
-        this.schema = schema;
-        this.name = name;
+
+        setSchema(schema);
+        setName(name);
         attributes   = new Hashtable();
         _contentModel = new ContentModelGroupImpl();
     } //-- Complextype
-    
+
     /**
      * Adds the given AttributeDecl to this Complextype
      * @param attrDecl the AttributeDecl to add to this Complextype
      * @exception SchemaException when an AttributeDecl already
      * exists with the same name as the given AttributeDecl
     **/
-    public void addAttributeDecl(AttributeDecl attrDecl) 
+    public void addAttributeDecl(AttributeDecl attrDecl)
         throws SchemaException
     {
-        
+
         if (attributes.get(attrDecl.getName()) != null) {
             String err = "An attribute declaration with the given name, ";
             err += attrDecl.getName() + ", already exists in this scope.";
             throw new SchemaException(err);
         }
-        
+
         attributes.put(attrDecl.getName(), attrDecl);
-        
+
     } //-- addAttributeDecl
 
     /**
@@ -145,9 +132,9 @@ public class ComplexType extends XMLType
      * @return the new AttributeDecl
     **/
     public AttributeDecl createAttributeDecl(String name) {
-        return new AttributeDecl(this.schema, name);
+        return new AttributeDecl(getSchema(), name);
     } //-- createAttributeDecl
-    
+
     /**
      * Returns the AttributeDecl of associated with the given name
      * @return the AttributeDecl of associated with the given name, or
@@ -156,7 +143,7 @@ public class ComplexType extends XMLType
     public AttributeDecl getAttributeDecl(String name) {
         return (AttributeDecl)attributes.get(name);
     } //-- getAttributeDecl
-    
+
     /**
      * Returns an Enumeration of all the AttributeDecl objects
      * declared within this Complextype
@@ -174,71 +161,48 @@ public class ComplexType extends XMLType
     public ContentType getContentType() {
         return content;
     } //-- getContentType
-    
-    /**
-     * Returns the name of this Complextype, or null if no name was defined
-     * @return the name of this Complextype, or null if no name was defined
-    **/
-    public String getName() {
-        return name;
-    } //-- getName
-    
+
+
     /**
      * Returns the Id used to Refer to this Object
      * @return the Id used to Refer to this Object
      * @see Referable
     **/
     public String getReferenceId() {
-        return "archetype:"+name;
+        return "archetype:"+getName();
     } //-- getReferenceId
 
 
-    /**
-     * Returns the Schema with which this Complextype belongs
-     * @return the Schema with which this Complextype belongs
+   /**
+     * Returns the base type that this type inherits from.
+     * @return the parent type.
     **/
-    public Schema getSchema() {
-        return this.schema;
-    } //-- getSchema
-    
-    /**
-     * Returns the base type with which this type extends,
-     * or null if this type is not a derived type.
-     * @return the base type with which this type extends,
-     * or null if this type is not a derived type.
-    **/
-    public String getBase() {
-        return base;
-    } //-- getBase
-    
+    public XMLType getBaseType() {
+        if ( (base != null) && (super.getBaseType() == null) )
+            setBaseType( getSchema().getType(base) );
+        return super.getBaseType();
+    } //-- getBaseType
+
     /**
      * Returns true if this is a top level Complextype
      * @return true if this is a top level Complextype
     **/
     public boolean isTopLevel() {
-        if (name == null) return false;
-        if (schema == null) return false;
-        return (schema.getComplexType(name) == this);
+        if (getName() == null) return false;
+        if (getSchema() == null) return false;
+        return (getSchema().getComplexType(getName()) == this);
     } //-- isTopLevel
-    
+
     /**
      * Sets the content type of this archetype
      * @param contentType the ContentType for this archetype
     **/
-    public void setContentType(ContentType contentType) 
+    public void setContentType(ContentType contentType)
     {
         this.content = contentType;
     } //-- setContentType
-    
 
-    /**
-     * Sets the name of this Complextype
-     * @param name the new name for this Complextype
-    **/
-    public void setName(String name) {
-        this.name = name;
-    } //--setName
-    
+
     /**
      * Sets the base type that this type is derived from
      * @param base the type that this type is derived from
@@ -246,7 +210,7 @@ public class ComplexType extends XMLType
     public void setBase(String base) {
         this.base = base;
     } //-- setBase
-    
+
     public void useResolver(Resolver resolver) {
         // do nothing for now
     }
@@ -254,39 +218,41 @@ public class ComplexType extends XMLType
     //---------------------------------------/
     //- Implementation of ContentModelGroup -/
     //---------------------------------------/
-    
+
     /**
      * Adds the given ElementDecl to this ContentModelGroup
      * @param elementDecl the ElementDecl to add
      * @exception SchemaException when an ElementDecl already
      * exists with the same name as the given ElementDecl
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
+    public void addElementDecl(ElementDecl elementDecl)
         throws SchemaException
     {
         _contentModel.addElementDecl(elementDecl);
     } //-- addElementDecl
-    
+
     /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
      * specified group already exists in the current scope
     **/
-    public void addGroup(Group group) 
+    public void addGroup(Group group)
         throws SchemaException
     {
         _contentModel.addGroup(group);
     } //-- addGroup
-    
+
     public Enumeration enumerate() {
         return _contentModel.enumerate();
     } //-- enumerate
-    
+
+    public int getChildrenCount() { return _contentModel.getChildrenCount(); }
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -294,16 +260,6 @@ public class ComplexType extends XMLType
     public short getStructureType() {
         return Structure.COMPLEX_TYPE;
     } //-- getStructureType
-    
-    /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
-     * is invalid.
-    **/
-    public void validate()
-        throws ValidationException
-    {
-        //-- do nothing
-    } //-- validate
-        
+
+
 } //-- Complextype

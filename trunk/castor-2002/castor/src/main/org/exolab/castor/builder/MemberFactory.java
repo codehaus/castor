@@ -48,7 +48,7 @@ package org.exolab.castor.builder;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.types.BuiltInType;
+//import org.exolab.castor.xml.schema.types.BuiltInType;
 
 import org.exolab.javasource.JClass;
 import org.exolab.javasource.JSourceCode;
@@ -61,46 +61,46 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public class MemberFactory {
-    
 
-    /** 
+
+    /**
      * The FieldInfo factory.
     */
     private FieldInfoFactory infoFactory = null;
 
-    
+
     /** Constructor that creates a default type factory.
     */
     public MemberFactory() {
         this(new FieldInfoFactory());
     } //-- MemberFactory
-    
 
-    /** 
+
+    /**
      * Creates a new MemberFactory using the given FieldInfo factory.
      * @param infoFactory the FieldInfoFactory to use
     **/
-    public MemberFactory(FieldInfoFactory infoFactory) 
+    public MemberFactory(FieldInfoFactory infoFactory)
     {
-        super();    
-        
+        super();
+
         //this.resolver = resolver;
-        
+
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
             this.infoFactory = infoFactory;
-            
-            
+
+
     } //-- MemberFactory
-    
+
 
     /**
      * Creates a FieldInfo for content models that support "any" element.
      * @return the new FieldInfo
     **/
     public FieldInfo createFieldInfoForAny() {
-        
+
         XSType xsType = new XSClass(SGTypes.Object, "any");
         String memberName = "obj";
         String vName = "_anyObject";
@@ -112,13 +112,13 @@ public class MemberFactory {
         cInfo.setNodeName(xmlName);
         return cInfo;
     } //-- createFieldInfoForAny()
-        
+
     /**
      * Creates a FieldInfo for Text content
      * @return the new FieldInfo
     **/
     public FieldInfo createFieldInfoForText() {
-        
+
         XSType xsType = new XSString();
         String fieldName = "_content";
         FieldInfo fInfo = infoFactory.createFieldInfo(new XSString(),fieldName);
@@ -128,10 +128,10 @@ public class MemberFactory {
         fInfo.setNodeName("#text");
         fInfo.setDefaultValue("\"\"");
         return fInfo;
-        
+
     } //-- createFieldInfoForText
-    
-    
+
+
     /**
      * Creates a FieldInfo object for the given attribute
      * declaration
@@ -140,50 +140,50 @@ public class MemberFactory {
      * @return the FieldInfo for the given attribute declaration
     **/
     public FieldInfo createFieldInfo
-        (AttributeDecl attribute, ClassInfoResolver resolver) 
+        (AttributeDecl attribute, ClassInfoResolver resolver)
     {
-        
-        String memberName 
+
+        String memberName
             = JavaXMLNaming.toJavaMemberName(attribute.getName());
-            
-        if (!memberName.startsWith("_")) 
+
+        if (!memberName.startsWith("_"))
             memberName = "_"+memberName;
-            
+
         FieldInfo fieldInfo = null;
-                
+
         SimpleType simpleType = attribute.getSimpleType();
         XSType   xsType = null;
         ClassInfo cInfo = null;
-        
+
         boolean enumeration = false;
-        
+
         if (simpleType != null) {
-            
+
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 enumeration = true;
-            
+
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                 if (resolver != null) {
                     cInfo = resolver.resolve(simpleType);
                 }
-            
+
                 if (cInfo != null)
                     xsType = cInfo.getSchemaType();
             }
-            
+
             if (xsType == null)
                 xsType = TypeConversion.convertType(simpleType);
         }
         else
             xsType = new XSString();
-            
+
         switch (xsType.getType()) {
             case XSType.INTEGER:
                 fieldInfo = infoFactory.createFieldInfo(xsType, memberName);
                 fieldInfo.setCodeHelper(
                     new IntegerCodeHelper((XSInteger)xsType)
                 );
-                    
+
                 break;
             case XSType.ID:
                 fieldInfo = infoFactory.createIdentity(memberName);
@@ -192,11 +192,11 @@ public class MemberFactory {
                 fieldInfo = infoFactory.createFieldInfo(xsType, memberName);
                 break;
         }
-        
+
         fieldInfo.setNodeName(attribute.getName());
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
         fieldInfo.setRequired(attribute.getRequired());
-        
+
         String def = attribute.getDefaultValue();
         if (def != null && def.length() > 0) {
             if (xsType.getType() == XSType.STRING) {
@@ -220,32 +220,32 @@ public class MemberFactory {
                 fieldInfo.setDefaultValue(def);
             }
         }
-        
+
         if (attribute.hasFixedValue()) {
             fieldInfo.setFixedValue(attribute.getFixedValue());
         }
-        
+
         //fieldInfo.setSchemaType(attribute.getSimpletypeRef());
-        
+
         //-- add annotated comments
         String comment = createComment(attribute);
         if (comment != null) fieldInfo.setComment(comment);
-        
+
         return fieldInfo;
     } //-- createFieldInfo
-        
+
     /**
      * Creates a member based on the given ElementDecl
      * @param element the ElementDecl to create the member from
     **/
     public FieldInfo createFieldInfo
-        (ElementDecl element, ClassInfoResolver resolver) 
+        (ElementDecl element, ClassInfoResolver resolver)
     {
-        
+
         //-- check whether this should be a Vector or not
         int maxOccurs = element.getMaximumOccurance();
         int minOccurs = element.getMinimumOccurance();
-        
+
         ElementDecl eDecl = element;
         if (eDecl.isReference()) {
             ElementDecl eRef = eDecl.getReference();
@@ -257,19 +257,19 @@ public class MemberFactory {
             }
             else eDecl = eRef;
         }
-                
+
         //-- determine type
-                
+
         JSourceCode jsc     = null;
         FieldInfo fieldInfo = null;
         XSType   xsType     = null;
-        
+
         XMLType xmlType = eDecl.getType();
         //-- SimpleType
         if ((xmlType != null) && xmlType.isSimpleType()) {
-            
+
             SimpleType simpleType = (SimpleType)xmlType;
-            
+
             //-- handle special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
@@ -277,12 +277,12 @@ public class MemberFactory {
                 if (resolver != null) {
                     cInfo = resolver.resolve(simpleType);
                 }
-                
+
                 if (cInfo != null)
                     xsType = cInfo.getSchemaType();
             }
-            
-            if (xsType == null) 
+
+            if (xsType == null)
                 xsType = TypeConversion.convertType(simpleType);
         }
         //-- ComplexType
@@ -290,30 +290,30 @@ public class MemberFactory {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
             xsType = new XSClass(new JClass(className));
         }
-                
+
         String fieldName = JavaXMLNaming.toJavaMemberName(eDecl.getName());
-        if (fieldName.charAt(0) != '_') 
+        if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
-                
+
         if (maxOccurs != 1) {
             String vName = fieldName+"List";
-            CollectionInfo cInfo 
+            CollectionInfo cInfo
                 = infoFactory.createCollection(xsType, vName, eDecl.getName());
-                
+
             XSList xsList = cInfo.getXSList();
             xsList.setMaximumSize(maxOccurs);
             xsList.setMinimumSize(minOccurs);
             fieldInfo = cInfo;
-                    
+
         }
         else {
             fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
         }
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName());
-        
+
         //-- add annotated comments
-        
+
         //-- use elementRef first if necessary
         String comment = null;
         Enumeration enum = element.getAnnotations();
@@ -322,13 +322,13 @@ public class MemberFactory {
         else {
             comment = createComment(eDecl);
         }
-        
+
         if (comment != null) fieldInfo.setComment(comment);
-        
-        
+
+
         return fieldInfo;
     } //-- createFieldInfo(ElementDecl)
-        
+
     /**
      * Creates a comment to be used in Javadoc from
      * the given Annotated Structure.
@@ -336,7 +336,7 @@ public class MemberFactory {
      * @return the generated comment
     **/
     private String createComment(Annotated annotated) {
-        
+
         //-- process annotations
         Enumeration enum = annotated.getAnnotations();
         if (enum.hasMoreElements()) {
@@ -345,15 +345,15 @@ public class MemberFactory {
         }
         return null;
     } //-- createComment
-        
+
     /**
      * Creates a comment to be used in Javadoc from the given Annotation
      * @param annotation the Annotation to create the comment from
      * @return the generated comment
     **/
-    private String createComment(Annotation annotation) {        
+    private String createComment(Annotation annotation) {
         if (annotation == null) return null;
-        Enumeration enum = annotation.getDocumentation();        
+        Enumeration enum = annotation.getDocumentation();
         if (enum.hasMoreElements()) {
             //-- just use first <info>
             Documentation documentation = (Documentation) enum.nextElement();
@@ -361,5 +361,5 @@ public class MemberFactory {
         }
         return null;
     } //-- createComment
-        
+
 } //-- MemberFactory

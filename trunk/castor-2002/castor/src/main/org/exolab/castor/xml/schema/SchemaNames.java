@@ -53,11 +53,11 @@ package org.exolab.castor.xml.schema;
  * @version $Revision$ $Date$
 **/
 public class SchemaNames {
-    
+
     //-- packages
     public static final String SCHEMA_PACKAGE =
         "org.exolab.castor.xml.schema";
-        
+
     //-- element definitions
     public static final String ANNOTATION       = "annotation";
     public static final String APPINFO          = "appinfo";
@@ -75,7 +75,7 @@ public class SchemaNames {
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
-    
+
     //-- Attr name definitions
     public static final String BASE_ATTR        = "base";
     public static final String CONTENT_ATTR     = "content";
@@ -89,9 +89,14 @@ public class SchemaNames {
     public static final String TYPE_ATTR        = "type";
     public static final String USE_ATTR         = "use";
     public static final String VALUE_ATTR       = "value";
-    
+
+    //--Derivation methods
+    public static final String DERIVED_BY       = "derivedBy";
+    public static final String RESTRICTION      = "restriction";
+    public static final String LIST             = "list";
+
     //-- data types
     public static final String INTEGER_TYPE     = "integer";
     public static final String STRING_TYPE      = "string";
-    
+
 } //-- SchemaNames

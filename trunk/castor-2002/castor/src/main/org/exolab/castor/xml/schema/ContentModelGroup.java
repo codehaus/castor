@@ -64,22 +64,28 @@ public interface ContentModelGroup {
      * @exception SchemaException when an ElementDecl already
      * exists with the same name as the given ElementDecl
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
+    public void addElementDecl(ElementDecl elementDecl)
         throws SchemaException;
-    
+
     /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
      * specified group already exists in the current scope
     **/
-    public void addGroup(Group group) 
+    public void addGroup(Group group)
         throws SchemaException;
-    
+
     /**
      * Returns an enumeration of all the ContentModelGroups, within
      * this ContentModelGroups
     **/
     public Enumeration enumerate();
-    
+
+    /**
+     * Returns the number of ContentModelGroups, within
+     * this ContentModelGroups
+    **/
+    public int getChildrenCount();
+
 } //-- ContentModelGroup
