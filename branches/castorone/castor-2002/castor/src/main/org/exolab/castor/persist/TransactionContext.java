@@ -567,6 +567,7 @@ public abstract class TransactionContext
                 throw (DuplicateIdentityException) except;
             if ( except instanceof PersistenceException )
                 throw (PersistenceException) except;
+
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
     }
@@ -998,7 +999,7 @@ public abstract class TransactionContext
                 // Object has been created/accessed inside the
                 // transaction, release its lock.
                 if ( entry.modified ) {
-                    entry.engine.updateObject( this, entry.oid, entry.object );
+                    entry.engine.updateCache( this, entry.oid, entry.object );
                 }
                 entry.engine.releaseLock( this, entry.oid );
             }
