@@ -289,7 +289,7 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
-        return unmarshaller.unmarshal(reader);;
+        return unmarshaller.unmarshal(reader);
     } //-- void unmarshal(Writer) 
 
     /**
@@ -306,7 +306,7 @@ public class Unmarshaller {
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
-        return unmarshaller.unmarshal(source);;
+        return unmarshaller.unmarshal(source);
     } //-- void unmarshal(Writer) 
     
 } //-- Unmarshaller
