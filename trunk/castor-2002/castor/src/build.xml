@@ -190,7 +190,7 @@
              defaultexcludes="true" />
     <mkdir   dir="${build}/${archive}/lib" />
     <copydir src="${lib}" dest="${build}/${archive}/lib"
-             defaultexcludes="true" />
+             defaultexcludes="true" excludes="jconn2.jar" />
     <copydir src="." dest="${build}/${archive}"
              includes="*.sh,*.bat" />
 

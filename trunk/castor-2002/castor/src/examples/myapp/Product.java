@@ -21,6 +21,9 @@ public class Product
     private ProductGroup _group;
 
 
+    /** Java 1.2
+    private java.util.ArrayList  _details = new java.util.ArrayList();
+     */
     private Vector       _details = new Vector();
 
 
@@ -81,6 +84,14 @@ public class Product
     }
 
 
+    /** Java 1.2
+    public java.util.ArrayList getDetails()
+    {
+        return _details;
+    }
+    */
+
+
     public Vector getDetails()
     {
         return _details;
@@ -89,7 +100,7 @@ public class Product
 
     public void addDetail( ProductDetail detail )
     {
-        _details.addElement( detail );
+        _details.add( detail );
         detail.setProduct( this );
     }
 

@@ -37,6 +37,9 @@ JDO:     Added support for stored procedures in OQLQuery. Now it is possible to
 XML:     Support for ODMG 3.0 DArray collection in the XML source code generator.
          (Contributed by Frank Thelen <frank.thelen@poet.de>)
 
+Misc:    Support for Java 1.2 collections: Collection, Set, Map. Requires Java 1.2
+         to compile, but using reflection can be made to work on Java 1.1.
+
 
 Version 0.8.4  May 5 2000
 --------------------------
