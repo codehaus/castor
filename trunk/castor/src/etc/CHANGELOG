@@ -170,6 +170,10 @@ XML:   Improved the error messages for the FieldValidator to use the
 XML:   Added basic support for xs:token (treated as a string)
        (kvisco - 20031110)
 
+XML:   Fix for bug 1422: DateFieldHandler can't handle nullable elements
+       Patch from Paul Spencer and Stephane Pelchat.
+       (kvisco - 20031029)
+
 XML:   Added support for FieldHandlerFactory, which allows using
        custom GeneralizedFieldHandler instances per type 
        without having to specify them on a per-field basis in the
