@@ -3,67 +3,105 @@
                           "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.dtd"-->
 <!--
 
-    The Castor JDO database configuration file XML Schema
+    The Castor JDO configuration file XML Schema
 
     Namespace: http://castor.exolab.org/JDO
     System:    http://castor.exolab.org/jdo-conf.xsd
     Public:    -//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN
 
     Note: This schema is under evolution and subject to change.
-
  -->
-<xsd:schema xmlns:xsd="http://www.w3.org/1999/XMLSchema"
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://castor.exolab.org/JDO"
-  version="0.8">
+  xmlns="http://castor.exolab.org/"
+  version="$$VERSION$$">
+
+  <xsd:element name="jdo-conf">
+    <xsd:complexType>
+      <xsd:sequence>
+          <xsd:element ref="database" minOccurs="1"/>
+          <xsd:element ref="transaction-demarcation" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+    </xsd:complexType>
+  </xsd:element>
 
   <xsd:element name="database">
-    <xsd:type content="elemOnly" order="seq">
-      <xsd:element ref="driver" minOccurs="0" maxOccurs="1" />
-      <xsd:element ref="data-source" minOccurs="0" maxOccurs="1" />
-      <xsd:element ref="jndi" minOccurs="0" maxOccurs="1" />
-      <xsd:element ref="mapping" minOccurs="1" />
-      <xsd:attribute name="name" type="ID" minOccurs="1" />
-      <xsd:attribute name="engine" type="string" minOccurs="0" default="generic" />
-    </xsd:type>
+    <xsd:complexType>
+      <xsd:sequence>
+          <xsd:element ref="driver" minOccurs="0" maxOccurs="1" />
+          <xsd:element ref="data-source" minOccurs="0" maxOccurs="1" />
+          <xsd:element ref="jndi" minOccurs="0" maxOccurs="1" />
+          <xsd:element ref="transaction-demarcation" minOccurs="0" maxOccurs="1" />
+          <xsd:element ref="mapping" minOccurs="1" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:ID" minOccurs="1" />
+      <xsd:attribute name="engine" type="xsd:string" minOccurs="0" default="generic" />
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="mapping">
-    <xsd:type content="empty">
-      <xsd:attribute name="href" type="string" minOccurs="1" />
-    </xsd:type>
+    <xsd:complexType>
+      <xsd:attribute name="href" type="xsd:string" use="required" />
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="driver">
-    <xsd:type content="elemOnly" order="seq">
-      <xsd:element ref="param" minOccurs="0" />
-      <xsd:attribute name="url" type="string" minOccurs="1" />
-      <xsd:attribute name="class-name" type="string" minOccurs="0" />
-    </xsd:type>
+    <xsd:complexType>
+      <xsd:sequence>
+          <xsd:element ref="param" minOccurs="0" maxOccurs="unbounded" />
+      </xsd:sequence>
+      <xsd:attribute name="url" type="xsd:string" use="required" />
+      <xsd:attribute name="class-name" type="xsd:string" use="required" />
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="transaction-demarcation">
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element ref="transaction-manager" minOccurs="0" maxOccurs="1" />
+      </xsd:sequence>
+      <xsd:attribute name="mode" type="xsd:string" use="required"/>
+    </xsd:complexType>
+  </xsd:element>
+
+  <xsd:element name="transaction-manager">
+    <xsd:complexType>
+      <xsd:sequence>
+          <xsd:element ref="param" minOccurs="0" maxOccurs="unbounded"/>
+      </xsd:sequence>
+      <xsd:attribute name="name" type="xsd:string" default="local" />
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="param">
-    <xsd:type content="empty">
-      <xsd:attribute name="name" type="string" minOccurs="1" />
-      <xsd:attribute name="value" type="string" minOccurs="1" />
-    </xsd:type>
+    <xsd:complexType>
+          <xsd:attribute name="name" type="xsd:string" use="required" />
+          <xsd:attribute name="value" type="xsd:string" use="required" />
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="data-source">
-    <xsd:type content="elemOnly" order="seq">
-      <xsd:element ref="params" minOccurs="1" maxOccurs="1" />
-      <xsd:attribute name="class-name" type="string" minOccurs="1" />
-    </xsd:type>
+    <xsd:complexType>
+      <xsd:sequence>
+          <xsd:element ref="params" minOccurs="1" maxOccurs="1" />
+      </xsd:sequence>
+      <xsd:attribute name="class-name" type="xsd:string" use="required" />
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="params">
-    <xsd:type content="any">
-    </xsd:type>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:any namespace="http://www.w3.org/2001/XMLSchema" 
+            minOccurs="1" maxOccurs="unbounded" />
+      </xsd:sequence>
+    </xsd:complexType>
   </xsd:element>
 
   <xsd:element name="jndi">
-    <xsd:type content="empty">
-      <xsd:attribute name="name" type="string" minOccurs="1" />
-    </xsd:type>
+    <xsd:complexType>
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+    </xsd:complexType>
   </xsd:element>
 
 </xsd:schema>

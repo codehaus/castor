@@ -49,7 +49,7 @@ public class Test
     private static Log _log =
         LogFactory.getFactory().getInstance( Test.class );
 
-    public static final String DatabaseFile = "database.xml";
+    public static final String JdoConfFile = "jdo-conf.xml";
 
     
     public static final String MappingFile = "mapping.xml";
@@ -89,11 +89,13 @@ public class Test
         // Load the mapping file
         _mapping = new Mapping( getClass().getClassLoader() );
         // _mapping.setLogWriter( writer );
-        _mapping.loadMapping( getClass().getResource( MappingFile ) );
+         _mapping.loadMapping( getClass().getResource( MappingFile ) );
 
         _jdo = new JDO();
         // _jdo.setLogWriter( writer );
-        _jdo.setConfiguration( getClass().getResource( DatabaseFile ).toString() );
+        String jdoConf =  getClass().getResource( JdoConfFile ).toString();
+        _log.debug( "############## loading jdo descriptor: " + jdoConf );
+        _jdo.setConfiguration( getClass().getResource( JdoConfFile ).toString() );
         _jdo.setDatabaseName( "test" );
     }
 
@@ -404,9 +406,8 @@ public class Test
         db.close();
         _log.info( "Test complete" );
 
-
         // --------------------------------------------------------------------
-        _log.info( "Begin: Walking the mapping via objects" );
+        _log.info( "Begin: Walking the mapping descriptor via objects" );
 
         MappingRoot mappingRoot = _mapping.getRoot();
         ClassMapping classMap;
@@ -435,9 +436,7 @@ public class Test
             }
         }
 
-        _log.info( "End: Walking the mapping via objects" );
+        _log.info( "End: Walking the mapping descriptor via objects" );
         // --------------------------------------------------------------------
     }
 }
-
-

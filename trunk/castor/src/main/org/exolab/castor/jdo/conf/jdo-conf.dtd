@@ -2,13 +2,15 @@
 
     The Castor JDO database configuration file DTD
 
-    <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+    <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
                                "http://castor.exolab.org/jdo-conf.dtd">
 
     Note: This DTD is under evolution and subject to change.
 
  -->
 
+
+<!ELEMENT jdo-conf ( database ) >
 
 <!--
     The database configuration specifies the means to obtain a connection
@@ -132,7 +134,7 @@
     recommended to use jndi.
  -->
 
-<!ELEMENT data-source ( params )>
+<!ELEMENT data-source ( param* )>
 <!ATTLIST data-source
           class-name CDATA #REQUIRED>
 
@@ -157,3 +159,51 @@
           name CDATA #REQUIRED>
 
 
+<!--
+    Specifies the transaction demarcation mode to use. This can either be 
+    'local' or 'global'.
+
+    When running inside a J2EE application server, and you want to use 
+    container managed transactions, please make sure you use this 
+    element as follows:
+    
+       <transaction-demarcation mode="global">
+          <transaction-manager name="jndi" />
+       </transaction-demarcation>
+    
+    When using Castor JDO stand-alone and you want Castor to control 
+    transaction demarcation, please use this element as follows:
+
+       <transaction-demarcation mode="local" />
+    
+     -->
+<!ELEMENT transaction-demarcation ( transaction-manager? )>
+<!ATTLIST transaction-demarcation
+          mode CDATA #REQUIRED>
+
+
+<!--
+    Specifies the transaction manager to use. This should be used together 
+    with global transaction demarcation only.
+
+    The following transaction manager (tm) names are supported in Castor:
+
+    jndi					TM looked up in the JNDI ENC.
+    websphere		WebSphere 4 and previous releases.
+    websphere5	WebSphere 5.
+
+	In addition to specifying the transaction manager name, it is possible 
+	to pass arbitrary name/value pairs to the transaction manager instance. This
+	can be used to e.g. specify what JNDI ENC to use to lookup the transaction 
+	manager.
+	
+       <transaction-demarcation mode="global">
+          <transaction-manager name="jndi">
+            <param name="jndiEnc" value="java:comp/env/TransactionManager" />
+          </transaction-manager>
+       </transaction-demarcation>
+    
+     -->
+<!ELEMENT transaction-manager ( params* )>
+<!ATTLIST transaction-manager
+          name CDATA #REQUIRED>

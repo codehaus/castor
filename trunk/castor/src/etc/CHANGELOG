@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Added many enhancements to the tx mgr API including code improvements,
+       jdo-conf.xsd changes, dynamic code generation using Castor XML as well
+       as a refactored Ant build descriptor all from both myself and Werner. 
+       (Bruce - 20040323)
+
 ALL:   Fixed bug 1563 using a patch from Keith
        (Bruce - 20040323)
 
