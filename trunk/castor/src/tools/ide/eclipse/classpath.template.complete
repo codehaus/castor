@@ -14,7 +14,7 @@
 	<classpathentry kind="lib" path="lib/jndi_1.2.1.jar"/>
 	<classpathentry kind="lib" path="lib/jta1.0.1.jar"/>
 	<classpathentry kind="lib" path="lib/jtf-0.1.jar"/>
-	<classpathentry kind="lib" path="lib/junit_3.5.jar"/>
+	<classpathentry kind="lib" path="lib/junit_3.8.1.jar"/>
 	<classpathentry kind="lib" path="lib/ldapjdk_4.1.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="lib" path="lib/postgresql.jar"/>
