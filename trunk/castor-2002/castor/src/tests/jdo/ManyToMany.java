@@ -211,6 +211,7 @@ public class ManyToMany extends CastorTestCase {
         groupB.setId(groupBId);
         bl = new ArrayList();
         bl.add( person2 );
+        groupB.setPeople( bl );
         gPerson1.add( groupA );
         gPerson2.add( groupA );
         gPerson2.add( groupB );
