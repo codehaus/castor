@@ -394,7 +394,7 @@
   <contributor type="Contributor">
     <name surname="Lavandowska" given="Lance"/>
     <email>lance@aptura.com</email>
-    <description>Mapping GUI</description>
+    <description>Mapping GUI, LIMIT and OFFSET keywords for HSQL, MySQL and PostgreSQL</description>
   </contributor>
 
   <contributor type="Contributor">
