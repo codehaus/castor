@@ -1,5 +1,5 @@
 /*
- * (C) Copyright Keith Visco 1998, 1999  All rights reserved.
+ * (C) Copyright Keith Visco 1998-2003  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
@@ -43,7 +43,7 @@ import org.xml.sax.*;
 /**
  * A class for reading an XSLT stylesheet from a stream or file.
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
  *
  * <PRE>
