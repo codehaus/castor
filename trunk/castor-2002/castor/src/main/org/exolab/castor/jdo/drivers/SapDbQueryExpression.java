@@ -125,12 +125,9 @@ public final class SapDbQueryExpression
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
  
-        // Use FOR UPDATE to lock selected tables.
+        // Use WITH LOCK EXCLUSIVE to lock selected tables.
         if ( lock && _select == null ) {
-            sql.append( " FOR UPDATE OF " );
-            // it seems to be a bug in SAP DB: according to the documentaion,
-            // "FOR UPDATE" must work, but it doesn't, unless "OF" is specified
-            sql.append( getColumnList() );
+            sql.append( " WITH LOCK EXCLUSIVE" );
         }
         return sql.toString();
     }
