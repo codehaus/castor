@@ -315,8 +315,11 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
                 throw new IllegalArgumentException(e.getMessage());
             }
         }
-
-        if (SchemaNames.ELEMENT.equals(name)) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            Annotation ann = (Annotation)unmarshaller.getObject();
+            _group.addAnnotation(ann);
+        }
+        else if (SchemaNames.ELEMENT.equals(name)) {
             ElementDecl element =
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _group.addElementDecl(element);
