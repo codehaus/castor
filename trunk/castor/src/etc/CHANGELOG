@@ -2,6 +2,17 @@
 Version (CVS) 
 -------------
 
+All:   Fixed bug 1757 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added core/** package and children to castor-xml.jar.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1757
+       (Werner - 20041006)
+
+JDO:   Fixed bug 1755 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Brought jdo-conf.dtd in-line with XML Schema instance, making <transaction-demarcation>
+       required.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1755
+       (Werner - 20041006)
+       
 XML:   Fixed bug 1685, A StackOverflowError was occuring at certain times
        during container processing if the input XML was invalid.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1685
