@@ -157,15 +157,15 @@ public class DataObjectResolver extends Resolver {
 
         // iterate thru all available strategies
 
-        Entity entity        = new Entity( entityInfo, oid.getIdentity() );
+        Entity entity           = new Entity( entityInfo, oid.getIdentity() );
 
-        LockEngine le        = getLockEngine( tx, oid );
+        LockEngine le           = getLockEngine( tx, oid );
 
-        AccessMode effective = declaredMode.getEffectiveMode( mode );
+        AccessMode effective    = declaredMode.getEffectiveMode( mode );
 
         lockEngine.load( tx.getKey(), entity, effective, timeout );
 
-        Object newInstance   = getNewInstance( tx, oid, entity );
+        Object newInstance      = getNewInstance( tx, oid, entity );
 
         // must add to transaction first to to prevent circular references.
         tx.addObjectEntry( oid, newInstance );
@@ -221,12 +221,12 @@ public class DataObjectResolver extends Resolver {
             throws DuplicateIdentityException, LockNotGrantedException, 
             PersistenceException {
 
-        Entity entity = new Entity();
+        Entity entity       = new Entity();
 
         // must add to transaction first to to prevent circular references.
         tx.addObjectEntry( oid, objectToBeUpdated );
 
-        LockEngine le        = getLockEngine( tx, oid );
+        LockEngine le       = getLockEngine( tx, oid );
 
         // iterate thru all avaliable strategies
         Iterator itor = strategies.iterator();
@@ -235,7 +235,7 @@ public class DataObjectResolver extends Resolver {
             strategy.update( tx, oid, objectToBeUpdated, entity, timeout );
         }
 
-        le.update( tx.getKey(), entity, AccessMode.Exclusive, timeout );
+        le.update( tx.getKey(), entity, timeout );
     }
 
     public void writeLock( TransactionContext tx, OID oid, Object objectToBeLocked,
@@ -391,7 +391,6 @@ public class DataObjectResolver extends Resolver {
         }
     }
 
-    
     /**
      * Get the identity from a object of the base type
      * If object isn't persistent and key generator is used, returns null
