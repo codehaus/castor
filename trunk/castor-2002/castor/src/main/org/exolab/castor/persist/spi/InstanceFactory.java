@@ -57,14 +57,10 @@ import org.exolab.castor.jdo.Database;
  * @author <a href="adc@toolazydogs.com">Alan Cabrera</a>
  * @version $Revision$ $Date$
  */
-public interface InstanceFactory
-{
+public interface InstanceFactory {
 
     /**
      * Called to indicate that an object needs to be instatiated.
-     * <p>
-     * The parameters are ignored.  Data is obtained from the deployment info
-     * which has been obtained, in turn, from the current call context.
      *
      * @return an instance of the object needs to be instatiated
      * @param The name of the class of the object to be created
