@@ -127,7 +127,7 @@ public class Mapping
         }
 
     }
-        
+
 
     /**
      * Use this object to obtain the mapping resolver for JDO from
@@ -182,7 +182,7 @@ public class Mapping
      * for included Mappings
     **/
     private ClassMappingResolver _idResolver = null;
-    
+
     /**
      * The cached resolvers.
      */
@@ -268,7 +268,7 @@ public class Mapping
                     loaderClass = _loader.loadClass(engine.getLoaderClass() );
                 else
                     loaderClass = Class.forName(engine.getLoaderClass());
-                    
+
                 loaderConst = loaderClass.getConstructor( new Class[] { ClassLoader.class, PrintWriter.class } );
                 loaderImpl = (MappingLoader) loaderConst.newInstance( new Object[] { _loader, _logWriter } );
                 // Put loader in hash table first, so we don't get an error message if this
@@ -422,8 +422,8 @@ public class Mapping
             source = _resolver.resolveEntity( null, url );
             if ( source == null )
                 source = new InputSource( url );
-            else
-                source.setSystemId( url );
+            if (source.getSystemId() == null)
+               source.setSystemId(url);
             if ( _logWriter != null )
                 _logWriter.println( Messages.format( "mapping.loadingFrom", url ) );
             loadMappingInternal( source );
@@ -466,14 +466,14 @@ public class Mapping
                 unm.setLogWriter( _logWriter );
             unm.setClassLoader( Mapping.class.getClassLoader() );
             unm.setIDResolver(_idResolver);
-            
+
             loaded = (MappingRoot) unm.unmarshal( source );
 
 
             // gather "class" tags
             enum = loaded.enumerateClassMapping();
             while ( enum.hasMoreElements() )
-                _mapping.addClassMapping( (ClassMapping) enum.nextElement() );                
+                _mapping.addClassMapping( (ClassMapping) enum.nextElement() );
 
             // gather "key-generator" tags
             enum = loaded.enumerateKeyGeneratorDef();
@@ -505,19 +505,19 @@ public class Mapping
      * An IDResolver to allow us to resolve ClassMappings
      * from included Mapping files
     **/
-    class ClassMappingResolver 
-        implements org.exolab.castor.xml.IDResolver 
+    class ClassMappingResolver
+        implements org.exolab.castor.xml.IDResolver
     {
         private MappingRoot _mapping = null;
-        
+
         ClassMappingResolver() {
             super();
         }
-                
+
         public void setMapping(MappingRoot mapping) {
             this._mapping = mapping;
         } //-- setMapping
-        
+
         /**
          * Returns the Object whose id matches the given IDREF,
          * or null if no Object was found.
@@ -533,9 +533,9 @@ public class Mapping
             }
             return null;
         } //-- resolve
-        
+
     } //-- ClassMappingResolver
-        
+
 }
 
 
