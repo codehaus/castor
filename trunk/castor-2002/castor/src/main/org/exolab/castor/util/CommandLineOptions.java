@@ -188,7 +188,40 @@ public class CommandLineOptions {
     } //-- printUsage
     
     public void printHelp(PrintWriter pw) {
-        //-- add later
+        printUsage(pw);
+        pw.println();
+        
+        if (flags.size() > 0) {
+            pw.println("Flag               Description");
+            pw.println("----------------------------------------------");
+        }
+        for (int i = 0; i < flags.size(); i++) {
+            String flag = (String) flags.elementAt(i);
+            CmdLineOption opt = (CmdLineOption)optionInfo.get(flag);
+            
+            pw.print('-');
+            pw.print(flag);
+            
+            pw.print(' ');
+            //-- adjust spacing
+            int spaces = 17 - flag.length();
+            while (spaces > 0) { 
+                pw.print(' ');
+                --spaces;
+            }
+            
+            pw.print(opt.getComment());
+            
+            //String usage = opt.getUsageText();
+            //if (usage != null) {
+            //    pw.print(' ');
+            //    pw.print(usage);
+            //}
+            //if (opt.getOptional()) pw.print(']');
+            pw.println();
+        }
+        pw.println();
+        pw.flush();
     }
     
 } //-- CommandLineOptions
