@@ -65,7 +65,8 @@ import java.text.ParseException;
 **/
 public class TypeConversion {
 
-
+    private static final String TYPES_PACKAGE = "types";
+    
     /**
      * Converts the given Simpletype to the appropriate XSType.
      * @return the XSType which represets the given Simpletype
@@ -297,10 +298,30 @@ public class TypeConversion {
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
                 {
-                    XSString xsString = new XSString();
-                    if (!simpleType.isBuiltInType())
-                        xsString.setFacets(simpleType);
-                    return xsString;
+                    //-- Enumeration ?
+                    if (simpleType.hasFacet(Facet.ENUMERATION)) {
+                        String className
+                            = JavaNaming.toJavaClassName(simpleType.getName());
+                        
+                        String ns = simpleType.getSchema().getTargetNamespace();
+                        String pkgName = SourceGenerator.getJavaPackage(ns);
+                        if ((pkgName != null) && (pkgName.length() > 0))
+                            pkgName = pkgName + '.' + TYPES_PACKAGE;
+                        else
+                            pkgName = TYPES_PACKAGE;
+                        
+                        className = pkgName + '.' + className;
+                        xsType = new XSClass(new JClass(className));
+                        xsType.setAsEnumertated(true);
+                    } //- End Enumeration
+                    else {
+                        XSString xsString = new XSString();
+                        if (!simpleType.isBuiltInType()) {
+                            xsString.setFacets(simpleType);
+                        }
+                        xsType = xsString;
+                    }
+                    break;
                 }
                 //-- short
                 case SimpleTypesFactory.SHORT_TYPE:
