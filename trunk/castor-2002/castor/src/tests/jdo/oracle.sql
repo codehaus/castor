@@ -11,9 +11,9 @@ grant all on test_table to test;
 
 drop table   test_master;
 create table test_master (
-  id        int           not null,
+  id       numeric(10,0)    not null,
   value     varchar(200)  not null,
-  group_id  int           null
+  group_id numeric(10,0)  null
 );
 create unique index test_master_pk
   on test_master ( id );
@@ -22,8 +22,8 @@ grant all on test_master to test;
 
 drop table   test_detail;
 create table test_detail (
-  detail_id  int           not null,
-  master_id  int           not null,
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null,
   value      varchar(200)  not null
 );
 create unique index test_detail_pk
@@ -33,7 +33,7 @@ grant all on test_detail to test;
 
 drop table   test_group;
 create table test_group (
-  id     int           not null,
+  id     numeric(10,0)  not null,
   value  varchar(200)  not null
 );
 create unique index test_group_pk
@@ -48,7 +48,10 @@ create table test_types (
   ttm      date           not null,
   int_val  integer        null,
   char_val char(1)        null,
-  bool_val char(1)        null
+  bool_val char(1)        null,
+  int_date integer        null,
+  str_time char(12)       null,
+  num_date numeric(17,0)  null
 );
 create unique index test_types_pk
   on test_types ( id );

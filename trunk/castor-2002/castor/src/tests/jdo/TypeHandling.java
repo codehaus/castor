@@ -48,7 +48,10 @@ package jdo;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -100,6 +103,11 @@ public class TypeHandling
             OQLQuery      oql;
             TestTypes     types;
             Enumeration   enum;
+            Date          date;
+            Date          time;
+            Date          timestamp;
+            SimpleDateFormat df;
+
             
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
@@ -222,7 +230,7 @@ public class TypeHandling
                 stream.writeVerbose( "OK: value in character field passed" );
 
 
-            stream.writeVerbose( "Testing boolean->char.01 conversion" );
+            stream.writeVerbose( "Testing the boolean->char[01] conversion" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
@@ -248,7 +256,53 @@ public class TypeHandling
             if ( ! result )
                 return false;
             else
-                stream.writeVerbose( "OK: The boolean->char.01 conversion passed" );
+                stream.writeVerbose( "OK: The boolean->char[01] conversion passed" );
+
+            
+            stream.writeVerbose( "Testing date->int/numeric/char parameterized conversion" );
+            df = new SimpleDateFormat();
+            df.applyPattern("yyyy/MM/dd");
+            date = df.parse("2000/05/27");
+            df.applyPattern("hh:mm:ss.SSS");
+            time = df.parse("02:16:01.234");
+            df.applyPattern("yyyy/MM/dd hh:mm:ss.SSS");
+            timestamp = df.parse("2000/05/27 02:16:01.234");
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setDate2( date );
+                types.setTime2( time );
+                types.setTimestamp2( timestamp );
+            }
+            db.commit();
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( !date.equals( types.getDate2() ) ) {
+                    stream.writeVerbose( "Error: date/int value was not set" );
+                    result = false;
+                }
+                if ( !time.equals( types.getTime2() ) ) {
+                    stream.writeVerbose( "Error: time/string value was not set" );
+                    result = false;
+                }
+                if ( !timestamp.equals( types.getTimestamp2() ) ) {
+                    stream.writeVerbose( "Error: timestamp/numeric value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: date->int/numeric/char conversion passed" );
 
 
             db.close();

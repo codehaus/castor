@@ -81,6 +81,15 @@ public class TestTypes
     private boolean        _boolValue;
 
 
+    private java.util.Date _date2;
+
+
+    private java.util.Date _time2;
+
+
+    private java.util.Date _timestamp2;
+
+
     static final int       DefaultId = 3;
 
 
@@ -90,6 +99,8 @@ public class TestTypes
         _date = new java.util.Date();
         _time = new java.util.Date();
         _timestamp = new java.util.Date();
+        _date2 = new java.util.Date();
+        _timestamp2 = new java.util.Date();
     }
 
 
@@ -187,6 +198,42 @@ public class TestTypes
     public void setBoolValue( boolean value )
     {
         _boolValue = value;
+    }
+
+
+    public void setDate2( java.util.Date date )
+    {
+        _date2 = date;
+    }
+
+
+    public java.util.Date getDate2()
+    {
+        return _date2;
+    }
+
+
+    public void setTime2( java.util.Date date )
+    {
+        _time2 = date;
+    }
+
+
+    public java.util.Date getTime2()
+    {
+        return _time2;
+    }
+
+
+    public void setTimestamp2( java.util.Date date )
+    {
+        _timestamp2 = date;
+    }
+
+
+    public java.util.Date getTimestamp2()
+    {
+        return _timestamp2;
     }
 
 
