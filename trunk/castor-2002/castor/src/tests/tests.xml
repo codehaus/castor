@@ -21,16 +21,5 @@
     <jtf:case name="TC05" class-name="jdo.TypeHandling" />
   </jtf:category>
 
-  <jtf:category name="cloudscape" class-name="jdo.JDOCategory">
-    <jtf:description>JDO tests for Cloudscape 3</jtf:description>
-    <jdo:jdo database-name="cloudscape" configuration="cloudscape.xml" />
-    <jtf:case name="TC01" class-name="jdo.Concurrent" />
-    <jtf:case name="TC02" class-name="jdo.Deadlock" />
-    <jtf:case name="TC03" class-name="jdo.DuplicateKey" />
-    <jtf:case name="TC04" class-name="jdo.ReadOnly" />
-    <jtf:case name="TC05" class-name="jdo.TypeHandling" />
-    <jtf:case name="TC06" class-name="jdo.Join" />
-  </jtf:category>
-
 </jtf:harness>
 

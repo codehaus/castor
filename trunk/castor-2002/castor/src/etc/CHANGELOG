@@ -1,6 +1,9 @@
 Version 0.8.3  April 28, 2000
 -----------------------------
 
+JDO:     New OQL query engine. Not used by default, see new methods in OQLQueryImpl
+         and package org.exolab.castor.jdo.oql (by Nissim <nissim@nksystems.com>)
+
 JDO:     Added support for null fields by calling the relevant setNull() method
          when setting a null field. Does not apply to query parameters yet, does
          not apply to identity fields.
