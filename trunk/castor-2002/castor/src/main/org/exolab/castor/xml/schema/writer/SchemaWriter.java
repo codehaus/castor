@@ -411,13 +411,47 @@ public class SchemaWriter {
         //-- process annotations
         processAnnotated(complexType, schemaPrefix);
 
-        //-- process group
+         
+        //-- handle simpleContent/complexContent if we have a baseType.
+        String ELEM_CONTENT    = null;
+        String ELEM_DERIVATION = null;
+        XMLType baseType = complexType.getBaseType();
+        if (baseType != null) {
+            if (complexType.isSimpleContent())
+                ELEM_CONTENT = schemaPrefix + SchemaNames.SIMPLE_CONTENT;
+            else
+                ELEM_CONTENT = schemaPrefix + SchemaNames.COMPLEX_CONTENT;
+                                
+            _atts.clear();
+            if (complexType.isComplexContent()) {
+                if (complexType.getContentType() == ContentType.mixed) {
+                    _atts.addAttribute(SchemaNames.MIXED, CDATA,
+                        VALUE_TRUE);
+                }
+            }
+            _handler.startElement(ELEM_CONTENT, _atts);
+            
+            ELEM_DERIVATION = schemaPrefix + 
+                complexType.getDerivationMethod();
+                
+            _atts.clear();
+            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, 
+                baseType.getName());
+            _handler.startElement(ELEM_DERIVATION, _atts);
+        } 
+        
+        //-- process content model group
         processContentModelGroup(complexType, schemaPrefix);
 
         //-- process Attributes, must appear last in a complex type
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
             processAttribute((AttributeDecl)enum.nextElement(), schemaPrefix);
+        }
+        
+        if (baseType != null) {
+            _handler.endElement(ELEM_DERIVATION);
+            _handler.endElement(ELEM_CONTENT);
         }
 
         _handler.endElement(ELEMENT_NAME);
