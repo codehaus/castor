@@ -227,7 +227,7 @@ public class DirectorySourceImpl
             mapping.setEntityResolver( resolver );
             mapping.setLogWriter( logWriter );
             mapping.loadMapping( source );
-            _mapResolver = mapping.getResolver( Mapping.DAX );
+            _mapResolver = mapping.getResolver( Mapping.DAX, null );
         } catch ( IOException except ) {
             throw new MappingException( except );
         }

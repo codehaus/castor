@@ -216,8 +216,6 @@ public interface Database
 
 
     /**
-     * <b>Experimental</b>
-     * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
      * the same identity in the same transaction will return the same
@@ -289,8 +287,6 @@ public interface Database
 
 
     /**
-     * <b>Experimental</b>
-     * <p>
      * Creates a new object in persistent storage. The object will be
      * persisted only if the transaction commits.
      * <p>
@@ -489,7 +485,7 @@ public interface Database
      * Never try to close it (is done by castor).
      */
     public Object /* java.sql.Connection */ getConnection()
-	throws org.exolab.castor.jdo.PersistenceException ;
+    throws org.exolab.castor.jdo.PersistenceException ;
 
 }
 
