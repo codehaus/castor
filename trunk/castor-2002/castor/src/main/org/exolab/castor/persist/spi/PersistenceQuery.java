@@ -69,10 +69,6 @@ import org.exolab.castor.persist.ObjectNotFoundException;
  * <p>
  * See {@link Persistence} for information about locks, loading
  * objects, identities and stamps.
- * <p>
- * Queries are either forward only or traversable, depending on the
- * underlying implementation. Traversable queries implement the {@link
- * #getIdentity(int)} and {@link #getPosition} methods.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -141,56 +137,18 @@ public interface PersistenceQuery
      * When the result set has been exhuasted, this method will
      * return null.
      *
+     * @param identity The identity of the previous object
      * @return The identity of the next object
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object nextIdentity()
+    public Object nextIdentity( Object identity )
         throws PersistenceException;
     
-
-    /**
-     * Returns the identity of the object at the specified position.
-     * If the specified position is beyond the end of the result
-     * set, this method will return null. Indexes are one based.
-     * <p>
-     * This method will throw an exception if the query results are
-     * forward only.
-     *
-     * @param index The index of the requested identity (one based)
-     * @return The identity of the next object
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public Object getIdentity( int index )
-        throws PersistenceException;
-    
-
-    /**
-     * Returns the position of the last identity retrieved. The
-     * index is one based.
-     *
-     * @return The index of the last identity retruned (one based) 
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public int getPosition()
-        throws PersistenceException;
-
-
-    /**
-     * Returns true if this is a forward only result set. Forward only
-     * results set implement {@link #nextIdentity} but not {@link
-     * #getIdentity}.
-     *
-     * @return True if forward only result set
-     */
-    public boolean isForwardOnly();
-
 
     /**
      * Returns the next object. This method must be called immediately
-     * after {@link #nextIdentity} or {@link #getIdentity}.
+     * after {@link #nextIdentity}.
      * <p>
      * If the object is locked by another transaction this method will
      * block until the lock is released, or a timeout occured. If a
@@ -200,17 +158,18 @@ public interface PersistenceQuery
      * identity.
      * <p>
      * This method is equivalent to {@link Persistence#load} with a
-     * know cache engine, identity and lock and acts on the query
+     * known cache engine and access mode and acts on the query
      * results rather than issuing a new query to load the object.
      *
-     * @param object The object to load into
+     * @param fields The fields to load into
+     * @param identity The object's identity
      * @return The object's stamp, or null
      * @throws ObjectNotFoundException The object was not found in
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      * @see Persistence#load
      */
-    public Object fetch( Object object )
+    public Object fetch( Object[] fields, Object identity )
         throws ObjectNotFoundException, PersistenceException;
     
 

@@ -55,7 +55,6 @@ import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.FetchContext;
 
 
 /**
@@ -76,9 +75,6 @@ import org.exolab.castor.persist.FetchContext;
  * The engine must always use the identity passed in the method call
  * and never the identity contained in the object itself.
  * <p>
- * The {@link RelationContext} can be used to load/store related
- * objects using the same transaction context and persistence engine.
- * <p>
  * The stamp is an arbitrary object that is returned on object
  * creation and loading and passed when performing a dirty check. The
  * stamp can be used to detect object dirtyness in a more efficient
@@ -93,7 +89,6 @@ import org.exolab.castor.persist.FetchContext;
  * @version $Revision$ $Date$
  * @see TransactionContext
  * @see PersistenceQuery
- * @see RelationContext
  */
 public interface Persistence
 {
@@ -107,14 +102,14 @@ public interface Persistence
      * same identity and must retain a lock on the object after creation.
      *
      * @param conn An open connection
-     * @param obj The object to create
+     * @param fields The fields to store
      * @param identity The object's identity
      * @return The object's stamp, or null
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object create( Object conn, Object obj, Object identity )
+    public Object create( Object conn, Object[] fields, Object identity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -130,8 +125,7 @@ public interface Persistence
      * locked in persistence storage to prevent concurrent updates.
      *
      * @param conn An open connection
-     * @param ctx Context for fetching related objects
-     * @param obj The object to load into
+     * @param fields The fields to load into
      * @param identity object's identity
      * @param accessMode The access mode (null equals shared)
      * @return The object's stamp, or null
@@ -139,7 +133,7 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, FetchContext ctx, Object obj, Object identity,
+    public Object load( Object conn, Object[] fields, Object identity,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
@@ -163,9 +157,9 @@ public interface Persistence
      * retrieved with an exclusive lock.
      *
      * @param conn An open connection
-     * @param obj The object to store
+     * @param fields The fields to store
      * @param identity The object's identity
-     * @param original The original object, or null
+     * @param original The original fields, or null
      * @param stamp The object's stamp, or null
      * @return The object's stamp, or null
      * @throws ObjectModifiedException The object has been modified
@@ -174,8 +168,8 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( Object conn, Object obj, Object identity,
-                         Object original, Object stamp )
+    public Object store( Object conn, Object[] fields, Object identity,
+                         Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
@@ -204,13 +198,12 @@ public interface Persistence
      * reload the object.
      *
      * @param conn An open connection
-     * @param obj The object to lock, may be null
      * @param identity The object's identity
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Object conn, Object obj, Object identity )
+    public void writeLock( Object conn, Object identity )
         throws ObjectDeletedException, PersistenceException;
     
 
@@ -222,7 +215,6 @@ public interface Persistence
      * the transaction has completed.
      *
      * @param conn An open connection
-     * @param obj The object to modify, may be null
      * @param oldIdentity The object's old identity
      * @param newIdentity The object's new identity
      * @throws DuplicateIdentityException An object with the same
@@ -231,8 +223,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void changeIdentity( Object conn, Object obj,
-                                Object oldIdentity, Object newIdentity )
+    public void changeIdentity( Object conn, Object oldIdentity, Object newIdentity )
         throws ObjectDeletedException, DuplicateIdentityException, PersistenceException;
 
 
@@ -244,13 +235,12 @@ public interface Persistence
      * null may be used and type checking will defer to query
      * execution.
      *
-     * @param ctx Context for loading related objects
      * @param query The query statement
      * @param type List of all parameter types, or null
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
-    public PersistenceQuery createQuery( FetchContext ctx, String query, Class[] types )
+    public PersistenceQuery createQuery( String query, Class[] types )
         throws QueryException;
 
 
