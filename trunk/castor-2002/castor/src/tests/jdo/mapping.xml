@@ -612,6 +612,17 @@
     </field>
   </class>
 
+  <class name="jdo.TestOqlExtends" extends="jdo.TestPersistent">
+    <description>Test Persistent interface handling</description>
+    <map-to table="test_oqlext" />
+    <field name="id" type="integer">
+      <sql name="ident"/>
+    </field>
+    <field name="ext" type="integer" required="true">
+      <sql/>
+    </field>
+  </class>
+
   <class name="jdo.TestNestedFields" access="shared" identity="id">
     <description>Table used for nested fields testing</description>
     <map-to table="test_table" />

@@ -59,3 +59,5 @@ drop table test_col;
 
 drop table test_item;
 
+drop table test_oqlext;
+
