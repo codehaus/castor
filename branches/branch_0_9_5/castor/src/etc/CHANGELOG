@@ -2,6 +2,35 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1666: UnmarshalState._markedList Vector is a performance 
+       bottleneck. Applied patch from David Thal which replaces the
+       Vector with a HashSet.
+       (kvisco - 20040910)
+
+XML:   Fixed bug 1658: Handling of whitespace is never preserved for 
+       container objects. Applied patch from Chris Giordano which
+       basically inherits the whitespace preserving state from
+       the parent UnmarshalState.
+       (kvisco - 20040910)
+
+XML:   Fixed bug 1634: Whitespace handling while unmarshalling is flawed.
+       Updated the whitespace handling logic in UnmarshalHandler#characters
+       method and checked in a test case.
+       (kvisco - 20040910)
+
+XML:   Updated the Marshaller to use ContentHandler directly instead
+       of wrapping in a ParserAdapter. Users Marshalling to a 
+       ContentHandler should see a significant speed up when 
+       Marshalling.
+       (kvisco - 20040910)
+
+XML:   Fixed a bug in the Marshaller with the xsi:type logic not being
+       strict enough. Sometimes the Marshaller was not adding xsi:type
+       when it was needed. I've modified this logic a bit to make it
+       output xsi:type more often in order to preserve round tripping.
+       (kvisco - 20040910)
+
+
 XML:   Fixed bug 1560 by adding some additional checks for null
        in the XMLClassDescriptorImpl.
        (kvisco - 20040729)
