@@ -131,7 +131,7 @@ public class RelationCollection implements Collection, Lazy {
 
 
     public boolean add(Object o) {
-        Object id = _molder.getIdentity(o);
+        Object id = _molder.getIdentity( _tx, o );
         //boolean changed = false;
         if ( _ids.contains( id ) ) {
             if ( _deleted.contains( id ) ) {
@@ -156,10 +156,6 @@ public class RelationCollection implements Collection, Lazy {
                 return (_loaded.put( id, o )!=o);
             }
         }
-    }
-
-    public Class getBaseClass() {
-        return _molder.getJavaClass();
     }
 
     public boolean addAll(Collection c) {
@@ -198,7 +194,7 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public boolean contains(Object o) {
-        Object ids = _molder.getIdentity(o);
+        Object ids = _molder.getIdentity( _tx, o );
         if ( _added.contains( ids ) )
             return true;
         if ( _ids.contains( ids ) && !_deleted.contains( ids ) )
@@ -321,7 +317,7 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public boolean remove(Object o) {
-        Object id = _molder.getIdentity( o );
+        Object id = _molder.getIdentity( _tx, o );
         boolean changed = false;
 
         if ( _deleted.contains( id ) )
