@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1616 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Framed <driver>, <data-source> and <jndi> elements in jdo-conf.xsd with an <xsd:choice> to 
+       indicate that at any time only one should be present.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1616
+       (Werner - 20041002)
+
 JDO:   Fixed bug 1221 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added support for LIMIT/OFFSET clauses for HSQL, and extended HSQL-specific test case.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1221
