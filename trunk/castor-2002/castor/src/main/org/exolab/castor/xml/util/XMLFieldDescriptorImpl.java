@@ -391,6 +391,19 @@ public class XMLFieldDescriptorImpl implements XMLFieldDescriptor {
         this.incremental = incremental;
     } //-- setIncremental
     
+    /**
+     * Sets the immutable flag which indicates that changes
+     * to this Field result in a new Object to be created, such
+     * as java.lang.String. It serves to identify fields which
+     * should not be constructed...until after all the data is
+     * available.
+     * @param immutable the boolean which if true indicated that this
+     * described field is immutable
+    **/
+    public void setImmutable(boolean immutable) {
+        this._immutable = immutable;
+    } //-- setImmutable
+    
     public void setMultivalued(boolean multivalued) {
         this.multivalued = multivalued;
     } //-- setMultivalued
