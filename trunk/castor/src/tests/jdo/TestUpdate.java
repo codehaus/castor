@@ -93,7 +93,7 @@ public class TestUpdate extends CastorTestCase
     public void setUp() 
         throws PersistenceException, SQLException
     {
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
     }
 

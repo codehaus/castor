@@ -91,7 +91,7 @@ public class TimeStampMismatched extends CastorTestCase
     public void setUp() 
         throws PersistenceException, SQLException
     {
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
     }
 
@@ -125,7 +125,7 @@ public class TimeStampMismatched extends CastorTestCase
 
         stream.println( "Object timestamp: " + object.jdoGetTimeStamp() );
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         // Load the object
         _db.begin();
@@ -145,7 +145,7 @@ public class TimeStampMismatched extends CastorTestCase
         object.setValue2( "changed value" );
         stream.println( "Changed object: " + object );
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         // Update the object
         _db.begin();

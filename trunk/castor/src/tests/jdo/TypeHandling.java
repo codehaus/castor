@@ -93,7 +93,7 @@ public class TypeHandling extends CastorTestCase {
         Enumeration   enumeration;
 
         // Open transaction in order to perform JDO operations
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
 
         // Delete all records to avoid problems with changed mapping
         Connection conn = _category.getJDBCConnection();

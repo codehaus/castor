@@ -95,7 +95,7 @@ public class TxSynchronization extends CastorTestCase {
                 TxSynchronizableProperty, 
                 TxSynchronizableImpl.class.getName() );
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
     }
 
     public void runTest() throws PersistenceException, SQLException {

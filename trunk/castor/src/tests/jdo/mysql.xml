@@ -5,8 +5,8 @@
 <jdo-conf>
     <database name="mysql" engine="mysql" >
         <driver url="jdbc:mysql://localhost:3306/test" class-name="com.mysql.jdbc.Driver">
-            <param name="user" value="test" />
-            <param name="password" value="test" />
+            <param name="user" value="me" />
+            <param name="password" value="uLive2C" />
         </driver>
         <mapping href="jdo/mapping.xml" />
     </database>

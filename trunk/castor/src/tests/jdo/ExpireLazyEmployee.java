@@ -55,6 +55,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.CacheManager;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -70,6 +72,12 @@ import org.exolab.castor.persist.spi.Complex;
  */
 public class ExpireLazyEmployee extends CastorTestCase {
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (ExpireLazyEmployee.class);
+    
     private static final boolean BY_TYPE_OR_CLASS   = true;
     private static final boolean BY_OBJECT_IDENTITY = false;
 
@@ -88,10 +96,9 @@ public class ExpireLazyEmployee extends CastorTestCase {
     private PreparedStatement   _updateEmployeeStatement;
     private PreparedStatement   _updateAddressStatement;
     
-    private boolean             _debug = false;
-    
     /** 
      * Constructor
+     * @param category A {@link TestHarness} instance.
      */
     public ExpireLazyEmployee(TestHarness category) {
         super( category, "TC72", "Expire Lazy Employee" );
@@ -100,14 +107,15 @@ public class ExpireLazyEmployee extends CastorTestCase {
 
     /**
      * Initializes fields
+     * @throws SQLException An exception related to the execution of a SQLstatement.
      */
-    public void setUp()
-            throws SQLException {
+    public void setUp() throws SQLException {
 
         try {
-            _db   = _category.getDatabase(verbose);
+            _db   = _category.getDatabase();
         }
         catch(Exception e) {
+        	_log.warn ("Problem obtaining Datavase instance.", e);
         }
         _conn = _category.getJDBCConnection();
 
@@ -128,6 +136,8 @@ public class ExpireLazyEmployee extends CastorTestCase {
 
     /**
      * Calls the individual tests embedded in this test case
+     * @throws PersistenceException ???
+     * @throws SQLException An exception related to the execution of a SQLstatement.
      */
     public void runTest() 
             throws PersistenceException, SQLException {
@@ -139,6 +149,8 @@ public class ExpireLazyEmployee extends CastorTestCase {
 
     /**
      * Close the database and JDBC connection
+     * @throws PersistenceException
+     * @throws SQLException An exception related to the execution of a SQLstatement.
      */
     public void tearDown() 
             throws PersistenceException, SQLException {
@@ -210,12 +222,13 @@ public class ExpireLazyEmployee extends CastorTestCase {
 
     /**
      * Create the requisite objects in the database
+     * @throws Exception A general exception.
      */
     private void createTestDataSet() throws Exception {
         log("creating test data set..."); 
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
 
             TestLazyEmployee person = new TestLazyEmployee();
@@ -327,7 +340,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
      *
      * @param firstName first part of primary key of object to be updated
      * @param lastName first part of primary key of object to be updated
-     * @param newBirthdate new value of persons birthdate
+     * @param newStartDate new value of persons birthdate
      */
     private void updateEmployeeUsingJDBC( String firstName, String lastName, Date newStartDate ) {
         log("updateEmployeeUsingJDBC: updating "+firstName+" "+lastName);
@@ -375,7 +388,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
     /**
      * Setup and execute a database expire cache request.
      *
-     * @param expireByType when <code>true</code> this method will request that
+     * @param byType when <code>true</code> this method will request that
      *      objects be expired from the cache by specifying a single type or
      *      class of objects to be expired; when <code>false</code> this method
      *      will request that objects be expired from the cache using individual
@@ -408,7 +421,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
         log("validating load for employee "+firstName+" "+lastName+"...");
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             Complex fullname = new Complex( "First", "Person" );
             TestLazyEmployee person = (TestLazyEmployee) db.load( TestLazyEmployee.class, fullname );
@@ -422,6 +435,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn ("Problem closing Datavase instance", se);
                 }
             }
             log("testQuery: exception caught while validating read for "+firstName+" "+lastName+" : "+e.getMessage());
@@ -432,7 +446,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
         log("validating query for employee "+firstName+" "+lastName+"...");
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             OQLQuery oql = db.getOQLQuery( "SELECT employee FROM jdo.TestLazyEmployee employee WHERE employee.firstName = $1 AND employee.lastName = $2" );
             oql.bind( firstName );
@@ -452,6 +466,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn("Problem closing Database instance", se);
                 }
             }
             log("testQuery: exception caught while validating read for "+firstName+" "+lastName+" : "+e.getMessage());
@@ -465,13 +480,14 @@ public class ExpireLazyEmployee extends CastorTestCase {
      *
      * @param firstName primary key of object to be read
      * @param lastName primary key of object to be read
+     * @return True if read transaction is valid.
      */
     private boolean validReadTransaction( String firstName, String lastName ) {
         log("validating read transaction for person "+firstName+" "+lastName+"...");
         Database db = null;
         boolean valid = true;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             
             Complex fullname = new Complex( "First", "Person" );
@@ -508,6 +524,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn ("Problem closing Database instance.", se);
                 }
             }
             log("validReadTransaction: exception caught while validating read for "+firstName+" "+lastName+" : "+e.getMessage());
@@ -520,14 +537,15 @@ public class ExpireLazyEmployee extends CastorTestCase {
     /**
      * Modify fields of an object and validate that the transaction completes
      * successfully.
-     *
-     * @param masterId primary key of object to be updated
+     * @param firstName First name.
+     * @param lastName Last name.
+     * @return True if write transaction is valid.
      */
     private boolean validWriteTransaction( String firstName, String lastName ) {
         log("validating write transaction for group "+firstName+" "+lastName+"...");
         Database db = null;
         try {
-            db = this._category.getDatabase( verbose );
+            db = this._category.getDatabase();
             db.begin();
             Complex fullname = new Complex( "First", "Person" );
             TestLazyEmployee person = (TestLazyEmployee) db.load( TestLazyEmployee.class, fullname );
@@ -547,6 +565,7 @@ public class ExpireLazyEmployee extends CastorTestCase {
                     db.close();
                 }
                 catch (Exception se) {
+                	_log.warn ("Problem closing Database instance.", se);
                 }
             }
             log("validWriteTransaction: exception caught while validating write for "+firstName+" "+lastName+" : "+e.getMessage());
@@ -578,13 +597,11 @@ public class ExpireLazyEmployee extends CastorTestCase {
 
     /**
      * log a message
+     * @param message The message to log.
      */
-    private void log(String s)
+    private void log(String message)
     {
-        if (_debug)
-            System.out.println(s);
-        else
-            stream.println(s);
+        _log.debug (message);
     }
 
 }

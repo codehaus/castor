@@ -174,7 +174,7 @@ public class CacheLeakage extends CastorTestCase {
     public void setUp() 
             throws PersistenceException, SQLException {
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
         _conn = _category.getJDBCConnection();
         _conn.setAutoCommit( false );
     }
@@ -185,7 +185,7 @@ public class CacheLeakage extends CastorTestCase {
     public void runTest() 
             throws PersistenceException, SQLException {
 
-        _db = _category.getDatabase( verbose );
+        _db = _category.getDatabase();
         _conn = _category.getJDBCConnection();
         _conn.setAutoCommit( false );
 
@@ -290,7 +290,7 @@ public class CacheLeakage extends CastorTestCase {
         ReadThread( CacheLeakage theTest, CreateDeleteThread other, JDOCategory c, int n ) 
                 throws PersistenceException {
 
-            this.db = c.getDatabase( CastorTestCase.verbose );
+            this.db = c.getDatabase();
             this.trial = n;
             this.ran = new Random();
             this.other = other;
@@ -371,7 +371,7 @@ public class CacheLeakage extends CastorTestCase {
         private CreateDeleteThread( CacheLeakage theTest, JDOCategory c, int cachetype, int n ) 
                 throws PersistenceException {
 
-            this.db = c.getDatabase( CastorTestCase.verbose );
+            this.db = c.getDatabase();
             this.trial = n;
             this.ran = new Random();
             this.cachetype = cachetype;
