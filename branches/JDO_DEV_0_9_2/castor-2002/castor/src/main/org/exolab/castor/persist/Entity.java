@@ -45,7 +45,34 @@
 package org.exolab.castor.persist;
 
 /**
- * Entity is....
+ * An Entity represents a tuple of values in a data store.
+ * <p>
+ * Each entity belongs to some entity classes. Entity class is a type structure
+ * that base on a single inheritance model. Each entity class may have zero or 
+ * more sub entity class(es), and each sub entity class may have zero or one
+ * super entity classes. If an entitiy belongs to a sub entity class, it also 
+ * belong to the super entity class and all its super entity classes, but not
+ * the other way around. The ultimate super entity class is called a base 
+ * entity class.
+ * <p>
+ * The EntityInfo contains the type information for a base class and all its
+ * directy or indirect sub classes. Each sub class EntityInfo describes the 
+ * field in additional to the super class EntityInfo and is not repeated and 
+ * cannot be overrided, except if it is a identity. In most case, the actual 
+ * entity doesn't span all the classes described in the EntityInfo.
+ * <p>
+ * An entity can be distinguish from any other entity by an identity. An identity 
+ * can be one of the value, or composed by multiple values in an entity. Multiple 
+ * values identity is wrapped in {@link org.exolab.castor.persist.types.Complex}.
+ * <p>
+ * An entity may has a stamp. A stamp is a value in an entity that can be used to 
+ * identify the state of an entity. The state of entity is changing overtime, and 
+ * a stamp is a value in the entity that always change when the state of the 
+ * entity change.
+ * <p>
+ * For example, the time of the last modification on an entity can be used as a 
+ * stamp. A sequence counter that increment itself after each modification to the 
+ * entity can also be used as a stamp.
  */
 public final class Entity {
 
@@ -75,7 +102,8 @@ public final class Entity {
     public boolean locked;
 
     /**
-     * The values of an entity.
+     * The values of an entity grouped with the the entity class's EntityInfo,
+     * which specify the fields of the values.
      * Notice that not every entity span all entity class and sub entity
      * classes in the EntityInfo.
      */

@@ -78,10 +78,12 @@ import org.exolab.castor.util.Messages;
 
 
 /**
- * LockEngine is a gateway for all the <tt>ClassMolder</tt>s of a persistence 
- * storage. It mantains dirty checking cache state and lock, and provides a 
- * thread safe enviroment for <tt>ClassMolder</tt>. LockEngine garantees that 
- * no two conflicting operations will be let running concurrently for the same object. 
+ * LockEngine is a gateway for a data store that implements the interfaces 
+ * int the {@link org.exolab.castor.persist.spi}.
+ * <p>
+ * It mantains dirty checking cache state and lock, and provides a thread safe 
+ * enviroment for transactions. LockEngine garantees that no two conflicting 
+ * operations will be let running concurrently for the same object. 
  * <p>
  * For example, it ensures that exactly one transaction may read (load) exclusively
  * on one object; transaction can not deleted an object while the other is 
