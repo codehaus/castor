@@ -36,6 +36,12 @@
     <description>Develops the new OQL query parser.</description>
   </contributor>
 
+  <contributor type="Committer">
+    <name surname="Fritz" given="Markus"/>
+    <email>mfritz@justis.de</email>
+    <company id="justis"/>
+    <description>JDO bugfixes, enhancements.</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
