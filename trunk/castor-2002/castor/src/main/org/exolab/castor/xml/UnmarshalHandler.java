@@ -1236,26 +1236,34 @@ public final class UnmarshalHandler extends MarshalFramework
             }
         }
         //-- loop through remaining attributes if necessary
+        //-- this might be useful for prefixed attributes
         int len = atts.getLength();
         if (len != processedAtts.size()) {
             for (int i = 0; i < len; i++) {
                 String attName = atts.getName(i);
-                if (processedAtts.contains(attName)) continue;
 
-                XMLFieldDescriptor descriptor =
+                //-- Begin Namespace Handling :
+                int idx = attName.indexOf(':');
+                if (idx >= 0)
+                    attName = attName.substring(idx+1,attName.length());
+               //-- End Namespace Handling
+
+               if (processedAtts.contains(attName)) continue;
+               XMLFieldDescriptor descriptor =
                     classDesc.getFieldDescriptor(attName, NodeType.Attribute);
 
-                if (descriptor == null) continue;
-                String attValue = atts.getValue(i);
-                try {
-                    processAttribute(attName, attValue, descriptor, classDesc, object);
-                }
-                catch(java.lang.IllegalStateException ise) {
-                    String err = "unable to add attribute \"" + attName + "\" to ";
-                    err += state.fieldDesc.getXMLName();
-                    err += "due to the following error: " + ise;
-                    throw new SAXException(err);
-                }
+               if (descriptor == null) continue;
+
+               String attValue = atts.getValue(i);
+               try {
+                   processAttribute(attName, attValue, descriptor, classDesc, object);
+               }
+               catch(java.lang.IllegalStateException ise) {
+                   String err = "unable to add attribute \"" + attName + "\" to ";
+                   err += state.fieldDesc.getXMLName();
+                   err += "due to the following error: " + ise;
+                   throw new SAXException(err);
+               }
             }
         }
 
@@ -1287,7 +1295,11 @@ public final class UnmarshalHandler extends MarshalFramework
         }
 
         if (attValue == null) {
-            if (descriptor.isRequired()) {
+             //-- This code is not needed since
+             //-- when validation=true there is a check
+             //-- to required field
+             //-- The only thing to keep is the locator stuff (Arnaud)
+             /*if (descriptor.isRequired()) {
                 String err = classDesc.getXMLName() + " is missing " +
                     "required attribute: " + attName;
                 if (_locator != null) {
@@ -1295,8 +1307,8 @@ public final class UnmarshalHandler extends MarshalFramework
                         " column: " + _locator.getColumnNumber();
                 }
                 throw new SAXException(err);
-            }
-            else return;
+            }*/
+             return;
         }
 
         //-- if this is the identity then save id
@@ -1324,7 +1336,6 @@ public final class UnmarshalHandler extends MarshalFramework
         Class type = descriptor.getFieldType();
         if (isPrimitive(type))
             value = toPrimitiveObject(type, attValue);
-
         //check if the value is a QName that needs to
         //be resolved (ns:value -> {URI}value)
         String valueType = descriptor.getSchemaType();
@@ -1334,6 +1345,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         if (handler != null)
             handler.setValue(parent, value);
+
     } //-- processAttribute
 
     /**
