@@ -105,16 +105,16 @@ public class FieldDescriptorImpl
 
 
     /**
+     * True if the field is multi valued (a collection).
+     */
+    private final boolean       _multi;
+
+
+    /**
      * The type class descriptor, if this field is of a type
      * known by a descriptor.
      */
     private ClassDescriptor      _clsDesc;
-
-
-    /**
-     * The collection handler.
-     */
-    private final CollectionHandler _colHandler;
 
 
     /**
@@ -134,12 +134,9 @@ public class FieldDescriptorImpl
         _handler = handler;
         _immutable = typeInfo.isImmutable();
         _fieldType = typeInfo.getFieldType();
-        if ( typeInfo.getCollectionType() != null )
-            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
-        else
-            _colHandler = null;
         _required = typeInfo.isRequired();
         _transient = trans;
+        _multi = ( typeInfo.getCollectionType() != null );
     }
 
 
@@ -155,7 +152,7 @@ public class FieldDescriptorImpl
         this._immutable = fieldDesc.isImmutable();
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
-        this._colHandler = fieldDesc.getCollectionHandler();
+        this._multi = fieldDesc.isMulti();
     }
 
 
@@ -189,6 +186,12 @@ public class FieldDescriptorImpl
     }
 
 
+    public boolean isMulti()
+    {
+        return _multi;
+    }
+
+
     public ClassDescriptor getClassDescriptor()
     {
         return _clsDesc;
@@ -198,12 +201,6 @@ public class FieldDescriptorImpl
     public FieldHandler getHandler()
     {
         return _handler;
-    }
-
-
-    public CollectionHandler getCollectionHandler()
-    {
-        return _colHandler;
     }
 
 

@@ -101,6 +101,14 @@ public interface FieldDescriptor
 
 
     /**
+     * Returns true if the field is multi valued (a collection).
+     *
+     * @return True if the field is multi valued
+     */
+    public boolean isMulti();
+
+
+    /**
      * Returns the class descriptor related to the field type. If the
      * field type is a class for which a descriptor exists, this
      * descriptor is returned. If the field type is a class for which
@@ -118,15 +126,6 @@ public interface FieldDescriptor
      * @return The field handler
      */
     public FieldHandler getHandler();
-
-
-    /**
-     * Return the collection handler of this field type. Returns null
-     * if the field is not a collection.
-     *
-     * @return The collection handler
-     */
-    public CollectionHandler getCollectionHandler();
 
 
 }
