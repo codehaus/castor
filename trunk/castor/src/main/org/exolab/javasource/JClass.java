@@ -42,20 +42,23 @@
  *
  * $Id$
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ *
  * Contributors:
  * --------------
- * Keith Visco (kvisco@intalio.com) - Original Author
- * Martin Skopp (skopp@riege.de)    - Moved some core code into JStructure
- *                                    and revised to extend JStructure
+ * Keith Visco (keith AT kvisco DOT com) 
+ *    - Original Author
+ * 
+ * Martin Skopp (skopp AT riege DOT de)  
+ *    - Moved some core code into JStructure and revised to 
+ *      extend JStructure
  *
  */
 
 package org.exolab.javasource;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.io.Writer;
-import java.io.PrintWriter;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -66,8 +69,8 @@ import java.util.Vector;
  * This package was modelled after the Java Reflection API
  * as much as possible to reduce the learning curve.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @author <a href="mailto:skopp@riege.de">Martin Skopp</a> 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
+ * @author <a href="mailto:skopp AT riege DOT de">Martin Skopp</a> 
  * @version $Revision$ $Date$
  */
 public class JClass extends JStructure {
@@ -95,7 +98,7 @@ public class JClass extends JStructure {
     /**
      * The superclass for this JClass
      */
-    private String _superClass = null;
+    private JTypeName _superClass = null;
     
 
     
@@ -118,7 +121,7 @@ public class JClass extends JStructure {
         _constructors     = new Vector();
         _fields           = new JNamedMap();
         _methods          = new Vector();
-        _innerClasses   = new Vector();
+        _innerClasses     = null;
         //-- initialize default Java doc
         getJDocComment().appendComment("Class " + getLocalName() + ".");
         
@@ -191,6 +194,38 @@ public class JClass extends JStructure {
         addImport(jField.getAnnotations());
     } //-- addField
 
+    /*
+     *  (non-Javadoc)
+     * @see org.exolab.javasource.JStructure#addImport(java.lang.String)
+     */
+    public void addImport(String name) {
+        
+        if ((name == null) || (name.length() == 0))
+            return;
+        
+        JTypeName jtName = new JTypeName(name);
+        
+        String cls = jtName.getLocalName();
+        String pkg = jtName.getPackageName();
+        
+        if (_superClass != null) {
+            if (_superClass.getLocalName().equals(cls)) {
+                if (_superClass.getPackageName() == null) {
+                    if (pkg != null) {
+                        // if we make it here we are extending
+                        // a class from the default package which
+                        // conflicts with this import, we cannot
+                        // import this class
+                        return;
+                    }
+                }
+            }
+        }
+        
+        super.addImport(name);
+        
+    } //-- adImport
+    
     /**
      * Adds the given JMember to this JClass
      *
@@ -380,6 +415,9 @@ public class JClass extends JStructure {
         }
         
         JClass innerClass = new JInnerClass(classname);
+        if (_innerClasses == null) {
+            _innerClasses = new Vector();
+        }
         _innerClasses.addElement(innerClass);
         return innerClass;
         
@@ -443,10 +481,13 @@ public class JClass extends JStructure {
      * @return an array of JClass contained within this JClass
      */
     public JClass[] getInnerClasses() {
-        int size = _innerClasses.size();
-        JClass[] carray = new JClass[size];
-        _innerClasses.copyInto(carray);
-        return carray;
+        if (_innerClasses != null) {
+            int size = _innerClasses.size();
+            JClass[] carray = new JClass[size];
+            _innerClasses.copyInto(carray);
+            return carray;
+        }
+        return new JClass[0];
     } //-- getInnerClasses;
     
     /**
@@ -507,7 +548,8 @@ public class JClass extends JStructure {
      * @return superClass the super Class that this Class extends
      */
     public String getSuperClass() {
-        return _superClass;
+        if (_superClass == null) return null;
+        return _superClass.getQualifiedName();
     } //-- getSuperClass
 
     /**
@@ -540,7 +582,7 @@ public class JClass extends JStructure {
             
             //-- get imports from inner-classes
             Vector removeImports = null;
-            if (_innerClasses.size() > 0) {
+            if ((_innerClasses != null) && (_innerClasses.size() > 0)) {
                 removeImports = new Vector();
                 for (int i = 0; i < _innerClasses.size(); i++) {
                     JClass iClass = (JClass)_innerClasses.elementAt(i);
@@ -714,17 +756,19 @@ public class JClass extends JStructure {
         }
 
         //-- print inner-classes
-        if (_innerClasses.size() > 0) {
+        if ((_innerClasses != null) && (_innerClasses.size() > 0)) {
             jsw.writeln();
             jsw.writeln("  //-----------------/");
             jsw.writeln(" //- Inner Classes -/");
             jsw.writeln("//-----------------/");
             jsw.writeln();
-        }
-        for (int i = 0; i < _innerClasses.size(); i++) {
-            JClass jClass = (JClass)_innerClasses.elementAt(i);
-            jClass.print(jsw, true);
-            jsw.writeln();
+        
+            for (int i = 0; i < _innerClasses.size(); i++) {
+                JClass jClass = (JClass)_innerClasses.elementAt(i);
+                jClass.print(jsw, true);
+                jsw.writeln();
+            }
+            
         }
         
         jsw.unindent();
@@ -796,7 +840,10 @@ public class JClass extends JStructure {
      * @return true if the JClass was removed, otherwise false.
      */
     public boolean removeInnerClass(JClass jClass) {
-        return _innerClasses.removeElement(jClass);
+        if (_innerClasses != null) {
+            return _innerClasses.removeElement(jClass);
+        }
+        return false;
     } //-- removeInnerClass
 
     /**
@@ -804,7 +851,10 @@ public class JClass extends JStructure {
      * @param superClass the super Class that this Class extends
      */
     public void setSuperClass(String superClass) {
-        _superClass = superClass;
+        if (superClass == null)
+            _superClass = null;
+        else
+            _superClass = new JTypeName(superClass);
     } //-- setSuperClass
 
 
