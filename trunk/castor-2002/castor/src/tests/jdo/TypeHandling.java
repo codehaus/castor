@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
@@ -69,12 +70,12 @@ public class TypeHandling
     private Database       _db;
 
 
-    public TypeHandling( TestBase testBase )
+    public TypeHandling( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC05", "Test type handling" );
+        super( name, description );
         try {
-            _db = testBase.getDatabase();
+            _db = ( (JDOCategory) category ).getDatabase();
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }
@@ -135,9 +136,7 @@ public class TypeHandling
             
             _db.close();
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }

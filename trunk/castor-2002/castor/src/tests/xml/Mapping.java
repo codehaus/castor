@@ -69,9 +69,7 @@ public class Mapping
             toolCopy = writer.toString();
             */
         } catch ( Exception except ) {
-            try {
-                stream.writeVerbose( "Error: " + except );
-            } catch ( IOException except2 ) { }
+            stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
         }
