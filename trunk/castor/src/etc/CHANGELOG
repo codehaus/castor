@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1092 using contribution from Rhett Sutphin [rhett-sutphin@uiowa.edu].
+	   Fixed default namespace declaration, changed some small syntax issues.
+       (Werner - 20040427)
+
 JDO:   Fixed bug 1606 using contribution from Emir Causevic [emirc@gawab.com]
        Fixed problem with incorrectly quoting non-function names for SAP DB.
        (Werner - 20040427)
@@ -63,6 +67,7 @@ ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pi
        Updates Eclipse related project files.
        (Werner - 20040319)
 
+>>>>>>> 1.61
 
 Version 0.9.5.3, March 09, 2004
 -------------------------------
