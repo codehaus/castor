@@ -810,7 +810,6 @@ public abstract class TransactionContext
             throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
-System.out.println("release lock");
         removeObjectEntry( object );
         handler = entry.engine.getClassHandler( object.getClass() );
         if ( handler.getCallback() != null )
