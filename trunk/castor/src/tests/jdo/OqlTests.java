@@ -73,7 +73,7 @@ import harness.CastorTestCase;
  * especially in the new impl. If/when this happens, we'll just split it up 
  * into multiple test cases. 
  *
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  */
 public class OqlTests extends CastorTestCase {
 

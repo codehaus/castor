@@ -63,7 +63,7 @@ import org.exolab.castor.util.LocalConfiguration;
  * obtained from the Castor properties file and used by the
  * JDO mapping configuration file.
  * 
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Id$
  */

@@ -55,7 +55,7 @@ import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireExcepti
  * Default transaction manager when Castor is used in standalone mode,
  * in other words not within a J2EE container.
  *  
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
  */
 public class LocalTransactionManagerFactory 

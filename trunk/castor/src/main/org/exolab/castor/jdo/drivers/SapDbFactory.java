@@ -56,7 +56,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
  * PersistenceFactory for SAP DB.
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
- * @author <a href="ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="ferret AT frii DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public final class SapDbFactory

@@ -55,7 +55,7 @@ import java.io.PrintWriter;
  * An exception encapsulating an exception that occurs during the operation 
  * to acquire a <tt>javax.transaction.TransactionManager</tt>.
  *
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
  * @version $Id$
  */

@@ -57,7 +57,7 @@ import javax.transaction.TransactionManager;
  * from J2EE containers. To provide an implementation for a specific J2EE
  * container, implement this interface.
  *
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>, <a href=" mailto:
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>, <a href=" mailto:
  * werner.guttmann@gmx.net">Werner Guttmann</a>
  * @version $Id: TransactionManagerFactory.java,v 1.1.1.1 2003/03/03 07:08:25
  * kvisco Exp $

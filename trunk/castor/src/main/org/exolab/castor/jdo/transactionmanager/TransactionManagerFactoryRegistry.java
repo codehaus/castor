@@ -72,7 +72,7 @@ import org.xml.sax.InputSource;
  * obtained from the Castor properties file and used by the
  * JDO mapping configuration file.
  * 
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
  * @version $Id$
  */
