@@ -604,4 +604,99 @@
     </field>
   </class> 
 
+  <class name="jdo.TestCol" identity="id">
+    <description>Table used for testing different collection types support</description>
+    <map-to table="test_col" />
+    <cache-type type="none" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <!--
+    <field name="dummy" type="integer" >
+      <sql name="dum" type="integer" />
+    </fild> -->
+  </class>
+
+  <class name="jdo.TestItem" identity="id">
+    <description>Table used for testing different collection types support</description>
+    <map-to table="test_item" />
+    <cache-type type="none" />
+    <field name="id" type="integer">
+      <sql name="iid" type="integer" />
+    </field>
+    <field name="testCol" type="jdo.TestCol" >
+      <sql name="id" />
+    </field>
+  </class>
+
+  <class name="jdo.TestColArrayList" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="arraylist">
+    </field>
+  </class>
+
+  <class name="jdo.TestColCollection" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="collection">
+    </field>
+  </class>
+
+  <!--
+  <class name="jdo.TestColHashMap" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="hashmap">
+    </field>
+  </class>
+
+  <class name="jdo.TestColHashSet" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="hashset">
+    </field>
+  </class>
+  -->
+
+  <class name="jdo.TestColHashtable" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="hashtable">
+    </field>
+  </class>
+
+  <class name="jdo.TestColMap" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="map">
+    </field>
+  </class>
+
+  <class name="jdo.TestColSet" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="set">
+    </field>
+  </class>
+
+  <class name="jdo.TestColVector" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="vector">
+    </field>
+  </class>
+
 </mapping>

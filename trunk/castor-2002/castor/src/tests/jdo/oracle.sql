@@ -332,6 +332,21 @@ go
 grant all on test_identity_ext to test
 go
 
+-- test_col
+drop table test_col;
+create table test_col (
+  id       integer         not null,
+  dum    integer    null
+);
+create unique index test_col_pk on test_col( id );
+
+drop table test_item;
+create table test_item (
+  iid       integer         not null,
+  id      integer         not null
+);
+create unique index test_item_pk on test_item( iid );
+
 
 
 -- test_persistent
