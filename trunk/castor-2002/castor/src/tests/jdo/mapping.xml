@@ -5,7 +5,7 @@
   <!-- Mapping for TestObject to test_table
        Single object mapping, shared access, dirty checking on all fields -->
 
-  <class name="jdo.TestManyGroup" access="shared" identity="id">
+  <class name="jdo.TestManyGroup" access="shared" identity="id" >
     <description>Table used for testing many to many relation</description>
     <map-to table="test_many_group" />
     <field name="id" type="integer">
@@ -20,7 +20,7 @@
     </field>
   </class>
 
-  <class name="jdo.TestManyPerson" access="shared" identity="id">
+  <class name="jdo.TestManyPerson" access="shared" identity="id" >
     <description>Table used for testing many to many relation</description>
     <map-to table="test_many_person" />
     <field name="id" type="integer">
@@ -36,6 +36,44 @@
       <sql name="sthelse" type="varchar" />
     </field>
     <field name="group" type="jdo.TestManyGroup" collection="arraylist"
+    required="false">
+      <sql many-table="test_group_person"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestManyGroupKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Table used for testing many to many relation</description>
+    <cache-type type="count-limited" capacity="30"/>
+    <map-to table="test_many_group" />
+    <field name="id" type="integer">
+      <sql name="gid" type="integer" />
+    </field>
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="people" type="jdo.TestManyPersonKeyGen" collection="arraylist"
+    required="false" >
+    <sql many-table="test_group_person"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestManyPersonKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Table used for testing many to many relation</description>
+    <cache-type type="count-limited" capacity="30"/>
+    <map-to table="test_many_person" />
+    <field name="id" type="integer">
+      <sql name="pid" type="integer" />
+    </field>
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="helloworld" type="string" >
+      <sql name="helloworld" type="varchar" />
+    </field>
+    <field name="sthelse" type="string"  >
+      <sql name="sthelse" type="varchar" />
+    </field>
+    <field name="group" type="jdo.TestManyGroupKeyGen" collection="arraylist"
     required="false">
       <sql many-table="test_group_person"/>
     </field>
