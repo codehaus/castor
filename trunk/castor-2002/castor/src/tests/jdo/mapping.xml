@@ -610,6 +610,20 @@
     <field name="group" type="jdo.TestGroup" required="true">
       <sql name="group_id" />
     </field>
+    <field name="related" type="jdo.TestPersistRelated" required="false">
+      <sql many-key="persist_id" />
+    </field>
+  </class>
+
+  <class name="jdo.TestPersistRelated" access="shared" identity="id">
+    <description>Test Persistent interface handling</description>
+    <map-to table="test_related" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer"/>
+    </field>
+    <field name="persistent" type="jdo.TestPersistent">
+      <sql name="persist_id" />
+    </field>
   </class>
 
   <class name="jdo.TestOqlExtends" extends="jdo.TestPersistent">

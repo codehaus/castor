@@ -361,6 +361,16 @@ create table test_persistent (
 create unique index test_persistent_pk on test_persistent ( id );
 
 
+drop table test_related;
+
+create table test_related (
+  id          integer     not null,
+  persist_id  integer     not null
+);
+
+create unique index test_related_pk on test_related ( id );
+
+
 drop table test_oqlext;
 
 create table test_oqlext (

@@ -51,6 +51,8 @@ drop table   test_seqtable;
 
 drop table test_persistent;
 
+drop table test_related;
+
 drop table test_identity;
 
 drop table test_identity_ext;
