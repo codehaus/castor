@@ -345,12 +345,13 @@ public class SimpleTypesFactory
                 //and create for each its associated SimpleType instance.
                 Vector types= typeList.getTypes();
                 _typesByName= new Hashtable();
+                _typesByCode= new Hashtable();
 		        for( int index= 0; index < types.size(); index++)
 		        {
 		            Type type= (Type)(types.get(index));
                     _typesByName.put(type.getName(), type);
-                    _typesByCode.put(new Integer(type.getCode()), type);
                     type.setSimpleType(createSimpleType(type));
+                    _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
 		        }
 	        }
 	        catch (Exception except)
