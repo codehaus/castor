@@ -57,24 +57,22 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.util.Logger;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
 import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import harness.TestHarness;
 
 
-public class JDOCategory
-    extends CWTestCategory
-{
+public class JDOCategory extends TestHarness {
 
 
     private JDO      _jdo;
 
 
-    public JDOCategory( String name, String description, Object jdo )
+    public JDOCategory( TestHarness superTest, String name, String description, Object jdo )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( superTest, name, description );
         _jdo = (JDO) jdo;
         _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
     }

@@ -51,12 +51,12 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.Random;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.lang.Math;
-import java.util.Vector;
-import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -67,403 +67,388 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
-import java.util.ArrayList;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
+ * Test for many to many relationship with key generators being used in both
+ * side of the relationship. The tests create data objects, modify it and
+ * verify the modification is persisted properly. These tests also test for
+ * many to many relationship with long transaction support: it loads a
+ * set of data objects in one transaction, modify it and update it into 
+ * another transaction. 
  */
-public class ManyToManyKeyGen extends CWTestCase {
+public class ManyToManyKeyGen extends CastorTestCase {
 
     private Database       _db;
 
 
-    private Connection     _conn;
-
-
     private JDOCategory    _category;
 
-
-    public ManyToManyKeyGen( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC31", "ManyToManyKeyGen" );
+    /**
+     * Constructor
+     *
+     * @param category The test suite of these test cases.
+     */
+    public ManyToManyKeyGen( TestHarness category ) {
+        super( category, "TC31", "ManyToManyKeyGen" );
         _category = (JDOCategory) category;
     }
 
-    public void preExecute()
-    {
-        super.preExecute();
+    /**
+     * Get a JDO database
+     */
+    public void setUp() 
+            throws PersistenceException {
+        _db = _category.getDatabase( verbose );
     }
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
+    /**
+     * The tests create data objects, modify it and
+     * verify the modification is persisted properly. These tests also test for
+     * many to many relationship with long transaction support: it loads a
+     * set of data objects in one transaction, modify it and update it into 
+     * another transaction. 
+     */
+    public void runTest() 
+            throws PersistenceException {
+
+        TestManyGroupKeyGen groupA, groupB;
+        TestManyPersonKeyGen person1;
+        TestManyPersonKeyGen person2;
+        TestManyPersonKeyGen person3;
+        TestManyPersonKeyGen person4;
+        TestManyPersonKeyGen temp;
+        ArrayList al;
+        OQLQuery oql;
+        OQLQuery oqlp;
+        QueryResults enum;
+        int groupAId, groupBId;
+        int person1Id, person2Id, person3Id, person4Id;
 
 
-    public boolean run( CWVerboseStream stream ) {
-        boolean result = true;
-        try {
-            TestManyGroupKeyGen groupA, groupB;
-            TestManyPersonKeyGen person1;
-            TestManyPersonKeyGen person2;
-            TestManyPersonKeyGen person3;
-            TestManyPersonKeyGen person4;
-            TestManyPersonKeyGen temp;
-            ArrayList al;
-            OQLQuery oql;
-            OQLQuery oqlp;
-            QueryResults enum;
-            int groupAId, groupBId;
-            int person1Id, person2Id, person3Id, person4Id;
+        stream.println( "Running..." );
+        stream.println( "" );
 
+        _db.begin();
 
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection(); 
-
-            stream.writeVerbose( "Running..." );
-            stream.writeVerbose( "" );
-
-            _db.begin();
-
-            // select an group and delete it, if it exist!
-            OQLQuery oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE object.id < $1" );
-            oqlclean.bind( Integer.MAX_VALUE );
-            enum = oqlclean.execute();
-            while ( enum.hasMore() ) {
-                groupA = (TestManyGroupKeyGen) enum.next();
-                stream.writeVerbose( "Retrieved object: " + groupA );
-                _db.remove( groupA );
-                stream.writeVerbose( "Deleted object: " + groupA );
-            }
-            _db.commit();
-
-            _db.begin();
-            oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE object.id < $1" );
-            oqlclean.bind( Integer.MAX_VALUE );
-            enum = oqlclean.execute();
-            while ( enum.hasMore() ) {
-                person1 = (TestManyPersonKeyGen) enum.next();
-                stream.writeVerbose( "Retrieved object: " + person1 );
-                _db.remove( person1 );
-                stream.writeVerbose( "Deleted object: " + person1 );
-            } 
-            _db.commit();
-
-
-            // create new group with two people
-            _db.begin();
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE id = $1" );
-            oqlp = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE id = $1" );
-            stream.writeVerbose("Creating new group with people!");
-            person1 = new TestManyPersonKeyGen();
-            person1.setValue1("I am person 1");
-            ArrayList gPerson1 = new ArrayList();
-            person1.setGroup( gPerson1 );
-            person1.setSthelse("Something else");
-            person1.setHelloworld("Hello World!");
-
-            person2 = new TestManyPersonKeyGen();
-            person2.setValue1("I am person 2");
-            ArrayList gPerson2 = new ArrayList();
-            person2.setGroup( gPerson2 );
-            person2.setSthelse("Something else");
-            person2.setHelloworld("Hello World!");
-
-            person3 = new TestManyPersonKeyGen();
-            person3.setValue1("I am person 3");
-            ArrayList gPerson3 = new ArrayList();
-            person3.setGroup( gPerson3 );
-            person3.setSthelse("Something else for person 3");
-            person3.setHelloworld("Hello World!");
-
-            person4 = new TestManyPersonKeyGen();
-            person4.setValue1("I am person 4");
-            ArrayList gPerson4 = new ArrayList();
-            person4.setGroup( gPerson4 );
-            person4.setSthelse("Something else for person 4");
-            person4.setHelloworld("Hello World!");
-
-            groupA = new TestManyGroupKeyGen();
-            groupA.setValue1("Group A");
-            al = new ArrayList();
-            al.add( person1 );
-            al.add( person2 );
-            groupA.setPeople( al );
-
-            groupB = new TestManyGroupKeyGen();
-            groupB.setValue1("Group B");
-
-            gPerson1.add( groupA );
-            gPerson2.add( groupA );
-
-            _db.create( groupA );
-            _db.create( person1 );
-            _db.create( person2 );
-
-            stream.writeVerbose("object created: " + groupA);
-            Collection ppl = groupA.getPeople();
-            _db.commit();
-
-            groupAId = groupA.getId();
-            person1Id = person1.getId();
-            person2Id = person2.getId();
-
-            // load the object and modify it
-            stream.writeVerbose("Load the objects and modify it");
-            _db.begin();
-            oql.bind( groupAId );
-            groupA = null;
-            person1 = null;
-            person2 = null;
-            enum = oql.execute();
-            if ( enum.hasMore() ) {
-                groupA = (TestManyGroupKeyGen) enum.next();
-                stream.writeVerbose( "Retrieved object: " + groupA );
-                Collection p = groupA.getPeople();
-                if ( p != null ) {
-                    Iterator itor = p.iterator();
-                    if ( itor.hasNext() ) 
-                        person1 = (TestManyPersonKeyGen) itor.next();
-                    if ( itor.hasNext() )
-                        person2 = (TestManyPersonKeyGen) itor.next();
-                    if ( itor.hasNext() )
-                        throw new Exception("Error: more people than expected!");
-                
-                    if ( person1 == null || person2 == null )
-                        throw new Exception("Error: expect two people in group");
-
-                    if ( person1.getId() == person2Id && person2.getId() == person1Id ) {
-                        temp = person1;
-                        person1 = person2;
-                        person2 = temp;
-                    }
-                    
-                    if ( person1.getId() == person1Id && person2.getId() == person2Id ) {
-                        // check if the value is valid for person1 and chnage value of person1
-                        if ( person1.getValue1() == null || !person1.getValue1().equals("I am person 1") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        } else {
-                            person1.setValue1("New person 1 value");
-                        }
-
-                        // check if the value is valid for person1 and remove person2
-                        if ( person2.getValue1() == null || !person2.getValue1().equals("I am person 2") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        }
-                        // remove person 2
-                        itor = p.iterator();
-                        while ( itor.hasNext() ) {
-                            person2 = (TestManyPersonKeyGen) itor.next();
-                            if ( person2.getId() == person2Id ) {
-                                itor.remove();
-                                break;
-                            }
-                        }
-                        // add person 3
-                        groupA.getPeople().add( person3 );
-                        person3.getGroup().add( groupA );
-                        _db.create( person3 );
-                    } else {
-                        result = false;
-                        throw new Exception("Error: people in group is not the same as expected!");
-                    }
-                } else {
-                    result = false;
-                    throw new Exception("Error: related object not found!");
-                }
-            } else {
-                result = false;
-                throw new Exception("Error: object not found!");
-            }
-            _db.commit();
-            person3Id = person3.getId();
-            if ( person3Id == person2Id )
-                throw new Exception("Error: unexpected id swapping ocurrs!");
-
-            // load again to see if the changes done are effective
-            stream.writeVerbose("Load the objects again to see if changes done are effective");
-            _db.begin();
-            oql.bind( groupAId );
-            groupA = null;
-            person1 = null;
-            person2 = null;
-            enum = oql.execute();
-            if ( enum.hasMore() ) {
-                groupA = (TestManyGroupKeyGen) enum.next();
-                stream.writeVerbose( "Retrieved object: " + groupA );
-                Collection p = groupA.getPeople();
-                if ( p != null ) {
-                    Iterator itor = p.iterator();
-                    if ( itor.hasNext() ) 
-                        person1 = (TestManyPersonKeyGen) itor.next();
-                    if ( itor.hasNext() )
-                        person3 = (TestManyPersonKeyGen) itor.next();
-
-                    // swap if the order is wrong
-                    if ( person1.getId() == person3Id && person3.getId() == person1Id ) {
-                        temp = person1;
-                        person1 = person3;
-                        person3 = temp;
-                    }
-                    if ( itor.hasNext() ) {
-                        throw new Exception("Error: more people than expected! 1:("+person1+") 2: ("+itor.next()+")");
-                    }
-
-                    if ( person1 == null )
-                        throw new Exception("Error: expect person1 in group");
-
-                    if ( person1.getId() == person1Id ) {
-                        // check if the value is valid for person1 and chnage value of person1
-                        if ( person1.getValue1() == null || !person1.getValue1().equals("New person 1 value") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        }
-                    } else {
-                        result = false;
-                        throw new Exception("Error: people in group is not the same as expected!");
-                    }
-
-                    if ( person3.getId() == person3Id ) {
-                        // check if the value is valid for person1 and chnage value of person1
-                        if ( person3.getValue1() == null || !person3.getValue1().equals("I am person 3") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        }
-                    } else {
-                        result = false;
-                        throw new Exception("Error: people in group is not the same as expected!");
-                    }
-
-                } else {
-                    result = false;
-                    throw new Exception("Error: related object not found!");
-                }
-            } else {
-                result = false;
-                throw new Exception("Error: object not found!");
-            }
-            _db.commit();
-
-            // test long transaction support
-            stream.writeVerbose("Modifing object outside of transaction");
-            // remove person 3
-            Iterator it = groupA.getPeople().iterator();
-            while ( it.hasNext() ) {
-                person3 = (TestManyPersonKeyGen) it.next();
-                if ( person3.getId() == person3Id ) {
-                    it.remove();
-                    break;
-                }
-            }
-            person3.getGroup().clear();
-            // add person 4
-            groupA.getPeople().add( person4 );
-            person4.getGroup().add( groupA );
-            // find person 1
-            person1 = null;
-            it = groupA.getPeople().iterator();
-            while ( it.hasNext() ) {
-                person1 = (TestManyPersonKeyGen) it.next();
-                if ( person1.getId() == person1Id )
-                    break;
-            }
-            person1.setValue1("New new value for person 1");
-
-            stream.writeVerbose("Update object to a new transaction");
-            _db.setAutoStore( true );
-            _db.begin();
-            _db.update( groupA );
-            _db.commit();
-
-            person4Id = person4.getId();
-            // load again to see if the changes done are effective
-            stream.writeVerbose("Load the objects again to see if changes done are effective");
-            _db.begin();
-            oql.bind( groupAId );
-            groupA = null;
-            person1 = null;
-            person2 = null;
-            enum = oql.execute();
-            if ( enum.hasMore() ) {
-                groupA = (TestManyGroupKeyGen) enum.next();
-                stream.writeVerbose( "Retrieved object: " + groupA );
-                Collection p = groupA.getPeople();
-                if ( p != null ) {
-                    Iterator itor = p.iterator();
-                    if ( itor.hasNext() ) 
-                        person1 = (TestManyPersonKeyGen) itor.next();
-                    else 
-                        throw new Exception("Erorr: less people than expected!");
-                    if ( itor.hasNext() )
-                        person4 = (TestManyPersonKeyGen) itor.next();
-                    else 
-                        throw new Exception("Erorr: less people than expected!");
-
-                    // swap if the order is wrong
-                    if ( person1.getId() == person4Id && person4.getId() == person1Id ) {
-                        temp = person1;
-                        person1 = person4;
-                        person4 = temp;
-                    }
-                    if ( itor.hasNext() ) {
-                        throw new Exception("Error: more people than expected! 1:("+person1+") 2: ("+itor.next()+")");
-                    }
-
-                    if ( person1 == null )
-                        throw new Exception("Error: expect person1 in group");
-
-                    if ( person1.getId() == person1Id ) {
-                        // check if the value is valid for person1 and chnage value of person1
-                        if ( person1.getValue1() == null || !person1.getValue1().equals("New new value for person 1") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        }
-                    } else {
-                        result = false;
-                        throw new Exception("Error: people in group is not the same as expected!");
-                    }
-
-                    if ( person4.getId() == person4Id ) {
-                        // check if the value is valid for person1 and chnage value of person1
-                        if ( person4.getValue1() == null || !person4.getValue1().equals("I am person 4") ) {
-                            result = false;
-                            throw new Exception("Error: unexpected person value");
-                        }
-                    } else {
-                        result = false;
-                        throw new Exception("Error: people in group is not the same as expected!");
-                    }
-
-                } else {
-                    result = false;
-                    throw new Exception("Error: related object not found!");
-                }
-            } else {
-                result = false;
-                throw new Exception("Error: object not found!");
-            }
-            _db.commit();
-        } catch ( Exception e ) {
-            e.printStackTrace();
-            if ( _db.isActive() )
-                try {
-                    _db.rollback();
-                } catch ( Exception ee ) {
-                }
-            result = false;
+        // select an group and delete it, if it exist!
+        OQLQuery oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE object.id < $1" );
+        oqlclean.bind( Integer.MAX_VALUE );
+        enum = oqlclean.execute();
+        while ( enum.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enum.next();
+            stream.println( "Retrieved object: " + groupA );
+            _db.remove( groupA );
+            stream.println( "Deleted object: " + groupA );
         }
+        _db.commit();
 
-        return result;
+        _db.begin();
+        oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE object.id < $1" );
+        oqlclean.bind( Integer.MAX_VALUE );
+        enum = oqlclean.execute();
+        while ( enum.hasMore() ) {
+            person1 = (TestManyPersonKeyGen) enum.next();
+            stream.println( "Retrieved object: " + person1 );
+            _db.remove( person1 );
+            stream.println( "Deleted object: " + person1 );
+        } 
+        _db.commit();
+
+
+        // create new group with two people
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE id = $1" );
+        oqlp = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE id = $1" );
+        stream.println("Creating new group with people!");
+        person1 = new TestManyPersonKeyGen();
+        person1.setValue1("I am person 1");
+        ArrayList gPerson1 = new ArrayList();
+        person1.setGroup( gPerson1 );
+        person1.setSthelse("Something else");
+        person1.setHelloworld("Hello World!");
+
+        person2 = new TestManyPersonKeyGen();
+        person2.setValue1("I am person 2");
+        ArrayList gPerson2 = new ArrayList();
+        person2.setGroup( gPerson2 );
+        person2.setSthelse("Something else");
+        person2.setHelloworld("Hello World!");
+
+        person3 = new TestManyPersonKeyGen();
+        person3.setValue1("I am person 3");
+        ArrayList gPerson3 = new ArrayList();
+        person3.setGroup( gPerson3 );
+        person3.setSthelse("Something else for person 3");
+        person3.setHelloworld("Hello World!");
+
+        person4 = new TestManyPersonKeyGen();
+        person4.setValue1("I am person 4");
+        ArrayList gPerson4 = new ArrayList();
+        person4.setGroup( gPerson4 );
+        person4.setSthelse("Something else for person 4");
+        person4.setHelloworld("Hello World!");
+
+        groupA = new TestManyGroupKeyGen();
+        groupA.setValue1("Group A");
+        al = new ArrayList();
+        al.add( person1 );
+        al.add( person2 );
+        groupA.setPeople( al );
+
+        groupB = new TestManyGroupKeyGen();
+        groupB.setValue1("Group B");
+
+        gPerson1.add( groupA );
+        gPerson2.add( groupA );
+
+        _db.create( groupA );
+        _db.create( person1 );
+        _db.create( person2 );
+
+        stream.println("object created: " + groupA);
+        Collection ppl = groupA.getPeople();
+        _db.commit();
+
+        groupAId = groupA.getId();
+        person1Id = person1.getId();
+        person2Id = person2.getId();
+
+        // load the object and modify it
+        stream.println("Load the objects and modify it");
+        _db.begin();
+        oql.bind( groupAId );
+        groupA = null;
+        person1 = null;
+        person2 = null;
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enum.next();
+            stream.println( "Retrieved object: " + groupA );
+            Collection p = groupA.getPeople();
+            if ( p != null ) {
+                Iterator itor = p.iterator();
+                if ( itor.hasNext() ) 
+                    person1 = (TestManyPersonKeyGen) itor.next();
+                if ( itor.hasNext() )
+                    person2 = (TestManyPersonKeyGen) itor.next();
+                if ( itor.hasNext() )
+                    fail("Error: more people than expected!");
+            
+                if ( person1 == null || person2 == null )
+                    fail("Error: expect two people in group");
+
+                if ( person1.getId() == person2Id && person2.getId() == person1Id ) {
+                    temp = person1;
+                    person1 = person2;
+                    person2 = temp;
+                }
+                
+                if ( person1.getId() == person1Id && person2.getId() == person2Id ) {
+                    // check if the value is valid for person1 and chnage value of person1
+                    if ( person1.getValue1() == null || !person1.getValue1().equals("I am person 1") ) {
+                        fail("Error: unexpected person value");
+                    } else {
+                        person1.setValue1("New person 1 value");
+                    }
+
+                    // check if the value is valid for person1 and remove person2
+                    if ( person2.getValue1() == null || !person2.getValue1().equals("I am person 2") ) {
+                        fail("Error: unexpected person value");
+                    }
+                    // remove person 2
+                    itor = p.iterator();
+                    while ( itor.hasNext() ) {
+                        person2 = (TestManyPersonKeyGen) itor.next();
+                        if ( person2.getId() == person2Id ) {
+                            itor.remove();
+                            break;
+                        }
+                    }
+                    // add person 3
+                    groupA.getPeople().add( person3 );
+                    person3.getGroup().add( groupA );
+                    _db.create( person3 );
+                } else {
+                    fail("Error: people in group is not the same as expected!");
+                }
+            } else {
+                fail("Error: related object not found!");
+            }
+        } else {
+            fail("Error: object not found!");
+        }
+        _db.commit();
+        person3Id = person3.getId();
+        if ( person3Id == person2Id )
+            fail("Error: unexpected id swapping ocurrs!");
+
+        // load again to see if the changes done are effective
+        stream.println("Load the objects again to see if changes done are effective");
+        _db.begin();
+        oql.bind( groupAId );
+        groupA = null;
+        person1 = null;
+        person2 = null;
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enum.next();
+            stream.println( "Retrieved object: " + groupA );
+            Collection p = groupA.getPeople();
+            if ( p != null ) {
+                Iterator itor = p.iterator();
+                if ( itor.hasNext() ) 
+                    person1 = (TestManyPersonKeyGen) itor.next();
+                if ( itor.hasNext() )
+                    person3 = (TestManyPersonKeyGen) itor.next();
+
+                // swap if the order is wrong
+                if ( person1.getId() == person3Id && person3.getId() == person1Id ) {
+                    temp = person1;
+                    person1 = person3;
+                    person3 = temp;
+                }
+                if ( itor.hasNext() ) {
+                    fail("Error: more people than expected! 1:("+person1+") 2: ("+itor.next()+")");
+                }
+
+                if ( person1 == null )
+                    fail("Error: expect person1 in group");
+
+                if ( person1.getId() == person1Id ) {
+                    // check if the value is valid for person1 and chnage value of person1
+                    if ( person1.getValue1() == null || !person1.getValue1().equals("New person 1 value") ) {
+                        fail("Error: unexpected person value");
+                    }
+                } else {
+                    fail("Error: people in group is not the same as expected!");
+                }
+
+                if ( person3.getId() == person3Id ) {
+                    // check if the value is valid for person1 and chnage value of person1
+                    if ( person3.getValue1() == null || !person3.getValue1().equals("I am person 3") ) {
+                        fail("Error: unexpected person value");
+                    }
+                } else {
+                    fail("Error: people in group is not the same as expected!");
+                }
+
+            } else {
+                fail("Error: related object not found!");
+            }
+        } else {
+            fail("Error: object not found!");
+        }
+        _db.commit();
+
+        // test long transaction support
+        stream.println("Modifing object outside of transaction");
+        // remove person 3
+        Iterator it = groupA.getPeople().iterator();
+        while ( it.hasNext() ) {
+            person3 = (TestManyPersonKeyGen) it.next();
+            if ( person3.getId() == person3Id ) {
+                it.remove();
+                break;
+            }
+        }
+        person3.getGroup().clear();
+        // add person 4
+        groupA.getPeople().add( person4 );
+        person4.getGroup().add( groupA );
+        // find person 1
+        person1 = null;
+        it = groupA.getPeople().iterator();
+        while ( it.hasNext() ) {
+            person1 = (TestManyPersonKeyGen) it.next();
+            if ( person1.getId() == person1Id )
+                break;
+        }
+        person1.setValue1("New new value for person 1");
+
+        stream.println("Update object to a new transaction");
+        _db.setAutoStore( true );
+        _db.begin();
+        _db.update( groupA );
+        _db.commit();
+
+        person4Id = person4.getId();
+        // load again to see if the changes done are effective
+        stream.println("Load the objects again to see if changes done are effective");
+        _db.begin();
+        oql.bind( groupAId );
+        groupA = null;
+        person1 = null;
+        person2 = null;
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enum.next();
+            stream.println( "Retrieved object: " + groupA );
+            Collection p = groupA.getPeople();
+            if ( p != null ) {
+                Iterator itor = p.iterator();
+                if ( itor.hasNext() ) 
+                    person1 = (TestManyPersonKeyGen) itor.next();
+                else 
+                    fail("Erorr: less people than expected!");
+                if ( itor.hasNext() )
+                    person4 = (TestManyPersonKeyGen) itor.next();
+                else 
+                    fail("Erorr: less people than expected!");
+
+                // swap if the order is wrong
+                if ( person1.getId() == person4Id && person4.getId() == person1Id ) {
+                    temp = person1;
+                    person1 = person4;
+                    person4 = temp;
+                }
+                if ( itor.hasNext() ) {
+                    fail("Error: more people than expected! 1:("+person1+") 2: ("+itor.next()+")");
+                }
+
+                if ( person1 == null )
+                    fail("Error: expect person1 in group");
+
+                if ( person1.getId() == person1Id ) {
+                    // check if the value is valid for person1 and chnage value of person1
+                    if ( person1.getValue1() == null || !person1.getValue1().equals("New new value for person 1") ) {
+                        fail("Error: unexpected person value");
+                    }
+                } else {
+                    fail("Error: people in group is not the same as expected!");
+                }
+
+                if ( person4.getId() == person4Id ) {
+                    // check if the value is valid for person1 and chnage value of person1
+                    if ( person4.getValue1() == null || !person4.getValue1().equals("I am person 4") ) {
+                        fail("Error: unexpected person value");
+                    }
+                } else {
+                    fail("Error: people in group is not the same as expected!");
+                }
+
+            } else {
+                fail("Error: related object not found!");
+            }
+        } else {
+            fail("Error: object not found!");
+        }
+        _db.commit();
+    }
+
+    /**
+     * Close the JDO database
+     */
+    public void tearDown() 
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
     }
 }
 

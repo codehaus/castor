@@ -12,7 +12,7 @@
 
 <database name="sybase" engine="sybase" >
   <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource"> 
-    <params user="test" password="secret" port-number="5000" server-name="leaf" />
+    <params user="thomas" password="thomas" port-number="2048" server-name="Dual1" database-name="thomas" />
   </data-source>
   <mapping href="mapping.xml" />
 </database>

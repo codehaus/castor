@@ -47,21 +47,79 @@
 import java.util.Vector;
 import java.util.Enumeration;
 import java.io.InputStreamReader;
-import org.exolab.jtf.CWBaseApplication;
+import java.io.OutputStream;
+import java.io.PrintStream;
+
+// jUnit framework classes
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.textui.TestRunner;
+
+// harness is the root of the test configuration
+import harness.Harness;
+import harness.TestHarness;
+import harness.CastorTestCase;
+
+// for using castor to read tests.xml into data object
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.mapping.Mapping;
-import harness.Harness;
 
 
-public class Main
-{
+public class Main extends TestHarness {
 
-    static public void main( String args[] )
-    {
+    /**
+     * Arguments
+     */
+    private String testBranchs;
+
+    /**
+     * Indicates all the test cases run in verbose mode
+     */
+    private boolean verbose;
+
+    /**
+     * Indicates we only display information of test case, 
+     * but not running them.
+     */
+    private boolean printInfo;
+
+    /**
+     * Indicates that the gui runner should be used
+     */
+    private boolean gui;
+
+    /**
+     * Constructor
+     */
+    private Main( boolean verbose, boolean printInfo, boolean gui, String tests ) {
+        super(null,"Castor","Root");
+        this.verbose = verbose;
+        this.printInfo = printInfo;
+        this.testBranchs = tests;
+        if ( verbose ) {
+            TestHarness.setVerboseStream( System.out );
+            TestHarness.setVerbose( true );
+            CastorTestCase.setVerboseStream( System.out );
+            CastorTestCase.setVerbose( true );
+        } else {
+            TestHarness.setVerboseStream( new PrintStream( new VoidOutputStream() ) );
+            TestHarness.setVerbose( false );
+            CastorTestCase.setVerboseStream( new PrintStream( new VoidOutputStream() ) );
+            CastorTestCase.setVerbose( false );
+        }
+    }
+
+    /**
+     * Setup and run the test suites according to the xml configuration file.
+     * Make the setup itself run like a test, such that setup errors is 
+     * reported.
+     */
+    public void run( TestResult result ) {
         try {
             Unmarshaller      unm;
             Harness           harness;
-            CWBaseApplication testApp;
+            TestHarness       testApp;
             Mapping           mapping;
             
             unm = new Unmarshaller( Harness.class );
@@ -69,12 +127,73 @@ public class Main
             mapping.loadMapping( Main.class.getResource( "harness/mapping.xml" ) );
             unm.setMapping( mapping );
             harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( "tests.xml" ) ) );
-            testApp = harness.createTestHarness();
-            testApp.run( args );
-        } catch ( Exception except ) {
-            except.printStackTrace();
+            testApp = harness.createTestHarness( testBranchs );
+            if ( printInfo )
+                testApp.printInfo( System.out, testBranchs );
+            else
+                testApp.run( result );
+        } catch ( Exception e ) {
+            result.addError( this, e );
         }
     }
 
+    /**
+     * The main method. 
+     * Usage: test [-verbose] [-info] [-gui] testcases
+     */
+    public static void main( String args[] ) {
+        int     cur       = 0;
+        boolean infoOnly  = false;
+        boolean verbose   = false;
+        boolean gui       = false;
+
+        if ( args.length == 0 ) {
+            usage();
+            return;
+        }
+
+        while ( cur < args.length && args[cur].startsWith( "-" ) ) {
+            if ( args[cur].equals("-verbose") ) {
+                verbose  = true;
+            } else if ( args[cur].equals("-info") ) {
+                infoOnly = true;
+            } else if ( args[cur].equals("-gui") ) {
+                gui = true;
+            }
+            cur++;
+        }
+        if ( cur >= args.length ) {
+            if ( !infoOnly ) {
+                usage();
+                return;
+            } else {
+                junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, null ) );
+                return;
+
+            }
+        }
+        if ( cur < (args.length-1) ) {
+            System.out.println( "argument(s) ignored:" );
+            for ( int i = (cur+1); i < args.length; i++ ) {
+                System.out.println( args[i] + "\t" );
+            }
+        }
+        junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, args[cur] ) );
+    }
+
+    /**
+     * Print the usage
+     */
+    private static void usage() {
+        System.out.println( "Usage: test [-verbose] [-info] testcases" );
+    }
+
+    /**
+     * Helper class that sallows all the verbose output
+     */
+    private static class VoidOutputStream extends OutputStream {
+        public void write( int b ) {
+        }
+    }
 
 }

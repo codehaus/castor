@@ -68,13 +68,17 @@ import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
+
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
+ *
  */
-public class Performance extends CWTestCase {
+public class Performance extends CastorTestCase {
 
     public final static int NUMBER_OF_PERSON = 100;
 
@@ -97,21 +101,13 @@ public class Performance extends CWTestCase {
     static final String    JDOValue = "jdo value";
 
 
-    public Performance( CWTestCategory category )
+    public Performance( TestHarness category )
             throws CWClassConstructorException {
-        super( "TC63", "Test on database's outter join and alternatives" );
+        super( category, "TC63", "Test on database's outter join and alternatives" );
         _category = (JDOCategory) category;
     }
 
 
-    public void preExecute() {
-        super.preExecute();
-    }
-
-
-    public void postExecute() {
-        super.postExecute();
-    }
     public boolean run( CWVerboseStream stream ) {
         boolean result = true;
 

@@ -12,28 +12,17 @@ import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
-public class TypeHandling
-    extends CWTestCase
-{
-
-
-    public TypeHandling( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC01", "Test type handling" );
-    }
+public class TypeHandling extends CastorTestCase {
 
 
-    public void preExecute()
-    {
-        super.preExecute();
-    }
-
-
-    public void postExecute()
-    {
-        super.postExecute();
+    public TypeHandling( TestHarness category ) {
+        super( category, "TC01", "Test type handling" );
     }
 
 

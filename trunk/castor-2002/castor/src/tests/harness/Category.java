@@ -51,11 +51,9 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Constructor;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWBaseApplication;
-import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
 public class Category
 {
@@ -136,31 +134,26 @@ public class Category
     }
 
 
-    public CWTestCategory createTestCategory()
-        throws CWClassConstructorException
-    {
+    public TestSuite createTestCategory( TestHarness harness, String branch )
+            throws Exception {
+
         Class          catClass;
         Constructor    cnst;
-        CWTestCategory category;
-        CWTestCase     tc;
+        TestHarness    category;
+        CastorTestCase tc;
 
-        try {
-            catClass = getClass().forName( _className );
-            cnst = catClass.getConstructor( new Class[] { String.class, String.class, Object.class } );
-            category = (CWTestCategory) cnst.newInstance( new Object[] { _name, _description, _object } );
-            for ( int i = 0 ; i < _cases.size() ; ++i ) {
-                tc = ( (Case) _cases.elementAt( i ) ).createTestCase( category );
-                category.add( tc.name(), tc, true );
-            }
-            return category;
-        } catch ( CWClassConstructorException except ) {
-            throw except;
-        } catch ( InvocationTargetException except ) {
-            throw new CWClassConstructorException( (Exception) except.getTargetException() );
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except );
+        String sub = (branch==null||branch.equals(""))?null
+            :branch.substring( branch.indexOf(".")==-1?branch.length():branch.indexOf(".")+1 );
+
+        catClass = getClass().forName( _className );
+        cnst = catClass.getConstructor( new Class[] { TestHarness.class, String.class, String.class, Object.class } );
+        category = (TestHarness) cnst.newInstance( new Object[] { harness, _name, _description, _object } );
+        for ( int i = 0 ; i < _cases.size() ; ++i ) {
+            tc = ((Case)_cases.elementAt(i)).createTestCase( category );
+            if ( sub == null || sub.trim().equals("") || sub.equals( tc.getName() ) )
+                category.addTest( tc );
         }
+        return category;
     }
-
 
 }

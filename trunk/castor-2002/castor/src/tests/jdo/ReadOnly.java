@@ -53,107 +53,119 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 /**
- * Tests that read only objects are not stored in the database.
+ * Tests that modification to read only objects are not persist in the 
+ * database.
  */
-public class ReadOnly
-    extends CWTestCase
-{
+public class ReadOnly extends CastorTestCase {
 
-
+    /**
+     * The test suite that this test case belongs
+     */
     private JDOCategory    _category;
 
+    /**
+     * The JDO Database
+     */
+    private Database       _db;
 
     static final String    NewValue = "new value";
 
-
-    public ReadOnly( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC05", "Read only tests" );
+    /**
+     * Constructor
+     *
+     * @param category the test suite that this test case belongs
+     */
+    public ReadOnly( TestHarness category ) {
+        super( category, "TC05", "Read only tests" );
         _category = (JDOCategory) category;
     }
 
+    /**
+     * Get a jdo.Database and create a test object for readOnly test
+     */
+    public void setUp() 
+            throws PersistenceException {
 
-    public void preExecute()
-    {
-        super.preExecute();
+        OQLQuery      oql;
+        TestObject    object;
+        Enumeration   enum;
+
+        // Open transaction in order to perform JDO operations
+        _db = _category.getDatabase( verbose );
+        _db.begin();
+    
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            object.setValue1( TestObject.DefaultValue1 );
+            object.setValue2( TestObject.DefaultValue2 );
+        } else {
+            object = new TestObject();
+            stream.println( "Creating new object: " + object );
+            _db.create( object );
+        } 
+        _db.commit();
     }
 
+    /**
+     * Tests that modification to read only objects are not persist in the 
+     * database.
+     */
+    public void runTest() 
+            throws PersistenceException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
+        OQLQuery      oql;
+        TestObject    object;
+        Enumeration   enum;
 
-
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            TestObject    object;
-            Enumeration   enum;
-
-            // Open transaction in order to perform JDO operations
-            db = _category.getDatabase( stream.verbose() );
-            db.begin();
+        // load an object using readOnly mode
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute( Database.ReadOnly );
+        object = (TestObject) enum.nextElement();
+        stream.println( "Retrieved object: " + object );
+        object.setValue1( NewValue );
+        stream.println( "Modified object: " + object );
+        _db.commit();
         
-            // Determine if test object exists, if not create it.
-            // If it exists, set the name to some predefined value
-            // that this test will later override.
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                object.setValue1( TestObject.DefaultValue1 );
-                object.setValue2( TestObject.DefaultValue2 );
-            } else {
-                object = new TestObject();
-                stream.writeVerbose( "Creating new object: " + object );
-                db.create( object );
-            } 
-            db.commit();
+        // read the object from another transaction to see
+        // if changes is not persisted.
+        _db.begin();
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute( Database.ReadOnly );
+        object = (TestObject) enum.nextElement();
+        stream.println( "Retrieved object: " + object );
+        if ( object.getValue1().equals( NewValue ) ) {
+            stream.println( "Error: modified object was stored" );
+            fail("Modified object was stored");
+        } else
+            stream.println( "OK: object is read-only" );
+        _db.commit();
 
-            db.begin();
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute( Database.ReadOnly );
-            object = (TestObject) enum.nextElement();
-            stream.writeVerbose( "Retrieved object: " + object );
-            object.setValue1( NewValue );
-            stream.writeVerbose( "Modified object: " + object );
-            db.commit();
-            
-            db.begin();
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute( Database.ReadOnly );
-            object = (TestObject) enum.nextElement();
-            stream.writeVerbose( "Retrieved object: " + object );
-            if ( object.getValue1().equals( NewValue ) ) {
-                result = false;
-                stream.writeVerbose( "Error: modified object was stored" );
-            } else
-                stream.writeVerbose( "OK: object is read-only" );
-            db.commit();
-
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
-        }
-        return result;
     }
 
+    /**
+     * Close the database used in this test
+     */
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 
 }
 

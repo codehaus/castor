@@ -48,6 +48,7 @@ package jdo;
 
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
@@ -55,127 +56,147 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 import org.exolab.castor.persist.OID;
 
-/**
- * Tests for duplicate key detection. Tests both duplicate key detection
- * in memory and in the database.
- */
-public class DuplicateKey
-    extends CWTestCase
-{
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.TestResult;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
+/**
+ * Tests for duplicate key detection. 
+ * 1/ Try to create an object with an identity same as another loaded (in memory) 
+ *    object.
+ * 2/ Try to create an object with an identity same as another object what is not
+ *    loaded by in the database.
+ */
+public class DuplicateKey extends CastorTestCase {
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
+    public DuplicateKey( TestHarness category ) {
 
-    public DuplicateKey( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC01", "Duplicate key detection" );
+        super( category, "TC01", "Duplicate key detection" );
         _category = (JDOCategory) category;
     }
 
+    /**
+     * Creates data objects used by these tests
+     */
+    public void setUp() 
+            throws PersistenceException {
 
-    public void preExecute()
-    {
-        super.preExecute();
-    }
-
-
-    public void postExecute()
-    {
-        super.postExecute();
-    }
-
-
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            TestObject    object;
-            QueryResults   enum;
-            
-            // Open transaction in order to perform JDO operations
-            db = _category.getDatabase( stream.verbose() );
-            db.begin();
-            
-            // Determine if test object exists, if not create it.
-            // If it exists, set the name to some predefined value
-            // that this test will later override.
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMore() ) {
-                object = (TestObject) enum.next();
-                stream.writeVerbose( "Updating object: " + object );
-            } else {
-                object = new TestObject();
-                stream.writeVerbose( "Creating new object: " + object );
-                db.create( object );
-            }
-            db.commit();
-            
-
-            // Attempt to create a new object with the same identity,
-            // while one is in memory. Will report duplicate key from
-            // the cache engine.
-            db.begin();
-            oql.bind( new Integer( TestObject.DefaultId ) );
-            enum = oql.execute();
-            while ( enum.hasMore() )
-                enum.next();
-            
+        OQLQuery      oql;
+        TestObject    object;
+        QueryResults  enum;
+        
+        // Open transaction in order to perform JDO operations
+        _db = _category.getDatabase( verbose );
+        _db.begin();
+        
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            object = (TestObject) enum.next();
+            stream.println( "Updating object: " + object );
+        } else {
             object = new TestObject();
-            stream.writeVerbose( "Creating new object: " + object );
-            stream.writeVerbose( "Will report duplicate identity from cache engine" );
-            try {
-                db.create( object );
-                result = false;
-                stream.writeVerbose( "Error: DuplicateIdentityException not thrown" );
-            } catch ( DuplicateIdentityException except ) {
-                stream.writeVerbose( "OK: DuplicateIdentityException thrown" );
-            } catch ( Exception except ) {
-                result = false;
-                stream.writeVerbose( "Error: " + except );
-            }
-            db.commit();
-
-            //System.out.println("Second commit done!");
-	    
-            // Attempt to create a new object with the same identity,
-            // in the database. Will report duplicate key from SQL engine.
-            db.begin();
-            object = new TestObject();
-            stream.writeVerbose( "Creating new object: " + object );
-            stream.writeVerbose( "Will report duplicate identity from SQL engine" );
-            try {
-                db.create( object );
-                result = false;
-                stream.writeVerbose( "Error: DuplicateIdentityException not thrown" );
-            } catch ( DuplicateIdentityException except ) {
-                stream.writeVerbose( "OK: DuplicateIdentityException thrown" );
-            } catch ( Exception except ) {
-                // result = false;
-                stream.writeVerbose( "Error: " + except );
-            }
-            db.commit();
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+            stream.println( "Creating new object: " + object );
+            _db.create( object );
         }
-        return result;
+        _db.commit();
     }
 
+    /**
+     * Calls the individual tests embedded in this test case
+     */
+    public void runTest() 
+            throws PersistenceException {
+        testDuplicateIdentityAsInMemory();
+        testDuplicateIdentityAsInDatabase();
+    }
 
+    /**
+     * Try to create two objects with the same identity. This test passes 
+     * if an DuplicateIdentityException is thrown when the second object 
+     * with duplicated identity is created.
+     */
+    public void testDuplicateIdentityAsInMemory() 
+            throws PersistenceException {
+
+        TestObject    object;
+        OQLQuery      oql;
+        QueryResults  enum;
+
+        // Attempt to create a new object with the same identity,
+        // while one is in memory. Will report duplicate key from
+        // the cache engine.
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        enum = oql.execute();
+        while ( enum.hasMore() )
+            enum.next();
+        
+        object = new TestObject();
+        stream.println( "Creating new object: " + object );
+        stream.println( "Will report duplicate identity from cache engine" );
+        try {
+            _db.create( object );
+            // expected exception
+            fail("DuplicateIdentityException not thrown");
+            stream.println( "Error: DuplicateIdentityException not thrown" );
+        } catch ( DuplicateIdentityException except ) {
+            stream.println( "OK: DuplicateIdentityException thrown" );
+        } catch ( PersistenceException except ) {
+            stream.println( "Error: " + except );
+            throw except;
+        } finally {
+            _db.commit();
+        }
+    }
+
+    /**
+     * Try to create an object with an identity same as another object what is not
+     * loaded by in the database.  This test case pass if an 
+     * DuplicateIdentityException is thrown when the object with duplicated identity 
+     * is created.
+     */
+    public void testDuplicateIdentityAsInDatabase() 
+            throws PersistenceException {
+
+        _db.begin();
+        TestObject object = new TestObject();
+        stream.println( "Creating new object: " + object );
+        stream.println( "Will report duplicate identity from SQL engine" );
+        try {
+            _db.create( object );
+            //result = false;
+            stream.println( "Error: DuplicateIdentityException not thrown" );
+        } catch ( DuplicateIdentityException except ) {
+            stream.println( "OK: DuplicateIdentityException thrown" );
+        } catch ( PersistenceException except ) {
+            // result = false;
+            stream.println( "Error: " + except );
+        } finally {
+            _db.commit();
+        }
+    }
+
+    /**
+     * Close the database
+     */
+    public void tearDown() 
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 }

@@ -79,13 +79,16 @@ import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 import java.util.ArrayList;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
+
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
  */
-public class ListTypes extends CWTestCase {
+public class ListTypes extends CastorTestCase {
 
     private Database       _db;
 
@@ -96,21 +99,11 @@ public class ListTypes extends CWTestCase {
     private JDOCategory    _category;
 
 
-    public ListTypes( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC60", "List SQL Types" );
+    public ListTypes( TestHarness category )
+            throws CWClassConstructorException {
+
+        super( category, "TC60", "List SQL Types" );
         _category = (JDOCategory) category;
-    }
-
-    public void preExecute()
-    {
-        super.preExecute();
-    }
-
-    public void postExecute()
-    {
-        super.postExecute();
     }
 
 

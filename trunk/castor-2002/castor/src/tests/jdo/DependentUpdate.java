@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -60,17 +60,17 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  */
-public class DependentUpdate
-    extends CWTestCase
-{
+public class DependentUpdate extends CastorTestCase {
 
 
     private Connection     _conn;
@@ -79,317 +79,279 @@ public class DependentUpdate
     private JDOCategory    _category;
 
 
-    public DependentUpdate( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC25", "Dependent update objects tests" );
+    private Database       _db;
+
+
+    public DependentUpdate( TestHarness category )
+            throws PersistenceException {
+
+        super( category, "TC25", "Dependent update objects tests" );
         _category = (JDOCategory) category;
     }
 
-
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException, SQLException {
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection();
+        _conn.setAutoCommit( false );
     }
 
+    public void runTest()
+            throws PersistenceException, SQLException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
+        OQLQuery      oql;
+        OQLQuery      groupOql;
+        TestMaster    master;
+        TestGroup     group;
+        TestDetail    detail;
+        TestDetail2   detail2;
+        QueryResults  qres;
+        TestMaster    master2;
+        int           cnt;
+        int           detailId = 0;
 
+        stream.println( "Delete everything" );
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
+        qres = oql.execute();
 
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            OQLQuery      groupOql;
-            TestMaster    master;
-            TestGroup     group;
-            TestDetail    detail;
-            TestDetail2   detail2;
-            QueryResults  qres;
-            TestMaster    master2;
-            int           cnt;
-            int           detailId = 0;
-
-            db = _category.getDatabase( stream.verbose() );
-
-            stream.writeVerbose( "Delete everything" );
-            db.begin();
-            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
-            qres = oql.execute();
-
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.next() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " master objects" );
-			/*
-            oql = db.getOQLQuery( "SELECT detail FROM jdo.TestDetail detail" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " detail objects" );
-            oql = db.getOQLQuery( "SELECT detail2 FROM jdo.TestDetail2 detail2" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " detail2 objects" );
-			*/
-            oql = db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " group objects" );
-            db.commit();
-
-            stream.writeVerbose( "Attempt to create master with details" );
-            db.begin();
-            master = new TestMaster();
-            master.addDetail( new TestDetail( 5 ) );
-            detail = new TestDetail( 6 );
-            detail.addDetail2( new TestDetail2() );
-            detail.addDetail2( new TestDetail2() );
-            master.addDetail( detail );
-            detail = new TestDetail( 7 );
-            detail.addDetail2( new TestDetail2() );
-            detail.addDetail2( new TestDetail2() );
-            master.addDetail( detail );
-            group = new TestGroup();
-            db.create( group );
-            master.setGroup( group );
-            db.create( master );
-            db.commit();
-
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getGroup() == null ) {
-                    stream.writeVerbose( "Error: loaded master without group: " + master );
-                    result  = false;
-                } else if ( master.getGroup().getId() != TestGroup.DefaultId ) {
-                    stream.writeVerbose( "Error: loaded master with wrong group: " + master );
-                    result  = false;
-                }
-                if ( master.getDetails() == null ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master without three details: " + master );
-                    result  = false;
-                }
-                detail = master.findDetail( 5 );
-                if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
-                    stream.writeVerbose( "Error: loaded detail 5 with details2: " + qres.next() );
-                    result = false;
-                }
-                detail = master.findDetail( 6 );
-                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
-                    stream.writeVerbose( "Error: loaded detail 6 without two details: " + detail );
-                    result  = false;
-                }
-                detail = master.findDetail( 7 );
-                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
-                    stream.writeVerbose( "Error: loaded detail 7 without two details: " + detail );
-                    result  = false;
-                }
-            } else {
-                stream.writeVerbose( "Error: failed to create master with details and group" );
-                result = false;
-            }
-            if ( result )
-                stream.writeVerbose( "Created master with details: " + master );
-            db.commit();
-            if ( ! result )
-                return false;
-
-
-            stream.writeVerbose( "Attempt to change details" );
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master == null ) {
-                stream.writeVerbose( "Error: failed to find master with details group" );
-                return false;
-            }
-            // remove detail with id == 5
-            master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
-            //db.remove( detail );
-            // add new detail
-            master.addDetail( new TestDetail( 8 ) );
-            // add new detail and create it explicitely
-            detail = new TestDetail( 9 );
-            master.addDetail( detail );
-            //db.create( detail );
-            // delete, then create detail with id == 7 explicitly
-            detail = (TestDetail) master.findDetail( 7 );
-            master.getDetails().remove( master.getDetails().indexOf( detail ) );
-            //db.remove( detail );
-            master.addDetail( detail );
-            //db.create( detail );
-            db.commit();
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getDetails().size() == 0 ||
-                     master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     master.findDetail( 6 ).getDetails2() == null ||
-                     master.findDetail( 6 ).getDetails2().size() != 2 ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            db.commit();
-            if ( ! result )
-                return false;
-
-
-            stream.writeVerbose( "Test long transaction with dirty checking" );
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master == null ) {
-                stream.writeVerbose( "Error: failed to find master with details group" );
-                return false;
-            }
-            db.commit();
-            db.begin();
-            master2 = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            master2.setValue1( master2.getValue1() + "2" );
-            db.commit();
-
-            stream.writeVerbose( "Test 1" );
-            try {
-                db.begin();
-                db.update( master );
-                db.commit();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            } catch ( ObjectModifiedException exept ) {
-                db.rollback();
-                stream.writeVerbose( "OK: Dirty checking works" );
-            }
-
-            stream.writeVerbose( "Test 2" );
-            detail = new TestDetail( 5 );
-            detail2 = new TestDetail2();
-            detail.addDetail2( detail2 );
-            master2.addDetail( detail );
-            master2.getDetails().remove( new TestDetail( 8 ) );
-            master2.getDetails().remove( new TestDetail( 9 ) );
-            try {
-                db.begin();
-                db.update( master2 );
-                db.commit();
-                detailId = detail2.getId();
-                stream.writeVerbose( "OK: Dirty checking works" );
-            } catch ( ObjectModifiedException exept ) {
-                db.rollback();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            }
-
-            stream.writeVerbose( "Test 3" );
-            _conn = _category.getJDBCConnection();
-            _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_master SET value1='concurrent' WHERE id="
-                    + master2.getId() );
-            _conn.commit();
-            _conn.close();
-            master2.setValue1( "long transaction new value" );
-            try {
-                db.begin();
-                db.update( master2 );
-                db.commit();
-                stream.writeVerbose( "Error: Dirty checking doesn't work" );
-                result  = false;
-            } catch ( ObjectModifiedException exept ) {
-                if (db.isActive()) {
-                    db.rollback();
-                }
-                stream.writeVerbose( "OK: Dirty checking works" );
-            }
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getDetails().size() == 0 ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     master.findDetail( 5 ).findDetail2( detailId ) == null  ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     master.findDetail( 6 ).getDetails2() == null ||
-                     master.findDetail( 6 ).getDetails2().size() != 2 ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     master.getDetails().contains( new TestDetail( 9 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly in the long transaction: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            db.commit();
-
-            // modify an dependent object and see if it got updated
-            stream.writeVerbose( "Test 3" );
-            detail = master.findDetail( 5 );
-            detail.setValue1("new updated value");
-            detail.findDetail2( detailId ).setValue1("new detail 2 value");
-            db.begin();
-            db.update( master );
-            db.commit();
-
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getDetails() == null ||
-                     master.getDetails().size() == 0 ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     master.getDetails().contains( new TestDetail( 9 ) ) ||
-                     ! "new updated value".equals( master.findDetail( 5 ).getValue1()) ||
-                     master.findDetail( 5 ).findDetail2( detailId ) == null ||
-                     ! "new detail 2 value".equals( master.findDetail( 5 ).findDetail2( detailId ).getValue1() ) ) {
-
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly in the long transaction: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            db.commit();
-
-            if ( ! result )
-                return false;
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        for ( cnt = 0; qres.hasMore(); cnt++ ) {
+            _db.remove( qres.next() );
         }
-        return result;
+        stream.println( "Deleting " + cnt + " master objects" );
+
+        oql = _db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
+        qres = oql.execute();
+        for ( cnt = 0; qres.hasMore(); cnt++ ) {
+            _db.remove( qres.nextElement() );
+        }
+        stream.println( "Deleting " + cnt + " group objects" );
+        _db.commit();
+
+        stream.println( "Attempt to create master with details" );
+        _db.begin();
+        master = new TestMaster();
+        master.addDetail( new TestDetail( 5 ) );
+        detail = new TestDetail( 6 );
+        detail.addDetail2( new TestDetail2() );
+        detail.addDetail2( new TestDetail2() );
+        master.addDetail( detail );
+        detail = new TestDetail( 7 );
+        detail.addDetail2( new TestDetail2() );
+        detail.addDetail2( new TestDetail2() );
+        master.addDetail( detail );
+        group = new TestGroup();
+        _db.create( group );
+        master.setGroup( group );
+        _db.create( master );
+        _db.commit();
+
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getGroup() == null ) {
+                stream.println( "Error: loaded master without group: " + master );
+                fail("expecting group");
+            } else if ( master.getGroup().getId() != TestGroup.DefaultId ) {
+                stream.println( "Error: loaded master with wrong group: " + master );
+                fail("incorrect group");
+            }
+            if ( master.getDetails() == null ||
+                 ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ) {
+                stream.println( "Error: loaded master without three details: " + master );
+                fail("incorrect detail(s)");
+            }
+            detail = master.findDetail( 5 );
+            if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
+                stream.println( "Error: loaded detail 5 with details2: " + qres.next() );
+                fail("unexpected element found");
+            }
+            detail = master.findDetail( 6 );
+            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
+                stream.println( "Error: loaded detail 6 without two details: " + detail );
+                fail("details' size mismatch");
+            }
+            detail = master.findDetail( 7 );
+            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
+                stream.println( "Error: loaded detail 7 without two details: " + detail );
+                fail("details' size mismatch");
+            }
+        } else {
+            stream.println( "Error: failed to create master with details and group" );
+            fail("failed to create master with details and group");
+        }
+        _db.commit();
+        stream.println( "Created master with details: " + master );
+
+        stream.println( "Attempt to change details" );
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master == null ) {
+            stream.println( "Error: failed to find master with details group" );
+            fail("master not found");
+        }
+        // remove detail with id == 5
+        master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
+        // add new detail
+        master.addDetail( new TestDetail( 8 ) );
+        // add new detail and create it explicitely
+        detail = new TestDetail( 9 );
+        master.addDetail( detail );
+        // delete, then create detail with id == 7 explicitly
+        detail = (TestDetail) master.findDetail( 7 );
+        master.getDetails().remove( master.getDetails().indexOf( detail ) );
+        master.addDetail( detail );
+        _db.commit();
+
+
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getDetails().size() == 0 ||
+                 master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 master.findDetail( 6 ).getDetails2() == null ||
+                 master.findDetail( 6 ).getDetails2().size() != 2 ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 8 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
+                stream.println( "Error: loaded master has wrong set of details: " + master );
+                fail("loaded master has wrong set of details");
+            } else {
+                stream.println( "Details changed correctly: " + master );
+            }
+        } else {
+            stream.println( "Error: master not found" );
+            fail("master not found");
+        }
+        _db.commit();
+
+
+        stream.println( "Test long transaction with dirty checking" );
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master == null ) {
+            stream.println( "Error: failed to find master with details group" );
+            fail("master not found");
+        }
+        _db.commit();
+        _db.begin();
+        master2 = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        master2.setValue1( master2.getValue1() + "2" );
+        _db.commit();
+
+        stream.println( "Test 1" );
+        try {
+            _db.begin();
+            _db.update( master );
+            _db.commit();
+            stream.println( "Error: Dirty checking doesn't work" );
+            fail("dirty check failed");
+        } catch ( ObjectModifiedException exept ) {
+            _db.rollback();
+            stream.println( "OK: Dirty checking works" );
+        }
+
+        stream.println( "Test 2" );
+        detail = new TestDetail( 5 );
+        detail2 = new TestDetail2();
+        detail.addDetail2( detail2 );
+        master2.addDetail( detail );
+        master2.getDetails().remove( new TestDetail( 8 ) );
+        master2.getDetails().remove( new TestDetail( 9 ) );
+        try {
+            _db.begin();
+            _db.update( master2 );
+            _db.commit();
+            detailId = detail2.getId();
+            stream.println( "OK: Dirty checking works" );
+        } catch ( ObjectModifiedException exept ) {
+            _db.rollback();
+            stream.println( "Error: Dirty checking doesn't work" );
+            fail("dirty check failed");
+        }
+
+        stream.println( "Test 3" );
+        _conn.createStatement().execute( "UPDATE test_master SET value1='concurrent' WHERE id="
+                + master2.getId() );
+        _conn.commit();
+        master2.setValue1( "long transaction new value" );
+        try {
+            _db.begin();
+            _db.update( master2 );
+            _db.commit();
+            stream.println( "Error: Dirty checking doesn't work" );
+            fail("dirty check failed");
+        } catch ( ObjectModifiedException exept ) {
+            if (_db.isActive()) {
+                _db.rollback();
+            }
+            stream.println( "OK: Dirty checking works" );
+        }
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getDetails().size() == 0 ||
+                 ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 master.findDetail( 5 ).findDetail2( detailId ) == null  ||
+                 ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 master.findDetail( 6 ).getDetails2() == null ||
+                 master.findDetail( 6 ).getDetails2().size() != 2 ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                 master.getDetails().contains( new TestDetail( 8 ) ) ||
+                 master.getDetails().contains( new TestDetail( 9 ) ) ) {
+                stream.println( "Error: loaded master has wrong set of details: " + master );
+                fail("unexpect set of details");
+            } else {
+                stream.println( "Details changed correctly in the long transaction: " + master );
+            }
+        } else {
+            stream.println( "Error: master not found" );
+            fail("master not found");
+        }
+        _db.commit();
+
+        // modify an dependent object and see if it got updated
+        stream.println( "Test 3" );
+        detail = master.findDetail( 5 );
+        detail.setValue1("new updated value");
+        detail.findDetail2( detailId ).setValue1("new detail 2 value");
+        _db.begin();
+        _db.update( master );
+        _db.commit();
+
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getDetails() == null ||
+                 master.getDetails().size() == 0 ||
+                 ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                 master.getDetails().contains( new TestDetail( 8 ) ) ||
+                 master.getDetails().contains( new TestDetail( 9 ) ) ||
+                 ! "new updated value".equals( master.findDetail( 5 ).getValue1()) ||
+                 master.findDetail( 5 ).findDetail2( detailId ) == null ||
+                 ! "new detail 2 value".equals( master.findDetail( 5 ).findDetail2( detailId ).getValue1() ) ) {
+
+                stream.println( "Error: loaded master has wrong set of details: " + master );
+                fail("unexpected set of details");
+            } else {
+                stream.println( "Details changed correctly in the long transaction: " + master );
+            }
+        } else {
+            stream.println( "Error: master not found" );
+            fail("master not found");
+        }
+        _db.commit();
     }
 
-
+    public void tearDown()
+            throws PersistenceException, SQLException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+        _conn.close();
+    }
 }

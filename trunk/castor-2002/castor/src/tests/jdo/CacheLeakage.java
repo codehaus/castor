@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -65,166 +65,252 @@ import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
+ * This is a concurrent stress test. This test creates one write thread
+ * that continuously create, load and modify, load and test if the 
+ * modification is succeed, load and remove data objects and create 
+ * again.... from a JDO database; multiple read threads are created and 
+ * continuously read the data objects from a transaction and commit the 
+ * transactions without modifying them. The read and commit action essentially 
+ * lock and unlock the data object. These tests pass if all modification to
+ * data objects via the write lock is properly persisted and no deadlock occurs.
+ * Passing the tests confirm Castor JDO properly lock and release objects. 
+ * Tests are performed on all four differnt cache-type.
+ * (note, these tests may failed if the number of JDBC connections available
+ * to Castor JDO is too small. To resolve the problem, reduce the number of 
+ * read threads or increase the available connections.)
  */
-public class CacheLeakage extends CWTestCase {
+public class CacheLeakage extends CastorTestCase {
 
+    /**
+     * Number of target data objects to be created and deleted
+     */
     private final static int NUM_OF_CREATE_DELETE = 10;
 
+    /**
+     * Number of trial of loads and releases on each object
+     */
     private final static int NUM_OF_READ = 50;
 
+    /**
+     * Number of retrials attempt to load per each trial
+     */
     private final static int NUM_OF_RETRIAL = 20;
 
+    /**
+     * The base time in milliseconds between each attempts
+     */
     private final static int SLEEP_BASE_TIME = 100;
 
-    private final static int NUM_OF_READ_THREADS = 1;
+    /**
+     * Number of load and releases of read threads to race on 
+     * the target object
+     */
+    private final static int NUM_OF_READ_THREADS = 5;
 
+    /**
+     * The JDO test suite these test cases belongs to
+     */
     private JDOCategory    _category;
 
+    /**
+     * The JDO database
+     */
     Database _db;
 
+    /**
+     * The JDBC connection used to initalizes tables for tests
+     */
     Connection _conn;
 
+    /**
+     * The class name of the target data objects
+     */
     String _className;
 
+    /**
+     * The java class of the target data objects
+     */
     Class _classType;
 
+    /**
+     * The cache type used in the current test
+     */
     int _cacheType;
 
+    /**
+     * Indicates leakage detected
+     */
     boolean _errLeak;
 
+    /**
+     * Indicates error detected
+     */
     boolean _errCount;
 
-    public CacheLeakage( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC08", "Cache leakage" );
+    private final static int COUNT_LIMITED = 0;
+
+    private final static int TIME_LIMITED  = 1;
+
+    private final static int NO_CACHE      = 2;
+
+    private final static int UNLIMITED     = 3;
+
+    /**
+     * Constructor
+     *
+     * @param category the test suite of these test cases
+     */
+    public CacheLeakage( TestHarness category ) {
+
+        super( category, "TC08", "Cache leakage" );
         _category = (JDOCategory) category;
         _errLeak = false;
         _errCount = false;
     }
 
+    /**
+     * Get a JDO Database and get a JDBC connection
+     */
+    public void setUp() 
+            throws PersistenceException, SQLException {
 
-    public void preExecute()
-    {
-        super.preExecute();
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection();
+        _conn.setAutoCommit( false );
     }
 
+    /**
+     * Run the stress test for four different cache setting
+     */
+    public void runTest() 
+            throws PersistenceException, SQLException {
 
-    public void postExecute()
-    {
-        super.postExecute();
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection();
+        _conn.setAutoCommit( false );
+
+        _cacheType = Database.Shared;
+        runOnce();
+
+        _cacheType = Database.Exclusive;
+        runOnce();
+
+        _cacheType = Database.DbLocked;
+        runOnce();
+
+        _cacheType = Database.ReadOnly; 
+        runOnce();
+
+        assert( "Element leak not detected!", !_errLeak );
+        assert( "Race condition not happened!", !_errCount );
     }
 
-    public boolean run( CWVerboseStream stream ) {
-        try {
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection();
-            _conn.setAutoCommit( false );
+    public void tearDown() 
+            throws PersistenceException, SQLException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+        _conn.close();
+    }
 
-            boolean result = true;
-            for ( int i=0; i < 4; i++ ) {
-                _cacheType = i;
-                if ( !runOnce( stream ) )
-                    result = false;
-            }
-            _db.close();
-            _conn.close();
-            if ( _errLeak )
-                System.out.println("Element leak happened!");
-            if ( _errCount )
-                System.out.println("Sum do not match!");
+    /**
+     * Helper class to run the stress tests once for a cache type.
+     */
+    public void runOnce() 
+            throws PersistenceException, SQLException {
 
-            return result && !_errLeak && !_errCount;
-        } catch ( Exception e ) {
-            stream.write( "Error: "+ e );
-            return false;
+        OQLQuery        oql;
+        TestObjectEx    object;
+        Enumeration     enum;
+        Database        db2;
+
+        // clear the table
+        int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
+        stream.println( "row deleted in table test_race: " + del );
+        _conn.commit();
+
+        // set the className and classType to be used
+        switch ( _cacheType ) {
+        case COUNT_LIMITED:
+            _className = "jdo.TestRaceCount";
+            _classType = jdo.TestRaceCount.class;
+            break;
+        case TIME_LIMITED:
+            _className = "jdo.TestRaceTime";
+            _classType = jdo.TestRaceTime.class;
+            break;
+        case NO_CACHE:
+            _className = "jdo.TestRaceNone";
+            _classType = jdo.TestRaceNone.class;
+            break;
+        case UNLIMITED:
+            _className = "jdo.TestRaceUnlimited";
+            _classType = jdo.TestRaceUnlimited.class;
+            break;
         }
 
-    }
+        CreateDeleteThread cdThread = new CreateDeleteThread( this, _category, _cacheType, NUM_OF_CREATE_DELETE );
 
-    public boolean runOnce( CWVerboseStream stream ) {
-        OQLQuery      oql;
-        TestObjectEx    object;
-        Enumeration   enum;
-        Database db2;
+        ReadThread[] rThread =  new ReadThread[NUM_OF_READ_THREADS];
+        for ( int i=0; i < NUM_OF_READ_THREADS; i++ ) {
+            rThread[i] = new ReadThread( this, cdThread, _category, NUM_OF_READ );
+            rThread[i].start();
+        }
 
-        boolean result = true;
+        cdThread.start();
+        
 
+        // Polling the test case to see if it is finished
         try {
-            // clear the table
-            int del = _conn.createStatement().executeUpdate( "DELETE FROM test_race" );
-            stream.writeVerbose( "row deleted in table test_race: " + del );
-            _conn.commit();
-
-            switch ( _cacheType ) {
-            case 0:
-                _className = "jdo.TestRaceCount";
-                _classType = jdo.TestRaceCount.class;
-                break;
-            case 1:
-                _className = "jdo.TestRaceTime";
-                _classType = jdo.TestRaceTime.class;
-                break;
-            case 2:
-                _className = "jdo.TestRaceNone";
-                _classType = jdo.TestRaceNone.class;
-                break;
-            case 3:
-                _className = "jdo.TestRaceUnlimited";
-                _classType = jdo.TestRaceUnlimited.class;
-                break;
-            }
-
-            CreateDeleteThread cdThread = new CreateDeleteThread( stream, _category, _cacheType, NUM_OF_CREATE_DELETE );
-
-            ReadThread[] rThread =  new ReadThread[NUM_OF_READ_THREADS];
-            for ( int i=0; i < NUM_OF_READ_THREADS; i++ ) {
-                rThread[i] = new ReadThread( stream, cdThread, _category, NUM_OF_READ );
-                rThread[i].start();
-            }
-
-            cdThread.start();
-            
-
-            while ( !cdThread.isDone() /*&& !rThread.isDone()*/ ) {
+            while ( !cdThread.isDone() ) {
                 Thread.currentThread().sleep( 500 );
             }
-            
-            // create threads, make a race so each thread
-            // keeping increment to the pairs of number.
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+
+            // Joins all the finished threads
+            cdThread.join();
+            for ( int i=0; i < NUM_OF_READ_THREADS; i++ ) {
+                rThread[i].join();
+            }
+        } catch ( InterruptedException e ) {
+            fail( e.toString() );
         }
-        return result;
     }
-    class ReadThread extends Thread {
+
+    /**
+     * Multiple read threads are created and continuously read the data 
+     * objects that is modifing by the WriteThread. A read threads does
+     * not modify the data objects but commit the transaction. It gives
+     * stress to Castor JDO and intend to test if the right behavior is
+     * not affect by stress.
+     */
+    private class ReadThread extends Thread {
         Database db;
         int trial;
         int cachetype;
         boolean isDone;
         Random ran;
-        Integer id = new Integer(5);
-        CWVerboseStream stream;
+        CacheLeakage  theTest;
         CreateDeleteThread other;
-        ReadThread( CWVerboseStream stream, CreateDeleteThread other, JDOCategory c, int n ) throws Exception {
-            this.db = c.getDatabase( stream.verbose() );
+        Integer            id = new Integer(5);
+
+        ReadThread( CacheLeakage theTest, CreateDeleteThread other, JDOCategory c, int n ) 
+                throws PersistenceException {
+
+            this.db = c.getDatabase( theTest.verbose );
             this.trial = n;
-            this.stream = stream;
             this.ran = new Random();
             this.other = other;
+            this.theTest = theTest;
         }
+
         public void run() {
             boolean succeed;
             int trials = 0;
@@ -232,10 +318,11 @@ public class CacheLeakage extends CWTestCase {
             try {
                 for ( int i=0; i < trial && !other.isDone(); i++ ) {
                     try {
-                        // load it and modify it
+                        // loads it and releases it
                         db.begin();
                         succeed = false;
                         trials = 0;
+
                         while ( !succeed && trials < NUM_OF_RETRIAL && !other.isDone() ) {
                             trials++;
                             try {
@@ -262,35 +349,53 @@ public class CacheLeakage extends CWTestCase {
                             db.rollback();
                     
                     } catch ( Exception e ) {
+                        fail( e.toString() );
                     }
                 }
             } finally {
                 isDone = true;
+                try {
+                    db.close();
+                } catch ( PersistenceException e ) {
+                    fail( e.toString() );
+                }
             }
         }
         boolean isDone() {
             return isDone;
         }
     }
-    class CreateDeleteThread extends Thread {
-        Database db;
-        int trial;
-        boolean isDone;
-        Random ran;
-        CWVerboseStream stream;
-        int cachetype;
 
-        CreateDeleteThread( CWVerboseStream stream, JDOCategory c, int cachetype, int n ) throws Exception {
-            this.db = c.getDatabase( stream.verbose() );
+    /**
+     * This is write thread that continuously create, load and modify, 
+     * load and test if the modification is succeed, load and remove 
+     * data objects and create again. This threads is the only thread 
+     * that modifies data objects. If any inconsistency detected, for
+     * examples, modification is not persisted, deleted object reappears,
+     * created object disappeared, we can confirm there is problem in
+     * the concurrent engine of Castor JDO.
+     */
+    private class CreateDeleteThread extends Thread {
+        CacheLeakage theTest;
+        Database     db;
+        int          trial;
+        boolean      isDone;
+        Random       ran;
+        int          cachetype;
+
+        private CreateDeleteThread( CacheLeakage theTest, JDOCategory c, int cachetype, int n ) 
+                throws PersistenceException {
+
+            this.db = c.getDatabase( theTest.verbose );
             this.trial = n;
-            this.stream = stream;
             this.ran = new Random();
             this.cachetype = cachetype;
+            this.theTest = theTest;
         }
         public void run() {
             try {
                 int num = 0;
-                stream.writeVerbose("start testing");
+                theTest.stream.println("start testing");
                 TestRace tr;
                 TestRace testrace;
                 OQLQuery oql;
@@ -301,7 +406,8 @@ public class CacheLeakage extends CWTestCase {
 
                 out:
                 for ( int i=0; i<trial; i++ ) {
-                    // create, modified, delete object
+                    // create, modified, delete object, depending on the current
+                    // cache type
                     try {
                         switch ( cachetype ) {
                         case 0:
@@ -324,14 +430,9 @@ public class CacheLeakage extends CWTestCase {
                             testrace = null;
                         }
      
-                        // create object
-                        //try {
                             db.begin();
                             db.create( testrace );  // may throw duplicateIdentityException
                             db.commit();
-                        //} catch ( Exception e ) {
-                        //    e.printStackTrace();
-                        //}
 
                         // load it and modify it
                         succeed = false;
@@ -341,8 +442,8 @@ public class CacheLeakage extends CWTestCase {
                             try {
                                 db.begin();
                                 tr = (TestRace) db.load( _classType, id );
-                                                    // may throw ObjectNotFoundException
-                                                    // LockNotGrantedException
+                                // may throw ObjectNotFoundException
+                                // LockNotGrantedException
                                 tr.incValue1();
                                 db.commit();
                                 succeed = true;
@@ -369,8 +470,8 @@ public class CacheLeakage extends CWTestCase {
                             try {
                                 db.begin();
                                 tr = (TestRace) db.load( _classType, id );
-                                                    // may throw ObjectNotFoundException
-                                                    // LockNotGrantedException
+                                // may throw ObjectNotFoundException
+                                // LockNotGrantedException
                                 db.commit();
                                 succeed = true;
                             } catch ( LockNotGrantedException e ) {
@@ -413,19 +514,19 @@ public class CacheLeakage extends CWTestCase {
                             throw new Exception("Transaction can't not lock the object within "+trials+" trials");
 
                     } catch ( TransactionNotInProgressException e ) {
-                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
+                        theTest.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: "+e.getException() );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( PersistenceException e ) {
-                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
+                        theTest.stream.println( "Thread <CreateDelete> will be killed. Unexcepted exception: " );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
                         break out;
                     } catch ( Exception e ) {
-                        stream.writeVerbose( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
+                        theTest.stream.println( "Thread <CreateDelete> will be killed. Element not found: other exception: "+e );
                         e.printStackTrace();
                         if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
                         _errLeak = true;
@@ -435,6 +536,11 @@ public class CacheLeakage extends CWTestCase {
 
             } finally {
                 isDone = true;
+                try {
+                    db.close();
+                } catch ( PersistenceException e ) {
+                    fail( e.toString() );
+                }
             }
         }
         boolean isDone() {

@@ -329,10 +329,6 @@ create table test_types (
   int_date integer        null,
   str_time char(12)       null,
   num_date numeric(17,0)  null,
-  blob_val blob           null,
-  clob_val clob           null,
-  blob_val2 blob          null,
-  clob_val2 clob          null,
   date_str  date          null
 );
 
@@ -340,6 +336,18 @@ create unique index test_types_pk
   on test_types ( id );
 
 grant all on test_types to test;
+
+create table test_lob (
+  id       numeric(10,0)  not null,
+  blob_val blob           null,
+  clob_val clob           null,
+  blob_val2 blob          null,
+  clob_val2 clob          null
+);
+
+create unique index test_lob_pk on test_lob ( id );
+
+grant all on test_lobs to test;
 
 
 -- test_keygen

@@ -51,12 +51,12 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.ArrayList;
+import java.util.Vector;
+import java.util.Random;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.lang.Math;
-import java.util.Vector;
-import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -67,182 +67,144 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
-import java.util.ArrayList;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
- * Concurrent access test. Tests a JDO modification and concurrent
- * JDBC modification to determine if JDO can detect the modification
- * with dirty checking.
- *
+ * Test for different collection types supported by Castor JDO.
+ * This test create data objects that has a field type
  */
-public class Collections extends CWTestCase {
+public class Collections extends CastorTestCase {
 
     private Database       _db;
 
-
     private Connection     _conn;
-
 
     private JDOCategory    _category;
 
-
-    public Collections( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC28", "Collections" );
+    public Collections( TestHarness category ) {
+        super( category, "TC28", "Collections" );
         _category = (JDOCategory) category;
     }
 
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException, SQLException {
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection();
+        _conn.setAutoCommit( false );
     }
 
-    public void postExecute()
-    {
-        super.postExecute();
+    public void runTest() 
+            throws PersistenceException, SQLException, Exception {
+
+        runOnce( TestColCollection.class );
+
+        runOnce( TestColArrayList.class );
+
+        runOnce( TestColVector.class );
+
+        runOnce( TestColSet.class );
+        
+        runOnce( TestColMap.class );
+
+        runOnce( TestColHashtable.class );
+
     }
 
+    public void runOnce( Class masterClass ) 
+            throws PersistenceException, SQLException, Exception {
 
-    public boolean run( CWVerboseStream stream ) {
-        boolean result = true;
-        boolean passed = true;
-        try {
-            passed = runOnce( stream, TestColCollection.class );
-            if ( !passed ) result = false;
-
-            passed = runOnce( stream, TestColArrayList.class );
-            if ( !passed ) result = false;
-
-            passed = runOnce( stream, TestColVector.class );
-            if ( !passed ) result = false;
-
-            passed = runOnce( stream, TestColSet.class );
-            if ( !passed ) result = false;
-            /*
-            passed = runOnce( stream, TestColHashSet.class );
-            if ( !passed ) result = false;
-            */
-            
-            passed = runOnce( stream, TestColMap.class );
-            if ( !passed ) result = false;
-
-            /*
-            passed = runOnce( stream, TestColHashMap.class );
-            if ( !passed ) result = false;
-            */
-            passed = runOnce( stream, TestColHashtable.class );
-            if ( !passed ) result = false;
-
-        } catch ( Exception e ) {
-            return false;
-        }
-        return result;
-    }
-
-    public boolean runOnce( CWVerboseStream stream, Class masterClass ) {
         String masterName = masterClass.getName();
 
-        try {
+        stream.println( "Running..." );
+        stream.println( "" );
 
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection(); 
-            _conn.setAutoCommit( false );
+        // delete everything
+        _conn.createStatement().executeUpdate( "DELETE FROM test_col" );
+        _conn.createStatement().executeUpdate( "DELETE FROM test_item" );
+        _conn.commit();
 
-            stream.writeVerbose( "Running..." );
-            stream.writeVerbose( "" );
-
-            // delete everything
-            _conn.createStatement().executeUpdate( "DELETE FROM test_col" );
-            _conn.createStatement().executeUpdate( "DELETE FROM test_item" );
-            _conn.commit();
-
-            // create new TestCol object with elements
-            _db.begin();
-            TestCol testCol = (TestCol) masterClass.newInstance();
-            testCol.setId( 1 );
-            _db.create( testCol );
-            for ( int i=0; i < 5; i++ ) {
-                TestItem newItem = new TestItem( 100+i );
-                testCol.addItem( newItem );
-                _db.create( newItem );
-            }
-            _db.commit();
-            // test if object created properly
-            _db.begin();
-            testCol = (TestCol) _db.load( masterClass, new Integer(1) );
-            if ( testCol == null )
-                throw new Exception( "Object creation failed!" );
-                
-            if ( testCol.itemSize() != 5 ||
-                    !testCol.containsItem( new TestItem( 100 ) ) ||
-                    !testCol.containsItem( new TestItem( 101 ) ) ||
-                    !testCol.containsItem( new TestItem( 102 ) ) ||
-                    !testCol.containsItem( new TestItem( 103 ) ) ||
-                    !testCol.containsItem( new TestItem( 104 ) ) )
-                throw new Exception( "Related objects creation failed!" );
-
-            testCol.removeItem( new TestItem( 100 ) );
-            testCol.removeItem( new TestItem( 103 ) );
-            TestItem newItem = new TestItem( 106 );
+        // create new TestCol object with elements
+        _db.begin();
+        TestCol testCol = (TestCol) masterClass.newInstance();
+        testCol.setId( 1 );
+        _db.create( testCol );
+        for ( int i=0; i < 5; i++ ) {
+            TestItem newItem = new TestItem( 100+i );
             testCol.addItem( newItem );
             _db.create( newItem );
-            newItem = new TestItem( 107 );
-            testCol.addItem( newItem );
-            _db.create( newItem );
-            _db.commit();
-            
-            // test if add and remove work properly.
-            _db.begin();
-            testCol = (TestCol) _db.load( masterClass, new Integer(1) );
-            if ( testCol == null )
-                throw new Exception( "Object add/remove failed! " + testCol );
-
-            if ( testCol.itemSize() != 5 ||
-                    !testCol.containsItem( new TestItem( 106 ) ) ||
-                    !testCol.containsItem( new TestItem( 101 ) ) ||
-                    !testCol.containsItem( new TestItem( 102 ) ) ||
-                    !testCol.containsItem( new TestItem( 107 ) ) ||
-                    !testCol.containsItem( new TestItem( 104 ) ) )
-                throw new Exception( "Related add/remove failed!" + testCol );
-
-            // test if add and remove rollback properly.
-            testCol.removeItem( new TestItem( 102 ) );
-            testCol.removeItem( new TestItem( 104 ) );
-            newItem = new TestItem( 108 );
-            testCol.addItem( newItem );
-            newItem = new TestItem( 109 );
-            testCol.addItem( newItem );
-            _db.create( newItem );
-            _db.rollback();
-
-            if ( testCol.itemSize() != 5 ||
-                    !testCol.containsItem( new TestItem( 106 ) ) ||
-                    !testCol.containsItem( new TestItem( 101 ) ) ||
-                    !testCol.containsItem( new TestItem( 102 ) ) ||
-                    !testCol.containsItem( new TestItem( 107 ) ) ||
-                    !testCol.containsItem( new TestItem( 104 ) ) )
-                throw new Exception( "Related add/remove rollback failed!" + testCol );
-
-            // shoud test for update too
-        } catch ( Exception e ) {
-            e.printStackTrace();
-
-            stream.writeVerbose( "Exception: "+ e );
-            try {
-                if ( _db.isActive() )
-                    _db.close();
-                return false;
-            } catch ( Exception ex ) {
-                return false;
-            }
         }
-        return true;
+        _db.commit();
+
+        // test if object created properly
+        _db.begin();
+        testCol = (TestCol) _db.load( masterClass, new Integer(1) );
+        if ( testCol == null )
+            fail( "Object creation failed!" );
+            
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 100 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 103 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related objects creation failed!" );
+
+        testCol.removeItem( new TestItem( 100 ) );
+        testCol.removeItem( new TestItem( 103 ) );
+        TestItem newItem = new TestItem( 106 );
+        testCol.addItem( newItem );
+        _db.create( newItem );
+        newItem = new TestItem( 107 );
+        testCol.addItem( newItem );
+        _db.create( newItem );
+        _db.commit();
+        
+        // test if add and remove work properly.
+        _db.begin();
+        testCol = (TestCol) _db.load( masterClass, new Integer(1) );
+        if ( testCol == null )
+            fail( "Object add/remove failed! " + testCol );
+
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 106 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 107 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related add/remove failed!" + testCol );
+
+        // test if add and remove rollback properly.
+        testCol.removeItem( new TestItem( 102 ) );
+        testCol.removeItem( new TestItem( 104 ) );
+        newItem = new TestItem( 108 );
+        testCol.addItem( newItem );
+        newItem = new TestItem( 109 );
+        testCol.addItem( newItem );
+        _db.create( newItem );
+        _db.rollback();
+
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 106 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 107 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related add/remove rollback failed!" + testCol );
+
+        // shoud test for update too
+    } 
+
+    public void tearDown()
+            throws PersistenceException, SQLException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+        _conn.close();
     }
 }
 

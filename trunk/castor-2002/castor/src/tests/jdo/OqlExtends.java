@@ -59,148 +59,135 @@ import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  */
-public class OqlExtends
-    extends CWTestCase
-{
-
+public class OqlExtends extends CastorTestCase {
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
-    public OqlExtends( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC30", "OQL queries for extends" );
+    public OqlExtends( TestHarness category ) {
+        super( category, "TC30", "OQL queries for extends" );
         _category = (JDOCategory) category;
     }
 
-
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException {
+        _db = _category.getDatabase( verbose );
     }
 
+    public void runTest()
+            throws PersistenceException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
-
-
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
         Date date;
+        OQLQuery         oqlAll;
+        OQLQuery         oql;
+        TestOqlExtends   t;
+        QueryResults     res;
+        int              cnt;
+        TestGroup        group1 = new TestGroup();
+        TestGroup        group2 = new TestGroup();
 
-        try {
-            OQLQuery         oqlAll;
-            OQLQuery         oql;
-            TestOqlExtends   t;
-            TestGroup        group1 = new TestGroup();
-            TestGroup        group2 = new TestGroup();
-            QueryResults     res;
-            int              cnt;
+        group2.setId(TestGroup.DefaultId + 1);
 
-            group2.setId(TestGroup.DefaultId + 1);
-
-            db = _category.getDatabase( stream.verbose() );
-            db.begin();
-            oqlAll = db.getOQLQuery( "SELECT t FROM jdo.TestOqlExtends t" );
-            res = oqlAll.execute();
-            while ( res.hasMore() ) {
-                db.remove( res.next() );
-            }
-            oql = db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t" );
-            res = oql.execute();
-            while ( res.hasMore() ) {
-                db.remove( res.next() );
-            }
-            oql.close();
-            oql = db.getOQLQuery( "SELECT t FROM jdo.TestGroup t" );
-            res = oql.execute();
-            while ( res.hasMore() ) {
-                db.remove( res.next() );
-            }
-            oql.close();
-            db.commit();
-            db.begin();
-            stream.writeVerbose( "Creating group: " + group1 );
-            db.create( group1 );
-            stream.writeVerbose( "Creating group: " + group2 );
-            db.create( group2 );
-            t = new TestOqlExtends();
-            t.setId(TestOqlExtends.DefaultId + 10);
-            t.setGroup(group1);
-            stream.writeVerbose( "Creating new object: " + t );
-            db.create( t );
-            date = new Date();
-            t = new TestOqlExtends();
-            t.setId(TestOqlExtends.DefaultId + 11);
-            t.setGroup(group2);
-            stream.writeVerbose( "Creating new object: " + t );
-            db.create( t );
-            db.commit();
-            db.begin();
-            oql.close();
-            oql = db.getOQLQuery( "SELECT t FROM jdo.TestOqlExtends t WHERE t.group.id=$1" );
-            oql.bind( group1.getId() );
-            res = oql.execute();
-            for ( cnt = 0; res.hasMore(); cnt++ ) {
-                t = (TestOqlExtends) res.next();
-                stream.writeVerbose( "Retrieved object: " + t );
-                if (t.getExt() != 0) {
-                    stream.writeVerbose( "Error: ext field = " + t.getExt());
-                    result = false;
-                }
-            }
-            oql.close();
-            if (cnt == 1) {
-                stream.writeVerbose( "OK" );
-            } else {
-                stream.writeVerbose( "Error: retrieved " + cnt + " objects");
-                result = false;
-            }
-
-            oql = db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t WHERE t.creationTime<$1" );
-            oql.bind( date );
-            res = oql.execute();
-            for ( cnt = 0; res.hasMore(); cnt++ ) {
-                t = (TestOqlExtends) res.next();
-                stream.writeVerbose( "Retrieved object: " + t );
-            }
-            oql.close();
-            if (cnt == 1) {
-                stream.writeVerbose( "OK" );
-            } else {
-                stream.writeVerbose( "Error: retrieved " + cnt + " objects");
-                result = false;
-            }
-
-            res = oqlAll.execute();
-            while ( res.hasMore() ) {
-                db.remove( res.next() );
-            }
-
-            db.commit();
-            oqlAll.close();
-
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        // remove old test objects
+        _db.begin();
+        oqlAll = _db.getOQLQuery( "SELECT t FROM jdo.TestOqlExtends t" );
+        res = oqlAll.execute();
+        while ( res.hasMore() ) {
+            _db.remove( res.next() );
         }
-        return result;
+        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t" );
+        res = oql.execute();
+        while ( res.hasMore() ) {
+            _db.remove( res.next() );
+        }
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestGroup t" );
+        res = oql.execute();
+        while ( res.hasMore() ) {
+            _db.remove( res.next() );
+        }
+        oql.close();
+
+        // create data objects for test
+        _db.commit();
+        _db.begin();
+        stream.println( "Creating group: " + group1 );
+        _db.create( group1 );
+        stream.println( "Creating group: " + group2 );
+        _db.create( group2 );
+        t = new TestOqlExtends();
+        t.setId(TestOqlExtends.DefaultId + 10);
+        t.setGroup(group1);
+        stream.println( "Creating new object: " + t );
+        _db.create( t );
+        date = new Date();
+        t = new TestOqlExtends();
+        t.setId(TestOqlExtends.DefaultId + 11);
+        t.setGroup(group2);
+        stream.println( "Creating new object: " + t );
+        _db.create( t );
+        _db.commit();
+
+        // query on extends object
+        _db.begin();
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestOqlExtends t WHERE t.group.id=$1" );
+        oql.bind( group1.getId() );
+        res = oql.execute();
+        for ( cnt = 0; res.hasMore(); cnt++ ) {
+            t = (TestOqlExtends) res.next();
+            stream.println( "Retrieved object: " + t );
+            if (t.getExt() != 0) {
+                stream.println( "Error: ext field = " + t.getExt());
+                fail("ext field retrieval failed");
+            }
+        }
+        oql.close();
+        if (cnt == 1) {
+            stream.println( "OK" );
+        } else {
+            stream.println( "Error: retrieved " + cnt + " objects");
+            fail("result size mismatch");
+        }
+
+        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t WHERE t.creationTime<$1" );
+        oql.bind( date );
+        res = oql.execute();
+        for ( cnt = 0; res.hasMore(); cnt++ ) {
+            t = (TestOqlExtends) res.next();
+            stream.println( "Retrieved object: " + t );
+        }
+        oql.close();
+        if (cnt == 1) {
+            stream.println( "OK" );
+        } else {
+            stream.println( "Error: retrieved " + cnt + " objects");
+            fail("result size mismatch");
+        }
+
+        res = oqlAll.execute();
+        while ( res.hasMore() ) {
+            _db.remove( res.next() );
+        }
+        _db.commit();
+        oqlAll.close();
+
     }
 
-
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 }
