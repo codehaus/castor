@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/presentations.xml">
+  <body>
+    <title>Castor Presentations and Articles</title>
+
+    <section title="">
+      <p><b>Presentations about Castor...</b></p>
+      <p>
+         <b>Javaworld (April 2002)</b>
+         <p/>
+         Jacek Kruszelnicki discusses the pros and cons of Sun JDO and Castor JDO.
+         <a href="http://www.javaworld.com/javaworld/jw-04-2002/jw-0412-jdo.html?">Read</a>
+      </p>
+      <p>
+         <b>XML One Amsterdam (September 2001)</b>
+         <p/>
+         Andrew Fawcett, of CODA - our main evangelist, gave a presentation on implementing XML data binding
+         solutions using web-services with Castor at the XML One conference in Amsterdam, September 2001.
+         <a href="http://ftp.exolab.org/ftp/castor/presentations/xml-one-amsterdam-20010919%20.zip">Download</a>
+      </p>
+      <p>
+         <b>Professional XML (2nd Edition) Chapter 15 (June 2001)</b>
+         <p/>
+         A chapter written by Keith Visco about Castor XML. Available for
+         Download at Wrox:
+         <a href="http://www.wrox.com/Support/PDF/SampleChapter_5059.pdf">Download</a>
+      </p>
+
+      <p>
+         <b>XML One London (March 2001)</b>
+         <p/>
+         Andrew Fawcett, of CODA, gave a presentation on XML data binding
+         with Castor at the XML One conference in London, March 2001.
+         <a href="http://ftp.exolab.org/ftp/castor/presentations/xml-one-london-20010322%20.zip">Download</a>
+      </p>
+
+      <p>
+         <b>O'Reilly Java Conference (March 2000)</b>
+         <p/>
+         The first public presentation on Castor was done at the O'Reilly Java Conference
+         in March 2000. It's a little dated, but still serves as a decent overview
+         of what Castor is all about.
+         <a href="ora-mar-2k/castor.htm">View the presentation</a>.
+      </p>
+    </section>
+  </body>
+</document>
