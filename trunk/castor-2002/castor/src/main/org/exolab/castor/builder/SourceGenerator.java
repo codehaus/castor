@@ -134,9 +134,22 @@ public class SourceGenerator {
     
     /**
      * Names of properties used in the configuration file.
+     *
      */
     public static class Property
     {
+        /**
+         * Property specifying whether or not to generate source code
+         * for bound properties. Currently all properties will be
+         * treated as bound properties if this flag is set to true.
+         * A value of 'true' enables bound properties.
+         * <pre>
+         * org.exolab.castor.builder.boundproperties
+         * </pre>
+         */
+         public static final String BOUND_PROPERTIES =
+            "org.exolab.castor.builder.boundproperties";
+         
 		/**
          * Property specifying how element's and type's are mapped into a Java
          * class hierarchy by the Source Generator. 
@@ -165,7 +178,9 @@ public class SourceGenerator {
         public static final String FileName = "castorbuilder.properties";
 
         static final String ResourceName = "/org/exolab/castor/builder/castorbuilder.properties";
-    }
+        
+    } //--Property
+    
 
     // Some static string definitions
 	private static final String ELEMENT_VALUE = "element";
@@ -178,7 +193,12 @@ public class SourceGenerator {
      * The flag indicating which type of binding we are
      * configured for
     **/
-    private static int  bindingType = ELEMENT_BINDING;
+    private static int  _bindingType = ELEMENT_BINDING;
+    
+    /**
+     * bound properties flag
+    **/
+    private static boolean _boundProperties = false;
     
 	/**
      * The default properties loaded from the configuration file.
@@ -759,7 +779,22 @@ public class SourceGenerator {
     {
         return getDefault().getProperty( name, defValue );
     }
-
+   
+    /**
+     * Returns true if bound properties are enabled.
+     *
+     * Enabling bound properties is controlled via
+     * the org.exolab.castor.builder.boundproperties item
+     * in the castorbuilder.properties file. The value is
+     * either 'true' or 'false'.
+     *
+     * @return true if bound properties are enabled.
+    **/
+    public static boolean boundPropertiesEnabled() {
+        getDefault();
+        return _boundProperties;
+    } //-- boundPropertiesEnabled
+    
 	/**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
 	 * @return True if the Source Generator is mapping schema elements to Java classes.
@@ -769,8 +804,8 @@ public class SourceGenerator {
 	    //-- call getDefault to ensure we loaded the properties
 	    getDefault();
 	    
-	    return (bindingType == ELEMENT_BINDING);  
-	}
+	    return (_bindingType == ELEMENT_BINDING);  
+	} //-- mappingSchemaElement2Java
 
 	/**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'type' value.
@@ -781,8 +816,8 @@ public class SourceGenerator {
 	    //-- call getDefault to ensure we loaded the properties
 	    getDefault();
 	    
-	    return (bindingType == TYPE_BINDING);  
-	}
+	    return (_bindingType == TYPE_BINDING);  	    
+	} //-- mappingSchemaType2Java
 	
 	/**
 	 * Gets a Java package to an XML namespace URL
@@ -833,7 +868,7 @@ public class SourceGenerator {
 		while(tokens.hasMoreTokens())
 		{
 			String token = tokens.nextToken();
-			int comma = token.indexOf("=");
+			int comma = token.indexOf('=');
 			if(comma==-1)
 				continue;
 			String ns = token.substring(0,comma).trim();
@@ -841,8 +876,13 @@ public class SourceGenerator {
 			_nspackages.put(ns, javaPackage);
 		}
 		
-		initBindingType();
-    }
+		//-- bound properties
+		prop = _default.getProperty( Property.BOUND_PROPERTIES, "");
+		_boundProperties = prop.equalsIgnoreCase("true");
+		
+		initBindingType();		
+		
+    } //-- load
     
     /**
      * Called by #load to initialize the binding type
@@ -850,7 +890,7 @@ public class SourceGenerator {
     protected static void initBindingType() {
 		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
 		if (prop.toLowerCase().equals(TYPE_VALUE))
-		    bindingType = TYPE_BINDING;
+		    _bindingType = TYPE_BINDING;
     } //-- initBindingType
 
 } //-- SourceGenerator

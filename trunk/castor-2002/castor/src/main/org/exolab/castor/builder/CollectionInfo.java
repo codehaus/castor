@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999,2000 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999,2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * Contribution(s):
  *
@@ -115,6 +115,12 @@ public class CollectionInfo extends FieldInfo {
     //- Public Methods -/
     //------------------/
     
+    /**
+     * Creates the Access methods for the collection described
+     * by this CollectionInfo
+     *
+     * @param jClass the JClass to add the methods to.
+    **/
     public void createAccessMethods(JClass jClass) {
         
         
@@ -292,6 +298,9 @@ public class CollectionInfo extends FieldInfo {
 
     /** 
      * Creates implementation of add method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createAddMethod(JMethod method) {
         
@@ -314,11 +323,18 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
         
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+            
     } //-- createAddMethod
     
                     
     /** 
      * Creates implementation of object[] get() method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createGetMethod(JMethod method) {
 
@@ -396,6 +412,9 @@ public class CollectionInfo extends FieldInfo {
 
     /**
      * Creates implementation of array set method
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createSetArrayMethod(JMethod method) {
         
@@ -425,10 +444,18 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(");");
         jsc.unindent();
         jsc.add("}");
+        
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+        
     } //-- createSetArrayMethod
 
     /** 
      * Creates implementation of set method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createSetByIndexMethod(JMethod method) {
 
@@ -460,11 +487,33 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(", index);");
         
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+        
     } //-- createSetMethod
-    
 
+    /**
+     * Creates the necessary source code for notifying
+     * PropertyChangeListeners when the collection has
+     * been updated.
+     *
+     * @param jsc the JSourceCode to add the new source code to.
+    **/
+    protected void createBoundPropertyCode(JSourceCode jsc) {
+        //notify listeners
+        jsc.add("notifyPropertyChangeListeners(\"");
+        jsc.append(getName());
+        jsc.append("\", null, ");
+        jsc.append(getName());
+        jsc.append(");");
+    } //-- createBoundPropertyCode
+    
     /** 
      * Creates implementation of getCount method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createGetCountMethod(JMethod method) {
         
@@ -477,6 +526,9 @@ public class CollectionInfo extends FieldInfo {
 
     /** 
      * Creates implementation of Enumerate method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createEnumerateMethod(JMethod method) {
         
@@ -490,21 +542,34 @@ public class CollectionInfo extends FieldInfo {
 
     /** 
      * Creates implementation of remove(Object) method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createRemoveByObjectMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         
-        jsc.add("return ");
+        jsc.add("boolean removed = ");
         jsc.append(getName());
         jsc.append(".removeElement(");
         jsc.append(getContentName());
         jsc.append(");");
         
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+            
+        //-- return value
+        jsc.add("return removed;");
+        
     } //-- createRemoveByObjectMethod
 
     /** 
      * Creates implementation of remove(int i) method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createRemoveByIndexMethod(JMethod method) {
         
@@ -516,6 +581,13 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(".elementAt(index);");
         jsc.add(getName());
         jsc.append(".removeElementAt(index);");
+        
+        
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+            
+        //-- return value
         jsc.add("return ");
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
@@ -526,11 +598,13 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(getContentType().createFromJavaObjectCode("obj"));
             jsc.append(";");
         }
-        
     } //-- createRemoveByIndexMethod
 
     /** 
      * Creates implementation of removeAll() method.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
     **/
     public void createRemoveAllMethod (JMethod method) {
 
@@ -538,6 +612,10 @@ public class CollectionInfo extends FieldInfo {
         jsc.add(getName());
         jsc.append(".removeAllElements();");
         
+        //-- bound properties
+        if (isBound()) 
+            createBoundPropertyCode(jsc);
+            
     } //-- createRemoveAllMethod
     
 
