@@ -59,7 +59,7 @@
        <p>
           The source code generator has a number of different options which
           may be set. Some of these are done using the command line, and others
-          are done using a properties file.
+          are done using a properties file located at <pre>"org/exolab/castor/builder/castorbuilder.properties"</pre>.
        </p>
        <section title="Command Line Options">
           <table border="1" cellspacing="0">
