@@ -80,10 +80,7 @@ public final class OracleQueryExpression
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
 
-        if ( _select == null )  
-          sql.append( getColumnList() );
-        else
-          sql.append( _select ).append(" ");
+        sql.append( getColumnList() );
 
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause

@@ -84,10 +84,7 @@ public final class SapDbQueryExpression
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
 
-        if ( _select == null )
-          sql.append( getColumnList() );
-        else
-          sql.append( _select ).append(" ");
+        sql.append( getColumnList() );
 
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
@@ -175,7 +172,7 @@ public final class SapDbQueryExpression
           sql.append(JDBCSyntax.OrderBy).append(_order);
 
         // Use WITH LOCK to lock selected tables.
-        if ( lock && _select == null ) {
+        if ( lock ) {
             sql.append( " WITH LOCK" );
         }
         return sql.toString();
