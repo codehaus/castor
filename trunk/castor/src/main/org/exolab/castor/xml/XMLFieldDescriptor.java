@@ -233,6 +233,19 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      */
     public boolean matches(String xmlName);
 
+    /**
+     * Returns true if this descriptor can be used to handle elements
+     * or attributes with the given XML name. By default this method
+     * simply compares the given XML name with the internal XML name.
+     * This method can be overridden to provide more complex matching.
+     * @param xmlName the XML name to compare
+     * @param namespace the namespace URI 
+     *
+     * @return true if this descriptor can be used to handle elements
+     * or attributes with the given XML name.
+     */
+    public boolean matches(String xmlName, String namespace);
+
 
 } //-- XMLFieldDescriptor
 
