@@ -157,7 +157,7 @@ public class FieldInfo extends XMLInfo {
         //-- special supporting fields
 
         //-- has_field
-        if ((!type.isEnumerated()) && type.isPrimitive()) {
+        if ((!type.isEnumerated()) && jType.isPrimitive()) {
             field = new JField(JType.Boolean, "_has" + name);
             field.setComment("keeps track of state for field: " + name);
             jClass.addField(field);
@@ -199,7 +199,7 @@ public class FieldInfo extends XMLInfo {
 
 
         boolean needs_has
-            = ((!xsType.isEnumerated()) && xsType.isPrimitive());
+            = ((!xsType.isEnumerated()) && jType.isPrimitive());
 
         //-- create get method
         method = new JMethod(jType, "get"+mname);

@@ -322,7 +322,7 @@ public class DescriptorSourceFactory {
        jsc.append(localClassName);
        jsc.append(") object;");
        //-- handle primitives
-	   if ((!xsType.isEnumerated()) && xsType.isPrimitive()  && (!member.isMultivalued()))
+	   if ((!xsType.isEnumerated()) && xsType.getJType().isPrimitive()  && (!member.isMultivalued()))
        {
 		   jsc.add("if(!target."+member.getHasMethodName()+"())");
 		   jsc.indent();
@@ -1607,7 +1607,7 @@ public class DescriptorSourceFactory {
 
         //-- make sure we have characters to escape
         if (str.indexOf('\\') < 0 && str.indexOf('\"') < 0) return str;
-        
+
         StringBuffer sb = new StringBuffer();
         char[] chars = str.toCharArray();
 
