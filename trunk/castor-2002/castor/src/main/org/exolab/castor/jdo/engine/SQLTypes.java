@@ -47,10 +47,12 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.sql.ResultSet;
 import java.sql.Types;
 import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.sql.SQLException;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -258,6 +260,16 @@ public final class SQLTypes
             }
         }
         return java.toString();
+    }
+
+
+    public static Object getObject( ResultSet rs, int index, int sqlType )
+            throws SQLException
+    {
+        if ( sqlType == Types.INTEGER )
+            return new Integer( rs.getInt( index ) );
+        else
+            return rs.getObject( index );
     }
 
 
