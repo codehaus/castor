@@ -104,10 +104,12 @@ public final class CacheRegistry {
      *
      * @param cacheType Cache type identifier
      * @param capacity Cache capacity.
+     * @param className Class name.
+	 * @param classLoader A ClassLoader instance.
      * @return A {@link Cache} instance, null if no cache type with this name exists.
      * @throws CacheAcquireException A cache of the type specified can not be acquired.
      */
-    public static Cache getCache (String cacheType, int capacity, String className) 
+    public static Cache getCache (String cacheType, int capacity, String className, ClassLoader classLoader) 
     	throws CacheAcquireException
     {
         load();
@@ -130,7 +132,7 @@ public final class CacheRegistry {
         CacheFactory cacheFactory = (CacheFactory) _cacheFactories.get (cacheType);
         
         if (cacheFactory != null) {
-            cache = cacheFactory.getCache();
+            cache = cacheFactory.getCache(classLoader);
             cache.setCacheType (cacheType);
             cache.setCapacity (capacity);
             cache.setClassName (className);
