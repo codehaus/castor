@@ -36,7 +36,8 @@ public class Xml implements java.io.Serializable {
 
     private java.lang.String _name;
 
-
+    private java.lang.String _match;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -62,6 +63,12 @@ public class Xml implements java.io.Serializable {
         return this._node;
     } //-- java.lang.String getNode() 
 
+    public java.lang.String getMatch() {
+        if (_match != null) 
+            return _match;
+        return _name;
+    } //-- getMatch
+    
     /**
     **/
     public java.lang.String getType() {
@@ -106,6 +113,15 @@ public class Xml implements java.io.Serializable {
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
+    
+    /**
+     * 
+     * @param _name
+    **/
+    public void setMatch(java.lang.String _match) {
+        this._match = _match;
+    } //-- void setMatch(java.lang.String) 
+    
     /**
      * 
      * @param _name
@@ -114,6 +130,7 @@ public class Xml implements java.io.Serializable {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
+    
     /**
      * 
      * @param _node
