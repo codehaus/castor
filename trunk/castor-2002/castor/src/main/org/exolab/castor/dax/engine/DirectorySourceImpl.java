@@ -48,6 +48,7 @@ package org.exolab.castor.dax.engine;
 
 
 import java.io.PrintWriter;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
@@ -82,11 +83,11 @@ public class DirectorySourceImpl
     implements DirectorySource, XADirectorySource
 {
 
-
+    
     public static class Protocol
     {
-	public static final int LDAPv2 = 2;
-	public static final int LDAPv3 = 3;
+        public static final int LDAPv2 = 2;
+        public static final int LDAPv3 = 3;
     }
 
 
@@ -106,68 +107,68 @@ public class DirectorySourceImpl
 
 
     public void setURL( String url )
-	throws MalformedURLException
+        throws MalformedURLException
     {
-	_url = new LDAPUrl( url );
-	_rootDN = _url.getDN();
-	if ( _rootDN == null )
-	    throw new MalformedURLException( "LDAP URL must specify root DN" );
-	if ( _rootDN.charAt( 0 ) == '/' )
-	    _rootDN = _rootDN.substring( 1 );
-	// Normalize the URL, so that we can match it to a mapping
-	_url = new LDAPUrl( _url.getHost(), _url.getPort(), _url.getDN() );
+        _url = new LDAPUrl( url );
+        _rootDN = _url.getDN();
+        if ( _rootDN == null )
+            throw new MalformedURLException( "LDAP URL must specify root DN" );
+        if ( _rootDN.charAt( 0 ) == '/' )
+            _rootDN = _rootDN.substring( 1 );
+        // Normalize the URL, so that we can match it to a mapping
+        _url = new LDAPUrl( _url.getHost(), _url.getPort(), _url.getDN() );
     }
 
 
     public String getURL()
     {
-	return ( _url == null ? null : _url.toString() );
+        return ( _url == null ? null : _url.toString() );
     }
-
+    
 
     public void setProtocol( int protocol )
     {
-	if ( protocol != Protocol.LDAPv2 && protocol != Protocol.LDAPv3 )
-	    throw new IllegalArgumentException( "LDAP protocol version " + protocol + " not supported" );
-	_protocol = protocol;
+        if ( protocol != Protocol.LDAPv2 && protocol != Protocol.LDAPv3 )
+            throw new IllegalArgumentException( "LDAP protocol version " + protocol + " not supported" );
+        _protocol = protocol;
     }
 
 
     public int getProtocol()
     {
-	return _protocol;
+        return _protocol;
     }
 
 
     public Directory getDirectory()
-	throws DirectoryException
+        throws DirectoryException
     {
-	return new DirectoryImpl( getConnection( null, null ), _url, _mapResolver, _logWriter );
+        return new DirectoryImpl( getConnection( null, null ), _url, _mapResolver, _logWriter );
     }
-
-
+    
+    
     public Directory getDirectory( String userDN, String password )
-	throws DirectoryException
+        throws DirectoryException
     {
-	return new DirectoryImpl( getConnection( userDN, password ), _url, _mapResolver, _logWriter );
+        return new DirectoryImpl( getConnection( userDN, password ), _url, _mapResolver, _logWriter );
     }
-
-
+    
+    
     public XADirectory getXADirectory()
-	throws DirectoryException
+        throws DirectoryException
     {
-	return null;
-	//	return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
-	//					       _url, _mapResolver, _logWriter ) );
+        return null;
+        // return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
+        //                             _url, _mapResolver, _logWriter ) );
     }
-
-
+    
+    
     public XADirectory getXADirectory(  String userDN, String password )
-	throws DirectoryException
+        throws DirectoryException
     {
-	return null;
-	//	return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
-	//					       _url, _mapResolver, _logWriter ) );
+        return null;
+        // return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
+        //                             _url, _mapResolver, _logWriter ) );
     }
 
 
@@ -181,7 +182,7 @@ public class DirectorySourceImpl
      */
     public PrintWriter getLogWriter()
     {
-	return _logWriter;
+        return _logWriter;
     }
 
 
@@ -195,66 +196,53 @@ public class DirectorySourceImpl
      */
     public void setLogWriter( PrintWriter logWriter )
     {
-	_logWriter = logWriter;
+        _logWriter = logWriter;
     }
 
 
     private LDAPConnection getConnection( String userDN, String password )
-	throws DirectoryException
+        throws DirectoryException
     {
-	LDAPConnection conn;
-	int            port;
-
-	try {
-	    conn = new LDAPConnection();
-	    port = _url.getPort();
-	    if ( port <= 0 )
-		port = ( _protocol == Protocol.LDAPv2 ? LDAPv2.DEFAULT_PORT : LDAPv3.DEFAULT_PORT );
-	    conn.connect( _protocol, _url.getHost(), port, userDN, password );
-	    return conn;
-	} catch ( LDAPException except ) {
-	    throw new DirectoryException( except );
-	}
+        LDAPConnection conn;
+        int            port;
+        
+        try {
+            conn = new LDAPConnection();
+            port = _url.getPort();
+            if ( port <= 0 )
+                port = ( _protocol == Protocol.LDAPv2 ? LDAPv2.DEFAULT_PORT : LDAPv3.DEFAULT_PORT );
+            conn.connect( _protocol, _url.getHost(), port, userDN, password );
+            return conn;
+        } catch ( LDAPException except ) {
+            throw new DirectoryException( except );
+        }
     }
 
 
     public static synchronized void loadMapping( InputSource source )
-	throws MappingException
+        throws MappingException
     {
-	loadMapping( source, null, null );
+        loadMapping( source, null, null );
     }
 
 
     public static synchronized void loadMapping( InputSource source,
-						 EntityResolver resolver,
-						 PrintWriter logWriter )
-	throws MappingException
+                                                 EntityResolver resolver,
+                                                 PrintWriter logWriter )
+        throws MappingException
     {
-	Unmarshaller unm;
+        DAXMappingHelper mapping;
 
-	unm = new Unmarshaller( Mapping.class );
-	try {
-	    if ( resolver == null )
-		unm.setEntityResolver( new DTDResolver() );
-	    else
-		unm.setEntityResolver( new DTDResolver( resolver ) );
-	    if ( logWriter != null )
-		unm.setLogWriter( logWriter );
-	    loadMapping( (Mapping) unm.unmarshal( source ) );
-	} catch ( MappingException except ) {
-	    throw except;
-	} catch ( Exception except ) {
-	    throw new MappingException( except );
-	}
+        try {
+            mapping = new DAXMappingHelper( null );
+            mapping.setEntityResolver( resolver );
+            mapping.setLogWriter( logWriter );
+            mapping.loadMapping( source );
+        } catch ( IOException except ) {
+            throw new MappingException( except );
+        }
+        _mapResolver = mapping;
     }
-
-
-    public static synchronized void loadMapping( Mapping mapping )
-	throws MappingException
-    {
-	_mapResolver = new DAXMappingHelper( DirectorySource.class.getClassLoader(), mapping );
-    }
-
-
+    
 
 }
