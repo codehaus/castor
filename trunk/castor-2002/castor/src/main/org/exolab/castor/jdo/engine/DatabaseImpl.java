@@ -460,7 +460,7 @@ public class DatabaseImpl
         TransactionContext tx;
         
         if ( _scope == null )
-            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
             return _ctx;
         throw new TransactionNotInProgressException( Messages.message( "jdo.dbTxNotInProgress" ) );
@@ -610,9 +610,8 @@ public class DatabaseImpl
     }
 
 
-    public String toString()
-    {
-        return _dbName;
+    public String toString() {
+        return super.toString()+":"+_dbName;
     }
 
 
