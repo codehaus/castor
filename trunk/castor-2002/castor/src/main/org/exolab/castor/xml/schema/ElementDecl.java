@@ -87,11 +87,6 @@ public class ElementDecl extends Particle {
     private XMLType xmlType = null;
 
     /**
-     * True if the xmlType is a type reference
-     */
-    private boolean hasTypeReference= false;
-
-    /**
      * The parent schema that this element declaration belongs to
     **/
     private Schema schema = null;
@@ -295,8 +290,6 @@ public class ElementDecl extends Particle {
     **/
     public void setType(XMLType type)
     {
-        hasTypeReference= false;
-
         if ((type != null) && (type.isSimpleType())) {
             ((SimpleType)type).setParent(this);
         }
@@ -309,19 +302,10 @@ public class ElementDecl extends Particle {
      */
     public void setTypeReference(String name)
     {
-        hasTypeReference= true;
         TypeReference reference= new TypeReference();
         reference.setName(name);
         reference.setSchema(schema);
         setType(reference);
-    }
-
-    /**
-     * Returns true if this element's type is a reference.
-     */
-    public boolean hasTypeReference()
-    {
-        return hasTypeReference;
     }
 
 	/**
