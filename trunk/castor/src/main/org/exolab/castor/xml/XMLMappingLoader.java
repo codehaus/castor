@@ -96,6 +96,12 @@ public class XMLMappingLoader
 {
 
 
+    /**
+     * The default xml prefix used on certain 
+     * attributes such as xml:lang, xml:base, etc.
+     */
+    private static final String XML_PREFIX = "xml:";
+    
 
     /**
      * Empty array of class types used for reflection
@@ -356,6 +362,10 @@ public class XMLMappingLoader
                 }
                 namespace = xmlName.substring(1, idx);
                 xmlName = xmlName.substring(idx+1);
+            }
+            else if (xmlName.startsWith(XML_PREFIX)) {
+                namespace = Namespaces.XML_NAMESPACE;
+                xmlName = xmlName.substring(4);
             }
         }
 
