@@ -47,11 +47,14 @@ package org.exolab.castor.xml;
 
 //-- Castor imports
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.ObjectFactory;
+import org.exolab.castor.util.DefaultObjectFactory;
 import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.List;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.ExtendedFieldHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
@@ -224,6 +227,12 @@ public final class UnmarshalHandler extends MarshalFramework
 
     private Hashtable _nsPackageMappings = null;
 
+    /**
+     * A reference to the ObjectFactory used to create instances
+     * of the classes if the FieldHandler is not used.
+     */
+    private ObjectFactory _objectFactory = new DefaultObjectFactory();
+    
     /**
      * A boolean to indicate that objects should
      * be re-used where appropriate
@@ -1008,27 +1017,14 @@ public final class UnmarshalHandler extends MarshalFramework
                     }
 
                     //-- try to create instance of the given Class
-                    try {
-                        _topState.object = instanceClass.newInstance();
-                    }
-                    catch(Exception ex) {
-                        String msg = "unable to instantiate " +
-                            instanceClass.getName() + "; ";
-                        throw new SAXException(msg + ex);
-                    }
-
+                    Arguments args = processConstructorArgs(atts, classDesc);
+                    _topState.object = createInstance(instanceClass, args);
                 }
                 //-- no xsi type information present
                 else {
                     //-- try to create instance of the given Class
-                    try {
-                        _topState.object = _topClass.newInstance();
-                    }
-                    catch(Exception ex) {
-                        String msg = "unable to instantiate " +
-                            _topClass.getName() + "; ";
-                        throw new SAXException(msg + ex);
-                    }
+                    Arguments args = processConstructorArgs(atts, classDesc);
+                    _topState.object = createInstance(_topClass, args);
                 }
             }
             //-- otherwise use _topObject
@@ -1320,8 +1316,9 @@ public final class UnmarshalHandler extends MarshalFramework
                     state.derived = true;
                 }
             }
-            else
+            else {
                 _class = descriptor.getFieldType();
+            }
 
             // Retrieving the xsi:type attribute, if present
             String currentPackage = getJavaPackage(parentState.type);
@@ -1442,6 +1439,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 state.primitiveOrImmutable = true;
             }
             else {
+                if (classDesc == null)
+                    classDesc = getClassDescriptor(_class);
+                    
                 //-- XXXX should remove this test once we can
                 //-- XXXX come up with a better solution
                 if ((!state.derived) && useHandler) {
@@ -1452,7 +1452,22 @@ public final class UnmarshalHandler extends MarshalFramework
                         create = (state.object == null);
                     }
                     if (create) {
-                        state.object = handler.newInstance(parentState.object);
+                        Arguments args = processConstructorArgs(atts, classDesc);
+                        if ((args.values != null) && (args.values.length > 0)) {
+                            if (handler instanceof ExtendedFieldHandler) {
+                                ExtendedFieldHandler efh = 
+                                    (ExtendedFieldHandler)handler;
+                                state.object = efh.newInstance(parentState.object, args.values);
+                            }
+                            else {
+                                String err = "constructor arguments can only be " +
+                                    "used with an ExtendedFieldHandler.";
+                                throw new SAXException(err);
+                            }
+                        }
+                        else {
+                            state.object = handler.newInstance(parentState.object);
+                        }
                     }
                 }
                 //-- reassign class in case there is a conflict
@@ -1468,7 +1483,11 @@ public final class UnmarshalHandler extends MarshalFramework
                             state.object = new ArrayHandler(_class.getComponentType());
                             _class = ArrayHandler.class;
                         }
-                        else state.object = _class.newInstance();
+                        else {
+                            Arguments args = processConstructorArgs(atts, classDesc);
+                            state.object = createInstance(_class, args);
+                            //state.object = _class.newInstance();
+                        }
                     }
                     catch(java.lang.Exception ex) {
                         String err = "unable to instantiate a new type of: ";
@@ -1595,6 +1614,28 @@ public final class UnmarshalHandler extends MarshalFramework
      //- Private Methods -/
     //-------------------/
 
+    /**
+     * Creates an instance of the given class
+     */
+     private Object createInstance(Class type, Arguments args) 
+        throws SAXException
+     {
+        Object instance = null;
+        try {
+            if (args == null) {
+                instance = _objectFactory.createInstance(type);
+            }
+            else {
+                instance = _objectFactory.createInstance(type, args.types, args.values);
+            }
+        }
+        catch(Exception ex) {
+            String msg = "unable to instantiate " + type.getName() + "; ";
+            throw new SAXException(msg + ex);
+        }
+        return instance;
+     } //-- createInstance
+     
     /**
      * Returns the resolved instance type attribute (xsi:type).
      * If present the instance type attribute is resolved into
@@ -1968,6 +2009,11 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- simply return
             return;
         }
+        
+        //-- if it's a constructor argument, we can exit at this point
+        //-- since constructor arguments have already been set
+        if (descriptor.isConstructorArgument()) 
+            return;
 
         //-- check for proper type and do type
         //-- conversion
@@ -1985,6 +2031,83 @@ public final class UnmarshalHandler extends MarshalFramework
             handler.setValue(parent, value);
 
     } //-- processAttribute
+
+    /**
+     * Processes the given attribute set, and creates the
+     * constructor arguments
+     *
+     * @param atts the AttributeSet to process
+     * @param classDesc the XMLClassDescriptor of the objec
+     * @return the array of constructor argument values.
+     */
+    private Arguments processConstructorArgs
+        (AttributeSet atts, XMLClassDescriptor classDesc)
+        throws org.xml.sax.SAXException
+    {
+        
+        if (classDesc == null) return new Arguments();
+
+
+        //-- Loop through Attribute Descriptors and build
+        //-- the argument array
+
+        //-- NOTE: Due to IDREF being able to reference an
+        //-- un-yet unmarshalled object, we cannot handle
+        //-- references as constructor arguments. 
+        //-- kvisco - 20030421
+        XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
+        int count = 0;
+        for (int i = 0; i < descriptors.length; i++) {
+            XMLFieldDescriptor descriptor = descriptors[i];
+            if (descriptor == null) continue;
+            if (descriptor.isConstructorArgument()) ++count;
+        }
+        
+        Arguments args = new Arguments();
+        
+        if (count == 0) return args;
+        
+        args.values = new Object[count];
+        args.types  = new Class[count];
+        
+        for (int i = 0; i < descriptors.length; i++) {
+
+            XMLFieldDescriptor descriptor = descriptors[i];
+            if (descriptor == null) continue;
+            if (!descriptor.isConstructorArgument()) continue;
+            
+            int argIndex = descriptor.getConstructorArgumentIndex();
+            if (argIndex >= count) {
+                String err = "argument index out of bounds: " + argIndex;
+                throw new SAXException(err);
+            }
+
+            args.types[argIndex] = descriptor.getFieldType();
+            String name      = descriptor.getXMLName();
+            String namespace = descriptor.getNameSpaceURI();
+
+            int index = atts.getIndex(name, namespace);
+
+            if (index >= 0) {
+                Object value = atts.getValue(index);
+                //-- check for proper type and do type
+                //-- conversion
+                if (isPrimitive(args.types[argIndex]))
+                    value = toPrimitiveObject(args.types[argIndex], (String)value);
+                //check if the value is a QName that needs to
+                //be resolved (ns:value -> {URI}value)
+                String valueType = descriptor.getSchemaType();
+                if ((valueType != null) && (valueType.equals(QNAME_NAME))) {
+                        value = resolveNamespace(value);
+                }
+                args.values[argIndex] = value;
+            }
+            else {
+                args.values[argIndex] = null;
+            }
+        }
+        return args;
+    } //-- processConstructorArgs
 
     /**
      * Processes the given IDREF
@@ -2525,6 +2648,15 @@ public final class UnmarshalHandler extends MarshalFramework
             this.descriptor = descriptor;
         }
     }
+    
+    /**
+     * Internal class used for passing constructor argument
+     * information
+     */
+    class Arguments {
+        Object[] values = null;
+        Class[]  types  = null;
+    } //-- Arguments
 
     /**
      * A class for handling Arrays during unmarshalling.
