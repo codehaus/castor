@@ -55,7 +55,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class AttributeDecl extends Annotated {
+public final class AttributeDecl extends Annotated {
 
     private static final short FIXED   = 1; // #b01
     private static final short DEFAULT = 2; // #b10
@@ -114,19 +114,16 @@ public class AttributeDecl extends Annotated {
      * The only valid values for minOccurs are 0 and 1.
     **/
     public AttributeDecl(Schema schema, String name, int minOccurs) {
+        
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        if ((name == null) || (name.length() == 0)) {
-            String err = NULL_ARGUMENT +
-                "; 'name' must not be null or zero-length.";
-            throw new IllegalArgumentException(err);
-        }
-        this.name    = name;
         this.schema  = schema;
+        
+        setName(name);
         setMinOccurs(minOccurs);
-    } //-- AttrDecl
+    } //-- AttributeDecl
 
     /**
      * Returns the name of attributes defined by this AttributeDecl
@@ -205,6 +202,15 @@ public class AttributeDecl extends Annotated {
     } //-- getFixedValue
 
     /**
+     * Returns the Schema that this AttributeGroupDecl belongs to.
+     *
+     * @return the Schema that this AttributeGroupDecl belongs to
+    **/
+    public Schema getSchema() {
+        return schema;
+    } //-- getSchema
+    
+    /**
      * Returns true if this attribute declaration has a fixed value
      * of which attributes of this type must lexically match.
      * @return true if this attribute declaration has a fixed value.
@@ -279,9 +285,31 @@ public class AttributeDecl extends Annotated {
 
     /**
      * Sets the name of attributes defined by this attribute definition
-     * @param name
+     * @param name the name of the this AttributeDecl
+     * @exception SchemaException when the name is not valid
     **/
     public void setName(String name) {
+        if (name == null) {
+            String err = "AttributeDecl#setName: 'name' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        //-- handle namespace if necessary
+        int idx = name.indexOf(':');
+        if (idx >= 0) {
+            String nsPrefix = name.substring(0,idx);
+            //-- we should resolve nsPrefix...just ignore for now
+            
+            //-- use local name
+            name = name.substring(idx+1);
+        }
+        
+        if (name.length() == 0) {
+            String err = "AttributeDecl#setName: 'name' must not be "+
+                "zero-length.";
+            throw new IllegalArgumentException(err);
+        }
+        
         this.name = name;
     } //-- setName
 

@@ -99,6 +99,16 @@ public class Schema extends Annotated {
     private String version  = null;
 
     /**
+     * The global AttribteGroups for this Schema
+    **/
+    private Hashtable attributeGroups = null;
+    
+    /**
+     * The global attributes for this Schema
+    **/
+    private Hashtable attributes = null;
+    
+    /**
      * A list of defined architypes
     **/
     private Hashtable complexTypes = null;
@@ -143,19 +153,112 @@ public class Schema extends Annotated {
     **/
     public Schema(String schemaNS) {
         super();
-        complexTypes = new Hashtable();
-        simpleTypes  = new Hashtable();
-        elements   = new Hashtable();
+        
+        attributes      = new Hashtable();
+        attributeGroups = new Hashtable();
+        complexTypes    = new Hashtable();
+        simpleTypes     = new Hashtable();
+        elements        = new Hashtable();
 		importedSchemas = new Hashtable();
 		includedSchemas = new Vector();
-		namespaces = new Hashtable();
+		namespaces      = new Hashtable();
+		
         this.schemaNS = schemaNS;
+        
         init();
     } //-- ScehamDef
 
     private void init() {
 
     } //-- init
+
+    /**
+     * Adds the given attribute definition to this Schema definition
+     *
+     * @param attribute the AttributeDecl to add
+     * @exception SchemaException if an AttributeDecl
+     * already exisits with the same name
+    **/
+    public void addAttribute(AttributeDecl attribute) 
+        throws SchemaException
+    {
+        if (attribute == null) return;
+        
+        if (attribute.getSchema() != this) {
+            String err = "invalid attempt to add an AttributeDecl which ";
+            err += "belongs to a different Schema; " + name;
+            throw new SchemaException(err);
+        }
+        
+        Object obj = attributes.get(name);
+        
+        if (obj == attribute) return;
+        
+        if (obj != null) {
+            String err = "Error attempting to add an AttributeDecl to this " +
+                "Schema definition, an AttributeDecl already exists with " +
+                "the given name: ";
+            throw new SchemaException(err + name);
+        }
+        
+        attributes.put(name, attribute);
+        
+    } //-- addAttribute
+    
+    /**
+     * Adds the given attribute group definition to this Schema
+     * definition.
+     *
+     * @param attrGroup the AttributeGroupDecl to add
+     * @exception SchemaException if an AttributeGroupDecl 
+     * already exisits with the same name
+    **/
+    public void addAttributeGroup(AttributeGroupDecl attrGroup) 
+        throws SchemaException
+    {
+        if (attrGroup == null) return;
+        
+        String name = attrGroup.getName();
+
+        //-- handle namespace prefix, if necessary
+        int idx = name.indexOf(':');
+        if (idx >= 0)
+		{
+			String nsPrefix = name.substring(0,idx);
+            name = name.substring(idx + 1);
+			String ns = (String) namespaces.get(nsPrefix);
+			if (ns == null)  {
+			    String err = "addAttributeGroup: ";
+			    err += "Namespace prefix not recognized '"+nsPrefix+"'";
+			    throw new IllegalArgumentException(err);
+			}
+			if (!ns.equals(targetNS)) {
+			    String err = "AttributeGroup has different namespace " +
+			     "than this Schema definition.";
+			    throw new IllegalArgumentException(err);
+			}
+		}
+		
+        if (attrGroup.getSchema() != this) {
+            String err = "invalid attempt to add an AttributeGroup which ";
+            err += "belongs to a different Schema; " + name;
+            throw new SchemaException(err);
+        }
+        
+        Object obj = attributeGroups.get(name);
+        
+        if (obj == attrGroup) return;
+        
+        if (obj != null) {
+            String err = "Error attempting to add an AttributeGroup to this " +
+                "Schema definition, an AttributeGroup already exists with " +
+                "the given name: ";
+            throw new SchemaException(err + name);
+        }
+        
+        attributeGroups.put(name, attrGroup);
+        
+    } //-- addAttributeGroup
 
 
     /**
@@ -309,12 +412,101 @@ public class Schema extends Annotated {
     }
 
     /**
+     * Returns the top-level Attribute associated with the given name.
+     *
+     * @return the Attribute associated with the given name,
+     * or null if no Attribute association is found.
+    **/
+    public AttributeDecl getAttribute(String name) {
+        
+		//-- Null?
+        if (name == null)  {
+            String err = NULL_ARGUMENT + "getAttribute: ";
+            err += "'name' cannot be null.";
+            throw new IllegalArgumentException(err);
+        }
+
+        //-- Namespace prefix?
+        String canonicalName = name;
+		String nsprefix = "";
+		String ns = targetNS;
+        int colon = name.indexOf(':');
+        if (colon != -1)
+		{
+            canonicalName = name.substring(colon + 1);
+			nsprefix = name.substring(0,colon);
+			ns = (String) namespaces.get(nsprefix);
+			if (ns == null)  {
+			    String err = "getAttribute: ";
+			    err += "Namespace prefix not recognized '"+name+"'";
+			    throw new IllegalArgumentException(err);
+			}
+		}
+
+		if ((ns==null) || (ns.equals(targetNS)) )
+			return (AttributeDecl)attributes.get(canonicalName);
+		else {
+			Schema schema = getImportedSchema(ns);
+			if (schema!=null)
+				return schema.getAttribute(canonicalName);
+		}
+
+		return null;
+        
+    } //-- getAttribute
+
+    /**
+     * Returns the AttributeGroup associated with the given name.
+     *
+     * @return the AttributeGroup associated with the given name,
+     * or null if no AttributeGroup association is found.
+    **/
+    public AttributeGroup getAttributeGroup(String name) {
+        
+		//-- Null?
+        if (name == null)  {
+            String err = NULL_ARGUMENT + "getAttributeGroup: ";
+            err += "'name' cannot be null.";
+            throw new IllegalArgumentException(err);
+        }
+
+        //-- Namespace prefix?
+        String canonicalName = name;
+		String nsprefix = "";
+		String ns = targetNS;
+        int colon = name.indexOf(':');
+        if (colon != -1)
+		{
+            canonicalName = name.substring(colon + 1);
+			nsprefix = name.substring(0,colon);
+			ns = (String) namespaces.get(nsprefix);
+			if (ns == null)  {
+			    String err = "getAttributeGroup: ";
+			    err += "Namespace prefix not recognized '"+name+"'";
+			    throw new IllegalArgumentException(err);
+			}
+		}
+
+		if ((ns==null) || (ns.equals(targetNS)) )
+			return (AttributeGroup)attributeGroups.get(canonicalName);
+		else {
+			Schema schema = getImportedSchema(ns);
+			if (schema!=null)
+				return schema.getAttributeGroup(canonicalName);
+		}
+
+		return null;
+        
+    } //-- getAttributeGroup
+    
+    /**
      * Gets a built in type's name given its code.
      */
     public String getBuiltInTypeName(int builtInTypeCode) {
         return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
     } //-- getBuiltInTypeName
 
+    
     /**
      * Returns the ComplexType of associated with the given name
      * @return the ComplexType of associated with the given name, or
