@@ -36,7 +36,7 @@
           <li>Java to SQL mapping uses an XML document to specify the mapping
               textually, and provides an API to specify them programatically</li>
 
-          <li>Supports one-one and one-many relation types (release 0.9),
+          <li>Supports one-one and one-many relation types (release 0.8),
               SQL/Java inheritance, object graph to single row mapping, and
               multiple column primary keys and automatic type conversion</li>
 
@@ -86,8 +86,8 @@
             queries with simple syntax and single object retrieval. A project
             to extend the OQL engine is underway.</li>
 
-        <li>This release supports one-one relations but not one-many relations
-            (collections). One-many relations will be introduced in release 0.9.</li>
+        <li>This release supports one-one and one-many relations but not many-many
+            relations. Many-many relations will be introduced shortly.</li>
 
         <li>The DAX implementation is not complete. There are plans to replace
             the ODMG API with a similar, but J2EE-compatible API.</li>
@@ -112,16 +112,14 @@
 <pre>
   JDO: Add SQL capabilities mechanism to address different databases.
 
-  JDO: Inheritance is not fully working. Need to rethink over OID model.
-
   JDO: Need to think up a better alternative to the ODMG API.
 
   JDO: Implement dirty checking, define SPI for key generation, support
        stored procedures.
 
-  JDO: Add mechanism to close result set.
+  JDO: Support for many-many relations.
 
-  JDO: Support for one-many, many-many relations.
+  JDO: More type convertors (serialize, BLOB, etc)
 
   DAX: Type convertors to/from String, support for Vectors.
 
