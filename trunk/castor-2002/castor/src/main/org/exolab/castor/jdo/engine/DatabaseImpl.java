@@ -331,6 +331,15 @@ public final class DatabaseImpl
     }
 
 
+    public XAResource getXAResource()
+    {
+	return this;
+    }
+
+
+
+
+
     private Hashtable _resManager = new Hashtable();
 
 
@@ -346,7 +355,7 @@ public final class DatabaseImpl
 	    case TMNOFLAGS:
 		_ctx = (TransactionContext) _resManager.get( xid );
 		if ( _ctx == null ) {
-		    _ctx = new TransactionContext();
+		    _ctx = new TransactionContext( xid );
 		    _resManager.put( xid, _ctx );
 		}
 		break;

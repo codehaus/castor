@@ -62,6 +62,8 @@ import org.odmg.ClassNotPersistenceCapableException;
 import org.odmg.ODMGException;
 import org.odmg.ODMGRuntimeException;
 import javax.transaction.Status;
+import javax.transaction.xa.Xid;
+import javax.transaction.xa.XAResource;
 import org.exolab.castor.jdo.ODMGSQLException;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.TransactionAbortedReasonException;
@@ -73,7 +75,8 @@ import org.exolab.castor.jdo.TransactionAbortedReasonException;
  * org.odmg.Transaction} for the ODMG API and into {@link
  * javax.transaction.xa.XAResource} for XA databases. The only way
  * to begin a new transaction is through the creation of a new
- * transaction context.
+ * transaction context. All database access must be performed
+ * through a transaction context.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -121,8 +124,32 @@ final class TransactionContext
     private Hashtable   _conns = new Hashtable();
 
 
+    /**
+     * If this transaction is managed by the transaction monitor
+     * through the {@link XAResource} interface, it will have a
+     * transaction identifier and will not attempt to commit/rollback
+     * directly against the underlying database.
+     */
+    private Xid         _xid;
+
+
+    /**
+     * Create a new transaction context. This method is used by the
+     * ODMG transaction model, see {@link TransactionImpl}.
+     */
     public TransactionContext()
     {
+	_status = Status.STATUS_ACTIVE;
+    }
+
+
+    /**
+     * Create a new transaction context. This method is used by the
+     * JTA transaction model, see {@link XAResourceImpl}.
+     */
+    public TransactionContext( Xid xid )
+    {
+	_xid = xid;
 	_status = Status.STATUS_ACTIVE;
     }
 
@@ -148,7 +175,7 @@ final class TransactionContext
      * @throws ODMGRuntimeException The object is already persisted or
      *   an error occured talking to the persistence engine
      */
-    public synchronized OID create( DatabaseEngine dbEngine, Object obj )
+    public synchronized OID create( DatabaseEngine dbEngine, Object obj, Object primKey )
     throws TransactionNotInProgressException, DuplicatePrimaryKeyException,
 	   ClassNotPersistenceCapableException, ODMGRuntimeException
     {
@@ -160,7 +187,7 @@ final class TransactionContext
 	// Create the object. This can only happen once for each object in
 	// all transactions running on the same engine, so after creation
 	// add a new entry for this object and use this object as the view
-	oid = dbEngine.create( obj, this );
+	oid = dbEngine.create( this, obj );
 	entry = addObjectEntry( obj, oid, dbEngine );
 	entry.created = true;
 	return oid;
@@ -205,7 +232,7 @@ final class TransactionContext
 	// Must acquire a write lock on the object in order to delete it,
 	// prevents object form being deleted while someone else is
 	// looking at it.
-	entry.dbEngine.writeLock( entry.oid, this );
+	entry.dbEngine.writeLock( this, entry.oid );
 	// Mark object as deleted. This will prevent it from being viewed
 	// in this transaction and will handle it properly at commit time.
 	// The write lock will prevent it from being viewed in another
@@ -254,7 +281,52 @@ final class TransactionContext
 	// object is not persistent), so we only need to acquire a write lock.
 	if ( write ) {
 	    try {
-		entry.dbEngine.writeLock( entry.oid, this );
+		entry.dbEngine.writeLock( this, entry.oid );
+	    } catch ( ObjectDeletedException except ) {
+		throw except;
+	    } catch ( LockNotGrantedException except ) {
+		throw except;
+	    } catch ( ODMGRuntimeException except ) {
+		// Any exception other than delete/lock is a lock problem
+		throw new LockNotGrantedException( "Lock not granted for the following reason: " +
+						   except.toString() );
+	    }
+	}
+    }
+
+
+    public synchronized void acquire( DatabaseEngine dbEngine, Object obj, Object primKey,
+				      boolean write, int timeout )
+	throws TransactionNotInProgressException, ObjectNotPersistentException,
+	       LockNotGrantedException
+    {
+	ObjectEntry entry;
+	OID         oid;
+
+	if ( _status != Status.STATUS_ACTIVE )
+	    throw new TransactionNotInProgressException( "Transaction has been closed" );
+	// Get the entry for this object, if it exists in this
+	// transaction, simply acquire the lock.
+	entry = getObjectEntry( obj );
+	if ( entry != null ) {
+	    entry.readOnly = false;
+	    if ( write )
+		lock( obj, write, timeout );
+	    return;
+	}
+
+	// Object not persistent in this transaction, but might be
+	// know to the database engine.
+	oid = new OID( dbEngine, dbEngine.getObjectDesc( obj.getClass() ), primKey );
+	
+
+	if ( entry == null || entry.readOnly )
+	    throw new ObjectNotPersistentExceptionImpl( obj );
+	// At this point read lock is available on the object (otherwise the
+	// object is not persistent), so we only need to acquire a write lock.
+	if ( write ) {
+	    try {
+		entry.dbEngine.writeLock( this, entry.oid );
 	    } catch ( ObjectDeletedException except ) {
 		throw except;
 	    } catch ( LockNotGrantedException except ) {
@@ -294,7 +366,7 @@ final class TransactionContext
 	if ( entry == null || entry.readOnly )
 	    throw new ObjectNotPersistentExceptionImpl( obj );
 	// Release the lock, forget about the object in this transaction
-	entry.dbEngine.releaseLock( entry.oid, this );
+	entry.dbEngine.releaseLock( this, entry.oid );
 	removeObjectEntry( obj );
     }
 
@@ -339,7 +411,7 @@ final class TransactionContext
 	    throw new TransactionNotInProgressException( "Transaction has been closed" );
 	// Load the object through the engine acquiring the proper lock
 	// Return null if object not found, otherwise we have a read/write lock
-	oid = dbEngine.load( type, primKey, this,
+	oid = dbEngine.load( this, type, primKey,
 			     ( openMode == Database.OPEN_EXCLUSIVE ), timeout );
 	if ( oid == null )
 	    return null;
@@ -366,13 +438,13 @@ final class TransactionContext
 	entry = addObjectEntry( obj, oid, dbEngine );
 	if ( openMode == Database.OPEN_READ_ONLY ) {
 	    entry.readOnly = true;
-	    entry.dbEngine.releaseLock( entry.oid, this );
+	    entry.dbEngine.releaseLock( this, entry.oid );
 	}	    
 	return obj;
     }
 
 
-
+    // XXX NOT FULLY IMPLEMENTED
     public synchronized Object query( DatabaseEngine dbEngine, Class type, String sql,
 				      Object[] values, int openMode, int timeout )
 	throws TransactionNotInProgressException, LockNotGrantedException,
@@ -386,7 +458,7 @@ final class TransactionContext
 	    throw new TransactionNotInProgressException( "Transaction has been closed" );
 	// Load the object through the engine acquiring the proper lock
 	// Return null if object not found, otherwise we have a read/write lock
-	oid = dbEngine.query( type, sql, values, this,
+	oid = dbEngine.query( this, type, sql, values,
 			      ( openMode == Database.OPEN_EXCLUSIVE ), timeout );
 	if ( oid == null )
 	    return null;
@@ -411,9 +483,8 @@ final class TransactionContext
 	obj = dbEngine.copyInto( this, oid, null );
 	entry = addObjectEntry( obj, oid, dbEngine );
 	if ( openMode == Database.OPEN_READ_ONLY ) {
-System.out.println( "Entry is read only" );
 	    entry.readOnly = true;
-	    entry.dbEngine.releaseLock( entry.oid, this );
+	    entry.dbEngine.releaseLock( this, entry.oid );
 	}	    
 	return obj;
     }
@@ -463,11 +534,11 @@ System.out.println( "Entry is read only" );
 		// the database.
 		if ( ! entry.readOnly ) {
 		    if ( entry.deleted ) {
-			entry.dbEngine.delete( entry.oid, this );
+			entry.dbEngine.delete( this, entry.oid );
 		    } else {
 			// When storing the object it's OID might change
 			// if the primary key has been changed
-			entry.oid = entry.dbEngine.store( entry.oid, entry.obj, this );
+			entry.oid = entry.dbEngine.store( this, entry.oid, entry.obj );
 		    }
 		}
 		// At least one object has been prepared, this is not
@@ -485,6 +556,18 @@ System.out.println( "Entry is read only" );
     }
 
 
+    /**
+     * Commits all changes but does not closes the transaction and does
+     * not releases any locks. All objects remain persistent, except for
+     * objects deleted during the transaction. May be called any number
+     * of times prior to committing/aborting the transaction.
+     *
+     * @throws  TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws TransactionAbortedException The transaction has been
+     *   aborted due to inconsistency, duplicate object key, error
+     *   with the persistence engine or any other reason
+     */
     public void checkpoint()
 	throws TransactionNotInProgressException, TransactionAbortedReasonException
     {
@@ -492,6 +575,8 @@ System.out.println( "Entry is read only" );
 	ObjectEntry entry;
 	Connection  conn;
 
+	if ( _xid != null )
+	    throw new ODMGRuntimeException( "Check points not supported for XA resources" );
 	// Never commit transaction that has been marked for rollback
 	if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
 	    rollback();
@@ -508,12 +593,11 @@ System.out.println( "Entry is read only" );
 	    enum = _conns.elements();
 	    while ( enum.hasMoreElements() ) {
 		conn = (Connection) enum.nextElement();
-		// XXX Prevent this when running in JTA env
-		//     Cannot allow a checkpoint to occur
+		// Checkpoint can only be done if transaction is not running
+		// under transaction monitor
 		conn.commit();
 		conn.setAutoCommit( false );
 	    }
-	    _conns.clear();
 
 	    // Assuming all went well in the RDBMS department, no deadlocks,
 	    // etc. clean all the transaction locks with regards to the
@@ -525,13 +609,13 @@ System.out.println( "Entry is read only" );
 		    if ( entry.deleted ) {
 			// Object has been deleted inside transaction,
 			// engine must forget about it.
-			entry.dbEngine.forgetObject( entry.oid, this );
+			entry.dbEngine.forgetObject( this, entry.oid );
 		    } else {
 			// Object has been created/accessed inside the
 			// transaction must retain the database lock.
 
 			// XXX Do we need to acquire write or read lock?
-			entry.dbEngine.writeLock( entry.obj, this );
+			entry.dbEngine.writeLock( this, entry.oid );
 		    }
 		}
 	    }
@@ -578,14 +662,15 @@ System.out.println( "Entry is read only" );
 	try {
 	    _status = Status.STATUS_COMMITTING;
 
-	    // Go through all the connections opened in this transaction,
-	    // commit and close them one by one.
-	    enum = _conns.elements();
-	    while ( enum.hasMoreElements() ) {
-		conn = (Connection) enum.nextElement();
-		// XXX Prevent this when running in JTA env
-		conn.commit();
-		conn.close();
+	    if ( _xid == null ) {
+		// Go through all the connections opened in this transaction,
+		// commit and close them one by one.
+		enum = _conns.elements();
+		while ( enum.hasMoreElements() ) {
+		    conn = (Connection) enum.nextElement();
+		    conn.commit();
+		    conn.close();
+		}
 	    }
 	    _conns.clear();
 
@@ -599,12 +684,12 @@ System.out.println( "Entry is read only" );
 		    if ( entry.deleted ) {
 			// Object has been deleted inside transaction,
 			// engine must forget about it.
-			entry.dbEngine.forgetObject( entry.oid, this );
+			entry.dbEngine.forgetObject( this, entry.oid );
 		    } else {
 			// Object has been created/accessed inside the
 			// transaction, release its lock.
 			entry.dbEngine.update( this, entry.oid, entry.obj );
-			entry.dbEngine.releaseLock( entry.oid, this );
+			entry.dbEngine.releaseLock( this, entry.oid );
 		    }
 		}
 	    }
@@ -641,15 +726,17 @@ System.out.println( "Entry is read only" );
 	     _status != Status.STATUS_MARKED_ROLLBACK )
 	    throw new TransactionNotInProgressException( "Transaction has been closed" );
 
-	// Go through all the connections opened in this transaction,
-	// rollback and close them one by one. Ignore errors.
-	enum = _conns.elements();
-	while ( enum.hasMoreElements() ) {
-	    conn = (Connection) enum.nextElement();
-	    try {
-		conn.rollback();
-		conn.close();
-	    } catch ( SQLException except ) { }
+	if ( _xid == null ) {
+	    // Go through all the connections opened in this transaction,
+	    // rollback and close them one by one. Ignore errors.
+	    enum = _conns.elements();
+	    while ( enum.hasMoreElements() ) {
+		conn = (Connection) enum.nextElement();
+		try {
+		    conn.rollback();
+		    conn.close();
+		} catch ( SQLException except ) { }
+	    }
 	}
 	_conns.clear();
 
@@ -663,12 +750,12 @@ System.out.println( "Entry is read only" );
 		    if ( entry.created ) {
 			// Object has been created in this transaction,
 			// it no longer exists, forgt about it in the engine.
-			entry.dbEngine.forgetObject( entry.oid, this );
+			entry.dbEngine.forgetObject( this, entry.oid );
 		    } else {
 			// Object has been queried (possibly) deleted in this
 			// transaction, release the lock and revert to the old value.
 			entry.dbEngine.copyInto( this, entry.oid, entry.obj );
-			entry.dbEngine.releaseLock( entry.oid, this );
+			entry.dbEngine.releaseLock( this, entry.oid );
 		    }
 		}
 	    } catch ( Exception except ) { }
@@ -749,7 +836,8 @@ System.out.println( "Entry is read only" );
 		// transaction association in the engine inflates the
 		// code size in other places.
 		conn = dbEngine.createConnection();
-		conn.setAutoCommit( false );
+		if ( _xid == null )
+		    conn.setAutoCommit( false );
 		_conns.put( dbEngine, conn );
 	    } catch ( SQLException except ) {
 		throw new ODMGSQLException( except );
@@ -846,25 +934,12 @@ System.out.println( "Entry is read only" );
      */
     private static class ObjectEntry
     {
-	/*
-	static class State
-	{
-	    public static final int Queried = 0;
-	    public static final int ReadOnly = 1;
-	    public static final int Deleted = 2;
-	    public static final int Created = 3;
-	    public static final int CreatedStored = 4;
-
-	}
-	*/
 
 	DatabaseEngine dbEngine;
 
 	OID            oid;
 
 	Object         obj;
-
-	int            state;
 
 	boolean        deleted;
 
