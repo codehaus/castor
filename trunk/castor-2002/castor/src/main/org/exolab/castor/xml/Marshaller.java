@@ -56,6 +56,7 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
+import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.Messages;
@@ -645,7 +646,12 @@ public class Marshaller extends MarshalFramework {
 
         //-- Suppress 'xsi:type' attributes when Castor is able to infer the
         //-- information from the mapping file
+        //-- XXXX Date fix
+        if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
+            saveType = false;
+        //-- XXXX end Date fix
         if (saveType) {
+            
             // XML Name associated with the class we are marshalling
             String xmlElementName = classDesc.getXMLName();
             // We try to find if there is a XMLClassDescriptor associated
