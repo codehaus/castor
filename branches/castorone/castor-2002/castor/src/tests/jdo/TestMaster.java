@@ -49,6 +49,8 @@ package jdo;
 
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -67,7 +69,7 @@ public class TestMaster
     private TestGroup  _group;
 
 
-    private Vector     _details;
+    private ArrayList     _details;
 
 
     static final int       DefaultId = 3;
@@ -81,7 +83,7 @@ public class TestMaster
         _id = DefaultId;
         _value = DefaultValue;
         _group = null;
-        _details = new Vector();
+        _details = new ArrayList();
     }
 
 
@@ -129,25 +131,29 @@ public class TestMaster
 
     public void addDetail( TestDetail detail )
     {
-        _details.addElement( detail );
+        _details.add( detail );
         detail.setMaster( this );
     }
 
 
-    public Vector getDetails()
+    public ArrayList getDetails()
     {
         return _details;
     }
 
 
+    public void setDetails( ArrayList array ) {
+        _details = array;
+    }
+
     public TestDetail findDetail(int id)
     {
-        Enumeration enum;
+        Iterator enum;
         TestDetail detail;
 
-        enum = _details.elements();
-        while ( enum.hasMoreElements() ) {
-            detail = (TestDetail) enum.nextElement();
+        enum = _details.iterator();
+        while ( enum.hasNext() ) {
+            detail = (TestDetail) enum.next();
             if ( detail.getId() == id ) {
                 return detail;
             }
@@ -169,7 +175,7 @@ public class TestMaster
         for ( int i = 0 ; i < _details.size() ; ++i ) {
             if ( i > 0 )
                 details = details + ", ";
-            details = details + _details.elementAt( i ).toString();
+            details = details + _details.get( i ).toString();
         }
         return _id + " / " + _value + " (" + _group + ") { " + details + " }";
     }

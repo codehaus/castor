@@ -217,10 +217,10 @@ public class Dependent
                 return false;
             }
             // remove detail with id == 5
-            master.getDetails().removeElement( master.findDetail( 5 ) );
+            master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
             // remove detail with id == 6 explicitly
             detail = (TestDetail) master.findDetail( 6 );
-            master.getDetails().removeElement( detail );
+            master.getDetails().remove( master.getDetails().indexOf( detail ) );
             db.remove( detail );
             // add new detail
             master.addDetail( new TestDetail( 8 ) );
@@ -230,7 +230,7 @@ public class Dependent
             db.create( detail );
             // delete, then create detail with id == 7 explicitly
             detail = (TestDetail) master.findDetail( 7 );
-            master.getDetails().removeElement( detail );
+            master.getDetails().remove( master.getDetails().indexOf( detail ) );
             db.remove( detail );
             master.addDetail( detail );
             db.create( detail );
@@ -286,8 +286,8 @@ public class Dependent
             stream.writeVerbose( "Test 2" );
             master2.addDetail( new TestDetail( 5 ) );
             master2.addDetail( new TestDetail( 6 ) );
-            master2.getDetails().removeElement( new TestDetail( 8 ) );
-            master2.getDetails().removeElement( new TestDetail( 9 ) );
+            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 8 ) ) );
+            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 9 ) ) );
             try {
                 db.begin();
                 db.update( master2 );

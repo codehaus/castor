@@ -104,7 +104,7 @@
     <field name="group" type="jdo.TestGroup" required="false">
       <sql name="group_id"/>
     </field>
-    <field name="details" type="jdo.TestDetail" collection="vector" required="false">
+    <field name="details" type="jdo.TestDetail" collection="arraylist" required="false">
       <sql many-key="master_id"/>
     </field>
   </class>
@@ -122,7 +122,7 @@
     <field name="master" type="jdo.TestMaster" required="true">
       <sql name="master_id" />
     </field>
-    <field name="details2" type="jdo.TestDetail2" collection="vector" required="false">
+    <field name="details2" type="jdo.TestDetail2" collection="arraylist" required="false">
     </field>
   </class>
 

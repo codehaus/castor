@@ -634,7 +634,7 @@ public final class LockEngine {
             throws LockNotGrantedException, ObjectDeletedException,
             ObjectModifiedException, DuplicateIdentityException,
             PersistenceException {
-        System.out.println("LockEngine.store() "+oid);
+
         Object[]   fields;
         Object[]   original;
         ObjectLock lock;

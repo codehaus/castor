@@ -95,6 +95,10 @@ public class FieldMolder {
 
     private boolean _check;
 
+    private boolean _store;
+
+    private boolean _multi;
+
     private ClassMolder _eMold;
 
     private ClassMolder _fMold;
@@ -140,6 +144,10 @@ public class FieldMolder {
         return _manyToManyLoader;
     }
 
+    public boolean isStored() {
+        return _store;
+    }
+
     public boolean isManyToMany() {
         return _manyToManyLoader != null;
     }
@@ -149,7 +157,7 @@ public class FieldMolder {
     }
 
     public boolean isMulti() {
-        return (_colClass != null || _manyToManyLoader != null );
+        return _multi;
     }
 
     public boolean isPersistanceCapable() {
@@ -352,13 +360,29 @@ public class FieldMolder {
 
             if ( fieldMap.getSql() == null 
                     || fieldMap.getSql().getDirty() == null
-                    || ! fieldMap.getSql().getDirty().equals("ignore") ) 
+                    || ! fieldMap.getSql().getDirty().equals("ignore") ) {
                 _check = true;
-            
-            // Set collection type
-            if ( fieldMap.getCollection() != null ) 
-                _colClass = getCollectionType( fieldMap.getCollection(), _lazy );
+            }
 
+
+            if ( fieldMap.getSql() == null )
+                _store = false;
+            else if ( fieldMap.getSql().getName() == null )
+                _store = false;
+            else if ( fieldMap.getSql().getManyTable() == null ) 
+                _store = false;
+            else 
+                _store = true;
+
+            if ( fieldMap.getCollection() != null )
+                _multi = true;
+                
+
+            // Set collection type
+            if ( fieldMap.getCollection() != null ) {
+                _colClass = getCollectionType( fieldMap.getCollection(), _lazy );
+                _store = false;
+            }
             // Set field name, if it is null, we try to discover it with
             // return type of set/get method.
             _fType = fieldMap.getType();

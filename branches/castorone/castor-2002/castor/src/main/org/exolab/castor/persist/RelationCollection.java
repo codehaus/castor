@@ -12,6 +12,7 @@ import java.util.Hashtable;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.ArrayVector;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -30,7 +31,7 @@ public class RelationCollection implements Collection, Lazy {
 
     /* Vector of identity */
     // to be change to oid for multi-pk support
-    Vector _ids;
+    ArrayVector _ids;
 
     /* Vector of identity */
     Vector _deleted;
@@ -44,7 +45,7 @@ public class RelationCollection implements Collection, Lazy {
     int _changecount;
 
     public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine, 
-            ClassMolder molder, AccessMode amode, Vector ids ) {
+            ClassMolder molder, AccessMode amode, ArrayVector ids ) {
         _tx = tx;
         _oid = enclosing;
         _molder = molder;
@@ -110,14 +111,14 @@ public class RelationCollection implements Collection, Lazy {
         Object id;
 
         for ( int i=0; i<_ids.size(); i++ ) {
-            id = _ids.elementAt(i);
+            id = _ids.get(i);
             _deleted.add( id );
             _loaded.remove( id );
         }
 
 
         for ( int i=0; i<_added.size(); i++ ) {
-            id = _ids.elementAt(i);
+            id = _ids.get(i);
             _loaded.remove( id );
         }
         _changecount++; // need more accurate count?? or it's fine
@@ -178,7 +179,7 @@ public class RelationCollection implements Collection, Lazy {
                 ids = (Object[]) _added.elementAt( cursor++ );
                 return lazyLoad( ids );
             } else {
-                ids = (Object[]) parent._ids.elementAt(translate( cursor - _added.size() ) );
+                ids = (Object[]) parent._ids.get(translate( cursor - _added.size() ) );
                 return lazyLoad( ids );
             }
         }
@@ -188,12 +189,12 @@ public class RelationCollection implements Collection, Lazy {
             int i = 0;
             int idcur = 0;
             while ( i <= relatedCursor ) {
-                id = parent._ids.elementAt( idcur );
+                id = parent._ids.get( idcur );
                 if ( !parent._deleted.contains( id ) )
                     i++;
                 idcur++;
             }
-            while ( parent._deleted.contains( ((Vector)parent._ids).elementAt( idcur )) ) {
+            while ( parent._deleted.contains( parent._ids.get( idcur )) ) {
                 idcur++;
             }
             return idcur;
@@ -234,7 +235,7 @@ public class RelationCollection implements Collection, Lazy {
                 id = parent._added.elementAt( cur );
                 parent.remove( id );
             } else {
-                id = parent._ids.elementAt(translate( cursor-_added.size() ) );
+                id = parent._ids.get(translate( cursor-_added.size() ) );
                 parent.remove( id );
             }
         }
