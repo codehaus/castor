@@ -27,7 +27,7 @@
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
-    <case class="jdo.NestedFields" />
+    <!-- <case class="jdo.NestedFields" /> -->
     <!-- -->
     <!-- -->
     <!-- -->
@@ -40,7 +40,7 @@
     <!-- -->
     <!-- -->
     <case class="jdo.Persistent" />
-    <case class="jdo.StoredProcedure" />
+    <!-- <case class="jdo.StoredProcedure" /> -->
 
     <!-- D -->
     <case class="jdo.ListTypes" />
