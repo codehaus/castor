@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -50,6 +50,7 @@ import java.math.BigDecimal;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.Iterator;
+import org.exolab.castor.persist.resolvers.Resolver;
 
 /**
  * Object identifier. An object identifier is unique within a cache
