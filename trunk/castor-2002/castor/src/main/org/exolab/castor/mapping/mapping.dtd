@@ -70,7 +70,7 @@
     depends         IDREF    #IMPLIED
     identity        NMTOKENS #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
-    key-generator   NMTOKEN  #IMPLIED 
+    key-generator   NMTOKEN  #IMPLIED
     auto-complete   (true|false) "false">
 
 
@@ -114,7 +114,7 @@
 
     If the accessors (get and set methods) are specified the field
     will be accessed only through these methods. The methods must be
-    public and not static. 
+    public and not static.
 
     If the attribute direct is true, the field will be accessed
     directly. The field must be public, not static and not transient.
@@ -126,6 +126,10 @@
     If the field is a collection, the collection type is specified with
     the collection attribute and the type of each element with the type
     attribute.
+
+    If the field should be treated as a container (ie only it's fields
+    should be persisted but not itself) the containter attribute should
+    be set to true. (Currently only supported in Castor XML)
 
  -->
 <!ELEMENT field ( description?, sql?, bind-xml?, ldap? )>
@@ -139,6 +143,7 @@
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
     transient      (true|false) "false"
+    container      ( true | false ) "false"
     collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate )  #IMPLIED>
 
 
@@ -149,7 +154,7 @@
     The SQL type can be the proper Java class type returned by the
     JDBC driver or the SQL type without precision (e.g.
     java.math.BigDecimal or numeric).
-    However, SQL type may contain the parameter for the SQL<->Java type 
+    However, SQL type may contain the parameter for the SQL<->Java type
     convertors in square brackets (e.g., char[01] for false->0, true->1
     conversion from Boolean Java type to char SQL type)
 
@@ -161,7 +166,7 @@
     many-key    NMTOKENS  #IMPLIED
     many-table  NMTOKEN  #IMPLIED
     read-only   ( true | false )  "false"
-    dirty  ( check | ignore )  "check"> 
+    dirty  ( check | ignore )  "check">
 
 
 <!--
@@ -176,7 +181,7 @@
 
     Note: This used to be called "xml" which is an invalid xml element name
           according to the W3C XML 1.0 recommendation. We still support
-          the "xml" element for backward compatibility, but we will remove 
+          the "xml" element for backward compatibility, but we will remove
           support for it in the future.
  -->
 
