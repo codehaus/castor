@@ -303,23 +303,17 @@ public abstract class TransactionContext
 	* global transaction.
 	*/
 	public TransactionContext( Database db,  javax.transaction.Transaction transaction )
-    {
+    	throws javax.transaction.SystemException
+	{
         _xid = null;       
         _db = db;
-		_status = -1;
 		//this should be removed when we move 
 		//to separate implementations of TransactionContext
 		//for explicit demarcation and global transactions.
 		//In the latter case, I think we should just wrap
 		//the global transaction and pass getStatus() through to the 
 		//wrapped transaction
-		try {
-			_status = transaction.getStatus();
-    	}
-		catch ( javax.transaction.SystemException e ) {
-			_log.error ( "Problem in TransactionContext( db , transaction )", e );
-			// TODO WG: do something about this exception; catching silently is not enough
-		}
+		_status = transaction.getStatus();
 	}
 		
 	
