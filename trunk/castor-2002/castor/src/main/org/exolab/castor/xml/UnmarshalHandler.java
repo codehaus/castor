@@ -491,14 +491,47 @@ public class UnmarshalHandler implements DocumentHandler {
             _topState.classDesc = classDesc;
             _topState.type = _topClass;
 
-            //-- try to create instance of the given Class
-            try {
-                _topState.object = _topClass.newInstance();
-            }
-            catch(Exception ex) {
-                String msg = "unable to instantiate " + 
-                    _topClass.getName() + "; ";
-                throw new SAXException(msg + ex);
+            // Retrieving the xsi:type attribute, if present
+            String instanceClassname = getInstanceType(atts);
+            if (instanceClassname != null) {
+                Class instanceClass = null;
+                Object instance = null;
+                try {
+                    instanceClass = _cdResolver.resolve(instanceClassname)
+                        .getJavaClass();
+                    if (!_topClass.isAssignableFrom(instanceClass)) {
+                        String err = instanceClass + " is not a subclass of "
+                            + _topClass;
+                        throw new SAXException(err);
+                    }
+                    
+                } catch(Exception ex) {
+                    String msg = "unable to instantiate " + 
+                        instanceClassname + "; ";
+                    throw new SAXException(msg + ex);
+                }
+                
+                //-- try to create instance of the given Class
+                try {
+                    _topState.object = instanceClass.newInstance();
+                }
+                catch(Exception ex) {
+                    String msg = "unable to instantiate " + 
+                        instanceClass.getName() + "; ";
+                    throw new SAXException(msg + ex);
+                }
+                
+            } else {
+                
+                //-- try to create instance of the given Class
+                try {
+                    _topState.object = _topClass.newInstance();
+                }
+                catch(Exception ex) {
+                    String msg = "unable to instantiate " + 
+                        _topClass.getName() + "; ";
+                    throw new SAXException(msg + ex);
+                }
             }
             _stateInfo.push(_topState);
             processAttributes(atts, classDesc);
@@ -660,7 +693,29 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 else
                     _class = descriptor.getFieldType();
-
+                
+                // Retrieving the xsi:type attribute, if present
+                String instanceClassname = getInstanceType(atts);
+                if (instanceClassname != null) {
+                    Class instanceClass = null;
+                    Object instance = null;
+                    try {
+                        instanceClass = _cdResolver.resolve(instanceClassname)
+                            .getJavaClass();
+                        if (!_class.isAssignableFrom(instanceClass)) {
+                            String err = instanceClass 
+                                + " is not a subclass of " + _class;
+                            throw new SAXException(err);
+                        }
+                        _class = instanceClass;
+                    } catch(Exception ex) {
+                        String msg = "unable to instantiate " + 
+                            instanceClassname + "; ";
+                        throw new SAXException(msg + ex);
+                    }
+                    
+                }
+                
                 //-- Handle support for "Any" type
                 if (_class == Object.class) {
                     
@@ -792,6 +847,23 @@ public class UnmarshalHandler implements DocumentHandler {
       //-------------------/
      //- Private Methods -/
     //-------------------/
+    
+    /**
+     * Returns the instance type attribute.
+     * @return String the value of the xsi:type attribute, or null if there is
+     * no xsi:type attribute
+     */
+    private String getInstanceType(AttributeList atts) {
+        String xsiTypeAttribute = atts.getValue("xsi:type");
+        if (xsiTypeAttribute != null) {
+            if (xsiTypeAttribute.startsWith("java:")) {
+                return xsiTypeAttribute.substring(5);
+            }
+            // TODO : Retrieve the type corresponding to the schema name and
+            // return it.
+        }
+        return null;
+    } //-- getInstanceType
     
     /**
      * Returns true if the given NCName (element name) is qualified

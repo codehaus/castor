@@ -53,21 +53,20 @@ XML:    Added support for in-lined SimpleTypes (anonymous) for
 
 XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
         for the April xML Schema draft (kvisco)
-        
 
 XML:    Added support for top-level annotations (kvisco)
 
-XML:    Made some changes in Unmarshalling code to handle "null" primitives. Based
-        on suggestions from Fabrice Gomez. (kvisco)
+XML:    Made some changes in Unmarshalling code to handle "null" primitives. 
+	Based on suggestions from Fabrice Gomez. (kvisco)
 
-XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers using
-        dynamic-introspection. (kvisco)
+XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers 
+	using dynamic-introspection. (kvisco)
 
 XML:    Changed some case-sensitive issues with the below mentioned Schema
         syntax upgrade (kvisco)
 
 XML:    Update of the XML Schema syntax to the April 7th draft
-           (Remy Maucherat <maucherat@intalio.com>)
+           (Remy Maucherat <remm@apache.org>)
 
         The following things in the April draft are supported :
           - datatype -> simpleType
@@ -91,12 +90,16 @@ XML:    <include> element support (Andrew Fawcett)
 
 XML:    decimal type support (Andrew Fawcett)
 
+XML:	Support xsi:type from XML Schema for Instances 
+	(Remy Maucherat <remm@apache.org>)
+
 
 Version 0.8.8  June 20, 2000
 ----------------------------
 
-XML:     Added support for the Unmarshaller to automatically determine the Class of the
-         root element, based on a given Mapping, or ClassDescriptorResolver
+XML:     Added support for the Unmarshaller to automatically determine the 
+	 Class of the root element, based on a given Mapping, or 
+	 ClassDescriptorResolver
 
 XML:     Added support for the "has" method for primitives in the generated source
 
