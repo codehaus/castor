@@ -232,7 +232,12 @@ final class ObjectLock
 	    _readLock = new LinkedTx( tx, _readLock );
 	} else {
 	    // Detect possibility of dead-lock
-	    detectDeadlock( tx );
+	    try {
+		tx.setWaitOnLock( this );
+		detectDeadlock( tx );
+	    } finally {
+		tx.setWaitOnLock( null );
+	    }
 
 	    // Must wait for lock and then attempt to reacquire
 	    if ( write ) {

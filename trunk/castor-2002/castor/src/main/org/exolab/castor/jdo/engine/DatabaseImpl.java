@@ -65,13 +65,14 @@ import org.odmg.TransactionNotInProgressException;
 import org.odmg.TransactionInProgressException;
 import org.odmg.ODMGException;
 import org.odmg.ODMGRuntimeException;
+import javax.transaction.Status;
+import javax.transaction.xa.XAResource;
+import javax.transaction.xa.XAException;
+import javax.transaction.xa.Xid;
 import org.exolab.castor.jdo.MappingException;
 import org.exolab.castor.jdo.DuplicatePrimaryKeyException;
 import org.exolab.castor.jdo.desc.ObjectDesc;
 import org.exolab.castor.util.Messages;
-import javax.transaction.xa.XAResource;
-import javax.transaction.xa.XAException;
-import javax.transaction.xa.Xid;
 
 
 /**
@@ -119,6 +120,9 @@ public final class DatabaseImpl
 
 
     private PrintWriter      _logWriter;
+
+
+    private int              _lockWaitTimeout = 10000;
 
 
     public DatabaseImpl()
@@ -192,7 +196,7 @@ public final class DatabaseImpl
 	enum = _txOpen.elements();
 	while ( enum.hasMoreElements() ) {
 	    tx = (TransactionContext) enum.nextElement();
-	    if ( tx.getStatus() == TransactionContext.Status.Open )
+	    if ( tx.isOpen() )
 		throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.dbTxInProgress" ) );
 	}
 	_dbEngine = null;
@@ -229,7 +233,7 @@ public final class DatabaseImpl
 	TransactionContext tx;
 
 	tx = getTransaction();
-	return tx.load( _dbEngine, type, primKey, ( _mode == OPEN_EXCLUSIVE ) );
+	return tx.load( _dbEngine, type, primKey, _mode, _lockWaitTimeout );
     }
 
 
@@ -266,7 +270,8 @@ public final class DatabaseImpl
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
 	try {
-	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name, false );
+	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name,
+					     OPEN_READ_WRITE, _lockWaitTimeout );
 	} catch ( ODMGException except ) {
 	    throw new ObjectNameNotFoundException( "Nested exception: " + except.toString() );
 	}
@@ -284,11 +289,13 @@ public final class DatabaseImpl
 
 	tx = getTransaction();
 	try {
-	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name, false );
+	    binding = (NameBinding) tx.load( _dbEngine, NameBinding.class, name,
+					     OPEN_READ_WRITE, _lockWaitTimeout );
 	    if ( binding == null )
 		throw new ObjectNameNotFoundException( name );
 	    tx.unlock( binding );
-	    return tx.load( _dbEngine, binding.getType(), binding.objectId, ( _mode == OPEN_EXCLUSIVE ) );
+	    return tx.load( _dbEngine, binding.getType(), binding.objectId,
+			    _mode, _lockWaitTimeout );
 	} catch ( ODMGException except ) {
 	    throw new ObjectNameNotFoundException( "Nested exception: " + except.toString() );
 	}
@@ -315,7 +322,7 @@ public final class DatabaseImpl
 	// Get the current transaction, complain if none found:
 	// Cannot persist outside of a transaction.
 	tx = TransactionImpl.getCurrentContext();
-	if ( tx == null || tx.getStatus() != TransactionContext.Status.Open )
+	if ( tx == null || ! tx.isOpen() )
 	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
 	// Must register transaction with this database.
 	if ( ! _txOpen.contains( tx ) )
@@ -348,7 +355,7 @@ public final class DatabaseImpl
 		_ctx = (TransactionContext) _resManager.get( xid );
 		if ( _ctx == null )
 		    throw new XAException( XAException.XAER_NOTA );
-		if ( _ctx.getStatus() != TransactionContext.Status.Open )
+		if ( ! _ctx.isOpen() )
 		    throw new XAException( XAException.XAER_NOTA );
 		break;
 	    default:
@@ -401,7 +408,10 @@ public final class DatabaseImpl
 	    ctx = (TransactionContext) _resManager.remove( xid );
 	    if ( ctx == null )
 		throw new XAException( XAException.XAER_NOTA );
-	    if ( ctx.getStatus() == TransactionContext.Status.Open ) {
+
+	    // Forget is never called on an open transaction, but one
+	    // can never tell.
+	    if ( ctx.isOpen() ) {
 		ctx.rollback();
 		throw new XAException( XAException.XAER_PROTO );
 	    }
@@ -422,8 +432,12 @@ public final class DatabaseImpl
 	    ctx = (TransactionContext) _resManager.get( xid );
 	    if ( ctx == null )
 		throw new XAException( XAException.XAER_NOTA );
+
 	    switch ( ctx.getStatus() ) {
-	    case TransactionContext.Status.Open:
+	    case Status.STATUS_PREPARED:
+	    case Status.STATUS_ACTIVE:
+		// Can only prepare an active transaction. And error
+		// is reported as vote to rollback the transaction.
 		try {
 		    if ( ctx.prepare() ) {
 			return XA_OK;
@@ -433,13 +447,11 @@ public final class DatabaseImpl
 		} catch ( ODMGRuntimeException except ) {
 		    throw new XAException( XAException.XA_RBROLLBACK );
 		}
-	    case TransactionContext.Status.Committed:
-		return XA_RDONLY;
-	    case TransactionContext.Status.Rolledback:
+	    case Status.STATUS_MARKED_ROLLBACK:
+		// Report transaction marked for rollback.
 		throw new XAException( XAException.XA_RBROLLBACK );
 	    default:
-		// This should never happen
-		throw new XAException( XAException.XAER_RMFAIL );
+		throw new XAException( XAException.XAER_PROTO );
 	    }
 	}
     }
@@ -466,16 +478,27 @@ public final class DatabaseImpl
 	    if ( ctx == null )
 		throw new XAException( XAException.XAER_NOTA );
 	    switch ( ctx.getStatus() ) {
-	    case TransactionContext.Status.Committed:
+	    case Status.STATUS_COMMITTED:
+		// Allowed to make multiple commit attempts.
 		return;
-	    case TransactionContext.Status.Rolledback:
+	    case Status.STATUS_ROLLEDBACK:
+		// This should not happen unless someone interfered
+		// by calling rollback directly or failing a commit,
+		// but is still a valid heuristic condition on our behalf.
 		throw new XAException( XAException.XA_HEURRB );
-	    case TransactionContext.Status.Open:
+	    case Status.STATUS_PREPARED:
+		// Commit can only occur after a prepare, so must be
+		// in prepared state first. Any ODMG error is reported
+		// as a heuristic decision to rollback.
 		try {
 		    ctx.commit();
 		} catch ( ODMGRuntimeException except ) {
 		    throw new XAException( XAException.XA_HEURRB );
+		} catch ( Exception except ) {
+		    throw new XAException( XAException.XAER_RMFAIL );
 		}
+	    default:
+		throw new XAException( XAException.XAER_PROTO );
 	    }
 	}
     }
@@ -495,16 +518,25 @@ public final class DatabaseImpl
 	    if ( ctx == null )
 		throw new XAException( XAException.XAER_NOTA );
 	    switch ( ctx.getStatus() ) {
-	    case TransactionContext.Status.Committed:
+	    case Status.STATUS_COMMITTED:
+		// This should not happen unless someone interfered
+		// by calling commit directly, but is still a valid
+		// heuristic condition on our behalf.
 		throw new XAException( XAException.XA_HEURCOM );
-	    case TransactionContext.Status.Rolledback:
+	    case Status.STATUS_ROLLEDBACK:
+		// Allowed to make multiple rollback attempts.
 		return;
-	    case TransactionContext.Status.Open:
+	    case Status.STATUS_ACTIVE:
+	    case Status.STATUS_MARKED_ROLLBACK:
+		// Rollback never fails with an application exception.
 		try {
 		    ctx.rollback();
-		} catch ( ODMGRuntimeException except ) {
-		    throw new XAException( XAException.XA_HEURHAZ );
+		} catch ( Exception except ) {
+		    throw new XAException( XAException.XAER_RMFAIL );
 		}
+		return;
+	    default:
+		throw new XAException( XAException.XAER_PROTO );
 	    }
 	}
     }
