@@ -293,12 +293,12 @@ public class Marshaller {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
         
-        descriptor = null;
         if (descriptor == null)
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
-
+      
         //-- calculate Object's name
         String name = descriptor.getXMLName();
+        
         if (name == null) {
             name = _class.getName();
             //-- remove package information from name
