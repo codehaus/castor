@@ -10,7 +10,7 @@
  -->
 
 
-<!ELEMENT jdo-conf ( database+ ) >
+<!ELEMENT jdo-conf ( database+, transaction-demarcation ) >
 
 <!--
     The database configuration specifies the means to obtain a connection
@@ -204,6 +204,6 @@
        </transaction-demarcation>
     
      -->
-<!ELEMENT transaction-manager ( params* )>
+<!ELEMENT transaction-manager ( param* )>
 <!ATTLIST transaction-manager
           name CDATA #REQUIRED>
