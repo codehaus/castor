@@ -63,13 +63,16 @@ public class SGTypes {
         = new JClass("org.xml.sax.SAXException");
         
     
-    //----------------------/
-    //- org.exolab Objects -/
-    //----------------------/
+    //---------------------------/
+    //- org.exolab.castor types -/
+    //---------------------------/
     
-    //-- org.exolab.xml.schema
     public static final JClass UnmarshalException = 
         new JClass("org.exolab.castor.xml.UnmarshalException");
+        
+    public static final JClass MarshalException =
+        new JClass("org.exolab.castor.xml.MarshalException");
+        
     public static final JClass ValidationException = 
         new JClass("org.exolab.castor.xml.ValidationException");
         
