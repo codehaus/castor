@@ -72,6 +72,7 @@ import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -157,31 +158,38 @@ public class OQLQueryImpl
             Class paramClass = info.getTheClass();
             Class valueClass = value.getClass();
 
-            if ( value != null && ! paramClass.isAssignableFrom( valueClass ) )
-                if ( info.isUserDefined() )
-                    //If the user specified a type they must pass that exact type.
+            if ( value != null ) {
+                if ( paramClass.isAssignableFrom( valueClass ) ) {
+                    ClassMolder molder = _dbImpl.getLockEngine().getClassMolder( valueClass );
 
-                    throw new IllegalArgumentException( "Query paramter " +
-                                                        ( _fieldNum + 1 ) +
-                                                        " is not of the expected type " +
-                                                        paramClass +
-                                                        " it is an instance of the class "
-                                                        + valueClass );
-                else {
-                    try {
-                        TypeConvertor tc = SQLTypes.getConvertor( valueClass, paramClass );
-                        value = tc.convert( value, null );
+                    if ( molder != null ) {
+                        value = molder.getActualIdentity( _dbImpl.getClassLoader(), value );
                     }
-                    catch ( MappingException e ) {
-                        throw new IllegalArgumentException( "Query parameter "
-                                                            + ( _fieldNum + 1 )
-                                                            + " cannot be converted from "
-                                                            + valueClass + " to "
-                                                            + paramClass
-                                                            + ", because no convertor can be found." );
+                } else {
+                    if ( info.isUserDefined() ) {
+                        //If the user specified a type they must pass that exact type.
+
+                        throw new IllegalArgumentException( "Query paramter " +
+                                                            ( _fieldNum + 1 ) +
+                                                            " is not of the expected type " +
+                                                            paramClass +
+                                                            " it is an instance of the class "
+                                                            + valueClass );
+                    } else {
+                        try {
+                            TypeConvertor tc = SQLTypes.getConvertor( valueClass, paramClass );
+                            value = tc.convert( value, null );
+                        } catch ( MappingException e ) {
+                            throw new IllegalArgumentException( "Query parameter "
+                                                                + ( _fieldNum + 1 )
+                                                                + " cannot be converted from "
+                                                                + valueClass + " to "
+                                                                + paramClass
+                                                                + ", because no convertor can be found." );
+                        }
                     }
                 }
-
+            }
             if ( _bindValues == null )
                 _bindValues = new Object[ _bindTypes.length ];
 
@@ -233,7 +241,7 @@ public class OQLQueryImpl
     }
 
     public void create( String oql )
-        throws QueryException    
+        throws QueryException
     {
 
         _fieldNum = 0;
@@ -245,12 +253,12 @@ public class OQLQueryImpl
             createCall( oql );
             return;
         }
-        
+
         Lexer lexer = new Lexer(oql);
         Parser parser = new Parser(lexer);
         ParseTreeNode parseTree = parser.getParseTree();
 
-        _dbEngine = _dbImpl.getLockEngine(); 
+        _dbEngine = _dbImpl.getLockEngine();
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
@@ -269,7 +277,7 @@ public class OQLQueryImpl
         int max = 0;
         for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) {
             ParamInfo info = (ParamInfo) e.nextElement();
-            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
+            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
             {
                 int paramIndex = ( (Integer) f.nextElement() ).intValue();
                 if (  paramIndex > max )
@@ -282,7 +290,7 @@ public class OQLQueryImpl
         for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) 
         {
             ParamInfo info = (ParamInfo) e.nextElement();
-            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
+            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
             {
                 int paramIndex = ( (Integer) f.nextElement() ).intValue();
                 _bindTypes[ paramIndex - 1 ] = f.getClass();
