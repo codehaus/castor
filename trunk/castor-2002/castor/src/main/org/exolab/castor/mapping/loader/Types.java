@@ -132,9 +132,18 @@ public class Types
     public static TypeConvertor getConvertor( Class fromType, Class toType )
         throws MappingException
     {
+        // first seek for exact match
+        // TODO: the closest possible match
+        for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
+            if ( _typeConvertors[ i ].fromType.equals( fromType ) &&
+                 toType.equals( _typeConvertors[ i ].toType ) ) 
+                return _typeConvertors[ i ].convertor;
+        }
+
+        // else seek for any match
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.isAssignableFrom( fromType ) &&
-                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) )
+                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) ) 
                 return _typeConvertors[ i ].convertor;
         }
         throw new MappingException( "mapping.noConvertor", fromType.getName(), toType.getName() );
@@ -421,23 +430,26 @@ public class Types
     static TypeConvertorInfo[] _typeConvertors = new TypeConvertorInfo[] {
         // Convertors to boolean
         new TypeConvertorInfo( java.lang.Short.class, java.lang.Boolean.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Boolean( ( (Short) obj ).shortValue() != 0 );
             }
             public String toString() { return "Short->Boolean"; }
         } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Boolean.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Boolean( ( (Integer) obj ).intValue() != 0 );
             }
             public String toString() { return "Integer->Boolean"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Boolean.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 switch ( ( (String) obj ).length() ) {
                     case 0: return Boolean.FALSE;
                     case 1: char ch = ( (String) obj ).charAt( 0 );
-                    return ( ch == 'T' || ch == 't'  ) ? Boolean.TRUE : Boolean.FALSE;
+                        if (param == null || param.length() != 2 )
+                            return ( ch == 'T' || ch == 't'  ) ? Boolean.TRUE : Boolean.FALSE;
+                        else 
+                            return ( ch == param.charAt( 1 ) ) ? Boolean.TRUE : Boolean.FALSE;
                     case 4: return ( (String) obj ).equalsIgnoreCase( "true" ) ? Boolean.TRUE : Boolean.FALSE;
                     case 5: return ( (String) obj ).equalsIgnoreCase( "false" ) ? Boolean.TRUE : Boolean.FALSE;
                 }
@@ -447,247 +459,247 @@ public class Types
         } ),
         // Convertors to integer
         new TypeConvertorInfo( java.lang.Short.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Integer( ( (Short) obj ).intValue() );
             }
             public String toString() { return "Short->Integer"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Integer( ( (Long) obj ).intValue() );
             }
             public String toString() { return "Long->Integer"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Integer( ( (Float) obj ).intValue() );
             }
             public String toString() { return "Float->Integer"; }
         } ),
         new TypeConvertorInfo( java.lang.Double.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Integer( ( (Double) obj ).intValue() );
             }
             public String toString() { return "Double->Integer"; }
         } ),
         new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Integer( ( (BigDecimal) obj ).intValue() );
             }
             public String toString() { return "BigDecimal->Integer"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Integer.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return Integer.valueOf( (String) obj );
             }
             public String toString() { return "String->Integer"; }
         } ),
         // Convertors to long
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Long( ( (Integer) obj ).longValue() );
             }
             public String toString() { return "Integer->Long"; }
         } ),
         new TypeConvertorInfo( java.lang.Short.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Long( ( (Short) obj ).longValue() );
             }
             public String toString() { return "Short->Long"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Long( ( (Float) obj ).longValue() );
             }
             public String toString() { return "Float->Long"; }
         } ),
         new TypeConvertorInfo( java.lang.Double.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Long( ( (Double) obj ).longValue() );
             }
             public String toString() { return "Double->Long"; }
         } ),
         new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Long( ( (BigDecimal) obj ).longValue() );
             }
             public String toString() { return "BigDecimal->Long"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Long.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return Long.valueOf( (String) obj );
             }
             public String toString() { return "String->Long"; }
         } ),
         // Convertors to short
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Short.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Short( ( (Integer) obj ).shortValue() );
             }
             public String toString() { return "Integer->Short"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.lang.Short.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Short( ( (Long) obj ).shortValue() );
             }
             public String toString() { return "Long->Short"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Short.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return Short.valueOf( (String) obj );
             }
             public String toString() { return "String->Short"; }
         } ),
         // Convertors to double
         new TypeConvertorInfo( java.lang.Float.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Double( ( (Float) obj ).floatValue() );
             }
             public String toString() { return "Float->Double"; }
         } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Double( (double) ( (Integer) obj ).intValue() );
             }
             public String toString() { return "Integer->Double"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Double( (double) ( (Long) obj ).longValue() );
             }
             public String toString() { return "Long->Double"; }
         } ),
         new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Double( ( (BigDecimal) obj ).doubleValue() );
             }
             public String toString() { return "BigDecimal->Double"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Double.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return Double.valueOf( (String) obj );
             }
             public String toString() { return "Double->String"; }
         } ),
         // Convertors to float
         new TypeConvertorInfo( java.lang.Double.class, java.lang.Float.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Float( ( (Double) obj ).floatValue() );
             }
             public String toString() { return "Double->Float"; }
         } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Float.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Float( (float) ( (Integer) obj ).intValue() );
             }
             public String toString() { return "Integer->Float"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.lang.Float.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Float( (float) ( (Long) obj ).longValue() );
             }
             public String toString() { return "Long->Float"; }
         } ),
         new TypeConvertorInfo( java.math.BigDecimal.class, java.lang.Float.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new Float( ( (BigDecimal) obj ).floatValue() );
             }
             public String toString() { return "BigDecimal->Float"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.lang.Float.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return Float.valueOf( (String) obj );
             }
             public String toString() { return "String->Float"; }
         } ),
         // Convertors to big decimal
         new TypeConvertorInfo( java.lang.Double.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new BigDecimal( ( (Double) obj ).doubleValue() );
             }
             public String toString() { return "Double->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new BigDecimal( ( (Float) obj ).floatValue() );
             }
             public String toString() { return "Float->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return BigDecimal.valueOf( ( (Integer) obj ).intValue() );
             }
             public String toString() { return "Integer->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return BigDecimal.valueOf( ( (Long) obj ).longValue() );
             }
             public String toString() { return "Long->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, java.math.BigDecimal.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new BigDecimal( (String) obj );
             }
             public String toString() { return "String->BigDecimal"; }
         } ),
         // Convertors to string
         new TypeConvertorInfo( java.lang.Short.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Short->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Integer->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Long.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Long->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Float->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Double.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Double->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Object.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Object->String"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj.toString();
             }
             public String toString() { return "Date->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Character.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new String( obj.toString() );
             }
             public String toString() { return "Character->String"; }
         } ),
         new TypeConvertorInfo( char[].class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new String( (char[]) obj );
             }
             public String toString() { return "chars->String"; }
         } ),
         new TypeConvertorInfo( byte[].class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 MimeBase64Encoder encoder;
 
                 encoder = new MimeBase64Encoder();
@@ -697,26 +709,29 @@ public class Types
             public String toString() { return "bytes->String"; }
         } ),
         new TypeConvertorInfo( java.lang.Boolean.class, java.lang.String.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
-                return ( (Boolean) obj ).booleanValue() ? "T" : "F";
+            public Object convert( Object obj, String param ) {
+                if ( param == null || param.length() != 2 )
+                    return ( (Boolean) obj ).booleanValue() ? "T" : "F";
+                else 
+                    return ( (Boolean) obj ).booleanValue() ? param.substring( 1, 2 ) : param.substring( 0, 1 );
             }
             public String toString() { return "Boolean->String"; }
         } ),
         // Convertors to character/byte array
         new TypeConvertorInfo( java.lang.String.class, java.lang.Character.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return ( new Character( ( (String ) obj ).charAt( 0 ) ) );
             }
             public String toString() { return "String->Character"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, char[].class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return ( (String ) obj ).toCharArray();
             }
             public String toString() { return "String->chars"; }
         } ),
         new TypeConvertorInfo( java.lang.String.class, byte[].class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 MimeBase64Decoder decoder;
 
                 decoder = new MimeBase64Decoder();
@@ -727,7 +742,7 @@ public class Types
         } ),
         // Convertors to date
         new TypeConvertorInfo( java.lang.String.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 try {
                     return _dateFormat.parse( (String) obj );
                 } catch ( ParseException except ) {
@@ -737,40 +752,40 @@ public class Types
             public String toString() { return "String->Date"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Date.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new java.sql.Date( ( (java.util.Date) obj ).getTime() );
             }
             public String toString() { return "util.Date->sql.Date"; }
         } ),
         new TypeConvertorInfo( java.sql.Date.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj;
             }
             public String toString() { return "sql.Date->util.Date"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Time.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new java.sql.Time( ( (java.util.Date) obj ).getTime() );
             }
             public String toString() { return "util.Date->sql.Time"; }
         } ),
         new TypeConvertorInfo( java.sql.Time.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj;
             }
             public String toString() { return "sql.Time->util.Date"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Timestamp.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return new java.sql.Timestamp( ( (java.util.Date) obj ).getTime() );
             }
             public String toString() { return "util.Date->sql.Timestamp"; }
         } ),
         new TypeConvertorInfo( java.sql.Timestamp.class, java.util.Date.class, new TypeConvertor() {
-            public Object convert( Object obj ) {
+            public Object convert( Object obj, String param ) {
                 return obj;
             }
-            public String toString() { return "sql.TimestampDate->util.Date"; }
+            public String toString() { return "sql.Timestamp->util.Date"; }
         } )
     };
 

@@ -47,152 +47,40 @@
 package jdo;
 
 
-import java.math.BigDecimal;
-
-
 /**
- * Test tyoe handling against test_types.
+ * Test object for RETURNING key generator.
  */
-public class TestTypes
+public class TestReturningObject extends TestKeyGenObject
 {
 
 
-    private long           _id;
+    private String _attr;
 
 
-    private java.util.Date _date;
+    static final String    DefaultAttr = "attr";
 
 
-    private java.util.Date _time;
-
-
-    private java.util.Date _timestamp;
-
-
-    private int            _intValue;
-
-
-    private boolean        _intExists = false;
-
-
-    private char           _charValue;
-
-
-    private boolean        _boolValue;
-
-
-    static final int       DefaultId = 3;
-
-
-    public TestTypes()
+    public TestReturningObject()
     {
-        _id = DefaultId;
-        _date = new java.util.Date();
-        _time = new java.util.Date();
-        _timestamp = new java.util.Date();
+        _attr = DefaultAttr;
     }
 
 
-    public void setId( long id )
+    public void setAttr( String attr )
     {
-        _id = id;
+        _attr = attr;
     }
 
 
-    public long getId()
+    public String getAttr()
     {
-        return _id;
-    }
-
-
-    public void setDate( java.util.Date date )
-    {
-        _date = date;
-    }
-
-
-    public java.util.Date getDate()
-    {
-        return _date;
-    }
-
-
-    public void setTime( java.util.Date date )
-    {
-        _time = date;
-    }
-
-
-    public java.util.Date getTime()
-    {
-        return _time;
-    }
-
-
-    public void setTimestamp( java.util.Date date )
-    {
-        _timestamp = date;
-    }
-
-
-    public java.util.Date getTimestamp()
-    {
-        return _timestamp;
-    }
-
-
-    public void setIntValue( int value )
-    {
-        _intValue = value;
-        _intExists = true;
-    }
-
-
-    public int getIntValue()
-    {
-        return _intValue;
-    }
-
-
-    public boolean hasIntValue()
-    {
-        return _intExists;
-    }
-
-
-    public void deleteIntValue()
-    {
-        _intExists = false;
-    }
-
-
-    public char getCharValue()
-    {
-        return _charValue;
-    }
-
-
-    public void setCharValue( char value )
-    {
-        _charValue = value;
-    }
-
-
-    public boolean getBoolValue()
-    {
-        return _boolValue;
-    }
-
-
-    public void setBoolValue( boolean value )
-    {
-        _boolValue = value;
+        return _attr;
     }
 
 
     public String toString()
     {
-        return "" + _id;
+        return super.toString() + " / " + _attr;
     }
 
 

@@ -81,6 +81,12 @@ public class TypeInfo
 
 
     /**
+     * Optional parameter for the convertor.
+     */
+    private String        _convertorParam;
+
+
+    /**
      * True if the field type is immutable.
      */
     private boolean       _immutable = false;
@@ -111,7 +117,7 @@ public class TypeInfo
      * @param fieldType The field type
     **/
     public TypeInfo(Class fieldType) {
-        this(fieldType, null, null, false, null, null );
+        this(fieldType, null, null, null, false, null, null );
     } //-- TypeInfo
 
     
@@ -126,15 +132,40 @@ public class TypeInfo
      * @param required True if the field is required
      * @param defaultValue The default value of the field, null to
      *  use the known Java defaults
-     * @param colHandler The collection handler for this field, or null if
+     * @param colType The collection type for this field, or null if
      *  field is singular
      */
     public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
                      boolean required, Object defaultValue, CollectionHandler colHandler )
     {
+        this(fieldType, convertorTo, convertorFrom, null, required, defaultValue, colHandler );
+    }
+
+
+    /**
+     * Construct new type information for the field.
+     *
+     * @param fieldType The field type
+     * @param convertorTo Convertor to the field type from external
+     *  type, or null if no conversion is required
+     * @param convertorFrom Convertor from the field type to external
+     *  type, or null if no conversion is required
+     * @param convertorParam Optional parameter for the convertor,
+     *  or null if either no conversion is required or no parameter is specified
+     * @param required True if the field is required
+     * @param defaultValue The default value of the field, null to
+     *  use the known Java defaults
+     * @param colHandler The collection handler for this field, or null if
+     *  field is singular
+     */
+    public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
+                     String convertorParam, boolean required, Object defaultValue,
+                     CollectionHandler colHandler )
+    {
         _fieldType = Types.typeFromPrimitive( fieldType );
         _convertorTo = convertorTo;
         _convertorFrom = convertorFrom;
+        _convertorParam = convertorParam;
         _immutable = Types.isImmutable( fieldType );
         _required = required;
         // Note: must be called with fieldType (might be primitive) and not
@@ -174,6 +205,17 @@ public class TypeInfo
     public TypeConvertor getConvertorFrom()
     {
         return _convertorFrom;
+    }
+
+
+    /**
+     * Returns the convertor parameter.
+     *
+     * @return Convertor parameter
+     */
+    public String getConvertorParam()
+    {
+        return _convertorParam;
     }
 
 

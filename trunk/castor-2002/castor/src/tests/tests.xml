@@ -26,6 +26,19 @@
     <jtf:case class="jdo.KeyGenGeneric" />
     <jtf:case class="jdo.KeyGenSequence" />
   </jtf:category>
+
+  <jtf:category name="oracle" class="jdo.JDOCategory">
+    <jtf:description>JDO tests for Oracle8i</jtf:description>
+    <jdo:jdo database-name="oracle" configuration="oracle.xml" />
+    <jtf:case class="jdo.Concurrent" />
+    <jtf:case class="jdo.Deadlock" />
+    <jtf:case class="jdo.DuplicateKey" />
+    <jtf:case class="jdo.ReadOnly" />
+    <jtf:case class="jdo.Join" />
+    <jtf:case class="jdo.KeyGenGeneric" />
+    <jtf:case class="jdo.KeyGenSequence" />
+    <jtf:case class="jdo.KeyGenReturning" />
+  </jtf:category>
 -->
 
   <jtf:category name="xml" class="xml.XMLCategory">

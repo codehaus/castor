@@ -125,9 +125,9 @@ public class TypeHandling
 
             stream.writeVerbose( "Testing date/time conversion" );
             db.begin();
-            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $(double)1" );
+            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
             // This one tests that bind performs type conversion
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -150,7 +150,7 @@ public class TypeHandling
 
             stream.writeVerbose( "Testing null in integer field" );
             db.begin();
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -159,7 +159,7 @@ public class TypeHandling
             }
             db.commit();
             db.begin();
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -174,7 +174,7 @@ public class TypeHandling
             }
             db.commit();
             db.begin();
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -193,10 +193,9 @@ public class TypeHandling
                 stream.writeVerbose( "OK: null in integer field passed" );
 
 
-
             stream.writeVerbose( "Testing value in char field" );
             db.begin();
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -204,7 +203,7 @@ public class TypeHandling
             }
             db.commit();
             db.begin();
-            oql.bind( (double) TestTypes.DefaultId );
+            oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
@@ -221,6 +220,36 @@ public class TypeHandling
                 return false;
             else
                 stream.writeVerbose( "OK: value in character field passed" );
+
+
+            stream.writeVerbose( "Testing boolean->char.01 conversion" );
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setBoolValue( true );
+            }
+            db.commit();
+            db.begin();
+            oql.bind( TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( types.getBoolValue() != true ) {
+                    stream.writeVerbose( "Error: bool value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: The boolean->char.01 conversion passed" );
+
 
             db.close();
         } catch ( Exception except ) {

@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.drivers;
 
 
+import java.sql.SQLException;
 import org.exolab.castor.persist.spi.QueryExpression;
 
 
@@ -73,9 +74,17 @@ public final class OracleFactory
     }
 
 
+    public Boolean isDuplicateKeyException( Exception except )
+    {
+        if ( except instanceof SQLException )
+            return ( (SQLException) except ).getErrorCode() == 1 ? Boolean.TRUE : Boolean.FALSE;
+        return null;
+    }
+
+
     public String quoteName( String name )
     {
-        return doubleQuoteName( name );
+        return doubleQuoteName( name ).toUpperCase();
     }
 
 

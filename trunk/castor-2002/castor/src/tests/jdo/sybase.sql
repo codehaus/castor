@@ -65,7 +65,8 @@ create table test_types (
   tdt      datetime       not null,
   ttm      smalldatetime  not null,
   int_val  integer        null,
-  char_val char(1)        null
+  char_val char(1)        null,
+  bool_val char(1)        null
 )
 go
 create unique index test_types_pk on test_types (id)

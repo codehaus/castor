@@ -47,153 +47,30 @@
 package jdo;
 
 
-import java.math.BigDecimal;
+import org.exolab.castor.jdo.Database;
+import org.exolab.jtf.CWVerboseStream;
+import org.exolab.jtf.CWTestCategory;
+import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
- * Test tyoe handling against test_types.
+ * Test for RETURNING key generator.
  */
-public class TestTypes
+public class KeyGenReturning
+    extends KeyGenGeneric
 {
 
 
-    private long           _id;
-
-
-    private java.util.Date _date;
-
-
-    private java.util.Date _time;
-
-
-    private java.util.Date _timestamp;
-
-
-    private int            _intValue;
-
-
-    private boolean        _intExists = false;
-
-
-    private char           _charValue;
-
-
-    private boolean        _boolValue;
-
-
-    static final int       DefaultId = 3;
-
-
-    public TestTypes()
+    public KeyGenReturning( CWTestCategory category )
+        throws CWClassConstructorException
     {
-        _id = DefaultId;
-        _date = new java.util.Date();
-        _time = new java.util.Date();
-        _timestamp = new java.util.Date();
+        super( "TC11", "Key generator: RETURNING", category );
     }
 
-
-    public void setId( long id )
+    protected void TestAllKeyGens( CWVerboseStream stream, Database db) 
+            throws Exception
     {
-        _id = id;
+        TestOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
     }
-
-
-    public long getId()
-    {
-        return _id;
-    }
-
-
-    public void setDate( java.util.Date date )
-    {
-        _date = date;
-    }
-
-
-    public java.util.Date getDate()
-    {
-        return _date;
-    }
-
-
-    public void setTime( java.util.Date date )
-    {
-        _time = date;
-    }
-
-
-    public java.util.Date getTime()
-    {
-        return _time;
-    }
-
-
-    public void setTimestamp( java.util.Date date )
-    {
-        _timestamp = date;
-    }
-
-
-    public java.util.Date getTimestamp()
-    {
-        return _timestamp;
-    }
-
-
-    public void setIntValue( int value )
-    {
-        _intValue = value;
-        _intExists = true;
-    }
-
-
-    public int getIntValue()
-    {
-        return _intValue;
-    }
-
-
-    public boolean hasIntValue()
-    {
-        return _intExists;
-    }
-
-
-    public void deleteIntValue()
-    {
-        _intExists = false;
-    }
-
-
-    public char getCharValue()
-    {
-        return _charValue;
-    }
-
-
-    public void setCharValue( char value )
-    {
-        _charValue = value;
-    }
-
-
-    public boolean getBoolValue()
-    {
-        return _boolValue;
-    }
-
-
-    public void setBoolValue( boolean value )
-    {
-        _boolValue = value;
-    }
-
-
-    public String toString()
-    {
-        return "" + _id;
-    }
-
 
 }

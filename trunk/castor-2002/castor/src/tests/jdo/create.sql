@@ -46,7 +46,9 @@ create table test_types (
   id       numeric(10,0)  not null,
   tdt      datetime       not null,
   ttm      time           not null
-  int_val  integer        null
+  int_val  integer        null,
+  char_val char(1)        null,
+  bool_val char(1)        null
 );
 create unique index test_types_pk
   on test_types ( id );
@@ -62,6 +64,16 @@ create unique index test_keygen_pk
   on test_keygen ( id );
 grant all on test_keygen to test;
  
+
+-- test_keygen_ext
+drop table test_keygen_ext;
+create table test_keygen_ext (
+  id   int          not null,
+  ext  varchar(200) not null
+);
+create unique index test_keygen_ext_pk on test_keygen_ext ( id );
+grant all on test_keygen_ext to test;
+
 
 drop table   test_seqtable;
 create table test_seqtable (
