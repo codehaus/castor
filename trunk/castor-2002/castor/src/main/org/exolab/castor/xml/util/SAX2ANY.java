@@ -225,7 +225,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
            return;
 
         //else just add the node we have built to the previous node
-        AnyNode _node = (AnyNode)_nodeStack.pop();
+        _node = (AnyNode)_nodeStack.pop();
 
         //if the stack is empty, we have a new child for the root node
         // or a new sibling for the first child of the root node
@@ -236,7 +236,9 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
         else {
             AnyNode previousNode = (AnyNode) _nodeStack.peek();
             previousNode.addChild(_node);
-        }
+            //the node processing is finished -> come back to the previous node
+            _node = previousNode;
+         }
     }
 
     public void characters(char[] ch, int start, int length) throws SAXException {
@@ -247,7 +249,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
             return;
         else {
             AnyNode tempNode = new AnyNode(AnyNode.TEXT, null, null, null, temp);
-           _node.addChild(tempNode);
+            _node.addChild(tempNode);
            _character = true;
         }
     }
