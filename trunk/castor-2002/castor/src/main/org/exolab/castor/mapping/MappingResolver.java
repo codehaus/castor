@@ -87,7 +87,7 @@ public interface MappingResolver
      * Each element is of type <tt>java.lang.Class</tt>, and for
      * each such class a suitable descriptor exists.
      */
-    public Enumeration listObjectTypes();
+    public Enumeration listJavaClasses();
 
 
 }
