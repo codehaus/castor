@@ -789,9 +789,9 @@ public class DescriptorSourceFactory {
                         max = xsFloat.getMaxInclusive();
                         jsc.add("fv.setMaxInclusive( )");
                     }
-                    if ( (max.isInfinite()) && (max.compareTo(new Float(0))<0) )
+                    if ( (max.equals(new Float(Float.NEGATIVE_INFINITY))) )
                         jsc.append("Float.NEGATIVE_INFINITY");
-                    else if ( (max.isInfinite()) && (max.compareTo(new Float(0))>0) )
+                    else if ( (max.equals(new Float(Float.POSITIVE_INFINITY))) )
                         jsc.append("Float.POSITIVE_INFINITY");
                     else jsc.append(max.toString());
                     jsc.append("));");
@@ -799,8 +799,9 @@ public class DescriptorSourceFactory {
 
                 //-- fixed values
                 if (fixed != null) {
-                    //-- make sure we have a valid value...
-                    Float.parseFloat(fixed);
+
+                   //-- make sure we've got a good value
+                   Float test = new Float(fixed);
 
                     jsc.add("fv.setFixedValue( new Float(");
                     jsc.append(fixed);
@@ -853,7 +854,7 @@ public class DescriptorSourceFactory {
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
-                    Double.parseDouble(fixed);
+                    Double test = new Double(fixed);
 
                     jsc.add("dv.setFixedValue(");
                     jsc.append(fixed);
