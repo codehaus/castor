@@ -483,31 +483,26 @@ public abstract class TransactionContext
         if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
             throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
 
-        if ( identity != null ) {
-            try {
-                // Must perform creation after object is recorded in transaction
-                // to prevent circular references.
-                oid = new OID( handler, identity );
-                entry = addObjectEntry( object, oid, engine );
-                oid = engine.create( this, object, identity );
-                removeObjectEntry( object );
-            } catch ( DuplicateIdentityException except ) {
-                removeObjectEntry( object );
-                throw except;
-            } catch ( PersistenceException except ) {
-                removeObjectEntry( object );
-                throw except;
-            } catch ( Exception except ) {
-                removeObjectEntry( object );
-                throw new PersistenceExceptionImpl( except );
-            }
-        } else {
+        try {
+            // Must perform creation after object is recorded in transaction
+            // to prevent circular references.
             oid = new OID( handler, identity );
+            entry = addObjectEntry( object, oid, engine );
+            oid = engine.create( this, object, identity );
+            removeObjectEntry( object );
+            entry = addObjectEntry( object, oid, engine );
+            entry.created = true;
+            return oid;
+        } catch ( DuplicateIdentityException except ) {
+            removeObjectEntry( object );
+            throw except;
+        } catch ( PersistenceException except ) {
+            removeObjectEntry( object );
+            throw except;
+        } catch ( Exception except ) {
+            removeObjectEntry( object );
+            throw new PersistenceExceptionImpl( except );
         }
-
-        entry = addObjectEntry( object, oid, engine );
-        entry.created = true;
-        return oid;
     }
 
 
@@ -814,8 +809,6 @@ public abstract class TransactionContext
                         // if the primary identity has been changed
                         handler = entry.engine.getClassHandler( entry.object.getClass() );
                         identity = handler.getIdentity( entry.object );
-                        if ( identity == null )
-                            throw new TransactionAbortedExceptionImpl( "persist.noIdentity", handler.getJavaClass(), null );
                         if ( handler.getCallback() != null )
                             handler.getCallback().storing( entry.object );
                         oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
