@@ -194,7 +194,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
                 try {
                     _stmt.close();
                 } catch ( SQLException e2 ) {
-                    _log.warn (Messages.message ("stClosingFailed"), e2);
+                    _log.warn (Messages.message ("persist.stClosingFailed"), e2);
                 }
             }
             throw new PersistenceException( Messages.format( "persist.nested", except ) );
@@ -233,7 +233,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
             try {
                 _rs.close();
             } catch ( SQLException except ) {
-            	_log.warn (Messages.message ("rsClosingFailed"), except);
+            	_log.warn (Messages.message ("persist.rsClosingFailed"), except);
             }
             _rs = null;
         }
@@ -241,7 +241,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
             try {
                 _stmt.close();
             } catch ( SQLException except ) {
-            	_log.warn (Messages.message ("stClosingFailed"), except);
+            	_log.warn (Messages.message ("persist.stClosingFailed"), except);
             }
             _stmt = null;
         }

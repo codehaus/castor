@@ -175,7 +175,7 @@ public final class MaxKeyGenerator implements KeyGenerator
                 try {
                     stmt.close();
                 } catch ( SQLException ex ) {
-                    _log.warn ("Problem closing JDBC Statement", ex);
+                    _log.warn (Messages.message ("persist.stClosingFailed"), ex);
                 }
             }
         }

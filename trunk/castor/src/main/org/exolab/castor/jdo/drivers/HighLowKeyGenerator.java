@@ -350,14 +350,14 @@ public class HighLowKeyGenerator implements KeyGenerator
                     try {
                         stmt.close();
                     } catch ( SQLException ex ) {
-                        _log.warn ("Problem closing JDBC Statement", ex);
+                        _log.warn (Messages.message("persist.stClosingFailed"), ex);
                     }
                 }
                 if ( stmt2 != null ) {
                     try {
                         stmt2.close();
                     } catch ( SQLException ex ) {
-                        _log.warn ("Problem closing JDBC Statement", ex);
+                        _log.warn (Messages.message("persist.stClosingFailed"), ex);
                     }
                 }
             }
