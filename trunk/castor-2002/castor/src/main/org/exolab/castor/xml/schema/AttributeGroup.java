@@ -64,12 +64,18 @@ public abstract class AttributeGroup extends Annotated {
     private String _id = null;
 
     /**
+     * Returns the anyAttribute set in this attribute group if any.
+     * @return the anyAttribute set in this attribute group if any.
+     */
+    public abstract Wildcard getAnyAttribute();
+
+    /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
     **/
     public abstract AttributeDecl getAttribute(String name);
-    
+
     /**
      * Returns an Enumeration of all the attributes of this
      * attribute group. The enumeration includes attributes from
@@ -79,7 +85,7 @@ public abstract class AttributeGroup extends Annotated {
      * attribute group.
     **/
     public abstract Enumeration getAttributes();
-    
+
     /**
      * Returns the id of this AttributeGroup
      * @return the id of this AttributeGroup, or null, if
@@ -88,7 +94,7 @@ public abstract class AttributeGroup extends Annotated {
     public String getId() {
         return _id;
     } //-- getId
-    
+
     /**
      * Returns true if this AttributeGroup does not contain any
      * AttributeDecls or any non-empty AttributeGroupReferences
@@ -97,7 +103,7 @@ public abstract class AttributeGroup extends Annotated {
      * AttributeDecls or any non-empty AttributeGroupReferences
     **/
     public abstract boolean isEmpty();
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -126,5 +132,5 @@ public abstract class AttributeGroup extends Annotated {
 
     } //-- validate
 
-    
+
 } //-- AttributeGroup

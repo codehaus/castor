@@ -77,7 +77,8 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
     **/
     private AttributeGroup _attributeGroup = null;
 
-    private boolean allowAnnotations  = true;
+    private boolean allowAnnotation   = true;
+    private boolean foundAnyAttribute = false;
     private boolean isRef             = false;
     private boolean requireName       = false;
 
@@ -100,10 +101,10 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
         super();
         this._schema = schema;
 
-        
+
         String ref = atts.getValue(SchemaNames.REF_ATTR);
         if (ref != null) {
-            if (ref.length() > 0) { 
+            if (ref.length() > 0) {
                 isRef = true;
                 _attributeGroup = new AttributeGroupReference(schema, ref);
             }
@@ -117,12 +118,12 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
         else {
             AttributeGroupDecl attDecl = new AttributeGroupDecl(schema);
             _attributeGroup = attDecl;
-            
+
             //-- handle attributes
             attDecl.setName(atts.getValue(SchemaNames.NAME_ATTR));
-            attDecl.setId(atts.getValue(SchemaNames.ID_ATTR));            
+            attDecl.setId(atts.getValue(SchemaNames.ID_ATTR));
         }
-        
+
 
 
     } //-- AttributeGroupUnmarshaller
@@ -142,10 +143,10 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
 
     /**
-     * Returns the AttributeGroup created by this 
+     * Returns the AttributeGroup created by this
      * AttributeGroupUnmarshaller
      *
-     * @return the AttributeGroup created by this 
+     * @return the AttributeGroup created by this
      * AttributeGroupUnmarshaller
     **/
     public AttributeGroup getAttributeGroup() {
@@ -175,26 +176,36 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
+        //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+            if (foundAnyAttribute)
+                error("an anyAttribute element can appear only once as a child "+
+                    "of an 'AttributeGroup'.");
+            foundAnyAttribute = true;
+            allowAnnotation = true;
+            unmarshaller
+                 = new WildcardUnmarshaller(_attributeGroup, _schema, name, atts, getResolver());
+        }
         //-- attribute declarations
-        if (SchemaNames.ATTRIBUTE.equals(name)) {
-            allowAnnotations = false;
-            
+        else if (SchemaNames.ATTRIBUTE.equals(name)) {
+            allowAnnotation = false;
+
             if (isRef)
                 error("AttributeGroup references may not have children.");
-            
+
             unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
         //-- element declarations
         else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
-            allowAnnotations = false;
+            allowAnnotation = false;
             if (isRef)
-                error("AttributeGroup references may not have children.");            
+                error("AttributeGroup references may not have children.");
             unmarshaller
                 = new AttributeGroupUnmarshaller(_schema, atts);
         }
         else if (name.equals(SchemaNames.ANNOTATION)) {
-            if (!allowAnnotations) outOfOrder(name);
+            if (!allowAnnotation) outOfOrder(name);
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else illegalElement(name);
@@ -220,8 +231,20 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
+         //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           Wildcard wildcard =
+                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
+            try {
+                ((AttributeGroupDecl)_attributeGroup).setAnyAttribute(wildcard);
+            } catch (SchemaException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
+
+
         //-- attribute declarations
-        if (SchemaNames.ATTRIBUTE.equals(name)) {
+        else if (SchemaNames.ATTRIBUTE.equals(name)) {
             AttributeDecl attrDecl =
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
 
@@ -229,9 +252,9 @@ public class AttributeGroupUnmarshaller extends SaxUnmarshaller {
         }
         //-- attribute group references
         else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
-            
+
             Object obj = unmarshaller.getObject();
-            
+
             try {
                 ((AttributeGroupDecl)_attributeGroup).addReference(
                     (AttributeGroupReference) obj);

@@ -89,6 +89,11 @@ public final class AttributeGroupDecl extends AttributeGroup {
     private Vector _references = null;
 
     /**
+     * the anyattribute wilcard, if any
+     */
+     private Wildcard _anyAttribute = null;
+
+    /**
      * Creates a new AttributeGroup definition
      * @param schema the Schema that this AttributeGroup
      * belongs to.
@@ -148,6 +153,13 @@ public final class AttributeGroupDecl extends AttributeGroup {
      */
     public Enumeration getMyAttributeGroupReferences() { return _references.elements(); }
 
+    /**
+     * Returns the wilcard used in this complexType (can be null)
+     * @return the wilcard used in this complexType (can be null)
+     */
+    public Wildcard getAnyAttribute() {
+        return _anyAttribute;
+    }
 
     /**
      * Returns the AttributeDecl associated with the given name
@@ -253,6 +265,31 @@ public final class AttributeGroupDecl extends AttributeGroup {
          }
          else return false;
     } //-- removeReference
+
+    /**
+     * Sets the wildcard (anyAttribute) of this attribute Group
+     * @exception SchemaException thrown when a wildcard as already be set
+     * or when the wildCard is not an <anyAttribute>.
+     */
+     public void setAnyAttribute(Wildcard wildcard)
+            throws SchemaException
+     {
+        if (wildcard != null) {
+           if (_anyAttribute != null) {
+              String err = "<anyAttribute> already set in this AttributeGroup: "
+                           + this.getName();
+              throw new SchemaException(err);
+           }
+
+           if (!wildcard.isAttributeWildcard()){
+              String err = "In AttributeGroup, "+this.getName()
+                            +"the wildcard must be an <anyAttribute>";
+               throw new SchemaException(err);
+           }
+        }
+        _anyAttribute = wildcard;
+
+     }
 
     /**
      * Sets the name of this AttributeGroup
