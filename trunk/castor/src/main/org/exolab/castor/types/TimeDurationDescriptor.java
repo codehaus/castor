@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -53,37 +53,16 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
+
 /**
  * The TimeDuration Descriptor
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ *
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  *
  */
-public class TimeDurationDescriptor
-    implements XMLClassDescriptor
-{
-
-
-    /**
-     * Used for returning no attribute and no element fields
-    **/
-    private static final XMLFieldDescriptor[] _noFields
-        = new XMLFieldDescriptor[0];
-
-    /**
-     * The TypeValidator to use for validation of the described class
-    **/
-    private TypeValidator validator = null;
-
-    /**
-     * The namespace prefix that is to be used when marshalling
-    **/
-    private String nsPrefix = null;
-
-    /**
-     * The namespace URI used for both Marshalling and Unmarshalling
-    **/
-    private String nsURI = null;
+public class TimeDurationDescriptor extends BaseDescriptor {
 
 
     /**
@@ -100,7 +79,7 @@ public class TimeDurationDescriptor
     //----------------/
 
     public TimeDurationDescriptor() {
-        super();
+        super(_xmlName, TimeDuration.class);
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
@@ -120,16 +99,6 @@ public class TimeDurationDescriptor
     //------------------/
 
     /**
-     * Returns the set of XMLFieldDescriptors for all members
-     * that should be marshalled as XML attributes.
-     * @return an array of XMLFieldDescriptors for all members
-     * that should be marshalled as XML attributes.
-    **/
-    public XMLFieldDescriptor[]  getAttributeDescriptors() {
-        return _noFields;
-    } // getAttributeDescriptors
-
-    /**
      * Returns the XMLFieldDescriptor for the member
      * that should be marshalled as text content.
      * @return the XMLFieldDescriptor for the member
@@ -140,102 +109,6 @@ public class TimeDurationDescriptor
     } // getContentDescriptor
 
     /**
-     * Returns the set of XMLFieldDescriptors for all members
-     * that should be marshalled as XML elements.
-     * @return an array of XMLFieldDescriptors for all members
-     * that should be marshalled as XML elements.
-    **/
-    public XMLFieldDescriptor[]  getElementDescriptors() {
-        return _noFields;
-    } // getElementDescriptors
-
-    /**
-     * Returns the XML field descriptor matching the given
-     * xml name and nodeType. If NodeType is null, then
-     * either an AttributeDescriptor, or ElementDescriptor
-     * may be returned. Null is returned if no matching
-     * descriptor is available.
-     *
-     * @param name the xml name to match against
-     * @param nodeType, the NodeType to match against, or null if
-     * the node type is not known.
-     * @return the matching descriptor, or null if no matching
-     * descriptor is available.
-     *
-    **/
-    public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
-    {
-        return null;
-
-    } //-- getFieldDescriptor
-
-    /**
-     * @return the namespace prefix to use when marshalling as XML.
-    **/
-    public String getNameSpacePrefix() {
-        return nsPrefix;
-    } //-- getNameSpacePrefix
-
-    /**
-     * @return the namespace URI used when marshalling and unmarshalling as XML.
-    **/
-    public String getNameSpaceURI() {
-        return nsURI;
-    } //-- getNameSpaceURI
-
-    /**
-     * Returns a specific validator for the class described by
-     * this ClassDescriptor. A null value may be returned
-     * if no specific validator exists.
-     *
-     * @return the type validator for the class described by this
-     * ClassDescriptor.
-    **/
-    public TypeValidator getValidator() {
-        return validator;
-    } //-- getValidator
-
-    /**
-     * Returns the XML Name for the Class being described.
-     *
-     * @return the XML name.
-    **/
-    public String getXMLName() {
-        return _xmlName;
-    } //-- getXMLName
-
-    /**
-     * Returns the String representation of this XMLClassDescriptor
-     * @return the String representation of this XMLClassDescriptor
-    **/
-    public String toString() {
-
-        String str = super.toString() +
-            "; descriptor for class: TimeDuration";
-
-        //-- add xml name
-        str += "; xml name: " + _xmlName;
-
-        return str;
-    } //-- toString
-
-
-    //-------------------------------------/
-    //- Implementation of ClassDescriptor -/
-    //-------------------------------------/
-
-    /**
-     * Returns the Java class represented by this descriptor.
-     *
-     * @return The Java class
-     */
-    public Class getJavaClass() {
-        return TimeDuration.class;
-    } //-- getJavaClass
-
-
-    /**
      * Returns a list of fields represented by this descriptor.
      *
      * @return A list of fields
@@ -243,56 +116,6 @@ public class TimeDurationDescriptor
     public FieldDescriptor[] getFields() {
         return _fields;
     } //-- getFields
-
-
-
-    /**
-     * Returns the class descriptor of the class extended by this class.
-     *
-     * @return The extended class descriptor
-     */
-    public ClassDescriptor getExtends() {
-        return null;
-    } //-- getExtends
-
-
-    /**
-     * Returns the identity field, null if this class has no identity.
-     *
-     * @return The identity field
-     */
-    public FieldDescriptor getIdentity() {
-        return null;
-    } //-- getIdentity
-
-
-    /**
-     * Returns the access mode specified for this class.
-     *
-     * @return The access mode
-     */
-    public AccessMode getAccessMode() {
-        return null;
-    } //-- getAccessMode
-
-
-     /**
-     * <p>Returns true if the given object represented by this XMLClassDescriptor
-     * can accept a member whose name is given.
-     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
-     * the given name and if the given object can hold this field (i.e a value is not already set for
-     * this field).
-     * <p>This is mainly used for container object (that can contains other object), in this particular case
-     * the implementation will return null.
-     * @param fieldName the name of the field to check
-     * @param object the object represented by this XMLCLassDescriptor
-     * @return true if the given object represented by this XMLClassDescriptor
-     * can accept a member whose name is given.
-     */
-    public boolean canAccept(String fieldName, Object object) {
-         return false;
-    }
-
 
     /**
      * A specialized FieldHandler for the XML Schema
