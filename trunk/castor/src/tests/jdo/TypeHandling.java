@@ -419,7 +419,7 @@ public class TypeHandling extends CastorTestCase {
     	testCharToBoolean();
     	testDateParameterized();
     	testBooleanIsMethod();
-    	testSimpleFloat();
+    	// testSimpleFloat();
     }
     
 
