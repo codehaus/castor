@@ -550,17 +550,11 @@ public final class Introspector {
                 }
             }
             
-            XMLFieldDescriptorImpl fieldDesc 
-                = createFieldDescriptor(type, methodSet.fieldName, xmlName);
-                
-            
             typeInfo = new TypeInfo(type, null, null, false, null, colHandler);
             
-            if (isCollection) {
-                fieldDesc.setMultivalued(true);
-                fieldDesc.setNodeType(NodeType.Element);
-            }
-            
+            //-- Create FieldHandler first, before the XMLFieldDescriptor
+            //-- in case we need to use a custom handler
+                                                
             FieldHandler handler = null;
             boolean customHandler = false;
             try {
@@ -590,6 +584,9 @@ public final class Introspector {
                         gfh.setFieldHandler(handler);
                         handler = gfh;
                         customHandler = true;
+                        //-- swap type with the type specified by the
+                        //-- custom field handler
+                        type = gfh.getFieldType();
                     }
                 } 
                 
@@ -598,6 +595,15 @@ public final class Introspector {
                 throw new MarshalException(mx);
             }
                     
+            
+            XMLFieldDescriptorImpl fieldDesc 
+                = createFieldDescriptor(type, methodSet.fieldName, xmlName);
+                        
+            if (isCollection) {
+                fieldDesc.setMultivalued(true);
+                fieldDesc.setNodeType(NodeType.Element);
+            }
+            
             //-- check for instances of java.util.Date
             if (java.util.Date.class.isAssignableFrom(type)) {
                 //handler = new DateFieldHandler(handler);
@@ -605,7 +611,7 @@ public final class Introspector {
                     dateDescriptors.add(fieldDesc);
                 }
             }
-                        
+            
             fieldDesc.setHandler(handler);
             
             //-- Wrap collections?
@@ -733,15 +739,8 @@ public final class Introspector {
                 String fieldName = field.getName();
                 String xmlName = _naming.toXMLName(fieldName);
                 
-                XMLFieldDescriptorImpl fieldDesc = 
-                        createFieldDescriptor(type, fieldName, xmlName);
-                        
-                if (isCollection) {
-                    fieldDesc.setNodeType(NodeType.Element);
-                    fieldDesc.setMultivalued(true);
-                }
-                descriptors.put(xmlName, fieldDesc);
-                classDesc.addFieldDescriptor(fieldDesc);
+                //-- Create FieldHandler first, before the XMLFieldDescriptor
+                //-- in case we need to use a custom handler
                 
                 typeInfo = new TypeInfo(type, null, null, false, null, colHandler);
                 
@@ -763,6 +762,9 @@ public final class Introspector {
                             gfh.setFieldHandler(handler);
                             handler = gfh;
                             customHandler = true;
+                            //-- swap type with the type specified by the
+                            //-- custom field handler
+                            type = gfh.getFieldType();
                         }
                     } 
                 }
@@ -770,6 +772,15 @@ public final class Introspector {
                     throw new MarshalException(mx);
                 }
                 
+                XMLFieldDescriptorImpl fieldDesc = 
+                        createFieldDescriptor(type, fieldName, xmlName);
+                        
+                if (isCollection) {
+                    fieldDesc.setNodeType(NodeType.Element);
+                    fieldDesc.setMultivalued(true);
+                }
+                descriptors.put(xmlName, fieldDesc);
+                classDesc.addFieldDescriptor(fieldDesc);
                 fieldDesc.setHandler(handler);
                    
                 //-- check for instances of java.util.Date
