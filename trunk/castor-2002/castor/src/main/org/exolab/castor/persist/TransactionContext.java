@@ -371,7 +371,6 @@ public abstract class TransactionContext
         object = fetch( engine, handler, identity, accessMode );
         if ( object != null )
             return object;
-        object = handler.newInstance();
         oid = new OID( handler, identity );
 
         // Load (or reload) the object through the persistence engine with the
@@ -388,6 +387,11 @@ public abstract class TransactionContext
         } catch ( ClassNotPersistenceCapableException except ) {
             throw new PersistenceExceptionImpl( except );
         }
+        // The returned actual cache oid may refer to an extending class.
+        // To avoid errors during copying from the cache in engine.copyObject()
+        // we must create an instance of the extending class.
+        handler = engine.getClassHandler( oid.getJavaClass() );
+        object = handler.newInstance();
 
         // Need to copy the contents of this object from the cached
         // copy and deal with it based on the transaction semantics.
@@ -396,7 +400,7 @@ public abstract class TransactionContext
         // the object in this transaction.
         entry = addObjectEntry( object, oid, engine );
         try {
-            engine.copyObject( this, oid, object );
+            engine.copyObject( this, oid, object, accessMode );
             if ( handler.getCallback() != null ) {
                 Class reloadClass;
 

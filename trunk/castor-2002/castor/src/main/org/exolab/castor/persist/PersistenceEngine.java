@@ -357,7 +357,7 @@ public interface PersistenceEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine obtaining a dependent object
      */
-    public void copyObject( TransactionContext tx, OID oid, Object obj )
+    public void copyObject( TransactionContext tx, OID oid, Object obj, AccessMode accessMode )
         throws PersistenceException;
 
 

@@ -1364,7 +1364,7 @@ public final class CacheEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine obtaining a dependent object
      */
-    public void copyObject( TransactionContext tx, OID oid, Object object )
+    public void copyObject( TransactionContext tx, OID oid, Object object, AccessMode accessMode )
         throws PersistenceException
     {
         ObjectLock lock;
@@ -1400,7 +1400,7 @@ public final class CacheEngine
             typeInfo.cache.finishLockForAquire( oid );
         }
         typeInfo.handler.setIdentity( object, oid.getIdentity() );
-        typeInfo.handler.copyInto( fields, object, new FetchContext( tx, this ) );
+        typeInfo.handler.copyInto( fields, object, new FetchContext( tx, this, accessMode ) );
         setObjectTimeStamp( object, oid.getStamp() );
     }
 

@@ -263,7 +263,7 @@ public final class QueryResults
                 object = handler.newInstance();
                 entry = _tx.addObjectEntry( object, oid, _engine );
                 try {
-                    _engine.copyObject( _tx, oid, object );
+                    _engine.copyObject( _tx, oid, object, _accessMode );
                     if ( handler.getCallback() != null ) {
                         Class reloadClass;
 
