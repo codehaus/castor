@@ -1,22 +1,18 @@
-JDO
----
+0123456789012345678901234567890123456789012345678901234567890123456789
+JDO: ObjectDesc/PrimaryKeyDesc are cloning return arrays to assure it
+     is immutable and prevent the caller from changing their contents.
+     This practice must be deprecated and checks made to assure these
+     arrays are not altered, or use an immutable return collection.
 
-* ObjectDesc/PrimaryKeyDesc are cloning return arrays to assure it is immutable
-  and prevent the caller from changing their contents. This practice must be
-  deprecated and checks made to assure these arrays are not altered, or use an
-  immutable return collection.
+JDO: Check that required fields are not null prior to storing object.
 
-* Check that required fields are not null prior to storing object.
-  Use default values when creating a new empty object.
+JDO: Use default values when creating a new empty object.
 
-* OID might need to clone the original primary key used at load, or
-  the dirty image should do that?
+JDO: Properly deal with primary keys changed during transaction.
+
+JDO: Check dirty only on dirty fields, only on objects that have dirty
+     fields, and perform store only on objects that have actually
+     changed.
 
 
-XML
----
-
- * Finish built-in XML Schema datatypes
-
- * Finish XML Schema Structures support
 
