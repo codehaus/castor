@@ -337,6 +337,16 @@ public class TypeInfo
         _colHandler = handler;
     } //-- setCollectionHandler
     
+    /**
+     * Sets whether or not the type is immutable
+     * 
+     * @param immutable a boolean that when true indicates the type
+     * is immutable
+     */
+    void setImmutable(boolean immutable) {
+    	_immutable = immutable;
+    }
+    
 } 
 
 
