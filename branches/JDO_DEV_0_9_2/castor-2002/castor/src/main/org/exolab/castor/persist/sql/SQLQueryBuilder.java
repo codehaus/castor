@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.HashMap;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
+import java.util.BitSet;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
@@ -63,7 +64,6 @@ import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
@@ -92,77 +92,109 @@ import org.exolab.castor.util.Messages;
 public class SQLQueryBuilder implements SQLQueryKinds {
 
     /**
-     * The HashMap maps SQLQueryBuilder.ExecutorKey to SQLQueryExecutor.
-     */
-    private static HashMap _executors = new HashMap();
-
-
-    /**
      * The factory method for creating instances of this class.
      */
-    public static SQLQueryExecutor getExecutor(BaseFactory factory, SQLConnector connector, LogInterceptor log,
-                                               EntityInfo info, byte kind, boolean dirtyCheck, boolean withLock)
-            throws MappingException {
-        SQLEntityInfo sqlInfo;
+    public static SQLQueryExecutor getExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log, SQLEntityInfo info, byte kind, BitSet dirtyCheckNulls, boolean withLock)
+            throws PersistenceException {
         QueryExpression query;
-        SQLQueryExecutor executor;
-        ExecutorKey key;
         String sql;
         KeyGenerator keyGen = null;
 
-        key = new ExecutorKey(factory, connector, info.entityClass, kind, dirtyCheck, withLock);
-        executor = (SQLQueryExecutor) _executors.get(key);
-        sqlInfo = SQLEntityInfo.getInstance(info);
-        if (executor == null) {
-            if (kind == LOOKUP || kind == SELECT) {
-               try {
-                    query = factory.getQueryExpression();
-                    buildLookup(query, sqlInfo);
-                    if (kind == SELECT) {
-                        buildSelect(query, sqlInfo);
-                    }
-                    sql = query.getStatement(withLock);
-                    if (kind == SELECT && log != null) {
-                        log.storeStatement("SQL for loading " + info + ":  " + sql);
-                    }
-                } catch (QueryException except) {
-                    except.printStackTrace();
-                    throw new MappingException( except );
+        if (kind == LOOKUP || kind == SELECT) {
+            try {
+                query = factory.getQueryExpression();
+                buildLookup(query, info);
+                if (kind == SELECT) {
+                    buildSelect(query, info);
                 }
-            } else {
-                switch (kind) {
-                case INSERT:
-                    // Prepare key generator
-                    // Assume that it generates the very first identity field.
-                    if (info.keyGen != null) {
-                        keyGen = info.keyGen.getKeyGeneratorRegistry().getKeyGenerator(
-                                factory, info.keyGen, sqlInfo.idInfo[0].sqlType[0], log);
-                    }
-                    sql = buildInsert(factory, sqlInfo, keyGen);
-                    if (log != null) {
-                        log.storeStatement("SQL for creating " + info + ":  " + sql);
-                    }
-                    break;
-                case UPDATE:
-                    sql = buildUpdate(factory, sqlInfo, dirtyCheck);
-                    if (log != null) {
-                        log.storeStatement("SQL for updating " + info + ":  " + sql);
-                    }
-                    break;
-                case DELETE:
-                    sql = buildDelete(factory, sqlInfo, dirtyCheck);
-                    if (log != null) {
-                        log.storeStatement("SQL for deleting " + info + ":  " + sql);
-                    }
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown kind of SQL query: " + kind);
+                sql = query.getStatement(withLock);
+                if (kind == SELECT && log != null) {
+                    log.storeStatement("SQL for loading " + info + ":  " + sql);
                 }
+            } catch (QueryException except) {
+                throw new PersistenceException(Messages.format("persist.nested", except), except);
             }
-            executor = new SQLQueryExecutor(factory, connector, log, sqlInfo, sql, kind, dirtyCheck, keyGen);
-            _executors.put(key, executor);
+        } else {
+            switch (kind) {
+            case INSERT:
+                // Prepare key generator
+                // Assume that it generates the very first identity field.
+                if (info.info.keyGen != null) {
+                    try {
+                        keyGen = info.info.keyGen.getKeyGeneratorRegistry().getKeyGenerator(
+                                 factory, info.info.keyGen, info.idInfo[0].sqlType[0], log);
+                    } catch (Exception except) {
+                        throw new PersistenceException(Messages.format("persist.nested", except), except);
+                    }
+                }
+                sql = buildInsert(factory, info, keyGen);
+                if (log != null) {
+                    log.storeStatement("SQL for creating " + info + ":  " + sql);
+                }
+                break;
+            case UPDATE:
+                sql = buildUpdate(factory, info, dirtyCheckNulls);
+                if (log != null) {
+                    log.storeStatement("SQL for updating " + info + ":  " + sql);
+                }
+                break;
+            case DELETE:
+                sql = buildDelete(factory, info, dirtyCheckNulls);
+                if (log != null) {
+                    log.storeStatement("SQL for deleting " + info + ":  " + sql);
+                }
+                break;
+            default:
+                throw new IllegalStateException("Unknown kind of SQL query: " + kind);
+            }
         }
-        return executor;
+        return new SQLQueryExecutor(factory, connector, log, info, sql, kind, dirtyCheckNulls, keyGen);
+    }
+
+    /**
+     * This is a convenience method for LOOKUP.
+     */
+    public static SQLQueryExecutor getLookupExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log,  SQLEntityInfo info, boolean withLock)
+            throws PersistenceException {
+        return getExecutor(factory, connector, log, info, LOOKUP, null, withLock);
+    }
+
+    /**
+     * This is a convenience method for SELECT.
+     */
+    public static SQLQueryExecutor getSelectExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log,  SQLEntityInfo info, boolean withLock)
+            throws PersistenceException {
+        return getExecutor(factory, connector, log, info, SELECT, null, withLock);
+    }
+
+    /**
+     * This is a convenience method for INSERT.
+     */
+    public static SQLQueryExecutor getCreateExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log, SQLEntityInfo info)
+            throws PersistenceException {
+        return getExecutor(factory, connector, log, info, INSERT, null, false);
+    }
+
+    /**
+     * This is a convenience method for UPDATE.
+     */
+    public static SQLQueryExecutor getStoreExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log, SQLEntityInfo info, BitSet dirtyCheckNulls)
+            throws PersistenceException {
+        return getExecutor(factory, connector, log, info, UPDATE, dirtyCheckNulls, false);
+    }
+
+    /**
+     * This is a convenience method for DELETE.
+     */
+    public static SQLQueryExecutor getDeleteExecutor(BaseFactory factory, SQLConnector connector,
+            LogInterceptor log, SQLEntityInfo info, BitSet dirtyCheckNulls)
+            throws PersistenceException {
+        return getExecutor(factory, connector, log, info, DELETE, dirtyCheckNulls, false);
     }
 
     private static void buildLookup(QueryExpression query, SQLEntityInfo info)
@@ -228,7 +260,7 @@ public class SQLQueryBuilder implements SQLQueryKinds {
     }
 
     private static String buildInsert(BaseFactory factory, SQLEntityInfo info, KeyGenerator keyGen)
-            throws MappingException {
+            throws PersistenceException {
         int count;
         StringBuffer sql;
         String[] fieldNames;
@@ -238,17 +270,6 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         sql.append(factory.quoteName(info.info.entityClass));
         sql.append(" (");
         count = 0;
-        for (int i = 0; i < info.idNames.length; i++) {
-            if (i == 0 && keyGen != null && keyGen.getStyle() != KeyGenerator.BEFORE_INSERT) {
-                // The generated column is not known yet
-                continue;
-            }
-            if (count > 0) {
-                sql.append(',');
-            }
-            sql.append(factory.quoteName(info.idNames[i]));
-            count++;
-        }
         for (int i = 0; i < info.fieldInfo.length; i++) {
             if (info.fieldInfo[i] != null) {
                 fieldNames = info.fieldInfo[i].info.fieldNames;
@@ -260,6 +281,18 @@ public class SQLQueryBuilder implements SQLQueryKinds {
                     count++;
                 }
             }
+        }
+        // Put identity after all ather fields as in other kinds of SQL statements
+        for (int i = 0; i < info.idNames.length; i++) {
+            if (i == 0 && keyGen != null && keyGen.getStyle() != KeyGenerator.BEFORE_INSERT) {
+                // The generated column is not known yet
+                continue;
+            }
+            if (count > 0) {
+                sql.append(',');
+            }
+            sql.append(factory.quoteName(info.idNames[i]));
+            count++;
         }
         // it is possible to have no fields in INSERT statement:
         // only the primary key field in the table,
@@ -280,7 +313,11 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         result = sql.toString();
 
         if (keyGen != null && keyGen.getStyle() != KeyGenerator.BEFORE_INSERT) {
-            result = keyGen.patchSQL(result, info.idNames[0]);
+            try {
+                result = keyGen.patchSQL(result, info.idNames[0]);
+            } catch (Exception except) {
+                throw new PersistenceException(Messages.format("persist.nested", except), except);
+            }
             if (keyGen.getStyle() == KeyGenerator.DURING_INSERT) {
                 result = JDBCSyntax.Call + result + JDBCSyntax.EndCall;
             }
@@ -288,10 +325,10 @@ public class SQLQueryBuilder implements SQLQueryKinds {
         return result;
     }
 
-    private static String buildUpdate(BaseFactory factory, SQLEntityInfo info, boolean dirtyCheck) {
-        int count;
+    private static String buildUpdate(BaseFactory factory, SQLEntityInfo info, BitSet dirtyCheckNulls) {
         StringBuffer sql;
         String[] fieldNames;
+        int count;
 
         sql = new StringBuffer(JDBCSyntax.Update);
         sql.append(factory.quoteName(info.info.entityClass));
@@ -310,20 +347,20 @@ public class SQLQueryBuilder implements SQLQueryKinds {
                 }
             }
         }
-        addWhere(sql, factory, info, dirtyCheck);
+        addWhere(sql, factory, info, dirtyCheckNulls);
         return sql.toString();
     }
 
-    private static String buildDelete(BaseFactory factory, SQLEntityInfo info, boolean dirtyCheck) {
+    private static String buildDelete(BaseFactory factory, SQLEntityInfo info, BitSet dirtyCheckNulls) {
         StringBuffer sql;
 
         sql = new StringBuffer(JDBCSyntax.Delete);
         sql.append(factory.quoteName(info.info.entityClass));
-        addWhere(sql, factory, info, dirtyCheck);
+        addWhere(sql, factory, info, dirtyCheckNulls);
         return sql.toString();
     }
 
-    private static void addWhere(StringBuffer sql, BaseFactory factory, SQLEntityInfo info, boolean dirtyCheck) {
+    private static void addWhere(StringBuffer sql, BaseFactory factory, SQLEntityInfo info, BitSet dirtyCheckNulls) {
         String[] fieldNames;
 
         sql.append(JDBCSyntax.Where);
@@ -334,60 +371,21 @@ public class SQLQueryBuilder implements SQLQueryKinds {
             sql.append(factory.quoteName(info.idNames[i]));
             sql.append("=?");
         }
-        if (dirtyCheck) {
+        if (dirtyCheckNulls != null) {
             for (int i = 0; i < info.fieldInfo.length; i++) {
                 if (info.fieldInfo[i] != null && info.fieldInfo[i].info.dirtyCheck) {
                     fieldNames = info.fieldInfo[i].info.fieldNames;
                     for (int j = 0; j < fieldNames.length; j++) {
                         sql.append(" AND ");
                         sql.append(factory.quoteName(fieldNames[j]));
-                        sql.append("=?");
+                        if (dirtyCheckNulls.get(i)) {
+                            sql.append(" IS NULL");
+                        } else {
+                            sql.append("=?");
+                        }
                     }
                 }
             }
-        }
-    }
-
-    //------------------------------ Inner classes -------------------------------------------
-
-
-    /**
-     * The key for the HashMap of all instances of this class
-     */
-    static class ExecutorKey {
-
-        final BaseFactory factory;
-
-        final SQLConnector connector;
-
-        final String entityClass;
-
-        final byte kind;
-
-        final boolean dirtyCheck;
-
-        final boolean withLock;
-
-        ExecutorKey(BaseFactory factory, SQLConnector connector, String entityClass, byte kind,
-                    boolean dirtyCheck, boolean withLock) {
-            this.factory = factory;
-            this.connector = connector;
-            this.entityClass = entityClass;
-            this.kind = kind;
-            this.dirtyCheck = dirtyCheck;
-            this.withLock = withLock;
-        }
-
-        public int hashCode() {
-            return entityClass.hashCode() + kind + (dirtyCheck ? 8 : 0) + (withLock ? 16 : 0);
-        }
-
-        public boolean equals(Object obj) {
-            ExecutorKey key = (ExecutorKey) obj;
-
-            return (entityClass.equals(key.entityClass) && (kind == key.kind) &&
-                    (dirtyCheck == key.dirtyCheck) && (withLock == key.withLock)) &&
-                    (factory == key.factory) && (connector == key.connector);
         }
     }
 }
