@@ -1,4 +1,4 @@
-/**
+/*
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided
  * that the following conditions are met:
@@ -50,6 +50,7 @@ package org.exolab.castor.persist;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.Iterator;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
@@ -111,7 +112,21 @@ public abstract class TransactionContext
      * access mechanism.
      */
 
+    public static int OBJECT_STATE_TRANSIENT = 0;
 
+    public static int OBJECT_STATE_HOLLOW = 1;
+
+    public static int OBJECT_STATE_READ_ONLY = 2;
+    
+    public static int OBJECT_STATE_PERSISTENT = 3;
+
+    public static int OBJECT_STATE_PERSISTENT_NEW = 4;
+
+    public static int OBJECT_STATE_PERSISTENT_DELETED = 5;
+
+    public static int OBJECT_STATE_PERSISTENT_NEW_DELETED = 6;
+
+    
     /**
      * Set while transaction is waiting for a lock.
      *
@@ -842,6 +857,13 @@ public abstract class TransactionContext
                 entry.updatePersistNeeded = true;
             if ( updateCache )
                 entry.updateCacheNeeded = true;
+            if ( updatePersist || updateCache ) {
+                // | really need to schedule lock on updateCache object.
+                // because it's possible that preStore already called
+                // and, updateLock must be called in prepare state, but not
+                // commited state.
+                //entry.engine.softLock( this, entry.oid, _lockTimeout );
+            }
         } else {
             // report or ignore?
         }
@@ -1005,19 +1027,19 @@ public abstract class TransactionContext
 
             _status = Status.STATUS_PREPARING;
 
-            // Process all modified objects
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                if ( !entry.deleted && (entry.updatePersistNeeded) ) {
-                    entry.engine.store( this, entry.oid, entry.object );
-                }
-            }
             // Process all deleted objects last in FIFO order.
             while ( _deletedList != null ) {
                 entry = _deletedList;
                 _deletedList = _deletedList.nextDeleted;
                 entry.engine.delete( this, entry.oid, entry.object );
+            }
+
+            // Process all modified objects
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                if ( !entry.deleted && (entry.updatePersistNeeded || entry.updateCacheNeeded) )
+                    entry.engine.store( this, entry.oid, entry.object );
             }
 
             _status = Status.STATUS_PREPARED;
@@ -1210,8 +1232,6 @@ public abstract class TransactionContext
         return ( ( entry != null ) && ( ! entry.deleted ) );
     }
 
-
-
     public boolean isDepended( OID master, Object dependent ) {
         ObjectEntry entry;
         OID depends;
@@ -1225,6 +1245,8 @@ public abstract class TransactionContext
         
         return depends.equals( master );
     }
+
+    
     /**
      * Returns the object's identity. If the identity was determined when
      * the object was created, or if the object was retrieved, that identity
@@ -1296,6 +1318,43 @@ public abstract class TransactionContext
         return _waitOnLock;
     }
 
+
+    public boolean isDeleted( Object object ) {
+
+        ObjectEntry entry;
+
+        entry = getObjectEntry( object );
+        if ( entry != null ) 
+            return entry.deleted;
+    
+        return false;
+    }
+            
+
+    public int getObjectState( Object object ) {
+
+        ObjectEntry entry;
+
+        entry = getObjectEntry( object );
+        if ( entry != null ) {
+            if ( entry.created && !entry.deleted )
+                return OBJECT_STATE_PERSISTENT_NEW;
+            if ( entry.created && entry.deleted )
+                return OBJECT_STATE_PERSISTENT_NEW_DELETED;
+            if ( entry.deleted )
+                return OBJECT_STATE_PERSISTENT_DELETED;
+            else
+                return OBJECT_STATE_PERSISTENT;
+        } else {
+            // see if it is readonly
+            Iterator values = _readOnlyObjects.values().iterator();
+            while ( values.hasNext() ) {
+                if ( object == values.next() )
+                    return OBJECT_STATE_READ_ONLY;
+            }
+            return OBJECT_STATE_TRANSIENT;
+        }
+    }
 
     /**
      * Marks an object for deletion. Used during the preparation stage to
