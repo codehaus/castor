@@ -61,7 +61,7 @@ interface JMember {
      * Returns the class in which this JMember has been declared
      * @return the class in which this JMember has been declared
     **/
-    public JClass getDeclaringClass();
+    //public JClass getDeclaringClass();
 
     /**
      * Returns the modifiers for this JMember
