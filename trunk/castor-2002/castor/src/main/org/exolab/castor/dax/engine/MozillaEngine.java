@@ -124,7 +124,7 @@ public class MozillaEngine
 	    if ( fields[ i ] instanceof ContainerFieldDesc ) {
 		FieldDesc[] contained;
 
-		contained = ( (ContainerFieldDesc) fields[ i ] ).getContainedFields();
+		contained = ( (ContainerFieldDesc) fields[ i ] ).getFields();
 		for ( int j = 0 ; j < contained.length ; ++j ) {
 		    if ( _fields.put( ( (DAXFieldDesc) contained[ j ] ).getLdapName(),
 				      new DAXContainedFieldDesc( (DAXFieldDesc) contained[ j ], (ContainerFieldDesc) fields[ i ] ) ) != null )
@@ -138,7 +138,7 @@ public class MozillaEngine
 
 	dnField = _clsDesc.getIdentity();
 	if ( dnField instanceof ContainerFieldDesc ) {
-	    fields = ( (ContainerFieldDesc) dnField ).getContainedFields();
+	    fields = ( (ContainerFieldDesc) dnField ).getFields();
 	    _dnFields = new DAXFieldDesc[ fields.length ];
 	    for ( int i = 0 ; i < fields.length ; ++i )
 		_dnFields[ i ] = (DAXFieldDesc) fields[ i ];

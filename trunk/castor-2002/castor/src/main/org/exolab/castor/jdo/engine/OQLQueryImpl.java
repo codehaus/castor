@@ -215,7 +215,7 @@ public class OQLQueryImpl
 	    }
 	}
 
-	if ( fields == null ) {
+	if ( field == null ) {
 	    if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
 		fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
 		for ( int i = 0 ; i < fields.length ; ++i ) {

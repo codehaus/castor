@@ -48,12 +48,14 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.util.Vector;
+import java.util.Enumeration;
 import org.exolab.castor.mapping.Types;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.MappingHelper;
+import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 
@@ -69,6 +71,23 @@ public class JDOMappingHelper
 {
 
 
+    public JDOMappingHelper( ClassLoader loader, Mapping mapping )
+        throws MappingException
+    {
+	Enumeration   enum;
+	ClassMapping  clsMap;
+	ClassDesc     clsDesc;
+
+	enum = mapping.enumerateClassMapping();
+	while ( enum.hasMoreElements() ) {
+	    clsMap = (ClassMapping) enum.nextElement();
+	    clsDesc = createDescriptor( loader, clsMap );
+	    if ( clsDesc != null )
+		addDescriptor( clsDesc );
+	}
+    }
+
+
     protected ClassDesc createDescriptor( ClassLoader loader, ClassMapping clsMap )
         throws MappingException
     {
@@ -78,7 +97,7 @@ public class JDOMappingHelper
 	Vector      jdoFields;
 
 	if ( clsMap.getSqlTable() == null )
-	    throw new IllegalArgumentException( "Class mapping does not include SQL information" );
+	    return null;
 
 	clsDesc = super.createDescriptor( loader, clsMap );
 	// JDO descriptor must include an identity field.
@@ -94,7 +113,7 @@ public class JDOMappingHelper
 		if ( fields[ i ] instanceof ContainerFieldDesc ) {
 		    FieldDesc[] cFields;
 		    
-		    cFields = ( (ContainerFieldDesc) fields[ i ] ).getContainedFields();
+		    cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
 		    for ( int j = 0 ; j < cFields.length ; ++j )
 			jdoFields.add( cFields[ j ] );
 		} else {
