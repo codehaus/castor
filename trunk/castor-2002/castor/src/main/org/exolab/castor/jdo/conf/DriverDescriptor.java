@@ -79,6 +79,10 @@ public class DriverDescriptor implements org.exolab.castor.xml.XMLClassDescripto
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -112,6 +116,10 @@ public class DriverDescriptor implements org.exolab.castor.xml.XMLClassDescripto
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -144,6 +152,16 @@ public class DriverDescriptor implements org.exolab.castor.xml.XMLClassDescripto
                 try {
                     Driver target = (Driver) object;
                     target.addParam( (Param) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                try {
+                    Driver target = (Driver) object;
+                    target.removeAllParam();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());

@@ -78,6 +78,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -109,6 +113,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -142,6 +150,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -173,6 +185,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -206,6 +222,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, Boolean.FALSE );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -236,6 +256,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -275,6 +299,10 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -303,6 +331,16 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 try {
                     Container target = (Container) object;
                     target.addFieldMapping( (FieldMapping) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                try {
+                    Container target = (Container) object;
+                    target.removeAllFieldMapping();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());

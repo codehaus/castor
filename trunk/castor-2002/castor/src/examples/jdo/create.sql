@@ -2,7 +2,7 @@ drop table prod;
 create table prod (
   id        int not null,
   name      varchar(200) not null,
-  price     float not null,
+  price     numeric(18,2) not null,
   group_id  int not null
 );
 create unique index prod_pk on prod ( id );

@@ -79,6 +79,10 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -111,6 +115,10 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -148,6 +156,10 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new Driver();
             }
@@ -180,6 +192,10 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new DataSource();
@@ -214,6 +230,10 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new Jndi();
             }
@@ -242,6 +262,16 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
                 try {
                     Database target = (Database) object;
                     target.addMapping( (Mapping) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                try {
+                    Database target = (Database) object;
+                    target.removeAllMapping();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());

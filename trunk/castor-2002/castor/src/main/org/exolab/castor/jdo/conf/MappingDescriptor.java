@@ -79,6 +79,10 @@ public class MappingDescriptor implements org.exolab.castor.xml.XMLClassDescript
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }

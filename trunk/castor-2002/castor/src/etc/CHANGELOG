@@ -1,4 +1,4 @@
-Version 0.8.6  May 12, 2000
+Version 0.8.6  May 19, 2000
 ---------------------------
 
 JDO:     Fixed bug when related object is null and SQL_OTHER type is passed to JDBC
@@ -11,6 +11,17 @@ JDO:     Fixed bug with dirty checking that caused lock to not be acquired and o
 JDO:     Fixed the way in which null fields are handled, so has/delete methods are called
          if available, default value is used otherwise, setNull/wasNull are used on the
          JDBC record.
+
+JDO:     Changed callback sequence. jdoRemove is now called on deleted objects,
+         unsetDatabase on objects that become transient (including those removes).
+         setDatabase is still not called on any object.
+
+JDO:     Fixed SQLTypes to pick up proper SQL type form field of type java.util.Date.
+         Fixed SQLEngine to use SQL type in some calls to setObject.
+         (Contributed by Donald Ball <balld@webslingerz.com>)
+
+Mapping: Added resetValue() method to field handler. This generally resets a field to
+         it's default value or empties a collection field.
 
 Mapping: Date type no longer defaults to new date() when field is null, field is no
          longer set to default when null. (Reported by Lincoln Spiteri

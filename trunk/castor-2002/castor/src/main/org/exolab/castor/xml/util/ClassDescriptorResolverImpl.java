@@ -239,7 +239,6 @@ public class ClassDescriptorResolverImpl
     public XMLClassDescriptor resolveByXMLName
         (String xmlName, ClassLoader loader) 
     {
-            
         if ((xmlName == null) || (xmlName.length() == 0)) {
             clearError(); //-- clear previous error flag
             setError("Cannot resolve a null or zero-length xml name.");
@@ -252,8 +251,9 @@ public class ClassDescriptorResolverImpl
             Enumeration enum = mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
-                if (xmlName.equals(classDesc.getXMLName()))
+                if (xmlName.equals(classDesc.getXMLName())) {
                     return classDesc;
+                }
                 classDesc = null;
             }
         }

@@ -30,7 +30,7 @@
 
   <jtf:category name="xml" class="xml.XMLCategory">
     <jtf:description>Tests for XML marshalling framework</jtf:description>
-    <jtf:case class="xml.Mapping" />
+    <jtf:case class="xml.Inheritance" />
   </jtf:category>
 
 </jtf:harness>

@@ -79,6 +79,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -110,6 +114,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -143,6 +151,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
             }
@@ -174,6 +186,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -207,6 +223,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -237,6 +257,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -270,6 +294,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -300,6 +328,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new java.lang.String();
@@ -339,6 +371,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -372,6 +408,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new Sql();
             }
@@ -404,6 +444,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return new Xml();
             }
@@ -435,6 +479,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
             }
             public Object newInstance( Object parent ) {
                 return new Ldap();

@@ -82,6 +82,10 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
             public Object newInstance( Object parent ) {
                 return null;
             }
@@ -110,6 +114,17 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                 try {
                     MappingRoot target = (MappingRoot) object;
                     target.addInclude( (Include) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object ) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    MappingRoot target = (MappingRoot) object;
+                    target.removeAllInclude();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -148,6 +163,17 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                     throw new IllegalStateException(ex.toString());
                 }
             }
+            public void resetValue( Object object) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    MappingRoot target = (MappingRoot) object;
+                    target.removeAllClassMapping();
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
             public Object newInstance( Object parent ) {
                 return new ClassMapping();
             }
@@ -177,6 +203,17 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
                 try {
                     MappingRoot target = (MappingRoot) object;
                     target.addKeyGeneratorDef( (KeyGeneratorDef) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object ) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    MappingRoot target = (MappingRoot) object;
+                    target.removeAllKeyGeneratorDef();
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
