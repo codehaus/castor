@@ -380,7 +380,38 @@
   </xsl:template>
 
   <xsl:template match="include">
-      <xsl:apply-templates select="document(./@href)/document/body/section"/>
+      <xsl:variable name="sections" select="document(./@href)/document/body/section"/>
+      <xsl:variable name="url" select="./@href"/>
+      <xsl:variable name="tmp-count">
+         <xsl:choose>
+            <xsl:when test="@max-nodes"><xsl:value-of select="@max-nodes"/></xsl:when>
+            <xsl:otherwise>9999999</xsl:otherwise>
+         </xsl:choose>
+      </xsl:variable>
+      <xsl:variable name="max-count" select="number($tmp-count)"/>
+
+      <xsl:choose>
+         <xsl:when test="@select-node">
+            <xsl:for-each select="$sections/*[local-name()=current()/@select-node]">
+               <xsl:if test="position() &lt;= $max-count">
+                  <xsl:apply-templates select="."/>
+               </xsl:if>
+               <xsl:if test="position() = ($max-count+1)">
+                  <xsl:variable name="href">
+                     <xsl:call-template name="link-convertor">
+                        <xsl:with-param name="href" select="$url"/>
+                     </xsl:call-template>
+                  </xsl:variable>
+                  <p><a href="{$href}">More...</a></p>
+               </xsl:if>
+
+            </xsl:for-each>
+         </xsl:when>
+         <xsl:otherwise>
+               <xsl:apply-templates select="$sections"/>
+         </xsl:otherwise>
+      </xsl:choose>
+
   </xsl:template>
 
   <xsl:template match="mailing-lists">
