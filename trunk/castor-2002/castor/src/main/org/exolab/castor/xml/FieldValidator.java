@@ -89,6 +89,42 @@ public class FieldValidator extends Validator {
         this._validator = validator;
     } //-- FieldValidator
     
+    /**
+     * Returns the mimimum number of occurances for a given object.
+     *
+     * @returns the mimimum number of occurances for a given object.
+     * A zero value denotes no lower bound 
+     * (ie. the object is optional)
+    **/
+    public int getMinOccurs() {
+        return minOccurs;
+    } //-- getMinOccurs
+    
+    /**
+     * Returns the maximum number of occurances for a given object.
+     * 
+     * @returns the maximum number of occurances for a given object.
+     * A negative value denotes no upper bound.
+     * 
+    **/
+    public int getMaxOccurs() {
+        return maxOccurs;
+    } //-- getMaxOccurs
+    
+    /**
+     * Returns true if a TypeValidator has been set
+     *
+     * @return true if a TypeValidator has been set
+    **/
+    public TypeValidator getTypeValidator() {
+        return _validator;
+    } //-- getTypeValidator
+    
+    /**
+     * Returns true if a TypeValidator has been set
+     *
+     * @return true if a TypeValidator has been set
+    **/
     public boolean hasTypeValidator() {
         return (_validator != null);
     } //-- hasTypeValidator
