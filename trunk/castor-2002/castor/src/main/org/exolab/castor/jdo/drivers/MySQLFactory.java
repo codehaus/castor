@@ -71,17 +71,6 @@ public final class MySQLFactory
         return "mysql";
     }
 
-    /**
-     * MySQL doesn't support ResultSet.getBigDecimal()
-     */
-    public Class adjustSqlType( Class sqlType ) {
-        if (sqlType == java.math.BigDecimal.class) {
-            return java.lang.Double.class;
-         } else {
-               return sqlType;
-         }
-    }
-    
 }
 
 
