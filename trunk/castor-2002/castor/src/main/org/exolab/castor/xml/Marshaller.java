@@ -650,7 +650,7 @@ public class Marshaller extends MarshalFramework {
             // We try to find if there is a XMLClassDescriptor associated
             // with the XML name of this class
             XMLClassDescriptor xmlElementNameClassDesc =
-                _cdResolver.resolveByXMLName(xmlElementName, null);
+                _cdResolver.resolveByXMLName(xmlElementName, null, null);
             // Make sure ClassDescriptor was not created by the introspector
             if (xmlElementNameClassDesc != null &&
                 ! (Introspector.introspected(xmlElementNameClassDesc)))
