@@ -1,3 +1,30 @@
+Version 0.7.12  March 12, 2000
+------------------------------
+
+JDO:     Added support for pluggable SQL engines (PersistenceFactory),
+         listed in the Castor properties file and referenced from the
+         JDO configuration file, allowing each database configuration
+         file to select the most suitable engine.
+
+JDO:     Extended JDO configuration file to include engine name, plus
+         minor modifications to element and attribute names in DTD/Schema,
+         and documentation of the configuration file.
+
+JDO:     Upgraded to use QueryExpression to construct SQL query statements
+         in database specific syntax.
+
+JDO:     Implemented dirty checking on objects loaded with a shared lock.
+	 Dirty checking performed on fields within UPDATE statement requiring
+	 a single SQL operation to update/check dirtyness.
+
+JDO SPI: Added QueryExpression and KeyGenerator to the SPI. QueryExpression
+         is generated from PersistenceFactory. Added way to load factories
+         from the Castor properties file.
+
+JDO:     No longer supports identity changes. Added supported for pluggable
+         key generators on a per table basis.
+
+
 Version 0.7.11  March 10, 2000
 ------------------------------
 
