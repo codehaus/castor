@@ -72,6 +72,8 @@ public class ParamInfo {
   private Class _fieldType;
 
   private Class _sqlType;
+  
+  private ClassLoader _classLoader;
 
   /**
    * Convertor that converts from the parameter type to SQL type of the parameter,
@@ -91,21 +93,28 @@ public class ParamInfo {
    *
    * @param userDefinedType The user defined type, empty string if undefined.
    * @param systemType The system generated type
+   * @param desc JDO field descriptor.
+   * @param classLoader ClassLoader instance, null if not specified.
    * @throws QueryException if the user defined type cannot be converted to the
    *      systemType or if the type is not found.
    */
-  public ParamInfo( String userDefinedType, String systemType, JDOFieldDescriptor desc )
+  public ParamInfo( String userDefinedType, String systemType, JDOFieldDescriptor desc, ClassLoader classLoader )
       throws QueryException
   {
     _userDefinedType = userDefinedType;
     _systemType = systemType;
+    _classLoader = classLoader;
 
     _sqlQueryParamMap = new Vector();
 
     Class userClass = null;
     Class systemClass = null;
     try {
-      systemClass = Class.forName(systemType);
+        if (_classLoader == null) {
+            systemClass = Class.forName (systemType);
+        } else {
+            systemClass = _classLoader.loadClass (systemType); 
+        }
     }
     catch (Exception e) {
       throw new QueryException( "Error: Could not find system defined class: " + systemType );
@@ -164,7 +173,11 @@ public class ParamInfo {
     if ( ! systemType.equals(_systemType) ) {
       Class systemClass = null;
       try {
-        systemClass = Class.forName(systemType);
+          if (_classLoader == null) {
+              systemClass = Class.forName (systemType);
+          } else {
+              systemClass = _classLoader.loadClass (systemType);
+          }
       }
       catch (Exception e) {
         throw new QueryException( "Error: Could notfind system defined class: " + systemType );
@@ -173,7 +186,11 @@ public class ParamInfo {
       if ( ! userDefinedType.equals("") ) {
         Class userClass = null;
         try {
-          userClass = Class.forName(_userDefinedType);
+            if (_classLoader == null) {
+                userClass = Class.forName(_userDefinedType);
+            } else {
+                userClass = _classLoader.loadClass (_userDefinedType);
+            }
         }
         catch (Exception e) {
           throw new QueryException( "The class " + userClass + " could not be found." );
