@@ -427,6 +427,7 @@ public class Parser implements TokenTypes {
         retNode = match(tokenType);
         retNode.addChild(leftSide);
         retNode.addChild(additiveExpr());
+        break;
       case KEYWORD_BETWEEN:
         retNode = match(KEYWORD_BETWEEN);
         retNode.addChild(leftSide);
@@ -628,14 +629,17 @@ public class Parser implements TokenTypes {
       case KEYWORD_IS_DEFINED:
       case KEYWORD_IS_UNDEFINED:
         retNode = undefinedExpr();
+        break;
       case KEYWORD_LIST:
         retNode = collectionExpr();
+        break;
       case KEYWORD_COUNT:
       case KEYWORD_SUM:
       case KEYWORD_MIN:
       case KEYWORD_MAX:
       case KEYWORD_AVG:
         retNode = aggregateExpr();
+        break;
       case DOLLAR:
         retNode = queryParam();
         break;
