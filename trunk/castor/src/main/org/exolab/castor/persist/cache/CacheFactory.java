@@ -38,100 +38,47 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: LRU.java
+ * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ *
+ * $Id: CacheFactory.java,v 1.1.1.1 2003/03/03 07:08:25 kvisco Exp
+ * $
  */
+
 
 package org.exolab.castor.persist.cache;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-
 /**
- * Factory for creating Cache instances.
+ * A factory for instantiating Cache implementations. To provide an implementation 
+ * for a specific cache type, please implement this interface.
  * 
- * @author <a href="werner DOT guttmann AT gmx DOT com">Werner Guttmann</a>
- * @version $Revision$ $Date$
+ * When providing your own cache instance as explained in the JavaDocs for this 
+ * package, please make sure that you provide valid values for the <b>name</b> and
+ * <b>className</b> properties.  
+ *
+ * @author <a href=" mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @version $Id$
  */
-public class CacheFactory {
-	
-    /** 
-     * Default cache type identifier
+public interface CacheFactory
+{
+
+    /**
+     * Instantiates an instance of the given class.
+     * @return A Cache instance.
+     * @throws CacheAcquireException Problem instantiating a cache instance.
      */
-    public final static String DEFAULT_TYPE_IDENTIFIER = "count-limited";
+    Cache getCache () 
+    	throws CacheAcquireException;
+
+    /**
+     * Returns the short alias for this factory instance.
+     * @return The short alias name. 
+     */
+    String getName();
+
+    /**
+     * Returns the full class name of the underlying cache implementation.
+     * @return The full cache class name. 
+     */
+    String getCacheClassName();
     
-	/** 
-	 * Default LRU mechanism
-	 */
-	public final static CacheType DEFAULT_TYPE = CacheType.CACHE_COUNT_LIMITED;
-	/**
-	 * Specify the default LRU parameter
-	 */
-	public final static int DEFAULT_PARAM = 100;
-	
-	/**
-	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-	 * Commons Logging</a> instance used for all logging.
-	 */
-	private static Log _log = LogFactory.getFactory().getInstance( CacheFactory.class );
-	
-	
-	/**
-	 * Factory method to create a LRU map of specified type.
-	 *
-	 * @param type   mechanism type
-	 * @param param   capacity of the lru
-	 */
-	public static Cache create( String type, int param ) 
-	    throws InvalidCacheTypeException 
-    {
-		
-		Cache cache = null;
-		CacheType cacheType = null;
-        
-        if (type == null) {
-        	type = DEFAULT_TYPE_IDENTIFIER;
-        }
-		
-		try {
-			cacheType = CacheType.create (type);
-		}
-		catch (InvalidCacheTypeException e) {
-			_log.error ("Invalid cache type encountered", e);
-            throw e;
-		}
-        
-		if (cacheType == DEFAULT_TYPE) {
-			param = DEFAULT_PARAM;
-		}
-		
-		if (cacheType == CacheType.CACHE_COUNT_LIMITED) {
-			if ( param > 0 ) 
-				cache = new CountLimited( param );
-			else 
-				cache = new NoCache();
-		}
-		else if (cacheType == CacheType.CACHE_TIME_LIMITED) {
-			if ( param > 0 ) 
-				cache = new TimeLimited( param );
-			else 
-				cache = new NoCache();
-		}
-		else if (cacheType == CacheType.CACHE_UNLIMITED) {
-			cache = new Unlimited();
-		}
-		else if (cacheType == CacheType.CACHE_NONE) {
-			cache = new NoCache();
-		}
-		
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating cache instance for type " + cacheType.toString());
-		}
-        
-        // setting cache type
-        cache.setCacheType(cacheType);
-		
-		return cache;
-	}
-	
 }
