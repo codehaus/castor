@@ -19,7 +19,7 @@
     same collection.
 
  -->
-<!ELEMENT mapping ( description?, include*, class*, key-generator*, relation* )>
+<!ELEMENT mapping ( description?, include*, class*, key-generator* )>
 
 
 <!--
@@ -63,7 +63,7 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, cache-type?, map-to?, ( field | container )+ )>
+<!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
@@ -71,27 +71,6 @@
     identity        CDATA    #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
     key-generator   IDREF    #IMPLIED >
-
-
-
-<!--
-    Specifies a many-to-many relation between two Java type. Each relation
-    contains exactly two related element. 
- -->
-<!ELEMENT relation ( description?, map-to?, related, related ) >
-<!ATTLIST relation 
-    name           NMTOKEN  #REQUIRED>
-
-
-<!--
-    Specifies an entity of a many-to-many relation. See <relation/>.
- -->
-<!ELEMENT related ( description?, sql?, xml?, ldap? ) >
-<!ATTLIST related
-    name           NMTOKEN  #REQUIRED
-    type           NMTOKEN  #IMPLIED>
-
-
 
 
 <!--
@@ -148,7 +127,7 @@
     attribute.
 
  -->
-<!ELEMENT field ( description?, sql?, xml?, ldap? )>
+<!ELEMENT field ( description?, sql?, bind-xml?, ldap? )>
 <!ATTLIST field
     name           NMTOKEN  #REQUIRED
     type           NMTOKEN  #IMPLIED
@@ -190,11 +169,17 @@
     attribute values. Only one field can be specified as the content
     model in a given object.
 
+    Note: This used to be called "xml" which is an invalid xml element name
+          according to the W3C XML 1.0 recommendation. We still support
+          the "xml" element for backward compatibility, but we will remove 
+          support for it in the future.
  -->
-<!ELEMENT xml EMPTY>
-<!ATTLIST xml
+
+<!ELEMENT bind-xml EMPTY>
+<!ATTLIST bind-xml
     name  NMTOKEN  #IMPLIED
     type  NMTOKEN  #IMPLIED
+    matches  NMTOKEN  #IMPLIED
     node  ( attribute | element | text )  #IMPLIED>
 
 
@@ -207,23 +192,6 @@
 <!ELEMENT ldap EMPTY>
 <!ATTLIST ldap
     name  NMTOKEN  #IMPLIED>
-
-
-<!--
-    A container is a special type of field that represents a container
-    class for which field mappings are provided in the scope of this
-    class.
-
-  -->
-<!ELEMENT container ( description?, field+ )>
-<!ATTLIST container
-    name           NMTOKEN  #REQUIRED
-    type           NMTOKEN  #IMPLIED
-    required       ( true | false )  "false"
-    direct         ( true | false )  "false"
-    get-method     NMTOKEN  #IMPLIED
-    set-method     NMTOKEN  #IMPLIED
-    create-method  NMTOKEN  #IMPLIED>
 
 
 <!--

@@ -48,6 +48,7 @@
         <xsd:enumeration value="db-locked"/>
       </xsd:attribute>
       <xsd:attribute name="key-generator" type="IDREF" minOccurs="0"/>
+      <xsd:attribute name="complete" type="boolean" minOccurs="0" default="true"/>
     </xsd:type>
   </xsd:element>
 
@@ -117,6 +118,10 @@
     <xsd:type content="empty">
       <xsd:attribute name="name" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
+
+      <!-- Allows overriding the matching rule -->
+      <xsd:attribute name="matches" type="string" minOccurs="0"/>
+
       <xsd:attribute name="node" type="string" minOccurs="0">
         <xsd:enumeration value="attribute"/>
         <xsd:enumeration value="element"/>

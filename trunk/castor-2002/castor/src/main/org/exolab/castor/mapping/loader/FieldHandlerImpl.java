@@ -487,7 +487,29 @@ public final class FieldHandlerImpl
                         for ( int i = 0; i < _getSequence.length; i++ ) 
                             object = _getSequence[ i ].invoke( object, null );
                     collect = _getMethod.invoke( object, null );
+
+                    // If we deal with a collection who is an array of primitive
+                    // and that has not been instantiated, we have to handle the
+                    // instantiation here rather than in J1CollectionHandler,
+                    // because we have acces to the Field object here.
+                    if (collect == null) {
+                        // The return type of the get method should be the type of the collection.
+                        Class type = _getMethod.getReturnType();
+                        
+                        // The other cases are handled in the
+                        // J1CollectionHandler during the add(collect,value) call
+                        if (type.isArray() && type.getComponentType().isPrimitive()) {
+                            try {
+                                collect = java.lang.reflect.Array.newInstance(type.getComponentType(), 0);
+                            } catch (Exception e) {
+                                throw new IllegalStateException("Unable to instantiate an array of '" + type.getComponentType() + "' : " + e);
+                            }
+                        }
+                    }
+
+
                     collect = _colHandler.add( collect, value );
+
                     if ( collect != null && _setMethod != null)
                         _setMethod.invoke( object, new Object[] { collect } );
                 }                
