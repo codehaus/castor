@@ -953,6 +953,15 @@
     </field>
   </class>
 
+  <class name="jdo.TestColArray" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="items" type="jdo.TestItem" collection="array">
+    </field>
+  </class>
+
   <class name="jdo.TestColCollection" extends="jdo.TestCol">
     <description>Table used for testing different collection types support</description>
     <!-- this is a dirty hack, don't follows. It only work if load always

@@ -779,15 +779,25 @@ public class ClassMolder {
                     // lazy loading is not specified, load all objects into
                     // the collection and set the Collection as the data object
                     // field.
-
-                    CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
+                      // simple array type support
+                      Class collectionType = _fhs[i].getCollectionType();
+                      if (collectionType.isArray()) {
+                        Object[] value = (Object[])java.lang.reflect.Array.newInstance(
+                                collectionType.getComponentType(), v.size());
+                        for ( int j=0,l=v.size(); j<l; j++ ) {
+                          value[j] = tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                        }
+                        _fhs[i].setValue( object, value, tx.getClassLoader() );
+                      } else {
+                        CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
                         for ( int j=0,l=v.size(); j<l; j++ ) {
                             cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode ) );
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );
+                      }
                     } else {
                         _fhs[i].setValue( object, null, tx.getClassLoader() );
                     }
@@ -1659,6 +1669,34 @@ public class ClassMolder {
             return added;
         }
 
+        if ( collection.getClass().isArray() ) {
+            if ( orgIds == null || orgIds.size() == 0 ) {
+                if ( collection == null )
+                    return new ArrayList(0);
+                else {
+                  Object[] newValues = (Object[]) collection;
+                  ArrayList result = new ArrayList(newValues.length);
+                  for(int i=0;i<newValues.length;i++) {
+                    result.add(newValues[i]);
+                  }
+                  return result;
+                }
+            }
+
+            if ( collection == null )
+                return new ArrayList(0);
+
+            Object[] newValues = (Object[]) collection;
+            ArrayList added = new ArrayList( newValues.length );
+            for(int i=0;i<newValues.length;i++) {
+                Object newValue = newValues[i];
+                Object newId = ch.getIdentity( tx, newValue );
+                if ( newId == null || !orgIds.contains( newId ) )
+                    added.add( newValue );
+            }
+            return added;
+        }
+
         throw new IllegalArgumentException( "Collection type "+collection.getClass().getName()+" is not supported!" );
     }
 
@@ -1703,6 +1741,30 @@ public class ClassMolder {
             Iterator newColItor = newCol.iterator();
             while ( newColItor.hasNext() ) {
                 Object newObject = newColItor.next();
+                Object newId = ch.getIdentity( tx, newObject );
+                if ( newId != null )
+                    newMap.put( newId, newObject );
+            }
+            while ( orgItor.hasNext() ) {
+                Object id = orgItor.next();
+                if ( !newMap.containsKey( id ) )
+                    removed.add( id );
+            }
+            return removed;
+        }
+
+        if ( collection.getClass().isArray() ) {
+            if ( orgIds == null || orgIds.size() == 0 )
+                return new ArrayList(0);
+
+            Object[] newCol = (Object[]) collection;
+            Iterator orgItor = orgIds.iterator();
+            ArrayList removed = new ArrayList(0);
+
+            // make a new map of key and value of the new collection
+            HashMap newMap = new HashMap();
+            for (int i=0;i<newCol.length;i++) {
+                Object newObject = newCol[i];
                 Object newId = ch.getIdentity( tx, newObject );
                 if ( newId != null )
                     newMap.put( newId, newObject );
@@ -2475,9 +2537,19 @@ public class ClassMolder {
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
 
-                    CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
+                    Class collectionType = _fhs[i].getCollectionType();
+
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
+                      if (collectionType.isArray()) {
+                        Object[] arrayValue = (Object[])java.lang.reflect.Array.newInstance(
+                                collectionType.getComponentType(), v.size());
+                        for ( int j=0,l=v.size(); j<l; j++ ) {
+                          arrayValue[j] = tx.fetch( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
+                        }
+                        _fhs[i].setValue( object, arrayValue, tx.getClassLoader() );
+                      } else {
+                        CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
                         // clear collection
                         _fhs[i].setValue( object, cp.getCollection(), tx.getClassLoader());
 
@@ -2486,6 +2558,7 @@ public class ClassMolder {
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );
+                      }
                     } else {
                         _fhs[i].setValue( object, null, tx.getClassLoader() );
                     }
@@ -2903,6 +2976,15 @@ public class ClassMolder {
                 idList.add( itor.next() );
             }
             return idList;
+        } else if ( col.getClass().isArray() ) {
+          ArrayList idList = new ArrayList();
+          Object[] arrayCol = (Object[])col;
+          for (int i=0;i<arrayCol.length;i++) {
+            Object id = molder.getIdentity( tx, arrayCol[i] );
+              if ( id != null )
+                  idList.add( id );
+          }
+          return idList;
         } else {
             throw new IllegalArgumentException("A Collection or Map is expected!");
         }
@@ -2951,7 +3033,7 @@ abstract class CollectionProxy {
         } else if ( cls == Map.class ) {
             return new MapProxy( fm, object, cl, new HashMap() );
         } else {
-            throw new IllegalArgumentException("Collection Proxy doesn't exist for it type");
+          throw new IllegalArgumentException("Collection Proxy doesn't exist for this type : "+cls);
         }
     }
 
