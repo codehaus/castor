@@ -47,6 +47,7 @@
 package org.exolab.castor.persist.spi;
 
 
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectDeletedException;
@@ -54,6 +55,7 @@ import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.RelationContext;
 
 
 /**
@@ -74,6 +76,9 @@ import org.exolab.castor.persist.TransactionContext;
  * The engine must always use the identity passed in the method call
  * and never the identity contained in the object itself.
  * <p>
+ * The {@link RelationContext} can be used to load/store related
+ * objects using the same transaction context and persistence engine.
+ * <p>
  * The stamp is an arbitrary object that is returned on object
  * creation and loading and passed when performing a dirty check. The
  * stamp can be used to detect object dirtyness in a more efficient
@@ -88,6 +93,7 @@ import org.exolab.castor.persist.TransactionContext;
  * @version $Revision$ $Date$
  * @see TransactionContext
  * @see PersistenceQuery
+ * @see RelationContext
  */
 public interface Persistence
 {
@@ -124,15 +130,17 @@ public interface Persistence
      * locked in persistence storage to prevent concurrent updates.
      *
      * @param conn An open connection
+     * @param rtx Context for loading/storing related objects
      * @param obj The object to load into
      * @param identity object's identity
-     * @param lock True if object should be locked
+     * @param accessMode The access mode (null equals shared)
      * @return The object's stamp, or null
      * @throws ObjectNotFoundException The object was not found in
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, Object obj, Object identity, boolean lock )
+    public Object load( Object conn, RelationContext rtx, Object obj, Object identity,
+                        AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
 
@@ -237,13 +245,15 @@ public interface Persistence
      * null may be used and type checking will defer to query
      * execution.
      *
+     * @param rtx Context for loading/storing related objects
      * @param query The query statement
      * @param type List of all parameter types, or null
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
-    public PersistenceQuery createQuery( String query, Class[] types )
+    public PersistenceQuery createQuery( RelationContext rtx, String query, Class[] types )
         throws QueryException;
 
 
 }
+
