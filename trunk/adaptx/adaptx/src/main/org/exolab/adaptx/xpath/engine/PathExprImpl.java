@@ -44,7 +44,7 @@ import org.exolab.adaptx.xpath.expressions.PathExpr;
 class PathExprImpl
     extends PathExpr
 {
-
+    
     /**
      * A PathExpr can be used to wrap an ErrorExpr
      */
@@ -52,9 +52,20 @@ class PathExprImpl
 
     
     /**
-     * The local FilterExpr of this PathExpr
+     * The local PathComponent of this PathExpr
      */
-    private FilterBase _filter = null;
+    private AbstractPathComponent _filter = null;
+    
+    
+    /**
+     * Indicates that this PathExpr is an "absolute"
+     * expression. Note that any PathExpr with a
+     * parent cannot be absolute, but just because
+     * a parent doesn't exist, doesn't mean it
+     * is absolute. The expression must start
+     * with "/" to be absolute.
+     */
+    private boolean _absolute = false;
 
     
     /**
@@ -67,7 +78,7 @@ class PathExprImpl
      * The parent PathExpr (if this PathExpr is a
      * sub-path of another PathExpr).
      */
-    private PathExprImpl parent  = null;
+    private PathExprImpl _parent  = null;
     
 
     /**
@@ -93,23 +104,29 @@ class PathExprImpl
     
 
     /**
-     * Creates a new PathExpr with the given FilterBase
+     * Creates a new PathExpr with the given PathComponent
+     *
+     * @param pathComponent the PathComponent to create the 
+     * PathExpr for
      */
-    public PathExprImpl( FilterBase filterBase )
+    public PathExprImpl( AbstractPathComponent pathComponent )
     {
         super();
-        _filter = filterBase;
+        _filter = pathComponent;
     } //-- PathExprImpl
 
 
     /**
-     * Creates a new PathExpr with the given FilterBase and PathExpr
+     * Creates a new PathExpr with the given PathComponent
+     *
+     * @param pathComponent the PathComponent to create the 
+     * PathExpr for
      */
-    public PathExprImpl( FilterBase filterBase, PathExprImpl pathExpr )
+    public PathExprImpl( AbstractPathComponent pathComponent, PathExprImpl pathExpr )
     {
-        _filter = filterBase;
+        _filter = pathComponent;
         _subPath = pathExpr;
-        _subPath.parent = this;
+        _subPath._parent = this;
     } //-- PathExprImpl
     
     
@@ -194,10 +211,29 @@ class PathExprImpl
         return _filter;
     }
     
-    public void setFilter( FilterBase filterBase )
+    /**
+     * Sets the "filter" or PathComponent for this 
+     * PathExpression (for backward compatibility)
+     *
+     * @param pathComponent
+     */
+    public void setFilter( AbstractPathComponent pathComponent )
     {
-        this._filter = filterBase;
+        this._filter = pathComponent;
     } //-- setFilter
+    
+    /**
+     * Sets the PathComponent for this PathExpression 
+     * the PathComponent may be a LocationStep or 
+     * FilterExpr.
+     *
+     * @param pathComponent
+     */
+    public void setPathComponent( AbstractPathComponent pathComponent )
+    {
+        this._filter = pathComponent;
+    } //-- setPathComponent
+    
     
 
     public PathExpr getSubPath() {
@@ -206,11 +242,15 @@ class PathExprImpl
 
     public void setSubPath( PathExprImpl pathExpr )
     {
+        //-- clear existing subpath
         if ( _subPath != null )
-            _subPath.parent = null;
+            _subPath._parent = null;
+       
+       //-- set new subpath
         _subPath = pathExpr;
         if ( _subPath != null )
-            _subPath.parent = this;
+            _subPath._parent = this;
+            
     } //-- setSubPath
     
 
@@ -229,13 +269,18 @@ class PathExprImpl
         if ( sb == null )
             sb = new StringBuffer();
         if ( _filter != null ) {
+            if (_parent != null) {
+                sb.append('/');
+            }            
+            /*
             switch ( _filter.getAncestryOp( )) {
-                case FilterBase.PARENT_OP:
-                    sb.append( "/" );
+                case AbstractPathComponent.PARENT_OP:
                     break;
                 default:
                     break;                
             }
+            */
+            
             sb.append( _filter.toString() );
         }
         if ( _subPath != null )
@@ -270,13 +315,16 @@ class PathExprImpl
     
     
     /**
-     * Determines if this PathExpr Represents an AbsolutePathExpr or not
-    **/
+     * Determines if this PathExpr Represents an absolute PathExpr or not.
+     * An absolute path expression is any PathExpr that starts with "/" 
+     * indicating that it's context node for evaluation is the root node 
+     * and not the current context node.
+     *
+     * @return true if the PathExpr is an absolute PathExpr otherwise false.
+     */
     public boolean isAbsolute()
     {
-        if ( _filter == null )
-            return true;
-        return ( _filter.getAncestryOp() != FilterBase.NO_OP );
+        return _absolute;
     } //-- isAbsolute
     
 
@@ -310,37 +358,31 @@ class PathExprImpl
             
             boolean useAncestors = hasDescendantsAxis(_filter);
             
-            //-- select node's parent or ancestors
-            switch ( _filter.getAncestryOp() ) {
+            if (_parent != null) {
                 
-                case FilterBase.PARENT_OP: {
-                    XPathNode parent = node.getParentNode();
-                    NodeSet nodes = tmpContext.getNodeSet();
-                    while ( parent != null ) {
-                        nodes.clear();
-                        nodes.add(parent);
-                        if (_filter.matches( node, tmpContext )) {
-                            return true;
-                        }
-                        parent = (useAncestors) ? parent.getParentNode() : null;
+                XPathNode parent = node.getParentNode();
+                NodeSet nodes = tmpContext.getNodeSet();
+                while ( parent != null ) {
+                    nodes.clear();
+                    nodes.add(parent);
+                    if (_filter.matches( node, tmpContext )) {
+                        return true;
                     }
-                    break;
+                    parent = (useAncestors) ? parent.getParentNode() : null;
                 }
-                default: 
-                {
-                    //-- This case checks to see if there is
-                    //-- any ancestor-or-self context which
-                    //-- would allow the given node to be matched.
-                    XPathNode ancestor = node;
-                    NodeSet nodes = tmpContext.getNodeSet();
-                    while ( ancestor != null )  {
-                        nodes.clear();
-                        nodes.add(ancestor);
-                        if ( _filter.matches( node, tmpContext ) ) 
-                            return true;
-                        ancestor = ancestor.getParentNode();
-                    }
-                    break;
+            }
+            else {
+                //-- This case checks to see if there is
+                //-- any ancestor-or-self context which
+                //-- would allow the given node to be matched.
+                XPathNode ancestor = node;
+                NodeSet nodes = tmpContext.getNodeSet();
+                while ( ancestor != null )  {
+                    nodes.clear();
+                    nodes.add(ancestor);
+                    if ( _filter.matches( node, tmpContext ) ) 
+                        return true;
+                    ancestor = ancestor.getParentNode();
                 }
             }
             return false;
@@ -369,47 +411,44 @@ class PathExprImpl
 
         while ( px != null ) {
             
-            FilterBase filter = px._filter; 
+            AbstractPathComponent filter = px._filter; 
             
             boolean useAncestors = hasDescendantsAxis(filter);
             
             for ( int i = 0 ; i < current.size() ; i++ ) {
                 XPathNode tnode = current.item(i);
 
-                //-- select node's parent or ancestors
-                switch ( filter.getAncestryOp() ) {
-                    
-                    case FilterBase.PARENT_OP: {
-                        XPathNode parent = tnode.getParentNode();
-                        while ( parent != null ) {
-                            NodeSet nodes = tmpContext.getNodeSet();
-                            nodes.clear();
-                            nodes.add(parent);
-                            if ( filter.matches( tnode, tmpContext ) )
-                                ancestors.add( parent );
+                if (px._parent != null) {
+                    XPathNode parent = tnode.getParentNode();
+                    while ( parent != null ) {
+                        NodeSet nodes = tmpContext.getNodeSet();
+                        nodes.clear();
+                        nodes.add(parent);
+                        if ( filter.matches( tnode, tmpContext ) )
+                            ancestors.add( parent );
                                 
-                            parent = (useAncestors) ? parent.getParentNode() : null;
-                        }
-                        break;
+                        parent = (useAncestors) ? parent.getParentNode() : null;
                     }
-                    default:
-                        if ( px == this ) {
-                            //-- This case checks to see if there is
-                            //-- any ancestor-or-self context which
-                            //-- would allow the given node to be matched.
-                            XPathNode ancestor = tnode;
-                            NodeSet nodes = tmpContext.getNodeSet();
-                            while ( ancestor != null )  {
-                                nodes.clear();
-                                nodes.add(ancestor);
-                                if ( filter.matches( tnode, tmpContext ) ) 
-                                    return true;
-                                ancestor = ancestor.getParentNode();
-                            }
+                }
+                else {
+                    if ( px == this ) {
+                        //-- This case checks to see if there is
+                        //-- any ancestor-or-self context which
+                        //-- would allow the given node to be matched.
+                        XPathNode ancestor = tnode;
+                        NodeSet nodes = tmpContext.getNodeSet();
+                        while ( ancestor != null )  {
+                            nodes.clear();
+                            nodes.add(ancestor);
+                            if ( filter.matches( tnode, tmpContext ) ) 
+                                return true;
+                            ancestor = ancestor.getParentNode();
                         }
-                        else 
-                            return false; //-- error in expression
-                } //-- switch(op)
+                    }
+                    else {
+                        return false; //-- error in expression
+                    }
+                } //-- if (parent != null)
             } //-- for
             
             if ( ancestors.size() == 0 ) 
@@ -424,7 +463,7 @@ class PathExprImpl
             if ( px == this )
                 break;
             else
-                px = px.parent;
+                px = px._parent;
         } //-- while
 
         if ( isAbsolute() ) {
@@ -435,7 +474,22 @@ class PathExprImpl
         }
         return ( current.size() > 0 );
     } //-- matches
-        
+    
+    /**
+     * Sets whether or not this PathExpr is an absolute
+     * path expression
+     *
+     * @param absolute a flag indicating whether or not
+     * the this PathExpr is absolute
+     */
+    protected final void setAbsolute(boolean absolute) {
+        if ((_parent != null) && (absolute)) {
+            String err = "A PathExpr with a parent expression cannot be absolute.";
+            throw new IllegalStateException(err);
+        }
+        _absolute = absolute;
+    } //-- setAbsolute
+    
     //-------------------//
     //- Private Methods -//
     //-------------------//
@@ -448,7 +502,7 @@ class PathExprImpl
      * @return true if the given filter has an axis of
      * from-descendants or from-descendants-or-self.
     **/
-    private boolean hasDescendantsAxis(FilterBase filter) {
+    private boolean hasDescendantsAxis(AbstractPathComponent filter) {
         if (filter.getExprType() == XPathExpression.STEP) {
             LocationStepImpl step = (LocationStepImpl)filter;
             int axis = step.getAxisIdentifier();
