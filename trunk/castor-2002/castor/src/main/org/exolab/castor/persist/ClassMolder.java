@@ -1333,7 +1333,7 @@ public class ClassMolder {
                 } else {
                     RelationCollection lazy = (RelationCollection) value;
                     ArrayList deleted = lazy.getDeleted();
-                    if ( deleted != null ) {
+                    if ( !deleted.isEmpty() ) {
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
                         updateCache = true;
@@ -1355,7 +1355,7 @@ public class ClassMolder {
                     }
 
                     ArrayList added = lazy.getAdded();
-                    if ( added != null ) {
+                    if ( !added.isEmpty() ) {
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
                         updateCache = true;
@@ -1440,7 +1440,7 @@ public class ClassMolder {
                 } else {
                     RelationCollection lazy = (RelationCollection) value;
                     ArrayList deleted = lazy.getDeleted();
-                    if ( deleted != null ) {
+                    if ( !deleted.isEmpty() ) {
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
                         updateCache = true;
@@ -1467,7 +1467,7 @@ public class ClassMolder {
                     }
 
                     ArrayList added = lazy.getAdded();
-                    if ( added != null ) {
+                    if ( !added.isEmpty() ) {
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
                         updateCache = true;
