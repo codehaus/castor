@@ -5,6 +5,7 @@
   <properties>
     <title>Castor XML Mapping</title>
     <author email="gignoux@intalio.com">Sebastien Gignoux</author>
+    <author email="kvisco@intalio.com">Keith Visco</author>
     <abstract>
        Describes how to use the Castor XML Mapping.
     </abstract>
@@ -476,7 +477,7 @@ public class myclass {
               public void &lt;set-method>(&lt;type> value);
             </code>
 
-            <p>If 'get-method' or 'set-method' attributes are not provided, Castor will try to
+            <p>If 'get-method' and 'set-method' attributes are not provided, Castor will try to
               find the following function:</p>
 
             <code>
@@ -527,13 +528,33 @@ public class myclass {
             define the type of the content inside the collection.</li>
 
           <li><b>get-method:</b> optional name of the get method Castor should use. If
-            this attribute is not set, Castor will try to guess the name with the
-            algorithm described above.</li>
-
+            this attribute is not set and the set-method attribute is not set, then
+            Castor will try to guess the name with the algorithm described above.</li>
 
           <li><b>set-method:</b> optional name of the set method Castor should use. If
-            this attribute is not set, Castor will try to guess the name with the
-            algorithm described above.</li>
+            this attribute is not set and the get-method attribute is not set, then
+            Castor will try to guess the name with the algorithm described above.
+            <p>
+               <a name="constructor-args"/>
+               <b>*Now supported (since 0.9.5) for <i>attribute</i> mapped fields, you may map a
+                  constructor field using the set-method attribute.</b>
+            </p>
+            <p>
+               To specify a constructor argument use "%1" - "%9" as the value of the
+               set-method attribute.
+            </p>
+            <p>
+               For example:<br/>
+               <code>
+               &lt;field name="foo" set-method="%1" get-method="getFoo" type="string"&gt;
+                  &lt;bind-xml node="attribute"/&gt;
+               &lt;/field&gt;
+               </code>
+               Note that because the set-method is specified, the get-method also must be
+               specified...a bit of an annoyance, but at least there is now a way to handle
+               this feature.
+           </p>
+          </li>
 
           <li><b>create-method:</b> Factory method for instantiation of FieldHandler</li>
         </ul>
@@ -1037,7 +1058,7 @@ public class main {
 
     <section title="6. Location attribute">
 
-       <p>Since 0.9.4.4</p>
+       <p>Since 0.9.5</p>
 
        <p>
           The location attribute allows the user to map fields from nested
@@ -1139,6 +1160,16 @@ public class main {
           by extending org.exolab.castor.mapping.GeneralizedFieldHandler or
           org.exolab.castor.mapping.AbstractFieldHandler.
           The FieldHandler can be specified on the &lt;field&gt; element.
+       </p>
+       </section>
+       <section title="7.3 Mapping constructor arguments">
+       Since: 0.9.5
+       <p>
+          You may map any attributes to constructor arguments. Mapping elements
+          to constructor arguments is not yet supported. For more information
+          on how to map constructor arguments see the information available
+          in the section on <a href="#constructor-args">set-method</a>
+          above.
        </p>
        </section>
 
