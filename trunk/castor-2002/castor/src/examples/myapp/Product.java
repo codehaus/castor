@@ -35,6 +35,8 @@ public class Product
 
     public float getPrice() { return price; }
 
+    public ProductGroup getGroup() { return group; }
+
     public Enumeration getDetail() { return detail.elements(); }
 
     public Enumeration getCategory() { return category.elements(); }
