@@ -48,6 +48,7 @@ package org.exolab.castor.xml.schema.writer;
 import java.io.Writer;
 import java.io.IOException;
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.xml.schema.*;
@@ -132,7 +133,6 @@ public class SchemaWriter {
     {
         if (schema == null)
             throw new IllegalArgumentException("Schema must not be null.");
-
 
         processSchema(schema);
 
@@ -327,11 +327,24 @@ public class SchemaWriter {
         //-- type attribute
         boolean hasAnonymousType = false;
         if (!element.isReference()) {
-            XMLType type = element.getType();
-            if (type.getName() != null) {
-                _atts.addAttribute("type", null, type.getName());
+             XMLType type = element.getType();
+             if (type.getName() == null) {
+                 hasAnonymousType = true;
+             } else {
+                    if (type instanceof SimpleType && ((SimpleType)type).isBuiltInType()){
+                        _atts.addAttribute("type", null, "xsd:"+type.getName());
+                    } else if (isImportedType(type,element)) {
+                        String nsPrefix = getNSPrefix(element.getSchema(), type.getSchema().getTargetNamespace());
+                        if (nsPrefix == null || nsPrefix.length() == 0){
+                             System.out.println("Warning: Unable to get proper namespace prefix for imported type " + type.getName());
+                            _atts.addAttribute("type", null, type.getName());
+                   } else {
+                        _atts.addAttribute("type", null, nsPrefix+":"+type.getName());
+                   }
+                } else {
+                    _atts.addAttribute("type", null, type.getName());
+                 }
             }
-            else hasAnonymousType = true;
         }
 
         //-- default
@@ -397,6 +410,14 @@ public class SchemaWriter {
         //-- namespace declaration for xsd
         _atts.addAttribute("xmlns:xsd", null, schema.getSchemaNamespace());
 
+        //-- namespace declarations
+        Enumeration keys = schema.getNamespaces().keys();
+        while (keys.hasMoreElements()) {
+            String nsPrefix = (String)keys.nextElement();
+            if (!nsPrefix.equals("xsd"))
+                _atts.addAttribute("xmlns:" + nsPrefix, null, (String)schema.getNamespaces().get(nsPrefix));
+        }
+
         //-- targetNS
         String value = schema.getTargetNamespace();
         if (value != null)
@@ -408,6 +429,12 @@ public class SchemaWriter {
         processAnnotated(schema);
 
         Enumeration enum = null;
+         //-- process all imported schemas
+        enum = schema.getImportedSchema();
+        while (enum.hasMoreElements()) {
+            processImport((Schema)enum.nextElement());
+        }
+
         //-- process all top level element declarations
         enum = schema.getElementDecls();
         while (enum.hasMoreElements()) {
@@ -430,6 +457,22 @@ public class SchemaWriter {
 
     } //-- processSchema
 
+    /**
+     * Process an imported schema
+     */
+    private void processImport(Schema impSchema)
+        throws SAXException
+    {
+        String ELEMENT_NAME = "xsd:import";
+        _atts.clear();
+
+        String ns = impSchema.getTargetNamespace();
+        _atts.addAttribute("namespace", null, ns);
+        String schemaLoc = impSchema.getSchemaLocation();
+        _atts.addAttribute("schemaLocation", null, schemaLoc);
+        _handler.startElement(ELEMENT_NAME, _atts);
+        _handler.endElement(ELEMENT_NAME);
+    } //-- processImport
     /**
      * Processes the given simple type definition
      *
@@ -481,6 +524,41 @@ public class SchemaWriter {
         _handler.endElement(ELEMENT_NAME);
 
     } //-- processSimpleType
+
+    /**
+     * Determines if a given XMLType is imported by the
+     * schema containing the element that refers to it.
+     *
+     * @param type the type to be checked to see if it is imported
+     * @param element the schema element that references the type
+    **/
+    private boolean isImportedType(XMLType type, ElementDecl element) {
+
+        if (element.getSchema().getImportedSchema(type.getSchema().getTargetNamespace()) != null){
+            return true;
+        }
+        return false;
+    } //-- isImportedType
+
+    /**
+     * Determines the proper namespace prefix for a namespace
+     * by scanning all declared namespaces for the schema.
+     *
+     * @param schema the schema in which the namespace is declared
+     * @param namespace the namespace for which a prefix will be returned
+    **/
+
+    private String getNSPrefix(Schema schema, String namespace){
+        Hashtable namespaces = schema.getNamespaces();
+        for (Enumeration e = namespaces.keys(); e.hasMoreElements();) {
+            String prefix = (String)e.nextElement();
+            String ns = (String)namespaces.get(prefix);
+            if (ns != null && ns.equals(namespace)){
+                return (prefix);
+            }
+        }
+        return null;
+    } //-- getNSPrefix
 
 
 } //-- SchemaWriter
