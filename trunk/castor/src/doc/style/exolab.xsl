@@ -369,6 +369,9 @@
 
   <xsl:template match="code-panel">
     <p/>
+    <xsl:if test="@top-caption">
+     <i><xsl:value-of select="@top-caption"/></i>
+    </xsl:if>
     <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
       <tr>
         <td>
@@ -383,7 +386,7 @@
     <xsl:if test="@caption">
 	  <i><xsl:value-of select="@caption"/></i>
     </xsl:if>
-    <br/>
+    <p/>
   </xsl:template>
 
   <xsl:template match="code-block">
