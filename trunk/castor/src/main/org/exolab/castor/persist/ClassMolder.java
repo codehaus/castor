@@ -2942,6 +2942,24 @@ public class ClassMolder {
             return ((Collection) o).iterator();
         } else if ( o instanceof Map ) {
             return ((Map) o).values().iterator();
+          } else if ( o.getClass().isArray() ) {
+                  final class ArrayIterator implements java.util.Iterator {
+                      Object[] array;
+                      int i = 0;
+                      ArrayIterator(Object[] array) {
+                          this.array = array;
+                      }
+                     public boolean hasNext() {
+                          return i<array.length;
+                      }
+                      public Object next() {
+                          return array[i++];
+                      }
+                      public void remove() {
+                          throw new UnsupportedOperationException();
+                      }
+                  }
+                  return new ArrayIterator((Object[])o);
         } else {
             throw new IllegalArgumentException();
         }
