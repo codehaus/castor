@@ -121,7 +121,7 @@ public final class SQLTypes
     public static int getSQLType( Class sqlType )
     {
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-            if ( sqlType == _typeInfos[ i ].javaType )
+            if ( sqlType.isAssignableFrom( _typeInfos[ i ].javaType ) )
                 return _typeInfos[ i ].sqlType;
         }
         return java.sql.Types.OTHER;
