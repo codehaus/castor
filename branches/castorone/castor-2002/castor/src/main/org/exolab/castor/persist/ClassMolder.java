@@ -115,12 +115,12 @@ public class ClassMolder {
     int _cachetype;
 
     int _cacheparam;
-
+    /*
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append( _name );
         return sb.toString();
-    }
+    }*/
 
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist ) 
             throws ClassNotFoundException, MappingException {
@@ -401,10 +401,53 @@ public class ClassMolder {
         return result;
     }
 
+    private boolean removeRelation( TransactionContext tx, Object object, ClassMolder relatedMolder, Object relatedObject ) {
+
+        boolean removed = false;
+        boolean updateCache = false;
+        boolean updatePersist = false;
+        for ( int i=0; i < _fhs.length; i++ ) {
+            int fieldType = _fhs[i].getFieldType();
+            ClassMolder fieldClassMolder;
+            switch (fieldType) {
+            case FieldMolder.PERSISTANCECAPABLE:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                if ( fieldClassMolder == relatedMolder ) {
+                    Object related = _fhs[i].getValue( object );
+                    if ( related == relatedObject ) {
+                        _fhs[i].setValue( object, null );
+                        updateCache = true;
+                        updatePersist = true;
+                        removed = true;
+                    }
+                    // |
+                }
+                break;
+            case FieldMolder.ONE_TO_MANY:
+            case FieldMolder.MANY_TO_MANY:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                if ( fieldClassMolder == relatedMolder ) {
+                    // same action to be taken for lazy and non lazy collection
+                    Object related = _fhs[i].getValue( object );
+                    ArrayList alist = (ArrayList) related;
+                    boolean changed = alist.remove( relatedObject );
+                    if ( changed ) {
+                        updateCache = true;
+                        updatePersist = false;
+                        removed = true;
+                    }
+                }
+                break;
+            }
+        }
+        tx.markModified( object, updatePersist, updateCache );
+        return removed;
+    }
     //
     // Methods of LockEngine, which called by TransactionContext
     //
     public OID load( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
+
             throws ObjectNotFoundException, PersistenceException {       
         //System.out.println("ClassMolder.load(): Oid: "+oid);
 
@@ -725,7 +768,466 @@ public class ClassMolder {
             return null;
     }
 
-    public boolean store( TransactionContext tx, OID oid, DepositBox locker, Object object )
+
+    public boolean preStore( TransactionContext tx, OID oid, DepositBox locker, Object object, int timeout )
+            throws PersistenceException {
+
+        // if cached.id != object.id, rise exception
+        ClassMolder fieldClassMolder;
+        LockEngine fieldEngine;
+        Object[] newfields;
+        Object[] dependIds;
+        Object[] fields;
+        Iterator itor;
+        ArrayVector list;
+        ArrayVector orgFields;
+        Object newobj;
+        Object oldobj;
+        Object fetched;
+        Object[] fids;
+        Object[] newids;
+        Object[] ids;
+        Object[] ffid;
+        Object o;
+        int fieldType;
+        boolean modified;
+        boolean lockrequired;
+        boolean updateCache;
+
+        if ( oid.isIdsNull() ) 
+            throw new PersistenceException("The identities of the object to be stored is null");
+
+        if ( !OID.isEquals( oid.getIdentities(), getIdentities( object ) ) ) 
+            throw new PersistenceException("Identities changes is not allowed!");
+
+        fields = (Object[]) locker.getObject( tx );
+
+        if ( fields == null ) 
+            throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
+
+
+        newfields = new Object[_fhs.length];
+
+        
+        ids = oid.getIdentities();
+
+        newfields = new Object[_fhs.length];
+        modified = false;
+        lockrequired = false;
+        updateCache = false;
+
+        for ( int i=0; i<newfields.length; i++ ) {
+            fieldType = _fhs[i].getFieldType();
+            switch (fieldType) {
+            case FieldMolder.PRIMITIVE:
+                if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
+                    if ( _fhs[i].isStored() ) {
+                        updateCache = true;
+                        if ( _fhs[i].isCheckDirty() ) {
+                            modified = true;
+                            lockrequired = true;
+                        } else {
+                            modified = true;
+                        }
+                    }
+                }
+                break;
+            case FieldMolder.PERSISTANCECAPABLE:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                if ( o != null ) 
+                    newfields[i] = fieldClassMolder.getIdentities( o );
+
+                if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
+                    updateCache = true;
+                    if ( _fhs[i].isStored() ) {
+                        if ( _fhs[i].isCheckDirty() ) {
+                            modified = true;
+                            lockrequired = true;
+                        } else {
+                            modified = true;
+                        }
+                    }
+
+                    if ( o != null ) {
+                        if ( _fhs[i].isDependent() ) {
+                            if ( !OID.isEquals( fields[i], newfields[i] ) ) {
+                                if ( fields[i] != null ) { 
+                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
+                                    if ( reldel != null ) {
+                                        tx.delete( reldel );
+                                    } else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't delete dependent object himself. So, must
+                                        // error.                                   
+                                    }
+                                        
+                                }
+                                if ( newfields[i] != null ) {
+                                    if ( !tx.isPersistent( o ) ) {
+                                        // should be created if transaction have no record of the object
+                                        tx.create( fieldEngine, fieldClassMolder, o, oid );
+                                    } else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't create dependent object himself. So, must
+                                        // error.                                   
+                                    }
+                                }
+                            }
+                        } else {
+                            // need to do anything for non-dependent object?
+                            // it seem not. should list all the case and make sure
+                            if ( tx.isPersistent( o ) )
+                                fieldClassMolder.removeRelation( tx, o, this, object );
+                        }
+                    }
+                }
+                break;
+            case FieldMolder.ONE_TO_MANY:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                orgFields = (ArrayVector)fields[i];
+                if ( ! (o instanceof Lazy) ) {
+                    itor = getIterator( o );
+                    ArrayList v = (ArrayList) o;
+                    list = new ArrayVector( v.size() );
+                    for ( int j=0; j<v.size(); j++ ) {
+                        list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
+                    }
+                    if ( !OID.isEquals( (ArrayVector)fields[i], list ) ) {
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+                        //if ( _fhs[i].isDependent() ) {
+                        if ( orgFields != null && list != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                if ( !list.contains( orgFields.get(j) ) ) {
+                                    Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    if ( reldel != null ) {
+                                        if ( _fhs[i].isDependent() ) 
+                                            tx.delete( reldel );
+                                        else
+                                            fieldClassMolder.removeRelation( tx, reldel, this, object );
+                                    } else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't delete dependent object himself. So, must
+                                        // error.
+                                    }
+                                }
+                            }
+                            // add relation which added after it's created or loaded
+                            for ( int j=0; j<list.size(); j++ ) {
+                                if ( !orgFields.contains( list.get(j) ) ) {
+                                    if ( _fhs[i].isDependent() ) {
+                                        if ( !tx.isPersistent( v.get(j) ) ) {
+                                            tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
+                                        } else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't create dependent object himself. So, must
+                                        // error.                                   
+                                        }
+                                    }
+                                }
+                            }
+                        } else if ( orgFields != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                if ( reldel != null ) {
+                                    if ( _fhs[i].isDependent() ) 
+                                        tx.delete( reldel );
+                                    else
+                                        fieldClassMolder.removeRelation( tx, reldel, this, object );
+                                } else {
+                                    // should i notify user that the object does not exist?
+                                    // user can't delete dependent object himself. So, must
+                                    // error.
+                                }
+                            }                                
+                        } else {    // list != null 
+                            for ( int j=0; j<list.size(); j++ ) {
+                                if ( _fhs[i].isDependent() ) {
+                                    if ( !tx.isPersistent( v.get(j) ) ) {
+                                        tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
+                                    } else {
+                                    // should i notify user that the object does not exist?
+                                    // user can't create dependent object himself. So, must
+                                    // error.                                   
+                                    }
+                                }
+                            }
+                        }
+                        //}
+                    }
+                } else {
+                    RelationCollection lazy = (RelationCollection) o;
+                    ArrayList deleted = lazy.getDeleted();
+                    if ( deleted != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+                        //if ( _fhs[i].isDependent() ) {
+                        itor = deleted.iterator();
+                        while ( itor.hasNext() ) {
+                            updateCache = true;
+                            Object toBeDeleted = lazy.find( (Object[])itor.next() );
+                            if ( toBeDeleted != null && tx.isPersistent( toBeDeleted ) ) {
+                                if ( _fhs[i].isDependent() )
+                                    tx.delete( toBeDeleted );
+                                else
+                                    fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );    
+                            } else { 
+                                //System.out.println("Object to be delete is not found!");
+                                // what to do if it happens?
+                            }
+                        }
+                    }
+
+                    ArrayList added = lazy.getAdded();
+                    if ( added != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+                        if ( _fhs[i].isDependent() ) {
+                            itor = added.iterator();
+                            while ( itor.hasNext() ) {
+                                updateCache = true;
+                                Object toBeAdded = lazy.find( (Object[])itor.next() );
+                                if ( toBeAdded != null ) {
+                                    tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
+                                } else {
+                                    // what to do if it happens?
+                                    //System.out.println("Object to be added is not found!");
+                                }
+                            }
+                        } else {
+                        }
+                    }
+
+                }
+                break;
+            case FieldMolder.MANY_TO_MANY:
+
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                if ( ! (o instanceof Lazy) ) {
+                    itor = getIterator( o );
+                    ArrayList v = (ArrayList) o;
+                    list = getIds( fieldClassMolder, o );
+                    orgFields = (ArrayVector)fields[i];
+                    if ( !OID.isEquals( orgFields, list ) ) {
+                        updateCache = true;
+                        itor = getIterator( o );
+                        while ( o != null && itor.hasNext() ) {
+                            newobj = itor.next();
+                            fids = fieldClassMolder.getIdentities( newobj );
+
+                            if ( !tx.isPersistent( newobj ) ) {
+                                // should be created if transaction have no record of the object
+                                // (will not be dependent, so don't create it)
+                                //if ( _fhs[i].isDependent() ) {
+                                //    tx.create( fieldEngine, fieldClassMolder, newobj, oid );
+                                //}
+                                // create the relation in relation table too
+                                _fhs[i].getRelationLoader().createRelation( 
+                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                oid.getIdentities(), fieldClassMolder.getIdentities(newobj) );
+                            }
+                        }
+
+                        // need to add support for add and delete relation
+                        // delete relation which no long exist
+                        if ( orgFields != null && list != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                if ( !list.contains( orgFields.get(j) ) ) {
+                                    // must be loaded thur transaction, so that the related object
+                                    // is properly locked and updated before we delete it.
+                                    Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    if ( reldel != null ) {
+                                        tx.writeLock( reldel, tx.getLockTimeout() );
+                                     
+                                        _fhs[i].getRelationLoader().deleteRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+
+                                        fieldClassMolder.removeRelation( tx, reldel, this, object );
+                                    } else {
+                                        // the object not there, and we try to delete the rubbish relation,
+                                        // if there is
+                                        _fhs[i].getRelationLoader().deleteRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    }
+                                }
+                            }
+                            // add relation which added after it's created or loaded
+                            for ( int j=0; j<list.size(); j++ ) {
+                                if ( !orgFields.contains( list.get(j) ) ) {
+                                    // must be loaded thur transaction, so that the related object
+                                    // is properly locked and updated before we create it.
+                                    Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
+                                    if ( reladd != null ) {
+                                        tx.writeLock( reladd, tx.getLockTimeout() );
+                                     
+                                        _fhs[i].getRelationLoader().createRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    } else {
+                                        // ignored if object not found, if later in transaction 
+                                        // the other side of object is added. then, the relation 
+                                        // will be added if the other side of object is just 
+                                        // deleted in this transaction, then it seem to be an 
+                                        // non-critical error ignore it seem to better than annoy 
+                                        // user
+                                    }
+                                }
+                            }
+                        } else if ( orgFields != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                // must be loaded thur transaction, so that the related object
+                                // is properly locked and updated before we delete it.
+                                Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                if ( reldel != null ) {
+                                    tx.writeLock( reldel, tx.getLockTimeout() );
+                                 
+                                    _fhs[i].getRelationLoader().deleteRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+
+                                    fieldClassMolder.removeRelation( tx, reldel, this, object );                                   
+                                } else {
+                                    // the object not there, and we try to delete the rubbish relation,
+                                    // if there is
+                                    _fhs[i].getRelationLoader().deleteRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                }
+                            }
+                        } else {
+                            for ( int j=0; j<list.size(); j++ ) {
+                                // must be loaded thur transaction, so that the related object
+                                // is properly locked and updated before we create it.
+                                Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
+                                if ( reladd != null ) {
+                                    tx.writeLock( reladd, tx.getLockTimeout() );
+                                 
+                                    _fhs[i].getRelationLoader().createRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                } else {
+                                    // ignored if object not found, if later in transaction 
+                                    // the other side of object is added. then, the relation 
+                                    // will be added if the other side of object is just 
+                                    // deleted in this transaction, then it seem to be an 
+                                    // non-critical error ignore it seem to better than annoy 
+                                    // user
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    RelationCollection lazy = (RelationCollection) o;
+                    ArrayList deleted = lazy.getDeleted();
+                    if ( deleted != null ) {
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+                        itor = deleted.iterator();
+                        while ( itor.hasNext() ) {
+                            updateCache = true;
+                            Object[] deletedId = (Object[])itor.next();
+                            Object toBeDeleted = lazy.find( deletedId );
+                            if ( toBeDeleted != null && !tx.isPersistent(toBeDeleted) ) {
+                                tx.writeLock( toBeDeleted, 0 );
+
+                                _fhs[i].getRelationLoader().deleteRelation( 
+                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                oid.getIdentities(), deletedId );
+
+                                fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );
+                            } else { 
+                                // what to do if it happens?
+                            }
+                        }
+                    }
+
+                    ArrayList added = lazy.getAdded();
+                    if ( added != null ) {
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() ) {
+                                modified = true;
+                                lockrequired = true;
+                            } else {
+                                modified = true;
+                            }
+                        }
+
+                        itor = added.iterator();
+                        while ( itor.hasNext() ) {
+                            Object[] addedId = (Object[])itor.next();
+                            Object toBeAdded = lazy.find( addedId );
+                            if ( toBeAdded != null ) {
+                                _fhs[i].getRelationLoader().createRelation( 
+                                (Connection)tx.getConnection(oid.getLockEngine()), 
+                                oid.getIdentities(), addedId );
+                            } else {
+                                // what to do if it happens?
+                            }
+                        }
+                    }
+                }
+                break;
+            default:
+            }
+        }
+ 
+
+        if ( lockrequired ) {
+            //tx.writeLock( object, tx.getTransactionTimeout() );
+        }
+
+        tx.markModified( object, modified, updateCache );
+
+
+        if ( updateCache || modified ) 
+            tx.writeLock( object, timeout );
+         
+        return updateCache;
+        // checkValidity
+        // call store of each fieldMolder
+        // update oid and setStamp
+    }
+
+
+    public void store( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws DuplicateIdentityException, PersistenceException,
             ObjectModifiedException, ObjectDeletedException {
 
@@ -807,15 +1309,6 @@ public class ClassMolder {
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 Object[] temp = new Object[] {_fhs[i].getValue( object )};
                 newfields[i] = temp;
-
-                if ( !OID.isEquals( (Object[])fields[i], temp ) ) {
-                    if ( _fhs[i].isCheckDirty() ) {
-                        modified = true;
-                        lockrequired = true;
-                    } else {
-                        modified = true;
-                    }
-                }
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
@@ -823,380 +1316,18 @@ public class ClassMolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) 
                     newfields[i] = fieldClassMolder.getIdentities( o );
-
-                if ( !OID.isEquals( (Object[])fields[i], (Object[])newfields[i] ) ) {
-                    if ( _fhs[i].isStored() ) {
-                        if ( _fhs[i].isCheckDirty() ) {
-                            modified = true;
-                            lockrequired = true;
-                        } else {
-                            modified = true;
-                        }
-                    }
-
-                    if ( o != null ) {
-                        if ( _fhs[i].isDependent() ) {
-                            if ( !OID.isEquals( fields[i], newfields[i] ) ) {
-                                if ( fields[i] != null ) { 
-                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
-                                    if ( reldel != null )
-                                        tx.delete( reldel );
-                                    else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't delete dependent object himself. So, must
-                                        // error.                                   
-                                    }
-                                        
-                                }
-                                if ( newfields[i] != null ) {
-                                    if ( !tx.isPersistent( o ) ) {
-                                        // should be created if transaction have no record of the object
-                                        tx.create( fieldEngine, fieldClassMolder, o, oid );
-                                    } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't create dependent object himself. So, must
-                                        // error.                                   
-                                    }
-                                }
-                            }
-                        } else {
-                            // need to do anything for non-dependent object?
-                            // it seem not. should list all the case and make sure
-                        }
-                    }
-                }
                 break;
             case FieldMolder.ONE_TO_MANY:
-                fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
-                o = _fhs[i].getValue( object );
-                orgFields = (ArrayVector)fields[i];
-                if ( ! (o instanceof Lazy) ) {
-                    itor = getIterator( o );
-                    ArrayList v = (ArrayList) o;
-                    list = new ArrayVector( v.size() );
-                    for ( int j=0; j<v.size(); j++ ) {
-                        list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
-                    }
-                    if ( !OID.isEquals( (ArrayVector)fields[i], list ) ) {
-                        if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
-                                modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
-                        }
-
-                        if ( _fhs[i].isDependent() ) {
-                            if ( orgFields != null && list != null ) {
-                                for ( int j=0; j<orgFields.size(); j++ ) {
-                                    if ( !list.contains( orgFields.get(j) ) ) {
-                                        Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                        if ( reldel != null ) {
-                                            tx.delete( reldel );
-                                        } else {
-                                            // should i notify user that the object does not exist?
-                                            // user can't delete dependent object himself. So, must
-                                            // error.
-                                        }
-                                    }
-                                }
-                                // add relation which added after it's created or loaded
-                                for ( int j=0; j<list.size(); j++ ) {
-                                    if ( !orgFields.contains( list.get(j) ) ) {
-                                        if ( !tx.isPersistent( v.get(j) ) ) 
-                                            tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
-                                        else {
-                                            // should i notify user that the object does not exist?
-                                            // user can't create dependent object himself. So, must
-                                            // error.                                   
-                                        }
-                                    }
-                                }
-                            } else if ( orgFields != null ) {
-                                for ( int j=0; j<orgFields.size(); j++ ) {
-                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                    if ( reldel != null ) {
-                                        tx.delete( reldel );
-                                    } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't delete dependent object himself. So, must
-                                        // error.
-                                    }
-                                }                                
-                            } else {    // list != null 
-                                for ( int j=0; j<list.size(); j++ ) {
-                                    if ( !tx.isPersistent( v.get(j) ) ) 
-                                        tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
-                                    else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't create dependent object himself. So, must
-                                        // error.                                   
-                                    }
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    RelationCollection lazy = (RelationCollection) o;
-                    ArrayList deleted = lazy.getDeleted();
-                    if ( deleted != null ) {
-                        if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
-                                modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
-                        }
-
-                        if ( _fhs[i].isDependent() ) {
-                            itor = deleted.iterator();
-                            while ( itor.hasNext() ) {
-                                Object toBeDeleted = lazy.find( (Object[])itor.next() );
-                                if ( toBeDeleted != null && tx.isPersistent( toBeDeleted ) ) {
-                                    tx.delete( toBeDeleted );
-                                } else { 
-                                    //System.out.println("Object to be delete is not found!");
-                                    // what to do if it happens?
-                                }
-                            }
-                        }
-                    }
-
-                    ArrayList added = lazy.getAdded();
-                    if ( added != null ) {
-                        if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
-                                modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
-                        }
-
-                        if ( _fhs[i].isDependent() ) {
-                            itor = added.iterator();
-                            while ( itor.hasNext() ) {
-                                Object toBeAdded = lazy.find( (Object[])itor.next() );
-                                if ( toBeAdded != null ) {
-                                    tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
-                                } else {
-                                    // what to do if it happens?
-                                    //System.out.println("Object to be added is not found!");
-                                }
-                            }
-                        }
-                    }
-
-                }
                 break;
             case FieldMolder.MANY_TO_MANY:
-
-                fieldClassMolder = _fhs[i].getFieldClassMolder();
-                fieldEngine = _fhs[i].getFieldLockEngine();
-                o = _fhs[i].getValue( object );
-                if ( ! (o instanceof Lazy) ) {
-                    itor = getIterator( o );
-                    ArrayList v = (ArrayList) o;
-                    list = getIds( fieldClassMolder, o );
-                    orgFields = (ArrayVector)fields[i];
-                    if ( !OID.isEquals( orgFields, list ) ) {
-
-                        itor = getIterator( o );
-                        while ( o != null && itor.hasNext() ) {
-                            newobj = itor.next();
-                            fids = fieldClassMolder.getIdentities( newobj );
-
-                            if ( !tx.isPersistent( newobj ) ) {
-                                // should be created if transaction have no record of the object
-                                // (will not be dependent, so don't create it)
-                                //if ( _fhs[i].isDependent() ) {
-                                //    tx.create( fieldEngine, fieldClassMolder, newobj, oid );
-                                //}
-                                // create the relation in relation table too
-                                _fhs[i].getRelationLoader().createRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
-                                oid.getIdentities(), fieldClassMolder.getIdentities(newobj) );
-                            }
-                        }
-
-                        // need to add support for add and delete relation
-                        // delete relation which no long exist
-                        if ( orgFields != null && list != null ) {
-                            for ( int j=0; j<orgFields.size(); j++ ) {
-                                if ( !list.contains( orgFields.get(j) ) ) {
-                                    // must be loaded thur transaction, so that the related object
-                                    // is properly locked and updated before we delete it.
-                                    Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                    if ( reldel != null ) {
-                                        tx.writeLock( reldel, tx.getLockTimeout() );
-                                     
-                                        _fhs[i].getRelationLoader().deleteRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
-                                        oid.getIdentities(), (Object[])orgFields.get(j) );
-                                    } else {
-                                        // the object not there, and we try to delete the rubbish relation,
-                                        // if there is
-                                        _fhs[i].getRelationLoader().deleteRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
-                                        oid.getIdentities(), (Object[])orgFields.get(j) );
-                                    }
-                                }
-                            }
-                            // add relation which added after it's created or loaded
-                            for ( int j=0; j<list.size(); j++ ) {
-                                if ( !orgFields.contains( list.get(j) ) ) {
-                                    // must be loaded thur transaction, so that the related object
-                                    // is properly locked and updated before we create it.
-                                    Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
-                                    if ( reladd != null ) {
-                                        tx.writeLock( reladd, tx.getLockTimeout() );
-                                     
-                                        _fhs[i].getRelationLoader().createRelation( 
-                                        (Connection)tx.getConnection(oid.getLockEngine()), 
-                                        oid.getIdentities(), (Object[])orgFields.get(j) );
-                                    } else {
-                                        // ignored if object not found, if later in transaction 
-                                        // the other side of object is added. then, the relation 
-                                        // will be added if the other side of object is just 
-                                        // deleted in this transaction, then it seem to be an 
-                                        // non-critical error ignore it seem to better than annoy 
-                                        // user
-                                    }
-                                }
-                            }
-                        } else if ( orgFields != null ) {
-                            for ( int j=0; j<orgFields.size(); j++ ) {
-                                // must be loaded thur transaction, so that the related object
-                                // is properly locked and updated before we delete it.
-                                Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
-                                if ( reldel != null ) {
-                                    tx.writeLock( reldel, tx.getLockTimeout() );
-                                 
-                                    _fhs[i].getRelationLoader().deleteRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), (Object[])orgFields.get(j) );
-                                } else {
-                                    // the object not there, and we try to delete the rubbish relation,
-                                    // if there is
-                                    _fhs[i].getRelationLoader().deleteRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), (Object[])orgFields.get(j) );
-                                }
-                            }
-                        } else {
-                            for ( int j=0; j<list.size(); j++ ) {
-                                // must be loaded thur transaction, so that the related object
-                                // is properly locked and updated before we create it.
-                                Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
-                                if ( reladd != null ) {
-                                    tx.writeLock( reladd, tx.getLockTimeout() );
-                                 
-                                    _fhs[i].getRelationLoader().createRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), (Object[])orgFields.get(j) );
-                                } else {
-                                    // ignored if object not found, if later in transaction 
-                                    // the other side of object is added. then, the relation 
-                                    // will be added if the other side of object is just 
-                                    // deleted in this transaction, then it seem to be an 
-                                    // non-critical error ignore it seem to better than annoy 
-                                    // user
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    RelationCollection lazy = (RelationCollection) o;
-                    ArrayList deleted = lazy.getDeleted();
-                    if ( deleted != null ) {
-                        if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
-                                modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
-                        }
-
-                        itor = deleted.iterator();
-                        while ( itor.hasNext() ) {
-                            Object[] deletedId = (Object[])itor.next();
-                            Object toBeDeleted = lazy.find( deletedId );
-                            if ( toBeDeleted != null && !tx.isPersistent(toBeDeleted) ) {
-                                tx.writeLock( toBeDeleted, 0 );
-
-                                _fhs[i].getRelationLoader().deleteRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
-                                oid.getIdentities(), deletedId );
-                            } else { 
-                                // what to do if it happens?
-                            }
-                        }
-                    }
-
-                    ArrayList added = lazy.getAdded();
-                    if ( added != null ) {
-                        if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
-                                modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
-                        }
-
-                        itor = added.iterator();
-                        while ( itor.hasNext() ) {
-                            Object[] addedId = (Object[])itor.next();
-                            Object toBeAdded = lazy.find( addedId );
-                            if ( toBeAdded != null ) {
-                                _fhs[i].getRelationLoader().createRelation( 
-                                (Connection)tx.getConnection(oid.getLockEngine()), 
-                                oid.getIdentities(), addedId );
-                            } else {
-                                // what to do if it happens?
-                            }
-                        }
-                    }
-                }
                 break;
             default:
             }
         }
  
-
-        if ( lockrequired ) {
-            //tx.writeLock( object, tx.getTransactionTimeout() );
-        }
-
-        if ( modified ) {
-            tx.writeLock( object, tx.getTransactionTimeout() );
-            //System.out.println("object is modifed, now storing it");
-            for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                //System.out.print("<"+i+":"+(newfields[i] instanceof Object[]?OID.flatten((Object[])newfields[i]):newfields[i])+" of "+_fhs[i].getJavaClass()+">  ");
-            }
-            //System.out.println("     new field in object");
-
-            for ( int i=0; fields!=null && i<fields.length; i++ ) {
-                //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+">  ");
-            }
-            //System.out.println("       in cache");
-            
-            Object stamp = _persistence.store( tx.getConnection(oid.getLockEngine()),
+        Object stamp = _persistence.store( tx.getConnection(oid.getLockEngine()),
                 newfields, oid.getIdentities(), fields, oid.getStamp() );
-            oid.setStamp( stamp );
-            return true;
-        } else {
-            //System.out.println("object not modifed!");
-            return false;
-        }
-        
-        // checkValidity
-        // call store of each fieldMolder
-        // update oid and setStamp
+        oid.setStamp( stamp );
     }
 
     public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
@@ -1347,11 +1478,23 @@ public class ClassMolder {
                 }
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
+                /*
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     fid = fieldClassMolder.getIdentities( o );
                     fields[i] = fid; // [oleg] IMHO was wrong: fid[0]
+                } else {
+                    fields[i] = null;
+                }*/
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                if ( o != null ) {
+                    fid = fieldClassMolder.getIdentities( o );
+                    if ( fid != null ) {
+                        fields[i] = fid;
+                    }
                 } else {
                     fields[i] = null;
                 }
@@ -1361,12 +1504,16 @@ public class ClassMolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     if ( !( o instanceof Lazy) ) {
+                        /*
                         ArrayList list = (ArrayList) o;
                         ArrayVector fidlist = new ArrayVector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
                             fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         fields[i] = fidlist;
+                        */
+                        fids = getIds( fieldClassMolder, o );
+                        fields[i] = fids;
                     } else {
                         RelationCollection lazy = (RelationCollection) o;
                         fids = (ArrayList)lazy.getIdentitiesList().clone();
@@ -1381,12 +1528,16 @@ public class ClassMolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     if ( !( o instanceof Lazy ) ) {
+                        /*
                         ArrayList list = (ArrayList) o;
                         ArrayVector fidlist = new ArrayVector( list.size() );
                         for ( int j=0; j<list.size(); j++ ) {
                             fidlist.add( fieldClassMolder.getIdentities( list.get(j) ) );
                         }
                         fields[i] = fidlist;
+                        */
+                        fids = getIds( fieldClassMolder, o );
+                        fields[i] = fids;
                     } else {
                         RelationCollection lazy = (RelationCollection) o;
                         fids = (ArrayList)lazy.getIdentitiesList().clone();
@@ -1502,6 +1653,7 @@ public class ClassMolder {
             case FieldMolder.PRIMITIVE:
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
+                // persistanceCapable include many_to_one
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 if ( _fhs[i].isDependent() ) {
@@ -1517,11 +1669,25 @@ public class ClassMolder {
                     if ( fobject != null && tx.isPersistent( fobject ) ) {
                         tx.delete( fobject );
                     }
+                } else {
+                    // delete the object from the other side of the relation
+                    Object[] fid = (Object[]) fields[i];
+                    Object fetched = null;
+                    if ( fid != null ) {
+                        fetched = tx.fetch( fieldEngine, fieldClassMolder, (Object[]) fields[i], null );
+                        if ( fetched != null )
+                            fieldClassMolder.removeRelation( tx, fetched, this, object );
+                    }
                 }
                 break;
             case FieldMolder.ONE_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
+                // markDelete mix with prestore
+                // so, store is not yet called, and only the loaded (or created)
+                // relation have to be deleted.
+                // not really. cus, the other created relation, may already
+                // has reference to this object. so, how to deal with that?
                 if ( _fhs[i].isDependent() ) {
                     ArrayList alist = (ArrayList) fields[i];
                     for ( int j=0; j<alist.size(); j++ ) {
@@ -1541,6 +1707,26 @@ public class ClassMolder {
                             tx.delete( fobject );
                         }
                     }
+                } else {
+                    ArrayList alist = (ArrayList) fields[i];
+                    for ( int j=0; j<alist.size(); j++ ) {
+                        Object[] fid = (Object[]) alist.get(j);
+                        Object fetched = null;
+                        if ( fid != null ) {    
+                            fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
+                            if ( fetched != null ) { 
+                                fieldClassMolder.removeRelation( tx, fetched, this, object );
+                            }
+                        }
+                    }
+
+                    ArrayList blist = (ArrayList) _fhs[i].getValue( object );
+                    for ( int j=0; j<blist.size(); j++ ) {
+                        Object fobject = blist.get(j);
+                        if ( fobject != null && tx.isPersistent( fobject ) ) {
+                            fieldClassMolder.removeRelation( tx, fobject, this, object );
+                        }
+                    }
                 }
                 break;
             case FieldMolder.MANY_TO_MANY:
@@ -1550,6 +1736,33 @@ public class ClassMolder {
                 (Connection)tx.getConnection(oid.getLockEngine()), 
                 oid.getIdentities() );
                 */
+
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                // markDelete mix with prestore
+                // so, store is not yet called, and only the loaded (or created)
+                // relation have to be deleted.
+                // not really. cus, the other created relation, may already
+                // has reference to this object. so, how to deal with that?
+                ArrayList alist = (ArrayList) fields[i];
+                for ( int j=0; j<alist.size(); j++ ) {
+                    Object[] fid = (Object[]) alist.get(j);
+                    Object fetched = null;
+                    if ( fid != null ) {    
+                        fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
+                        if ( fetched != null ) {
+                            fieldClassMolder.removeRelation( tx, fetched, this, object );
+                        }
+                    }
+                }
+
+                ArrayList blist = (ArrayList) _fhs[i].getValue( object );
+                for ( int j=0; j<blist.size(); j++ ) {
+                    Object fobject = blist.get(j);
+                    if ( fobject != null && tx.isPersistent( fobject ) ) {
+                        fieldClassMolder.removeRelation( tx, fobject, this, object );
+                    }
+                }
                 break;
             default:
                 throw new PersistenceException("Invalid field type!");
