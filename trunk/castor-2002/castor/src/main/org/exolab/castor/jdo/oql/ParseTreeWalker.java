@@ -3,7 +3,7 @@
  * ("Software"), with or without modification, are permitted provided
  * that the following conditions are met:
  *
- * 1. Redistributions of source code must retain copyright
+ * 1. Redistributions of source code must retain coyright
  *    statements and notices.  Redistributions must also contain a
  *    copy of this document.
  *
@@ -48,12 +48,14 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
+import java.util.Vector;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
+import org.exolab.castor.mapping.loader.Types;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -71,6 +73,7 @@ public class ParseTreeWalker implements TokenTypes
 
   private String _projectionName;
   private String _projectionAlias;
+  private int _projectionType;
 
   private String _fromClassName;
   private String _fromClassAlias;
@@ -80,9 +83,19 @@ public class ParseTreeWalker implements TokenTypes
   
   private Hashtable _paramInfo;
   private Hashtable _fieldInfo;
+  private Hashtable _pathInfo;
   
   private SQLEngine _engine;
   private JDOClassDescriptor _clsDesc;
+
+  //projection types
+  public static final int AGGREGATE = 1;
+  public static final int FUNCTION = 2;
+  public static final int PARENT_OBJECT = 3;
+  public static final int DEPENDANT_OBJECT = 4;
+  public static final int DEPENDANT_OBJECT_VALUE = 5;
+  public static final int DEPENDANT_VALUE = 6;
+  
     
   /**
    * Creates a new parse tree walker.  Which checks the tree for errors, and 
@@ -100,10 +113,15 @@ public class ParseTreeWalker implements TokenTypes
 
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
+    _pathInfo = new Hashtable();
 
     if ( ! _parseTree.isRoot() )
       throw (new QueryException( "ParseTreeWalker must be created with the root node of the parse tree."));
 
+    //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_TYPES));
+    //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_VALUES));
+    
+    
     checkErrors();
     createQueryExpression();
   }
@@ -118,6 +136,15 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
+   * Accessor method for _projectionType.
+   *
+   * @return The _projectionType member.
+   */
+  public int getProjectionType() {
+    return _projectionType;
+  }
+
+   /**
    * Accessor method for private _queryExpr member.
    *
    * @return private _queryExpr member
@@ -136,27 +163,49 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
-   * Traverses the tree checking for errors.  Records name and alias in 
-   * SELECT part of query, records name and alias in FROM part.  Checks that
-   * name in SELECT part matches name or alias in FROM part.
+   * Traverses the tree checking for errors.  
    *
    * @throws QueryException if there is an error.
    */
   private void checkErrors() throws QueryException {
+
+    for (Enumeration e = _parseTree.children(); e.hasMoreElements(); ) {
+      ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
+      if ( curChild.getToken().getTokenType() == KEYWORD_FROM ) {
+        checkFromPart( curChild.getChild(0) );
+        break;
+      }
+    }
+
+    if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
+      checkSelectPart( _parseTree.getChild(1) );
+    else
+      checkSelectPart( _parseTree.getChild(0) );
     
-    //get the projection Name and alias
-    ParseTreeNode selectPart = _parseTree.getChild(0);
-    if (selectPart.getToken().getTokenType() ==  KEYWORD_AS) {
-      _projectionName = selectPart.getChild(0).getToken().getTokenValue();
-      _projectionAlias = selectPart.getChild(1).getToken().getTokenValue();
+    for ( int curChild = 2; curChild <= _parseTree.getChildCount() - 1; curChild++ ) {
+      int tokenType = _parseTree.getChild(curChild).getToken().getTokenType();
+      switch ( tokenType ) {
+        case KEYWORD_WHERE:
+          checkWhereClause( _parseTree.getChild(curChild) );
+          break;
+        case KEYWORD_ORDER:
+          checkOrderClause( _parseTree.getChild(curChild) );
+          break;
+      }
     }
-    else {
-      _projectionName = selectPart.getToken().getTokenValue();
-      _projectionAlias = _projectionName;
-    }
-           
+  }
+
+  /**
+   * Checks the from parts of the query.  
+   *
+   * @param fromPart is the ParseTreeNode containing the from part of the 
+   *      queryTree.
+   * @throws QueryException if there is an error.
+   */
+  private void checkFromPart( ParseTreeNode fromPart ) 
+        throws QueryException {
+
     //get the class name from the from clause
-    ParseTreeNode fromPart = _parseTree.getChild(1).getChild(0);
     if (fromPart.getToken().getTokenType() ==  KEYWORD_AS) {
       ParseTreeNode classNameNode = fromPart.getChild(0);
       if ( classNameNode.getToken().getTokenType() == DOT ) {
@@ -191,9 +240,6 @@ public class ParseTreeWalker implements TokenTypes
       _fromClassAlias = _fromClassName;
     }
     
-    if ( ! _projectionName.equals(_fromClassAlias) )
-      throw new QueryException( "Object name not the same in SELECT and FROM" );
-      
     try {
       _objClass = Class.forName( _fromClassName );
     } 
@@ -208,15 +254,157 @@ public class ParseTreeWalker implements TokenTypes
     if ( _clsDesc == null )
       throw new QueryException( "Could not get a descriptor for class " + _fromClassName );
 
-    for ( int curChild = 2; curChild <= _parseTree.getChildCount() - 1; curChild++ ) {
-      int tokenType = _parseTree.getChild(curChild).getToken().getTokenType();
-      switch ( tokenType ) {
-        case KEYWORD_WHERE:
-          checkWhereClause( _parseTree.getChild(curChild) );
+  }
+
+  /**
+   * Checks the select part of the query.  
+   *
+   * @param selectPart is the ParseTreeNode containing the select part of the 
+   *      queryTree.
+   * @throws QueryException if there is an error.
+   */
+  private void checkSelectPart( ParseTreeNode selectPart ) 
+        throws QueryException {
+
+    if (selectPart.getToken().getTokenType() ==  KEYWORD_AS) {
+      checkProjection( selectPart.getChild(0), true, false );
+      _projectionAlias = selectPart.getChild(1).getToken().getTokenValue();
+    }
+    else {
+      checkProjection( selectPart, true, false );
+      _projectionAlias = "";
+    }
+           
+    //if ( ! _projectionName.equals(_fromClassAlias) )
+    //  throw new QueryException( "Object name not the same in SELECT and FROM - select: " + _projectionName + ", from: " + _fromClassAlias );
+  }
+
+  /**
+   * Checks a projection (one of the items selected).  Determines the 
+   * _projectionType.
+   *
+   * @param projection The ParseTreeNode containing the projection.
+   * @param firstLevel pass true when calling on the top level of projection
+   *    in the parse tree.  False when recursing
+   * @param onlySimple pass true if you want to throw errors if the 
+   *    object passed as the ParseTreeNode is not a simple type (use this
+   *    when recursing on the arguments passed to Aggregate and SQL functions).
+   * @throws QueryException if there is an error.
+   */
+  private void checkProjection( ParseTreeNode projection, 
+                                boolean topLevel, 
+                                boolean onlySimple )
+          throws QueryException {
+    
+    if ( projection.getChildCount() == 0 ) {
+      if ( topLevel ) {
+        _projectionType = PARENT_OBJECT;
+        _projectionName = projection.getToken().getTokenValue();
+       if ( ! _projectionName.equals(_fromClassAlias) )
+          throw new QueryException( "Object name not the same in SELECT and FROM - select: " + _projectionName + ", from: " + _fromClassAlias );
+      }
+      else
+        if ( onlySimple )
+          throw new QueryException( "Only primitive values are allowed to be passed as parameters to Aggregate and SQL functions." );
+        else
+          return;
+    }
+    else {
+      int tokenType = projection.getToken().getTokenType();
+      switch( tokenType ) {
+        case IDENTIFIER:
+          //a SQL function call -- check the arguments
+          _projectionType = FUNCTION;
+          for (Enumeration e = projection.getChild(0).children(); 
+               e.hasMoreElements(); ) 
+            checkProjection( (ParseTreeNode) e.nextElement(), false, true );
           break;
-        case KEYWORD_ORDER:
-          checkOrderClause( _parseTree.getChild(curChild) );
+          
+        case DOT:
+          //a path expression -- check if it is valid, and create a paramInfo 
+          Enumeration e = projection.children();
+          ParseTreeNode curNode = null;
+          String curName = null;
+          StringBuffer projectionName = new StringBuffer();
+          Vector projectionInfo = new Vector();
+          
+          //check that the first word before the dot is our class
+          if ( e.hasMoreElements() ) {
+            curNode = (ParseTreeNode) e.nextElement();
+            curName = curNode.getToken().getTokenValue();
+            projectionName.append(curName);
+            projectionInfo.addElement(curName);
+            if ( ! curName.equals(_fromClassAlias ) )
+              throw new QueryException( "Object name not the same in SELECT and FROM." );
+          }
+              
+          //use the ClassDescriptor to check that the rest of the path is valid.
+          JDOClassDescriptor curClassDesc = _clsDesc;
+          JDOFieldDescriptor curField = null;
+          int count = 0;
+          while ( e.hasMoreElements() ) {
+            curNode = (ParseTreeNode) e.nextElement();
+            curName = curNode.getToken().getTokenValue();
+            projectionName.append(".").append(curName);
+            projectionInfo.addElement(curName);
+            curField = curClassDesc.getField(curName);
+            if ( curField == null )
+              throw new QueryException( "An unknown field was requested in the select part of the query: " + curName );
+            curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
+            count++;
+          }
+
+          _pathInfo.put( projection, projectionInfo );
+          _fieldInfo.put( projection, curField );
+          
+          Class theClass = curField.getFieldType();
+          // is it actually a Java primitive, or String, 
+          // or a subclass of Number
+          boolean isSimple = Types.isSimpleType(theClass);
+          
+          if ( topLevel ) {
+            _projectionName = projectionName.toString();
+            if ( isSimple )
+              if ( count > 1 )
+                _projectionType = DEPENDANT_OBJECT_VALUE;
+              else
+                _projectionType = DEPENDANT_VALUE;
+            else
+              _projectionType = DEPENDANT_OBJECT;
+          }
+          else
+            if ( ! isSimple && onlySimple )
+              throw new QueryException( "Only primitive values are allowed to be passed as parameters to Aggregate and SQL functions." );
+            else
+              return;
           break;
+          
+        case KEYWORD_COUNT:
+          //count a special case
+          _projectionType = AGGREGATE;
+          if ( projection.getChild(0).getToken().getTokenType() == TIMES )
+            //count(*)
+            return;
+          else
+            //can call count on object types -- recurse over child
+            checkProjection( projection.getChild(0), false, false );
+          break;
+            
+        case KEYWORD_SUM:
+        case KEYWORD_MIN:
+        case KEYWORD_MAX:
+        case KEYWORD_AVG:
+          //an aggregate -- recurse over the child
+          _projectionType = AGGREGATE;
+          checkProjection( projection.getChild(0), false, true );
+          break;
+          
+        default:
+          //we use function to describe sql expressions also, like
+          // SELECT s.age - 5 FROM Student s
+          _projectionType = FUNCTION;
+          for (e = projection.children(); e.hasMoreElements(); )
+            checkProjection( (ParseTreeNode) e.nextElement(), false, false );
       }
     }
   }
@@ -434,7 +622,22 @@ public class ParseTreeWalker implements TokenTypes
    */
   private void createQueryExpression() {
 
-    _queryExpr = _engine.getFinder();
+    //We use the SQLEngine buildfinder for any queries which require 
+    //us to load the entire object from the database.  Otherwise
+    //we use the local addSelectFromJoins method.
+    
+    //System.out.println( _projectionType );
+
+    switch ( _projectionType ) {
+      case PARENT_OBJECT:
+      case DEPENDANT_OBJECT:
+      case DEPENDANT_OBJECT_VALUE:
+        _queryExpr = _engine.getFinder();
+        break;
+      default:
+        _queryExpr = _engine.getQueryExpression();
+        addSelectFromJoins();
+    }
 
     //check for DISTINCT
     if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
@@ -453,7 +656,63 @@ public class ParseTreeWalker implements TokenTypes
       }
     }
   }
+
+  /**
+   * Adds the selected fields, and the necessary joins to the QueryExpression.
+   * This method is used when the query is for dependant values, aggregates,
+   * or SQL functions, where we're just gonna query the item directly.
+   *
+   */
+  private void addSelectFromJoins() {
+
+    ParseTreeNode selectPart = null;
+    if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
+      selectPart = _parseTree.getChild(1);
+    else
+      selectPart = _parseTree.getChild(0);
+
+    _queryExpr.addTable( _clsDesc.getTableName() );
+    _queryExpr.addSelect( getSQLExpr( selectPart ) );
+   
+  }
   
+  
+  /**
+   * Adds joins to the queryExpr for path expressions in the OQL.
+   *
+   */
+  private void addJoinsForPathExpression( Vector path ) {
+
+    JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
+    String identityColumn = identity.getSQLName();
+
+    JDOClassDescriptor clsDesc = _clsDesc;
+    JDOFieldDescriptor fieldDesc = null;
+    for ( int i = 1; i < path.size() - 1; i++ ) {
+      fieldDesc = clsDesc.getField( (String) path.elementAt(i) );
+      clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
+      if ( clsDesc != null )
+        //we must add this table as a join
+        if ( fieldDesc.getManyTable() == null ) {
+          //a many -> one relationship
+          JDOFieldDescriptor foreignKey = 
+                          (JDOFieldDescriptor) clsDesc.getIdentity();
+          _queryExpr.addInnerJoin( _clsDesc.getTableName(),
+                                   fieldDesc.getSQLName(),
+                                   clsDesc.getTableName(),
+                                   foreignKey.getSQLName() );
+        }
+        else
+          //a one -> many relationship
+          _queryExpr.addInnerJoin( _clsDesc.getTableName(), 
+                                   identityColumn,
+                                   fieldDesc.getManyTable(), 
+                                   fieldDesc.getManyKey() );
+        
+    }
+  }
+
+ 
   /**
    * Returns a SQL version of an OQL where clause.
    *
@@ -540,6 +799,18 @@ public class ParseTreeWalker implements TokenTypes
         return getSQLExpr( exprTree.getChild(0) ) + " IS NOT NULL ";
       case KEYWORD_IS_UNDEFINED:
         return getSQLExpr( exprTree.getChild(0) ) + " IS NULL ";
+      case KEYWORD_COUNT:
+        if ( exprTree.getChild(0).getToken().getTokenType() == TIMES )
+          return " COUNT(*) ";
+        else
+          return " COUNT(" + getSQLExpr(exprTree.getChild(0)) +") ";
+      case KEYWORD_SUM:
+      case KEYWORD_MIN:
+      case KEYWORD_MAX:
+      case KEYWORD_AVG:
+        return " " + exprTree.getToken().getTokenValue() + "(" +
+               getSQLExpr(exprTree.getChild(0)) + ") ";
+      
 
       //List creation
       case KEYWORD_LIST:
@@ -550,13 +821,47 @@ public class ParseTreeWalker implements TokenTypes
             .append(" , ");
             
         //replace final comma space with close paren.
-        sb.replace(sb.length() - 2, sb.length() - 1, " )");
+        sb.replace(sb.length() - 2, sb.length() - 1, " )").append(" ");
         return sb.toString();
 
-      //fields
+      //fields or SQL functions
       case IDENTIFIER: case DOT:
-        JDOFieldDescriptor field = (JDOFieldDescriptor) _fieldInfo.get(exprTree);
-        return _engine.quoteName( _clsDesc.getTableName() + "." + field.getSQLName() );
+        if ( exprTree.getChildCount() > 0 && 
+             exprTree.getChild(1).getToken().getTokenType() == LPAREN ) {
+          //An SQL function
+          sb = new StringBuffer(exprTree.getToken().getTokenValue())
+                      .append("(");
+          int paramCount = 0;
+          for (Enumeration e = exprTree.children(); e.hasMoreElements(); ) {
+            sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) )
+              .append(" , ");
+            paramCount++;
+          }
+
+          if ( paramCount > 0 )
+            //replace final comma space with close paren.
+            sb.replace(sb.length() - 2, sb.length() - 1, " )").append(" ");
+          else
+            //there were no parameters, so no commas.
+            sb.append(") ");
+
+          return sb.toString();
+        }
+        else {
+          //a field
+          if ( tokenType == DOT )
+            addJoinsForPathExpression( (Vector) _pathInfo.get(exprTree) );
+            
+          JDOFieldDescriptor field = 
+                  (JDOFieldDescriptor) _fieldInfo.get(exprTree);
+          JDOClassDescriptor clsDesc = 
+                  (JDOClassDescriptor) field.getClassDescriptor();
+
+          if ( clsDesc == null )
+            clsDesc = _clsDesc;
+                  
+          return _engine.quoteName( clsDesc.getTableName() + "." + field.getSQLName() );
+        }
 
       //parameters
       case DOLLAR:
