@@ -1,5 +1,5 @@
 
-A simple example of using the XML Schema Time/Date types (including Time, Date and TimeDuration)  and Pattern facet.
+A simple example using the SourceGenerator
 
 
 files: 
