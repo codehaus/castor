@@ -97,7 +97,7 @@ import org.exolab.castor.persist.spi.Complex;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see JDO#getDatabase
+ * @see JDO#getDatabase()
  * @see Query
  */
 public interface Database
@@ -176,7 +176,7 @@ public interface Database
     /**
      * Creates an OQL query from the supplied statement.
      *
-     * @param query An OQL query statement
+     * @param oql An OQL query statement
      * @return An OQL query
      * @throws QueryException The query syntax is invalid
      */
