@@ -57,7 +57,7 @@ import java.beans.PropertyChangeListener;
 //-- import for generated classes
 import test.*;
 
-import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.types.Duration;
 import org.exolab.castor.types.Date;
 import org.exolab.castor.types.Time;
 
@@ -127,7 +127,7 @@ public class InvoiceTest implements PropertyChangeListener {
 	    System.out.println("  " + method.getOption());
 	    System.out.print("   Estimated Time: ");
 
-	    TimeDuration duration = method.getEstimatedDelivery();
+	    Duration duration = method.getEstimatedDelivery();
 
 	    int years  = duration.getYear();
 	    int months = duration.getMonth();
