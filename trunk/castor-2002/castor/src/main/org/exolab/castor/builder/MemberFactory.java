@@ -496,7 +496,7 @@ public class MemberFactory {
         }
 
         if (comment != null) fieldInfo.setComment(comment);
-
+        fieldInfo.setNodeType(XMLInfo.ELEMENT_TYPE);
         return fieldInfo;
     } //-- createFieldInfo(ElementDecl)
 
