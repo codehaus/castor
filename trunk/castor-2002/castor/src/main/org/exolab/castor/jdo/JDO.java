@@ -76,6 +76,7 @@ import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.util.Messages;
 
@@ -154,6 +155,11 @@ public class JDO
      * to be sent.
      */
     private CallbackInterceptor _callback;
+
+    /**
+     * The instance factory to which create a new instance of data object
+     */
+    private InstanceFactory     _instanceFactory;
 
     /**
      * The lock timeout for this database. Zero for immediate
@@ -281,6 +287,23 @@ public class JDO
         _callback = callback;
     }
 
+    /**
+     * Overrides the default instance factory by a custom one
+     * to be used by Castor to obtaining an instance of data 
+     * object when it is needed during loading.
+     * <p>
+     * If instance factory is not overrided, and if class loader
+     * is not set, Class.forName( className ).newInstance() will
+     * be used; if instance factory is not override, and class
+     * loader is set, loader.loadClass( className ).newInstance()
+     * will be used to create a new instance.
+     *
+     * @param factory The instance factory, null to use the default
+     */
+    public void setInstanceFactory( InstanceFactory factory )
+    {
+        _instanceFactory = factory;
+    }
 
     /**
      * Returns the log interceptor for this database source.
@@ -578,7 +601,7 @@ public class JDO
 
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
                     dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
-                            _callback, tx, _classLoader, _autoStore );
+                            _callback, _instanceFactory, tx, _classLoader, _autoStore );
 
                     if ( _txDbPool != null )
                         _txDbPool.put( tx, dbImpl );
@@ -597,7 +620,7 @@ public class JDO
             }
         }
         return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
-                _callback, null, _classLoader, _autoStore );
+                _callback, _instanceFactory, null, _classLoader, _autoStore );
     }
 
 

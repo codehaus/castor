@@ -67,6 +67,7 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -241,6 +242,11 @@ public abstract class TransactionContext
     private CallbackInterceptor        _callback;
 
     /**
+     * The instance factory to that creates new instances of data object
+     */
+    private InstanceFactory            _instanceFactory;
+
+    /**
      * Creating 
      *
      */
@@ -302,6 +308,19 @@ public abstract class TransactionContext
      */
     public void setCallback( CallbackInterceptor callback ) {
         _callback = callback;
+    }
+
+    /**
+     * Overrides the default instance factory by a custom one for 
+     * this database source.
+     * <p>
+     * The factory is used to obatain a new instance of data object
+     * when it is needed during loading.
+     *
+     * @param instanceFactory The instanceFactory to be used, null if disable
+     */
+    public void setInstanceFactory( InstanceFactory factory ) {
+        _instanceFactory = factory;
     }
 
 
@@ -569,8 +588,13 @@ public abstract class TransactionContext
             //object = molder.newInstance();
             if ( objectToBeLoaded != null )
                 object = objectToBeLoaded;
-            else
-                object = molder.newInstance( _db.getClassLoader() );
+            else {
+                if ( _instanceFactory != null ) {
+                    object = _instanceFactory.newInstance( molder.getName(), _db.getClassLoader() );
+                } else {
+                    object = molder.newInstance( _db.getClassLoader() );
+                }
+            }
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout, results );
 

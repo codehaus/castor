@@ -73,6 +73,7 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Messages;
@@ -128,6 +129,10 @@ public class DatabaseImpl
      */
     private CallbackInterceptor        _callback;
 
+    /**
+     * The instance factory to that creates new instances of data object
+     */
+    private InstanceFactory            _instanceFactory;
 
     /**
      * The name of this database.
@@ -163,7 +168,8 @@ public class DatabaseImpl
 
     public DatabaseImpl( String dbName, int lockTimeout,
             LogInterceptor logInterceptor, CallbackInterceptor callback,
-            Transaction transaction, ClassLoader classLoader, boolean autoStore )
+            InstanceFactory instanceFactory, Transaction transaction, 
+            ClassLoader classLoader, boolean autoStore )
             throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
@@ -179,6 +185,7 @@ public class DatabaseImpl
         _scope = new PersistenceInfoGroup( pe );
         _logInterceptor = logInterceptor;
         _callback = callback;
+        _instanceFactory = instanceFactory;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
 
@@ -481,6 +488,7 @@ public class DatabaseImpl
         _ctx.setLockTimeout( _lockTimeout );
         _ctx.setAutoStore( _autoStore );
         _ctx.setCallback( _callback );
+        _ctx.setInstanceFactory( _instanceFactory );
     }
 
 
