@@ -293,7 +293,7 @@ Will be adding this later.
                     if ( fields[ i ] == null )
                         stmt.setNull( count, _fields[ i ].sqlType );
                     else
-                        stmt.setObject( count, fields[ i ] );
+                        stmt.setObject( count, fields[ i ], _fields[ i ].sqlType );
                     ++count;
                 }
 
@@ -387,7 +387,7 @@ Will be adding this later.
                     if ( fields[ i ] == null )
                         stmt.setNull( count, _fields[ i ].sqlType );
                     else
-                        stmt.setObject( count, fields[ i ] );
+                        stmt.setObject( count, fields[ i ], _fields[ i ].sqlType );
                     ++count;
                 }
             stmt.setObject( count, identity );
@@ -399,7 +399,7 @@ Will be adding this later.
                         if ( original[ i ] == null )
                             stmt.setNull( count, _fields[ i ].sqlType );
                         else
-                            stmt.setObject( count, original[ i ] );
+                            stmt.setObject( count, original[ i ], _fields[ i ].sqlType );
                         ++count;
                     }
                 }
@@ -862,7 +862,10 @@ Will be adding this later.
             try {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {
-                    _stmt.setObject( i + 1, _values[ i ] );
+                    if ( _values[ i ] != null )
+                        _stmt.setObject( i + 1, _values[ i ], SQLTypes.getSQLType( _types[ i ] ) );
+                    else
+                        _stmt.setNull( i + 1, SQLTypes.getSQLType( _types[ i ] ) );
                     _values[ i ] = null;
                 }
                 _rs = _stmt.executeQuery();
@@ -1044,7 +1047,10 @@ Will be adding this later.
             try {
                 _stmt = ( (Connection) conn ).prepareCall( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {
-                    _stmt.setObject( i + 1, _values[ i ] );
+                    if ( _values[ i ] != null )
+                        _stmt.setObject( i + 1, _values[ i ], SQLTypes.getSQLType( _types[ i ] ) );
+                    else
+                        _stmt.setNull( i + 1, SQLTypes.getSQLType( _types[ i ] ) );
                     _values[ i ] = null;
                 }
                 _stmt.execute();
