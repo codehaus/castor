@@ -1,0 +1,18 @@
+<html>
+  <title>Castor Persistence Engine API</title>
+  <body>
+    <p>The persistence engine API is used by the application APIs (JDO, CMP, DAX) to implement
+       caching, queries, transactions and concurrency, etc. This layer is shared by all persistence
+       engine and exposes a unified interface for use as a persistence engine for EJB CMP.</p>
+
+    <p>An application API will use a <a href="TransactionContext.html">TransactionContext</a>
+       in order to perform operations. All operations against the persistence engine are
+       transactional.</p>
+
+    <p>If the application API supports enlistment as an XA resource, it will use
+       <a href="XAResourceImpl.html">XAResourceImpl</a> and implement <a href="XAResourceSource.html">
+       XAResourceSource</a> for automatic enlistment/delistment with a transaction context.</p>
+
+    <p></p>
+  </body>
+</html>
