@@ -40,40 +40,62 @@
  *
  * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.builder.binding.XMLBindingComponent;
 
 import org.exolab.castor.builder.util.ClassInfoResolverImpl;
 import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.builder.util.Dialog;
 import org.exolab.castor.xml.schema.Annotated;
 import org.exolab.castor.xml.schema.Schema;
-
+import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.javasource.*;
+import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Stack;
+import java.util.Properties;
 import java.util.Vector;
 
 /**
  * A class for maintaining state for the SourceGenerator
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 class SGStateInfo extends ClassInfoResolverImpl {
+    
+    private static final Enumeration EMPTY_ENUMERATION 
+        = new Vector(0).elements();
 
     public static final int NORMAL_STATUS = 0;
     public static final int STOP_STATUS = 1;
+
+    private Hashtable   _classTypes  = null;
+    
+    /**
+     * The in memory mapping files for each
+     * package
+     */
+    private Hashtable _mappings = null;
+    
+    /**
+     * The in memory package listings for
+     * each package
+     */
+    private Hashtable _packageListings = null;
     
     /**
      * The package used when creating new classes.
     **/
     protected String    packageName = null;
 
-    private Hashtable   _classTypes  = null;
 
     private Vector      _processed   = null;
 
@@ -98,6 +120,7 @@ class SGStateInfo extends ClassInfoResolverImpl {
     private int _status = NORMAL_STATUS;
     
     private Hashtable _sources = null;
+    
     
     
 //    private XMLBindingComponent _bindingComponent = null;
@@ -157,6 +180,57 @@ class SGStateInfo extends ClassInfoResolverImpl {
     public JClass[] getSourceCode(Annotated annotated) {
         return (JClass[])_sources.get(annotated);
     } //-- getSourceCode
+    
+    /**
+     * Returns the Mapping file associated with 
+     * the given filename
+     * 
+     * @return the Mapping file
+     */
+    public MappingRoot getMapping(String filename) {
+        if ((_mappings != null) && (filename != null)) {
+            return (MappingRoot) _mappings.get(filename);
+        }
+        return null;
+    } //-- getMapping
+    
+    /**
+     * Returns the CDRFile (Properties file) associated
+     * with the given filename
+     * 
+     * @param filename
+     * @return the Properties file
+     */
+    public Properties getCDRFile(String filename) {
+        if ((_packageListings != null) && (filename != null)) {
+            return (Properties) _packageListings.get(filename);
+        }
+        return null;
+    }
+
+    /**
+     * Returns the set of CDR file names
+     * 
+     * @return the set of CDR file names
+     */
+    public Enumeration getCDRFilenames() {
+        if (_packageListings == null) {
+            return EMPTY_ENUMERATION;
+        }
+        return _packageListings.keys();
+    } //-- getCDRFilenames
+    
+    /**
+     * Returns the set of mapping filenames
+     * 
+     * @return the set of mapping filenames
+     */
+    public Enumeration getMappingFilenames() {
+        if (_mappings == null) {
+            return EMPTY_ENUMERATION;
+        }
+        return _mappings.keys();
+    } //-- getMappingFilenames
     
     /**
      * Returns the current status
@@ -227,6 +301,57 @@ class SGStateInfo extends ClassInfoResolverImpl {
     void setSuppressNonFatalWarnings(boolean suppressNonFatalWarnings) {
         _suppressNonFatalWarnings = suppressNonFatalWarnings;
     }
+
+    /**
+     * Sets the CDR (ClassDescriptorResolver) file associated with 
+     * the given filename
+     * 
+     * @param filename the filename associated with the CDR file
+     * @param props the Properties file
+     */
+    public void setCDRFile(String filename, Properties props) {
+        if (filename == null) {
+            String err = "The argument 'filename' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+    
+        if (_packageListings == null) {
+            _packageListings = new Hashtable();
+        }
+        
+        if (props == null) {
+            _packageListings.remove(filename);
+        }
+        else {
+            _packageListings.put(filename, props);
+        }
+    } //-- setCDRFile
+    
+    /**
+     * Sets the Mapping file associated with 
+     * the given filename
+     * 
+     * @param filename the filename associated with the Mapping
+     * @param mapping the MappingRoot
+     */
+    public void setMapping(String filename, MappingRoot mapping) {
+        if (filename == null) {
+            String err = "The argument 'filename' must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+    
+        if (_mappings == null) {
+            _mappings = new Hashtable();
+        }
+        
+        if (mapping == null) {
+            _mappings.remove(filename);
+        }
+        else {
+            _mappings.put(filename, mapping);
+        }
+    } //-- setMapping
+    
 
     /**
      * Returns the Dialog used for interacting with the user
