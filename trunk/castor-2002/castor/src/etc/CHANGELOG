@@ -11,6 +11,8 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Added support for top-level annotations (kvisco)
+
 XML:    Made some changes in Unmarshalling code to handle "null" primitives. Based
         on suggestions from Fabrice Gomez. (kvisco)
 
@@ -36,7 +38,7 @@ XML:    Update of the XML Schema syntax to the April 7th draft
             following values : default, optional, required, fixed and
             prohibited
 	  - Info element is now Documentation
-	  - maxOccurs = "*" is replaced by maxOccurs="unbounded" 
+	  - maxOccurs = "*" is replaced by maxOccurs="unbounded"
 		(Andrew Fawcett)
 	  - <include> element support (Andrew Fawcett)
 
