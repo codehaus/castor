@@ -238,8 +238,10 @@ public final class FieldHandlerImpl
             // Get the field value
             if ( _field != null )
                 value = _field.get( object );
-            else
+            else if ( _getMethod != null )
                 value = _getMethod.invoke( object, null );
+            else
+                return null;
         } catch ( IllegalAccessException except ) {
             // This should never happen
             throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
@@ -283,7 +285,7 @@ public final class FieldHandlerImpl
             try {
                 if ( _field != null )
                     _field.set( object, value );
-                else
+                else if ( _setMethod != null )
                     _setMethod.invoke( object, new Object[] { value } );
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
@@ -315,7 +317,7 @@ public final class FieldHandlerImpl
                     collection = _field.get( object );
                     collection = _colHandler.add( collection, value );
                     _field.set( object, collection );
-                } else {
+                } else if ( _getMethod != null && _setMethod != null ) {
                     collection = _getMethod.invoke( object, null );
                     collection = _colHandler.add( collection, value );
                     _setMethod.invoke( object, new Object[] { collection } );
