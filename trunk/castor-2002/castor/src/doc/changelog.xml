@@ -2,6 +2,181 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+
+    <section title="Version 0.9 February, 15 2001"><pre>
+
+XML:   Adding a new feature for handling all types of content and not only TEXT content (Arnaud)  
+
+XML:   Change the read method name for arrays (Arnaud)
+       (bug reported by thebuledirt@yahoo.com)	 
+
+XML:   Several bug fixes in the SourceGenerator concerning the attribute string value (Arnaud) 
+
+XML:   Added improved grouping support. Grouping support is not finished,
+       but is definately improved over Castor 0.8.11. 1st-level choice is
+       now supported. (kvisco)
+
+XML:   Added enumerate() method to generated enumeration types. (kvisco)
+
+XML:   Added support for specifying certain properties of the Introspector, such
+       as whether primitives should be treated as attributes or elements, and
+       default naming conventions. (kvisco)
+
+XML:   Updated mapping.xsd_sg to be compliant with latest XML Schema. (kvisco)
+
+XML:   Added support for DOM in Marshaller.java and Unmarshaller.java
+          (Andrew Fawcett andrew.fawcett@coda.com)
+
+XML:   Added setPolymorph method to Marshaller.java. This can be used to force all field values
+          to be marshalled as their field types rather than their instance types.
+          (Andrew Fawcett andrew.fawcett@coda.com)
+
+XML:    Changed the default behavior of the Xerces Serializer to preserve space
+        by default.
+        (Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+
+XML:	Added support for restriction in simpleContent and enhanced complexType support
+	(Arnaud &lt;blandin@intalio.com>)	
+
+XML: 	Added the command-line option '-nomarshall' which aims at preventing the
+	generation of the marshalling framework specific methods (marshall, unmarshall, validate)
+	(Arnaud &lt;blandin@intalio.com>)
+
+XML:   Added setNSPrefixAtRoot method. When used in conjunction with setNamespaceMapping this
+	will insert the namepsace declarations at the root node.
+	(Andrew Fawcett, andrew.fawcett@coda.com)
+
+XML:    Fixed collection handling for introspected class. 
+        (Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+XML:    Bug fix for using addXxx methods.
+        (Fix submitted by Michael Thyen &lt;mthyen@excite.com>)
+
+XML:    Bug fix in the handling of 'Map' collection. Now we use the abstract
+        'Map' interface rather than 'HashMap'.
+        (Fix submitted by Ron Smith &lt;rsmith7209@yahoo.com>)
+
+XML:    Added some logic to avoid unnecessary use of 'xsi:type' when
+        marshalling. The logic check if Castor is able to find the proper java
+        class to instantiate from the mapping file information.
+        (Sebastien Gignoux &lt;gignoux@intalio.com>) 
+
+XML:    Solved a performance bug for unmarshalling of primitive type. We don't
+        try anymore to generate a Class Descriptor for primitive type as we know
+        that not only it fails but it is deadly slow (due to getMethods()
+        call). Now, unmarhsalling speed is nearly only bounded by the speed of
+        the parser.
+        (Sebastien Gignoux &lt;gignoux@intalio.com>) 
+
+XML &amp; JDO:  
+        Check that an XML mapping file do not declare more identity attributes
+        for a given class than there are field elementsdefined for that
+        class.
+        (Patch submitted by Gabriel Richard Pack &lt;gpack@electroneconomy.com>)
+
+XML &amp; JDO:
+	Regenerated data objects in the org.exolab.castor.mapping.xml package,
+	using an updated version of schema (Nov 2000).
+
+XML &amp; JDO:
+        Now the return type of get-method must be a super-class of or equal to
+	the class declared in mapping.xml (was: sub-class).
+	Note, that now "arraylist" can be used as a value of "collection"
+	attribute in mapping.xml 
+
+JDO:    Bug fix when castor closed Connection during db.close() (before the end of
+        transaction) and the got new Connection during beforeCompletion(),
+        which remains open after the end of transaction.
+        (Solution submitted by Terry Child &lt;tmchild@gmx.net>)
+
+JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
+        This is especially relevant when used in a BMP/CMP environment where the 
+        EJB container might assign a ClassLoader instance per set of Beans, or 
+        might attach a different classloader for each new transaction.
+        (Sebastien Sahuc &lt;ssahuc@intalio.com>)
+
+JDO:    Added an AutoStore option to JDO. Method of setAutoStore and isAutoStore
+	are added into the jdo.Database interface. If autoStore is set, Castor 
+	will try to create or update** all reachable object if it is not
+	exist in the transaction, and store all reachable modified object at the 
+	commit time. If autoStore is not set, Castor will only create/update/store
+	dependent object, and related objects must be created/update explicitly.
+	(* update is used for long transaction only, all modified object 
+	created/loaded from the short transaction will be store properly
+	at commit time)
+
+JDO:    Added "trigger" mode for SEQUENCE key generator. 
+        (Vitaly Shishakov &lt;vitaly.shishakov@novalumen.com>)
+
+JDO:    Added support for MySQL auto_increment columns in IDENTITY key generator
+        (Oleg Nitz, thanks to Alain RAVET &lt;aravet@cirb.irisnet.be> for idea
+        and to George Stewart &lt;georgestewartiv@yahoo.com> for help).
+
+JDO:    Improved support for BLOB and CLOB values. Now you can get them as 
+        java.io.InputStream and java.sql.Clob, respectively, see "types.html"
+        for details (oleg). 
+
+JDO:    Solved problem of NULL dirty checking with Oracle (oleg).         
+
+JDO:    Added support for BIGINT sql type in key generators (oleg).
+ 
+JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
+        by brian rogers &lt;brian@freya.bianca.com>).
+
+JDO:    Added "serializable" as a supported field type. Require BLOB support in the 
+	database. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged JDO branch, "castorone", into the main branch.
+
+JDO:    Merged: Store cycle during transaction "prepare" state is split into
+	preStore and store cycles. With the new addition cycle, dependent object 
+	using key-generator is stored properly. It also avoid unnecessary update
+	SQL statements execution. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Added markModification in TransactionContext. It enable a 
+	more flexible way to mark an object dirty. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: RemoveRelated is added in LockEngine. It automatically removes the 
+	reference of the deleted object in other related object. It protect 
+	cache consistency and avoid some ObjectNotFoundException due to
+	users' errors. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Added Multiple Primary Keys support. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Added Many-to-Many relationship support. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Added Lazy loading for "collection" support. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Improved dependent object support. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Improved the in-memory locking architecture and stablity. (Thomas Yip &lt;yip@intalio.com>) 
+
+JDO:    Merged: Cleaned up excessive ExceptionImpl classes. (Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Support of Object[] as a collection type is temporarily removed. 
+	(Thomas Yip &lt;yip@intalio.com>)
+
+JDO:    Merged: Support of custom ClassDescriptor for JDO side is no longer supported. 
+	(Thomas Yip &lt;yip@intalio.com>)
+
+DAX:    Merged: Tempoarily removed DAX. To be reworked and merged into JDO 
+	(as new type of data-store).  (Thomas Yip &lt;yip@intalio.com>)
+
+DSML:   Add a more detailed policies :
+        * NewAttrOnly, which implies that new attributes are created according 
+        to the DSML, but attributes that already have a value in the ldap are 
+        not updated;
+        * UpdateOnly, which mean that DSML attributes that do not already exist 
+        in the Ldap are not created.
+        Submitted by Marc-Antoine Parent &lt;Marc-Antoine_Parent@Mitel.COM>
+
+DSML:   An ASCII string encoding bug is fixed.
+	Submiited by Marc-Antoine Parent &lt;Marc-Antoine_Parent@Mitel.COM>
+
+    </pre></section>
+
+
     <section title="Version 0.8.11  December, 15 2000"><pre>
 XML:    Updated Schema syntax and some of the Schema Object Model to support 
         the W3C XML Schema Candidate Release. (kvisco)
