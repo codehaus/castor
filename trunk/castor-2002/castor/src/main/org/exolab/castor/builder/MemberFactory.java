@@ -471,8 +471,9 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
-
-            else if (!xsType.getJType().isPrimitive()) {
+            //don't generate code for date/time type since the constructor that parses
+            //a string is throwing exception
+            else if (!xsType.getJType().isPrimitive() && !xsType.isDateTime()) {
                  //XXX This works only if a constructor
                  //XXX with String as parameter exists
                  value = "new "+xsType.getJType().toString()+"(\""+value+"\")";
