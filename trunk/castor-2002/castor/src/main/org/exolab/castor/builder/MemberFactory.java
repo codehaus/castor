@@ -202,35 +202,44 @@ public class MemberFactory {
 
         fieldInfo.setNodeName(attribute.getName());
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
-        fieldInfo.setRequired(attribute.getRequired());
+        fieldInfo.setRequired(attribute.isRequired());
 
-        String def = attribute.getDefaultValue();
-        if (def != null && def.length() > 0) {
+        String value = attribute.getValue();
+        
+        if (value != null) {
+            
+            //-- XXX Need to change this...and we
+            //-- XXX need to validate the value.
+            
+            //-- clean up value
             if (xsType.getType() == XSType.STRING) {
-                char ch = def.charAt(0);
+                char ch = value.charAt(0);
                 switch (ch) {
                     case '\'':
                     case '\"':
-                        fieldInfo.setDefaultValue(def);
                         break;
                     default:
-                        fieldInfo.setDefaultValue("\"" + def + "\"");
+                        value = '\"' + value + '\"';
                         break;
                 }
             }
             else if (enumeration) {
+                
+                //-- we'll need to change this
+                //-- when enumerations are no longer
+                //-- treated as strings
                 JClass jClass = cInfo.getJClass();
-                String val = jClass.getName() + "." + def.toUpperCase();
-                fieldInfo.setDefaultValue(val);
+                String tmp = jClass.getName() + ".valueOf(\"" + value;
+                tmp += "\");";
+                value = tmp;
             }
-            else {
-                fieldInfo.setDefaultValue(def);
-            }
+            
+            if (attribute.isFixed())
+                fieldInfo.setFixedValue(value);
+            else
+                fieldInfo.setDefaultValue(value);
         }
 
-        if (attribute.hasFixedValue()) {
-            fieldInfo.setFixedValue(attribute.getFixedValue());
-        }
 
         //fieldInfo.setSchemaType(attribute.getSimpletypeRef());
 
