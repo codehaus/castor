@@ -256,7 +256,12 @@ public class TypeConversion {
                 }
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
-                    return toXSString(simpleType);
+                {
+                    XSString xsString = new XSString();
+                    if (!simpleType.isBuiltInType())
+                        xsString.setFacets(simpleType);
+                    return xsString;
+                }
                 //-- time
                 case SimpleTypesFactory.TIME_TYPE:
                     return new XSTime();
@@ -328,29 +333,6 @@ public class TypeConversion {
     //-------------------/
 
 
-    /**
-     * Converts the given simpletype to an XSString
-     * @param simpletype the Simpletype to convert
-     * @return the XSString representation of the given Simpletype
-    **/
-    private static XSString toXSString(SimpleType simpleType) {
-        XSString xsString = new XSString();
-        //-- copy valid facets
-        Enumeration enum = simpleType.getFacets();
-        while (enum.hasMoreElements()) {
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-            //-- maxlength
-            if (Facet.MAX_LENGTH.equals(name))
-                xsString.setMaxLength(facet.toInt());
-            else if (Facet.MIN_LENGTH.equals(name))
-                xsString.setMinLength(facet.toInt());
-            else if (Facet.PATTERN.equals(name)) {
-                xsString.setPattern(facet.getValue());
-            }
-        }
-        return xsString;
-    } //-- toXSString
 
     /**
      * Creates the naming table for type conversion

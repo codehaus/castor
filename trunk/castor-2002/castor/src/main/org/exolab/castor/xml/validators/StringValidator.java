@@ -54,27 +54,28 @@ import org.exolab.castor.xml.*;
  * @version $Revision$ $Date$
 **/
 public class StringValidator extends PatternValidator
-    implements TypeValidator 
+    implements TypeValidator
 {
-    
-    
+
+
     private String  fixed      = null;
-    
+
     private boolean required   = false;
-    
+
+    private int _length        = 0;
     private int     minLength  = 0;
-    
+
     private int     maxLength  = -1;
-    
-    
+
+
     /**
      * Creates a new StringValidator with no restrictions
     **/
     public StringValidator() {
         super();
     } //-- StringValidator
-    
-    
+
+
     /**
      * Sets the fixed value in which all valid Strings must match.
      * @param fixedValue the fixed value that all Strings must match
@@ -82,7 +83,7 @@ public class StringValidator extends PatternValidator
     public void setFixedValue(String fixedValue) {
         this.fixed = fixedValue;
     } //-- setFixedValue
-    
+
     /**
      * Sets the maximum length of that a valid String must be.
      * To remove the max length facet, use a negative value.
@@ -91,7 +92,7 @@ public class StringValidator extends PatternValidator
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     } //-- setMaxLength
-    
+
     /**
      * Sets the minimum length that valid Strings must be
      * @param minLength the minimum length that valid Strings must be
@@ -99,28 +100,37 @@ public class StringValidator extends PatternValidator
     public void setMinLength(int minLength) {
         this.minLength = minLength;
     } //-- setMinLength
-    
-    /** 
+
+    /**
+     * Sets the length that valid Strings must be
+     * @param length the length that valid Strings must be
+     */
+     public void setLength( int length) {
+        this._length = length;
+        setMaxLength(length);
+        setMinLength(length);
+    }//-- setLength
+
+    /**
      * Sets whether or not a String is required (non null)
      * @param required the flag indicating whether Strings are required
     **/
     public void setRequired(boolean required) {
         this.required = required;
     } //-- setRequired
-    
-    public void validate(String value) 
-        throws ValidationException 
+
+    public void validate(String value)
+        throws ValidationException
     {
-        
-        if (value == null) {
+
+       if (value == null) {
             if (required) {
                 String err = "this is a required field and cannot be null.";
                 throw new ValidationException(err);
             }
         }
         else {
-            
-            if (fixed != null) {
+       if (fixed != null) {
                 if (!fixed.equals(value)) {
                     String err = "strings of this type must be equal to the "
                         + "fixed value of " + fixed;
@@ -128,6 +138,11 @@ public class StringValidator extends PatternValidator
                 }
             }
             int len = value.length();
+            if ( (_length > 0) && (len != _length) ) {
+                String err = "strings of this type must have a length of "
+                            +_length;
+                throw new ValidationException(err);
+            }
             if ((minLength > 0) && (len < minLength)) {
                 String err = "strings of this type must have a minimum "
                     + "length of " + minLength;
@@ -138,17 +153,17 @@ public class StringValidator extends PatternValidator
                     + "length of " + maxLength;
                 throw new ValidationException(err);
             }
-            
+
             if (hasPattern()) super.validate(value);
         }
     } //-- validate
-    
+
     /**
      * Validates the given Object
      * @param object the Object to validate
     **/
     public void validate(Object object)
-        throws ValidationException 
+        throws ValidationException
     {
         if (object == null) {
             if (required) {
@@ -158,6 +173,6 @@ public class StringValidator extends PatternValidator
         }
         validate(object.toString());
     } //-- validate
-    
+
 } //-- StringValidator
 

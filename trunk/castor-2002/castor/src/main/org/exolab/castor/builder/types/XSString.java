@@ -45,7 +45,9 @@
 
 package org.exolab.castor.builder.types;
 
+import java.util.Enumeration;
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
 import org.exolab.javasource.*;
 
 /**
@@ -62,6 +64,11 @@ public final class XSString extends XSPatternBase {
         = new JClass("java.lang.String");
 
     private String value = null;
+
+    /**
+     * The length facet
+     */
+    private int _length = 0;
 
     /**
      * The max length facet
@@ -118,6 +125,13 @@ public final class XSString extends XSPatternBase {
     } //-- getMinLength
 
     /**
+     * Returns the length that this type must have
+     * @return the length that this type must have
+     */
+     public int getLength() {
+        return this._length;
+     }
+    /**
      * Returns true if a maximum length has been set
      * @return true if a maximum length has been set
     **/
@@ -132,6 +146,28 @@ public final class XSString extends XSPatternBase {
     public boolean hasMinLength() {
         return (minLength > 0);
     } //-- hasMinLength
+
+    /**
+     * Returns true if a length has been set
+     * @return true if a length has been set
+     */
+    public boolean hasLength() {
+        return (_length > 0);
+    }
+
+    /**
+     * Sets the length of this XSString.
+     * While setting the length, the maxLength and minLength are also
+     * set up to this length
+     * @param length the length to set
+     * @see #setMaxLength
+     * @see #setMinLength
+     */
+     public void setLength(int length) {
+        this._length = length;
+        setMaxLength(length);
+        setMinLength(length);
+    }
 
     /**
      * Sets the maximum length of this XSString. To remove the max length
@@ -150,7 +186,28 @@ public final class XSString extends XSPatternBase {
         this.minLength = minLength;
     } //-- setMinLength
 
-    public void setFacets(SimpleType simpleType) {}
+    public void setFacets(SimpleType simpleType) {
+     //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            //-- maxLength
+            if (Facet.MAX_LENGTH.equals(name))
+                setMaxLength(facet.toInt());
+            //-- minLength
+            else if (Facet.MIN_LENGTH.equals(name))
+                setMinLength(facet.toInt());
+            //-- length
+            else if (Facet.LENGTH.equals(name))
+                setLength(facet.toInt());
+            else if (Facet.PATTERN.equals(name))
+                setPattern(facet.getValue());
+
+        }
+    }
     /**
      * Returns the String value of this XSString
      * @return thr String value of this XSString
