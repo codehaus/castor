@@ -208,6 +208,13 @@ public class SourceGenerator {
 		public static final String NamespacePackages = "org.exolab.castor.builder.nspackages";
 
         /**
+         * Property specifying if we want to have the equals method
+         * generated for each generated class
+         */
+        public static final String EqualsMethod = "org.exolab.castor.builder.equalsmethod";
+
+
+        /**
          * The name of the configuration file.
          * <pre>
          * castor.properties
@@ -237,6 +244,12 @@ public class SourceGenerator {
      * bound properties flag
     **/
     private static boolean _boundProperties = false;
+
+    /**
+     * Set to true if we generate an 'equals' method for each
+     * generated class
+     */
+     private static boolean _equalsMethod = false;
 
 	/**
      * The default properties loaded from the configuration file.
@@ -807,7 +820,6 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
-                    //--
                     processContentModel((Group)struct, sInfo);
                     break;
                 default:
@@ -834,7 +846,6 @@ public class SourceGenerator {
                 allowPrinting = dialog.confirm(message);
             }
         }
-
         //-- print class
         if (allowPrinting) {
 
@@ -842,7 +853,8 @@ public class SourceGenerator {
             //to avoid the compiler complaining with java.util.Date
             jClass.removeImport("org.exolab.castor.types.Date");
             jClass.setHeader(header);
-
+            if (equalsMethod())
+               createEqualsMethod(jClass);
             jClass.print(destDir,lineSeparator);
         }
 
@@ -922,6 +934,28 @@ public class SourceGenerator {
     } //-- boundPropertiesEnabled
 
 	/**
+     * Returns true if we generate an 'equals' method for
+     * each generated class.
+     *
+     * Enabling this property is controlled via
+     * the org.exolab.castor.builder.equalsmethod item
+     * in the castorbuilder.properties file. The value is
+     * either 'true' or 'false'.
+     *
+     * @return true if bound properties are enabled.
+    **/
+    public static boolean equalsMethod() {
+        return _equalsMethod;
+    } //-- boundPropertiesEnabled
+
+    /**
+     * Sets the 'equalsmethod' property
+     * @param boolean the value we want to ues
+     */
+     public static void setEqualsMethod(boolean equals) {
+            _equalsMethod = equals;
+     }
+    /**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
 	 * @return True if the Source Generator is mapping schema elements to Java classes.
 	 */
@@ -1008,6 +1042,10 @@ public class SourceGenerator {
 		prop = _default.getProperty( Property.BOUND_PROPERTIES, "");
 		_boundProperties = prop.equalsIgnoreCase("true");
 
+        //-- Equals method?
+        prop = _default.getProperty( Property.EqualsMethod, "");
+		_equalsMethod = prop.equalsIgnoreCase("true");
+
 		initBindingType();
 
     } //-- load
@@ -1047,5 +1085,43 @@ public class SourceGenerator {
 
         return result;
     }
+
+    /**
+     * Create an 'equals' method on the given
+     * JClass
+     * @param jclass the Jclass in which we create the equals method
+     */
+     public static void createEqualsMethod(JClass jclass) {
+         if (jclass == null)
+            throw new IllegalArgumentException("JClass must not be null");
+
+        JField[] fields = jclass.getFields();
+        JMethod jMethod = new JMethod(JType.Boolean, "equals");
+        jMethod.setComment("Override the java.lang.Object.equals method");
+        jMethod.setComment("Note: hashCode() has not been overriden");
+        jMethod.addParameter(new JParameter(SGTypes.Object, "obj"));
+        jclass.addMethod(jMethod);
+        JSourceCode jsc = jMethod.getSourceCode();
+        jsc.add("if (obj instanceof "+jclass.getName(true)+") {");
+        jsc.add("");
+        jsc.indent();
+        jsc.add(jclass.getName(true)+" temp = ("+jclass.getName(true)+")obj;");
+        for (int i = 0; i <fields.length; i++) {
+            JField temp = fields[i];
+            //Be careful to arrayList....
+            String name = temp.getName();
+            if (temp.getType().isPrimitive())
+               jsc.add("if (this."+ name +" != temp."+name+")");
+            else jsc.add("if (!(this."+ name +".equals(temp."+name+")))");
+            jsc.indent();
+            jsc.add("return false;");
+            jsc.unindent();
+        }
+        jsc.add("return true;");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("return false;");
+
+     }
 } //-- SourceGenerator
 
