@@ -968,6 +968,52 @@ public class Schema extends Annotated {
     } //-- removeComplexType
 
     /**
+     * Removes the given top level Element from this Schema
+     * @param element the ElementDecl to remove
+     * @return true if the ElementDecl has been removed, or
+     * false if the ElementDecl wasn't top level or
+     * didn't exist in this Schema
+    **/
+    public boolean removeElement(ElementDecl element) {
+        if (elements.contains(element)) {
+            elements.remove(element.getName());
+            return true;
+        }
+        return false;
+    } //-- removeElement
+
+
+    /**
+     * Removes the given top level Attribute from this Schema
+     * @param attribute the AttributeDecl to remove
+     * @return true if the AttributeDecl has been removed, or
+     * false if the AttributeDecl wasn't top level or
+     * didn't exist in this Schema
+     */
+    public boolean removeAttribute(AttributeDecl attribute) {
+        if (attributes.contains(attribute)) {
+            attributes.remove(attribute.getName());
+            return true;
+        }
+        return false;
+    } //-- removeAttribute
+
+    /**
+     * Removes the given top level ModelGroup definition from this Schema
+     * @param group the ModelGroup definition to remove
+     * @return true if the ModelGroup definition has been removed, or
+     * false if the ModelGroup definition wasn't top level or
+     * didn't exist in this Schema.
+     */
+    public boolean removeGroup(ModelGroup group) {
+        if (_group.contains(group)) {
+            _group.remove(group.getName());
+            return true;
+        }
+        return false;
+    } //-- removeGroup
+
+    /**
      * Removes the given top level SimpleType from this Schema
      * @param SimpleType the SimpleType to remove
      * @return true if the SimpleType has been removed, or
