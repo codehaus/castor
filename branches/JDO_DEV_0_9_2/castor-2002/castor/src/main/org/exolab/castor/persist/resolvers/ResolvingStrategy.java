@@ -68,38 +68,42 @@ public abstract class ResolvingStrategy {
     // or, it should be pass to the method everytime
     protected int _offset;
     protected int _length;
-    
-    public abstract void load( OID id, Object objectToBeLoaded, 
-            Entity entityFromDataStore, TransactionContext tx,
+
+    public abstract void load( TransactionContext tx, OID id, 
+            Object objectToBeLoaded, Entity entityFromDataStore, 
             AccessMode mode, int timeout );
 
-    public abstract void preStore( OID id, Object objectToBeTestForModification, 
-            Entity entityFromCache, TransactionContext tx,
+    public abstract void create( TransactionContext tx, OID id, 
+            Object objectToBeCreated, Entity entityToBeCreated );
+
+    public abstract void postCreate( TransactionContext tx, OID id, 
+            Object objectToBeCreated, Entity entityToBeCreated );
+
+    // long transaction
+    public abstract void update( TransactionContext tx, OID id, 
+            Object updateObject, Entity entityToBeUpdated, 
+            int timeout );
+
+    public abstract void preStore( TransactionContext tx, OID id, 
+            Object objectToBePreStored, Entity entityFromCache, 
             int timeout );
         // walk object, call tx.markModified( objectToBeTestForModification,...)
         // to mark object dirty
 
-    public abstract void store( OID id, Object objectToBeStored, 
-            Entity entityToBeStored, TransactionContext tx );
+    public abstract void store( TransactionContext tx, OID id, 
+            Object objectToBeStored, Entity entityToBeStored );
 
-    // not sure if create should be splited into preCreate
-    // and create.
-    public abstract void create( OID id, Object objectToBeCreated,
-            Entity entityToBeCreated, TransactionContext tx );
 
-    // long transaction
-    public abstract void update( OID id, Object objectLoadedOutsideOfThisTransactionToBeUpdated,
-            Entity entityToBeUpdated, TransactionContext tx, int timeout );
-
-    public abstract void markDeleted( OID id, Object objectToBeDeleted,
-            Entity entityToBeDeleted, TransactionContext tx,
+    public abstract void markDeleted( TransactionContext tx, OID id, 
+            Object objectToBeDeleted, Entity entityToBeDeleted, 
             int timeout );
 
-    public abstract void delete( OID id, Object objectToBeDeleted,
-            Entity entityToBeDeleted, TransactionContext tx,
+    public abstract void delete( TransactionContext tx, OID id, 
+            Object objectToBeDeleted, Entity entityToBeDeleted, 
             int timeout );
 
-    public abstract void writeLock( OID id, Object objectToBeLocked,
-            TransactionContext tx, int timeout );
+    public abstract void writeLock( TransactionContext tx, OID id, 
+            Object objectToBeLocked, Entity entityToBeLocked, 
+            int timeout );
 
 }
