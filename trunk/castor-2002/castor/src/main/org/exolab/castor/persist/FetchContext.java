@@ -55,7 +55,7 @@ import org.exolab.castor.mapping.AccessMode;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class FetchContext
+class FetchContext
 {
 
 

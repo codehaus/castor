@@ -73,7 +73,7 @@ final class OID
     /**
      * The object's type.
      */
-    private Class        _type;
+    private Class        _javaClass;
 
 
     /**
@@ -94,17 +94,22 @@ final class OID
     private int          _hashCode;
 
 
+    /**
+     * The top level class, used for equating OIDs based on commong parent.
+     */
+    private Class _topClass;
+
+
     OID( ClassHandler handler, Object identity )
     {
         _identity = identity;
+        _javaClass = handler.getJavaClass();
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        /* XXX Need to fix that
-          while ( clsDesc.getExtends() != null )
-          clsDesc = (ClassDesc) clsDesc.getExtends();
-        */
-        _type = handler.getJavaClass();
-        _hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
+        while ( handler.getExtends() != null )
+            handler = (ClassHandler) handler.getExtends();
+        _topClass = handler.getJavaClass();
+        _hashCode = _topClass.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
 
 
@@ -191,9 +196,9 @@ final class OID
      *
      * @return The object's type
      */
-    Object getJavaClass()
+    Class getJavaClass()
     {
-        return _type;
+        return _javaClass;
     }
 
 
@@ -220,13 +225,13 @@ final class OID
         // have no primary identity, therefore all such objects are
         // not identical.
         other = (OID) obj;
-        return ( _type == other._type && _identity != null && _identity.equals( other._identity ) );
+        return ( _topClass == other._topClass && _identity != null && _identity.equals( other._identity ) );
     }
 
 
     public String toString()
     {
-        return _type.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
+        return _javaClass.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
     }
 
 

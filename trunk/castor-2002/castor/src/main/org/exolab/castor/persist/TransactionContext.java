@@ -335,7 +335,6 @@ public abstract class TransactionContext
             oid = engine.load( this, obj.getClass(), identity,
                                accessMode, _lockTimeout );
         } catch ( ObjectNotFoundException except ) {
-            removeObjectEntry( obj );
             throw except;
         } catch ( LockNotGrantedException except ) {
             throw except;
@@ -348,7 +347,12 @@ public abstract class TransactionContext
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction. 
-        engine.copyObject( this, oid, obj );
+        try {
+            engine.copyObject( this, oid, obj );
+        } catch ( ObjectNotFoundException except ) {
+            engine.forgetObject( this, oid );
+            throw except;
+        }
         if ( entry == null ) {
             if ( accessMode == AccessMode.ReadOnly ) {
                 engine.releaseLock( this, oid );
@@ -460,7 +464,12 @@ public abstract class TransactionContext
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction. 
         obj = handler.newInstance();
-        engine.copyObject( this, oid, obj );
+        try {
+            engine.copyObject( this, oid, obj );
+        } catch ( ObjectNotFoundException except ) {
+            engine.forgetObject( this, oid );
+            throw except;
+        }
         if ( entry == null ) {
             if ( accessMode == AccessMode.ReadOnly ) {
                 engine.releaseLock( this, oid );
@@ -747,7 +756,7 @@ public abstract class TransactionContext
                 // removal attempts. Otherwise the object is stored in
                 // the database.
                 if ( entry.deleted ) {
-                    entry.engine.delete( this, entry.obj, entry.oid.getIdentity() );
+                    entry.engine.delete( this, entry.obj.getClass(), entry.oid.getIdentity() );
                 } else {
                     Object       identity;
                     ClassHandler handler;

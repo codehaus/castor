@@ -207,12 +207,12 @@ public interface PersistenceEngine
      * </ul>
      *
      * @param tx The transaction context
-     * @param obj The object to delete
+     * @param type The object type
      * @param identity The object's identity
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void delete( TransactionContext tx, Object obj, Object identity )
+    public void delete( TransactionContext tx, Class type, Object identity )
         throws PersistenceException;
     
 
