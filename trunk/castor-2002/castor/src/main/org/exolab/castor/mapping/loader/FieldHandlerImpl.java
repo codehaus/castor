@@ -294,7 +294,7 @@ public final class FieldHandlerImpl
             else if ( _getMethod != null ) {
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise, 
-                if ( _hasMethod != null && _hasMethod.invoke( object, null ) == Boolean.FALSE )
+                if ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() )
                     value = null;
                 else
                     value = _getMethod.invoke( object, null );
@@ -332,11 +332,8 @@ public final class FieldHandlerImpl
     {
         if ( _colHandler == null ) {
 
-            // If there is a default value, use it for a null field.
-            // Otherwise, if there is a convertor, apply conversion.
-            if ( value == null )
-                value = _default;
-            else if ( _convertTo != null ) {
+            // If there is a convertor, apply conversion here.
+            if ( value != null && _convertTo != null ) {
                 try {
                     value = _convertTo.convert( value );
                 } catch ( ClassCastException except ) {
@@ -348,12 +345,12 @@ public final class FieldHandlerImpl
                 if ( _handler != null )
                     _handler.setValue( object, value );
                 else if ( _field != null )
-                    _field.set( object, value );
+                    _field.set( object, value == null ? _default : value );
                 else if ( _setMethod != null ) {
                     if ( value == null && _deleteMethod != null )
                         _deleteMethod.invoke( object, null );
                     else
-                        _setMethod.invoke( object, new Object[] { value } );
+                        _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                 }
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
@@ -492,7 +489,7 @@ public final class FieldHandlerImpl
             _hasMethod = hasMethod;
         }
 
-        if ( _deleteMethod != null ) {
+        if ( deleteMethod != null ) {
             if ( ( deleteMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
                  ( deleteMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
                 throw new MappingException( "mapping.accessorNotAccessible",
