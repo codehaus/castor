@@ -2,6 +2,63 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.7.9  February 25, 2000"><pre>
+JDO:     Now loads JDO configuration file from ODMG.loadDatabase() which in
+         turn loads all the required mapping files. Added jdo-conf DTD which
+         has been separated from the mapping DTD. For more info see the JDO
+         example.
+
+JDO:     Supports the new mapping API, new mapping DTD. See the JDO example
+         for using the new mapping file.
+
+JDO:     Cleaned up SQLEngine query composer using QueryExpr. Will be able to
+         support different join and locking syntaxes in the future.
+
+JDO:     Access mode (shared, exclusive, read-only) is now specified at the
+         class level in the mapping file and not in the database level as
+         before. This allows one transaction to support multiple type of
+         locks depending on the object being used.
+
+XML:     A Castor JAR with just the XML module will be created from the
+         'jar' target (less than half the size) and also available from
+         the FTP.
+
+XML:     Better error reporting in exceptions.
+
+Mapping: The API for the mapping package has been finalized. Both JDO and DAX
+         use the new API, XML support is in the works.
+
+Persist: Added support for relations (one-one, one-many) in loading,
+         creating and deleting of objects. Related objects are now loaded
+         from the cache, reloaded only when necessary, locked appropriately.
+
+Misc:    New Ant and build.xml include 100% Java Tar task, improved Javadoc
+         task, now also generates zips for binary and source distribution,
+         new cvs task gets last snapshot from CVS.
+    </pre></section>
+    <section title="Version 0.7.8  February 10, 2000"><pre>
+XML:    If annotations are used within elements, or attributes, I add
+        these to the Javadoc comments of the generated source.
+        example:
+        &lt;attribute name="foo" type="string"&gt;
+           &lt;annotation&gt;
+              &lt;info&gt;This comment will be included in the Java source&lt;/info&gt;
+           &lt;/annotation&gt;
+        &lt;/attribute&gt;
+
+JDO:     Fixed bug in SQLEngine not deleting row. (Contributed by
+         Oleg Nitz)
+
+JDO:     Fixed examples not setting reference of related class for
+         Inventory (Contributed by Steve Muench)
+
+XML:     Fixed bug with package name for top-level types, reported by
+         Kevin Burton
+
+XML:     Added support for "annotation" as a child for most of the structures.
+
+XML:     Added more support for "datatype"
+    </pre></section>
     <section title="Version 0.7.7  February 4, 2000"><pre>
 XML:     Changed "archetype" to "type" in accordance with the 19991217
          XML Schema draft
