@@ -242,7 +242,7 @@ public class FloatValidator extends PatternValidator
 
         float value = 0;
         try {
-             value = java.lang.Float.parseFloat(object.toString());
+             value = new java.lang.Float(object.toString()).floatValue();
         }
         catch(Exception ex) {
             String err = "Expecting a float, received instead: ";
