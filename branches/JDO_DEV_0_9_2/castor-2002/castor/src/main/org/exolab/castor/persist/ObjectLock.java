@@ -881,7 +881,7 @@ final class ObjectLock {
      * and the current thread must already synchronized with "this"
      */
     private void upgradeLockInternal( Key key, int timeout )
-            throws LockUpgradeFailedException {
+            throws LockUpgradeFailedException, LockNotGrantedException {
 
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
