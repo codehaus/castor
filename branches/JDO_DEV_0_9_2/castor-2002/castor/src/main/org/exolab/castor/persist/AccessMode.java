@@ -161,6 +161,15 @@ public final class AccessMode {
     }
 
     /**
+     * Return true if lock mode is exclusive or db-locked
+     */
+    public boolean isExclusive() {
+        if ( this == Exclusive || this == DbLocked )
+            return true;
+        return false;
+    }
+
+    /**
      * The name of this access mode as it would appear in a
      * mapping file.
      */
