@@ -81,6 +81,12 @@ public class CastorTestSuiteRunner extends TestCase {
     private final static String FILE_SEPARATOR = System.getProperty("file.separator");
 
     /**
+     * Command line argument that causes the help/options
+     * to be displayed
+     */
+    private final static String HELP_ARG = "-help";
+    
+    /**
      * Command line argument to set the verbose mode
      */
     private final static String VERBOSE_ARG = "-verbose";
@@ -157,6 +163,8 @@ public class CastorTestSuiteRunner extends TestCase {
         boolean text = false; // GUI by default
 
         for (int i=0; i<args.length; ++i) {
+            
+            System.out.println("arg: '" + args[i] +"'");
 
             if (args[i].equals(VERBOSE_ARG)) {
                 // Set up verbose mode
@@ -178,11 +186,17 @@ public class CastorTestSuiteRunner extends TestCase {
                     System.out.println("Unable to parse the number for the seed");
                     error();
                 }
-            } else if (System.getProperty(TEST_ROOT_PROPERTY) == null) {
+            } 
+            else if (args[i].equals(HELP_ARG)) {
+                usage();
+                return;
+            }
+            else if (System.getProperty(TEST_ROOT_PROPERTY) == null) {
                 System.setProperty(TEST_ROOT_PROPERTY, args[i]);
             }
-            else
+            else {
                 error();
+            }
         }
 
         if (System.getProperty(TEST_ROOT_PROPERTY) == null)
@@ -202,12 +216,22 @@ public class CastorTestSuiteRunner extends TestCase {
      * Print usage and exit.
      */
     private static void error() {
+        usage();
+        System.exit(1);
+    }
+    
+    /**
+     * Print usage
+     */
+    private static void usage() {
         System.out.println("Castor Testing Framework ");
+        System.out.println("------------------------ ");
         System.out.println("argument: [" + VERBOSE_ARG + "] [" + TEXT_MODE_ARG + "] [" + PRINT_STACK + "] [" + SEED_ARG + " <seed value>] <root test directory or a castor jar test file>");
+        System.out.println("   " + HELP_ARG + " : displays this screen.");
         System.out.println("   " + VERBOSE_ARG + " : give detailed execution information for the each test");
         System.out.println("   " + TEXT_MODE_ARG + " : run the test without starting the swing gui");
         System.out.println("   " + PRINT_STACK + " : Print the full stack trace on the console when an exception is thrown");
         System.out.println("   " + SEED_ARG  + " <seed value> : force the use of a given seed for the pseudo-random number generator used for the random tests");
-        System.exit(1);
     }
+    
 }
