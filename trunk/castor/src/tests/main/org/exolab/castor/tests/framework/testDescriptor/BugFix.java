@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -139,7 +139,7 @@ public class BugFix implements java.io.Serializable {
     } //-- int getCommentCount() 
 
     /**
-     * Method getDate_FixReturns the value of field 'date_Fix'.
+     * Returns the value of field 'date_Fix'.
      * 
      * @return the value of field 'date_Fix'.
      */
@@ -149,8 +149,7 @@ public class BugFix implements java.io.Serializable {
     } //-- org.exolab.castor.types.Date getDate_Fix() 
 
     /**
-     * Method getDate_ReportReturns the value of field
-     * 'date_Report'.
+     * Returns the value of field 'date_Report'.
      * 
      * @return the value of field 'date_Report'.
      */
@@ -160,7 +159,7 @@ public class BugFix implements java.io.Serializable {
     } //-- org.exolab.castor.types.Date getDate_Report() 
 
     /**
-     * Method getReporterReturns the value of field 'reporter'.
+     * Returns the value of field 'reporter'.
      * 
      * @return the value of field 'reporter'.
      */
@@ -258,7 +257,7 @@ public class BugFix implements java.io.Serializable {
     } //-- void setComment(java.lang.String) 
 
     /**
-     * Method setDate_FixSets the value of field 'date_Fix'.
+     * Sets the value of field 'date_Fix'.
      * 
      * @param date_Fix the value of field 'date_Fix'.
      */
@@ -268,7 +267,7 @@ public class BugFix implements java.io.Serializable {
     } //-- void setDate_Fix(org.exolab.castor.types.Date) 
 
     /**
-     * Method setDate_ReportSets the value of field 'date_Report'.
+     * Sets the value of field 'date_Report'.
      * 
      * @param date_Report the value of field 'date_Report'.
      */
@@ -278,7 +277,7 @@ public class BugFix implements java.io.Serializable {
     } //-- void setDate_Report(org.exolab.castor.types.Date) 
 
     /**
-     * Method setReporterSets the value of field 'reporter'.
+     * Sets the value of field 'reporter'.
      * 
      * @param reporter the value of field 'reporter'.
      */
@@ -288,15 +287,15 @@ public class BugFix implements java.io.Serializable {
     } //-- void setReporter(java.lang.String) 
 
     /**
-     * Method unmarshal
+     * Method unmarshalBugFix
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.BugFix unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalBugFix(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.tests.framework.testDescriptor.BugFix) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.BugFix.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.BugFix unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshalBugFix(java.io.Reader) 
 
     /**
      * Method validate

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -55,6 +55,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
 
     public SourceGeneratorTestDescriptor() {
         super();
+        nsPrefix = "test";
         nsURI = "http://castor.exolab.org/Test";
         xmlName = "SourceGeneratorTest";
         
@@ -219,7 +220,7 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         }
         desc.setValidator(fieldValidator);
         //-- _root_Object
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.Root_Object.class, "_root_Object", "Root_Object", org.exolab.castor.xml.NodeType.Element);
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.RootType.class, "_root_Object", "Root_Object", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
@@ -232,14 +233,14 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
             {
                 try {
                     SourceGeneratorTest target = (SourceGeneratorTest) object;
-                    target.setRoot_Object( (org.exolab.castor.tests.framework.testDescriptor.Root_Object) value);
+                    target.setRoot_Object( (org.exolab.castor.tests.framework.testDescriptor.RootType) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.tests.framework.testDescriptor.Root_Object();
+                return new org.exolab.castor.tests.framework.testDescriptor.RootType();
             }
         } );
         desc.setHandler(handler);

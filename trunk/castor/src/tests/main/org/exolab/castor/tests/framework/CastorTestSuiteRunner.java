@@ -151,8 +151,8 @@ public class CastorTestSuiteRunner extends TestCase {
      * Runs the Castor Test.
      */
     public static void main(String args[]) {
-
-         if (args.length == 0)
+      
+        if (args.length == 0)
             error();
         boolean text = false; // GUI by default
 

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -113,7 +113,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateComment() 
 
     /**
-     * Method getAuthorReturns the value of field 'author'.
+     * Returns the value of field 'author'.
      * 
      * @return the value of field 'author'.
      */
@@ -123,7 +123,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.lang.String getAuthor() 
 
     /**
-     * Method getBugFixReturns the value of field 'bugFix'.
+     * Returns the value of field 'bugFix'.
      * 
      * @return the value of field 'bugFix'.
      */
@@ -133,7 +133,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.BugFix getBugFix() 
 
     /**
-     * Method getCategoryReturns the value of field 'category'.
+     * Returns the value of field 'category'.
      * 
      * @return the value of field 'category'.
      */
@@ -180,7 +180,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- int getCommentCount() 
 
     /**
-     * Method getNameReturns the value of field 'name'.
+     * Returns the value of field 'name'.
      * 
      * @return the value of field 'name'.
      */
@@ -190,8 +190,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.lang.String getName() 
 
     /**
-     * Method getTestDescriptorChoiceReturns the value of field
-     * 'testDescriptorChoice'.
+     * Returns the value of field 'testDescriptorChoice'.
      * 
      * @return the value of field 'testDescriptorChoice'.
      */
@@ -259,7 +258,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.lang.String removeComment(int) 
 
     /**
-     * Method setAuthorSets the value of field 'author'.
+     * Sets the value of field 'author'.
      * 
      * @param author the value of field 'author'.
      */
@@ -269,7 +268,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setAuthor(java.lang.String) 
 
     /**
-     * Method setBugFixSets the value of field 'bugFix'.
+     * Sets the value of field 'bugFix'.
      * 
      * @param bugFix the value of field 'bugFix'.
      */
@@ -279,7 +278,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setBugFix(org.exolab.castor.tests.framework.testDescriptor.BugFix) 
 
     /**
-     * Method setCategorySets the value of field 'category'.
+     * Sets the value of field 'category'.
      * 
      * @param category the value of field 'category'.
      */
@@ -319,7 +318,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setComment(java.lang.String) 
 
     /**
-     * Method setNameSets the value of field 'name'.
+     * Sets the value of field 'name'.
      * 
      * @param name the value of field 'name'.
      */
@@ -329,8 +328,7 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setName(java.lang.String) 
 
     /**
-     * Method setTestDescriptorChoiceSets the value of field
-     * 'testDescriptorChoice'.
+     * Sets the value of field 'testDescriptorChoice'.
      * 
      * @param testDescriptorChoice the value of field
      * 'testDescriptorChoice'.
@@ -341,15 +339,15 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setTestDescriptorChoice(org.exolab.castor.tests.framework.testDescriptor.TestDescriptorChoice) 
 
     /**
-     * Method unmarshal
+     * Method unmarshalTestDescriptor
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.TestDescriptor unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalTestDescriptor(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.tests.framework.testDescriptor.TestDescriptor) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.TestDescriptor.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.TestDescriptor unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshalTestDescriptor(java.io.Reader) 
 
     /**
      * Method validate

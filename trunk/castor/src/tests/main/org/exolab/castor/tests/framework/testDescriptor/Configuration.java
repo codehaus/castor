@@ -22,11 +22,11 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * Class FailureType.
+ * Class Configuration.
  * 
  * @version $Revision$ $Date$
  */
-public class FailureType implements java.io.Serializable {
+public class Configuration implements java.io.Serializable {
 
 
       //--------------------------/
@@ -34,28 +34,23 @@ public class FailureType implements java.io.Serializable {
     //--------------------------/
 
     /**
-     * internal content storage
+     * Field _marshal
      */
-    private boolean _content;
+    private org.exolab.castor.tests.framework.testDescriptor.ConfigurationType _marshal;
 
     /**
-     * keeps track of state for field: _content
+     * Field _unmarshal
      */
-    private boolean _has_content;
-
-    /**
-     * Field _exception
-     */
-    private java.lang.String _exception;
+    private org.exolab.castor.tests.framework.testDescriptor.ConfigurationType _unmarshal;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public FailureType() {
+    public Configuration() {
         super();
-    } //-- org.exolab.castor.tests.framework.testDescriptor.FailureType()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Configuration()
 
 
       //-----------/
@@ -63,41 +58,24 @@ public class FailureType implements java.io.Serializable {
     //-----------/
 
     /**
-     * Method deleteContent
-     */
-    public void deleteContent()
-    {
-        this._has_content= false;
-    } //-- void deleteContent() 
-
-    /**
-     * Returns the value of field 'content'. The field 'content'
-     * has the following description: internal content storage
+     * Returns the value of field 'marshal'.
      * 
-     * @return the value of field 'content'.
+     * @return the value of field 'marshal'.
      */
-    public boolean getContent()
+    public org.exolab.castor.tests.framework.testDescriptor.ConfigurationType getMarshal()
     {
-        return this._content;
-    } //-- boolean getContent() 
+        return this._marshal;
+    } //-- org.exolab.castor.tests.framework.testDescriptor.ConfigurationType getMarshal() 
 
     /**
-     * Returns the value of field 'exception'.
+     * Returns the value of field 'unmarshal'.
      * 
-     * @return the value of field 'exception'.
+     * @return the value of field 'unmarshal'.
      */
-    public java.lang.String getException()
+    public org.exolab.castor.tests.framework.testDescriptor.ConfigurationType getUnmarshal()
     {
-        return this._exception;
-    } //-- java.lang.String getException() 
-
-    /**
-     * Method hasContent
-     */
-    public boolean hasContent()
-    {
-        return this._has_content;
-    } //-- boolean hasContent() 
+        return this._unmarshal;
+    } //-- org.exolab.castor.tests.framework.testDescriptor.ConfigurationType getUnmarshal() 
 
     /**
      * Method isValid
@@ -138,37 +116,35 @@ public class FailureType implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Sets the value of field 'content'. The field 'content' has
-     * the following description: internal content storage
+     * Sets the value of field 'marshal'.
      * 
-     * @param content the value of field 'content'.
+     * @param marshal the value of field 'marshal'.
      */
-    public void setContent(boolean content)
+    public void setMarshal(org.exolab.castor.tests.framework.testDescriptor.ConfigurationType marshal)
     {
-        this._content = content;
-        this._has_content = true;
-    } //-- void setContent(boolean) 
+        this._marshal = marshal;
+    } //-- void setMarshal(org.exolab.castor.tests.framework.testDescriptor.ConfigurationType) 
 
     /**
-     * Sets the value of field 'exception'.
+     * Sets the value of field 'unmarshal'.
      * 
-     * @param exception the value of field 'exception'.
+     * @param unmarshal the value of field 'unmarshal'.
      */
-    public void setException(java.lang.String exception)
+    public void setUnmarshal(org.exolab.castor.tests.framework.testDescriptor.ConfigurationType unmarshal)
     {
-        this._exception = exception;
-    } //-- void setException(java.lang.String) 
+        this._unmarshal = unmarshal;
+    } //-- void setUnmarshal(org.exolab.castor.tests.framework.testDescriptor.ConfigurationType) 
 
     /**
-     * Method unmarshalFailureType
+     * Method unmarshalConfiguration
      * 
      * @param reader
      */
-    public static java.lang.Object unmarshalFailureType(java.io.Reader reader)
+    public static java.lang.Object unmarshalConfiguration(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.tests.framework.testDescriptor.FailureType) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.FailureType.class, reader);
-    } //-- java.lang.Object unmarshalFailureType(java.io.Reader) 
+        return (org.exolab.castor.tests.framework.testDescriptor.Configuration) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.Configuration.class, reader);
+    } //-- java.lang.Object unmarshalConfiguration(java.io.Reader) 
 
     /**
      * Method validate

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -46,7 +46,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
      */
     private java.lang.String _property_File;
 
-  /**
+    /**
      * Field _collection
      */
     private org.exolab.castor.tests.framework.testDescriptor.types.CollectionType _collection = org.exolab.castor.tests.framework.testDescriptor.types.CollectionType.valueOf("vector");
@@ -59,7 +59,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     /**
      * Field _root_Object
      */
-    private org.exolab.castor.tests.framework.testDescriptor.Root_Object _root_Object;
+    private org.exolab.castor.tests.framework.testDescriptor.RootType _root_Object;
 
     /**
      * Field _unitTestCaseList
@@ -74,6 +74,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     public SourceGeneratorTest() {
         super();
         _schemaList = new Vector();
+        setCollection(org.exolab.castor.tests.framework.testDescriptor.types.CollectionType.valueOf("vector"));
         _unitTestCaseList = new Vector();
     } //-- org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest()
 
@@ -145,8 +146,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateUnitTestCase() 
 
     /**
-     * Method getBindingFileReturns the value of field
-     * 'bindingFile'.
+     * Returns the value of field 'bindingFile'.
      * 
      * @return the value of field 'bindingFile'.
      */
@@ -156,7 +156,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- java.lang.String getBindingFile() 
 
     /**
-     * Method getCollectionReturns the value of field 'collection'.
+     * Returns the value of field 'collection'.
      * 
      * @return the value of field 'collection'.
      */
@@ -166,8 +166,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.types.CollectionType getCollection() 
 
     /**
-     * Method getProperty_FileReturns the value of field
-     * 'property_File'.
+     * Returns the value of field 'property_File'.
      * 
      * @return the value of field 'property_File'.
      */
@@ -177,15 +176,14 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- java.lang.String getProperty_File() 
 
     /**
-     * Method getRoot_ObjectReturns the value of field
-     * 'root_Object'.
+     * Returns the value of field 'root_Object'.
      * 
      * @return the value of field 'root_Object'.
      */
-    public org.exolab.castor.tests.framework.testDescriptor.Root_Object getRoot_Object()
+    public org.exolab.castor.tests.framework.testDescriptor.RootType getRoot_Object()
     {
         return this._root_Object;
-    } //-- org.exolab.castor.tests.framework.testDescriptor.Root_Object getRoot_Object() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.RootType getRoot_Object() 
 
     /**
      * Method getSchema
@@ -340,7 +338,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCase removeUnitTestCase(int) 
 
     /**
-     * Method setBindingFileSets the value of field 'bindingFile'.
+     * Sets the value of field 'bindingFile'.
      * 
      * @param bindingFile the value of field 'bindingFile'.
      */
@@ -350,7 +348,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- void setBindingFile(java.lang.String) 
 
     /**
-     * Method setCollectionSets the value of field 'collection'.
+     * Sets the value of field 'collection'.
      * 
      * @param collection the value of field 'collection'.
      */
@@ -360,8 +358,7 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- void setCollection(org.exolab.castor.tests.framework.testDescriptor.types.CollectionType) 
 
     /**
-     * Method setProperty_FileSets the value of field
-     * 'property_File'.
+     * Sets the value of field 'property_File'.
      * 
      * @param property_File the value of field 'property_File'.
      */
@@ -371,14 +368,14 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- void setProperty_File(java.lang.String) 
 
     /**
-     * Method setRoot_ObjectSets the value of field 'root_Object'.
+     * Sets the value of field 'root_Object'.
      * 
      * @param root_Object the value of field 'root_Object'.
      */
-    public void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.Root_Object root_Object)
+    public void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.RootType root_Object)
     {
         this._root_Object = root_Object;
-    } //-- void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.Root_Object) 
+    } //-- void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.RootType) 
 
     /**
      * Method setSchema
@@ -441,15 +438,15 @@ public class SourceGeneratorTest implements java.io.Serializable {
     } //-- void setUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * Method unmarshal
+     * Method unmarshalSourceGeneratorTest
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalSourceGeneratorTest(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshalSourceGeneratorTest(java.io.Reader) 
 
     /**
      * Method validate

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -212,15 +212,15 @@ public class SchemaTest implements java.io.Serializable {
     } //-- void setUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * Method unmarshal
+     * Method unmarshalSchemaTest
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.SchemaTest unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalSchemaTest(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.tests.framework.testDescriptor.SchemaTest) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.SchemaTest.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.SchemaTest unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshalSchemaTest(java.io.Reader) 
 
     /**
      * Method validate

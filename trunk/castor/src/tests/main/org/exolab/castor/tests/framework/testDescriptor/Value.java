@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -22,27 +22,62 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.ContentHandler;
 
 /**
- * Class Listener.
+ * Class Value.
  * 
  * @version $Revision$ $Date$
  */
-public class Listener extends ListenerType 
-implements java.io.Serializable
-{
+public class Value implements java.io.Serializable {
+
+
+      //--------------------------/
+     //- Class/Member Variables -/
+    //--------------------------/
+
+    /**
+     * internal content storage
+     */
+    private java.lang.String _content = "";
+
+    /**
+     * Field _type
+     */
+    private java.lang.String _type;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public Listener() {
+    public Value() {
         super();
-    } //-- org.exolab.castor.tests.framework.testDescriptor.Listener()
+        setContent("");
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Value()
 
 
       //-----------/
      //- Methods -/
     //-----------/
+
+    /**
+     * Returns the value of field 'content'. The field 'content'
+     * has the following description: internal content storage
+     * 
+     * @return the value of field 'content'.
+     */
+    public java.lang.String getContent()
+    {
+        return this._content;
+    } //-- java.lang.String getContent() 
+
+    /**
+     * Returns the value of field 'type'.
+     * 
+     * @return the value of field 'type'.
+     */
+    public java.lang.String getType()
+    {
+        return this._type;
+    } //-- java.lang.String getType() 
 
     /**
      * Method isValid
@@ -83,15 +118,36 @@ implements java.io.Serializable
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Method unmarshal
+     * Sets the value of field 'content'. The field 'content' has
+     * the following description: internal content storage
+     * 
+     * @param content the value of field 'content'.
+     */
+    public void setContent(java.lang.String content)
+    {
+        this._content = content;
+    } //-- void setContent(java.lang.String) 
+
+    /**
+     * Sets the value of field 'type'.
+     * 
+     * @param type the value of field 'type'.
+     */
+    public void setType(java.lang.String type)
+    {
+        this._type = type;
+    } //-- void setType(java.lang.String) 
+
+    /**
+     * Method unmarshalValue
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.Listener unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalValue(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.tests.framework.testDescriptor.Listener) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.Listener.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.Listener unmarshal(java.io.Reader) 
+        return (org.exolab.castor.tests.framework.testDescriptor.Value) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.Value.class, reader);
+    } //-- java.lang.Object unmarshalValue(java.io.Reader) 
 
     /**
      * Method validate

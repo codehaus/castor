@@ -17,11 +17,11 @@ import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.validators.*;
 
 /**
- * Class SchemaTestDescriptor.
+ * Class ConfigurationTypeDescriptor.
  * 
  * @version $Revision$ $Date$
  */
-public class SchemaTestDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class ConfigurationTypeDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
       //--------------------------/
@@ -53,11 +53,11 @@ public class SchemaTestDescriptor extends org.exolab.castor.xml.util.XMLClassDes
      //- Constructors -/
     //----------------/
 
-    public SchemaTestDescriptor() {
+    public ConfigurationTypeDescriptor() {
         super();
         nsPrefix = "test";
         nsURI = "http://castor.exolab.org/Test";
-        xmlName = "SchemaTest";
+        xmlName = "ConfigurationType";
         
         //-- set grouping compositor
         setCompositorAsSequence();
@@ -68,28 +68,28 @@ public class SchemaTestDescriptor extends org.exolab.castor.xml.util.XMLClassDes
         
         //-- initialize element descriptors
         
-        //-- _unitTestCaseList
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase.class, "_unitTestCaseList", "UnitTestCase", org.exolab.castor.xml.NodeType.Element);
+        //-- _callMethodList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.CallMethod.class, "_callMethodList", "Call-method", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                SchemaTest target = (SchemaTest) object;
-                return target.getUnitTestCase();
+                ConfigurationType target = (ConfigurationType) object;
+                return target.getCallMethod();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    SchemaTest target = (SchemaTest) object;
-                    target.addUnitTestCase( (org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) value);
+                    ConfigurationType target = (ConfigurationType) object;
+                    target.addCallMethod( (org.exolab.castor.tests.framework.testDescriptor.CallMethod) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.tests.framework.testDescriptor.UnitTestCase();
+                return new org.exolab.castor.tests.framework.testDescriptor.CallMethod();
             }
         } );
         desc.setHandler(handler);
@@ -98,13 +98,13 @@ public class SchemaTestDescriptor extends org.exolab.castor.xml.util.XMLClassDes
         desc.setMultivalued(true);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _unitTestCaseList
+        //-- validation code for: _callMethodList
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.SchemaTestDescriptor()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.ConfigurationTypeDescriptor()
 
 
       //-----------/
@@ -140,7 +140,7 @@ public class SchemaTestDescriptor extends org.exolab.castor.xml.util.XMLClassDes
      */
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.tests.framework.testDescriptor.SchemaTest.class;
+        return org.exolab.castor.tests.framework.testDescriptor.ConfigurationType.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
