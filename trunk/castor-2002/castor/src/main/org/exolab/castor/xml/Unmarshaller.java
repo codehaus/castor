@@ -99,6 +99,13 @@ public class Unmarshaller {
     private IDResolver _idResolver = null;
 
     /**
+     * A boolean that specifies whether or not
+     * non-matched attributes should be ignored upon
+     * unmarshalling.
+    **/
+    private boolean _ignoreExtraAtts = true;
+    
+    /**
      * The instance of _class to Unmarshal into (optional)
     **/
     private Object _instanceObj = null;
@@ -226,6 +233,7 @@ public class Unmarshaller {
         handler.setDebug(_debug);
         handler.setReuseObjects(_reuseObjects);
         handler.setValidation(_validate);
+        handler.setIgnoreExtraAttributes(_ignoreExtraAtts);
 
         if (_instanceObj != null) {
             handler.setRootObject(_instanceObj);
@@ -288,6 +296,19 @@ public class Unmarshaller {
         _idResolver = idResolver;
     } //-- idResolver
 
+    /**
+     * Sets whether or not attributes that do not match
+     * a specific field should simply be ignored or
+     * reported as an error. By default, extra attributes
+     * are ignored.
+     *
+     * @param ignoreExtraAtts a boolean that when true will
+     * allow non-matched attributes to simply be ignored.
+    **/
+    public void setIgnoreExtraAttributes(boolean ignoreExtraAtts) {
+        _ignoreExtraAtts = ignoreExtraAtts;    
+    } //-- setIgnoreExtraAttributes
+    
     /**
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
