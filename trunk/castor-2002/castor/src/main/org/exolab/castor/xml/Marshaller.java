@@ -378,9 +378,9 @@ public class Marshaller {
                 if (nsPrefix != null) {
                     if (nsPrefix.length() > 0) 
                         attName += ":" + nsPrefix;
-                    _nsScope.add(nsURI);
-                    addedNamespace = true;
                 }
+                addedNamespace = true;
+                _nsScope.add(nsURI);
                 atts.addAttribute(attName, null, nsURI);
             }
         }
