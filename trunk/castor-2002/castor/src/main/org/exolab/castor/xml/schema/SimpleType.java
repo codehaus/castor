@@ -369,6 +369,27 @@ public abstract class SimpleType extends XMLType
     //-- protected Methods -/
 
     /**
+     * A helper method for classes which extend SimpleType. This method
+     * allows creating a reference to a SimpleType.
+     *
+     * @return the reference to the SimpleType.
+    **/
+    protected SimpleType createReference(String name) {
+        return new SimpleTypeReference(getSchema(), name);
+    } //-- createReference
+
+    /**
+     * A helper method for classes which extend SimpleType. This method
+     * allows resolving a SimpleType reference to a SimpleType.
+     *
+     * @return the resolved SimpleType.
+     * @see createReference
+    **/
+    protected static SimpleType resolveReference(SimpleType simpleType) {
+        return (SimpleType) simpleType.getType();
+    } //-- createReference
+    
+    /**
      * Sets the parent for this SimpleType
      * @param parent the Structure that contains this SimpleType.
      * Currently this should only be Schema, ElementDecl or AttributeDecl.
