@@ -5,7 +5,12 @@
 
     <section title="">
       <p><b>Presentations about Castor...</b></p>
-
+      <p>
+         <b>Javaworld (April 2002)</b>
+         <p/>
+         Jacek Kruszelnicki discusses the pros and cons of Sun JDO and Castor JDO.
+         <a href="http://www.javaworld.com/javaworld/jw-04-2002/jw-0412-jdo.html?">Read</a>
+      </p>
       <p>
          <b>XML One Amsterdam (September 2001)</b>
          <p/>
