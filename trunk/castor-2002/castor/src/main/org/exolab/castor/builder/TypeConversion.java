@@ -291,6 +291,9 @@ public class TypeConversion {
                 }
                 default:
                     //-- error
+                    String warning = "Warning: The W3C datatype "+simpleType.getName();
+                    warning += " is not currently supported by Castor Source Generator.";
+                    System.out.println(warning);
                     String className
                         = JavaXMLNaming.toJavaClassName(simpleType.getName());
                     xsType = new XSClass(new JClass(className));
