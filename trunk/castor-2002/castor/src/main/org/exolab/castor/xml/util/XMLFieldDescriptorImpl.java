@@ -597,6 +597,15 @@ public class XMLFieldDescriptorImpl
             
     } //-- setValidator
     
+    /**
+     * Sets the xml name for the described field
+     *
+     * @param name the XML name for the described field
+    **/
+    public void setXMLName(String xmlName) {
+        _xmlName = xmlName;
+    } //-- setXMLName
+    
     public String toString()
     {
         return "XMLFieldDesciptor: " + _fieldName + " AS " + _xmlName;
