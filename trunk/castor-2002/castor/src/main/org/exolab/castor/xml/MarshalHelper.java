@@ -83,7 +83,7 @@ public class MarshalHelper {
      * @return the new XMLClassDescriptor created for the given class
      * @exception MarshalException when an error occurs during the creation
      * of the ClassDescriptor.
-    **/
+     **/
     public static XMLClassDescriptor generateClassDescriptor(Class c) 
         throws MarshalException
     {
@@ -97,7 +97,7 @@ public class MarshalHelper {
      * @return the new XMLClassDescriptor created for the given class
      * @exception MarshalException when an error occurs during the creation
      * of the ClassDescriptor.
-    **/
+     **/
     public static XMLClassDescriptor generateClassDescriptor
         (Class c, PrintWriter errorWriter) throws MarshalException
     {
@@ -117,20 +117,21 @@ public class MarshalHelper {
             (c == Class.class)||
             (c == Object.class)) {
             throw new MarshalException (
-                MarshalException.BASE_CLASS_OR_VOID_ERR );
+                                        MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
         
-		if ((!c.isPrimitive()) && 
-		    (!Serializable.class.isAssignableFrom( c ))) {
-		    if (errorWriter != null) {
-		        errorWriter.print("cannot create an XMLClassDescriptor for \'");
-		        errorWriter.print(c.getName());
-		        errorWriter.print("', it's not a primitive, or it doesn't");
-		        errorWriter.println(" implement java.io.Serializable.");
-		    }
-            return null;
-        }
-            
+        /*
+          if ((!c.isPrimitive()) && 
+          (!Serializable.class.isAssignableFrom( c ))) {
+          if (errorWriter != null) {
+          errorWriter.print("cannot create an XMLClassDescriptor for \'");
+          errorWriter.print(c.getName());
+          errorWriter.print("', it's not a primitive, or it doesn't");
+          errorWriter.println(" implement java.io.Serializable.");
+          }
+          return null;
+          }
+        */    
         XMLClassDescriptorImpl classDesc = new XMLClassDescriptorImpl(c);
         
         //-- handle primitives...should we have default MarshalInfo classes
@@ -141,7 +142,7 @@ public class MarshalHelper {
         Method[] methods = c.getMethods();
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
-
+            
             //-- if method comes from the Object base class, ignore
             if (method.getDeclaringClass() == Object.class) continue;
             
@@ -150,101 +151,101 @@ public class MarshalHelper {
             //-- read methods
             if (methodName.startsWith(GET)) {
                 if (method.getParameterTypes().length != 0) continue;
-            
+                
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
                 String xmlName   = toXMLName(fieldName);
-            
+                
                 Class type = method.getReturnType();
-
+                
                 if (!isDescriptable(type)) continue;
                 
-			    XMLFieldDescriptorImpl fieldDesc 
-			        = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
-            			
-			    if (fieldDesc == null) {
-			        fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
-			        descriptors.put(xmlName, fieldDesc);
-			        classDesc.addFieldDescriptor(fieldDesc);
-			    }
-			    
-			    FieldHandlerImpl handler 
-			        = (FieldHandlerImpl)fieldDesc.getHandler();
-			        
-			    if (handler == null) {
-			        TypeInfo typeInfo = new TypeInfo(type);
-			        try {
-			            handler = new FieldHandlerImpl(fieldName,
-			                                           method,
-			                                           null, 
-			                                           typeInfo);
-			        }
-			        catch (MappingException mx) {
-			            throw new MarshalException(mx);
-			        }
-			        
-			        fieldDesc.setHandler(handler);
-			    }
-			    else {
-			        try {
-			            handler.setReadMethod(method);
-			        }
-			        catch(MappingException mx) {
-			            throw new MarshalException(mx);
-			        }
-			    }
-			    
+                XMLFieldDescriptorImpl fieldDesc 
+                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
+                
+                if (fieldDesc == null) {
+                    fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
+                    descriptors.put(xmlName, fieldDesc);
+                    classDesc.addFieldDescriptor(fieldDesc);
+                }
+                
+                FieldHandlerImpl handler 
+                    = (FieldHandlerImpl)fieldDesc.getHandler();
+                
+                if (handler == null) {
+                    TypeInfo typeInfo = new TypeInfo(type);
+                    try {
+                        handler = new FieldHandlerImpl(fieldName,
+                                                       method,
+                                                       null, 
+                                                       typeInfo);
+                    }
+                    catch (MappingException mx) {
+                        throw new MarshalException(mx);
+                    }
+                    
+                    fieldDesc.setHandler(handler);
+                }
+                else {
+                    try {
+                        handler.setReadMethod(method);
+                    }
+                    catch(MappingException mx) {
+                        throw new MarshalException(mx);
+                    }
+                }
+                
             }
             //-- write methods
             else if (methodName.startsWith(ADD) ||
                      methodName.startsWith(SET) ) {
-        
+                
                 if (method.getParameterTypes().length != 1) continue;
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
                 String xmlName   = toXMLName(fieldName);
-            
+                
                 Class type = method.getParameterTypes()[0];
                 if (!isDescriptable(type)) continue;
                 
-			    XMLFieldDescriptorImpl fieldDesc 
-			        = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
-            			
-			    if (fieldDesc == null) {
-			        fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
-			        descriptors.put(xmlName, fieldDesc);
-			        classDesc.addFieldDescriptor(fieldDesc);
-			    }
-			    //-- collection
-			    if (methodName.startsWith(ADD)) {
+                XMLFieldDescriptorImpl fieldDesc 
+                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
+                
+                if (fieldDesc == null) {
+                    fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
+                    descriptors.put(xmlName, fieldDesc);
+                    classDesc.addFieldDescriptor(fieldDesc);
+                }
+                //-- collection
+                if (methodName.startsWith(ADD)) {
                     fieldDesc.setNodeType(NodeType.Element);
                     fieldDesc.setMultivalued(true);
                 }
-			    
-			    FieldHandlerImpl handler 
-			        = (FieldHandlerImpl)fieldDesc.getHandler();
-			        
-			    if (handler == null) {
-			        TypeInfo typeInfo = new TypeInfo(type);
-			        try {
-			            handler = new FieldHandlerImpl(fieldName,
-			                                           null,
-			                                           method, 
-			                                           typeInfo);
-			        }
-			        catch (MappingException mx) {
-			            throw new MarshalException(mx);
-			        }
-			        fieldDesc.setHandler(handler);
-			    }
-			    else {
-			        try {
-    			        handler.setWriteMethod(method);
-			        }
-			        catch(MappingException mx) {
-			            throw new MarshalException(mx);
-			        }
-			    }
+                
+                FieldHandlerImpl handler 
+                    = (FieldHandlerImpl)fieldDesc.getHandler();
+                
+                if (handler == null) {
+                    TypeInfo typeInfo = new TypeInfo(type);
+                    try {
+                        handler = new FieldHandlerImpl(fieldName,
+                                                       null,
+                                                       method, 
+                                                       typeInfo);
+                    }
+                    catch (MappingException mx) {
+                        throw new MarshalException(mx);
+                    }
+                    fieldDesc.setHandler(handler);
+                }
+                else {
+                    try {
+                        handler.setWriteMethod(method);
+                    }
+                    catch(MappingException mx) {
+                        throw new MarshalException(mx);
+                    }
+                }
             }
         }
         return classDesc;
@@ -253,30 +254,31 @@ public class MarshalHelper {
     public static boolean marshallable(Class type) {
         
         //-- make sure type is not Void, or Class;
-		if  (type == Void.class || type == Class.class ) return false;
-		        
-		if (( !type.isInterface() || (type == Object.class))) {
-			if (!type.isPrimitive()) {
-			            
-			    //-- make sure type is serializable
-			    if (!Serializable.class.isAssignableFrom( type ))
-                   return false;
+        if  (type == Void.class || type == Class.class ) return false;
+        
+        if (( !type.isInterface() || (type == Object.class))) {
+            
+            if (!type.isPrimitive()) {
+                
+                //-- make sure type is serializable
+                // if (!Serializable.class.isAssignableFrom( type ))
+                // return false;
                 
                 //-- make sure we can construct the Object
-				if (!type.isArray() ) {
-		            //-- try to get the default constructor and make
-		            //-- sure we are only looking at classes that can 
-		            //-- be instantiated by calling Class#newInstance
-			        try {
-			            type.getConstructor( EMPTY_CLASS_ARGS );
-			        }
-				    catch ( NoSuchMethodException e ) { 
-				        return false;
-				    }
-				}
-			}
-		}
-		return true;
+                if (!type.isArray() ) {
+                    //-- try to get the default constructor and make
+                    //-- sure we are only looking at classes that can 
+                    //-- be instantiated by calling Class#newInstance
+                    try {
+                        type.getConstructor( EMPTY_CLASS_ARGS );
+                    }
+                    catch ( NoSuchMethodException e ) { 
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     } //-- marshallable
     
     /**
@@ -284,7 +286,7 @@ public class MarshalHelper {
      * @param name the name to convert to a Java Name
      * @param upperFirst a flag to indicate whether or not the
      * the first character should be converted to uppercase. 
-    **/
+     **/
     public static String toJavaName(String name, boolean upperFirst) {
         
         int size = name.length();
@@ -297,18 +299,18 @@ public class MarshalHelper {
             char ch = ncChars[i];
             
             switch(ch) {
-                case ':':
-                case '-':
-                    uppercase = true;
-                    break;
-                default:
-                    if (uppercase == true) {
-                        ncChars[next] = Character.toUpperCase(ch);
-                        uppercase = false;
-                    }
-                    else ncChars[next] = ch;
-                    ++next;
-                    break;
+            case ':':
+            case '-':
+                uppercase = true;
+                break;
+            default:
+                if (uppercase == true) {
+                    ncChars[next] = Character.toUpperCase(ch);
+                    uppercase = false;
+                }
+                else ncChars[next] = ch;
+                ++next;
+                break;
             }
         }
         return new String(ncChars,0,next);
@@ -320,7 +322,7 @@ public class MarshalHelper {
      * to convert the String to
      * @param value the String to convert to a primitive
      * @return the new primitive Object
-    **/
+     **/
     public static Object toPrimitiveObject(Class type, String value) {
         
         Object primitive = null;
@@ -359,7 +361,7 @@ public class MarshalHelper {
         // do nothing
         else 
             primitive = value;
-            
+        
         return primitive;
     } //-- toPrimitiveObject
     
@@ -373,7 +375,7 @@ public class MarshalHelper {
      * <BR /><B>examples:</B><BR />
      * "Blob" becomes "blob" and "DataSource" becomes "data-source".
      * An XML
-    **/
+     **/
     public static String toXMLName(String name) {
         
         if (name == null) return null;
@@ -385,7 +387,7 @@ public class MarshalHelper {
         //-- 2 uppercase characters.
         if (Character.isUpperCase(name.charAt(0)) &&
             Character.isUpperCase(name.charAt(1))) return name;
-            
+        
         //-- process each character
         StringBuffer cbuff = new StringBuffer(name);
         cbuff.setCharAt(0, Character.toLowerCase(cbuff.charAt(0)));
@@ -404,7 +406,7 @@ public class MarshalHelper {
         }
         return cbuff.toString();
     }
-
+    
     //-------------------/
     //- Private Methods -/
     //-------------------/
@@ -412,7 +414,7 @@ public class MarshalHelper {
     private static XMLFieldDescriptorImpl createFieldDescriptor
         (Class type, String fieldName, String xmlName) 
     {
-	
+
         XMLFieldDescriptorImpl fieldDesc =
             new XMLFieldDescriptorImpl(type, fieldName, xmlName, null);
             
@@ -439,30 +441,30 @@ public class MarshalHelper {
     **/
     private static boolean isDescriptable(Class type) {
         //-- make sure type is not Void, or Class;
-		if  (type == Void.class || type == Class.class ) return false;
-		        
-		if ( (!type.isInterface())  && 
-		     (type != Object.class) &&
-			 (!type.isPrimitive())) {
-			            
-			//-- make sure type is serializable
-			if (!Serializable.class.isAssignableFrom( type ))
-                return false;
-                
+        if  (type == Void.class || type == Class.class ) return false;
+        
+        if ( (!type.isInterface())  && 
+             (type != Object.class) &&
+             (!type.isPrimitive())) {
+            
+            //-- make sure type is serializable
+            //if (!Serializable.class.isAssignableFrom( type ))
+            // return false;
+            
             //-- make sure we can construct the Object
-			if (!type.isArray() ) {
-		        //-- try to get the default constructor and make
-		        //-- sure we are only looking at classes that can 
-		        //-- be instantiated by calling Class#newInstance
-			    try {
-			        type.getConstructor( EMPTY_CLASS_ARGS );
-			    }
-				catch ( NoSuchMethodException e ) { 
-				    return false;
-				}
-			}
-		}
-		return true;
+            if (!type.isArray() ) {
+                //-- try to get the default constructor and make
+                //-- sure we are only looking at classes that can 
+                //-- be instantiated by calling Class#newInstance
+                try {
+                    type.getConstructor( EMPTY_CLASS_ARGS );
+                }
+                catch ( NoSuchMethodException e ) { 
+                    return false;
+                }
+            }
+        }
+        return true;
     } //-- isDescriptable
     
 } //-- MarshalHelper
