@@ -261,12 +261,11 @@ public class UnmarshalHandler implements DocumentHandler {
         
         //-- If we don't have an instance object and the Class type
         //-- is not a primitive or a byte[] we must simply return
-        if ((state.object == null) && 
-            (!state.type.isPrimitive()) &&
-            (!byteArray)) return;
+        if ((state.object == null) && (!state.primitiveOrImmutable))
+            return;
             
             
-        if ((type == String.class) || type.isPrimitive() || byteArray) {
+        if (state.primitiveOrImmutable) {
             
             String str = null;
             
