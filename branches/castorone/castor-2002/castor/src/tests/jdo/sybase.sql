@@ -161,13 +161,13 @@ create table test_rel_person (
 )
 go
 
-create unique index test_rel_person_pk on test_rel_person( pid );
+create unique index test_rel_person_pk on test_rel_person( pid )
 go
-grant all on test_rel_person to test;
+grant all on test_rel_person to test
 go
 
 -- extend base class (person)
-drop table test_rel_employee;
+drop table test_rel_employee
 go
 create table test_rel_employee (
   pid    int             not null,
