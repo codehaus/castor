@@ -166,6 +166,8 @@ public class Types
      * <li>All primitive types
      * <li>String
      * <li>Date
+     * <li>java.sql.Date
+     * <li>java.sql.Time
      * <li>Timestamp
      * <li>byte/char arrays
      * <li>BigDecimal
