@@ -114,11 +114,11 @@ public class SourceGenerator {
     **/
     private static final String DISABLE_DESCRIPTORS_MSG
         = "Disabling generation of Class descriptors";
-        
+
     //----------------------/
     //- Instance Variables -/
     //----------------------/
-    
+
     private String lineSeparator = null;
     private JComment header = null;
 
@@ -136,13 +136,13 @@ public class SourceGenerator {
      * descriptors for the generated classes
     **/
     private boolean _createDescriptors = true;
-    
+
     /**
      * The field info factory.
     **/
     private FieldInfoFactory infoFactory = null;
 
-    /** 
+    /**
      * The source factory.
     **/
     private SourceFactory sourceFactory = null;
@@ -236,7 +236,7 @@ public class SourceGenerator {
 	 * Namespace URL to Java package mapping
 	 */
 	private static java.util.Hashtable _nspackages;
-	
+
 
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
@@ -391,7 +391,7 @@ public class SourceGenerator {
     public void setDescriptorCreation(boolean createDescriptors) {
         _createDescriptors = createDescriptors;
     } //-- setDescriptorCreation
-    
+
     /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
@@ -455,13 +455,13 @@ public class SourceGenerator {
         boolean force           = (options.getProperty("f") != null);
         String  typeFactory     = options.getProperty("types");
         boolean verbose         = (options.getProperty("verbose") != null);
-        
+
         if (schemaFilename == null) {
             System.out.println(appName);
             allOptions.printUsage(new PrintWriter(System.out));
             return;
         }
-        
+
         // -- XXX maintained temporarily
         if (typeFactory == null)
             typeFactory = options.getProperty("type-factory");
@@ -509,10 +509,10 @@ public class SourceGenerator {
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
         sgen.setVerbose(verbose);
-     
-        if (force) 
+
+        if (force)
             System.out.println("-- Suppressing non fatal warnings.");
-            
+
         if (options.getProperty("nodesc") != null) {
             sgen.setDescriptorCreation(false);
             System.out.print("-- ");
@@ -784,9 +784,9 @@ public class SourceGenerator {
         //------------------------------------/
         //- Create ClassDescriptor and print -/
         //------------------------------------/
-        
+
         ClassInfo classInfo = state.resolve(jClass);
-        
+
         if (_createDescriptors && (classInfo != null)) {
 
             JClass desc
@@ -885,6 +885,8 @@ public class SourceGenerator {
 	 */
 	public static String getJavaPackage(String nsURL)
 	{
+        if (nsURL == null) return "";
+
 		//-- Ensure properties have been loaded
 		getDefault();
 
