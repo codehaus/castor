@@ -192,7 +192,7 @@ public interface QueryExpression
      *
      * @param writeLock True if a write lock is required
      * @return The SQL statement
-     * @throws QueryExpression The query cannot be constructed for
+     * @throws QueryException The query cannot be constructed for
      *  this engine
      */
     public String getStatement( boolean writeLock )

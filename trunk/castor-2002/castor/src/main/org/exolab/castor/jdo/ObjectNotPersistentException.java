@@ -48,7 +48,8 @@ package org.exolab.castor.jdo;
 
 
 /**
- * Exception indicating object is not persistent.
+ * Exception indicating object is not persistent. Thrown when attempting to
+ * remove or lock a transient object.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

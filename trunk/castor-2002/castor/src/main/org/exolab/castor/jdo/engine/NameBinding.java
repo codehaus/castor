@@ -56,7 +56,6 @@ import org.exolab.castor.persist.ClassHandler;
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see DatabaseSource
  */
 public class NameBinding
 {

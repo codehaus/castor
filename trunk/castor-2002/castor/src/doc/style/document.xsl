@@ -121,15 +121,6 @@
     &#xA0;
   </xsl:template>
 
-  <!-- Everything else in the document is considered HTML and
-       produced as such with the proper processing.
-   -->
-  <xsl:template match="*|@*">
-    <xsl:copy>
-      <xsl:apply-templates select="@*|*|text()"/>
-    </xsl:copy>
-  </xsl:template>
-
 </xsl:stylesheet>
 
 

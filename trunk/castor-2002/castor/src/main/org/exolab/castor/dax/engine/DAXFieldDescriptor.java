@@ -59,7 +59,7 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 
 
 /**
- * DAX field descriptor. Wraps {@link FieldDesc} and adds LDAP-related
+ * DAX field descriptor. Wraps {@link FieldDescriptor} and adds LDAP-related
  * information, type conversion, and set/get for LDAP.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>

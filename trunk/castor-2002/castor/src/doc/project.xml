@@ -29,6 +29,7 @@
     <item name="DTDs" href="schema.xml"/>
   </menu>
   <menu name="Using">
+    <item name="Using JDO" href="jdo.xml"/>
     <item name="JDO Config" href="database-conf.xml"/>
     <item name="Types" href="types.xml"/>
     <item name="Source generator" href="sourcegen.xml"/>
@@ -52,7 +53,7 @@
     names mentioned herein are trademarks of their respective owners.
   </notice>
   <notice>
-    <a href="http://www.exoffice.com">Exoffice Technologies, Inc.</a> (C) 2000. All rights reserved
+    Copyright 2000 (C) <a href="http://www.exoffice.com">Exoffice Technologies Inc</a>. All Rights Reserved.
   </notice>
 
 </project>

@@ -2,7 +2,8 @@ package jdo;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.jdo.JDOSource;
+import java.util.Enumeration;
+import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -19,7 +20,7 @@ public class Deadlock
 {
 
 
-    private JDOSource      _jdo;
+    private DataObjects    _jdo;
 
 
     private Database       _db;
@@ -31,7 +32,7 @@ public class Deadlock
     public static final long  Wait = 2000;
 
 
-    public Deadlock( JDOSource jdo, PrintWriter logger )
+    public Deadlock( DataObjects jdo, PrintWriter logger )
 	throws PersistenceException
     {
         _jdo = jdo;
@@ -46,34 +47,37 @@ public class Deadlock
     {
 	OQLQuery      oql;
         TestObject    object;
+        Enumeration   enum;
 
         // Open transaction in order to perform JDO operations
         _db.begin();
         
         // Create two objects in the database -- need something to lock
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-        oql.bind( new Integer( TestObject.DefaultId ) );
-        object = (TestObject) oql.execute();
-        if ( object == null ) {
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            _logger.println( "Found object: " + object );
+        } else {
             object = new TestObject();
             object.id = TestObject.DefaultId;
-            object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
             _db.create( object );
-        } else {
-            _logger.println( "Found object: " + object );
         }
-        oql.bind( new Integer( TestObject.DefaultId + 1 ) );
-        object = (TestObject) oql.execute();
-        if ( object == null ) {
+        object.name = TestObject.DefaultName;
+        oql.bind( TestObject.DefaultId + 1 );
+        enum = oql.execute();
+        if ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            _logger.println( "Found object: " + object );
+        } else {
             object = new TestObject();
             object.id = TestObject.DefaultId + 1;
-            object.name = TestObject.DefaultName;
             _logger.println( "Creating new object: " + object );
             _db.create( object );
-        } else {
-            _logger.println( "Found object: " + object );
         }
+        object.name = TestObject.DefaultName;
         _db.commit();
 
         _logger.println( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );
@@ -100,7 +104,7 @@ public class Deadlock
     {
         
 
-        private JDOSource      _jdo;
+        private DataObjects    _jdo;
 
 
         private PrintWriter    _logger;
@@ -108,7 +112,6 @@ public class Deadlock
 
         public void run()
         {
-            OQLQuery     oql;
             TestObject   object;
             Database     db = null;
             long         start;
@@ -116,14 +119,13 @@ public class Deadlock
             try {
                 db = _jdo.getDatabase();
                 db.begin();
-                oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
                 start = System.currentTimeMillis();
 
                 // Load first object and change something about it (otherwise will not write)
                 _logger.println( "First: Loading object " + TestObject.DefaultId );
-                oql.bind( new Integer( TestObject.DefaultId ) );
-                object = (TestObject) oql.execute();
+                object = (TestObject) db.load( TestObject.class,
+                                               new Integer( TestObject.DefaultId ) );
                 object.name = TestObject.DefaultName + ":1";
                 _logger.println( "First: Modified to " + object );
                 
@@ -132,8 +134,8 @@ public class Deadlock
                 start = System.currentTimeMillis();
                 
                 _logger.println( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
-                oql.bind( new Integer( TestObject.DefaultId + 1 ) );
-                object = (TestObject) oql.execute();
+                object = (TestObject) db.load( TestObject.class,
+                                               new Integer( TestObject.DefaultId + 1 ) );
                 object.name = TestObject.DefaultName + ":1";
                 _logger.println( "First: Modified to " + object );
                 
@@ -164,7 +166,7 @@ public class Deadlock
     {
 
         
-        private JDOSource      _jdo;
+        private DataObjects    _jdo;
 
 
         private PrintWriter    _logger;
@@ -172,7 +174,6 @@ public class Deadlock
         
         public void run()
         {
-            OQLQuery     oql;
             TestObject   object;
             Database     db = null;
             long         start;
@@ -180,7 +181,6 @@ public class Deadlock
             try {
                 db = _jdo.getDatabase();
                 db.begin();
-                oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( Wait / 2 );
@@ -188,8 +188,8 @@ public class Deadlock
                 
                 // Load first object and change something about it (otherwise will not write)
                 _logger.println( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
-                oql.bind( new Integer( TestObject.DefaultId + 1 ) );
-                object = (TestObject) oql.execute();
+                object = (TestObject) db.load( TestObject.class,
+                                               new Integer( TestObject.DefaultId + 1 ) );
                 object.name = TestObject.DefaultName + ":2";
                 _logger.println( "Second: Modified to " + object );
                 
@@ -198,8 +198,8 @@ public class Deadlock
                 start = System.currentTimeMillis();
                 
                 _logger.println( "Second: Loading object " + TestObject.DefaultId );
-                oql.bind( new Integer( TestObject.DefaultId ) );
-                object = (TestObject) oql.execute();
+                object = (TestObject) db.load( TestObject.class,
+                                               new Integer( TestObject.DefaultId ) );
                 object.name = TestObject.DefaultName + ":2";
                 _logger.println( "Second: Modified to " + object );
 

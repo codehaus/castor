@@ -50,12 +50,11 @@
     <html><head>
       <meta name="author" content="{document/properties/author/.}"/>
       <link rel="stylesheet" type="text/css" href="style/default.css"/>
-      <xsl:if test="/document/properties/title">
-        <title><xsl:value-of select="/document/properties/title"/></title>
-      </xsl:if>
-      <xsl:if test="/document/body/title">
-        <title><xsl:value-of select="/document/body/title"/></title>
-      </xsl:if>
+      <xsl:choose>
+        <xsl:when test="/document/properties/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
+        <xsl:when test="/document/body/title"><title><xsl:value-of select="/document/body/title"/></title></xsl:when>
+        <xsl:otherwise><title><xsl:value-of select="$project/title"/></title></xsl:otherwise>
+      </xsl:choose>
     </head>
 
     <body bgcolor="{$color-e}" link="#bfbffe" vlink="#bfbffe" alink="#bfbffe" leftmargin="0" topmargin="0">
@@ -169,33 +168,29 @@
           </td>
           <td bgcolor="{$color-beta}" valign="top"></td>
         </tr>
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11" valign="top">
-            <img src="style/images/corners/nw-small.gif" height="11" width="11"/>
-          </td>
-          <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
-        </tr>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
-          <td bgcolor="{$color-alpha}">
-            <xsl:for-each select="$project/notice">
-              <small><xsl:copy-of select="."/></small><br/>
-            </xsl:for-each>
-          </td>
-        </tr>
+        <xsl:if test="$project/notice">
+          <tr>
+            <td bgcolor="{$color-beta}" width="120"></td>
+            <td bgcolor="{$color-beta}" width="11" valign="top"><img src="style/images/corners/nw-small.gif" height="11" width="11"/></td>
+            <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
+          </tr>
+          <tr>
+            <td bgcolor="{$color-beta}" width="120"></td>
+            <td bgcolor="{$color-alpha}" width="11">&#xA0;</td>
+            <td bgcolor="{$color-alpha}">
+              <xsl:for-each select="$project/notice">
+                <small><xsl:copy-of select="."/><br/>&#xA0;<br/></small>
+              </xsl:for-each>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="{$color-beta}" width="120"></td>
+            <td bgcolor="{$color-beta}" width="11" valign="top"><img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
+            <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
+          </tr>
+        </xsl:if>
 
-        <tr>
-          <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11" valign="top">
-            <img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/>
-          </td>
-          <td bgcolor="{$color-alpha}" valign="top">
-            <img src="style/images/blank.gif" height="11" width="11"/>
-          </td>
-        </tr>
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
           <td bgcolor="{$color-beta}" width="11" valign="top"></td>

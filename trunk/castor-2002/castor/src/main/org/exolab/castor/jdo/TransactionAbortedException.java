@@ -41,7 +41,7 @@
  * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
  * $Id$
-k */
+ */
 
 
 package org.exolab.castor.jdo;
