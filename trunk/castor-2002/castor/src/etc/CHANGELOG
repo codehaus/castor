@@ -1,7 +1,7 @@
-Version 0.8.x  June xx, 2000
+Version 0.8.8  June 20, 2000
 ----------------------------
 
-XML:     Added suppor for the Unmarshaller to automatically determine the Class of the
+XML:     Added support for the Unmarshaller to automatically determine the Class of the
          root element, based on a given Mapping, or ClassDescriptorResolver
 
 XML:     Added support for the "has" method for primitives in the generated source

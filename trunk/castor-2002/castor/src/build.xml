@@ -72,6 +72,17 @@
   </target>
 
 
+  <target name="newspec" depends="prepare">
+    <javac srcdir="${source}/newspec" destdir="${classes}/newspec" excludes="**/package.html"
+           classpath="${classpath}" debug="on" deprecation="${deprecation}" />
+    <mkdir    dir="${build}/doc/newspec" />
+    <style    basedir="${source}/doc" destdir="${build}/doc" style="style/print.xsl"
+              includes="newspec/**.xml" excludes="style/**,project.xml" />
+    <copydir  src="${source}/newspec/doc" dest="${build}/doc/newspec" includes="*.xsd" />
+  </target>
+
+
+
   <!-- Build all the sources with debug and deprecation -->
   <target name="main" depends="prepare">
     <javac srcdir="${main}" destdir="${classes}" excludes="**/package.html"
@@ -106,6 +117,7 @@
   <target name="jar" depends="main-opt">
     <delete   file="${dist}/${archive}.jar" />
 
+    <delete   file="${classes}/MANIFEST.MF" />
     <copyfile src="${source}/etc/MANIFEST.MF" dest="${classes}/MANIFEST.MF" />
     <replace  file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}" />
     <copydir  src="${source}/etc" dest="${classes}" includes="LICENSE,README" />
@@ -117,6 +129,13 @@
               manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,
               org/exolab/castor/xml/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,
               org/exolab/castor/*" />
+
+    <delete   file="${classes}/MANIFEST.MF" />
+    <delete   file="${dist}/sourceGen.jar" />
+    <copyfile src="${source}/etc/sourceGenMANIFEST.MF" dest="${classes}/MANIFEST.MF" />
+    <replace  file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}" />
+    <jar      jarfile="${dist}/sourceGen.jar" basedir="${classes}"
+              manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
   </target>
 
 
