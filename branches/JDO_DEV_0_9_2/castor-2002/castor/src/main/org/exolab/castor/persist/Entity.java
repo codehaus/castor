@@ -404,7 +404,7 @@ public final class Entity implements Cloneable {
         public boolean next() {
             int deep = entity.actual.getDeep();
             if ( ++level > deep ) {
-                cur == null;
+                cur = null;
                 return false;
             }
 
