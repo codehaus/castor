@@ -151,10 +151,12 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
          * equals the minOccurs value.
          */
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
+        
         if (attValue != null) {
-            if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
-            int maxOccurs = toInt(attValue);
-            _group.setMaxOccurs(maxOccurs);
+            if (MAX_OCCURS_WILDCARD.equals(attValue)) 
+                _group.setMaxOccurs(-1);
+            else
+                _group.setMaxOccurs(toInt(attValue));
         }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
