@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling XML Schema <appinfo> elements
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class AppInfoUnmarshaller extends SaxUnmarshaller {
 
@@ -66,20 +66,20 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The Attribute reference for the Attribute we are constructing
     **/
     private AppInfo _appInfo = null;
-    
+
     private StringBuffer sb = null;
-    
-    
+
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -88,18 +88,18 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
      * Creates a new AppInfoUnmarshaller
      * @param atts the AttributeList
     **/
-    public AppInfoUnmarshaller(AttributeList atts) 
+    public AppInfoUnmarshaller(AttributeList atts)
         throws SAXException
     {
         super();
-        
+
         _appInfo = new AppInfo();
-        
+
         //-- handle attributes
         String attValue = null;
-            
-        _appInfo.setSource(atts.getValue(SchemaNames.BASE_ATTR));
-        
+
+        _appInfo.setSource(atts.getValue(SchemaNames.SOURCE_ATTR));
+
     } //-- AppInfoUnmarshaller
 
       //-----------/
@@ -107,7 +107,7 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
     //-----------/
 
     /**
-     * 
+     *
     **/
     public AppInfo getAppInfo() {
         if (sb != null) finish();
@@ -122,7 +122,7 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
     **/
     public String elementName() {
         return SchemaNames.APPINFO;
-    } //-- elementName    
+    } //-- elementName
 
     /**
      * Called to signal an end of unmarshalling. This method should
@@ -134,7 +134,7 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
             sb = null;
         }
     } //-- finish
-    
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -142,41 +142,41 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return getAppInfo();
     } //-- getObject
-    
+
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
         //-- ignore all daughter elements for now
         ++depth;
-        
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
         --depth;
     } //-- endElement
 
-    public void characters(char[] ch, int start, int length) 
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.characters(ch, start, length);
         }
-        
+
         if (sb == null) sb = new StringBuffer();
         sb.append(ch, start, length);
-        
+
     } //-- characters
 
 } //-- AppInfoUnmarshaller
