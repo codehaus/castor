@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
+       From various performance improvements contributed by Ian Richards (also CODA)
+       (afawcett - 20040510)
+
 XML:   One fix and various minor enhancements to classes in 'javasource' package.
        (afawcett - 20040510)
 
