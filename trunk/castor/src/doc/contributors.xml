@@ -674,6 +674,12 @@
   </contributor>
 
   <contributor type="Feedback">
+    <name surname="Christopherson" given="Dan"/>
+    <email>danch@nvisia.com</email>
+    <description>Patch for wildcard introspection bug</description>
+  </contributor>
+
+  <contributor type="Feedback">
     <name surname="Dankert" given="Edwin"/>
     <email>edankert@cladonia.com</email>
     <description>
