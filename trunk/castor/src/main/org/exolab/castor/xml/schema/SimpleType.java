@@ -327,8 +327,46 @@ public abstract class SimpleType extends XMLType
         {
             return null;
         }
-    }
-
+    } //-- getMaxLength
+    
+    /**
+     * Removes the given Facet from this SimpleType.
+     * Returns true if this SimpleType actually contains
+     * the given facet.
+     *
+     * <p>Removes only local facets.</p>
+     *
+     * @param facet the Facet to remove
+     * @return true if the specified Facet has been removed
+     */
+    public boolean removeFacet(Facet facet) {
+        if (facet == null) return false;
+        return facets.remove(facet);
+    } //-- removeFacet
+    
+    
+    /**
+     * Removes the facet with the given name from this SimpleType.
+     * Returns true if this Simpletype has a facet with the given
+     * name and it is successfully removed.
+     *
+     * <p>Removes only local facets.</p>
+     *
+     * @param name the name of the Facet to remove
+     * @return true if the specified Facet has been removed
+     */
+    public boolean removeFacet(String name) {
+        if (name == null) return false;
+        for (int i = facets.size()-1; i > 0; i--) {
+            Facet facet = (Facet) facets.get(i);
+            if (name.equals(facet.getName())) {
+                facets.remove(i);
+                return true;
+            }
+        }
+        return false;
+    } //-- removeFacet
+    
     /**
      * Sets the value of the 'final' property, indicating which
      * types of derivation are not allowed. A null value will indicate
