@@ -4,7 +4,7 @@
 
   <properties>
     <title>The Source Code Generator</title>
-    <author email="kvisco@intalio.com">Keith Visco</author>
+    <author email="keith AT kvisco DOT com">Keith Visco</author>
     <author email="blandin@intalio.com">Arnaud Blandin</author>
     <abstract>
        Describes how to use the Source Code Generator, and what
@@ -19,12 +19,11 @@
 
     <title>Using the Source Code Generator</title>
     <header>
-      <p>Reference: <api package="org.exolab.castor.builder">The Source Builder API</api></p>
-      <p>For a more detailed version of the Source Generator documentation, please download the
-      <a href="./SourceGeneratorUser.pdf">Source Generator User Document(PDF).</a></p>
+      <p>API Reference: <api package="org.exolab.castor.builder">The Source Builder API</api></p>
     </header>
 
     <section title="Introduction">
+
 
       <p>Castor's Source Code Generator creates a set of Java classes
          which represent an object model for an XML Schema
@@ -37,8 +36,10 @@
          </note>
      </p>
 
-      <p>Example:
-        <pre>java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd -package com.xyz</pre></p>
+        <code-panel top-caption="Example:">
+java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
+    -package com.xyz
+        </code-panel>
 
       <p>This will generate a set of source files from the the XML Schema, foo-schema.xsd,
 
@@ -48,7 +49,8 @@
 
       <p>To compile the generated classes simply run javac, or your favorite compiler:
 
-         <pre>javac com/xyz/*.java</pre></p>
+         <code-panel>javac com/xyz/*.java</code-panel>
+      </p>
 
       <p>Created class will have marshal and unmarshal methods which are used to go back
 
@@ -57,6 +59,13 @@
     </section>
 
     <section title="Source Generator Options">
+      <tip>For additional information about the Source Generator and
+          options, You can download the
+      <a href="./SourceGeneratorUser.pdf">Source Generator User Document(PDF).
+        </a>
+        Note: The binding-file is not dicussed in that document.
+      </tip>
+
        <p>
           The source code generator has a number of different options which
           may be set. Some of these are done using the command line, and others
@@ -185,14 +194,14 @@
             </p>
             <p>To enable bound properties uncomment the appropriate line in the
                "org/exolab/castor/builder/castorbuilder.properties" file:
-               <code>
+               <code-panel>
     # To enable bound properties uncomment the following line. Please
     # note that currently *all* fields will be treated as bound properties
     # when enabled. This will change in the future when we introduce
     # fine grained control over each class and it's properties.
     #
     #org.exolab.castor.builder.boundproperties=true
-               </code>
+               </code-panel>
                <p>
                   When enabled, <b>all</b> properties will be treated as bound properties.
                   For each class that is generated a <b>setPropertyChangeListener</b>
@@ -204,10 +213,11 @@
      * @param pcl The PropertyChangeListener to register.
     **/
     </comment>
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener pcl)
+    public void addPropertyChangeListener
+        (java.beans.PropertyChangeListener pcl)
     {
         propertyChangeListeners.addElement(pcl);
-    } //-- void addPropertyChangeListener(java.beans.PropertyChangeListener)
+    } //-- void addPropertyChangeListener
                  </code>
                  Whenever a property of the class is changed, a <b>PropertyChangeEvent</b>
                  will be sent to all registered listeners. The property name, the old
@@ -273,12 +283,12 @@
                 generated classes (of course class descriptors are not concerned by this option)
             </p>
             <p> To set up the super class, edit the castorbuilder.properties file :
-            <code>
+            <code-panel>
     # This property allows one to specify the super class of *all*
     # generated classes
     #
     #org.exolab.castor.builder.superclass=com.xyz.BaseObject
-            </code>
+            </code-panel>
             </p>
         </section>
 
@@ -312,13 +322,13 @@
             </p>
             <p>Note: hashcode() is not currently overriden.</p>
             <p> To generate the equals() method , edit the castorbuilder.properties file :
-            <code>
+            <code-panel>
 	# Set to true if you want to generate the equals method
 	# for each generated class.
 	# false by default
 	#org.exolab.castor.builder.equalsmethod=true
 
-            </code>
+            </code-panel>
             </p>
         </section>
 
@@ -338,12 +348,12 @@
 		</ul>
 	     </p>
  	     <p>To enable this property, edit the castor builder.properties file:
-	     <code>
+        <code-panel>
 	 # Set to true if you want to use Object Wrappers instead
 	 # of primitives (e.g Float instead of float).
 	 # false by default.
 	 #org.exolab.castor.builder.primitivetowrapper=false
-	     </code>
+        </code-panel>
 	     </p>
 	</section>
 
@@ -364,29 +374,32 @@
       <a href="./SourceGeneratorUser.pdf">Source Generator User Document(PDF).</a></p>
 
       <section title="&lt;binding> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;binding
     defaultBindingType = (element|type)>
-    (include*,package*,namingXML?,elementBinding*, attributeBinding, complexTypeBinding, groupBinding)
+    (include*,
+     package*,
+     namingXML?,
+     elementBinding*,
+     attributeBinding,
+     complexTypeBinding,
+     groupBinding)
 &lt;/binding>
-               </code>
-             </tr>
-          </table>
+          </code-panel>
           <p>The binding element is the root element and contains the binding information. The attribute <code>defaultBindingType</code> controls the
           <a href="#Class-Creation/Mapping">Class creation type</a></p>
+          <tip>
+             Be careful when using <b>defaultBindingType</b> attribute
+             as it will override the binding type specified in the
+             <i>castorbuilder.properties</i> file.
+          </tip>
       </section>
 
       <section title="&lt;include> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;include
     URI = xsd:anyURI/>
-               </code>
-             </tr>
-          </table>
+         </code-panel>
           <ul>
              <li><b>URI:</b>The URI of the binding file to include.</li>
           </ul>
@@ -395,17 +408,13 @@
       </section>
 
       <section title="&lt;package> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;package>
     name = xsd:string
     (namespace|schemaLocation) = xsd:string>
 &lt;/package>
 
-               </code>
-             </tr>
-          </table>
+         </code-panel>
           <ul>
              <li><b>name:</b>A fully qualified java package name.</li>
              <li><b>namespace:</b>An XML namespace that will be mapped to the package name defined by the <i>name</i> element.</li>
@@ -420,9 +429,7 @@
       </section>
 
      <section title="&lt;namingXML> element">
-          <table>
-             <tr>
-               <code>
+        <code-panel>
 &lt;namingXML>
    (elementName,complexTypeName,modelGroupName)
 &lt;/namingXML>
@@ -430,78 +437,70 @@
 &lt;elementName|complexTypeName|modelGroupName>
     (prefix?, suffix?) = xsd:string
 &lt;/elementName|complexTypeName|modelGroupName>
-
-               </code>
-             </tr>
-          </table>
-          <ul>
-             <li><b>prefix:</b>The prefix to add to the names of the generated classes.</li>
-             <li><b>suffix:</b>The suffix to append to the the names of the generated classes</li>
-          </ul>
-          <p>One of the aim of the binding file is to avoid naming collisions. Indeed XML Schema allows elements and complexTypes to share the same name which
-          results in name collisions when generated the sources. Defining a binding for every element and complexType that share the same name is sometimes not
-          a convenient solution (for instance the BPML XML Schema or the UDDI v2.0 XML Schema use the same names for top-level complexTypes and top-level elements).
-          The aim of the &lt;naming/> XML element is to define a prefix and a suffix for the names of the classes generated for an element,
-          a complexType or a model group definition.<br/>
-          <b>Note:</b>It is not possible to control the names of the classes generated to represent nested model groups (all, choice, sequence).</p>
-       </section>
+         </code-panel>
+         <ul>
+            <li><b>prefix:</b>The prefix to add to the names of the generated classes.</li>
+            <li><b>suffix:</b>The suffix to append to the the names of the generated classes</li>
+         </ul>
+         <p>One of the aim of the binding file is to avoid naming collisions. Indeed XML Schema allows elements and complexTypes to share the same name which
+         results in name collisions when generated the sources. Defining a binding for every element and complexType that share the same name is sometimes not
+         a convenient solution (for instance the BPML XML Schema or the UDDI v2.0 XML Schema use the same names for top-level complexTypes and top-level elements).
+         The aim of the &lt;naming/> XML element is to define a prefix and a suffix for the names of the classes generated for an element,
+         a complexType or a model group definition.<br/>
+         <b>Note:</b>It is not possible to control the names of the classes generated to represent nested model groups (all, choice, sequence).</p>
+      </section>
 
        <section title="&lt;componentBinding> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;elementBinding|attributeBinding|complexTypeBinding|groupBinding
     name = xsd:string>
-   ((java-class|interface|member), elementBinding*, attributeBinding*, complexTypeBinding*, groupBinding*)
+   ((java-class|interface|member),
+     elementBinding*,
+     attributeBinding*,
+     complexTypeBinding*,
+     groupBinding*)
 &lt;/elementBinding|attributeBinding|complexTypeBinding|groupBinding>
+         </code-panel>
+         <ul>
+            <li><b>name:</b>The name of the XML schema component for which we are defining a binding.</li>
+         </ul>
+         <p>These elements are the tenets of the binding file since they contain the binding definition for an XML Schema element, attribute, complexType
+         and modelGroup definition. The first child element (&lt;java-class/>, &lt;interface> or &lt;member>) will determine the type of binding one is defining.
+         Please note that defining a &lt;java-class> binding on an XML Schema attribute will have absolutely no <b>effect</b>.</p>
+         <p>The binding file being written from an XML Schema point of view; there are two distinct ways to define the XML Schema component for which we are
+         defining a binding. First we can define it throught the <tt>name</tt> attribute.</p>
+         <p>The value of the name attribute uniquely identifies the XML Schema Component. It can refer to the top-level component using the NCName of that component or
+         it can use a location language based on <a href="http://www.w3.org/TR/xpath">XPath</a><sup>3</sup>.
+         The grammar of that language can be defined by the following BNF:</p>
+         <pre>
+            [1]Path         ::= LocationPath('/'LocationPath)*
+            [2]LocationPath ::= (Complex|ModelGroup|Attribute|Element)
+            [3]Complex      ::= 'complexType:'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
+            [4]ModelGroup   ::= 'group:'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
+            [5]Attribute    ::= '@'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
+            [6]Element      ::= <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
+         </pre>
+         <p>The second option to identify a XML Schema Component is to embed its binding definition inside its parent binding definition.</p>
+         <p>For instance, the following
+         binding definition will be equivalent and will identify the element 'foo' defined in the top-level complexType 'fooType'.</p>
 
-               </code>
-             </tr>
-          </table>
-          <ul>
-             <li><b>name:</b>The name of the XML schema component for which we are defining a binding.</li>
-          </ul>
-          <p>These elements are the tenets of the binding file since they contain the binding definition for an XML Schema element, attribute, complexType
-          and modelGroup definition. The first child element (&lt;java-class/>, &lt;interface> or &lt;member>) will determine the type of binding one is defining.
-          Please note that defining a &lt;java-class> binding on an XML Schema attribute will have absolutely no <b>effect</b>.</p>
-          <p>The binding file being written from an XML Schema point of view; there are two distinct ways to define the XML Schema component for which we are
-          defining a binding. First we can define it throught the <tt>name</tt> attribute.</p>
-          <p>The value of the name attribute uniquely identifies the XML Schema Component. It can refer to the top-level component using the NCName of that component or
-          it can use a location language based on <a href="http://www.w3.org/TR/xpath">XPath</a><sup>3</sup>.
-          The grammar of that language can be defined by the following BNF:</p>
-          <pre>
-              [1]Path         ::= LocationPath('/'LocationPath)*
-              [2]LocationPath ::= (Complex|ModelGroup|Attribute|Element)
-              [3]Complex      ::= 'complexType:'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
-              [4]ModelGroup   ::= 'group:'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
-              [5]Attribute    ::= '@'<a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
-              [6]Element      ::= <a href="http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/datatypes.html#NCName">NCName</a>
-          </pre>
-          <p>The second option to identify a XML Schema Component is to embed its binding definition inside its parent binding definition.</p>
-          <p>For instance, the following
-          binding definition will be equivalent and will identify the element 'foo' defined in the top-level complexType 'fooType'.</p>
+         <pre>
+            &lt;elementBinding name="complexType:fooType/foo>
+               &lt;member name="MyFoo" handler="mypackage.myHandler"/>
+            &lt;/elementBinding>
+         </pre>
 
-          <pre>
-             &lt;elementBinding name="complexType:fooType/foo>
-                 &lt;member name="MyFoo" handler="mypackage.myHandler"/>
-             &lt;/elementBinding>
-          </pre>
-
-          <pre>
-             &lt;complexTypeBinding name="fooType">
-                &lt;elementBinding name="foo>
-                    &lt;member name="MyFoo" handler="mypackage.myHandler"/>
-               &lt;/elementBinding>
-             &lt;complexTypeBinding>
-          </pre>
-
-
+         <pre>
+            &lt;complexTypeBinding name="fooType">
+               &lt;elementBinding name="foo>
+                  &lt;member name="MyFoo" handler="mypackage.myHandler"/>
+            &lt;/elementBinding>
+            &lt;complexTypeBinding>
+         </pre>
        </section>
 
        <section title="&lt;java-class> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;java-class
     name? = xsd:string
     package? = xsd:string
@@ -511,85 +510,67 @@
     bound? = xsd:boolean >
     (implements*,extends?)
 &lt;/java-class>
-
-               </code>
-             </tr>
-          </table>
-               <ul>
-                 <li><b>name:</b>The name of the class that will be generated.</li>
-                 <li><b>package:</b>The package of the class to be generated. if set, this option overrides the mapping defined in the &lt;package/> element.</li>
-                 <li><b>final:</b>If true, the generated class will be final.</li>
-                 <li><b>abstract:</b>If true, the generated class will be abstract.</li>
-                 <li><b>equals:</b>If true, the generated class will implement the equals method.</li>
-                 <li><b>bound:</b>If true, the generated class will implement the bound properties.</li>
-               </ul>
-               <p>This element defines all the options for the class to be generated.</p>
+         </code-panel>
+         <ul>
+            <li><b>name:</b>The name of the class that will be generated.</li>
+            <li><b>package:</b>The package of the class to be generated. if set, this option overrides the mapping defined in the &lt;package/> element.</li>
+            <li><b>final:</b>If true, the generated class will be final.</li>
+            <li><b>abstract:</b>If true, the generated class will be abstract.</li>
+            <li><b>equals:</b>If true, the generated class will implement the equals method.</li>
+            <li><b>bound:</b>If true, the generated class will implement the bound properties.</li>
+         </ul>
+         <p>This element defines all the options for the class to be generated.</p>
        </section>
 
 
        <section title="&lt;interface> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
 &lt;interface>
     name = xsd:string
 &lt;/interface>
+         </code-panel>
+         <ul>
+            <li><b>name:</b>The name of the interface that will be generated.</li>
+         </ul>
+         <p>This element specifies the name of the interface to be generated for an XML schema component.</p>
 
-               </code>
-             </tr>
-           </table>
-               <ul>
-                 <li><b>name:</b>The name of the interface that will be generated.</li>
-               </ul>
-               <p>This element specifies the name of the interface to be generated for an XML schema component.</p>
-
-               <p><b>NOTE: this element is not yet implemented.</b></p>
+         <p><b>NOTE: this element is not yet implemented.</b></p>
        </section>
 
        <section title="&lt;member> element">
-          <table>
-             <tr>
-               <code>
+         <code-panel>
  &lt;member
-     name? = xsd:string
-     java-type? = xsd:string
-     wrapper? = xsd:boolean
-     handler? = xsd:string
-     collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map)
-     validator? = xsd:string/>
-
-
-               </code>
-             </tr>
-          </table>
-               <ul>
-                 <li><b>name:</b>The name of the class member that will be generated.</li>
-                 <li><b>java-type:</b>the fully qualified name of the java type.</li>
-                 <li><b>wrapper:</b>If true, a wrapper object will be generated in case the java type is a java primitive.</li>
-                 <li><b>handler:</b>The fully qualified name of the FieldHandler to use.</li>
-                 <li><b>collection:</b>If the schema component can occur more than once then this attribute allows to specify the collection to use
-                 to represent the component in Java.</li>
-                 <li><b>validator:</b>The fully qualified name of the FieldValidator to use.</li>
-               </ul>
-                <p>This element represents the binding for class member. It allows the definition
-                of its name and java type as well as an implementation of FieldHandler
-                to help the Marshalling framework in handling that member. Defining a validator is also
-                possible. The names given for the validator and the fieldHandler must be fully qualified.</p>
+  name? = xsd:string
+  java-type? = xsd:string
+  wrapper? = xsd:boolean
+  handler? = xsd:string
+  collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map)
+  validator? = xsd:string/>
+         </code-panel>
+         <ul>
+            <li><b>name:</b>The name of the class member that will be generated.</li>
+            <li><b>java-type:</b>the fully qualified name of the java type.</li>
+            <li><b>wrapper:</b>If true, a wrapper object will be generated in case the java type is a java primitive.</li>
+            <li><b>handler:</b>The fully qualified name of the FieldHandler to use.</li>
+            <li><b>collection:</b>If the schema component can occur more than once then this attribute allows to specify the collection to use
+            to represent the component in Java.</li>
+            <li><b>validator:</b>The fully qualified name of the FieldValidator to use.</li>
+         </ul>
+            <p>This element represents the binding for class member. It allows the definition
+            of its name and java type as well as an implementation of FieldHandler
+            to help the Marshalling framework in handling that member. Defining a validator is also
+            possible. The names given for the validator and the fieldHandler must be fully qualified.</p>
        </section>
 
        <section title="todo">
           <ul>
             <li>
-              <table>
-                 <tr>
-                  <code>
+                  <code-panel>
  &lt;enumBinding>
     (enumClassName|enumMemberName)
  &lt;/enumBinding>
 
-                  </code>
-                </tr>
-             </table>
+                  </code-panel>
              <p>This element will allow more control on the type safe enumerations generated to represent an XML Schema simpleType enumeration</p>
           </li>
           <li>
