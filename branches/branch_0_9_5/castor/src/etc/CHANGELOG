@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1524: Stack Overflow when container elements occur in 
+       instance document. The problem was primarily due to the 
+       MarshalFramework#searchInheritence method which was allowing
+       the ClassDescriptors for schema groups to be searched.
+       (kvisco - 20040608)
+
 XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
        Patch from axia@sonusnet.com.
        (kvisco - 20040527)
