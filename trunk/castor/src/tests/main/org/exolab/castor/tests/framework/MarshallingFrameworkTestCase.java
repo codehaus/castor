@@ -167,7 +167,8 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         
         //-- Add outputRoot to classpath
         ClassLoader loader = _test.getClassLoader();
-        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);     
+        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);
+        _test.setClassLoader(loader);
 
         if (_rootClassName == null)
             throw new Exception("No Root Object found in test descriptor");
