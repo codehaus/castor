@@ -325,6 +325,8 @@ create table test_types (
   tdt      datetime       not null,
   ttm      smalldatetime  not null,
   int_val  integer        null,
+  float_val  float        null,
+  real_val   real         null,
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
