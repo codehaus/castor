@@ -129,6 +129,9 @@ JDO:    Fixed an IllegalArgumentException being thrown the second time a value
 JDO:    Added IdentityKeyGenerator support for Informix.
         (Submitted by David Tinker [david@hemtech.co.za])
 
+JDO:    Fixed an ArrayOutOfBoundsException occurs in lazy loaded collection's
+        iterator. (Submitted by Georg Schneider [h8825037@obelix.wu-wien.ac.at])
+
 JDO:    Fixed: Loading with "db-locked" mode is now always load from the
         Database. (yip)
 
