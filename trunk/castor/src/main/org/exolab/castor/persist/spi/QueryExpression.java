@@ -47,6 +47,7 @@
 package org.exolab.castor.persist.spi;
 
 
+import org.exolab.castor.jdo.DbMetaInfo;
 import java.util.Map;
 
 import org.exolab.castor.jdo.QueryException;
@@ -366,4 +367,11 @@ public interface QueryExpression
      * @return re-ordered bind parameter info
      */
     public Map postProcessParamInfo(Map paramInfo);
+    
+    /**
+     * Store database meta information
+     * @param dbInfo DbMetaInfo instance
+     */    
+    public void setDbMetaInfo( DbMetaInfo dbInfo );
+
 }
