@@ -56,7 +56,7 @@ import java.lang.reflect.Modifier;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.mapping.FieldDesc;
-import org.exolab.castor.mapping.ObjectFieldDesc;
+import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.Types;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
@@ -155,7 +155,7 @@ public class MappingHelper
 	    fieldDesc = createFieldDesc( objField.getName(), objField.getType(), "--", null, null,
 					 objField.getAccessor(), loader, objType );
 	    contained = createContainedDescs( objField, fieldDesc, loader, objType );
-	    fieldDesc = new ObjectFieldDesc( fieldDesc, contained );
+	    fieldDesc = new ContainerFieldDesc( fieldDesc, contained );
 	    if ( fields.put( fieldDesc.getFieldName(), fieldDesc ) != null )
 		throw new MappingException( "Duplicate fields with the same name: " +
 					    fieldDesc.getFieldName() );
@@ -202,7 +202,7 @@ public class MappingHelper
 	    }
 	    relField = createFieldDesc( relMap.getName(), objTypeName, "--", null, null,
 					relMap.getAccessor(), loader, objType );
-	    relField = new ObjectFieldDesc( relField, relDesc.getFields() );
+	    relField = new ContainerFieldDesc( relField, relDesc.getFields() );
 
 	    if ( Relation.OneToOne.equals( relMap.getType() ) ) {
 		related[ index ] = new RelationDesc( Relation.OneToOne, relDesc, relField,
@@ -221,9 +221,9 @@ public class MappingHelper
 
 	    name = (String) enum.nextElement();
 	    fieldDesc = (FieldDesc) fields.get( name );
-	    if ( fieldDesc instanceof ObjectFieldDesc ) {
+	    if ( fieldDesc instanceof ContainerFieldDesc ) {
 		fields.remove( name );
-		descs = ( (ObjectFieldDesc) fieldDesc ).getContainedFields();
+		descs = ( (ContainerFieldDesc) fieldDesc ).getContainedFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    if ( fields.put( fieldDesc.getFieldName() + "." + descs[ i ].getFieldName(), descs[ i ] ) != null )
 			throw new MappingException( "Duplicate fields with the same name: " +
@@ -467,8 +467,8 @@ public class MappingHelper
 		throw new MappingException( "Internal error: Must specify the primary key field for an internal primary key" );
 	    if ( Types.typeFromPrimitive( primKeyField.getFieldType() ) != objType )
 		throw new MappingException( "Primary key type and primary key field type are not the same" );
-	    if ( primKeyField instanceof ObjectFieldDesc ) {
-		primKeyDesc = new PrimaryKeyDesc( objType, (JDOFieldDesc[]) ( (ObjectFieldDesc) primKeyField ).getContainedFields() );
+	    if ( primKeyField instanceof ContainerFieldDesc ) {
+		primKeyDesc = new PrimaryKeyDesc( objType, (JDOFieldDesc[]) ( (ContainerFieldDesc) primKeyField ).getContainedFields() );
 	    } else {
 		primKeyDesc = new PrimaryKeyDesc( objType, new JDOFieldDesc[] { (JDOFieldDesc) primKeyField } );
 	    }
