@@ -93,8 +93,6 @@ class DatingService {
 
     Hashtable clsMolders;
 
-    Hashtable relations;
-
     Hashtable needExtendsClassMolder;
 
     Hashtable needDependsClassMolder;
@@ -250,16 +248,6 @@ class DatingService {
         }
     }
 
-    boolean pairRelationDescriptor( FieldMolder fm, String fieldType, String encloseClassType ) throws MappingException {
-        if ( fm.isManyToMany() ) return true;
-
-        RelationDescriptor rd = getRelated( fieldType, encloseClassType );
-
-        //fm.setRelationDescriptor( rd  );
-
-        return true;
-    }
-
     /**
      * Register the name of a ClassMolder which will be pairing
      * up.
@@ -270,38 +258,4 @@ class DatingService {
         clsMolders.put( name, clsMold );
     }
 
-    /**
-     * Register the RelationDescriptor
-     */
-    void registerRelation( RelationDescriptor rd ) {
-
-        if ( relations == null )
-            relations = new Hashtable();
-        relations.put( rd.type1+"+"+rd.type2, rd );
-        relations.put( rd.type2+"+"+rd.type1, rd );
-    }
-
-    /**
-     * Return true if the classnames represents classes are relating
-     * to each other.
-     */
-    boolean isRelated( String a, String b ) {
-        RelationDescriptor rd;
-        if ( relations == null )
-            return false;
-        if ( relations.get(a+"+"+b) != null )
-            return true;
-        return false;
-    }
-
-    /**
-     * Get the RelationDescriptor given classnames of two classes.
-     *
-     */
-    RelationDescriptor getRelated( String a, String b ) {
-        RelationDescriptor rd;
-        if ( relations == null )
-            return null;
-        return (RelationDescriptor) relations.get(a+"+"+b);
-    }
 }

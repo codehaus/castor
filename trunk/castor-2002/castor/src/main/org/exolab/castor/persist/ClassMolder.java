@@ -477,10 +477,6 @@ public class ClassMolder {
         ClassDescriptor desc;
 
         DatingService ds = new DatingService( ClassLoader.getSystemClassLoader() );
-        enum = loader.listRelations();
-        while ( enum.hasMoreElements() ) {
-            ds.registerRelation( (RelationDescriptor) enum.nextElement() );
-        }
 
         enum = loader.listJavaClasses();
         while ( enum.hasMoreElements() ) {
