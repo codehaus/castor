@@ -217,7 +217,7 @@ public class XMLMappingLoader
                     if (clsDesc != null) 
                         return clsDesc;
                 }
-                catch(ResolverException rx) {};
+                catch(ResolverException rx) {}
                 
             }
         }
