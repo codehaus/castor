@@ -99,7 +99,7 @@ public class JDOFieldDescriptor
         if ( sqlName == null )
             throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = sqlName;
-        _dirtyCheck = _dirtyCheck;
+        _dirtyCheck = dirtyCheck;
     }
 
 
