@@ -111,13 +111,13 @@
               <xsl:variable name="level" select="count(ancestor::*)"/>
               <xsl:choose>
                 <xsl:when test='$level=2'>
-                  <a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
+                  <b><a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a></b><br/>
                 </xsl:when>
                 <xsl:when test='$level=3'>
-                  <a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
+                  <a href="#{translate(@title,' ','-')}">&#xA0;&#xA0;&#xA0;&#xA0;<xsl:value-of select="@title"/></a><br/>
                 </xsl:when>
                 <xsl:otherwise>
-                  &#xA0;&#xA0;&#xA0;<a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
+                  &#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;<a href="#{translate(@title,' ','-')}"><xsl:value-of select="@title"/></a><br/>
                 </xsl:otherwise>
               </xsl:choose>
             </xsl:if>
