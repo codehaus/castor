@@ -722,13 +722,15 @@ public class SourceGenerator {
         //-- ComplexType
         else if (xmlType.isComplexType()) {
 
-			JClass jClass = sourceFactory.createSourceCode(elementDecl,
+			JClass[] classes = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
 
             processComplexType((ComplexType)xmlType, sInfo);
 
-            processJClass(jClass, sInfo);
+            for (int i = 0; i < classes.length; i++)
+                 processJClass(classes[i], sInfo);
+
         }
         //-- SimpleType
         else {
