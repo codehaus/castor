@@ -91,7 +91,7 @@ public class XMLClassDescriptorImpl
      * The ValidationRule to use when performing validation
      * of instances of the Class associated with this MarshalInfo
     **/
-    private List validationRules = null;
+    //private List validationRules = null;
 
     /**
      * The set of element descriptors
@@ -164,7 +164,7 @@ public class XMLClassDescriptorImpl
     protected XMLClassDescriptorImpl() {
         attributeDescriptors = new List(7);
         elementDescriptors = new List(7);
-        validationRules = new List();
+        //validationRules = new List();
     } //-- XMLClassDescriptor
     
     //------------------/
@@ -194,7 +194,7 @@ public class XMLClassDescriptorImpl
             
     } //-- addFieldDescriptor
 
-
+    
     /**
      * Returns the set of XMLFieldDescriptors for all members
      * that should be marshalled as XML attributes.
@@ -202,8 +202,10 @@ public class XMLClassDescriptorImpl
      * that should be marshalled as XML attributes.
     **/
     public XMLFieldDescriptor[]  getAttributeDescriptors() {
+        
         XMLFieldDescriptor[] fields 
             = new XMLFieldDescriptor[attributeDescriptors.size()];
+            
         attributeDescriptors.toArray(fields);
         return fields;
     } // getAttributeDescriptors
@@ -281,6 +283,55 @@ public class XMLClassDescriptorImpl
     public void setXMLName(String xmlName) {
         this._xmlName = xmlName;
     } //-- setXMLName
+    
+    /** 
+     * This method is used to keep the set of descriptors in the proper
+     * sorted lists. If you dynamically change the NodeType of
+     * an XMLFieldDescriptor after adding it the this ClassDescriptor,
+     * then call this method.
+    **/
+    public void sortDescriptors() {
+        
+        XMLFieldDescriptor fieldDesc = null;
+        NodeType nodeType = null;
+        
+        List remove = new List(3);
+        for (int i = 0; i < attributeDescriptors.size(); i++) {
+            fieldDesc = (XMLFieldDescriptor)attributeDescriptors.get(i);
+            switch (fieldDesc.getNodeType().getType()) {
+                case NodeType.ELEMENT:
+                    elementDescriptors.add(fieldDesc);
+                    remove.add(fieldDesc);
+                    break;
+                case NodeType.TEXT:
+                    remove.add(fieldDesc);
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (int i = 0; i < remove.size(); i++)
+            attributeDescriptors.remove(remove.get(i));
+        
+        remove.clear();
+        for (int i = 0; i < elementDescriptors.size(); i++) {
+            fieldDesc = (XMLFieldDescriptor)elementDescriptors.get(i);
+            switch (fieldDesc.getNodeType().getType()) {
+                case NodeType.ATTRIBUTE:
+                    attributeDescriptors.add(fieldDesc);
+                    remove.add(fieldDesc);
+                    break;
+                case NodeType.TEXT:
+                    remove.add(fieldDesc);
+                    break;
+                default:
+                    break;
+            }
+        }
+        for (int i = 0; i < remove.size(); i++)
+            elementDescriptors.remove(remove.get(i));
+            
+    } //-- sortDescriptors
     
     public String toString()
     {
