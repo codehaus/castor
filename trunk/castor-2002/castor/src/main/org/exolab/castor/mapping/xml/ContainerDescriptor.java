@@ -342,7 +342,7 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setValidator(fieldValidator);
         
         //-- _fieldMapping
-        desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMapping", "field-mapping", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMapping", "field", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException

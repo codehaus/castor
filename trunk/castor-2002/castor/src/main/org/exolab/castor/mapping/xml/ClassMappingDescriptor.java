@@ -341,7 +341,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         desc.setValidator(fieldValidator);
 
         //-- _cacheTypeMapping
-        desc = new XMLFieldDescriptorImpl(CacheTypeMapping.class, "_cacheTypeMapping", "cache-type-mapping", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(CacheTypeMapping.class, "_cacheTypeMapping", "cache-type", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object )
                 throws IllegalStateException

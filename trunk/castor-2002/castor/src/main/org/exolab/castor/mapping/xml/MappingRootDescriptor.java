@@ -167,7 +167,7 @@ public class MappingRootDescriptor extends org.exolab.castor.xml.util.XMLClassDe
         desc.setValidator(fieldValidator);
 
         //-- _keyGeneratorDefList
-        desc = new XMLFieldDescriptorImpl(KeyGeneratorDef.class, "_keyGeneratorDefList", "key-generator-def", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(KeyGeneratorDef.class, "_keyGeneratorDefList", "key-generator", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object )
                 throws IllegalStateException

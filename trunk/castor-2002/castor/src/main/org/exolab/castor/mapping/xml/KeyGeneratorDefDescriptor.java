@@ -49,7 +49,7 @@ public class KeyGeneratorDefDescriptor extends org.exolab.castor.xml.util.XMLCla
     public KeyGeneratorDefDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/";
-        xmlName = "key-generator-def";
+        xmlName = "key-generator";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
