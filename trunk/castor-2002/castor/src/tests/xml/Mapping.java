@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Reader;
 import java.io.InputStreamReader;
-import org.exolab.castor.tools.MappingTool;
+//import org.exolab.castor.tools.MappingTool;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.exceptions.CWClassConstructorException;
@@ -42,6 +42,7 @@ public class Mapping
         boolean result = true;
 
         try {
+            /*
             org.exolab.castor.mapping.Mapping    mapping;
 
             mapping = new org.exolab.castor.mapping.Mapping();
@@ -66,7 +67,7 @@ public class Mapping
             while ( reader.ready() )
                 writer.write( reader.read() );
             toolCopy = writer.toString();
-
+            */
         } catch ( Exception except ) {
             try {
                 stream.writeVerbose( "Error: " + except );
