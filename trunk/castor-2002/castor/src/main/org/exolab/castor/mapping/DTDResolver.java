@@ -54,8 +54,14 @@ import org.xml.sax.InputSource;
 
 
 /**
- * Entity resolved for resolving JDO mapping DTD and Schema public/system
- * identifiers into local copies.
+ * Entity resolved for mapping DTD/schema. Can be used as wrapper to
+ * another entity resolver. For example, if a resolver is used for
+ * external entities in the mapping file, construct a new resolver
+ * using the {@link #DTDResolver(EntityResolver)} constructor.
+ * <p>
+ * This resolver will support both the public and system identifier
+ * of either the DTD or XML schema. It will return an input stream
+ * to the DTD/schema obtained from the Castor JAR.
  *
  * @author <a href="mailto:arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -65,31 +71,53 @@ public class DTDResolver
 {
 
 
+    /**
+     * List of public identifiers.
+     */
     private static final String[] PublicId = new String[] {
 	MappingSchema.DTD.PublicId,
 	MappingSchema.Schema.SystemId
     };
 
+    /**
+     * List of system identifiers.
+     */
     private static final String[] SystemId = new String[] {
 	MappingSchema.DTD.PublicId,
 	MappingSchema.Schema.PublicId
     };
 
+    /**
+     * List of resources for the actual files.
+     */
     private static final String[] Resource = new String[] {
 	MappingSchema.DTD.Resource,
 	MappingSchema.Schema.Resource
     };
 
 
+    /**
+     * The wrapped resolver.
+     */
     private EntityResolver _resolver;
 
 
+    /**
+     * Constructs a new DTD resolver. This resolver wraps another
+     * resolver and will delegate all resolving not related to the
+     * Castor mapping files to that resolver. The wrapper resolver
+     * will typically be used for entities appearing in the actual
+     * mapping file.
+     */
     public DTDResolver( EntityResolver resolver )
     {
 	_resolver = resolver;
     }
 
 
+    /**
+     * Constructs a new DTD resolver.
+     */
     public DTDResolver()
     {
     }

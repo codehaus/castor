@@ -55,13 +55,17 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.xml.Mapping;
-import org.exolab.castor.mapping.xml.ObjectMapping;
+import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.ContainerMapping;
 import org.exolab.castor.mapping.xml.LdapInfo;
 
 
 /**
+ * Assists in the construction of descriptors. Can be used as a mapping
+ * resolver to the engine. Engines will implement their own mapping
+ * scheme typically by extending this class.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
@@ -70,6 +74,9 @@ public abstract class MappingHelper
 {
 
 
+    /**
+     * All class descriptors added so far, keyed by Java class.
+     */
     private Hashtable  _clsDescs = new Hashtable();
 
 
@@ -91,69 +98,111 @@ public abstract class MappingHelper
     }
 
 
+    /**
+     * Adds a class descriptor. Will throw a mapping exception if a
+     * descriptor for this class already exists.
+     *
+     * @param clsDesc The descriptor to add
+     * @throws MappingException A descriptor for this class already
+     *  exists
+     */
     protected void addDescriptor( ClassDesc clsDesc )
 	throws MappingException
     {
-	if ( _clsDescs.contains( clsDesc.getObjectType() ) )
-	    throw new MappingException( "Mapping already exists" );
-	_clsDescs.put( clsDesc.getObjectType(), clsDesc );
+	if ( _clsDescs.contains( clsDesc.getJavaClass() ) )
+	    throw new MappingException( "mapping.duplicateDescriptors", clsDesc.getJavaClass() );
+	_clsDescs.put( clsDesc.getJavaClass(), clsDesc );
     }
 
 
-    protected ClassDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
+    /**
+     * Creates a new descriptor. The class mapping information is used
+     * to create a new stock {@link ClassDesc}. Implementations may
+     * extend this class to create a more suitable descriptor.
+     *
+     * @param loader The class loader to use
+     * @param clsMap The class mapping information
+     * @throws MappingException An exception indicating why mapping for
+     *  the class cannot be created
+     */
+    protected ClassDesc createDescriptor( ClassLoader loader, ClassMapping clsMap )
         throws MappingException
     {
 	FieldDesc[]      fields;
 	FieldDesc        identity;
 	Enumeration      enum;
-	Class            objType;
-	ClassDesc       extend;
+	Class            javaClass;
+	ClassDesc        extend;
 	ContainerMapping contMaps[];
 
-	if ( objMap.getExtends() != null ) {
+	// Obtain the Java class.
+	try {
+	    javaClass = loader.loadClass( clsMap.getClassName() );
+	} catch ( ClassNotFoundException except ) {
+	    throw new MappingException( "mapping.classNotFound", clsMap.getClassName(), loader );
+	}
+
+	// If this class extends another class, need to obtain the extended
+	// class and make sure this class indeed extends it.
+	if ( clsMap.getExtends() != null ) {
 	    try {
-		extend = getDescriptor( loader.loadClass( objMap.getExtends() ) );
+		extend = getDescriptor( loader.loadClass( clsMap.getExtends() ) );
 		if ( extend == null )
-		    throw new MappingException( "Extend not found" );
+		    throw new MappingException( "mapping.extendsMissing",
+						clsMap.getExtends(), javaClass.getName() );
 	    } catch ( ClassNotFoundException except ) {
-		throw new MappingException( except.toString() );
+		throw new MappingException( except );
 	    }
 	} else
 	    extend = null;
-	try {
-	    objType = loader.loadClass( objMap.getType() );
-	} catch ( ClassNotFoundException except ) {
-	    throw new MappingException( except.toString() );
-	}
 
-	fields = createFieldDescs( loader, objType, objMap.getFieldMapping() );
-	contMaps = objMap.getContainerMapping();
+	// Create all the field descriptors followed by all the container
+	// field descriptors. Order is preserved for fields, but not for
+	// container fields.
+	fields = createFieldDescs( loader, javaClass, clsMap.getFieldMapping() );
+	contMaps = clsMap.getContainerMapping();
 	if ( contMaps != null && contMaps.length > 0 ) {
 	    FieldDesc[] allFields;
 
 	    allFields = new FieldDesc[ fields.length + contMaps.length ];
-	    System.arraycopy( fields, 0, allFields, 0, fields.length );
+	    for ( int i = 0 ; i < fields.length ; ++i )
+		allFields[ i ] = fields[ i ];
 	    for ( int i = 0 ; i < contMaps.length ; ++i )
-		allFields[ i + fields.length ] = createContainerFieldDesc( loader, objType, contMaps[ i ] );
+		allFields[ i + fields.length ] = createContainerFieldDesc( loader, javaClass, contMaps[ i ] );
 	    fields = allFields;
 	}
 
+	// Obtain the identity field from one of the above fields.
 	identity = null;
-	if ( objMap.getIdentity() != null ) {
+	if ( clsMap.getIdentity() != null ) {
 	    for ( int i = 0 ; i < fields.length ; ++i ) {
-		if ( fields[ i ].getFieldName().equals( objMap.getIdentity().getFieldRef() ) ) {
+		if ( fields[ i ].getFieldName().equals( clsMap.getIdentity().getFieldRef() ) ) {
 		    identity = fields[ i ];
 		    break;
 		}
 	    }
 	    if ( identity == null )
-		throw new MappingException( "Identity field not found" );
+		throw new MappingException( "mapping.identityMissing", clsMap.getIdentity().getFieldRef(),
+					    javaClass.getName() );
 	}
-	return new ClassDesc( objType, fields, identity, extend );
+	return new ClassDesc( javaClass, fields, identity, extend );
     }
 
 
-    protected FieldDesc[] createFieldDescs( ClassLoader loader, Class objType, FieldMapping[] fieldMaps )
+    /**
+     * Create field descriptors. The class mapping information is used
+     * to create descriptors for all the fields in the class, except
+     * for container fields. Implementations may extend this method to
+     * create more suitable descriptors, or create descriptors only for
+     * a subset of the fields.
+     *
+     * @param loader The class loader to use
+     * @param javaClass The class to which the fields belong
+     * @param fieldMaps The field mappings
+     * @throws MappingException An exception indicating why mapping for
+     *  the class cannot be created
+     */
+    protected FieldDesc[] createFieldDescs( ClassLoader loader, Class javaClass, FieldMapping[] fieldMaps )
 	throws MappingException
     {
 	FieldDesc[] fields;
@@ -162,13 +211,24 @@ public abstract class MappingHelper
 	    return new FieldDesc[ 0 ];
 	fields = new FieldDesc[ fieldMaps.length ];
 	for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
-	    fields[ i ] = createFieldDesc( loader, objType, fieldMaps[ i ] );
+	    fields[ i ] = createFieldDesc( loader, javaClass, fieldMaps[ i ] );
 	}
 	return fields;
     }
 
 
-    protected ContainerFieldDesc createContainerFieldDesc( ClassLoader loader, Class objType,
+    /**
+     * Create container field descriptor. The contained mapping is used
+     * to create a single field descriptor which includes several field
+     * descriptors for all contained fields.
+     *
+     * @param loader The class loader to use
+     * @param javaClass The class to which the field belongs
+     * @param fieldMap The field mapping
+     * @throws MappingException An exception indicating why mapping for
+     *  the class cannot be created
+     */
+    protected ContainerFieldDesc createContainerFieldDesc( ClassLoader loader, Class javaClass,
 							   ContainerMapping fieldMap )
 	throws MappingException
     {
@@ -181,48 +241,60 @@ public abstract class MappingHelper
 	    try {
 		 fieldType = Types.typeFromName( loader, fieldMap.getType() );
 	    } catch ( ClassNotFoundException except ) {
-		throw new MappingException( except.toString() );
+		throw new MappingException( "mapping.classNotFound", fieldMap.getType(), loader );
 	    }
 	} else
 	    fieldType = null;
 
 	if ( fieldMap.getGetMethod() != null ||
 	     fieldMap.getSetMethod() != null ) {
-	    Method getMethod;
-	    Method setMethod;
+	    // Accessors, map field using either methods.
+	    Method getMethod = null;
+	    Method setMethod = null;
 
-	    getMethod = findAccessor( objType, fieldMap.getGetMethod(), fieldType, true );
-	    fieldType = getMethod.getReturnType();
-	    setMethod = findAccessor( objType, fieldMap.getGetMethod(), fieldType, true );
+	    if ( fieldMap.getGetMethod() != null ) {
+		getMethod = findAccessor( javaClass, fieldMap.getGetMethod(), fieldType, true );
+		// Use return type for parameter type checking, if known
+		fieldType = getMethod.getReturnType();
+	    }
+	    if ( fieldMap.getSetMethod() != null ) {
+		setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), fieldType, true );
+		if ( fieldType == null )
+		    fieldType = setMethod.getParameterTypes()[ 0 ];
+	    }
 	    container = new FieldDesc( fieldMap.getName(), fieldType, getMethod, setMethod,
-				   fieldMap.getRequired(), true, true );
+				       fieldMap.getRequired() );
 	} else {
+	    // No accessor, map field directly.
 	    Field field;
 
-	    field = findField( objType, fieldMap.getName(), fieldType );
+	    field = findField( javaClass, fieldMap.getName(), fieldType );
 	    fieldType = field.getType();
-	    container = new FieldDesc( field, fieldMap.getRequired(), true, true );
+	    container = new FieldDesc( field, fieldMap.getRequired() );
 	}
+
+	// Container type must be constructable.
 	if ( ! Types.isConstructable( fieldType ) )
-	    throw new MappingException( "Unconstructable" );
+	    throw new MappingException( "mapping.classNotConstructable", fieldType.getName() );
+	// Create descriptors for all the fields.
 	fields = createFieldDescs( loader, fieldType, fieldMap.getFieldMapping() );
-	if ( fields.length == 0 )
-	    throw new MappingException( "Zero fields" );
 	return new ContainerFieldDesc( container, fields );
     }
 
 
     /**
-     * Creates and returns a field descriptor for the specified field mapping.
+     * Creates a single field descriptor. The field mapping is used to
+     * create a new stock {@link FieldDesc}. Implementations may
+     * extend this class to create a more suitable descriptor.
      *
      * @param loader The class loader to use
-     * @param objType The type of the object to which the field belongs
+     * @param javaClass The class to which the field belongs
      * @param fieldMap The field mapping information
      * @return The field descriptor
      * @throws MappingException The field or its accessor methods are not
      *  found, not accessible, not of the specified type, etc
      */
-    protected FieldDesc createFieldDesc( ClassLoader loader, Class objType, FieldMapping fieldMap )
+    protected FieldDesc createFieldDesc( ClassLoader loader, Class javaClass, FieldMapping fieldMap )
 	throws MappingException
     {
 	Class fieldType;
@@ -232,42 +304,51 @@ public abstract class MappingHelper
 	    try {
 		 fieldType = Types.typeFromName( loader, fieldMap.getType() );
 	    } catch ( ClassNotFoundException except ) {
-		throw new MappingException( "Class not found" );
+		throw new MappingException( "mapping.classNotFound", fieldMap.getType(), loader );
 	    }
 	} else
 	    fieldType = null;
 
 	if ( fieldMap.getGetMethod() != null ||
 	     fieldMap.getSetMethod() != null ) {
-	    Method getMethod;
-	    Method setMethod;
+	    // Accessors, map field using either methods.
+	    Method getMethod = null;
+	    Method setMethod = null;
 
-	    getMethod = findAccessor( objType, fieldMap.getGetMethod(), fieldType, true );
-	    fieldType = getMethod.getReturnType();
-	    setMethod = findAccessor( objType, fieldMap.getGetMethod(), fieldType, true );
+	    if ( fieldMap.getGetMethod() != null ) {
+		getMethod = findAccessor( javaClass, fieldMap.getGetMethod(), fieldType, true );
+		// Use return type for parameter type checking, if known
+		fieldType = getMethod.getReturnType();
+	    }
+	    if ( fieldMap.getSetMethod() != null ) {
+		setMethod = findAccessor( javaClass, fieldMap.getGetMethod(), fieldType, true );
+		if ( fieldType == null )
+		    fieldType = setMethod.getParameterTypes()[ 0 ];
+	    }
 	    return new FieldDesc( fieldMap.getName(), fieldType, getMethod, setMethod,
-				  fieldMap.getRequired(), true, true );
+				  fieldMap.getRequired() );
 	} else {
+	    // No accessor, map field directly.
 	    Field field;
 
-	    field = findField( objType, fieldMap.getName(), fieldType );
-	    return new FieldDesc( field, fieldMap.getRequired(), true, true );
+	    field = findField( javaClass, fieldMap.getName(), fieldType );
+	    return new FieldDesc( field, fieldMap.getRequired() );
 	}
     }
 
 
     /**
-     * Find and return the named field in the object and make sure that field
-     * is accessible.
+     * Returns the named field. Uses reflection to return the named
+     * field and check the field type, if specified.
      *
-     * @param objType The type of the object to which the field belongs
+     * @param javaClass The class to which the field belongs
      * @param fieldName The name of the field
      * @param fieldType The type of the field if known, or null
      * @return The field
      * @throws MappingException The field is not accessible or is not of the
      *  specified type
      */
-    private Field findField( Class objType, String fieldName, Class fieldType )
+    private Field findField( Class javaClass, String fieldName, Class fieldType )
 	throws MappingException
     {
 	Field field;
@@ -275,72 +356,64 @@ public abstract class MappingHelper
 	try {
 	    // Look up the field based on its name, make sure it's only modifier
 	    // is public. If a type was specified, match the field type.
-	    field = objType.getField( fieldName );
+	    field = javaClass.getField( fieldName );
 	    if ( field.getModifiers() != Modifier.PUBLIC &&
 		 field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
-		throw new MappingException( "Field " + fieldName +
-					    " is not public, or is static/transient/final" );
-	    if ( fieldType == null ) {
+		throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
+	    if ( fieldType == null )
 		fieldType = Types.typeFromPrimitive( field.getType() );
-	    } else {
-		if ( fieldType != Types.typeFromPrimitive( field.getType() ) )
-		    throw new MappingException( "Field " + fieldName +
-						" is not of specified type " + fieldType );
-	    }
+	    else if ( fieldType != Types.typeFromPrimitive( field.getType() ) )
+		throw new MappingException( "mapping.fieldTypeMismatch", field, fieldType.getName() );
 	    return field;
 	} catch ( NoSuchFieldException except ) {
 	} catch ( SecurityException except ) {
 	}
 	// No such/access to field
-	throw new MappingException( "Field " + fieldName +
-				    " does not exist or is not accessible in " +
-				    objType.getName() );
+	throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
     }
 
 
     /**
-     * Find and return the named accessor in the object and make sure that
-     * accessor
-     * is accessible.
+     * Returns the named accessor. Uses reflection to return the named
+     * accessor and check the return value or parameter type, if
+     * specified.
      *
-     * @param objType The type of the object to which the field belongs
+     * @param javaClass The class to which the field belongs
      * @param methodName The name of the accessor method
      * @param fieldType The type of the field if known, or null
-     * @param getMethod True if get method, false if set method
+     * @param isGetMethod True if get method, false if set method
      * @return The method
      * @throws MappingException The method is not accessible or is not of the
      *  specified type
      */
-    public static Method findAccessor( Class objType, String methodName,
-				       Class fieldType, boolean getMethod )
+    private static Method findAccessor( Class javaClass, String methodName,
+					Class fieldType, boolean getMethod )
 	throws MappingException
     {
 	Method   method;
 	Method[] methods;
 	int      i;
-
+	
 	try {
 	    if ( getMethod ) {
 		// Get method: look for the named method or prepend get to the
 		// method name. Look up the field and potentially check the
 		// return type.
-		method = objType.getMethod( methodName, new Class[ 0 ] );
-		if ( fieldType == null ) {
+		method = javaClass.getMethod( methodName, new Class[ 0 ] );
+		if ( fieldType == null )
 		    fieldType = Types.typeFromPrimitive( method.getReturnType() );
-		} else {
-		    if ( fieldType != Types.typeFromPrimitive( method.getReturnType() ) )
-			throw new MappingException( "Field accessor " + methodName +
-						    " is not of specified type " + fieldType );
-		}
+		else if ( fieldType != Types.typeFromPrimitive( method.getReturnType() ) )
+		    throw new MappingException( "mapping.accessorReturnTypeMismatch",
+						method, fieldType.getName() );
 	    } else {
 		// Set method: look for the named method or prepend set to the
 		// method name. If the field type is know, look up a suitable
 		// method. If the fielf type is unknown, lookup the first
 		// method with that name and one parameter.
-		if ( fieldType != null ) {
-		    method = objType.getMethod( methodName, new Class[] { fieldType } );
-		} else {
-		    methods = objType.getMethods();
+		if ( fieldType != null )
+		    method = javaClass.getMethod( methodName, new Class[] { fieldType } );
+		else {
+		    methods = javaClass.getMethods();
 		    method = null;
 		    for ( i = 0 ; i < methods.length ; ++i ) {
 			if ( methods[ i ].getName().equals( methodName ) &&
@@ -356,16 +429,15 @@ public abstract class MappingHelper
 	    // Make sure method is public and not abstract/static.
 	    if ( method.getModifiers() != Modifier.PUBLIC &&
 		 method.getModifiers() != ( Modifier.PUBLIC | Modifier.SYNCHRONIZED ) )
-		throw new MappingException( "Field accessor " + methodName +
-					    " is not public, or is static/abstract" );
+		throw new MappingException( "mapping.accessorNotAccessible",
+					    methodName, javaClass.getName() );
 	    return method;
 	} catch ( NoSuchMethodException except ) {
 	} catch ( SecurityException except ) {
 	}
 	// No such/access to method
-	throw new MappingException( "Field accessor " + methodName +
-				    " does not exist or is not accessible in " +
-				    objType.getName() );
+	throw new MappingException( "mapping.accessorNotAccessible",
+				    methodName, javaClass.getName() );
     }
 
 

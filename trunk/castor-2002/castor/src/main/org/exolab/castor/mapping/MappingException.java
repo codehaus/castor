@@ -50,6 +50,7 @@ package org.exolab.castor.mapping;
 import java.io.PrintWriter;
 import java.io.PrintStream;
 import java.sql.SQLException;
+import org.exolab.castor.util.CastorException;
 
 
 /**
@@ -60,7 +61,7 @@ import java.sql.SQLException;
  * @version $Revision$ $Date$
  */
 public class MappingException
-    extends SQLException
+    extends CastorException
 {
 
 
@@ -72,9 +73,22 @@ public class MappingException
 	super( message );
     }
 
+
+    public MappingException( String message, Object arg1 )
+    {
+	super( message, arg1 );
+    }
+
+
+    public MappingException( String message, Object arg1, Object arg2 )
+    {
+	super( message, arg1, arg2 );
+    }
+
+
     public MappingException( Exception except )
     {
-	super( "Nested exception: " + except.toString() );
+	super( "mapping.nested", except.toString() );
 	_except = except;
     }
 

@@ -66,19 +66,19 @@ public class SqlTableMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         //-- initialize attributes
         
         attributes = new MarshalDescriptor[1];
-        //-- vName
-        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vName", "name");
+        //-- vTableName
+        desc = new SimpleMarshalDescriptor(java.lang.String.class, "vTableName", "table-name");
         desc.setDescriptorType(DescriptorType.attribute);
         try {
-            desc.setReadMethod(SqlTable.class.getMethod("getName", emptyClassArgs));
+            desc.setReadMethod(SqlTable.class.getMethod("getTableName", emptyClassArgs));
             classArgs[0] = java.lang.String.class;
-            desc.setWriteMethod(SqlTable.class.getMethod("setName", classArgs));
+            desc.setWriteMethod(SqlTable.class.getMethod("setTableName", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
         attributes[0] = desc;
         
-        bvr = new BasicValidationRule("name");
+        bvr = new BasicValidationRule("table-name");
         bvr.setAsAttributeRule();
         bvr.setMaxOccurs(1);
         bvr.setTypeValidator(new NameValidator(NameValidator.NMTOKEN));

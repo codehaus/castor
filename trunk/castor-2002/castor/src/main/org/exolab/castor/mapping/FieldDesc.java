@@ -51,16 +51,17 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
+import org.exolab.castor.util.Messages;
 
 
 /**
  * A field descriptor describes and is used to access the field in a
- * Java object. This class is a wrapper around the <tt>Field</tt>
- * class of the reflection package and provides additional information
- * about name and type, read/write access, etc.
+ * Java object. This class is a wrapper around <tt>java.lang.reflect.Field</tt>
+ * and provides additional information about name and type, read/write access,
+ * etc.
  * <p>
  * This class is used as the common parent for all derived classes
- * including {@link ContainedFieldDesc}, {@link ObjectFieldDesc}, etc.
+ * including {@link ContainerFieldDesc}.
  * <p>
  * Engines will extend this class to provide additional functionality.
  *
@@ -99,7 +100,7 @@ public class FieldDesc
 
 
     /**
-     * The Java type of this field in the object.
+     * The Java class of this field.
      */
     private Class  _fieldType;
 
@@ -109,18 +110,6 @@ public class FieldDesc
      * be null on output.
      */
     private boolean  _required;
-
-
-    /**
-     * True if the field is readable. Readable fields are set on input.
-     */
-    private boolean  _readable;
-
-
-    /**
-     * True if the field is writeable. Writeable fields are set on output.
-     */
-    private boolean  _writeable;
 
 
     /**
@@ -143,24 +132,20 @@ public class FieldDesc
      * @param field The field being described
      * @param required True if the field is required and may not be null
      *    on output
-     * @param readable True if the field is readable
-     * @param writeable True if the field is writeable
      * @throws MappingException If the field is not public, is static or
      *    transient
      */
-    public FieldDesc( Field field, boolean required, boolean readable, boolean writeable )
+    public FieldDesc( Field field, boolean required )
 	throws MappingException
     {
 	if ( field.getModifiers() != Modifier.PUBLIC &&
 	     field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
-	    throw new MappingException( "Cannot use the field " + field.getName() + " in class " +
-					field.getDeclaringClass() + ": the field is not public, or is static/transient" );
+	    throw new MappingException( "mapping.fieldNotAccessible", field.getName(),
+					field.getDeclaringClass().getName() );
 	_field = field;
 	_fieldName = field.getName();
 	_fieldType = Types.typeFromPrimitive( field.getType() );
 	_required = required;
-	_readable = readable;
-	_writeable = writeable;
 	_immutable = Types.isImmutable( _fieldType );
 	_default = Types.getDefault( _fieldType );
     }
@@ -172,60 +157,51 @@ public class FieldDesc
      * methods must be public and not static. The field name is
      * required for descriptive purposes. The field type must match
      * the return value of the get method and the single parameter of
-     * the set method. A set method is mandatory for readable fields,
-     * a get method is mandatory for writable fields.
+     * the set method. Either get or set methods are optional.
      *
      * @param fieldName The field being described
      * @param fieldType The field type being described
      * @param getMethod The method used to retrieve the field value,
-     *   required if the field is writeable, must accept no parameters
-     *   and have a return type castable to the field type
-     * @param setMethod The method used to set the field value, required
-     *   if the field is readable, must accept a single paramater that
-     *   is castable to the field type
+     *  must accept no parameters and have a return type castable to
+     *  the field type
+     * @param setMethod The method used to set the field value, must
+     *  accept a single paramater that is castable to the field type
      * @param required True if the field is required and may not be null
      *    on output
-     * @param readable True if the field is readable
-     * @param writeable True if the field is writeable
      * @throws MappingException If the get or set method are not public,
-     *   are static, do not specify the proper types, or are missing
+     *   are static, or do not specify the proper types
      *
      */
     public FieldDesc( String fieldName, Class fieldType,
-		      Method getMethod, Method setMethod,
-		      boolean required, boolean readable, boolean writeable )
+		      Method getMethod, Method setMethod, boolean required )
 	throws MappingException
     {
-	this( fieldName, fieldType, required, readable, writeable );
+	this( fieldName, fieldType, required );
 	if ( fieldName == null )
 	    throw new IllegalArgumentException( "Argument 'fieldName' is null" );
+	if ( getMethod == null && setMethod == null )
+	    throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
 	
-	if ( getMethod == null ) {
-	    if ( writeable )
-		throw new MappingException( "Field is designated writeable, writeable fields must have a get method" );
-	} else {
+	if ( getMethod != null ) {
 	    if ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
 		 ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
-		throw new MappingException( "Field accessor " + getMethod.getName() +
-					    " is not public, or is static/abstract" );
+		throw new MappingException( "mapping.accessorNotAccessible",
+					    getMethod, getMethod.getDeclaringClass().getName() );
 	    if ( ! _fieldType.isAssignableFrom( getMethod.getReturnType() ) )
-		throw new MappingException( "The field type and return type of the accessor " +
-					    getMethod.getName() + " are not the same" );
+		throw new MappingException( "mapping.accessorReturnTypeMismatch",
+					    getMethod, fieldType.getName() );
 	    _getMethod = getMethod;
 	    
 	}
-	if ( setMethod == null ) {
-	    if ( readable )
-		throw new MappingException( "Field is designated readable, readable fields must have a set method" );
-	} else {
+	if ( setMethod != null ) {
 	    if ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
 		 ( setMethod.getModifiers() & Modifier.STATIC ) != 0 )
-		throw new MappingException( "Field accessor " + setMethod.getName() +
-					    " is not public, or is static/abstract" );
+		throw new MappingException( "mapping.accessorNotAccessible",
+					    setMethod, setMethod.getDeclaringClass().getName() );
 	    if ( setMethod.getParameterTypes().length != 1 &&
 		 ! setMethod.getParameterTypes()[ 0 ].isAssignableFrom( _fieldType ) )
-		throw new MappingException( "The field type and parameter types of the accessor " +
-					    setMethod.getName() + " are not the same" );
+		throw new MappingException( "mapping.accessorParameterMismatch",
+					    setMethod, fieldType.getName() );
 	    _setMethod = setMethod;
 	}
     }
@@ -239,19 +215,14 @@ public class FieldDesc
      *   to be set on input/output
      * @param required True if the field is required and may not be null
      *    on output
-     * @param readable True if the field is readable
-     * @param writeable True if the field is writeable
      * @throws MappingException If the field is not public, is static or
      *    transient
      */
-    protected FieldDesc( String fieldName, Class fieldType,
-			 boolean required, boolean readable, boolean writeable )
+    protected FieldDesc( String fieldName, Class fieldType, boolean required )
     {
 	_fieldName = fieldName;
 	_fieldType = Types.typeFromPrimitive( fieldType );
 	_required = required;
-	_readable = readable;
-	_writeable = writeable;
 	_immutable = Types.isImmutable( _fieldType );
 	_default = Types.getDefault( _fieldType );
     }
@@ -269,18 +240,16 @@ public class FieldDesc
 	_getMethod = desc._getMethod;
 	_setMethod = desc._setMethod;
 	_required = desc._required;
-	_readable = desc._readable;
-	_writeable = desc._writeable;
 	_immutable = desc._immutable;
 	_default = desc._default;
     }
 
 
     /**
-     * Returns the name of this field in the object. The field must
-     * have a name, even if it set through accessor methods.
+     * Returns the name of this field. The field must have a name,
+     * even if it set through accessor methods.
      *
-     * @return The Java field name
+     * @return The field name
      */
     public String getFieldName()
     {
@@ -289,9 +258,9 @@ public class FieldDesc
 
 
     /**
-     * Returns the Java type of this field in the object.
+     * Returns the Java type of this field.
      *
-     * @return The object field type
+     * @return The field type
      */
     public Class getFieldType()
     {
@@ -301,8 +270,7 @@ public class FieldDesc
 
     /**
      * Returns true if the field is required. Required fields cannot
-     * be null and an attempt to output a required field with the
-     * value of null will result in a {@link IllegalArgumentException}.
+     * be null.
      *
      * @return True if the field is required
      */
@@ -313,36 +281,8 @@ public class FieldDesc
 
 
     /**
-     * Returns true if the field is readable. Readable fields are
-     * set on output. Some fields (e.g. primary key) must be readable.
-     * An attempt to call {@link #setValue} on a non-readable field
-     * will result in a {@link IllegalStateException}.
-     *
-     * @return True if field is readable
-     */
-    public boolean isReadable()
-    {
-	return _readable;
-    }
-
-
-    /**
-     * Returns true if the field is writeable. Writeable fields are
-     * set on output. Some fields (e.g. primary key) must be writeable.
-     * An attempt to call {@link #getValue} on a non-writeable field
-     * will result in a {@link IllegalStateException}.
-     *
-     * @return True if field is writeable
-     */
-    public boolean isWriteable()
-    {
-	return _writeable;
-    }
-
-
-    /**
-     * Returns the get method, the method used to obtain the value.
-     * Fields that are not writable need not have a get method.
+     * Returns the get method. The get method is used to obtain the
+     * value of the field.
      *
      * @return The get method, or null
      */
@@ -353,8 +293,8 @@ public class FieldDesc
 
 
     /**
-     * Returns the set method, the method used to set the value.
-     * Fields that are not readable need not have a set method.
+     * Returns the set method. The method used to set the value of
+     * the field.
      *
      * @return The set method, or null
      */
@@ -365,7 +305,7 @@ public class FieldDesc
 
 
     /**
-     * Returns the value of the field from the specified object.
+     * Returns the value of the field in the object.
      *
      * @param obj The object
      * @return The value of the field
@@ -373,57 +313,55 @@ public class FieldDesc
     public Object getValue( Object obj )
     {
 	try {
-	    if ( _getMethod == null )
+	    if ( _field != null )
 		return _field.get( obj );
-	    else
+	    else if ( _getMethod != null )
 		return _getMethod.invoke( obj, null );
+	    // If field has no get method, we return the default value.
+	    else
+		return _default;
 	} catch ( IllegalAccessException except ) {
 	    // This should never happen
-	    throw new IllegalStateException( "Schema change: " + _fieldName + " is no longer accessible" );
+	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
 	} catch ( InvocationTargetException except ) {
 	    // This should never happen
-	    throw new IllegalStateException( "Java schema change: " + _fieldName + " invocation error: " +
-					     except.toString() );
+	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+							      toString(), except.getMessage() ) );
 	}
     }
     
 
     /**
-     * Sets the value of the field on the specified object.
+     * Sets the value of the field in the object.
      *
      * @param obj The object
      * @param value The new value
      */
     public void setValue( Object obj, Object value )
     {
-	if ( value == null && _required ) {
-	    if ( _default != null )
-		value = _default;
-	}
+	// If there is a default value, use it for a required field.
+	if ( value == null && _required && _default != null )
+	    value = _default;
 	try {
-	    if ( _setMethod == null )
+	    if ( _field != null )
 		_field.set( obj, value );
-	    else
+	    else if ( _setMethod != null )
 		_setMethod.invoke( obj, new Object[] { value } );
+	    // If the field has no set method, ignore it.
 	} catch ( IllegalArgumentException except ) {
 	    // Graceful way of dealing with unwrapping exception
-	    if ( value == null ) {
-		throw new IllegalArgumentException( "Type conversion error: could not set null to " +
-						    toString() + " of type " + _fieldType.getName() +
-						    "; original error: " + except.getMessage() );
-	    } else {
-		throw new IllegalArgumentException( "Type conversion error: failed to set value of " +
-						    value.getClass().getName() + " in field " + toString() +
-						    " of type " + _fieldType.getName() + "; original error: " +
-						    except.getMessage() );
-	    }
-	} catch ( InvocationTargetException except ) {
-	    // This should never happen
-	    throw new IllegalStateException( "Java schema change: " + _fieldName + " invocation error: " +
-					     except.toString() );
+	    if ( value == null )
+		throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
+	    else
+		throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
+								     toString(), value.getClass().getName() ) );
 	} catch ( IllegalAccessException except ) {
 	    // This should never happen
-	    throw new IllegalStateException( "Schema change: " + _fieldName + " is no longer accessible" );
+	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+	} catch ( InvocationTargetException except ) {
+	    // This should never happen
+	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+							      toString(), except.getMessage() ) );
 	}
     }
 
@@ -452,6 +390,8 @@ public class FieldDesc
      * Determines if the field can be stored. Returns null if the field
      * can be stored, or a message indicating the reason why the field
      * cannot be stored. For example, if a required field is null.
+     * The message name can be used to look up the appropriate message
+     * text and should be formatted with an argument specifying the class name.
      *
      * @param obj The object
      * @return Null if can store, otherwise a message indicate why
@@ -460,7 +400,7 @@ public class FieldDesc
     public String canStore( Object obj )
     {
 	if ( getValue( obj ) == null && _required )
-	    return toString() + " is required, null value used";
+	    return "mapping.requiredField";
 	return null;
     }
 
@@ -487,7 +427,7 @@ public class FieldDesc
 
     public String toString()
     {
-        return "Field " + _fieldName;
+        return "field " + _fieldName + "(" + _fieldType.getName() + ")";
     }
     
 

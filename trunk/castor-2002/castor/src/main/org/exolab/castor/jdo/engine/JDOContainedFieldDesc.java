@@ -130,7 +130,7 @@ public class JDOContainedFieldDesc
 	if ( self == null ) {
 	    // If the contained object does not exist, it is
 	    // created at this point.
-	    self = Types.createNew( _parentField.getFieldType() );
+	    self = Types.newInstance( _parentField.getFieldType() );
 	    if ( _parentRefField != null )
 		_parentRefField.setValue( self, obj );
 	    _parentField.setValue( obj, self );

@@ -103,13 +103,13 @@ public class MappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         bvr = new BasicValidationRule("include");
         bvr.setMinOccurs(0);
         gvr.addValidationRule(bvr);
-        //-- vObjectList
-        desc = new SimpleMarshalDescriptor(ObjectMapping.class, "vObjectList", "object");
+        //-- vClassList
+        desc = new SimpleMarshalDescriptor(ClassMapping.class, "vClassList", "class");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(Mapping.class.getMethod("getObjectMapping", emptyClassArgs));
-            classArgs[0] = ObjectMapping.class;
-            desc.setWriteMethod(Mapping.class.getMethod("addObjectMapping", classArgs));
+            desc.setReadMethod(Mapping.class.getMethod("getClassMapping", emptyClassArgs));
+            classArgs[0] = ClassMapping.class;
+            desc.setWriteMethod(Mapping.class.getMethod("addClassMapping", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -117,7 +117,7 @@ public class MappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         desc.setMultivalued(true);
         elements[2] = desc;
         
-        bvr = new BasicValidationRule("object");
+        bvr = new BasicValidationRule("class");
         bvr.setMinOccurs(1);
         gvr.addValidationRule(bvr);
     } //-- MappingMarshalInfo()

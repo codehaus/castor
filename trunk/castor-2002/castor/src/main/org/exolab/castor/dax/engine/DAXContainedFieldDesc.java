@@ -156,7 +156,7 @@ public class DAXContainedFieldDesc
 	if ( self == null ) {
 	    // If the contained object does not exist, it is
 	    // created at this point.
-	    self = Types.createNew( _containerField.getFieldType() );
+	    self = Types.newInstance( _containerField.getFieldType() );
 	    if ( _parentRefField != null )
 		_parentRefField.setValue( self, obj );
 	    _containerField.setValue( obj, self );
@@ -176,7 +176,7 @@ public class DAXContainedFieldDesc
 	if ( self == null ) {
 	    // If the contained object does not exist, it is
 	    // created at this point.
-	    self = Types.createNew( _containerField.getFieldType() );
+	    self = Types.newInstance( _containerField.getFieldType() );
 	    if ( _parentRefField != null )
 		_parentRefField.setValue( self, obj );
 	    _containerField.setValue( obj, self );

@@ -150,7 +150,7 @@ public class DirectoryImpl
 	try {
 	    next = expr.indexOf( '$' );
 	    if ( next <= 0 ) {
-		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getObjectType() ).createQuery( expr, new Class[ 0 ] ) );
+		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
 	    } else {
 		pos = 0;
 		query = new StringBuffer();
@@ -176,7 +176,7 @@ public class DirectoryImpl
 		array = new Class[ types.size() ];
 		types.copyInto( array );
 		System.out.println( query.toString() );
-		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getObjectType() ).createQuery( query.toString(), array ) );
+		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( query.toString(), array ) );
 	    }
 	} catch ( QueryException except ) {
 	    throw new InvalidSearchException( except.getMessage() );
@@ -197,7 +197,7 @@ public class DirectoryImpl
 
 	clsDesc = _clsDesc;
 	// clsDesc = _dirEngine.getClassDesc();
-	obj = clsDesc.createNew();
+	obj = clsDesc.newInstance();
 	try {
 	    if ( _tx != null ) {
 		_tx.load( _dirEngine, obj, rdn, AccessMode.ReadWrite );
@@ -232,7 +232,7 @@ public class DirectoryImpl
 	clsDesc = _clsDesc;
 	// clsDesc = _dirEngine.getClassDesc();
 	while ( clsDesc != null ) {
-	    if ( clsDesc.getObjectType().isAssignableFrom( obj.getClass() ) )
+	    if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
 		break;
 	    clsDesc = clsDesc.getExtends();
 	}
@@ -274,7 +274,7 @@ public class DirectoryImpl
 	clsDesc = _clsDesc;
 	// clsDesc = _dirEngine.getClassDesc();
 	while ( clsDesc != null ) {
-	    if ( clsDesc.getObjectType().isAssignableFrom( obj.getClass() ) )
+	    if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
 		break;
 	    clsDesc = clsDesc.getExtends();
 	}
@@ -440,7 +440,7 @@ public class DirectoryImpl
 	SingleMapping( ClassDesc clsDesc )
 	{
 	    _clsDescs = new Hashtable();
-	    _clsDescs.put( clsDesc.getObjectType(), clsDesc );
+	    _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
 	}
 
 	public ClassDesc getDescriptor( Class type )

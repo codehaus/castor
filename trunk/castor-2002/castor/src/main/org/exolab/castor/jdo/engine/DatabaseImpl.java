@@ -264,7 +264,7 @@ public final class DatabaseImpl
 	clsDesc = _dbEngine.getClassDesc( type );
 	if ( clsDesc == null )
 	    throw new ClassNotPersistenceCapableException();
-	obj = clsDesc.createNew();
+	obj = clsDesc.newInstance();
 	try {
 	    switch ( _mode ) {
 	    case OPEN_READ_ONLY:
@@ -358,8 +358,8 @@ public final class DatabaseImpl
 	    tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
 	    clsDesc = _dbEngine.getClassDesc( binding.getType() );
 	    if ( clsDesc == null )
-		throw new ClassNotPersistenceCapableException( clsDesc.getObjectType().getName() );
-	    obj = clsDesc.createNew();
+		throw new ClassNotPersistenceCapableException( clsDesc.getJavaClass().getName() );
+	    obj = clsDesc.newInstance();
 	    tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
 	    return obj;
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {

@@ -106,7 +106,7 @@ final class OID
 	while ( clsDesc.getExtends() != null )
 	    clsDesc = (ClassDesc) clsDesc.getExtends();
 	*/
-	_type = clsDesc.getObjectType();
+	_type = clsDesc.getJavaClass();
 	_hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
 
@@ -194,7 +194,7 @@ final class OID
      *
      * @return The object's type
      */
-    Object getObjectType()
+    Object getJavaClass()
     {
 	return _type;
     }

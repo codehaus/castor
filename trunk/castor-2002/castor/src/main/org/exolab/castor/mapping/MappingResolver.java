@@ -51,7 +51,12 @@ import java.util.Enumeration;
 
 
 /**
- * 
+ * Provides the mapping descriptor for Java classes. The engines use
+ * resolvers to obtain the mapping descriptor for a particular Java
+ * class, or to list all the known descriptors. Although the interface
+ * is identical, each engine will use a resolver that returns class
+ * descriptor suitable for that particular engine. Resolvers are
+ * immutable and engines need not cache the returned descriptors.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -60,12 +65,28 @@ public interface MappingResolver
 {
 
 
-    public ClassDesc getDescriptor( Class type );
+    /**
+     * Returns the class descriptor for the specified Java class.
+     * In no such descriptor exists, returns null.
+     *
+     * @param javaClass The Java class
+     * @return A suitable class descriptor or null
+     */
+    public ClassDesc getDescriptor( Class javaClass );
 
 
+    /**
+     * Returns an enumeration of all the known descriptors. Each
+     * element is of type {@link ClassDesc}.
+     */
     public Enumeration listDescriptors();
 
 
+    /**
+     * Returns an enumeration of all the supported Java classes.
+     * Each element is of type <tt>java.lang.Class</tt>, and for
+     * each such class a suitable descriptor exists.
+     */
     public Enumeration listObjectTypes();
 
 

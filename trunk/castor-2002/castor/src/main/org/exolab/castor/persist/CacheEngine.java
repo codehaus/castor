@@ -142,9 +142,9 @@ class CacheEngine
 	    clsDesc = (ClassDesc) enum.nextElement();
 	    persist = factory.getPersistence( clsDesc, logWriter );
 	    if ( persist != null )
-		_typeInfo.put( clsDesc.getObjectType(), new TypeInfo( persist, clsDesc ) );
+		_typeInfo.put( clsDesc.getJavaClass(), new TypeInfo( persist, clsDesc ) );
 	    else if ( _logWriter != null ) {
-		_logWriter.println( Messages.format( "persist.noEngine", clsDesc.getObjectType() ) );
+		_logWriter.println( Messages.format( "persist.noEngine", clsDesc.getJavaClass() ) );
 	    }
 	}
     }
@@ -272,7 +272,7 @@ class CacheEngine
 	    
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded and a lock is acquired.
-	    obj = typeInfo.clsDesc.createNew();
+	    obj = typeInfo.clsDesc.newInstance();
 	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
 	    try {
 		oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
@@ -393,7 +393,7 @@ class CacheEngine
 	    
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded from the query and a lock is acquired.
-	    obj = typeInfo.clsDesc.createNew();
+	    obj = typeInfo.clsDesc.newInstance();
 	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
 	    try {
 		oid.setStamp( query.fetch( obj ) );
@@ -482,7 +482,7 @@ class CacheEngine
 	    // Copy the contents of the object we just created into the
 	    // cache engine. This copy will be deleted if the transaction
 	    // ends up rolling back.
-	    locked = typeInfo.clsDesc.createNew();
+	    locked = typeInfo.clsDesc.newInstance();
 	    typeInfo.clsDesc.copyInto( obj, locked );
 	    lock = new ObjectLock( locked );
 	    try {
@@ -523,7 +523,7 @@ class CacheEngine
 	Object     obj;
 	TypeInfo   typeInfo;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	// Get the lock from the OID. Assure the object has a write
 	// lock -- since this was done during the transaction, we
 	// don't wait to acquire the lock.
@@ -580,7 +580,7 @@ class CacheEngine
 	Object     oldIdentity;
 	TypeInfo   typeInfo;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	lock = getLock( oid );
 	if ( lock == null || ! lock.hasLock( tx, false ) )
 	    throw new IllegalStateException( Messages.format( "persist.internal",
@@ -668,7 +668,7 @@ class CacheEngine
 	TypeInfo   typeInfo;
 	Object     obj;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	lock = getLock( oid );
 	if ( lock == null || ! lock.hasLock( tx, false ) )
 	    throw new IllegalStateException( Messages.format( "persist.internal",
@@ -712,7 +712,7 @@ class CacheEngine
 	TypeInfo   typeInfo;
 	Object     locked;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	lock = getLock( oid );
 	if ( lock == null )
 	    throw new IllegalStateException( Messages.format( "persist.internal",
@@ -755,7 +755,7 @@ class CacheEngine
 	TypeInfo   typeInfo;
 	Object     locked;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	lock = getLock( oid );
 	if ( lock == null )
 	    throw new IllegalStateException( Messages.format( "persist.internal",
@@ -789,7 +789,7 @@ class CacheEngine
 	ObjectLock lock;
 	TypeInfo   typeInfo;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	oid.setExclusive( false );
 	lock = getLock( oid );
 	lock.release( tx );
@@ -812,7 +812,7 @@ class CacheEngine
 	Object     obj;
 	TypeInfo   typeInfo;
 
-	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 	lock = getLock( oid );
 	try {
 	    obj = lock.acquire( tx, true, 0 );

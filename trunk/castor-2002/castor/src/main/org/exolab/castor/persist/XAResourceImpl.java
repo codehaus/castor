@@ -64,7 +64,7 @@ import javax.transaction.xa.Xid;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  * @see TransactionContext
- * @see XASource
+ * @see XAResourceSource
  */
 public final class XAResourceImpl
     implements XAResource

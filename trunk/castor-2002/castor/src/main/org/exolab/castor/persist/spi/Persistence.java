@@ -53,6 +53,7 @@ import org.exolab.castor.persist.ObjectDeletedException;
 import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.TransactionContext;
 
 
 /**
@@ -119,7 +120,7 @@ public interface Persistence
      * fields. This method may return a stamp which can be used at a
      * later point to determine whether the copy of the object in
      * persistence storage is newer than the cached copy (see {@link
-     * #needReload}). If <tt>lock</tt> is true the object must be
+     * #store}). If <tt>lock</tt> is true the object must be
      * locked in persistence storage to prevent concurrent updates.
      *
      * @param conn An open connection
@@ -138,10 +139,9 @@ public interface Persistence
     /**
      * Stores the object in persistent storage, given the object and
      * its identity. The object has been loaded before or has been
-     * created through a call to {@link #create}. This method is
-     * called after a call to {@link #dirtyCheck} has determined that
-     * the object has not been modified in persistent storage since
-     * it was loaded. After this method returns all locks on the
+     * created through a call to {@link #create}. This method should
+     * detect whether the object has been modified in persistent storage
+     * since it was loaded. After this method returns all locks on the
      * object must be retained until the transaction has completed.
      * This method may return a new stamp to track further updates to
      * the object.
@@ -174,11 +174,9 @@ public interface Persistence
     /**
      * Deletes the object from persistent storage, given the object
      * and its identity. The object has been loaded before or has been
-     * created through a call to {@link #create}. This method is called
-     * after a call to {@link #dirtyCheck} has determined that the
-     * object has not been modified in persistent storage since it was
-     * loaded. After this method returns all locks on the object must
-     * be retained until the transaction has completed.
+     * created through a call to {@link #create}. After this method
+     * returns all locks on the object must be retained until the
+     * transaction has completed.
      *
      * @param conn An open connection
      * @param obj The object to delete, may be null
@@ -196,9 +194,7 @@ public interface Persistence
      * before either in this or another transaction. This method is
      * used to assure that updates or deletion of the object will
      * succeed when the transaction completes, without attempting to
-     * reload the object. Unlike {@link #needReload} the caller of
-     * this method is not interested in knowing whether the object
-     * has been modified since it was last loaded.
+     * reload the object.
      *
      * @param conn An open connection
      * @param obj The object to lock, may be null

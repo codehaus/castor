@@ -106,8 +106,7 @@ public interface PersistenceEngine
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. The object's
      * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #acquire} to obtain
-     * the object.
+     * operations on the object.
      *
      * @param tx The transaction context
      * @param type The type of the object to load
@@ -139,8 +138,7 @@ public interface PersistenceEngine
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. The object's
      * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #acquire} to obtain
-     * the object.
+     * operations on the object.
      *
      * @param tx The transaction context
      * @param query The query persistence engine
@@ -280,8 +278,6 @@ public interface PersistenceEngine
      * @param tx The transaction context
      * @param oid The object's oid
      * @param obj The object into which to copy
-     * @throws LockNotGrantedException Timeout or deadlock occured
-     *  attempting to acquire lock on object
      */
     public void copyObject( TransactionContext tx, OID oid, Object obj );
 

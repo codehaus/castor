@@ -83,7 +83,7 @@ public class MappingSchema
 	 * <tt>/org/exolab/castor/mapping/mapping.dtd</tt>.
 	 */
 	public static final String Resource =
-	    "/org/exolab/castor/mapping/mapping.dtd";
+	    "/org/exolab/castor/mapping/schema/mapping.dtd";
 
     }
 
@@ -114,7 +114,7 @@ public class MappingSchema
 	 * <tt>/org/exolab/castor/mapping/mapping.xsd</tt>.
 	 */
 	public static final String Resource =
-	    "/org/exolab/castor/mapping/mapping.xsd";
+	    "/org/exolab/castor/mapping/schame/mapping.xsd";
 	
     }
 
