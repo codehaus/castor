@@ -199,6 +199,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         _schema.setId(atts.getValue(SchemaNames.ID_ATTR));
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
+        //set the default locator of this schema
+        _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+
     } //-- init
 
     /**
