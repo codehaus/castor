@@ -76,6 +76,11 @@ public class ComplexType extends XMLType
 	 */
 	 private boolean _simpleContent = false;
 
+    /**
+	 * a flag set to true if this complexType is a restriction
+	 */
+	 private boolean _restricted = false;
+
 	/**
      * The base type used in <restriction> or <extension>
     **/
@@ -214,7 +219,7 @@ public class ComplexType extends XMLType
 
 	/**
 	 * Returns true if this complexType is a 'complexContent'
-	 * @eturns true if this complexType is a 'complexContent'
+	 * @returns true if this complexType is a 'complexContent'
 	 */
 	public boolean isComplexContent() {
 	       return _complexContent;
@@ -222,10 +227,18 @@ public class ComplexType extends XMLType
 
 	/**
 	 * Returns true if this complexType is a 'simpleContent'
-	 * @eturns true if this complexType is a 'simpleContent'
+	 * @returns true if this complexType is a 'simpleContent'
 	 */
 	public boolean isSimpleContent() {
 	       return _simpleContent;
+	}
+
+	/**
+	 * Returns true if this complexType is a restriction
+	 * @returns true if this complexType is a restriction
+	 */
+	public boolean isRestricted() {
+	       return _restricted;
 	}
 
 	/**
@@ -242,6 +255,14 @@ public class ComplexType extends XMLType
 	 */
 	public void setSimpleContent(boolean simpleContent) {
 	       this._simpleContent = simpleContent;
+	}
+
+	/**
+	 * Sets whether or not this complexType is a restriction
+	 * @param complexContent true if this complexType is a restriction
+	 */
+	public void setRestriction(boolean restricted) {
+	       this._restricted = restricted;
 	}
 
 	/**
