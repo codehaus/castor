@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1804 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Castor JDO test suite now uses log level "error" by default.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1804
+       (Werner - 20041127)
+       
 JDO:   Fixed bug 1795 using contribution from Gregory Block [gblock@ctoforaday.com]
        Fixed problem in CastorException (String, Throwable) where the constructor of the 
        superclass was not called.
