@@ -77,12 +77,7 @@ public class SAX2DOMHandler extends HandlerBase
 		Element element = document.createElement(name);
 		int length = attributes.getLength();
 		for(int i=0;i<length;i++)				
-		{
-			String attrName = attributes.getName(i);
-			if (attrName.startsWith("xmlns"))
-				break;
-			element.setAttribute(attrName, attributes.getValue(i));
-		}
+			element.setAttribute(attributes.getName(i), attributes.getValue(i));
 		parent.appendChild(element);
 		_parents.push(element);
 	}
