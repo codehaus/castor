@@ -46,12 +46,11 @@
 
 package org.exolab.castor.jdo.drivers;
 
-
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * QueryExpression for DB 2.
+ * QueryExpression for DB2.
  *
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -72,10 +71,24 @@ public final class DB2QueryExpression
         StringBuffer sql;
 
         sql = getStandardStatement( lock, false );
+
+        // support for LIMIT clause
+        if ( _limit != null )
+        {
+            sql.append(" fetch first ");
+            sql.append(_limit);
+            sql.append(" rows only ");
+        }
+        
         if (lock) {
             sql.append( " FOR UPDATE" );
         }
+        
         return sql.toString();
+    }
+    
+    public boolean isLimitClauseSupported () {
+    	return true;
     }
 
 }
