@@ -49,8 +49,11 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
+import org.exolab.castor.tests.framework.testDescriptor.RootObject;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
 import org.exolab.castor.tests.framework.testDescriptor.SourceGeneratorTest;
+
+import org.exolab.castor.builder.FieldInfoFactory;
 
 import sun.misc.URLClassPath;
 
@@ -70,6 +73,7 @@ import java.util.zip.ZipEntry;
 
 import org.exolab.castor.builder.SourceGenerator;
 
+import java.util.Properties;
 import java.util.Vector;
 import java.util.Enumeration;
 
@@ -82,45 +86,12 @@ import java.util.Enumeration;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
-public class SourceGeneratorTestCase extends TestCase {
-
-    /**
-     * Name of this test
-     */
-    protected String _name;
-
-    /**
-     * The jarTest in which this test is specified
-     */
-    protected CastorJarTestCase _jarTest;
+public class SourceGeneratorTestCase extends XMLTestCase {
 
     /**
      * Contain the information for the configuration of all the test of this jar.
      */
     protected SourceGeneratorTest _sourceGenConf;
-
-    /**
-     * The unit test case this class represent
-     */
-    protected UnitTestCase _unitTest;
-
-    /**
-     * Place where the temporary file have to be put
-     */
-    protected File _outputRootFile;
-
-    /**
-     * True if we expect a lot of info on what happen.
-     */
-    private static boolean _verbose;
-
-    static {
-        String v = System.getProperty(TestCaseAggregator.VERBOSE_PROPERTY);
-        if (v!=null && v.equals("true"))
-            _verbose = true;
-        else
-            _verbose = false; 
-    }
 
     /**
      * Name of the schema in the jar
@@ -133,15 +104,23 @@ public class SourceGeneratorTestCase extends TestCase {
     private File _schemaFile;
 
     /**
+     * Name of the property file to use. Null if any
+     */
+    private String _propertyFileName;
+    
+    /**
+     * Name of the collection to use by default. Null if we rely on the default
+     * behavior
+     */
+    private String _fieldInfoFactoryName;
+    
+    /**
      * Create a new test case for the given setup.
      */
     public SourceGeneratorTestCase(CastorJarTestCase jarTest, UnitTestCase unit, SourceGeneratorTest sourceGen, File outputRoot) {
-        super(unit.getName());
-        _name           = unit.getName();
-        _jarTest        = jarTest;
+        super(jarTest, unit, outputRoot);
         _sourceGenConf  = sourceGen;
-        _unitTest       = unit;
-        _outputRootFile = outputRoot;
+        _hasRandom      = _sourceGenConf.getRootObject().getRandom();
     }
 
     /**
@@ -149,13 +128,8 @@ public class SourceGeneratorTestCase extends TestCase {
      * MarshallingFrameworkTestCase given in parameter.
      */
     public SourceGeneratorTestCase(String name, SourceGeneratorTestCase sgtc) {
-        super(name);
-        _name           = sgtc._name;
-        _jarTest        = sgtc._jarTest;
+        super(name, sgtc);
         _sourceGenConf  = sgtc._sourceGenConf;
-        _unitTest       = sgtc._unitTest;
-        _outputRootFile = sgtc._outputRootFile;
-        
     }
     
     /**
@@ -173,10 +147,13 @@ public class SourceGeneratorTestCase extends TestCase {
     public Test suite() {
 
         TestSuite suite  = new TestSuite(_name);
-        
-         suite.addTest(new SourceGeneratorTestCase("dummy", this));
-//         suite.addTest(new SourceGeneratorTestCase("testWithRandomObject", this));
-        
+
+        // Use the default test implemented in XMLTestCase
+        suite.addTest(new SourceGeneratorTestCase("testWithReferenceDocument", this));
+
+        if (_hasRandom)
+            suite.addTest(new SourceGeneratorTestCase("testWithRandomObject", this));
+
         return suite;
     }
     
@@ -189,6 +166,27 @@ public class SourceGeneratorTestCase extends TestCase {
         verbose("\n========================================");
         verbose("Setting up test for '" + _name + "' from '" + _jarTest.getName() + "'");
 
+        // 0. Get information to run the test
+        _propertyFileName     = _sourceGenConf.getPropertyFile();
+        _fieldInfoFactoryName = _sourceGenConf.getFieldInfoFactory();
+
+        _inputName  = _unitTest.getInput();
+        _outputName = _unitTest.getOutput();
+        
+        if (_inputName != null)
+            _input  = _jarTest.getClassLoader().getResourceAsStream(_inputName);
+        
+        if (_outputName != null)
+            _output = _jarTest.getClassLoader().getResourceAsStream(_outputName);
+
+        RootObject rootType = _sourceGenConf.getRootObject();
+        _rootClassName      = rootType.getContent();
+        _hasDump            = rootType.getDump();
+        _hasRandom          = rootType.getRandom();
+
+        if (_rootClassName == null)
+            throw new Exception("No object root found in test descriptor"); 
+
         // 1. Move the support file into tmp dir
         _schemaName = _sourceGenConf.getSchema();
         assertNotNull("Unable to find the name of the schema", _schemaName);
@@ -199,7 +197,24 @@ public class SourceGeneratorTestCase extends TestCase {
 
         // 2. Run the source generator
         verbose("Running the source generator");
-        SourceGenerator sourceGen = new SourceGenerator();
+        SourceGenerator sourceGen = null;
+
+        if (_fieldInfoFactoryName != null) {
+            Class factoryClass = _jarTest.getClassLoader().loadClass(_fieldInfoFactoryName);
+            FieldInfoFactory factory = (FieldInfoFactory)factoryClass.newInstance();
+            sourceGen = new SourceGenerator(factory);
+        } else
+            sourceGen = new SourceGenerator();
+
+        if (_propertyFileName != null) {
+            Properties prop = new Properties();
+            prop.load(_jarTest.getClassLoader().getResourceAsStream(_propertyFileName));
+            sourceGen.setDefaultProperties(prop);
+        }
+            
+        // equals() is needed to compare two objects
+        sourceGen.setEqualsMethod(true);
+
         sourceGen.setDestDir(_outputRootFile.getAbsolutePath());
         sourceGen.generateSource(new FileReader(_schemaFile), null);
 
@@ -215,18 +230,10 @@ public class SourceGeneratorTestCase extends TestCase {
         ClassLoader loader =  new URLClassLoader(URLClassPath.pathToURLs(_outputRootFile.getAbsoluteFile().toString()),
                                                  _jarTest.getClassLoader());
         _jarTest.setClassLoader(loader);
+
+        // 5. Set up the root class
+        _rootClass =  _jarTest.getClassLoader().loadClass(_rootClassName);
     }
-
-    
-    public void dummy() 
-        throws java.lang.Exception {
-
-        System.out.println(_sourceGenConf.getRootObject().getContent());
-
-        System.out.println(_jarTest.getClassLoader().loadClass(_sourceGenConf.getRootObject().getContent()).newInstance());
-
-    }
-
 
     /**
      * Clean up the tests.
@@ -237,15 +244,6 @@ public class SourceGeneratorTestCase extends TestCase {
         verbose("Test for '" + _name + "' complete");
         verbose("========================================");
 
-    }
-
-
-    /**
-     * print the message if in verbose mode.
-     */
-    private void verbose(String message) {
-        if (_verbose)
-            System.out.println(message);
     }
 
     

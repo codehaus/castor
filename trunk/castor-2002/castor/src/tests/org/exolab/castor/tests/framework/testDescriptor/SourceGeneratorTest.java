@@ -34,6 +34,10 @@ public class SourceGeneratorTest implements java.io.Serializable {
 
     private java.lang.String _schema;
 
+    private java.lang.String _propertyFile;
+
+    private java.lang.String _fieldInfoFactory;
+
     private RootObject _rootObject;
 
     private java.util.Vector _unitTestCaseList;
@@ -69,6 +73,20 @@ public class SourceGeneratorTest implements java.io.Serializable {
     {
         return _unitTestCaseList.elements();
     } //-- java.util.Enumeration enumerateUnitTestCase() 
+
+    /**
+    **/
+    public java.lang.String getFieldInfoFactory()
+    {
+        return this._fieldInfoFactory;
+    } //-- java.lang.String getFieldInfoFactory() 
+
+    /**
+    **/
+    public java.lang.String getPropertyFile()
+    {
+        return this._propertyFile;
+    } //-- java.lang.String getPropertyFile() 
 
     /**
     **/
@@ -170,6 +188,24 @@ public class SourceGeneratorTest implements java.io.Serializable {
         _unitTestCaseList.removeElementAt(index);
         return (UnitTestCase) obj;
     } //-- UnitTestCase removeUnitTestCase(int) 
+
+    /**
+     * 
+     * @param _fieldInfoFactory
+    **/
+    public void setFieldInfoFactory(java.lang.String _fieldInfoFactory)
+    {
+        this._fieldInfoFactory = _fieldInfoFactory;
+    } //-- void setFieldInfoFactory(java.lang.String) 
+
+    /**
+     * 
+     * @param _propertyFile
+    **/
+    public void setPropertyFile(java.lang.String _propertyFile)
+    {
+        this._propertyFile = _propertyFile;
+    } //-- void setPropertyFile(java.lang.String) 
 
     /**
      * 
