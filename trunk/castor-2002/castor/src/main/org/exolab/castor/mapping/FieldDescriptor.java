@@ -139,20 +139,5 @@ public interface FieldDescriptor
     public FieldHandler getHandler();
 
 
-    /**
-     * Returns the convertor from the field type to an external type.
-     *
-     * @return Convertor from field type
-     */
-    public TypeConvertor getConvertor();
-
-
-    /**
-     * Returns the convertor parameter.
-     *
-     * @return Convertor parameter
-     */
-    public String getConvertorParam();
-
 }
 
