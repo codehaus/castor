@@ -531,7 +531,7 @@ public final class SQLTypes
 
         Class toType;
 
-        private SQLTypeConvertor( Class fromType, Class toType ) {
+        SQLTypeConvertor( Class fromType, Class toType ) {
             this.fromType = fromType;
             this.toType = toType;
         }
