@@ -1141,7 +1141,10 @@ public class RuleProcessor extends ErrorObserverAdapter {
                     prefix = name.substring(0, idx);
                     name   = name.substring(idx+1);
                 }
-                String ns = rpState.getNamespaceURI(prefix);
+                String ns = xslObject.getNamespace();
+                if (ns == null) {
+                    ns = rpState.getNamespaceURI(prefix);
+                }
                 if (!formatter.isNamespaceDeclared(ns))
                     formatter.declareNamespace(prefix, ns);
                 formatter.startElement(name, ns);
