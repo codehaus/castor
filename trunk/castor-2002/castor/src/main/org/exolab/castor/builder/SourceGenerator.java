@@ -245,6 +245,7 @@ public class SourceGenerator {
     
     /**
      * main class used for command line invocation
+     * @param args the String[] consisting of the command line arguments
     **/
     public static void main(String[] args) {
         
@@ -263,9 +264,15 @@ public class SourceGenerator {
         allOptions.addFlag("line-separator", "( unix | mac | win)", desc);
         allOptions.setOptional("line-separator", true);
         
-        desc = "Suppress non fatal warnings, such as overwritting files.";
+        //-- Force flag
+        desc = "Suppress non fatal warnings, such as overwriting files.";
         allOptions.addFlag("f", "", desc);
         allOptions.setOptional("f", true);
+        
+        //-- Help flag
+        desc = "Displays this help screen.";
+        allOptions.addFlag("h", "", desc);
+        allOptions.setOptional("h", true);
         
         //-- source generator type-factory name flag
         allOptions.addFlag("type-factory", "type-factory-name", "Sets the source generator type-factory name (SGTypeFactory)");
@@ -274,11 +281,19 @@ public class SourceGenerator {
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
         
-        String schemaFilename = options.getProperty("i");
-        String packageName    = options.getProperty("package");
-        String lineSepStyle   = options.getProperty("line-separator");
+        //-- check for help option
+        if (options.getProperty("h") != null) {
+            PrintWriter pw = new PrintWriter(System.out, true);
+            allOptions.printHelp(pw);
+            pw.flush();
+            return;
+        }
+        
+        String  schemaFilename = options.getProperty("i");
+        String  packageName    = options.getProperty("package");
+        String  lineSepStyle   = options.getProperty("line-separator");
         boolean force         = (options.getProperty("f") != null);
-        String typeFactory    = options.getProperty("type-factory");
+        String  typeFactory    = options.getProperty("type-factory");
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
