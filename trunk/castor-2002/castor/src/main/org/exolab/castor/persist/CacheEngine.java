@@ -586,7 +586,7 @@ public final class CacheEngine
 
             relations = typeInfo.handler.getRelations();
             for ( int i = 0 ; i < relations.length ; ++i ) {
-                if ( relations[ i ] != null ) {
+                if ( relations[ i ] != null && relations[ i ].isAttached() ) {
                     Object related;
 
                     if ( ! relations[ i ].isMulti() ) {
