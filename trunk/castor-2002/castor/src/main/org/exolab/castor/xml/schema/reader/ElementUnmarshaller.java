@@ -114,14 +114,14 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         String attValue = null;
 
         //-- @ref
-        attValue = atts.getValue("ref");
+        attValue = atts.getValue(SchemaNames.REF_ATTR);
         if (attValue != null) {
             _element.setReference(attValue);
         }
 
 
         //-- @name
-        _element.setName(atts.getValue("name"));
+        _element.setName(atts.getValue(SchemaNames.NAME_ATTR));
 
         //-- @default
         String temp = atts.getValue(SchemaNames.DEFAULT_ATTR);
@@ -141,7 +141,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
 
         temp = null;
         //-- @type
-        attValue = atts.getValue("type");
+        attValue = atts.getValue(SchemaNames.TYPE_ATTR);
         if (attValue != null) _element.setTypeReference(attValue);
 
         //-- @nullable
