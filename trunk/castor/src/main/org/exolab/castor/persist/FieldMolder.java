@@ -222,7 +222,6 @@ public class FieldMolder {
     }
 
     public Object getValue( Object object, ClassLoader loader ) {
-        Object value;
         ReflectService rf = getContextReflectService ( loader );
         try {
             // If field is accessed directly, get it's value, if not
@@ -357,7 +356,9 @@ public class FieldMolder {
     // ======================================================
     protected Class getCollectionType( String coll, boolean lazy )
             throws MappingException {
-        Class type;
+        /* 
+         * Class type;
+         */
 
         for ( int i=0; i<info.length; i++ ) {
             if ( info[i].name.equals( coll ) )
@@ -407,9 +408,8 @@ public class FieldMolder {
      * create a new stock {@link FieldMolder}. Implementations may
      * extend this class to create a more suitable descriptor.
      *
-     * @param javaClass The class to which the field belongs
+     * @param eMold The ClassMolder to which the field belongs
      * @param fieldMap The field mapping information
-     * @return The field descriptor
      * @throws MappingException The field or its accessor methods are not
      *  found, not accessible, not of the specified type, etc
      */
@@ -665,8 +665,6 @@ public class FieldMolder {
             // what exact instance to be created.
             if ( fieldMap.getCreateMethod() != null ) {
                 try {
-                    Method method;
-
                     _defaultReflectService._createMethod = javaClass.getMethod( fieldMap.getCreateMethod(), null );
                 } catch ( Exception except ) {
                     // No such/access to method
@@ -764,7 +762,7 @@ public class FieldMolder {
      * @param javaClass The class to which the field belongs
      * @param methodName The name of the accessor method
      * @param fieldType The type of the field if known, or null
-     * @param isGetMethod True if get method, false if set method
+     * @param getMethod True if get method, false if set method
      * @return The method, null if not found
      * @throws MappingException The method is not accessible or is not of the
      *  specified type
