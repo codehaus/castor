@@ -149,7 +149,7 @@ public class DuplicateKey
             }
             db.commit();
 
-            System.out.println("Second commit done!");
+            //System.out.println("Second commit done!");
 	    
             // Attempt to create a new object with the same identity,
             // in the database. Will report duplicate key from SQL engine.
