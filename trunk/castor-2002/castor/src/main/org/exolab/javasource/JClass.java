@@ -216,9 +216,8 @@ public class JClass extends JType {
         // then add import
         JType type = jMember.getType();
         while (type.isArray()) type = type.getComponentType();
-        if (!type.isPrimitive()) {
+        if ( !type.isPrimitive() )
             addImport( ((JClass)type).getName());
-        }
 
     } //-- addMember
 
@@ -240,7 +239,7 @@ public class JClass extends JType {
         if (modifiers.isAbstract()) {
             this.modifiers.setAbstract(true);
         }
-        
+
         for (int i = 0; i < methods.size(); i++) {
             JMethod tmp = (JMethod) methods.elementAt(i);
             //-- first compare modifiers
@@ -275,8 +274,8 @@ public class JClass extends JType {
             while (jType.isArray())
                 jType = jType.getComponentType();
 
-            if (!jType.isPrimitive())
-                addImport( ((JClass)jType).getName());
+            if   (!jType.isPrimitive())
+                 addImport( ((JClass)jType).getName());
         }
         //-- check exceptions
         JClass[] exceptions = jMethod.getExceptions();
@@ -337,7 +336,7 @@ public class JClass extends JType {
         if ((packageName != null) && (packageName.length() > 0)) {
             javaPackagePath = packageName.replace('.',File.separatorChar);
 		}
-		
+
 		//-- Create fully qualified path (including 'destDir') to file
         File pathFile;
         if (destDir==null)
@@ -347,7 +346,7 @@ public class JClass extends JType {
         if (!pathFile.exists()) {
             pathFile.mkdirs();
         }
-		
+
 		//-- Prefix filename with path
 		if (pathFile.toString().length()>0)
 			filename = pathFile.toString()+File.separator+filename;
@@ -440,7 +439,17 @@ public class JClass extends JType {
 		}
 		return name;
 	}
-	
+
+
+    public boolean removeImport(String className) {
+        boolean result = false;
+        if (className == null) return result;
+        if (className.length() == 0) return result;
+
+        result = imports.remove(className);
+        return result;
+    } //-- removeImport
+
     public static boolean isValidClassName(String name) {
         //** add class name validation */
         return true;
@@ -741,13 +750,13 @@ public class JClass extends JType {
         JConstructor cons = testClass.createConstructor();
         testClass.addConstructor(cons);
         cons.getSourceCode().add("this.x = 6;");
-        
+
         JMethod jMethod = new JMethod(JType.Int, "getX");
         jMethod.setSourceCode("return this.x;");
         testClass.addMethod(jMethod);
-        
+
         testClass.print();
     } //-- main
     /* */
-    
+
 } //-- JClass
