@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+
+JDO:   Fixed bug 1791 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added support for using constants in comparison expressions with bind values.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1791
+       (Werner - 20041129)
+
 JDO:   Fixed bug 1804 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Castor JDO test suite now uses log level "error" by default.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1804
