@@ -531,6 +531,12 @@ public abstract class XSType {
                 return NON_NEGATIVE_INTEGER_NAME;
             case POSITIVE_INTEGER_TYPE:
                 return POSITIVE_INTEGER_NAME;
+            case COLLECTION:
+                short type = ((XSList)this).getContentType().getType();
+                if (type == NMTOKEN_TYPE)
+                    return NMTOKENS_NAME;
+                else if (type == IDREF_TYPE)
+                    return IDREFS_NAME;
             default:
                 return null;
         }
