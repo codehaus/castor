@@ -76,6 +76,12 @@ public class SQLEntityInfo
     public final SQLFieldInfo[] idInfo;
 
     /**
+     * The positions of idInfo elements in fieldInfo array (idInfo.length == idPos.length).
+     *
+     */
+    public final int[] idPos;
+
+    /**
      * The names of SQL columns that the identity consists of.
      * idNames.length may be more than idInfo.length if identity contains foreign keys.
      */
@@ -95,6 +101,7 @@ public class SQLEntityInfo
     private SQLEntityInfo(EntityInfo info) throws MappingException {
         ArrayList idNamesList = new ArrayList();
         String[] fieldNames;
+        boolean isId;
 
         this.info = info;
 
@@ -114,7 +121,17 @@ public class SQLEntityInfo
         fieldInfo = new SQLFieldInfo[info.fieldInfo.length];
         for (int i = 0; i < fieldInfo.length; i++) {
             if (!info.fieldInfo[i].join) {
-                fieldInfo[i] = new SQLFieldInfo(info.fieldInfo[i]);
+                isId = false;
+                for (int j = 0; j < idInfo.length; j++) {
+                    if (info.fieldInfo[i].fieldNames[0].equals(info.idInfo[j].fieldNames[0])) {
+                        isId = true;
+                        idPos[j] = i;
+                        break;
+                    }
+                }
+                if (!isId) {
+                    fieldInfo[i] = new SQLFieldInfo(info.fieldInfo[i]);
+                }
             }
         }
 
