@@ -362,7 +362,7 @@ public final class FieldHandlerImpl
         // If we have a create method and parent object, call the create method.
         if ( _createMethod != null && object != null ) {
             try {
-                return _createMethod.invoke( object, new Object[ 0 ] );
+                return _createMethod.invoke( object, null );
             } catch ( IllegalAccessException except ) {
                 // This should never happen
                 throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
@@ -396,7 +396,7 @@ public final class FieldHandlerImpl
              ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
             throw new MappingException( "mapping.accessorNotAccessible",
                                         method, method.getDeclaringClass().getName() );
-        if ( method.getParameterTypes().length != 1 )
+        if ( method.getParameterTypes().length != 0 )
             throw new MappingException( "mapping.createMethodNoParam",
                                         method, method.getDeclaringClass().getName() );
         _createMethod = method;
