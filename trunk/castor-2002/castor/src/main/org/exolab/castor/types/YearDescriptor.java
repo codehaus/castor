@@ -340,7 +340,7 @@ public class YearDescriptor
                 yearTarget.setYear(temp.getYear());
                 yearTarget.setCentury(temp.getCentury());
             }
-            catch (java.text.ParseException ex) {
+            catch (Exception ex) {
                 //-- ignore for now
             }
         } //-- setValue

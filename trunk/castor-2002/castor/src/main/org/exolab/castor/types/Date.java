@@ -49,6 +49,7 @@
 
 package org.exolab.castor.types;
 import org.exolab.castor.types.TimePeriod;
+import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
@@ -57,7 +58,9 @@ import java.util.GregorianCalendar;
 /**
  * Describe an XML schema Date
  * The date type is derived from time period by setting up the facet :
- *      - duration to "P1D"
+ *  <ul>
+ *      <li>duration to "P1D"</li>
+ *  </ul>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  */
@@ -74,11 +77,18 @@ public class Date extends TimePeriod {
         int temp = SimpleTimeZone.getDefault().getRawOffset();
         if (temp < 0){
             temp = -temp;
-            _zoneNegative = true ;
+            try {
+                this.setZoneNegative();
+            } catch (NotSupportedOperationException e) {
+            }
         }
-        _zoneHour = (short) (temp / (60*60*1000));
+        short zhour = (short) (temp / (60*60*1000));
         temp = temp % (60*60*1000);
-        _zoneMinute = (short)(temp / (60*1000));
+        short zmin  = (short)(temp / (60*1000));
+        try {
+            this.setZone(zhour,zmin);
+        } catch (NotSupportedOperationException e) {
+        }
     }
 
     /**
@@ -92,34 +102,59 @@ public class Date extends TimePeriod {
         new Date();
         GregorianCalendar tempCalendar = new GregorianCalendar();
         tempCalendar.setTime(dateRef);
-        this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
-        this.setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
+        try {
+            this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
+            this.setYear((short) (tempCalendar.get(tempCalendar.YEAR)%100));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            // we can never reach that point because
+            // we are allowed in a date type to set those fields
+        }
         //we need to add 1 to the Month value returned by GregorianCalendar
         //because 0<MONTH<11 (i.e January is 0)
-        this.setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
-        this.setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
+        try {
+            this.setMonth((short) (tempCalendar.get(tempCalendar.MONTH)+1));
+            this.setDay((short) (tempCalendar.get(tempCalendar.DAY_OF_MONTH)));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            // we can never reach that point because
+            // we are allowed in a date type to set those fields
+        }
+
     } //Date(java.util.Date)
 
 
      /*Disallow the access to time method */
-     public void setHour(short hour) {
-        throw new UnsupportedOperationException("hour must not be changed");
+     public void setHour(short hour)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Date : the hour field must not be changed";
+        throw new NotSupportedOperationException(err);
      }
 
-    public void setMinute(short minute) {
-      throw new UnsupportedOperationException("minute must not be changed");
+    public void setMinute(short minute)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Date : the minute field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setSecond(short second,short millsecond) {
-      throw new UnsupportedOperationException("second must not be changed");
+    public void setSecond(short second,short millsecond)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Date : the second fields must not be changed";
+        throw new NotSupportedOperationException(err);}
+
+    public void setZone(short hour, short minute)
+        throws NotSupportedOperationException
+    {
+      String err = "In a Date : the time zone fields must not be changed";
+      throw new NotSupportedOperationException(err);
     }
 
-    public void setZone(short hour, short minute) {
-      throw new UnsupportedOperationException("time zone must not be changed");
-    }
-
-    public void setZoneNegative() {
-        throw new UnsupportedOperationException("time zone must not be changed");
+    public void setZoneNegative()
+        throws NotSupportedOperationException
+    {
+        String err = "In a Date : the time zone fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
 
@@ -205,7 +240,12 @@ public class Date extends TimePeriod {
         if (DEBUG) {
             System.out.println("Processing year: "+temp.substring(2,4));
         }
-        result.setYear(Short.parseShort( temp.substring(2,4) ));
+        try {
+            result.setYear(Short.parseShort( temp.substring(2,4) ));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            // we can never reach that point because
+            // we are allowed in a date type to set those fields
+        }
 
         temp=token.nextToken();
         if (temp.length() != 2)
@@ -213,7 +253,12 @@ public class Date extends TimePeriod {
         if (DEBUG) {
             System.out.println("Processing month: "+temp);
         }
-        result.setMonth(Short.parseShort(temp));
+        try {
+            result.setMonth(Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            // we can never reach that point because
+            // we are allowed in a date type to set those fields
+        }
 
         temp=token.nextToken();
         if (temp.length() != 2)
@@ -221,7 +266,12 @@ public class Date extends TimePeriod {
         if (DEBUG) {
             System.out.println("Processing day: "+temp);
         }
-        result.setDay(Short.parseShort(temp));
+        try {
+            result.setDay(Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            // we can never reach that point because
+            // we are allowed in a date type to set those fields
+        }
 
         temp = null;
         return result;

@@ -42,21 +42,24 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 12/05/2000   Aranud Blandin  Added support for NotSupportedOperationException
  * 11/02/2000   Arnaud Blandin  Changed the constructor
  * 26/10/2000   Arnaud Blandin  Created
  */
 
 package org.exolab.castor.types;
 import org.exolab.castor.types.RecurringDuration;
-
+import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
 
 /**
- * Describe an XML schema TimePeriod
- * The time period type is derived from recurringDuration by setting up the facet:
- *  - period to "P0Y"
+ * <p>Describe an XML schema TimePeriod.
+ * <p>The time period type is derived from recurringDuration by setting up the facet:
+ *      <ul>
+ *          <li>period to "P0Y"</li>
+ *      </ul>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  * @see RecurringDuration
@@ -137,7 +140,13 @@ public class TimePeriod extends RecurringDuration{
         if (DEBUG) {
             System.out.println("Processing year: "+temp.substring(2,4));
         }
-        this.setYear(Short.parseShort( temp.substring(2,4) ));
+        try {
+            this.setYear(Short.parseShort( temp.substring(2,4) ));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
+
 
         //MM
         temp=token.nextToken();
@@ -146,7 +155,12 @@ public class TimePeriod extends RecurringDuration{
         if (DEBUG) {
             System.out.println("Processing month: "+temp);
         }
-        this.setMonth(Short.parseShort(temp));
+        try {
+            this.setMonth(Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
         //DD
         temp=token.nextToken();
@@ -155,7 +169,12 @@ public class TimePeriod extends RecurringDuration{
         if (DEBUG) {
             System.out.println("Processing day: "+temp);
         }
-        this.setDay(Short.parseShort(temp));
+        try {
+            this.setDay(Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
         //proceed Time
         token = new StringTokenizer(time,":");
@@ -171,7 +190,13 @@ public class TimePeriod extends RecurringDuration{
          if (DEBUG) {
             System.out.println("Processing hour: "+temp);
         }
-         this.setHour(Short.parseShort( temp ));
+
+         try {
+            this.setHour(Short.parseShort( temp ));
+         } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+         }
 
         //mm
         temp=token.nextToken();
@@ -180,7 +205,12 @@ public class TimePeriod extends RecurringDuration{
         if (DEBUG) {
             System.out.println("Processing minute: "+temp);
         }
-        this.setMinute( Short.parseShort(temp));
+        try {
+            this.setMinute( Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
         //ss
         temp=token.nextToken();
@@ -195,25 +225,44 @@ public class TimePeriod extends RecurringDuration{
         if (DEBUG) {
             System.out.println("Processing seconds: "+temp);
         }
-        this.setSecond(Short.parseShort(temp.substring(0,2)),
-                         Short.parseShort(milsecond));
+        try {
+            this.setSecond(Short.parseShort(temp.substring(0,2)),
+                           Short.parseShort(milsecond));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
 
         // proceed TimeZone if any
         if (timeZone) {
-            if (zoneStr.startsWith("-")) this.setZoneNegative();
+            try {
+                if (zoneStr.startsWith("-")) this.setZoneNegative();
+            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+            }
+
             if (zoneStr.length()!= 6)
                 throw new ParseException(str+": Bad time zone format",20);
-            this.setZone(Short.parseShort(zoneStr.substring(1,3)),
-                           Short.parseShort(zoneStr.substring(4,6)));
+            try {
+                this.setZone(Short.parseShort(zoneStr.substring(1,3)),
+                             Short.parseShort(zoneStr.substring(4,6)));
+            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a timePeriod type
+            //(if not a ParseException is thrown) so we can never reach that point
+            }
+
         }
         else this.isUTC();
         temp = null;
     }//setFields
 
 
-     public void setPeriod(TimeDuration period) {
-        throw new UnsupportedOperationException("in a time period type,the period must not be changed");
+     public void setPeriod(TimeDuration period)
+        throws NotSupportedOperationException
+    {
+        throw new NotSupportedOperationException("in a time period type,the period must not be changed");
     }
 
 } //TimePeriod

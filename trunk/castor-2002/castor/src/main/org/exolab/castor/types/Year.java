@@ -47,15 +47,18 @@
 package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimePeriod;
+import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
 import java.text.SimpleDateFormat;
 
 /**
- * Describe an XML schema Century
- * The date type is derived from time period by setting up the facet :
- *      - duration to "P100Y"
+ * <p>Describe an XML schema Year
+ * <p>The date type is derived from time period by setting up the facet :
+ *      <ul>
+ *          <li>duration to "P1Y"</li>
+ *      </ul>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  */
@@ -75,46 +78,72 @@ public class Year extends TimePeriod {
         int temp = SimpleTimeZone.getDefault().getRawOffset();
         if (temp < 0){
             temp = -temp;
-            _zoneNegative = true ;
+            try {
+                this.setZoneNegative();
+            } catch(NotSupportedOperationException e) {
+            }
         }
-        _zoneHour = (short) (temp / (60*60*1000));
+        short zhour = (short) (temp / (60*60*1000));
         temp = temp % (60*60*1000);
-        _zoneMinute = (short)(temp / (60*1000));
+        short zmin = (short)(temp / (60*1000));
+        try {
+            this.setZone(zhour,zmin);
+        } catch (NotSupportedOperationException e) {
+        }
     }
 
 
     /*Disallow the access to set month method*/
-    public void setMonth(short month) {
-        throw new UnsupportedOperationException("month must not be changed");
+    public void setMonth(short month)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the month field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
     /*Disallow the access to set day method*/
-    public void setDay(short day) {
-        throw new UnsupportedOperationException("day must not be changed");
+    public void setDay(short day)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the day field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
-
     /*Disallow the access to set time methods */
-    public void setHour(short hour) {
-       throw new UnsupportedOperationException("hour must not be changed");
+    public void setHour(short hour)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the hour field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setMinute(short minute) {
-      throw new UnsupportedOperationException("minute must not be changed");
+    public void setMinute(short minute)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the minute field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setSecond(short second,short millsecond) {
-      throw new UnsupportedOperationException("second must not be changed");
+    public void setSecond(short second,short millsecond)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the second fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setZone(short hour, short minute) {
-      throw new UnsupportedOperationException("time zone must not be changed");
+    public void setZone(short hour, short minute)
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the time zone fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setZoneNegative() {
-        throw new UnsupportedOperationException("time zone must not be changed");
+    public void setZoneNegative()
+         throws NotSupportedOperationException
+    {
+        String err = "In a Year : the time zone fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-
-     /**
+    /**
      * convert this Year to a string
      * The format is defined by W3C XML Schema draft and ISO8601
      * i.e (+|-)CCYY
@@ -184,8 +213,10 @@ public class Year extends TimePeriod {
         if (DEBUG) {
             System.out.println("Processing year: "+str.substring(2,4));
         }
-        result.setYear(Short.parseShort( str.substring(2,4) ));
-
+        try {
+            result.setYear(Short.parseShort( str.substring(2,4) ));
+        } catch(NotSupportedOperationException e) {
+        }
         return result;
     }//parse
 
@@ -197,7 +228,7 @@ public class Year extends TimePeriod {
         // Set the time zone
         if ( !isUTC() ) {
             int offset = 0;
-            offset = (int) ( (_zoneMinute + _zoneHour*60)*60*1000);
+            offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
             timeZone.setID(timeZone.getAvailableIDs(offset)[0]);

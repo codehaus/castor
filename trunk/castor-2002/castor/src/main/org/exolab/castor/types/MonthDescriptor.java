@@ -342,7 +342,7 @@ public class MonthDescriptor
                 monthTarget.setYear(temp.getYear());
                 monthTarget.setCentury(temp.getCentury());
             }
-            catch (java.text.ParseException ex) {
+            catch (Exception ex) {
                 //-- ignore for now
             }
         } //-- setValue

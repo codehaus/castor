@@ -164,10 +164,10 @@ public class DateDescriptor
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType) 
+        (String name, NodeType nodeType)
     {
         return null;
-        
+
     } //-- getFieldDescriptor
 
     /**
@@ -343,7 +343,7 @@ public class DateDescriptor
                 dateTarget.setMonth(temp.getMonth());
                 dateTarget.setDay(temp.getDay());
             }
-            catch (java.text.ParseException ex) {
+            catch (Exception ex) {
                 //-- ignore for now
             }
         } //-- setValue
