@@ -49,6 +49,7 @@ package org.exolab.castor.jdo.drivers;
 
 import java.util.Enumeration;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
@@ -60,6 +61,12 @@ import org.exolab.castor.jdo.engine.JDBCSyntax;
 public final class PostgreSQLQueryExpression
     extends JDBCQueryExpression
 {
+
+
+    public PostgreSQLQueryExpression( PersistenceFactory factory )
+    {
+        super( factory );
+    }
 
 
     public String getStatement( boolean lock )
@@ -77,7 +84,7 @@ public final class PostgreSQLQueryExpression
         // Add all the tables to the FROM clause
         enum = _tables.elements();
         while ( enum.hasMoreElements() ) {
-            sql.append( (String) enum.nextElement() );
+            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
             if ( enum.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }
@@ -96,9 +103,11 @@ public final class PostgreSQLQueryExpression
             for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                 if ( j > 0 )
                     sql.append( JDBCSyntax.And );
-                sql.append( join.leftTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.leftColumns[ j ] );
+                sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
+                                                join.leftColumns[ j ] ) );
                 sql.append( OpEquals );
-                sql.append( join.rightTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.rightColumns[ j ] );
+                sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
+                                                join.rightColumns[ j ] ) );
             }
         }
         first = addWhereClause( sql, first );

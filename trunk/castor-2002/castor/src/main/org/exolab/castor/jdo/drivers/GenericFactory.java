@@ -76,7 +76,7 @@ public class GenericFactory
 
     public QueryExpression getQueryExpression()
     {
-        return new JDBCQueryExpression();
+        return new JDBCQueryExpression( this );
     }
 
 
@@ -89,6 +89,17 @@ public class GenericFactory
     public Boolean isDuplicateKeyException( Exception ex )
     {
         return null;
+    }
+
+
+    public String quoteName( String name )
+    {
+        int index;
+
+        index = name.indexOf( '.' );
+        if ( index > 0 )
+            return "\"" + name.substring( 0, index ) + "\".\"" + name.substring( index + 1 ) + "\"";
+        return '"' + name + '"';
     }
 
 

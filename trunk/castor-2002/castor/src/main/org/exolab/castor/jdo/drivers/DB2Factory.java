@@ -69,7 +69,7 @@ public final class DB2Factory
 
     public QueryExpression getQueryExpression()
     {
-        return new DB2QueryExpression();
+        return new DB2QueryExpression( this );
     }
 
 

@@ -52,6 +52,7 @@ import java.util.Vector;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
@@ -78,9 +79,20 @@ public class JDBCQueryExpression
 
     protected String    _where;
 
+
     protected String    _order;
 
+
     protected boolean   _distinct = false;
+
+
+    protected PersistenceFactory  _factory;
+
+
+    public JDBCQueryExpression( PersistenceFactory factory )
+    {
+        _factory = factory;
+    }
 
 
     public void setDistinct(boolean distinct)
@@ -91,7 +103,7 @@ public class JDBCQueryExpression
     public void addColumn( String tableName, String columnName )
     {
         _tables.put( tableName, tableName );
-        _cols.addElement( tableName + JDBCSyntax.TableColumnSeparator + columnName  );
+        _cols.addElement( _factory.quoteName( tableName + JDBCSyntax.TableColumnSeparator + columnName ) );
     }
 
 
@@ -105,7 +117,7 @@ public class JDBCQueryExpression
                               String condOp, String value )
     {
         _tables.put( tableName, tableName );
-        _conds.addElement( tableName + JDBCSyntax.TableColumnSeparator + columnName +
+        _conds.addElement( _factory.quoteName( tableName + JDBCSyntax.TableColumnSeparator + columnName ) +
                            condOp + value );
     }
 
@@ -166,7 +178,7 @@ public class JDBCQueryExpression
             for ( int i = 0 ; i < _conds.size() ; ++i ) {
                 if ( i > 0 )
                     sql.append( JDBCSyntax.And );
-                sql.append( (String) _conds.elementAt( i ) );
+                sql.append( _factory.quoteName( (String) _conds.elementAt( i ) ) );
             }
         }
         if ( _where != null ) {
@@ -208,14 +220,15 @@ public class JDBCQueryExpression
                 else
                     sql.append( JDBCSyntax.TableSeparator );
                 sql.append( "{oj " );
-                sql.append( join.leftTable );
-                sql.append( JDBCSyntax.LeftJoin );
-                sql.append( join.rightTable ).append( JDBCSyntax.On );
+                sql.append( _factory.quoteName( join.leftTable ) ).append( JDBCSyntax.LeftJoin );
+                sql.append( _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
                 for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                     if ( j > 0 )
                         sql.append( JDBCSyntax.And );
-                    sql.append( join.leftTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.leftColumns[ j ] ).append( OpEquals );
-                    sql.append( join.rightTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.rightColumns[ j ] );
+                    sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.leftColumns[ j ] ) ).append( OpEquals );
+                    sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.rightColumns[ j ] ) );
                 }
                 sql.append( "}" );
                 tables.remove( join.leftTable );
@@ -228,7 +241,7 @@ public class JDBCQueryExpression
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
-            sql.append( (String) enum.nextElement() );
+            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
         }
 
         // Use standard join syntax for all inner joins.
@@ -246,8 +259,10 @@ public class JDBCQueryExpression
                 for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                     if ( j > 0 )
                         sql.append( JDBCSyntax.And );
-                    sql.append( join.leftTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.leftColumns[ j ] ).append( OpEquals );
-                    sql.append( join.rightTable ).append( JDBCSyntax.TableColumnSeparator ).append( join.rightColumns[ j ] );
+                    sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.leftColumns[ j ] ) ).append( OpEquals );
+                    sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
+                                                    join.rightColumns[ j ] ) );
                 }
             }
         } 
@@ -272,7 +287,9 @@ public class JDBCQueryExpression
         JDBCQueryExpression clone;
 
         try {
-            clone = (JDBCQueryExpression) getClass().newInstance();
+            clone = (JDBCQueryExpression) getClass().
+                getConstructor( new Class[] { PersistenceFactory.class } ).
+                newInstance( new Object[] { _factory } );
         } catch ( Exception except ) {
             // This should never happen
             throw new RuntimeException( except.toString() );
