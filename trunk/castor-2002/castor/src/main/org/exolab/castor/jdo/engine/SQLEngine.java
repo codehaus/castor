@@ -379,7 +379,7 @@ Will be adding this later.
             // All other dependents are stored independently.
             if ( _extends != null )
                 _extends.store( conn, fields, identity, original, stamp );
-
+            
             stmt = ( (Connection) conn ).prepareStatement( original == null ? _sqlStore : _sqlStoreDirty );
             count = 1;
             for ( int i = 0 ; i < _fields.length ; ++i )
@@ -392,33 +392,34 @@ Will be adding this later.
                 }
             stmt.setObject( count, identity );
             ++count;
-
-        if ( original != null ) {
-        for ( int i = 0 ; i < _fields.length ; ++i )
-            if ( _fields[ i ].dirtyCheck ) {
-                        if ( original[ i ] == null )
+            
+            if ( original != null ) {
+                for ( int i = 0 ; i < _fields.length ; ++i ) {
+                    if ( _fields[ i ].dirtyCheck ) {
+                        if ( original[ i ] == null ) {
                             stmt.setNull( count, _fields[ i ].sqlType );
-                        else
+                        } else
                             stmt.setObject( count, original[ i ] );
-            ++count;
+                        ++count;
+                    }
+                }
             }
-        }
-
+            
             if ( stmt.executeUpdate() == 0 ) {
                 // If no update was performed, the object has been previously
                 // removed from persistent storage or has been modified if
-        // dirty checking. Determine which is which.
+                // dirty checking. Determine which is which.
                 stmt.close();
-        if ( original != null ) {
-            stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-            stmt.setObject( 1, identity );
-            if ( stmt.executeQuery().next() ) {
-            stmt.close();
-            throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
-            }
-            stmt.close();
-        }
-
+                if ( original != null ) {
+                    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+                    stmt.setObject( 1, identity );
+                    if ( stmt.executeQuery().next() ) {
+                        stmt.close();
+                        throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
+                    }
+                    stmt.close();
+                }
+                
                 throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
             }
             stmt.close();
@@ -701,7 +702,11 @@ Will be adding this later.
                 if ( relDesc == null || ( (JDOFieldDescriptor) fields[ i ] ).getManyTable() == null ) {
                     expr.addColumn( clsDesc.getTableName(),
                                     ( (JDOFieldDescriptor) fields[ i ] ).getSQLName() );
-                    allFields.addElement( new FieldInfo( fields[ i ], store ) );
+                    if ( relDesc == null )
+                        allFields.addElement( new FieldInfo( fields[ i ], store ) );
+                    else
+                        allFields.addElement( new FieldInfo( fields[ i ], true,
+                                                             ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLType() ) );
                 } else {
                     expr.addColumn( ( (JDOFieldDescriptor) fields[ i ] ).getManyTable(),
                                     ( (JDOFieldDescriptor) fields[ i ] ).getSQLName() );
@@ -715,7 +720,7 @@ Will be adding this later.
 
                 relDesc = (JDOClassDescriptor) fields[ i ].getClassDescriptor();
                 if ( relDesc == null )
-                    System.err.println( "No relation for " + fields[ i ] );
+                    Logger.getSystemLogger().println( "No relation for " + fields[ i ] );
                 else {
                     FieldDescriptor[] relFields;
                     String            foreKey = null;
@@ -732,7 +737,7 @@ Will be adding this later.
                         expr.addColumn( relDesc.getTableName(), ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLName() );
                         expr.addOuterJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
                                            relDesc.getTableName(), foreKey );
-                        allFields.addElement( new FieldInfo( fields[ i ], false ) );
+                        allFields.addElement( new FieldInfo( (JDOFieldDescriptor) relDesc.getIdentity(), false ) );
                     }
                 }
             }
@@ -757,7 +762,7 @@ Will be adding this later.
 
         final boolean dirtyCheck;
 
-        final int     sqlType;
+        int           sqlType;
 
         FieldInfo( FieldDescriptor fieldDesc, boolean store )
         {
@@ -771,6 +776,12 @@ Will be adding this later.
                 this.dirtyCheck = false;
                 this.sqlType = java.sql.Types.OTHER;
             }
+        }
+
+        FieldInfo( FieldDescriptor fieldDesc, boolean store, int sqlType )
+        {
+            this( fieldDesc, store );
+            this.sqlType = sqlType;
         }
 
         public String toString()
