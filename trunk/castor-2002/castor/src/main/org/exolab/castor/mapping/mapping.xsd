@@ -67,7 +67,7 @@
     <xsd:type content="elemOnly" order="seq">
       <xsd:element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <xsd:element ref="sql" minOccurs="0" maxOccurs="1"/>
-      <xsd:element ref="xml" minOccurs="0" maxOccurs="1"/>
+      <xsd:element ref="bind-xml" minOccurs="0" maxOccurs="1"/>
       <xsd:element ref="ldap" minOccurs="0" maxOccurs="1"/>
       <xsd:attribute name="name" type="NMTOKEN" minOccurs="1"/>
       <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
@@ -114,7 +114,7 @@
     </xsd:type>
   </xsd:element>
 
-  <xsd:element name="xml">
+  <xsd:element name="bind-xml">
     <xsd:type content="empty">
       <xsd:attribute name="name" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
