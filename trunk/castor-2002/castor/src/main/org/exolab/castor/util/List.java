@@ -32,6 +32,7 @@ package org.exolab.castor.util;
  * <B>Note: This is not a complete implementation yet,
  *    None of the methods that take a Collection have been imlplemented.
  * </B>
+ *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see java.util.List

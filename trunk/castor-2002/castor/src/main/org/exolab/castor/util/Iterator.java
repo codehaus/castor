@@ -52,6 +52,7 @@ package org.exolab.castor.util;
  * I wrote this because I want people using 1.1.x to be able 
  * to use my apps, but I also wanted to get a start in moving my 
  * source to JDK 1.2<BR>
+ *
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @see java.util.Iterator
  * @version $Revision$ $Date$ 
