@@ -3,6 +3,11 @@
  * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
+ *
+ * NOTE: 
+ *   THOMAS, THIS FILE WAS MODIFIED BY HAND.
+ *   Changes include:
+ *     - XML name change, "class" instead of "class-mapping"
  */
 
 package org.exolab.castor.mapping.xml;
