@@ -240,6 +240,24 @@
     </xsl:choose>
   </xsl:template>
 
+  <!-- UL is processed into a table using graphical bullets -->
+  <xsl:template match="ul">
+    <table border="0" cellpadding="2" cellspacing="2">
+      <tr><td colspan="2" height="5"></td></tr>
+      <xsl:apply-templates/>
+    </table>
+  </xsl:template>
+
+  <xsl:template match="ul/li">
+    <tr>
+      <td align="left" valign="top" width="15">
+        <img src="style/images/bullets/blue.gif" height="22" width="15" alt="*"/>
+     </td>
+      <td align="left" valign="top"><xsl:apply-templates/></td>
+    </tr>
+  </xsl:template>
+
+
 </xsl:stylesheet>
 
 
