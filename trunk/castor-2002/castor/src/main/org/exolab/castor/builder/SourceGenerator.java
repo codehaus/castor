@@ -1152,10 +1152,11 @@ public class SourceGenerator {
         for (int i = 0; i <fields.length; i++) {
             JField temp = fields[i];
             //Be careful to arrayList....
+
             String name = temp.getName();
             if (temp.getType().isPrimitive())
                jsc.add("if (this."+ name +" != temp."+name+")");
-            else jsc.add("if (!(this."+ name +".equals(temp."+name+")))");
+            else jsc.add("if (!(this."+ name +".equals(temp."+name+"))) ");
             jsc.indent();
             jsc.add("return false;");
             jsc.unindent();
@@ -1194,7 +1195,9 @@ public class SourceGenerator {
             JType type = temp.getType();
             JType component = null;
             String name = temp.getName();
+            String setName = "set" + JavaNaming.toJavaClassName(name);
             String componentName = null;
+
             if (name.indexOf("_has") == -1) {
                if ( (type.getName().equals("java.util.Vector")) ||
                     (type.getName().equals("java.util.ArrayList")) ) {
@@ -1209,10 +1212,10 @@ public class SourceGenerator {
                }
 
                if (type.isPrimitive())
-                  jsc.add(name+" = RandomHelper.getRandom("+name+");");
+                  jsc.add(setName+"(RandomHelper.getRandom("+name+"));");
                else
-                   jsc.add(name+" = ("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class);");
-               jsc.add("");
+                 jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class));");
+                 jsc.add("");
             }
         }
 
@@ -1221,7 +1224,7 @@ public class SourceGenerator {
         jMethod.setComment("implementation of org.exolab.castor.tests.framework.CastorTestable");
         jclass.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
-        jsc.add("String result = \"DumpFields() for element: "+jclass.getName()+"\";");
+        jsc.add("String result = \"DumpFields() for element: "+jclass.getName()+"\\n\";");
         for (int i = 0; i <fields.length; i++) {
 
             JField temp = fields[i];
