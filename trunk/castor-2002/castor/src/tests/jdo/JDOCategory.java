@@ -92,7 +92,7 @@ public class JDOCategory
     public Connection getJDBCConnection()
         throws SQLException
     {
-        return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName(), null ).createConnection();
+        return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName() ).createConnection();
     }
 
 
