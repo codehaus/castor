@@ -188,6 +188,12 @@
   </contributor>
 
   <contributor type="Feedback">
+    <name surname="Zamler" given="Eldad"/>
+    <email>eldad314@netvision.net.il</email>
+    <description>Found and reported bugs in ClassMolder, ObjectLock and SQLEngine</description>
+  </contributor>
+
+  <contributor type="Feedback">
     <name surname="Arias" given="Luis"/>
     <email>luis@elysia.com</email>
     <description>XML Schema related issues</description>
@@ -258,6 +264,18 @@
     <name surname="Wolpert" given="Edward"/>
     <email>wolpert@methodsystems.com</email>
     <description>Testing for PostgreSQL.</description>
+  </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Rimac" given="Ivica"/>
+    <email>ivica.rimac@KOM.tu-darmstadt.de</email>
+    <description>A lot of bug reports, feature requrests, feedbacks and testing for Castor JDO</description>
+  </contributor>
+
+  <contributor type="Documentor">
+    <name surname="Horowitz" given="Rick"/>
+    <email>rickhoro@yahoo.com</email>
+    <description>Improve the documentation of Castor JDO. Also, bug reports and feedback.</description>
   </contributor>
 
   <!--
