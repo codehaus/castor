@@ -183,7 +183,7 @@ public class TimeDurationValidator implements TypeValidator {
 
         TimeDuration value = null;
         try {
-            value = TimeDuration.parse(object.toString());
+            value = TimeDuration.parseTimeDuration(object.toString());
         }
         catch(Exception ex) {
             String err = "Expecting a TimeDuration, received instead: ";
