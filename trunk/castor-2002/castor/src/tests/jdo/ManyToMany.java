@@ -77,8 +77,8 @@ import harness.CastorTestCase;
 
 
 /**
- * Test for many-to-many relationship.
- *
+ * Test for many-to-many relationship. A many to many relationship
+ * is stored in a relational database as a separated table.
  */
 public class ManyToMany extends CastorTestCase {
 

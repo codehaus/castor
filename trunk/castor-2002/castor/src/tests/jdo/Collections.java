@@ -77,7 +77,8 @@ import harness.CastorTestCase;
 
 /**
  * Test for different collection types supported by Castor JDO.
- * This test create data objects that has a field type
+ * This test creates data objects that each has a collection as
+ * a field type.
  */
 public class Collections extends CastorTestCase {
 

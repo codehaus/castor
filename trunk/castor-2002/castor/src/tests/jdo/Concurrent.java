@@ -122,7 +122,7 @@ public class Concurrent extends CastorTestCase {
     /**
      * Test for concurrent modification detection in Shared Mode.
      * (Optimistic Locking Mode)
-     * This test contains two parts. The first part test if Castor 
+     * This test contains two parts. The first part tests if Castor 
      * JDO can detect concurrent modification done directly via
      * JDBC in Shared Mode. The second part test if Castor can
      * ignores concurrent modification done to fields that 
@@ -143,11 +143,11 @@ public class Concurrent extends CastorTestCase {
     /**
      * Test for concurrent modification detection in Exclusive Mode.
      * (Pessimistic Locking Mode)
-     * This test contains two parts. The first part test if Castor 
+     * This test contains two parts. The first part tests if Castor 
      * JDO can detect concurrent modification done directly via
-     * JDBC in Shared Mode. The second part test if Castor can
-     * ignores concurrent modification done to fields that 
-     * indicates dirty check should not be done.
+     * JDBC in Shared Mode. The second part tests if Castor can
+     * ignore concurrent modification done to fields that 
+     * are indicated dirty check should not be done.
      */
     public void testAccessModeExclusive() 
             throws PersistenceException, SQLException {
@@ -165,11 +165,11 @@ public class Concurrent extends CastorTestCase {
     /**
      * Test for concurrent modification detection in DbLocked Mode.
      * (Pessimistic Locking Mode plus database row lock)
-     * This test contains two parts. The first part test if Castor 
+     * This test contains two parts. The first part tests if Castor 
      * JDO can detect concurrent modification done directly via
-     * JDBC in Shared Mode. The second part test if Castor can
-     * ignores concurrent modification done to fields that 
-     * indicates dirty check should not be done.
+     * JDBC in Shared Mode. The second part tests if Castor can
+     * ignores concurrent modification done to fields that are
+     * indicated dirty check should not be done.
      * (note: some databases don't support database lock and will
      * fails this test case)
      */

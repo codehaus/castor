@@ -66,9 +66,9 @@ import harness.CastorTestCase;
  * transactions working on the same objects. The first transaction will 
  * succeed, the second will fail. All three access modes: Shared (aka
  * optimistic locking), Exclusive (aka pessimistic locking) and DbLocked 
- * (premissitic memory locking with DBMS's locking) are covered. 
- * These tests passed if LockNotGrantedException is thrown in the appropriate 
- * time for the access mode in action.
+ * (premissitic memory locking with DBMS's locking) are covered by these 
+ * test cases. These tests passed if LockNotGrantedException is thrown 
+ * in the appropriate time for the access mode in action.
  */
 public class Deadlock extends CastorTestCase {
 

@@ -165,10 +165,10 @@ public class DuplicateKey extends CastorTestCase {
     }
 
     /**
-     * Try to create an object with an identity same as another object what is not
-     * loaded by in the database.  This test case pass if an 
-     * DuplicateIdentityException is thrown when the object with duplicated identity 
-     * is created.
+     * Try to create an object that has an identity which is the same 
+     * as another object that is not loaded by in the database.  This 
+     * test case passes if a DuplicateIdentityException is thrown when 
+     * the object with duplicated identity is created.
      */
     public void testDuplicateIdentityAsInDatabase() 
             throws PersistenceException {

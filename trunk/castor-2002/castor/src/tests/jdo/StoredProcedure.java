@@ -64,6 +64,9 @@ import harness.CastorTestCase;
 
 
 /**
+ * Test for store procedure support in a OQL query. Castor 
+ * enables user to invoke store procedures of a DBMS throught
+ * a OQL query.
  */
 public class StoredProcedure extends CastorTestCase {
 
