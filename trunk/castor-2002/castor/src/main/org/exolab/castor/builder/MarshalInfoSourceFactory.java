@@ -449,7 +449,7 @@ public class MarshalInfoSourceFactory {
         else jsc.add("return null;");
         marshalInfo.addMethod(method);
             
-        //-- create getNameSpacePrefix method
+        //-- create getNameSpaceURI method
         method = new JMethod(SGTypes.String, "getNameSpaceURI");
         jsc = method.getSourceCode();
         if (nsURI != null) {

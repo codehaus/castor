@@ -111,7 +111,6 @@ public class SourceFactory  {
         
         //-- namespace information
         Schema  schema = element.getSchema();        
-        classInfo.setNamespacePrefix(element.getSchemaAbbrev());
         classInfo.setNamespaceURI(schema.getTargetNamespace());
         
         //-- process annotation
