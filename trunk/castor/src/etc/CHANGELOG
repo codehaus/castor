@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1594 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added new JDO2.java, adding factory method for instantiation, removing public 
+       constructor, changing way of loading configuration.
+       At the same time, JDO.java has been deprecated.
+       (Werner - 20041005)
+       
 JDO:   Fixed bug 1435 using contribution from Matt Caswell [bugzilla.exolab.org@baggins.org]
        Fixed problem with finding add<FieldName>() method. 
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1435
