@@ -48,13 +48,12 @@ import junit.framework.TestCase;
 
 import org.exolab.castor.tests.framework.testDescriptor.CallMethod;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.Failure;
-import org.exolab.castor.tests.framework.testDescriptor.Listener;
 import org.exolab.castor.tests.framework.testDescriptor.types.TypeType;
 import org.exolab.castor.tests.framework.testDescriptor.Configuration;
-import org.exolab.castor.tests.framework.testDescriptor.Marshal;
-import org.exolab.castor.tests.framework.testDescriptor.Unmarshal;
-import org.exolab.castor.tests.framework.testDescriptor.CallMethod;
+import org.exolab.castor.tests.framework.testDescriptor.ConfigurationType;
+import org.exolab.castor.tests.framework.testDescriptor.FailureType;
+import org.exolab.castor.tests.framework.testDescriptor.ListenerType;
+
 import org.exolab.castor.tests.framework.testDescriptor.Value;
 
 import org.exolab.castor.mapping.Mapping;
@@ -73,7 +72,7 @@ import java.io.FileWriter;
 import java.util.Enumeration;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Constructor;
+
 
 /**
  * This class encapsulates all the common logic to run the test patterns for
@@ -167,7 +166,7 @@ public abstract class XMLTestCase extends TestCase {
     /**
      * The failure object that is not null is the test intends to fail
      */
-    protected Failure _failure;
+    protected FailureType _failure;
 
     /**
      * True if we expect a lot of info on what happen.
@@ -573,7 +572,7 @@ public abstract class XMLTestCase extends TestCase {
             config = _configuration;
 
         if (config != null) {
-            Marshal marshal = config.getMarshal();
+            ConfigurationType marshal = config.getMarshal();
             if (marshal != null) {
                 
                 Enumeration methods = marshal.enumerateCallMethod();
@@ -641,7 +640,7 @@ public abstract class XMLTestCase extends TestCase {
            config = _configuration;
 
        if (config != null) {
-           Unmarshal unmarshal = config.getUnmarshal();
+           ConfigurationType unmarshal = config.getUnmarshal();
            if (unmarshal != null) {                
                Enumeration methods = unmarshal.enumerateCallMethod();
                //-- For each method defined, we invoke it on marshaller just created.
@@ -685,7 +684,7 @@ public abstract class XMLTestCase extends TestCase {
     /**
      * Initialize listeners for marshalling/unmarshalling
      */
-    protected void initializeListeners (Listener listener)
+    protected void initializeListeners (ListenerType listener)
         throws java.lang.ClassNotFoundException,
                java.lang.IllegalAccessException,
                java.lang.InstantiationException
@@ -795,15 +794,33 @@ public abstract class XMLTestCase extends TestCase {
             }
             
             public void runTest() {
-                _delegate.testWithReferenceDocument();
+                if (_delegate != null)
+                    _delegate.testWithReferenceDocument();
+                else
+                    throw new IllegalStateException("No test specified to be run.");
             }
             
             protected void setUp() throws Exception {
-                _delegate.setUp();
+                if (_delegate != null) {
+                 if (_delegate instanceof MarshallingFrameworkTestCase)
+                       ((MarshallingFrameworkTestCase)_delegate).setUp();
+                 else if (_delegate instanceof SourceGeneratorTestCase)
+                    ((SourceGeneratorTestCase)_delegate).setUp();
+    
+                }
+                else
+                    throw new IllegalStateException("No test specified to set up.");
             }
             
             protected void tearDown() throws Exception {
-                _delegate.tearDown();
+                if (_delegate != null) {
+                    if (_delegate instanceof MarshallingFrameworkTestCase)
+                       ((MarshallingFrameworkTestCase)_delegate).tearDown();
+                    else if (_delegate instanceof SourceGeneratorTestCase)
+                         ((SourceGeneratorTestCase)_delegate).tearDown();
+                }
+                else
+                    throw new IllegalStateException("No test specified to tear down.");                
             }
     }
     
@@ -822,15 +839,33 @@ public abstract class XMLTestCase extends TestCase {
                 }
             
                 public void runTest() {
-                    _delegate.testWithRandomObject();
-                }
-            
-                protected void setUp() throws Exception {
-                    _delegate.setUp();
-                }
-            
-                protected void tearDown() throws Exception {
-                    _delegate.tearDown();
-                }
+                   if (_delegate != null)
+                       _delegate.testWithRandomObject();
+                   else
+                       throw new IllegalStateException("No test specified to be run.");
+               }
+                    
+               protected void setUp() throws Exception {
+                  
+                   if (_delegate != null) {
+                      if (_delegate instanceof MarshallingFrameworkTestCase)
+                          ((MarshallingFrameworkTestCase)_delegate).setUp();
+                      else if (_delegate instanceof SourceGeneratorTestCase)
+                          ((SourceGeneratorTestCase)_delegate).setUp();
+                  }
+                   else
+                       throw new IllegalStateException("No test specified to set up.");
+               }
+                    
+               protected void tearDown() throws Exception {
+                   if (_delegate != null) {
+                       if (_delegate instanceof MarshallingFrameworkTestCase)
+                           ((MarshallingFrameworkTestCase)_delegate).tearDown();
+                       else if (_delegate instanceof SourceGeneratorTestCase)
+                           ((SourceGeneratorTestCase)_delegate).tearDown();
+                   }
+                   else
+                       throw new IllegalStateException("No test specified to tear down.");                
+               }
         }
 }

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -55,6 +55,7 @@ public class ListenerTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     public ListenerTypeDescriptor() {
         super();
+        nsPrefix = "test";
         nsURI = "http://castor.exolab.org/Test";
         xmlName = "ListenerType";
         

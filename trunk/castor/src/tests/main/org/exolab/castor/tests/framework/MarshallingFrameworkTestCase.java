@@ -47,10 +47,10 @@ package org.exolab.castor.tests.framework;
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
+import org.exolab.castor.tests.framework.testDescriptor.ListenerType;
 import org.exolab.castor.tests.framework.testDescriptor.MarshallingTest;
+import org.exolab.castor.tests.framework.testDescriptor.RootType;
 import org.exolab.castor.tests.framework.testDescriptor.UnitTestCase;
-import org.exolab.castor.tests.framework.testDescriptor.Root_Object;
-import org.exolab.castor.tests.framework.testDescriptor.Listener;
 import org.exolab.castor.mapping.Mapping;
 
 import org.xml.sax.InputSource;
@@ -146,7 +146,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
 
         assert("The input file specified:"+_inputName+" cannot be found.", _input != null);
 
-        Root_Object rootType = _marshallingConf.getRoot_Object();
+        RootType rootType = _marshallingConf.getRoot_Object();
         _rootClassName = rootType.getContent();
         _hasDump =   rootType.getDump();
         _hasRandom = rootType.getRandom();
@@ -204,7 +204,7 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
                 else throw new Exception(ex.toString());
             } //--mapping
 
-            Listener listener = _unitTest.getListener();
+            ListenerType listener = _unitTest.getListener();
             if ( listener != null ) {
                 String listenerName = listener.getClassName();
                 try {

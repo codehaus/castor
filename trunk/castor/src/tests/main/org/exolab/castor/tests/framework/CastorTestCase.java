@@ -220,7 +220,7 @@ public class CastorTestCase extends TestCase {
         }
 
         try {
-            _testDescriptor = (TestDescriptor) TestDescriptor.unmarshal(new InputStreamReader(descriptor));
+            _testDescriptor = (TestDescriptor) TestDescriptor.unmarshalTestDescriptor(new InputStreamReader(descriptor));
         } catch (ValidationException ve) {
             verbose("Error reading: "+_testFile.getAbsolutePath());
             verbose("-> " + ve.toString());

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -56,11 +56,48 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
     public RootTypeDescriptor() {
         super();
         setExtendsWithoutFlatten(new org.exolab.castor.tests.framework.testDescriptor.StringTypeDescriptor());
+        nsPrefix = "test";
         nsURI = "http://castor.exolab.org/Test";
         xmlName = "RootType";
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.xml.XMLFieldHandler              handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
+        //-- _content
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_content", "PCDATA", org.exolab.castor.xml.NodeType.Text);
+        desc.setImmutable(true);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                RootType target = (RootType) object;
+                return target.getContent();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    RootType target = (RootType) object;
+                    target.setContent( (java.lang.String) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _content
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+            StringValidator typeValidator = new StringValidator();
+            typeValidator.setWhiteSpace("preserve");
+            fieldValidator.setValidator(typeValidator);
+        }
+        desc.setValidator(fieldValidator);
         //-- initialize attribute descriptors
         
         //-- _random

@@ -178,7 +178,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         if (_inputName != null)
             _input  = _test.getClassLoader().getResourceAsStream(_inputName);
 
-        Root_Object rootType = _sourceGenConf.getRoot_Object();
+        RootType rootType = _sourceGenConf.getRoot_Object();
         _rootClassName      = rootType.getContent();
         _hasDump            = rootType.getDump();
         _hasRandom          = rootType.getRandom();

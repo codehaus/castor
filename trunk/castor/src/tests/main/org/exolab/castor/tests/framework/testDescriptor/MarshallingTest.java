@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -38,7 +38,12 @@ public class MarshallingTest implements java.io.Serializable {
     /**
      * Field _root_Object
      */
-    private org.exolab.castor.tests.framework.testDescriptor.Root_Object _root_Object;
+    private org.exolab.castor.tests.framework.testDescriptor.RootType _root_Object;
+
+    /**
+     * Field _configuration
+     */
+    private org.exolab.castor.tests.framework.testDescriptor.Configuration _configuration;
 
     /**
      * Field _unitTestCaseList
@@ -92,15 +97,24 @@ public class MarshallingTest implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateUnitTestCase() 
 
     /**
-     * Method getRoot_ObjectReturns the value of field
-     * 'root_Object'.
+     * Returns the value of field 'configuration'.
+     * 
+     * @return the value of field 'configuration'.
+     */
+    public org.exolab.castor.tests.framework.testDescriptor.Configuration getConfiguration()
+    {
+        return this._configuration;
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Configuration getConfiguration() 
+
+    /**
+     * Returns the value of field 'root_Object'.
      * 
      * @return the value of field 'root_Object'.
      */
-    public org.exolab.castor.tests.framework.testDescriptor.Root_Object getRoot_Object()
+    public org.exolab.castor.tests.framework.testDescriptor.RootType getRoot_Object()
     {
         return this._root_Object;
-    } //-- org.exolab.castor.tests.framework.testDescriptor.Root_Object getRoot_Object() 
+    } //-- org.exolab.castor.tests.framework.testDescriptor.RootType getRoot_Object() 
 
     /**
      * Method getUnitTestCase
@@ -198,14 +212,24 @@ public class MarshallingTest implements java.io.Serializable {
     } //-- org.exolab.castor.tests.framework.testDescriptor.UnitTestCase removeUnitTestCase(int) 
 
     /**
-     * Method setRoot_ObjectSets the value of field 'root_Object'.
+     * Sets the value of field 'configuration'.
+     * 
+     * @param configuration the value of field 'configuration'.
+     */
+    public void setConfiguration(org.exolab.castor.tests.framework.testDescriptor.Configuration configuration)
+    {
+        this._configuration = configuration;
+    } //-- void setConfiguration(org.exolab.castor.tests.framework.testDescriptor.Configuration) 
+
+    /**
+     * Sets the value of field 'root_Object'.
      * 
      * @param root_Object the value of field 'root_Object'.
      */
-    public void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.Root_Object root_Object)
+    public void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.RootType root_Object)
     {
         this._root_Object = root_Object;
-    } //-- void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.Root_Object) 
+    } //-- void setRoot_Object(org.exolab.castor.tests.framework.testDescriptor.RootType) 
 
     /**
      * Method setUnitTestCase
@@ -238,15 +262,15 @@ public class MarshallingTest implements java.io.Serializable {
     } //-- void setUnitTestCase(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) 
 
     /**
-     * Method unmarshal
+     * Method unmarshalMarshallingTest
      * 
      * @param reader
      */
-    public static org.exolab.castor.tests.framework.testDescriptor.MarshallingTest unmarshal(java.io.Reader reader)
+    public static java.lang.Object unmarshalMarshallingTest(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.tests.framework.testDescriptor.MarshallingTest) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.MarshallingTest.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.MarshallingTest unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshalMarshallingTest(java.io.Reader) 
 
     /**
      * Method validate

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -11,20 +11,23 @@ package org.exolab.castor.tests.framework.testDescriptor;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import org.exolab.castor.tests.framework.testDescriptor.types.TypeType;
+import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
+import org.xml.sax.ContentHandler;
 
 /**
  * Class ListenerType.
  * 
  * @version $Revision$ $Date$
  */
-public abstract class ListenerType implements java.io.Serializable {
+public class ListenerType implements java.io.Serializable {
 
 
       //--------------------------/
@@ -62,7 +65,7 @@ public abstract class ListenerType implements java.io.Serializable {
     //-----------/
 
     /**
-     * Method getClassNameReturns the value of field 'className'.
+     * Returns the value of field 'className'.
      * 
      * @return the value of field 'className'.
      */
@@ -72,7 +75,7 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- java.lang.String getClassName() 
 
     /**
-     * Method getGoldFileReturns the value of field 'goldFile'.
+     * Returns the value of field 'goldFile'.
      * 
      * @return the value of field 'goldFile'.
      */
@@ -82,7 +85,7 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- java.lang.String getGoldFile() 
 
     /**
-     * Method getTypeReturns the value of field 'type'.
+     * Returns the value of field 'type'.
      * 
      * @return the value of field 'type'.
      */
@@ -106,7 +109,31 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
-     * Method setClassNameSets the value of field 'className'.
+     * Method marshal
+     * 
+     * @param out
+     */
+    public void marshal(java.io.Writer out)
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * Method marshal
+     * 
+     * @param handler
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.ContentHandler) 
+
+    /**
+     * Sets the value of field 'className'.
      * 
      * @param className the value of field 'className'.
      */
@@ -116,7 +143,7 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- void setClassName(java.lang.String) 
 
     /**
-     * Method setGoldFileSets the value of field 'goldFile'.
+     * Sets the value of field 'goldFile'.
      * 
      * @param goldFile the value of field 'goldFile'.
      */
@@ -126,7 +153,7 @@ public abstract class ListenerType implements java.io.Serializable {
     } //-- void setGoldFile(java.lang.String) 
 
     /**
-     * Method setTypeSets the value of field 'type'.
+     * Sets the value of field 'type'.
      * 
      * @param type the value of field 'type'.
      */
@@ -134,6 +161,17 @@ public abstract class ListenerType implements java.io.Serializable {
     {
         this._type = type;
     } //-- void setType(org.exolab.castor.tests.framework.testDescriptor.types.TypeType) 
+
+    /**
+     * Method unmarshalListenerType
+     * 
+     * @param reader
+     */
+    public static java.lang.Object unmarshalListenerType(java.io.Reader reader)
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.tests.framework.testDescriptor.ListenerType) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.ListenerType.class, reader);
+    } //-- java.lang.Object unmarshalListenerType(java.io.Reader) 
 
     /**
      * Method validate

@@ -17,11 +17,11 @@ import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.validators.*;
 
 /**
- * Class MarshallingTestDescriptor.
+ * Class CallMethodDescriptor.
  * 
  * @version $Revision$ $Date$
  */
-public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
+public class CallMethodDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
 
 
       //--------------------------/
@@ -53,11 +53,11 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
      //- Constructors -/
     //----------------/
 
-    public MarshallingTestDescriptor() {
+    public CallMethodDescriptor() {
         super();
         nsPrefix = "test";
         nsURI = "http://castor.exolab.org/Test";
-        xmlName = "MarshallingTest";
+        xmlName = "Call-method";
         
         //-- set grouping compositor
         setCompositorAsSequence();
@@ -66,100 +66,66 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
+        //-- _name
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", org.exolab.castor.xml.NodeType.Attribute);
+        desc.setImmutable(true);
+        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                CallMethod target = (CallMethod) object;
+                return target.getName();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    CallMethod target = (CallMethod) object;
+                    target.setName( (java.lang.String) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _name
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+            StringValidator typeValidator = new StringValidator();
+            typeValidator.setWhiteSpace("preserve");
+            fieldValidator.setValidator(typeValidator);
+        }
+        desc.setValidator(fieldValidator);
         //-- initialize element descriptors
         
-        //-- _root_Object
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.RootType.class, "_root_Object", "Root_Object", org.exolab.castor.xml.NodeType.Element);
+        //-- _valueList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.Value.class, "_valueList", "Value", org.exolab.castor.xml.NodeType.Element);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
-                MarshallingTest target = (MarshallingTest) object;
-                return target.getRoot_Object();
+                CallMethod target = (CallMethod) object;
+                return target.getValue();
             }
             public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    MarshallingTest target = (MarshallingTest) object;
-                    target.setRoot_Object( (org.exolab.castor.tests.framework.testDescriptor.RootType) value);
+                    CallMethod target = (CallMethod) object;
+                    target.addValue( (org.exolab.castor.tests.framework.testDescriptor.Value) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.tests.framework.testDescriptor.RootType();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        desc.setRequired(true);
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _root_Object
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(1);
-        { //-- local scope
-        }
-        desc.setValidator(fieldValidator);
-        //-- _configuration
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.Configuration.class, "_configuration", "Configuration", org.exolab.castor.xml.NodeType.Element);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                MarshallingTest target = (MarshallingTest) object;
-                return target.getConfiguration();
-            }
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MarshallingTest target = (MarshallingTest) object;
-                    target.setConfiguration( (org.exolab.castor.tests.framework.testDescriptor.Configuration) value);
-                }
-                catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.tests.framework.testDescriptor.Configuration();
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        desc.setMultivalued(false);
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _configuration
-        fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        { //-- local scope
-        }
-        desc.setValidator(fieldValidator);
-        //-- _unitTestCaseList
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.tests.framework.testDescriptor.UnitTestCase.class, "_unitTestCaseList", "UnitTestCase", org.exolab.castor.xml.NodeType.Element);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
-            public java.lang.Object getValue( java.lang.Object object ) 
-                throws IllegalStateException
-            {
-                MarshallingTest target = (MarshallingTest) object;
-                return target.getUnitTestCase();
-            }
-            public void setValue( java.lang.Object object, java.lang.Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    MarshallingTest target = (MarshallingTest) object;
-                    target.addUnitTestCase( (org.exolab.castor.tests.framework.testDescriptor.UnitTestCase) value);
-                }
-                catch (java.lang.Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new org.exolab.castor.tests.framework.testDescriptor.UnitTestCase();
+                return new org.exolab.castor.tests.framework.testDescriptor.Value();
             }
         } );
         desc.setHandler(handler);
@@ -168,13 +134,13 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
         desc.setMultivalued(true);
         addFieldDescriptor(desc);
         
-        //-- validation code for: _unitTestCaseList
+        //-- validation code for: _valueList
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
         fieldValidator.setMinOccurs(1);
         { //-- local scope
         }
         desc.setValidator(fieldValidator);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.MarshallingTestDescriptor()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.CallMethodDescriptor()
 
 
       //-----------/
@@ -210,7 +176,7 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
      */
     public java.lang.Class getJavaClass()
     {
-        return org.exolab.castor.tests.framework.testDescriptor.MarshallingTest.class;
+        return org.exolab.castor.tests.framework.testDescriptor.CallMethod.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**
