@@ -121,6 +121,17 @@ public interface CallbackInterceptor
 
 
     /**
+     * Called to indicate that an object has been deleted.
+     * <p>
+     * This method is called during db.remove().
+     *
+     * @param object The object
+     */
+    public void removed( Object object )
+        throws Exception;
+
+
+    /**
      * Called to indicate that an object has been made transient.
      * <p>
      * This method is made at commit or rollback time on all objects
@@ -128,7 +139,7 @@ public interface CallbackInterceptor
      *
      * @param object The object
      * @param committed True if the object has been commited, false
-     *  if rollback or otherwise cancelled 
+     *  if rollback or otherwise cancelled
      */
     public void releasing( Object object, boolean committed );
 
