@@ -617,7 +617,126 @@ public abstract class Configuration
             return _defaultValues.primitiveNodeType;
         }
     } //-- getDefaultPrimitiveNodeType
+
     
+    /**
+     * Returns an XML document parser implementing the requested
+     * set of features. The feature list is a comma separated list
+     * of features that parser may or may not support. No errors are
+     * generated for unsupported features. If the feature list is not
+     * null, it overrides the default feature list specified in the
+     * configuration file, including validation and Namespaces.
+     *
+     * @return A suitable XML parser
+     */
+    public XMLReader getXMLReader()
+    {
+        return getDefaultXMLReader( null ) ;
+        
+    } //-- getXMLReader
+    
+    /**
+     * Returns an XML document parser implementing the requested
+     * set of features. The feature list is a comma separated list
+     * of features that parser may or may not support. No errors are
+     * generated for unsupported features. If the feature list is not
+     * null, it overrides the default feature list specified in the
+     * configuration file, including validation and Namespaces.
+     *
+     * @return A suitable XML parser
+     */
+    public static XMLReader getDefaultXMLReader()
+    {
+        return getDefaultXMLReader( null ) ;
+    } //-- getDefaultXMLReader
+    
+    /**
+     * Returns an XML document parser implementing the requested
+     * set of features. The feature list is a comma separated list
+     * of features that parser may or may not support. No errors are
+     * generated for unsupported features. If the feature list is not
+     * null, it overrides the default feature list specified in the
+     * configuration file, including validation and Namespaces.
+     *
+     * @param features The requested feature list, null for the
+     *   defaults
+     * @return A suitable XML parser
+     */
+    public static XMLReader getDefaultXMLReader( String features )
+    {
+        String prop;
+        XMLReader reader = null;
+        
+        //-- validation?
+        prop = getDefault().getProperty( Property.ParserValidation, "false" );
+        boolean validation = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+                               
+        //-- namespaces?
+        prop = getDefault().getProperty( Property.Namespaces, "false" );
+        boolean namespaces = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+        
+
+        //-- which parser?
+        prop = getDefault().getProperty( Property.Parser );
+        if (( prop == null ) || (prop.length() == 0))  {
+            // If no parser class was specified, check for JAXP
+            // otherwise we default to Xerces.
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(namespaces);
+            factory.setValidating(validation);
+            try {
+                SAXParser saxParser = factory.newSAXParser();
+                reader = saxParser.getXMLReader();
+            }
+            catch(ParserConfigurationException pcx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+            }
+            catch(org.xml.sax.SAXException sx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+            }
+            
+        }
+        
+        if (reader == null) {
+            if ((prop == null) ||
+                (prop.length() == 0) ||
+                (prop.equalsIgnoreCase("xerces"))) 
+            {
+                prop = "org.apache.xerces.parsers.SAXParser";
+            }
+        
+            // If a parser class was specified, we try to create it and
+            // complain about creation error.
+            try {
+                Class cls;
+                cls = Class.forName( prop );
+                reader = (XMLReader) cls.newInstance();
+            } catch ( Exception except ) {
+                throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
+                                                            prop, except ) );
+            }
+        }
+
+        StringTokenizer token;
+        boolean         flag;            
+        try {
+            reader.setFeature( Features.Validation, validation );
+            reader.setFeature( Features.Namespaces, namespaces );
+            features = getDefault().getProperty( Property.ParserFeatures, features );
+            if ( features != null ) {
+                token = new StringTokenizer( features, ", " );
+                while ( token.hasMoreTokens() ) {
+                    reader.setFeature( token.nextToken(), true );
+                }
+            }
+        } 
+        catch ( SAXException except ) {
+            Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+        }
+        return reader;
+    } //-- getDefaultXMLReader
 
     /**
      * Returns a new instance of the specified Regular Expression
