@@ -161,6 +161,14 @@ public interface QueryExpression
 
 
     /**
+     * Adds a where clause.  Caller is responsible for making sure all tables
+     * mentioned in the where clause are included in the fromClause.
+     *
+     * @param whereClause The WHERE clause to add (without the word WHERE).
+     */
+    public void addWhereClause( String whereClause );
+    
+    /**
      * Add an inner join.
      *
      * @param leftTable The table name on the left side
@@ -197,7 +205,6 @@ public interface QueryExpression
      */
     public String getStatement( boolean writeLock )
         throws QueryException;
-
 
     /**
      * Returns a clone of the query expression that can be further

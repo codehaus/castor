@@ -1,0 +1,176 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
+package org.exolab.castor.jdo.oql;
+
+import java.util.Vector;
+import org.exolab.castor.jdo.QueryException;
+
+/**
+ * A class to store and check information about numbered query parameters.
+ *
+ * @author <a href="mailto:nissim@nksystems.com">Nissim Karpenstein</a>
+ * @version $Revision$ $Date$
+ */
+public class ParamInfo {
+
+  private String _userDefinedType;
+  private String _systemType;
+  
+  private Class _class;
+
+  private Vector _sqlQueryParamMap;
+    
+  /**
+   * Creates a new ParamInfo.  Which checks for incompatibilities between types.
+   *
+   * @param userDefinedType The user defined type, empty string if undefined.
+   * @param systemType The system generated type
+   * @throws QueryException if the user defined type cannot be converted to the
+   *      systemType or if the type is not found.
+   */
+  public ParamInfo( String userDefinedType, String systemType ) 
+      throws QueryException 
+  {
+    _userDefinedType = userDefinedType;
+    _systemType = systemType;
+    
+    Class userClass = null;
+    Class systemClass = null;
+    try {
+      systemClass = Class.forName(systemType);
+    }
+    catch (Exception e) {
+      throw new QueryException( "Error: Could not find system defined class: " + systemType );
+    }
+
+    if ( ! userDefinedType.equals("") ) {
+      try {
+        userClass = Class.forName(userDefinedType);
+      } 
+      catch (Exception e) {
+        throw new QueryException( "The class " + userClass + " could not be found." );
+      }
+
+      if ( ! systemClass.isAssignableFrom(userClass) )
+        throw new QueryException( "The class " + userDefinedType + " is incompatible with the system defined class " + systemType );
+
+      _class = userClass;
+    }
+    else
+      _class = systemClass;
+
+  }
+  
+  /**
+   * Checks whether the userDefinedType and systemType match those previousle
+   * specified in the constructor.
+   *
+   * @param userDefinedType The user defined type, empty string if undefined.
+   * @param systemType The system generated type
+   * @throws QueryException if the user defined type is not the same as the 
+   *    one prevuiously specified in the constructor, or if the systemType is 
+   *    not convertable to the original systemType.
+   */
+  public void check( String userDefinedType, String systemType ) 
+      throws QueryException 
+  {
+    if ( ! _userDefinedType.equals(userDefinedType) ) 
+      throw new QueryException( "Different types were specified for the same numbered parameter." );
+
+    if ( ! systemType.equals(_systemType) ) {
+      Class systemClass = null;
+      try {
+        systemClass = Class.forName(systemType);
+      }
+      catch (Exception e) {
+        throw new QueryException( "Error: Could notfind system defined class: " + systemType );
+      }
+
+      if ( ! userDefinedType.equals("") ) {
+        Class userClass = null;
+        try {
+          userClass = Class.forName(_userDefinedType);
+        } 
+        catch (Exception e) {
+          throw new QueryException( "The class " + userClass + " could not be found." );
+        }
+  
+        if ( ! systemClass.isAssignableFrom(userClass) )
+          throw new QueryException( "The class " + userDefinedType + " is incompatible with the system defined class " + systemType );
+
+      }
+    }
+  }
+
+  /**
+   * Maps this numbered parameter to the numbered SQL parameter.
+   *
+   * @param sqlParamIndex The SQL parameter number.
+   */
+  public void mapToSQLParam(int sqlParamIndex) {
+    _sqlQueryParamMap.addElement(new Integer(sqlParamIndex));
+  }
+
+  /**
+   * Accessor method for _sqlQueryParamMap.
+   *
+   * @return private member _sqlQueryParamMap.
+   */
+  public Vector getParamMap() {
+    return _sqlQueryParamMap;
+  }
+
+  /**
+   * Accessor method for _class.
+   *
+   * @return private member _class
+   */
+  public Class getTheClass() {
+    return _class;
+  }
+  
+}
