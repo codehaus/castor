@@ -326,4 +326,234 @@ public final class Entity implements Cloneable {
         values[pos] = value;
     } // -- setFieldValue
 
+    /**
+     * Get a new instance of Create Iterator
+     */
+    public CreateIterator cIteartor() {
+        return new CreateIterator( this );
+    } // -- cIterator
+
+        
+    /**
+     * Create Iterator
+     */
+    public static class CreateIterator {
+        /**
+         * The entity to iterate on
+         */
+        private Entity          entity;
+
+        /**
+         * The EntityInfo in the current position
+         */
+        private EntityInfo      cur;
+
+        /**
+         * The offset position of sub entity field value
+         */
+        private int             valuesOffset;
+
+        /**
+         * Constructor
+         *
+         * @throws NullPointerException if entity is null
+         */
+        private CreateIterator( Entity entity ) 
+                throws NullPointerException {
+            this.entity = entity;
+        } // -- CreateIterator
+
+        //=============
+        //  Global
+        //=============
+        /**
+         * Get the entity info represents the base of the entity that
+         * this iterator iterating on.
+         */
+        public EntityInfo getBaseEntityInfo() {
+            return entity.base;
+        } // -- EntityInfo
+
+        /**
+         * Set the entityInfo as the base of the entity this iterator
+         * iterator on.
+         *
+         * @throws IllegalStateException if the original base is not null,
+         *         or different from the specified base to be set
+         */
+        public void setBaseEntityInfo( EntityInfo base )
+                throws IllegalStateException {
+
+            if ( entity.base == base )
+                return;
+
+            if ( entity.base == null ) {
+                entity.base = base;
+                return;
+            }
+            throw new IllegalStateException("Change of entity base is not allowed");
+        } // -- EntityInfo
+
+        //===================
+        //  Sub Entity level
+        //===================
+        /**
+         * Returns the EntityInfo of the current position
+         */
+        public EntityInfo getEntityInfo() {
+            if ( entity.base == null )
+                return null;
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+            
+            return cur;
+        } // -- getEntityInfo
+
+        /**
+         * Returns the number of sub entity the current entity contains
+         *
+         * @throws IllegalStateException if entity base is not set
+         */
+        public int getSubEntitySize() {
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+            
+            return cur.subEntities.length;
+        } // -- getSubEntitySize
+
+        /**
+         * Returns the specified sub entity of the current entity
+         *
+         * @throws IllegalStateException if entity base is not set
+         * @throws ArrayIndexOutOfBoundsException if there is no sub entity
+         *         matches to the specified fieldNumber
+         */
+        public EntityInfo getSubEntityInfo( int subEntityNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+
+    
+            return cur.subEntities[subEntityNumber];
+        } // -- getSubEntityInfo
+
+        /**
+         * Iterator to the specified sub entity from the current entity
+         *
+         * @throws IllegalStateException if entity base is not set
+         * @throws ArrayIndexOutOfBoundsException if there is no sub entity
+         *         matches to the specified fieldNumber
+         */
+        public void goSubEntity( int subEntityNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+
+            cur = cur.subEntities[subEntityNumber];
+        } // -- goSubEntity
+
+        //=====================
+        //  Entity Field level
+        //=====================
+        /**
+         * Get the specified field info of the current entity
+         *
+         * @throws IllegalStateException if entity base is not set
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public EntityFieldInfo getEntityFieldInfo( int fieldNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur= entity.base;
+                valuesOffset = 0;
+            }
+
+            return cur.fieldInfo[fieldNumber];
+        } // -- getEntityFieldInfo
+
+        /**
+         * Get the specified field value of the current entity
+         *
+         * @throws IllegalStateException if entity base is not set
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public Object getFieldValue( int fieldNumber ) 
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+
+            // let java to check ArrayIndex for me
+            Object junk = cur.fieldInfo[fieldNumber];
+
+            if ( entity.values == null 
+                    || entity.values.length < valuesOffset+cur.fieldInfo.length )
+                return null;
+
+            return entity.values[valuesOffset+fieldNumber];
+        } // -- getFieldValue
+
+        /**
+         * Get the specified field value of the current entity
+         *
+         * @throws IllegalStateException if entity base is not set
+         * @throws ArrayIndexOutOfBoundsException if there is no field
+         *         matches to the specified fieldNumber
+         */
+        public void setFieldValue( int fieldNumber, Object value )
+                throws IllegalStateException, ArrayIndexOutOfBoundsException {
+
+            if ( entity.base == null )
+                throw new IllegalStateException("entity base is not defined");
+
+            if ( cur == null ) {
+                cur = entity.base;
+                valuesOffset = 0;
+            }
+
+            // let java to check ArrayIndex for me
+            Object junk = cur.fieldInfo[fieldNumber];
+
+            if ( entity.values == null ) {
+                entity.values = new Object[entity.base.getMaxLength()];
+            } else if ( entity.values.length < valuesOffset+cur.fieldInfo.length ) {
+                Object[] temp = entity.values;
+                entity.values = new Object[entity.base.getMaxLength()];
+                System.arraycopy( temp, 0, entity.values, 0, temp.length );
+            }
+
+            entity.values[valuesOffset+fieldNumber] = value;
+        } // -- setFieldValue
+
+    } // == CreateIterator
+
 }
