@@ -302,16 +302,17 @@ public final class UnmarshalHandler extends MarshalFramework
     {
 
         //-- Do delagation if necessary
-        if ( (_anyUnmarshaller != null) && (_depth > 0)) {
+
+        if (_anyUnmarshaller != null) {
             _anyUnmarshaller.endElement(name);
             --_depth;
+            //we are back to the starting node
             if (_depth == 0) {
                _node = _anyUnmarshaller.getStartingNode();
                _anyUnmarshaller = null;
             }
             else return;
         }
-
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
         }
@@ -448,6 +449,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if (descriptor.isIncremental()) return; //-- already added
 
         Object val = state.object;
+
         //--special code for AnyNode handling
         if (_node != null) {
            val = _node;
@@ -472,7 +474,6 @@ public final class UnmarshalHandler extends MarshalFramework
 
         try {
             FieldHandler handler = descriptor.getHandler();
-
             if (state.container == null)
                 handler.setValue(state.object, val);
             else {
@@ -546,12 +547,11 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- if we are in an <any> section
         //-- we delegate the event handling
-        if ( (_anyUnmarshaller != null) && (_depth>0) ) {
+        if (_anyUnmarshaller != null) {
             _depth++;
            _anyUnmarshaller.startElement(name,atts);
            return;
         }
-
         //-- handle namespaces
         String namespace = null;
 
@@ -705,16 +705,16 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- we wish to unmarshal
         XMLFieldDescriptor descriptor = null;
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
-        
-        
-        /* 
+
+
+        /*
           XXXX Search for container, hopefully this is a temporary fix
         */
         if (descriptor == null) {
             descriptor = searchContainers(name, classDesc);
         }
         /* end of container fix */
-        
+
         /*
           If descriptor is null, we need to handle possible inheritence,
           which might not be described in the current ClassDescriptor.
@@ -724,11 +724,11 @@ public final class UnmarshalHandler extends MarshalFramework
         */
         XMLClassDescriptor cdInherited = null;
         if (descriptor == null) {
-            ClassDescriptorEnumeration cde = 
+            ClassDescriptorEnumeration cde =
                 _cdResolver.resolveAllByXMLName(name, namespace, null);
-                
+
             if (cde.hasNext()) {
-                XMLFieldDescriptor[] descriptors 
+                XMLFieldDescriptor[] descriptors
                     = classDesc.getElementDescriptors();
                 while (cde.hasNext() && (descriptor == null)) {
                     cdInherited = cde.getNext();
@@ -793,11 +793,11 @@ public final class UnmarshalHandler extends MarshalFramework
                     throw new SAXException(ex);
                 }
             }
-            
 
-            XMLClassDescriptor containerClassDesc 
+
+            XMLClassDescriptor containerClassDesc
                 = (XMLClassDescriptor)descriptor.getClassDescriptor();
-            
+
             if (containerClassDesc == null) {
                 Class fieldType = descriptor.getFieldType();
                 containerClassDesc = getClassDescriptor(fieldType);
@@ -808,12 +808,12 @@ public final class UnmarshalHandler extends MarshalFramework
                     ((XMLFieldDescriptorImpl)descriptor).setClassDescriptor(containerClassDesc);
                 }
             }
-            
+
             descriptor = containerClassDesc.getFieldDescriptor(name, NodeType.Element);
-            
+
             if (descriptor == null) {
                 String msg = "unable to find field descriptor for '" + name;
-                msg += "' in element '" + parentState.elementName + "'."; 
+                msg += "' in element '" + parentState.elementName + "'.";
                 throw new SAXException(msg);
             }
             parentState.container = containerObject;
@@ -912,10 +912,10 @@ public final class UnmarshalHandler extends MarshalFramework
             }
 
             //-- Handle support for "Any" type
+
             if (_class == Object.class) {
                 Class pClass = parentState.type;
                 ClassLoader loader = pClass.getClassLoader();
-
                 //-- first look for a descriptor based
                 //-- on the XML name
                 classDesc = _cdResolver.resolveByXMLName(name, namespace, loader);
@@ -926,7 +926,6 @@ public final class UnmarshalHandler extends MarshalFramework
                     cname = JavaNaming.toJavaClassName(name);
                     classDesc = getClassDescriptor(cname, loader);
                 }
-
                 //-- if still null, try using parents package
                 if (classDesc == null) {
                     //-- use parent to get package information
@@ -938,7 +937,6 @@ public final class UnmarshalHandler extends MarshalFramework
                         classDesc = getClassDescriptor(cname, loader);
                     }
                 }
-
                 if (classDesc != null) {
                     _class = classDesc.getJavaClass();
                     useHandler = false;
@@ -949,10 +947,12 @@ public final class UnmarshalHandler extends MarshalFramework
                     _anyUnmarshaller = new SAX2ANY();
                     //2- delegates the element handling
                     _anyUnmarshaller.startElement(name, atts);
-                    _depth++;
-                    /*String err = "unable to determine class for " +
-                        "element: " + name;
-                    throw new SAXException(err);*/
+                    //first element so depth can only be one at this point
+                    _depth = 1;
+                    state.object = new Object();
+                    state.type = _class;
+                    //don't need to continue
+                     return;
                 }
             }
 
@@ -977,8 +977,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- between descriptor#getFieldType and
                 //-- handler#newInstance...I should hope not, but
                 //-- who knows
-                if (state.object != null)
+                if (state.object != null) {
                     _class = state.object.getClass();
+                }
                 else {
                     try {
                         state.object = _class.newInstance();
@@ -1016,7 +1017,6 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- assign object, if incremental
 
         if (descriptor.isIncremental()) {
-
             if (debug) {
                 buf.setLength(0);
                 buf.append("debug: Processing incrementally for element: ");
@@ -1382,22 +1382,22 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param name the element to search for
     **/
     private XMLFieldDescriptor searchContainers
-        (String name, XMLClassDescriptor classDesc) 
+        (String name, XMLClassDescriptor classDesc)
         throws SAXException
     {
-        
+
         XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
-        
+
         XMLFieldDescriptor descriptor = null;
-        
+
         for (int i = 0; i < descriptors.length; i++) {
             if (descriptors[i] == null) continue;
-                
+
             XMLFieldDescriptor xfd = descriptors[i];
             if (xfd.isContainer()) {
                 //-- set class descriptor if necessary
                 if (xfd.getClassDescriptor() == null) {
-                    XMLClassDescriptor xcd 
+                    XMLClassDescriptor xcd
                         = getClassDescriptor(xfd.getFieldType());
                     if (xcd != null) {
                         //-- set class descriptor if necessary
@@ -1422,7 +1422,7 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         return descriptor;
     } //-- searchContainers.
-    
+
     /**
      * Returns the name of a class, handles array types
      * @return the name of a class, handles array types
