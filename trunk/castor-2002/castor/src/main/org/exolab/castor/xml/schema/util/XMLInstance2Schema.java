@@ -72,6 +72,7 @@ public class XMLInstance2Schema {
 
     private Schema      _schema  = null;
     
+    private Order       _defaultGroup = Order.seq;
     
     /**
      * Creates a new XMLInstance2Schema
@@ -118,6 +119,7 @@ public class XMLInstance2Schema {
         throws IOException
     {
         XMLInstance2SchemaHandler handler = new XMLInstance2SchemaHandler();
+        handler.setDefaultGroupOrder(_defaultGroup);
         
         try {
 	        Parser parser = Configuration.getParser();
@@ -135,6 +137,14 @@ public class XMLInstance2Schema {
         }
         return handler.getSchema();
     } //-- createSchema
+    
+    /**
+     * Sets the default grouping as "all". By default groups
+     * will be treated as "sequence".
+    **/
+    public void setDefaultGroupingAsAll() {
+        _defaultGroup = Order.all;
+    } //-- method: setDefaultGroupAsAll
     
     
     /**
