@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1588.
+       Introduces various checks and additional exception handling wrt to using TimeStampables.
+       (Werner - 20040406)
+       
 ALL:   Fixed bug 1585 adding separate build folders for src/tests and src/examples
        to the Eclipse project files
        (Werner - 20040330)
