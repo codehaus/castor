@@ -133,7 +133,7 @@ public class TypeConversion {
                 //-- CDATA
                 case SimpleTypesFactory.CDATA_TYPE:
                 {
-                    XSCdata xsCdata = new XSCdata();
+                    XSCData xsCdata = new XSCData();
                     if (!simpleType.isBuiltInType())
                         xsCdata.setFacets(simpleType);
                     return xsCdata;
