@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -250,7 +250,7 @@ public final class XSDouble extends XSPatternBase {
                 setMinInclusive(facet.toDouble());
             //-- pattern
             else if (Facet.PATTERN.equals(name))
-                addPattern(facet.getValue());
+                setPattern(facet.getValue());
         }
     }
 
@@ -338,22 +338,13 @@ public final class XSDouble extends XSPatternBase {
              jsc.append(fixedValue);
              jsc.append(");");
         }               //-- pattern facet
-        //-- pattern facet
-        String[] patterns = getPatterns();
-        if (patterns != null) {
-            int i = 0;
-            while (i<patterns.length) {
-                 String pattern = patterns[i];
-                 if (pattern != null) {
-                       jsc.add("typeValidator.addPattern(\"");
-                       jsc.append(escapePattern(pattern));
-                       jsc.append("\");");
-                 }     
-             }
-             i++;
-         }
-        
-         jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
+        String pattern = getPattern();
+        if (pattern != null) {
+             jsc.add("typeValidator.setPattern(\"");
+             jsc.append(escapePattern(pattern));
+             jsc.append("\");");
+        }
+        jsc.add(fieldValidatorInstanceName+".setValidator(typeValidator);");
 
 		
     }
