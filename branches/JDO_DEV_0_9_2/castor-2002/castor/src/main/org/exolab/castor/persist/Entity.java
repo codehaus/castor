@@ -62,7 +62,7 @@ package org.exolab.castor.persist;
  * entity doesn't span all the classes described in the EntityInfo.
  * <p>
  * An entity can be distinguish from any other entity by an identity. An identity 
- * can be one of the value, or composed by multiple values in an entity. Multiple 
+ * can be one of the value, or composed by multiple values in an entity. Multiple
  * values identity is wrapped in {@link org.exolab.castor.persist.types.Complex}.
  * <p>
  * An entity may has a stamp. A stamp is a value in an entity that can be used to 
@@ -108,6 +108,24 @@ public final class Entity {
      * classes in the EntityInfo.
      */
     public Values[] values;
+
+    public boolean equals(Object obj) {
+        Entity ent;
+
+        if (obj == null || !(obj instanceof Entity)) {
+            return false;
+        }
+        ent = (Entity) obj;
+        return (info.equals(ent.info) && identity.equals(ent.identity));
+    }
+
+    public int hashCode() {
+        return info.hashCode() + (identity == null ? 0 : identity.hashCode());
+    }
+
+    public String toString() {
+        return info + "[" + identity + "]";
+    }
 
     /**
      * Values of an entity.
