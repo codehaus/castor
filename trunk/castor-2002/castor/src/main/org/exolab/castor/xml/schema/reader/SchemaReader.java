@@ -48,12 +48,15 @@ package org.exolab.castor.xml.schema.reader;
 import java.io.Reader;
 import java.io.IOException;
 
+
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.NestedIOException;
 import org.exolab.castor.xml.schema.*;
 
-import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.Parser;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 
 import org.apache.xml.serialize.Serializer;
@@ -130,8 +133,21 @@ public class SchemaReader {
         }
         catch(org.xml.sax.SAXException sx) {
             Exception except = sx.getException();
-            if (except == null) except = sx;
-            throw new IOException(except.toString());
+            if (except == null) {
+                except = sx;
+            }
+            else if (except instanceof SAXParseException) {
+                SAXParseException spe = (SAXParseException)except;
+                String filename = spe.getSystemId();
+                if (filename == null) filename = "<filename unavailable>";
+                
+                String err = spe.getMessage();
+                
+                err += "; " + filename + " [ line: " + spe.getLineNumber();
+                err += ", column: " + spe.getColumnNumber() + ']';
+                throw new NestedIOException(err, except);
+            }
+            throw new NestedIOException(except);
         }
 
         _schema = schemaUnmarshaller.getSchema();
