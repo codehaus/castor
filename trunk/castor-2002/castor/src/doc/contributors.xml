@@ -177,6 +177,15 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Green" given="Nathan"/>
+    <email>nsgreen@thazar.com</email>
+    <description>
+       Enhancements to ConsoleDialog and SourceGenerator to allow
+       "all" option via command line utility.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Skopp" given="Martin"/>
     <email>skopp@riege.de</email>
     <description>
