@@ -110,7 +110,7 @@ public class OQLQueryImpl
 
     private Object[]           _bindValues;
 
-    private Hashtable          _newBindTypes;
+    private Hashtable          _paramInfo;
 
 
     private int                _fieldNum;
@@ -121,36 +121,15 @@ public class OQLQueryImpl
         _dbImpl = dbImpl;
     }
 
-
-    public void bind( Object value )
+   public void bind( Object value )
     {
         if ( _expr == null )
             throw new IllegalStateException( "Must create query before using it" );
-        if ( _fieldNum == _bindTypes.length )
-            throw new IllegalArgumentException( "Only " + _bindTypes.length +
+        if ( _fieldNum == _paramInfo.size() )
+            throw new IllegalArgumentException( "Only " + _paramInfo.size() +
                                                 " fields in this query" );
         try {
-            if ( value != null && ! _bindTypes[ _fieldNum ].isAssignableFrom( value.getClass() ) )
-                throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
-                                                    _bindTypes[ _fieldNum ].getName() );
-            if ( _bindValues == null )
-                _bindValues = new Object[ _bindTypes.length ];
-            _bindValues[ _fieldNum ] = value;
-        } catch ( IllegalArgumentException except ) {
-            throw except;
-        }
-        ++_fieldNum;
-    }
-
-    public void newBind( Object value )
-    {
-        if ( _expr == null )
-            throw new IllegalStateException( "Must create query before using it" );
-        if ( _fieldNum == _newBindTypes.size() )
-            throw new IllegalArgumentException( "Only " + _newBindTypes.size() +
-                                                " fields in this query" );
-        try {
-            ParamInfo info = (ParamInfo) _newBindTypes.get(new Integer( _fieldNum + 1 ));
+            ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
             
             if ( value != null && ! info.getTheClass().isAssignableFrom( value.getClass() ) )
                 throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
@@ -211,7 +190,7 @@ public class OQLQueryImpl
         bind( new Double( value ) );
     }
 
-    public void newCreate( String oql )
+    public void create( String oql )
         throws QueryException    
     {
 
@@ -230,13 +209,13 @@ public class OQLQueryImpl
 
         _objClass = walker.getObjClass();
         _expr = walker.getQueryExpression();
-        _newBindTypes = walker.getParamInfo();
+        _paramInfo = walker.getParamInfo();
 
 
-        //port new bind types back to the format of old bind types.
+        //port param info types back to the format of old bind types.
         //first get the maximum SQL param.
         int max = 0;
-        for (Enumeration e = _newBindTypes.elements(); e.hasMoreElements(); ) {
+        for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) {
             ParamInfo info = (ParamInfo) e.nextElement();
             for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
             {
@@ -248,7 +227,7 @@ public class OQLQueryImpl
         
         //then create the types array and fill it
         _bindTypes = new Class[max];
-        for (Enumeration e = _newBindTypes.elements(); e.hasMoreElements(); ) 
+        for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) 
         {
             ParamInfo info = (ParamInfo) e.nextElement();
             for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
@@ -260,121 +239,7 @@ public class OQLQueryImpl
          
     }
     
-
-    public void create( String oql )
-        throws QueryException
-    {
-        StringTokenizer    token;
-        String             objType;
-        String             objName;
-        StringBuffer       sql;
-        JDOClassDescriptor clsDesc;
-        SQLEngine          engine;
-        Vector             types;
-        Class[]            array;
-        
-        _fieldNum = 0;
-        _expr = null;
-        types = new Vector();
-        sql = new StringBuffer();
-        token = new StringTokenizer( oql );
-        if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "SELECT" ) )
-            throw new QueryException( "Query must start with SELECT" );
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing object name" );
-        objName = token.nextToken();
-        if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "FROM" ) )
-            throw new QueryException( "Object must be followed by FROM" );
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing object type" );
-        objType = token.nextToken();
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing object name" );
-        if ( ! objName.equals( token.nextToken() ) )
-            throw new QueryException( "Object name not same in SELECT and FROM" );
-        
-        try {
-            _objClass = Class.forName( objType );
-        } catch ( ClassNotFoundException except ) {
-            throw new QueryException( "Could not find class " + objType );
-        }
-        _dbEngine = _dbImpl.getPersistenceEngine(); 
-        if ( _dbEngine == null )
-            throw new QueryException( "Could not find an engine supporting class " + objType );
-        engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-        if ( engine == null )
-            throw new QueryException( "Could not find an engine supporting class " + objType );
-        clsDesc = engine.getDescriptor();
-        if ( engine == null )
-            throw new QueryException( "Could not descriptor for class " + objType );
-
-        _expr = engine.getFinder();
-        if ( token.hasMoreTokens() ) {
-            if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
-                throw new QueryException( "Missing WHERE clause" );
-            parseField( clsDesc, token, _expr, types );
-            while ( token.hasMoreTokens() ) {
-                if ( ! token.nextToken().equals( "AND" ) )
-                    throw new QueryException( "Only AND supported in WHERE clause" );
-                parseField( clsDesc, token, _expr, types );
-            }
-        }
-
-        _bindTypes = new Class[ types.size() ];
-        types.copyInto( _bindTypes );
-    }
-    
-    
-    private void parseField( JDOClassDescriptor clsDesc, StringTokenizer token,
-                             QueryExpression expr, Vector types )
-        throws QueryException
-    {
-        String               name;
-        String               op;
-        String               value;
-        FieldDescriptor[]    fields;
-        JDOFieldDescriptor   field;
-        
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing field name" );
-        name = token.nextToken();
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing operator" );
-        op = token.nextToken();
-        if ( ! token.hasMoreTokens() )
-            throw new QueryException( "Missing field value" );
-        
-        value = token.nextToken();
-        if ( name.indexOf( "." ) > 0 )
-            name = name.substring( name.indexOf( "." ) + 1 );
-        fields = clsDesc.getFields();
-        field = null;
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof JDOFieldDescriptor &&
-                 fields[ i ].getFieldName().equals( name ) ) {
-                field = (JDOFieldDescriptor) fields[ i ];
-                break;
-            }
-        }
-        
-        if ( field == null ) {
-            if ( clsDesc.getIdentity() instanceof JDOFieldDescriptor &&
-                 clsDesc.getIdentity().getFieldName().equals( name ) ) {
-                field = (JDOFieldDescriptor) clsDesc.getIdentity();
-            }
-        }
-        
-        if ( field == null )
-            throw new QueryException( "The field " + name + " was not found" );
-        if ( value.startsWith( "$" ) ) {
-            expr.addParameter( clsDesc.getTableName(), field.getSQLName(), op );
-            types.addElement( field.getFieldType() );
-        } else {
-            expr.addCondition( clsDesc.getTableName(), field.getSQLName(), op, value );
-        }
-    }
-    
-    
+   
     public Enumeration execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
