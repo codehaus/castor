@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1067 using contribution from unkown.
+       Fixed a problem with class loading in various places of ParamInfo by passing 
+       a ClassLoader instance during instantiatin.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1067
+       (Werner - 20040526)
+       
 JDO:   Fixed bug 1617 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
        Fixed an incorrectly coded equality check related to global transaction demarcation.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1617
