@@ -406,7 +406,6 @@ public class Marshaller extends MarshalFramework {
 
         if ((nsPrefix == null) || (nsPrefix.length() == 0)) {
             _defaultNamespace = nsURI;
-            return;
         }
 
         _namespaces.addNamespace(nsPrefix, nsURI);
@@ -962,7 +961,8 @@ public class Marshaller extends MarshalFramework {
         }
         //-- declare namespace at this element scope?
         if (nsURI != null) {
-		    if (nsPrefix == null) {
+		    if ((nsPrefix == null) && (!nsURI.equals(_defaultNamespace))) 
+		    {
 		        nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
 		    }
 			declareNamespace(nsPrefix, nsURI);
