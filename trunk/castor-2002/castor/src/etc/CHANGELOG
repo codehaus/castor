@@ -29,8 +29,11 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Added support for in-lined SimpleTypes (anonymous) for 
+        element declarations. (kvisco)
+
 XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
-        for the April xML Schema draft
+        for the April xML Schema draft (kvisco)
         
 
 XML:    Added support for top-level annotations (kvisco)
