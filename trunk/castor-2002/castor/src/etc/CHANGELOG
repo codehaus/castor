@@ -1,7 +1,10 @@
 
 Version (CVS)
 -------------
-XML:	Numerous bug fixes in Schema Object Model and Validation code (Arnaud)
+XML:	  Refactored the handling of wildcard in the Schema Object Model and
+        Source Generator
+
+XML:	  Added support in the Schema Object Model for 'remove' methods (Arnaud)
 
 XML:    Added support to the Schema Object Model for a number of XML Schema
         attributes / properties such as elementFormDefault, form, 
