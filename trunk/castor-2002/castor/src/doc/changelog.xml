@@ -23,7 +23,7 @@ JDO:    SAP DB driver, improved support for MySQL (Oleg Nitz)
 
 JDO:    Added possibility to close OQL queries in order to release resources (Oleg Nitz)
       </pre></section>
-    <section title="Version 0.8.10"><pre>
+    <section title="Version 0.8.10 November, 29 2000"><pre>
 XML:    Made the collection name in the mapping file NOT case sensitive. (Seb)
 
 XML:	Added new validation flag for the marshalling framework in castor.properties
@@ -42,7 +42,7 @@ XML:    Fixed a bug in the unmarshalling of array of primitive type when using m
 XML:    Added feature to castorbuilder.properties to allow specifying a super
         class of generated types (kvisco)
       </pre></section>
-    <section title="Version 0.8.9"><pre>
+    <section title="Version 0.8.9 November, 3 2000"><pre>
 JDO:    SEQUENCE key generator for Interbase (contributed by Nic Wise &lt;nicw@xerxes.co.nz>).
 
 JDO:    MySQL driver (contributed by Leonardo Souza Mario Bueno &lt;leonardo@itera.com.br>).
