@@ -289,6 +289,25 @@ SELECT p FROM myapp.Product p]]>
         </p>
         </section>
 
+        <section title="Timestampable Dynamic Proxy">
+        <p>
+        <b>Description:</b><br />
+        Remove the requirement of all objects to explicitly implement the
+        Timestampable interface.
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b><br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        Currently Castor requires all objects involved in a long transaction
+        to implement the <a
+        href="http://www.castor.org/javadoc/org/exolab/castor/jdo/TimeStampable.html">Timestampable</a>
+        interface. This requirement can easily be removed via a dymanic proxy
+        implementation.
+        </p>
+        </section>
+
         <section title="Must Fix Bugs">
         <p>
         <b>Description:</b><br />
