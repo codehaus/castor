@@ -317,6 +317,34 @@ public class JClass extends JType {
     } //-- getConstructors
     
     /**
+     * Returns the name of the file that this JClass would be
+     * printed as, given a call to #print.
+     *
+     * @param destDir the destination directory. This may be null.
+     * @return the name of the file that this JClass would be
+     * printed as, given a call to #print.
+    **/
+    public String getFilename(String destDir) {
+        
+        String filename = getLocalName() + ".java";
+        
+        if ((packageName != null) && (packageName.length() > 0)) {
+            String path = packageName.replace('.',File.separatorChar);
+            File pathFile;
+            if (destDir==null)
+                pathFile=new File(path);
+            else
+                pathFile=new File(destDir,path);
+            if (!pathFile.exists()) {
+                pathFile.mkdirs();
+            }
+            filename = path+File.separator+filename;
+        }
+        
+        return filename;
+    } //-- getFilename
+    
+    /**
      * Returns the Java Doc comment for this JClass
      * @return the JDocComment for this JClass
     **/
@@ -400,22 +428,10 @@ public class JClass extends JType {
     **/
     public void print(String destDir, String lineSeparator) {
 
-        //-- open output file
         String name = getLocalName();
-        String filename = name + ".java";
         
-        if ((packageName != null) && (packageName.length() > 0)) {
-            String path = packageName.replace('.',File.separatorChar);
-            File pathFile;
-            if (destDir==null)
-                pathFile=new File(path);
-            else
-                pathFile=new File(destDir,path);
-            if (!pathFile.exists()) {
-                pathFile.mkdirs();
-            }
-            filename = path+File.separator+filename;
-        }
+        //-- open output file
+        String filename = getFilename(destDir);
         
         File file = new File(filename);
         JSourceWriter jsw = null;
