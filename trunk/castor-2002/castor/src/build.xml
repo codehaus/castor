@@ -65,7 +65,7 @@
   </target>
 
   
-  <target name="jar" depends="clean,all.release,examples">
+  <target name="jar" depends="all.release,examples">
     <deltree dir="${dist}/${jar.name}.jar" />
     <deltree dir="${dist}/${jar.name}-example.jar" />
 
@@ -158,7 +158,13 @@
               dest="${bin}/odmg-3.0.jar" />
     <copyfile src="${lib}/xerces.jar"
               dest="${bin}/xerces.jar" />
+    <copyfile src="${lib}/jta1.0.1.jar"
+              dest="${bin}/jta1.0.1.jar" />
     <copydir  src="${source}/schema" dest="${bin}/schema" />
+    <exec command="tar --create --directory ${source} examples
+                       --exclude-from ${source}/etc/exclude"
+          output="${bin}/examples.tar" />
+    <exec command="gzip ${bin}/examples.tar" />
     <exec command="tar --create --directory ${build} castor-${version}"
           output="${dist}/castor-${version}.tar" />
     <exec command="gzip ${dist}/castor-${version}.tar" />
