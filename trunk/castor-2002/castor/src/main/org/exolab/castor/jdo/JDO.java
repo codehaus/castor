@@ -493,6 +493,7 @@ public class JDO
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
+        _classLoader = loader;
     }
     
     
@@ -515,6 +516,7 @@ public class JDO
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( source, resolver, null, loader );
+        _classLoader = loader;
     }
 
 
