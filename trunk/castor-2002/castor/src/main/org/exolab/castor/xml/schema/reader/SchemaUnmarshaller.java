@@ -312,7 +312,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- use VM internal String of name
         name = name.intern();
 
-        if (name == SchemaNames.SCHEMA) {
+        if (name.equals(SchemaNames.SCHEMA)) {
 
             if (foundSchemaDef)
                 illegalElement(name);
@@ -323,38 +323,42 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
 
         //-- <annotation>
-        if (name == SchemaNames.ANNOTATION) {
+        if (name.equals(SchemaNames.ANNOTATION)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
+        //--<attribute>
+        else if (name.equals(SchemaNames.ATTRIBUTE)) {
+            unmarshaller = new AttributeUnmarshaller(_schema,atts, getResolver());
+        }
         //-- <attributeGroup>
-        else if (name == SchemaNames.ATTRIBUTE_GROUP) {
+        else if (name.equals(SchemaNames.ATTRIBUTE_GROUP)) {
             unmarshaller = new AttributeGroupUnmarshaller(_schema, atts);
         }
         //-- <complexType>
-        else if (name == SchemaNames.COMPLEX_TYPE) {
+        else if (name.equals(SchemaNames.COMPLEX_TYPE)) {
             unmarshaller
                 = new ComplexTypeUnmarshaller(_schema, atts, _resolver);
         }
         //-- <element>
-        else if (name == SchemaNames.ELEMENT) {
+        else if (name.equals(SchemaNames.ELEMENT)) {
             unmarshaller
                 = new ElementUnmarshaller(_schema, atts, _resolver);
         }
         //-- <simpleType>
-        else if (name == SchemaNames.SIMPLE_TYPE) {
+        else if (name.equals(SchemaNames.SIMPLE_TYPE)) {
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
         //-- <group>
-        else if (name == SchemaNames.GROUP) {
+        else if (name.equals(SchemaNames.GROUP)) {
              unmarshaller = new ModelGroupUnmarshaller(_schema, atts, _resolver);
         }
         //-- <include>
-        else if (name == SchemaNames.INCLUDE) {
+        else if (name.equals(SchemaNames.INCLUDE)) {
             unmarshaller
                 = new IncludeUnmarshaller(_schema, atts, _resolver, getDocumentLocator(), _state);
         }
         //-- <import>
-        else if (name == SchemaNames.IMPORT) {
+        else if (name.equals(SchemaNames.IMPORT)) {
             unmarshaller
                 = new ImportUnmarshaller(_schema, atts, _resolver, getDocumentLocator(), _state);
         }
@@ -419,11 +423,15 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
 
         //-- <annotation>
-        if (name == SchemaNames.ANNOTATION) {
+        if (name.equals(SchemaNames.ANNOTATION)) {
             _schema.addAnnotation((Annotation)unmarshaller.getObject());
         }
+        //-- <attribute>
+        else if (name.equals(SchemaNames.ATTRIBUTE)) {
+            _schema.addAttribute((AttributeDecl)unmarshaller.getObject());
+        }
         //-- <attributeGroup>
-        else if (name == SchemaNames.ATTRIBUTE_GROUP) {
+        else if (name.equals(SchemaNames.ATTRIBUTE_GROUP)) {
             Object obj = unmarshaller.getObject();
             try {
                 _schema.addAttributeGroup((AttributeGroupDecl)obj);
@@ -435,7 +443,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             }
         }
         //-- <complexType>
-        else if (name == SchemaNames.COMPLEX_TYPE) {
+        else if (name.equals(SchemaNames.COMPLEX_TYPE)) {
             ComplexType complexType = null;
             complexType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
             _schema.addComplexType(complexType);
@@ -447,20 +455,20 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             }
         }
         //-- <simpleType>
-        else if (name == SchemaNames.SIMPLE_TYPE) {
+        else if (name.equals(SchemaNames.SIMPLE_TYPE)) {
             SimpleType simpleType = null;
             simpleType = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
             _schema.addSimpleType(simpleType);
             _resolver.addResolvable(simpleType.getReferenceId(), simpleType);
         }
         //--<element>
-        else if (name == SchemaNames.ELEMENT) {
+        else if (name.equals(SchemaNames.ELEMENT)) {
             ElementDecl element = null;
             element = ((ElementUnmarshaller)unmarshaller).getElement();
             _schema.addElementDecl(element);
         }
         //--<group>
-        else if (name == SchemaNames.GROUP) {
+        else if (name.equals(SchemaNames.GROUP)) {
             ModelGroup group = null;
             group = (ModelGroup) (((ModelGroupUnmarshaller)unmarshaller).getGroup());
             _schema.addModelGroup(group);
