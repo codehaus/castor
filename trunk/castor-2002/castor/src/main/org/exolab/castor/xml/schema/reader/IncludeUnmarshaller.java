@@ -66,7 +66,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 
 		String include = atts.getValue("schemaLocation");
 		if (include==null)
-			throw new SAXException("'include' attribute missing on 'include'");
+			throw new SAXException("'schemaLocation' attribute missing on 'include'");
         //if the path is relative Xerces append the "user.Dir"
         //we need to keep the base directory of the document
         // note: URI not supported (just system path)
