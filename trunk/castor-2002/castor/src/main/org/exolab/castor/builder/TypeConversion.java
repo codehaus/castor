@@ -398,6 +398,9 @@ public class TypeConversion {
                 xsString.setMaxLength(facet.toInt());
             else if (Facet.MIN_LENGTH.equals(name))
                 xsString.setMinLength(facet.toInt());
+            else if (Facet.PATTERN.equals(name)) {
+                xsString.setPattern(facet.getValue());
+            }
         }
         return xsString;
     } //-- toXSString
@@ -424,8 +427,8 @@ public class TypeConversion {
         nameMap.put("binary",              "byte[]");
         nameMap.put("boolean",             "boolean");
         nameMap.put("integer",             "int");
-        nameMap.put("negative-integer",    "int");
-        nameMap.put("positive-integer",    "int");
+        nameMap.put("negativeInteger",     "int");
+        nameMap.put("positiveInteger",     "int");
         nameMap.put("real",                "double");
         nameMap.put("string",              "java.lang.String");
         nameMap.put("timeInstant",         "java.util.Date");

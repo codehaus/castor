@@ -777,6 +777,13 @@ public class DescriptorSourceFactory {
                     jsc.append(fixed);
                     jsc.append("\");");
                 }
+                //-- pattern facet
+                String pattern = xsString.getPattern();
+                if (pattern != null) {
+                    jsc.add("sv.setPattern(\"");
+                    jsc.append(pattern);
+                    jsc.append("\");");
+                }
                 
                 jsc.add("fieldValidator.setValidator(sv);");
                 jsc.unindent();

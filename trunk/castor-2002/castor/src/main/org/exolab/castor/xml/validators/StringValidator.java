@@ -53,12 +53,12 @@ import org.exolab.castor.xml.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class StringValidator implements TypeValidator {
+public class StringValidator extends PatternValidator
+    implements TypeValidator 
+{
     
     
     private String  fixed      = null;
-    
-    private String  regex      = null;
     
     private boolean required   = false;
     
@@ -100,14 +100,6 @@ public class StringValidator implements TypeValidator {
         this.minLength = minLength;
     } //-- setMinLength
     
-    /**
-     * Sets the Regular Expression that Strings validated with this
-     * String Validator must match. (Currently does nothing)
-    **/
-    public void setRegEx(String regex) {
-        this.regex = regex;
-    } //-- setRegEx
-    
     /** 
      * Sets whether or not a String is required (non null)
      * @param required the flag indicating whether Strings are required
@@ -146,6 +138,8 @@ public class StringValidator implements TypeValidator {
                     + "length of " + maxLength;
                 throw new ValidationException(err);
             }
+            
+            if (hasPattern()) super.validate(value);
         }
     } //-- validate
     
@@ -166,3 +160,4 @@ public class StringValidator implements TypeValidator {
     } //-- validate
     
 } //-- StringValidator
+
