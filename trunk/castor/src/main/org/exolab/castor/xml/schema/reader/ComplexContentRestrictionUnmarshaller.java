@@ -138,6 +138,12 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
             else if (!baseType.isAnyType()) {
 			     // We are now sure the base is a complexType
 			    // but is it already a restriction? (see PR 5.11->restriction->1.1)
+			    
+			    //-- KV 2004-03-15
+			    //-- Need to valididate this constraint...I couldn't
+			    //-- find it in the XML Schema 1.0 Recommendation,
+			    //-- commenting out for now.
+                /*
 			    if (((ComplexType)baseType).isRestricted()) {
 			       String err="complexType: "+(_complexType.getName()) != null?
                                             _complexType.getName():"\n";
@@ -145,6 +151,8 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
 					     " of a restriction.";
                    throw new IllegalStateException(err);
 			    }
+			    
+			    */
             }
 			_complexType.setBaseType(baseType);
 
