@@ -61,6 +61,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
+import org.xml.sax.XMLReader;
 import org.xml.sax.helpers.AttributeListImpl;
 import org.xml.sax.helpers.XMLReaderAdapter;
 
@@ -163,12 +164,15 @@ public class Unmarshaller {
      */
     private UnmarshalListener _unmarshalListener = null;
 
+    private boolean _useXMLReader = true;
+    
     /**
      * The flag indicating whether or not to validate during
      * unmarshalling
      */
     private boolean _validate = false;
 
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -539,20 +543,50 @@ public class Unmarshaller {
     public Object unmarshal(InputSource source)
         throws MarshalException, ValidationException
     {
-        Parser parser = _config.getParser();
+        XMLReader reader = null;
+        Parser parser = null;
+        
+        //-- First try XMLReader
+        try {
+            reader = _config.getXMLReader();
+            if (entityResolver != null)
+                reader.setEntityResolver(entityResolver);
+        }
+        catch(RuntimeException rx) {
+            if (_debug) {
+                String err = "Unable to create SAX XMLReader, attempting SAX Parser.";
+                if (_pw != null) {
+                    _pw.println(err);
+                }
+                else {
+                    System.out.println(err);
+                }
+            }
+        }
+        
+        if (reader == null) {
+            parser = _config.getParser();
+            if (parser == null)
+                throw new MarshalException("Unable to create SAX Parser.");
+            if (entityResolver != null)
+                parser.setEntityResolver(entityResolver);
+        }
 
-        if (parser == null)
-            throw new MarshalException("unable to create parser");
-
-        if (entityResolver != null)
-            parser.setEntityResolver(entityResolver);
 
         UnmarshalHandler handler = createHandler();
-        parser.setDocumentHandler(handler);
-        parser.setErrorHandler(handler);
+        
 
         try {
-            parser.parse(source);
+            if (reader != null) {
+                reader.setContentHandler(handler);
+                reader.setErrorHandler(handler);
+                reader.parse(source);
+            }
+            else {
+                parser.setDocumentHandler(handler);
+                parser.setErrorHandler(handler);
+                parser.parse(source);
+            }
         }
         catch(java.io.IOException ioe) {
             throw new MarshalException(ioe);
@@ -597,17 +631,14 @@ public class Unmarshaller {
 
 
     /**
-     * Wraps the given UnmarshalHandler with a SAX 2 ContentHandler.
-     * Allows for improved integration with SAX 2 applications
+     * Returns a ContentHandler for the given UnmarshalHandler
      *
      * @return the ContentHandler
-    **/
+     */
     public static ContentHandler getContentHandler(UnmarshalHandler handler)
         throws SAXException
     {
-        XMLReaderAdapter adapter = new XMLReaderAdapter();
-        adapter.setDocumentHandler(handler);
-        return adapter;
+        return handler;
     } //-- getContentHandler
 
     /**
