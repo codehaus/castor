@@ -419,7 +419,7 @@
         </tr>
         <xsl:for-each select="../contributor[@type=$type]">
           <tr>
-            <td><span class="bodyGrey">
+            <td valign="top"><span class="bodyGrey">
               <a href="mailto:{email}"><xsl:value-of select="name@given"/>&#xA0;<xsl:value-of select="name@surname"/></a></span>
             </td>
             <td><span class="bodyGrey">
