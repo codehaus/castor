@@ -47,34 +47,19 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Properties;
-import java.util.Hashtable;
-import java.util.Enumeration;
-// import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import javax.sql.DataSource;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import org.xml.sax.InputSource;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.SAXException;
-//import org.apache.commons.beanutils.BeanUtils;
-//import org.apache.commons.beanutils.ConversionException;
-//import org.apache.commons.beanutils.ConvertUtils;
-//import org.apache.commons.beanutils.Converter;
-//import org.apache.commons.beanutils.converters.BigDecimalConverter;
-//import org.apache.commons.beanutils.converters.BigIntegerConverter;
-//import org.apache.commons.beanutils.converters.BooleanConverter;
-//import org.apache.commons.beanutils.converters.ByteConverter;
-//import org.apache.commons.beanutils.converters.DoubleConverter;
-//import org.apache.commons.beanutils.converters.FloatConverter;
-//import org.apache.commons.beanutils.converters.IntegerConverter;
-//import org.apache.commons.beanutils.converters.LongConverter;
-//import org.apache.commons.beanutils.converters.ShortConverter;
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.conf.Database;
@@ -90,6 +75,9 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.UnmarshalHandler;
 import org.exolab.castor.xml.Unmarshaller;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -338,7 +326,7 @@ public class DatabaseRegistry
     				// JDO configuration file specifies a DataSource object, use the
     				// DataSource which was configured from the JDO configuration file
     				// to create a new registry object.
-    				dbs = initFromDataSource(mapping, database, factory);
+    				dbs = initFromDataSource(mapping, database, factory, loader);
     			} else if ( database.getDatabaseChoice().getJndi() != null ) {
     				// JDO configuration file specifies a DataSource lookup through JNDI, 
     				// locate the DataSource object frome the JNDI namespace and use it.
@@ -367,13 +355,13 @@ public class DatabaseRegistry
      * @return DatabaseRegistry instance.
      * @throws MappingException Problem related to analysing the JDO configuration.
      */
-    public static DatabaseRegistry initFromDataSource(Mapping mapping, Database database, PersistenceFactory factory) 
+    public static DatabaseRegistry initFromDataSource(Mapping mapping, Database database, PersistenceFactory factory, ClassLoader classLoader) 
 		throws MappingException 
 	{
         DatabaseRegistry dbs;
 		DataSource dataSource;
 		
-		dataSource = loadDataSource (database);		
+		dataSource = loadDataSource (database, classLoader);		
 		
 		dbs = new DatabaseRegistry (database.getName(), 
 									mapping.getResolver (Mapping.JDO, factory), 
@@ -384,18 +372,21 @@ public class DatabaseRegistry
 		return dbs;
 	}
     
-    public static DataSource loadDataSource (Database database) 
+    public static DataSource loadDataSource (Database database, ClassLoader classLoader) 
     	throws MappingException
 	{
 
-    	DataSource dataSource;
+        DataSource dataSource;
 		Param[] parameters;
 		Param param;
 		
 		String className = database.getDatabaseChoice().getDataSource().getClassName();
+		if (classLoader == null) {
+			classLoader = Thread.currentThread().getContextClassLoader();
+		}
 		
 		try {
-			dataSource = (DataSource) Class.forName (className, true, Thread.currentThread().getContextClassLoader()).newInstance();
+			dataSource = (DataSource) Class.forName (className, true, classLoader).newInstance();
 		} 
 		catch (Exception e) {
 			throw new MappingException(Messages.format ("jdo.engine.classNotInstantiable", 
