@@ -460,9 +460,19 @@ public class DescriptorSourceFactory {
                 jsc.append(classType(xsType.getJType()));
                 jsc.append(", \"");
                 jsc.append(member.getName());
-                jsc.append("\", \"");
-                jsc.append(member.getNodeName());
-                jsc.append("\", NodeType.Element);");
+                jsc.append("\", ");
+                
+                String nodeName = member.getNodeName();
+                if (nodeName != null) {
+                    jsc.append("\"");
+                    jsc.append(member.getNodeName());
+                    jsc.append("\"");
+                }
+                else {
+                    jsc.append("(String)null");
+                }
+                
+                jsc.append(", NodeType.Element);");
                 
                 switch (xsType.getType()) {
                     
