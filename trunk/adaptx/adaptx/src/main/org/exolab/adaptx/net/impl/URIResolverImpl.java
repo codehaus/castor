@@ -76,6 +76,7 @@ public final class URIResolverImpl implements URIResolver {
 	public URILocation resolve(String href, String documentBase)
 	    throws URIException
 	{
+	    if (href == null) return null;	    
 	    URILocation uriLocation = null;
 	    try {
 	        uriLocation = new URILocationImpl(href, documentBase);
