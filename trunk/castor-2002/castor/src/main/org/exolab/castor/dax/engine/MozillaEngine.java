@@ -70,13 +70,17 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.DuplicateIdentityException;
-import org.exolab.castor.persist.ObjectNotFoundException;
-import org.exolab.castor.persist.ObjectModifiedException;
-import org.exolab.castor.persist.ObjectDeletedException;
-import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.persist.FatalPersistenceException;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
+import org.exolab.castor.persist.DuplicateIdentityExceptionImpl;
+import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
+import org.exolab.castor.persist.ObjectDeletedExceptionImpl;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
@@ -162,11 +166,11 @@ public class MozillaEngine
             return null;
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
-                throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
+                throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -186,14 +190,14 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectNotFoundException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectNotFoundException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
         
         ldapSet = entry.getAttributeSet();
@@ -257,14 +261,14 @@ public class MozillaEngine
         try {
             entry = ( (LDAPConnection) conn ).read( dn );
             if ( entry == null )
-                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.NO_SUCH_OBJECT )
-                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
         ldapSet = entry.getAttributeSet();
         
@@ -327,7 +331,7 @@ public class MozillaEngine
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
     
@@ -344,7 +348,7 @@ public class MozillaEngine
             if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                  except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                 throw new FatalPersistenceException( except );
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -580,7 +584,7 @@ public class MozillaEngine
                 if ( except.getLDAPResultCode() == LDAPException.SERVER_DOWN || 
                      except.getLDAPResultCode() == LDAPException.CONNECT_ERROR )
                     throw new FatalPersistenceException( except );
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
         }
 
@@ -605,9 +609,9 @@ public class MozillaEngine
                     return getIdentityFromDN( _lastResult.getDN() );
                 } else if ( result instanceof LDAPReferralException ) {
                     // No support for referrals in this release
-                    throw new PersistenceException( (LDAPReferralException) result );
+                    throw new PersistenceExceptionImpl( (LDAPReferralException) result );
                 } else if ( result instanceof LDAPException ) {
-                    throw new PersistenceException( (LDAPException) result );
+                    throw new PersistenceExceptionImpl( (LDAPException) result );
                 }
             }
             return null;
@@ -623,7 +627,7 @@ public class MozillaEngine
             Enumeration        enum;
             
             if ( _lastResult == null )
-                throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
+                throw new PersistenceExceptionImpl( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
             
             ldapSet = _lastResult.getAttributeSet();
 
