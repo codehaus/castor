@@ -307,7 +307,7 @@ create table test_types (
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
-  str_time char(12)       null,
+  str_time char(24)       null,
   num_date fixed(17,0)    null,
   blob_val long byte      null,
   clob_val long           null,
@@ -459,7 +459,7 @@ drop table test_item
 
 create table test_item (
   iid     integer         not null,
-  id      integer         not null
+  id      integer         null
 )
 //
 
