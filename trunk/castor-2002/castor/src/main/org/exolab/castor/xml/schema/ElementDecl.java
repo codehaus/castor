@@ -513,7 +513,8 @@ public class ElementDecl extends Particle
      * @param name the name of the defined element
     **/
     public void setName(String name) {
-        if (ValidationUtils.isQName(name)) {
+        
+        if ((name == null) || (ValidationUtils.isQName(name))) {
             _name = name;
         }
         else {
