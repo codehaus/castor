@@ -47,8 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Hashtable;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.MappingException;
@@ -58,6 +56,8 @@ import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
+
+import java.util.Hashtable;
 
 
 /**

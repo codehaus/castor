@@ -47,39 +47,16 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Properties;
-import java.util.Stack;
-import java.util.Vector;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectDeletedException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.jdo.*;
+import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
-import org.exolab.castor.persist.spi.Complex;
-import org.exolab.castor.persist.spi.KeyGenerator;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.*;
 import org.exolab.castor.util.Messages;
+
+import java.sql.*;
+import java.util.*;
 
 
 /**
