@@ -683,8 +683,10 @@ final class SQLEngine
         {
             close();
             _lastIdentity = null;
+            /*
             if ( _engine._logWriter != null )
                 _engine._logWriter.println( _sql );
+            */
             try {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {

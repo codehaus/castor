@@ -56,7 +56,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.util.Serializer;
 
 
 /**
