@@ -52,6 +52,10 @@ public interface Connector {
 
     public Object createConnection() throws PersistenceException;
 
+    public void commitConnection( Object conn ) throws PersistenceException;
 
+    public void rollbackConnection( Object conn ) throws PersistenceException;
+
+    public void closeConnection( Object conn ) throws PersistenceException;
 }
 
