@@ -1,5 +1,8 @@
 Version (CVS)
 -------------
+XML:	Added new validation flag for the marshalling framework in castor.properties
+	Changed the parser validation property to og.exolab.castor.parser.validation
+	(Arnaud)
 
 XML:    Added fix to Marshaller#isPrimitive to support BigDecimal, submitted
         by Don Kleppinger. (kvisco)

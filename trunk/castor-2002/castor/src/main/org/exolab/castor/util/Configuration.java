@@ -116,18 +116,26 @@ public abstract class Configuration
         /**
          * Property specifying whether to perform document validation by default.
          * <pre>
-         * org.exolab.castor.validation
+         * org.exolab.castor.SAXParser.validation
          * </pre>
          */
-        public static final String Validation = "org.exolab.castor.validation";
+        public static final String Validation = "org.exolab.castor.parser.validation";
 
         /**
          * Property specifying whether to support Namespaces by default.
          * <pre>
-         * org.exolab.castor.Namespaces
+         * org.exolab.castor.SAXParser.namespaces
          * </pre>
          */
-        public static final String Namespaces = "org.exolab.castor.Namespaces";
+        public static final String Namespaces = "org.exolab.castor.parser.namespaces";
+
+        /**
+         * Property specifying whether to use validation in the Marshalling Framework
+         * <pre>
+         * org.exolab.castor.marshalling.validation
+         * </pre>
+         */
+         public static final String Marshalling_validation = "org.exolab.castor.marshalling.validation";
 
         /**
          * Property specifying whether XML documents should be indented by default.
@@ -148,7 +156,7 @@ public abstract class Configuration
         public static final String ParserFeatures = "org.exolab.castor.sax.features";
 
         public static final String ParserFeatureSeparator = ",";
-        
+
         /**
          * Property specifying the regular expression validator
          * to use. This specified class must implement
@@ -158,7 +166,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String RegExp = "org.exolab.castor.regexp";
-        
+
         /**
          * Property specifying whether to run in debug mode.
          * <pre>
@@ -176,7 +184,7 @@ public abstract class Configuration
         public static final String FileName = "castor.properties";
 
         static final String ResourceName = "/org/exolab/castor/castor.properties";
-        
+
     }
 
 
@@ -201,15 +209,29 @@ public abstract class Configuration
      * True if the default configuration specified debugging.
      */
     private static boolean    _debug;
-	
+
+    /**
+     * True if the default configuration specified validation in the marshalling Framework
+     */
+     private static boolean  _validation;
+
     /**
      * Returns true if the default configuration specified debugging.
      */
     public static boolean debug()
     {
+        getDefault().getProperty(Property.Debug);
         return _debug;
     }
 
+    /**
+     * Returns true if the default configuration specified validation.
+     */
+    public static boolean validation()
+    {
+        getDefault().getProperty(Property.Validation);
+        return _validation;
+    }
 
     /**
      * Returns the default configuration file. Changes to the returned
@@ -323,38 +345,38 @@ public abstract class Configuration
         return parser;
     }
 
-    
+
     /**
-     * Returns a new instance of the specified Regular Expression 
+     * Returns a new instance of the specified Regular Expression
      * Evaluator, or null if no validator was specified
-     * 
+     *
      * @return the regular expression evaluator,
      *
     **/
     public static RegExpEvaluator getRegExpEvaluator() {
-        
+
         String prop = getDefault().getProperty( Property.RegExp );
-        
+
         RegExpEvaluator regex = null;
-        
+
         if ( prop == null ) {
             return null;
-        } 
+        }
         else {
             try {
                 Class cls;
                 cls = Class.forName( prop );
                 regex = (RegExpEvaluator) cls.newInstance();
-            } 
+            }
             catch ( Exception except ) {
                 throw new RuntimeException( Messages.format( "conf.failedInstantiateRegExp",
                                                              prop, except ) );
             }
         }
-        
+
         return regex;
     } //-- getRegExpEvaluator
-    
+
     /**
      * Returns a default serializer for producing an XML document.
      * The caller can specify an alternative output format, may reuse
@@ -450,7 +472,7 @@ public abstract class Configuration
                                                          serializer.getClass().getName() ) );
         return docHandler;
     }
-	
+
     /**
      * Called by {@link #getDefault} to load the configuration the
      * first time. Will not complain about inability to load
@@ -461,11 +483,15 @@ public abstract class Configuration
     protected static void load()
     {
 		_default = loadProperties( Property.ResourceName, Property.FileName);
-		
+
         String     prop;
         prop = _default.getProperty( Property.Debug, "" );
         if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
             _debug = true;
+        prop = _default.getProperty( Property.Marshalling_validation, "" );
+        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
+            _validation = true;
+        prop = null;
     }
 
     /**
@@ -513,8 +539,8 @@ public abstract class Configuration
             }
         } catch ( Exception except ) {
             // Do nothing
-        }	
-		
+        }
+
 		return properties;
 	}
 } //-- Configuration

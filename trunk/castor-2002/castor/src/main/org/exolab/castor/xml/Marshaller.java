@@ -77,91 +77,90 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class Marshaller {
-    
+
     /**
      * Message name for a non sax capable serializer error
     **/
     private static final String SERIALIZER_NOT_SAX_CAPABLE
         = "conf.serializerNotSaxCapable";
-          
-    
+
+
     /**
      * The namespace declaration String
     **/
     private static final String XMLNS  = "xmlns";
-    
+
     /**
      * Namespace declaration for xml schema instance
     **/
     private static final String XSI_PREFIX = "xsi";
-    
+
     /**
      * The xsi:type attribute
     **/
     private static final String XSI_TYPE = "xsi:type";
-    
+
     /**
-     * A flag indicating whether or not to generate 
+     * A flag indicating whether or not to generate
      * debug information
     **/
     private boolean _debug = false;
-    
+
 
     /**
      * The print writer used for logging
     **/
     private PrintWriter _logWriter = null;
-    
+
     /**
      * The NameSpace Prefix to URI table
     **/
     private Hashtable _nsPrefixKeyHash = null;
-    
+
     /**
      * The NameSpace URI to Prefix table
     **/
     private Hashtable _nsURIKeyHash = null;
-    
+
     /**
      * The default namespace
     **/
     private String _defaultNamespace = null;
-    
+
     /**
      * The validation flag
     **/
-    private boolean _validate = true;
-    
-    
+    static private boolean _validate = false;
+
     /**
      * The current namespace scoping
     **/
     private List _nsScope = null;
-    
+
     /**
      * The ClassDescriptorResolver used for resolving XMLClassDescriptors
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
-    private Hashtable        _cdCache      = null;  
+    private Hashtable        _cdCache      = null;
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
-    
+
     /**
      * The depth of the sub tree, 0 denotes document level
     **/
     int depth = 0;
-    
+
     private List   _packages = null;
-    
+
     private Stack   _parents  = null;
-    
+
     /**
      * An instance of StringClassDescriptor
     **/
     private static final StringClassDescriptor _StringClassDescriptor
         = new StringClassDescriptor();
-        
+
     /**
      * Creates a new Marshaller
     **/
@@ -169,7 +168,7 @@ public class Marshaller {
         if ( handler == null )
             throw new IllegalArgumentException( "Argument 'handler' is null." );
         _handler         = handler;
-        
+
         // call internal initializer
         initialize();
     } //-- Marshaller
@@ -184,20 +183,20 @@ public class Marshaller {
     {
         if (out == null)
             throw new IllegalArgumentException( "Argument 'out' is null.");
-        
+
         // call internal initializer
         initialize();
-        
+
         _serializer = Configuration.getSerializer();
-        
+
         if (_serializer == null)
             throw new RuntimeException("Unable to obtain serailizer");
-            
+
         _serializer.setOutputCharStream( out );
         _handler = _serializer.asDocumentHandler();
-        if ( _handler == null ) {            
+        if ( _handler == null ) {
             String err = Messages.format( this.SERIALIZER_NOT_SAX_CAPABLE,
-                                          _serializer.getClass().getName() );                                          
+                                          _serializer.getClass().getName() );
             throw new RuntimeException( err );
         }
     } //-- Marshaller
@@ -213,26 +212,27 @@ public class Marshaller {
         _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
-        _cdCache         = new Hashtable(3);        
+        _cdCache         = new Hashtable(3);
         _parents         = new Stack();
+        _validate        = Configuration.validation();
     } //-- initialize();
-    
+
     /**
      * Sets whether or not to marshal as a document which includes
      * the XML declaration, and if necessary the DOCTYPE declaration.
-     * By default the Marshaller will marshal as a well formed 
+     * By default the Marshaller will marshal as a well formed
      * XML fragment (no XML declaration or DOCTYPE).
      *
      * @param asDocument a boolean, when true, indicating to marshal
      * as a complete XML document.
     **/
     public void setMarshalAsDocument(boolean asDocument) {
-        
+
         if (_serializer != null) {
             OutputFormat format = Configuration.getOutputFormat();
             format.setOmitXMLDeclaration( ! asDocument );
             _serializer.setOutputFormat( format );
-            
+
             try {
                 _handler = _serializer.asDocumentHandler();
             }
@@ -245,7 +245,7 @@ public class Marshaller {
         }
 
     } //-- setMarshalAsDocument
-    
+
     /**
      * Sets the given mapping to be used by the marshalling
      * Framework. If a ClassDescriptorResolver exists
@@ -257,9 +257,9 @@ public class Marshaller {
     public void setMapping( Mapping mapping )
         throws MappingException
     {
-        if (_cdResolver == null) 
+        if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
-            
+
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
@@ -269,20 +269,20 @@ public class Marshaller {
      * @param nsURI the namespace that the prefix resolves to
     **/
     public void setNamespaceMapping(String nsPrefix, String nsURI) {
-        
+
         if ((nsURI == null) || (nsURI.length() == 0)) {
             String err = "namespace URI must not be null.";
             throw new IllegalArgumentException(err);
         }
-        
+
         if ((nsPrefix == null) || (nsPrefix.length() == 0)) {
             _defaultNamespace = nsURI;
             return;
         }
-        
+
         _nsPrefixKeyHash.put(nsPrefix, nsURI);
         _nsURIKeyHash.put(nsURI, nsPrefix);
-        
+
     } //-- setNamespacePrefix
 
     /**
@@ -301,7 +301,7 @@ public class Marshaller {
     public void setValidation(boolean validate) {
         _validate = validate;
     } //-- setValidation
-    
+
     /**
      * Marshals the given Object as XML using the given writer
      * @param obj the Object to marshal
@@ -309,7 +309,7 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
-    public static void marshal(Object object, Writer out) 
+    public static void marshal(Object object, Writer out)
         throws MarshalException, ValidationException
     {
         Marshaller marshaller;
@@ -330,7 +330,7 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
-    public static void marshal(Object object, DocumentHandler handler) 
+    public static void marshal(Object object, DocumentHandler handler)
         throws MarshalException, ValidationException
     {
         Marshaller marshaller;
@@ -346,21 +346,21 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
-    public void marshal(Object object) 
+    public void marshal(Object object)
         throws MarshalException, ValidationException
     {
-        validate(object);        
-        marshal(object, null, _handler);        
+        validate(object);
+        marshal(object, null, _handler);
     } //-- marshal
 
     /**
-     * Marshals the given object, using the given descriptor 
+     * Marshals the given object, using the given descriptor
      * and document handler.
      *
      * <BR/>
      * <B>Note:</B>
      * <I>
-     *   It is an error if this method is called with an 
+     *   It is an error if this method is called with an
      *   AttributeDescriptor.
      * </I>
      * @param descriptor the XMLFieldDescriptor for the given object
@@ -370,36 +370,35 @@ public class Marshaller {
      * during marshaling
     **/
     private void marshal
-        (Object object, 
-         XMLFieldDescriptor descriptor, 
-         DocumentHandler handler) 
+        (Object object,
+         XMLFieldDescriptor descriptor,
+         DocumentHandler handler)
         throws MarshalException, ValidationException
     {
         if (object == null) {
-            String err = "Marshaller#marshal: null parameter: 'object'"; 
+            String err = "Marshaller#marshal: null parameter: 'object'";
             throw new IllegalArgumentException(err);
         }
-        
-        
+
+
         //-- add object to stack so we don't potentially get into
         //-- an endlessloop
         if (_parents.search(object) >= 0) return;
         _parents.push(object);
-        
+
         Class _class = object.getClass();
-        
+
         boolean byteArray = false;
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
-        
+
         if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
         }
-      
+
         //-- calculate Object's name
         String name = descriptor.getXMLName();
-        
-        if (name == null) {         
+        if (name == null) {
             name = _class.getName();
             //-- remove package information from name
             int idx = name.lastIndexOf('.');
@@ -409,29 +408,29 @@ public class Marshaller {
             //-- remove capitalization
             name = MarshalHelper.toXMLName(name);
         }
-            
+
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         boolean saveType = false; /* flag for xsi:type */
-        
+
         if (_class == descriptor.getFieldType())
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
 
         if (classDesc == null) {
-            
+
             //-- check for primitive or String, we need to use
             //-- the special #isPrimitive method of this class
-            //-- so that we can check for the primitive wrapper 
+            //-- so that we can check for the primitive wrapper
             //-- classes
-            if (isPrimitive(_class) || (_class == String.class) || byteArray) 
+            if (isPrimitive(_class) || (_class == String.class) || byteArray)
             {
-                
+
                 classDesc = _StringClassDescriptor;
-                                
+
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
                 saveType = (descriptor.getFieldType() == Object.class);
-                    
+
             }
             else {
                 //-- save package information for use when searching
@@ -443,19 +442,19 @@ public class Marshaller {
                     if (!_packages.contains(pkgName))
                         _packages.add(pkgName);
                 }
-                
+
                 classDesc = getClassDescriptor(_class);
                 if (descriptor.getXMLName()==null)
                     name = classDesc.getXMLName();
             }
-            
+
             if (classDesc == null) {
-                
+
                 //-- make sure we are allowed to marshal Object
                 if ((_class == Void.class) ||
                     (_class == Object.class) ||
                     (_class == Class.class)) {
-                        
+
                     throw new MarshalException
                         (MarshalException.BASE_CLASS_OR_VOID_ERR);
                 }
@@ -463,38 +462,38 @@ public class Marshaller {
                 return;
             }
         }
-        
-        
+
+
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
-        
+
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
         for (int i = 0; i < descriptors.length; i++) {
-            
+
             if (descriptors[i] == null) continue;
-            
+
             XMLFieldDescriptor attDescriptor = descriptors[i];
-            
+
             String xmlName = attDescriptor.getXMLName();
-            
+
             //-- handle attribute namespaces
             //-- [need to add this support]
-            
+
             Object value = null;
-            
+
             try {
                 value = attDescriptor.getHandler().getValue(object);
             }
             catch(IllegalStateException ise) {
                 continue;
             }
-            
+
             //-- handle IDREFs
             if (attDescriptor.isReference() && (value != null)) {
                 XMLClassDescriptor cd = getClassDescriptor(value.getClass());
                 String err = null;
                 if (cd != null) {
-                    XMLFieldDescriptor fieldDesc 
+                    XMLFieldDescriptor fieldDesc
                         = (XMLFieldDescriptor) cd.getIdentity();
                     if (fieldDesc != null) {
                         FieldHandler fieldHandler = fieldDesc.getHandler();
@@ -505,8 +504,8 @@ public class Marshaller {
                             catch(IllegalStateException ise) {
                                 err = ise.toString();
                             }
-                        } 
-                        else { 
+                        }
+                        else {
                             err = "FieldHandler for Identity descriptor is null.";
                         }
                     }
@@ -516,51 +515,51 @@ public class Marshaller {
                     err = "Unable to resolve ClassDescriptor for: " +
                         value.getClass().getName();
                 }
-                    
+
                 if (err != null) {
                     String errMsg = "Unable to save reference to: " +
                         cd.getXMLName() + " from element: " +
-                        classDesc.getXMLName() + 
+                        classDesc.getXMLName() +
                         " due to the following error: ";
                     throw new MarshalException(errMsg);
                 }
             }
-            
+
             if (value == null) continue;
-            
+
             atts.addAttribute(xmlName, null, value.toString());
         }
-        
+
         //-- xsi:type
         if (saveType) {
-            saveType = declareNamespace(XSI_PREFIX, 
+            saveType = declareNamespace(XSI_PREFIX,
                 MarshalHelper.XSI_NAMESPACE, atts);
             atts.addAttribute(XSI_TYPE, null, "java:"+_class.getName());
         }
-        
+
         //------------------/
         //- Create element -/
         //------------------/
-        
+
         //-- namespace management
         String nsPrefix = descriptor.getNameSpacePrefix();
         if (nsPrefix == null) nsPrefix = classDesc.getNameSpacePrefix();
-            
+
         String nsURI = descriptor.getNameSpaceURI();
         if (nsURI == null) nsURI = classDesc.getNameSpaceURI();
-        
+
         if ((nsURI == null) && (nsPrefix != null)) {
             nsURI = (String) _nsPrefixKeyHash.get(nsPrefix);
         }
         else if ((nsPrefix == null) && (nsURI != null)) {
             nsPrefix = (String) _nsURIKeyHash.get(nsURI);
         }
-        
+
         boolean declaredNS = false;
         if (nsURI != null)
             declaredNS = declareNamespace(nsPrefix, nsURI, atts);
-        
-        
+
+
         String qName = null;
         if (nsPrefix != null) {
             int len = nsPrefix.length();
@@ -574,15 +573,15 @@ public class Marshaller {
             else qName = name;
         }
         else qName = name;
-        
+
         try {
             handler.startElement(qName, atts);
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
         }
-        
-        
+
+
         //-- handle text content
         XMLFieldDescriptor cdesc = classDesc.getContentDescriptor();
         if (cdesc != null) {
@@ -628,14 +627,14 @@ public class Marshaller {
             }
         }
 
-        
-        
+
+
         //-- handle daughter elements
         descriptors = classDesc.getElementDescriptors();
-        
+
         ++depth;
         for (int i = 0; i < descriptors.length; i++) {
-            
+
             XMLFieldDescriptor elemDescriptor = descriptors[i];
             Object obj = null;
             try {
@@ -645,12 +644,12 @@ public class Marshaller {
                 continue;
             }
             if (obj == null) continue;
-            
+
             Class type = obj.getClass();
-            
+
             //-- handle arrays
             if (type.isArray()) {
-                
+
                 //-- special case for byte[]
                 if (type.getComponentType() == Byte.TYPE) {
                     marshal(obj, elemDescriptor, handler);
@@ -669,7 +668,7 @@ public class Marshaller {
                 Enumeration enum = (Enumeration)obj;
                 while (enum.hasMoreElements()) {
                     Object item = enum.nextElement();
-                    if (item != null) 
+                    if (item != null)
                         marshal(item, elemDescriptor, handler);
                 }
             }
@@ -684,7 +683,7 @@ public class Marshaller {
             }
             else marshal(obj, elemDescriptor, handler);
         }
-        
+
         //-- finish element
         try {
             handler.endElement(qName);
@@ -692,39 +691,39 @@ public class Marshaller {
         catch(org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
         }
-        
+
         --depth;
         _parents.pop();
         if (declaredNS) _nsScope.remove(nsURI);
         if (saveType) _nsScope.remove(MarshalHelper.XSI_NAMESPACE);
-        
-    } //-- void marshal(DocumentHandler) 
-      
-    
+
+    } //-- void marshal(DocumentHandler)
+
+
     /**
      * Declares the given namespace, if not already in scope
-     * 
+     *
      * @param nsPrefix the namespace prefix
      * @param nsURI the namespace URI to declare
      * @param atts the AttributeListImpl to create the namespace
      * declaration
-     * @return true if the namespace was not in scope and was 
+     * @return true if the namespace was not in scope and was
      *  sucessfully declared, other false
     **/
     private boolean declareNamespace
-        (String nsPrefix, String nsURI, AttributeListImpl atts) 
+        (String nsPrefix, String nsURI, AttributeListImpl atts)
     {
-        
+
         boolean declared = false;
-        
+
         if (nsURI != null) {
-            
+
             if (!_nsScope.contains(nsURI)) {
                 String attName = XMLNS;
-                
+
                 if (nsPrefix != null) {
                     int len = nsPrefix.length();
-                    if (len > 0) { 
+                    if (len > 0) {
                         StringBuffer buf = new StringBuffer(6+len);
                         buf.append(XMLNS);
                         buf.append(':');
@@ -732,7 +731,7 @@ public class Marshaller {
                         attName = buf.toString();
                     }
                 }
-                
+
                 _nsScope.add(nsURI);
                 atts.addAttribute(attName, null, nsURI);
                 declared = true;
@@ -740,7 +739,7 @@ public class Marshaller {
         }
         return declared;
     } //-- declareNamespace
-    
+
     /**
      * Sets the flag to turn on and off debugging
      * @param debug the flag indicating whether or not debug information
@@ -749,7 +748,7 @@ public class Marshaller {
     public void setDebug(boolean debug) {
         this._debug = debug;
     } //-- setDebug
-    
+
     /**
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
@@ -757,16 +756,16 @@ public class Marshaller {
     public void setLogWriter(PrintWriter printWriter) {
         this._logWriter = printWriter;
     } //-- setLogWriter
-    
+
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
-     * a XMLClassDescriptor could not be found, this method will attempt to 
-     * create one automatically using reflection. 
+     * a XMLClassDescriptor could not be found, this method will attempt to
+     * create one automatically using reflection.
      * @param _class the Class to get the XMLClassDescriptor for
-     * @exception MarshalException when there is a problem 
+     * @exception MarshalException when there is a problem
      * retrieving or creating the XMLClassDescriptor for the given class
     **/
-    private XMLClassDescriptor getClassDescriptor(Class _class) 
+    private XMLClassDescriptor getClassDescriptor(Class _class)
         throws MarshalException
     {
         XMLClassDescriptor classDesc = _cdResolver.resolve(_class);
@@ -775,17 +774,17 @@ public class Marshaller {
         }
         return classDesc;
     } //-- getClassDescriptor
-    
+
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
-     * a XMLClassDescriptor could not be found, this method will attempt to 
-     * create one automatically using reflection. 
+     * a XMLClassDescriptor could not be found, this method will attempt to
+     * create one automatically using reflection.
      * @param _class the Class to get the XMLClassDescriptor for
-     * @exception MarshalException when there is a problem 
+     * @exception MarshalException when there is a problem
      * retrieving or creating the XMLClassDescriptor for the given class
     **/
     private XMLClassDescriptor getClassDescriptor
-        (String className, ClassLoader loader) 
+        (String className, ClassLoader loader)
         throws MarshalException
     {
         XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
@@ -794,16 +793,16 @@ public class Marshaller {
         }
         return classDesc;
     } //-- getClassDescriptor
-    
-    private void validate(Object object) 
+
+    private void validate(Object object)
         throws ValidationException
     {
-        if (_validate) {
+        if  (_validate) {
             //-- we must have a valid element before marshalling
             Validator.validate(object, _cdResolver);
         }
     }
-    
+
     /**
      * Returns true if the given class should be treated as a primitive
      * type
@@ -813,12 +812,21 @@ public class Marshaller {
     private boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
-        if ((type == Boolean.class) ||(type == Character.class))
+
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class))
             return true;
-        return (type.getSuperclass() == Number.class);
-       
+
+       return false;
+
     } //-- isPrimitive
-    
+
 } //-- Marshaller
 
 
