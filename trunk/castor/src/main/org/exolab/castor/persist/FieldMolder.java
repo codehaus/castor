@@ -73,18 +73,30 @@ import org.exolab.castor.jdo.DataObjectAccessException;
  */
 public class FieldMolder {
 
-	/**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance(FieldMolder.class);
-
-    // field types
-    public static final short PRIMITIVE = 0;
+	// accepted collection types
+    private static final String COLLECTION_TYPE_ARRAY = "array";
+    private static final String COLLECTION_TYPE_COLLECTION = "collection";
+    private static final String COLLECTION_TYPE_VECTOR = "vector";
+    private static final String COLLECTION_TYPE_ARRAYLIST = "arraylist";
+    private static final String COLLECTION_TYPE_HASHTABLE = "hashtable";
+    private static final String COLLECTION_TYPE_MAP = "map";
+    private static final String COLLECTION_TYPE_SET = "set";
+    private static final String COLLECTION_TYPE_HASHMAP = "hashmap";
+    private static final String COLLECTION_TYPE_HASHSET = "hashset";
+    
+	private static final String FIELD_TYPE_SERIALIZABLE = "serializable";
+	
+	public static final short PRIMITIVE = 0;
     public static final short SERIALIZABLE = 1;
     public static final short PERSISTANCECAPABLE = 2;
     public static final short ONE_TO_MANY = 3;
     public static final short MANY_TO_MANY = 4;
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(FieldMolder.class);
 
     // method prefixes
     private static final String METHOD_GET_PREFIX = "get";
@@ -275,9 +287,14 @@ public class FieldMolder {
     public void addValue( Object object, Object value, ClassLoader loader ) {
 
         ReflectService rf = getContextReflectService ( loader );
+        
+        if (_log.isDebugEnabled()) {
+        	_log.debug ("Calling " + rf._addMethod.getName() + " on " + object.getClass().getName());
+        }
+        
         try {
             if ( rf._addMethod == null )
-                throw new DataObjectAccessException("No add method defined for this field");
+                throw new DataObjectAccessException(Messages.format ("mapping.addMethodNotDefined", this.getName()));
 
             if ( value == null )
                 throw new NullPointerException("Adding null value is not allowed");
@@ -403,16 +420,15 @@ public class FieldMolder {
     }
 
     private static CollectionInfo[] info =
-        { new CollectionInfo( "collection", java.util.Collection.class ),
-          new CollectionInfo( "vector", java.util.Vector.class ),
-          new CollectionInfo( "arraylist", java.util.ArrayList.class ),
-          new CollectionInfo( "hashtable", java.util.Hashtable.class ),
-          new CollectionInfo( "hashmap", java.util.HashMap.class ),
-          new CollectionInfo( "set", java.util.Set.class ),
-          new CollectionInfo( "hashset", java.util.HashSet.class ),
-          new CollectionInfo( "map", java.util.Map.class ),
-          new CollectionInfo( "array", Object[].class ) };
-
+        { new CollectionInfo( COLLECTION_TYPE_COLLECTION, java.util.Collection.class ),
+          new CollectionInfo( COLLECTION_TYPE_VECTOR, java.util.Vector.class ),
+          new CollectionInfo( COLLECTION_TYPE_ARRAYLIST, java.util.ArrayList.class ),
+          new CollectionInfo( COLLECTION_TYPE_HASHTABLE, java.util.Hashtable.class ),
+          new CollectionInfo( COLLECTION_TYPE_HASHMAP, java.util.HashMap.class ),
+          new CollectionInfo( COLLECTION_TYPE_SET, java.util.Set.class ),
+          new CollectionInfo( COLLECTION_TYPE_HASHSET, java.util.HashSet.class ),
+          new CollectionInfo( COLLECTION_TYPE_MAP, java.util.Map.class ),
+          new CollectionInfo( COLLECTION_TYPE_ARRAY, Object[].class ) };
 
           //( array | vector | hashtable | collection | set | map )
 
@@ -460,7 +476,7 @@ public class FieldMolder {
                 _check = true;
             }
 
-            if ( "serializable".equals( fieldMap.getType() ) )
+            if ( FIELD_TYPE_SERIALIZABLE.equals( fieldMap.getType() ) )
                 _serial = true;
 
             if ( fieldMap.getSql() == null )
@@ -481,7 +497,7 @@ public class FieldMolder {
             // Set collection type
             if ( fieldMap.getCollection() != null ) {
               // simple arrays support
-              if ("array".equals(fieldMap.getCollection().toString())) {
+              if (COLLECTION_TYPE_ARRAY.equals(fieldMap.getCollection().toString())) {
                 String arrayClassName = "[L" + fieldMap.getType() + ";";
                 try {
                   _colClass = ds.resolve(arrayClassName);
@@ -639,7 +655,7 @@ public class FieldMolder {
 
                 if ( _defaultReflectService._setMethod == null )
                     _defaultReflectService._addMethod
-                        = findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ), null, false );
+                        = findAccessor( javaClass, METHOD_ADD_PREFIX + capitalize( name ), declaredClass, false );
 
                 if ( _defaultReflectService._addMethod == null && name.endsWith("s") )
                     _defaultReflectService._addMethod
@@ -682,14 +698,17 @@ public class FieldMolder {
                 }
 
                 // Second look up the set/add accessor
-                if ( fieldMap.getSetMethod() != null ) {
+                if ( fieldMap.getSetMethod() != null) {
 
                     if ( _colClass != null ) {
                         _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _colClass, false );
 
                         // find addXXX method only if lazy loading is turned off
-                        if ( _defaultReflectService._setMethod == null && !fieldMap.getLazy() )
-                            _defaultReflectService._addMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
+                        if ( _defaultReflectService._setMethod == null && !fieldMap.getLazy() ) {
+                            _defaultReflectService._addMethod = 
+                            	findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
+                            if ( _defaultReflectService._addMethod != null) _addable = true;
+                        }
 
                     } else {
                         // find setXXX method
@@ -697,9 +716,11 @@ public class FieldMolder {
                     }
 
 
-                    if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
-                        throw new MappingException( "mapping.accessorNotFound",
-                                fieldMap.getSetMethod(), methodClass, javaClass.getName() );
+                    if (_defaultReflectService._setMethod == null && 
+                    	_defaultReflectService._addMethod == null)
+						throw new MappingException("mapping.accessorNotFound",
+								fieldMap.getSetMethod(), methodClass, javaClass
+										.getName());
 
                     if ( _defaultReflectService._fClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._setMethod.getParameterTypes()[ 0 ];
@@ -728,7 +749,9 @@ public class FieldMolder {
 
                     method = javaClass.getMethod( METHOD_CREATE_PREFIX + capitalize( fieldMap.getName() ), null );
                     _defaultReflectService._createMethod = method;
-                } catch ( Exception except ) { }
+                } catch ( Exception except ) {
+                	// no explicit exception handling
+                }
             }
 
             // If there is an has/delete method, add them to field handler
@@ -746,10 +769,14 @@ public class FieldMolder {
                              ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                             deleteMethod = null;
                         deleteMethod = javaClass.getMethod( METHOD_DELETE_PREFIX + capitalize( fieldMap.getName() ), null );
-                    } catch ( Exception except ) { }
+                    } catch ( Exception except ) {
+                    	// no explicit exception handling 
+                    }
                     _defaultReflectService._hasMethod = hasMethod;
                     _defaultReflectService._deleteMethod = deleteMethod;
-                } catch ( Exception except ) { }
+                } catch ( Exception except ) {
+                	// no explicit exception handling
+                }
             }
 
             if ( _defaultReflectService._field == null && _defaultReflectService._setMethod == null && _defaultReflectService._getMethod == null ) {
@@ -799,7 +826,9 @@ public class FieldMolder {
                 throw new MappingException( "mapping.fieldTypeMismatch", field, fieldType.getName() );
             return field;
         } catch ( NoSuchFieldException except ) {
+        	// no explicit exception handling
         } catch ( SecurityException except ) {
+        	// no explicit exception handling
         }
         return null;
     }
@@ -918,7 +947,9 @@ public class FieldMolder {
         /**
          * Default constructor. All fields need to be set one by one.
          */
-        ReflectService () { }
+        ReflectService () {
+        	// no code to execute
+		}
 
         /**
          * Contructs a ReflectService object based on the instance provided
