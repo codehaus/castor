@@ -100,11 +100,9 @@
           <td bgcolor="{$color-alpha}" width="11" valign="top">
               <img src="images/corners/nw-small.gif" height="11" width="11" valign="top"/>
           </td>
-          <td bgcolor="{$color-alpha}" height="45">
-              <xsl:value-of select="$nbsp"/><img src="images/bullets/dots.gif" height="11" width="41" valign="top"/><xsl:value-of select="$nbsp"/>
-              <font size="4" color="{$color-c}"><b>
-                <xsl:value-of select="$project/title"/>
-              </b></font>    
+          <td bgcolor="{$color-alpha}" height="45" width="3600">
+            &#xA0;&#xA0;<img src="images/bullets/dots.gif" height="11" width="41" valign="top"/>&#xA0;&#xA0;
+            <font size="4" color="{$color-c}"><b><xsl:value-of select="$project/title"/></b></font>    
           </td>
         </tr>
 

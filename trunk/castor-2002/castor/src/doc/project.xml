@@ -15,12 +15,23 @@ width="39"/>
     <link name="Exolab" href="http://www.exolab.org" image="images/links/exolab.gif" height="19" width="47"/>
   </links>
 
-  <menu name="mapping">
-    <item name="types" href="types.xml"/>
+  <menu name="API">
+  </menu>
+  <menu name="Mapping">
+    <item name="Types" href="types.xml"/>
+    <item name="Source generator" href="sourcegen.xml"/>
+  </menu>
+  <menu name="Examples">
+  </menu>
+  <menu name="Design">
+    <item name="Persistence" href="design-persist.xml"/>
   </menu>
 
   <notice>
-    Java, Sun, Sun Microsystems are trademarks or registered trademarks of Sun Microsystems, Inc. in the United States and in other countries.
+    Java, EJB, JDBC, JNDI, Sun, Sun Microsystems are trademarks or registered trademarks of Sun Microsystems, Inc.
+    in the United States and in other countries. XML, XML schema and related standards are trademarks or registered
+    trademarks of MIT, INRIA, Keio or others, and a product of the World Wide Web Consortium. All other product
+    names mentioned herein are trademarks of their respective owners.
   </notice>
   <notice>
     <a href="http://www.exoffice.com">Exoffice Technologies, Inc.</a> (C) 2000. All rights reserved

@@ -1,5 +1,16 @@
-Version 0.8  January 21, 2000
------------------------------
+Version 0.7.4  January 23, 2000
+-------------------------------
+
+JDO:  New persistence engine. JDO package is now an ODMG API
+      implementation on top of the concurrency engine and an SQL 92
+      connector.
+
+JDO:  New query mechanism allows multiple objects to be retrieved as
+      an enumeration.
+
+JDO:  Revised concurrency engine with query mechanism, object caching,
+      transactions and locking, now resides in package
+      org.exolab.castor.persist.
 
 JDO:  Added SQL type conversion. A field mapping may now specify the
       SQL datatype using SQL names (numeric, varchar, etc). If the SQL
@@ -20,9 +31,20 @@ XML:  Added support for positive-integer and negative-integer
 XML:  Added support for Validation during Unmarshalling. Enabled by
       default.  (Marshalling Framework)
 
-XML: Changed Exceptions from SAXException and IOException to
-     MarshalException and ValidationException (Framework + Source Generator)
-     -- Sorry for the inconvenience.
+XML:  Changed Exceptions from SAXException and IOException to
+      MarshalException and ValidationException (Framework + Source
+      Generator) -- Sorry for the inconvenience.
+
+Docs: This is the first release to see some documentation beyond the
+      README file. The docs are located in the directory src/doc in XML
+      and are transformed into HTML in the target directory build/doc.
+      The transformation stylesheets are contained in src/doc/style.
+
+Misc: Three layer persistence architecture introduced in this release.
+      Each package implements the top level applications API (EJB,
+      ODMG, DAX, JNDI), org.exolab.castor.persist implements the
+      concurrency layer (transaction, locking, caching) and connectors
+      are used to talk to the underlying persistent storage.
 
 Misc: ObjectDesc, FieldDesc and related classed have no been
       consolidated from the three modules and placed in a single
