@@ -107,9 +107,9 @@ public interface Persistence {
      * If the identity is null, an identity might be created and returned
      * by this method.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     * @param fields The fields to store
-     * @param identity The object's identity
+     * @param entity The entity to create
      * @return The object's identity
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
@@ -128,9 +128,9 @@ public interface Persistence {
      * #store}). If <tt>lock</tt> is true the object must be
      * locked in persistence storage to prevent concurrent updates.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     * @param fields The fields to load into
-     * @param identity object's identity
+     * @param entity The entity to load into
      * @param accessMode The access mode (null equals shared)
      * @return The object's stamp, or null
      * @throws ObjectNotFoundException The object was not found in
@@ -146,8 +146,13 @@ public interface Persistence {
      * the supplied value. Conceptually, the specified field is a foreign key
      * field; the supplied values is the value the foreign key.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     *
+     * @param field The field on the "many" side of the relation
+     * @param value The value of the field
+     * @param entityIds The list of loaded identities that should be filled in the method
+     * @param accessMode The access mode (null equals shared)
+     * @throws PersistenceException A persistence error occured
      */
     public Object loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
         throws PersistenceException;
@@ -170,11 +175,10 @@ public interface Persistence {
      * call to {@link #load}. These arguments are null for objects
      * retrieved with an exclusive lock.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     * @param fields The fields to store
-     * @param identity The object's identity
-     * @param original The original fields, or null
-     * @param stamp The object's stamp, or null
+     * @param entity The entity to store
+     * @param original The original entity, or null
      * @return The object's stamp, or null
      * @throws ObjectModifiedException The object has been modified
      *  in persistence storage since it was last loaded
@@ -193,13 +197,14 @@ public interface Persistence {
      * locks on the object must be retained until the transaction has
      * completed.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     * @param identity The object's identity
+     * @param entity The entity to delete
      * @throws PersistenceException A persistence error occured
      */
     public void delete( TransactionContext tx, Object conn, Entity entity )
         throws PersistenceException;
-    
+
 
     /**
      * Obtains a write lock on the object. This method is called in
@@ -210,15 +215,16 @@ public interface Persistence {
      * succeed when the transaction completes, without attempting to
      * reload the object.
      *
+     * @param tx The transaction context
      * @param conn An open connection
-     * @param identity The object's identity
+     * @param entity The entity to lock
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
     public void writeLock( TransactionContext tx, Object conn, Entity entity )
         throws ObjectDeletedException, PersistenceException;
-    
+
 
     /**
      * Creates and returns a new query object. The query object is
@@ -229,13 +235,14 @@ public interface Persistence {
      * execution.
      *
      * @param query The query expression
-     * @param type List of all parameter types, or null
+     * @param types List of all parameter types, or null
+     * @param accessMode The access mode (null equals shared)
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
     public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException;
-    
+
 
     public PersistenceQuery createCall( String call, Class[] types )
         throws QueryException;
