@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: LRU.java
+ * $Id$
  */
 
 package org.exolab.castor.persist.cache;
@@ -73,7 +73,15 @@ implements Cache
 	 * Commons Logging</a> instance used for all logging.
 	 */
 	private static Log _log = LogFactory.getFactory().getInstance(NoCache.class);
-	
+
+	/**
+	 * Creates an instance of this class. 
+	 */
+    public NoCache () {
+    	super();
+    	_log.debug ("Successfulyl initialized instance of " + getClass().getName());
+    }
+    
 	/**
 	 * Maps the specified <code>key</code> to the specified 
 	 * <code>value</code> in this Map. Neither the key nor the 
@@ -151,6 +159,7 @@ implements Cache
 	/**
 	 * This method is called when an object is disposed.
 	 * Override this method if you interested in the disposed object.
+	 * @param o Objec to be disposed.
 	 */
 	protected void dispose( Object o ) {
 		if (_log.isDebugEnabled()) {
@@ -174,7 +183,10 @@ implements Cache
 		}
 	}
 	
-	/* Indicates whether the cache holds a valuze object for the specified key.
+	/**
+	 * Indicates whether the cache holds value object mapped to the specified key.
+	 * @param key - A key identifying a value object.
+	 * @return True if the cache holds a value object for the specified key, false otherwise.
 	 * @see org.exolab.castor.persist.cache.Cache#contains(java.lang.Object)
 	 */
 	public boolean contains(Object key) {
