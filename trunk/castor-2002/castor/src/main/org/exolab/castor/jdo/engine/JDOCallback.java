@@ -103,6 +103,13 @@ public class JDOCallback
     }
 
 
+    public void removed( Object object )
+        throws Exception
+    {
+        ( (Persistent) object ).jdoAfterRemove();
+    }
+
+
     public void releasing( Object object, boolean committed )
     {
         ( (Persistent) object ).jdoTransient();

@@ -111,12 +111,22 @@ public interface CallbackInterceptor
     /**
      * Called to indicate that an object is to be deleted.
      * <p>
-     * This method is made at commit time on objects deleted during the
-     * transaction before setting their fields to null.
+     * This method is called during db.remove().
      *
      * @param object The object
      */
     public void removing( Object object )
+        throws Exception;
+
+
+    /**
+     * Called to indicate that an object has been deleted.
+     * <p>
+     * This method is called during db.remove().
+     *
+     * @param object The object
+     */
+    public void removed( Object object )
         throws Exception;
 
 

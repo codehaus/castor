@@ -353,6 +353,12 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }                   
          
     
+    public void jdoAfterRemove()
+        throws Exception
+    {
+    }
+
+
     public long jdoGetTimeStamp()
     {
         return _timeStamp;
