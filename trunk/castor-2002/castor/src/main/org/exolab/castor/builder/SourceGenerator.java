@@ -512,10 +512,7 @@ public class SourceGenerator {
     } //-- setTestable
 
   	public void setDefaultProperties(Properties properties) {
-           //don't need to throw a IllegalArgumentException
-           if (properties == null)
-              return;
-           _default = properties;
+        _default = properties;
     }
     /**
      * main class used for command line invocation
@@ -942,7 +939,7 @@ public class SourceGenerator {
                 if (ch == 'a') {
                     state.setPromptForOverwrite(false);
                     allowPrinting = true;
-                } 
+                }
                 else if (ch == 'y')
                     allowPrinting = true;
                 else
@@ -981,7 +978,7 @@ public class SourceGenerator {
                     if (ch == 'a') {
                         state.setPromptForOverwrite(false);
                         allowPrinting = true;
-                    } 
+                    }
                     else if (ch == 'y')
                         allowPrinting = true;
                     else
@@ -1243,11 +1240,11 @@ public class SourceGenerator {
            throw new IllegalArgumentException("The parameter must represent an absolute path.");
         if (File.separatorChar != '/')
             result = result.replace(File.separatorChar, '/');
-            
+
         if (result.startsWith("/"))
             /*Unix platform*/
             result = "file://" + result;
-        else 
+        else
             result = "file:///" + result;   /*DOS platform*/
 
         return result;
