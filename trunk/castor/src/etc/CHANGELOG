@@ -1,6 +1,13 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1499 using contribution from Stein M. Hugubakken [dulci@start.no].
+	   DatabaseImpl.finalize() now outputs a warning if the instance about to be 
+	   garbage-collected still has valid scope. In addition, improves code 
+	   quality in DatabaseImpl.java by removing unused import statements and 
+	   local variables.
+       (Werner - 20040124)
+       
 JDO:   Fixed bug 1417 using contribution from Stein M. Hugubakken [dulci@start.no].
 	   Added missing entry for resource string "persist.missingEnd" to 
 	   messages.properties. 
