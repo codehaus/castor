@@ -50,6 +50,7 @@ package org.exolab.castor.persist.sql;
 import java.sql.DriverManager;
 import javax.sql.DataSource;
 import java.sql.SQLException;
+import java.sql.Connection;
 import java.util.Properties;
 import java.util.Enumeration;
 import javax.naming.InitialContext;
@@ -221,6 +222,29 @@ public abstract class BaseFactory
                     return DriverManager.getConnection( _url, _pros );
             } catch (SQLException except) {
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
+            }
+        }
+
+        public void commitConnection( Object conn ) throws PersistenceException {
+            try {
+                ((Connection)conn).commit();
+            } catch ( SQLException e ) {
+                throw new PersistenceException( "SQLException during commit", e );
+            }
+        }
+
+        public void rollbackConnection( Object conn ) throws PersistenceException {
+            try {
+                ((Connection)conn).rollback();
+            } catch ( SQLException e ) {
+                throw new PersistenceException( "SQLException during commit", e );
+            }
+        }
+
+        public void closeConnection( Object conn ) throws PersistenceException {
+            try {
+                ((Connection)conn).close();
+            } catch ( SQLException e ) {
             }
         }
     }
