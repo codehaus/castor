@@ -109,6 +109,16 @@ public class SourceGenerator {
         appURI + "\">" + appName + " " + version +
         "</a>, using an XML Schema.\n$" + "Id"+"$";
 
+    /**
+     * Message used when descriptor creation is disabled
+    **/
+    private static final String DISABLE_DESCRIPTORS_MSG
+        = "Disabling generation of Class descriptors";
+        
+    //----------------------/
+    //- Instance Variables -/
+    //----------------------/
+    
     private String lineSeparator = null;
     private JComment header = null;
 
@@ -122,12 +132,19 @@ public class SourceGenerator {
     private String  destDir = null;
 
     /**
+     * A flag indicating whether or not to create
+     * descriptors for the generated classes
+    **/
+    private boolean _createDescriptors = true;
+    
+    /**
      * The field info factory.
-     */
+    **/
     private FieldInfoFactory infoFactory = null;
 
-    /** The source factory.
-    */
+    /** 
+     * The source factory.
+    **/
     private SourceFactory sourceFactory = null;
 
     private ConsoleDialog dialog = null;
@@ -219,6 +236,7 @@ public class SourceGenerator {
 	 * Namespace URL to Java package mapping
 	 */
 	private static java.util.Hashtable _nspackages;
+	
 
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
@@ -362,6 +380,19 @@ public class SourceGenerator {
     } //-- setVerbose
 
     /**
+     * Sets whether or not to create ClassDescriptors for
+     * the generated classes. By default, descriptors are
+     * generated.
+     *
+     * @param createDescriptors a boolean, when true indicates
+     * to generated ClassDescriptors
+     *
+    **/
+    public void setDescriptorCreation(boolean createDescriptors) {
+        _createDescriptors = createDescriptors;
+    } //-- setDescriptorCreation
+    
+    /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
     **/
@@ -396,6 +427,10 @@ public class SourceGenerator {
         desc = "Prints out additional messages when creaing source";
         allOptions.addFlag("verbose", "", desc, true);
 
+        //-- no descriptors flag
+        desc = "Disables the generation of the Class descriptors";
+        allOptions.addFlag("nodesc", "", desc, true);
+
         //-- source generator types name flag
         desc = "Sets the source generator types name (SGTypeFactory)";
         allOptions.addFlag("types", "types", desc, true);
@@ -420,7 +455,13 @@ public class SourceGenerator {
         boolean force           = (options.getProperty("f") != null);
         String  typeFactory     = options.getProperty("types");
         boolean verbose         = (options.getProperty("verbose") != null);
-
+        
+        if (schemaFilename == null) {
+            System.out.println(appName);
+            allOptions.printUsage(new PrintWriter(System.out));
+            return;
+        }
+        
         // -- XXX maintained temporarily
         if (typeFactory == null)
             typeFactory = options.getProperty("type-factory");
@@ -468,13 +509,16 @@ public class SourceGenerator {
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
         sgen.setVerbose(verbose);
-        if (force) System.out.println("-- Suppressing non fatal warnings.");
-
-        if (schemaFilename == null) {
-            System.out.println(appName);
-            allOptions.printUsage(new PrintWriter(System.out));
-            return;
+     
+        if (force) 
+            System.out.println("-- Suppressing non fatal warnings.");
+            
+        if (options.getProperty("nodesc") != null) {
+            sgen.setDescriptorCreation(false);
+            System.out.print("-- ");
+            System.out.println(DISABLE_DESCRIPTORS_MSG);
         }
+
 
         try {
             sgen.generateSource(schemaFilename, packageName);
@@ -737,11 +781,13 @@ public class SourceGenerator {
             jClass.print(destDir,lineSeparator);
         }
 
-        //-- create MarshalInfo and print
-
+        //------------------------------------/
+        //- Create ClassDescriptor and print -/
+        //------------------------------------/
+        
         ClassInfo classInfo = state.resolve(jClass);
-        if (classInfo != null) {
-
+        
+        if (_createDescriptors && (classInfo != null)) {
 
             JClass desc
                 = DescriptorSourceFactory.createSource(classInfo);
