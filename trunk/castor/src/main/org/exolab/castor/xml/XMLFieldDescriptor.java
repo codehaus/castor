@@ -87,6 +87,7 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     **/
     public NodeType getNodeType();
 
+    
     /**
      * Returns a specific validator for the field described by
      * this descriptor. A null value may be returned
@@ -103,6 +104,50 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
     **/
     public String getXMLName();
 
+    /**
+     * Returns the "relative" XML path for the field being described.
+     *
+     * In most cases, this will be null. However sometimes a
+     * field may be mapped to a nested element. In which case 
+     * the value returned by this method should be the nested
+     * element name. If more than one level of nesting is
+     * needed each nested element name should be separated by
+     * by a path separator (forward slash '/').
+     *
+     * The location path name is "relative" to the parent Class. The
+     * name of the parent should not be included in the path.
+     *
+     * 
+     * For example, give the following two classes:
+     * <code>
+     *
+     *    class Root {    
+     *        Bar bar;    
+     *    }
+     *
+     *    class Bar {
+     *       String value;
+     *    }
+     * </code>
+     *
+     * And the following XML:
+     *
+     * <code>
+     *    &lt;root&gt;
+     *       &lt;foo&gt;
+     *          &lt;bar&gt; value of bar &lt;/bar&gt;
+     *       &lt;/foo&gt;
+     *    &lt;/root&gt;
+     * </code>
+     *
+     * Since foo has no associated class, the path for 'bar'
+     * would be: "foo"
+     * 
+     * 
+     * @returns the "relative" XML path for the field being described.
+     */
+    public String getLocationPath();
+    
     /**
      * Returns the XML Schema type of the XML field being described.
      */
