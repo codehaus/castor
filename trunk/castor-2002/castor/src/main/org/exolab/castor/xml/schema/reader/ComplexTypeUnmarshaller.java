@@ -197,6 +197,23 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
+        //-- attribute group declarations
+        else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
+            allowRefines = false;
+            allowContentModel = false;
+            
+            //-- make sure we have an attribute group
+            //-- reference and not a definition
+            
+            if (atts.getValue(SchemaNames.REF_ATTR) == null) {
+                String err = "A complexType may contain referring "+
+                    "attribute groups, but not defining ones.";
+                error(err);
+            }
+            
+            unmarshaller
+                = new AttributeGroupUnmarshaller(_schema, atts);
+        }
         //-- element declarations
         else if (SchemaNames.ELEMENT.equals(name)) {
             allowRefines = false;
@@ -251,6 +268,12 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
 
             _complexType.addAttributeDecl(attrDecl);
+        }
+        //-- attribute groups
+        else if (SchemaNames.ATTRIBUTE_GROUP.equals(name)) {
+            AttributeGroupReference attrGroupRef =
+                (AttributeGroupReference) unmarshaller.getObject();
+            _complexType.addAttributeGroupReference(attrGroupRef);
         }
         //-- element declarations
         else if (SchemaNames.ELEMENT.equals(name)) {

@@ -270,6 +270,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         if (name == SchemaNames.ANNOTATION) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
+        //-- <attributeGroup>
+        else if (name == SchemaNames.ATTRIBUTE_GROUP) {
+            unmarshaller = new AttributeGroupUnmarshaller(_schema, atts);
+        }
         //-- <complexType>
         else if (name == SchemaNames.COMPLEX_TYPE) {
             unmarshaller
@@ -360,6 +364,18 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- <annotation>
         if (name == SchemaNames.ANNOTATION) {
             _schema.addAnnotation((Annotation)unmarshaller.getObject());
+        }
+        //-- <attributeGroup>
+        else if (name == SchemaNames.ATTRIBUTE_GROUP) {
+            Object obj = unmarshaller.getObject();
+            try {
+                _schema.addAttributeGroup((AttributeGroupDecl)obj);
+            }
+            catch (ClassCastException ex) {
+                String err = "Top-level AttributeGroups must be defining "+
+                    "AttributeGroups and not referring AttributeGroups.";
+                error(err);
+            }
         }
         //-- <complexType>
         else if (name == SchemaNames.COMPLEX_TYPE) {
