@@ -363,19 +363,19 @@ public abstract class Configuration
         prop = getDefault().getProperty( Property.Parser );
         if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
             // If no parser class was specified, we default to Xerces.
-            parser = new org.apache.xerces.parsers.SAXParser();
-        } else {
-            // If a parser class was specified, we try to create it and
-            // complain about creation error.
-            try {
-                Class cls;
+            prop = "org.apache.xerces.parsers.SAXParser";
+        }
 
-                cls = Class.forName( prop );
-                parser = (Parser) cls.newInstance();
-            } catch ( Exception except ) {
-                throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
-                                                             prop, except ) );
-            }
+        // If a parser class was specified, we try to create it and
+        // complain about creation error.
+        try {
+            Class cls;
+            
+            cls = Class.forName( prop );
+            parser = (Parser) cls.newInstance();
+        } catch ( Exception except ) {
+            throw new RuntimeException( Messages.format( "conf.failedInstantiateParser",
+                                                         prop, except ) );
         }
 
         if ( parser instanceof XMLReader ) {
