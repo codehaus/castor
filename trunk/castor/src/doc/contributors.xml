@@ -862,6 +862,7 @@
       It makes it easier to maintain
   -->
 
+
   <contributor type="Documentor">
     <name surname="Gilmartin" given="Andrew"/>
     <email>andrew.gilmartin@ingenta.com</email>
@@ -883,6 +884,14 @@
     <description>
         Clean-up of <i>xml-mapping</i> documentation and documentation on xsi:type.
         The create-method addition to the <i>tip &amp; tricks</i> page.
+    </description>
+  </contributor>
+
+  <contributor type="Documentor">
+    <name surname="Tanner" given="Dan"/>
+    <email>Dan.B.Tanner@wellsfargo.com</email>
+    <description>
+       Contribution to the Castor XML FAQ.
     </description>
   </contributor>
 
