@@ -119,9 +119,15 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Parent" given="Marc-Antoine"/>
+    <email>Marc-Antoine_Parent@mitel.com</email>
+    <description>Enhancements to the Castor DSML and bug fixing.</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
-    <email>ssahuc@imediation.com</email>
+    <email>ssahuc@citeweb.net</email>
     <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
