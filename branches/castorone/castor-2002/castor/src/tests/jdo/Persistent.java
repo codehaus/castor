@@ -138,18 +138,20 @@ public class Persistent
                      ! parent.getChildren().contains( new TestPersistent( 71 ) ) ||
                      ! parent.getChildren().contains( new TestPersistent( 72 ) ) ||
                      ! parent.getChildren().contains( new TestPersistent( 73 ) ) ) {
-                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );
+                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );					
                     result  = false;
-                }
-                child = parent.findChild( 73 );
-                if ( child == null || child.getChildren() == null || 
-                     child.getChildren().size() != 2 ||
-                     ! child.getChildren().contains( new TestPersistent( 731 ) ) ||
-                     ! child.getChildren().contains( new TestPersistent( 732 ) ) ) {
-                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
-                    result  = false;
-                }
-                child.setValue("new value");
+                } else {
+	                child = parent.findChild( 73 );
+	                if ( child == null || child.getChildren() == null || 
+	                     child.getChildren().size() != 2 ||
+	                     ! child.getChildren().contains( new TestPersistent( 731 ) ) ||
+	                     ! child.getChildren().contains( new TestPersistent( 732 ) ) ) {
+	                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
+	                    result  = false;
+	                } else {
+						child.setValue("new value");
+					}
+				}
             } else {
                 stream.writeVerbose( "Error: failed to create parent with children" );
                 result = false;
