@@ -183,6 +183,14 @@
     <description>Contributed SEQUENCE key generator for Interbase.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Shishakov" given="Vitaly"/>
+    <email>vitaly.shishakov@novalumen.com</email>
+    <description>Contributed "trigger" mode for SEQUENCE key generator.</description>
+  </contributor>
+
+
+
   <!--
       Company Information, so we don't have to duplicate it for
       mulitple contributors of the same company
