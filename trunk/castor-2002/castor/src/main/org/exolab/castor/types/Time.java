@@ -87,7 +87,6 @@ public class Time extends DateTimeBase {
      * @param the long value that represents the time instance.
      */
     public Time (long l) {
-        System.out.println("in time:"+l);
         if (l>86400000L)
             throw new IllegalArgumentException("Bad Time: the long value can't represent more than 24h.");
         this.setHour((short)(l/3600000));
