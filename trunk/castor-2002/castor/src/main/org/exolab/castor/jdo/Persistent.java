@@ -93,8 +93,7 @@ public interface Persistent
      * either in {@link OQLQuery#execute( short accessMode )}, or in
      * {@link Database#load( Class type, Object identity, short accessMode )}.
      * The constants are defined in {@link Database}.
-     * @return null or the extending Class. In the latter case Castor will
-     * reload the object of the given class with the same identity.
+     * @return the return value is discarded
      * @throws Exception An exception occured, the object cannot be loaded
      */
     public Class jdoLoad(short accessMode)
