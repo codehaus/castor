@@ -257,7 +257,7 @@ public final class OID {
      *
      * @return The object's identity, or null
      */
-    Object getIdentity() {
+    public Object getIdentity() {
         return _identity;
     }
 
