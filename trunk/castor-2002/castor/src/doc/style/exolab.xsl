@@ -219,22 +219,6 @@
     </xsl:for-each>
   </xsl:template>
 
-
-  <xsl:template name="link-convertor">
-    <xsl:param name="href" select="empty"/>
-    <xsl:choose>
-      <xsl:when test="starts-with($href,'http:')">
-        <xsl:value-of select="$href"/>
-      </xsl:when>
-      <xsl:when test="not(contains($href,'.xml'))">
-        <xsl:value-of select="$href"/>
-      </xsl:when>
-      <xsl:otherwise>
-        <xsl:value-of select="substring-before($href, '.xml')"/>.html
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
-
   <!-- UL is processed into a table using graphical bullets -->
   <xsl:template match="ul">
     <table border="0" cellpadding="2" cellspacing="2">
