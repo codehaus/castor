@@ -53,9 +53,9 @@ import java.util.Enumeration;
 /**
  * Collection handler for adding/listing elements of a collection.
  * A collection field will use this handler to add elements when it's
- * value is set, and to list then when it's value is retrieved.
+ * value is set, and to enumerate then when it's value is retrieved.
  * A collection handler is instantiated only once, must be thread
- * safe and not rely on synchronization.
+ * safe and not use any synchronization.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -94,6 +94,29 @@ public interface CollectionHandler
      */
     public Enumeration elements( Object collection )
         throws ClassCastException;
+
+
+    /**
+     * Returns the number of elements in the collection.
+     *
+     * @param collection The collection
+     * @return Number of elements in the collection
+     * @throws ClassCastException The collection handler does not
+     *  support collections of this type
+     */
+    public int size( Object collection )
+        throws ClassCastException;
+
+
+    /**
+     * Returns true if the collection requires get/set methods.
+     * <tt>java.util</tt> collections only require a get method,
+     * but an array collection required both get and set methods.
+     *
+     * @return True if collection requires get/set methods, false
+     *  if collection requires only get method
+     */
+    public boolean isGetSetCollection();
 
 
 }

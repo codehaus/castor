@@ -390,10 +390,10 @@ public final class FieldHandlerImpl
                     collect = _colHandler.add( collect, value );
                     if ( collect != null )
                         _field.set( object, collect );
-                } else if ( _getMethod != null && _setMethod != null ) {
+                } else if ( _getMethod != null ) {
                     collect = _getMethod.invoke( object, null );
                     collect = _colHandler.add( collect, value );
-                    if ( collect != null )
+                    if ( collect != null && _setMethod != null)
                         _setMethod.invoke( object, new Object[] { collect } );
                 }                
             } catch ( IllegalAccessException except ) {
