@@ -60,10 +60,17 @@ class UnmarshalState {
     StringBuffer buffer = null;
 
     /**
+     * The key for the object. This may be null if no key
+     * or identity has been specified.
+    **/
+    Object key = null;
+    
+    /**
      * The current that we are unmarshalling to
     **/
     Object object = null;
 
+    
     /**
      * The class of the object, mainly used for primitives
     **/

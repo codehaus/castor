@@ -64,6 +64,7 @@ import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.types.AutoNamingType;
+import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.util.Configuration;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
@@ -81,7 +82,6 @@ import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 public class XMLMappingLoader
     extends MappingLoader
 {
-
 
     /**
      * naming conventions
@@ -346,6 +346,13 @@ public class XMLMappingLoader
         if (xml != null) {
             xmlDesc.setSchemaType(xml.getType());
             xmlDesc.setQNamePrefix(xml.getQNamePrefix());
+        }
+        
+        //-- isMapped item
+        CollectionType colType = fieldMap.getCollection();
+        if (colType != null) {
+            xmlDesc.setMapped((colType == CollectionType.HASHTABLE) ||
+               (colType == CollectionType.MAP));
         }
 
         return xmlDesc;
