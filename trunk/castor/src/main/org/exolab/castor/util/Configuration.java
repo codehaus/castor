@@ -214,6 +214,18 @@ public abstract class Configuration
          */
         public static final String StrictElements = "org.exolab.castor.xml.strictelements";
 
+
+        /**
+         * Property specifying whether or not to save the "keys" of a Hashtable or 
+         * Map during marshalling. By default this is true.
+         * <pre>
+         * org.exolab.castor.xml.saveMapKeys
+         * </pre>
+         * @since 0.9.5.3
+         */
+        public static final String SaveMapKeys = "org.exolab.castor.xml.saveMapKeys";
+        
+        
         /**
          * The name of the configuration file.
          * <pre>
