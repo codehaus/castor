@@ -267,15 +267,15 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 
 
     private class ValuesEnumeration implements Enumeration {
-        private Enumeration enum;
+        private Enumeration enumeration;
         private ValuesEnumeration(Collection coll) {
-            enum = (new Vector(coll)).elements();
+            enumeration = (new Vector(coll)).elements();
         }
         public boolean hasMoreElements() {
-            return enum.hasMoreElements();
+            return enumeration.hasMoreElements();
         }
         public Object nextElement() throws NoSuchElementException {
-            return ((QueueItem) enum.nextElement()).value;
+            return ((QueueItem) enumeration.nextElement()).value;
         }
     }
     

@@ -107,7 +107,7 @@ public class KeyGenGeneric extends CastorTestCase {
         OQLQuery            oql;
         TestKeyGenObject    object;
         TestKeyGenObject    ext;
-        QueryResults        enum;
+        QueryResults        enumeration;
         boolean             result;
 
         result = true;
@@ -137,10 +137,10 @@ public class KeyGenGeneric extends CastorTestCase {
         oql.create( "SELECT object FROM " + objClass.getName() +
                        " object WHERE id = $1" );
         oql.bind( object.getId() );
-        enum = oql.execute();
+        enumeration = oql.execute();
         stream.println( "Removing first object: " + object );
-        if ( enum.hasMore() ) {
-            object = (TestKeyGenObject) enum.next();
+        if ( enumeration.hasMore() ) {
+            object = (TestKeyGenObject) enumeration.next();
             _db.remove( object );
             stream.println( "OK: Removed" );
         } else {
@@ -154,10 +154,10 @@ public class KeyGenGeneric extends CastorTestCase {
         oql.create( "SELECT ext FROM " + extClass.getName() +
                        " ext WHERE id = $1" );
         oql.bind( ext.getId() );
-        enum = oql.execute();
+        enumeration = oql.execute();
         stream.println( "Removing second object: " + ext );
-        if ( enum.hasMore() ) {
-            ext = (TestKeyGenObject) enum.next();
+        if ( enumeration.hasMore() ) {
+            ext = (TestKeyGenObject) enumeration.next();
             _db.remove( ext );
             stream.println( "OK: Removed" );
         } else {

@@ -427,9 +427,9 @@ public class ElementDecl extends Particle
      */
     public Enumeration getSubstitutionGroupMembers() {
     	Vector result = new Vector();
-    	Enumeration enum = _schema.getElementDecls();
-    	while (enum.hasMoreElements()) {
-    		ElementDecl temp  = (ElementDecl)enum.nextElement();
+    	Enumeration enumeration = _schema.getElementDecls();
+    	while (enumeration.hasMoreElements()) {
+    		ElementDecl temp  = (ElementDecl)enumeration.nextElement();
     		String subName = temp.getSubstitutionGroup();
     		if (subName!=null && subName.equals(_name)) 
     			result.add(temp);

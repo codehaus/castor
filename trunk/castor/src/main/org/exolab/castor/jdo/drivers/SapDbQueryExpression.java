@@ -76,7 +76,7 @@ public final class SapDbQueryExpression
         Join         join;
         StringBuffer sql;
         boolean      first;
-        Enumeration  enum;
+        Enumeration  enumeration;
         int          size;
         Vector       sorted = new Vector();
 
@@ -92,12 +92,12 @@ public final class SapDbQueryExpression
         // They should go in the special order: the table from the left side of outer join
         // should go before the table from the right side.
         // first add elements that participate in outer joins
-        enum = _joins.elements();
-        while ( enum.hasMoreElements() ) {
+        enumeration = _joins.elements();
+        while ( enumeration.hasMoreElements() ) {
             int left;
             int right;
 
-            join = (Join) enum.nextElement();
+            join = (Join) enumeration.nextElement();
             if ( ! join.outer ) {
                 continue;
             }
@@ -118,19 +118,19 @@ public final class SapDbQueryExpression
             }
         }
         // now add elements that don't participate in outer joins
-        enum = _tables.keys();
-        while ( enum.hasMoreElements() ) {
+        enumeration = _tables.keys();
+        while ( enumeration.hasMoreElements() ) {
             Object name;
 
-            name = enum.nextElement();
+            name = enumeration.nextElement();
             if (!sorted.contains(name)) {
                 sorted.addElement(name);
             }
         }
         // Append all the tables (from sorted) to the sql string.
-        enum = sorted.elements();
-        while ( enum.hasMoreElements() ) {
-            String tableAlias = (String) enum.nextElement();
+        enumeration = sorted.elements();
+        while ( enumeration.hasMoreElements() ) {
+            String tableAlias = (String) enumeration.nextElement();
             String tableName = (String) _tables.get( tableAlias );
             if( tableAlias.equals( tableName ) ) {
                 sql.append( _factory.quoteName( tableName ) );
@@ -138,7 +138,7 @@ public final class SapDbQueryExpression
                 sql.append( _factory.quoteName( tableName ) + " " +
                             _factory.quoteName( tableAlias ) );
             }
-            if ( enum.hasMoreElements() )
+            if ( enumeration.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }
         first = true;

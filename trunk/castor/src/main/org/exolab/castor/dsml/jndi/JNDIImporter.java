@@ -100,7 +100,7 @@ public class JNDIImporter
        	Attributes        attrSet;
 	Attribute         attr;
 	int               i;
-	NamingEnumeration enum;
+	NamingEnumeration enumeration;
 
 	if ( result.getAttributes().size() == 0 ) {
 
@@ -124,9 +124,9 @@ public class JNDIImporter
 
 		modifs = new Vector();
 		attrSet = result.getAttributes();
-		enum = attrSet.getAll();
-		while ( enum.hasMore() ) {
-		    attr = (Attribute) enum.next();
+		enumeration = attrSet.getAll();
+		while ( enumeration.hasMore() ) {
+		    attr = (Attribute) enumeration.next();
 		    if ( existing.get( attr.getID() ) != null ) {
                         if ( ( policy & ImportDescriptor.Policy.NewAttrOnly ) == 0 ) {
                             if ( attr.size() > 0 ) {
@@ -144,9 +144,9 @@ public class JNDIImporter
                     }
 		}
 		if ( ( policy & ImportDescriptor.Policy.ReplaceAttr ) != 0 ) {
-		    enum = existing.getAll();
-		    while ( enum.hasMore() ) {
-			attr = (Attribute) enum.next();
+		    enumeration = existing.getAll();
+		    while ( enumeration.hasMore() ) {
+			attr = (Attribute) enumeration.next();
 			if ( attrSet.get( attr.getID() ) == null ) {
 			    modifs.addElement( new ModificationItem( DirContext.REMOVE_ATTRIBUTE, attr ) );
 			}

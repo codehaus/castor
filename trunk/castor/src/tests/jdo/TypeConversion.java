@@ -107,7 +107,7 @@ public class TypeConversion extends CastorTestCase {
             throws PersistenceException, SQLException {
 
         TestConversion      types;
-        Enumeration         enum;
+        Enumeration         enumeration;
 
         // Open transaction in order to perform JDO operations
         _db = _category.getDatabase( verbose );
@@ -119,9 +119,9 @@ public class TypeConversion extends CastorTestCase {
         _oql = _db.getOQLQuery( "SELECT types FROM jdo.TestConversion types WHERE id = $1" );
         // This one tests that bind performs type conversion
         _oql.bind( new Integer(TestConversion.DefaultId) );
-        enum = _oql.execute();
-        if ( enum.hasMoreElements() ) {
-            types = (TestConversion) enum.nextElement();
+        enumeration = _oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            types = (TestConversion) enumeration.nextElement();
             // reset all value to default
             types.setBoolByte(false);
             types.setBoolShort(false);
@@ -175,7 +175,7 @@ public class TypeConversion extends CastorTestCase {
 
         TestConversion      types;
 
-        Enumeration         enum;
+        Enumeration         enumeration;
 
         stream.println( "Testing date/time conversion" );
         _db.begin();

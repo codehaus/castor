@@ -1250,10 +1250,10 @@ public class ParseTreeWalker implements TokenTypes
             if ( tokenType == DOT ) {
                 if ( path == null ) {
                     System.err.println( "exprTree=" + exprTree.toStringEx() + "\npathInfo = {" );
-                    Enumeration enum = _pathInfo.keys();
+                    Enumeration enumeration = _pathInfo.keys();
                     ParseTreeNode n;
-                    while ( enum.hasMoreElements() ) {
-                        n = (ParseTreeNode)enum.nextElement();
+                    while ( enumeration.hasMoreElements() ) {
+                        n = (ParseTreeNode)enumeration.nextElement();
                         System.err.println( "\t" + n.toStringEx() );
                     }
                     // Exception follows in addJoinsForPathExpression()

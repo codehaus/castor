@@ -198,7 +198,7 @@ public class Concurrent extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        QueryResults   enum;
+        QueryResults   enumeration;
 
         // Open transaction in order to perform JDO operations
         _db.begin();
@@ -208,9 +208,9 @@ public class Concurrent extends CastorTestCase {
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            object = (TestObject) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            object = (TestObject) enumeration.next();
             stream.println( "Retrieved object: " + object );
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );
@@ -304,7 +304,7 @@ public class Concurrent extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        QueryResults   enum;
+        QueryResults   enumeration;
 
         // Open transaction in order to perform JDO operations
         _db.begin();
@@ -314,9 +314,9 @@ public class Concurrent extends CastorTestCase {
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            object = (TestObject) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            object = (TestObject) enumeration.next();
             stream.println( "Retrieved object: " + object );
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );

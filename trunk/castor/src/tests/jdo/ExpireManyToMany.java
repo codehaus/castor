@@ -530,7 +530,7 @@ public class ExpireManyToMany extends CastorTestCase {
      */
     private void deleteTestDataSet() {
         log("deleting test data set...");
-        QueryResults enum;
+        QueryResults enumeration;
         TestManyGroup group = null;
         TestManyPerson person = null;
         Database db = null;
@@ -540,9 +540,9 @@ public class ExpireManyToMany extends CastorTestCase {
             db.begin();
             OQLQuery oqlclean = db.getOQLQuery( "SELECT object FROM jdo.TestManyGroup object WHERE object.id < $1" );
             oqlclean.bind( Integer.MAX_VALUE );
-            enum = oqlclean.execute();
-            while ( enum.hasMore() ) {
-                group = (TestManyGroup) enum.next();
+            enumeration = oqlclean.execute();
+            while ( enumeration.hasMore() ) {
+                group = (TestManyGroup) enumeration.next();
                 stream.println( "Retrieved object: " + group );
                 db.remove( group );
                 stream.println( "Deleted object: " + group );
@@ -552,9 +552,9 @@ public class ExpireManyToMany extends CastorTestCase {
             db.begin();
             oqlclean = db.getOQLQuery( "SELECT object FROM jdo.TestManyPerson object WHERE object.id < $1" );
             oqlclean.bind( Integer.MAX_VALUE );
-            enum = oqlclean.execute();
-            while ( enum.hasMore() ) {
-                person = (TestManyPerson) enum.next();
+            enumeration = oqlclean.execute();
+            while ( enumeration.hasMore() ) {
+                person = (TestManyPerson) enumeration.next();
                 stream.println( "Retrieved object: " + person );
                 db.remove( person );
                 stream.println( "Deleted object: " + person );

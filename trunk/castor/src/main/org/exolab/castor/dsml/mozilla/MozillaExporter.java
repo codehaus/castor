@@ -92,7 +92,7 @@ public class MozillaExporter
 			boolean serverSchema, boolean importPolicy )
 	throws ImportExportException
     {
-	Enumeration enum;
+	Enumeration enumeration;
 	String[]    attrs;
 	MozillaProducer  producer;
 	LDAPSchema  schema;
@@ -116,14 +116,14 @@ public class MozillaExporter
 		scope = LDAPv2.SCOPE_SUB;
 		break;
 	    }
-	    enum = _conn.search( getSearchDescriptor().getBaseDN(), scope,
+	    enumeration = _conn.search( getSearchDescriptor().getBaseDN(), scope,
 				getSearchDescriptor().getFilter(), attrs, false );
 	} catch ( LDAPException except ) {
 	    // Object does not exist, was not removed, ignore.
 	    // Anything else, we must complain.
 	    if ( except.getLDAPResultCode() != LDAPException.NO_SUCH_OBJECT )
 		throw new ImportExportException( except );
-	    enum = null;
+	    enumeration = null;
 	}
 
 	try {
@@ -134,8 +134,8 @@ public class MozillaExporter
 		schema.fetchSchema( _conn );
 		producer.produce( schema );
 	    }
-	    if ( enum != null )
-		producer.produce( enum );
+	    if ( enumeration != null )
+		producer.produce( enumeration );
 	    if ( importPolicy && getImportDescriptor() != null )
 		producer.produce( getImportDescriptor() );
 	    producer.endDocument();

@@ -116,11 +116,11 @@ public class Test
             response.getDocumentHandler().startDocument();
             response.getDocumentHandler().startElement( "products", new AttributeListImpl() );
             if ( result instanceof Enumeration ) {
-                Enumeration enum;
+                Enumeration enumeration;
 
-                enum = (Enumeration) result;
-                while( enum.hasMoreElements() )
-                   marshal.marshal( enum.nextElement() );
+                enumeration = (Enumeration) result;
+                while( enumeration.hasMoreElements() )
+                   marshal.marshal( enumeration.nextElement() );
             } else 
                 marshal.marshal( result );
 

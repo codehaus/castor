@@ -229,17 +229,17 @@ public class JCompUnit {
         for (int i = 0; i < classes.size(); ++i) {
             JClass jClass = (JClass) classes.get(i);
             
-            Enumeration enum = jClass.getImports();
-            while (enum.hasMoreElements()) {
-                allImports.add(enum.nextElement());
+            Enumeration enumeration = jClass.getImports();
+            while (enumeration.hasMoreElements()) {
+                allImports.add(enumeration.nextElement());
             }
         }
         
         for (int i = 0; i < interfaces.size(); ++i) {
             JInterface jInterface = (JInterface) interfaces.get(i);
-            Enumeration enum = jInterface.getImports();
-            while (enum.hasMoreElements()) {
-                allImports.add(enum.nextElement());
+            Enumeration enumeration = jInterface.getImports();
+            while (enumeration.hasMoreElements()) {
+                allImports.add(enumeration.nextElement());
             }
         }
         

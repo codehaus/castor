@@ -115,14 +115,14 @@ final class TransactionContextImpl
     protected void commitConnections()
         throws TransactionAbortedException
     {
-        Enumeration enum;
+        Enumeration enumeration;
         Connection  conn;
 
         if ( _globalTx ) {
-            enum = _conns.elements();
-            while ( enum.hasMoreElements() ) {
+            enumeration = _conns.elements();
+            while ( enumeration.hasMoreElements() ) {
                 try {
-                    ( (Connection) enum.nextElement() ).close();
+                    ( (Connection) enumeration.nextElement() ).close();
                 } catch ( SQLException except ) { }
             }
 
@@ -131,9 +131,9 @@ final class TransactionContextImpl
             try {
                 // Go through all the connections opened in this transaction,
                 // commit and close them one by one.
-                enum = _conns.elements();
-                while ( enum.hasMoreElements() ) {
-                    conn = (Connection) enum.nextElement();
+                enumeration = _conns.elements();
+                while ( enumeration.hasMoreElements() ) {
+                    conn = (Connection) enumeration.nextElement();
                     // Checkpoint can only be done if transaction is not running
                     // under transaction monitor
                     conn.commit();
@@ -141,10 +141,10 @@ final class TransactionContextImpl
             } catch ( SQLException except ) {
                 throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
             } finally {
-                enum = _conns.elements();
-                while ( enum.hasMoreElements() ) {
+                enumeration = _conns.elements();
+                while ( enumeration.hasMoreElements() ) {
                     try {
-                        ( (Connection) enum.nextElement() ).close();
+                        ( (Connection) enumeration.nextElement() ).close();
                     } catch ( SQLException except ) { }
                 }
                 _conns.clear();
@@ -156,7 +156,7 @@ final class TransactionContextImpl
     protected void closeConnections()
         throws TransactionAbortedException
     {
-        Enumeration enum;
+        Enumeration enumeration;
         Connection  conn;
         Exception   error = null;
 
@@ -166,9 +166,9 @@ final class TransactionContextImpl
         // Go through all the connections opened in this transaction,
         // close them one by one.
         // Close all that can be closed, after that report error if any.
-        enum = _conns.elements();
-        while ( enum.hasMoreElements() ) {
-            conn = (Connection) enum.nextElement();
+        enumeration = _conns.elements();
+        while ( enumeration.hasMoreElements() ) {
+            conn = (Connection) enumeration.nextElement();
             try {
                 conn.close();
             } catch ( SQLException except ) {
@@ -185,13 +185,13 @@ final class TransactionContextImpl
     protected void rollbackConnections()
     {
         Connection  conn;
-        Enumeration enum;
+        Enumeration enumeration;
 
         // Go through all the connections opened in this transaction,
         // rollback and close them one by one. Ignore errors.
-        enum = _conns.elements();
-        while ( enum.hasMoreElements() ) {
-            conn = (Connection) enum.nextElement();
+        enumeration = _conns.elements();
+        while ( enumeration.hasMoreElements() ) {
+            conn = (Connection) enumeration.nextElement();
             try {
                 // if not a global transaction, rollback each one
                 if ( ! _globalTx )

@@ -832,9 +832,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 
                 //-- check unresolved references
                 if (_resolveTable != null) {
-                    Enumeration enum = _resolveTable.keys();
-                    while (enum.hasMoreElements()) {
-                        String msg = "unable to resolve reference: " + enum.nextElement();                        
+                    Enumeration enumeration = _resolveTable.keys();
+                    while (enumeration.hasMoreElements()) {
+                        String msg = "unable to resolve reference: " + enumeration.nextElement();                        
                         if (first == null) {
                             first = new ValidationException(msg);
                             last = first;
@@ -2990,9 +2990,9 @@ public final class UnmarshalHandler extends MarshalFramework
             UnmarshalState state = (UnmarshalState) _stateInfo.peek();
             FieldHandler handler = nsDescriptor.getHandler();
             if (handler != null) {
-                Enumeration enum = _namespaces.getLocalNamespacePrefixes();
-                while (enum.hasMoreElements()) {
-                    String nsPrefix = (String)enum.nextElement();
+                Enumeration enumeration = _namespaces.getLocalNamespacePrefixes();
+                while (enumeration.hasMoreElements()) {
+                    String nsPrefix = (String)enumeration.nextElement();
                     if (nsPrefix == null) nsPrefix = "";
                     String nsURI = _namespaces.getNamespaceURI(nsPrefix);
                     if (nsURI == null) nsURI = "";

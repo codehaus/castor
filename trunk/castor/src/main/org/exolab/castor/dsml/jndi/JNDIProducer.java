@@ -86,7 +86,7 @@ public class JNDIProducer
     {
         AttributeListImpl  attrList;
         Attribute          attr;
-        NamingEnumeration  enum;
+        NamingEnumeration  enumeration;
         NamingEnumeration  values;
         Object             value;
 
@@ -124,10 +124,10 @@ public class JNDIProducer
                 _docHandler.endElement( prefix( XML.Entries.Elements.ObjectClass ) );
             }
 
-            enum = attrs.getAll();
-            while ( enum.hasMore() ) {
+            enumeration = attrs.getAll();
+            while ( enumeration.hasMore() ) {
                 // dsml:attr
-                attr = (Attribute) enum.next();
+                attr = (Attribute) enumeration.next();
                 if ( attr.getID().equals( "objectclass" ) )
                     continue;
                 attrList = new AttributeListImpl();

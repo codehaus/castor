@@ -1583,9 +1583,9 @@ public class Marshaller extends MarshalFramework {
                 }
                 if (processCollection) {
                     CollectionHandler colHandler = getCollectionHandler(type);
-                    Enumeration enum = colHandler.elements(obj);
-                    while (enum.hasMoreElements()) {
-                        Object item = enum.nextElement();
+                    Enumeration enumeration = colHandler.elements(obj);
+                    while (enumeration.hasMoreElements()) {
+                        Object item = enumeration.nextElement();
                         if (item != null) {
                             marshal(item, elemDescriptor, handler);
                         }
@@ -1989,9 +1989,9 @@ public class Marshaller extends MarshalFramework {
         if (attDescriptor.isReference() && (value != null)) {
 
             if (attDescriptor.isMultivalued()) {
-                Enumeration enum = null;
+                Enumeration enumeration = null;
                 if (value instanceof Enumeration) {
-                    enum = (Enumeration)value;
+                    enumeration = (Enumeration)value;
                 }
                 else {
                     CollectionHandler colHandler = null;
@@ -2001,13 +2001,13 @@ public class Marshaller extends MarshalFramework {
                     catch(MappingException mx) {
                         throw new MarshalException(mx);
                     }
-                    enum = colHandler.elements(value);
+                    enumeration = colHandler.elements(value);
                 }
-                if (enum.hasMoreElements()) {
+                if (enumeration.hasMoreElements()) {
                     StringBuffer sb = new StringBuffer();
-                    for (int v = 0; enum.hasMoreElements(); v++) {
+                    for (int v = 0; enumeration.hasMoreElements(); v++) {
                         if (v > 0) sb.append(' ');
-                        sb.append(getObjectID(enum.nextElement()).toString());
+                        sb.append(getObjectID(enumeration.nextElement()).toString());
                     }
                     value = sb;
                 }
@@ -2075,9 +2075,9 @@ public class Marshaller extends MarshalFramework {
              return;
         }
         else if (target instanceof Enumeration) {
-            Enumeration enum = (Enumeration)target;
-            while (enum.hasMoreElements()) {
-                Object item = enum.nextElement();
+            Enumeration enumeration = (Enumeration)target;
+            while (enumeration.hasMoreElements()) {
+                Object item = enumeration.nextElement();
                 if (item != null)
                     processContainerAttributes(item, containerFieldDesc, atts);
             }

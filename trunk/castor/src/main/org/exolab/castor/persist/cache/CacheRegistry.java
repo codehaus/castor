@@ -156,13 +156,13 @@ public final class CacheRegistry {
     public static String[] getCacheFactories()
     {
         String[]    names;
-        Enumeration enum;
+        Enumeration enumeration;
 
         load();
         names = new String[ _cacheFactories.size() ];
-        enum = _cacheFactories.keys();
+        enumeration = _cacheFactories.keys();
         for ( int i = 0 ; i < names.length ; ++i ) {
-            names[ i ] = (String) enum.nextElement();
+            names[ i ] = (String) enumeration.nextElement();
         }
         return names;
     }

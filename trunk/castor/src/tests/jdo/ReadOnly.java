@@ -96,7 +96,7 @@ public class ReadOnly extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        Enumeration   enum;
+        Enumeration   enumeration;
 
         // Open transaction in order to perform JDO operations
         _db = _category.getDatabase( verbose );
@@ -107,9 +107,9 @@ public class ReadOnly extends CastorTestCase {
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            object = (TestObject) enumeration.nextElement();
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );
         } else {
@@ -129,14 +129,14 @@ public class ReadOnly extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        Enumeration   enum;
+        Enumeration   enumeration;
 
         // load an object using readOnly mode
         _db.begin();
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute( Database.ReadOnly );
-        object = (TestObject) enum.nextElement();
+        enumeration = oql.execute( Database.ReadOnly );
+        object = (TestObject) enumeration.nextElement();
         stream.println( "Retrieved object: " + object );
         object.setValue1( NewValue );
         stream.println( "Modified object: " + object );
@@ -146,8 +146,8 @@ public class ReadOnly extends CastorTestCase {
         // if changes is not persisted.
         _db.begin();
         oql.bind( TestObject.DefaultId );
-        enum = oql.execute( Database.ReadOnly );
-        object = (TestObject) enum.nextElement();
+        enumeration = oql.execute( Database.ReadOnly );
+        object = (TestObject) enumeration.nextElement();
         stream.println( "Retrieved object: " + object );
         if ( object.getValue1().equals( NewValue ) ) {
             stream.println( "Error: modified object was stored" );

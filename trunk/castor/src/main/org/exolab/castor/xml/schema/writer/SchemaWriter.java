@@ -229,9 +229,9 @@ public class SchemaWriter {
     private void processAnnotated(Annotated annotated, String schemaPrefix)
         throws SAXException
     {
-        Enumeration enum = annotated.getAnnotations();
-        while (enum.hasMoreElements())
-            processAnnotation( (Annotation) enum.nextElement(), schemaPrefix );
+        Enumeration enumeration = annotated.getAnnotations();
+        while (enumeration.hasMoreElements())
+            processAnnotation( (Annotation) enumeration.nextElement(), schemaPrefix );
 
     } //-- processAnnotated
 
@@ -253,10 +253,10 @@ public class SchemaWriter {
 
         
         //--process appinfo elements
-        Enumeration enum = annotation.getAppInfo();
+        Enumeration enumeration = annotation.getAppInfo();
         String ELEM_APPINFO = schemaPrefix + APPINFO;
-        while (enum.hasMoreElements()) {
-            AppInfo app = (AppInfo) enum.nextElement();
+        while (enumeration.hasMoreElements()) {
+            AppInfo app = (AppInfo) enumeration.nextElement();
             String source = app.getSource();
             if (source != null)
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
@@ -280,10 +280,10 @@ public class SchemaWriter {
         }
         
         //-- process documentation elements
-        enum = annotation.getDocumentation();
+        enumeration = annotation.getDocumentation();
         String ELEM_DOCUMENTATION = schemaPrefix + DOCUMENTATION;
-        while (enum.hasMoreElements()) {
-            Documentation doc = (Documentation) enum.nextElement();
+        while (enumeration.hasMoreElements()) {
+            Documentation doc = (Documentation) enumeration.nextElement();
             String source = doc.getSource();
             if (source != null)
                 _atts.addAttribute(SchemaNames.SOURCE_ATTR, CDATA,source);
@@ -454,14 +454,14 @@ public class SchemaWriter {
 
         if (!isReference) {
             AttributeGroupDecl group = (AttributeGroupDecl)attGroup;
-            Enumeration enum = group.getLocalAttributes();
-            while (enum.hasMoreElements()) {
-                processAttribute((AttributeDecl)enum.nextElement(),
+            Enumeration enumeration = group.getLocalAttributes();
+            while (enumeration.hasMoreElements()) {
+                processAttribute((AttributeDecl)enumeration.nextElement(),
                     schemaPrefix);
             }
-            enum = group.getLocalAttributeGroupReferences();
-            while (enum.hasMoreElements()) {
-                processAttributeGroup((AttributeGroup)enum.nextElement(),
+            enumeration = group.getLocalAttributeGroupReferences();
+            while (enumeration.hasMoreElements()) {
+                processAttributeGroup((AttributeGroup)enumeration.nextElement(),
                     schemaPrefix);
             }
             
@@ -613,9 +613,9 @@ public class SchemaWriter {
                     SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
                     SimpleType simpleType = simpleContent.getSimpleType();
                     //-- process facets
-                    Enumeration enum = simpleType.getLocalFacets();
-                    while (enum.hasMoreElements()) {
-                        Facet facet = (Facet) enum.nextElement();
+                    Enumeration enumeration = simpleType.getLocalFacets();
+                    while (enumeration.hasMoreElements()) {
+                        Facet facet = (Facet) enumeration.nextElement();
                         _atts.clear();
                         _atts.addAttribute(SchemaNames.VALUE_ATTR, CDATA,
                                            facet.getValue());
@@ -628,7 +628,7 @@ public class SchemaWriter {
                         }
                        _handler.endElement(facetName);
                     } //--facets
-                    enum = null;
+                    enumeration = null;
                     simpleType = null;
                 }
             }//--<simpleContent><restriction>
@@ -639,13 +639,13 @@ public class SchemaWriter {
         processContentModelGroup(complexType, schemaPrefix);
 
         //-- process Attributes, must appear last in a complex type
-        Enumeration enum = complexType.getLocalAttributeDecls();
-        while (enum.hasMoreElements()) {
-            processAttribute((AttributeDecl)enum.nextElement(), schemaPrefix);
+        Enumeration enumeration = complexType.getLocalAttributeDecls();
+        while (enumeration.hasMoreElements()) {
+            processAttribute((AttributeDecl)enumeration.nextElement(), schemaPrefix);
         }
-        enum = complexType.getAttributeGroupReferences();
-        while (enum.hasMoreElements()) {
-            processAttributeGroup((AttributeGroup)enum.nextElement(), schemaPrefix);
+        enumeration = complexType.getAttributeGroupReferences();
+        while (enumeration.hasMoreElements()) {
+            processAttributeGroup((AttributeGroup)enumeration.nextElement(), schemaPrefix);
         }
 
         if (baseType != null) {
@@ -667,9 +667,9 @@ public class SchemaWriter {
         (ContentModelGroup contentModel, String schemaPrefix)
         throws SAXException
     {
-        Enumeration enum = contentModel.enumerate();
-        while (enum.hasMoreElements()) {
-            Structure structure = (Structure) enum.nextElement();
+        Enumeration enumeration = contentModel.enumerate();
+        while (enumeration.hasMoreElements()) {
+            Structure structure = (Structure) enumeration.nextElement();
             switch (structure.getStructureType()) {
                 case Structure.ELEMENT:
                     processElement((ElementDecl)structure, schemaPrefix);
@@ -854,9 +854,9 @@ public class SchemaWriter {
         }
 
         //-- process any identity-constraints
-        Enumeration enum = element.getIdentityConstraints();
-        while(enum.hasMoreElements()) {
-            processIdentityConstraint((IdentityConstraint)enum.nextElement(),
+        Enumeration enumeration = element.getIdentityConstraints();
+        while(enumeration.hasMoreElements()) {
+            processIdentityConstraint((IdentityConstraint)enumeration.nextElement(),
                 schemaPrefix);
         }
 
@@ -1021,9 +1021,9 @@ public class SchemaWriter {
 
         //-- process field(s)
         String ELEM_FIELD = schemaPrefix + SchemaNames.FIELD;
-        Enumeration enum = constraint.getFields();
-        while(enum.hasMoreElements()) {
-            IdentityField field = (IdentityField) enum.nextElement();
+        Enumeration enumeration = constraint.getFields();
+        while(enumeration.hasMoreElements()) {
+            IdentityField field = (IdentityField) enumeration.nextElement();
             _atts.clear();
             id    = field.getId();
             xpath = field.getXPath();
@@ -1131,30 +1131,30 @@ public class SchemaWriter {
         //-- process annotations
         processAnnotated(schema, schemaPrefix);
 
-        Enumeration enum = null;
+        Enumeration enumeration = null;
          //-- process all imported schemas
-        enum = schema.getImportedSchema();
-        while (enum.hasMoreElements()) {
-            processImport((Schema)enum.nextElement(), schemaPrefix);
+        enumeration = schema.getImportedSchema();
+        while (enumeration.hasMoreElements()) {
+            processImport((Schema)enumeration.nextElement(), schemaPrefix);
         }
         
         //-- process all cached included schemas
-        enum = schema.getCachedIncludedSchemas();
-        while (enum.hasMoreElements()) {
-        	processIncludedSchema((Schema)enum.nextElement(), schemaPrefix);
+        enumeration = schema.getCachedIncludedSchemas();
+        while (enumeration.hasMoreElements()) {
+        	processIncludedSchema((Schema)enumeration.nextElement(), schemaPrefix);
         }
         
         //-- process all redefinitions
-        enum = schema.getRedefineSchema();
-        while (enum.hasMoreElements()) {
-        	processRedefinition((RedefineSchema)enum.nextElement(), schema, schemaPrefix);
+        enumeration = schema.getRedefineSchema();
+        while (enumeration.hasMoreElements()) {
+        	processRedefinition((RedefineSchema)enumeration.nextElement(), schema, schemaPrefix);
         }
         
         //-- process all top level attributeGroup declarations
-        enum = schema.getAttributeGroups();
-        while (enum.hasMoreElements()) {
+        enumeration = schema.getAttributeGroups();
+        while (enumeration.hasMoreElements()) {
         	boolean found = false;
-        	AttributeGroup temp = (AttributeGroup) enum.nextElement();
+        	AttributeGroup temp = (AttributeGroup) enumeration.nextElement();
         	//-- check if this attributeGroup is not 
             //-- part of a redefinition
            if (temp instanceof AttributeGroupDecl) {
@@ -1178,9 +1178,9 @@ public class SchemaWriter {
         }
 
         //-- process all top level attribute declarations
-        enum = schema.getAttributes();
-        while (enum.hasMoreElements()) {
-        	AttributeDecl temp = (AttributeDecl) enum.nextElement();
+        enumeration = schema.getAttributes();
+        while (enumeration.hasMoreElements()) {
+        	AttributeDecl temp = (AttributeDecl) enumeration.nextElement();
         	boolean found = false;
         	//--check if this attributeGroup is not 
         	//-- included 
@@ -1195,9 +1195,9 @@ public class SchemaWriter {
         }
 
         //-- process all top level element declarations
-        enum = schema.getElementDecls();
-        while (enum.hasMoreElements()) {
-        	ElementDecl temp = (ElementDecl) enum.nextElement();
+        enumeration = schema.getElementDecls();
+        while (enumeration.hasMoreElements()) {
+        	ElementDecl temp = (ElementDecl) enumeration.nextElement();
         	boolean found = false;
         	//--check if this attributeGroup is not 
         	//-- included 
@@ -1212,9 +1212,9 @@ public class SchemaWriter {
         }
 
         //-- process all top level complex types
-        enum = schema.getComplexTypes();
-        while (enum.hasMoreElements()) {
-            ComplexType temp = (ComplexType) enum.nextElement();
+        enumeration = schema.getComplexTypes();
+        while (enumeration.hasMoreElements()) {
+            ComplexType temp = (ComplexType) enumeration.nextElement();
             boolean found = false;
             //--check if this attributeGroup is not 
             //-- included 
@@ -1228,9 +1228,9 @@ public class SchemaWriter {
         }
 
         //-- process all top level groups
-        enum = schema.getModelGroups();
-        while (enum.hasMoreElements()) {
-        	ModelGroup temp = (ModelGroup)enum.nextElement();
+        enumeration = schema.getModelGroups();
+        while (enumeration.hasMoreElements()) {
+        	ModelGroup temp = (ModelGroup)enumeration.nextElement();
         	boolean found = false;
         	//--check if this Group is not 
         	//-- included 
@@ -1245,9 +1245,9 @@ public class SchemaWriter {
         }
 
         //-- process all top level simple types
-        enum = schema.getSimpleTypes();
-        while (enum.hasMoreElements()) {
-            SimpleType temp = (SimpleType) enum.nextElement();
+        enumeration = schema.getSimpleTypes();
+        while (enumeration.hasMoreElements()) {
+            SimpleType temp = (SimpleType) enumeration.nextElement();
             boolean found = false;
             //--check if this attributeGroup is not 
             //-- included 
@@ -1286,10 +1286,10 @@ public class SchemaWriter {
         
         //-- @namespace
         StringBuffer namespace = new StringBuffer();
-        Enumeration enum = wildcard.getNamespaces();
-        while (enum.hasMoreElements()) {
+        Enumeration enumeration = wildcard.getNamespaces();
+        while (enumeration.hasMoreElements()) {
             if (namespace.length() > 0) namespace.append(' ');
-            namespace.append(enum.nextElement().toString());
+            namespace.append(enumeration.nextElement().toString());
         }
         if (namespace.length() > 0) {
             _atts.addAttribute(SchemaNames.NAMESPACE, CDATA, namespace.toString());
@@ -1386,29 +1386,29 @@ public class SchemaWriter {
     	processAnnotated(schema, schemaPrefix);
     	
     	if (schemaLoc != "") {
-	    	Enumeration enum = null;
+	    	Enumeration enumeration = null;
 	    	//--process complexTypes
-	        enum = schema.enumerateComplexTypes();
-	        while (enum.hasMoreElements()) {
-	        	ComplexType type = (ComplexType)enum.nextElement();
+	        enumeration = schema.enumerateComplexTypes();
+	        while (enumeration.hasMoreElements()) {
+	        	ComplexType type = (ComplexType)enumeration.nextElement();
 	        	processComplexType(type, schemaPrefix);
 	        }
 	    	//--process simpleTypes
-	        enum = schema.enumerateSimpleTypes();
-	        while (enum.hasMoreElements()) {
-	        	SimpleType type = (SimpleType)enum.nextElement();
+	        enumeration = schema.enumerateSimpleTypes();
+	        while (enumeration.hasMoreElements()) {
+	        	SimpleType type = (SimpleType)enumeration.nextElement();
 	        	processSimpleType(type, schemaPrefix);
 	        }
 	    	//--process groups
-	        enum = schema.enumerateGroups();
-	        while (enum.hasMoreElements()) {
-	        	ModelGroup group= (ModelGroup)enum.nextElement();
+	        enumeration = schema.enumerateGroups();
+	        while (enumeration.hasMoreElements()) {
+	        	ModelGroup group= (ModelGroup)enumeration.nextElement();
 	        	processGroup(group, schemaPrefix);
 	        }
 	    	//--process AttributeGroups
-	        enum = schema.enumerateAttributeGroups();
-	        while (enum.hasMoreElements()) {
-	        	AttributeGroupDecl attGroup = (AttributeGroupDecl)enum.nextElement();
+	        enumeration = schema.enumerateAttributeGroups();
+	        while (enumeration.hasMoreElements()) {
+	        	AttributeGroupDecl attGroup = (AttributeGroupDecl)enumeration.nextElement();
 	        	processAttributeGroup(attGroup, schemaPrefix);
 	        }
     	}
@@ -1490,9 +1490,9 @@ public class SchemaWriter {
             _handler.startElement(ELEM_RESTRICTION, _atts);
 
             //-- process facets
-            Enumeration enum = simpleType.getLocalFacets();
-            while (enum.hasMoreElements()) {
-                Facet facet = (Facet) enum.nextElement();
+            Enumeration enumeration = simpleType.getLocalFacets();
+            while (enumeration.hasMoreElements()) {
+                Facet facet = (Facet) enumeration.nextElement();
                 _atts.clear();
                 _atts.addAttribute(SchemaNames.VALUE_ATTR, CDATA,
                     facet.getValue());
@@ -1569,9 +1569,9 @@ public class SchemaWriter {
 
         //-- process local simpleType references
         StringBuffer memberTypes = new StringBuffer();
-        Enumeration enum = union.getMemberTypes();
-        while (enum.hasMoreElements()) {
-            SimpleType simpleType = (SimpleType)enum.nextElement();
+        Enumeration enumeration = union.getMemberTypes();
+        while (enumeration.hasMoreElements()) {
+            SimpleType simpleType = (SimpleType)enumeration.nextElement();
             //-- ignore local simpleTypes;
             if (simpleType.getParent() != union.getSchema()) {
                 continue;
@@ -1594,9 +1594,9 @@ public class SchemaWriter {
         }
 
         //-- process local simpleType definitions
-        enum = union.getMemberTypes();
-        while (enum.hasMoreElements()) {
-            SimpleType simpleType = (SimpleType)enum.nextElement();
+        enumeration = union.getMemberTypes();
+        while (enumeration.hasMoreElements()) {
+            SimpleType simpleType = (SimpleType)enumeration.nextElement();
             //-- ignore top-level simpleTypes;
             if (simpleType.getParent() == union.getSchema())
                 continue;

@@ -127,7 +127,7 @@ public class ManyToManyKeyGen extends CastorTestCase {
         ArrayList al, bl;
         OQLQuery oql;
         OQLQuery oqlp;
-        QueryResults enum;
+        QueryResults enumeration;
         int groupAId, groupBId;
         int person1Id, person2Id, person3Id, person4Id;
 
@@ -140,9 +140,9 @@ public class ManyToManyKeyGen extends CastorTestCase {
         // select an group and delete it, if it exist!
         OQLQuery oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyGroupKeyGen object WHERE object.id < $1" );
         oqlclean.bind( Integer.MAX_VALUE );
-        enum = oqlclean.execute();
-        while ( enum.hasMore() ) {
-            groupA = (TestManyGroupKeyGen) enum.next();
+        enumeration = oqlclean.execute();
+        while ( enumeration.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enumeration.next();
             stream.println( "Retrieved object: " + groupA );
             _db.remove( groupA );
             stream.println( "Deleted object: " + groupA );
@@ -152,9 +152,9 @@ public class ManyToManyKeyGen extends CastorTestCase {
         _db.begin();
         oqlclean = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPersonKeyGen object WHERE object.id < $1" );
         oqlclean.bind( Integer.MAX_VALUE );
-        enum = oqlclean.execute();
-        while ( enum.hasMore() ) {
-            person1 = (TestManyPersonKeyGen) enum.next();
+        enumeration = oqlclean.execute();
+        while ( enumeration.hasMore() ) {
+            person1 = (TestManyPersonKeyGen) enumeration.next();
             stream.println( "Retrieved object: " + person1 );
             _db.remove( person1 );
             stream.println( "Deleted object: " + person1 );
@@ -246,9 +246,9 @@ public class ManyToManyKeyGen extends CastorTestCase {
         groupA = null;
         person1 = null;
         person2 = null;
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            groupA = (TestManyGroupKeyGen) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enumeration.next();
             stream.println( "Retrieved object: " + groupA );
             Collection p = groupA.getPeople();
             if ( p != null ) {
@@ -335,9 +335,9 @@ public class ManyToManyKeyGen extends CastorTestCase {
         groupA = null;
         person1 = null;
         person2 = null;
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            groupA = (TestManyGroupKeyGen) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enumeration.next();
             stream.println( "Retrieved object: " + groupA );
             Collection p = groupA.getPeople();
             if ( p != null ) {
@@ -494,9 +494,9 @@ public class ManyToManyKeyGen extends CastorTestCase {
         groupA = null;
         person1 = null;
         person2 = null;
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            groupA = (TestManyGroupKeyGen) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            groupA = (TestManyGroupKeyGen) enumeration.next();
             stream.println( "Retrieved object: " + groupA );
             Collection p = groupA.getPeople();
             if ( p != null ) {

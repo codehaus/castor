@@ -96,7 +96,7 @@ public class StoredProcedure extends CastorTestCase {
 
         OQLQuery      oql;
         TestObject    object;
-        Enumeration   enum;
+        Enumeration   enumeration;
         int resCnt;
         
         // Open transaction in order to perform JDO operations
@@ -104,9 +104,9 @@ public class StoredProcedure extends CastorTestCase {
         // Remove all objects.
         // Then create three objects with the given field values.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-        enum = oql.execute();
-        while ( enum.hasMoreElements() ) {
-            object = (TestObject) enum.nextElement();
+        enumeration = oql.execute();
+        while ( enumeration.hasMoreElements() ) {
+            object = (TestObject) enumeration.nextElement();
             _db.remove( object );
         }
         _db.commit();
@@ -149,11 +149,11 @@ public class StoredProcedure extends CastorTestCase {
         oql = _db.getOQLQuery( "CALL proc_check_permissions($,$) AS jdo.TestObject" );
         oql.bind( USER1 );
         oql.bind( GROUP1 );
-        enum = oql.execute();
+        enumeration = oql.execute();
 
         resCnt = 0;
-        for (int i = 1; enum.hasMoreElements(); i++ ) {
-            object = (TestObject) enum.nextElement();
+        for (int i = 1; enumeration.hasMoreElements(); i++ ) {
+            object = (TestObject) enumeration.nextElement();
             stream.println( "Fetched object: " + object );
             resCnt++;
         }

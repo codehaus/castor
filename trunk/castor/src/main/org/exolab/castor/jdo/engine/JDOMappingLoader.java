@@ -147,7 +147,7 @@ public class JDOMappingLoader
         if ( keyGenName != null ) {
             String keyGenFactoryName;
             KeyGeneratorDef keyGenDef;
-            Enumeration enum;
+            Enumeration enumeration;
             Properties params;
 
             // first search among declared key generators
@@ -157,9 +157,9 @@ public class JDOMappingLoader
             keyGenFactoryName = keyGenName;
             if ( keyGenDef != null ) {
                 keyGenFactoryName = keyGenDef.getName();
-                enum = keyGenDef.enumerateParam();
-                while ( enum.hasMoreElements() ) {
-                    Param par = (Param) enum.nextElement();
+                enumeration = keyGenDef.enumerateParam();
+                while ( enumeration.hasMoreElements() ) {
+                    Param par = (Param) enumeration.nextElement();
                     params.put( par.getName(), par.getValue() );
                 }
             }
@@ -302,15 +302,15 @@ public class JDOMappingLoader
     public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
-        Enumeration enum;
+        Enumeration enumeration;
         _factory = (BaseFactory) param;
         // Load the key generator definitions and check for duplicate names
-        enum = mapping.enumerateKeyGeneratorDef();
-        while ( enum.hasMoreElements() ) {
+        enumeration = mapping.enumerateKeyGeneratorDef();
+        while ( enumeration.hasMoreElements() ) {
             KeyGeneratorDef keyGenDef;
             String name;
 
-            keyGenDef = (KeyGeneratorDef) enum.nextElement();
+            keyGenDef = (KeyGeneratorDef) enumeration.nextElement();
             name = keyGenDef.getAlias();
             if (name == null) {
                 name = keyGenDef.getName();

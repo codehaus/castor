@@ -100,7 +100,7 @@ public class TypeLOB extends CastorTestCase {
             throws PersistenceException {
 
         TestLOB     types;
-        Enumeration   enum;
+        Enumeration   enumeration;
 
         // Open transaction in order to perform JDO operations
         db = _category.getDatabase( verbose );
@@ -112,9 +112,9 @@ public class TypeLOB extends CastorTestCase {
         oql = db.getOQLQuery( "SELECT types FROM jdo.TestLOB types WHERE id = $(integer)1" );
         // This one tests that bind performs type conversion
         oql.bind( TestLOB.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            types = (TestLOB) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            types = (TestLOB) enumeration.nextElement();
             stream.println( "Updating object: " + types );
         } else {
             types = new TestLOB();
@@ -130,7 +130,7 @@ public class TypeLOB extends CastorTestCase {
 
         TestLOB     types;
 
-        Enumeration   enum;
+        Enumeration   enumeration;
 
         int           len;
 
@@ -146,9 +146,9 @@ public class TypeLOB extends CastorTestCase {
         stream.println( "Testing BLOB and CLOB fields" );
         db.begin();
         oql.bind( TestLOB.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            types = (TestLOB) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            types = (TestLOB) enumeration.nextElement();
             types.setBlob( BLOB_VALUE );
             types.setClob( CLOB_VALUE );
             //types.setBlob2( new ByteArrayInputStream( BLOB_VALUE ) );
@@ -158,9 +158,9 @@ public class TypeLOB extends CastorTestCase {
 
         db.begin();
         oql.bind( TestLOB.DefaultId );
-        enum = oql.execute();
-        if ( enum.hasMoreElements() ) {
-            types = (TestLOB) enum.nextElement();
+        enumeration = oql.execute();
+        if ( enumeration.hasMoreElements() ) {
+            types = (TestLOB) enumeration.nextElement();
 
             if ( types.getBlob() == null || ! (new String(types.getBlob())).equals(new String(BLOB_VALUE)) ) {
                 stream.println( "Error: BLOB value was not set" );

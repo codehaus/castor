@@ -164,13 +164,13 @@ public final class LockEngine {
             Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory );
     
             _typeInfo = new HashMap();
-            Enumeration enum = v.elements();
+            Enumeration enumeration = v.elements();
 
             HashSet processedClasses = new HashSet();
             HashSet freshClasses = new HashSet();
             // copy things into an arraylist
-            while ( enum.hasMoreElements() )
-                freshClasses.add( enum.nextElement() );
+            while ( enumeration.hasMoreElements() )
+                freshClasses.add( enumeration.nextElement() );
 
             // iterates through all the ClassMolders in the LockEngine.
             // We first create a TypeInfo for all the base class (ie not extends
@@ -230,8 +230,8 @@ public final class LockEngine {
             }
             // XXX [SMH]: Remove this comment-block or is it something we need?
             /*
-            while ( enum.hasMoreElements() ) {
-                molder = (ClassMolder) enum.nextElement();
+            while ( enumeration.hasMoreElements() ) {
+                molder = (ClassMolder) enumeration.nextElement();
                 if ( molder.getExtends() != null ) {
                     ClassMolder extend = molder.getExtends();
                     while ( extend.getExtends() != null ) {
@@ -255,9 +255,9 @@ public final class LockEngine {
             }
             // we then iterate through all extended classes in which the 
             // using the base typeInfo.
-            enum = waitingForBase.elements();
-            while ( enum.hasMoreElements() ) {
-                molder = (ClassMolder) enum.nextElement();
+            enumeration = waitingForBase.elements();
+            while ( enumeration.hasMoreElements() ) {
+                molder = (ClassMolder) enumeration.nextElement();
                 ClassMolder extend = molder.getExtends();
                 while ( extend.getExtends() != null ) {
                     extend = extend.getExtends();
@@ -1150,8 +1150,8 @@ public final class LockEngine {
                     _log.info("In locks: " + entry);
                 }
 
-                for (Enumeration enum = cache.elements(); enum.hasMoreElements();) {
-                    ObjectLock entry = (ObjectLock) enum.nextElement();
+                for (Enumeration enumeration = cache.elements(); enumeration.hasMoreElements();) {
+                    ObjectLock entry = (ObjectLock) enumeration.nextElement();
                     _log.info("In cache: " + entry.getOID());
                 }
             }
@@ -1174,8 +1174,8 @@ public final class LockEngine {
                 
                 // Remove all objects not participating in a transaction
                 // from the cache.
-                for (Enumeration enum = cache.elements(); enum.hasMoreElements();) {
-                    ObjectLock objectLock = (ObjectLock) enum.nextElement();
+                for (Enumeration enumeration = cache.elements(); enumeration.hasMoreElements();) {
+                    ObjectLock objectLock = (ObjectLock) enumeration.nextElement();
                     cache.expire(objectLock.getOID());
                 }
             }

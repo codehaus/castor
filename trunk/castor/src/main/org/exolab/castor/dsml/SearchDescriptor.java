@@ -196,7 +196,7 @@ public class SearchDescriptor
 	throws SAXException
     {
 	AttributeListImpl attrList;
-	Enumeration       enum;
+	Enumeration       enumeration;
 
 	attrList = new AttributeListImpl();
 	docHandler.startElement( XML.Namespace.Root, attrList );
@@ -223,11 +223,11 @@ public class SearchDescriptor
 	docHandler.startElement( Names.Element.Search, attrList );
 
 	if ( _returnAttrs != null ) {
-	    enum = _returnAttrs.elements();
-	    while ( enum.hasMoreElements() ) {
+	    enumeration = _returnAttrs.elements();
+	    while ( enumeration.hasMoreElements() ) {
 		attrList = new AttributeListImpl();
 		attrList.addAttribute( Names.Attribute.AttrName, "NMTOKEN",
-				       (String) enum.nextElement() );
+				       (String) enumeration.nextElement() );
 		docHandler.startElement( Names.Element.ReturnAttr, attrList );
 		docHandler.endElement( Names.Element.ReturnAttr );
 	    }

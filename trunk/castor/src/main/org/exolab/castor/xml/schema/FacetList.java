@@ -147,9 +147,9 @@ public class FacetList implements java.io.Serializable {
     public Facet contains(String name) {
         if (name == null)
             return null;
-        Enumeration enum = enumerate();
-        while (enum.hasMoreElements()) {
-            Facet temp = (Facet)enum.nextElement();
+        Enumeration enumeration = enumerate();
+        while (enumeration.hasMoreElements()) {
+            Facet temp = (Facet)enumeration.nextElement();
             if (temp.getName().equals(name))
                 return temp;
         }

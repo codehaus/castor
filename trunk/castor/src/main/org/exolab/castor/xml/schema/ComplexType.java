@@ -339,9 +339,9 @@ public class ComplexType extends XMLType
     */
     public boolean hasAny() {
         boolean result = false;
-        Enumeration enum = _contentModel.enumerate();
-        while (enum.hasMoreElements() && !result) {
-            Structure struct = (Structure)enum.nextElement();
+        Enumeration enumeration = _contentModel.enumerate();
+        while (enumeration.hasMoreElements() && !result) {
+            Structure struct = (Structure)enumeration.nextElement();
             switch (struct.getStructureType()) {
                 case Structure.ELEMENT:
                     break;
@@ -811,9 +811,9 @@ public class ComplexType extends XMLType
         _attributes.validate();
 
         //-- check content model
-        Enumeration enum = _contentModel.enumerate();
-        while (enum.hasMoreElements()) {
-            ((Structure)enum.nextElement()).validate();
+        Enumeration enumeration = _contentModel.enumerate();
+        while (enumeration.hasMoreElements()) {
+            ((Structure)enumeration.nextElement()).validate();
         }
 
         //-- make sure baseType is accessible

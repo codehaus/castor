@@ -351,10 +351,10 @@ public abstract class XSType {
 	protected static Enumeration getFacets(SimpleType simpleType)
 	{
 		Hashtable hashTable = new Hashtable();
-        Enumeration enum = simpleType.getFacets();
-		while (enum.hasMoreElements()) {
+        Enumeration enumeration = simpleType.getFacets();
+		while (enumeration.hasMoreElements()) {
 
-            Facet facet = (Facet)enum.nextElement();
+            Facet facet = (Facet)enumeration.nextElement();
             String name = facet.getName();
 			hashTable.put(name, facet);
 		}

@@ -101,16 +101,16 @@ public class TimeStampMismatched extends CastorTestCase
 
         OQLQuery      oql;
         TestObject2   object;
-        QueryResults  enum;
+        QueryResults  enumeration;
 
         // Remove and create the object
         _db.begin();
         oql = _db.getOQLQuery( "select obj from jdo.TestObject2 obj" );
-        enum = oql.execute();
+        enumeration = oql.execute();
 
-        if ( enum.hasMore() ) 
+        if ( enumeration.hasMore() ) 
         {
-            object = ( TestObject2 ) enum.next();
+            object = ( TestObject2 ) enumeration.next();
             stream.println( "Loaded object: " + object );
             stream.println( "Removing object: " + object );
             _db.remove( object );
@@ -130,11 +130,11 @@ public class TimeStampMismatched extends CastorTestCase
         // Load the object
         _db.begin();
         oql = _db.getOQLQuery( "select obj from jdo.TestObject2 obj" );
-        enum = oql.execute();
+        enumeration = oql.execute();
 
-        if ( enum.hasMore() ) 
+        if ( enumeration.hasMore() ) 
         {
-            object = ( TestObject2 ) enum.next();
+            object = ( TestObject2 ) enumeration.next();
             stream.println( "Loaded object: " + object );
         }
         _db.rollback();

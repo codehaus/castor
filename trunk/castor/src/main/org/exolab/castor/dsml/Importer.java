@@ -178,7 +178,7 @@ public abstract class Importer
     protected abstract Consumer createConsumer();
 
 
-    public abstract void importEntries( Enumeration enum )
+    public abstract void importEntries( Enumeration enumeration )
 	throws ImportExportException;
 
 

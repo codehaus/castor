@@ -109,13 +109,13 @@ public class PersistenceFactoryRegistry
     public static String[] getFactoryNames()
     {
         String[]    names;
-        Enumeration enum;
+        Enumeration enumeration;
 
         load();
         names = new String[ _factories.size() ];
-        enum = _factories.keys();
+        enumeration = _factories.keys();
         for ( int i = 0 ; i < names.length ; ++i )
-            names[ i ] = (String) enum.nextElement();
+            names[ i ] = (String) enumeration.nextElement();
         return names;
     }
 

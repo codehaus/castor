@@ -170,9 +170,9 @@ public abstract class MappingLoader
     {
         if (className == null) return null;
         
-        Enumeration enum = _clsDescs.keys();
-        while (enum.hasMoreElements()) {
-            Class type = (Class) enum.nextElement();
+        Enumeration enumeration = _clsDescs.keys();
+        while (enumeration.hasMoreElements()) {
+            Class type = (Class) enumeration.nextElement();
             if (className.equals(type.getName())) {
                 return (ClassDescriptor) _clsDescs.get( type );
             }
@@ -242,16 +242,16 @@ public abstract class MappingLoader
     public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
-        Enumeration   enum;
+        Enumeration   enumeration;
 
         // Load the mapping for all the classes. This is always returned
         // in the same order as it appeared in the mapping file.
-        enum = mapping.enumerateClassMapping();
+        enumeration = mapping.enumerateClassMapping();
         
         Vector retryList = null;
-        while ( enum.hasMoreElements() ) {
+        while ( enumeration.hasMoreElements() ) {
 
-            ClassMapping clsMap = (ClassMapping) enum.nextElement();
+            ClassMapping clsMap = (ClassMapping) enumeration.nextElement();
             ClassDescriptor clsDesc = null;
             
             try {
@@ -283,9 +283,9 @@ public abstract class MappingLoader
         if (retryList != null) {
             Vector tmpRetryList = retryList;
             retryList = null;
-            enum = tmpRetryList.elements();
-            while ( enum.hasMoreElements() ) {
-                ClassMapping clsMap = (ClassMapping) enum.nextElement();
+            enumeration = tmpRetryList.elements();
+            while ( enumeration.hasMoreElements() ) {
+                ClassMapping clsMap = (ClassMapping) enumeration.nextElement();
                 ClassDescriptor clsDesc = createDescriptor( clsMap );
                 if ( clsDesc != NoDescriptor )
                     addDescriptor( clsDesc );
@@ -298,11 +298,11 @@ public abstract class MappingLoader
         }
         
 
-        enum = _clsDescs.elements();
-        while ( enum.hasMoreElements() ) {
+        enumeration = _clsDescs.elements();
+        while ( enumeration.hasMoreElements() ) {
             ClassDescriptor clsDesc;
 
-            clsDesc = (ClassDescriptor) enum.nextElement();
+            clsDesc = (ClassDescriptor) enumeration.nextElement();
             if ( clsDesc != NoDescriptor  )
                 resolveRelations( clsDesc );
         }

@@ -138,7 +138,7 @@ public class Race extends CastorTestCase {
     public void runOnce( int cachetype ) 
             throws PersistenceException, SQLException, Exception {
 
-        Enumeration     enum;
+        Enumeration     enumeration;
         OQLQuery        oql;
 
         // clear the table
@@ -225,9 +225,9 @@ public class Race extends CastorTestCase {
         for ( int i=0; i<jdos.length; i++ ) {
             oql = _db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
             oql.bind( i );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                TestRace tr = (TestRace) enum.nextElement();
+            enumeration = oql.execute();
+            if ( enumeration.hasMoreElements() ) {
+                TestRace tr = (TestRace) enumeration.nextElement();
                 if ( tr.getValue1() == controls[i].getValue1() )
                     num++;
                 stream.println( "Number Pair "+i+" -- JDO: "+tr.getValue1()+" control: "
@@ -288,9 +288,9 @@ public class Race extends CastorTestCase {
                                     db.begin();
                                     OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                                     oql.bind( i );
-                                    QueryResults enum = oql.execute();
-                                    if ( enum.hasMore() ) {
-                                        TestRace tr = (TestRace) enum.next();
+                                    QueryResults enumeration = oql.execute();
+                                    if ( enumeration.hasMore() ) {
+                                        TestRace tr = (TestRace) enumeration.next();
                                         tr.incValue1();
                                         db.commit();
                                         isOk = true;
@@ -303,9 +303,9 @@ public class Race extends CastorTestCase {
                                     db.begin();
                                     OQLQuery oql = db.getOQLQuery( "SELECT object FROM "+_className+" object WHERE id = $1" );
                                     oql.bind( i );
-                                    Enumeration enum = oql.execute();
-                                    if ( enum.hasMoreElements() ) {
-                                        TestRace tr = (TestRace) enum.nextElement();
+                                    Enumeration enumeration = oql.execute();
+                                    if ( enumeration.hasMoreElements() ) {
+                                        TestRace tr = (TestRace) enumeration.nextElement();
                                         tr.incValue1();
                                         db.commit();
                                         isOk = true;

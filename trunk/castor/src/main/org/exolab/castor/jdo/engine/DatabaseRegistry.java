@@ -364,12 +364,12 @@ public class DatabaseRegistry
 
     static LockEngine getLockEngine( Class objType )
     {
-        Enumeration      enum;
+        Enumeration      enumeration;
         DatabaseRegistry dbs;
 
-        enum = _databases.elements();
-        while ( enum.hasMoreElements() ) {
-            dbs = (DatabaseRegistry) enum.nextElement();
+        enumeration = _databases.elements();
+        while ( enumeration.hasMoreElements() ) {
+            dbs = (DatabaseRegistry) enumeration.nextElement();
             if ( dbs._mapResolver.getDescriptor( objType ) != null )
                 return dbs._engine;
         }
@@ -390,12 +390,12 @@ public class DatabaseRegistry
 
     public static DatabaseRegistry getDatabaseRegistry( Class c )
     {
-        Enumeration      enum;
+        Enumeration      enumeration;
         DatabaseRegistry dbs;
 
-        enum = _databases.elements();
-        while ( enum.hasMoreElements() ) {
-            dbs = (DatabaseRegistry) enum.nextElement();
+        enumeration = _databases.elements();
+        while ( enumeration.hasMoreElements() ) {
+            dbs = (DatabaseRegistry) enumeration.nextElement();
             if ( dbs._mapResolver.getDescriptor( c ) != null )
                 return dbs;
         }

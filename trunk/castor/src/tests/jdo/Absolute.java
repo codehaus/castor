@@ -95,11 +95,11 @@ public class Absolute extends CastorTestCase {
             throws PersistenceException {
 
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
          OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        while (enum.hasMore()) {
-            _db.remove(enum.next());
+        enumeration = oqlquery.execute(true);
+        while (enumeration.hasMore()) {
+            _db.remove(enumeration.next());
         }
         _db.commit();
     }
@@ -123,15 +123,15 @@ public class Absolute extends CastorTestCase {
             throws PersistenceException {
 
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        assertTrue("should have been able to move to 1", enum.absolute(1));
-        assertTrue("should have been able to move to 5",enum.absolute(5));
-        assertTrue("should have been able to move to 10",enum.absolute(10));
-        assertTrue("should have been able to move to 15",enum.absolute(15));
-        assertTrue("should have been able to move to 20",enum.absolute(20));
-        assertTrue("should have been able to move to 25",enum.absolute(25));
+        enumeration = oqlquery.execute(true);
+        assertTrue("should have been able to move to 1", enumeration.absolute(1));
+        assertTrue("should have been able to move to 5",enumeration.absolute(5));
+        assertTrue("should have been able to move to 10",enumeration.absolute(10));
+        assertTrue("should have been able to move to 15",enumeration.absolute(15));
+        assertTrue("should have been able to move to 20",enumeration.absolute(20));
+        assertTrue("should have been able to move to 25",enumeration.absolute(25));
         _db.commit();
     }
 
@@ -143,14 +143,14 @@ public class Absolute extends CastorTestCase {
             throws PersistenceException {
 
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
+        enumeration = oqlquery.execute(true);
         int next = 1;
         boolean hasMore = true;
-        while (enum.hasMore() && hasMore ==true) {
+        while (enumeration.hasMore() && hasMore ==true) {
             stream.println("at: " + next);
-            hasMore = enum.absolute(next);
+            hasMore = enumeration.absolute(next);
             next++;
         }
         _db.commit();
@@ -163,11 +163,11 @@ public class Absolute extends CastorTestCase {
             throws PersistenceException {
 
         _db.begin();
-        QueryResults enum;
+        QueryResults enumeration;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-        enum = oqlquery.execute(true);
-        assertFalse("shouldn't be able to move to -50", enum.absolute(-50));
-        assertFalse("shouldn't be able to move to 99999",enum.absolute(99999));
+        enumeration = oqlquery.execute(true);
+        assertFalse("shouldn't be able to move to -50", enumeration.absolute(-50));
+        assertFalse("shouldn't be able to move to 99999",enumeration.absolute(99999));
         _db.commit();
     }
 
@@ -178,11 +178,11 @@ public class Absolute extends CastorTestCase {
 
         try {
             _db.begin();
-            QueryResults enum;
+            QueryResults enumeration;
             OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-            enum = oqlquery.execute(false);
+            enumeration = oqlquery.execute(false);
             // following should fail.
-            enum.absolute(5);
+            enumeration.absolute(5);
             _db.commit();
             fail ("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail");
         } catch (Exception e) {

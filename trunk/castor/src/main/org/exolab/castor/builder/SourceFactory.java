@@ -1253,11 +1253,11 @@ public class SourceFactory {
     **/
     private String processAnnotations(Annotated annotated) {
         //-- process annotations
-        Enumeration enum = annotated.getAnnotations();
-        if (enum.hasMoreElements()) {
+        Enumeration enumeration = annotated.getAnnotations();
+        if (enumeration.hasMoreElements()) {
             StringBuffer comment = new StringBuffer();
-            while (enum.hasMoreElements()) {
-                Annotation ann = (Annotation) enum.nextElement();
+            while (enumeration.hasMoreElements()) {
+                Annotation ann = (Annotation) enumeration.nextElement();
                 Enumeration documentations = ann.getDocumentation();
                 while (documentations.hasMoreElements()) {
                     Documentation documentation =
@@ -1281,11 +1281,11 @@ public class SourceFactory {
         if (complexType == null)
             return;
 
-        Enumeration enum = complexType.getAttributeDecls();
+        Enumeration enumeration = complexType.getAttributeDecls();
         XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
-        while (enum.hasMoreElements()) {
-            AttributeDecl attr = (AttributeDecl)enum.nextElement();
+        while (enumeration.hasMoreElements()) {
+            AttributeDecl attr = (AttributeDecl)enumeration.nextElement();
             
             component.setView(attr);
      
@@ -1412,15 +1412,15 @@ public class SourceFactory {
         //- handle elements and groups -/
         //------------------------------/
 
-        Enumeration enum = contentModel.enumerate();
+        Enumeration enumeration = contentModel.enumerate();
 
         FieldInfo fieldInfo = null;
         XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
         
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
 
-            Annotated annotated = (Annotated)enum.nextElement();
+            Annotated annotated = (Annotated)enumeration.nextElement();
             component.setView(annotated);
 
             switch(annotated.getStructureType()) {
@@ -1548,13 +1548,13 @@ public class SourceFactory {
         (SimpleType simpleType, FactoryState state)
     {
 
-        Enumeration enum = simpleType.getFacets("enumeration");
+        Enumeration enumeration = simpleType.getFacets("enumeration");
 
 
         //-- select naming for types and instances
         boolean useValuesAsName = true;
-        while (enum.hasMoreElements()) {
-            Facet facet = (Facet)enum.nextElement();
+        while (enumeration.hasMoreElements()) {
+            Facet facet = (Facet)enumeration.nextElement();
             String possibleId = translateEnumValueToIdentifier(facet.getValue());
             if (!JavaNaming.isValidJavaIdentifier(possibleId)) {
                 useValuesAsName = false;
@@ -1562,7 +1562,7 @@ public class SourceFactory {
             }
         }
 
-        enum = simpleType.getFacets("enumeration");
+        enumeration = simpleType.getFacets("enumeration");
 
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
@@ -1648,9 +1648,9 @@ public class SourceFactory {
         //-- Loop through "enumeration" facets
         int count = 0;
 
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
 
-            Facet facet = (Facet) enum.nextElement();
+            Facet facet = (Facet) enumeration.nextElement();
 
             String value = facet.getValue();
 
@@ -1795,7 +1795,7 @@ public class SourceFactory {
             baseType = _typeConversion.convertType(base);
 
 
-        Enumeration enum = simpleType.getFacets("enumeration");
+        Enumeration enumeration = simpleType.getFacets("enumeration");
 
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
@@ -1817,9 +1817,9 @@ public class SourceFactory {
 
         StringBuffer values = new StringBuffer("{\n");
 
-        while (enum.hasMoreElements()) {
+        while (enumeration.hasMoreElements()) {
 
-            Facet facet = (Facet) enum.nextElement();
+            Facet facet = (Facet) enumeration.nextElement();
 
             String value = facet.getValue();
 

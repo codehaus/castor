@@ -370,7 +370,7 @@ public class ClassDescriptorResolverImpl
         
         
         XMLClassDescriptor classDesc = null;
-        Enumeration enum             = null;
+        Enumeration enumeration             = null;
         
         //-- check name cache first...
         String nameKey = xmlName;
@@ -384,9 +384,9 @@ public class ClassDescriptorResolverImpl
         //-- next check mapping loader...
         XMLClassDescriptor possibleMatch = null;
         if (_mappingLoader != null) {
-            enum = _mappingLoader.listDescriptors();
-            while (enum.hasMoreElements()) {
-                classDesc = (XMLClassDescriptor)enum.nextElement();
+            enumeration = _mappingLoader.listDescriptors();
+            while (enumeration.hasMoreElements()) {
+                classDesc = (XMLClassDescriptor)enumeration.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
                     if (namespaceEquals(namespaceURI, classDesc.getNameSpaceURI())) {
                         _cacheViaName.put(nameKey, classDesc);
@@ -399,9 +399,9 @@ public class ClassDescriptorResolverImpl
         }
         
         //-- next look in local cache
-        enum = _cacheViaClass.elements();
-        while (enum.hasMoreElements()) {
-            classDesc = (XMLClassDescriptor)enum.nextElement();
+        enumeration = _cacheViaClass.elements();
+        while (enumeration.hasMoreElements()) {
+            classDesc = (XMLClassDescriptor)enumeration.nextElement();
             if (xmlName.equals(classDesc.getXMLName())) {
                 if (namespaceEquals(namespaceURI, classDesc.getNameSpaceURI())) {
                     _cacheViaName.put(nameKey, classDesc);
@@ -443,13 +443,13 @@ public class ClassDescriptorResolverImpl
         
         XCDEnumerator xcdEnumerator  = new XCDEnumerator();
         XMLClassDescriptor classDesc = null;
-        Enumeration enum             = null;
+        Enumeration enumeration             = null;
         
         //-- check mapping loader first
         if (_mappingLoader != null) {
-            enum = _mappingLoader.listDescriptors();
-            while (enum.hasMoreElements()) {
-                classDesc = (XMLClassDescriptor)enum.nextElement();
+            enumeration = _mappingLoader.listDescriptors();
+            while (enumeration.hasMoreElements()) {
+                classDesc = (XMLClassDescriptor)enumeration.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
                     xcdEnumerator.add(classDesc);
                 }
@@ -457,9 +457,9 @@ public class ClassDescriptorResolverImpl
         }
         
         //-- next look in local cache
-        enum = _cacheViaClass.elements();
-        while (enum.hasMoreElements()) {
-            classDesc = (XMLClassDescriptor)enum.nextElement();
+        enumeration = _cacheViaClass.elements();
+        while (enumeration.hasMoreElements()) {
+            classDesc = (XMLClassDescriptor)enumeration.nextElement();
             if (xmlName.equals(classDesc.getXMLName())) {
                 xcdEnumerator.add(classDesc);
             }

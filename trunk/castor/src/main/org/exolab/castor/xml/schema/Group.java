@@ -425,9 +425,9 @@ public class Group extends Particle
     */
     public boolean hasAny() {
         boolean result = false;
-        Enumeration enum = _contentModel.enumerate();
-        while (enum.hasMoreElements() && !result) {
-            Structure struct = (Structure)enum.nextElement();
+        Enumeration enumeration = _contentModel.enumerate();
+        while (enumeration.hasMoreElements() && !result) {
+            Structure struct = (Structure)enumeration.nextElement();
             switch (struct.getStructureType()) {
                 case Structure.ELEMENT:
                     break;
@@ -466,9 +466,9 @@ public class Group extends Particle
                throw new ValidationException(err);
            }
         }
-        Enumeration enum = _contentModel.enumerate();
-        while (enum.hasMoreElements()) {
-            ((Structure)enum.nextElement()).validate();
+        Enumeration enumeration = _contentModel.enumerate();
+        while (enumeration.hasMoreElements()) {
+            ((Structure)enumeration.nextElement()).validate();
         }
     } //-- validate
 

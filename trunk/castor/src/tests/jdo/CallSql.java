@@ -102,7 +102,7 @@ public class CallSql extends CastorTestCase
     {
         OQLQuery      oql;
         TestObject    object;
-        QueryResults  enum;
+        QueryResults  enumeration;
 
         _db.begin();
 
@@ -111,9 +111,9 @@ public class CallSql extends CastorTestCase
         // that this test will later override.
         oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( 50 );
-        enum = oql.execute();
-        if ( enum.hasMore() ) {
-            object = (TestObject) enum.next();
+        enumeration = oql.execute();
+        if ( enumeration.hasMore() ) {
+            object = (TestObject) enumeration.next();
             stream.println( "Retrieved object: " + object );
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );
@@ -131,9 +131,9 @@ public class CallSql extends CastorTestCase
           _db.begin();
           oql = _db.getOQLQuery( "CALL SQL SELECT ID,VALUE1,VALUE2 FROM TEST_TABLE WHERE (ID = $1) AS jdo.TestObject" );
           oql.bind( 50 );
-          enum = oql.execute();
-          if (enum.hasMore()) {
-            object = (TestObject) enum.next();
+          enumeration = oql.execute();
+          if (enumeration.hasMore()) {
+            object = (TestObject) enumeration.next();
             stream.println( "Retrieved object: " + object );
           } else {
              fail( "test object not found" );

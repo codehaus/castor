@@ -93,7 +93,7 @@ public class JNDIExporter
 			boolean serverSchema, boolean importPolicy )
 	throws ImportExportException
     {
-	NamingEnumeration enum;
+	NamingEnumeration enumeration;
 	String            filter;
 	JNDIProducer      producer;
 	SearchControls    searchCtrl;
@@ -119,9 +119,9 @@ public class JNDIExporter
 		searchCtrl.setSearchScope( SearchControls.SUBTREE_SCOPE );
 		break;
 	    }
-	    enum = _ctx.search( getSearchDescriptor().getBaseDN(), filter, searchCtrl );
+	    enumeration = _ctx.search( getSearchDescriptor().getBaseDN(), filter, searchCtrl );
 	} catch ( NameNotFoundException except ) {
-	    enum = null;
+	    enumeration = null;
 	} catch ( NamingException except ) {
 	    throw new ImportExportException( except );
 	}
@@ -129,8 +129,8 @@ public class JNDIExporter
 	try {
 	    producer = new JNDIProducer( docHandler, false );
 	    producer.startDocument();
-	    if ( enum != null )
-		producer.produce( enum );
+	    if ( enumeration != null )
+		producer.produce( enumeration );
 	    if ( importPolicy && getImportDescriptor() != null )
 		producer.produce( getImportDescriptor() );
 	    producer.endDocument();

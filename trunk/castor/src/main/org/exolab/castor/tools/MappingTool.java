@@ -468,14 +468,14 @@ public class MappingTool
     {
         Marshaller  marshal;
         MappingRoot mapping;
-        Enumeration enum;
+        Enumeration enumeration;
 
         try {
             mapping = new MappingRoot();
             mapping.setDescription( "Castor generated mapping file" );
-            enum = _mappings.elements();
-            while ( enum.hasMoreElements() )
-                mapping.addClassMapping( (ClassMapping) enum.nextElement() );
+            enumeration = _mappings.elements();
+            while ( enumeration.hasMoreElements() )
+                mapping.addClassMapping( (ClassMapping) enumeration.nextElement() );
             marshal = new Marshaller( writer );
             marshal.setNamespaceMapping(null, "http://castor.exolab.org/");
             marshal.setNamespaceMapping("cst", "http://castor.exolab.org/");
