@@ -148,6 +148,7 @@ public class ImportUnmarshaller extends ComponentReader
 			    addSchema = true;
 			}
 		}
+		else alreadyLoaded = true;
 
         state.markAsProcessed(schemaLocation, importedSchema);
 
