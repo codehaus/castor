@@ -2,6 +2,10 @@
  * This class was automatically generated with 
  * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
+ *
+ * Hand modified by Thomas Yip <yip@intalio.com> based on a patch
+ * submitted by Jakob Braeuchi [jbraeuchi@hotmail.com].
+ *
  * $Id$
  */
 
@@ -42,6 +46,8 @@ public class Sql implements java.io.Serializable {
     private java.util.Vector _manyKey;
 
     private org.exolab.castor.mapping.xml.types.DirtyType _dirty = org.exolab.castor.mapping.xml.types.DirtyType.valueOf("check");;
+
+    private boolean _readonly;
 
 
       //----------------/
@@ -158,6 +164,22 @@ public class Sql implements java.io.Serializable {
     {
         return this._manyTable;
     } //-- java.lang.String getManyTable() 
+
+    /**
+    **/
+    public boolean getReadonly()
+    {
+        return this._readonly;
+    } //-- boolean getReadonly() 
+
+    /**
+     * 
+     * @param _readonly
+    **/
+    public void setReadonly(boolean _readonly)
+    {
+        this._readonly = _readonly;
+    } //-- void setReadonly(boolean) 
 
     /**
      * 

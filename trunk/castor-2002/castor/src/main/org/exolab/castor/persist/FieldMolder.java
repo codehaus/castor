@@ -107,6 +107,8 @@ public class FieldMolder {
 
     private Object        _default;
 
+    private boolean _readonly;
+
     /**
      * Collection of reflection service keyed by ClassLoader instance.
      */
@@ -207,6 +209,10 @@ public class FieldMolder {
 
     public LockEngine getFieldLockEngine() {
         return (_fMold==null?null:_fMold.getLockEngine());
+    }
+
+    public boolean isReadonly() {
+        return _readonly;
     }
 
     public Class getCollectionType() {
@@ -449,6 +455,8 @@ public class FieldMolder {
                 _store = false;
             else
                 _store = true;
+
+            _readonly = fieldMap.getSql().getReadonly();
 
             if ( fieldMap.getCollection() != null )
                 _multi = true;
@@ -946,4 +954,5 @@ public class FieldMolder {
             return resultClass;
         }
     }
+
 }

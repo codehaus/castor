@@ -2,6 +2,10 @@
  * This class was automatically generated with 
  * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
+ *
+ * Hand modified by Thomas Yip <yip@intalio.com> based on a patch
+ * submitted by Jakob Braeuchi [jbraeuchi@hotmail.com].
+ *
  * $Id$
  */
 
@@ -219,7 +223,39 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         //-- validation code for: _dirty
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
-        
+
+        //-- _readonly
+        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_readonly", "read-only", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object )
+                throws IllegalStateException
+            {
+                Sql target = (Sql) object;
+                return new Boolean(target.getReadonly());
+            }
+            public void setValue( Object object, Object value)
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Sql target = (Sql) object;
+                    target.setReadonly( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+
+        //-- validation code for: _readonly
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+
         //-- initialize element descriptors
         
     } //-- org.exolab.castor.mapping.xml.SqlDescriptor()

@@ -369,7 +369,7 @@ public class ClassMolder {
         }
 
         // ssa, FIXME : Are the two statements equivalents ?
-		//        if ( Persistent.class.isAssignableFrom( _base ) )
+        //        if ( Persistent.class.isAssignableFrom( _base ) )
         if ( Persistent.class.isAssignableFrom( ds.resolve(_name) ) )
             _callback = new JDOCallback();
     }
@@ -1140,9 +1140,13 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 value =  _fhs[i].getValue( object, tx.getClassLoader() );
                 if ( !isEquals( fields[i], value ) ) {
-                    if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
-                        updatePersist = true;
-                    updateCache = true;
+                    if (_fhs[i].isReadonly()) {
+                        _fhs[i].setValue( object, fields[i], tx.getClassLoader() );
+                    } else {
+                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
+                            updatePersist = true;
+                        updateCache = true;
+                    }
                 }
                 break;
 

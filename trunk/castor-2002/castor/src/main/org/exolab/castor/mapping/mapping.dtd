@@ -160,6 +160,7 @@
     type        NMTOKENS    #IMPLIED
     many-key    NMTOKENS  #IMPLIED
     many-table  NMTOKEN  #IMPLIED
+    read-only   ( true | false )  "false"
     dirty  ( check | ignore )  "check"> 
 
 
