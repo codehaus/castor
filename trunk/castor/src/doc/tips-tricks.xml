@@ -168,6 +168,13 @@ org.exolab.castor.marshalling.validation=true
           <b>Example:</b>
           <code>&lt;class name="com.acme.Foo" auto-complete="true"/&gt;</code>
        </p>
+       <p>
+          This is also compatible with generated descriptor files, you can use a mapping file
+          to override some of the behavior of a compiled descriptor by using auto-complete.
+          <br/><b>**</b>Note: Be careful to make sure you use the exact field name as specified
+          in the generated descriptor file in order to modify the behavior of the field descriptor!
+          Otherwise, you'll probably end up with two fields being marshalled!
+       </p>
     </section>
 
     <section title="XML/JDO: Create method">
@@ -233,21 +240,21 @@ org.exolab.castor.marshalling.validation=true
 
     <section title="XML: MarshalListener and UnmarshalListener">
       <p>
-         Castor allows full control on the object being marshalled or unmarshalled by 
+         Castor allows control on the object being marshalled or unmarshalled by
          a set of two listener interfaces: MarshalListener and UnmarshalListener.
       </p>
 
       <p>
-         The MarshalListener interface located in <code>org.exolab.castor.xml</code> listens to 
+         The MarshalListener interface located in <code>org.exolab.castor.xml</code> listens to
          two different that are intercepted by the following methods:
-         <ul> 
+         <ul>
              <li>preMarshal: this method is called before an object gets marshalled.</li>
              <li>postMarshall: this method is called once an object has been marshalled.</li>
          </ul>
       </p>
 
       <p>
-         The UnmarshalListener located also in <code>org.exolab.castor.xml</code>  offers the possibility 
+         The UnmarshalListener located also in <code>org.exolab.castor.xml</code>  offers the possibility
          to intercept more events with the four following methods:
          <ul>
              <li>initialized: this method is called once an object has been instantiated.</li>
