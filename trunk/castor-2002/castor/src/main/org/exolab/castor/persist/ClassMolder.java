@@ -2179,6 +2179,15 @@ public class ClassMolder {
             throws PersistenceException {
 
         Object ids = oid.getIdentity();
+
+        for( int i=0; i < _fhs.length; i++ ) {
+            if( _fhs[i].isManyToMany() ) {
+                _fhs[i].getRelationLoader().deleteRelation(
+                  (Connection)tx.getConnection(oid.getLockEngine()),
+                  ids);
+            }
+        }
+
         _persistence.delete( (Connection)tx.getConnection(oid.getLockEngine()), ids );
 
         // All field along the extend path will be deleted by transaction
@@ -2211,13 +2220,6 @@ public class ClassMolder {
             }
         }
 
-        for( int i=0; i < _fhs.length; i++ ) {
-            if( _fhs[i].isManyToMany() ) {
-                _fhs[i].getRelationLoader().deleteRelation(
-                  (Connection)tx.getConnection(oid.getLockEngine()),
-                  ids);
-            }
-        }
     }
 
     /**
