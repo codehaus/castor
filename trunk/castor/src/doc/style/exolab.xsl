@@ -616,8 +616,12 @@
   </xsl:template>
 
   <xsl:template match="bugs">
-    <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2"><tr><td>
+    <table width="100%" border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
+      <tr><td>
       <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
+      <CAPTION style="font-weight:bold">
+         Bug Fixes And Issues Addressed
+      </CAPTION>
 	  	 <tr bgcolor="#7270c2">
            <th align="left">Id</th>
            <th align="left">Date</th>
@@ -715,8 +719,9 @@
          <td><a href="mailto:{$submitter-email}"><xsl:value-of select="$submitter-name" /></a></td>
          <td><xsl:value-of select="description"/>
             <xsl:if test="$reporter-name != ''">
-               <br/><b>Reporter: </b>
+               <br/><i><b>Reporter: </b>
                <a href="mailto:{$reporter-email}"><xsl:value-of select="$reporter-name" /></a>
+               </i>
             </xsl:if>
          </td>
          <td><xsl:value-of select="type"/></td>
