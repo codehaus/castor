@@ -60,7 +60,7 @@ import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.types.CollectionType;
-import org.exolab.castor.mapping.xml.types.NodeType;
+import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.xml.JavaNaming;
@@ -392,7 +392,7 @@ public class MappingTool
             //-- handle XML Specific information
             fieldMap.setBindXml( new BindXml() );
             fieldMap.getBindXml().setName( ( (XMLFieldDescriptor) fdesc ).getXMLName() );
-            fieldMap.getBindXml().setNode( NodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
+            fieldMap.getBindXml().setNode( BindXmlNodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
             classMap.addFieldMapping( fieldMap );
             
             if (deep) {
