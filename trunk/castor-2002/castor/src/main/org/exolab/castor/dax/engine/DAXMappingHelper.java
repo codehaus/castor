@@ -57,7 +57,7 @@ import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingHelper;
 import org.exolab.castor.mapping.FieldDesc;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.Types;
 import org.exolab.castor.mapping.xml.Mapping;
@@ -81,31 +81,31 @@ public class DAXMappingHelper
     {
 	Enumeration   enum;
 	ObjectMapping objMap;
-	ObjectDesc    objDesc;
+	ClassDesc    clsDesc;
 
 	enum = mapping.enumerateObjectMapping();
 	while ( enum.hasMoreElements() ) {
 	    objMap = (ObjectMapping) enum.nextElement();
-	    objDesc = createDescriptor( loader, objMap );
-	    if ( objDesc != null )
-		addDescriptor( objDesc );
+	    clsDesc = createDescriptor( loader, objMap );
+	    if ( clsDesc != null )
+		addDescriptor( clsDesc );
 	}
     }
 
 
-    protected ObjectDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
+    protected ClassDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
         throws MappingException
     {
-	ObjectDesc objDesc;
+	ClassDesc clsDesc;
 	FieldDesc  attrSet;
 
 	if ( objMap.getLdapEntry() == null )
 	    return null;
-	objDesc = super.createDescriptor( loader, objMap );
-	if ( objDesc.getIdentityField() == null ) {
+	clsDesc = super.createDescriptor( loader, objMap );
+	if ( clsDesc.getIdentityField() == null ) {
 	    return null;
 	}
-	return new DAXObjectDesc( objDesc, null, objMap.getLdapEntry().getObjectClass() );
+	return new DAXClassDesc( clsDesc, null, objMap.getLdapEntry().getObjectClass() );
     }
 
 

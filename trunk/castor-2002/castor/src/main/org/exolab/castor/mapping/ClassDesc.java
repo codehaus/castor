@@ -59,7 +59,7 @@ package org.exolab.castor.mapping;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectDesc
+public class ClassDesc
 {
 
 
@@ -79,7 +79,7 @@ public class ObjectDesc
      * The descriptor of the object which this object extends,
      * or null if this is a top-level object.
      */
-    private ObjectDesc     _extends;
+    private ClassDesc     _extends;
 
 
     /**
@@ -102,7 +102,7 @@ public class ObjectDesc
      * @throws MappingException The extended descriptor does not match
      *   a parent class of this object type
      */
-    public ObjectDesc( Class objType, FieldDesc[] fields, FieldDesc identity, ObjectDesc extend )
+    public ClassDesc( Class objType, FieldDesc[] fields, FieldDesc identity, ClassDesc extend )
 	throws MappingException
     {
 	if ( ! Types.isConstructable( objType ) )
@@ -122,12 +122,12 @@ public class ObjectDesc
     }
 
 
-    protected ObjectDesc( ObjectDesc objDesc )
+    protected ClassDesc( ClassDesc clsDesc )
     {
-	_objType = objDesc._objType;
-	_fields = objDesc._fields;
-	_extends = objDesc._extends;
-	_identity = objDesc._identity;
+	_objType = clsDesc._objType;
+	_fields = clsDesc._fields;
+	_extends = clsDesc._extends;
+	_identity = clsDesc._identity;
     }
 
 
@@ -162,7 +162,7 @@ public class ObjectDesc
      *
      * @return The descriptor of the extended object, or null
      */
-    public ObjectDesc getExtends()
+    public ClassDesc getExtends()
     {
 	return _extends;
     }
@@ -209,9 +209,71 @@ public class ObjectDesc
         }
 	if ( _identity != null )
 	    _identity.copyInto( source, target );
-        if ( getExtends() != null )
-            getExtends().copyInto( source, target );
+        if ( _extends != null )
+            _extends.copyInto( source, target );
     } 
+
+
+    /**
+     * Determines if the object can be stored. Returns null if the object
+     * can be stored, or a message indicating the reason why the object
+     * cannot be stored. For example, if a required field is null, the
+     * identity is null, etc.
+     *
+     * @param obj The object
+     * @return Null if can store, otherwise a message indicate why
+     *  the object cannot be stored
+     */
+    public String canStore( Object obj )
+    {
+	String reason;
+
+	// Object cannot be saved if one of the required fields is null
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+	    reason = _fields[ i ].canStore( obj );
+	    if ( reason != null )
+		return reason;
+        }
+	// Object cannot be saves without identity
+	if ( _identity == null ) {
+	    return "Cannot store object, identity field is null";
+	} else {
+	    reason = _identity.canStore( obj );
+	    if ( reason != null )
+		return reason;
+	}
+	if ( _extends != null )
+	    return _extends.canStore( obj );
+	return null;
+    }
+
+
+    /**
+     * Determines if the object has been modified from its original
+     * cached value. Returns true if the object has been modified.
+     *
+     * @param obj The object
+     * @param cached The cached copy
+     * @return True if the object has been modified
+     */
+    public boolean isModified( Object obj, Object cached )
+    {
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+	    if ( _fields[ i ].isModified( obj, cached ) )
+		return true;
+        }
+	if ( _identity != null )
+	    _identity.isModified( obj, cached );
+	if ( _extends != null )
+	    return _extends.isModified( obj, cached );
+	return false;
+    }
+
+
+    public String toString()
+    {
+	return "Mapping for class " + _objType.getName();
+    }
 
 
 }

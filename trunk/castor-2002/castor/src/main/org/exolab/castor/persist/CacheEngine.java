@@ -50,7 +50,7 @@ package org.exolab.castor.persist;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.Persistence;
@@ -133,18 +133,18 @@ class CacheEngine
 	throws MappingException
     {
 	Enumeration enum;
-	ObjectDesc  objDesc;
+	ClassDesc  clsDesc;
 	Persistence persist;
 
 	_logWriter = logWriter;
 	enum = mapResolver.listDescriptors();
 	while ( enum.hasMoreElements() ) {
-	    objDesc = (ObjectDesc) enum.nextElement();
-	    persist = factory.getPersistence( objDesc, logWriter );
+	    clsDesc = (ClassDesc) enum.nextElement();
+	    persist = factory.getPersistence( clsDesc, logWriter );
 	    if ( persist != null )
-		_typeInfo.put( objDesc.getObjectType(), new TypeInfo( persist, objDesc ) );
+		_typeInfo.put( clsDesc.getObjectType(), new TypeInfo( persist, clsDesc ) );
 	    else if ( _logWriter != null ) {
-		_logWriter.println( Messages.format( "persist.noEngine", objDesc.getObjectType() ) );
+		_logWriter.println( Messages.format( "persist.noEngine", clsDesc.getObjectType() ) );
 	    }
 	}
     }
@@ -162,7 +162,7 @@ class CacheEngine
     }
 
 
-    public ObjectDesc getObjectDesc( Class type )
+    public ClassDesc getClassDesc( Class type )
     {
 	TypeInfo typeInfo;
 
@@ -170,7 +170,7 @@ class CacheEngine
 	if ( typeInfo == null )
 	    return null;
 	else
-	    return typeInfo.objDesc;
+	    return typeInfo.clsDesc;
     }
 
 
@@ -217,7 +217,7 @@ class CacheEngine
 
 	// Create an OID to represent the object and see if we
 	// have a lock (i.e. object is cached).
-	oid = new OID( typeInfo.objDesc, identity );
+	oid = new OID( typeInfo.clsDesc, identity );
 	lock = getLock( oid );
 	
 	if ( lock != null ) {
@@ -272,8 +272,8 @@ class CacheEngine
 	    
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded and a lock is acquired.
-	    obj = typeInfo.objDesc.createNew();
-	    typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	    obj = typeInfo.clsDesc.createNew();
+	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
 	    try {
 		oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
 						     obj, identity, exclusive ) );
@@ -340,7 +340,7 @@ class CacheEngine
 	typeInfo = (TypeInfo) _typeInfo.get( query.getResultType() );
 	// Create an OID to represent the object and see if we
 	// have a lock (i.e. object is cached).
-	oid = new OID( typeInfo.objDesc, identity );
+	oid = new OID( typeInfo.clsDesc, identity );
 	lock = getLock( oid );
 	
 	if ( lock != null ) {
@@ -393,8 +393,8 @@ class CacheEngine
 	    
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded from the query and a lock is acquired.
-	    obj = typeInfo.objDesc.createNew();
-	    typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	    obj = typeInfo.clsDesc.createNew();
+	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
 	    try {
 		oid.setStamp( query.fetch( obj ) );
 	    } catch ( PersistenceException except ) {
@@ -455,7 +455,7 @@ class CacheEngine
 	// Must prevent concurrent attempt to create the same object
 	// Best way to do that is through the type
 	synchronized ( typeInfo ) {
-	    oid = new OID( typeInfo.objDesc, identity );
+	    oid = new OID( typeInfo.clsDesc, identity );
 	    if ( identity != null ) {
 		// If the object has a known identity at creation time, perform
 		// duplicate identity check. Otherwise, create the object in
@@ -482,8 +482,8 @@ class CacheEngine
 	    // Copy the contents of the object we just created into the
 	    // cache engine. This copy will be deleted if the transaction
 	    // ends up rolling back.
-	    locked = typeInfo.objDesc.createNew();
-	    typeInfo.objDesc.copyInto( obj, locked );
+	    locked = typeInfo.clsDesc.createNew();
+	    typeInfo.clsDesc.copyInto( obj, locked );
 	    lock = new ObjectLock( locked );
 	    try {
 		lock.acquire( tx, true, 0 );
@@ -630,7 +630,7 @@ class CacheEngine
 						      locked, oid.getStamp() ) );
 	    typeInfo.persist.changeIdentity( tx.getConnection( this ), obj, oldIdentity, identity );
 	    removeLock( removeOID( locked ) );
-	    oid = new OID( typeInfo.objDesc, identity );
+	    oid = new OID( typeInfo.clsDesc, identity );
 	    if ( getLock( oid ) != null )
 		throw new DuplicateIdentityException( obj.getClass(), identity );
 	    removeLock( removeOID( locked ) );
@@ -727,7 +727,7 @@ class CacheEngine
 		throw new IllegalArgumentException( Messages.format( "persist.typeMismatch",
 								     obj.getClass(), locked.getClass() ) );
 	    }
-	    typeInfo.objDesc.copyInto( locked, obj );
+	    typeInfo.clsDesc.copyInto( locked, obj );
 	} catch ( LockNotGrantedException except ) {
 	    // If this transaction has no write lock on the object,
 	    // something went foul.
@@ -765,7 +765,7 @@ class CacheEngine
 	// need to wait for the lock
 	try {
 	    locked = lock.acquire( tx, true, 0 );
-	    typeInfo.objDesc.copyInto( obj, locked );
+	    typeInfo.clsDesc.copyInto( obj, locked );
 	} catch ( LockNotGrantedException except ) {
 	    // If this transaction has no write lock on the object,
 	    // something went foul.
@@ -885,14 +885,14 @@ class CacheEngine
     static class TypeInfo
     {
 
-	ObjectDesc   objDesc;
+	ClassDesc   clsDesc;
 
 	Persistence  persist;
 
-	TypeInfo( Persistence persist, ObjectDesc objDesc )
+	TypeInfo( Persistence persist, ClassDesc clsDesc )
 	{
 	    this.persist = persist;
-	    this.objDesc = objDesc;
+	    this.clsDesc = clsDesc;
 	}
 
     }

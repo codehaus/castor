@@ -70,44 +70,44 @@ public abstract class MappingHelper
 {
 
 
-    private Hashtable  _objDescs = new Hashtable();
+    private Hashtable  _clsDescs = new Hashtable();
 
 
-    public ObjectDesc getDescriptor( Class type )
+    public ClassDesc getDescriptor( Class type )
     {
-	return (ObjectDesc) _objDescs.get( type );
+	return (ClassDesc) _clsDescs.get( type );
     }
 
 
     public Enumeration listDescriptors()
     {
-	return _objDescs.elements();
+	return _clsDescs.elements();
     }
 
 
     public Enumeration listObjectTypes()
     {
-	return _objDescs.keys();
+	return _clsDescs.keys();
     }
 
 
-    protected void addDescriptor( ObjectDesc objDesc )
+    protected void addDescriptor( ClassDesc clsDesc )
 	throws MappingException
     {
-	if ( _objDescs.contains( objDesc.getObjectType() ) )
+	if ( _clsDescs.contains( clsDesc.getObjectType() ) )
 	    throw new MappingException( "Mapping already exists" );
-	_objDescs.put( objDesc.getObjectType(), objDesc );
+	_clsDescs.put( clsDesc.getObjectType(), clsDesc );
     }
 
 
-    protected ObjectDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
+    protected ClassDesc createDescriptor( ClassLoader loader, ObjectMapping objMap )
         throws MappingException
     {
 	FieldDesc[]      fields;
 	FieldDesc        identity;
 	Enumeration      enum;
 	Class            objType;
-	ObjectDesc       extend;
+	ClassDesc       extend;
 	ContainerMapping contMaps[];
 
 	if ( objMap.getExtends() != null ) {
@@ -149,7 +149,7 @@ public abstract class MappingHelper
 	    if ( identity == null )
 		throw new MappingException( "Identity field not found" );
 	}
-	return new ObjectDesc( objType, fields, identity, extend );
+	return new ClassDesc( objType, fields, identity, extend );
     }
 
 

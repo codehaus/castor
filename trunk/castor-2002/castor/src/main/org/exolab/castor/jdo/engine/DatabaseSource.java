@@ -63,16 +63,14 @@ import org.xml.sax.EntityResolver;
 import org.odmg.ODMGException;
 import org.odmg.DatabaseNotFoundException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.jdo.MappingTable;
 import org.exolab.castor.jdo.mapping.Databases;
 import org.exolab.castor.jdo.mapping.Database;
 import org.exolab.castor.jdo.mapping.Param;
 import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.Include;
 import org.exolab.castor.jdo.schema.DTDResolver;
-import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.spi.Persistence;
@@ -433,11 +431,11 @@ public class DatabaseSource
 	implements PersistenceFactory
     {
 	
-	public Persistence getPersistence( ObjectDesc objDesc, PrintWriter logWriter )
+	public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
 	    throws MappingException
 	{
 	    try {
-		return new SQLEngine( (JDOObjectDesc) objDesc, logWriter );
+		return new SQLEngine( (JDOClassDesc) clsDesc, logWriter );
 	    } catch ( MappingException except ) {
 		logWriter.println( except.toString() );
 		return null;

@@ -65,7 +65,7 @@ import netscape.ldap.LDAPDN;
 import netscape.ldap.util.DN;
 import netscape.ldap.util.RDN;
 import org.exolab.castor.dax.engine.DAXFieldDesc;
-import org.exolab.castor.dax.engine.DAXObjectDesc;
+import org.exolab.castor.dax.engine.DAXClassDesc;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.ContainerFieldDesc;
 import org.exolab.castor.mapping.MappingException;
@@ -92,7 +92,7 @@ public class MozillaEngine
 {
 
 
-    private DAXObjectDesc  _objDesc;
+    private DAXClassDesc  _clsDesc;
 
 
     private Hashtable      _fields;
@@ -110,15 +110,15 @@ public class MozillaEngine
     private String         _rootDN;
 
 
-    public MozillaEngine( DAXObjectDesc objDesc, String rootDN )
+    public MozillaEngine( DAXClassDesc clsDesc, String rootDN )
 	throws MappingException
     {
 	FieldDesc[] fields;
 	FieldDesc   dnField;
 
-	_objDesc = objDesc;
-	_attrField = _objDesc.getAttributeSetField();
-	fields = objDesc.getFields();
+	_clsDesc = clsDesc;
+	_attrField = _clsDesc.getAttributeSetField();
+	fields = clsDesc.getFields();
 	_fields = new Hashtable();
 	for ( int i = 0 ; i < fields.length ; ++i ) {
 	    if ( fields[ i ] instanceof ContainerFieldDesc ) {
@@ -136,14 +136,14 @@ public class MozillaEngine
 	    }
 	}
 
-	dnField = _objDesc.getIdentityField();
+	dnField = _clsDesc.getIdentityField();
 	if ( dnField instanceof ContainerFieldDesc ) {
 	    fields = ( (ContainerFieldDesc) dnField ).getContainedFields();
 	    _dnFields = new DAXFieldDesc[ fields.length ];
 	    for ( int i = 0 ; i < fields.length ; ++i )
 		_dnFields[ i ] = (DAXFieldDesc) fields[ i ];
 	} else {
-	    _dnFieldName = ( (DAXFieldDesc) _objDesc.getIdentityField() ).getLdapName();
+	    _dnFieldName = ( (DAXFieldDesc) _clsDesc.getIdentityField() ).getLdapName();
 	}
 	_rootDN = rootDN;
     }
@@ -168,12 +168,12 @@ public class MozillaEngine
 	    }
 	    // XXX
 	    // Also need to create all the attributes in the attrSet
-	    DAXObjectDesc type;
+	    DAXClassDesc type;
 	    
-	    type = _objDesc;
+	    type = _clsDesc;
 	    while ( type != null ) {
 		ldapSet.add( new LDAPAttribute( "objectclass", type.getLdapClass() ) );
-		type = (DAXObjectDesc) type.getExtends();
+		type = (DAXClassDesc) type.getExtends();
 	    }
 	    ( (LDAPConnection) conn ).add( new LDAPEntry( dn, ldapSet ) );
 	    return null;
@@ -224,14 +224,14 @@ public class MozillaEngine
 		classes = ldapAttr.getStringValueArray();
 		match = false;
 		for ( int j = 0 ; j < classes.length ; ++j ) {
-		    if ( classes[ j ].equals( _objDesc.getLdapClass() ) ) {
+		    if ( classes[ j ].equals( _clsDesc.getLdapClass() ) ) {
 			match = true;
 			break;
 		    }
 		}
 		if ( ! match ) {
 		    throw new IllegalStateException( "LDAP entry does not match object class " +
-						     _objDesc.getLdapClass() );
+						     _clsDesc.getLdapClass() );
 		}
 		*/
 
@@ -442,7 +442,7 @@ public class MozillaEngine
 	if ( _dnFields != null ) {
 	    Object identity;
 
-	    identity = Types.createNew( _objDesc.getIdentityField().getFieldType() );
+	    identity = Types.createNew( _clsDesc.getIdentityField().getFieldType() );
 	    for ( int i = _dnFields.length ; i-- > 0 ; )
 		_dnFields[ i ].setValue( identity, rdns[ i ] );
 	    return identity;
@@ -518,7 +518,7 @@ public class MozillaEngine
 
 	public Class getResultType()
 	{
-	    return _objDesc.getObjectType();
+	    return _clsDesc.getObjectType();
 	}
 
 
