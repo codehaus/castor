@@ -28,7 +28,6 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.NumberResult;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-import org.exolab.adaptx.xpath.engine.FunctionCall;
 import org.exolab.adaptx.xpath.engine.Names;
 
 
@@ -49,9 +48,10 @@ import org.exolab.adaptx.xpath.engine.Names;
  * number, an XPathException will be thrown.
  *
  * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
+ * @version $Revision$
  */
 public class SumFunctionCall
-    extends FunctionCall
+    extends FunctionCallImpl
 {
 
     

@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,23 +29,23 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.StringResult;
 import org.exolab.adaptx.xpath.BooleanResult;
 import org.exolab.adaptx.xpath.XPathException;
-import org.exolab.adaptx.xpath.engine.FunctionCall;
 import org.exolab.adaptx.xpath.engine.Names;
 
 
 /**
- * A implementation of the "starts-with" function call
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * A implementation of the XPath "lang" function call
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class LangFunctionCall
-    extends FunctionCall
+    extends FunctionCallImpl
 {
 
     
     private static final String XML_LANG = "xml:lang";
 
-    private static final String XML_NS = "http://www.w3.org/XML/1998/namespac";
+    private static final String XML_NS = "http://www.w3.org/XML/1998/namespace";
 
     
     /**

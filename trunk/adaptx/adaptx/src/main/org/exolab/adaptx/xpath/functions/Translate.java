@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -28,17 +28,16 @@ import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.StringResult;
 import org.exolab.adaptx.xpath.XPathException;
-import org.exolab.adaptx.xpath.engine.FunctionCall;
-import org.exolab.adaptx.xpath.engine.Names;
 
 
 /**
  * An implementation of the "translate" function call
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @version $Revision$
  */
 public class Translate
-    extends FunctionCall
+    extends FunctionCallImpl
 {
 
     
