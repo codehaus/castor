@@ -145,7 +145,12 @@ public class Product implements Persistent
     }
 
 
-    public void jdoCreate()
+    public void jdoBeforeCreate( Database db )
+    {
+    }
+
+
+    public void jdoAfterCreate()
     {
     }
 
@@ -155,23 +160,17 @@ public class Product implements Persistent
     }
 
 
-    public void jdoRemove()
-    {
-    }
-
-
-    public void jdoUpdate()
-    {
-    }
-
-
-    public void jdoBeforeCreate( Database db )
+    public void jdoBeforeRemove()
     {
     }
 
 
     public void jdoAfterRemove()
-        throws Exception
+    {
+    }
+
+
+    public void jdoUpdate()
     {
     }
 
