@@ -333,7 +333,7 @@ public final class LocalConfiguration extends Configuration {
             try {
                 xmlReader.setFeature( Features.Validation, validation );
                 xmlReader.setFeature( Features.Namespaces, namespaces );
-                features = getDefault().getProperty( Property.ParserFeatures, features );
+                features = getProperties().getProperty( Property.ParserFeatures, features );
                 if ( features != null ) {
                     token = new StringTokenizer( features, ", " );
                     while ( token.hasMoreTokens() ) {
