@@ -273,7 +273,7 @@ class CacheEngine
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded and a lock is acquired.
 	    obj = typeInfo.clsDesc.newInstance();
-	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
+	    typeInfo.clsDesc.getIdentity().setValue( obj, identity );
 	    try {
 		oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
 						     obj, identity, exclusive ) );
@@ -394,7 +394,7 @@ class CacheEngine
 	    // Object has not been loaded yet, or cleared from the cache.
 	    // The object is now loaded from the query and a lock is acquired.
 	    obj = typeInfo.clsDesc.newInstance();
-	    typeInfo.clsDesc.getIdentityField().setValue( obj, identity );
+	    typeInfo.clsDesc.getIdentity().setValue( obj, identity );
 	    try {
 		oid.setStamp( query.fetch( obj ) );
 	    } catch ( PersistenceException except ) {

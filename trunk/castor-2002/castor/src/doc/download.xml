@@ -6,6 +6,8 @@
       <ul>For FTP access use <url>ftp://ftp.exolab.org/pub</url>.
         <li><url>http://www.exolab.org/ftp/jars/castor-0.7.7.jar</url><br/>
              The Castor JAR</li>
+        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.7-xml.jar</url><br/>
+             The Castor XML module</li>
         <li><url>http://www.exolab.org/ftp/jars/castor-0.7.7.tgz</url><br/>
             The Castor JAR, dependent JARs, XML schemas, command line tools
             and examples</li>

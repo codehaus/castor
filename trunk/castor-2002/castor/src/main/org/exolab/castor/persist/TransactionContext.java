@@ -668,7 +668,7 @@ public abstract class TransactionContext
 		    // When storing the object it's OID might change
 		    // if the primary identity has been changed
 		    clsDesc = entry.engine.getClassDesc( entry.obj.getClass() );
-		    identity = clsDesc.getIdentityField().getValue( entry.obj );
+		    identity = clsDesc.getIdentity().getValue( entry.obj );
 		    if ( identity == null )
 			throw new TransactionAbortedException( "persist.noIdentity", 
 							       clsDesc.getJavaClass(), null );

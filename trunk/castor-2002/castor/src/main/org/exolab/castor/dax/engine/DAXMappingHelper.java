@@ -102,7 +102,7 @@ public class DAXMappingHelper
 	if ( objMap.getLdapEntry() == null )
 	    return null;
 	clsDesc = super.createDescriptor( loader, objMap );
-	if ( clsDesc.getIdentityField() == null ) {
+	if ( clsDesc.getIdentity() == null ) {
 	    return null;
 	}
 	return new DAXClassDesc( clsDesc, null, objMap.getLdapEntry().getObjectClass() );
