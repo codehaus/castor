@@ -41,6 +41,8 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
 
     private java.lang.String xmlName;
 
+    private org.exolab.castor.xml.XMLFieldDescriptor identity;
+
 
       //----------------/
      //- Constructors -/
@@ -52,7 +54,7 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[5];
+        attributes = new XMLFieldDescriptorImpl[6];
         //-- _setMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_setMethod", "set-method", NodeType.Attribute);
         desc.setHandler( new XMLFieldHandler() {
@@ -79,6 +81,32 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
         } );
         attributes[0] = desc;
         
+        //-- _createMethod
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_createMethod", "create-method", NodeType.Attribute);
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                Container target = (Container) object;
+                return target.getCreateMethod();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Container target = (Container) object;
+                    target.setCreateMethod( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        attributes[1] = desc;
+        
         //-- _getMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_getMethod", "get-method", NodeType.Attribute);
         desc.setHandler( new XMLFieldHandler() {
@@ -103,7 +131,7 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 return new java.lang.String();
             }
         } );
-        attributes[1] = desc;
+        attributes[2] = desc;
         
         //-- _type
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
@@ -129,7 +157,7 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 return new java.lang.String();
             }
         } );
-        attributes[2] = desc;
+        attributes[3] = desc;
         
         //-- _required
         desc = new XMLFieldDescriptorImpl(boolean.class, "_required", "required", NodeType.Attribute);
@@ -155,7 +183,7 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 return null;
             }
         } );
-        attributes[3] = desc;
+        attributes[4] = desc;
         
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
@@ -181,13 +209,15 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
                 return new java.lang.String();
             }
         } );
-        attributes[4] = desc;
+        desc.setRequired(true);
+        attributes[5] = desc;
         
         //-- initialize element descriptors
         
         elements = new XMLFieldDescriptorImpl[2];
         //-- _description
-        desc = new XMLFieldDescriptorImpl(Description.class, "_description", "description", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -200,14 +230,14 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
             {
                 try {
                     Container target = (Container) object;
-                    target.setDescription( (Description) value);
+                    target.setDescription( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new Description();
+                return null;
             }
         } );
         desc.setHandler(handler);
@@ -302,7 +332,7 @@ public class ContainerDescriptor implements org.exolab.castor.xml.XMLClassDescri
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
-        return null;
+        return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**

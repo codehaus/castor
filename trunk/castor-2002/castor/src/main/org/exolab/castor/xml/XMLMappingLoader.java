@@ -47,6 +47,7 @@
 package org.exolab.castor.xml;
 
 
+import java.io.PrintWriter;
 import java.util.Vector;
 import java.util.Enumeration;
 import org.exolab.castor.mapping.MappingException;
@@ -57,7 +58,6 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
-import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 
@@ -78,16 +78,10 @@ public class XMLMappingLoader
 {
 
 
-    /**
-     * The type for the name of a compiled class.
-     */
-    private static final String CompiledType = "XML";
-
-
-    public XMLMappingLoader( ClassLoader loader )
+    public XMLMappingLoader( ClassLoader loader, PrintWriter logWriter )
         throws MappingException
     {
-        super( loader );
+        super( loader, logWriter );
     }
 
 
@@ -122,17 +116,17 @@ public class XMLMappingLoader
         String          xmlName;
         
         // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getClassName(), CompiledType, XMLClassDescriptor.class );
-        if ( clsDesc != null )
+        clsDesc = loadClassDescriptor( clsMap.getName() );
+        if ( clsDesc != null && clsDesc instanceof XMLClassDescriptor )
             return clsDesc;
 
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         clsDesc = super.createDescriptor( clsMap );
-        if ( clsMap.getXmlSchema() == null || clsMap.getXmlSchema().getName() == null )
-            xmlName = clsDesc.getJavaClass().getName();
+        if ( clsMap.getMapTo() == null || clsMap.getMapTo().getXml() == null )
+            xmlName = MarshalHelper.toXMLName( clsDesc.getJavaClass().getName() );
         else
-            xmlName = clsMap.getXmlSchema().getName();
+            xmlName = clsMap.getMapTo().getXml();
             
         return new XMLClassDescriptorAdapter( clsDesc, xmlName );
     }
@@ -148,17 +142,15 @@ public class XMLMappingLoader
         
         // Create an XML field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-        if ( fieldMap.getXmlInfo() == null || fieldMap.getXmlInfo().getName() == null )
+        if ( fieldMap.getXml() == null || fieldMap.getXml().getName() == null )
             xmlName = null;
         else
-            xmlName = fieldMap.getXmlInfo().getName();
-        if ( fieldMap.getXmlInfo() == null || fieldMap.getXmlInfo().getNodeType() == null )
+            xmlName = fieldMap.getXml().getName();
+        if ( fieldMap.getXml() == null || fieldMap.getXml().getNode() == null )
             nodeType = null;
         else
-            nodeType = NodeType.getNodeType( fieldMap.getXmlInfo().getNodeType() );
+            nodeType = NodeType.getNodeType( fieldMap.getXml().getNode() );
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
-        if ( fieldMap.getSetMethod() != null && fieldMap.getSetMethod().startsWith( "add" ) )
-            xmlDesc.setMultivalued( true );
         return xmlDesc; 
     }
 
@@ -169,7 +161,7 @@ public class XMLMappingLoader
         TypeConvertor convertorTo;
         TypeConvertor convertorFrom;
 
-        if ( Types.isSimpleType( fieldType ) && fieldMap.getXmlInfo() != null ) {
+        if ( Types.isSimpleType( fieldType ) && fieldMap.getXml() != null ) {
             fieldType = Types.typeFromPrimitive( fieldType );
             convertorTo = Types.getConvertor( String.class, fieldType );
             convertorFrom = Types.getConvertor( fieldType, String.class );

@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.io.PrintWriter;
 import java.util.Vector;
 import java.util.Enumeration;
 import org.exolab.castor.mapping.MappingException;
@@ -58,7 +59,6 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 
@@ -75,19 +75,12 @@ public class JDOMappingLoader
 {
 
 
-    /**
-     * The type for the name of a compiled class.
-     */
-    private static final String CompiledType = "JDO";
-
-
     private static final String IgnoreDirty = "ignore";
 
 
-    public JDOMappingLoader( ClassLoader loader )
-        throws MappingException
+    public JDOMappingLoader( ClassLoader loader, PrintWriter logWriter )
     {
-        super( loader );
+        super( loader, logWriter );
     }
 
 
@@ -100,12 +93,12 @@ public class JDOMappingLoader
         
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
-        if ( clsMap.getSqlTable() == null )
+        if ( clsMap.getMapTo() == null || clsMap.getMapTo().getTable() == null )
             return NoDescriptor;
 
         // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getClassName(), CompiledType, JDOClassDescriptor.class );
-        if ( clsDesc != null )
+        clsDesc = loadClassDescriptor( clsMap.getName() );
+        if ( clsDesc != null && clsDesc instanceof JDOClassDescriptor )
             return clsDesc;
 
         // Use super class to create class descriptor. Field descriptors will be
@@ -121,7 +114,7 @@ public class JDOMappingLoader
         if ( clsDesc.getIdentity() == null )
             throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
         
-        return new JDOClassDescriptor( clsDesc, clsMap.getSqlTable().getTableName() );
+        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable() );
     }
 
 
@@ -131,11 +124,11 @@ public class JDOMappingLoader
         TypeConvertor convertorTo = null;
         TypeConvertor convertorFrom = null;
 
-        if ( fieldMap.getSqlInfo() != null && fieldMap.getSqlInfo().getType() != null ) {
+        if ( fieldMap.getSql() != null && fieldMap.getSql().getType() != null ) {
             Class sqlType;
 
             fieldType = Types.typeFromPrimitive( fieldType );
-            sqlType = SQLTypes.typeFromName( fieldMap.getSqlInfo().getType() );
+            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
             if ( fieldType != sqlType ) {
                 convertorTo = Types.getConvertor( sqlType, fieldType );
                 convertorFrom = Types.getConvertor( fieldType, sqlType );
@@ -153,18 +146,18 @@ public class JDOMappingLoader
         String          sqlName;
         
         // If not an SQL field, return a stock field descriptor.
-        if ( fieldMap.getSqlInfo() == null )
+        if ( fieldMap.getSql() == null )
             return super.createFieldDesc( javaClass, fieldMap );
         
         // Create a JDO field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-        if ( fieldMap.getSqlInfo().getName() == null )
+        if ( fieldMap.getSql().getName() == null )
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
         else
-            sqlName = fieldMap.getSqlInfo().getName();
+            sqlName = fieldMap.getSql().getName();
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName,
-            ! IgnoreDirty.equals( fieldMap.getSqlInfo().getDirty() ),
-            fieldMap.getSqlInfo().getManyTable(), fieldMap.getSqlInfo().getManyKey() );
+            ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
+            fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }
 
 

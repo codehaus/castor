@@ -38,19 +38,21 @@ public class FieldMapping implements java.io.Serializable {
 
     private java.lang.String _getMethod;
 
+    private boolean _transient = false;
+
     private java.lang.String _type;
 
     private boolean _required = false;
 
     private java.lang.String _name;
 
-    private Description _description;
+    private java.lang.String _description;
 
-    private SqlInfo _sqlInfo;
+    private Sql _sql;
 
-    private XmlInfo _xmlInfo;
+    private Xml _xml;
 
-    private LdapInfo _ldapInfo;
+    private Ldap _ldap;
 
 
       //----------------/
@@ -80,9 +82,9 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public Description getDescription() {
+    public java.lang.String getDescription() {
         return this._description;
-    } //-- Description getDescription() 
+    } //-- java.lang.String getDescription() 
 
     /**
     **/
@@ -92,9 +94,9 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public LdapInfo getLdapInfo() {
-        return this._ldapInfo;
-    } //-- LdapInfo getLdapInfo() 
+    public Ldap getLdap() {
+        return this._ldap;
+    } //-- Ldap getLdap() 
 
     /**
     **/
@@ -116,9 +118,15 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public SqlInfo getSqlInfo() {
-        return this._sqlInfo;
-    } //-- SqlInfo getSqlInfo() 
+    public Sql getSql() {
+        return this._sql;
+    } //-- Sql getSql() 
+
+    /**
+    **/
+    public boolean getTransient() {
+        return this._transient;
+    } //-- boolean getTransient() 
 
     /**
     **/
@@ -128,47 +136,9 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
     **/
-    public XmlInfo getXmlInfo() {
-        return this._xmlInfo;
-    } //-- XmlInfo getXmlInfo() 
-
-    /**
-    **/
-    public boolean isValid() {
-        try {
-            validate();
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    } //-- boolean isValid() 
-
-    /**
-     * 
-     * @param out
-    **/
-    public void marshal(java.io.Writer out) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
-
-    /**
-     * 
-     * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    public Xml getXml() {
+        return this._xml;
+    } //-- Xml getXml() 
 
     /**
      * 
@@ -190,9 +160,9 @@ public class FieldMapping implements java.io.Serializable {
      * 
      * @param _description
     **/
-    public void setDescription(Description _description) {
+    public void setDescription(java.lang.String _description) {
         this._description = _description;
-    } //-- void setDescription(Description) 
+    } //-- void setDescription(java.lang.String) 
 
     /**
      * 
@@ -204,11 +174,11 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _ldapInfo
+     * @param _ldap
     **/
-    public void setLdapInfo(LdapInfo _ldapInfo) {
-        this._ldapInfo = _ldapInfo;
-    } //-- void setLdapInfo(LdapInfo) 
+    public void setLdap(Ldap _ldap) {
+        this._ldap = _ldap;
+    } //-- void setLdap(Ldap) 
 
     /**
      * 
@@ -236,11 +206,19 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _sqlInfo
+     * @param _sql
     **/
-    public void setSqlInfo(SqlInfo _sqlInfo) {
-        this._sqlInfo = _sqlInfo;
-    } //-- void setSqlInfo(SqlInfo) 
+    public void setSql(Sql _sql) {
+        this._sql = _sql;
+    } //-- void setSql(Sql) 
+
+    /**
+     * 
+     * @param _transient
+    **/
+    public void setTransient(boolean _transient) {
+        this._transient = _transient;
+    } //-- void setTransient(boolean) 
 
     /**
      * 
@@ -252,28 +230,10 @@ public class FieldMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _xmlInfo
+     * @param _xml
     **/
-    public void setXmlInfo(XmlInfo _xmlInfo) {
-        this._xmlInfo = _xmlInfo;
-    } //-- void setXmlInfo(XmlInfo) 
-
-    /**
-     * 
-     * @param reader
-    **/
-    public static org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader reader) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        return (org.exolab.castor.mapping.xml.FieldMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.FieldMapping.class, reader);
-    } //-- org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
+    public void setXml(Xml _xml) {
+        this._xml = _xml;
+    } //-- void setXml(Xml) 
 
 }

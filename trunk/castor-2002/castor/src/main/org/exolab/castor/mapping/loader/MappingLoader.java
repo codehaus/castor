@@ -50,32 +50,23 @@ package org.exolab.castor.mapping.loader;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.URL;
-import java.net.MalformedURLException;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.exolab.castor.mapping.xml.Mapping;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.Container;
-import org.exolab.castor.mapping.xml.Include;
-import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.mapping.xml.Container;
+import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.DTDResolver;
 
 
 /**
@@ -94,7 +85,7 @@ public abstract class MappingLoader
     /**
      * The suffix for the name of a compiled class.
      */
-    private static final String CompiledSuffix = "ClassDescriptor";
+    private static final String CompiledSuffix = "Descriptor";
 
 
     /**
@@ -115,12 +106,6 @@ public abstract class MappingLoader
     private ClassLoader _loader;
 
 
-    /**
-     * The entity resolver to use. May be null.
-     */
-    private DTDResolver _resolver = new DTDResolver();
-
-
     public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl( Class.class );
 
 
@@ -130,11 +115,12 @@ public abstract class MappingLoader
      *
      * @param loader The class loader to use, null for the default
      */
-    protected MappingLoader( ClassLoader loader )
+    protected MappingLoader( ClassLoader loader, PrintWriter logWriter )
     {
         if ( loader == null )
             loader = getClass().getClassLoader();
         _loader = loader;
+        _logWriter = logWriter;
     }
 
 
@@ -180,109 +166,6 @@ public abstract class MappingLoader
 
 
     /**
-     * Sets the log writer. If not null, errors and other messages
-     * will be directed to that log writer.
-     *
-     * @param logWriter The log writer to use
-     */
-    public void setLogWriter( PrintWriter logWriter )
-    {
-        if ( logWriter != null )
-            _logWriter = logWriter;
-    }
-
-
-    /**
-     * Sets the entity resolver. The entity resolver can be used to
-     * resolve external entities and cached documents that are used
-     * from within mapping files.
-     *
-     * @param resolver The entity resolver to use
-     */
-    public void setEntityResolver( EntityResolver resolver )
-    {
-        if ( resolver != null )
-            _resolver = new DTDResolver( resolver );
-    }
-
-
-    /**
-     * Sets the base URL for the mapping and related files. If the base
-     * URL is known, files can be included using relative names. Any URL
-     * can be passed, if the URL can serve as a base URL it will be used.
-     *
-     * @param url The base URL
-     */
-    public void setBaseURL( String url )
-    {
-        try {
-            _resolver.setBaseURL( new URL( url ) );
-        } catch ( MalformedURLException except ) { }
-    }
-
-
-    /**
-     * Loads the mapping from the specified URL. If an entity resolver
-     * was specified, will use the entity resolver to resolve the URL.
-     * This method is also used to load mappings referenced from another
-     * mapping or configuration file.
-     *
-     * @param url The URL of the mapping file
-     * @throws IOException An error occured when reading the mapping
-     *  file
-     * @throws MappingException The mapping file is invalid
-     */
-    public void loadMapping( String url )
-        throws IOException, MappingException
-    {
-        InputSource source;
-
-        try {
-            source = _resolver.resolveEntity( null, url );
-            if ( source == null )
-                source = new InputSource( url );
-            else
-                source.setSystemId( url );
-            if ( _logWriter != null )
-                _logWriter.println( Messages.format( "mapping.loadingFrom", url ) );
-            loadMapping( source );
-        } catch ( SAXException except ) {
-            loadMapping( new InputSource( url ) );
-        }
-    }
-
-
-    /**
-     * Loads the mapping from the specified input source. This method
-     * loads the mapping objects from the specified input source.
-     *
-     * @param source The input source
-     * @throws IOException An error occured when reading the mapping
-     *  file
-     * @throws MappingException The mapping file is invalid
-     */
-    public void loadMapping( InputSource source )
-        throws IOException, MappingException
-    {
-        Unmarshaller unm;
-       
-        try {
-            unm = new Unmarshaller( Mapping.class );
-            unm.setEntityResolver( _resolver );
-            if ( _logWriter != null )
-                unm.setLogWriter( _logWriter );
-            loadMapping( (Mapping) unm.unmarshal( source ) );
-        } catch ( MappingException except ) {
-            throw except;
-        } catch ( MarshalException except ) {
-            throw new MappingException( except );
-        } catch ( Exception except ) {
-            throw new MappingException( except );
-        }
-    }
-
-
-    /**
      * Loads the mapping from the specified mapping object. Calls {@link
      * #createDescriptor} to create each descriptor and {@link
      * #addDescriptor} to store it. Also loads all the included mapping
@@ -291,24 +174,11 @@ public abstract class MappingLoader
      * @param mapping The mapping information
      * @throws MappingException The mapping file is invalid
      */
-    protected void loadMapping( Mapping mapping )
+    public void loadMapping( MappingRoot mapping )
         throws MappingException
     {
         Enumeration   enum;
 
-        // Load all the included mapping files first.
-        enum = mapping.enumerateInclude();
-        while ( enum.hasMoreElements() ) {
-            Include       include;
-
-            include = (Include) enum.nextElement();
-            try {
-                loadMapping( include.getHref() );
-            } catch ( IOException except ) {
-                throw new MappingException( except );
-            }
-        }
-        
         // Load the mapping for all the classes.
         enum = mapping.enumerateClassMapping();
         while ( enum.hasMoreElements() ) {
@@ -321,7 +191,7 @@ public abstract class MappingLoader
             // If the return value is NoDescriptor then the derived
             // class was not successful in constructing a descriptor.
             if ( clsDesc == NoDescriptor && _logWriter != null ) {
-                _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getClassName() ) );
+                _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getName() ) );
             }
         }
 
@@ -394,22 +264,22 @@ public abstract class MappingLoader
         ClassDescriptor   clsDesc;
 
         // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getClassName(), null, ClassDescriptor.class );
+        clsDesc = loadClassDescriptor( clsMap.getName() );
         if ( clsDesc != null )
             return clsDesc;
 
         // Obtain the Java class.
         try {
-            javaClass = resolveType( clsMap.getClassName() );
+            javaClass = resolveType( clsMap.getName() );
         } catch ( ClassNotFoundException except ) {
-            throw new MappingException( "mapping.classNotFound", clsMap.getClassName() );
+            throw new MappingException( "mapping.classNotFound", clsMap.getName() );
         }
 
         // If this class extends another class, need to obtain the extended
         // class and make sure this class indeed extends it.
         if ( clsMap.getExtends() != null ) {
             try {
-                extend = getDescriptor( resolveType( clsMap.getExtends() ) );
+                extend = getDescriptor( resolveType( ( (ClassMapping)  clsMap.getExtends() ).getName() ) );
                 if ( extend == null )
                     throw new MappingException( "mapping.extendsMissing",
                                                 clsMap.getExtends(), javaClass.getName() );
@@ -456,7 +326,7 @@ public abstract class MappingLoader
         identity = null;
         if ( clsMap.getIdentity() != null ) {
             for ( int i = 0 ; i < fields.length ; ++i ) {
-                if ( fields[ i ].getFieldName().equals( clsMap.getIdentity().getFieldRef() ) ) {
+                if ( fields[ i ].getFieldName().equals( clsMap.getIdentity() ) ) {
                     identity = fields[ i ];
                     if ( identity instanceof FieldDescriptorImpl )
                         ( (FieldDescriptorImpl) identity ).setRequired( true );
@@ -475,7 +345,7 @@ public abstract class MappingLoader
                 }
             }
             if ( identity == null )
-                throw new MappingException( "mapping.identityMissing", clsMap.getIdentity().getFieldRef(),
+                throw new MappingException( "mapping.identityMissing", clsMap.getIdentity(),
                                             javaClass.getName() );
         }
 
@@ -556,6 +426,8 @@ public abstract class MappingLoader
         Class            colType = null;
         FieldHandlerImpl handler;
         String           fieldName;
+        Method           getMethod = null;
+        Method           setMethod = null;
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. If the field is declared as a collection, grab
@@ -569,32 +441,55 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
             }
         }
-        if ( fieldMap.getCollection() != null ) {
-            // Note: will return a collection type, for which a handler can be
-            // obtained; null for the special 'enumerate' collection type;
-            // or throw an exception if the collection is not supported.
+        if ( fieldMap.getCollection() != null )
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
+
+        // First look up the get accessors
+        if ( fieldMap.getGetMethod() != null ) {
+            getMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
+                                      ( colType == null ? fieldType : colType ), true );
+            if ( getMethod == null )
+                throw new MappingException( "mapping.accessorNotFound",
+                                            fieldMap.getGetMethod(), ( colType == null ? fieldType : colType ),
+                                            javaClass.getName() );
+            if ( fieldType == null && colType == null )
+                fieldType = getMethod.getReturnType();
+        } else if ( fieldMap.getName() != null ) {
+            getMethod = findAccessor( javaClass, "get" + fieldMap.getName(), ( colType == null ? fieldType : colType ), true );
+            if ( getMethod != null && fieldType == null && colType == null )
+                fieldType = getMethod.getReturnType();
         }
 
-        if ( fieldMap.getGetMethod() != null ||
-             fieldMap.getSetMethod() != null ) {
-            // Accessors, map field using either methods.
-            Method getMethod = null;
-            Method setMethod = null;
-            
-            if ( fieldMap.getGetMethod() != null ) {
-                getMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
-                                          ( colType == null ? fieldType : colType ), true );
-                // Use return type for parameter type checking, if known
-                if ( fieldType == null )
-                    fieldType = getMethod.getReturnType();
-            }
-            if ( fieldMap.getSetMethod() != null ) {
+        // Second look up the set/add accessor
+        if ( fieldMap.getSetMethod() != null ) {
+            if ( colType != null && CollectionHandlers.isEnumerate( colType ) ) {
+                setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), fieldType, false );
+                if ( setMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                fieldMap.getSetMethod(), fieldType, javaClass.getName() );
+            } else {
                 setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
                                           ( colType == null ? fieldType : colType ), false );
-                if ( fieldType == null )
-                    fieldType = setMethod.getParameterTypes()[ 0 ];
+                if ( setMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
             }
+            if ( fieldType == null )
+                fieldType = setMethod.getParameterTypes()[ 0 ];
+        } else if ( fieldMap.getName() != null ) {
+            if ( colType != null && CollectionHandlers.isEnumerate( colType ) )
+                setMethod = findAccessor( javaClass, "add" + fieldMap.getName(), fieldType, false );
+            if ( setMethod == null )
+                setMethod = findAccessor( javaClass, "set" + fieldMap.getName(),
+                                          ( colType == null ? fieldType : colType ), false );
+            if ( setMethod != null && fieldType == null )
+                fieldType = setMethod.getParameterTypes()[ 0 ];
+        }
+
+        // If accessors found, use them to construct field handler,
+        // if not, access field directly
+        if ( getMethod != null || setMethod != null ) {
             typeInfo = getTypeInfo( fieldType, colType, fieldMap );
 
             fieldName = fieldMap.getName();
@@ -607,6 +502,8 @@ public abstract class MappingLoader
             
             fieldName = fieldMap.getName();
             field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
+            if ( field == null )
+                throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
             if ( fieldType == null )
                 fieldType = field.getType();
             typeInfo = getTypeInfo( fieldType, colType, fieldMap );
@@ -646,7 +543,7 @@ public abstract class MappingLoader
      * @param javaClass The class to which the field belongs
      * @param fieldName The name of the field
      * @param fieldType The type of the field if known, or null
-     * @return The field
+     * @return The field, null if not found
      * @throws MappingException The field is not accessible or is not of the
      *  specified type
      */
@@ -670,8 +567,7 @@ public abstract class MappingLoader
         } catch ( NoSuchFieldException except ) {
         } catch ( SecurityException except ) {
         }
-        // No such/access to field
-        throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
+        return null;
     }
 
 
@@ -684,7 +580,7 @@ public abstract class MappingLoader
      * @param methodName The name of the accessor method
      * @param fieldType The type of the field if known, or null
      * @param isGetMethod True if get method, false if set method
-     * @return The method
+     * @return The method, null if not found
      * @throws MappingException The method is not accessible or is not of the
      *  specified type
      */
@@ -729,8 +625,7 @@ public abstract class MappingLoader
                         }
                     }
                     if ( method == null )
-                        throw new MappingException( "mapping.accessorNotFound",
-                                                    methodName, fieldType, javaClass.getName() );
+                        return null;
                 }
             }
             // Make sure method is public and not abstract/static.
@@ -743,37 +638,24 @@ public abstract class MappingLoader
             throw except;
         } catch ( Exception except ) {
         }
-        // No such/access to method
-        throw new MappingException( "mapping.accessorNotFound",
-                                    methodName, fieldType, javaClass.getName() );
+        return null;
     }
 
 
     /**
-     * Loads a class descriptor from a compiled class. Based
-     * on the class name, the name of the descriptor class
-     * is created by adding the typePrefix (null for the stock
-     * descriptor) and "ClassDesc". If the descriptor is found
-     * and of the right type, it is returned. If no descriptor
-     * is found, null is returned.
+     * Loads a class descriptor from a compiled class.
      *
      * @param clsName The class for which the descriptor is loaded
-     * @param compiledType The type prefix for the compiled class
-     *  descriptor name (XML, JDO, etc), may be null
-     * @param clsDescType The type of the class descriptor
      * @return An instance of the class descriptor or null if not found
      */
-    protected ClassDescriptor loadClassDescriptor( String clsName, String compiledType,
-                                                   Class clsDescType )
+    protected ClassDescriptor loadClassDescriptor( String clsName )
     {
-        if ( compiledType != null )
-            clsName = clsName + compiledType;
         clsName = clsName + CompiledSuffix;
         try {
             Object obj;
 
             obj = resolveType( clsName ).newInstance();
-            if ( clsDescType.isAssignableFrom( obj.getClass() ) )
+            if ( obj instanceof ClassDescriptor )
                 return (ClassDescriptor) obj;
             return null;
         } catch ( Exception except ) {

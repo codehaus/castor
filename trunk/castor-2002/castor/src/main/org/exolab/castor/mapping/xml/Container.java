@@ -34,6 +34,8 @@ public class Container implements java.io.Serializable {
 
     private java.lang.String _setMethod;
 
+    private java.lang.String _createMethod;
+
     private java.lang.String _getMethod;
 
     private java.lang.String _type;
@@ -42,7 +44,7 @@ public class Container implements java.io.Serializable {
 
     private java.lang.String _name;
 
-    private Description _description;
+    private java.lang.String _description;
 
     private java.util.Vector _fieldMappingList;
 
@@ -79,9 +81,15 @@ public class Container implements java.io.Serializable {
 
     /**
     **/
-    public Description getDescription() {
+    public java.lang.String getCreateMethod() {
+        return this._createMethod;
+    } //-- java.lang.String getCreateMethod() 
+
+    /**
+    **/
+    public java.lang.String getDescription() {
         return this._description;
-    } //-- Description getDescription() 
+    } //-- java.lang.String getDescription() 
 
     /**
      * 
@@ -147,44 +155,6 @@ public class Container implements java.io.Serializable {
 
     /**
     **/
-    public boolean isValid() {
-        try {
-            validate();
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    } //-- boolean isValid() 
-
-    /**
-     * 
-     * @param out
-    **/
-    public void marshal(java.io.Writer out) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
-
-    /**
-     * 
-     * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
-
-    /**
-    **/
     public void removeAllFieldMapping() {
         _fieldMappingList.removeAllElements();
     } //-- void removeAllFieldMapping() 
@@ -201,11 +171,19 @@ public class Container implements java.io.Serializable {
 
     /**
      * 
+     * @param _createMethod
+    **/
+    public void setCreateMethod(java.lang.String _createMethod) {
+        this._createMethod = _createMethod;
+    } //-- void setCreateMethod(java.lang.String) 
+
+    /**
+     * 
      * @param _description
     **/
-    public void setDescription(Description _description) {
+    public void setDescription(java.lang.String _description) {
         this._description = _description;
-    } //-- void setDescription(Description) 
+    } //-- void setDescription(java.lang.String) 
 
     /**
      * 
@@ -261,23 +239,5 @@ public class Container implements java.io.Serializable {
     public void setType(java.lang.String _type) {
         this._type = _type;
     } //-- void setType(java.lang.String) 
-
-    /**
-     * 
-     * @param reader
-    **/
-    public static org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader reader) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        return (org.exolab.castor.mapping.xml.Container) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Container.class, reader);
-    } //-- org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
 }

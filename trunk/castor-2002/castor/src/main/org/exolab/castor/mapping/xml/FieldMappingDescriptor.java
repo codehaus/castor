@@ -41,6 +41,8 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
 
     private java.lang.String xmlName;
 
+    private org.exolab.castor.xml.XMLFieldDescriptor identity;
+
 
       //----------------/
      //- Constructors -/
@@ -52,7 +54,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[7];
+        attributes = new XMLFieldDescriptorImpl[8];
         //-- _collection
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_collection", "collection", NodeType.Attribute);
         desc.setImmutable(true);
@@ -158,6 +160,32 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         } );
         attributes[3] = desc;
         
+        //-- _transient
+        desc = new XMLFieldDescriptorImpl(boolean.class, "_transient", "transient", NodeType.Attribute);
+        desc.setHandler( new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return new Boolean(target.getTransient());
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setTransient( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        attributes[4] = desc;
+        
         //-- _type
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
         desc.setHandler( new XMLFieldHandler() {
@@ -182,7 +210,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return new java.lang.String();
             }
         } );
-        attributes[4] = desc;
+        attributes[5] = desc;
         
         //-- _required
         desc = new XMLFieldDescriptorImpl(boolean.class, "_required", "required", NodeType.Attribute);
@@ -208,7 +236,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return null;
             }
         } );
-        attributes[5] = desc;
+        attributes[6] = desc;
         
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
@@ -234,13 +262,15 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return new java.lang.String();
             }
         } );
-        attributes[6] = desc;
+        desc.setRequired(true);
+        attributes[7] = desc;
         
         //-- initialize element descriptors
         
         elements = new XMLFieldDescriptorImpl[4];
         //-- _description
-        desc = new XMLFieldDescriptorImpl(Description.class, "_description", "description", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
+        desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -253,98 +283,98 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setDescription( (Description) value);
+                    target.setDescription( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new Description();
+                return null;
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
         elements[0] = desc;
         
-        //-- _sqlInfo
-        desc = new XMLFieldDescriptorImpl(SqlInfo.class, "_sqlInfo", "sql-info", NodeType.Element);
+        //-- _sql
+        desc = new XMLFieldDescriptorImpl(Sql.class, "_sql", "sql", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 FieldMapping target = (FieldMapping) object;
-                return target.getSqlInfo();
+                return target.getSql();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setSqlInfo( (SqlInfo) value);
+                    target.setSql( (Sql) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new SqlInfo();
+                return new Sql();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
         elements[1] = desc;
         
-        //-- _xmlInfo
-        desc = new XMLFieldDescriptorImpl(XmlInfo.class, "_xmlInfo", "xml-info", NodeType.Element);
+        //-- _xml
+        desc = new XMLFieldDescriptorImpl(Xml.class, "_xml", "xml", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 FieldMapping target = (FieldMapping) object;
-                return target.getXmlInfo();
+                return target.getXml();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setXmlInfo( (XmlInfo) value);
+                    target.setXml( (Xml) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new XmlInfo();
+                return new Xml();
             }
         } );
         desc.setHandler(handler);
         desc.setMultivalued(false);
         elements[2] = desc;
         
-        //-- _ldapInfo
-        desc = new XMLFieldDescriptorImpl(LdapInfo.class, "_ldapInfo", "ldap-info", NodeType.Element);
+        //-- _ldap
+        desc = new XMLFieldDescriptorImpl(Ldap.class, "_ldap", "ldap", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
                 FieldMapping target = (FieldMapping) object;
-                return target.getLdapInfo();
+                return target.getLdap();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     FieldMapping target = (FieldMapping) object;
-                    target.setLdapInfo( (LdapInfo) value);
+                    target.setLdap( (Ldap) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new LdapInfo();
+                return new Ldap();
             }
         } );
         desc.setHandler(handler);
@@ -410,7 +440,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
-        return null;
+        return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**

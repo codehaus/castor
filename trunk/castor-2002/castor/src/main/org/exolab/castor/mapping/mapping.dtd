@@ -63,12 +63,12 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, sql-table?, xml-schema?, ldap-entry?,
-                  identity?, ( field | container )+ )>
+<!ELEMENT class ( description?, map-to?, ( field | container )+ )>
 <!ATTLIST class
-    class-name ID #REQUIRED
+    name       ID #REQUIRED
     extends    IDREF #IMPLIED
-    access     (read-only|shared|exclusive) "shared">
+    identity   CDATA #IMPLIED
+    access     (read-only|shared|exclusive|locked) "shared">
 
 
 <!--
@@ -77,43 +77,14 @@
     SQL table.
 
  -->
-<!ELEMENT sql-table EMPTY>
-<!ATTLIST sql-table
-    table-name NMTOKEN  #REQUIRED>
-
-
-<!--
-    Specifies the XML document type and namespace for the given
-    class. Only required for classes that represent root elements.
-    When an XML document is produced using this class as the root
-    element, the document type and namespace will be used.
-
- -->
-<!ELEMENT xml-schema EMPTY>
-<!ATTLIST xml-schema
-    name      CDATA #IMPLIED
-    public-id CDATA #IMPLIED
-    system-id CDATA #IMPLIED
-    namespace CDATA #IMPLIED
-    prefix    NMTOKEN #IMPLIED>
-
-
-<!ELEMENT ldap-entry EMPTY>
-<!ATTLIST ldap-entry
-    object-class NMTOKEN #REQUIRED>
-
-
-<!--
-    Specifies the identity field for this class. The identity field
-    is required for persistence, but not required for Java to XML
-    binding. The identity field references another field or container
-    in this class'ss mapping. Containers fields are used for multiple
-    column primary keys and multi-field LDAP RDNs.
-
- -->
-<!ELEMENT identity EMPTY>
-<!ATTLIST identity
-    field-ref NMTOKEN #REQUIRED>
+<!ELEMENT map-to EMPTY>
+<!ATTLIST map-to
+    table     NMTOKEN #REQUIRED
+    xml       NMTOKEN #REQUIRED
+    ns-uri    NMTOKEN #REQUIRED
+    ns-prefix NMTOKEN #REQUIRED
+    ldap-dn   NMTOKEN #REQUIRED
+    ldap-oc   NMTOKEN #REQUIRED>
 
 
 <!--
@@ -141,11 +112,12 @@
     attribute.
 
  -->
-<!ELEMENT field ( description?, sql-info?, xml-info?, ldap-info? )>
+<!ELEMENT field ( description?, sql?, xml?, ldap? )>
 <!ATTLIST field
     name NMTOKEN #REQUIRED
     type NMTOKEN #IMPLIED
     required (true|false) "false"
+    transient (true|false) "true"
     get-method NMTOKEN #IMPLIED
     set-method NMTOKEN #IMPLIED
     create-method NMTOKEN #IMPLIED
@@ -161,14 +133,13 @@
     java.math.BigDecimal or numeric).
 
  -->
-<!ELEMENT sql-info EMPTY>
-<!ATTLIST sql-info
+<!ELEMENT sql EMPTY>
+<!ATTLIST sql
     name NMTOKEN #IMPLIED
     type NMTOKEN #IMPLIED
     many-table NMTOKEN #IMPLIED
     many-key NMTOKEN #IMPLIED
-    dirty (check|ignore) "check"
-    access (none|read|write|both) "both">
+    dirty (check|ignore) "check">
 
 
 <!--
@@ -182,11 +153,11 @@
     model in a given object.
 
  -->
-<!ELEMENT xml-info EMPTY>
-<!ATTLIST xml-info
+<!ELEMENT xml EMPTY>
+<!ATTLIST xml
     name NMTOKEN #IMPLIED
     type NMTOKEN #IMPLIED
-    node-type (attribute|element|content) #IMPLIED>
+    node (attribute|element|content) #IMPLIED>
 
 
 <!--
@@ -195,10 +166,9 @@
     The name of the LDAP attribute.
 
  -->
-<!ELEMENT ldap-info EMPTY>
-<!ATTLIST ldap-info
-    name NMTOKEN #IMPLIED
-    access (none|read|write|both) "both">
+<!ELEMENT ldap EMPTY>
+<!ATTLIST ldap
+    name NMTOKEN #IMPLIED>
 
 
 <!--
@@ -213,7 +183,8 @@
     type NMTOKEN #IMPLIED
     required (true|false) "false"
     get-method NMTOKEN #IMPLIED
-    set-method NMTOKEN #IMPLIED>
+    set-method NMTOKEN #IMPLIED
+    create-method NMTOKEN #IMPLIED>
 
 
 <!--

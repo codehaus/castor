@@ -56,7 +56,6 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.TypeSystem;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.MimeBase64Decoder;

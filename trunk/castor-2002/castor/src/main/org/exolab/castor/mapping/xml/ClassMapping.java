@@ -32,21 +32,17 @@ public class ClassMapping implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _className;
-
     private java.lang.String _access = "shared";
 
-    private java.lang.String _extends;
+    private java.lang.String _identity;
 
-    private Description _description;
+    private java.lang.Object _extends;
 
-    private SqlTable _sqlTable;
+    private java.lang.String _name;
 
-    private XmlSchema _xmlSchema;
+    private java.lang.String _description;
 
-    private LdapEntry _ldapEntry;
-
-    private Identity _identity;
+    private MapTo _mapTo;
 
     private java.util.Vector _fieldMappingList;
 
@@ -107,12 +103,6 @@ public class ClassMapping implements java.io.Serializable {
     } //-- java.lang.String getAccess() 
 
     /**
-    **/
-    public java.lang.String getClassName() {
-        return this._className;
-    } //-- java.lang.String getClassName() 
-
-    /**
      * 
      * @param index
     **/
@@ -146,15 +136,15 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public Description getDescription() {
+    public java.lang.String getDescription() {
         return this._description;
-    } //-- Description getDescription() 
+    } //-- java.lang.String getDescription() 
 
     /**
     **/
-    public java.lang.String getExtends() {
+    public java.lang.Object getExtends() {
         return this._extends;
-    } //-- java.lang.String getExtends() 
+    } //-- java.lang.Object getExtends() 
 
     /**
      * 
@@ -190,71 +180,27 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public Identity getIdentity() {
+    public java.lang.String getIdentity() {
         return this._identity;
-    } //-- Identity getIdentity() 
+    } //-- java.lang.String getIdentity() 
 
     /**
     **/
-    public LdapEntry getLdapEntry() {
-        return this._ldapEntry;
-    } //-- LdapEntry getLdapEntry() 
+    public MapTo getMapTo() {
+        return this._mapTo;
+    } //-- MapTo getMapTo() 
+
+    /**
+    **/
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
     **/
     public java.lang.String getReferenceId() {
-        return this._className;
+        return this._name;
     } //-- java.lang.String getReferenceId() 
-
-    /**
-    **/
-    public SqlTable getSqlTable() {
-        return this._sqlTable;
-    } //-- SqlTable getSqlTable() 
-
-    /**
-    **/
-    public XmlSchema getXmlSchema() {
-        return this._xmlSchema;
-    } //-- XmlSchema getXmlSchema() 
-
-    /**
-    **/
-    public boolean isValid() {
-        try {
-            validate();
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    } //-- boolean isValid() 
-
-    /**
-     * 
-     * @param out
-    **/
-    public void marshal(java.io.Writer out) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
-
-    /**
-     * 
-     * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
     **/
@@ -298,14 +244,6 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _className
-    **/
-    public void setClassName(java.lang.String _className) {
-        this._className = _className;
-    } //-- void setClassName(java.lang.String) 
-
-    /**
-     * 
      * @param vContainer
      * @param index
     **/
@@ -323,17 +261,17 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _description
     **/
-    public void setDescription(Description _description) {
+    public void setDescription(java.lang.String _description) {
         this._description = _description;
-    } //-- void setDescription(Description) 
+    } //-- void setDescription(java.lang.String) 
 
     /**
      * 
      * @param _extends
     **/
-    public void setExtends(java.lang.String _extends) {
+    public void setExtends(java.lang.Object _extends) {
         this._extends = _extends;
-    } //-- void setExtends(java.lang.String) 
+    } //-- void setExtends(java.lang.Object) 
 
     /**
      * 
@@ -354,50 +292,24 @@ public class ClassMapping implements java.io.Serializable {
      * 
      * @param _identity
     **/
-    public void setIdentity(Identity _identity) {
+    public void setIdentity(java.lang.String _identity) {
         this._identity = _identity;
-    } //-- void setIdentity(Identity) 
+    } //-- void setIdentity(java.lang.String) 
 
     /**
      * 
-     * @param _ldapEntry
+     * @param _mapTo
     **/
-    public void setLdapEntry(LdapEntry _ldapEntry) {
-        this._ldapEntry = _ldapEntry;
-    } //-- void setLdapEntry(LdapEntry) 
+    public void setMapTo(MapTo _mapTo) {
+        this._mapTo = _mapTo;
+    } //-- void setMapTo(MapTo) 
 
     /**
      * 
-     * @param _sqlTable
+     * @param _name
     **/
-    public void setSqlTable(SqlTable _sqlTable) {
-        this._sqlTable = _sqlTable;
-    } //-- void setSqlTable(SqlTable) 
-
-    /**
-     * 
-     * @param _xmlSchema
-    **/
-    public void setXmlSchema(XmlSchema _xmlSchema) {
-        this._xmlSchema = _xmlSchema;
-    } //-- void setXmlSchema(XmlSchema) 
-
-    /**
-     * 
-     * @param reader
-    **/
-    public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader) 
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
-    {
-        return (org.exolab.castor.mapping.xml.ClassMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.ClassMapping.class, reader);
-    } //-- org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
 
 }
