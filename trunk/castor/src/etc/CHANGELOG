@@ -2,6 +2,14 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1877 using contribution from Lilians Auvigne) [lilian.auvigne@bnpparibas.com ]
+       Fixed wrong class and method name for Websphere 5.0 transaction manager factory.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1877
+       (Werner - 20050217)
+
+Version 0.9.6, Februray 09, 2004
+-------------------------------
+
 JDO:   Fixed bug 1855 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed problem with TransactionContext.getObjectEntry(Object) that was introduced as a 
        result of adding support for lazy loading 1:1 relations.
