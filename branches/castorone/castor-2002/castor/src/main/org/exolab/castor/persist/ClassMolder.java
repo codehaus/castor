@@ -124,6 +124,7 @@ public class ClassMolder {
 
     ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist ) 
             throws ClassNotFoundException, MappingException {
+
         ClassMapping clsMap = ((ClassDescriptorImpl) clsDesc).getMapping();
 
         _engine = lock;
@@ -405,7 +406,7 @@ public class ClassMolder {
     //
     public OID load( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
             throws ObjectNotFoundException, PersistenceException {       
-        System.out.println("ClassMolder.load(): Oid: "+oid);
+        //System.out.println("ClassMolder.load(): Oid: "+oid);
 
         Connection conn;
         ClassMolder fieldClassMolder;
@@ -428,22 +429,7 @@ public class ClassMolder {
             conn = (Connection)tx.getConnection(oid.getLockEngine());
             stamp = _persistence.load( conn, fields, oid.getIdentities(), accessMode );
             oid.setDbLock( accessMode == AccessMode.DbLocked );
-            //try {
-                locker.setObject( tx, fields );
-            //} catch ( LockNotGrantedException e ) {
-                // the chance it happens is one in zillions:
-                // it happens only if two transaction both try to load
-                // an object which isn't in cache, and also the one of 
-                // the transaction "luckly" preempted between acquire 
-                // and setObject, and also the second transaction
-                // already acquire and read lock.
-                // transaction finish.
-            //  try {
-            //      fields = locker.getObject( tx );
-            //  } catch ( LockNotGrantedException e ) {
-            //        
-            //  }
-            //}
+            locker.setObject( tx, fields );
         }
 
         if ( object instanceof TimeStampable ) {
@@ -452,16 +438,16 @@ public class ClassMolder {
 
         ids = oid.getIdentities();
         for ( int i=0; i<_ids.length; i++ ) {
-            System.out.println("Ids.length: "+ids.length);
+            //System.out.println("Ids.length: "+ids.length);
             if ( ids[i] == null )
                 throw new PersistenceException( "One of the identities is null!" );
             _ids[i].setValue( object, ids[i] );
         }
 
         for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
+            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
         }
-        System.out.println("  is loaded!");
+        //System.out.println("  is loaded!");
     
         for ( int i = 0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -528,6 +514,8 @@ public class ClassMolder {
                             col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
                         }
                         _fhs[i].setValue( object, col );
+                    } else {
+                        _fhs[i].setValue( object, null );
                     }
                 } else {
                     ArrayVector list = (ArrayVector) fields[i];
@@ -556,7 +544,7 @@ public class ClassMolder {
     public Object[] create( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws DuplicateIdentityException, PersistenceException {
 
-        System.out.println("ClassMolder.create(): Oid: "+oid);
+        //System.out.println("ClassMolder.create(): Oid: "+oid);
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -577,6 +565,13 @@ public class ClassMolder {
 
         if ( _persistence == null )
             throw new PersistenceException("non persistence capable: "+oid.getJavaClass());        
+
+        // idea
+        // should optimize it into 3 phase
+        // because _fhs[i].getObject is expensive
+        // 1/ getObject into array
+        // 2/ put things in cache
+        // 3/ deal with relations
 
         fields = new Object[_fhs.length];
         ids = oid.getIdentities();
@@ -642,9 +637,9 @@ public class ClassMolder {
             _ids[i].setValue( object, createdId[i] );        
         }
         for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
+            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+_fhs[i].getJavaClass()+">  ");
         }
-        System.out.println(" will be created");
+        //System.out.println(" will be created");
 
         if ( createdId == null || createdId[0] == null )
             throw new PersistenceException("Identity can't be created!");
@@ -660,7 +655,6 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
-                    // need multi-pk
                     if ( _fhs[i].isDependent() ) {
                         if ( !tx.isPersistent( o ) ) 
                             tx.create( fieldEngine, fieldClassMolder, o, oid );
@@ -679,7 +673,6 @@ public class ClassMolder {
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
-                itor = getIterator( o );
                 if ( o != null ) {
                     itor = getIterator( o );
                     while (itor.hasNext()) {
@@ -709,10 +702,10 @@ public class ClassMolder {
                     while (itor.hasNext()) {
                         Object oo = itor.next();
                         if ( !tx.isPersistent( oo ) ) {
-                            System.out.println("Object Does not Exist!");
-                            tx.create( fieldEngine, fieldClassMolder, oo, null );
+                            //System.out.println("Object Does not Exist!");
+                            //tx.create( fieldEngine, fieldClassMolder, oo, null );
                         } else {
-                            System.out.println("Object already created and will not be recreated!");
+                            //System.out.println("Object already created and will not be recreated!");
                         }
                         // create the relation in relation table too
                         _fhs[i].getRelationLoader().createRelation( 
@@ -921,6 +914,27 @@ public class ClassMolder {
                                         }
                                     }
                                 }
+                            } else if ( orgFields != null ) {
+                                for ( int j=0; j<orgFields.size(); j++ ) {
+                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    if ( reldel != null ) {
+                                        tx.delete( reldel );
+                                    } else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't delete dependent object himself. So, must
+                                        // error.
+                                    }
+                                }                                
+                            } else {    // list != null 
+                                for ( int j=0; j<list.size(); j++ ) {
+                                    if ( !tx.isPersistent( v.get(j) ) ) 
+                                        tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
+                                    else {
+                                        // should i notify user that the object does not exist?
+                                        // user can't create dependent object himself. So, must
+                                        // error.                                   
+                                    }
+                                }
                             }
                         }
                     }
@@ -944,7 +958,7 @@ public class ClassMolder {
                                 if ( toBeDeleted != null && tx.isPersistent( toBeDeleted ) ) {
                                     tx.delete( toBeDeleted );
                                 } else { 
-                                    System.out.println("Object to be delete is not found!");
+                                    //System.out.println("Object to be delete is not found!");
                                     // what to do if it happens?
                                 }
                             }
@@ -970,7 +984,7 @@ public class ClassMolder {
                                     tx.create( fieldEngine, fieldClassMolder, toBeAdded, oid );
                                 } else {
                                     // what to do if it happens?
-                                    System.out.println("Object to be added is not found!");
+                                    //System.out.println("Object to be added is not found!");
                                 }
                             }
                         }
@@ -1013,6 +1027,8 @@ public class ClassMolder {
                         if ( orgFields != null && list != null ) {
                             for ( int j=0; j<orgFields.size(); j++ ) {
                                 if ( !list.contains( orgFields.get(j) ) ) {
+                                    // must be loaded thur transaction, so that the related object
+                                    // is properly locked and updated before we delete it.
                                     Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
                                     if ( reldel != null ) {
                                         tx.writeLock( reldel, tx.getLockTimeout() );
@@ -1032,6 +1048,8 @@ public class ClassMolder {
                             // add relation which added after it's created or loaded
                             for ( int j=0; j<list.size(); j++ ) {
                                 if ( !orgFields.contains( list.get(j) ) ) {
+                                    // must be loaded thur transaction, so that the related object
+                                    // is properly locked and updated before we create it.
                                     Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
                                     if ( reladd != null ) {
                                         tx.writeLock( reladd, tx.getLockTimeout() );
@@ -1047,6 +1065,45 @@ public class ClassMolder {
                                         // non-critical error ignore it seem to better than annoy 
                                         // user
                                     }
+                                }
+                            }
+                        } else if ( orgFields != null ) {
+                            for ( int j=0; j<orgFields.size(); j++ ) {
+                                // must be loaded thur transaction, so that the related object
+                                // is properly locked and updated before we delete it.
+                                Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                if ( reldel != null ) {
+                                    tx.writeLock( reldel, tx.getLockTimeout() );
+                                 
+                                    _fhs[i].getRelationLoader().deleteRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                } else {
+                                    // the object not there, and we try to delete the rubbish relation,
+                                    // if there is
+                                    _fhs[i].getRelationLoader().deleteRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                }
+                            }
+                        } else {
+                            for ( int j=0; j<list.size(); j++ ) {
+                                // must be loaded thur transaction, so that the related object
+                                // is properly locked and updated before we create it.
+                                Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
+                                if ( reladd != null ) {
+                                    tx.writeLock( reladd, tx.getLockTimeout() );
+                                 
+                                    _fhs[i].getRelationLoader().createRelation( 
+                                    (Connection)tx.getConnection(oid.getLockEngine()), 
+                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                } else {
+                                    // ignored if object not found, if later in transaction 
+                                    // the other side of object is added. then, the relation 
+                                    // will be added if the other side of object is just 
+                                    // deleted in this transaction, then it seem to be an 
+                                    // non-critical error ignore it seem to better than annoy 
+                                    // user
                                 }
                             }
                         }
@@ -1112,27 +1169,28 @@ public class ClassMolder {
  
 
         if ( lockrequired ) {
-            tx.writeLock( object, tx.getTransactionTimeout() );
+            //tx.writeLock( object, tx.getTransactionTimeout() );
         }
 
         if ( modified ) {
-            System.out.println("object is modifed, now storing it");
+            tx.writeLock( object, tx.getTransactionTimeout() );
+            //System.out.println("object is modifed, now storing it");
             for ( int i=0; newfields!=null && i<newfields.length; i++ ) {
-                System.out.print("<"+i+":"+(newfields[i] instanceof Object[]?OID.flatten((Object[])newfields[i]):newfields[i])+" of "+_fhs[i].getJavaClass()+">  ");
+                //System.out.print("<"+i+":"+(newfields[i] instanceof Object[]?OID.flatten((Object[])newfields[i]):newfields[i])+" of "+_fhs[i].getJavaClass()+">  ");
             }
-            System.out.println("     new field in object");
+            //System.out.println("     new field in object");
 
             for ( int i=0; fields!=null && i<fields.length; i++ ) {
-                    System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+">  ");
+                //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+">  ");
             }
-            System.out.println("       in cache");
+            //System.out.println("       in cache");
             
             Object stamp = _persistence.store( tx.getConnection(oid.getLockEngine()),
                 newfields, oid.getIdentities(), fields, oid.getStamp() );
             oid.setStamp( stamp );
             return true;
         } else {
-            System.out.println("object not modifed!");
+            //System.out.println("object not modifed!");
             return false;
         }
         
@@ -1144,7 +1202,7 @@ public class ClassMolder {
     public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
         throws PersistenceException, ObjectModifiedException {
 
-        System.out.println("ClassMolder.update(): Oid: "+oid);
+        //System.out.println("ClassMolder.update(): Oid: "+oid);
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -1183,9 +1241,9 @@ public class ClassMolder {
         }
 
         for ( int i=0; i<_fhs.length; i++ ) {
-            System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+(_fhs[i]==null?null:_fhs[i].getJavaClass())+">  ");
+            //System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+(_fhs[i]==null?null:_fhs[i].getJavaClass())+">  ");
         }
-        System.out.println("  is updated!");
+        //System.out.println("  is updated!");
         
         for ( int i=0; i<_fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -1200,7 +1258,7 @@ public class ClassMolder {
                     // need multi-pk
                     if ( _fhs[i].isDependent() ) {
                         if ( !tx.isPersistent( o ) ) 
-                            tx.update( fieldEngine, fieldClassMolder, o);
+                            tx.update( fieldEngine, fieldClassMolder, o, oid );
                         else 
                             // fail-fast principle: if the object depend on another object,
                             // throw exception
@@ -1236,7 +1294,7 @@ public class ClassMolder {
                                 }
                                 // update all dependent objects
                                 for ( int j=0; j<list.size(); j++ ) {
-                                    tx.update( fieldEngine, fieldClassMolder, v.get(j));
+                                    tx.update( fieldEngine, fieldClassMolder, v.get(j), oid );
                                 }
                             }
                         }
@@ -1255,7 +1313,7 @@ public class ClassMolder {
     }
 
     public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object )
-                        throws DuplicateIdentityException, PersistenceException {
+                        /*throws DuplicateIdentityException, PersistenceException*/ {
         // similar to store, no recusrion is needed
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -1270,10 +1328,11 @@ public class ClassMolder {
         
         int fieldType;
 
-        fields = (Object[])locker.getObject( tx );
+        fields = new Object[_fhs.length];
+        //(Object[])locker.getObject( tx );
 
         if ( oid.isIdsNull() ) 
-            throw new PersistenceException("The identities of the cache to be updated is null");
+            throw new IllegalStateException("The identities of the cache to be updated is null");
 
         for ( int i=0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -1341,6 +1400,8 @@ public class ClassMolder {
                 throw new IllegalArgumentException("Field type invalid!");
             }
         }
+
+        locker.setObject( tx, fields );
     }
 
     private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object[] identities ) 
@@ -1484,10 +1545,11 @@ public class ClassMolder {
                 break;
             case FieldMolder.MANY_TO_MANY:
                 // delete the relation in relation table too
+                /*
                 _fhs[i].getRelationLoader().deleteRelation( 
                 (Connection)tx.getConnection(oid.getLockEngine()), 
                 oid.getIdentities() );
-
+                */
                 break;
             default:
                 throw new PersistenceException("Invalid field type!");
@@ -1707,7 +1769,7 @@ public class ClassMolder {
         if ( o instanceof Collection ) {
             return ((Collection) o).iterator();
         } else if ( o instanceof Vector ) {
-            System.out.println("expect colleciton");
+            //System.out.println("expect colleciton");
             return null;            
         } else {
             return null;
@@ -1717,7 +1779,7 @@ public class ClassMolder {
      *  Vector of Object[]
      */
     private ArrayVector getIds( ClassMolder molder, Object o ) {
-        ArrayVector v;
+        ArrayVector v = null;
         Vector vo;
         Iterator i;
         Collection c;
@@ -1736,9 +1798,10 @@ public class ClassMolder {
             while ( e.hasMoreElements() ) {
                 v.add( molder.getIdentities( e.nextElement() ) );
             }
-        } else {
+        } else if ( o != null ) {
             v = null;
-            System.out.println("expecting collection");
+            //System.out.println("expecting collection");
+            throw new RuntimeException("expecting collection");
         }
         return v;
     }
