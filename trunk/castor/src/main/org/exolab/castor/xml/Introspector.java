@@ -335,17 +335,40 @@ public final class Introspector {
         int methodCount = 0;
         
         Class superClass = c.getSuperclass();
+        Class[] interfaces = c.getInterfaces();
+        
+        
         
         //-- create method sets
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             
-            //-- if method comes from the Object base class, ignore
-            if (method.getDeclaringClass() == Object.class) continue;
-                        
+            Class owner = method.getDeclaringClass();
+            
             //-- ignore methods from super-class, that will be
             //-- introspected separately, if necessary
-            if (method.getDeclaringClass() == superClass) continue;
+            if (owner != c) {
+                //-- if declaring class is anything but
+                //-- an interface, than just continue,
+                //-- the field comes from a super class
+                //-- (e.g. java.lang.Object)
+                if (!owner.isInterface()) continue;
+                
+                //-- owner is an interface, is it an
+                //-- interface this class implements
+                //-- or a parent class?
+                if (interfaces.length > 0) {
+                    boolean found = false;
+                    for (int count = 0; count < interfaces.length; count++) {
+                        if (interfaces[count] == owner) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) continue;
+                }
+            }
+            
             
             //-- if method is static...ignore
             if ((method.getModifiers() & Modifier.STATIC) != 0) continue;
@@ -626,13 +649,31 @@ public final class Introspector {
             for (int i = 0; i < fields.length; i++) {                
                 Field field = fields[i];
                 
-                
-                //-- if field comes from the Object base class, ignore
-                if (field.getDeclaringClass() == Object.class) continue;
+                Class owner = field.getDeclaringClass();
                 
                 //-- ignore fields from super-class, that will be
                 //-- introspected separately, if necessary
-                if (field.getDeclaringClass() == superClass) continue;
+                if (owner != c) {
+                    //-- if declaring class is anything but
+                    //-- an interface, than just continue,
+                    //-- the field comes from a super class
+                    //-- (e.g. java.lang.Object)
+                    if (!owner.isInterface()) continue;
+                    
+                    //-- owner is an interface, is it an
+                    //-- interface this class implements
+                    //-- or a parent class?
+                    if (interfaces.length > 0) {
+                        boolean found = false;
+                        for (int count = 0; count < interfaces.length; count++) {
+                            if (interfaces[count] == owner) {
+                                found = true;
+                                break;
+                            }
+                        }
+                        if (!found) continue;
+                    }
+                }
             
                 Class type = field.getType();
                 
