@@ -459,6 +459,12 @@ public class OQLQueryImpl
         return _results;
     }
 
+    /**
+     * Get the generated SQL statement for this OQLQuery
+     */
+    public String getSQL() throws org.exolab.castor.jdo.QueryException {
+        return _expr.getStatement(true);
+    }
 
     public void close()
     {
