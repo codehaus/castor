@@ -298,6 +298,8 @@
                   <td>
                      enumeration<br/>
                      length<br/>
+                     minLength<br/>
+                     maxLength<br/>
                      pattern<br/>
                   </td>
                </tr>
