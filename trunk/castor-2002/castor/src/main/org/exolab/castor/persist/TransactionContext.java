@@ -770,7 +770,16 @@ public abstract class TransactionContext
         }
         // markCreate will walk the object tree starting from the specified
         // object and mark all the object to be created.
-        markCreate( engine, molder, object, depended );
+       try {
+            markUpdate( engine, molder, object, depended );
+        } catch (DuplicateIdentityException e) {
+            if (walk) _creating = false;
+            throw e;
+        } catch (PersistenceException e) {
+            if (walk) _creating = false;
+            throw e;
+        }
+
         // if exception throws in markCreate state, we simply let the exception
         // to pass to upper level.
 
@@ -977,7 +986,17 @@ public abstract class TransactionContext
             walk = true;
             _creating = true;
         }
-        markUpdate( engine, molder, object, depended );
+        
+        try {
+            markUpdate( engine, molder, object, depended );
+        } catch (DuplicateIdentityException e) {
+            if (walk) _creating = false;
+            throw e;
+        } catch (PersistenceException e) {
+            if (walk) _creating = false;
+            throw e;
+        }
+
 
         // markUpdate will actually update object loaded/create from preious
         // transaction, or it might marked some object to be created.
