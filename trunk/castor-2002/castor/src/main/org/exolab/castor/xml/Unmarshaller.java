@@ -77,6 +77,7 @@ public class Unmarshaller {
     **/
     private Class _class = null;
 
+    
     /**
      * The class descriptor resolver
     **/
@@ -87,6 +88,11 @@ public class Unmarshaller {
     **/
     private IDResolver _idResolver = null;
 
+    /**
+     * The instance of _class to Unmarshal into (optional)
+    **/
+    private Object _instanceObj = null;
+    
     /**
      * The EntityResolver used for resolving entities
     **/
@@ -100,18 +106,18 @@ public class Unmarshaller {
     /**
      * The print writer used for log information
     **/
-    private PrintWriter pw = null;
+    private PrintWriter _pw = null;
 
     /**
      * The flag indicating whether or not to display debug information
     **/
-    private boolean debug = false;
+    private boolean _debug = false;
 
     /**
      * The flag indicating whether or not to validate during
      * unmarshalling
     **/
-    private boolean validate = false;
+    private boolean _validate = false;
 
     //----------------/
     //- Constructors -/
@@ -158,13 +164,31 @@ public class Unmarshaller {
             this._loader = mapping.getClassLoader();
         }
     } //-- Unmarshaller(Mapping)
+    
+    
+    /**
+     * Creates a new Unmarshaller with the given Object
+     * @param root the instance to unmarshal into. This
+     * may be null, if the Unmarshaller#setMapping is called
+     * to load a mapping for the root element of xml document.
+     *
+     * @param root the Object instance to unmarshal into
+    **/
+    public Unmarshaller(Object root) {
+        initConfig();
+        if (root != null) {
+            _class = root.getClass();
+            _loader = _class.getClassLoader();
+        }
+        _instanceObj = root;
+    } //-- Unmarshaller(Class)
 
     /**
      * Used by constructors to get configuration information
     **/
     private void initConfig() {
-        debug = Configuration.debug();
-        validate = Configuration.marshallingValidation();
+        _debug = Configuration.debug();
+        _validate = Configuration.marshallingValidation();
     } //-- initConfig
     
     /**
@@ -191,7 +215,7 @@ public class Unmarshaller {
      * @see #setLogWriter
     **/
     public void setDebug(boolean debug) {
-        this.debug = debug;
+        _debug = debug;
     } //-- setDebug
 
     /**
@@ -221,7 +245,7 @@ public class Unmarshaller {
      * @param printWriter the PrintWriter to use for logging
     **/
     public void setLogWriter(PrintWriter printWriter) {
-        this.pw = printWriter;
+        _pw = printWriter;
     } //-- setLogWriter
 
     /**
@@ -270,7 +294,7 @@ public class Unmarshaller {
      * By default validation will be performed.
     **/
     public void setValidation(boolean validate) {
-        this.validate = validate;
+        _validate = validate;
     } //-- setValidation
 
 
@@ -452,10 +476,13 @@ public class Unmarshaller {
     public UnmarshalHandler createHandler() {
         UnmarshalHandler handler = new UnmarshalHandler(_class);
         handler.setResolver(_cdResolver);
-        handler.setLogWriter(pw);
-        handler.setDebug(debug);
-        handler.setValidation(validate);
+        handler.setLogWriter(_pw);
+        handler.setDebug(_debug);
+        handler.setValidation(_validate);
 
+        if (_instanceObj != null) {
+            handler.setRootObject(_instanceObj);
+        }
         if (_idResolver != null)
             handler.setIDResolver(_idResolver);
 
