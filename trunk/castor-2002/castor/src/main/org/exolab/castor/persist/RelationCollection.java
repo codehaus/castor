@@ -328,7 +328,7 @@ public class RelationCollection implements Collection, Lazy {
             _changecount++;
 			_size--;
             return true;
-        } else if ( _ids.contains( o ) ) {
+        } else if ( _ids.contains( id ) ) {
             _deleted.add( id );
             _changecount++;
 			_size--;
