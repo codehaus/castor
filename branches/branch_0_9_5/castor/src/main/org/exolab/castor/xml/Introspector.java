@@ -140,6 +140,10 @@ public final class Introspector {
      */
     private static final String MAP = "java.util.Map";
     
+    /**
+     * Name of the java.util.Map collection
+     */
+    private static final String SET_COLLECTION = "java.util.Set";
 
     /**
      * Used as a prefix for the name of a container field
@@ -1197,7 +1201,9 @@ public final class Introspector {
      * @return a list of available collections
     **/
     private static Class[] loadCollections() {
-        Vector collections = new Vector(5);
+        
+        
+        Vector collections = new Vector(6);
         
         //-- JDK 1.1
         collections.addElement(Vector.class);
@@ -1227,16 +1233,29 @@ public final class Introspector {
         
             clazz = null;
             try {
+                //-- java.util.Map
                 if (loader != null) {
                     clazz = loader.loadClass(MAP);
                 }
                 else clazz = Class.forName(MAP);
+                if (clazz != null) {
+                    collections.addElement(clazz);
+                }
+                //-- java.util.Set
+                if (loader != null) {
+                    clazz = loader.loadClass(SET_COLLECTION);
+                }
+                else clazz = Class.forName(SET_COLLECTION);
+                if (clazz != null) {
+                    collections.addElement(clazz);
+                }
+                
+                
             }
             catch(ClassNotFoundException cnfx) {
                 //-- just ignore...for now
                 //-- some nasty ClassLoader issue has occurred.
             } 
-            if (clazz != null) collections.addElement(clazz);
         }
         
         
