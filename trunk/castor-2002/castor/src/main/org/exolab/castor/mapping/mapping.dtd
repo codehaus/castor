@@ -63,7 +63,7 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, cache-type?, map-to?, ( field | container )+ )>
+<!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
@@ -172,9 +172,10 @@
  -->
 <!ELEMENT xml EMPTY>
 <!ATTLIST xml
-    name  NMTOKEN  #IMPLIED
-    type  NMTOKEN  #IMPLIED
-    node  ( attribute | element | text )  #IMPLIED>
+    name     NMTOKEN  #IMPLIED
+    type     NMTOKEN  #IMPLIED
+    matches  NMTOKEN  #IMPLIED
+    node     ( attribute | element | text )  #IMPLIED>
 
 
 <!--
@@ -186,23 +187,6 @@
 <!ELEMENT ldap EMPTY>
 <!ATTLIST ldap
     name  NMTOKEN  #IMPLIED>
-
-
-<!--
-    A container is a special type of field that represents a container
-    class for which field mappings are provided in the scope of this
-    class.
-
-  -->
-<!ELEMENT container ( description?, field+ )>
-<!ATTLIST container
-    name           NMTOKEN  #REQUIRED
-    type           NMTOKEN  #IMPLIED
-    required       ( true | false )  "false"
-    direct         ( true | false )  "false"
-    get-method     NMTOKEN  #IMPLIED
-    set-method     NMTOKEN  #IMPLIED
-    create-method  NMTOKEN  #IMPLIED>
 
 
 <!--
