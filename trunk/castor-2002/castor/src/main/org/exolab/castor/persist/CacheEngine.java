@@ -50,19 +50,24 @@ package org.exolab.castor.persist;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.util.Logger;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
 
 
 /**
+ * Implements the object cache engine sitting between a persistence engine
+ * and persistence storage SPI.
+ *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class CacheEngine
+class CacheEngine
+    implements PersistenceEngine
 {
 
 
@@ -102,13 +107,6 @@ public class CacheEngine
 
 
     /**
-     * The name of this cache. Typically the name of this database,
-     * directory, shared space, etc.
-     */
-    private String    _cacheName;
-
-
-    /**
      * All the XA transactions running against this cache engine.
      */
     private Hashtable _xaTx = new Hashtable();
@@ -131,37 +129,24 @@ public class CacheEngine
      * @throws MappingException Indicate that one of the mappings is
      *  invalid
      */
-    protected CacheEngine( String cacheName, MappingResolver mapResolver,
-			   PersistenceFactory factory, PrintWriter logWriter )
+    CacheEngine( MappingResolver mapResolver, PersistenceFactory factory, PrintWriter logWriter )
 	throws MappingException
     {
 	Enumeration enum;
 	ObjectDesc  objDesc;
 	Persistence persist;
 
-	if ( cacheName == null )
-	    throw new IllegalArgumentException( "Argument 'cacheName' is null" );
-	_cacheName = cacheName;
 	_logWriter = logWriter;
 	enum = mapResolver.listDescriptors();
 	while ( enum.hasMoreElements() ) {
 	    objDesc = (ObjectDesc) enum.nextElement();
-	    persist = factory.getPersistence( this, objDesc, logWriter );
+	    persist = factory.getPersistence( objDesc, logWriter );
 	    if ( persist != null )
 		_typeInfo.put( objDesc.getObjectType(), new TypeInfo( persist, objDesc ) );
 	    else if ( _logWriter != null ) {
 		_logWriter.println( Messages.format( "persist.noEngine", objDesc.getObjectType() ) );
 	    }
 	}
-    }
-
-
-    /**
-     * Returns the name of this cache engine.
-     */
-    public String getName()
-    {
-	return _cacheName;
     }
 
 
@@ -216,8 +201,8 @@ public class CacheEngine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    protected OID load( TransactionContext tx, Class type, Object identity,
-			boolean exclusive, int timeout )
+    public OID load( TransactionContext tx, Class type, Object identity,
+		     boolean exclusive, int timeout )
 	throws ObjectNotFoundException, LockNotGrantedException,
 	       PersistenceException, ClassNotPersistenceCapableException
     {
@@ -342,8 +327,8 @@ public class CacheEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    protected OID fetch( TransactionContext tx, PersistenceQuery query, Object identity,
-			 boolean exclusive, int timeout )
+    public OID fetch( TransactionContext tx, PersistenceQuery query, Object identity,
+		      boolean exclusive, int timeout )
 	throws ObjectNotFoundException, LockNotGrantedException,
 	       PersistenceException
     {
@@ -455,7 +440,7 @@ public class CacheEngine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    protected OID create( TransactionContext tx, Object obj, Object identity )
+    public OID create( TransactionContext tx, Object obj, Object identity )
 	throws DuplicateIdentityException, PersistenceException,
 	       ClassNotPersistenceCapableException
     {
@@ -531,7 +516,7 @@ public class CacheEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    protected void delete( TransactionContext tx, OID oid )
+    public void delete( TransactionContext tx, OID oid )
 	throws PersistenceException
     {
 	ObjectLock lock;
@@ -584,7 +569,7 @@ public class CacheEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    protected OID store( TransactionContext tx, OID oid, Object obj,
+    public OID store( TransactionContext tx, OID oid, Object obj,
 			 Object identity, int timeout )
 	throws LockNotGrantedException, ObjectDeletedException,
 	       ObjectModifiedException, DuplicateIdentityException,
@@ -676,7 +661,7 @@ public class CacheEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    protected void writeLock( TransactionContext tx, OID oid, int timeout )
+    public void writeLock( TransactionContext tx, OID oid, int timeout )
 	throws LockNotGrantedException, ObjectDeletedException, PersistenceException
     {
 	ObjectLock lock;
@@ -721,7 +706,7 @@ public class CacheEngine
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
      */
-    void copyObject( TransactionContext tx, OID oid, Object obj )
+    public void copyObject( TransactionContext tx, OID oid, Object obj )
     {
 	ObjectLock lock;
 	TypeInfo   typeInfo;
@@ -764,7 +749,7 @@ public class CacheEngine
      * @param oid The object's oid
      * @param obj The object to copy from
      */
-    void updateObject( TransactionContext tx, OID oid, Object obj )
+    public void updateObject( TransactionContext tx, OID oid, Object obj )
     {
 	ObjectLock lock;
 	TypeInfo   typeInfo;
@@ -799,7 +784,7 @@ public class CacheEngine
      * @param tx The transaction context
      * @param oid The object OID
      */
-    void releaseLock( TransactionContext tx, OID oid )
+    public void releaseLock( TransactionContext tx, OID oid )
     {
 	ObjectLock lock;
 	TypeInfo   typeInfo;
@@ -821,7 +806,7 @@ public class CacheEngine
      * @param tx The transaction context
      * @param oid The object OID
      */
-    void forgetObject( TransactionContext tx, OID oid )
+    public void forgetObject( TransactionContext tx, OID oid )
     {
 	ObjectLock lock;
 	Object     obj;
@@ -849,7 +834,7 @@ public class CacheEngine
      * The association is shared between all transactions open against
      * this cache engine through the XAResource interface.
      */
-    Hashtable getXATransactions()
+    public Hashtable getXATransactions()
     {
 	return _xaTx;
     }
@@ -897,7 +882,7 @@ public class CacheEngine
      * lifecycle interceptor requesting notification about activities
      * that affect an object.
      */
-    public static class TypeInfo
+    static class TypeInfo
     {
 
 	ObjectDesc   objDesc;
