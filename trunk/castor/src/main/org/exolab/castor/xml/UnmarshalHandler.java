@@ -749,6 +749,24 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- if we are at root....just validate and we are done
          if (_stateInfo.empty()) {
              if (_validate) {
+                ValidationException first = null;
+                ValidationException last = null;
+                
+                //-- check unresolved references
+                if (_resolveTable != null) {
+                    Enumeration enum = _resolveTable.keys();
+                    while (enum.hasMoreElements()) {
+                        String msg = "unable to resolve reference: " + enum.nextElement();                        
+                        if (first == null) {
+                            first = new ValidationException(msg);
+                            last = first;
+                        }
+                        else {
+                            last.setNext(new ValidationException(msg));
+                            last = last.getNext();
+                        }                            
+                    }
+                }
                 try {
                     Validator validator = new Validator();
                     ValidationContext context = new ValidationContext();
@@ -757,7 +775,13 @@ public final class UnmarshalHandler extends MarshalFramework
                     validator.validate(state.object, context);
                 }
                 catch(ValidationException vEx) {
-                    throw new SAXException(vEx);
+                    if (first == null)
+                        first = vEx;
+                    else 
+                        last.setNext(vEx);
+                }
+                if (first != null) {
+                    throw new SAXException(first);
                 }
             }
 
@@ -3181,6 +3205,7 @@ public final class UnmarshalHandler extends MarshalFramework
         return primitive;
     } //-- toPrimitiveObject
 
+    
     /**
      * A utility class for keeping track of the
      * qName and how the SAX parser passed attributes
