@@ -46,6 +46,7 @@
 package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.validators.ValidationUtils;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -175,8 +176,8 @@ public class ElementDecl extends Particle
             throw new IllegalArgumentException(err);
         }
         _schema = schema;
-        _name   = name;
         _constraints = new Vector(3);
+        setName(name);
     } //-- ElementDecl
 
     /**
@@ -507,11 +508,18 @@ public class ElementDecl extends Particle
     } //-- setId
     
     /**
-     * Sets the name of the element that this Element definition defines
+     * Sets the name of the element that this Element definition defines.
+     *
      * @param name the name of the defined element
     **/
     public void setName(String name) {
-        _name = name;
+        if (ValidationUtils.isQName(name)) {
+            _name = name;
+        }
+        else {
+            String err = "error: '" + name + "' is not a valid QName.";
+            throw new IllegalArgumentException(err);
+        }
     } //-- setName
 
     /**
