@@ -80,7 +80,7 @@ design, which is important in larger projects. </p>
             Database support includes Oracle 8.1.x and different versions of Sybase Enterprise and Anywhere. Users can implement the Driver interface to adapt Castor to the differences in SQL syntax supported by different relational DBMS', as long as the DBMS supports JDBC 2.0, multiple ResultSet, and transactions. Thanks to many individual open source contributors, drivers for different database are available. [Links for all features will be added]</p>
     </section>
 
-    <section title="LRU Cache">
+    <section title="Caching">
     
         <p>Castor maintains and properly locks one copy of the dirty checking cache for each 
            object it loads from or creates into persistence storage. Until all transactions 
@@ -129,11 +129,15 @@ design, which is important in larger projects. </p>
 
             defines the time-limited least-recently-used algorithm as the caching algorithm for <i>com.xyz.MyObject</i> class and the cache will be disposed of if it is not used within 30 seconds. (Note that the time-limit ticks after all transaction involved with the objects complete, but not start after it is loaded.) </p>
 
-        <p>
-        <b>NOTE:</b> The default cache-type is <tt>count-limited</tt> with a 
-        capacity of 100. This will be used when no cache-type is specified in 
-        the mapping for a class.
-        </p>
+        <p><b>NOTE:</b> The default cache-type is <tt>count-limited</tt> with a capacity of 100. This will 
+           be used when no cache-type is specified in the mapping for a class.</p>
+        
+        <p><b>NOTE:</b> As of release 0.9.6, Castor allows for the addition of user-defined cache 
+           implementations. Instructions can be found <a href="jdo-caching.html">here</a></p>
+           
+        <p>For problems related to the use of performance caches, please consult with the relevant 
+           entries in the <a href="jdo-faq.html#Castor and performance caches">JDO F.A.Q.</a>.</p>
+        
     </section>
 
     <section title="Dependent and related relationships">
