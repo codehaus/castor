@@ -67,10 +67,6 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 import java.util.ArrayList;
 
 import junit.framework.TestSuite;

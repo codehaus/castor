@@ -73,10 +73,6 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 import java.util.ArrayList;
 
 import junit.framework.TestSuite;
@@ -99,18 +95,17 @@ public class ListTypes extends CastorTestCase {
     private JDOCategory    _category;
 
 
-    public ListTypes( TestHarness category )
-            throws CWClassConstructorException {
+    public ListTypes( TestHarness category ) {
 
         super( category, "TC60", "List SQL Types" );
         _category = (JDOCategory) category;
     }
 
 
-    public boolean run( CWVerboseStream stream ) {
+    public boolean runOld() {
         boolean result = true;
         try {
-            _db = _category.getDatabase( stream.verbose() );
+            _db = _category.getDatabase( verbose );
             _conn = _category.getJDBCConnection(); 
 
 			System.out.println("ARRAY"+" : "+java.sql.Types.ARRAY);
