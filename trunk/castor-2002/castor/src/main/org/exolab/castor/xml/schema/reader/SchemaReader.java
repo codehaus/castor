@@ -69,10 +69,12 @@ import org.apache.xml.serialize.Serializer;
 **/
 public class SchemaReader {
     
-    private Parser      _parser = null;
-    private InputSource _source = null;
+    private Parser      _parser   = null;
+    private InputSource _source   = null;
 
-    private Schema      _schema  = null;
+    private Schema      _schema   = null;
+    
+    private boolean     _validate = true;
     
     /**
      * Creates a new SchemaReader
@@ -192,10 +194,29 @@ public class SchemaReader {
 
         _schema = schemaUnmarshaller.getSchema();
         
+        if (_validate) {
+            try {
+                _schema.validate();
+            }
+            catch(org.exolab.castor.xml.ValidationException vx) {
+                throw new NestedIOException(vx);
+            }
+        }
+        
         return _schema;
         
     } //-- read
     
-    
-    
+    /**
+     * Sets whether or not post-read validation should
+     * occur. By default, validation is enabled. Note
+     * that certain read validation cannot be disabled.
+     *
+     * @param validate a boolean that when true will force
+     * a call to Schema#validate after the schema is read.
+    **/
+    public void setValidation(boolean validate) {
+        _validate = validate;
+    } //-- setValidation
+        
 } //-- SchemaReader
