@@ -91,6 +91,7 @@
  -->
 <!ELEMENT xml-schema EMPTY>
 <!ATTLIST xml-schema
+    name      CDATA #IMPLIED
     public-id CDATA #IMPLIED
     system-id CDATA #IMPLIED
     namespace CDATA #IMPLIED
