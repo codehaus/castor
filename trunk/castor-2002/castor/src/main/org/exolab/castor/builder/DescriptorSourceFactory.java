@@ -289,7 +289,7 @@ public class DescriptorSourceFactory {
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
-			//-- Handle optional primatives?
+			//-- Handle optional primitives?
 			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()) && (!member.isMultivalued()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
