@@ -134,6 +134,11 @@ public class Marshaller extends MarshalFramework {
 	 */
 	private boolean _nsPrefixAtRoot = false;
 
+	/**
+	 * Name of the root element to use
+	 */
+	private String _rootElement  = null;
+	
     /**
      * The default namespace
     **/
@@ -329,6 +334,24 @@ public class Marshaller extends MarshalFramework {
     } //-- setNamespacePrefix
 
 	/**
+	 * Sets the name of the root element to use
+	 * @param The name of the root element to use
+	 */
+	public void setRootElement(String rootElement)
+	{
+		_rootElement = rootElement;
+	} //-- setRootElement
+
+	/**
+	 * Returns the name of the root element to use
+	 * @return Returns the name of the root element to use
+	 */
+	public String getRootElement()
+	{
+		return _rootElement;
+	} //-- getRootElement
+	
+	/**
 	 * Set to True to declare the given namespace mappings at the root node. Default is False.
 	 * @param nsPrefixAtRoot
 	 */
@@ -339,6 +362,7 @@ public class Marshaller extends MarshalFramework {
 
 	/**
 	 * Returns True if the given namespace mappings will be declared at the root node.
+	 * @return Returns True if the given namespace mappings will be declared at the root node.
 	 */
 	public boolean getNSPrefixAtRoot()
 	{
@@ -388,6 +412,9 @@ public class Marshaller extends MarshalFramework {
 
 	/**
 	 * If True the marshaller will use the 'xsi:type' attribute
+	 * to marshall a field value that extended the defined field type.
+	 * Default is True.
+	 * @return If True the marshaller will use the 'xsi:type' attribute
 	 * to marshall a field value that extended the defined field type.
 	 * Default is True.
 	 */
@@ -520,14 +547,16 @@ public class Marshaller extends MarshalFramework {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
 
-	boolean atRoot = false;
+		boolean atRoot = false;
         if (descriptor == null) {
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
-	    atRoot = true;
+			atRoot = true;
         }
 
         //-- calculate Object's name
         String name = descriptor.getXMLName();
+		if (atRoot && _rootElement!=null)
+			name = _rootElement;
         if (name == null) {
             name = _class.getName();
             //-- remove package information from name
@@ -570,18 +599,22 @@ public class Marshaller extends MarshalFramework {
                         _packages.add(pkgName);
                 }
 
+				if (_marshalExtendedType)
+				{
+					//  marshall as the actual value
+					classDesc = getClassDescriptor(_class);
+					saveType = (_class != descriptor.getFieldType());
+				}
+				else
+				{
+					// marshall as the base field type
+					_class = descriptor.getFieldType();
+					classDesc = getClassDescriptor(_class);
+				}
 
-		if (_marshalExtendedType) {
-		    //  marshall as the actual value
-		    classDesc = getClassDescriptor(_class);
-		    saveType = (_class != descriptor.getFieldType());
-		} else {
-		      // marshall as the base field type
-		      _class = descriptor.getFieldType();
-		      classDesc = getClassDescriptor(_class);
-		}
-
-                if (descriptor.getXMLName()==null)
+				if (atRoot && _rootElement!=null)
+					name = _rootElement;
+				else if (descriptor.getXMLName()==null)
                     name = classDesc.getXMLName();
             }
 
