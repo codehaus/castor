@@ -363,6 +363,14 @@ create table test_item (
 create unique index test_item_pk on test_item( iid );
 
 
+-- test_serial
+drop table test_serial;
+create table test_serial (
+  id      integer        not null,
+  dep     blob           null
+);
+create unique index test_serial_pk on test_serial( id );
+
 
 -- test_persistent
 drop table test_persistent;
