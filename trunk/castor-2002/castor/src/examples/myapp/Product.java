@@ -3,43 +3,109 @@ package myapp;
 
 import java.util.Vector;
 import java.util.Enumeration;
-import java.io.Serializable;
 
 
 public class Product
-    implements Serializable
 {
 
 
-    public int       id;
+    private int      _id;
 
 
-    public String    name;
+    private String   _name;
 
 
-    public float     price;
+    private float    _price;
 
 
-    public ProductGroup     group;
+    private ProductGroup _group;
 
 
-    public Vector           detail;
+    private Vector       _details = new Vector();
 
 
-    public Vector           category;
+    private Vector       _categories = new Vector();
 
 
-    public int getId() { return id; }
+    public int getId()
+    {
+        return _id;
+    }
 
-    public String getName() { return name; }
 
-    public float getPrice() { return price; }
+    public void setId( int id )
+    {
+        _id = id;
+    }
 
-    public ProductGroup getGroup() { return group; }
 
-    public Enumeration getDetail() { return detail.elements(); }
+    public String getName()
+    {
+        return _name;
+    }
 
-    public Enumeration getCategory() { return category.elements(); }
+
+    public void setName( String name )
+    {
+        _name = name;
+    }
+
+
+    public float getPrice()
+    {
+        return _price;
+    }
+
+
+    public void setPrice( float price )
+    {
+        _price = price;
+    }
+
+
+    public ProductGroup getGroup()
+    {
+        return _group;
+    }
+
+
+    public void setGroup( ProductGroup group )
+    {
+        _group = group;
+    }
+
+
+    public Enumeration getDetail()
+    {
+        return _details.elements();
+    }
+
+
+    public void addDetail( ProductDetail detail )
+    {
+        detail.setProduct( this );
+        _details.addElement( detail );
+    }
+
+
+    public Enumeration getCategory()
+    {
+        return _categories.elements();
+    }
+
+
+    public void addCategory( Category category )
+    {
+        if ( ! _categories.contains( category ) )
+            _categories.addElement( category );
+        category.addProduct( this );
+    }
+
+
+    public String toString()
+    {
+        return _id + " " + _name;
+    }
 
 
 }

@@ -18,6 +18,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.mapping.Mapping;
 import org.apache.xml.serialize.*;
 
 
@@ -28,33 +29,50 @@ public class Test
     public static final String DatabaseFile = "database.xml";
 
     
+    public static final String MappingFile = "mapping.xml";
+
+
     public static final String Usage = "Usage: example jdo";
+
+
+    private Mapping  _mapping;
+
+
+    private JDO      _jdo;
     
     
     public static void main( String[] args )
     {
-        PrintWriter   logger;
+        PrintWriter   writer;
+        Test          test;
         
-        logger = new Logger( System.out ).setPrefix( "test" );
-        
+        writer = new Logger( System.out ).setPrefix( "test" );
         try {
-            JDO  jdo;
-            
-            logger.println( "Reading Java-SQL mapping from " + DatabaseFile );
-            // JDO.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null, Logger.getSystemLogger() );
-            jdo = new JDO();
-            jdo.setLogWriter( Logger.getSystemLogger() );
-            jdo.setConfiguration( Test.class.getResource( DatabaseFile ).toString() );
-            jdo.setDatabaseName( "test" );
-            test( jdo, logger );
+            test = new Test( writer );
+            test.run( writer );
         } catch ( Exception except ) {
-            logger.println( except );
-            except.printStackTrace( logger );
+            writer.println( except );
+            except.printStackTrace( writer );
         }
+    }
+
+
+    public Test( PrintWriter writer )
+        throws Exception
+    {
+        // Load the mapping file
+        _mapping = new Mapping( getClass().getClassLoader() );
+        _mapping.setLogWriter( writer );
+        _mapping.loadMapping( getClass().getResource( MappingFile ) );
+
+        _jdo = new JDO();
+        _jdo.setLogWriter( writer );
+        _jdo.setConfiguration( getClass().getResource( DatabaseFile ).toString() );
+        _jdo.setDatabaseName( "test" );
     }
     
     
-    public static void test( JDO jdo, PrintWriter logger )
+    public void run( PrintWriter writer )
         throws Exception
     {
         Database      db;
@@ -67,48 +85,49 @@ public class Test
         OQLQuery      computerOql;
         Enumeration   enum;
 
-        db = jdo.getDatabase();
+        db = _jdo.getDatabase();
 
+        /*
         db.begin();
-        logger.println( "Begin transaction" );
+        writer.println( "Begin transaction" );
         
         // Look up the product and if found in the database,
         // delete this object from the database
-        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE id = $1" );
+        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE Id = $1" );
         productOql.bind( 4 );
         enum = productOql.execute();
         if ( enum.hasMoreElements() ) {
             product = (Product) enum.nextElement();
-            logger.println( "Deleting existing product: " + product );
+            writer.println( "Deleting existing product: " + product );
             db.remove(  product );
         }
         
         // Look up the computer and if found in the database,
         // delete ethis object from the database
-        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE id = $1" );
+        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE Id = $1" );
         computerOql.bind( 6 );
         enum = computerOql.execute();
         if ( enum.hasMoreElements() ) {
             computer = (Computer) enum.nextElement();
-            logger.println( "Deleting existing computer: " + computer );
+            writer.println( "Deleting existing computer: " + computer );
             db.remove( computer );
         }
         
         // Look up the group and if found in the database,
         // delete this object from the database
-        groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
+        groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE Id = $1" );
         groupOql.bind( 3 );
         enum = groupOql.execute();
         if ( enum.hasMoreElements() ) {
             group = (ProductGroup) enum.nextElement();
-            logger.println( "Deleting existing group: " + group );
+            writer.println( "Deleting existing group: " + group );
             db.remove( group );
         }
         
         
         // Checkpoint commits all the updates to the database
         // but leaves the transaction (and locks) open
-        logger.println( "Transaction checkpoint" );
+        writer.println( "Transaction checkpoint" );
         db.checkpoint();
         
         
@@ -118,12 +137,12 @@ public class Test
         enum = groupOql.execute();
         if ( ! enum.hasMoreElements() ) {
             group = new ProductGroup();
-            group.id = 3;
-            group.name = "a group";
-            logger.println( "Creating new group: " + group );
+            group.setId( 3 );
+            group.setName( "a group" );
+            writer.println( "Creating new group: " + group );
         } else {
             group = (ProductGroup) enum.nextElement();
-            logger.println( "Query result: " + group );
+            writer.println( "Query result: " + group );
         }
         
         // If no such product exists in the database, create a new
@@ -134,25 +153,22 @@ public class Test
         enum = productOql.execute();
         if ( ! enum.hasMoreElements() ) {
             product = new Product();
-            product.id = 4;
-            product.name = "some product";
-            product.price = 55;
-            product.group = group;
-            product.detail = new Vector();
+            product.setId( 4 );
+            product.setName( "some product" );
+            product.setPrice( 55 );
+            product.setGroup( group );
             detail = new ProductDetail();
-            detail.id = 1;
-            detail.name = "one";
-            detail.product = product;
-            product.detail.addElement( detail );
+            detail.setId( 1 );
+            detail.setName( "one" );
+            product.addDetail( detail );
             detail = new ProductDetail();
-            detail.id = 2;
-            detail.name = "two";
-            detail.product = product;
-            product.detail.addElement( detail );
-            logger.println( "Creating new product: " + product );
+            detail.setId( 2 );
+            detail.setName( "two" );
+            product.addDetail( detail );
+            writer.println( "Creating new product: " + product );
             db.create( product );
         } else {
-            logger.println( "Query result: " + enum.nextElement() );
+            writer.println( "Query result: " + enum.nextElement() );
         }
         
         // If no such computer exists in the database, create a new
@@ -163,44 +179,45 @@ public class Test
         enum = computerOql.execute();
         if ( ! enum.hasMoreElements() ) {
             computer = new Computer();
-            computer.id = 6;
-            computer.cpu = "Pentium";
-            computer.name = "MyPC";
-            computer.price = 300;
-            computer.group = group;
-            computer.detail = new Vector();
+            computer.setId( 6 );
+            computer.setCpu( "Pentium" );
+            computer.setName( "MyPC" );
+            computer.setPrice( 300 );
+            computer.setGroup( group );
             detail = new ProductDetail();
-            detail.id = 4;
-            detail.name = "mouse";
-            detail.product = computer;
-            computer.detail.addElement( detail );
+            detail.setId( 4 );
+            detail.setName( "mouse" );
+            computer.addDetail( detail );
             detail = new ProductDetail();
-            detail.id = 5;
-            detail.name = "screen";
-            detail.product = computer;
-            computer.detail.addElement( detail );
-            logger.println( "Creating new computer: " + computer );
+            detail.setId( 5 );
+            detail.setName( "screen" );
+            computer.addDetail( detail );
+            writer.println( "Creating new computer: " + computer );
             db.create( computer );
         } else {
-            logger.println( "Query result: " + enum.nextElement() );
+            writer.println( "Query result: " + enum.nextElement() );
         }
         
-        logger.println( "Commit transaction" );
+        writer.println( "Commit transaction" );
         db.commit();
 
-
+        */
         Serializer  ser;
+        Marshaller  marshal;
+        Mapping     mapping;
+
+        ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
+        ser.setOutputCharStream( writer );
+        marshal = new Marshaller( ser.asDocumentHandler() );
+        marshal.setMapping( _mapping );
 
         db.begin();
         productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
         enum = productOql.execute();
-
-        ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
-        ser.setOutputCharStream( logger );
         ser.asDocumentHandler().startDocument();
         ser.asDocumentHandler().startElement( "products", null );
         while( enum.hasMoreElements() )
-            Marshaller.marshal( enum.nextElement(), ser.asDocumentHandler() );
+            marshal.marshal( enum.nextElement() );
         ser.asDocumentHandler().endElement( "products" );
         ser.asDocumentHandler().endDocument();
         db.commit();

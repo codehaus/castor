@@ -1,5 +1,18 @@
+Version 0.8.1   April 4, 2000
+-----------------------------
+
+JDO:     Fixed bug with modified exception not removing copy from cache.
+
+JDO:     Added isOpen method to database.
+
+JDO:     Fixed bug in bind( String) method of OQLQuery.
+
+Misc:    Upgraded test cases to run inside JTF as a test harness.
+
+
 Version 0.8     March 27, 2000
 ------------------------------
+
 XML:     support for IDREF/ID has been added back in
 
 XML:     fixed circular reference bug

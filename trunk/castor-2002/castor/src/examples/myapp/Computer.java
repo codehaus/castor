@@ -6,10 +6,19 @@ public class Computer
 {
 
 
-    public String cpu;
+    private String  _cpu;
 
 
-    public String getCpu() { return cpu; }
+    public String getCpu()
+    {
+        return _cpu;
+    }
+
+
+    public void setCpu( String cpu )
+    {
+        _cpu = cpu;
+    }
 
 
 }

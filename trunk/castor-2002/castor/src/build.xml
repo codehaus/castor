@@ -119,7 +119,6 @@
   </target>
 
 
-
   <!-- Build the documentation -->
   <target name="doc" depends="prepare">
     <mkdir    dir="${build}/doc" />
@@ -147,7 +146,6 @@
     <copydir  src="${doc}/pres/style" dest="${build}/doc/pres/style" includes="images/**,*.css" />
   </target>
 
-
   <!-- Build the full JavaDocs -->
   <target name="javadoc" depends="prepare">
     <mkdir    dir="${build}/doc" />
@@ -170,7 +168,7 @@
               doctitle="Castor API" windowtitle="Castor API" bottom="${copyright}"
               public="true" author="true"
               packagenames="org.exolab.castor.jdo,org.exolab.castor.dax,
-                            org.exolab.castor.xml,org.exolab.castor.dsml" />
+                            org.exolab.castor.xml,org.exolab.castor.dsml,org.exolab.castor.mapping" />
   </target>
 
   <!-- Build the docs, API and full JavaDocs, doc archives -->
@@ -213,14 +211,14 @@
   </target>
 
   <!-- Build the tarball including JAR and all dependent packages -->
-  <target name="tarball" depends="prepare,jar,docs">
+  <target name="tarball" depends="prepare,jar">
     <delete  file="${dist}/${archive}.tgz" />
     <delete  file="${dist}/${archive}.zip" />
     <deltree dir="${build}/${archive}" />
 
     <mkdir   dir="${build}/${archive}" />
     <copydir src="${etc}" dest="${build}/${archive}"
-             includes="README,LICENSE,CHANGELOG" />
+             includes="README,LICENSE,CHANGELOG,sourceGen*" />
     <copydir src="${dist}" dest="${build}/${archive}"
              includes="${archive}.jar,${archive}-xml.jar" />
     <copydir src="${lib}" dest="${build}/${archive}"
