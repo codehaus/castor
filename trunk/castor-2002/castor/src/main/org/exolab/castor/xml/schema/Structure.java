@@ -60,16 +60,16 @@ public abstract class Structure {
     
     public static final short ANNOTATION      = 0;
     public static final short APPINFO         = 1;
-    public static final short ARCHETYPE       = 2;
-    public static final short ATTRIBUTE       = 3;
-    public static final short DATATYPE        = 4;
-    public static final short ELEMENT         = 5;
-    public static final short FACET           = 6;
-    public static final short GROUP           = 7;
-    public static final short INFO            = 8;
-    public static final short MODELGROUP      = 9;
-    public static final short MODELGROUP_REF  = 10;
-    public static final short SCHEMA          = 11;
+    public static final short ATTRIBUTE       = 2;
+    public static final short COMPLEX_TYPE    = 3;
+    public static final short ELEMENT         = 4;
+    public static final short FACET           = 5;
+    public static final short GROUP           = 6;
+    public static final short INFO            = 7;
+    public static final short MODELGROUP      = 8;
+    public static final short MODELGROUP_REF  = 9;
+    public static final short SCHEMA          = 10;
+    public static final short SIMPLE_TYPE     = 11;
     public static final short UNKNOWN         = 12;
     
     

@@ -53,23 +53,11 @@ import java.util.Enumeration;
 
 /**
  * An XML Schema Group
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class ContentModelGroup extends ContentModelType {
+public interface ContentModelGroup {
 
-
-    private Vector _contentModel = null;
-    private ScopableResolver _resolver = null;
-    
-    /**
-     * Creates a new ContentModelGroup.
-    **/
-    public ContentModelGroup() {
-        _contentModel = new Vector();
-        _resolver = new ScopableResolver();
-    } //-- ContentModelGroup
-    
     /**
      * Adds the given ElementDecl to this ContentModelGroup
      * @param elementDecl the ElementDecl to add
@@ -77,26 +65,7 @@ public abstract class ContentModelGroup extends ContentModelType {
      * exists with the same name as the given ElementDecl
     **/
     public void addElementDecl(ElementDecl elementDecl) 
-        throws SchemaException
-    {
-        
-        if (elementDecl == null) return;
-        
-        String name = elementDecl.getName();
-        String key = "element:"+name;
-        //-- check for naming collisions
-        if (_resolver.resolve(key) != null) {
-            String err = "An element declaration with the given name, ";
-            err += name + ", already exists in this scope.";
-            throw new SchemaException(err);
-        }
-        
-        //_resolver.addResolvable(key, elementDecl);
-        
-        //-- add to content model
-        _contentModel.addElement(elementDecl);
-        
-    } //-- addElementDecl
+        throws SchemaException;
     
     /**
      * Adds the given Group to this ContentModelGroup
@@ -105,28 +74,12 @@ public abstract class ContentModelGroup extends ContentModelType {
      * specified group already exists in the current scope
     **/
     public void addGroup(Group group) 
-        throws SchemaException
-    {
-        if (group == null) return;
-        
-        String name = group.getName();
-        if (name != null) {
-            String key = "group:"+name;
-            //-- check for naming collisions
-            if (_resolver.resolve(key) != null) {
-                String err = "An element declaration with the given name, ";
-                err += name + ", already exists in this scope.";
-                throw new SchemaException(err);
-            }
-            
-            _resolver.addResolvable(key, group);
-        }
-        
-        //-- add to content model
-        _contentModel.addElement(group);
-    } //-- addGroup
+        throws SchemaException;
     
-    public Enumeration enumerate() {
-        return _contentModel.elements();
-    } //-- enumerate
+    /**
+     * Returns an enumeration of all the ContentModelGroups, within
+     * this ContentModelGroups
+    **/
+    public Enumeration enumerate();
+    
 } //-- ContentModelGroup

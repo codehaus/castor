@@ -169,6 +169,7 @@ public class Schema extends Annotated {
         if (complexType.getSchema() != this) {
             String err = "invalid attempt to add an ComplexType which ";
             err += "belongs to a different Schema; type name: " + name;
+            throw new SchemaException(err);
         }
         if (complexTypes.get(name) != null) {
             String err = "a ComplexType already exists with the given name: ";
@@ -181,18 +182,25 @@ public class Schema extends Annotated {
     /**
      * Adds the given SimpletType definition to this Schema defintion
      * @param simpletype the SimpleType to add to this Schema
-     * @exception SchemaException if the ComplexType does not have
-     * a name or if another ComplexType already exists with the same name
+     * @exception SchemaException if the SimpleType does not have
+     * a name or if another SimpleType already exists with the same name
     **/
     public synchronized void addSimpleType(SimpleType simpleType)
         throws SchemaException
     {
 
         String name = simpleType.getName();
+        
+        if ((name == null) || (name.length() == 0)) {
+            String err = "No name found for top-level SimpleType. " +
+                " A top-level SimpleType must have a name.";
+            throw new SchemaException(err);
+        }
 
         if (simpleType.getSchema() != this) {
             String err = "invalid attempt to add a SimpleType which ";
             err += "belongs to a different Schema; type name: " + name;
+            throw new SchemaException(err);
         }
         if (simpleTypes.get(name) != null) {
             String err = "a SimpleType already exists with the given name: ";

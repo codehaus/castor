@@ -113,7 +113,7 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
         //-- read contentType
         String content = atts.getValue(SchemaNames.CONTENT_ATTR);
         if (content != null) {
-            _complexType.setContent(ContentType.valueOf(content));
+            _complexType.setContentType(ContentType.valueOf(content));
         }
         
         //-- base and derivedBy

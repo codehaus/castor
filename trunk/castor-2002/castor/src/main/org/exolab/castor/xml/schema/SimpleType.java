@@ -14,13 +14,13 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -54,7 +54,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class SimpleType extends Annotated 
+public class SimpleType extends XMLType 
     implements Referable
 {
 
@@ -73,7 +73,7 @@ public class SimpleType extends Annotated
     private String base = null;    
     
     /**
-     * The datatype name
+     * The name for this simpleType
     **/
     private String name = null;
     
@@ -89,8 +89,8 @@ public class SimpleType extends Annotated
     
     /**
      * Creates a new SimpleType with the given name and basetype reference.
-     * @param name of the DataType
-     * @param schema the Schema to which this Simpletype belongs
+     * @param name of the SimpleType
+     * @param schema the Schema to which this SimpleType belongs
     **/
     public SimpleType(Schema schema, String name) {
         this(schema, name, null);
@@ -99,9 +99,9 @@ public class SimpleType extends Annotated
     /**
      * Creates a new SimpleType with the given name and basetype reference.
      * @param name of the SimpleType
-     * @param schema the Schema to which this Simpletype belongs
-     * @param base the base datatype which this datatype inherits from.
-     * If the datatype does not "extend" any other, base may be null.
+     * @param schema the Schema to which this SimpleType belongs
+     * @param base the base simpleType which this simpleType inherits from.
+     * If the simpleType does not "extend" any other, base may be null.
     **/
     public SimpleType(Schema schema, String name, String base) {
         super();
@@ -109,11 +109,14 @@ public class SimpleType extends Annotated
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
             throw new IllegalArgumentException(err);
         }
+        
+        /* in-line simpleTypes don't need a name
         if ((name == null) || (name.length() == 0)) {
             String err = NULL_ARGUMENT + 
                 "; 'name' must not be null or zero-length.";
             throw new IllegalArgumentException(err);
         }
+        */
         
         this.schema  = schema;
         this.name    = name;
@@ -168,8 +171,8 @@ public class SimpleType extends Annotated
     } //-- getFacets
     
     /**
-     * Returns the name of this DataType
-     * @return the name of this DataType
+     * Returns the name of this SimpleType
+     * @return the name of this SimpleType
     **/
     public String getName() {
         return name;
@@ -177,10 +180,10 @@ public class SimpleType extends Annotated
     
     
     /**
-     * Returns the base Simpletype that this Simpletype inherits from.
+     * Returns the base SimpleType that this SimpleType inherits from.
      * If this Simpletype does not inherit from any other, or if
      * reference cannot be resolved this will be null.
-     * @return the base Simpletype that this Simpletype inherits from.
+     * @return the base SimpleType that this SimpleType inherits from.
     **/
     public SimpleType getBase() {
         if (base == null) return null;
@@ -247,7 +250,7 @@ public class SimpleType extends Annotated
      * @return the type of this Schema Structure
     **/
     public short getStructureType() {
-        return Structure.DATATYPE;
+        return Structure.SIMPLE_TYPE;
     } //-- getStructureType
     
     /**
