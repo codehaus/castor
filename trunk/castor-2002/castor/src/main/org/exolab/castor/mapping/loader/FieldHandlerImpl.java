@@ -95,6 +95,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The sequence of methods used to create the nested object. May be null.
+     */
+    private Method[]      _setSequence;
+
+
+    /**
      * The method used to obtain the value of this field. May be null.
      */
     private Method        _getMethod;
@@ -264,7 +270,7 @@ public final class FieldHandlerImpl
      *   are static, or do not specify the proper types
      *
      */
-    public FieldHandlerImpl( String fieldName, Method[] getSequence, 
+    public FieldHandlerImpl( String fieldName, Method[] getSequence, Method[] setSequence, 
                              Method getMethod, Method setMethod, TypeInfo typeInfo )
         throws MappingException
     {
@@ -276,6 +282,7 @@ public final class FieldHandlerImpl
             throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
         _getSequence = getSequence;
+        _setSequence = setSequence;
         if ( setMethod != null )
             setWriteMethod( setMethod );
         if ( getMethod != null )
@@ -312,11 +319,17 @@ public final class FieldHandlerImpl
                 value = _field.get( object );
             else if ( _getMethod != null ) {
                 if ( _getSequence != null ) 
-                    for ( int i = 0; i < _getSequence.length; i++ ) 
+                    for ( int i = 0; i < _getSequence.length; i++ ) {
                         object = _getSequence[ i ].invoke( object, null );
+                        if ( object == null )
+                            break;
+                    }
+                // Some of the objects in the sequence might be null, then 
+                // the value is null
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise, 
-                if ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() )
+                if ( object == null ||
+                          ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() ) )
                     value = null;
                 else
                     value = _getMethod.invoke( object, null );
@@ -370,12 +383,28 @@ public final class FieldHandlerImpl
                     _field.set( object, value == null ? _default : value );
                 else if ( _setMethod != null ) {
                     if ( _getSequence != null ) 
-                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) {
+                            Object last;
+
+                            last = object;
                             object = _getSequence[ i ].invoke( object, null );
-                    if ( value == null && _deleteMethod != null )
-                        _deleteMethod.invoke( object, null );
-                    else
-                        _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
+                            if ( object == null ) {
+                                // if the value is not null, we must instantiate
+                                // the object in the sequence
+                                if ( value == null || _setSequence[ i ] == null )
+                                    break;
+                                else {
+                                    object = Types.newInstance( _getSequence[ i ].getReturnType() );
+                                    _setSequence[ i ].invoke( last, new Object[] { object } );
+                                }
+                            }
+                        }
+                    if ( object != null ) {
+                        if ( value == null && _deleteMethod != null )
+                            _deleteMethod.invoke( object, null );
+                        else
+                            _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
+                    }
                 }
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
@@ -445,12 +474,17 @@ public final class FieldHandlerImpl
                     _field.set( object, _default );
                 else if ( _setMethod != null ) {
                     if ( _getSequence != null ) 
-                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) {
                             object = _getSequence[ i ].invoke( object, null );
-                    if ( _deleteMethod != null )
-                        _deleteMethod.invoke( object, null );
-                    else
-                        _setMethod.invoke( object, new Object[] { _default } );
+                            if ( object == null )
+                                break;
+                        }
+                    if ( object != null ) {
+                        if ( _deleteMethod != null )
+                            _deleteMethod.invoke( object, null );
+                        else
+                            _setMethod.invoke( object, new Object[] { _default } );
+                    }
                 }
                 // If the field has no set method, ignore it.
                 // If this is a problem, identity it someplace else.
