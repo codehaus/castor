@@ -321,22 +321,6 @@ query.bind(false);
          ]]></code>
         </section>
 
-        <section title="Sometimes long transaction fails: on update() it is thrown ObjectModifiedException. Why?">
-            <p>
-            Most probably the object that is being updated has more than 100 related 
-            objects of one class and the cache size for this class is not enough. 
-            You should either increase the size of the cache or change the cache type 
-            to time-limited (the default cache type is count-limited, the default 
-            size is 100), for example:
-        <code><![CDATA[
-<class ...>
-  <cache-type type="count-limited" capacity="1000"/>
-  ...
-</class>
-        ]]></code>
-            </p>
-        </section>
-
         <section title="I get 'java.lang.AbstractMethodError: getBigDecimal' for numeric fields. Why?">
             <p>
             Your JDBC driver is not JDBC 2.0 compliant, upgrade it or find another one.
@@ -437,6 +421,59 @@ java.sql.SQLException: ORA-01461: can bind a LONG value only for insert into a L
 
     </section>
 
+    <section title="Castor and performance caches">
+    
+        <section title="Sometimes long transaction fails: on update() it is thrown ObjectModifiedException. Why?">
+            <p>
+            Most probably the object that is being updated has more than 100 related 
+            objects of one class and the cache size for this class is not enough. 
+            You should either increase the size of the cache or change the cache type 
+            to time-limited (the default cache type is count-limited, the default 
+            size is 100), for example:
+        <code><![CDATA[
+<class ...>
+  <cache-type type="count-limited" capacity="1000"/>
+  ...
+</class>
+        ]]></code>
+            </p>
+        </section>
+
+        <section title="Can I use the cache-type='none' with long transactions?">
+            <p>
+            As of release 0.9.5.3, you cannot. When using a cache of type 'none' with your 
+            'Timestampable' objects, a MappingException is thrown when performing long 
+            transactions. Currently, Castor requires a (performance) cache of type other than 
+            'none' to be used with classes  that implement the 'TimeStampable' interface. In 
+            other words, if you want to use long transactions, please make sure that you use 
+            one of these cache types: 'unlimited', 'count-limited' or 'time-limited'. 
+            </p>
+            <p>
+            The next entry has some more information about a potential cause of confusion in the 
+            context of long transactions and a cache type other than 'unlimited'.
+            </p>
+        </section>
+        
+        <section title="What is causing a PersistenceException with long transactions and how do I fix it?">
+            <p>
+            With long transactions, sometimes update() throws a PersistenceException. As of 
+            release 0.9.5.3, Castor requires a (performance) cache (of type other than 
+            'none') to be used with classes that implement the 'TimeStampable' interface. 
+            </p>
+            <p>
+            Please note that if you are using a cache type other than 'unlimited', 
+            it is possible that objects expire from the cache. This case will be highlighted 
+            to you by a PersistenceException being thrown.
+            </p>
+            <p>
+            In this cases, please consider switching to cache type 'unlimited' (if possible) or 
+            increase the size of the cache according to your needs when using 'count-limited'
+            (which has a default capacity of 100). 
+            </p>
+        </section>
+        
+    </section>
+    
     <section title="OQL">
 
         <section title="Is there any document available for Castor OQL?">
