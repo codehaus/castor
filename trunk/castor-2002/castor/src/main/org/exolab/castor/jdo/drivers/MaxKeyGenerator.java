@@ -115,7 +115,7 @@ public final class MaxKeyGenerator implements KeyGenerator
 
         try {
             // Create SQL sentence of the form
-            // "SELECT pk FROM table WHERE pk=(SELECT MAX(pk) FROM table)"
+            // "SELECT pk FROM table WHERE pk=(SELECT MAX(t1.pk) FROM table t1)"
             // with database-dependent keyword for lock
             query = _factory.getQueryExpression();
             query.addColumn( tableName, primKeyName);
