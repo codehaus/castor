@@ -53,7 +53,7 @@ import java.util.Enumeration;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.jdo.MappingTable;
+import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 
@@ -112,7 +112,7 @@ public class CacheEngine
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
      */
-    protected CacheEngine( String cacheName, MappingTable mapTable,
+    protected CacheEngine( String cacheName, MappingResolver mapResolver,
 			   PersistenceFactory factory )
 	throws MappingException
     {
@@ -123,7 +123,7 @@ public class CacheEngine
 	if ( cacheName == null )
 	    throw new IllegalArgumentException( "Argument 'cacheName' is null" );
 	_cacheName = cacheName;
-	enum = mapTable.listDescriptors();
+	enum = mapResolver.listDescriptors();
 	while ( enum.hasMoreElements() ) {
 	    objDesc = (ObjectDesc) enum.nextElement();
 	    persist = factory.getPersistence( this, objDesc );
@@ -268,7 +268,7 @@ public class CacheEngine
 	    typeInfo.objDesc.getIdentityField().setValue( obj, identity );
 	    try {
 		oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-						     obj, identity, true ) );
+						     obj, identity, exclusive ) );
 	    } catch ( ObjectNotFoundException except ) {
 		// Object was not found in persistent storge
 		throw except;

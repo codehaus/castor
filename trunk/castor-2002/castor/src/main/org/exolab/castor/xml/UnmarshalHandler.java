@@ -377,6 +377,10 @@ public class UnmarshalHandler implements DocumentHandler {
         this._locator = locator;
     } //-- setDocumentLocator
     
+    public Locator getDocumentLocator() {
+        return _locator;
+    } //-- getDocumentLocator
+
     public void startDocument() 
         throws org.xml.sax.SAXException 
     {

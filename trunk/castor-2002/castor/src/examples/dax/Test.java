@@ -1,14 +1,11 @@
 package dax;
 
 
-import netscape.ldap.LDAPConnection;
-import netscape.ldap.LDAPException;
-import netscape.ldap.LDAPv2;
-import netscape.ldap.LDAPEntry;
-import org.exolab.castor.dax.desc.FieldDesc;
-import org.exolab.castor.dax.desc.DNFieldDesc;
-import org.exolab.castor.dax.desc.ObjectDesc;
-import org.exolab.castor.dax.engine.Engine;
+import java.net.URL;
+import org.xml.sax.InputSource;
+import org.exolab.castor.dax.engine.DirectorySource;
+import org.exolab.castor.dax.Directory;
+import org.exolab.castor.dax.engine.TransactionImpl;
 
 
 public class Test
@@ -18,6 +15,32 @@ public class Test
     public static void main( String[] args )
     {
 	try {
+
+	    DirectorySource.loadMapping( new InputSource( Test.class.getResource( "mapping.xml" ).toString() ) );
+
+	    Directory       dir;
+	    User            user;
+	    TransactionImpl tx;
+
+	    dir = new Directory( new URL( "http://localhost/ou=people,dc=exoffice,dc=com" ), null );
+	    tx = new TransactionImpl();
+	    tx.begin();
+	    user = (User) dir.lookup( User.class, "kvisco" );
+	    if ( user == null ) {
+		user = new User();
+		dir.create( user );
+	    } else
+		System.out.println( "Query: " + user );
+	    user.uid = "kvisco";
+	    user.first = "Keith";
+	    user.last = "Visco";
+	    user.full = "Keith Visco";
+	    user.email = new String[] { "kvisco@exoffice.com" };
+	    System.out.println( "Creating: " + user );
+	    tx.commit();
+
+
+	    /*
 	    LDAPConnection conn;
 	    LDAPEntry      entry;
 
@@ -65,7 +88,7 @@ public class Test
 	    engine.update( conn, person );
 	    person = (Person) engine.read( conn, dn );
 	    System.out.println( person );
-
+	    */
 	} catch ( Exception except ) {
 	    System.out.println( except );
 	    except.printStackTrace();
