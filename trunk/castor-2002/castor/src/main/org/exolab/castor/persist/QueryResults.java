@@ -268,7 +268,7 @@ public final class QueryResults
                         Class reloadClass;
 
                         handler.getCallback().using( object, _db );
-                        reloadClass = handler.getCallback().loaded( object );
+                        reloadClass = handler.getCallback().loaded( object, _accessMode.toShort() );
                         if ( reloadClass != null && object.getClass() != reloadClass ) {
                             _tx.release( object );
                             _engine.forgetObject( _tx, oid );
@@ -287,8 +287,8 @@ public final class QueryResults
                 }         
            
                 if ( _accessMode == AccessMode.ReadOnly ) {
-                    _tx.removeObjectEntry( object );
-                    _engine.releaseLock( _tx, oid );
+                    _tx.removeObjectEntryWithDependent( object );
+                    _engine.releaseLockWithDependent( _tx, oid );
                 }
                 return object;
             }

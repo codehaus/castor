@@ -387,6 +387,16 @@ public interface PersistenceEngine
 
 
     /**
+     * Called to release lock held on the object and all its dependents.
+     * Is used to provide the ReadOnly mode.
+     *
+     * @param tx The transaction context
+     * @param oid The object OID
+     */
+    public void releaseLockWithDependent( TransactionContext tx, OID oid );
+
+
+    /**
      * Called at transaction commit or rollback to forget an object
      * and release its locks. Must be called for all objects that were
      * created when the transaction aborts, and for all objects that

@@ -72,7 +72,7 @@ public interface CallbackInterceptor
      * @param object The object
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public Class loaded( Object object )
+    public Class loaded( Object object, short accessMode )
         throws Exception;
 
 
