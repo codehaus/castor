@@ -145,6 +145,11 @@ public class SchemaWriter {
      */
     private AttributeListImpl _atts = new AttributeListImpl();
 
+    /**
+     * This field is no longer used and only here for
+     * backward compatibility.
+     * @deprecated 
+    **/
     public static boolean enable = false;
 
     /**
@@ -155,8 +160,6 @@ public class SchemaWriter {
     public SchemaWriter(Writer writer)
         throws IOException
     {
-        if (!enable) unsupported();
-
         Serializer serializer = Configuration.getSerializer();
 
         if (serializer == null)
@@ -184,8 +187,6 @@ public class SchemaWriter {
     **/
     public SchemaWriter(DocumentHandler handler) {
 
-        if (!enable) unsupported();
-
         if (handler == null)
             throw new IllegalArgumentException("DocumentHandler must not be null.");
 
@@ -193,15 +194,6 @@ public class SchemaWriter {
 
     } //-- SchemaWriter
 
-    private static final void unsupported() {
-        String err = "This class is not yet supported. " +
-            " If you really wish to use it, and you promise not to " +
-            " complain about unsupported features, then set " +
-            " SchemaWriter.enable to true, before you attempt to construct " +
-            " this class.";
-
-       throw new IllegalStateException ( err );
-    }
 
     public void write(Schema schema)
         throws SAXException
