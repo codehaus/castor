@@ -64,6 +64,7 @@ public class JModifiers {
     private static final String sProtected  = "protected";
     private static final String sPublic     = "public";
     private static final String sStatic     = "static";
+    private static final String sTransient  = "transient";
 
     private static final short vPrivate   = 1;
     private static final short vProtected = 2;
@@ -94,6 +95,12 @@ public class JModifiers {
      * with this JModifiers is abstract
     **/
     private boolean isAbstract = false;
+    
+    /**
+     * A flag indicating whether or not the object associated
+     * with this JModifiers is transient
+    **/
+    private boolean isTransient = false;
     
     /**
      * Creates a new JModifiers class, by default the
@@ -178,6 +185,22 @@ public class JModifiers {
     public boolean isPublic() {
         return (visibility == vPublic);
     } //-- isPublic
+
+    /**
+     * Returns true if the modifier represented is static.
+     * @return true if the modifier represented is static.
+    **/
+    public boolean isStatic() {
+        return this.isStatic;
+    } //-- isPublic
+
+    /**
+     * Returns true if the modifier represented is transient.
+     * @return true if the modifier represented is transient.
+    **/
+    public boolean isTransient() {
+        return this.isTransient;
+    } //-- isTransient
     
     /**
      * Sets whether or not the "abstract" qualifier is present
@@ -208,6 +231,15 @@ public class JModifiers {
     } //-- setStatic
     
     /**
+     * Sets whether or not the "transient" qualifier is present
+     * @param isTransient is a boolean which when true will indicate
+     * the "transient" qualifiter is present
+    **/
+    public void setTransient(boolean isTransient) {
+        this.isTransient = isTransient;
+    } //-- setTransient
+    
+    /**
      * Returns the String represetation of this JModifiers
      * @return the String represetation of this JModifiers
     **/
@@ -227,17 +259,18 @@ public class JModifiers {
                 break;
         }
         
+        //-- static
+        if (isStatic) {
+            sb.append(' ');
+            sb.append(sStatic);
+        }
+        
         //-- final
         if (isFinal) {
             sb.append(' ');
             sb.append(sFinal);
         }
 
-        //-- static
-        if (isStatic) {
-            sb.append(' ');
-            sb.append(sStatic);
-        }
         
         return sb.toString();
     } //-- toString

@@ -67,6 +67,10 @@ public class JType {
     
     private boolean _isArray = false;
     
+    /**
+     * used for array types
+    **/
+    private JType _componentType = null;
     
     /**
      * Creates a new JType with the given name
@@ -78,23 +82,26 @@ public class JType {
         this.name = name;
     } //-- JType
     
-    protected JType(String name, boolean isArray) {
-        this._isArray = isArray;
-        this.name = name;
-    } //-- JType
-    
     /**
      * Creates a JType Object representing an array of the current
      * JType.
      * @return the new JType which is represents an array.
     **/
-    public JType createArray() {
-        return new JType(getName(), true);
-    }
+    public final JType createArray() {
+        JType jType = new JType(getName());
+        jType._isArray = true;
+        jType._componentType = this;
+        return jType;
+    } //-- createArray
     
-    public String getName() {
-        return this.name;
-    } //-- getName
+    /**
+     * If this JType is an array this method will returns the component type 
+     * of the array, otherwise null will be returned.
+     * @return the component JType if this JType is an array, otherwise null.
+    **/
+    public JType getComponentType() {
+        return _componentType;
+    } //-- getComponentType
     
     public String getLocalName() {
 
@@ -108,6 +115,10 @@ public class JType {
         }
         return name;
     } //-- getLocalName
+    
+    public String getName() {
+        return this.name;
+    } //-- getName
     
     /**
      * Checks to see if this JType represents an array.
@@ -132,11 +143,46 @@ public class JType {
                 (this == this.Short));
     } //-- isPrimitive
     
+    /**
+     * Returns the String representation of this JType, which is
+     * simply the name of this type. 
+     * @return the String representation of this JType
+    **/
     public String toString() {
         
         if (_isArray) return this.name+"[]";
         else return this.name;
         
     } //-- toString
+    
+    //---------------------/
+    //- Protected methods -/
+    //---------------------/
+    
+    /**
+     * Allows subtypes, such as JClass to alter the package to which
+     * this JType belongs
+     * @param newPackage the new package to which this JType belongs
+     * <BR />
+     * <B>Note:</B> The package name cannot be changed on a primitive type.
+    **/
+    protected void changePackage(String newPackage) {
+        
+        if (this.name == null) return;
+        if (this.isPrimitive()) return;
+        
+        String localName = null;
+        int idx = name.lastIndexOf('.');
+        if (idx >= 0)
+            localName = this.name.substring(idx+1);
+        else 
+            localName = this.name;
+            
+        if ((newPackage == null) || (newPackage.length() == 0))
+            this.name = localName;
+        else
+            this.name = newPackage + "." + localName;
+        
+    } //-- changePackage
     
 } //-- JType
