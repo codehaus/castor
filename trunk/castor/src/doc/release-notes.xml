@@ -607,7 +607,7 @@
 				<p>Please note that we are providing the usual suspect (binaries, docs and
 				   sources) for this release at <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.6.">
 				   the Exolab FTP server</a>. We recommend, though, to download the complete package,
-				   as the HTML docs at <a href="http://castor.exolab.org">the main Castor site</a> have
+				   as the HTML docs at <a href="http://castor.codehaus.org">the main Castor site</a> have
 				   not been updated, and build the documentation yourself.</p>
 
 				<h2>Changes</h2>
