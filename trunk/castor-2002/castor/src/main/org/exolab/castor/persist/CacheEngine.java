@@ -109,11 +109,30 @@ public class CacheEngine
 
 
     /**
+     * All the XA transactions running against this cache engine.
+     */
+    private Hashtable _xaTx = new Hashtable();
+
+
+    private PrintWriter _logWriter;
+
+
+    /**
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
+     *
+     * @param cacheName The name of this cache
+     * @param mapResolver Provides mapping information for objects
+     *  supported by this cache
+     * @param factory Factory for creating persistence engines for each
+     *  object described in the map
+     * @param logWriter Log writer to use for cache and all its
+     *  persistence engines
+     * @throws MappingException Indicate that one of the mappings is
+     *  invalid
      */
     protected CacheEngine( String cacheName, MappingResolver mapResolver,
-			   PersistenceFactory factory )
+			   PersistenceFactory factory, PrintWriter logWriter )
 	throws MappingException
     {
 	Enumeration enum;
@@ -123,12 +142,16 @@ public class CacheEngine
 	if ( cacheName == null )
 	    throw new IllegalArgumentException( "Argument 'cacheName' is null" );
 	_cacheName = cacheName;
+	_logWriter = logWriter;
 	enum = mapResolver.listDescriptors();
 	while ( enum.hasMoreElements() ) {
 	    objDesc = (ObjectDesc) enum.nextElement();
-	    persist = factory.getPersistence( this, objDesc );
+	    persist = factory.getPersistence( this, objDesc, logWriter );
 	    if ( persist != null )
 		_typeInfo.put( objDesc.getObjectType(), new TypeInfo( persist, objDesc ) );
+	    else if ( _logWriter != null ) {
+		_logWriter.println( Messages.format( "persist.noEngine", objDesc.getObjectType() ) );
+	    }
 	}
     }
 
@@ -294,7 +317,32 @@ public class CacheEngine
     } 
 
 
-    protected OID fetch( TransactionContext tx, Query query, Object identity,
+    /**
+     * Loads an object of the specified type and identity from the
+     * query results. In exclusive mode the object is always loaded
+     * and a write lock is obtained on the object, preventing
+     * concurrent updates. In non-exclusive mode the object is either
+     * loaded or obtained from the cache with a read lock. The object's
+     * OID is always returned, this OID must be used in subsequent
+     * operations on the object. Must call {@link #acquire} to obtain
+     * the object.
+     *
+     * @param tx The transaction context
+     * @param query The query persistence engine
+     * @param identity The identity of the object to load
+     * @param exclusive True if the object must be loaded for
+     *  exclusive access (write lock)
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
+     * @return The object's OID
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    protected OID fetch( TransactionContext tx, PersistenceQuery query, Object identity,
 			 boolean exclusive, int timeout )
 	throws ObjectNotFoundException, LockNotGrantedException,
 	       PersistenceException
@@ -304,7 +352,7 @@ public class CacheEngine
 	ObjectLock lock;
 	TypeInfo   typeInfo;
 
-	typeInfo = (TypeInfo) _typeInfo.get( query.getObjectDesc().getObjectType() );
+	typeInfo = (TypeInfo) _typeInfo.get( query.getResultType() );
 	// Create an OID to represent the object and see if we
 	// have a lock (i.e. object is cached).
 	oid = new OID( typeInfo.objDesc, identity );
@@ -317,7 +365,7 @@ public class CacheEngine
 		obj = lock.acquire( tx, false, timeout );
 	    } catch ( ObjectDeletedWaitingForLockException except ) {
 		// This is equivalent to object not existing
-		throw new ObjectNotFoundException( query.getObjectDesc().getObjectType(), identity );
+		throw new ObjectNotFoundException( query.getResultType(), identity );
 	    }
 	    // Get the actual OID of the object, this one contains the
 	    // object's stamp that will be used for dirty checking.
@@ -496,11 +544,13 @@ public class CacheEngine
 	// don't wait to acquire the lock.
 	lock = getLock( oid );
 	if ( lock == null )
-	    throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to delete object for which no lock was acquired" ) );
 	try {
 	    obj = lock.acquire( tx, true, 0 );
 	} catch ( LockNotGrantedException except ) {
-	    throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to delete object for which no lock was acquired" ) );
 	}
 	typeInfo.persist.delete( tx.getConnection( this ), obj, oid.getIdentity() );
     }
@@ -547,10 +597,9 @@ public class CacheEngine
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
 	lock = getLock( oid );
-	if ( lock == null )
-	    throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
-	if ( ! lock.hasLock( tx, false ) )
-	    throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
+	if ( lock == null || ! lock.hasLock( tx, false ) )
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to store object for which no lock was acquired" ) );
 	
 	// Must acquire a write lock on the object in order to proceed to
 	// storing the object. Will wait until another transaction releases
@@ -636,10 +685,9 @@ public class CacheEngine
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
 	lock = getLock( oid );
-	if ( lock == null )
-	    throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
-	if ( ! lock.hasLock( tx, false ) )
-	    throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
+	if ( lock == null || ! lock.hasLock( tx, false ) )
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to lock object for which no lock was acquired" ) );
 	
 	// Attempt to obtain a lock on the database. If this attempt
 	// fails, release the lock and report the exception.
@@ -682,7 +730,9 @@ public class CacheEngine
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
 	lock = getLock( oid );
 	if ( lock == null )
-	    throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to copy object which is not persistent" ) );
+
 	// Acquire a read lock on the object. This method is generarlly
 	// called after a successful return from load(), so we don't
 	// want to wait for the lock.
@@ -696,7 +746,8 @@ public class CacheEngine
 	} catch ( LockNotGrantedException except ) {
 	    // If this transaction has no write lock on the object,
 	    // something went foul.
-	    Logger.getSystemLogger().println( "copyObject: " + except.toString() );
+	    if ( _logWriter != null )
+		_logWriter.println( Messages.format( "persist.internal", "copyObject: " + except.toString() ) );
 	    throw new IllegalStateException( except.toString() );
 	}
     }
@@ -722,7 +773,8 @@ public class CacheEngine
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
 	lock = getLock( oid );
 	if ( lock == null )
-	    throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
+	    throw new IllegalStateException( Messages.format( "persist.internal",
+	        "Attempt to copy object which is not persistent" ) );
 	// Acquire a write lock on the object. This method is always
 	// called after a successful return from store(), so we don't
 	// need to wait for the lock
@@ -732,7 +784,8 @@ public class CacheEngine
 	} catch ( LockNotGrantedException except ) {
 	    // If this transaction has no write lock on the object,
 	    // something went foul.
-	    Logger.getSystemLogger().println( "updateObject: " + except.toString() );
+	    if ( _logWriter != null )
+		_logWriter.println( Messages.format( "persist.internal", "updateObject: " + except.toString() ) );
 	    throw new IllegalStateException( except.toString() );
 	}
     }
@@ -784,9 +837,21 @@ public class CacheEngine
 	} catch ( LockNotGrantedException except ) {
 	    // If this transaction has no write lock on the object,
 	    // something went foul.
-	    Logger.getSystemLogger().println( "forgetObject: " + except.toString() );
+	    if ( _logWriter != null )
+		_logWriter.println( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
 	    throw new IllegalStateException( except.toString() );
 	}
+    }
+
+
+    /**
+     * Returns an association between Xid and transactions contexts.
+     * The association is shared between all transactions open against
+     * this cache engine through the XAResource interface.
+     */
+    Hashtable getXATransactions()
+    {
+	return _xaTx;
     }
 
 
