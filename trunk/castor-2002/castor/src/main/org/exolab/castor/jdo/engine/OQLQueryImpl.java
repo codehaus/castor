@@ -51,15 +51,11 @@ import java.util.Vector;
 import java.util.StringTokenizer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import org.odmg.OQLQuery;
-import org.odmg.Database;
-import org.odmg.ODMGRuntimeException;
-import org.odmg.ODMGException;
-import org.odmg.QueryParameterCountInvalidException;
-import org.odmg.QueryParameterTypeInvalidException;
-import org.odmg.QueryInvalidException;
-import org.odmg.TransactionNotInProgressException;
-import org.exolab.castor.util.Messages;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.ODMGRuntimeException;
+import org.exolab.castor.jdo.QueryInvalidException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.QueryException;
@@ -71,6 +67,8 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.Logger;
 
 
 /**
@@ -97,22 +95,20 @@ public class OQLQueryImpl
 
 
     public void bind( Object obj )
-        throws QueryParameterCountInvalidException,
-               QueryParameterTypeInvalidException
     {
         if ( _query == null ) {
             throw new ODMGRuntimeException( "Must create query before using it" );
         }
         if ( _fieldNum == _query.getParameterCount() )
-            throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
-                                                           " fields in this query" );
+            throw new IllegalArgumentException( "Only " + _query.getParameterCount() +
+                                                " fields in this query" );
         try {
             _query.setParameter( _fieldNum, obj );
         } catch ( IndexOutOfBoundsException except ) {
-            throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
-                                                           " fields in this query" );
+            throw new IllegalArgumentException( "Only " + _query.getParameterCount() +
+                                                " fields in this query" );
         } catch ( IllegalArgumentException except ) {
-            throw new QueryParameterTypeInvalidException( except.getMessage() );
+            throw except;
         }
         ++_fieldNum;
     }
@@ -234,10 +230,10 @@ public class OQLQueryImpl
     
     
     public Object execute()
-        throws QueryInvalidException
+        throws org.exolab.castor.jdo.QueryException
     {
         TransactionContext tx;
-        QueryResults       results;
+        QueryResults       results = null;
         Object             obj;
         Object             identity;
         Vector             set;
@@ -264,13 +260,18 @@ public class OQLQueryImpl
                 return set.elementAt( 0 );
             return set.elements();
         } catch ( QueryException except ) {
-            throw new QueryInvalidException( except.getMessage() );
+            throw new org.exolab.castor.jdo.QueryException( except.getMessage() );
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
             throw new TransactionNotInProgressException( except.getMessage() );
         } catch ( LockNotGrantedException except ) {
             throw new ODMGRuntimeException( except.toString() );
         } catch ( PersistenceException except ) {
+            if ( Logger.debug() )
+                except.printStackTrace( Logger.getSystemLogger() );
             throw new ODMGRuntimeException( except.toString() );
+        } finally {
+            if ( results != null )
+                results.close();
         }
     }
     
