@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
+       Brought test config file for SAP DB in-line with XML Schema.
+       (Werner - 20040427)
+       
 JDO:   Fixed bug 1368 using contribution from Tim O'Brien [tobrien@discursive.com].
 	   Small (mostly syntactical) changes to src/doc/jdo-faq.xml. Added a reference
 	   to XPath as well.
