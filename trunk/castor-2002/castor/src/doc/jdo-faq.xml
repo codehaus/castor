@@ -164,9 +164,11 @@
 
     <p>It is recommended to replace literals with parameters and to set them via OQLQuery.bind(), for example:</p>
          <code>
-  OQLQuery query = db.getOQLQuery("SELECT p FROM Person p WHERE name LIKE $1 AND dob>$2 AND married=$3");
+  OQLQuery query = db.getOQLQuery("SELECT p FROM Person p "
+        +"WHERE name LIKE $1 AND dob>$2 AND married=$3");
   query.bind("John %");
-  query.bind((new SimpleDateFormat("yyyy-MM-dd")).parse("1960-01-01"));
+  query.bind((new SimpleDateFormat("yyyy-MM-dd"))
+        .parse("1960-01-01"));
   query.bind(false);
          </code>
 
