@@ -18,7 +18,8 @@
               mapping based on an XML schema</li>
 
           <li>Supports XML schema data types including integer, real (float/double),
-              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded)
+              NMTOKEN, NCName, timeInstant, ID/IDREF, boolean and binary (base 64 encoded).
+              For an updated list see <a href="sourcegen.xml">Source Generator</a>
           </li>
 
           <li>Supports arbitrary object marshalling when object type is known at
@@ -91,29 +92,45 @@
     </section>
 
     <section title="TODO">
-      <ul>
-        <li>Add type convertors to bind parameters and load() method</li>
+       <section title="JDO">
+         <ul>
+            <li>Add type convertors to bind parameters and load() method</li>
 
-        <li>New architecture separating the responsibility of the CacheEngine from
-            that of the persistent object, in order to better support relations
-            (especially many-many) and better handle dependency object commits.</li>
+            <li>New architecture separating the responsibility of the CacheEngine from
+                  that of the persistent object, in order to better support relations
+                  (especially many-many) and better handle dependency object commits.</li>
 
-        <li>Multi column primary keys and contained objects.</li>
+            <li>Multi column primary keys and contained objects.</li>
 
-        <li>DataStore API replacing existing persist SPI. Consolidation of JDO and DAX.</li>
+            <li>DataStore API replacing existing persist SPI. Consolidation of JDO and DAX.</li>
 
-        <li>New mapping DTD</li>
+            <li>New mapping DTD</li>
 
-        <li>Remove excessive methods in source code generator</li>
+            <li>Remove excessive methods in source code generator</li>
 
-        <li>Support for read-only fields</li>
+            <li>Support for read-only fields</li>
 
-        <li>Serializable, SQLData, DOM field types</li>
+            <li>Serializable, SQLData, DOM field types</li>
 
-        <li>Stored procedures</li>
-      </ul>
+            <li>Stored procedures</li>
+         </ul>
+       </section>
+       <section title="XML">
+          <section title="Source Code Generator">
+            <ul>
+               <li>Finish support for XML Schema (Grouping, remaining datatypes, etc)</li>
+               <li>Create "customization" input file</li>
+               <li>Extensibility API</li>
+            </ul>
+         </section>
+         <section title="Mapping">
+            <p>
+               Finish mapping/binding file support. Collection support in the mapping
+               is currently limited on the XML side.
+            </p>
+         </section>
+       </section>
     </section>
-
   </body>
 </document>
 
