@@ -685,22 +685,25 @@ public class ParseTreeWalker implements TokenTypes
     for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
 
-      int tokenType = curChild.getToken().getTokenType();
-      switch (tokenType) {
-        case KEYWORD_ASC:
-        case KEYWORD_DESC:
-          checkField(curChild.getChild(0));
-          break;
-        case DOT:
-      checkProjection( curChild, false, false );
-      break;
-        case IDENTIFIER:
-          checkField(curChild);
-          break;
-        default:
-          throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
-      }
-    }
+	  int tokenType = curChild.getToken().getTokenType();
+	  switch (tokenType) {
+	  case KEYWORD_ASC:
+	  case KEYWORD_DESC:
+		  // iterate on child
+		  curChild = curChild.getChild(0);
+		  tokenType = curChild.getToken().getTokenType();
+	  }
+	  switch (tokenType) {
+	  case DOT:
+		  checkProjection( curChild, false, false );
+		  break;
+	  case IDENTIFIER:
+		  checkField(curChild);
+		  break;
+	  default:
+		  throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
+	  }
+	}
   }
 
   /**
