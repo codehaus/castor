@@ -256,6 +256,7 @@ public class XMLMappingLoader
         String                 match    = null;
         XMLFieldDescriptorImpl xmlDesc;
         boolean                isReference = false;
+        boolean                isXMLTransient = false;
 
         // Create an XML field descriptor
 
@@ -278,11 +279,15 @@ public class XMLMappingLoader
             //-- reference
             isReference = xml.getReference();
             
+            //-- XML transient
+            isXMLTransient = xml.getTransient() || fieldDesc.isTransient();
+            
             //-- autonaming
             BindXmlAutoNamingType autoName = xml.getAutoNaming();
             if (autoName != null) {
                 deriveNameByClass = (autoName == BindXmlAutoNamingType.DERIVEBYCLASS);
             }
+            
         }
         
         //-- handle QName for xmlName
@@ -317,6 +322,9 @@ public class XMLMappingLoader
 
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
 
+        //-- transient?
+        xmlDesc.setTransient(isXMLTransient);
+        
         //-- If deriveNameByClass we need to reset the name to
         //-- null because XMLFieldDescriptorImpl tries to be smart
         //-- and automatically creates the name.
