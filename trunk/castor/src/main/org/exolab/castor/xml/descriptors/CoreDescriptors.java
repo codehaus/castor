@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -49,6 +49,7 @@ package org.exolab.castor.xml.descriptors;
 import org.exolab.castor.xml.XMLClassDescriptor;
 
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
@@ -65,16 +66,30 @@ public final class CoreDescriptors {
         "org.exolab.castor.xml.descriptors.ListClassDescriptor";
         
     /**
+     * The java.util.Enumeration ClassDescriptor, really only
+     * useful for marshalling as Enumerations are read-only.
+     */
+    private static final XMLClassDescriptor ENUMERATION_DESCRIPTOR =
+        new EnumerationDescriptor();
+     
+    /**
      * The String ClassDescriptor
-    **/
+     */
     private static final XMLClassDescriptor STRING_DESCRIPTOR =
         new StringClassDescriptor();
 
     /**
      * The Date ClassDescriptor
-    **/
+     */
     private static final XMLClassDescriptor DATE_DESCRIPTOR =
         new DateClassDescriptor();
+        
+        
+    /**
+     * The java.sql.Date ClassDescriptor
+     */
+    private static final XMLClassDescriptor SQL_DATE_DESCRIPTOR =
+        new SQLDateClassDescriptor();
         
     /**
      * The Vector ClassDescriptor
@@ -117,6 +132,12 @@ public final class CoreDescriptors {
             
         if (clazz == Date.class)
             return DATE_DESCRIPTOR;
+            
+        if (clazz == java.sql.Date.class)
+            return SQL_DATE_DESCRIPTOR;            
+            
+        if (Enumeration.class.isAssignableFrom(clazz))
+            return ENUMERATION_DESCRIPTOR;
             
         if ((clazz == Vector.class) || Vector.class.isAssignableFrom(clazz))
             return VECTOR_DESCRIPTOR;
