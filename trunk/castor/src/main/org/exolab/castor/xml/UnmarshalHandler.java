@@ -769,6 +769,9 @@ public final class UnmarshalHandler extends MarshalFramework
                     state.object = decoder.getByteArray();
                 }
             }
+            else if (state.args != null) {
+            	state.object = createInstance(state.type, state.args);
+            }
             else state.object = toPrimitiveObject(type,str,state.fieldDesc);
         }
         else if (ArrayHandler.class.isAssignableFrom(state.type)) {
@@ -2105,14 +2108,23 @@ public final class UnmarshalHandler extends MarshalFramework
             if (_class.isArray())
                 byteArray = (_class.getComponentType() == Byte.TYPE);
 
-
             //-- check for immutable
             if (isPrimitive(_class) ||
                 descriptor.isImmutable() ||
                 byteArray)
             {
                 state.object = null;
-                state.primitiveOrImmutable = true;
+                state.primitiveOrImmutable = true;  
+                //-- handle immutable types, such as java.util.Locale
+                if (descriptor.isImmutable()) {
+                    if (classDesc == null)
+                        classDesc = getClassDescriptor(_class);
+                    state.classDesc = classDesc;
+                    Arguments args = processConstructorArgs(atts, classDesc);
+                    if ((args != null) && (args.size() > 0)) {
+                    	state.args = args;
+                    }
+                }
             }
             else {
                 if (classDesc == null)
@@ -2387,6 +2399,8 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         return instance;
      } //-- createInstance
+     
+     
      
      /**
       * Marks the given state as available for use
@@ -3612,6 +3626,11 @@ public final class UnmarshalHandler extends MarshalFramework
     class Arguments {
         Object[] values = null;
         Class[]  types  = null;
+        
+        public int size() {
+        	if (values == null) return 0;
+            return values.length;
+        }
     } //-- Arguments
 
     /**
