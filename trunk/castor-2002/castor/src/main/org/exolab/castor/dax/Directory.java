@@ -48,13 +48,12 @@ package org.exolab.castor.dax;
 
 
 /**
- * An object representing a directory. Each directory represents a
- * branch or leaf within the larger directory structure, identified
- * by the RDN, the relative distinguished names. All objects are
- * persisted within that directory based on their RDNs. If this
- * directory represents a branch in the directory structure, a
- * sub-branch or leaf directory may be obtained by calling {@link
- * #getDirectory}.
+ * An object representing a directory. All objects are persisted
+ * within that directory based on their RDNs. Operations can be
+ * atomic or transactional. When performing an operation in the
+ * context of a transaction, all changes to objects are persisted
+ * when the transaction commits, if the transaction rolls back all
+ * objects return to their previous state.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -64,14 +63,13 @@ public interface Directory
 
 
     /**
-     * Returns the RDN of this directory. Each directory has a
-     * relative distinguished name within the directory server.
-     * Objects in the directory have a relative distinguished names
-     * within the directory.
+     * Returns the DN of this directory. Each directory has a root
+     * distinguished name, all objects persisted in that directory
+     * have a relative DN within that directory.
      *
-     * @return The directory's RDN
+     * @return The directory's DN
      */
-    public String getRDN();
+    public String getDN();
 
 
     /**
@@ -80,12 +78,12 @@ public interface Directory
      *
      * @param filter The search expression
      * @return A new search object
-     * @throws InvalidSearchException The specified search expression
-     *  is invalid
+     * @throws InvalidSearchException An invalid search expression
+     *  or query parameter
      * @throws DirectoryException Directory access failed
      * @see Search
      */
-    public Search newSearch( String expr )
+    public Search createSearch( String expr )
 	throws InvalidSearchException, DirectoryException;
 
 
@@ -133,22 +131,6 @@ public interface Directory
      * @throws DirectoryException Directory access failed
      */
     public void delete( Object obj )
-	throws DirectoryException;
-
-
-    /**
-     * Stores an object in the directory. This method is equivalent
-     * to {@link #create} but will store the object even if an
-     * object with the same RDN already exists in the directory. If
-     * this method is called in the context of a transaction, the
-     * object will be persisted when the transaction commits. This
-     * method may be called only once for a given object within the
-     * context of a transaction.
-     *
-     * @param obj The object to store
-     * @throws DirectoryException Directory access failed
-     */
-    public void store( Object obj )
 	throws DirectoryException;
 
 
@@ -230,22 +212,6 @@ public interface Directory
     public boolean isPersistent( Object obj );
 
 
-
-    /**
-     * Returns a directory with a DN relative to this directory.
-     * The returned directory does not share the same transaction
-     * context as this directory and may or may not share the same
-     * connection to the directory server. Closing of this directory
-     * does not imply closing of the returned directory.
-     * 
-     * @param rdn The DN relative to this directory
-     * @return A new directory object
-     * @throws DirectoryException Directory access failed
-     */
-    public Directory getDirectory( String rdn )
-	throws DirectoryException;
-
-
     /**
      * Close this directory object. If this directory is in the
      * context of a transaction, the transaction will be rolled back.
@@ -257,3 +223,4 @@ public interface Directory
 
 
 }
+
