@@ -339,7 +339,7 @@ public class SourceFactory {
 
         //5--processing the type
         XMLType type = component.getXMLType();
-        boolean createForGroup = false;
+        boolean createForSingleGroup = false;
         boolean creatingForAnElement = false;
         
         if (type != null) {
@@ -445,8 +445,8 @@ public class SourceFactory {
         else {
             //--MODEL GROUP OR GROUP
             try{
-                createForGroup = true;
                 Group group = (Group)component.getAnnotated();
+                createForSingleGroup = (group.getMaxOccurs() == 1);
                 processContentModel(group, state);
                 component.setView(group);
                 //-- Check Group Type
@@ -478,8 +478,8 @@ public class SourceFactory {
             fname  = JavaNaming.toJavaMemberName(fname, false);
 
             FieldInfo fInfo = null;
-            if (createForGroup) {
-                //A choice Item can occur only once in the nested group
+            if (createForSingleGroup) {
+                //By default A nested group Item can occur only once 
                 fInfo = infoFactory.createFieldInfo(new XSClass(jClass),
                                                                 fname);
             } else {
