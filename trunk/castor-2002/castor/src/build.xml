@@ -194,10 +194,10 @@
             <fileset dir="${source}/etc" includes="MANIFEST.MF" />
         </copy>
 
-        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${build}/tests/MANIFEST.MF" 
+        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${build}/tests/MANIFEST.MF"
         includes="LICENSE,README,jdo/**,harness/**,*" excludes="xml" />
 
-    </target> 
+    </target>
 
     <target name="jar" depends="main-opt">
         <delete file="${dist}/${archive}.jar"/>
@@ -224,7 +224,7 @@
               manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
 -->
     </target>
-    
+
     <target name="CTFjar" depends="tests">
         <delete file="${dist}/CTF-${version}.jar"/>
         <copy todir="${classes}">
@@ -239,7 +239,9 @@
     <!-- Build the documentation -->
     <target name="doc" depends="clean,prepare">
         <mkdir dir="${build}/doc"/>
-        <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl" includes="**.xml" excludes="style/**,project.xml"/>
+        <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
+            includes="**.xml" excludes="style/**,project.xml"
+            processor="org.exolab.adaptx.util.JakartaAntAdapter"/>
         <copy todir="${build}/doc">
 		<fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
 	</copy>
@@ -252,7 +254,7 @@
         <copy todir="${build}/doc/">
 		<fileset dir="${doc}/style" includes="*.css"/>
 	</copy>
-        
+
         <replace file="${build}/doc/index.html" token="$$VERSION$$" value="${version}"/>
         <replace file="${build}/doc/index.html" token="$$RELEASE_DATE$$" value="${release_date}"/>
         <replace file="${build}/doc/download.html" token="$$VERSION$$" value="${version}"/>
