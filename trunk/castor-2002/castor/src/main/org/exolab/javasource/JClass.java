@@ -759,6 +759,39 @@ public class JClass extends JType {
     } //-- printSource
 
     /**
+     * Removes the field with the given name from this JClass
+     *
+     * @param name the name of the field to remove
+    **/
+    public void removeField(String name) {
+        
+        if (name == null) return;
+        
+        fields.remove(name);
+        
+        //-- clean up imports
+        //-- NOT YET IMPLEMENTED
+
+    } //-- removeField
+
+    /**
+     * Removes the given JField from this JClass
+     *
+     * @param jField, the JField to remove
+    **/
+    public void removeField(JField jField) {
+        if (jField == null) return;
+        
+        Object field = fields.get(jField.getName());
+        if (field == jField) {
+            fields.remove(jField.getName());
+        }        
+        //-- clean up imports
+        //-- NOT YET IMPLEMENTED
+
+    } //-- removeField
+
+    /**
      * Sets the header comment for this JClass
      * @param comment the comment to display at the top of the source file
      * when printed
