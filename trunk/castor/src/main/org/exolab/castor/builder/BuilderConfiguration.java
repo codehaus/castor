@@ -95,6 +95,16 @@ public class BuilderConfiguration {
             "org.exolab.castor.builder.boundproperties";
 
 
+         /**
+          * Property specifying whether to implement EnumeratedTypeAccess interface for
+          * all generated enumerated type classes
+          * <pre>
+          * org.exolab.castor.builder.enumTypeAccessInterface
+          * </pre>
+          */
+         public static final String ENUM_TYPE_ACCESS_INTERFACE =
+            "org.exolab.castor.builder.enumTypeAccessInterface";
+
         /**
          * Property specifying whether or not to generate source code
          * for extra collection methods. 
@@ -357,6 +367,29 @@ public class BuilderConfiguration {
         String value = (wrapper) ? TRUE : FALSE; 
         _localProps.setProperty(Property.Wrapper, value);
     } //-- setPrimitiveWrapper
+    
+    
+     /**
+      * Returns true if we generate the implements EnumeratedTypeAccess
+      * interface for enumerated type classes.  The value is
+      * either 'true' or 'false'
+      *
+      * @return true if use enumerated type interface is enabled
+      */
+     public boolean useEnumeratedTypeInterface() { 
+         return TRUE.equalsIgnoreCase(_localProps.getProperty(Property.ENUM_TYPE_ACCESS_INTERFACE));
+     } //-- useEnumeratedTypeInterface
+ 
+     /**
+      * Sets the 'enumTypeAccessInterface' property
+      *
+      * @param boolean the value we want to use
+      */
+      public void setUseEnumeratedTypeInterface(boolean flag) {
+         String value = (flag) ? TRUE : FALSE;
+         _localProps.setProperty(Property.ENUM_TYPE_ACCESS_INTERFACE, value);
+      } //-- setUseEnumeratedTypeInterface
+    
 
     /**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
