@@ -40,26 +40,27 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $Id: TransactionManagerFactory.java,v 1.1.1.1 2003/03/03 07:08:25 kvisco Exp
+ * $
  */
 
 
 package org.exolab.castor.jdo.transactionmanager;
 
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
 /**
  * A factory for properly acquiring <tt>javax.transaction.TransactionManager</tt> 
- * from J2EE containers. To provide an implementation for a J2EE container, 
- * implement this interface. 
+ * from J2EE containers. To provide an implementation for a specific J2EE
+ * container, implement this interface.
  *
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
- * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
- * @version $Id$
+ * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>, <a href=" mailto:
+ * werner.guttmann@gmx.net">Werner Guttmann</a>
+ * @version $Id: TransactionManagerFactory.java,v 1.1.1.1 2003/03/03 07:08:25
+ * kvisco Exp $
  */
 public interface TransactionManagerFactory
 {
@@ -67,12 +68,26 @@ public interface TransactionManagerFactory
     /**
      * Acquires the appropriate <tt>javax.transaction.TransactionManager</tt>.
      */
-    public TransactionManager getTransactionManager() throws TransactionManagerAcquireException;
-
+    TransactionManager getTransactionManager() 
+    	throws TransactionManagerAcquireException;
 
     /**
-     *
+     * Returns the short alias for this factory instance.
+     * @return The short alias name. 
      */
-    public String getName();
+    String getName();
+    
+    /**
+     * Returns the full set of parameters associated with this factory instance. 
+	 * @return The full set of parameters. Null if no parameters are available.
+	 */
+	Properties getParams();
+    
+	/**
+	 * Setsthe full set of parameters on this factory instance.
+	 * @param The full set of parameters. 
+	 */
+	void setParams(Properties params);
+    
 
 }

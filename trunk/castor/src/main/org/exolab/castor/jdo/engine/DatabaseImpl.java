@@ -176,6 +176,7 @@ public class DatabaseImpl
         DatabaseRegistry dbs;
 
         _autoStore = autoStore;
+        _log.debug( "Fetching DatabaseRegistry: " + dbName );
         dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );

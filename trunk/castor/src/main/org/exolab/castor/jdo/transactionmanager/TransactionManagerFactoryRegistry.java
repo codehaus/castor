@@ -47,13 +47,24 @@
 package org.exolab.castor.jdo.transactionmanager;
 
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Properties;
 import java.util.StringTokenizer;
-import org.exolab.castor.util.Configuration;
+
+import org.exolab.castor.jdo.conf.Param;
+import org.exolab.castor.jdo.conf.TransactionDemarcation;
+import org.exolab.castor.jdo.conf.TransactionManager;
+import org.exolab.castor.jdo.engine.JDOConfLoader;
+import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -65,8 +76,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
  * @version $Id$
  */
-public final class TransactionManagerFactoryRegistry
-{
+public final class TransactionManagerFactoryRegistry {
 
 
     /**
@@ -74,7 +84,7 @@ public final class TransactionManagerFactoryRegistry
      * implementations (<tt>org.exolab.castor.jdo.transactionManagerFactories</tt>).
      */
     private static final String TransactionManagerFactoriesProperty = 
-        "org.exolab.castor.jdo.transactionManagerFactories";
+        "org.exolab.castor.jdo.spi.transactionManagerFactories";
 
 
     /**
@@ -93,7 +103,7 @@ public final class TransactionManagerFactoryRegistry
      * @return The {@link TransactionManagerFactory}, null
      *  if no TransactionManagerFactory with this name exists
      */
-    public static TransactionManagerFactory getTransactionManager( String name )
+    public static TransactionManagerFactory getTransactionManagerFactory( String name )
     {
         load();
         return ( TransactionManagerFactory ) _factories.get( name );
@@ -121,6 +131,75 @@ public final class TransactionManagerFactoryRegistry
         return names;
     }
 
+	/**
+	 * Returns the names of all the configured {@link TransactionManagerFactory}
+	 * implementations. The names can be used to obtain a {@link TransactionManagerFactory}
+	 * from {@link #getTransactionManagerFactory}.
+	 *
+	 * @return Names of {@link TransactionManagerFactory} implementations
+	 */
+	public static Collection getTransactionManagerFactories() {
+		load();
+		return Collections.unmodifiableCollection(_factories.keySet());
+	}
+
+
+	/**
+	 * Loads configuration related to transaction demarcation and transaction manager factories from JDO config file.
+	 * @param source InputSource pointing to the JDO config file.
+	 * @param resolver Custom EntityResolver instance.
+	 * @throws TransactionManagerAcquireException If there is a problem obtaining tthe configuration. 
+	 */
+	public static void load (InputSource source, EntityResolver resolver) 
+		throws TransactionManagerAcquireException
+	{
+		load();
+		
+		try {
+			// Load the JDO configuration file from the specified input source.
+			TransactionDemarcation transactionDemarcation = JDOConfLoader.getTransactionDemarcation (source, resolver);
+				
+			if (transactionDemarcation == null)
+				throw new TransactionManagerAcquireException ("Problem obtaining transaction manager demarcation configuration");
+
+			String demarcationMode = transactionDemarcation.getMode();
+			TransactionManager transactionManager = transactionDemarcation.getTransactionManager();
+			
+			if (transactionManager == null) {
+				
+				if (!demarcationMode.equals(LocalTransactionManagerFactory.NAME))
+					throw new TransactionManagerAcquireException ("Problem obtaining required transaction manager configuration.");
+				
+			} else {
+				
+				String mode = transactionManager.getName();
+				if (mode == null)
+					throw new TransactionManagerAcquireException ("Attribute MODE for <transaction-manager> required");
+			
+				TransactionManagerFactory factory = getTransactionManagerFactory(mode);
+				if (factory == null)
+					throw new TransactionManagerAcquireException ("Invalid value for MODE. Transaction manager factory with MODE = " + 
+						mode + "does not exist");
+
+				Properties properties = new Properties();
+					
+				Enumeration parameters = transactionManager.enumerateParam();
+				while (parameters.hasMoreElements()) {
+					Param param = (Param) parameters.nextElement();
+					properties.put(param.getName(), param.getValue());
+				}
+			
+				factory.setParams(properties);
+				
+			}
+			
+			
+		}
+		catch (MappingException e) {
+			throw new TransactionManagerAcquireException ("Problem obtaining JDO configuration", e);
+		}
+
+	}
 
     /**
      * Load the {@link TransactionManagerFactory} implementations from the 
@@ -150,6 +229,5 @@ public final class TransactionManagerFactoryRegistry
             }
         }
     }
-
 
 }

@@ -48,78 +48,36 @@ package org.exolab.castor.jdo.transactionmanager.spi;
 
 
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.util.Messages;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
 import javax.transaction.TransactionManager;
 
 /**
-  * An IBM Websphere 4 and prior specific factory for acquiring transactions
-  * from this particular J2EE container.
-  *
-  * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
-  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
-  */
-public class WebSphereTransactionManagerFactory 
-    extends BaseTransactionManagerFactory
+ * Default transaction manager when Castor is used in standalone mode,
+ * in other words not within a J2EE container.
+ *  
+ * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+ * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
+ */
+public class LocalTransactionManagerFactory 
+   extends BaseTransactionManagerFactory
 {
     
     /**
-     * The <tt>javax.transaction.TransactionManager</tt> that Castor will use.
-     */
-    private TransactionManager _transactionManager;
-
-
-    /**
      * The name of the factory
      */
-    private final String _name = "websphere";
-
-
+    public static final String NAME = "local";
+    
     /**
      * Acquires the appropriate TransactionManager.
      */
     public TransactionManager getTransactionManager() 
         throws TransactionManagerAcquireException
     {
-        Class              webSphereTxMgr = null;
-        Method             method = null;
-
-        try 
-        {
-            webSphereTxMgr = Class.forName( "com.ibm.ejcs.jts.jta.JTSXA" );
-            method = webSphereTxMgr.getMethod( "getTransactionManager", null );
-            _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
-        }
-        catch( ClassNotFoundException cnfe )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage() ) );
-        }
-        catch( IllegalAccessException iae )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage() ) );
-        }
-        catch( InvocationTargetException ite )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", ite.getMessage() ) );
-        }
-        catch( NoSuchMethodException nsme )
-        {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", nsme.getMessage() ) );
-        }
-
-        return _transactionManager;
+        return null;
     }
 
 
     public String getName()
     {
-        return _name;
+        return NAME;
     }
 }

@@ -59,6 +59,9 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.mapping.Mapping;
@@ -83,6 +86,12 @@ import org.xml.sax.InputSource;
  */
 public class DatabaseRegistry
 {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( DatabaseRegistry.class );
 
 
     /**
@@ -223,16 +232,14 @@ public class DatabaseRegistry
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
-        unm = new Unmarshaller( Database.class );
+
+
         try {
-            // Load the JDO database configuration file from the specified
-            // input source. If the database was already configured, ignore
-            // this file (allowing multiple loadings).
-            if ( resolver == null )
-                unm.setEntityResolver( new DTDResolver() );
-            else
-                unm.setEntityResolver( new DTDResolver( resolver ) );
-            database = (Database) unm.unmarshal( source );
+            // Load the JDO configuration file from the specified input source.
+            database = JDOConfLoader.getDatabase (source, resolver);
+            
+            // If the database was already configured, ignore
+            // this database configuration (allowing multiple loadings).
             if ( _databases.get( database.getName() ) != null )
                 return;
 
@@ -253,9 +260,18 @@ public class DatabaseRegistry
                 mapping.setEntityResolver( resolver );
             if ( source.getSystemId() != null )
                 mapping.setBaseURL( source.getSystemId() );
+                
             mappings = database.enumerateMapping();
             while ( mappings.hasMoreElements() )
-                mapping.loadMapping( ( (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement() ).getHref() );
+            {
+                String mappingUrl = ( (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement() ).getHref();
+                _log.debug( "Loading the mapping descriptor: " + mappingUrl );
+
+                if ( mappingUrl != null )
+                {
+                    mapping.loadMapping( mappingUrl );
+                }
+            }
 
             if ( database.getDriver() != null ) {
                 // JDO configuration file specifies a driver, use the driver
