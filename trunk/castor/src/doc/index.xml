@@ -29,9 +29,9 @@
       <p>Short feature list (we haven't got all day):
         <ul>
           <li>
-             Castor XML: Java object model to and from XML
+             Castor XML: Java object model to and from XML (XML databinding)
              <br/>&#160;&#160; - Generate source code from an XML Schema
-             <br/>&#160;&#160; - Default introspector or mapping file for existing object models
+             <br/>&#160;&#160; - Default introspection or mapping file for existing object models
           </li>
           <li>Castor JDO: Java object persistence to RDBMS
               <li>Castor JDO is not the same-as or compatible with Sun's JDO. We have
