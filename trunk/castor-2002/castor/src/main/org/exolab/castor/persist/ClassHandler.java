@@ -647,7 +647,7 @@ public final class ClassHandler
     void setFieldsNull( Object object )
     {
         for ( int i = 0 ; i < _fields.length ; ++i )
-            _fields[ i ].handler.setValue( object, null );
+            _fields[ i ].handler.resetValue( object );
     }
 
 
