@@ -5,11 +5,13 @@
 
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/XSL/Transform/1.0">
 
+  <!-- Process the document -->
   <xsl:template match="document">
     <xsl:apply-templates/>
   </xsl:template>
 
 
+  <!-- Process the document properties -->
   <xsl:template match="document/properties">
     <table border="0" cellpadding="4" cellspacing="2">
       <tr>
@@ -37,6 +39,7 @@
   </xsl:template>
 
 
+  <!-- Process the document body -->
   <xsl:template match="document/body">
     <xsl:if test="/document/properties/title">
       <br/>
@@ -54,6 +57,7 @@
   </xsl:template>
 
 
+  <!-- Process a section in the document. Nested sections are supported -->
   <xsl:template match="document//section">
     <xsl:variable name="level" select="count(ancestor::*)"/>
     <xsl:choose>
@@ -80,18 +84,19 @@
   </xsl:template>
 
 
+  <!-- Paragraphs are separated with one empty line -->
   <xsl:template match="p">
     <p><xsl:apply-templates/><br/></p>
   </xsl:template>
 
 
+  <!-- UL is processed into a table using graphical bullets -->
   <xsl:template match="ul">
     <table border="0" cellpadding="2" cellspacing="2">
       <tr><td colspan="2" height="5"></td></tr>
       <xsl:apply-templates/>
     </table>
   </xsl:template>
-
 
   <xsl:template match="ul/li">
     <tr>
@@ -101,10 +106,12 @@
   </xsl:template>
 
 
+  <!-- Substitution for simple project-wide variables that
+       may appear in the document
+    -->
   <xsl:template match="project-name">
     <xsl:value-of select="$project/@name"/>
   </xsl:template>
-
 
   <xsl:template match="project-repository">
     <xsl:value-of select="$project/@repository"/>
@@ -114,6 +121,10 @@
     <xsl:value-of select="$project/title"/>
   </xsl:template>
 
+
+  <!-- Everything else in the document is considered HTML and
+       produced as such with the proper processing.
+   -->
   <xsl:template match="*|@*">
     <xsl:copy>
       <xsl:apply-templates select="*|@*|text()"/>
