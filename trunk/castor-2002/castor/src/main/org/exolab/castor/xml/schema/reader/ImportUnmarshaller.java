@@ -72,7 +72,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
         setResolver(resolver);
 
 		//-- Get schemaLocation
-		String schemaLocation = atts.getValue("schemaLocation");
+		String schemaLocation = atts.getValue(SchemaNames.SCHEMALOCATION_ATTR);
 		if (schemaLocation==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'import'");
 
@@ -159,6 +159,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 
 		//-- Add schema to list of imported schemas (if not already present)
 		if (addSchema)
+            importedSchema.setSchemaLocation(schemaLocation);
 			schema.addImportedSchema(importedSchema);
 	}
 
