@@ -288,7 +288,7 @@ Will be adding this later.
                 ++count;
             }
 
-            for ( int i = 0 ; i < _fields.length ; ++i )
+            for ( int i = 0 ; i < _fields.length ; ++i ) 
                 if ( _fields[ i ].store ) {
                     if ( fields[ i ] == null )
                         stmt.setNull( count, _fields[ i ].sqlType );
@@ -739,7 +739,9 @@ Will be adding this later.
                                 break;
                              }
                     }
-                    if ( foreKey != null ) {
+                    if ( foreKey == null ) 
+                        Logger.getSystemLogger().println( "No foreign key in " + relDesc.getTableName() + " for " + fields[ i ] );
+                    else {
                         expr.addColumn( relDesc.getTableName(), ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLName() );
                         expr.addOuterJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
                                            relDesc.getTableName(), foreKey );
