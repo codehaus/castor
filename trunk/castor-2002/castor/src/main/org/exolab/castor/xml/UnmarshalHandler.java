@@ -1147,16 +1147,15 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
 
         List processedAtts = new List(atts.getLength());
-
         for (int i = 0; i < descriptors.length; i++) {
 
             XMLFieldDescriptor descriptor = descriptors[i];
 
             String attName = descriptor.getXMLName();
-
+            System.out.println(attName);
             String attValue = atts.getValue(attName);
 
-            if (attName != null) processedAtts.add(attName);
+            if (attValue != null) processedAtts.add(attName);
 
             try {
                 processAttribute(attName, attValue, descriptor, classDesc, object);
@@ -1173,7 +1172,6 @@ public final class UnmarshalHandler extends MarshalFramework
         if (len != processedAtts.size()) {
             for (int i = 0; i < len; i++) {
                 String attName = atts.getName(i);
-
                 if (processedAtts.contains(attName)) continue;
                 XMLFieldDescriptor descriptor =
                     classDesc.getFieldDescriptor(attName, NodeType.Attribute);
