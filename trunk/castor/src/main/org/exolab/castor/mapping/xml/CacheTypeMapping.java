@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,19 +11,21 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.mapping.xml.types.TypeType;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class CacheTypeMapping.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class CacheTypeMapping implements java.io.Serializable {
 
 
@@ -31,13 +33,19 @@ public class CacheTypeMapping implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
-    private org.exolab.castor.mapping.xml.types.TypeType _type = org.exolab.castor.mapping.xml.types.TypeType.valueOf("count-limited");;
+    /**
+     * Field _type
+     */
+    private java.lang.String _type = "count-limited";
 
+    /**
+     * Field _capacity
+     */
     private int _capacity;
 
     /**
      * keeps track of state for field: _capacity
-    **/
+     */
     private boolean _has_capacity;
 
 
@@ -47,6 +55,7 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     public CacheTypeMapping() {
         super();
+        setType("count-limited");
     } //-- org.exolab.castor.mapping.xml.CacheTypeMapping()
 
 
@@ -55,35 +64,44 @@ public class CacheTypeMapping implements java.io.Serializable {
     //-----------/
 
     /**
-    **/
+     * Method deleteCapacity
+     */
     public void deleteCapacity()
     {
         this._has_capacity= false;
     } //-- void deleteCapacity() 
 
     /**
-    **/
+     * Returns the value of field 'capacity'.
+     * 
+     * @return the value of field 'capacity'.
+     */
     public int getCapacity()
     {
         return this._capacity;
     } //-- int getCapacity() 
 
     /**
-    **/
-    public org.exolab.castor.mapping.xml.types.TypeType getType()
+     * Returns the value of field 'type'.
+     * 
+     * @return the value of field 'type'.
+     */
+    public java.lang.String getType()
     {
         return this._type;
-    } //-- org.exolab.castor.mapping.xml.types.TypeType getType() 
+    } //-- java.lang.String getType() 
 
     /**
-    **/
+     * Method hasCapacity
+     */
     public boolean hasCapacity()
     {
         return this._has_capacity;
     } //-- boolean hasCapacity() 
 
     /**
-    **/
+     * Method isValid
+     */
     public boolean isValid()
     {
         try {
@@ -96,9 +114,10 @@ public class CacheTypeMapping implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -107,51 +126,56 @@ public class CacheTypeMapping implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
+     * Sets the value of field 'capacity'.
      * 
-     * @param _capacity
-    **/
-    public void setCapacity(int _capacity)
+     * @param capacity the value of field 'capacity'.
+     */
+    public void setCapacity(int capacity)
     {
-        this._capacity = _capacity;
+        this._capacity = capacity;
         this._has_capacity = true;
     } //-- void setCapacity(int) 
 
     /**
+     * Sets the value of field 'type'.
      * 
-     * @param _type
-    **/
-    public void setType(org.exolab.castor.mapping.xml.types.TypeType _type)
+     * @param type the value of field 'type'.
+     */
+    public void setType(java.lang.String type)
     {
-        this._type = _type;
-    } //-- void setType(org.exolab.castor.mapping.xml.types.TypeType) 
+        this._type = type;
+    } //-- void setType(java.lang.String) 
 
     /**
+     * Method unmarshal
      * 
      * @param reader
-    **/
-    public static org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader reader)
+     */
+    public static java.lang.Object unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.CacheTypeMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.CacheTypeMapping.class, reader);
-    } //-- org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader) 
+    } //-- java.lang.Object unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 
