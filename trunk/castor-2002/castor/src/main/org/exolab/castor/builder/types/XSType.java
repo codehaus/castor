@@ -137,9 +137,19 @@ public abstract class XSType {
     public static final String NCNAME_NAME = "NCName";
 
     /**
-     * The name of the negative-interger type
+     * The name of the non-positive-integer type
+     */
+     public static final String NON_NEGATIVE_INTEGER_NAME = "nonNegativeInteger";
+
+    /**
+     * The name of the non-positive-integer type
+     */
+     public static final String NON_POSITIVE_INTEGER_NAME = "nonPositiveInteger";
+
+    /**
+     * The name of the negative-integer type
     **/
-    public static final String NEGATIVE_INTEGER_NAME  = "negative-integer";
+    public static final String NEGATIVE_INTEGER_NAME  = "negativeInteger";
 
 
     /**
@@ -150,7 +160,7 @@ public abstract class XSType {
     /**
      * The name of the positive-integer type
     **/
-    public static final String POSITIVE_INTEGER_NAME  = "positive-integer";
+    public static final String POSITIVE_INTEGER_NAME  = "positiveInteger";
 
     /**
      * the name of the QName type
@@ -231,6 +241,8 @@ public abstract class XSType {
     public static final short NCNAME             = 16;
     public static final short NEGATIVE_INTEGER   = 17;
     public static final short NMTOKEN            = 18;
+    public static final short NON_NEGATIVE_INTEGER = 31;
+    public static final short NON_POSITIVE_INTEGER = 32;
     public static final short POSITIVE_INTEGER   = 19;
     public static final short QNAME              = 20;
     public static final short RECURRING_DURATION = 21;
@@ -401,6 +413,10 @@ public abstract class XSType {
                 return NEGATIVE_INTEGER_NAME;
             case NMTOKEN:
                 return NMTOKEN_NAME;
+            case NON_NEGATIVE_INTEGER:
+                return NON_NEGATIVE_INTEGER_NAME;
+            case NON_POSITIVE_INTEGER:
+                return NON_POSITIVE_INTEGER_NAME;
             case POSITIVE_INTEGER:
                 return POSITIVE_INTEGER_NAME;
             case QNAME:

@@ -873,6 +873,8 @@ public class DescriptorSourceFactory {
                 break;
             }
 
+            case XSType.NON_NEGATIVE_INTEGER:
+            case XSType.NON_POSITIVE_INTEGER:
             case XSType.NEGATIVE_INTEGER:
             case XSType.POSITIVE_INTEGER:
             case XSType.INTEGER:

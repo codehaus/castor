@@ -183,6 +183,22 @@ public class TypeConversion {
                 //-- month
                 case SimpleTypesFactory.MONTH_TYPE:
                     return new XSMonth();
+                //-- nonPositiveInteger
+                case SimpleTypesFactory.NON_POSITIVE_INTEGER_TYPE:
+                {
+                    XSInteger xsInteger = new XSNonPositiveInteger();
+                    xsInteger.setFacets(simpleType);
+                    return xsInteger;
+                }
+
+                //-- nonNegativeInteger
+                case SimpleTypesFactory.NON_NEGATIVE_INTEGER_TYPE:
+                {
+                    XSInteger xsInteger = new XSNonNegativeInteger();
+                    xsInteger.setFacets(simpleType);
+                    return xsInteger;
+                }
+
                 //-- negative-integer
                 case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
                 {
