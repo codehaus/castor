@@ -171,40 +171,4 @@ public class Product implements java.io.Serializable {
         this.vProductInventory = vProductInventory;
     } //-- void setProductInventory(ProductInventory) 
 
-    /**
-     * 
-     * @param out 
-    **/
-    public void marshal(java.io.Writer out) 
-        throws java.io.IOException, org.xml.sax.SAXException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
-
-    /**
-     * 
-     * @param handler 
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
-        throws java.io.IOException, org.xml.sax.SAXException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
-
-    /**
-     * 
-     * @param reader 
-    **/
-    public static Product unmarshal(java.io.Reader reader) 
-        throws java.io.IOException
-    {
-        return (Product) Unmarshaller.unmarshal(Product.class, reader);
-    } //-- Product unmarshal(java.io.Reader) 
-
 }

@@ -111,40 +111,6 @@ public class ProductGroup implements java.io.Serializable {
         this.vName = vName;
     } //-- void setName(java.lang.String) 
 
-    /**
-     * 
-     * @param out 
-    **/
-    public void marshal(java.io.Writer out) 
-        throws java.io.IOException, org.xml.sax.SAXException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, out);
-    } //-- void marshal(java.io.Writer) 
-
-    /**
-     * 
-     * @param handler 
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler) 
-        throws java.io.IOException, org.xml.sax.SAXException
-    {
-        //-- we must have a valid element before marshalling
-        //validate(false);
-        
-        Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
-
-    /**
-     * 
-     * @param reader 
-    **/
-    public static ProductGroup unmarshal(java.io.Reader reader) 
-        throws java.io.IOException
-    {
-        return (ProductGroup) Unmarshaller.unmarshal(ProductGroup.class, reader);
-    } //-- ProductGroup unmarshal(java.io.Reader) 
-
 }
+
+
