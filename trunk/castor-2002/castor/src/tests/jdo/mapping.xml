@@ -265,16 +265,30 @@
       <sql name="ctime" type="date" />
     </field>
     <field name="modificationTime" type="java.util.Date" required="false">
-      <sql name="mtime" type="date" />
+      <sql name="mtime" type="date" dirty="ignore" />
     </field>
     <field name="value" type="string"  required="true">
       <sql name="value" type="varchar" />
     </field>
     <field name="parentId" type="integer" required="false">
-      <sql name="parent_id" />
+      <sql name="parent_id" dirty="ignore" />
     </field>
   </class>
 
+
+  <class name="jdo.TestNestedFields" access="shared" identity="id">
+    <description>Table used for nested fields testing</description>
+    <map-to table="test_table" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="nested1.value1" type="string" required="true">
+      <sql name="value1" type="varchar"/>
+    </field>
+    <field name="nested2.nested3.value2" type="string">
+      <sql name="value2" type="varchar" dirty="ignore"/>
+    </field>
+  </class>
 
 </mapping>
 

@@ -89,6 +89,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The sequence of methods used to obtain the nested field. May be null.
+     */
+    private Method[]      _getSequence;
+
+
+    /**
      * The method used to obtain the value of this field. May be null.
      */
     private Method        _getMethod;
@@ -258,7 +264,8 @@ public final class FieldHandlerImpl
      *   are static, or do not specify the proper types
      *
      */
-    public FieldHandlerImpl( String fieldName, Method getMethod, Method setMethod, TypeInfo typeInfo )
+    public FieldHandlerImpl( String fieldName, Method[] getSequence, 
+                             Method getMethod, Method setMethod, TypeInfo typeInfo )
         throws MappingException
     {
         _handler = null;
@@ -268,6 +275,7 @@ public final class FieldHandlerImpl
         if ( getMethod == null && setMethod == null )
             throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
+        _getSequence = getSequence;
         if ( setMethod != null )
             setWriteMethod( setMethod );
         if ( getMethod != null )
@@ -303,6 +311,9 @@ public final class FieldHandlerImpl
             else if ( _field != null )
                 value = _field.get( object );
             else if ( _getMethod != null ) {
+                if ( _getSequence != null ) 
+                    for ( int i = 0; i < _getSequence.length; i++ ) 
+                        object = _getSequence[ i ].invoke( object, null );
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise, 
                 if ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() )
@@ -358,6 +369,9 @@ public final class FieldHandlerImpl
                 else if ( _field != null )
                     _field.set( object, value == null ? _default : value );
                 else if ( _setMethod != null ) {
+                    if ( _getSequence != null ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                            object = _getSequence[ i ].invoke( object, null );
                     if ( value == null && _deleteMethod != null )
                         _deleteMethod.invoke( object, null );
                     else
@@ -399,6 +413,9 @@ public final class FieldHandlerImpl
                     if ( collect != null )
                         _field.set( object, collect );
                 } else if ( _getMethod != null ) {
+                    if ( _getSequence != null ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                            object = _getSequence[ i ].invoke( object, null );
                     collect = _getMethod.invoke( object, null );
                     collect = _colHandler.add( collect, value );
                     if ( collect != null && _setMethod != null)
@@ -427,7 +444,9 @@ public final class FieldHandlerImpl
                 else if ( _field != null )
                     _field.set( object, _default );
                 else if ( _setMethod != null ) {
-System.out.println(_setMethod);
+                    if ( _getSequence != null ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                            object = _getSequence[ i ].invoke( object, null );
                     if ( _deleteMethod != null )
                         _deleteMethod.invoke( object, null );
                     else
@@ -462,6 +481,9 @@ System.out.println(_setMethod);
                     if ( collect != null )
                         _field.set( object, collect );
                 } else if ( _getMethod != null ) {
+                    if ( _getSequence != null ) 
+                        for ( int i = 0; i < _getSequence.length; i++ ) 
+                            object = _getSequence[ i ].invoke( object, null );
                     collect = _getMethod.invoke( object, null );
                     collect = _colHandler.clear( collect );
                     if ( collect != null && _setMethod != null)

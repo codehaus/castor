@@ -447,6 +447,8 @@ public abstract class MappingLoader
         String            fieldName;
         Method            getMethod = null;
         Method            setMethod = null;
+        Method[]          getSequence = null;
+        
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. 
@@ -472,12 +474,13 @@ public abstract class MappingLoader
             }
         }
 
+        fieldName = fieldMap.getName();
+        
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getDirect() ) {
             // No accessor, map field directly.
             Field field;
             
-            fieldName = fieldMap.getName();
             field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
             if ( field == null )
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
@@ -488,24 +491,52 @@ public abstract class MappingLoader
         } else {
 
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
+                int    point;
+                String seqName;
+                Vector seq = new Vector();
+                String methodName;
+                Method method;
                 
-                if ( fieldMap.getName() == null )
+                if ( fieldName == null )
                     throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
-                getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
-                                          ( colType == null ? fieldType : colType ), true );
+
+                try {
+                    while ( true ) {
+                        point = fieldName.indexOf( '.' );
+                        if ( point < 0 ) 
+                            break;
+                        methodName = "get" + capitalize( fieldName.substring( 0, point ) );
+                        method = javaClass.getMethod( methodName, null );
+                        fieldName = fieldName.substring( point + 1 );
+                        // Make sure method is public and not abstract/static.
+                        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                            ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                            throw new MappingException( "mapping.accessorNotAccessible",
+                                                        methodName, javaClass.getName() );
+                        javaClass = method.getReturnType();
+                        seq.addElement( method );
+                    }
+                    if ( seq.size() > 0 ) 
+                        getSequence = (Method[]) seq.toArray(new Method[0]);
+                    getMethod = findAccessor( javaClass, "get" + capitalize( fieldName ),
+                                            ( colType == null ? fieldType : colType ), true );
+                } catch ( MappingException except ) {
+                    throw except;
+                } catch ( Exception except ) {
+                }
                 if ( getMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
-                                                "get" + capitalize( fieldMap.getName() ),
+                                                "get" + capitalize( fieldName ),
                                                 ( colType == null ? fieldType : colType ),
                                                 javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
                 if ( colType == null || getSetCollection ) {
-                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
+                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
                                               ( colType == null ? fieldType : colType ), false );
                     if ( setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                                    "set" + capitalize( fieldMap.getName() ),
+                                                    "set" + capitalize( fieldName ),
                                                     ( colType == null ? fieldType : colType ),
                                                     javaClass.getName() );
                 }
@@ -537,10 +568,9 @@ public abstract class MappingLoader
             
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             
-            fieldName = fieldMap.getName();
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
-            handler = new FieldHandlerImpl( fieldName, getMethod, setMethod, typeInfo );
+            handler = new FieldHandlerImpl( fieldName, getSequence, getMethod, setMethod, typeInfo );
         }
 
         // If there is a create method, add it to the field handler
@@ -555,22 +585,22 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.createMethodNotFound",
                                             fieldMap.getCreateMethod(), javaClass.getName() );
             }
-        } else if ( fieldMap.getName() != null && ! Types.isSimpleType( fieldType ) ) {
+        } else if ( fieldName != null && ! Types.isSimpleType( fieldType ) ) {
             try {
                 Method method;
 
-                method = javaClass.getMethod( "create" + capitalize( fieldMap.getName() ), null );
+                method = javaClass.getMethod( "create" + capitalize( fieldName ), null );
                 handler.setCreateMethod( method );
             } catch ( Exception except ) { }
         }
 
         // If there is an has/delete method, add them to field handler
-        if ( fieldMap.getName() != null ) {
+        if ( fieldName != null ) {
             Method hasMethod = null;
             Method deleteMethod = null;
 
             try {
-                hasMethod = javaClass.getMethod( "has" + capitalize( fieldMap.getName() ), null );
+                hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), null );
                 if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
                      ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                     hasMethod = null;
@@ -578,12 +608,12 @@ public abstract class MappingLoader
                     if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
                          ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                         deleteMethod = null;
-                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldMap.getName() ), null );
+                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), null );
                 } catch ( Exception except ) { }
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, false );
+        return new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient() );
     }
 
 
