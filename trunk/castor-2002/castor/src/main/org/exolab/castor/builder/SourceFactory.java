@@ -144,8 +144,8 @@ public class SourceFactory  {
     {
         FactoryState state = null;
 
-        String elementName = element.getName();
-        String className = JavaNaming.toJavaClassName(elementName);
+		String elementName = element.getName();
+		String className = JavaNaming.toJavaClassName(elementName);
 
         className = resolveClassName(className, packageName);
 
@@ -721,11 +721,12 @@ public class SourceFactory  {
 
         //- Handle derived types
         XMLType base = complexType.getBaseType();
-        if ((base != null) && (base.isComplexType())) {
+		//-- if the base is a complexType, we need to process it
+		if ((base != null) && (base.isComplexType())) {
 
             String className = null;
 
-			//-- Is thie base type from the schema we are currently generating source for?
+			//-- Is this base type from the schema we are currently generating source for?
 			if (base.getSchema()==schema)
 			{
 				ClassInfo cInfo = state.resolve(base);
@@ -752,8 +753,17 @@ public class SourceFactory  {
 			//-- Set super class
             state.jClass.setSuperClass(className);
         }
+		//--if the base a simpleType, we need to add a 'value' member
+		if ( (base != null) && (base.isSimpleType()) ) {
+		   ElementDecl element = new ElementDecl(complexType.getSchema());
+		   element.setName("value");
+		   element.setType((SimpleType)base);
+		   FieldInfo fieldInfo = memberFactory.createFieldInfo(element, state);
+		   handleField(fieldInfo,state);
+        }
 
-        //---------------------/
+
+     	//---------------------/
         //- handle attributes -/
         //---------------------/
         //-- loop throug each attribute
