@@ -123,8 +123,10 @@ public class ClassDescriptorImpl
                                 AccessMode accessMode )
         throws MappingException
     {
-        if ( ! Types.isConstructable( javaClass ) )
+        if ( ! Types.isConstructable( javaClass, true ) ) {
             throw new MappingException( "mapping.classNotConstructable", javaClass.getName() );
+        }
+            
         _javaClass = javaClass;
         if ( fields == null )
             throw new IllegalArgumentException( "Argument 'fields' is null" );
