@@ -425,7 +425,7 @@ public final class CacheEngine
             } catch ( PersistenceException except ) {
                 // Report any error talking to the persistence engine
                 throw except;
-            }
+            } 
             // Create a lock for the object, register the lock and OID.
             // The lock is created for read or write depending on the
             // mode.
@@ -1503,7 +1503,6 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         oid.setDbLock( false );
-        //System.out.println("CacheEngine.realeaseLock!");
         lock = typeInfo.cache.getLockForAquire( oid );
         if ( lock != null && lock.hasLock( tx, false ) )
             lock.release( tx );
@@ -1526,7 +1525,6 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         oid.setDbLock( false );
-        //System.out.println("CacheEngine.realeaseLock!");
         lock = typeInfo.cache.getLockForAquire( oid );
         if ( lock != null ) {
             try {
@@ -1566,6 +1564,7 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = typeInfo.cache.getLockForAquire( oid );
+
         if ( lock != null ) {
             try {
                 fields = (Object[]) lock.acquire( tx, true, 0 );

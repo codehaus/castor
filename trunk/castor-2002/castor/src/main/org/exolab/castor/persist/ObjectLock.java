@@ -142,6 +142,8 @@ final class ObjectLock
     private LinkedTx          _writeWaiting;
 
 
+    private boolean           _deleted;
+
     /**
      * Create a new lock for the specified object. Must not create two
      * locks for the same object. This will be the object returned from
@@ -151,6 +153,7 @@ final class ObjectLock
      */
     ObjectLock( Object object, OID oid )
     {
+        _deleted = false;
         _object = object;
         _oid = oid;
     }
@@ -200,6 +203,10 @@ final class ObjectLock
     synchronized boolean isFree() {
 		return ( _writeLock == null && _readLock == null &&
 			_writeWaiting == null && _readWaiting == null );
+    }
+
+    synchronized boolean isDeleted() {
+        return _deleted;
     }
 
 
@@ -404,6 +411,7 @@ final class ObjectLock
             // Mark lock as unlocked and deleted, notify all waiting transactions
             _object = null;
             _writeLock = null;
+            _deleted = true;
             notifyAll();
         } catch ( ThreadDeath death ) {
             // Delete operation must never fail, not even in the
