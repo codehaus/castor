@@ -2321,17 +2321,28 @@ public class ClassMolder {
      * @return return an Object[] which contains the identity of the object
      */
     public Object getActualIdentity( TransactionContext tx, Object o ) {
+        return getActualIdentity( tx.getClassLoader(), o );
+    }
+
+    /**
+     * Get the identity from a object of the base type
+     *
+     * @param loader the current class loader
+     * @param o - object of the base type
+     * @return return an Object[] which contains the identity of the object
+     */
+    public Object getActualIdentity( ClassLoader loader, Object o ) {
         Object temp;
 
         if ( _ids.length == 1 ) {
-            return _ids[0].getValue( o, tx.getClassLoader() );
+            return _ids[0].getValue( o, loader );
         } else if ( _ids.length == 2 ) {
-            temp = _ids[0].getValue( o, tx.getClassLoader() );
-            return temp==null? null: new Complex( temp, _ids[1].getValue( o, tx.getClassLoader() ) );
+            temp = _ids[0].getValue( o, loader );
+            return temp==null? null: new Complex( temp, _ids[1].getValue( o, loader ) );
         } else {
         Object[] osIds = new Object[_ids.length];
         for ( int i=0; i<osIds.length; i++ ) {
-            osIds[i] = _ids[i].getValue( o, tx.getClassLoader() );
+            osIds[i] = _ids[i].getValue( o, loader );
         }
             if ( osIds[0] != null )
                 return null;
