@@ -78,6 +78,13 @@ public class JDBCQueryExpression
 
     protected String    _where;
 
+    protected boolean   _distinct = false;
+
+
+    public void setDistinct(boolean distinct)
+    {
+        _distinct = distinct;
+    }
 
     public void addColumn( String tableName, String columnName )
     {
@@ -177,6 +184,8 @@ public class JDBCQueryExpression
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
+        if ( _distinct )
+          sql.append( JDBCSyntax.Distinct );
         sql.append( getColumnList() );
         sql.append( JDBCSyntax.From );
 

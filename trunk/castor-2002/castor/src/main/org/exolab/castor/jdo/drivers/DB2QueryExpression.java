@@ -72,6 +72,8 @@ public final class DB2QueryExpression
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
+        if ( _distinct )
+          sql.append( JDBCSyntax.Distinct );
         sql.append( getColumnList() );
         sql.append( JDBCSyntax.From );
 
