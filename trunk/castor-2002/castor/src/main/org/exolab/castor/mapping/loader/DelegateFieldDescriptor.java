@@ -48,6 +48,7 @@ package org.exolab.castor.mapping.loader;
 
 
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.IntegrityException;
 
@@ -113,6 +114,12 @@ public class DelegateFieldDescriptor
     public boolean isTransient()
     {
         return _desc.isTransient();
+    }
+
+
+    public ClassDescriptor getTypeDescriptor()
+    {
+        return _desc.getTypeDescriptor();
     }
 
 
