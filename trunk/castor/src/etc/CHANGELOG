@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
+       Patch from axia@sonusnet.com.
+       (kvisco - 20040527)
+
 JDO:   Fixed bug 1067 using contribution from unkown.
        Fixed a problem with class loading in various places of ParamInfo by passing 
        a ClassLoader instance during instantiatin.
