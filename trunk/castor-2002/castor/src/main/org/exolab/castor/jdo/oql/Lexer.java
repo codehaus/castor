@@ -517,7 +517,7 @@ public class Lexer implements TokenTypes {
     _pos++;
     curChar = getChar();
           
-    while ( isDigit(curChar) || isLetter(curChar) ) {
+    while ( isDigit(curChar) || isLetter(curChar) || curChar == '_' ) {
       sb.append(curChar);
       _pos++;
       curChar = getChar();
