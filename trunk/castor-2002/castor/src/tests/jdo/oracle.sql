@@ -337,6 +337,8 @@ create unique index test_types_pk
 
 grant all on test_types to test;
 
+drop table   test_lob;
+
 create table test_lob (
   id       numeric(10,0)  not null,
   blob_val blob           null,
