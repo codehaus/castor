@@ -65,10 +65,7 @@ public final class XSDate extends XSTimePeriod {
         super(XSType.DATE,"P1D");
     } //-- XSDate
 
-   /**
-     * Returns the Java code neccessary to create a new instance of the
-     * JType associated with this XSType
-     */
+
      /**
      * Returns the Java code necessary to create a new instance of the
      * JType associated with this XSType
