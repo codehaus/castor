@@ -24,6 +24,14 @@ import org.exolab.castor.mapping.Mapping;
 import org.apache.xml.serialize.*;
 
 
+/**
+ * This example is only intended to show how castor should be set up 
+ * in a standalone environment. For detail examples on the mapping file, 
+ * database schemas, supported features and their expected behaviors, 
+ * please consult the JDO test cases instead. JDO Test cases can be 
+ * found in the full CVS snapshot and located under the directory of 
+ * src\tests\jdo.
+ */
 public class Test
 {
 
