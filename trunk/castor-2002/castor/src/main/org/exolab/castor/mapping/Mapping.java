@@ -47,7 +47,9 @@
 package org.exolab.castor.mapping;
 
 
+import java.util.Hashtable;
 import java.util.Enumeration;
+import java.lang.reflect.Constructor;
 import java.io.PrintWriter;
 import java.io.IOException;
 import java.net.URL;
@@ -57,12 +59,10 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.jdo.engine.JDOMappingLoader;
-import org.exolab.castor.dax.engine.DAXMappingLoader;
-import org.exolab.castor.xml.XMLMappingLoader;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.DTDResolver;
 
@@ -97,6 +97,41 @@ public class Mapping
 {
 
 
+    static class EngineMapping
+    {
+
+        private final String _name;
+
+        private final String _loaderClass;
+
+        EngineMapping( String name, String loaderClass )
+        {
+            _name = name;
+            _loaderClass = loaderClass;
+        }
+
+        public String getLoaderClass()
+        {
+            return _loaderClass;
+        }
+
+        public String toString()
+        {
+            return _name;
+        }
+
+    }
+        
+
+    public static final EngineMapping JDO = new EngineMapping( "jdo", "org.exolab.castor.jdo.engine.JDOMappingLoader" );
+
+
+    public static final EngineMapping DAX = new EngineMapping( "jdo", "org.exolab.castor.dax.engine.DAXMappingLoader" );
+
+
+    public static final EngineMapping XML = new EngineMapping( "jdo", "org.exolab.castor.xml.XMLMappingLoader" );
+
+
     /**
      * Log writer to report progress. May be null.
      */
@@ -122,21 +157,9 @@ public class Mapping
 
 
     /**
-     * The loaded JDO mapping.
+     * The cached resolvers.
      */
-    private JDOMappingLoader _jdoMapping;
-
-
-    /**
-     * The loaded XML mapping.
-     */
-    private XMLMappingLoader _xmlMapping;
-
-
-    /**
-     * The loaded DAX mapping.
-     */
-    private DAXMappingLoader _daxMapping;
+    private Hashtable  _resolvers = new Hashtable();
 
 
     /**
@@ -162,42 +185,34 @@ public class Mapping
     }
 
 
-    public MappingResolver getJDOMapping()
+    public MappingResolver getResolver( EngineMapping engine )
         throws MappingException
     {
+        MappingResolver resolver;
+
         if ( _mapping == null )
             throw new MappingException( "Must call loadMapping first" );
-        if ( _jdoMapping == null ) {
-            _jdoMapping = new JDOMappingLoader( _loader, _logWriter );
-            _jdoMapping.loadMapping( _mapping );
+        resolver = (MappingResolver) _resolvers.get( engine );
+        if ( resolver == null ) {
+            MappingLoader loaderImpl;
+            Class         loaderClass;
+            Constructor   loaderConst;
+
+            try {
+                // Find the constructor and use it to create a loader
+                loaderClass = getClass().getClassLoader().loadClass( engine.getLoaderClass() );
+                loaderConst = loaderClass.getConstructor( new Class[] { ClassLoader.class, PrintWriter.class } );
+                loaderImpl = (MappingLoader) loaderConst.newInstance( new Object[] { _loader, _logWriter } );
+                // Put loader in hash table first, so we don't get an error message if this
+                // method is called a second time
+                resolver = loaderImpl;
+                _resolvers.put( engine, resolver );
+                loaderImpl.loadMapping( _mapping );
+            } catch ( Exception except ) {
+                throw new MappingException( except );
+            }
         }
-        return _jdoMapping;
-    }
-
-
-    public MappingResolver getXMLMapping()
-        throws MappingException
-    {
-        if ( _mapping == null )
-            throw new MappingException( "Must call loadMapping first" );
-        if ( _xmlMapping == null ) {
-            _xmlMapping = new XMLMappingLoader( _loader, _logWriter );
-            _xmlMapping.loadMapping( _mapping );
-        }
-        return _xmlMapping;
-    }
-
-
-    public MappingResolver getDAXMapping()
-        throws MappingException
-    {
-        if ( _mapping == null )
-            throw new MappingException( "Must call loadMapping first" );
-        if ( _daxMapping == null ) {
-            _daxMapping = new DAXMappingLoader( _loader, _logWriter );
-            _daxMapping.loadMapping( _mapping );
-        }
-        return _daxMapping;
+        return resolver;
     }
 
 
@@ -353,11 +368,15 @@ public class Mapping
         MappingRoot  loaded;
         Unmarshaller unm;
         Enumeration  enum;
-       
+
+        // Clear all the cached resolvers, so they can be reconstructed a
+        // second time based on the new mappings loaded
+        _resolvers.clear();
         try {
             if ( _mapping == null )
                 _mapping = new MappingRoot();
 
+            // Load the specificed mapping source
             unm = new Unmarshaller( MappingRoot.class );
             unm.setEntityResolver( _resolver );
             if ( _logWriter != null )

@@ -158,7 +158,7 @@ public class Marshaller {
         throws MappingException
     {
         _cdResolver = new ClassDescriptorResolverImpl();
-        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getXMLMapping() );
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
     /**
