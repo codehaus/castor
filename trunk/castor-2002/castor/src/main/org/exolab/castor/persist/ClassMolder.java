@@ -893,6 +893,10 @@ public class ClassMolder {
         locker.setObject( tx, fields );
         oid.setDbLock( true );
 
+        // set the new timeStamp into the data object
+        if ( object instanceof TimeStampable )
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );   
+
         // set the identity into the object
         setIdentity( tx, object, createdId );
 
