@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 //import org.exolab.castor.tools.MappingTool;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
+import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
@@ -18,7 +19,7 @@ public class Mapping
 {
 
 
-    public Mapping()
+    public Mapping( CWTestCategory category )
         throws CWClassConstructorException
     {
         super( "TC01", "Test mapping loader/generator" );

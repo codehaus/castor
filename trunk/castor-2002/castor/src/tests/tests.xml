@@ -23,5 +23,10 @@
     <jtf:case class="jdo.KeyGenGeneric" />
   </jtf:category>
 
+  <jtf:category name="xml" class="xml.XMLCategory">
+    <jtf:description>Tests for XML marshalling framework</jtf:description>
+    <jtf:case class="xml.Mapping" />
+  </jtf:category>
+
 </jtf:harness>
 
