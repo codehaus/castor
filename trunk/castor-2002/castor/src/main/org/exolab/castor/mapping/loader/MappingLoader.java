@@ -372,6 +372,23 @@ public abstract class MappingLoader
         boolean idfield = false;
         String[] ids = clsMap.getIdentity();
         if (( ids != null ) && ( ids.length > 0)) {
+
+            // Check that an XML mapping file do not declare more identity
+            // attributes for a given class than there are field elements
+            // defined for that class.
+            // (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)          
+            if ( ids.length > fields.length ) {
+                String badIdentities = "";
+                String delimiter     = " or ";
+                for ( int index = 0; index < ids.length; index++ ) {
+                    badIdentities += ids[index];
+                    if ( index != ids.length - 1 )
+                        badIdentities += delimiter; 
+                }
+                throw new MappingException( "mapping.identityMissing",
+                badIdentities, javaClass.getName() );
+            }
+
             //System.out.println("getId....");
             //breakApart( clsMap.getIdentity(), ' ' );
             newFields = new FieldDescriptor[fields.length - ids.length];
