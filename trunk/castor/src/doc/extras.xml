@@ -25,8 +25,8 @@
                 <tr>
                     <td valign="top">Description:</td>
                     <td>
-                    Phantom-Castor contains components to ease the construction 
-                    of JDO applications using Castor. It provides easier use of 
+                    Phantom-Castor contains components to ease the construction
+                    of JDO applications using Castor. It provides easier use of
                     mappings with building OQL queries.
                     </td>
                 </tr>
@@ -42,25 +42,46 @@
        </p>
        </section>
 
+       <section title="Castor-Eclipse-Plugin">
+       <p>
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                       An Eclipse plugin for Castor's source code generator.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Current Author:</td>
+                    <td>Peter Nehrer</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://xdoclipse.sourceforge.net/cep.html</url></td>
+                </tr>
+            </table>
+       </p>
+       </section>
+
        <section title="Castor-Taglib">
        <p>
             <table border="0">
                 <tr>
                     <td valign="top">Description:</td>
                     <td>
-                        The Castor Taglib allows you to execute OQL queries in 
-                        your JSP page (using Castor JDO). It also helps you to 
-                        integrate Castor JDO with Java application servers like 
+                        The Castor Taglib allows you to execute OQL queries in
+                        your JSP page (using Castor JDO). It also helps you to
+                        integrate Castor JDO with Java application servers like
                         Tomcat, making use of JNDI and Tyrex for managed transactions.
                         <br />
                         <br />
-                        It is intended that support for more servlet containers 
+                        It is intended that support for more servlet containers
                         will be added.
                         <br />
                         <br />
-                        The taglib is compatible with JSTL 1.0, and allows you 
-                        to use expression language (EL) to pass values dynamically 
-                        to the attributes of certain tags. 
+                        The taglib is compatible with JSTL 1.0, and allows you
+                        to use expression language (EL) to pass values dynamically
+                        to the attributes of certain tags.
                     </td>
                 </tr>
                 <tr>
