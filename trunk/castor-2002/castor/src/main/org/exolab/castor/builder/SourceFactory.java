@@ -96,7 +96,16 @@ public class SourceFactory  {
         cMain = new JClass(cName);
         cMain.addInterface("java.io.Serializable");
         
+        if (classInfo.isDerived()) {
+            ClassInfo sourceInfo = classInfo.getSuperClassInfo();
+            cMain.setSuperClass(sourceInfo.getClassName());
+        }
+        
+        //-- check for abstract class
+        cMain.getModifiers().setAbstract(classInfo.isAbstract());
+        
         cMain.addConstructor(constructor = cMain.createConstructor());
+        constructor.getSourceCode().add("super();");
         
         //-- add imports
         cMain.addImport("org.exolab.castor.xml.*");
@@ -104,39 +113,18 @@ public class SourceFactory  {
         cMain.addImport("java.io.Reader");
         cMain.addImport("java.io.Serializable");
         
-        //-- create default methods
-        //-- #validate
-        jMethod = new JMethod(null, "validate");
-        jMethod.addException(SGTypes.ValidationException);
-        //mValidate.getModifiers().makeProtected();
-        cMain.addMethod(jMethod);
-        jsc = jMethod.getSourceCode();
-        jsc.add("org.exolab.castor.xml.Validator.validate(this, null);");
-        
-        //-- #isValid
-        jMethod  = new JMethod(JType.Boolean, "isValid");
-        jsc = jMethod.getSourceCode();
-        jsc.add("try {");
-        jsc.indent();
-        jsc.add("validate();");
-        jsc.unindent();
-        jsc.add("}");
-        jsc.add("catch (org.exolab.castor.xml.ValidationException vex) {");
-        jsc.indent();
-        jsc.add("return false;");
-        jsc.unindent();
-        jsc.add("}");
-        jsc.add("return true;");
-        cMain.addMethod(jMethod);        
         
         
         
         //-- handle attributes
         SGMember[] atts = classInfo.getAttributeMembers();
         
-        //JSourceCode vcode = mValidate.getSourceCode();
         for (int i = 0; i < atts.length; i++) {
             SGMember member = atts[i];
+            
+            //-- skip derived types
+            if (classInfo.isDerived(member)) continue;
+            
             cMain.addMember(member.createMember());
             cMain.addMethods(member.createAccessMethods());
             //-- Add initialization code
@@ -148,6 +136,10 @@ public class SourceFactory  {
         
         for (int i = 0; i < elements.length; i++) {
             SGMember member = elements[i];
+            
+            //-- skip derived types
+            if (classInfo.isDerived(member)) continue;
+            
             cMain.addMember(member.createMember());
             cMain.addMethods(member.createAccessMethods());
             //-- Add initialization code
@@ -164,10 +156,14 @@ public class SourceFactory  {
             constructor.getSourceCode().add("vContent = new String();");
         }
         
-        //-- #marshal()
-        createMarshalMethods(cMain);
-        //-- #unmarshal()
-        createUnmarshalMethods(cMain);
+        if (!classInfo.isAbstract()) {
+            //-- #validate()
+            createValidateMethods(cMain);
+            //-- #marshal()
+            createMarshalMethods(cMain);
+            //-- #unmarshal()
+            createUnmarshalMethods(cMain);
+        }
         
         return cMain;
     } //-- createClassSource
@@ -246,7 +242,40 @@ public class SourceFactory  {
         
     } //-- createUseResolverMethod
     
-    
+    /**
+     * Creates the Validate methods for the given JClass
+     * @param jClass the JClass to create the Validate methods for
+    **/
+    private static void createValidateMethods(JClass jClass) {
+        
+        JMethod     jMethod = null;
+        JSourceCode jsc     = null;
+        
+        //-- #validate
+        jMethod = new JMethod(null, "validate");
+        jMethod.addException(SGTypes.ValidationException);
+        
+        jClass.addMethod(jMethod);
+        jsc = jMethod.getSourceCode();
+        jsc.add("org.exolab.castor.xml.Validator.validate(this, null);");
+        
+        //-- #isValid
+        jMethod  = new JMethod(JType.Boolean, "isValid");
+        jsc = jMethod.getSourceCode();
+        jsc.add("try {");
+        jsc.indent();
+        jsc.add("validate();");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("catch (org.exolab.castor.xml.ValidationException vex) {");
+        jsc.indent();
+        jsc.add("return false;");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("return true;");
+        jClass.addMethod(jMethod);
+        
+    } //-- createValidateMethods
     
     
 } //-- SourceFactory

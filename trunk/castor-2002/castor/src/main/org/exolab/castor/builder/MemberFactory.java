@@ -126,7 +126,7 @@ public class MemberFactory {
                     
         }
         else {
-            member = new SGElementMember(xsType, memberName);
+            member = new SGMember(xsType, memberName);
         }
         member.setSchemaType(typeRef);
         member.setRequired(minOccurs > 0);

@@ -55,11 +55,12 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGId extends SGAttrMember {
+public class SGId extends SGMember {
  
     
     public SGId(String name) {
         super(new XSId(), name);
+        setXMLNodeType(SGMember.ATTRIBUTE);
     } //-- SGId
     
     public JMethod[] createAccessMethods() {

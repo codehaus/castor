@@ -58,11 +58,22 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class SGMember {
+public class SGMember {
  
+    /**
+     * The XML Attribute Node type
+    **/
     public static final short ATTRIBUTE = 0;
+    
+    /**
+     * The XML Element Node type
+    **/
     public static final short ELEMENT   = 1;
-    public static final short PCDATA    = 2;
+    
+    /**
+     * The XML Text (PCDATA) Node type
+    **/
+    public static final short TEXT      = 2;
     
     
     private boolean isRequired = false;
@@ -87,6 +98,10 @@ public abstract class SGMember {
     
     private boolean _multivalued = false;
     
+    private ClassInfo declaringClassInfo = null;
+    
+    private short xmlNodeType = ELEMENT;
+    
     /**
      * Creates a new SGMember with the given XML Schema type
      * and the given member name
@@ -105,8 +120,10 @@ public abstract class SGMember {
     /**
      * Returns which type of XML node this SGMember came from.
     **/
-    public abstract short getFromType();
-           
+    public short getXMLNodeType() {
+        return xmlNodeType;
+    }
+    
     //------------------/
     //- Public Methods -/
     //------------------/
@@ -251,6 +268,13 @@ public abstract class SGMember {
         this.codeHelper = codeHelper;
     } //-- setCodeHelper
     
+    /**
+     * Returns the ClassInfo to which this Member was declared,
+     * for inheritance reasons
+    **/
+    public ClassInfo getDeclaringClassInfo() {
+        return this.declaringClassInfo;
+    } //-- getDeclaringClassInfo
     
     /**
      * Sets whether this member represents an element that
@@ -290,6 +314,14 @@ public abstract class SGMember {
     public void setXMLName(String xmlName) {
         this.xmlName = xmlName;
     } //-- setXMLName
+    
+    public void setXMLNodeType(short xmlType) {
+        this.xmlNodeType = xmlType;
+    } //-- setXMLNodeType
+    
+    public void setDeclaringClassInfo(ClassInfo declaringClassInfo) {
+        this.declaringClassInfo = declaringClassInfo;
+    } //-- setDeclaringClassInfo
     
 } //-- SGMember
 

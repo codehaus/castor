@@ -49,6 +49,7 @@ package org.exolab.castor.xml;
 import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.MimeBase64Encoder;
 import org.xml.sax.helpers.AttributeListImpl;
 
 import java.io.PrintWriter;
@@ -225,6 +226,9 @@ public class Marshaller {
         
         Class _class = object.getClass();
         
+        boolean byteArray = false;
+        if (_class.isArray())
+            byteArray = (_class.getComponentType() == Byte.TYPE);
         
         
         if (descriptor == null)
@@ -250,7 +254,8 @@ public class Marshaller {
             //-- the special #isPrimitive method of this class
             //-- so that we can check for the primitive wrapper 
             //-- classes
-            if (isPrimitive(_class) || (_class == String.class)) {
+            if (isPrimitive(_class) || (_class == String.class) || byteArray) 
+            {
                 
                 //-- look for marshalInfo based on element name
                 String cname = MarshalHelper.toJavaName(name,true);
@@ -387,8 +392,16 @@ public class Marshaller {
                 }
             }
         }
+        // special case for byte[]
+        else if (byteArray) {
+            //-- Base64Encoding
+            MimeBase64Encoder encoder = new MimeBase64Encoder();
+            encoder.translate((byte[])object);
+            char[] chars = encoder.getCharArray();
+            handler.characters(chars, 0, chars.length);
+        }
         /* special case for Strings and primitives */
-        else if ((_class == String.class) || isPrimitive(_class)) { 
+        else if ((_class == String.class) || isPrimitive(_class)) {
             char[] chars = object.toString().toCharArray();
             handler.characters(chars,0,chars.length);
         }
@@ -402,7 +415,6 @@ public class Marshaller {
         for (int i = 0; i < descriptors.length; i++) {
             
             MarshalDescriptor elemDescriptor = descriptors[i];
-            
             Object obj = null;
             try {
                 obj = elemDescriptor.getValue(object);
@@ -419,9 +431,19 @@ public class Marshaller {
             
             //-- handle arrays
             if (type.isArray()) {
-                int length = Array.getLength(obj);
-                for (int j = 0; j < length; j++) {
-                    marshal(Array.get(obj, j), elemDescriptor, handler);
+                
+                System.out.print("Array: ");
+                System.out.println(type.getComponentType());
+                
+                //-- special case for byte[]
+                if (type.getComponentType() == Byte.TYPE) {
+                    marshal(obj, elemDescriptor, handler);
+                }
+                else {
+                    int length = Array.getLength(obj);
+                    for (int j = 0; j < length; j++) {
+                        marshal(Array.get(obj, j), elemDescriptor, handler);
+                    }
                 }
             }
             //-- handle enumerations
