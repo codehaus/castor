@@ -148,6 +148,16 @@
     </target>
     
     <target name="runtests" depends="prepare">
+        <!--Test for include of include-->
+        <!--to be removed when integrated-->
+        <!--to the Castor Testing Framework-->
+        <java classname="org.exolab.castor.builder.SourceGenerator">
+        	<arg value="-i${source}/tests/xml/xml2java/includeA.xsd" /> 
+        	<arg value="-f" />
+        	<arg value="-dest${build}/tests" />
+        	<arg value="-packagexml.xml2java" /> 
+        </java>
+        
         <java classname="org.exolab.castor.builder.SourceGenerator">
         	<!-- <arg value="-i testtype1.xsd -f -dest ../../../../build -package xml.xml2java" /> do not work because ant add " -->
         	<arg value="-i${source}/tests/xml/xml2java/testtype1.xsd" /> 
