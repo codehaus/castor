@@ -146,7 +146,23 @@ public class MemberFactory {
         fieldInfo.setNodeName(attribute.getName());
         fieldInfo.setNodeType(XMLInfo.ATTRIBUTE_TYPE);
         fieldInfo.setRequired(attribute.getRequired());
-        fieldInfo.setDefaultValue(attribute.getDefault());
+        
+        if (xsType.getType() == XSType.STRING) {
+            String def = attribute.getDefault();
+            if ((def != null) && (def.length() > 0)) {
+                char ch = def.charAt(0);
+                switch (ch) {
+                    case '\'':
+                    case '\"':
+                        fieldInfo.setDefaultValue(def);
+                        break;
+                    default:
+                        fieldInfo.setDefaultValue("\"" + def + "\"");
+                        break;
+                }
+            }
+        }
+        else fieldInfo.setDefaultValue(attribute.getDefault());
         
         //fieldInfo.setSchemaType(attribute.getDatatypeRef());
         
