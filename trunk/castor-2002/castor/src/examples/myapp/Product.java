@@ -24,8 +24,7 @@ public class Product
     public ProductGroup     group;
 
 
-    //    public Vector           detail;
-    public ProductDetail     detail;
+    public Vector           detail;
 
 
     public String toString()
@@ -33,7 +32,7 @@ public class Product
         return ( Integer.toString( id ) ) + " " +
             ( name == null ? "<no-name>" : name ) + " $" + price + " " +
             ( group == null ? "<no-group>" : "[" + group.toString() + "]" ) + " " +
-            ( detail == null ? "<no-detail>" : detail.toString() );
+            ( detail == null ? "<no-detail>" : toString( detail ) );
     }
 
 

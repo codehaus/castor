@@ -91,8 +91,8 @@ public class DatabaseSource
      * The JDBC URL when using a JDBC driver.
      */
     private String            _jdbcUrl;
-    
-    
+
+
     /**
      * The properties when using a JDBC driver.
      */
@@ -216,7 +216,7 @@ public class DatabaseSource
                 throw new MappingException( except );
             }
         }
-        
+
         if ( dbName.startsWith( "jdbc:" ) ) {
             dbs = new DatabaseSource( dbName, _defaultMapping, new SQLEngineFactory(),
                                       dbName, null, logWriter );
@@ -250,7 +250,7 @@ public class DatabaseSource
         Mapping[]        mappings;
         Database         database;
         DatabaseSource   dbs;
-        
+
         unm = new Unmarshaller( Database.class );
         try {
             if ( resolver == null )
@@ -277,7 +277,7 @@ public class DatabaseSource
                 Properties  props;
                 Enumeration params;
                 Param       param;
-          
+
                 if ( database.getDriver().getClassName() != null ) {
                     try {
                         Class.forName( database.getDriver().getClassName() );
@@ -298,7 +298,7 @@ public class DatabaseSource
                                           database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
                 DataSource ds;
-          
+
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getDbName() );
@@ -306,7 +306,7 @@ public class DatabaseSource
                                           ds, logWriter );
             } else if ( database.getDataSourceRef() != null ) {
                 Object    ds;
-          
+
                 try {
                     ds = new InitialContext().lookup( database.getDbName() );
                 } catch ( NameNotFoundException except ) {
@@ -324,7 +324,7 @@ public class DatabaseSource
             }
 
             _databases.put( dbs.getDBName(), dbs );
-                                      
+
         } catch ( MappingException except ) {
             throw except;
         } catch ( Exception except ) {
@@ -347,7 +347,7 @@ public class DatabaseSource
     {
         Enumeration    enum;
         DatabaseSource dbs;
-        
+
         enum = _databases.elements();
         while ( enum.hasMoreElements() ) {
             dbs = (DatabaseSource) enum.nextElement();
@@ -368,7 +368,7 @@ public class DatabaseSource
     {
         Enumeration    enum;
         DatabaseSource dbs;
-        
+
         enum = _databases.elements();
         while ( enum.hasMoreElements() ) {
             dbs = (DatabaseSource) enum.nextElement();
@@ -383,31 +383,31 @@ public class DatabaseSource
         throws MappingException
     {
         DatabaseSource dbs;
-        
+
         dbs = (DatabaseSource) _databases.get( dbName );
         if ( dbs == null )
             dbs = registerDatabase( dbName, null );
         return dbs;
     }
-    
-    
+
+
     static Connection createConnection( PersistenceEngine engine )
         throws SQLException
     {
         DatabaseSource dbs;
-        
+
         dbs = (DatabaseSource) _byEngine.get( engine );
         if ( dbs._dataSource != null )
             return dbs._dataSource.getConnection();
         else
             return DriverManager.getConnection( dbs._jdbcUrl, dbs._jdbcProps );
     }
-    
+
 
     static class SQLEngineFactory
         implements PersistenceFactory
     {
-        
+
         public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
             throws MappingException
         {
@@ -418,8 +418,8 @@ public class DatabaseSource
                 return null;
             }
         }
-        
+
     }
-    
+
 
 }

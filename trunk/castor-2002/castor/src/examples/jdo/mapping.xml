@@ -40,7 +40,7 @@
     <!-- Product has reference to ProductDetail
          many details per product  -->
     <field name="detail" type="myapp.ProductDetail" required="true"
-           collection="vector"/>
+           collection="java.util.Vector" />
   </class>
 
 

@@ -221,7 +221,7 @@
 
   <!-- Update the sources from the CVS -->
   <target name="cvs" depends="clean">
-    <cvs cvsRoot=":pserver:arkin@virtuals.exoffice.com:/cvs/${project}"
+    <cvs cvsRoot=":pserver:anoncvs@virtuals.exoffice.com:/cvs/${project}"
          dest="." package="${project}" />
   </target>
 
