@@ -75,6 +75,21 @@ public interface Directory
 
 
     /**
+     * Constructs and returns a new search object. The returned object
+     * will be used to perform the search.
+     *
+     * @param filter The search expression
+     * @return A new search object
+     * @throws InvalidSearchException The specified search expression
+     *  is invalid
+     * @throws DirectoryException Directory access failed
+     * @see Search
+     */
+    public Search newSearch( String expr )
+	throws InvalidSearchException, DirectoryException;
+
+
+    /**
      * Read an object with the specified identity. If the object is
      * found, it is returned to the application. If this method is
      * called in the context of a transaction, the object will be
@@ -84,7 +99,7 @@ public interface Directory
      * @param rdn The object's relative DN in this directory
      * @throws DirectoryException Directory access failed
      */
-    public Object read( Class type, Object rdn )
+    public Object read( Object rdn )
 	throws DirectoryException;
 
 
