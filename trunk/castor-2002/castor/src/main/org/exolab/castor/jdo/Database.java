@@ -341,6 +341,10 @@ public interface Database
      *  transaction is not in progress
      * @throws TransactionAbortedException The transaction cannot
      *  commit and has been rolled back
+     * @deprecated Use {@link #commit} and {@link #rollback} instead;
+     *  this method cannot be implemented properly with multiple type
+     *  of locks and will not be supported in future versions of the
+     *  API
      */
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException;
