@@ -51,9 +51,13 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -65,6 +69,11 @@ public class JDBCQueryExpression
     implements QueryExpression
 {
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( JDBCQueryExpression.class );
 
     protected Hashtable _tables = new Hashtable();
 
@@ -258,13 +267,25 @@ public class JDBCQueryExpression
     }
 
 
-    public void addLimitClause( String limit ) {
-        _limit = limit;
+    public void addLimitClause( String limit ) 
+    	throws SyntaxNotSupportedException 
+	{
+    	if (isLimitClauseSupported()) {
+    		_limit = limit;
+    	} else {
+    		throw new SyntaxNotSupportedException (Messages.format ("query.limitClauseNotSupported", _factory.getFactoryName()));
+    	}
     }
 
 
-    public void addOffsetClause( String offset ) {
-        _offset = offset;
+    public void addOffsetClause( String offset ) 
+    	throws SyntaxNotSupportedException
+	{
+    	if (isOffsetClauseSupported()) {
+    		_offset = offset;
+    	} else {
+    		throw new SyntaxNotSupportedException (Messages.format ("query.offsetClauseNotSupported", _factory.getFactoryName()));
+    	}
     }
 
 
@@ -319,7 +340,7 @@ public class JDBCQueryExpression
         }
         return first;
     }
-
+    
     /**
      * This should work for JDBC drivers with a full support of JDBC specification.
      */
@@ -337,7 +358,8 @@ public class JDBCQueryExpression
      * @param lock whether to lock selected tables
      * @param oj true in the first case above, false in the second case.
      **/
-    protected StringBuffer getStandardStatement( boolean lock, boolean oj ) {
+    protected StringBuffer getStandardStatement( boolean lock, boolean oj )  
+	{
         StringBuffer sql;
         Enumeration  enum;
         boolean      first;
@@ -474,8 +496,9 @@ public class JDBCQueryExpression
     }
 
     public String toString()
-    {
-        return "<" + getStatement( false ) + ">";
+    {	StringBuffer buffer = new StringBuffer ();
+    	buffer.append ("<").append (getStatement(false)).append (">");
+        return buffer.toString();
     }
 
 
@@ -565,6 +588,27 @@ public class JDBCQueryExpression
 
         }
     }
+
+
+
+    /** 
+     * Provides a default implementation of {@link QueryExpression#isLimitClauseSupported()}.
+     * @return false to indicate that this feature is not supported by default. 
+	 * @see org.exolab.castor.persist.spi.QueryExpression#isLimitClauseSupported()
+	 */
+	public boolean isLimitClauseSupported() {
+		return false;
+	}
+
+
+    /** 
+     * Provides a default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
+     * @return false to indicate that this feature is not supported by default. 
+	 * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
+	 */
+	public boolean isOffsetClauseSupported() {
+		return false;
+	}
 
 
 }
