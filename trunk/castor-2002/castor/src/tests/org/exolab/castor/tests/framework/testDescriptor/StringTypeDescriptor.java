@@ -85,7 +85,7 @@ public class StringTypeDescriptor extends org.exolab.castor.xml.util.XMLClassDes
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);

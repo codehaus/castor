@@ -96,7 +96,7 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         fieldValidator.setMinOccurs(1);
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
@@ -173,7 +173,7 @@ public class BugFixDescriptor extends org.exolab.castor.xml.util.XMLClassDescrip
         fieldValidator.setMinOccurs(1);
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
