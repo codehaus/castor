@@ -1,7 +1,8 @@
 
 Version (CVS)
 -------------
-
+XML:	Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and 
+      patch submitted by Marcin Chalotowski <Marcin.Chalotowski@3dart.com>) (Arnaud)
 
 
 Version 0.9.3 July 3, 2001
