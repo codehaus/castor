@@ -111,7 +111,7 @@ public final class XAResourceImpl
 	    synchronized ( _engine.getXATransactions() ) {
 		tx = (TransactionContext) _engine.getXATransactions().get( xid );
 		if ( tx == null ) {
-		    tx = new TransactionContext( xid );
+		    tx = _xaSource.createTransactionContext( xid );
 		    _engine.getXATransactions().put( xid, tx );
 		}
 	    }
