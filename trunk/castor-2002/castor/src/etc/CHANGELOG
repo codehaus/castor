@@ -5,6 +5,13 @@ JDO:     Fixed bug when related object is null and SQL_OTHER type is passed to J
          driver; now properly passes type of identity field. (Reported by
          Eitan Suez <eitan@uptodata.com>).
 
+JDO:     Fixed bug with dirty checking that caused lock to not be acquired and object
+         to be deleted if modified, and now properly reporting modified value of object.
+
+JDO:     Fixed the way in which null fields are handled, so has/delete methods are called
+         if available, default value is used otherwise, setNull/wasNull are used on the
+         JDBC record.
+
 Mapping: Date type no longer defaults to new date() when field is null, field is no
          longer set to default when null. (Reported by Lincoln Spiteri
          <Lincoln.Spiteri@mobisle.com>).
