@@ -255,7 +255,10 @@ public class DecimalValidator implements TypeValidator
         //we need to handle it by using a String
         if (_totalDigits != -1) {
             String temp = bd.toString();
-            int length = (temp.indexOf('.') ==  -1)?temp.length():temp.length()-1;
+            int length = temp.length();
+            if (temp.indexOf('.') >= 0) --length;
+            if (temp.indexOf('-') == 0) --length;
+            if (temp.indexOf('+') == 0) --length;
             if (length > _totalDigits){
                 String err = bd + " doesn't have the correct number of digits, it must be less than or equal to "+_totalDigits;
                 throw new ValidationException(err);
