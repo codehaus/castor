@@ -36,7 +36,7 @@ drop table test_types;
 create table test_types ( id int not null, tdt date not null, ttm date not null, int_val integer null, long_val numeric(18,0) null, char_val char(1) null, bool_val char(1) null, dbl_val numeric(14,2) not null);
 create unique index test_types_pk on test_types ( id );
 drop table test_keygen; 
-create table test_keygen ( id int not null, int_val int not null, attr  varchar(200)  not null );
+create table test_keygen ( id int not null, attr varchar(200) not null );
 create unique index test_keygen_pk on test_keygen ( id );
 drop table test_keygen_ext;
 create table test_keygen_ext ( id int not null, ext varchar(200) not null );

@@ -178,9 +178,6 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
-    <field name="intValue" type="integer" required="true">
-      <sql name="int_val" type="integer"/>
-    </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
     </field>
@@ -207,9 +204,6 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
-    <field name="intValue" type="integer" required="true">
-      <sql name="int_val" type="integer"/>
-    </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
     </field>
@@ -229,9 +223,6 @@
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
-    </field>
-    <field name="intValue" type="integer" required="true">
-      <sql name="int_val" type="integer"/>
     </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
@@ -276,9 +267,6 @@
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
-    </field>
-    <field name="intValue" type="integer" required="true">
-      <sql name="int_val" type="integer"/>
     </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
