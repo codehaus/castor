@@ -61,6 +61,8 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
  * against the database. The transaction context is mapped to an
  * API transaction or an XA transaction. The only way to begin a
  * new transaction is through the creation of a new transaction context.
+ * A transaction context is created from an implementation class directly
+ * or through {@link XAResourceImpl}.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
