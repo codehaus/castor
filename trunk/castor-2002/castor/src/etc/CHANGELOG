@@ -1,6 +1,10 @@
 
 Version (CVS)
 -------------
+
+XML:    Added the auto-complete feature and transient field support to the mapping file.
+        (Sebastien Gignoux <gignoux@intalio.com>)
+
 XML:    Fix a bug that creates infinite loop when cross-importing (or including) schemas(Arnaud).
 
 XML:    Added the support for the facets min/max Ex/Inclusive for the date/time types

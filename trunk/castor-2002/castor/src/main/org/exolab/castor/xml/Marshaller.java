@@ -575,6 +575,9 @@ public class Marshaller extends MarshalFramework {
             throw new MarshalException(err);
         }
 
+        if (descriptor != null && descriptor.isTransient())
+            return;
+
         if (object instanceof AnyNode) {
            try {
                AnyNode2SAX.fireEvents((AnyNode) object, handler);
