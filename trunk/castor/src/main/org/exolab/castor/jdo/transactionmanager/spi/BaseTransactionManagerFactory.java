@@ -49,9 +49,10 @@ package org.exolab.castor.jdo.transactionmanager.spi;
 
 import java.util.Properties;
 
+import javax.transaction.TransactionManager;
+
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
-import javax.transaction.TransactionManager;
 
 /**
  * Transaction manager factory instance to be used with J2EE containers

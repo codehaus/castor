@@ -47,11 +47,12 @@
 package org.exolab.castor.jdo.oql;
 
 import java.util.Vector;
+
 import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
+import org.exolab.castor.jdo.engine.SQLTypes;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.loader.Types;
 
 /**
  * A class to store and check information about numbered query parameters.
