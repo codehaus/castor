@@ -52,7 +52,7 @@ import org.apache.xml.serialize.HTMLSerializer;
  * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class DefaultHandler implements ResultHandler {
+public class DefaultHandler implements ContentHandler, ResultHandler {
 
     
     /**
@@ -220,6 +220,45 @@ public class DefaultHandler implements ResultHandler {
     } //-- endElement
     
     /**
+     * <p>ContentHandler#endElement</p>
+     *
+     * Signals the end of an element
+     *
+     * @param name the name of the element
+     */
+    public void endElement(String namespaceURI, String localName, String qName) 
+        throws org.xml.sax.SAXException
+    {
+        _serializer.endElement(namespaceURI, localName, qName);
+        --depth;
+        if (depth == 0) {
+            try {
+                if (_out != null) _out.flush();
+            }
+            catch(java.io.IOException ioe) {
+                //-- Ignore exception, writer may have
+                //-- been closed by Serializer, the flush
+                //-- is just a precautionary step to make
+                //-- sure the buffer has been flushed
+                //-- in case the Serializer doesn't do it.
+            }
+        }
+        
+    } //-- endElement
+    
+    /**
+     * Signals to end the namespace prefix mapping
+     * 
+     * @param prefix the namespace prefix 
+     */
+    public void endPrefixMapping(String prefix)
+        throws SAXException
+    { 
+        _serializer.endPrefixMapping(prefix);
+        
+    } //-- endPrefixMapping
+    
+    /**
      * Signals to recieve an entity reference with the given name
      * @param name the name of the entity reference
     **/
@@ -317,6 +356,18 @@ public class DefaultHandler implements ResultHandler {
     
     
     /**
+     * Signals that an entity was skipped by the parser
+     *
+     * @param name the skipped entity's name
+     */
+    public void skippedEntity(String name)
+        throws SAXException
+    {
+        _serializer.skippedEntity(name);
+        
+    } //-- skippedEntity
+    
+    /**
      * Signals the start of a document
     **/
     public void startDocument() 
@@ -342,6 +393,51 @@ public class DefaultHandler implements ResultHandler {
         _serializer.startElement(name, atts);
         ++depth;
     } //-- startElement
+    
+    /**
+     * <p>ContentHandler#startElement</p>
+     *
+     * Signals the start of element
+     *
+     * @param name the name of the element
+     * @param atts the AttributeList containing the associated
+     * attributes for the element
+     */
+    public void startElement(String namespaceURI, String localName, String qName, Attributes atts)
+        throws org.xml.sax.SAXException 
+    {
+        if ((!_hasElements) && (_chooseMethod)) {
+            String name = localName;
+            if ((name == null) || (name.length() == 0))
+                name = qName;
+            initSerializer(name);
+            _chooseMethod = false;
+        }
+        _hasElements = true;
+        _serializer.startElement(namespaceURI, localName, qName, atts);
+        ++depth;
+    } //-- startElement
+    
+    /**
+     * Signals to start the namespace - prefix mapping
+     * 
+     * @param prefix the namespace prefix to map
+     * @param uri the namespace URI
+     */
+    public void startPrefixMapping(String prefix, String uri)
+        throws SAXException
+    { 
+        if (_hasElements) {
+            _serializer.startPrefixMapping(prefix, uri);
+        }
+        else {
+            Event event = new NamespaceEvent(prefix, uri);
+            if (_saved == null) _saved = event;
+            else _saved.append(event);
+        }
+        
+        
+    } //-- startPrefixMapping
     
     /**
      * Signals to receive characters which should not be escaped
@@ -516,6 +612,35 @@ class CommentEvent extends Event {
     } //-- fire
     
 } //-- CommentEvent
+
+/**
+ * A class to store Namespace prefix mapping events
+ */
+class NamespaceEvent extends Event {
+    
+    private String prefix   = null;
+    private String uri      = null;
+    
+    /**
+     * Creates a new NamespaceEvent
+    **/
+    public NamespaceEvent(String prefix, String uri) {
+        this.prefix = prefix;
+        this.uri = uri;
+    } //-- NamespaceEvent
+    
+    /**
+     * Signals to fire the event to the given Handler
+     *
+     * @param handler the BaseMarkupSerializer to send the event to
+    **/
+    public void fire(BaseMarkupSerializer serializer) 
+        throws org.xml.sax.SAXException
+    {
+        serializer.startPrefixMapping(prefix, uri);
+    } //-- fire
+    
+} //-- NamespaceEvent
 
 
 /**
