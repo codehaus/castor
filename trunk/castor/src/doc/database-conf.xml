@@ -20,18 +20,18 @@
 
       <p>The following names are supported in Castor 1.0:
          <table border="1" cellpadding="4">
-           <tr><td>generic</td><td>Generic JDBC support</td></tr>
-           <tr><td>oracle</td><td>Oracle 7 and Oracle 8</td></tr>
-           <tr><td>sybase</td><td>Sybase 11</td></tr>
-           <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
            <tr><td>db2</td><td>DB/2</td></tr>
-           <tr><td>informix</td><td>Informix</td></tr>
-           <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
+           <tr><td>generic</td><td>Generic JDBC support</td></tr>
            <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
+           <tr><td>informix</td><td>Informix</td></tr>
            <tr><td>instantdb</td><td>InstantDB</td></tr>
            <tr><td>interbase</td><td>Interbase</td></tr>
            <tr><td>mysql</td><td>MySQL</td></tr>
+           <tr><td>oracle</td><td>Oracle 7 - Oracle 9i</td></tr>
+           <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
            <tr><td>sapdb</td><td>SAP DB</td></tr>
+           <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
+           <tr><td>sybase</td><td>Sybase 11</td></tr>
          </table></p>
       <p><small>Note: Castor doesn't work with JDBC-ODBC bridge from Sun.
                 In particular, MS Access is not supported.
@@ -194,6 +194,13 @@
         </tr>
        </table>
 
+    <p>
+    <b>NOTE:</b> <br />
+    Besides the examples listed above, a good source of 
+    configuraton examples are the JDO tests (<tt>src/tests/jdo</tt>). 
+    See the XML decriptor for each database type. 
+    </p>
+
     </section>
 
 
@@ -208,7 +215,7 @@
       For XML Schema validation use:
       <pre><![CDATA[
   <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN"
-                             "http://castor.exolab.org/jdo-conf.xtd">
+                             "http://castor.exolab.org/jdo-conf.xsd">
       ]]></pre>
       The Castor namespace URI is <tt>http://castor.exolab.org/</tt>.</p>
 
