@@ -54,12 +54,26 @@ import org.exolab.castor.jdo.QueryException;
  * the Parser.
  *
  * @author <a href="mailto:nissim@nksystems.com">Nissim Karpenstein</a>
+ * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Revision$ $Date$
  */
 public class OQLSyntaxException extends QueryException {
 
+    private Exception  _except;
+
 	public OQLSyntaxException( String message ) {
-    super( message );
-  }
+		super( message );
+	}
 	
+    
+    public OQLSyntaxException( String message, Exception except ) 
+    {
+        super( message );
+        _except = except;
+    }
+    
+    public Exception getException() 
+    {
+        return _except;
+    }
 }
