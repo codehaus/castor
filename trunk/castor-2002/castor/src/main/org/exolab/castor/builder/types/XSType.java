@@ -363,6 +363,8 @@ public abstract class XSType {
             case FLOAT:
             case INTEGER:
             case LONG:
+            case NON_NEGATIVE_INTEGER:
+            case NON_POSITIVE_INTEGER:
             case NEGATIVE_INTEGER:
             case POSITIVE_INTEGER:
             case SHORT:
