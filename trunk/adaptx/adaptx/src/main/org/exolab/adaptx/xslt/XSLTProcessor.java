@@ -34,7 +34,6 @@ import org.exolab.adaptx.xslt.handlers.DOMBuilder;
 import org.exolab.adaptx.xslt.util.Configuration;
 import org.exolab.adaptx.xslt.util.MessageObserver;
 import org.exolab.adaptx.xslt.util.DefaultObserver;
-import org.exolab.adaptx.util.CommandLineOptions;
 import org.exolab.adaptx.util.List;
 
 //-- XML related imports
@@ -54,7 +53,9 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Properties;
 
-
+//import org.apache.log4j.BasicConfigurator;
+//import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
 
 
 /**
@@ -206,6 +207,7 @@ public class XSLTProcessor
      */
     private XSLOutput _output = null;
     
+    private Logger   _logger   = Logger.getLogger("org.exolab.adaptx.xslt");
     
       //----------------/
      //- Constructors -/
@@ -215,6 +217,8 @@ public class XSLTProcessor
      * Creates a new XSLTProcessor
     **/
 	public XSLTProcessor() {
+        
+        
 	    super();
 	    params = new Properties();
         //-- initialize message observers
@@ -224,7 +228,9 @@ public class XSLTProcessor
         fnResolvers = new List(3);
         _uriResolver = new URIResolverImpl();
         
-    } //-- XSL:Processor
+        //BasicConfigurator.configure();
+        
+    } //-- XSLTProcessor
     
     
       //------------------/
@@ -433,9 +439,9 @@ public class XSLTProcessor
 	    }
 	    
 
-	    Writer out = null;
+        OutputStream out = null;
 	    if (outFile == null)
-	        out = new PrintWriter(System.out); // dump to stdout (WH)
+	        out = System.out; // dump to stdout (WH)
 	    else {
 	        try {
 	            File file = new File(outFile);
@@ -448,12 +454,13 @@ public class XSLTProcessor
 	                    return;
 	                }
 	            }
-	            out = new FileWriter(file);
+	            out = new FileOutputStream(file);
 	        }
 	        catch (java.io.IOException ex) {
-	            System.out.println("XSLProcessor error: " + ex.getMessage());
+	            System.out.println("XSLTProcessor error: " + ex.getMessage());
 	        }
 	    }
+        
 	    
     	XSLTProcessor xslp = new XSLTProcessor();
     	xslp.addErrorObserver(new DefaultObserver(true));
@@ -478,7 +485,7 @@ public class XSLTProcessor
     	    xslp.addErrorObserver(new DefaultObserver(errWriter));
     	}
     	
-    	xslp.process(xmlFile, xslFile, out);
+    	xslp.process(xmlFile, xslFile, new DefaultHandler(out));
     	
     	try {
 	        if (errWriter != null) errWriter.close();
@@ -506,6 +513,9 @@ public class XSLTProcessor
      * @param out the Writer to print all processing results to.
     **/
     public void process(String xmlFilename, Writer out) {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, Writer)");
+        }
         String xslFilename = null;
         process(xmlFilename, xslFilename, out);
     } //-- process(String, Writer)
@@ -518,6 +528,9 @@ public class XSLTProcessor
      * @returns the resulting Document
     **/
     public Document process(String xmlFilename) {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String)");
+        }
         String xslFile = null;
         return process(xmlFilename, xslFile);
     } //-- process(String)
@@ -536,6 +549,9 @@ public class XSLTProcessor
     public void process
         (String xmlFilename, String xslFilename, Writer out) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, String, Writer)");
+        }
         process(xmlFilename, xslFilename, new DefaultHandler(out));
     } //-- process(String, String, Writer)
             
@@ -554,6 +570,9 @@ public class XSLTProcessor
     public void process
         (String xmlFilename, XSLTStylesheet stylesheet, Writer out) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, XSLTStylesheet, Writer)");
+        }
         process(xmlFilename, stylesheet, new DefaultHandler(out));
     } //-- process(String, XSLStylesheet, Writer)
     
@@ -571,6 +590,10 @@ public class XSLTProcessor
     public void process
         (String xmlFilename, String xslFilename, ResultHandler handler)
     {
+        
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, String, ResultHandler)");
+        }
         
         if (handler == null) {
             throw new IllegalArgumentException(NULL_HANDLER_ERR); 
@@ -632,6 +655,10 @@ public class XSLTProcessor
         (String xmlFilename, XSLTStylesheet stylesheet, ResultHandler handler) 
     {
         
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, XSLTStylesheet, ResultHandler)");
+        }
+        
         if (handler == null) {
             throw new IllegalArgumentException(NULL_HANDLER_ERR); 
         }
@@ -660,6 +687,10 @@ public class XSLTProcessor
      * @return the resulting Document
     **/    
     public Document process(String xmlFilename, String xslFilename) {
+        
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(String, String)");
+        }
         
         if (xmlFilename == null) 
             throw new IllegalArgumentException(NULL_XML_FILENAME_ERR);
@@ -699,6 +730,10 @@ public class XSLTProcessor
     **/    
 	public Document process(URILocation xmlLocation, URILocation xslLocation) {
 	    
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(URILocation, URILocation)");
+        }
+        
 	    if (xmlLocation == null)
 	        throw new IllegalArgumentException(NULL_XML_LOCATION_ERR);
 	    
@@ -733,6 +768,10 @@ public class XSLTProcessor
 	    (URILocation xmlLocation, URILocation xslLocation, ResultHandler handler) 
 	{
 		                    
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(URILocation, URILocation, ResultHandler)");
+        }
+        
         if (handler == null)
             throw new IllegalArgumentException(NULL_HANDLER_ERR);
             
@@ -762,6 +801,10 @@ public class XSLTProcessor
 	    (URILocation xmlLocation, XSLTStylesheet stylesheet, ResultHandler handler) 
 	{
 		                    
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(URILocation, XSLTStylesheet, ResultHandler)");
+        }
+        
         if (handler == null)
             throw new IllegalArgumentException(NULL_HANDLER_ERR);
             
@@ -790,6 +833,9 @@ public class XSLTProcessor
     **/    
     public Document process(Document xmlDocument, Document xslDocument) {
         
+        if (_logger.isDebugEnabled()) {
+        	_logger.debug("#process(Document, Document)");
+        }
         
         if (xmlDocument == null) 
             throw new IllegalArgumentException(NULL_DOCUMENT_ERR);
@@ -817,6 +863,9 @@ public class XSLTProcessor
                         Document xslDocument,
                         Writer out) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(Document, Document, Writer)");
+        }
         process(xmlDocument, xslDocument, new DefaultHandler(out));
     } //-- process
     
@@ -833,6 +882,10 @@ public class XSLTProcessor
     public void process
         (Document xmlDocument, Document xslDocument, ResultHandler handler) 
     {
+        
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(Document, Document, ResultHandler)");
+        }
         
         if (handler == null)
             throw new IllegalArgumentException(NULL_HANDLER_ERR);
@@ -862,6 +915,10 @@ public class XSLTProcessor
     **/    
     public XPathNode process(XPathNode source, XSLTStylesheet stylesheet) {
         
+        
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(XPathNode, XSLTStylesheet)");
+        }
         
         if (source == null) 
             throw new IllegalArgumentException(NULL_XML_NODE_ERR);
@@ -898,6 +955,10 @@ public class XSLTProcessor
      * @return the resulting Document
     **/    
     public Document process(Document xmlDocument, XSLTStylesheet stylesheet) {
+
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(Document, XSLTStylesheet)");
+        }
         
         if (xmlDocument == null) 
             throw new IllegalArgumentException(NULL_DOCUMENT_ERR);
@@ -938,6 +999,9 @@ public class XSLTProcessor
     public void process
         (XPathNode source, XSLTStylesheet stylesheet, Writer out) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(XPathNode, XSLTStylesheet, Writer)");
+        }
         ResultHandler handler = null;
         
         if (stylesheet != null)
@@ -960,6 +1024,10 @@ public class XSLTProcessor
     public void process
         (Document xmlDocument, XSLTStylesheet stylesheet, Writer out) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(Document, XSLTStylesheet, Writer)");
+        }
+        
         ResultHandler handler = null;
         
         if (stylesheet != null)
@@ -983,6 +1051,9 @@ public class XSLTProcessor
     public void process
         (XPathNode source, XSLTStylesheet stylesheet, ResultHandler handler) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(XPathNode, XSLTStylesheet, ResultHandler)");
+        }
         
         if (handler == null)
             throw new IllegalArgumentException(NULL_HANDLER_ERR);
@@ -1032,6 +1103,10 @@ public class XSLTProcessor
     public void process
         (Document xmlDocument, XSLTStylesheet stylesheet, ResultHandler handler) 
     {
+        if (_logger.isDebugEnabled()) {
+            _logger.debug("#process(Document, XSLTStylesheet, ResultHandler)");
+        }
+        
         XPathNode source = new DocumentWrapperXPathNode(xmlDocument);
         process(source, stylesheet, handler);
     } //-- process
