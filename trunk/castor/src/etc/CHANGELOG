@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1795 using contribution from Gregory Block [gblock@ctoforaday.com]
+       Fixed problem in CastorException (String, Throwable) where the constructor of the 
+       superclass was not called.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1795
+       (Werner - 20041127)
+       
 JDO:   Fixed bug 1792 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Handling of SQL parameter binding and their order is now completely 
        handled by SqlBindParser; all use of ParamInfo maps has been removed.
