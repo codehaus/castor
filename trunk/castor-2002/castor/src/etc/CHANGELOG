@@ -1,6 +1,14 @@
 Version 0.8.9
 -------------
 
+JDO:    Fixed bugs (contributed by Bill Reynolds <bill@leastsquares.com>)
+        - same OID for parent class instance and subclass instance
+          with the same identities causes cache corruption
+        - it is possible for a subclassed object to be reported as
+          non-persistable even if it has a legal mapping
+        - if you're using a class with the identity key generators and
+          no member fields, you get bad sql generated
+
 JDO:    Added support for LIMIT clause in OQL queries, currently for
         PostrgeSQL only (contributed by Alexey Snisarenko <alex@plesk.com>)
 
