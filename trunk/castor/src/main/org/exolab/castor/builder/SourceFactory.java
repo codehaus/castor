@@ -98,7 +98,7 @@ public class SourceFactory {
     
     private static final String ENUM_ACCESS_INTERFACE =
         "org.exolab.castor.types.EnumeratedTypeAccess";
-
+        
     private static final short BASE_TYPE_ENUMERATION   = 0;
     private static final short OBJECT_TYPE_ENUMERATION = 1;
 
@@ -266,6 +266,11 @@ public class SourceFactory {
             throw new IllegalStateException("SGStateInfo may not be null.");
         }
         
+        
+        //-- check for previous JClass bindings
+        JClass[] classes = sgState.getSourceCode(component.getAnnotated());
+        if (classes != null) return classes;
+        
         _binding = component.getBinding();
         
         if (sgState.verbose()) {
@@ -277,7 +282,6 @@ public class SourceFactory {
         }
         
         FactoryState state = null;
-        JClass[] classes = null;
 
         //0-- set the packageName
         String packageName = component.getJavaPackage();
@@ -312,6 +316,7 @@ public class SourceFactory {
             state.setParent(sgState.getCurrentFactoryState());
             sgState.setCurrentFactoryState(state);
         }
+        
         //--Prevent endless loop
         if (state.processed(component.getAnnotated())) {
             return new JClass[0];
@@ -615,6 +620,11 @@ public class SourceFactory {
         sgState.bindReference(component.getAnnotated(), classInfo);
 
         classes[0] = jClass;
+        
+        //-- Save source code bindings to prevent duplicate code
+        //-- generation
+        sgState.bindSourceCode(component.getAnnotated(), classes);
+        
         return classes;
     }
 
@@ -636,7 +646,7 @@ public class SourceFactory {
         if (sgState == null) {
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
         }
-
+        
         //-- Unions are currently processed as the built-in
         //-- basetype for the member types of the Union, so
         //-- do nothing for now...however we can warn
@@ -649,6 +659,9 @@ public class SourceFactory {
             }
             return null;
         }
+        
+        ClassInfo cInfo = sgState.resolve(simpleType);
+        if (cInfo != null) return cInfo.getJClass();
 
         boolean enumeration = false;
 
@@ -703,6 +716,9 @@ public class SourceFactory {
         className = resolveClassName(className, packageName);
 
         FactoryState state = new FactoryState(className, sgState, packageName);
+        state.setParent(sgState.getCurrentFactoryState());
+        
+        
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
@@ -1296,8 +1312,10 @@ public class SourceFactory {
                 
                 if (sType.getSchema() == component.getSchema())
                 {
-                    if (state.resolve(sType) == null) {
-                        createSourceCode(sType, state.getSGStateInfo());
+                    if (state.resolve(sType) == null) {    
+                        if (sType.hasFacet(Facet.ENUMERATION)) {
+                            createSourceCode(sType, state.getSGStateInfo());
+                        }
                     }
                 }
             }
@@ -1521,6 +1539,7 @@ public class SourceFactory {
     private void processEnumeration
         (SimpleType simpleType, FactoryState state)
     {
+
 
  		// Added by robertlaferla at comcast dot net 01/21/2004
  	    if (_config.useEnumeratedTypeInterface()) {
@@ -1945,6 +1964,7 @@ public class SourceFactory {
                 sInfo.getDialog().notify(warn);
             }
         }
+        
 
         JSourceCode scInitializer
             = state.jClass.getConstructor(0).getSourceCode();
