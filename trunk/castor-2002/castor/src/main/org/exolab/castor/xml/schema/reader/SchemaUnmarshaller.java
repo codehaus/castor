@@ -151,6 +151,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
         if ((nsURI != null) && (nsURI.length() > 0))
             _schema.setTargetNamespace(nsURI);
+            
+        _schema.setId(atts.getValue(SchemaNames.ID_ATTR));
+        _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
     } //-- init
 
