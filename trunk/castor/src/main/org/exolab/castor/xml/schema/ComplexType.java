@@ -92,7 +92,7 @@ public class ComplexType extends XMLType
 	/**
 	 * a flag set to true if this complexType is a complexContent
 	 */
-	private boolean _complexContent = false;
+	private boolean _complexContent = true;
 
     /**
      * The content type ("mixed", "simpleType","elemOnly") for this ComplexType.
@@ -119,13 +119,6 @@ public class ComplexType extends XMLType
 	 * a flag set to true if this complexType is a restriction
 	 */
 	private boolean _restricted = false;
-
-    /**
-	 * a flag set to true if this complexType is a simpleContent
-	 */
-	private boolean _simpleContent = false;
-
-
 
     //------------------/
     //- Constructor(s) -/
@@ -392,7 +385,7 @@ public class ComplexType extends XMLType
 	 * @returns true if this complexType is a 'simpleContent'
 	 */
 	public boolean isSimpleContent() {
-	       return _simpleContent;
+	       return (!_complexContent);
 	}
 
 	/**
@@ -479,15 +472,20 @@ public class ComplexType extends XMLType
         super.setBaseType(baseType);
         if (baseType != null) {
             if (baseType.isSimpleType()) {
-                _simpleContent = true;
+                _complexContent = false;
                 _content = new SimpleContent((SimpleType)baseType);
             }
             else if (baseType.isComplexType()) {
                 ComplexType complexType = (ComplexType)baseType;
                 if (complexType.isSimpleContent()) {
-                    _simpleContent = true;
+                    _complexContent = false;
                     _content = ((SimpleContent)complexType.getContentType()).copy();
                 }
+                else _complexContent = true;
+            }
+            else {
+                //-- assuming anyType
+                _complexContent = true;
             }
         }
     } //-- setBaseType
@@ -574,7 +572,7 @@ public class ComplexType extends XMLType
 	 * @param complexContent true if this complexType is a 'simpleContent'
 	 */
 	public void setSimpleContent(boolean simpleContent) {
-	       this._simpleContent = simpleContent;
+	    _complexContent = (!simpleContent);
 	}
 
 	/**
@@ -826,7 +824,7 @@ public class ComplexType extends XMLType
             }
 		    else if (type.getStructureType() == Structure.COMPLEX_TYPE) {
              
-                if (_simpleContent) {
+                if (!_complexContent) {
    			        //we are now sure that the base is a ComplexType
                     //but is the base of this complexType a simpleType? (see 4.3.3->simpleContent->content type)
                     if ( ((ComplexType)type).getContentType().getType() != ContentType.SIMPLE) 
