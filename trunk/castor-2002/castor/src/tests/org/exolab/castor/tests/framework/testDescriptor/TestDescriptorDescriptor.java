@@ -96,7 +96,7 @@ public class TestDescriptorDescriptor extends org.exolab.castor.xml.util.XMLClas
         fieldValidator.setMinOccurs(1);
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);

@@ -129,7 +129,7 @@ public class MarshallingTestDescriptor extends org.exolab.castor.xml.util.XMLCla
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
