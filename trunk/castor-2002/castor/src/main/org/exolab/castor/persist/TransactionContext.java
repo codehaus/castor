@@ -891,7 +891,9 @@ public abstract class TransactionContext
             throw new NullPointerException();
 
         identity = molder.getActualIdentity( this, object );
-        // Make sure that nobody is looking at the object
+        if ( molder.isDefaultIdentity( identity ) )
+            identity = null;
+
         oid = new OID( engine, molder, depended, identity );
         entry = getObjectEntry( engine, oid );
         if ( _autoStore && entry != null && entry.object == object )
@@ -1907,7 +1909,6 @@ public abstract class TransactionContext
         if ( object == null )
             throw new IllegalArgumentException("object cannot be null");
 
-        //(new Exception("AddObjectEntry: "+oid)).printStackTrace();
         ObjectEntry entry;
         Hashtable   engineOids;
         LockEngine engine = oid.getLockEngine();
@@ -1947,10 +1948,10 @@ public abstract class TransactionContext
 
     ObjectEntry rehash( Object object, OID oid ) {
         ObjectEntry entry = getObjectEntry( object );
-
+        
         if ( entry == null )
             throw new IllegalArgumentException("ObjectEntry to be rehash is not found");
-        
+
         Hashtable engineOids = (Hashtable) _engineOids.get( entry.engine );
         engineOids.remove( entry.oid );
         engineOids.put( oid, entry );
