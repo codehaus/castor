@@ -459,7 +459,6 @@ public class Schema extends Annotated {
             String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-
         simpleType.setParent(this);
         _simpleTypes.put(name, simpleType);
 
@@ -818,9 +817,20 @@ public class Schema extends Annotated {
             
             //-- first check user-defined types
             result = (SimpleType)_simpleTypes.get(name);
-            
+            if (result != null) {
+                //-- resolve deferred type if necessary
+                if (result.getType() != result) {
+                    //-- can result.getType ever return null?
+                    //-- We can check, just in case.
+                    if (result.getType() != null) {
+                        result = (SimpleType)result.getType();
+                        result.setParent(this);
+                        _simpleTypes.put(name, result);
+                    }
+                }
+            }
             //-- otherwise try built-in types
-            if (result == null) {
+            else {
                 result= simpleTypesFactory.getBuiltInType(name);
                 //if we have a built-in type not declared in the good namespace -> Exception
                 if ( (result != null) && (_namespaces.contains(DEFAULT_SCHEMA_NS))) {
@@ -832,8 +842,21 @@ public class Schema extends Annotated {
         }
         else if (ns.equals(_schemaNamespace))
             result= simpleTypesFactory.getBuiltInType(canonicalName);
-        else if (ns.equals(_targetNamespace))
+        else if (ns.equals(_targetNamespace)) {
             result = (SimpleType)_simpleTypes.get(canonicalName);
+            if (result != null) {
+                //-- resolve deferred type if necessary
+                if (result.getType() != result) {
+                    //-- can result.getType ever return null?
+                    //-- We can check, just in case.
+                    if (result.getType() != null) {
+                        result = (SimpleType)result.getType();
+                        result.setParent(this);
+                        _simpleTypes.put(canonicalName, result);
+                    }
+                }
+            }
+        }
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null)
