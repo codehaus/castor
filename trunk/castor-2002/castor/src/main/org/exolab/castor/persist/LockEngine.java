@@ -302,7 +302,7 @@ public final class LockEngine {
 
             if ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked ) 
                 action = ObjectLock.ACTION_WRITE;
-            else 
+            else
                 action = ObjectLock.ACTION_READ;
 
             lock = typeInfo.acquire( oid, tx, action, timeout );
@@ -316,10 +316,10 @@ public final class LockEngine {
             // And should ClassMolder the one who set stamp?
 
             succeed = true;
-            
+
             lockedOid.setStamp( stamp );
 
-            if ( lockedOid != null ) 
+            if ( lockedOid != null )
                 oid = lockedOid;
 
             if ( _logInterceptor != null )
@@ -679,6 +679,9 @@ public final class LockEngine {
 
         try {
             lock = typeInfo.assure( oid, tx, false );
+
+            if ( _logInterceptor != null )
+                _logInterceptor.storing( typeInfo.javaClass, oid.getIdentity() );
 
             typeInfo.molder.store( tx, oid, lock, object );
         } catch ( ObjectModifiedException e ) {
