@@ -130,8 +130,7 @@ public class SourceFactory  {
         className = resolveClassName(className, packageName);
 
         state = new FactoryState(className, resolver, packageName);
-
-        //-- mark this element as being processed in this current
+		//-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
         while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();
@@ -171,10 +170,11 @@ public class SourceFactory  {
         // ComplexType
         else if (type.isComplexType()) {
             ComplexType complexType = (ComplexType)type;
-
-            if ( ! element.hasTypeReference() ) {
-                processComplexType( (ComplexType)type, state);
-                derived = (state.jClass.getSuperClass() != null);
+			if ( ! element.hasTypeReference() ) {
+				//process the complexType only if it has not been proceed
+				 if (!state.processed(complexType))
+					processComplexType( complexType, state);
+				 derived = (state.jClass.getSuperClass() != null);
             }
             else {
 
@@ -248,11 +248,12 @@ public class SourceFactory  {
 
         FactoryState state
             = new FactoryState(className, resolver, packageName);
-
-        ClassInfo classInfo = state.classInfo;
+		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
-        initialize(jClass);
+		state.markAsProcessed(type);
+
+		initialize(jClass);
         //-- set super class if necessary
         String base = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
         if (base != null)
@@ -686,8 +687,7 @@ public class SourceFactory  {
         (ComplexType complexType, FactoryState state)
     {
         String typeName = complexType.getName();
-
-        ClassInfo classInfo = state.classInfo;
+		ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
 
         Schema schema = complexType.getSchema();
@@ -1299,6 +1299,9 @@ class FactoryState implements ClassInfoResolver {
         (String className, ClassInfoResolver resolver, String packageName)
     {
         _processed   = new Vector();
+		//keep the elements and complexType already processed
+		if (resolver instanceof FactoryState)
+		   _processed = ((FactoryState)resolver)._processed;
 
         jClass       = new JClass(className);
         classInfo    = new ClassInfo(jClass);
@@ -1329,8 +1332,8 @@ class FactoryState implements ClassInfoResolver {
     } //-- bindReference
 
     /**
-     * Marks the given complexType as having been processed.
-     * @param complexType the ComplexType to mark as having
+     * Marks the given element as having been processed.
+     * @param complexType the Element to mark as having
      * been processed.
     **/
     void markAsProcessed(ElementDecl element) {
@@ -1338,14 +1341,31 @@ class FactoryState implements ClassInfoResolver {
     } //-- markAsProcessed
 
     /**
-     * Returns true if the given ComplexType has been marked as processed
-     * @param complexType the ComplexType to check for being marked as processed
+     * Returns true if the given Element has been marked as processed
+     * @param complexType the Element to check for being marked as processed
     **/
     boolean processed(ElementDecl element) {
         return _processed.contains(element);
     } //-- processed
 
     /**
+     * Marks the given complexType as having been processed.
+     * @param complexType the ComplexType to mark as having
+     * been processed.
+    **/
+    void markAsProcessed(ComplexType complex) {
+        _processed.addElement(complex);
+    } //-- markAsProcessed
+
+    /**
+     * Returns true if the given ComplexType has been marked as processed
+     * @param complexType the ComplexType to check for being marked as processed
+    **/
+    boolean processed(ComplexType complex) {
+       return _processed.contains(complex);
+    } //-- processed
+
+	/**
      * Returns true if any bound properties have been found
      *
      * @return true if any bound properties have been found
