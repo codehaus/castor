@@ -730,8 +730,12 @@ public class ParseTreeWalker implements TokenTypes
         break;
       case EQUAL: case NOT_EQUAL: case GT:
       case GTE: case LT: case LTE: case KEYWORD_BETWEEN:
-        systemType = getTypeForComparison(paramTree.getParent());
+        systemType = getParamTypeForComparison(paramTree.getParent());
         desc = getJDOFieldDescriptor(paramTree.getParent());
+        break;
+    case KEYWORD_LIST:
+        systemType = getParamTypeForList(paramTree.getParent());
+        break;
     }
 
     //get the param info for this numbered param
@@ -745,7 +749,7 @@ public class ParseTreeWalker implements TokenTypes
 
   }
 
-  private String getTypeForComparison(ParseTreeNode comparisonTree)
+  private String getParamTypeForComparison(ParseTreeNode comparisonTree)
       throws QueryException
   {
 
@@ -761,6 +765,46 @@ public class ParseTreeWalker implements TokenTypes
     }
 
     throw new QueryException( "Could not get type for comparison." );
+  }
+
+  /**
+   * Determine type of the list expression from the first contained
+   * constant. If there are only bind variables without user defined
+   * type present in the list, default to String as type.
+   *  
+   * @param listTree non-empty parser tree of list expression
+   * @return class name of the list type
+   * @throws QueryException
+   */
+  private String getParamTypeForList(ParseTreeNode listTree) throws QueryException
+  {
+    for (Enumeration e = listTree.children(); e.hasMoreElements(); ) {
+      ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
+      int tokenType = curChild.getToken().getTokenType();
+
+      switch(tokenType) {
+        case STRING_LITERAL:	return "java.lang.String";
+        case DOUBLE_LITERAL:	return "java.lang.Double";
+        case LONG_LITERAL:		return "java.lang.Long";
+        case BOOLEAN_LITERAL:	return "java.lang.Boolean";
+        case CHAR_LITERAL:		return "java.lang.Character";
+        case DATE_LITERAL:		return "java.util.Date";
+        case TIME_LITERAL:
+        case TIMESTAMP_LITERAL:	return "java.util.Time";
+
+        case DOLLAR:	// look for bind parameters with user defined type
+          if (curChild.getChildCount() == 2) {
+            String userDefinedType = curChild.getChild(0).getToken().getTokenValue();
+            try {
+                return Types.typeFromName(_classLoader, userDefinedType).getName();
+            } catch(ClassNotFoundException e1) {
+                throw new QueryException("Could not find class " + userDefinedType);
+            }
+          }
+      }
+    }
+
+    return "java.lang.String";	// default to String, if only simple bind variables are present in the list 
   }
 
   private JDOFieldDescriptor getJDOFieldDescriptor(ParseTreeNode comparisonTree)
@@ -790,24 +834,31 @@ public class ParseTreeWalker implements TokenTypes
    *    contains non literals.
    */
   private void checkInClauseRightSide(ParseTreeNode theList)
-        throws QueryException {
-
+        throws QueryException
+  {
     if ( theList.getToken().getTokenType() != KEYWORD_LIST )
       throw new QueryException( "The right side of the IN operator must be a LIST." );
 
     for ( Enumeration e = theList.children(); e.hasMoreElements(); ) {
-      switch (( (ParseTreeNode) e.nextElement() ).getToken().getTokenType()) {
+      ParseTreeNode node = (ParseTreeNode) e.nextElement();
+	  int tokenType = node.getToken().getTokenType();
+
+      switch(tokenType) {
         case KEYWORD_NIL: case KEYWORD_UNDEFINED:
         case BOOLEAN_LITERAL: case LONG_LITERAL:
         case DOUBLE_LITERAL: case CHAR_LITERAL:
         case STRING_LITERAL: case DATE_LITERAL:
         case TIME_LITERAL: case TIMESTAMP_LITERAL:
+	      break;
+
+        case DOLLAR:	// bind variable parameter
+          checkParameter(node);
           break;
+
         default:
-          throw new QueryException( "The LIST can only contain literals and Keywords nil and undefined." );
+          throw new QueryException( "The LIST can only contain literals, bind variables and the keywords 'nil' and 'undefined'." );
       }
     }
-
   }
 
   /**
