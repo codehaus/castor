@@ -70,7 +70,7 @@
     depends         IDREF    #IMPLIED
     identity        NMTOKENS #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
-    key-generator   IDREF    #IMPLIED 
+    key-generator   NMTOKEN  #IMPLIED 
     auto-complete   (true|false) "false">
 
 
