@@ -48,12 +48,12 @@ package org.exolab.castor.persist;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Array;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.ArrayVector;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -94,13 +94,13 @@ public class RelationCollection implements Collection, Lazy {
     private OID _oid;
 
     /* Vector of identity */
-    private ArrayVector _ids;
+    private ArrayList _ids;
 
     /* Vector of identity */
-    private ArrayVector _deleted;
+    private ArrayList _deleted;
 
     /* Vector of identity */ 
-    private ArrayVector _added;
+    private ArrayList _added;
 
     /* Vector of object */
     private Map _loaded;
@@ -116,7 +116,7 @@ public class RelationCollection implements Collection, Lazy {
      *
      */ 
     public RelationCollection( TransactionContext tx, OID enclosing, LockEngine engine, 
-            ClassMolder molder, AccessMode amode, ArrayVector ids ) {
+            ClassMolder molder, AccessMode amode, ArrayList ids ) {
         _tx = tx;
         _oid = enclosing;
         _molder = molder;
@@ -124,14 +124,14 @@ public class RelationCollection implements Collection, Lazy {
         _accessMode = amode;
         _ids = ids;
 		_size = _ids.size();
-        _deleted = new ArrayVector();
-        _added = new ArrayVector();
-        _loaded = new ArrayKeysHashMap();
+        _deleted = new ArrayList();
+        _added = new ArrayList();
+        _loaded = new HashMap();
     }
 
 
     public boolean add(Object o) {
-        Object[] id = _molder.getIdentities(o);
+        Object id = _molder.getIdentity(o);
         //boolean changed = false;
         if ( _ids.contains( id ) ) {
             if ( _deleted.contains( id ) ) {
@@ -198,7 +198,7 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public boolean contains(Object o) {
-        Object[] ids = _molder.getIdentities(o);
+        Object ids = _molder.getIdentity(o);
         if ( _added.contains( ids ) )
             return true;
         if ( _ids.contains( ids ) && !_deleted.contains( ids ) )
@@ -245,19 +245,19 @@ public class RelationCollection implements Collection, Lazy {
             if ( cursor >= parent._size )
                 throw new NoSuchElementException("Read after the end of iterator!");
             
-            Object[] id;
+            Object id;
             Object o;
             if ( cursor < _added.size() ) {
-                id = (Object[]) _added.get( cursor++ );
+                id = _added.get( cursor++ );
 				o = _loaded.get( id );
 				if ( o != null )
 					return o;
                 return lazyLoad( id );
             } else {
 				// skip to the first "not deleted" id
-				id = (Object[])_ids.get(cursor++);
+				id = _ids.get(cursor++);
 				while ( _deleted.contains(id) ) {
-				    id = (Object[])_ids.get(cursor++);
+				    id = _ids.get(cursor++);
 				}
 				o = _loaded.get( id );
 				if ( o != null )
@@ -265,7 +265,7 @@ public class RelationCollection implements Collection, Lazy {
                 return lazyLoad( id );
             }
         }
-        private Object lazyLoad( Object[] ids ) {
+        private Object lazyLoad( Object ids ) {
             Object o;
 
 			if ( ! _tx.isOpen() ) 
@@ -321,7 +321,7 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public boolean remove(Object o) {
-        Object[] id = _molder.getIdentities( o );
+        Object id = _molder.getIdentity( o );
         boolean changed = false;
 
         if ( _deleted.contains( id ) )
@@ -411,14 +411,14 @@ public class RelationCollection implements Collection, Lazy {
     }
 
     public ArrayList getIdentitiesList() {
-		ArrayList result = new ArrayVector();
+		ArrayList result = new ArrayList();
         result.addAll(_ids);
 		result.addAll(_added);
 		result.removeAll(_deleted);
 		return result;
     }
 
-	public Object find( Object[] ids ) {
+	public Object find( Object ids ) {
 		return _loaded.get( ids );
 	}
 

@@ -98,7 +98,7 @@ public final class QueryResults
     /**
      * The last identity retrieved with a call to {@link #nextIdentity}.
      */
-    private Object[]              _lastIdentities;
+    private Object              _lastIdentity;
 
 
     /*
@@ -153,19 +153,19 @@ public final class QueryResults
      * @throws TransactionNotInProgressException The transaction
      *  has been closed
      */
-    public Object[] nextIdentities()
+    public Object nextIdentity()
         throws TransactionNotInProgressException, PersistenceException
     {
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
         try {
-            _lastIdentities = _query.nextIdentities( _lastIdentities );
+            _lastIdentity = _query.nextIdentity( _lastIdentity );
         } catch ( PersistenceException except ) {
-            _lastIdentities = null;
+            _lastIdentity = null;
             throw except;
         }
-        return _lastIdentities;
+        return _lastIdentity;
     }
 
 
@@ -210,13 +210,13 @@ public final class QueryResults
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
-        if ( _lastIdentities == null )
+        if ( _lastIdentity == null )
             throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
         handler = _engine.getClassMolder( _query.getResultType() );
 
         // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentities, _accessMode );
+        object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
 
         return object;
 
