@@ -407,14 +407,13 @@ public class DescriptorSourceFactory {
              jsc.add("desc.setImmutable(true);");
          }
           //--We need to handle NMTOKENS with the CollectionFieldHandler
-          else if (xsType.getType() == XSType.NMTOKENS) {
+          else if (member.getSchemaType().getType() == XSType.COLLECTION) {
               jsc.add("desc.setHandler( new CollectionFieldHandler(");
               jsc.append("handler));");
           }
           //IDREFS?
 
           else jsc.add("desc.setHandler(handler);");
-
           //-- namespace
           if (nsURI != null) {
              jsc.add("desc.setNameSpaceURI(\"");
