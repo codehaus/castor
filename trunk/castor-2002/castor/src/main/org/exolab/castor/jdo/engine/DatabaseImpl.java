@@ -75,6 +75,7 @@ import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.Configuration;
 
 
 /**
@@ -101,18 +102,20 @@ public final class DatabaseImpl
 
 
     /**
-     * A list of all transactions opened during the life time of this
-     * database. Used to determine if the database can be closed.
-     * Elements are of type {@link TransactionContext}.
-     */
-    private Vector           _txOpen = new Vector();
-
-
-    /**
      * The transaction context is this database was accessed with an
      * {@link XAResource}.
      */
     private TransactionContext _ctx;
+
+
+    private int                DefaultWaitLockTimeout = 10000;
+
+
+    private int                _lockTimeout = DefaultWaitLockTimeout;
+
+
+    private PrintWriter        _logWriter;
+
 
 
     public DatabaseImpl( String dbName, PrintWriter logWriter )
@@ -132,8 +135,10 @@ public final class DatabaseImpl
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );
-        if ( logWriter != null )
-            _dbEngine.setLogWriter( logWriter );
+        if ( logWriter != null ) {
+            _logWriter = logWriter;
+            _dbEngine.setLogWriter( _logWriter );
+        }
     }
 
 
@@ -156,15 +161,12 @@ public final class DatabaseImpl
     public synchronized void close()
         throws PersistenceException
     {
-        Enumeration        enum;
-        TransactionContext tx;
-        
-        // Never close database while inside a transaction.
-        enum = _txOpen.elements();
-        while ( enum.hasMoreElements() ) {
-            tx = (TransactionContext) enum.nextElement();
-            if ( tx.isOpen() )
-                throw new PersistenceExceptionImpl( "jdo.dbTxInProgress" );
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        try {
+            _ctx.rollback();
+        } finally {
+            _ctx = null;
         }
         _dbEngine = null;
     }
@@ -309,28 +311,99 @@ public final class DatabaseImpl
         
         if ( _dbEngine == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
-        if ( _ctx != null )
+        if ( _ctx != null && _ctx.isOpen()  )
             return _ctx;
-        
-        // Get the current transaction, complain if none found:
-        // Cannot persist outside of a transaction.
-        tx = TransactionImpl.getCurrentContext();
-        if ( tx == null || ! tx.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.dbTxNotInProgress" ) );
-        // Must register transaction with this database.
-        if ( ! _txOpen.contains( tx ) )
-            _txOpen.addElement( tx );
-        return tx;
+        throw new TransactionNotInProgressException( Messages.message( "jdo.dbTxNotInProgress" ) );
     }
+
+
+    public void begin()
+    {
+        if ( _ctx != null && _ctx.isOpen() )
+            throw new IllegalStateException( Messages.message( "jdo.txInProgress" ) );
+        _ctx = new TransactionContextImpl( null );
+    }
+
+
+    public void commit()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
+    {
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
+            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
+        try {
+            _ctx.prepare();
+            _ctx.commit();
+        } catch ( TransactionAbortedException except ) {
+            if ( Configuration.debug() )
+                except.printStackTrace( _logWriter );
+            try {
+                _ctx.rollback();
+            } catch ( TransactionNotInProgressException except2 ) {
+                // This should never happen
+            }
+            throw except;
+        } finally {
+            _ctx = null;
+        }
+    }
+
+
+    public void abort()
+        throws TransactionNotInProgressException, PersistenceException
+    {
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        try {
+            _ctx.rollback();
+        } finally {
+            _ctx = null;
+        }
+    }
+
+
+    public void checkpoint()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
+    {
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
+            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
+        try {
+            _ctx.checkpoint();
+        } catch ( TransactionAbortedException except ) {
+            if ( Configuration.debug() )
+                except.printStackTrace( _logWriter );
+            try {
+                _ctx.rollback();
+            } catch ( TransactionNotInProgressException except2 ) {
+                // This should never happen
+            }
+            _ctx = null;
+            throw except;
+        }
+
+    }
+
+
+    public void lock( Object obj )
+        throws LockNotGrantedException, PersistenceException
+    {
+        if ( _ctx == null || ! _ctx.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        _ctx.writeLock( obj, _lockTimeout );
+    }
+
+
+
+
 
 
     public XAResource getXAResource()
     {
         return this;
     }
-
-
-
 
 
     private Hashtable _resManager = new Hashtable();
