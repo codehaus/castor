@@ -106,6 +106,10 @@ public final class OracleQueryExpression
             }
         }
         first = addWhereClause( sql, first );
+        
+        if ( _order != null )
+          sql.append(JDBCSyntax.OrderBy).append(_order);
+ 
         // Use FOR UPDATE to lock selected tables.
         if ( lock )
             sql.append( " FOR UPDATE" );
