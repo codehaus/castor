@@ -61,7 +61,7 @@ go
 drop table test_types
 go
 create table test_types (
-  id     numeric       not null,
+  id     numeric(10,0) not null,
   tdt    datetime      not null,
   ttm    smalldatetime not null
 )

@@ -293,7 +293,7 @@ public class ClassDescriptorResolverImpl
 		    return loader.loadClass(className);
 		//-- use internal loader
 		else if (_loader != null)
-		    return loader.loadClass(className);
+		    return _loader.loadClass(className);
 		//-- no loader available use Class.forName
 		return Class.forName(className);
     } //-- loadClass
@@ -315,3 +315,7 @@ public class ClassDescriptorResolverImpl
     } //-- setError
     
 } //-- ClassDescriptorResolverImpl
+
+
+
+
