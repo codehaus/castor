@@ -42,6 +42,7 @@
     <section title="News">
       <p>Version $VERSION$ is now <a href="download.xml">available for download</a>.
       <ul>
+        <li>Apr 7, 2000: Version 0.8.2, Minor bug fixes</li>
         <li>Apr 5, 2000: Version 0.8.1, JDO API useability, new mapping file, improved lock mechanism</li>
         <li>Mar 24, 2000: Version 0.8, unified mapping model, pluggable DB engine, dirty checking</li>
         <li>Mar 10, 2000: Version 0.7.11, supports one-many relations, XML-Servlet</li>

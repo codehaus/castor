@@ -16,7 +16,6 @@ JAVA=$JAVA_HOME/bin/java
 
 CLASSPATH=./build/classes:./build/examples:$CLASSPATH
 CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
-CLASSPATH=$JAVA_HOME/lib/tools.jar:$CLASSPATH
 
 if [ -z $1 ] ; then
   echo "Usage: example <pkg>";

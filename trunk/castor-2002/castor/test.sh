@@ -16,8 +16,8 @@ JAVA=$JAVA_HOME/bin/java
 
 CLASSPATH=./build/classes:./build/tests:$CLASSPATH
 CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
-CLASSPATH=$JAVA_HOME/lib/tools.jar:$CLASSPATH
 
 $JAVA -cp $CLASSPATH TestHarness $1 $2 $3 $4 $5 $6
+
 
 
