@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.MapItem;
 
 
 /**
@@ -180,12 +181,28 @@ public final class J2CollectionHandlers
         // For Map/HashMap (1.2)
         new CollectionHandlers.Info( "map", Map.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
+                
+                Object key = object;
+                Object value = object;
+                
+                if (object instanceof MapItem) {
+                    MapItem item = (MapItem)object;
+                    key = item.getKey();
+                    value = item.getValue();
+                    if (value == null) {
+                        value = object;
+                    }
+                    if (key == null) {
+                        key = value;
+                    }
+                }
+                
                 if ( collection == null ) {
                     collection = new HashMap();
-                    ( (Map) collection ).put( object, object );
+                    ( (Map) collection ).put( key, value );
                     return collection;
                 } else {
-                    ( (Map) collection ).put( object, object );
+                    ( (Map) collection ).put( key, value );
                     return null;
                 }
             }
