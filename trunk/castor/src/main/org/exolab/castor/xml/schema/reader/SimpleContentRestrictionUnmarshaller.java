@@ -58,6 +58,7 @@ import org.exolab.castor.xml.schema.Resolver;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.schema.SchemaException;
 import org.exolab.castor.xml.schema.SchemaNames;
+import org.exolab.castor.xml.schema.SimpleContent;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Structure;
 import org.exolab.castor.xml.schema.Wildcard;
@@ -103,7 +104,7 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
     /**
      * The content type 
     **/
-    private SimpleTypeDefinition _content = null;
+    private SimpleTypeDefinition _simpleTypeDef = null;
 
       //----------------/
      //- Constructors -/
@@ -131,11 +132,19 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
         if ((base != null) && (base.length() > 0)) {
 
             XMLType baseType= _schema.getType(base);
-            if (baseType == null)
+            if (baseType == null) {
                 _complexType.setBase(base);
-            else if (baseType.getStructureType() == Structure.SIMPLE_TYPE) {
-                String err ="complexType: "+(_complexType.getName()) != null?
-                                            _complexType.getName():"\n";
+                _complexType.setContentType(new SimpleContent(_schema, base));
+            }
+            else if (baseType.isSimpleType()) {
+                String err ="complexType: ";
+                String name = _complexType.getName();
+                if (name != null) {
+                    err += name;
+                } else {
+                    err += "#anonymous-complexType#";
+                }
+                
                 err += "A complex type cannot be a restriction"+
                     " of a simpleType:";
                 err += baseType.getName();
@@ -143,25 +152,38 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
             }
 			//we are now sure that the base is a ComplexType
             //but is the base of this complexType a simpleType? (see 4.3.3->simpleContent->content type)
-            else if ( ( (ComplexType) baseType).getContentType().getType() != ContentType.SIMPLETYPE) {
-                String err ="complexType: "+(_complexType.getName()) != null?
-                                            _complexType.getName():"\n";
-                err += "In a simpleContent when using restriction the base type"+
-                    " must be a complexType whose base is a simpleType.";
-                throw new IllegalStateException(err);
-            }
-
             else {
-				 //retrieve the base type of this complexType
-                 //the base type is the complexType but we have to
-                 //work with the simple type of the content type.
-                 ComplexType temp = (ComplexType)baseType;
-                 _complexType.setBaseType(temp);
-                 _complexType.setBase(temp.getName());
-			     _content = new SimpleTypeDefinition(_schema, temp.getName(),_id);
-			     
-                 _content.setBaseType( temp.getContentType().getSimpleType());
-                 temp = null;
+                ComplexType temp = (ComplexType) baseType;
+                
+                if ( ! temp.isSimpleContent() ) {
+                    String err ="complexType: ";
+                    String name = _complexType.getName();
+                    if (name != null) {
+                        err += name;
+                    } else {
+                        err += "#anonymous-complexType#";
+                    }
+                    
+                    err += "In a simpleContent when using restriction the base type"+
+                        " must be a complexType whose base is a simpleType.";
+                    throw new IllegalStateException(err);
+                }
+                else {
+				    //retrieve the base type of this complexType
+                    //the base type is the complexType but we have to
+                    //work with the simple type of the content type.
+                    SimpleContent contentType = (SimpleContent)temp.getContentType();
+                    _complexType.setBaseType(temp);
+                    _complexType.setBase(temp.getName());
+			        _simpleTypeDef = new SimpleTypeDefinition(_schema, temp.getName(),_id);
+			        SimpleType simpleType = contentType.getSimpleType();
+			        if (simpleType != null) {
+                        _simpleTypeDef.setBaseType(simpleType);
+                    }
+                    else {
+                        _simpleTypeDef.setBaseTypeName(contentType.getTypeName());
+                    }
+                }
             }
 		}
 
@@ -345,17 +367,11 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
         //-- simpleType
 		else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
             SimpleType type = (SimpleType) unmarshaller.getObject();
-            ContentType contentType = ContentType.valueOf("simpleType");
-            contentType.setSimpleType(type);
-            _complexType.setContentType(contentType);
-            type = null;
-            contentType = null;
-           
+            _complexType.setContentType(new SimpleContent(type));
         }
         //--facet
 		else {
-            Facet f = (Facet)unmarshaller.getObject();
-         	_content.addFacet((Facet)unmarshaller.getObject());
+         	_simpleTypeDef.addFacet((Facet)unmarshaller.getObject());
          	foundFacets = true;
             //set the flag in order to create the new base in
             //the finish() method
@@ -384,13 +400,9 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
      */
     public void finish() {
 
-        if (foundFacets) {
-            SimpleType baseType = _content.createSimpleType();
-            ContentType contentType = ContentType.valueOf("simpleType");
-            contentType.setSimpleType(baseType);
-            _complexType.setContentType(contentType);
-            baseType = null;
-            contentType = null;
+        if (_simpleTypeDef != null) {
+            SimpleType baseType = _simpleTypeDef.createSimpleType();
+            _complexType.setContentType(new SimpleContent(baseType));
         }
 		//the restriction was properly handle
 		//we can set the flag
