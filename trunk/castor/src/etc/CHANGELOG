@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1737 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added support for registering TxSynchronizable instances via castor.properties.
+       (Werner - 20041001)
+
 JDO:   Fixed bug 1209 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added a new converter boolean(true)->numeric(-1) to cover MS Access' way of storing 
        boolean values.
