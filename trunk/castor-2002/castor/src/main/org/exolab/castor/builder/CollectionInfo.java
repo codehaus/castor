@@ -421,10 +421,8 @@ public class CollectionInfo extends FieldInfo {
         jsc.indent();
         jsc.add(getName());
         jsc.append(".addElement(");
-        jsc.append(paramName);
-        jsc.append("[");
-        jsc.append(index);
-        jsc.append("]);");
+		jsc.append(getContentType().createToJavaObjectCode(paramName+'['+index+']'));
+        jsc.append(");");
         jsc.unindent();
         jsc.add("}");
     } //-- createSetArrayMethod
