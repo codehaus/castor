@@ -45,7 +45,6 @@
 
 package org.exolab.castor.jdo;
 
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.rmi.Remote;
@@ -258,7 +257,6 @@ public class JDO
      * The log writer is a character output stream to which all
      * logging and tracing messages will be printed.
      *
-     * @return The log writer, null if disabled
      * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
@@ -529,7 +527,7 @@ public class JDO
      * Indicates if jdo Database pooling is enable or not.
      * <p>
      * <b>Experimental</b> maybe removed in the further release
-     * @see #setDatabasePooling
+     * @see #setDatabasePooling(boolean)
      */ 
     public boolean getDatabasePooling() {
         return _txDbPool != null;
@@ -565,8 +563,6 @@ public class JDO
     public Database getDatabase()
         throws DatabaseNotFoundException, PersistenceException
     {
-        InputStream  is;
-
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
         if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
@@ -730,7 +726,7 @@ public class JDO
      * null the default class loader is used.
      * 
      * @param source The JDO configuration file
-     * @param resolve An optional entity resolver
+     * @param resolver An optional entity resolver
      * @param loader The class loader to use, null for the default
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
