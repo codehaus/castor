@@ -1,21 +1,27 @@
 Version 0.7.9  February 16, 2000
 -------------------------------
 
-JDO:  Supports the new mapping API, new mapping DTD.
+JDO:    Supports the new mapping API, new mapping DTD.
 
-JDO:  Added jdo-conf DTD for configuring the database connection.
+JDO:    Added jdo-conf DTD for configuring the database connection.
 
-XML:  A Castor JAR with just the XML module will be created from the
-      'jar' target (less than half the size) and also available from
-      the FTP.
+JDO:    Cleaned up SQLEngine query composer using QueryExpr. Will be able to
+        support different join and locking syntaxes.
 
-XML:  Better error reporting in exceptions.
+XML:     A Castor JAR with just the XML module will be created from the
+         'jar' target (less than half the size) and also available from
+         the FTP.
+
+XML:     Better error reporting in exceptions.
 
 Mapping: The API for the mapping package has been finalized.
 
-Misc: New Ant and build.xml include 100% Java Tar task, improved Javadoc
-      task, now also generates zips for binary and source distribution,
-      new cvs task gets last snapshot from CVS.
+Persist: Added support for relations (one-one, one-many) in loading,
+         creating and deleting of objects.
+
+Misc:    New Ant and build.xml include 100% Java Tar task, improved Javadoc
+         task, now also generates zips for binary and source distribution,
+         new cvs task gets last snapshot from CVS.
 
 
 Version 0.7.8  February 10, 2000

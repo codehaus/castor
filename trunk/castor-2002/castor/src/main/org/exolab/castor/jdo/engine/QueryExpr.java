@@ -57,7 +57,7 @@ import java.util.Enumeration;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-class QueryExpr
+public class QueryExpr
 {
 
     static class Syntax
@@ -260,7 +260,7 @@ class QueryExpr
     }
 
 
-    protected String getQuery( boolean lock )
+    public String getQuery( boolean lock )
     {
         StringBuffer sql;
         boolean      first;
