@@ -175,24 +175,11 @@ public class RelationCollection implements Collection, Lazy {
         Object o;
         Object id;
 
-        ArrayList newIds = new ArrayList();
-        for ( int i=0; i<_ids.size(); i++ ) {
-            id = _ids.get(i);
-            if ( !_deleted.contains(id) ) {
-                _ids.remove(id);
-                _size--;
-            }
+        Iterator itor = iterator();
+        while ( itor.hasNext() ) {
+            itor.next();
+            itor.remove();
         }
-        _ids = newIds;
-        for ( int i=0; i<_added.size(); i++ ) {
-            id = _added.get(i);
-            _added.remove(id);
-            _size--;
-        }
-        if ( _size != 0 )
-            throw new RuntimeException("Illegal Internal State!");
-
-        _changecount++; // need more accurate count?? or it's fine
     }
 
     public boolean contains(Object o) {
