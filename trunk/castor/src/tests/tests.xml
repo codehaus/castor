@@ -104,6 +104,7 @@
     <case class="jdo.TimeStampMismatched" />
     <case class="jdo.Size" />
     <case class="jdo.Absolute" />
+    <case class="jdo.TestLimitClause" id="TC62" />
 
   </category>
 
