@@ -224,7 +224,7 @@ public final class XSString extends XSPatternBase {
         else if (value.equals("replace"))
             this._whiteSpace = value;
         else if (value.equals("collapse"))
-            this._whiteSpace = "preserved";
+            this._whiteSpace = value;
         else {
             System.out.println("Warning : "+value+" is a bad entry for the whiteSpace value");
             this._whiteSpace = value;
