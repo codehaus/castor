@@ -466,7 +466,8 @@ public class DescriptorSourceFactory {
         if (member.getNamespaceURI() != null) {
             nsURI = member.getNamespaceURI();
         }
-        if (nsURI != null) {
+        //-- attributes do not use the default namespace
+        if (isElement && (nsURI != null)) {
             jsc.add("desc.setNameSpaceURI(\"");
             jsc.append(nsURI);
             jsc.append("\");");
