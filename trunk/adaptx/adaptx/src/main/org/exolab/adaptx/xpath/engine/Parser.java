@@ -128,7 +128,14 @@ public class Parser {
             switch (tok.type) {
                 case Token.R_PAREN:
                 case Token.R_BRACKET:
+                    lexer.pushBack();
+                    cFlag = false;
+                    break;
                 case Token.COMMA:
+                    if (expr == null) {
+                        String err = "',' cannot start an expr";
+                        throw new XPathException(err);
+                    }
                     lexer.pushBack();
                     cFlag = false;
                     break;
