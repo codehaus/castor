@@ -1365,7 +1365,7 @@ public class ClassMolder {
                     while ( addedItor.hasNext() ) {
                         Object addedField = addedItor.next();
 
-                        tx.writeLock( value, tx.getLockTimeout() );
+                        tx.writeLock( addedField, tx.getLockTimeout() );
 
                         if ( tx.isPersistent( addedField ) ) {
                             _fhs[i].getRelationLoader().createRelation(
