@@ -343,6 +343,10 @@ public class ElementDecl extends ContentModelType {
      * set it will be ignored.
     **/
     public void setType(XMLType type) {
+        
+        if ((type != null) && (type.isSimpleType())) {
+            ((SimpleType)type).setParent(this);
+        }
         this.xmlType = type;
     } //-- setType
 

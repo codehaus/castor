@@ -81,7 +81,20 @@ public class AttributeDecl extends Annotated {
     **/
     private int maxOccurs = 1;
     
-    String typeRef = null;
+    /**
+     * The type reference for this attribute declaration.
+     * <BR />
+     * <B>Note:</B> This is mutually exclusive with simpleType
+    **/
+    private String typeRef = null;
+    
+    /**
+     * The in-lined (anonymous) simple type for
+     * this AttributeDecl.
+     * <BR />
+     * <B>Note:</B> This is mutually exclusive with typeRef
+    **/
+    private SimpleType simpleType = null;
     
     /**
      * The Schema to which this AttributeDecl belongs
@@ -138,7 +151,8 @@ public class AttributeDecl extends Annotated {
      * @return the data type associated with this AttributeDecl
     **/
     public SimpleType getSimpleType() {
-        return schema.getSimpleType(typeRef);
+        if (simpleType != null) return simpleType;
+        else return schema.getSimpleType(typeRef);
     } //-- getSimpleType
 
     public String getSimpleTypeRef() {
@@ -213,8 +227,33 @@ public class AttributeDecl extends Annotated {
         return ((value != null) && (useFlag == FIXED));
     } //-- hasFixedValue
     
-    public void setSimpletypeRef(String name) {
+    /**
+     * Sets the SimpleType for this attribute declaration
+     * @param simpleType the SimpleType for this attribute
+     * declaration
+     * <BR />
+     * <B>Note:</B>This method is mutually exclusive with
+     * #setSimpleTypeRef
+    **/
+    public void setSimpleType(SimpleType simpleType) {
+        this.simpleType = simpleType;
+        if (simpleType != null) {
+            simpleType.setParent(this);
+        }
+        this.typeRef = null;
+    } //-- setSimpleType
+    
+    /**
+     * Sets the simple type "reference" for this attribute
+     * declaration
+     * @param name the name of the type
+     * <BR />
+     * <B>Note:</B>This method is mutually exclusive with
+     * #setSimpleType
+    **/
+    public void setSimpleTypeRef(String name) {
         this.typeRef = name;
+        this.simpleType = null;
     } //-- setSimpletypeRef
     
     

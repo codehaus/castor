@@ -206,6 +206,8 @@ public class Schema extends Annotated {
             String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
+        
+        simpleType.setParent(this);
         simpleTypes.put(name, simpleType);
 
     } //-- addSimpleType
