@@ -1267,7 +1267,7 @@ public final class SQLEngine implements Persistence {
                     for ( int j=0; j<leftCol.length; j++ ) {
                         leftCol[j] = _ids[j+offset].name;
                     }
-                    if (joinTables.contains( _fields[i].tableName )) {
+                    if (joinTables.contains( _fields[i].tableName ) || clsDesc.getTableName().equals( _fields[i].tableName )) {
                         alias = alias.replace('.', '_') + "_f" + i; // should not mix with aliases in ParseTreeWalker
                         expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol, alias );
                         find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol, alias );

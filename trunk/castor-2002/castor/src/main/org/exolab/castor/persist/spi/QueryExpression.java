@@ -240,15 +240,16 @@ public interface QueryExpression
 
 
     /**
-     * Add an inner join with an alias for the right table
+     * Add an inner join with an aliases for the tables
      *
      * @param leftTable The table name on the left side
      * @param leftColumn The column name on the left side
+     * @param leftTableAlias The alias name to use for the table on the left side
      * @param rightTable The table name on the right side
      * @param rightColumn The column name on the right side
      * @param rightTableAlias The alias name to use for the table on the right side
      */
-    public void addInnerJoin( String leftTable, String leftColumn,
+    public void addInnerJoin( String leftTable, String leftColumn, String leftTableAlias,
                               String rightTable, String rightColumn, String rightTableAlias );
 
 
@@ -279,20 +280,29 @@ public interface QueryExpression
                               String rightTable, String rightColumn, String rightTableAlias );
 
 
+    /**
+     * Add an inner join
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column names on the left side
+     * @param rightTable The table name on the right side
+     * @param rightColumn The column names on the right side
+     */
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn );
 
 
     /**
-     * Add an inner join with an alias for the right table
+     * Add an inner join with an aliases for the tables
      *
      * @param leftTable The table name on the left side
      * @param leftColumn The column names on the left side
-     * @param rightTable The table names on the right side
-     * @param rightColumn The column name on the right side
+     * @param leftTableAlias The alias name to use for the table on the left side
+     * @param rightTable The table name on the right side
+     * @param rightColumn The column names on the right side
      * @param rightTableAlias The alias name to use for the table on the right side
      */
-    public void addInnerJoin( String leftTable, String[] leftColumn,
+    public void addInnerJoin( String leftTable, String[] leftColumn, String leftTableAlias,
                               String rightTable, String[] rightColumn, String rightTableAlias );
 
 

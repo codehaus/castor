@@ -135,16 +135,16 @@ public final class SybaseQueryExpression
         return sql.toString();
     }
     
-    public void addInnerJoin( String leftTable, String leftColumn,
+    public void addInnerJoin( String leftTable, String leftColumn, String leftTableAlias,
                               String rightTable, String rightColumn, String rightTableAlias )
     {
-        // copy from JDBCQueryExpression.addInnerJoin(String,String,String,String,String)
+        // copy from JDBCQueryExpression.addInnerJoin(String,String,String,String,String,String)
         int index;
         Join join;
 
-        _tables.put( leftTable, leftTable );
+        _tables.put( leftTableAlias, leftTable );
         _tables.put( rightTableAlias, rightTable );
-        join = new Join( leftTable, leftColumn, rightTableAlias, rightColumn, false );
+        join = new Join( leftTableAlias, leftColumn, rightTableAlias, rightColumn, false );
         index = _joins.indexOf(join);
         if (index < 0) {
             _joins.add(join);
