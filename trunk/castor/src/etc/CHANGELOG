@@ -2,13 +2,17 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1506 - Enhancement for EnumeratedTypeAccess interface
+       using patch contributed by Robert La Ferla.
+       (kvisco - 20040505)
+
 ALL:   Reworked the mailing list guidelines. Added various sections re: cross-posting, etc.
        (Werner - 20040502)
 
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Brought test setup for SAP DB in-line with test requirements.
        (Werner - 20040429)
-9
+
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Brought test config file for SAP DB in-line with XML Schema.
        (Werner - 20040429)
