@@ -58,8 +58,7 @@ import java.util.StringTokenizer;
 import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
-import org.xml.sax.Configurable;
-import org.xml.sax.helpers.ParserFactory;
+import org.xml.sax.XMLReader;
 import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
@@ -242,28 +241,24 @@ public abstract class Configuration
 	Parser parser;
 
 	prop = getDefault().getProperty( Property.Parser );
-	if ( prop == null ) {
-	    // If no parser class was specified, we try to create a default
-	    // one using the parser factorie's properties. If this fail,
-	    // we complain about missing property.
-	    try {
-		parser = ParserFactory.makeParser();
-	    } catch ( Exception except ) {
-		throw new RuntimeException( Messages.format( "castor.conf.missingProperty",
-							     Property.Parser ) );
-	    }
+	if ( prop == null || prop.equals( "Xerces" ) ) {
+	    // If no parser class was specified, we default to Xerces.
+	    parser = new org.apache.xerces.parsers.SAXParser();
 	} else {
 	    // If a parser class was specified, we try to create it and
 	    // complain about creation error.
 	    try {
-		parser = ParserFactory.makeParser( prop );
+		Class cls;
+
+		cls = Class.forName( prop );
+		parser = (Parser) cls.newInstance();
 	    } catch ( Exception except ) {
 		throw new RuntimeException( Messages.format( "castor.conf.failedInstantiateParser",
 							     prop, except ) );
 	    }
 	}
 
-	if ( parser instanceof Configurable ) {
+	if ( parser instanceof XMLReader ) {
 	    StringTokenizer token;
 	    boolean         flag;
 
@@ -271,14 +266,14 @@ public abstract class Configuration
 		prop = getDefault().getProperty( Property.Validation, "false" );
 		flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
 		try {
-		    ( (Configurable) parser ).setFeature( Features.Validation, flag );
+		    ( (XMLReader) parser ).setFeature( Features.Validation, flag );
 		} catch ( SAXException except ) {
 		    // Ignore if feature not supported
 		}
 		prop = getDefault().getProperty( Property.Propertypaces, "false" );
 		flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
 		try {
-		    ( (Configurable) parser ).setFeature( Features.Propertypaces, flag );
+		    ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
 		} catch ( SAXException except ) {
 		    // Ignore if feature not supported
 		}
@@ -288,7 +283,7 @@ public abstract class Configuration
 	    token = new StringTokenizer( features, ", " );
 	    while ( token.hasMoreTokens() ) {
 		try {
-		    ( (Configurable) parser ).setFeature( token.nextToken(), true );
+		    ( (XMLReader) parser ).setFeature( token.nextToken(), true );
 		} catch ( SAXException except ) {
 		    // Ignore if feature not supported
 		}
