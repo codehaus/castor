@@ -98,6 +98,10 @@ public class Parser implements TokenTypes {
     if ( _curToken.getTokenType() == KEYWORD_ORDER ) {
       _treeRoot.addChild(orderClause());
     }
+
+    if ( _curToken.getTokenType() == KEYWORD_LIMIT ) {
+      _treeRoot.addChild(limitClause());
+    }
     
     match(END_OF_QUERY);
 
@@ -138,10 +142,10 @@ public class Parser implements TokenTypes {
     
     if (_curToken.getTokenType() != tokenType)
       throw (new OQLSyntaxException("An incorrect token type was found near " + 
-				    _curToken.getTokenValue()+" ("+
-				    String.valueOf( _curToken.getTokenType() )+
-				    ", need "+
-				    String.valueOf( tokenType ) ));
+                    _curToken.getTokenValue()+" ("+
+                    String.valueOf( _curToken.getTokenType() )+
+                    ", need "+
+                    String.valueOf( tokenType ) ));
 
     ParseTreeNode retNode = new ParseTreeNode(_curToken);
     _curToken = _nextToken;
@@ -665,8 +669,8 @@ public class Parser implements TokenTypes {
         break;
       default:
         throw (new OQLSyntaxException("An inapropriate token ("+
-				      String.valueOf( tokenType )+
-				      ") was encountered in an expression."));
+                      String.valueOf( tokenType )+
+                      ") was encountered in an expression."));
     }
     
     if (retNode == null)
@@ -899,6 +903,30 @@ public class Parser implements TokenTypes {
 
     }
     
+    return retNode;
+  }
+
+  /**
+   * Consumes tokens of limitClause.
+   *
+   * @return a Parse tree containing LIMIT as the root, with children
+   *    as limit parameters.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match(), or if an
+   *    unknown token is encountered here.
+   */
+  private ParseTreeNode limitClause()
+            throws InvalidCharException, OQLSyntaxException {
+
+    ParseTreeNode retNode = match(KEYWORD_LIMIT);
+
+    retNode.addChild(queryParam());
+      if ( _curToken.getTokenType() == COMMA )
+    {
+      retNode.addChild( match( COMMA ) );
+      retNode.addChild( queryParam() );
+    }
+
     return retNode;
   }
 

@@ -87,5 +87,7 @@ public interface JDBCSyntax
 
     public String OrderBy = " ORDER BY ";
 
+    public String Limit = " LIMIT "; //Alex
+
 }
 

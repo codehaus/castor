@@ -210,6 +210,14 @@ public interface QueryExpression
     
 
     /**
+     * Adds an limit clause. 
+     * @param limitClause The LIMIT clause to add (without the word 
+     *    LIMIT).
+     */
+    public void addLimitClause( String limitClause );  
+
+
+    /**
      * Add an inner join.
      *
      * @param leftTable The table name on the left side
