@@ -85,10 +85,10 @@ public class Deadlock
     public static final long  Wait = 1000;
 
 
-    public Deadlock( String name, String description, CWTestCategory category )
+    public Deadlock( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC02", "Deadlock detection" );
         _category = (JDOCategory) category;
     }
 
@@ -157,8 +157,8 @@ public class Deadlock
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
-                object.setFirst( TestObject.DefaultFirst );
-                object.setSecond( TestObject.DefaultSecond );
+                object.setValue1( TestObject.DefaultValue1 );
+                object.setValue2( TestObject.DefaultValue2 );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
@@ -169,8 +169,8 @@ public class Deadlock
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
                 stream.writeVerbose( "Retrieved object: " + object );
-                object.setFirst( TestObject.DefaultFirst );
-                object.setSecond( TestObject.DefaultSecond );
+                object.setValue1( TestObject.DefaultValue1 );
+                object.setValue2( TestObject.DefaultValue2 );
             } else {
                 object = new TestObject();
                 object.setId( TestObject.DefaultId + 1 );
@@ -241,7 +241,7 @@ public class Deadlock
                 _stream.writeVerbose( "First: Loading object " + TestObject.DefaultId );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId ), _accessMode );
-                object.setFirst( TestObject.DefaultFirst + ":1" );
+                object.setValue1( TestObject.DefaultValue1 + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -251,7 +251,7 @@ public class Deadlock
                 _stream.writeVerbose( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
-                object.setSecond( TestObject.DefaultSecond + ":1" );
+                object.setValue2( TestObject.DefaultValue2 + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -307,7 +307,7 @@ public class Deadlock
                 _stream.writeVerbose( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
-                object.setSecond( TestObject.DefaultSecond + ":2" );
+                object.setValue2( TestObject.DefaultValue2 + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
                 
                 // Give the other thread a 2 second opportunity.
@@ -329,7 +329,7 @@ public class Deadlock
                     _db.rollback();
                     return;
                 }
-                object.setFirst( TestObject.DefaultFirst + ":2" );
+                object.setValue1( TestObject.DefaultValue1 + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
 
                 // Give the other thread a 2 second opportunity.

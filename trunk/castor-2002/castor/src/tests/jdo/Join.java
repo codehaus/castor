@@ -71,10 +71,10 @@ public class Join
     private JDOCategory    _category;
 
 
-    public Join( String name, String description, CWTestCategory category )
+    public Join( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC06", "Outer join tests" );
         _category = (JDOCategory) category;
     }
 

@@ -72,10 +72,11 @@ public class DuplicateKey
     private JDOCategory    _category;
 
 
-    public DuplicateKey( String name, String description, CWTestCategory category )
+
+    public DuplicateKey( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC03", "Duplicate key detection" );
         _category = (JDOCategory) category;
     }
 

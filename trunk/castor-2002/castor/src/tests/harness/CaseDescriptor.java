@@ -57,36 +57,10 @@ public class CaseDescriptor implements org.exolab.castor.xml.XMLClassDescriptor 
         XMLFieldHandler handler = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[2];
-        //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
-        desc.setImmutable(true);
-        desc.setHandler( new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Case target = (Case) object;
-                return target.getName();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Case target = (Case) object;
-                    target.setName( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        attributes[0] = desc;
-        
-        //-- _name
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class-name", NodeType.Attribute);
+        attributes = new XMLFieldDescriptorImpl[1];
+
+        //-- _class
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class", NodeType.Attribute);
         desc.setImmutable(true);
         desc.setHandler( new XMLFieldHandler() {
             public Object getValue( Object object ) 
@@ -110,39 +84,11 @@ public class CaseDescriptor implements org.exolab.castor.xml.XMLClassDescriptor 
                 return null;
             }
         } );
-        attributes[1] = desc;
+        attributes[0] = desc;
 
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[1];
-        //-- _description
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
-        desc.setImmutable(true);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                Case target = (Case) object;
-                return target.getDescription();
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    Case target = (Case) object;
-                    target.setDescription( (java.lang.String) value);
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setMultivalued(false);
-        elements[0] = desc;
+        elements = new XMLFieldDescriptorImpl[0];
                 
     } //-- org.exolab.castor.mapping.xml.CaseDescriptor()
 

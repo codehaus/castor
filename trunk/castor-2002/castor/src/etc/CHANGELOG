@@ -1,11 +1,30 @@
 Version 0.8.4  May 0? 2000
 -----------------------------
 
-XML:    Added validation back into the generator sources
+XML:     Added validation back into the generator sources
 
-XML:    Added some changes from Frank Thelen to allow subclassing FieldInfoFactory
+XML:     Added some changes from Frank Thelen to allow subclassing FieldInfoFactory
 
-XML:    Fixed bug that occur when an enumeration uses uppercase values
+XML:     Fixed bug that occur when an enumeration uses uppercase values
+
+JDO:     Where clause now supports: 
+         - unary operators: +, -, abs, not
+         - binary operators: +, -, *, /, mod, ||, LIKE, >, >=, <, <=, =, !=, and,
+         - parenthesis: passed through to SQL as in OQL
+         - numbered parameters including user specified type support
+         (Nissim <nissim@panix.com>)
+
+JDO:     Fixed bug in Database when used as sychronized resource in a J2EE environment.
+         Calling close() will not rollback the transaction until the J2EE server has
+         completed two-phase commit and notified it. Database must be registerd with
+         a JTA transaction manager using the setTransactionManager option.
+
+Mapping: Fixed bug that caused exception with inheritance, now inheritance works
+         correctly if classes are specified in proper order in the mapping file.
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
+Tests:   Updated test cases, now includes test cases for key generators.
+         (Oleg Nitz <on@ibis.odessa.ua>, Arkin <arkin@exoffice.com>)
 
 
 Version 0.8.3  April 28, 2000

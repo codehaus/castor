@@ -10,10 +10,10 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
-    <field name="first" type="string" required="true">
+    <field name="value1" type="string" required="true">
       <sql name="value1" type="varchar"/>
     </field>
-    <field name="second" type="string">
+    <field name="value2" type="string">
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>

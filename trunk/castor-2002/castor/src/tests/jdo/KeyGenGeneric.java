@@ -71,10 +71,10 @@ public class KeyGenGeneric
     private JDOCategory    _category;
 
 
-    public KeyGenGeneric( String name, String description, CWTestCategory category )
+    public KeyGenGeneric( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC07", "Key generator" );
         _category = (JDOCategory) category;
     }
 

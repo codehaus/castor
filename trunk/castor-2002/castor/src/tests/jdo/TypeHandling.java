@@ -71,10 +71,10 @@ public class TypeHandling
     private JDOCategory    _category;
 
 
-    public TypeHandling( String name, String description, CWTestCategory category )
+    public TypeHandling( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( name, description );
+        super( "TC05", "Type handling" );
         _category = (JDOCategory) category;
     }
 
@@ -129,7 +129,7 @@ public class TypeHandling
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
-                object.setFirst( null );
+                object.setValue1( null );
             }
             try {
                 db.commit();
@@ -147,7 +147,7 @@ public class TypeHandling
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
-                object.setSecond( null );
+                object.setValue2( null );
             }
             db.commit();
             stream.writeVerbose( "OK: Stored null in non-required field" );

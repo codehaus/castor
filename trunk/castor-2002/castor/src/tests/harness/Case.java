@@ -61,37 +61,7 @@ public class Case
 {
 
 
-    private String  _name;
-
-
-    private String  _description;
-
-
     private String  _className;
-
-
-    public void setName( String name )
-    {
-        _name = name;
-    }
-
-
-    public String getName()
-    {
-        return _name;
-    }
-
-
-    public void setDescription( String description )
-    {
-        _description = description;
-    }
-
-
-    public String getDescription()
-    {
-        return _description;
-    }
 
 
     public void setClassName( String className )
@@ -114,8 +84,8 @@ public class Case
 
         try {
             catClass = getClass().getClassLoader().loadClass( _className );
-            cnst = catClass.getConstructor( new Class[] { String.class, String.class, CWTestCategory.class } );
-            return (CWTestCase) cnst.newInstance( new Object[] { _name, _description, category } );
+            cnst = catClass.getConstructor( new Class[] { CWTestCategory.class } );
+            return (CWTestCase) cnst.newInstance( new Object[] { category } );
         } catch ( InvocationTargetException except ) {
             throw new CWClassConstructorException( (Exception) except.getTargetException() );
         } catch ( Exception except ) {
