@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed a cyclic include bug with the IncludeUnmarshaller, added
+       some code to make sure the main schema couldn't include itself.
+       (kvisco - 20040624)
+
 XML:   Fixed bug 1524: Stack Overflow when container elements occur in 
        instance document. The problem was primarily due to the 
        MarshalFramework#searchInheritence method which was allowing
