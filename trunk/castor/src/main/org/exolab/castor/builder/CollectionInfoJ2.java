@@ -139,8 +139,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         
         if (extraMethods()) {
             //-- Reference getter (non type-safe)
-            String suffix = SourceGenerator.getProperty(this.REFERENCE_SUFFIX_PROPERTY, 
-                "AsReference");
+            String suffix = getReferenceMethodSuffix();
             method = new JMethod(SGTypes.ArrayList, "get" + cName + suffix);
             jClass.addMethod(method);
             createGetCollectionReferenceMethod(method);
@@ -178,8 +177,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
             createSetCollectionMethod(method);
             
             //-- Reference setter (non type-safe)
-            String suffix = SourceGenerator.getProperty(this.REFERENCE_SUFFIX_PROPERTY, 
-                "AsReference");
+            String suffix = getReferenceMethodSuffix();
             method = new JMethod(null, "set" + cName + suffix);
             method.addParameter(vParam);
             jClass.addMethod(method);
