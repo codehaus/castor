@@ -47,53 +47,88 @@
 package jdo;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-import org.exolab.castor.jdo.JDO;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.util.Logger;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.exceptions.CWClassConstructorException;
+import java.util.HashSet;
+import java.util.Iterator;
+import org.exolab.castor.jdo.TimeStampable;
 
 
+/**
+ * Test "set" collection.
+ * Only for JDK 1.2
+ */
+public class TestSetMaster {
 
-public class JDOCategory
-    extends CWTestCategory
-{
+    private int         _id;
 
+    private HashSet     _details;
+    
+    static final int    DefaultId = 3;
 
-    private JDO      _jdo;
-
-
-    public JDOCategory( String name, String description, Object jdo )
-        throws CWClassConstructorException
+    public TestSetMaster()
     {
-        super( name, description );
-        _jdo = (JDO) jdo;
-        _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
+        _id = DefaultId;
+        _details = new HashSet();
     }
 
 
-    public Database getDatabase( boolean verbose )
-        throws PersistenceException
+    public void setId( int id )
     {
-        if ( verbose )
-            _jdo.setLogWriter( Logger.getSystemLogger() );
-        return _jdo.getDatabase();
+        _id = id;
     }
 
 
-    public Connection getJDBCConnection()
-        throws SQLException
+    public int getId()
     {
-        return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName(), null ).createConnection();
+        return _id;
+    }
+
+    public void addDetail( TestSetDetail detail )
+    {
+        _details.add( detail );
+        detail.setMaster( this );
     }
 
 
+    public HashSet getDetails()
+    {
+        return _details;
+    }
+
+    public TestSetDetail createDetail()
+    {
+        return new TestSetDetail();
+    }
+
+    public TestSetDetail findDetail(int id)
+    {
+        Iterator it;
+        TestSetDetail detail;
+
+        it = _details.iterator();
+        while ( it.hasNext() ) {
+            detail = (TestSetDetail) it.next();
+            if ( detail.getId() == id ) {
+                return detail;
+            }
+        }
+        return null;
+    }
+
+    public String toString()
+    {
+        Iterator it;
+        TestSetDetail detail;
+        StringBuffer details = new StringBuffer();
+
+        it = _details.iterator();
+        while ( it.hasNext() ) {
+            detail = (TestSetDetail) it.next();
+            details.append( detail );
+            details.append( "," );
+        }
+        if ( details.length() > 0 ) {
+            details.setLength( details.length() - 1 );
+        }
+        return _id + " { " + details + " }";
+    }
 }

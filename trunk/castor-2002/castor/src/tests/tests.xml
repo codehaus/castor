@@ -17,6 +17,9 @@
     <case class="jdo.Dependent" name="TC15" />
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
+    <!--Only for JDK 1.2
+    <case class="jdo.Collections" name="TC19" />
+    -->
   </category>
   <category name="oracle" class="jdo.JDOCategory">
     <description>JDO tests for Oracle8i</description>
@@ -35,6 +38,10 @@
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
     <case class="jdo.StoredProcedure" name="TC10" />
+    <case class="jdo.Dependent" name="TC15" />
+    <!--Only for JDK 1.2
+    <case class="jdo.Collections" name="TC19" />
+    -->
   </category>
 
   <category name="oleak" class="jdo.JDOCategory">
