@@ -86,7 +86,9 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
     public MarshallingFrameworkTestCase(CastorTestCase test, UnitTestCase unit, MarshallingTest marshalling, File outputRoot) {
         super(test, unit, outputRoot);
         _marshallingConf = marshalling;
-        _hasRandom       = _marshallingConf.getRoot_Object().getRandom();
+        if (_marshallingConf.getRoot_Object() != null) {
+        	_hasRandom       = _marshallingConf.getRoot_Object().getRandom();
+        }
     }
 
     /**
@@ -149,9 +151,11 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         assertNotNull("The input file specified:"+_inputName+" cannot be found.", _input);
 
         RootType rootType = _marshallingConf.getRoot_Object();
-        _rootClassName = rootType.getContent();
-        _hasDump =   rootType.getDump();
-        _hasRandom = rootType.getRandom();
+        if (rootType != null) {
+        	_rootClassName = rootType.getContent();
+            _hasDump =   rootType.getDump();
+            _hasRandom = rootType.getRandom();
+        }
         
         if (!_test.isDirectoryCompiled()) {
             verbose("-->Compiling any necessary source files");
@@ -170,10 +174,17 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);
         _test.setClassLoader(loader);
 
-        if (_rootClassName == null)
-            throw new Exception("No Root Object found in test descriptor");
+        //if (_rootClassName == null)
+        //    throw new Exception("No Root Object found in test descriptor");
 
-        _rootClass =  loader.loadClass(_rootClassName);
+        if (_rootClassName != null) {
+            verbose("Root class specified in TestDescriptor...");
+            verbose("Loading class: " + _rootClassName);
+            _rootClass =  loader.loadClass(_rootClassName);
+        }
+        else {
+            verbose("No root class specified in TestDescriptor");
+        }
 
         // Try to load the mapping file if any, else we will use the introspector
 
