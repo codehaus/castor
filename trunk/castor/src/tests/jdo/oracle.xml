@@ -1,23 +1,26 @@
 <?xml version="1.0" ?>
-<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-conf.dtd">
-<!--
-<database name="oracle" engine="oracle" >
-    <driver url="jdbc:oracle:thin:@127.0.0.1:1521:TEST"
-            class-name="oracle.jdbc.driver.OracleDriver">
-      <param name="user" value="SYSTEM"/>
-      <param name="password" value="manager"/>
-    </driver>
-  <mapping href="mapping.xml" />
-</database>
--->
-<database name="oracle" engine="oracle" >
-    <driver url="jdbc:oracle:thin:@localhost:1521:LEAF"	
-            class-name="oracle.jdbc.driver.OracleDriver">
+<!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+                          "http://castor.exolab.org/jdo-conf.dtd">
 
-      <param name="user" value="test"/>
-      <param name="password" value="secret"/>
-    </driver>
-  <mapping href="mapping.xml" />
-</database>
+<jdo-conf>
+    <database name="oracle" engine="oracle" >
+        <driver url="jdbc:oracle:thin:@localhost:1521:TEST"
+                class-name="oracle.jdbc.driver.OracleDriver">
+            <param name="user" value="test"/>
+            <param name="password" value="secret"/>
+        </driver>
+<!--
+        <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
+            <param name="URL" value="jdbc:oracle:thin:@localhost:1521:TEST" />
+            <param name="user" value="test" />
+            <param name="password" value="secret" />
+            <param name="minLimit" value="5" />
+            <param name="maxLimit" value="10" />
+            <param name="cacheScheme" value="OracleConnectionCacheImpl.DYNAMIC_SCHEME" />
+        </data-source>
+-->        
+		<mapping href="jdo/mapping.xml" />
+    </database>
+    <transaction-demarcation mode="local" />
+</jdo-conf>
 
