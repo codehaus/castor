@@ -269,11 +269,20 @@ public final class SequenceKeyGenerator implements KeyGenerator
         }
         tableName = st.nextToken();
 
-        // remove quotes
-        if ( tableName.startsWith("\"") ) {
-            tableName = tableName.substring( 1, tableName.length() - 1 );
+        // remove every double quote in the tablename
+        int idxQuote = tableName.indexOf("\"");
+        if (idxQuote >= 0) {
+            StringBuffer buffer2 = new StringBuffer(tableName);
+
+            do {
+                buffer2.deleteCharAt(idxQuote);
+                idxQuote = buffer2.indexOf("\"", idxQuote);
+            } while(idxQuote >= 0);
+
+    		tableName = buffer2.toString();
         }
-        seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
+
+		seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
         nextval = _factory.quoteName(seqName + ".nextval");
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );
