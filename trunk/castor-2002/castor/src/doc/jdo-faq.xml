@@ -406,5 +406,11 @@
         <p>All other Castor features are supported with <a href="http:/www.mysql.com">MySQL</a>, <a href="http://www.interbase2000.org">Interbase</a>, <a href="http://instantdb.enhydra.org">InstantDB</a> and <a href="http://www.hypersonicsql.com">Hypersonic SQL</a>.</p>
     </section>
 
+    <section title="Integrating Castor's logging with Log4J">
+        <p><b>How can I integrate Castor's logging with a logging infrastructure using Log4J?</b></p>
+
+        <p>Please see <a href="http://www.mail-archive.com/castor-dev@exolab.org/msg02710.html">this message</a> from the mailing list. It includes an adapter class that will provide this functionality. (Thanks John!)</p>
+    </section>
+
   </body>
 </document>
