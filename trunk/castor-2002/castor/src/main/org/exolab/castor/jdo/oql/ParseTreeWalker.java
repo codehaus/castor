@@ -853,7 +853,8 @@ public class ParseTreeWalker implements TokenTypes
           } else {
               index = i.intValue();
           }
-          tableAlias = tableAlias + "_" + index;
+          // If table name contains '.', it should be replaced, since such names aren't allowed for aliases
+          tableAlias = tableAlias.replace('.', '_') + "_" + index;
       }
       //System.out.println( "TableAlias: " + tableAlias );
       return tableAlias;
