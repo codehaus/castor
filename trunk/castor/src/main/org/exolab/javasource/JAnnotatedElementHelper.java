@@ -46,7 +46,8 @@ package org.exolab.javasource;
 
 import java.io.PrintWriter;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
+
+import org.exolab.castor.util.OrderedHashMap;
 
 /**
  * Class implements JAnnotatedElement interface on behalf of other classes 
@@ -57,24 +58,28 @@ import java.util.LinkedHashMap;
 public class JAnnotatedElementHelper
 	implements JAnnotatedElement 
 {
+    
+    // NOTE: Removed references to LinkedHashMap as we are trying to maintain
+    // backward compatibility with JDK 1.2 and 1.3.
+    
 	/**
 	 * Stores annotations associated with the source element containing this helper
 	 */
-	private LinkedHashMap _annotations;
-
+	private OrderedHashMap _annotations;
+    
 	/**
 	 * Creates a JAnnodatedElementHelper
 	 */	
 	public JAnnotatedElementHelper()
 	{
-		// Retain the order annotations are assigned
-		_annotations = new LinkedHashMap();
+        super();
 	}
 	
 	/* (non-Javadoc)
 	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotation(org.exolab.javasource.JAnnotationType)
 	 */
 	public JAnnotation getAnnotation(JAnnotationType annotationType) {
+        if (_annotations == null) return null;
 		return (JAnnotation) _annotations.get(annotationType.getName());
 	}
 
@@ -82,6 +87,9 @@ public class JAnnotatedElementHelper
 	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotations()
 	 */
 	public JAnnotation[] getAnnotations() {
+        if (_annotations == null) 
+            return new JAnnotation[0];
+        
 		return (JAnnotation[]) _annotations.values().toArray(new JAnnotation[] {});
 	}
 
@@ -89,7 +97,10 @@ public class JAnnotatedElementHelper
 	 * @see org.exolab.javasource.JAnnotatedElement#isAnnotationPresent(org.exolab.javasource.JAnnotation)
 	 */
 	public boolean isAnnotationPresent(JAnnotationType annotationType) {
-		return _annotations.containsKey(annotationType.getName());
+        if (_annotations != null) {
+        	return _annotations.containsKey(annotationType.getName());
+        }
+        return false;
 	}
 
 	/* (non-Javadoc)
@@ -99,7 +110,10 @@ public class JAnnotatedElementHelper
 		if(isAnnotationPresent(annotation.getAnnotationType()))
 			throw new IllegalArgumentException("Annotation for '"+annotation.getAnnotationType().getName()+"' already added.");
 		String annotationType = annotation.getAnnotationType().getName();
-		_annotations.put(annotationType, annotation);		
+        if (_annotations == null) {
+        	_annotations = new OrderedHashMap();
+        }
+        _annotations.put(annotationType, annotation);
 	}
 
 	/* (non-Javadoc)
@@ -115,7 +129,10 @@ public class JAnnotatedElementHelper
 	 * @see org.exolab.javasource.JAnnotatedElement#hasAnnotations()
 	 */
 	public boolean hasAnnotations() {
-		return _annotations.size()>0;
+        if (_annotations != null) {
+        	return _annotations.size()>0;
+        }
+        return false;
 	}
 	
 	/**
@@ -125,14 +142,16 @@ public class JAnnotatedElementHelper
 	public boolean printAnnotations(JSourceWriter jsw)
 	{
 		boolean printed = false;
-		Iterator annotations = _annotations.values().iterator();
-		while(annotations.hasNext())
-		{
-			JAnnotation annotation = (JAnnotation) annotations.next();
-			annotation.print(jsw);
-			jsw.writeln();
-			printed = true;
-		}
+        if (_annotations != null) {
+    		Iterator annotations = _annotations.values().iterator();
+    		while(annotations.hasNext())
+    		{
+    			JAnnotation annotation = (JAnnotation) annotations.next();
+    			annotation.print(jsw);
+    			jsw.writeln();
+    			printed = true;
+    		}
+        }
 		return printed;
 	}
 	

@@ -50,7 +50,8 @@ package org.exolab.javasource;
 
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
-import java.util.LinkedHashMap;
+
+import org.exolab.castor.util.OrderedHashMap;
 
 /**
  * JAnnotation represents a single annotation against a code element. The methods 
@@ -147,7 +148,7 @@ public class JAnnotation
 	 * Element values associated with this JAnnotation, contains String, String[],
 	 *   JAnnotation and JAnnotation[] objects.
 	 */
-	private LinkedHashMap _elementValues = new LinkedHashMap();
+	private OrderedHashMap _elementValues = new OrderedHashMap();
 	
 	/**
 	 * Name of a single element 
