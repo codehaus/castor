@@ -975,8 +975,7 @@ public abstract class TransactionContext
                     entry.engine.forgetObject( this, entry.oid );
                 } else {
                     // Object has been queried (possibly) deleted in this
-                    // transaction, release the lock and revert to the old value.
-                    entry.engine.copyObject( this, entry.oid, entry.object );
+                    // transaction and release the lock.
                     entry.engine.releaseLock( this, entry.oid );
                 }
             } catch ( Exception except ) { }
