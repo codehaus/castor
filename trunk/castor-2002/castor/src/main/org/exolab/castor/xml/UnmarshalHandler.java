@@ -100,7 +100,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * reserved for use by XML and XML related specs.
     **/
     private static final String XML_PREFIX = "xml";
-    
+
     /**
      * Attribute name for default namespace declaration
     **/
@@ -197,26 +197,27 @@ public final class UnmarshalHandler extends MarshalFramework
      */
      private org.exolab.castor.types.AnyNode _node = null;
 
-     /**
-      * The namespace stack
-      */
-     private Namespaces _namespaces = null;
+    /**
+     * The namespace stack
+     */
+    private Namespaces _namespaces = null;
 
     private Hashtable _nsPackageMappings = null;
-    
+
     /**
      * A boolean to indicate that objects should
      * be re-used where appropriate
     **/
     private boolean _reuseObjects = false;
-    
+
     /**
      * A boolean that indicates attribute processing should
      * be strict and an error should be flagged if any
      * extra attributes exist.
     **/
     private boolean _strictAttributes = false;
-    
+
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -243,7 +244,6 @@ public final class UnmarshalHandler extends MarshalFramework
         _topClass     = _class;
         _namespaces   = new Namespaces();
         _nsPackageMappings = new Hashtable();
-
     } //-- UnmarshalHandler(Class)
 
     public Object getObject() {
@@ -305,8 +305,8 @@ public final class UnmarshalHandler extends MarshalFramework
 
     /**
      * Sets a boolean that when true indicates that objects
-     * contained within the object model should be re-used 
-     * where appropriate. This is only valid when unmarshalling 
+     * contained within the object model should be re-used
+     * where appropriate. This is only valid when unmarshalling
      * to an existing object.
      *
      * @param reuse the boolean indicating whether or not
@@ -315,7 +315,7 @@ public final class UnmarshalHandler extends MarshalFramework
     public void setReuseObjects(boolean reuse) {
         _reuseObjects = reuse;
     } //-- setReuseObjects
-    
+
     /**
      * Sets the ClassDescriptorResolver to use for loading and
      * resolving ClassDescriptors
@@ -334,7 +334,7 @@ public final class UnmarshalHandler extends MarshalFramework
     public void setRootObject(Object root) {
         _topObject = root;
     } //-- setRootObject
-    
+
     /**
      * Sets the flag for validation
      * @param validate, a boolean to indicate whether or not
@@ -393,7 +393,6 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             else return;
         }
-
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
         }
@@ -411,10 +410,20 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- make sure we have the correct closing tag
         XMLFieldDescriptor descriptor = state.fieldDesc;
+
         if (!state.elementName.equals(name)) {
-            String err = "error in xml, expecting </" + state.elementName;
-            err += ">, but received </" + name + "> instead.";
-            throw new SAXException(err);
+            //maybe there is still a container to end
+            if (descriptor.isContainer()) {
+                _stateInfo.push(state);
+                endElement(state.elementName);
+                endElement(name);
+                return;
+            }
+            else {
+                String err = "error in xml, expecting </" + state.elementName;
+                err += ">, but received </" + name + "> instead.";
+                throw new SAXException(err);
+            }
         }
 
         //-- clean up current Object
@@ -443,7 +452,7 @@ public final class UnmarshalHandler extends MarshalFramework
             _namespaces = _namespaces.getParent();
             return;
         }
-        
+
         if (state.primitiveOrImmutable) {
 
             String str = null;
@@ -522,7 +531,7 @@ public final class UnmarshalHandler extends MarshalFramework
              if (_validate) {
                 try {
                     Validator validator = new Validator();
-                     validator.validate(state.object, _cdResolver);
+                    validator.validate(state.object, _cdResolver);
                 }
                 catch(ValidationException vEx) {
                     throw new SAXException(vEx);
@@ -564,17 +573,13 @@ public final class UnmarshalHandler extends MarshalFramework
 
         //-- save fieldState
         UnmarshalState fieldState = state;
-        
+
         //-- get target object
         state = (UnmarshalState) _stateInfo.peek();
-
         //-- check to see if we have already read in
         //-- an element of this type
-        if (!descriptor.isMultivalued() && (state.container == null)) {
+        if (!descriptor.isMultivalued() ) {
             if (state.isUsed(descriptor)) {
-
-                FieldHandler handler = descriptor.getHandler();
-
                 String err = "element \"" + name;
                 err += "\" occurs more than once. (" + descriptor + ")";
                 ValidationException vx =
@@ -587,32 +592,25 @@ public final class UnmarshalHandler extends MarshalFramework
         try {
             FieldHandler handler = descriptor.getHandler();
             //check if the value is a QName that needs to
-            //be resolved (ns:value -> {URI}value
+            //be resolved (ns:value -> {URI}value)
             String valueType = descriptor.getSchemaType();
             if ((valueType != null) && (valueType.equals(QNAME_NAME))) {
                  val = resolveNamespace(val);
             }
 
-            if (state.container == null) {
+            boolean addObject = true;
+            if (_reuseObjects && fieldState.primitiveOrImmutable) {
+                 //-- check to see if we need to
+                 //-- add the object or not
+                 Object tmp = handler.getValue(state.object);
+                 if (tmp != null) {
+                     //-- Do not add object if values
+                     //-- are equal
+                     addObject = (!tmp.equals(val));
+                 }
+            }
+            if (addObject) handler.setValue(state.object, val);
 
-                boolean addObject = true;
-                if (_reuseObjects && fieldState.primitiveOrImmutable) {
-                    //-- check to see if we need to
-                    //-- add the object or not
-                    Object tmp = handler.getValue(state.object);
-                    if (tmp != null) {
-                        //-- Do not add object if values
-                        //-- are equal
-                        addObject = (!tmp.equals(val));
-                    }
-                }              
-                if (addObject) handler.setValue(state.object, val);
-            }
-            else {
-                state.ContainerFieldDesc.getHandler().setValue(state.container, val);
-                state.container = null;
-                state.ContainerFieldDesc = null;
-            }
         }
         /*
         catch(java.lang.reflect.InvocationTargetException itx) {
@@ -687,7 +685,6 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.startElement(name,attList);
            return;
         }
-
         //-- The namespace of the given element
         String namespace = null;
 
@@ -695,7 +692,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- XXX Note: This code will change when we update the XML event API
 
         _namespaces = _namespaces.createNamespaces();
-        
+
         //-- convert AttributeList to AttributeSet and process
         //-- namespace declarations
         AttributeSet atts = processAttributeList(attList);
@@ -845,8 +842,32 @@ public final class UnmarshalHandler extends MarshalFramework
 
 
         //-- get MarshalDescriptor for the given element
-
         UnmarshalState parentState = (UnmarshalState)_stateInfo.peek();
+
+        //Test if we can accept the field in the parentState
+        //in case the parentState fieldDesc is a container
+        boolean canAccept = false;
+        while (parentState.fieldDesc.isContainer() && !canAccept) {
+            XMLClassDescriptor tempClassDesc = parentState.classDesc;
+
+            //-- Find ClassDescriptor for Parent
+            if (tempClassDesc == null) {
+               tempClassDesc = (XMLClassDescriptor)parentState.fieldDesc.getClassDescriptor();
+               if (tempClassDesc == null)
+                  tempClassDesc = getClassDescriptor(parentState.object.getClass());
+            }
+
+            canAccept = tempClassDesc.canAccept(name, parentState.object);
+
+            if (!canAccept) {
+                endElement(parentState.elementName);
+                parentState = (UnmarshalState)_stateInfo.peek();
+            }
+
+            tempClassDesc = null;
+        }
+
+
         //-- create new state object
         state = new UnmarshalState();
         state.elementName = name;
@@ -871,15 +892,6 @@ public final class UnmarshalHandler extends MarshalFramework
         descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
 
         /*
-          XXXX Search for container, hopefully this is a temporary fix
-        */
-        if (descriptor == null) {
-            descriptor = searchContainers(name, classDesc);
-        }
-
-        /* end of container fix */
-
-        /*
           If descriptor is null, we need to handle possible inheritence,
           which might not be described in the current ClassDescriptor.
           This can be a slow process...for speed use the match attribute
@@ -896,7 +908,7 @@ public final class UnmarshalHandler extends MarshalFramework
              }
         }
 
-        //the field descriptor is still null -> problem
+        //the field descriptor is still null, we face a problem
         if (descriptor == null) {
             String msg = "unable to find FieldDescriptor for '" + name;
             msg += "' in ClassDescriptor of " + classDesc.getXMLName();
@@ -904,72 +916,68 @@ public final class UnmarshalHandler extends MarshalFramework
             //the class descriptor was introspected
             //just log it
             if (Introspector.introspected(classDesc)) {
-               message(msg);
-               return;
+                message(msg);
+                return;
             }
             //but if we could not find the field descriptor
             //whereas a class descriptor has been provided (using the
             //Source Generator for instance)
             else throw new SAXException(msg);
+
         }
 
-        //-- Handle Container field (handle container in container too)
         Object object = parentState.object;
-        while (descriptor.isContainer()) {
+        //--container support
+        if (descriptor.isContainer()) {
+            //create a new state a set the container as the object
+            //don't save the current state, it will be recreated later
+            _stateInfo.pop();
+            state = new UnmarshalState();
+            // swap states so that container comes before the
+            // the state for the item contained within the container
+            _stateInfo.push(state);
 
-            // Check if the container object has already been instantiated
+            //here we can hard-code a name or take the field name
+            state.elementName = descriptor.getFieldName();
+            state.fieldDesc = descriptor;
+            state.classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
             Object containerObject = null;
+
+            //1-- the container is not multivalued (not a collection)
             if (!descriptor.isMultivalued()) {
+                // Check if the container object has already been instantiated
                 FieldHandler handler = descriptor.getHandler();
                 containerObject = handler.getValue(object);
-                if (containerObject == null) {
+                if (containerObject != null)
+                    //remove the descriptor from the used list
+                    parentState.markAsNotUsed(descriptor);
+                else {
                     containerObject = handler.newInstance(object);
-                    handler.setValue(object, containerObject);
                 }
+
             }
+            //2-- the container is multivalued
             else {
                 Class containerClass = descriptor.getFieldType();
                 try {
-                    containerObject = containerClass.newInstance();
-                    FieldHandler handler = descriptor.getHandler();
-                    handler.setValue(object, containerObject);
+                     containerObject = containerClass.newInstance();
                 }
                 catch(Exception ex) {
                     throw new SAXException(ex);
                 }
             }
+            state.object = containerObject;
+            state.type = containerObject.getClass();
 
-
-            XMLClassDescriptor containerClassDesc
-                = (XMLClassDescriptor)descriptor.getClassDescriptor();
-
-            if (containerClassDesc == null) {
-                Class fieldType = descriptor.getFieldType();
-                containerClassDesc = getClassDescriptor(fieldType);
-                if (containerClassDesc == null) {
-                    throw new SAXException("unable to resolve descriptor for class: " + fieldType);
-                }
-                if (descriptor instanceof XMLFieldDescriptorImpl) {
-                    ((XMLFieldDescriptorImpl)descriptor).setClassDescriptor(containerClassDesc);
-                }
-            }
-
-            descriptor = containerClassDesc.getFieldDescriptor(name, NodeType.Element);
-
-            if (descriptor == null) {
-                String msg = "unable to find field descriptor for '" + name;
-                msg += "' in element '" + parentState.elementName + "'.";
-                throw new SAXException(msg);
-            }
-            parentState.container = containerObject;
-            parentState.ContainerFieldDesc = descriptor;
-            object = containerObject;
-        } //-- End Container Support
-
+            //we need to recall startElement()
+            //so that we can find a more appropriate descriptor in for the given name
+            startElement(name, attList);
+            return;
+        }
+        //--End of the container support
 
         //-- Find object type and create new Object of that type
-
-        state.fieldDesc = descriptor;
+       state.fieldDesc = descriptor;
 
         /* <update>
             *  we need to add this code back in, to make sure
@@ -998,7 +1006,6 @@ public final class UnmarshalHandler extends MarshalFramework
 
         if (classDesc == null)
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
-
         FieldHandler handler = descriptor.getHandler();
         boolean useHandler = true;
 
@@ -1031,7 +1038,7 @@ public final class UnmarshalHandler extends MarshalFramework
                         = getClassDescriptor(instanceType, _loader);
 
                     boolean loadClass = true;
-                    
+
                     if (instanceDesc != null) {
                         instanceClass = instanceDesc.getJavaClass();
                         classDesc = instanceDesc;
@@ -1039,23 +1046,23 @@ public final class UnmarshalHandler extends MarshalFramework
                             loadClass = (!instanceClass.getName().equals(instanceType));
                         }
                     }
-                    
+
                     if (loadClass) {
                         instanceClass = loadClass(instanceType, null);
                         //the FieldHandler can be either an XMLFieldHandler
                         //or a FieldHandlerImpl
                         FieldHandler tempHandler = descriptor.getHandler();
-                        
+
                         boolean collection = false;
                         if (tempHandler instanceof FieldHandlerImpl) {
                             collection = ((FieldHandlerImpl)tempHandler).isCollection();
                         }
                         else {
                             collection = Introspector.isCollection(instanceClass);
-                        }                                           
-                               
+                        }
+
                         if ( (! collection ) &&
-                         ! _class.isAssignableFrom(instanceClass)) 
+                         ! _class.isAssignableFrom(instanceClass))
                         {
                             String err = instanceClass
                                 + " is not a subclass of " + _class;
@@ -1133,13 +1140,13 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- XXXX should remove this test once we can
                 //-- XXXX come up with a better solution
                 if ((!state.derived) && useHandler) {
-                    
+
                     boolean create = true;
                     if (_reuseObjects) {
                         state.object = handler.getValue(parentState.object);
                         create = (state.object == null);
                     }
-                    
+
                     if (create) {
                         state.object = handler.newInstance(parentState.object);
                     }
@@ -1169,7 +1176,6 @@ public final class UnmarshalHandler extends MarshalFramework
             throw new SAXException(ise);
         }
 
-
         //-- At this point we should have a new object, unless
         //-- we are dealing with a primitive type, or a special
         //-- case such as byte[]
@@ -1194,7 +1200,6 @@ public final class UnmarshalHandler extends MarshalFramework
                 buf.append(name);
                 message(buf.toString());
             }
-
             try {
                 handler.setValue(parentState.object, state.object);
             }
@@ -1270,10 +1275,10 @@ public final class UnmarshalHandler extends MarshalFramework
     private String getInstanceType(AttributeSet atts, String currentPackage) {
 
         if (atts == null) return null;
-        
+
         //-- find xsi:type attribute
         String type = atts.getValue(XSI_TYPE, XSI_NAMESPACE);
-        
+
         if (type != null) {
             if (type.startsWith(JAVA_PREFIX)) {
                 return type.substring(JAVA_PREFIX.length());
@@ -1321,7 +1326,7 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- handle empty attributes
         if ((atts == null) || (atts.getSize() == 0)) {
             if (classDesc != null) {
-                XMLFieldDescriptor[] descriptors 
+                XMLFieldDescriptor[] descriptors
                     = classDesc.getAttributeDescriptors();
                 for (int i = 0; i < descriptors.length; i++) {
                     XMLFieldDescriptor descriptor = descriptors[i];
@@ -1359,7 +1364,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 return;
             }
         }
-        
+
         //-- First loop through Attribute Descriptors.
         //-- Then, if we have any attributes which
         //-- haven't been processed we can ask
@@ -1374,14 +1379,14 @@ public final class UnmarshalHandler extends MarshalFramework
 
             String name      = descriptor.getXMLName();
             String namespace = descriptor.getNameSpaceURI();
-            
+
             int index = atts.getIndex(name, namespace);
-            
+
 
             if (index >= 0) {
                 processedAtts[index] = true;
             }
-            //-- otherwise...for now just continue, this code needs to 
+            //-- otherwise...for now just continue, this code needs to
             //-- change when we upgrade to new event API
             else continue;
 
@@ -1395,44 +1400,43 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new SAXException(err);
             }
         }
-        
+
         //-- Handle any non processed attributes...
         //-- This is useful for descriptors that might use
         //-- wild-cards or other types of matching..as well
         //-- as backward compatibility...attribute descriptors
         //-- were erronously getting set with the default
-        //-- namespace by the source generator...this is 
+        //-- namespace by the source generator...this is
         //-- also true of the generated classes for the
         //-- Mapping Framework...we need to clean this up
         //-- at some point in the future.
         for (int i = 0; i < processedAtts.length; i++) {
             if (processedAtts[i]) continue;
-            
+
             String name = atts.getName(i);
-            
+
             if (name.startsWith(XML_PREFIX + ':')) {
                 //-- XML specification specific attribute
                 //-- It should be safe to ignore these...but
                 //-- if you think otherwise...let use know!
                 if (debug) {
-                    String msg = "ignoring attribute '" + name + 
-                        "' for class: " + 
+                    String msg = "ignoring attribute '" + name +
+                        "' for class: " +
                             state.classDesc.getJavaClass().getName();
                     message(msg);
                 }
                 continue;
             }
-            
+
             //-- This really should handle namespace...but it currently
-            //-- doesn't. Ignoring namespaces also helps with the 
+            //-- doesn't. Ignoring namespaces also helps with the
             //-- backward compatibility issue mentioned above.
             XMLFieldDescriptor descriptor =
                 classDesc.getFieldDescriptor(name, NodeType.Attribute);
-
             if (descriptor == null) {
                 if (_strictAttributes) {
                     //-- handle error
-                    String error = "The attribute '" + name + 
+                    String error = "The attribute '" + name +
                         "' appears illegally on element '" +
                         state.elementName + "'.";
                     throw new SAXException(error);
@@ -1450,7 +1454,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new SAXException(err);
             }
         }
-        
+
     } //-- processAttributes
 
     /**
@@ -1526,7 +1530,6 @@ public final class UnmarshalHandler extends MarshalFramework
                 value = resolveNamespace(value);
         }
         FieldHandler handler = descriptor.getHandler();
-
         if (handler != null)
             handler.setValue(parent, value);
 
@@ -1567,10 +1570,10 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param atts the AttributeList to process.
     **/
     private AttributeSet processAttributeList(AttributeList atts) {
-        
+
         if (atts == null) return new AttributeSetImpl(0);
-        
-        
+
+
         //-- process all namespaces first
         int attCount = 0;
         boolean[] validAtts = new boolean[atts.getLength()];
@@ -1608,9 +1611,9 @@ public final class UnmarshalHandler extends MarshalFramework
             }
         }
         else attSet = new AttributeSetImpl(0);
-        
+
         return attSet;
-        
+
     } //-- method: processNamespaces
 
     /**
@@ -1771,59 +1774,6 @@ public final class UnmarshalHandler extends MarshalFramework
         else pkg = "";
         return pkg;
     } //-- getJavaPackage
-
-    /**
-     * Searches for Container descriptors that match the given element name.
-     * This is a patch, which will hopefully be changed at a later date.
-     *
-     * @param name the element to search for
-    **/
-    private XMLFieldDescriptor searchContainers
-        (String name, XMLClassDescriptor classDesc)
-        throws SAXException
-    {
-         XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
-
-        XMLFieldDescriptor descriptor = null;
-
-        for (int i = 0; i < descriptors.length; i++) {
-            if (descriptors[i] == null) continue;
-
-            XMLFieldDescriptor xfd = descriptors[i];
-            if (xfd.isContainer()) {
-                XMLClassDescriptor xcd = (XMLClassDescriptor)xfd.getClassDescriptor();
-
-                //-- set class descriptor if necessary
-                if (xcd  == null) {
-                    xcd = getClassDescriptor(xfd.getFieldType());
-                    if (xcd != null) {
-                         //-- set class descriptor if necessary
-                        if (xfd instanceof XMLFieldDescriptorImpl) {
-                            ((XMLFieldDescriptorImpl)xfd).setClassDescriptor(xcd);
-                        }
-                    }
-                } // xcd == null
-
-                //have we found the descriptor?
-                if (xfd.matches(name)) {
-                    descriptor = xfd;
-                    break;
-                }
-                //is it in this class descriptor?
-                else if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
-                    descriptor = xfd;
-                    break;
-                }
-                //or is it contained in a fieldDescriptor?
-                else if (searchContainers(name, xcd) != null) {
-                     descriptor = xfd;
-                     break;
-                }
-            }
-        }
-        return descriptor;
-    } //-- searchContainers.
-
 
     /**
      * Returns the name of a class, handles array types
