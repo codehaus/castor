@@ -665,13 +665,14 @@ public class DescriptorSourceFactory {
         }
         
         String fixed = member.getFixedValue();
+        String pattern = null;
         
         //-- create proper validator
         
         switch (xsType.getType()) {
             
             case XSType.NEGATIVE_INTEGER:
-            case XSType.POSITIVE_INTEGER: 
+            case XSType.POSITIVE_INTEGER:             
             case XSType.INTEGER:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -709,6 +710,13 @@ public class DescriptorSourceFactory {
                     jsc.append(fixed);
                     jsc.append(");");
                 }
+                //-- pattern facet
+                pattern = xsInteger.getPattern();
+                if (pattern != null) {
+                    jsc.add("iv.setPattern(\"");
+                    jsc.append(pattern);
+                    jsc.append("\");");
+                }
                 
                 jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
@@ -717,7 +725,7 @@ public class DescriptorSourceFactory {
 			case XSType.INT:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
-                jsc.add("IntValidator iv = new IntValidator();");
+                jsc.add("IntegerValidator iv = new IntegerValidator();");
                 XSInt xsInt = (XSInt)xsType;
                 if (xsInt.hasMinimum()) {
                     Integer min = xsInt.getMinExclusive();
@@ -751,11 +759,70 @@ public class DescriptorSourceFactory {
                     jsc.append(fixed);
                     jsc.append(");");
                 }
+                //-- pattern facet
+                pattern = xsInt.getPattern();
+                if (pattern != null) {
+                    jsc.add("iv.setPattern(\"");
+                    jsc.append(pattern);
+                    jsc.append("\");");
+                }
                 
                 jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
                 jsc.add("}");
                 break;
+            //-- long
+            case XSType.LONG:
+            {
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("LongValidator lv = new LongValidator();");
+                XSLong xsLong = (XSLong)xsType;
+                if (xsLong.hasMinimum()) {
+                    Long min = xsLong.getMinExclusive();
+                    if (min != null)
+                        jsc.add("lv.setMinExclusive(");
+                    else {
+                        min = xsLong.getMinInclusive();
+                        jsc.add("lv.setMinInclusive(");
+                    }
+                    jsc.append(min.toString());
+                    jsc.append("L);");
+                }
+                if (xsLong.hasMaximum()) {
+                    Long max = xsLong.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("lv.setMaxExclusive(");
+                    else {
+                        max = xsLong.getMaxInclusive();
+                        jsc.add("lv.setMaxInclusive(");
+                    }
+                    jsc.append(max.toString());
+                    jsc.append("L);");
+                }
+                
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Long.parseLong(fixed);
+                    
+                    jsc.add("lv.setFixedValue(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                //-- pattern facet
+                pattern = xsLong.getPattern();
+                if (pattern != null) {
+                    jsc.add("lv.setPattern(\"");
+                    jsc.append(pattern);
+                    jsc.append("\");");
+                }
+                
+                jsc.add("fieldValidator.setValidator(lv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+            }
             case XSType.STRING:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
@@ -778,7 +845,7 @@ public class DescriptorSourceFactory {
                     jsc.append("\");");
                 }
                 //-- pattern facet
-                String pattern = xsString.getPattern();
+                pattern = xsString.getPattern();
                 if (pattern != null) {
                     jsc.add("sv.setPattern(\"");
                     jsc.append(pattern);
