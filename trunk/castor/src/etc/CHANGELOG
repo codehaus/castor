@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1720.
+       In the case a RDBMS does not support the LIMIT/OFFSET clauses, a
+       SyntaxNotSupportedException is thrown.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1720
+       (Werner - 20040909)
+       
 JDO:   Fixed bug 1595 using contribution from Stein M. Hugubakken [dulci@start.no]
        Added CacheManager (and DatabaseImpl.getCacheManager() method) to allow users
        to selectively flush the Castor performance cache(s).
