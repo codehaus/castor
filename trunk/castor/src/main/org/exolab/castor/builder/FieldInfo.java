@@ -265,26 +265,8 @@ public class FieldInfo extends XMLInfo {
             jsc.add("this._has");
             jsc.append(getName());
             jsc.append(" = true;");
-
-            //-- create hasMethod
-            method = new JMethod(JType.Boolean, "has"+mname);
-            jClass.addMethod(method);
-            jsc = method.getSourceCode();
-            jsc.add("return this._has");
-            jsc.append(getName());
-            jsc.append(";");
-
-			//-- if optional then create delete method
-			if (!isRequired()) {
-                method = new JMethod(null, "delete"+mname);
-                jClass.addMethod(method);
-                jsc = method.getSourceCode();
-                jsc.add("this._has");
-                jsc.append(getName());
-                jsc.append("= false;");
-            }
         }
-
+        
         //-- bound properties
         if (_bound) {
             //notify listeners
@@ -297,7 +279,36 @@ public class FieldInfo extends XMLInfo {
             jsc.append(xsType.createToJavaObjectCode("this."+getName()));
             jsc.append(");");
         }
+        
+        if (needs_has) {
 
+            //-- create hasMethod
+            method = new JMethod(JType.Boolean, "has"+mname);
+            jClass.addMethod(method);
+            jsc = method.getSourceCode();
+            jsc.add("return this._has");
+            jsc.append(getName());
+            jsc.append(";");
+
+			//-- create delete method
+            method = new JMethod(null, "delete"+mname);
+            jClass.addMethod(method);
+            jsc = method.getSourceCode();
+            jsc.add("this._has");
+            jsc.append(getName());
+            jsc.append("= false;");
+            //-- bound properties
+            if (_bound) {
+                //notify listeners
+                jsc.add("notifyPropertyChangeListeners(\"");
+                jsc.append(getName());
+                jsc.append("\", ");
+			    //-- 'this.' ensures this refers to the class member not the parameter
+                jsc.append(xsType.createToJavaObjectCode("this."+getName()));
+                jsc.append(", null");
+                jsc.append(");");
+            }
+        }
 
     } //-- createAccessMethods
 
