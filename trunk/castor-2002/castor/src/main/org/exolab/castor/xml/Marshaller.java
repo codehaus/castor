@@ -345,15 +345,8 @@ public class Marshaller {
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         
-		System.out.print("Poop"+_class.getName()+","+descriptor.getFieldType().getName()+","+name);
         if (_class == descriptor.getFieldType())
-		{
-			System.out.print("Match!");
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
-			System.out.println(classDesc);
-		}
-		else
-			System.out.println("NoMatch!");
 
         if (classDesc == null) {
             
@@ -395,7 +388,6 @@ public class Marshaller {
                 classDesc = getClassDescriptor(_class);
 				if (descriptor.getXMLName()==null)
 					name = classDesc.getXMLName();
-				System.out.println("class "+name);
             }
             
             if (classDesc == null) {
