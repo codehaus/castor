@@ -61,6 +61,7 @@ class SimpleTypeDefinition {
 
     private String      _name           = null;
     private String      _id             = null;
+    private String      _final          = null;
     private Schema      _schema         = null;
     private SimpleType  _baseType       = null;
     private String      _baseTypeName   = null;
@@ -101,6 +102,12 @@ class SimpleTypeDefinition {
         //-- set Schema
         simpleType.setSchema(_schema);
         
+        //-- @id
+        simpleType.setId(_id);
+        
+        //-- @final
+        simpleType.setFinal(_final);
+        
         //-- copy Facets
         Enumeration enum = _facets.enumerate();
         while (enum.hasMoreElements())
@@ -128,6 +135,13 @@ class SimpleTypeDefinition {
         else {
             simpleType = new UrType();
         }
+        
+        
+        //-- @id
+        simpleType.setId(_id);
+        
+        //-- @final
+        simpleType.setFinal(_final);
         
         //-- copy Facets
         Enumeration enum = _facets.enumerate();
@@ -180,6 +194,17 @@ class SimpleTypeDefinition {
         _baseTypeName = baseTypeName;
         _baseType = null;
     } //-- setBaseTypeName
+    
+    /**
+     * Sets the value of the 'final' property, indicating which
+     * types of derivation are not allowed. A null value will indicate
+     * all types of derivation (list, restriction, union) are allowed.
+     *
+     * @param finalValue the value of the final property.
+    **/
+    void setFinal(String finalValue) {
+        _final = finalValue;
+    }
 
 } //-- SimpleTypeDefinition
 
