@@ -153,9 +153,27 @@ public class Parser {
                         unionExpr.setUnionExpr((UnionExprImpl)createUnionExpr(lexer));
                         expr = unionExpr;
                     }
+                    else if (expr.getExprType() == XPathExpression.PRIMARY) {
+                        
+                        PrimaryExpr px = (PrimaryExpr) expr;
+                        switch(px.getType()) {
+                            case PrimaryExpr.VARIABLE_REFERENCE:
+                            case PrimaryExpr.FUNCTION_CALL:
+                                FilterExprImpl fx = new FilterExprImpl( px );
+                                lexer.pushBack();
+                                expr = new PathExprImpl(fx);
+                                break;
+                            default:
+                                String err = "Primary expr '" + expr.toString() + "' used as part of "+
+                                    "a path expression.";
+                                throw new XPathException(err);
+                        }
+                    }
                     else {
-                        throw new XPathException("#parse error: "+
-                            lexer.toString());
+                        String path = lexer.toStringPrevious();
+                        path += " <-- cannot use '|' at this position in the expression.";
+                        throw new XPathException("#parse error: invalid token '|' found at: "+
+                            path + "\n expression: " + lexer.toString());
                     }
                     break;
                 case Token.ANCESTOR_OP:
@@ -178,7 +196,7 @@ public class Parser {
                                 expr = new PathExprImpl(fx, createPathExpr(lexer));
                                 break;
                             default:
-                                String err = "Primary expr used as part of "+
+                                String err = "Primary expr '" + expr.toString() + "' used as part of "+
                                     "a path expression.";
                                 throw new XPathException(err);
                         }
@@ -1146,7 +1164,8 @@ public class Parser {
             "cname mod 4",
             "(9)*(7)",
             "not((@align) or (../@align) or (../parent::*[(self::thead) or (self::tfoot) or (self::tbody)]/@align)) and (ancestor::table[1]/*[(self::col) or (self::colgroup)]/descendant-or-self::*/@align)",
-            "@text"
+            "@text",
+            "(not($var1) or ($var2 | $var3//*))"
         };
         
         //-- UnionExpr tests
