@@ -59,7 +59,7 @@ import org.exolab.castor.util.Messages;
 import org.exolab.castor.mapping.Mapping;
 
 import org.exolab.castor.xml.Unmarshaller;
-
+import org.exolab.castor.xml.schema.SchemaException;
 import org.exolab.castor.xml.schema.simpletypes.*;
 import org.exolab.castor.xml.schema.simpletypes.factory.*;
 
@@ -78,33 +78,6 @@ import org.xml.sax.InputSource;
 **/
 public class SimpleTypesFactory
 {
-    /**
-     * Tells if a type code corresponds to an xml schema built in type
-     */
-    public static boolean isBuiltInType(int codeType)
-    {
-        return USER_TYPE < codeType;
-    }
-
-    /**
-     * Tells if a type code corresponds to an xml schema (built in) primitive type
-     */
-    public static boolean isPrimitiveType(int codeType)
-    {
-        return (STRING_TYPE <= codeType)&&(codeType <= QNAME_TYPE);
-    }
-
-    /**
-     * Gets an instance of a class derived from SimpleType representing the
-     * built in type which name is given as a parameter.
-     */
-    public SimpleType getBuiltInType(String typeName)
-    {
-        Type type= getType(typeName);
-        if (type == null) return null;
-        return type.getSimpleType();
-    }
-
 
     //Type Codes:
 
@@ -199,8 +172,39 @@ public class SimpleTypesFactory
      */
     private static PrintWriter _logWriter= new PrintWriter(System.out);
 
+    /**
+     * The built-in schema, hopefully only temporary
+    **/
+    private static final Schema _builtInSchema = new Schema();
+
+     /**
+     * Tells if a type code corresponds to an xml schema built in type
+     */
+    public static boolean isBuiltInType(int codeType)
+    {
+        return USER_TYPE < codeType;
+    }
 
     /**
+     * Tells if a type code corresponds to an xml schema (built in) primitive type
+     */
+    public static boolean isPrimitiveType(int codeType)
+    {
+        return (STRING_TYPE <= codeType)&&(codeType <= QNAME_TYPE);
+    }
+
+    /**
+     * Gets an instance of a class derived from SimpleType representing the
+     * built in type which name is given as a parameter.
+     */
+    public SimpleType getBuiltInType(String typeName)
+    {
+        Type type= getType(typeName);
+        if (type == null) return null;
+        return type.getSimpleType();
+    }
+    
+   /**
      * Gets a built in type's name given its code.
      */
     public String getBuiltInTypeName(int builtInTypeCode) {
@@ -299,6 +303,8 @@ public class SimpleTypesFactory
 
         if ( (derivation != null) && (derivation.equals(SchemaNames.LIST)) ) {
             //derive as list
+            /* This doesn't seem valid based on the XML Schema 
+             * Recommendation, so I am commenting it out (kvisco)
             if ( !(baseType instanceof AtomicType) ) {
                 //only lists of atomic values are allowed by the specification
                 sendToLog( Messages.format("schema.deriveByListError",
@@ -306,8 +312,17 @@ public class SimpleTypesFactory
                                            baseType.getName()) );
                 return null;
             }
-            result= new ListType();
-            ((ListType)result).setType( (AtomicType)baseType );
+            */
+            try {
+                result= new ListType(schema);
+            }
+            catch(SchemaException sx) {
+                sendToLog( Messages.format("schema.deriveByListError",
+                                           internalName,
+                                           baseType.getName()) );
+                return null;
+            }
+            ((ListType)result).setItemType( baseType );
         }
         else {
             //derive as restriction (only derivation allowed apart from list for simple types)
@@ -320,9 +335,9 @@ public class SimpleTypesFactory
             }
 
             //creates the instance of a class derived from SimpleType representing the new type.
-	        result= createInstance(builtInBase.getName());
+	        result= createInstance(schema, builtInBase.getName());
             if (result == null) {
-                throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
+                throw new SimpleTypesFactoryException( Messages.message("schema.cantLoadBuiltInTypes") );
             }
         }
 
@@ -420,7 +435,7 @@ public class SimpleTypesFactory
 		        {
                     Type type= (Type)(types.elementAt(index));
                     _typesByName.put(type.getName(), type);
-                    type.setSimpleType(createSimpleType(type));
+                    type.setSimpleType(createSimpleType(_builtInSchema, type));
                     _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
                 }
 	        }
@@ -438,13 +453,15 @@ public class SimpleTypesFactory
     /**
      * Creates a SimpleType, valid only for built in types.
      */
-    private SimpleType createSimpleType(Type type)
+    private SimpleType createSimpleType(Schema schema, Type type)
     {
         //Creates the instance of a class derived from SimpleType representing the type.
-        SimpleType result= createInstance(type.getName());
+        SimpleType result= createInstance(schema, type.getName());
 
-        if (result == null)
-            throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
+        if (result == null) {
+            String err = Messages.message("schema.cantLoadBuiltInTypes");
+            throw new SimpleTypesFactoryException( err );
+        }
 
 	    result.setName(type.getName());
 
@@ -494,7 +511,7 @@ public class SimpleTypesFactory
      * Creates the correct instance for the given type name.
      * Valid only for built in type names.
      */
-    private SimpleType createInstance(String builtInTypeName)
+    private SimpleType createInstance(Schema schema, String builtInTypeName)
     {
         Type type= getType(builtInTypeName);
 
@@ -502,7 +519,13 @@ public class SimpleTypesFactory
         String derivation= type.getDerivedBy();
         ListType resultList = null;
         if ( (derivation != null) && (derivation.equals(SchemaNames.LIST)) ) {
-            resultList = new ListType();
+            try {
+                resultList = new ListType(schema);
+            }
+            catch(SchemaException sx) {
+                //-- This should not happen...but who knows!
+                throw new SimpleTypesFactoryException(sx);
+            }
         }
 
         //Finds the primitive ancestor (defines the class that represents it)
@@ -522,28 +545,29 @@ public class SimpleTypesFactory
         if (implClass.isAssignableFrom(UrType.class)) {
                 try {
                      result = (UrType)implClass.newInstance();
-                } catch (Exception e) {
-                     //should never happen
-                     result = null;
-                     e.printStackTrace();
+                     result.setSchema(schema);
+                } 
+                catch (Exception e) {
+                    throw new SimpleTypesFactoryException(e);
                 }
-        } else {
+        } 
+        else {
              try {
                  result = (AtomicType)implClass.newInstance();
-             } catch (Exception except) {
+                 result.setSchema(schema);
+             } 
+             catch (Exception except) {
                  except.printStackTrace();
                  result= null;
              }
-
              if (resultList != null) {
-                  resultList.setType((AtomicType)result);
+                  resultList.setItemType(result);
                   return resultList;
              }
         }
         return result;
-    }
-
-}
+    } //-- createInstance
+} //-- class: SimpleTypesFactory
 
 /**
  * A RuntimeException which allows nested exceptions.
