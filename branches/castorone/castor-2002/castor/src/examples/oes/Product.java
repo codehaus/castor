@@ -164,7 +164,12 @@ public class Product
     }
 
 
-    public void jdoCreate()
+    public void jdoBeforeCreate( Database db )
+    {
+    }
+
+
+    public void jdoAfterCreate()
     {
     }
 
@@ -174,17 +179,17 @@ public class Product
     }
 
 
-    public void jdoRemove()
+    public void jdoBeforeRemove()
+    {
+    }
+
+
+    public void jdoAfterRemove()
     {
     }
 
 
     public void jdoUpdate()
-    {
-    }
-
-
-    public void jdoBeforeCreate( Database db )
     {
     }
 

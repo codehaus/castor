@@ -128,17 +128,26 @@ public interface Persistent
      * Called to indicate that an object has been created in persistent
      * storage. This method is called during db.create().
      */
-    public void jdoCreate()
+    public void jdoAfterCreate()
         throws Exception;
-    
+
 
     /**
      * Called to indicate that an object is to be removed from persistent
      * storage. This method is called during db.remove().
      */
-    public void jdoRemove()
+    public void jdoBeforeRemove()
         throws Exception;
-    
+
+
+
+    /**
+     * Called to indicate that an object has been removed from persistent
+     * storage. This method is called during db.remove().
+     */
+    public void jdoAfterRemove()
+        throws Exception;
+
 
 
     /**
