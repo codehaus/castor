@@ -121,7 +121,7 @@
         </p>
         </section>
 
-        <section title="OQL Query Externalization">
+        <section title="Query Externalization">
         <p>
         <b>Description:</b><br />
         Castor should include a mechanism for queries to be externalized in the 
@@ -133,9 +133,9 @@
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
         This would allow for named queries that do not require recompilation 
-        for changes. These queries would be specified within the &lt;class> elements 
-        and would just be included automatically via the Castor XML unmarshalling 
-        of the object mapping descriptor.
+        for changes. These queries would be included automatically via the 
+        Castor XML unmarshalling of the object mapping descriptor via the 
+        &lt;includes> element.
         </p>
         </section>
 
@@ -151,6 +151,8 @@
         <b>Status:</b> not started<br />
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
+        The relationship type (e.g. one-to-one, one-to-many, many-to-many) is 
+        already determined by the <tt>FieldMolder</tt>.
         </p>
         </section>
 
@@ -193,7 +195,62 @@
         There should really be a cache API. This would abstract the entire cache 
         engine allowing it to be made pluggable. In fact, I would much rather 
         consider using a <a href="http://jcp.org/en/jsr/detail?id=107">JSR 107</a>
-        implementation than writing our own API. 
+        implementation than writing our own API. Because this layer will be
+        pluggable, a distributed cache implementation should be provided using
+        <a href="http://www.javagroups.com/">JavaGroups</a>.
+        </p>
+        </section>
+
+        <section title="Polymorphism">
+        <p>
+        <b>Description:</b><br />
+        Handling of interfaces and abstract classes with regard to both object 
+        mapping and queries. 
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b> not started<br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        Maybe this could be handled for the object mapping by using nested 
+        &lt;class> elements??? 
+        <br />
+        <i>Interface idea</i> - introduce the 'implements' attribute to the
+        &lt;class> element: 
+        <pre><![CDATA[
+<class name="myapp.Foo" ... >
+    <class name="myapp.FooBar" implements="myapp.Foo" ...>
+    </class>
+</class>]]>
+        </pre>
+        Obviously an interface can be determined by using <tt>java.lang.Class#isInterfaces()</tt> and/or
+        <tt>java.lang.Class#isInterface()</tt>. 
+        <br />
+        <br />
+        <i>Abstract class idea</i> - make use of the 'extends' element plus
+        some code testing: 
+        <pre><![CDATA[
+<class name="myapp.Foo" ... >
+    <class name="myapp.FooBar" extends="myapp.Foo" ...>
+    </class>
+</class>]]>
+        </pre>
+        The use of the 'extends' attribute for the abstract class is not
+        unique enough to determine that the class is abstract or concrete.
+        But by using <tt>java.lang.Class#isAssignableFrom()</tt> and/or 
+        <tt>java.lang.Class#getSuperclass()</tt> will work. 
+        </p>
+        <p>
+        <i>Queries</i> - objects should already be cast properly:
+        <pre><![CDATA[
+SELECT p FROM myapp.Product p]]>
+        </pre>
+        The above query would return all <tt>Product</tt>s including
+        <tt>Computer</tt>s, etc.
+        </p>
+        <p>
+        Not sure if this will really work. It will need experimentation to 
+        determine.
         </p>
         </section>
 
@@ -230,6 +287,50 @@
         <b>Notes:</b><br />
         </p>
         </section>
+
+        <!--
+        Items to be added to this list (in no particular order):
+
+        - Support for sub-queries, joins, order by, group by, between, functions, 
+          is null, is not null, named parameters, binary, logical and match 
+          operators, precedence via parens, etc. 
+        - Make it easier to use straight SQL (e.g. no AS <object-name> syntax
+          for certain cases)
+        - Support for the mapping of multiple classes to one table and one 
+          class to multiple tables
+        - Support the splitting of object mapping (this is highly dependent 
+          upon Castor XML)
+        - Best practices/patterns document
+        - Persistence of primitives and primitive wrappers
+        - Make it really easy to implement type convertors (e.g. Oracle JDBC
+          types, etc.)
+        - Cascading deletes of an object graph via the object mapping descriptor
+        - Lazy loading via either byte code manipulation or dynamic proxies
+        - Sorted Collections
+        - Support a choice of outer joins or ???
+        - Updated JBoss JMX MBean 
+        - Log4J CastorAppender
+        - Updated XDoclet exolab plug-in
+        - Better examples (e.g. servlet, EJB, client/server, etc.)
+        - xPetstore Castor implementation
+        - Castor tutorial document
+        - More engine support (e.g. native XML databases, SAP DB, FirstSQL, 
+          McKoi SQL, Pointbase, etc.)
+        -->
+
+        <!--
+        <section title="">
+        <p>
+        <b>Description:</b><br />
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b><br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        </p>
+        </section>
+        -->
 
     </section>
 
