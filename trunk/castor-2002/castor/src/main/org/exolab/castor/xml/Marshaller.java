@@ -203,6 +203,13 @@ public class Marshaller extends MarshalFramework {
 	private boolean _marshalExtendedType = true;
 
     /**
+     * The registered MarshalListener to receive 
+     * notifications of pre and post marshal for
+     * each object in the tree being marshalled.
+    **/
+    private MarshalListener _marshalListener = null;
+    
+    /**
      * The namespace stack
     **/
     private Namespaces _namespaces = null;
@@ -446,6 +453,24 @@ public class Marshaller extends MarshalFramework {
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
 
+    /**
+     * Sets an optional MarshalListener to recieve pre and post
+     * marshal notification for each Object in the tree.
+     * MarshalListener is only for complex objects that map
+     * into elements, simpleTypes and types that map into
+     * attributes do not cause any pre and post event notifications.
+     * Current only one (1) listener is allowed. If you need
+     * register multiple listeners, you will have to create
+     * your own master listener that will forward the
+     * event notifications and manage the multiple
+     * listeners.
+     *
+     * @param listener the MarshalListener to set.
+    **/
+    public void setMarshalListener(MarshalListener listener) {
+        _marshalListener = listener;
+    } //-- setMarshalListener
+    
     /**
      * Sets the mapping for the given Namespace prefix
      * @param nsPrefix the namespace prefix
@@ -709,6 +734,13 @@ public class Marshaller extends MarshalFramework {
         if (descriptor != null && descriptor.isTransient())
             return;
 
+        //-- notify listener
+        if (_marshalListener != null) {
+            if (!_marshalListener.preMarshal(object))
+                return;
+        }
+        
+        //-- handle AnyNode
         if (object instanceof AnyNode) {
            try {
                AnyNode2SAX.fireEvents((AnyNode) object, handler);
@@ -988,7 +1020,7 @@ public class Marshaller extends MarshalFramework {
             String valueType = attDescriptor.getSchemaType();
             if ((valueType != null) && (valueType.equals(QNAME_NAME)))
                  value = resolveQName(value, attDescriptor);
-
+                 
             atts.addAttribute(xmlName, CDATA, value.toString());
         }
 
@@ -1181,10 +1213,14 @@ public class Marshaller extends MarshalFramework {
         catch(org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
         }
-
+        
         --depth;
         _parents.pop();
         if (!atRoot) _namespaces = _namespaces.getParent();
+        
+        //-- notify listener of post marshal
+        if (_marshalListener != null)
+            _marshalListener.postMarshal(object);
 
     } //-- void marshal(DocumentHandler)
 
