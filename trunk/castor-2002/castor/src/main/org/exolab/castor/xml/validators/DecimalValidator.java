@@ -61,6 +61,8 @@ import java.math.BigDecimal;
 public class DecimalValidator implements TypeValidator
 {
 
+    private boolean _isFixed = false;
+    private BigDecimal _fixed = null;
     private boolean useMin   = false;
     private boolean useMax   = false;
 
@@ -155,7 +157,25 @@ public class DecimalValidator implements TypeValidator
           else _fractionDigits = fractionDig;
      }
 
+    /**
+     * Sets the fixed value the decimal to validate must
+     * be equal to.
+     * @param fixed the fixed value
+     */
+    public void setFixed(BigDecimal fixed) {
+        _fixed = fixed;
+        _isFixed = true;
+    } //-- setMinExclusive
+
     public void validate(BigDecimal bd) throws ValidationException {
+
+        if (_isFixed) {
+            if (!bd.equals(_fixed)) {
+                String err = bd + " is not equal to the fixed value of ";
+                err += _fixed;
+                throw new ValidationException(err);
+            }
+        }
 
         if (useMin) {
             if (bd.compareTo(min)==-1) {
@@ -177,16 +197,16 @@ public class DecimalValidator implements TypeValidator
         if (_totalDigits != -1) {
             String temp = bd.toString();
             int length = (temp.indexOf('.') ==  -1)?temp.length():temp.length()-1;
-            if (length != _totalDigits){
-                String err = bd + " doesn't have the correct number of digits: "+_totalDigits;
+            if (length > _totalDigits){
+                String err = bd + " doesn't have the correct number of digits, it must be less than or equal to "+_totalDigits;
                 throw new ValidationException(err);
             }
             temp = null;
         }
         if (_fractionDigits != -1) {
 
-            if (bd.scale() != _fractionDigits){
-                String err = bd + " doesn't have the correct number of digits in the fraction part: "+_fractionDigits;
+            if (bd.scale() > _fractionDigits){
+                String err = bd + " doesn't have the correct number of digits in the fraction part: , it must be less than or equal to "+_fractionDigits;
                 throw new ValidationException(err);
             }
         }
