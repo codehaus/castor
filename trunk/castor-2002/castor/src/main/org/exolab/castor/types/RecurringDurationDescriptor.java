@@ -40,7 +40,7 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $Id $
  */
 
 
@@ -54,12 +54,11 @@ import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
 /**
- * The Time Descriptor
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * The RecurringDuration Descriptor
+ * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
- * @see TimeDurationDescriptor
  */
-public class DateDescriptor
+public class RecurringDurationDescriptor
     implements XMLClassDescriptor
 {
 
@@ -72,8 +71,8 @@ public class DateDescriptor
 
     /**
      * The TypeValidator to use for validation of the described class
-    **/
-    private TypeValidator validator = null;
+     **/
+     private TypeValidator validator = null;
 
     /**
      * The namespace prefix that is to be used when marshalling
@@ -89,7 +88,7 @@ public class DateDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "date";
+    private static final String _xmlName = "recurringDuration";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +98,13 @@ public class DateDescriptor
     //- Constructors -/
     //----------------/
 
-    public DateDescriptor() {
+    public RecurringDurationDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new DateFieldHandler());
+            _contentDescriptor.setHandler(new RecurringDurationFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +112,7 @@ public class DateDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- DateDescriptor
+    }
 
     //------------------/
     //- Public Methods -/
@@ -191,7 +190,7 @@ public class DateDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Date";
+            "; descriptor for class: RecurringDuration";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -210,7 +209,7 @@ public class DateDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Date.class;
+        return RecurringDuration.class;
     } //-- getJavaClass
 
 
@@ -260,7 +259,7 @@ public class DateDescriptor
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
      * @version $Revision $ $Date $
     **/
-    class DateFieldHandler extends XMLFieldHandler {
+    class RecurringDurationFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
@@ -269,7 +268,7 @@ public class DateDescriptor
         /**
          * Creates a new TimeFieldHandler
         **/
-        public DateFieldHandler() {
+        public RecurringDurationFieldHandler() {
             super();
         } //-- TimeFieldHandler
 
@@ -289,9 +288,9 @@ public class DateDescriptor
         {
 
             //-- check for TimeDuration class  -- add later
-            Date date = (Date) target;
+            RecurringDuration recurr = (RecurringDuration) target;
 
-            return date.toString();
+            return recurr.toString();
         } //-- getValue
 
         /**
@@ -303,12 +302,11 @@ public class DateDescriptor
             throws java.lang.IllegalStateException
         {
 
-
-            if (! (target instanceof Date) ) {
+            if (! (target instanceof RecurringDuration) ) {
                //-- throw exception
             }
 
-            Date dateTarget = (Date) target;
+            RecurringDuration recurTarget = (RecurringDuration) target;
 
             if (value == null) {
                /// do something
@@ -316,11 +314,16 @@ public class DateDescriptor
 
             //-- update current instance of time with new time
             try {
-                Date temp = (Date) Date.parseDate(value.toString()) ;
-                dateTarget.setCentury(temp.getCentury());
-                dateTarget.setYear(temp.getYear());
-                dateTarget.setMonth(temp.getMonth());
-                dateTarget.setDay(temp.getDay());
+                RecurringDuration temp = RecurringDuration.parse(value.toString()) ;
+                recurTarget.setCentury(temp.getCentury());
+                recurTarget.setYear(temp.getYear());
+                recurTarget.setMonth(temp.getMonth());
+                recurTarget.setDay(temp.getDay());
+                recurTarget.setHour(temp.getHour());
+                recurTarget.setMinute(temp.getMinute());
+                recurTarget.setSecond(temp.getSeconds(), temp.getMilli());
+                recurTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
+                recurTarget.isUTC();
             }
             catch (java.text.ParseException ex) {
                 //-- ignore for now
@@ -362,11 +365,11 @@ public class DateDescriptor
         public Object newInstance( Object parent )
             throws IllegalStateException
         {
-            return new Date();
+            return new RecurringDuration();
         } //-- newInstance
 
 
-    } //-- DateFieldHandler
+    } //-- RecurringDurationFieldHandler
 
+} //-- RecurringDurationValidator
 
-} //-- DateDescriptor

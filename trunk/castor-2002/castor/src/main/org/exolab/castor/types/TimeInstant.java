@@ -41,25 +41,25 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
+ * Date         Author          Changes
+ * 11/02/2000   Arnaud Blandin  Changed the constructor
+ * 26/10/2000   Arnaud Blandin  Created
  */
 package org.exolab.castor.types;
 /**
  * Describe an XML schema TimeInstant
+ * The time type is derived from recurringDuration by setting up the facet:
+ *  - duration to "P0Y"
+ *  - period to "P0Y"
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
+ * @see RecurringDuration
  */
 
 public class TimeInstant extends RecurringDuration {
 
     public TimeInstant() {
-        super();
-        try {
-            setDuration( TimeDuration.parse("P0Y"));
-            setPeriod( TimeDuration.parse("P0Y"));
-        } catch (Exception e) {
-            System.out.println("Error in TimeInstant constructor");
-            System.out.println(e);
-        }
+        super("P0Y","P0Y");
     }
 }

@@ -42,35 +42,34 @@
  *
  * $Id$
  * Date         Author              Changes
- * 11/01/2000   Arnaud Blandin      added toDate(), enhancements
- * 10/23/2000   Arnaud Blandin      Created
+ * 11/01/2000   Arnaud Blandin      Created
  */
 package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimePeriod;
 
 import java.text.ParseException;
-import java.util.StringTokenizer;
-import java.text.SimpleDateFormat;
 import java.util.SimpleTimeZone;
+import java.text.SimpleDateFormat;
+
 /**
- * Describe an XML schema Month
+ * Describe an XML schema Year
  * The date type is derived from time period by setting up the facet :
- *      - duration to "P1M"
+ *      - duration to "P1Y"
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  */
 
-public class Month extends TimePeriod {
+public class Century extends TimePeriod {
 
     /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;
 
     /** The month format used by the toDate() method */
-    private static final String MONTH_FORMAT = "yyyy-MM";
+    private static final String YEAR_FORMAT = "yyyy";
 
-    public Month() {
-        super("P1M");
+    public Century() {
+        super("P100Y");
         //we need to set the time zone to the computer local time zone
         //if we want to use the toDate() method.
         int temp = SimpleTimeZone.getDefault().getRawOffset();
@@ -83,6 +82,16 @@ public class Month extends TimePeriod {
         _zoneMinute = (short)(temp / (60*1000));
     }
 
+
+    /*Disallow the access to set year method*/
+    public void setYear(short year) {
+        throw new UnsupportedOperationException("year must not be changed");
+    }
+
+    /*Disallow the access to set month method*/
+    public void setMonth(short month) {
+        throw new UnsupportedOperationException("month must not be changed");
+    }
     /*Disallow the access to set day method*/
     public void setDay(short day) {
         throw new UnsupportedOperationException("day must not be changed");
@@ -111,10 +120,10 @@ public class Month extends TimePeriod {
 
 
      /**
-     * convert this Month to a string
+     * convert this Year to a string
      * The format is defined by W3C XML Schema draft and ISO8601
-     * i.e (+|-)CCYY-MM
-     * @return a string representing this Month
+     * i.e (+|-)CC
+     * @return a string representing this Century
      */
      public String toString() {
 
@@ -123,15 +132,6 @@ public class Month extends TimePeriod {
         result = String.valueOf(this.getCentury());
         if (result.length() == 1)
             result = "0"+result;
-        String temp = String.valueOf(this.getYear());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result =  result  + temp;
-
-        temp = String.valueOf(this.getMonth());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = result + "-" + temp;
 
         result = isNegative() ? "-"+result : result;
 
@@ -140,59 +140,44 @@ public class Month extends TimePeriod {
     }//toString
 
     /**
-     * parse a String and convert it into a Month
+     * parse a String and convert it into a Century
      * @param str the string to parse
-     * @return the Month represented by the string
+     * @return the Century represented by the string
      * @throws ParseException a parse exception is thrown if the string to parse
      *                        does not follow the rigth format (see the description
      *                        of this class)
      */
-    public static Month parseMonth(String str) throws ParseException {
+    public static Century parseCentury(String str) throws ParseException {
 
-        Month result = new Month();
+        Century result = new Century();
 
-        if ( str.startsWith("-") )
+        if ( str.startsWith("-") ) {
             result.setNegative();
+            str =str.substring(1);
+        }
 
         if (DEBUG) {
-            System.out.println("In parsing method of Month");
+            System.out.println("In parsing method of Century");
             System.out.println("String to parse : "+str);
             System.out.println("Negative ? "+result.isNegative());
         }
 
-        // proceed date
-        StringTokenizer token = new StringTokenizer(str,"-");
 
-        if (token.countTokens() != 2)
-            throw new ParseException(str+": Bad XML Schema Month type format (CCYY-MM)",0);
+        if (str.length() != 2)
+            throw new ParseException(str+": Bad XML Schema Century type format (CC)",0);
 
-        String temp = token.nextToken();
-        if (temp.length() != 4)
-            throw new ParseException(str+": Bad year format",1);
+
         if (DEBUG) {
-            System.out.println("Processing century: "+temp.substring(0,2));
+            System.out.println("Processing century: "+str.substring(0,2));
         }
-        result.setCentury(Short.parseShort( temp.substring(0,2) ));
-        if (DEBUG) {
-            System.out.println("Processing year: "+temp.substring(2,4));
-        }
-        result.setYear(Short.parseShort( temp.substring(2,4) ));
+        result.setCentury(Short.parseShort(str));
 
-        temp=token.nextToken();
-        if (temp.length() != 2)
-            throw new ParseException(str+": Bad month format",5);
-        if (DEBUG) {
-            System.out.println("Processing month: "+temp);
-        }
-        result.setMonth(Short.parseShort(temp));
-
-        temp = null;
         return result;
     }//parse
 
      public java.util.Date toDate() throws ParseException {
         java.util.Date date = null;
-        SimpleDateFormat df = new SimpleDateFormat(MONTH_FORMAT);
+        SimpleDateFormat df = new SimpleDateFormat(YEAR_FORMAT);
         SimpleTimeZone timeZone = new SimpleTimeZone(0,"UTC");
 
         // Set the time zone
@@ -207,5 +192,4 @@ public class Month extends TimePeriod {
         date = df.parse(this.toString());
         return date;
     }//toDate()
-
-}//Month
+} //--Century

@@ -54,12 +54,12 @@ import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
 /**
- * The Time Descriptor
+ * The Century Descriptor
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see TimeDurationDescriptor
  */
-public class DateDescriptor
+public class CenturyDescriptor
     implements XMLClassDescriptor
 {
 
@@ -89,7 +89,7 @@ public class DateDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "date";
+    private static final String _xmlName = "century";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +99,13 @@ public class DateDescriptor
     //- Constructors -/
     //----------------/
 
-    public DateDescriptor() {
+    public CenturyDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new DateFieldHandler());
+            _contentDescriptor.setHandler(new CenturyFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +113,7 @@ public class DateDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- DateDescriptor
+    } //--CenturyDescriptor
 
     //------------------/
     //- Public Methods -/
@@ -191,7 +191,7 @@ public class DateDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Date";
+            "; descriptor for class: Century";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -210,7 +210,7 @@ public class DateDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Date.class;
+        return Century.class;
     } //-- getJavaClass
 
 
@@ -256,11 +256,11 @@ public class DateDescriptor
 
     /**
      * A specialized FieldHandler for the XML Schema
-     * TimeDuration related types
+     * Century related types
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
-     * @version $Revision $ $Date $
+     * @version $Revision$ $Date$
     **/
-    class DateFieldHandler extends XMLFieldHandler {
+    class CenturyFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
@@ -269,9 +269,9 @@ public class DateDescriptor
         /**
          * Creates a new TimeFieldHandler
         **/
-        public DateFieldHandler() {
+        public CenturyFieldHandler() {
             super();
-        } //-- TimeFieldHandler
+        } //-- CenturyFieldHandler
 
         //------------------/
         //- Public Methods -/
@@ -287,11 +287,10 @@ public class DateDescriptor
         public Object getValue(Object target)
             throws java.lang.IllegalStateException
         {
+            //-- check for Century class  -- add later
+            Century  century = (Century) target;
 
-            //-- check for TimeDuration class  -- add later
-            Date date = (Date) target;
-
-            return date.toString();
+            return century.toString();
         } //-- getValue
 
         /**
@@ -303,27 +302,23 @@ public class DateDescriptor
             throws java.lang.IllegalStateException
         {
 
-
-            if (! (target instanceof Date) ) {
+            if (! (target instanceof Century) ) {
                //-- throw exception
             }
 
-            Date dateTarget = (Date) target;
+            Century centuryTarget = (Century) target;
 
             if (value == null) {
                /// do something
             }
 
-            //-- update current instance of time with new time
+            //-- update current instance of century with new century
             try {
-                Date temp = (Date) Date.parseDate(value.toString()) ;
-                dateTarget.setCentury(temp.getCentury());
-                dateTarget.setYear(temp.getYear());
-                dateTarget.setMonth(temp.getMonth());
-                dateTarget.setDay(temp.getDay());
+                Century temp = Century.parseCentury(value.toString()) ;
+                centuryTarget.setCentury(temp.getCentury());
             }
             catch (java.text.ParseException ex) {
-                //-- ignore for now
+                //ignore for now
             }
         } //-- setValue
 
@@ -362,11 +357,11 @@ public class DateDescriptor
         public Object newInstance( Object parent )
             throws IllegalStateException
         {
-            return new Date();
+            return new Century();
         } //-- newInstance
 
 
-    } //-- DateFieldHandler
+    } //-- CenturyFieldHandler
 
 
-} //-- DateDescriptor
+} //-- CenturyDescriptor

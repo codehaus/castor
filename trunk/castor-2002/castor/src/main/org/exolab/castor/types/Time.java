@@ -47,6 +47,7 @@ package org.exolab.castor.types;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
+import java.util.TimeZone;
 import java.util.StringTokenizer;
 import java.util.Date;
 
@@ -54,33 +55,33 @@ import org.exolab.castor.types.TimeDuration;
 
 /**
  * Describe an XML schema Time
- * TODO List :
- * <ul>
- *      <li> Check the validity of the fields</li>
- *      <li> fix the bug in the toDate() method (comes frome the timeZone)</li>
- *      <li> write the full Javadoc and follow Exolab Conventions </li>
+ * The time type is derived from recurringDuration by setting up the facet:
+ *  - duration to "P0Y"
+ *  - period to "P1D"
+ * The format is defined by W3C XML Schema draft and ISO8601
+ * i.e (+|-)hh:mm:ss.sss(Z|(+|-)hh:mm)
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
+ * @see RecurringDuration
  */
 
 public class Time extends RecurringDurationBase {
 
     /** Set to true and recompile to include debugging code in class. */
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
+    /** The Time Format used by the toDate() method */
     private static final String TIME_FORMAT = "HH:mm:ss.SSS";
 
     public Time() {
-        super();
-        try{
-            setDuration( TimeDuration.parse("P0Y"));
-            setPeriod( TimeDuration.parse("P1D"));
-        }catch (ParseException e) {
-            System.out.println("Error in constructor Time");
-            System.out.println(e);
-        }
+        super("P0Y","P1D");
     }
 
+    /**
+     * convert this Time into a local Date
+     * @return a local date representing this Time
+     * @throws ParseException
+     */
     public Date toDate() throws ParseException {
         Date date = null;
         SimpleDateFormat df = new SimpleDateFormat(TIME_FORMAT);
@@ -95,12 +96,18 @@ public class Time extends RecurringDurationBase {
             timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
         }
 
-        //df.setTimeZone(timeZone);
+        df.setTimeZone(timeZone);
         date = df.parse(this.toString());
         return date;
 
     }//toDate()
 
+    /**
+     * convert this Time to a string
+     * The format is defined by W3C XML Schema draft and ISO8601
+     * i.e (+|-)hh:mm:ss.sss(Z|(+|-)hh:mm)
+     * @return a string representing this Time
+     */
     public String toString() {
 
         String result = null;
@@ -144,12 +151,17 @@ public class Time extends RecurringDurationBase {
 
     }//toString
 
-    /**
-     * parse a String and convert it into a recurringDuration
+     /**
+     * parse a String and convert it into a Time
+     * @param str the string to parse
+     * @return the Time represented by the string
+     * @throws ParseException a parse exception is thrown if the string to parse
+     *                        does not follow the rigth format (see the description
+     *                        of this class)
      */
+
     public static Time parse(String str) throws ParseException {
 
-        //TODO check the length of the string
         Time result = new Time();
         //remove if necessary the Z at the end
         if ( str.endsWith("Z"))
@@ -178,8 +190,6 @@ public class Time extends RecurringDurationBase {
                                                          str.lastIndexOf("-");
             str = str.substring(0,index);
         }
-
-
 
         //proceed Time
         StringTokenizer token  = new StringTokenizer(str,":");
@@ -235,6 +245,4 @@ public class Time extends RecurringDurationBase {
         temp = null;
         return result;
     }//parse
-
-
-}
+}//Time

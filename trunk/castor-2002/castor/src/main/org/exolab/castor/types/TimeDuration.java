@@ -55,7 +55,9 @@ import java.text.ParseException;
  * Represents the timeDuration XML Schema type.
  * This representation does not support the decimal fraction
  * for the lowest order item.
- * TODO suuport the corresponding facets
+ * Besides setting TimeDuration to '0' is not possible thus there is
+ * no distinction between '0' and 'P0Y'
+ * TODO support the corresponding facets
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  **/
@@ -329,8 +331,8 @@ public class TimeDuration  {
 
 
         if (chars.length == 0) {
-            throw new IllegalArgumentException("the string to be parsed must not"
-                                                +" be empty");
+            //str = "" means a null TimeDuration
+            return null;
         }
 
         if (chars[idx] == '-') {
@@ -539,8 +541,12 @@ public class TimeDuration  {
     } //equals
 
     /**
-     * Returns true if the present instance of TimeDuration is greater than
+     * <p>Returns true if the present instance of TimeDuration is greater than
      * the parameter
+     * <p>Note This definition does not follow the XML SCHEMA DRAFT 20001024
+     * the following orger relation is used :
+     * t1,t2 timeDuration types
+     * t1>t2 iff t1.toLong()>t2.toLong()
      * @param timeD the time duration to compare with the present instance
      * @return true if the present instance is the greatest, false if not
      */
