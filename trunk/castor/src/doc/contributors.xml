@@ -612,7 +612,7 @@
   </contributor>
 
   <contributor type="Contributor">
-    <name surname="Pelchat" given="St?phane"/>
+    <name surname="Pelchat" given="Stéphane"/>
     <email>stephane@ofoto.com</email>
     <description>Patches to enum and date field handlers to support "nillable" fields.</description>
   </contributor>
@@ -1038,7 +1038,7 @@
   </contributor>
 
   <contributor type="Feedback">
-    <name surname="Wichoski" given="Cl?vis"/>
+    <name surname="Wichoski" given="Clóvis"/>
     <email></email>
     <description>Patch for SapDbQueryExpression</description>
   </contributor>
