@@ -57,7 +57,7 @@
               </xsd:restriction>
 	   </xsd:simpleType>
         </xsd:attribute>
-        <xsd:attribute name="key-generator" type="IDREF"   use="optional"/>
+        <xsd:attribute name="key-generator" type="string"   use="optional"/>
         <xsd:attribute name="auto-complete" type="boolean" use="optional" value="true"/>
     </xsd:complexType>
   </xsd:element>
@@ -78,7 +78,7 @@
       <xsd:sequence>
         <xsd:element name="description"   type="string" minOccurs="0" maxOccurs="1" />
         <xsd:element ref="sql"            minOccurs="0" maxOccurs="1"/>
-        <xsd:element ref="xml"            minOccurs="0" maxOccurs="1"/>
+        <xsd:element ref="bind-xml"       minOccurs="0" maxOccurs="1"/>
         <xsd:element ref="ldap"           minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
 
