@@ -61,7 +61,7 @@ public class ObjectDeletedWaitingForLockException
 
     ObjectDeletedWaitingForLockException()
     {
-	super( "persist.deletedWaitingForLock" );
+        super( "persist.deletedWaitingForLock" );
     }
 
 

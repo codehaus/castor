@@ -67,64 +67,64 @@ public class PersistenceException
 
     private Exception  _except;
 
-
+    
     public PersistenceException( Exception except )
     {
-	super( "persist.nested", except );
-	_except = except;
+        super( "persist.nested", except );
+        _except = except;
     }
 
 
     public PersistenceException( String message )
     {
-	super( message );
+        super( message );
     }
-
-
+    
+    
     public PersistenceException( String message, Object arg1 )
     {
-	super( message, arg1 );
+        super( message, arg1 );
     }
-
-
+    
+    
     public PersistenceException( String message, Object arg1, Object arg2 )
     {
-	super( message, arg1, arg2 );
+        super( message, arg1, arg2 );
     }
-
-
+    
+    
     public Exception getException()
     {
-	return _except;
+        return _except;
     }
-
-
+    
+    
     public void printStackTrace()
     {
-	if ( _except == null )
-	    super.printStackTrace();
-	else
-	    _except.printStackTrace();
+        if ( _except == null )
+            super.printStackTrace();
+        else
+            _except.printStackTrace();
     }
-
-
+    
+    
     public void printStackTrace( PrintStream print )
     {
-	if ( _except == null )
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
-
-
+    
+    
     public void printStackTrace( PrintWriter print )
     {
-	if ( _except == null )
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
-
+    
 
 }
 

@@ -93,26 +93,19 @@ public class Messages
         MessageFormat   mf;
         String          msg;
         
-        try
-        {
+        try {
             mf = (MessageFormat) _formats.get( message );
-            if ( mf == null )
-            {
-                try
-                {
+            if ( mf == null ) {
+                try {
                     msg = _messages.getString( message );
-                }
-                catch ( MissingResourceException except )
-                {
+                } catch ( MissingResourceException except ) {
                     return message;
                 }
                 mf = new MessageFormat( msg );
                 _formats.put( message, mf );
             }
             return mf.format( args );
-        }
-        catch ( Exception except )
-        {
+        } catch ( Exception except ) {
             return "An internal error occured while processing message " + message;
         }
     }
@@ -120,12 +113,9 @@ public class Messages
     
     public static String message( String message )
     {
-        try
-        {
+        try {
             return _messages.getString( message );
-        }
-        catch ( MissingResourceException except )
-        {
+        } catch ( MissingResourceException except ) {
             return message;
         }
     }
@@ -133,17 +123,17 @@ public class Messages
     
     public static void setLocale( Locale locale )
     {
-	_formats = new Hashtable();
-	try {
-	    if ( locale == null )
-		_messages = ResourceBundle.getBundle( ResourceName ); 
-	    else
-		_messages = ResourceBundle.getBundle( ResourceName, locale ); 
-	} catch ( Exception except ) {
-	    _messages = new EmptyResourceBundle();
-	    Logger.getSystemLogger().println( "Failed to locate messages resource " +
-					      ResourceName );
-	}
+        _formats = new Hashtable();
+        try {
+            if ( locale == null )
+                _messages = ResourceBundle.getBundle( ResourceName ); 
+            else
+                _messages = ResourceBundle.getBundle( ResourceName, locale ); 
+        } catch ( Exception except ) {
+            _messages = new EmptyResourceBundle();
+            Logger.getSystemLogger().println( "Failed to locate messages resource " +
+                                              ResourceName );
+        }
     }
     
     
@@ -154,30 +144,30 @@ public class Messages
 
 
     static class EmptyResourceBundle
-	extends ResourceBundle
-	implements Enumeration
+        extends ResourceBundle
+        implements Enumeration
     {
-
-	public Enumeration getKeys()
-	{
-	    return this;
-	}
-
-	protected Object handleGetObject( String name )
-	{
-	    return "[Missing message " + name + "]";
-	}
-
-	public boolean hasMoreElements()
-	{
-	    return false;
-	}
-
-	public Object nextElement()
-	{
-	    return null;
-	}
-
+        
+        public Enumeration getKeys()
+        {
+            return this;
+        }
+        
+        protected Object handleGetObject( String name )
+        {
+            return "[Missing message " + name + "]";
+        }
+        
+        public boolean hasMoreElements()
+        {
+            return false;
+        }
+        
+        public Object nextElement()
+        {
+            return null;
+        }
+        
     }
     
     

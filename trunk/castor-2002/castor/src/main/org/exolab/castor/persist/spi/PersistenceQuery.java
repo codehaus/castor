@@ -131,7 +131,7 @@ public interface PersistenceQuery
      *  persistence engine
      */
     public void execute( Object conn, boolean lock )
-	throws QueryException, PersistenceException;
+        throws QueryException, PersistenceException;
 
 
     /**
@@ -145,8 +145,8 @@ public interface PersistenceQuery
      *  persistence engine
      */
     public Object nextIdentity()
-	throws PersistenceException;
-
+        throws PersistenceException;
+    
 
     /**
      * Returns the identity of the object at the specified position.
@@ -162,8 +162,8 @@ public interface PersistenceQuery
      *  persistence engine
      */
     public Object getIdentity( int index )
-	throws PersistenceException;
-
+        throws PersistenceException;
+    
 
     /**
      * Returns the position of the last identity retrieved. The
@@ -174,7 +174,7 @@ public interface PersistenceQuery
      *  persistence engine
      */
     public int getPosition()
-	throws PersistenceException;
+        throws PersistenceException;
 
 
     /**
@@ -210,8 +210,8 @@ public interface PersistenceQuery
      * @see Persistence#load
      */
     public Object fetch( Object obj )
-	throws ObjectNotFoundException, PersistenceException;
-
+        throws ObjectNotFoundException, PersistenceException;
+    
 
 }
 

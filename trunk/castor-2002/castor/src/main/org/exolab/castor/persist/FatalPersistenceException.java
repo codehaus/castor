@@ -63,13 +63,13 @@ public class FatalPersistenceException
 
     public FatalPersistenceException( Exception except )
     {
-	super( except );
+        super( except );
     }
 
 
     public FatalPersistenceException( String message )
     {
-	super( message );
+        super( message );
     }
 
 

@@ -70,59 +70,59 @@ public class MappingException
 
     public MappingException( String message )
     {
-	super( message );
+        super( message );
     }
 
 
     public MappingException( String message, Object arg1 )
     {
-	super( message, arg1 );
+        super( message, arg1 );
     }
 
 
     public MappingException( String message, Object arg1, Object arg2 )
     {
-	super( message, arg1, arg2 );
+        super( message, arg1, arg2 );
     }
 
 
     public MappingException( Exception except )
     {
-	super( "mapping.nested", except.toString() );
-	_except = except;
+        super( "mapping.nested", except.toString() );
+        _except = except;
     }
 
 
     public Exception getException()
     {
-	return _except;
+        return _except;
     }
 
 
     public void printStackTrace()
     {
-	if ( _except == null )
-	    super.printStackTrace();
-	else
-	    _except.printStackTrace();
+        if ( _except == null )
+            super.printStackTrace();
+        else
+            _except.printStackTrace();
     }
 
 
     public void printStackTrace( PrintStream print )
     {
-	if ( _except == null )
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null )
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
 
 
     public void printStackTrace( PrintWriter print )
     {
-	if ( _except == null ) 
-	    super.printStackTrace( print );
-	else
-	    _except.printStackTrace( print );
+        if ( _except == null ) 
+            super.printStackTrace( print );
+        else
+            _except.printStackTrace( print );
     }
 
 

@@ -61,7 +61,7 @@ public class ObjectModifiedException
     
     public ObjectModifiedException( Class type, Object identity )
     {
-	super( "persist.objectModified", type.getName(), identity );
+        super( "persist.objectModified", type.getName(), identity );
     }
 
 

@@ -63,7 +63,7 @@ public class ObjectNotPersistentException
 
     public ObjectNotPersistentException( Class type )
     {
-	super( "persist.objectNotPersistent", type.getName() );
+        super( "persist.objectNotPersistent", type.getName() );
     }
 
 

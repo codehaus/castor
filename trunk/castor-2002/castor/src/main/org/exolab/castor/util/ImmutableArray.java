@@ -61,20 +61,20 @@ public final class ImmutableArray
 
     public ImmutableArray( Object[] array )
     {
-	_array = array;
+        _array = array;
     }
 
 
     public Object get( int index )
         throws ArrayIndexOutOfBoundsException
     {
-	return _array[ index ];
+        return _array[ index ];
     }
 
 
     public int length()
     {
-	return _array.length;
+        return _array.length;
     }
 
 

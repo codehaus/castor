@@ -83,7 +83,7 @@ public interface PersistenceFactory
      *  supported by the persistence engine due to improper mapping
      */
     public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
-	throws MappingException;
+        throws MappingException;
 
 
 }

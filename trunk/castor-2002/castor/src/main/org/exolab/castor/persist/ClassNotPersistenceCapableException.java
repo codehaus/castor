@@ -64,7 +64,7 @@ public class ClassNotPersistenceCapableException
     
     public ClassNotPersistenceCapableException( Class type )
     {
-	super( "persist.classNotPersistenceCapable", type.getName() );
+        super( "persist.classNotPersistenceCapable", type.getName() );
     }
 
 

@@ -64,7 +64,7 @@ public class ObjectNotFoundException
 
     public ObjectNotFoundException( Class type, Object identity )
     {
-	super( "persist.objectNotFound", type, identity );
+        super( "persist.objectNotFound", type, identity );
     }
 
 

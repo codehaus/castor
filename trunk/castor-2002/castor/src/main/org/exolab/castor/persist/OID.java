@@ -99,15 +99,15 @@ final class OID
 
     OID( ClassDesc clsDesc, Object identity )
     {
-	_identity = identity;
-	// OID must be unique across the engine: always use the parent
-	// most class of an object, getting it from the descriptor
-	/*
-	while ( clsDesc.getExtends() != null )
-	    clsDesc = (ClassDesc) clsDesc.getExtends();
-	*/
-	_type = clsDesc.getJavaClass();
-	_hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
+        _identity = identity;
+        // OID must be unique across the engine: always use the parent
+        // most class of an object, getting it from the descriptor
+        /*
+          while ( clsDesc.getExtends() != null )
+          clsDesc = (ClassDesc) clsDesc.getExtends();
+        */
+        _type = clsDesc.getJavaClass();
+        _hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
 
 
@@ -122,7 +122,7 @@ final class OID
      */
     Object getStamp()
     {
-	return _stamp;
+        return _stamp;
     }
 
 
@@ -135,7 +135,7 @@ final class OID
      */
     void setStamp( Object stamp )
     {
-	_stamp = stamp;
+        _stamp = stamp;
     }
 
 
@@ -151,7 +151,7 @@ final class OID
      */
     void setExclusive( boolean exclusive )
     {
-	_exclusive = exclusive;
+        _exclusive = exclusive;
     }
 
 
@@ -167,7 +167,7 @@ final class OID
      */
     boolean isExclusive()
     {
-	return _exclusive;
+        return _exclusive;
     }
 
 
@@ -183,7 +183,7 @@ final class OID
      */
     Object getIdentity()
     {
-	return _identity;
+        return _identity;
     }
 
 
@@ -196,8 +196,9 @@ final class OID
      */
     Object getJavaClass()
     {
-	return _type;
+        return _type;
     }
+
 
     /**
      * Returns true if the two OID's are identical. Two OID's are
@@ -208,33 +209,33 @@ final class OID
      */
     public boolean equals( Object obj )
     {
-	OID other;
-
-	if ( this == obj )
-	    return true;
-	// Equality test is based on the following rules:
-	//   Classes are identical
-	//   Identity pass equality test
-	// There is no need to do equality test on class or
-	// database engine since only the same instances imply
-	// the same OID.
-	// Null primary identity exist only for objects created and
-	// have no primary identity, therefore all such objects are
-	// not identical.
-	other = (OID) obj;
-	return ( _type == other._type && _identity != null && _identity.equals( other._identity ) );
+        OID other;
+        
+        if ( this == obj )
+            return true;
+        // Equality test is based on the following rules:
+        //   Classes are identical
+        //   Identity pass equality test
+        // There is no need to do equality test on class or
+        // database engine since only the same instances imply
+        // the same OID.
+        // Null primary identity exist only for objects created and
+        // have no primary identity, therefore all such objects are
+        // not identical.
+        other = (OID) obj;
+        return ( _type == other._type && _identity != null && _identity.equals( other._identity ) );
     }
 
 
     public String toString()
     {
-	return _type.getName() + ( _identity == null ? "/new" : _identity.toString() );
+        return _type.getName() + ( _identity == null ? "/new" : _identity.toString() );
     }
 
 
     public int hashCode()
     {
-	return _hashCode;
+        return _hashCode;
     }
 
 

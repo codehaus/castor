@@ -65,7 +65,7 @@ public class DuplicateIdentityException
     
     public DuplicateIdentityException( Class type, Object key )
     {
-	super( "persist.duplicateIdentity", type.getName(), key.toString() );
+        super( "persist.duplicateIdentity", type.getName(), key.toString() );
     }
 
 

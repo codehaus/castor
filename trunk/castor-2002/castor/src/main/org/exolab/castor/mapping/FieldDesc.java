@@ -136,18 +136,18 @@ public class FieldDesc
      *    transient
      */
     public FieldDesc( Field field, boolean required )
-	throws MappingException
+        throws MappingException
     {
-	if ( field.getModifiers() != Modifier.PUBLIC &&
-	     field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
-	    throw new MappingException( "mapping.fieldNotAccessible", field.getName(),
-					field.getDeclaringClass().getName() );
-	_field = field;
-	_fieldName = field.getName();
-	_fieldType = Types.typeFromPrimitive( field.getType() );
-	_required = required;
-	_immutable = Types.isImmutable( _fieldType );
-	_default = Types.getDefault( _fieldType );
+        if ( field.getModifiers() != Modifier.PUBLIC &&
+             field.getModifiers() != ( Modifier.PUBLIC | Modifier.VOLATILE ) )
+            throw new MappingException( "mapping.fieldNotAccessible", field.getName(),
+                                        field.getDeclaringClass().getName() );
+        _field = field;
+        _fieldName = field.getName();
+        _fieldType = Types.typeFromPrimitive( field.getType() );
+        _required = required;
+        _immutable = Types.isImmutable( _fieldType );
+        _default = Types.getDefault( _fieldType );
     }
 
 
@@ -173,37 +173,37 @@ public class FieldDesc
      *
      */
     public FieldDesc( String fieldName, Class fieldType,
-		      Method getMethod, Method setMethod, boolean required )
-	throws MappingException
+                      Method getMethod, Method setMethod, boolean required )
+        throws MappingException
     {
-	this( fieldName, fieldType, required );
-	if ( fieldName == null )
-	    throw new IllegalArgumentException( "Argument 'fieldName' is null" );
-	if ( getMethod == null && setMethod == null )
-	    throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
-	
-	if ( getMethod != null ) {
-	    if ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-		 ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
-		throw new MappingException( "mapping.accessorNotAccessible",
-					    getMethod, getMethod.getDeclaringClass().getName() );
-	    if ( ! _fieldType.isAssignableFrom( getMethod.getReturnType() ) )
-		throw new MappingException( "mapping.accessorReturnTypeMismatch",
-					    getMethod, fieldType.getName() );
-	    _getMethod = getMethod;
-	    
-	}
-	if ( setMethod != null ) {
-	    if ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-		 ( setMethod.getModifiers() & Modifier.STATIC ) != 0 )
-		throw new MappingException( "mapping.accessorNotAccessible",
-					    setMethod, setMethod.getDeclaringClass().getName() );
-	    if ( setMethod.getParameterTypes().length != 1 &&
-		 ! setMethod.getParameterTypes()[ 0 ].isAssignableFrom( _fieldType ) )
-		throw new MappingException( "mapping.accessorParameterMismatch",
-					    setMethod, fieldType.getName() );
-	    _setMethod = setMethod;
-	}
+        this( fieldName, fieldType, required );
+        if ( fieldName == null )
+            throw new IllegalArgumentException( "Argument 'fieldName' is null" );
+        if ( getMethod == null && setMethod == null )
+            throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
+        
+        if ( getMethod != null ) {
+            if ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                 ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
+                throw new MappingException( "mapping.accessorNotAccessible",
+                                            getMethod, getMethod.getDeclaringClass().getName() );
+            if ( ! _fieldType.isAssignableFrom( getMethod.getReturnType() ) )
+                throw new MappingException( "mapping.accessorReturnTypeMismatch",
+                                            getMethod, fieldType.getName() );
+            _getMethod = getMethod;
+            
+        }
+        if ( setMethod != null ) {
+            if ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                 ( setMethod.getModifiers() & Modifier.STATIC ) != 0 )
+                throw new MappingException( "mapping.accessorNotAccessible",
+                                            setMethod, setMethod.getDeclaringClass().getName() );
+            if ( setMethod.getParameterTypes().length != 1 &&
+                 ! setMethod.getParameterTypes()[ 0 ].isAssignableFrom( _fieldType ) )
+                throw new MappingException( "mapping.accessorParameterMismatch",
+                                            setMethod, fieldType.getName() );
+            _setMethod = setMethod;
+        }
     }
 
 
@@ -220,11 +220,11 @@ public class FieldDesc
      */
     protected FieldDesc( String fieldName, Class fieldType, boolean required )
     {
-	_fieldName = fieldName;
-	_fieldType = Types.typeFromPrimitive( fieldType );
-	_required = required;
-	_immutable = Types.isImmutable( _fieldType );
-	_default = Types.getDefault( _fieldType );
+        _fieldName = fieldName;
+        _fieldType = Types.typeFromPrimitive( fieldType );
+        _required = required;
+        _immutable = Types.isImmutable( _fieldType );
+        _default = Types.getDefault( _fieldType );
     }
 
 
@@ -234,14 +234,14 @@ public class FieldDesc
      */
     protected FieldDesc( FieldDesc desc )
     {
-	_field = desc._field;
-	_fieldName = desc._fieldName;
-	_fieldType = desc._fieldType;
-	_getMethod = desc._getMethod;
-	_setMethod = desc._setMethod;
-	_required = desc._required;
-	_immutable = desc._immutable;
-	_default = desc._default;
+        _field = desc._field;
+        _fieldName = desc._fieldName;
+        _fieldType = desc._fieldType;
+        _getMethod = desc._getMethod;
+        _setMethod = desc._setMethod;
+        _required = desc._required;
+        _immutable = desc._immutable;
+        _default = desc._default;
     }
 
 
@@ -253,7 +253,7 @@ public class FieldDesc
      */
     public String getFieldName()
     {
-	return _fieldName;
+        return _fieldName;
     }
 
 
@@ -264,7 +264,7 @@ public class FieldDesc
      */
     public Class getFieldType()
     {
-	return _fieldType;
+        return _fieldType;
     }
 
 
@@ -276,7 +276,7 @@ public class FieldDesc
      */
     public boolean isRequired()
     {
-	return _required;
+        return _required;
     }
 
 
@@ -288,7 +288,7 @@ public class FieldDesc
      */
     public Method getGetMethod()
     {
-	return _getMethod;
+        return _getMethod;
     }
 
 
@@ -300,7 +300,7 @@ public class FieldDesc
      */
     public Method getSetMethod()
     {
-	return _setMethod;
+        return _setMethod;
     }
 
 
@@ -312,22 +312,22 @@ public class FieldDesc
      */
     public Object getValue( Object obj )
     {
-	try {
-	    if ( _field != null )
-		return _field.get( obj );
-	    else if ( _getMethod != null )
-		return _getMethod.invoke( obj, null );
-	    // If field has no get method, we return the default value.
-	    else
-		return _default;
-	} catch ( IllegalAccessException except ) {
-	    // This should never happen
-	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
-	} catch ( InvocationTargetException except ) {
-	    // This should never happen
-	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-							      toString(), except.getMessage() ) );
-	}
+        try {
+            if ( _field != null )
+                return _field.get( obj );
+            else if ( _getMethod != null )
+                return _getMethod.invoke( obj, null );
+            // If field has no get method, we return the default value.
+            else
+                return _default;
+        } catch ( IllegalAccessException except ) {
+            // This should never happen
+            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+        } catch ( InvocationTargetException except ) {
+            // This should never happen
+            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                              toString(), except.getMessage() ) );
+        }
     }
     
 
@@ -339,30 +339,30 @@ public class FieldDesc
      */
     public void setValue( Object obj, Object value )
     {
-	// If there is a default value, use it for a required field.
-	if ( value == null && _required && _default != null )
-	    value = _default;
-	try {
-	    if ( _field != null )
-		_field.set( obj, value );
-	    else if ( _setMethod != null )
-		_setMethod.invoke( obj, new Object[] { value } );
-	    // If the field has no set method, ignore it.
-	} catch ( IllegalArgumentException except ) {
-	    // Graceful way of dealing with unwrapping exception
-	    if ( value == null )
-		throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
-	    else
-		throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
-								     toString(), value.getClass().getName() ) );
-	} catch ( IllegalAccessException except ) {
-	    // This should never happen
-	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
-	} catch ( InvocationTargetException except ) {
-	    // This should never happen
-	    throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-							      toString(), except.getMessage() ) );
-	}
+        // If there is a default value, use it for a required field.
+        if ( value == null && _required && _default != null )
+            value = _default;
+        try {
+            if ( _field != null )
+                _field.set( obj, value );
+            else if ( _setMethod != null )
+                _setMethod.invoke( obj, new Object[] { value } );
+            // If the field has no set method, ignore it.
+        } catch ( IllegalArgumentException except ) {
+            // Graceful way of dealing with unwrapping exception
+            if ( value == null )
+                throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
+            else
+                throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
+                                                                     toString(), value.getClass().getName() ) );
+        } catch ( IllegalAccessException except ) {
+            // This should never happen
+            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+        } catch ( InvocationTargetException except ) {
+            // This should never happen
+            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                              toString(), except.getMessage() ) );
+        }
     }
 
 
@@ -378,11 +378,11 @@ public class FieldDesc
      */
     public void copyInto( Object source, Object target )
     {
-	if ( _immutable )
-	    setValue( target, getValue( source ) );
-	else
-	    // XXX Need to perform cloning or serialization here
-	    setValue( target, getValue( source ) );
+        if ( _immutable )
+            setValue( target, getValue( source ) );
+        else
+            // XXX Need to perform cloning or serialization here
+            setValue( target, getValue( source ) );
     }
 
 
@@ -399,9 +399,9 @@ public class FieldDesc
      */
     public String canStore( Object obj )
     {
-	if ( getValue( obj ) == null && _required )
-	    return "mapping.requiredField";
-	return null;
+        if ( getValue( obj ) == null && _required )
+            return "mapping.requiredField";
+        return null;
     }
 
 
@@ -415,16 +415,16 @@ public class FieldDesc
      */
     public boolean isModified( Object obj, Object cached )
     {
-	Object value;
-
-	value = getValue( obj );
-	if ( value == null )
-	    return ( getValue( cached ) == null );
-	else
-	    return ( value.equals( getValue( cached ) ) );
+        Object value;
+        
+        value = getValue( obj );
+        if ( value == null )
+            return ( getValue( cached ) == null );
+        else
+            return ( value.equals( getValue( cached ) ) );
     }
-
-
+    
+    
     public String toString()
     {
         return "field " + _fieldName + "(" + _fieldType.getName() + ")";

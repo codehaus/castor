@@ -126,10 +126,10 @@ public interface PersistenceEngine
      *  persistent capable
      */
     public OID load( TransactionContext tx, Class type, Object identity,
-			boolean exclusive, int timeout )
-	throws ObjectNotFoundException, LockNotGrantedException,
-	       PersistenceException, ClassNotPersistenceCapableException;
-
+                     boolean exclusive, int timeout )
+        throws ObjectNotFoundException, LockNotGrantedException,
+               PersistenceException, ClassNotPersistenceCapableException;
+    
 
     /**
      * Loads an object of the specified type and identity from the
@@ -156,9 +156,9 @@ public interface PersistenceEngine
      *  persistence engine
      */
     public OID fetch( TransactionContext tx, PersistenceQuery query, Object identity,
-			 boolean exclusive, int timeout )
-	throws ObjectNotFoundException, LockNotGrantedException,
-	       PersistenceException;
+                      boolean exclusive, int timeout )
+        throws ObjectNotFoundException, LockNotGrantedException,
+               PersistenceException;
 
 
     /**
@@ -183,9 +183,9 @@ public interface PersistenceEngine
      *  persistent capable
      */
     public OID create( TransactionContext tx, Object obj, Object identity )
-	throws DuplicateIdentityException, PersistenceException,
-	       ClassNotPersistenceCapableException;
-
+        throws DuplicateIdentityException, PersistenceException,
+               ClassNotPersistenceCapableException;
+    
 
     /**
      * Called at transaction commit time to delete the object. Object
@@ -206,8 +206,8 @@ public interface PersistenceEngine
      *  persistence engine
      */
     public void delete( TransactionContext tx, OID oid )
-	throws PersistenceException;
-
+        throws PersistenceException;
+    
 
     /**
      * Called at transaction commit to store an object that has been
@@ -238,11 +238,11 @@ public interface PersistenceEngine
      *  persistence engine
      */
     public OID store( TransactionContext tx, OID oid, Object obj,
-			 Object identity, int timeout )
-	throws LockNotGrantedException, ObjectDeletedException,
-	       ObjectModifiedException, DuplicateIdentityException,
-	       PersistenceException;
-
+                      Object identity, int timeout )
+        throws LockNotGrantedException, ObjectDeletedException,
+               ObjectModifiedException, DuplicateIdentityException,
+               PersistenceException;
+    
 
     /**
      * Acquire a write lock on the object. A write lock assures that
@@ -265,8 +265,8 @@ public interface PersistenceEngine
      *  persistence engine
      */
     public void writeLock( TransactionContext tx, OID oid, int timeout )
-	throws LockNotGrantedException, ObjectDeletedException, PersistenceException;
-
+        throws LockNotGrantedException, ObjectDeletedException, PersistenceException;
+    
 
     /**
      * Obtain a copy of the cached object give the object's OID. The

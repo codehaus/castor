@@ -109,7 +109,7 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public Object create( Object conn, Object obj, Object identity )
-	throws DuplicateIdentityException, PersistenceException;
+        throws DuplicateIdentityException, PersistenceException;
 
 
     /**
@@ -133,7 +133,7 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public Object load( Object conn, Object obj, Object identity, boolean lock )
-	throws ObjectNotFoundException, PersistenceException;
+        throws ObjectNotFoundException, PersistenceException;
 
 
     /**
@@ -167,8 +167,8 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public Object store( Object conn, Object obj, Object identity,
-			 Object original, Object stamp )
-	throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
+                         Object original, Object stamp )
+        throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
     /**
@@ -184,8 +184,8 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public void delete( Object conn, Object obj, Object identity )
-	throws PersistenceException;
-
+        throws PersistenceException;
+    
 
     /**
      * Obtains a write lock on the object. This method is called in
@@ -204,8 +204,8 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public void writeLock( Object conn, Object obj, Object identity )
-	throws ObjectDeletedException, PersistenceException;
-
+        throws ObjectDeletedException, PersistenceException;
+    
 
     /**
      * Called to change the identity of an object. If possible, the
@@ -225,8 +225,8 @@ public interface Persistence
      * @throws PersistenceException A persistence error occured
      */
     public void changeIdentity( Object conn, Object obj,
-				Object oldIdentity, Object newIdentity )
-	throws ObjectDeletedException, DuplicateIdentityException, PersistenceException;
+                                Object oldIdentity, Object newIdentity )
+        throws ObjectDeletedException, DuplicateIdentityException, PersistenceException;
 
 
     /**
@@ -243,7 +243,7 @@ public interface Persistence
      * @throws QueryException The query is invalid
      */
     public PersistenceQuery createQuery( String query, Class[] types )
-	throws QueryException;
+        throws QueryException;
 
 
 }

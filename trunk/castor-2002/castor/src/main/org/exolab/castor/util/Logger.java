@@ -82,15 +82,15 @@ public class Logger
 
     public Logger( OutputStream output )
     {
-	super( output, true );
-	_newLine = true;
+        super( output, true );
+        _newLine = true;
     }
 
 
     public Logger( Writer output )
     {
-	super( output, true );
-	_newLine = true;
+        super( output, true );
+        _newLine = true;
     }
 
 
@@ -100,7 +100,7 @@ public class Logger
      */
     public static PrintWriter getSystemLogger()
     {
-	return _logger;
+        return _logger;
     }
 
 
@@ -110,9 +110,9 @@ public class Logger
      */
     public static void setSystemLogger( PrintWriter logger )
     {
-	if ( logger == null )
-	    throw new NullPointerException( "Argument 'logger' is null" );
-	_logger = logger;
+        if ( logger == null )
+            throw new NullPointerException( "Argument 'logger' is null" );
+        _logger = logger;
     }
 
 
@@ -126,11 +126,11 @@ public class Logger
      */
     public Logger setPrefix( String prefix )
     {
-	if ( prefix != null && prefix.length() > 0 )
-	    _prefix = "[" + prefix + "] ";
-	else
-	    _prefix = "";
-	return this;
+        if ( prefix != null && prefix.length() > 0 )
+            _prefix = "[" + prefix + "] ";
+        else
+            _prefix = "";
+        return this;
     }
 
 
@@ -144,188 +144,188 @@ public class Logger
      */
     public Logger setLogTime( boolean logTime )
     {
-	_logTime = logTime;
-	return this;
+        _logTime = logTime;
+        return this;
     }
 
 
     public void println()
     {
-	super.println();
-	_newLine = true;
+        super.println();
+        _newLine = true;
     }
 
 
     public void println( boolean value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( boolean value )
     {
-	prefixLine();
-	super.print( value );
+        prefixLine();
+        super.print( value );
     }
 
 
     public void println( char value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( char value )
     {
-	prefixLine();
-	super.print( value );
-	_newLine = ( value == '\n' );
+        prefixLine();
+        super.print( value );
+        _newLine = ( value == '\n' );
     }
 
 
     public void println( int value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
-
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
+        
     }
 
 
     public void print( int value )
     {
-	prefixLine();
-	super.print( value );
+        prefixLine();
+        super.print( value );
     }
 
 
     public void println( long value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( long value )
     {
-	prefixLine();
-	super.print( value );
+        prefixLine();
+        super.print( value );
     }
 
 
     public void println( float value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( float value )
     {
-	prefixLine();
-	super.print( value );
+        prefixLine();
+        super.print( value );
     }
 
 
     public void println( double value )
     {
-	prefixLine();
-	super.print( value );
-	super.println();
-	_newLine = true;
+        prefixLine();
+        super.print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( double value )
     {
-	prefixLine();
-	super.print( value );
+        prefixLine();
+        super.print( value );
     }
 
 
     public void println( char[] value )
     {
-	print( value );
-	super.println();
-	_newLine = true;
+        print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( char[] value )
     {
-	int i;
-	int offset;
-
-	offset = 0;
-	for ( i = 0 ; i < value.length ; ++i ) {
-	    if ( value[ i ] == '\n' ) {
-		prefixLine();
-		super.write( value, offset, i - offset );
-		super.println();
-		_newLine = true;
-		offset = i + 1;
-	    }
-	}
-	if ( i > offset ) {
-	    prefixLine();
-	    super.write( value, offset, i - offset );
-	    _newLine = false;
-	}
+        int i;
+        int offset;
+        
+        offset = 0;
+        for ( i = 0 ; i < value.length ; ++i ) {
+            if ( value[ i ] == '\n' ) {
+                prefixLine();
+                super.write( value, offset, i - offset );
+                super.println();
+                _newLine = true;
+                offset = i + 1;
+            }
+        }
+        if ( i > offset ) {
+            prefixLine();
+            super.write( value, offset, i - offset );
+            _newLine = false;
+        }
     }
 
 
     public void println( String value )
     {
-	print( value );
-	super.println();
-	_newLine = true;
+        print( value );
+        super.println();
+        _newLine = true;
     }
 
 
     public void print( String value )
     {
-	int i;
-	int offset;
-
-	offset = 0;
-	for ( i = 0 ; i < value.length() ; ++i ) {
-	    if ( value.charAt( i ) == '\n' ) {
-		prefixLine();
-		super.write( value, offset, i - offset );
-		super.println();
-		_newLine = true;
-		offset = i + 1;
-	    }
-	}
-	if ( i > offset ) {
-	    prefixLine();
-	    super.write( value, offset, i - offset );
-	    _newLine = false;
-	}
+        int i;
+        int offset;
+        
+        offset = 0;
+        for ( i = 0 ; i < value.length() ; ++i ) {
+            if ( value.charAt( i ) == '\n' ) {
+                prefixLine();
+                super.write( value, offset, i - offset );
+                super.println();
+                _newLine = true;
+                offset = i + 1;
+            }
+        }
+        if ( i > offset ) {
+            prefixLine();
+            super.write( value, offset, i - offset );
+            _newLine = false;
+        }
     }
 
 
     public void println( Object value )
     {
-	println( String.valueOf( value ) );
+        println( String.valueOf( value ) );
     }
-
-
+    
+    
     public void print( Object value )
     {
-	prefixLine();
-	println( String.valueOf( value ) );
+        prefixLine();
+        println( String.valueOf( value ) );
     }
 
 
@@ -336,14 +336,14 @@ public class Logger
      */
     protected final void prefixLine()
     {
-	if ( _newLine ) {
-	    if ( _logTime ) {
-		write( new Date().toString() );
-		write( ' ' );
-	    }
-	    if ( _prefix != null )
-		write( _prefix );
-	}
+        if ( _newLine ) {
+            if ( _logTime ) {
+                write( new Date().toString() );
+                write( ' ' );
+            }
+            if ( _prefix != null )
+                write( _prefix );
+        }
     }
 
 

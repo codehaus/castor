@@ -95,14 +95,14 @@ public final class QueryResults
      */
     private Object              _lastIdentity;
     
-
+    
     QueryResults( TransactionContext tx, PersistenceEngine engine,
-		  PersistenceQuery query, int accessMode )
+                  PersistenceQuery query, int accessMode )
     {
-	_tx = tx;
-	_engine = engine;
-	_query = query;
-	_accessMode = accessMode;
+        _tx = tx;
+        _engine = engine;
+        _query = query;
+        _accessMode = accessMode;
     }
 
 
@@ -114,7 +114,7 @@ public final class QueryResults
      */
     public TransactionContext getTransaction()
     {
-	return _tx;
+        return _tx;
     }
     
     
@@ -125,7 +125,7 @@ public final class QueryResults
      */
     public Class getResultType()
     {
-	return _query.getResultType();
+        return _query.getResultType();
     }
     
     
@@ -142,14 +142,14 @@ public final class QueryResults
      *  has been closed
      */
     public Object nextIdentity()
-	throws TransactionNotInProgressException, PersistenceException
+        throws TransactionNotInProgressException, PersistenceException
     {
-	// Make sure transaction is still open.
-	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-	    throw new TransactionNotInProgressException();
-	_lastIdentity = null;
-	_lastIdentity = _query.nextIdentity();
-	return _lastIdentity;
+        // Make sure transaction is still open.
+        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException();
+        _lastIdentity = null;
+        _lastIdentity = _query.nextIdentity();
+        return _lastIdentity;
     }
 
 
@@ -169,14 +169,14 @@ public final class QueryResults
      *  has been closed
      */
     public Object getIdentity( int index )
-	throws TransactionNotInProgressException, PersistenceException
+        throws TransactionNotInProgressException, PersistenceException
     {
-	// Make sure transaction is still open.
-	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-	    throw new TransactionNotInProgressException();
-	_lastIdentity = null;
-	_lastIdentity = _query.getIdentity( index );
-	return _lastIdentity;
+        // Make sure transaction is still open.
+        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException();
+        _lastIdentity = null;
+        _lastIdentity = _query.getIdentity( index );
+        return _lastIdentity;
     }
 
 
@@ -191,12 +191,12 @@ public final class QueryResults
      *  has been closed
      */
     public int getPosition()
-	throws TransactionNotInProgressException, PersistenceException
+        throws TransactionNotInProgressException, PersistenceException
     {
-	// Make sure transaction is still open.
-	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-	    throw new TransactionNotInProgressException();
-	return _query.getPosition();
+        // Make sure transaction is still open.
+        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException();
+        return _query.getPosition();
     }
 
 
@@ -209,7 +209,7 @@ public final class QueryResults
      */
     public boolean isForwardOnly()
     {
-	return _query.isForwardOnly();
+        return _query.isForwardOnly();
     }
 
 
@@ -247,107 +247,107 @@ public final class QueryResults
      * @see TransactionContext#load
      */
     public boolean fetch( Object obj )
-	throws TransactionNotInProgressException, PersistenceException,
-	       ObjectNotFoundException, LockNotGrantedException
+        throws TransactionNotInProgressException, PersistenceException,
+               ObjectNotFoundException, LockNotGrantedException
     {
-	OID                            oid;
-	TransactionContext.ObjectEntry entry;
-	ClassDesc                     clsDesc;
-	
-	// Make sure transaction is still open.
-	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-	    throw new TransactionNotInProgressException();
-	if ( _lastIdentity == null )
-	    throw new IllegalStateException( "Not called after 'nextIdentity' 'getIdentity' returned an identity" );
-	
-	synchronized ( _tx ) {
-	    // Handle the case where object has already been loaded in
-	    // the context of this transaction. The case where object
-	    // has been loaded in another transaction is handled by the
-	    // locking mechanism.
-	    entry = _tx.getObjectEntry( obj );
-	    if ( entry != null ) {
-		// If the object has been loaded in this transaction from a
-		// different engine this is an error. If the object has been
-		// deleted in this transaction, it cannot be re-loaded. If the
-		// object has been created in this transaction, it cannot be
-		// re-loaded but no error is reported.
-		if ( entry.engine != _engine )
-		    throw new PersistenceException( "persist.multipleLoad", obj.getClass(), _lastIdentity );
-		if ( entry.deleted )
-		    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
-		if ( obj.getClass() != entry.obj.getClass() )
-		    throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
-		if ( entry.created )
-		    return false;
-		if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
-		     ! entry.oid.isExclusive() ) {
-		    // If we are in exclusive mode and object has not been
-		    // loaded in exclusive mode before, then we have a
-		    // problem. We cannot return an object that is not
-		    // synchronized with the database, but we cannot
-		    // synchronize a live object.
-		    throw new PersistenceException( "persist.lockConflict",
-						    obj.getClass(), _lastIdentity );
-		}
-		return false;
-	    }
-
-	    // Get the next OID from the query engine. The object is
-	    // already loaded into the persistence engine at this point and
-	    // has a lock based on the original query (i.e. read write
-	    // or exclusive). If no next record return null.
-	    clsDesc = _engine.getClassDesc( _query.getResultType() );
-	    oid = new OID( clsDesc, _lastIdentity );
-	    
-	    // Did we already load (or created) this object in this
-	    // transaction.
-	    entry = _tx.getObjectEntry( _engine, oid );
-	    if ( entry != null ) {
-		// The object has already been loaded in this transaction
-		// and is available from the persistence engine.
-		if ( entry.deleted )
-		    // Object has been deleted in this transaction, so skip
-		    // to next object.
-		    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
-		else {
-		    if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
-			 ! oid.isExclusive() ) {
-			// If we are in exclusive mode and object has not been
-			// loaded in exclusive mode before, then we have a
-			// problem. We cannot return an object that is not
-			// synchronized with the database, but we cannot
-			// synchronize a live object.
-			throw new PersistenceException( "persist.lockConflict",
-							_query.getResultType(), _lastIdentity );
-		    } else {
-			// Either read only or exclusive mode, and we
-			// already have an object in that mode, so we
-			// return that object.
-			_engine.copyObject( _tx, oid, obj );
-			return true;
-		    }
-		}
-	    } else {
-		// First time we see the object in this transaction,
-		// must create a new record for this object. We only
-		// record the object in the transaction if in read-write
-		// or exclusive mode.
-		try {
-		    _engine.fetch( _tx, _query, _lastIdentity,
-				   ( _accessMode == TransactionContext.AccessMode.Exclusive ),
-				   _tx.getLockTimeout() );
-		    _engine.copyObject( _tx, oid, obj );
-		    if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
-			_engine.releaseLock( _tx, oid );
-		    else
-			_tx.addObjectEntry( obj, oid, _engine );
-		    return true;
-		} finally {
-		    _lastIdentity = null;
-		}
-	    }
-	}
+        OID                            oid;
+        TransactionContext.ObjectEntry entry;
+        ClassDesc                     clsDesc;
+        
+        // Make sure transaction is still open.
+        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException();
+        if ( _lastIdentity == null )
+            throw new IllegalStateException( "Not called after 'nextIdentity' 'getIdentity' returned an identity" );
+        
+        synchronized ( _tx ) {
+            // Handle the case where object has already been loaded in
+            // the context of this transaction. The case where object
+            // has been loaded in another transaction is handled by the
+            // locking mechanism.
+            entry = _tx.getObjectEntry( obj );
+            if ( entry != null ) {
+                // If the object has been loaded in this transaction from a
+                // different engine this is an error. If the object has been
+                // deleted in this transaction, it cannot be re-loaded. If the
+                // object has been created in this transaction, it cannot be
+                // re-loaded but no error is reported.
+                if ( entry.engine != _engine )
+                    throw new PersistenceException( "persist.multipleLoad", obj.getClass(), _lastIdentity );
+                if ( entry.deleted )
+                    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
+                if ( obj.getClass() != entry.obj.getClass() )
+                    throw new PersistenceException( "persist.typeMismatch", obj.getClass(), entry.obj.getClass() );
+                if ( entry.created )
+                    return false;
+                if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
+                     ! entry.oid.isExclusive() ) {
+                    // If we are in exclusive mode and object has not been
+                    // loaded in exclusive mode before, then we have a
+                    // problem. We cannot return an object that is not
+                    // synchronized with the database, but we cannot
+                    // synchronize a live object.
+                    throw new PersistenceException( "persist.lockConflict",
+                                                    obj.getClass(), _lastIdentity );
+                }
+                return false;
+            }
+            
+            // Get the next OID from the query engine. The object is
+            // already loaded into the persistence engine at this point and
+            // has a lock based on the original query (i.e. read write
+            // or exclusive). If no next record return null.
+            clsDesc = _engine.getClassDesc( _query.getResultType() );
+            oid = new OID( clsDesc, _lastIdentity );
+            
+            // Did we already load (or created) this object in this
+            // transaction.
+            entry = _tx.getObjectEntry( _engine, oid );
+            if ( entry != null ) {
+                // The object has already been loaded in this transaction
+                // and is available from the persistence engine.
+                if ( entry.deleted )
+                    // Object has been deleted in this transaction, so skip
+                    // to next object.
+                    throw new ObjectNotFoundException( obj.getClass(), _lastIdentity );
+                else {
+                    if ( _accessMode == TransactionContext.AccessMode.Exclusive &&
+                         ! oid.isExclusive() ) {
+                        // If we are in exclusive mode and object has not been
+                        // loaded in exclusive mode before, then we have a
+                        // problem. We cannot return an object that is not
+                        // synchronized with the database, but we cannot
+                        // synchronize a live object.
+                        throw new PersistenceException( "persist.lockConflict",
+                                                        _query.getResultType(), _lastIdentity );
+                    } else {
+                        // Either read only or exclusive mode, and we
+                        // already have an object in that mode, so we
+                        // return that object.
+                        _engine.copyObject( _tx, oid, obj );
+                        return true;
+                    }
+                }
+            } else {
+                // First time we see the object in this transaction,
+                // must create a new record for this object. We only
+                // record the object in the transaction if in read-write
+                // or exclusive mode.
+                try {
+                    _engine.fetch( _tx, _query, _lastIdentity,
+                                   ( _accessMode == TransactionContext.AccessMode.Exclusive ),
+                                   _tx.getLockTimeout() );
+                    _engine.copyObject( _tx, oid, obj );
+                    if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
+                        _engine.releaseLock( _tx, oid );
+                    else
+                        _tx.addObjectEntry( obj, oid, _engine );
+                    return true;
+                } finally {
+                    _lastIdentity = null;
+                }
+            }
+        }
     }
     
     
