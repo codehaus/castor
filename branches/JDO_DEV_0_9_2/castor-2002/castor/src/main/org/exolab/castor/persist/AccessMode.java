@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.mapping;
+package org.exolab.castor.persist;
 
 
 /**

@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.persist.spi;
+package org.exolab.castor.persist;
 
 
 import java.io.PrintWriter;
@@ -62,8 +62,7 @@ import java.io.PrintWriter;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public interface LogInterceptor
-{
+public interface LogInterceptor {
 
 
     /**

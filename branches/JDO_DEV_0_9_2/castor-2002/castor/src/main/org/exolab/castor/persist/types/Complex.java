@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.persist.spi;
+package org.exolab.castor.persist.types;
 
 /**
  * @author <a href="yip@intalio.com">Thomas Yip</a>

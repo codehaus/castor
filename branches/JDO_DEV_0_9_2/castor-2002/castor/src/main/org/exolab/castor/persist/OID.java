@@ -80,29 +80,29 @@ public final class OID {
     /**
      * The LockEngine of the object
      */
-    private final LockEngine  _engine;
+    // 092: private final LockEngine  _engine;
 
     /**
      * The ClassMolder of the object
      */
-    private final ClassMolder _molder;
+    private final Resolver _molder;
 
 
     /**
      * The OID of depended object
      */
-    private final OID         _depends;
+    //private final OID         _depends;
 
     /**
      * The object's stamp, used for efficient dirty checking.
      */
-    private Object       _stamp;
+    //private Object       _stamp;
 
 
     /**
      * True if the object is loaded with db-lock access.
      */
-    private boolean      _dbLock;
+    //private boolean      _dbLock;
 
 
     /**
@@ -114,42 +114,42 @@ public final class OID {
     /**
      * The full qualified name of the top level class, used for equating OIDs based on commong parent.
      */
-    private String _topClassName;
+    //private String _topClassName;
 
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, Object identity ) {
-        this( engine, molder, null, identity );
+    OID( Resolver molder, Object identity ) {
+        this( molder, null, identity );
     }
 
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
+    OID( Resolver molder, OID depends, Object identity ) {
 
-        if ( engine == null )
-            throw new IllegalArgumentException("engine can't be null");
+        //if ( engine == null )
+        //    throw new IllegalArgumentException("engine can't be null");
         if ( molder == null )
             throw new IllegalArgumentException("molder can't be null");
         if ( identity instanceof Object[] ) {
             IllegalArgumentException e = new IllegalArgumentException("identity can't be object array!");
             throw e;
         }
-        _engine = engine;
+        //_engine = null;
         _molder = molder;
         _identity = identity;
         _name = molder.getName();
-        _depends = depends;
+        //_depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        while ( molder.getExtends() != null )
-            molder = (ClassMolder) molder.getExtends();
+        //while ( molder.getExtends() != null )
+        //    molder = (ClassMolder) molder.getExtends();
         
-        _topClassName = molder.getName();
+        //_topClassName = molder.getName();
 
         // calculate hashCode
-        _hashCode = _topClassName.hashCode() + (_identity == null? 0 : _identity.hashCode());
+        _hashCode = _name.hashCode() + (_identity == null? 0 : _identity.hashCode());
     }
 
     /**
@@ -157,16 +157,18 @@ public final class OID {
      *
      * @return the depended object's oid
      */
+     /*
     public OID getDepends() {
         return _depends;
-    }
+    }*/
 
     /**
      * Get the ClassMolder of this object
      *
      * @return the ClassMolder of this object
-     */ 
-    ClassMolder getMolder() {
+     */
+
+    Resolver getResolver() {
         return _molder;
     }
 
@@ -176,9 +178,10 @@ public final class OID {
      *
      * @return the LockEngine of this object.
      */
+     /*
     LockEngine getLockEngine() {
         return _engine;
-    }
+    }*/
 
     /**
      * Returns the OID's stamp. The stamp may be used to efficiently
@@ -189,9 +192,10 @@ public final class OID {
      *
      * @return The OID's stamp, or null
      */
+     /*
     Object getStamp() {
         return _stamp;
-    }
+    }*/
 
 
     /**
@@ -201,9 +205,10 @@ public final class OID {
      *
      * @param stamp The OID's stamp
      */
+     /*
     void setStamp( Object stamp ) {
         _stamp = stamp;
-    }
+    } */
 
 
     /**
@@ -215,10 +220,10 @@ public final class OID {
      *
      * @param dbLock True the object represented by this OID has
      *  a database lock
-     */
+     */ /*
     void setDbLock( boolean dbLock ) {
         _dbLock = dbLock;
-    }
+    }*/
 
 
     /**
@@ -230,10 +235,10 @@ public final class OID {
      *
      * @return True the object represented by this OID is loaded
      *  with a datbase lock
-     */
+     */ /*
     boolean isDbLock() {
         return _dbLock;
-    }
+    } */
 
 
     /**
@@ -286,7 +291,7 @@ public final class OID {
         // not identical.
         other = (OID) obj;
         // ssa, FIXME : should we replace the String.equals(String) with String == String test ?
-        return ( _topClassName.equals(other._topClassName) && _identity != null &&
+        return ( _name.equals(other._name) && _identity != null &&
                 _identity.equals( other._identity ) );
         
     }

@@ -51,16 +51,16 @@ import java.sql.Clob;
 import java.sql.SQLException;
 
 /**
- * This is an implementation of java.sql.Clob interface that is constructed 
- * from java.io.Reader, in needs information about the length of the stream 
+ * This is an implementation of java.sql.Clob interface that is constructed
+ * from java.io.Reader, in needs information about the length of the stream
  * (which is not provided by java.io.Reader interface).
- * 
+ *
  * It is useful for setting CLOB values in the database.
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$
  */
 public class ClobImpl implements Clob {
-    
+
     private final Reader _reader;
 
     private final long _length;
@@ -108,7 +108,7 @@ public class ClobImpl implements Clob {
                 _reader.close();
             }
 
-        };    
+        };
     }
 
     public Reader getCharacterStream() {
@@ -136,7 +136,7 @@ public class ClobImpl implements Clob {
      * Not implemented, I guess it is not needed for writing CLOB
      */
     public long position(Clob searchstr, long start) {
-        return 0;    
+        return 0;
     }
 
     /**
@@ -146,4 +146,4 @@ public class ClobImpl implements Clob {
         return 0;
     }
 
-} 
+}

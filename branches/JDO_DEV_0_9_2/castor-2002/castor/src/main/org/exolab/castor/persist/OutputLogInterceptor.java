@@ -50,7 +50,7 @@ package org.exolab.castor.persist;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.io.PrintWriter;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.LogInterceptor;
 
 
 /**

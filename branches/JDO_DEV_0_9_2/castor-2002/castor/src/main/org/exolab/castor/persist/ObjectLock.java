@@ -93,7 +93,7 @@ import org.exolab.castor.jdo.ObjectDeletedException;
  * @see TransactionContext
  */
 
-final class ObjectLock implements DepositBox {
+final class ObjectLock {
 
 
     final static short ACTION_READ = 1;
@@ -119,9 +119,16 @@ final class ObjectLock implements DepositBox {
     private Object              _object;
 
     /**
+     * The object being checked in. If the commit is sucessful,
+     * this object will become the locked object. If it fails,
+     * this value will set null;
+     */
+    private Object              _newobject;
+
+    /**
      * The object's OID.
      */
-    private OID                 _oid;
+    private Object              _oid;
 
     /**
      * Write lock on this object. Refers to the transaction that has
@@ -190,7 +197,7 @@ final class ObjectLock implements DepositBox {
      *
      * @param obj The object to create a lock for
      */
-    ObjectLock( OID oid ) {
+    ObjectLock( Object oid ) {
         _oid = oid;
 
         // give each instance of ObjectLock an id, for debug only
@@ -204,7 +211,7 @@ final class ObjectLock implements DepositBox {
     /**
      * Return the object's OID.
      */
-    OID getOID() {
+    Object getOID() {
         return _oid;
     }
 
@@ -212,7 +219,7 @@ final class ObjectLock implements DepositBox {
      * Set OID of this lock to new value.
      *
      */
-    void setOID( OID oid ) {
+    void setOID( Object oid ) {
         _oid = oid;
     }
 
@@ -550,6 +557,25 @@ final class ObjectLock implements DepositBox {
                 tx.setWaitOnLock( null );                
             }
         }
+    }
+
+    public synchronized void checkin( TransactionContext tx, Object object ) {
+
+        if ( _confirmWaiting != null && _confirmWaiting == tx ) {
+            _timeStamp = System.currentTimeMillis();
+            _object = object;
+            if ( _confirmWaitingAction == ACTION_READ ) {
+                _readLock = new LinkedTx( tx, null );
+            } else {
+                _writeLock = tx;
+            }
+            _confirmWaiting = null;
+            notifyAll();
+        } else if ( _writeLock != null && _writeLock == tx ) {
+            _timeStamp = System.currentTimeMillis();
+            _newobject = object;
+        } else
+            throw new IllegalArgumentException("Transaction tx does not own this lock, "+toString()+"!");
     }
 
     public synchronized void setObject( TransactionContext tx, Object object ) {
@@ -998,7 +1024,7 @@ final class ObjectLock implements DepositBox {
      * Object uses to hold a linked list of transactions holding
      * write locks or waiting for a read/write lock.
      */
-    static class LinkedTx
+    private static class LinkedTx
     {
 
         TransactionContext tx;

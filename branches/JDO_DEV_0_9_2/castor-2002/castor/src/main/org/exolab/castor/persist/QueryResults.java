@@ -53,7 +53,6 @@ import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
 
@@ -80,7 +79,7 @@ public final class QueryResults
     /**
      * The persistence engine against which this query was executed.
      */
-    private final LockEngine   _engine;
+    //private final LockEngine   _engine;
     
     
     /**
@@ -107,13 +106,18 @@ public final class QueryResults
     private Database            _db;
 
 
-    QueryResults( TransactionContext tx, LockEngine engine,
+    private DatabaseRegistry    _dbReg;
+
+
+
+    QueryResults( TransactionContext tx, DatabaseRegistry dbReg,
                   PersistenceQuery query, AccessMode accessMode, Database db )
     {
         _tx = tx;
-        _engine = engine;
+        //_engine = engine;
+        _dbReg = dbReg;
         _query = query;
-        _accessMode =  engine.getClassMolder( _query.getResultType() ).getAccessMode( accessMode );
+        _accessMode =  accessMode;
         _db = db;
     }
 
@@ -204,7 +208,7 @@ public final class QueryResults
     {
         TransactionContext.ObjectEntry entry;
         OID              oid;
-        ClassMolder     handler;
+        Resolver         handler;
         Object           object;
         
         // Make sure transaction is still open.
@@ -213,10 +217,10 @@ public final class QueryResults
         if ( _lastIdentity == null )
             throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
-        handler = _engine.getClassMolder( _query.getResultType() );
+        handler = _dbReg.getResolver( _query.getResultType() );
 
         // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
+        object = _tx.load( handler, _lastIdentity, _accessMode );
 
         return object;
 
