@@ -186,11 +186,11 @@ public class JSourceWriter extends Writer {
      * Sets the line separator to use at the end of each line
      * @param lineSeparator the String to use as a line
      * separator. 
-     * <BR />
+     * <BR>
      * Typically a line separator will be one of the following:
-     * <BR />
-     * "\r\n" for MS Windows<BR />
-     * "\n"   for UNIX<BR />
+     * <BR>
+     * "\r\n" for MS Windows<BR>
+     * "\n"   for UNIX<BR>
      * "\r"   for Macintosh
     **/
     public void setLineSeparator(String lineSeparator) {

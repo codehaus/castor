@@ -136,7 +136,7 @@ public final class LockEngine {
     
     /**
      * Used by the constructor when creating handlers to temporarily
-     * hold the persistence factory for use by {@link #addClassHandler}.
+     * hold the persistence factory for use by {@link #addClassMolder}.
      */
     private PersistenceFactory _factory;
 
@@ -298,9 +298,7 @@ public final class LockEngine {
      * loaded and a write lock is obtained on the object, preventing
      * concurrent updates. In non-exclusive mode the object is either
      * loaded or obtained from the cache with a read lock. The object's
-     * OID is always returned, this OID must be used in subsequent
-     * operations on the object. Must call {@link #copyObject} to obtain
-     * the object.
+     * OID is always returned.
      *
      * @param tx The transaction context
      * @param oid The identity of the object to load
@@ -829,7 +827,6 @@ public final class LockEngine {
      *  object (specified in seconds)
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
-     * @throws ObjectDeletedException The object has been deleted from
      *  persistent storage
      */
     public void softLock( TransactionContext tx, OID oid, int timeout )

@@ -180,7 +180,7 @@ public abstract class SimpleType extends XMLType
     /**
      * Returns the Id used to Refer to this Object.
      * @return the Id used to Refer to this Object
-     * @see org.exolab.castor.xml.Referable
+     * @see org.exolab.castor.xml.schema.Referable
     **/
     public String getReferenceId() {
         return "datatype:"+getName();

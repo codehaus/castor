@@ -174,7 +174,7 @@ public class Unmarshaller {
      * System.out will be used to display debug information
      * @param debug the flag indicating whether to generate debug information.
      * A value of true, will turn debuggin on.
-     * @see #setLogWriter.
+     * @see #setLogWriter
     **/
     public void setDebug(boolean debug) {
         this.debug = debug;
@@ -213,7 +213,7 @@ public class Unmarshaller {
     /**
      * Sets the Mapping to use during unmarshalling.
      * @param mapping the Mapping to use during unmarshalling.
-     * @see setResolver
+     * @see #setResolver
     **/
     public void setMapping( Mapping mapping )
         throws MappingException
@@ -229,7 +229,7 @@ public class Unmarshaller {
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
-     * @see setMapping
+     * @see #setMapping
      * <BR />
      * <B>Note:</B> This method will nullify any Mapping
      * currently being used by this Unmarshaller

@@ -386,7 +386,7 @@ public class Marshaller extends MarshalFramework {
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
-     * @see setMapping
+     * @see #setMapping
      * <BR />
      * <B>Note:</B> This method will nullify any Mapping
      * currently being used by this Marshaller

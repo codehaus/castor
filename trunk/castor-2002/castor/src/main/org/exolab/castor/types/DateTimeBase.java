@@ -66,7 +66,6 @@ import java.text.SimpleDateFormat;
  * This is needed by the Marshalling framework.
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
- * @see DateTime
  * @see Date
  * @see Time
  */
@@ -628,7 +627,7 @@ public abstract class DateTimeBase
      * if a timeZone is present but it is not Z then we convert the date/time datatype
      * to Z using the addition operation defined in <a href="http://www.w3.org/TR/xmlschema-2/#adding-durations-to-dateTimes">
      * Adding Duration to dateTimes (W3C XML Schema, part 2 appendix E).</a>
-     * @see addDuration
+     * @see #addDuration
      */
     public void normalize() {
         if (!isUTC())
@@ -842,7 +841,7 @@ public abstract class DateTimeBase
 
     /**
      * Overrides the java.lang.Object#equals method
-     * @see equal
+     * @see #equal
      */
      public boolean equals(Object object) {
         //no need to check if we are comparing

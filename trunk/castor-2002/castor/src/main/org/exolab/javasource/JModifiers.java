@@ -167,7 +167,7 @@ public class JModifiers {
     
     /**
      * Returns true if the abstract qualifier is present.
-     * <BR /> This is only applicable to methods and classes.
+     * <BR> This is only applicable to methods and classes.
      * @return true if the abstract qualifier is present
     **/
     public boolean isAbstract() {
@@ -224,7 +224,7 @@ public class JModifiers {
     
     /**
      * Sets whether or not the "abstract" qualifier is present
-     * <BR /> This applies only to methods or classes.
+     * <BR> This applies only to methods or classes.
      * @param isAbstract is a boolean which when true will indicate
      * that the abstract qualifier should be present
     **/

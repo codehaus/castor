@@ -52,7 +52,7 @@ package org.exolab.castor.persist;
  * <p>
  * Checking for accessMode will be done to each access of the DepositBox. 
  * Only if a transaction has write access may <tt>setObject()</tt> or 
- * {@link java.lang.IllegalArgumentException()} will be thrown. 
+ * {@link java.lang.IllegalArgumentException} will be thrown. 
  * <p>
  * Only if a transaction with read or write access may call
  * <tt>getObject()</tt>. Multiple transactions may own read access of the

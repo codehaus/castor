@@ -66,10 +66,11 @@ import org.exolab.castor.util.Messages;
 /**
  * A transaction context is required in order to perform operations
  * against the database. The transaction context is mapped to {@link
- * Transaction} for the ODMG API and into {@link javax.transaction.xa.XAResource}
- * for XA databases. The only way to begin a new transaction is through
- * the creation of a new transaction context. All database access must
- * be performed through a transaction context.
+ * javax.transaction.Transaction} for the ODMG API and into 
+ * {@link javax.transaction.xa.XAResource} for XA databases. The only 
+ * way to begin a new transaction is through the creation of a new 
+ * transaction context. All database access must be performed through 
+ * a transaction context.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

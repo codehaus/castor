@@ -50,7 +50,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
- * {@link PersistenceFactory} for Informix driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for Informix driver.
  *
  * @author <a href="mailto:santiago.arriaga@catnet.com.mx">Santiago Arriaga</a>
  */

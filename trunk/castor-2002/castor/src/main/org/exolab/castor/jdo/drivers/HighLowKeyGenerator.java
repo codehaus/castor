@@ -67,7 +67,7 @@ import org.exolab.castor.util.Messages;
  * The parent abstract class for HIGH/LOW key generators
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see HighLowGeneratorFactory
+ * @see HighLowKeyGeneratorFactory
  */
 public class HighLowKeyGenerator implements KeyGenerator
 {

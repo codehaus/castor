@@ -65,7 +65,7 @@ public final class DefaultNaming extends XMLNaming {
     /**
      * The mixed case style with uppercase characters to
      * separate words.
-     * <BR /><B>examples:</B><BR />
+     * <BR><B>examples:</B><BR>
      * "Blob" becomes "blob" and "DataSource" becomes "dataSource".
     **/
     public static final short MIXED_CASE_STYLE = 1;
@@ -111,12 +111,12 @@ public final class DefaultNaming extends XMLNaming {
      * the proper methods, or by ClassDescriptors for your classes.
      * @param name the String to convert to an XML name
      * @return the xml name representation of the given String
-     * <BR /><B>examples:</B><BR />
+     * <BR><B>examples:</B><BR>
      * "Blob" becomes "blob" and "DataSource" becomes "data-source".
      * 
      * @param c the Class to create the XML Name for
      * @return the xml name for the given class
-     * @see org.exolab.castor.xml.Naming
+     * @see org.exolab.castor.xml.XMLNaming
     **/
     public String createXMLName(Class c) {
         //-- create default XML name
@@ -134,7 +134,7 @@ public final class DefaultNaming extends XMLNaming {
      * the proper methods, or by ClassDescriptors for your classes.
      * @param name the String to convert to an XML name
      * @return the xml name representation of the given String
-     * <BR /><B>examples:</B><BR />
+     * <BR><B>examples:</B><BR>
      * "Blob" becomes "blob" and "DataSource" becomes "data-source".
      * @ see org.exolab.castor.xml.Naming
      **/

@@ -66,7 +66,7 @@ import org.exolab.castor.util.Messages;
  * <p>
  * Note: the field Java type is obtained from {@link TypeInfo#getFieldType()},
  * but if the field is a collection, the actual field/accessor type is
- * obtained from {@link TypeInfo#getCollectionType} and the object to create
+ * obtained from {@link TypeInfo#getCollectionHandler} and the object to create
  * (with {@link #newInstance}) is the former field type.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
@@ -642,7 +642,7 @@ public final class FieldHandlerImpl
 
     /**
      * Mutator method used by {@link MappingLoader} and
-     * {@link org.exolab.castor.xml.MarshalHelper}.
+     * {@link org.exolab.castor.xml.Introspector}.
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
@@ -662,7 +662,7 @@ public final class FieldHandlerImpl
 
     /**
      * Mutator method used by {@link MappingLoader} and
-     * {@link org.exolab.castor.xml.MarshalHelper}.
+     * {@link org.exolab.castor.xml.Introspector}.
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
@@ -694,7 +694,7 @@ public final class FieldHandlerImpl
 
 
     /**
-     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Mutator method used by {@link org.exolab.castor.xml.Introspector}.
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
@@ -713,7 +713,7 @@ public final class FieldHandlerImpl
 
 
     /**
-     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Mutator method used by {@link org.exolab.castor.xml.Introspector}.
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
@@ -732,7 +732,7 @@ public final class FieldHandlerImpl
 
 
     /**
-     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Mutator method used by {@link org.exolab.castor.xml.Introspector}.
      * Please understand how this method is used before you start
      * playing with it! :-)
      */

@@ -560,7 +560,7 @@ public class Duration
 
     /**
      * Override the java.lang.equals method
-     * @see equal
+     * @see #equal
      */
      public boolean equals(Object object) {
         if (object instanceof Duration)

@@ -51,7 +51,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
- * {@link PersistenceFactory} for DB 2 driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for DB 2 driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

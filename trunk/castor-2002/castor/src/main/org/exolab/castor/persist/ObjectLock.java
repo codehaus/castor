@@ -58,10 +58,10 @@ import org.exolab.castor.jdo.ObjectDeletedException;
  * may be unlocked, write locked by one transaction, or read locked
  * by one or more transactions.
  * <p>
- * In order to obtain a lock, the transaction must call {@link
- * #acquire} passing itself, the lock type and the lock timeout. The
+ * In order to obtain a lock, the transaction must call one of the
+ * acquire, passing itself, the lock type and the lock timeout. The
  * transaction must attempt to obtain only one lock at any given time
- * by synchronizing all calls to {@link #acquire}. If the transaction
+ * by synchronizing all calls to one of the <tt>acquire</tt>. If the transaction
  * has acquired a read lock it may attempt to re-acquire the read
  * lock. If the transaction attempts to acquire a write lock the lock
  * will be upgraded.
@@ -75,8 +75,7 @@ import org.exolab.castor.jdo.ObjectDeletedException;
  * while waiting for the lock, {@link ObjectDeletedException} is
  * thrown.
  * <p>
- * When the lock is acquired, {@link #acquire} will return the locked
- * object.
+ * When the lock is acquired, the locked object is returned.
  * <p>
  * The transaction must call {@link #release} when the lock is no
  * longer required, allowing other transactions to obtain a lock. The
@@ -186,7 +185,7 @@ final class ObjectLock implements DepositBox {
     /**
      * Create a new lock for the specified object. Must not create two
      * locks for the same object. This will be the object returned from
-     * a successful call to {@link #acquire}.
+     * a successful call to one of the <tt>acquire</tt>.
      *
      * @param obj The object to create a lock for
      */
@@ -760,8 +759,8 @@ final class ObjectLock implements DepositBox {
 
 
     /**
-     * Releases a lock on the object previously acquired with {@link
-     * #acquire}. A write lock cannot be downgraded into a read lock
+     * Releases a lock on the object previously acquired. 
+     * A write lock cannot be downgraded into a read lock
      * and the transaction loses its lock on the object. Other
      * transactions are allowed to acquire a read/write lock on the
      * object.

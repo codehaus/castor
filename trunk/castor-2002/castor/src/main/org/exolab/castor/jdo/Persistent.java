@@ -64,7 +64,7 @@ public interface Persistent
      * <p>
      * Called when the object is first created as the result of a
      * query, perior to calling {@link #jdoLoad}, or after {@link
-     * Database.create} has been called on the object, prior to
+     * Database#create} has been called on the object, prior to
      * calling {@link #jdoStore}.
      *
      * @param db The database to which this object belongs
@@ -77,7 +77,7 @@ public interface Persistent
      * no longer use the database object assigned to it, and will
      * become hollow with various fields set to null.
      * <p>
-     * Called when the object transaction completes following any
+     * Called when the object #setFacetscompletes following any
      * call to {@link #jdoStore} or when the object is deleted from
      * the database.
      */
@@ -90,7 +90,7 @@ public interface Persistent
      * object with the database.
      *
      * @param accessMode The access mode that was specified for this object
-     * either in {@link OQLQuery#execute( short accessMode )}, or in
+     * either in {@link org.exolab.castor.jdo.OQLQuery#execute( short accessMode )}, or in
      * {@link Database#load( Class type, Object identity, short accessMode )}.
      * The constants are defined in {@link Database}.
      * @return the return value is discarded

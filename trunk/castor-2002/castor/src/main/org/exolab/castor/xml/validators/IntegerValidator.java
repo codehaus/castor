@@ -103,7 +103,7 @@ public class IntegerValidator extends PatternValidator
      * validated must be equal to
      * @param fixedValue the fixed value an integer validated with
      * this validator must be equal to.
-     * <BR />
+     * <BR>
      * NOTE: Using Fixed values takes preceedence over using max and mins,
      * and is really the same as setting both max-inclusive and
      * min-inclusive to the same value

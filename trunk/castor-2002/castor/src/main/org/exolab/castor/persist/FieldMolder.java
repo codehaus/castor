@@ -379,7 +379,7 @@ public class FieldMolder {
 
     /**
      * Creates a single field descriptor. The field mapping is used to
-     * create a new stock {@link FieldDescriptor}. Implementations may
+     * create a new stock {@link FieldMolder}. Implementations may
      * extend this class to create a more suitable descriptor.
      *
      * @param javaClass The class to which the field belongs

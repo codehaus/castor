@@ -481,13 +481,13 @@ public class JDO
     /**
      * Enable/disable jdo Database pooling. This option only affects
      * JDO if transactionManager is set and a transaction is associated
-     * with the thread that call getDatabase(). If jdo Database pooling
+     * with the thread that call {@link #getDatabase}. If jdo Database pooling
      * is enabled, JDO will first search in the pool to see if there
      * is already a Database for the current transaction. If found, it
      * returns the database; if not, it create a new one, associates
      * it will the transaction and return the newly created Database.
      * <p>
-     * This method should be called before the invocation of getDatabase().
+     * This method should be called before the invocation of {@link #getDatabase}.
      * <p>
      * <b>Experimental</b> maybe removed in the future releases
      *
@@ -513,7 +513,7 @@ public class JDO
      * Indicates if jdo Database pooling is enable or not.
      * <p>
      * <b>Experimental</b> maybe removed in the further release
-     * @see #setDatabasePooling()
+     * @see #setDatabasePooling
      */ 
     public boolean getDatabasePooling() {
         return _txDbPool != null;

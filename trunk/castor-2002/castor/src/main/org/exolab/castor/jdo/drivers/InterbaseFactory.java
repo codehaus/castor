@@ -9,7 +9,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
- * {@link PersistenceFactory} for Interbase driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for Interbase driver.
  *
  */
 public final class InterbaseFactory

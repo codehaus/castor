@@ -233,7 +233,7 @@ public final class XSInt extends XSPatternBase {
      * override the readFacet method of XSType
      * @param simpletype the Simpletype containing the facets
      * @param xsType the XSType to set the facets of
-     * @see org.exolab.castor.builder.xstype#readFacets
+     * @see org.exolab.castor.builder.types.XSType#getFacets
      */
     public void setFacets(SimpleType simpleType){
 

@@ -97,8 +97,7 @@ import java.util.HashSet;
  * relationships. An SQL engine is created for each object type
  * represented by a database. When persisting, it requires a physical
  * connection that maps to the SQL database and the transaction
- * running on that database, through the {@link ConnectionProvider}
- * interface.
+ * running on that database
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
@@ -367,7 +366,7 @@ public final class SQLEngine implements Persistence {
     }
 
     /**
-     * Used by {@link OQLQuery} to retrieve the class descriptor.
+     * Used by {@link org.exolab.castor.jdo.OQLQuery} to retrieve the class descriptor.
      */
     public JDOClassDescriptor getDescriptor()
     {

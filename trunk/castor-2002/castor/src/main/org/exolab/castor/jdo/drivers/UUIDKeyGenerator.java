@@ -88,7 +88,7 @@ import org.exolab.castor.util.Messages;
  * UUID key generator.
  * @author <a href="thomas.fach@publica.de">Thomas Fach</a>
  * @version $Revision$ $Date$
- * @see UUIDGeneratorFactory
+ * @see UUIDKeyGeneratorFactory
  */
 public final class UUIDKeyGenerator implements KeyGenerator
 {

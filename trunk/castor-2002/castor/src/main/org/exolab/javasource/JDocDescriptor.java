@@ -262,7 +262,7 @@ public class JDocDescriptor {
     
     /**
      * Returns the name of the object being described. This
-     * is valid for the following fields:<br />
+     * is valid for the following fields:<br>
      *  <ul>
      *     <li>author</li>
      *     <li>exception</li>
@@ -294,7 +294,7 @@ public class JDocDescriptor {
     
     /**
      * Sets the name value of the JavaDoc field. This is
-     * only valid for the following fields:<br />
+     * only valid for the following fields:<br>
      *  <ul>
      *     <li>author</li>
      *     <li>exception</li>

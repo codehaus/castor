@@ -240,7 +240,7 @@ public final class UnmarshalHandler extends MarshalFramework
      * System.out will be used to display debug information
      * @param debug the flag indicating whether to generate debug information.
      * A value of true, will turn debuggin on.
-     * @see #setLogWriter.
+     * @see #setLogWriter
     **/
     public void setDebug(boolean debug) {
         this.debug = debug;

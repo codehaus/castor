@@ -70,7 +70,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
     /**
      * Creates a new CollectionFieldHandler using the given
      * FieldHandler for delegation.
-     * @param
+     * @param fieldHandler the fieldHandler for delegation.
     **/
     public CollectionFieldHandler(FieldHandler fieldHandler) {
 

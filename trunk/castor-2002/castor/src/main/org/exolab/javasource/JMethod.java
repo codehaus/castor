@@ -231,7 +231,7 @@ public class JMethod implements JMember {
     
     /**
      * Returns the set of JParameters for this JMethod.
-     * <BR />
+     * <BR>
      * <B>Note:</B> the array is a copy, the params in the array
      * are the actual references.
      * @return the set of JParameters for this JMethod
