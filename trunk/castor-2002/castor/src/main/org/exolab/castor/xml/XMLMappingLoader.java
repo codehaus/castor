@@ -61,6 +61,7 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.mapping.xml.Xml;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
@@ -141,16 +142,27 @@ public class XMLMappingLoader
         XMLFieldDescriptorImpl xmlDesc;
         
         // Create an XML field descriptor
+        
+        //-- name
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-        if ( fieldMap.getXml() == null || fieldMap.getXml().getName() == null )
+        Xml xml = fieldMap.getXml();
+        if ( xml == null || xml.getName() == null )
             xmlName = null;
         else
-            xmlName = fieldMap.getXml().getName();
-        if ( fieldMap.getXml() == null || fieldMap.getXml().getNode() == null )
+            xmlName = xml.getName();
+            
+        //-- node type
+        if ( xml == null || xml.getNode() == null )
             nodeType = null;
         else
-            nodeType = NodeType.getNodeType( fieldMap.getXml().getNode() );
+            nodeType = NodeType.getNodeType( xml.getNode() );
+            
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
+        
+        //-- matches
+        if (xml.getMatch() != null)
+            xmlDesc.setMatches(xml.getMatch());
+            
         return xmlDesc; 
     }
 

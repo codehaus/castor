@@ -57,7 +57,7 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[3];
+        attributes = new XMLFieldDescriptorImpl[4];
         //-- _node
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_node", "node", NodeType.Attribute);
         desc.setImmutable(true);
@@ -165,6 +165,41 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        desc.setValidator(fieldValidator);
+
+        //-- _match
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_match", "match", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                Xml target = (Xml) object;
+                return target.getMatch();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    Xml target = (Xml) object;
+                    target.setMatch( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[3] = desc;
+        
+        //-- validation code for: _match
+        fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
