@@ -91,7 +91,7 @@ public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params, int sqlType )
             throws MappingException
     {
-        return new HighLowKeyGenerator( params, sqlType );
+        return new HighLowKeyGenerator( factory, params, sqlType );
     }
 
     /**
