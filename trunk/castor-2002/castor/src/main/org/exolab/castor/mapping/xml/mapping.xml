@@ -1,0 +1,78 @@
+<!--
+<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+                             "http://castor.exolab.org/mapping.dtd">
+-->
+<mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.ClassMapping">
+    <xml-schema xml-name="class"/>
+    <field-mapping set-method="setExtends" type="string">
+      <xml-info name="extends"/>
+    </field-mapping>
+    <field-mapping set-method="setClassName" type="string">
+      <xml-info name="class-name"/>
+    </field-mapping>
+    <field-mapping set-method="setAccessMode" type="string">
+      <xml-info name="access-mode"/>
+    </field-mapping>
+    <field-mapping set-method="setDescription" type="string">
+      <xml-info name="description" node-type="element"/>
+    </field-mapping>
+    <field-mapping set-method="setSqlTable"
+                   type="org.exolab.castor.mapping.xml.SqlTable">
+      <xml-info name="sql-table"/>
+    </field-mapping>
+    <field-mapping set-method="setXmlSchema"
+                   type="org.exolab.castor.mapping.xml.XmlSchema">
+      <xml-info name="xml-schema"/>
+    </field-mapping>
+    <field-mapping set-method="setLdapEntry" type="org.exolab.castor.mapping.xml.LdapEntry">
+      <xml-info name="ldap-entry"/>
+    </field-mapping>
+    <field-mapping set-method="setIdentity" type="org.exolab.castor.mapping.xml.Identity">
+      <xml-info name="identity"/>
+    </field-mapping>
+    <field-mapping set-method="addFieldMapping">
+      <xml-info name="field-mapping"/>
+    </field-mapping>
+    <field-mapping set-method="addContainerMapping">
+      <xml-info name="container"/>
+    </field-mapping>
+  </class-mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.FieldMapping">
+    <xml-schema xml-name="field-mapping"/>
+    <field-mapping set-method="setCollection" type="string">
+      <xml-info name="collection"/>
+    </field-mapping>
+    <field-mapping set-method="setSetMethod" type="string">
+      <xml-info name="set-method"/>
+    </field-mapping>
+    <field-mapping set-method="setGetMethod" type="string">
+      <xml-info name="get-method"/>
+    </field-mapping>
+    <field-mapping set-method="setType" type="string">
+      <xml-info name="type"/>
+    </field-mapping>
+    <field-mapping set-method="setRequired" type="string">
+      <xml-info name="required"/>
+    </field-mapping>
+    <field-mapping set-method="setName" type="string">
+      <xml-info name="name"/>
+    </field-mapping>
+    <field-mapping set-method="setDescription" type="string">
+      <xml-info name="description" node-type="element"/>
+    </field-mapping>
+    <field-mapping set-method="setSqlInfo" type="org.exolab.castor.mapping.xml.SqlInfo">
+      <xml-info name="sql-info"/>
+    </field-mapping>
+    <field-mapping set-method="setXmlInfo" type="org.exolab.castor.mapping.xml.XmlInfo">
+      <xml-info name="xml-info"/>
+    </field-mapping>
+    <field-mapping set-method="setLdapInfo" type="org.exolab.castor.mapping.xml.LdapInfo">
+      <xml-info name="ldap-info"/>
+    </field-mapping>
+  </class-mapping>
+
+</mapping>
+
