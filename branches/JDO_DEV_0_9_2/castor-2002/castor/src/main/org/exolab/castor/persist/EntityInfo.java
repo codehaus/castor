@@ -184,6 +184,34 @@ public final class EntityInfo {
     } // -- getBase
 
     /**
+     * Get the deep of this sub entities to the base
+     */
+    public int getDeep() {
+        int deep = 0;
+        EntityInfo cur = this;
+        while ( cur != null ) {
+            ++deep;
+            cur = cur.superEntity;
+        }
+        return deep;
+    } // -- getDeep
+
+    /**
+     * Determines the position of this sub entitiy related to the super 
+     * entities.
+     */
+    public int getEntityPos() {
+        if ( superEntity == null ) 
+            return 0;
+
+        for ( int i = 0; i < superEntity.subEntities.length; i++ ) {
+            if ( superEntity.subEntities[i] == this )
+                return i;
+        }
+        throw new IllegalStateException("EntityInfo, "+this+", is corrupted. It doesn't not contained in an super entity it belongs");
+    } // -- getEntityPos
+
+    /**
      * Return the maximium number of field possible
      * (aka, the sum of the number of fields of this and all sub entities)
      */
