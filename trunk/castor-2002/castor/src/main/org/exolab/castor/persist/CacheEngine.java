@@ -873,7 +873,6 @@ public final class CacheEngine
                     if ( ! checkObjectTimeStamp( object, oid.getStamp() ) ) 
                         throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), identity ) );
                 }
-                
                 fields = (Object[]) lock.acquire( tx, writeLock, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
@@ -883,6 +882,50 @@ public final class CacheEngine
                 // from transcation state to cache state.
                 typeInfo.cache.finishLockForAquire( oid );
             }
+
+            // update all dependent and related objects
+            RelationHandler[] relations;
+
+            relations = typeInfo.handler.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                if ( relations[ i ] != null && relations[ i ].isMulti() ) {
+                    Object related;
+                    Enumeration enum;
+                    Object[] origIdentity;
+
+                    enum = (Enumeration) relations[ i ].getRelated( object );
+                    if ( enum != null ) {
+                        while ( enum.hasMoreElements() ) {
+                            related = enum.nextElement();
+                            if ( related != null )
+                                tx.update( this, related, relations[ i ].getIdentity( related ) );
+                        }
+                    }
+                    // make sure that all dependent objects are included in the transaction,
+                    // otherwise objects that should be deleted won't be deleted
+                    if ( fields[ i ] == null )
+                        origIdentity = new Object[ 0 ];
+                    else {
+                        origIdentity = new Object[ ( (Vector) fields[ i ] ).size() ];
+                        ( (Vector) fields[ i ] ).copyInto( origIdentity );
+                    }
+
+                    if ( relations[ i ].isAttached() ) {
+                        for ( int j = 0 ; j < origIdentity.length ; ++j ) {
+                            if ( origIdentity[ j ] != null ) {
+                                ClassHandler relHandler;
+
+                                relHandler = relations[ i ].getRelatedHandler();
+                                if ( tx.fetch( this, relHandler, origIdentity[ j ], accessMode ) == null) {
+                                    tx.load( this, relHandler, relHandler.newInstance(),
+                                             origIdentity[ j ], accessMode );
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
             if ( writeLock && ! oid.isDbLock() ) {
                 // Db-lock mode we always synchronize the object with
                 // the database and obtain a lock on the object.
@@ -905,6 +948,7 @@ public final class CacheEngine
                     lock.delete( tx );
                     throw except;
                 }
+
                 // At this point the object is known to exist in
                 // persistence storage and we have a write lock on it.
                 return oid;
@@ -915,18 +959,20 @@ public final class CacheEngine
             }
         } else {
             // Object has not been loaded yet, or cleared from the cache.
-            if ( object instanceof TimeStampable ) {
-                // XXX If there is a database timestamp field, we must read it and 
-                //     compare with the object's timestamp.
-                // Otherwise report ObjectModifiedException
-                throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), 
-                                                    typeInfo.handler.getIdentity( object ) ) );
-            } else {
-                // Long transaction dirty checking is impossible, so merely 
-                // load the object (then it will be filled with the new values),
-                // assuming that the programmer knows what he does :-)
-                return load( tx, type, identity, accessMode, timeout );
-            }
+            return null;
+
+            //if ( object instanceof TimeStampable ) {
+            //    // XXX If there is a database timestamp field, we must read it and 
+            //    //     compare with the object's timestamp.
+            //    // Otherwise report ObjectModifiedException
+            //    throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(), 
+            //                                        typeInfo.handler.getIdentity( object ) ) );
+            //} else {
+            //    // Long transaction dirty checking is impossible, so merely 
+            //    // load the object (then it will be filled with the new values),
+            //    // assuming that the programmer knows what he does :-)
+            //    return load( tx, type, identity, accessMode, timeout );
+            //}
         }
     }
 

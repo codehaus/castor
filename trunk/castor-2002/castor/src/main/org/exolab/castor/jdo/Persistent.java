@@ -124,6 +124,17 @@ public interface Persistent
         throws Exception;
     
 
+
+    /**
+     * Called to indicate that an object has been included to the current
+     * transaction by means of db.update() method (at the end of a "long "
+     * transaction).
+     *
+     * @throws Exception An exception occured, the object cannot be stored
+     */
+    public void jdoUpdate()
+        throws Exception;
+
 }
 
 

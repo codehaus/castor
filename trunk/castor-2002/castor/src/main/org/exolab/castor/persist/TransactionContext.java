@@ -586,21 +586,27 @@ public abstract class TransactionContext
         ObjectEntry  entry;
         ClassHandler handler;
         AccessMode   accessMode = null;
-        Object       tmp;
 
-        // Make sure the object has not beed persisted in this transaction.
-        entry = getObjectEntry( object );
-        if ( entry != null ) {
-            if ( entry.deleted )
-                throw new ObjectDeletedExceptionImpl( object.getClass(), identity );
-            throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
-        }
         handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName() ) );
         if ( identity == null )
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
+        // Make sure that nobody is looking at the object
+        oid = new OID( handler, identity );
+        entry = getObjectEntry( engine, oid );
+        if ( entry != null ) {
+            if ( entry.deleted )
+                throw new ObjectDeletedExceptionImpl( object.getClass(), identity );
+            // to prevent circular references
+            if ( entry.object == object ) 
+                return oid;
+            throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
+        }
+
+        // to prevent circular references
+        addObjectEntry( object, oid, engine );
         // Check the object's timestamp
         accessMode = handler.getAccessMode( accessMode );
         try {
@@ -613,27 +619,18 @@ public abstract class TransactionContext
             throw new PersistenceExceptionImpl( except );
         }
 
-        // Update the object. This can only happen once for each object in
-        // all transactions running on the same engine, so after updating
-        // add a new entry for this object and use this object as the view
-        
-        // Instantiate a temporary object and fill it from the cache
-        tmp = handler.newInstance();
+        // If the object isn't found in the cache, then attempt to create it.
+        if ( oid == null ) {
+            removeObjectEntry( object );
+            return create( engine, object, identity );
+        }
+
         try {
-            engine.copyObject( this, oid, tmp );
-            // Now overwrite the values that was either loaded from the cache or
-            // from the database with the new values
-            addObjectEntry( tmp, oid, engine );
-            handler.fillFromCopy( object, this, engine );
-            removeObjectEntry( tmp );
-            // Replace the temporary object by the orignal
-            addObjectEntry( object, oid, engine );
             if ( handler.getCallback() != null ) {
                 handler.getCallback().using( object, _db );
-                handler.getCallback().loaded( object );
+                handler.getCallback().updated( object );
             }
         } catch ( Exception except ) {
-            removeObjectEntry( tmp );
             removeObjectEntry( object );
             engine.forgetObject( this, oid );
             if ( handler.getCallback() != null )
