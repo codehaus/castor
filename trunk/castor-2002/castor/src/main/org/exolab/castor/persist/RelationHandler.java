@@ -51,11 +51,12 @@ import java.util.Enumeration;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.CollectionHandler;
-import org.exolab.castor.mapping.loader.IndirectFieldHandler;
 
 
 /**
- *
+ * Used by {@link ClassHandler} to represent a relation field. The
+ * handler is used to simplify access to the related object, it's
+ * identity, or a collection of related objects.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -64,59 +65,103 @@ public final class RelationHandler
 {
 
 
+    /**
+     * The handler of the relation field.
+     */
     private final FieldHandler      _handler;
 
 
+    /**
+     * A collection handler if this is a many relation.
+     */
     private final CollectionHandler _colHandler;
 
 
+    /**
+     * The handler of the related class.
+     */
     private final ClassHandler      _relHandler;
 
 
-    private final String            _fieldName;
-
-
+    /**
+     * True if an attached relation.
+     */
     private final boolean           _attached;
 
 
+    /**
+     * Constructor used by {@link ClassHandler}.
+     */
     RelationHandler( FieldDescriptor fieldDesc, ClassHandler relHandler, boolean attached )
     {
-        _fieldName = fieldDesc.getFieldName();
-        if ( fieldDesc.getHandler() instanceof IndirectFieldHandler )
-            _handler = ( (IndirectFieldHandler) fieldDesc.getHandler() ).getHandler();
-        else
-            _handler = fieldDesc.getHandler();
+	_handler = fieldDesc.getHandler();
         _colHandler = fieldDesc.getCollectionHandler();
         _relHandler = relHandler;
         _attached = attached;
     }
 
 
-    public String getFieldName()
+    /**
+     * Returns true if the relation is a many relation. Both one-many
+     * and many-many relations deal with a collection of related
+     * objects.
+     * <p>
+     * If this method returns false, use {@link #getRelated} to obtain
+     * the related object. If this method returns true, use {@link
+     * #getCollection} to obtain the related objects.
+     *
+     * @return True if a many relation
+     */
+    public boolean isMany()
     {
-        return _fieldName;
+        return ( _colHandler != null );
     }
 
 
-    public FieldHandler getFieldHandler()
+    /**
+     * Returns true if the relation is attached. In an attached
+     * relation the related object is deleted when the primary object
+     * is deleted.
+     *
+     * @return True if an attached relation
+     */
+    public boolean isAttached()
     {
-        return _handler;
+        return _attached;
     }
 
 
-    public Object getIdentity( Object object )
-    {
-        return _relHandler.getIdentity( object );
-    }
-
-
+    /**
+     * Returns the related object.
+     *
+     * @param object The object
+     * @return The related object
+     */
     public Object getRelated( Object object )
     {
         return _handler.getValue( object );
     }
 
 
-    public Enumeration listRelated( Object object )
+    /**
+     * Sets the related object.
+     *
+     * @param object The object
+     * @param related The related object
+     */
+    public void setRelated( Object object, Object related )
+    {
+        _handler.setValue( object, related );
+    }
+
+
+    /**
+     * Returns the collection of related objects.
+     *
+     * @param object The object
+     * @return The related objects
+     */
+    public Enumeration getCollection( Object object )
     {
         Object collection;
 
@@ -127,45 +172,46 @@ public final class RelationHandler
     }
 
 
-    public void setRelated( Object object, Object related )
+    /**
+     * Returns the identity of this relation. Acts on the related
+     * object and returns it's identity.
+     *
+     * @param object The related object
+     * @return The identity of the relation
+     */
+    public Object getIdentity( Object object )
     {
-        _handler.setValue( object, related );
+        return _relHandler.getIdentity( object );
     }
 
 
-    public boolean isMulti()
-    {
-        return ( _colHandler != null );
-    }
-
-
-    public boolean isAttached()
-    {
-        return _attached;
-    }
-
-
-    public ClassHandler getRelatedHandler()
-    {
-        return _relHandler;
-    }
-
-
+    /**
+     * Returns the Java class of the related object, which this
+     * relation field references.
+     *
+     * @return The related Java class
+     */
     public Class getRelatedClass()
     {
         return _relHandler.getJavaClass();
     }
 
 
-    public Object newInstance()
+    /**
+     * Returns the class handler of the related object, which this
+     * relation field references.
+     *
+     * @return The related class handler
+     */
+    public ClassHandler getRelatedHandler()
     {
-        return _relHandler.newInstance();
+        return _relHandler;
     }
 
 
     public String toString()
     {
-        return _handler + " to " + _relHandler;
+        return "Relation " + _handler;
     }
 
 
