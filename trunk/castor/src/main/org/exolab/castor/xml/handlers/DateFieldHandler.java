@@ -98,19 +98,14 @@ public class DateFieldHandler extends XMLFieldHandler {
     /**
      * The local timezone offset from UTC
      */
-	private static TimeZone TIMEZONE = TimeZone.getDefault();
-	
+    private static TimeZone TIMEZONE = TimeZone.getDefault();
+    
     /**
      * A boolean to indicate that the TimeZone can be suppressed
      * if the TimeZone is equivalent to the "default" timezone.
      */
     private static boolean _allowTimeZoneSuppression = false;
     
-    /**
-     * Always use UTC time
-     */
-    private static boolean _alwaysUseUTC = false;
-
     /**
      * The nested FieldHandler
      */
@@ -156,7 +151,7 @@ public class DateFieldHandler extends XMLFieldHandler {
 
         if (val == null) return val;
 
-		Object formatted = null;
+        Object formatted = null;
 
         Class type = val.getClass();
         
@@ -221,24 +216,6 @@ public class DateFieldHandler extends XMLFieldHandler {
 
 
     /**
-     * Checks the field validity. Returns successfully if the field
-     * can be stored, is valid, etc, throws an exception otherwise.
-     *
-     * @param object The object
-     * @throws ValidityException The field is invalid, is required and
-     *  null, or any other validity violation
-     * @throws IllegalStateException The Java object has changed and
-     *  is no longer supported by this handler, or the handler
-     *  is not compatiable with the Java object
-     */
-    public void checkValidity( Object object )
-        throws ValidityException, IllegalStateException
-    {
-        //-- do nothing for now
-    } //-- checkValidity
-
-
-    /**
      * Creates a new instance of the object described by this field.
      *
      * @param parent The object for which the field is created
@@ -257,7 +234,7 @@ public class DateFieldHandler extends XMLFieldHandler {
     /**
      * Returns true if the given object is an XMLFieldHandler that
      * is equivalent to the delegated handler. An equivalent XMLFieldHandler
-	 * is an XMLFieldHandler that is an instances of the same class.
+     * is an XMLFieldHandler that is an instances of the same class.
      *
      * @return true if the given object is an XMLFieldHandler that
      * is equivalent to this one.
@@ -280,32 +257,24 @@ public class DateFieldHandler extends XMLFieldHandler {
     } //-- setAlwaysUseUTCTime
 
     /**
-     * Sets whether or not UTC time should always be used when
-     * marshalling out xsd:dateTime values.
-     */
-    public static void setAlwaysUseUTCTime(boolean alwaysUseUTC) {
-        _alwaysUseUTC = alwaysUseUTC;
-    } //-- setAlwaysUseUTCTime
-    
-    /**
      * Sets the default TimeZone used for comparing dates when marshalling out 
      * xsd:dateTime values using this handler. This is used when determining
      * if the timezone can be omitted when marshalling.
      *
-	 * Default is JVM default returned by TimeZone.getDefault()
+     * Default is JVM default returned by TimeZone.getDefault()
      * @param timeZone TimeZone to use instead of JVM default
      * @see setAllowTimeZoneSuppression
      */
-	public static void setDefaultTimeZone(TimeZone timeZone)
-	{
-	    if (timeZone == null) {
-	        //-- reset timezone to the default
-	        TIMEZONE = TimeZone.getDefault();
-		}
-		else {
-		    TIMEZONE = (TimeZone)timeZone.clone();
-		}
-	} //-- setDefaultTimeZone
+    public static void setDefaultTimeZone(TimeZone timeZone)
+    {
+        if (timeZone == null) {
+            //-- reset timezone to the default
+            TIMEZONE = TimeZone.getDefault();
+        }
+        else {
+            TIMEZONE = (TimeZone)timeZone.clone();
+        }
+    } //-- setDefaultTimeZone
 
     //-------------------/
     //- Private Methods -/
@@ -343,7 +312,7 @@ public class DateFieldHandler extends XMLFieldHandler {
      * @exception ParseException when the given string does not conform
      * to the above string.
      */
-    private final static Date parse( String dateTime ) 
+    protected static Date parse( String dateTime ) 
             throws ParseException 
     {
                 
@@ -528,9 +497,7 @@ public class DateFieldHandler extends XMLFieldHandler {
             cal.setTimeZone(tz);
         }
         else {
-            //TimeZone tz = cal.getTimeZone();
             cal.setTimeZone((TimeZone)TIMEZONE.clone());
-            //tz.setRawOffset(TIMEZONE_OFFSET);
         }
         
         return cal.getTime();
@@ -544,16 +511,14 @@ public class DateFieldHandler extends XMLFieldHandler {
      * @param date the Date to format
      * @return the formatted string
      */
-    private final static String format( Date date ) {
+    protected static String format( Date date ) {
 
         StringBuffer buffer = null;
         //-- Year: CCYY
         GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);
         
-        if (_alwaysUseUTC) {
-            cal.setTimeZone(TimeZone.getTimeZone(UTC_TIMEZONE));
-        }
+        cal.setTimeZone(TIMEZONE);
         
         int value   = cal.get(Calendar.YEAR);
         if (value > 9999) {
@@ -655,7 +620,6 @@ public class DateFieldHandler extends XMLFieldHandler {
         return buffer.toString();
     } //-- format
 
-
     /**
      * Formats the given object. If the object is a Date, a call
      * to #getFormattedDate will be made, otherwise the toString()
@@ -673,6 +637,3 @@ public class DateFieldHandler extends XMLFieldHandler {
     } //-- format
      
 } //-- DateFieldHandler
-
-
-
