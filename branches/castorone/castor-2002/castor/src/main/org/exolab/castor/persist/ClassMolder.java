@@ -754,14 +754,13 @@ public class ClassMolder implements CacheHolder {
                         if ( !tx.isPersistent( oo ) ) {
                             System.out.println("Object Does not Exist!");
                             tx.create( fieldEngine, fieldClassMolder, oo, null );
-
-                            // create the relation in relation table too
-                            _fhs[i].getRelationLoader().createRelation( 
-                            (Connection)tx.getConnection(oid.getLockEngine()), 
-                            oid.getIdentities(), fieldClassMolder.getIdentities(oo) );
                         } else {
                             System.out.println("Object already created and will not be recreated!");
                         }
+                        // create the relation in relation table too
+                        _fhs[i].getRelationLoader().createRelation( 
+                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                        oid.getIdentities(), fieldClassMolder.getIdentities(oo) );
                     }
                 }
                 break;
@@ -968,17 +967,40 @@ public class ClassMolder implements CacheHolder {
                         if ( orgFields != null && list != null ) {
                             for ( int j=0; j<orgFields.size(); j++ ) {
                                 if ( !list.contains( orgFields.get(j) ) ) {
-                                    _fhs[i].getRelationLoader().deleteRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    Object reldel = tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    if ( reldel != null ) {
+                                        tx.writeLock( reldel, tx.getLockTimeout() );
+                                     
+                                        _fhs[i].getRelationLoader().deleteRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    } else {
+                                        // the object not there, and we try to delete the rubbish relation,
+                                        // if there is
+                                        _fhs[i].getRelationLoader().deleteRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    }
                                 }
                             }
                             // add relation which added after it's created or loaded
                             for ( int j=0; j<list.size(); j++ ) {
                                 if ( !orgFields.contains( list.get(j) ) ) {
-                                    _fhs[i].getRelationLoader().createRelation( 
-                                    (Connection)tx.getConnection(oid.getLockEngine()), 
-                                    oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    Object reladd = tx.load( fieldEngine, fieldClassMolder, (Object[])list.get(j), null );
+                                    if ( reladd != null ) {
+                                        tx.writeLock( reladd, tx.getLockTimeout() );
+                                     
+                                        _fhs[i].getRelationLoader().createRelation( 
+                                        (Connection)tx.getConnection(oid.getLockEngine()), 
+                                        oid.getIdentities(), (Object[])orgFields.get(j) );
+                                    } else {
+                                        // ignored if object not found, if later in transaction 
+                                        // the other side of object is added. then, the relation 
+                                        // will be added if the other side of object is just 
+                                        // deleted in this transaction, then it seem to be an 
+                                        // non-critical error ignore it seem to better than annoy 
+                                        // user
+                                    }
                                 }
                             }
                         }
