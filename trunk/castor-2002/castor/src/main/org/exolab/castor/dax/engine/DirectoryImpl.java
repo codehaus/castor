@@ -192,7 +192,7 @@ public class DirectoryImpl
         throws DirectoryException
     {
         ClassHandler  handler;
-        Object        obj;
+        Object        object;
         
         if ( _dirEngine == null )
             throw new DirectoryException( "Directory closed" );
@@ -201,12 +201,14 @@ public class DirectoryImpl
         // clsDesc = _dirEngine.getClassDesc();
         try {
             if ( _tx != null ) {
-                obj = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
+                object = handler.newInstance();
+                _tx.fetch( _dirEngine, handler, object, rdn, AccessMode.Shared );
             } else {
                 TransactionContext tx;
                 
                 tx = new TransactionContextImpl( _conn );
-                obj = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
+                object = handler.newInstance();
+                _tx.fetch( _dirEngine, handler, object, rdn, AccessMode.Shared );
                 tx.commit();
             }
         } catch ( ObjectNotFoundException except ) {
@@ -217,7 +219,7 @@ public class DirectoryImpl
             else
                 throw new DirectoryException( except );
         }
-        return obj;
+        return object;
     }
     
     
@@ -299,17 +301,12 @@ public class DirectoryImpl
         if ( _tx == null )
             throw new DirectoryException( "Not inside a transaction" );
         try {
-            try {
-                _tx.prepare();
-                _tx.commit();
-            } catch ( TransactionAbortedException except ) {
-                _tx.rollback();
-            }
-        } catch ( TransactionNotInProgressException except ) {
-            throw new DirectoryException( except );
-        } finally {
-            _tx = null;
+            _tx.prepare();
+            _tx.commit();
+        } catch ( TransactionAbortedException except ) {
+            _tx.rollback();
         }
+        _tx = null;
     }
 
 
@@ -320,13 +317,8 @@ public class DirectoryImpl
             throw new DirectoryException( "Directory closed" );
         if ( _tx == null )
             throw new DirectoryException( "Not inside a transaction" );
-        try {
-            _tx.rollback();
-        } catch ( TransactionNotInProgressException except ) {
-            throw new DirectoryException( except );
-        } finally {
-            _tx = null;
-        }
+        _tx.rollback();
+        _tx = null;
     }
 
 
