@@ -347,14 +347,14 @@ public class ClassMolder {
                     relatedIdSQL = manyName;
                 }
 
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, 
-                        idSQL, idType, idConvertTo, idConvertFrom, idConvertParam, 
+                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable,
+                        idSQL, idType, idConvertTo, idConvertFrom, idConvertParam,
                         relatedIdSQL, relatedIdType, relatedIdConvertTo, relatedIdConvertFrom, relatedIdConvertParam );
             } else {
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i] );
             }
         }
-        
+
         // ssa, FIXME : Are the two statements equivalents ?
 //        if ( Persistent.class.isAssignableFrom( _base ) )
         if ( Persistent.class.isAssignableFrom( ds.resolve(_name) ) )
@@ -429,15 +429,32 @@ public class ClassMolder {
         String[] identities;
         boolean idfield;
         ClassMapping extend = (ClassMapping) clsMap.getExtends();
-
+        ClassMapping origin;
+        ArrayList fieldList;
 
         if ( extend != null ) {
+            origin = extend;
+            while (origin.getExtends() != null) {
+                origin = (ClassMapping) origin.getExtends();
+            }
+            identities = origin.getIdentity();
             extendFields = getFullFields( extend );
             thisFields = clsMap.getFieldMapping();
 
-            fields = new FieldMapping[extendFields.length+thisFields.length];
-            System.arraycopy( extendFields, 0, fields, 0, extendFields.length );
-            System.arraycopy( thisFields, 0, fields, extendFields.length, thisFields.length );
+            fieldList = new ArrayList(extendFields.length + thisFields.length);
+            for (int i = 0; i < extendFields.length; i++) {
+                fieldList.add(extendFields[i]);
+            }
+            for ( int i=0; i<thisFields.length; i++ ) {
+                for ( int k=0; k<identities.length; k++ ) {
+                    if ( ! thisFields[i].getName().equals( identities[k] ) ) {
+                        fieldList.add(thisFields[i]);
+                        break;
+                    }
+                }
+            }
+            fields = new FieldMapping[fieldList.size()];
+            fieldList.toArray(fields);
         } else {
             identities = clsMap.getIdentity();
             if ( identities == null || identities.length == 0 )
@@ -628,7 +645,7 @@ public class ClassMolder {
         // set the identities into the target object
         ids = oid.getIdentity();
         setIdentity( tx, object, ids );
-        
+
         // iterates thur all the field of the object and bind all field.
         for ( int i = 0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -750,7 +767,7 @@ public class ClassMolder {
         int fieldType;
 
         if ( _persistence == null )
-            throw new PersistenceException("non persistence capable: "+oid.getName());            
+            throw new PersistenceException("non persistence capable: "+oid.getName());
 
         // optimization note: because getObject is an expensive operation,
         // if this method divided into 3 phase, the performance will be

@@ -279,7 +279,6 @@ public abstract class MappingLoader
         throws MappingException
     {
         FieldDescriptor[] fields;
-        FieldDescriptor[] newFields;
         FieldDescriptor[] identities;
         Enumeration       enum;
         Class             javaClass;
@@ -370,20 +369,28 @@ public abstract class MappingLoader
         // The identity field is removed from the list of fields.
         identities = null;
         boolean idfield = false;
-        String[] ids = clsMap.getIdentity();
+        String[] ids;
+        ClassMapping origin = clsMap;
+        Vector fieldList = new Vector();
+        Vector idList = new Vector();
+
+        while (origin.getExtends() != null) {
+            origin = (ClassMapping) origin.getExtends();
+        }
+        ids = origin.getIdentity();
         if (( ids != null ) && ( ids.length > 0)) {
 
             // Check that an XML mapping file do not declare more identity
             // attributes for a given class than there are field elements
             // defined for that class.
-            // (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)          
-            if ( ids.length > fields.length ) {
+            // (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)
+            if ( ids.length > fields.length && origin == clsMap ) {
                 String badIdentities = "";
                 String delimiter     = " or ";
                 for ( int index = 0; index < ids.length; index++ ) {
                     badIdentities += ids[index];
                     if ( index != ids.length - 1 )
-                        badIdentities += delimiter; 
+                        badIdentities += delimiter;
                 }
                 throw new MappingException( "mapping.identityMissing",
                 badIdentities, javaClass.getName() );
@@ -391,39 +398,51 @@ public abstract class MappingLoader
 
             //System.out.println("getId....");
             //breakApart( clsMap.getIdentity(), ' ' );
-            newFields = new FieldDescriptor[fields.length - ids.length];
             //System.out.println("field.length: "+fields.length+" id.length: "+ids.length);
-            identities = new FieldDescriptor[ids.length];
-            for ( int i=0,x=0,y=0; i < fields.length ; i++ ) {
+            for ( int i=0; i < fields.length ; i++ ) {
                 //System.out.println("MappingLoader.createClassDesc.for:id: " + i );
                 idfield = false;
-                IDSEARCH:
                 for ( int k=0; k<ids.length; k++ ) {
                     //System.out.println(fields[i].getFieldName() + " " + ids[k] );
                     if ( fields[i].getFieldName().equals( ids[k] ) ) {
                         idfield = true;
-                        break IDSEARCH;
+                        break;
                     }
                 }
                 if ( idfield ) {
                     //System.out.println("Field["+i+"] is an id field");
-                    identities[x] = fields[ i ];
-                    if ( identities[x] instanceof FieldDescriptorImpl )
-                        ( (FieldDescriptorImpl) identities[x] ).setRequired( true );
-                    if ( identities[x].getHandler() instanceof FieldHandlerImpl )
-                        ( (FieldHandlerImpl) identities[x].getHandler() ).setRequired( true );
-                    x++;
+                    if ( fields[i] instanceof FieldDescriptorImpl )
+                        ( (FieldDescriptorImpl) fields[i] ).setRequired( true );
+                    if ( fields[i].getHandler() instanceof FieldHandlerImpl )
+                        ( (FieldHandlerImpl) fields[i].getHandler() ).setRequired( true );
+                    idList.addElement(fields[i]);
                 } else {
                     // copy non identity field from list of fields.
-                    newFields[y] = fields[i];
-                    y++;
+                    fieldList.addElement(fields[i]);
                 }
             }
-            fields = newFields;
-
-            if ( identities == null || (identities.length == 0) )
+            if (extend == null) {
+                identities = new FieldDescriptor[idList.size()];
+                idList.toArray(identities);
+            } else {
+                identities = new FieldDescriptor[((ClassDescriptorImpl) extend).getIdentities().length];
+                for (int i = 0; i < identities.length; i++) {
+                    identities[i] = ((ClassDescriptorImpl) extend).getIdentities()[i];
+                    for (int j = 0; j < idList.size(); j++) {
+                        if (((FieldDescriptor) idList.elementAt(j)).getFieldName().equals(identities[i].getFieldName())) {
+                            identities[i] = (FieldDescriptor) idList.elementAt(j);
+                            idList.removeElementAt(j);
+                            break;
+                        }
+                    }
+                }
+            }
+            fields = new FieldDescriptor[fieldList.size()];
+            fieldList.toArray(fields);
+            if ( identities == null || identities.length == 0 ) {
                 throw new MappingException( "mapping.identityMissing", clsMap.getIdentity(),
                                             javaClass.getName() );
+            }
         }
 
 
