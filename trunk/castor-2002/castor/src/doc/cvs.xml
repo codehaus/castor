@@ -2,20 +2,24 @@
 <document url="http://castor.exolab.org/cvs.xml">
   <body>
     <title>CVS Access</title>
-    <p>The source code, documentation and libraries are available for anonymous access
-       from the ExoLab CVS server.</p>
+    <header>
+      <p>The source code, documentation and libraries are available for anonymous access
+         from the ExoLab CVS server.</p>
 
-    <p>The CVS root is <tt>:pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/></tt>
-       and the password <tt>anoncvs</tt>.</p>
+      <p>The CVS root is <tt>:pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/></tt>
+         and the password <tt>anoncvs</tt>.</p>
 
-    <p>To login to CVS from the command line and checkout a version of <project-name/>
-       use the following commands:</p>
+      <p>To login to CVS from the command line and checkout a version of <project-name/>
+         use the following commands:</p>
 
-    <pre>
+      <pre>
   <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> login
   <b>password:</b> anoncvs
   <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> checkout <project-repository/>
-    </pre>
+      </pre>
 
+      <p><b>Note:</b> jCVS may not be able to checkout the entire repository. Please use an
+         alternative CVS tool until this problem is resolved.</p>
+    </header>
   </body>
 </document>

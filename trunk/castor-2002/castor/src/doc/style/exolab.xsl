@@ -66,7 +66,11 @@
 
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                 <tr>
-                  <td bgcolor="{$color-beta}" align="left" width="254" rowspan="2"><a href="http://www.exolab.org/"><img src="images/exolab.gif" height="117" width="254" border="0"/></a></td>
+                  <td bgcolor="{$color-beta}" align="left" width="254" rowspan="2">
+                    <a href="http://www.exolab.org/">
+                      <img src="style/images/exolab.gif" height="117" width="254" border="0"/>
+                    </a>
+                  </td>
                   <td bgcolor="{$color-beta}" align="left" height="11" width="3600">
                     <xsl:apply-templates select="$project/links"/>
                   </td>
@@ -74,7 +78,7 @@
                 <tr>
                   <td bgcolor="{$color-alpha}" width="*" align="left" valign="top">
                     <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/>
-                    <a href="http://castor.exolab.org"><img src="images/castor.gif" border="0"/></a>
+                    <a href="{$project/@href}"><img src="{$project/@image}" border="0"/></a>
                   </td>
                 </tr>
 
@@ -88,9 +92,6 @@
             <xsl:if test="document/properties">
               <xsl:attribute name="rowspan">4</xsl:attribute>
             </xsl:if>
-            <span class="alpha">
-              <font color="{$color-alpha}"><a href="print/{}">Print</a></font>
-            </span>
             <table>
               <xsl:for-each select="$project/menu">
                 <tr>
@@ -100,7 +101,9 @@
                 </tr>
                 <xsl:for-each select="item">
                   <tr>
-                    <td width="15" valign="top" align="right"><img src="images/bullets/square-small-white.gif" alt="*" height="12" width="12"/></td>
+                    <td width="15" valign="top" align="right">
+                      <img src="style/images/bullets/square-small-white.gif" alt="*" height="12" width="12"/>
+                    </td>
                     <td><span class="alpha">
                       <xsl:variable name="href">
                         <xsl:call-template name="link-convertor">
@@ -115,10 +118,10 @@
             </table>
           </td>
           <td bgcolor="{$color-alpha}" width="11" valign="top">
-              <img src="images/corners/nw-small.gif" height="11" width="11" valign="top"/>
+              <img src="style/images/corners/nw-small.gif" height="11" width="11" valign="top"/>
           </td>
           <td bgcolor="{$color-alpha}" height="45" width="3600">
-            &#xA0;&#xA0;<img src="images/bullets/dots.gif" height="11" width="41" valign="top"/>&#xA0;&#xA0;
+            &#xA0;&#xA0;<img src="style/images/bullets/dots.gif" height="11" width="41" valign="top"/>&#xA0;&#xA0;
             <font size="4" color="{$color-c}"><b><xsl:value-of select="$project/title"/></b></font>    
           </td>
         </tr>
@@ -147,18 +150,26 @@
 
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" height="11" width="11" valign="top"><img src="images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
-          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-beta}" height="11" width="11" valign="top">
+            <img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/>
+          </td>
+          <td bgcolor="{$color-alpha}" valign="top">
+            <img src="style/images/blank.gif" height="11" width="11"/>
+          </td>
         </tr>
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11"><img src="images/blank.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-beta}" width="11">
+            <img src="style/images/blank.gif" height="11" width="11"/>
+          </td>
           <td bgcolor="{$color-beta}" valign="top"></td>
         </tr>
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11" valign="top"><img src="images/corners/nw-small.gif" height="11" width="11"/></td>
-          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-beta}" width="11" valign="top">
+            <img src="style/images/corners/nw-small.gif" height="11" width="11"/>
+          </td>
+          <td bgcolor="{$color-alpha}" valign="top"><img src="style/images/blank.gif" height="11" width="11"/></td>
         </tr>
 
         <tr>
@@ -173,8 +184,12 @@
 
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
-          <td bgcolor="{$color-beta}" width="11" valign="top"><img src="images/corners/sw-small.gif" height="11" width="11" valign="top"/></td>
-          <td bgcolor="{$color-alpha}" valign="top"><img src="images/blank.gif" height="11" width="11"/></td>
+          <td bgcolor="{$color-beta}" width="11" valign="top">
+            <img src="style/images/corners/sw-small.gif" height="11" width="11" valign="top"/>
+          </td>
+          <td bgcolor="{$color-alpha}" valign="top">
+            <img src="style/images/blank.gif" height="11" width="11"/>
+          </td>
         </tr>
         <tr>
           <td bgcolor="{$color-beta}" width="120"></td>
