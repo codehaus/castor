@@ -624,7 +624,51 @@ public final class SQLEngine implements Persistence {
     }
 
 
-    public Object store( Object conn, Object[] fields, Object identity, 
+    /**
+     * If the RDBMS doesn't support setNull for "WHERE fld=?" and requires "WHERE fld IS NULL",
+     * we need to modify the statement.
+     */
+    private String getStoreStatement( Object[] original ) {
+        StringBuffer sb = null;
+        int pos = 0;
+        int last_replacement;
+
+        if (original == null) {
+            return _sqlStore;
+        }
+        if (((BaseFactory) _factory).supportsSetNullInWhere()) {
+            return _sqlStoreDirty;
+        }
+        last_replacement = original.length;
+        for (int i = original.length - 1; i >= 0; i--) {
+            if ( ! _fields[ i ].store || ! _fields[i].dirtyCheck ) {
+                last_replacement--;
+                continue;
+            }
+
+            if (original[i] != null) {
+                continue;
+            }
+            if (sb == null) {
+                pos = _sqlStoreDirty.length();
+                sb = new StringBuffer(pos * 4);
+                sb.append(_sqlStoreDirty);
+            }
+            for ( ; last_replacement > i; last_replacement--) {
+                for (pos--; pos > 0; pos--) {
+                    if (sb.charAt(pos - 1) == '=' && sb.charAt(pos) == '?') {
+                        pos--;
+                        break;
+                    }
+                }
+            }
+            sb.delete(pos, pos + 2);
+            sb.insert(pos, " IS NULL");
+        }
+        return (sb == null ? _sqlStoreDirty : sb.toString());
+    }
+
+    public Object store( Object conn, Object[] fields, Object identity,
                          Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
 
@@ -637,7 +681,7 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null )
                 _extends.store( conn, fields, identity, original, stamp );
 
-            stmt = ( (Connection) conn ).prepareStatement( original == null ? _sqlStore : _sqlStoreDirty );
+            stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( original ) );
 
             count = 1;
 
@@ -684,12 +728,15 @@ public final class SQLEngine implements Persistence {
 
             // bind the old fields of the row to be stored into the preparedStatement
             if ( original != null ) {
+                boolean supportsSetNull = ((BaseFactory) _factory).supportsSetNullInWhere();
+
                 for ( int i = 0 ; i < _fields.length ; ++i ) {
                     if ( _fields[ i ].store && _fields[i].dirtyCheck ) {
                         if ( original[i] == null ) {
-                            for ( int j=0; j < _fields[i].columns.length; j++ )
-                                stmt.setNull( count++, _fields[i].columns[j].sqlType );
-
+                            if (supportsSetNull) {
+                                for ( int j=0; j < _fields[i].columns.length; j++ )
+                                    stmt.setNull( count++, _fields[i].columns[j].sqlType );
+                            }
                         } else if ( original[i] instanceof Complex ) {
                             Complex complex = (Complex)original[i];
                             if ( complex.size() != _fields[i].columns.length )

@@ -103,7 +103,7 @@ public abstract class BaseFactory
 
 
     /**
-     * Most of databases has some problems with some SQL types.
+     * Some databases has some problems with some SQL types.
      * Usually it is enough to merely replace one SQL type by another.
      * @param sqlType The correspondent Java class for the SQL type in mapping.xml
      * @return The correspondent Java class for the SQL type that should be used instead.
@@ -111,6 +111,14 @@ public abstract class BaseFactory
     public Class adjustSqlType( Class sqlType )
     {
         return sqlType;
+    }
+
+    /**
+     * Many databases don't support setNull for "WHERE fld=?" and require "WHERE fld IS NULL".
+     */
+    public boolean supportsSetNullInWhere()
+    {
+        return false;
     }
 }
 

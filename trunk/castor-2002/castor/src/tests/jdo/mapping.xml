@@ -417,10 +417,12 @@
       <sql name="ttm" type="timestamp" dirty="ignore" />
     </field>
     <field name="intValue" type="integer" required="false" >
-      <sql name="int_val" type="integer" dirty="ignore" />
+      <!--sql name="int_val" type="integer" dirty="ignore" /-->
+      <sql name="int_val" type="integer" />
     </field>
     <field name="longValue" type="long" required="false" >
-      <sql name="long_val" type="numeric" dirty="ignore" />
+      <!--sql name="long_val" type="numeric" dirty="ignore" /-->
+      <sql name="long_val" type="numeric" />
     </field>
     <field name="charValue" type="char" required="false" >
       <sql name="char_val" type="char" />
