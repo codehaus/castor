@@ -212,7 +212,7 @@ public class Collections extends CWTestCase {
 
             // test if add and remove rollback properly.
             testCol.removeItem( new TestItem( 102 ) );
-            testCol.removeItem( new TestItem( 103 ) );
+            testCol.removeItem( new TestItem( 104 ) );
             newItem = new TestItem( 108 );
             testCol.addItem( newItem );
             newItem = new TestItem( 109 );
