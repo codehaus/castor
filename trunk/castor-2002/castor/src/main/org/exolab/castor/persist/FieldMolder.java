@@ -604,7 +604,9 @@ public class FieldMolder {
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
-                    Class methodClass = _colClass!=null? _colClass: javaClass;
+                    Class methodClass = 
+                        _colClass!=null? _colClass: _defaultReflectService._fClass;
+
                     _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
                     if ( _defaultReflectService._setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
