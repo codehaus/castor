@@ -325,13 +325,16 @@ public class TimeDescriptor
         {
 
             if (! (target instanceof Time) ) {
-               //-- throw exception
+                String err = "TimeDescriptor#setValue: expected Date, received instead:"
+                            + target.getClass();
+               throw new IllegalStateException(err);
             }
 
             Time timeTarget = (Time) target;
 
             if (value == null) {
-               /// do something
+               String err = "TimeDescriptor#setValue: null value.";
+               throw new IllegalStateException(err);
             }
 
             //-- update current instance of time with new time
@@ -339,14 +342,14 @@ public class TimeDescriptor
                 Time temp = Time.parseTime(value.toString()) ;
                 timeTarget.setHour(temp.getHour());
                 timeTarget.setMinute(temp.getMinute());
-                if (temp.isUTC())
-                    timeTarget.setUTC();
                 timeTarget.setSecond(temp.getSeconds(), temp.getMilli());
-                timeTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
-
-            }
-            catch (Exception ex) {
-                //-- ignore for now
+                if (temp.isUTC()) {
+                    timeTarget.setUTC();
+                    timeTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
+                }
+            } catch  (java.text.ParseException ex) {
+                String err = "TimeDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 

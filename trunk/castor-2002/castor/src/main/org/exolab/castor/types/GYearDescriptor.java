@@ -338,13 +338,15 @@ public class GYearDescriptor implements XMLClassDescriptor {
                 GYear temp = GYear.parseGYear(value.toString()) ;
                 GYearTarget.setCentury(temp.getCentury());
                 GYearTarget.setYear(temp.getYear());
-                if (temp.isUTC())
+                if (temp.isUTC()) {
                     GYearTarget.setUTC();
-                GYearTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                    GYearTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                }
                 temp = null;
             }
-            catch (Exception ex) {
-                //-- ignore for now
+            catch (java.text.ParseException ex) {
+                String err = "GYearDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 

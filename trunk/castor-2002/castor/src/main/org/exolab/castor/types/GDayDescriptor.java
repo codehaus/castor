@@ -335,14 +335,15 @@ public class GDayDescriptor implements XMLClassDescriptor {
             try {
                 GDay temp = GDay.parseGDay(value.toString()) ;
                 GDayTarget.setDay(temp.getDay());
-                if (temp.isUTC())
+                if (temp.isUTC()) {
                     GDayTarget.setUTC();
-                GDayTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                    GDayTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                }
                 temp = null;
             }
-            catch (Exception ex) {
-                //-- ignore for now
-                ex.printStackTrace();
+            catch (java.text.ParseException ex) {
+                String err = "GDayDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 

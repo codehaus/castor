@@ -337,13 +337,15 @@ public class GMonthDescriptor implements XMLClassDescriptor {
             try {
                 GMonth temp = GMonth.parseGMonth(value.toString()) ;
                 GMonthTarget.setMonth(temp.getMonth());
-                if (temp.isUTC())
+                if (temp.isUTC()) {
                     GMonthTarget.setUTC();
-                GMonthTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                    GMonthTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                }
                 temp = null;
             }
-            catch (Exception ex) {
-                //-- ignore for now
+            catch (java.text.ParseException ex) {
+                String err = "GMonthDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 
