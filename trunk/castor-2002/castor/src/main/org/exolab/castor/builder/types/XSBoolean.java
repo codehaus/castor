@@ -48,52 +48,32 @@ package org.exolab.castor.builder.types;
 import org.exolab.javasource.*;
 
 /**
- * The base XML Schema Type class
+ * The boolean XML Schema datatype
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class XSType {
+public class XSBoolean extends XSType {
     
-    public static final short NULL               = -1;
+    /**
+     * The JType represented by this XSType
+    **/
+    private static final JType jType 
+        = new JClass("boolean");
+        
     
-    //-- this type should change to Archetype or
-    //-- something like that
-    public static final short CLASS              =  0;
-    //--
-    public static final short BINARY             =  1;
-    public static final short BOOLEAN            =  2;
-    public static final short ID                 =  3;
-    public static final short IDREF              =  4;
-    public static final short INTEGER            =  5;
-    public static final short LIST               =  6;
-    public static final short NCNAME             =  7;
-    public static final short NEGATIVE_INTEGER   =  8;
-    public static final short NMTOKEN            =  9;
-    public static final short POSITIVE_INTEGER   = 10;
-    public static final short REAL               = 11;
-    public static final short STRING             = 12;
-    public static final short TIME_INSTANT       = 13;
+    public XSBoolean() {
+        super(XSType.BOOLEAN);
+    } //-- XSBoolean
     
-    private short type = NULL;
-    
-    protected XSType(short type) {
-        this.type = type;
-    }
     
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
     **/
-    public abstract JType getJType();
-    
-    /**
-     * Returns the type of this XSType
-     * @return the type of this XSType
-    **/
-    public short getType() {
-        return this.type;
-    } //-- getType
-    
+    public JType getJType() {
+        return this.jType;
+    } //-- getJType
+        
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -102,7 +82,10 @@ public abstract class XSType {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        return variableName;
+        StringBuffer sb = new StringBuffer("new Boolean(");
+        sb.append(variableName);
+        sb.append(")");
+        return sb.toString();
     } //-- toJavaObject
 
     /**
@@ -114,28 +97,10 @@ public abstract class XSType {
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
-        StringBuffer sb = new StringBuffer();
-        
-        JType jType = getJType();
-        if (jType != null) {
-            sb.append('(');
-            sb.append(jType.getName());
-            sb.append(") ");
-        }
+        StringBuffer sb = new StringBuffer("((Boolean)");
         sb.append(variableName);
+        sb.append(").booleanValue()");
         return sb.toString();
     } //-- fromJavaObject
     
-    public boolean isPrimitive() {
-        switch (type) {
-            case INTEGER:
-            case NEGATIVE_INTEGER:
-            case POSITIVE_INTEGER:
-            case REAL:
-                return true;
-            default:
-                return false;
-        }
-    }
-    
-} //-- XSType
+} //-- XSBoolean
