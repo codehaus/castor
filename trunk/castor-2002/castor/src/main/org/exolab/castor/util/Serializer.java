@@ -64,22 +64,22 @@ public class Serializer
 
 
     public static Object deserialize( byte [] bytes ) 
-	throws IOException, ClassNotFoundException
+        throws IOException, ClassNotFoundException
     {
         ByteArrayInputStream bais;
         ObjectInputStream    ois;
-	bais = new ByteArrayInputStream( bytes );
-	ois = new ObjectInputStream( bais );
+        bais = new ByteArrayInputStream( bytes );
+        ois = new ObjectInputStream( bais );
         return ois.readObject();
     }
 
 
     public static byte[] serialize( Object object )
-	throws IOException
+        throws IOException
     {
         ByteArrayOutputStream baos;
         ObjectOutputStream    oos;
-
+        
         baos = new ByteArrayOutputStream();
         oos = new ObjectOutputStream( baos );
         oos.writeObject( object );
