@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1713 using contribution from Gregory Block [gblock@ctoforaday.com]
+       Fixed problem in FieldMolder when dealing with addXXX() methods on fields of
+       type collection.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1713
+       (Werner - 200409017)
+
 JDO:   Fixed bug 1689 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        FieldMolder now looks for is<FieldName>() methods for boolean properties, in addition
        to standard get<FieldName>() methods.
