@@ -99,8 +99,8 @@ public class LDAPQueryExpression
 
     public String encodeColumn( String tableName, String columnName )
     {
-	// ! not yet implemented => ToDo !
-	return tableName + "." + columnName;
+    // ! not yet implemented => ToDo !
+    return tableName + "." + columnName;
     }
 
 
@@ -122,6 +122,11 @@ public class LDAPQueryExpression
 
 
     public void addOrderClause( String where )
+    {
+    }
+
+
+    public void addLimitClause( String limitClause )
     {
     }
 
