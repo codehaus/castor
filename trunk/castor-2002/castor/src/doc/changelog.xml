@@ -2,6 +2,26 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.7.10  March 3, 2000"><pre>
+JDO:     Upgraded to use new cache mechanism, reducing memory overhead for
+         loading. Initial code base for one-many relation support.
+
+Persist: Optimization to the cache mechanism. Now uses fixed-size arrays to
+         hold cached objects, eliminating much of the use of handlers.
+         Also cleaned some of the API calls.
+
+Persist: The cache mechanism now supports class-level resolution, allowing
+         different cache properties for different class types.
+
+Persist: Added initial support for one-many relations. Currently not working,
+         but the query engine has been revised to deal with one-many
+         relations, and some tests have been working successfully.
+
+Persist: Query mechanism no longer supports scrolling to a particular point,
+         due to the need to efficiently retrieve related records.
+
+Mapping: Minor changes to accomodate better creation of relation handlers.
+    </pre></section>
     <section title="Version 0.7.9  February 25, 2000"><pre>
 JDO:     Now loads JDO configuration file from ODMG.loadDatabase() which in
          turn loads all the required mapping files. Added jdo-conf DTD which
