@@ -2,12 +2,14 @@
   <property name="project" value="castor" />
 
   <property name="source" value="src" />
-  <property name="etc" value="src/etc" />
+  <property name="main" value="${source}/main" />
+  <property name="etc" value="${source}/etc" />
   <property name="build" value="build" />
   <property name="classes" value="${build}/classes" />
   <property name="dist" value="dist" />
   <property name="lib" value="lib" />
-  <property name="doc" value="src/doc" />
+  <property name="doc" value="${source}/doc" />
+  <property name="schema" value="${source}/schema" />
 
   <property name="classpath" value="${classpath}:${classes}" />
   <property name="build.compiler" file="classic" />
@@ -41,6 +43,16 @@
     <mkdir dir="${build}"/>
     <mkdir dir="${classes}"/>
     <mkdir dir="${dist}"/>
+
+    <!-- Copy the DTD and schema to the schema directory -->
+    <deltree dir="${schema}" />
+    <mkdir   dir="${schema}" />
+    <copydir src="${main}/org/exolab/castor/mapping" includes="*.dtd,*.xsd"
+             dest="${schema}" />
+    <copydir src="${main}/org/exolab/castor/jdo/conf" includes="*.dtd,*.xsd"
+             dest="${schema}" />
+    <copydir src="${main}/org/exolab/castor/dsml/schema" includes="*.dtd,*.xsd"
+             dest="${schema}" />
   </target>
 
   <!-- Kill all the directories created in prepare -->
@@ -52,7 +64,7 @@
 
   <!-- Build all the sources with debug and deprecation -->
   <target name="main" depends="prepare">
-    <javac srcdir="${source}/main" destdir="${classes}"
+    <javac srcdir="${main}" destdir="${classes}"
            classpath="${classpath}" debug="on" deprecation="${deprecation}" />
   </target>
 
@@ -61,7 +73,7 @@
 
   <!-- Same as main, but no debug and no deprecation -->
   <target name="no-debug" depends="prepare">
-    <javac srcdir="${source}/main" destdir="${classes}"
+    <javac srcdir="${main}" destdir="${classes}"
            classpath="${classpath}" debug="off" deprecation="off" optimize="on"/>
   </target>
 
@@ -120,6 +132,7 @@
            includes="**.xml" excludes="style/**,project.xml"/>
     <copydir src="${doc}/images" dest="${build}/doc/print/images"/>
     <copyfile src="${doc}/license.txt" dest="${build}/doc/print/license.txt"/>
+    <copydir src="${schema}" includes="*.dtd,*.xsd" dest="${build}/doc" />
   </target>
 
   <!-- Build the API JavaDoc -->
@@ -127,7 +140,7 @@
     <mkdir   dir="${build}/doc" />
     <deltree dir="${build}/doc/javadoc" />
     <mkdir   dir="${build}/doc/javadoc" />
-    <javadoc sourcepath="${source}/main" destdir="${build}/doc/javadoc" dir="."
+    <javadoc sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
              doctitle="Castor" public="true" noindex="true" author="true"
 	     packagenames="org.exolab.castor.xml, org.exolab.castor.jdo, org.exolab.castor.dax,
                            org.exolab.castor.persist.*, org.exolab.castor.mapping,
@@ -176,7 +189,7 @@
               dest="${bin}/xerces.jar" />
     <copyfile src="${lib}/jta1.0.1.jar"
               dest="${bin}/jta1.0.1.jar" />
-    <copydir  src="${source}/schema" dest="${bin}/schema" />
+    <copydir  src="${schema}" dest="${bin}/schema" />
 
     <tar includes="examples/**" basedir="${source}"
          tarfile="${bin}/examples.tar" defaultexcludes="true" />	  
