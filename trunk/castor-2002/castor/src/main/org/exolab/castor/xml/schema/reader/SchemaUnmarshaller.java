@@ -201,6 +201,19 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //set the default locator of this schema
         _schema.setSchemaLocation(getDocumentLocator().getSystemId());
+        
+        //-- attributeFormDefault
+        String form = atts.getValue(SchemaNames.ATTR_FORM_DEFAULT_ATTR);
+        if (form != null) {
+            _schema.setAttributeFormDefault(Form.valueOf(form));
+        }
+        
+        //-- elementFormDefault
+        form = atts.getValue(SchemaNames.ELEM_FORM_DEFAULT_ATTR);
+        if (form != null) {
+            _schema.setElementFormDefault(Form.valueOf(form));
+        }
+        
 
     } //-- init
 
@@ -309,11 +322,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-
-
-
-        //-- use VM internal String of name
-        name = name.intern();
 
         if (name.equals(SchemaNames.SCHEMA)) {
 

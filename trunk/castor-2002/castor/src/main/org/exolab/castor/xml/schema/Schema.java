@@ -92,77 +92,93 @@ public class Schema extends Annotated {
     //--------------------/
 
     /**
-     * The ID for this Schema
+     * The attributeFormDefault property
     **/
-    private String id       = null;
-
-    private String name     = null;
-
-    private String schemaNS = null;
-
-    /**
-     * The targetNamespace
-    **/
-    private String targetNS = null;
-
-    /**
-     * The version information as specified by the version
-     * attribute
-    **/
-    private String version  = null;
-
-    /**
-     * The schemaLocation hint provided in the 'import' tag.
-     * By default the schemaLocation is the locator of the SaxUnmarshaller
-     */
-     private String _schemaLocation;
-
+    private Form _attributeFormDefault = null;
+    
     /**
      * The global AttribteGroups for this Schema
     **/
-    private Hashtable attributeGroups = null;
+    private Hashtable _attributeGroups = null;
 
     /**
      * The global attributes for this Schema
     **/
-    private Hashtable attributes = null;
+    private Hashtable _attributes = null;
 
     /**
      * A list of defined architypes
     **/
-    private Hashtable complexTypes = null;
+    private Hashtable _complexTypes = null;
+
+    /**
+     * The elementFormDefault attribute for this Schema
+    **/
+    private Form _elementFormDefault = null;
+    
+    /**
+     * A list of defined elements
+    **/
+    private Hashtable _elements = null;
+
+    /**
+     * A list of defined top-levels groups
+     */
+    private Hashtable _groups = null;
+    
+    /**
+     * The ID for this Schema
+    **/
+    private String _id = null;
+    
+    /**
+     * A list of imported schemas
+    **/
+    private Hashtable _importedSchemas = null;
+
+    /**
+     * A list of  XML Schema files included in this schema
+    **/
+    private Vector _includedSchemas = null;
+
+    /**
+     * A list of namespaces declared in this schema
+     */
+    private Hashtable _namespaces = null;
+
+    /**
+     * The schemaLocation hint provided in the 'import' tag.
+     * By default the schemaLocation is the locator of the SaxUnmarshaller
+    **/
+    private String _schemaLocation = null;
+
+    /**
+     * The namespace of this XML Schema (ie the namespace
+     * of the W3C Schema supported by this Schema).
+    **/
+    private String _schemaNamespace = null;
 
 
     /**
      * A list of defined SimpleTypes
     **/
-    private Hashtable simpleTypes = null;
-
+    private Hashtable _simpleTypes = null;
+    
     /**
-     * A list of defined elements
+     * The targetNamespace for this Schema
     **/
-    private Hashtable elements = null;
+    private String _targetNamespace = null;
 
     /**
-     * A list of defined top-levels groups
-     */
-    private Hashtable _group = null;
-    /**
-     * A list of imported schemas
-     */
-    private Hashtable importedSchemas = null;
-
-    /**
-     * A list of  XML Schema files included in this schema
-     */
-    private Vector includedSchemas = null;
-
-    /**
-     * A list of namespaces declared in this schema
-     */
-    private Hashtable namespaces = null;
-
-
+     * The version information as specified by the version
+     * attribute
+    **/
+    private String _version  = null;
+    
+    //----------------/
+    //- Constructors -/
+    //----------------/
+    
     /**
      * Creates a new SchemaDef
     **/
@@ -177,17 +193,17 @@ public class Schema extends Annotated {
     public Schema(String schemaNS) {
         super();
 
-        attributes      = new Hashtable();
-        attributeGroups = new Hashtable();
-        complexTypes    = new Hashtable();
-        simpleTypes     = new Hashtable();
-        elements        = new Hashtable();
-        _group          = new Hashtable();
-        importedSchemas = new Hashtable();
-        includedSchemas = new Vector();
-        namespaces      = new Hashtable();
+        _attributes       = new Hashtable();
+        _attributeGroups  = new Hashtable();
+        _complexTypes     = new Hashtable();
+        _simpleTypes      = new Hashtable();
+        _elements         = new Hashtable();
+        _groups           = new Hashtable();
+        _importedSchemas  = new Hashtable();
+        _includedSchemas  = new Vector();
+        _namespaces       = new Hashtable();
 
-        this.schemaNS = schemaNS;
+        _schemaNamespace = schemaNS;
 
         init();
     } //-- ScehamDef
@@ -223,7 +239,7 @@ public class Schema extends Annotated {
                 attribute.getName(false);
             throw new SchemaException(err);
         }
-        Object obj = attributes.get(name);
+        Object obj = _attributes.get(name);
 
         if (obj == attribute) return;
 
@@ -234,7 +250,7 @@ public class Schema extends Annotated {
             throw new SchemaException(err + name);
         }
 
-        attributes.put(name, attribute);
+        _attributes.put(name, attribute);
 
     } //-- addAttribute
 
@@ -259,13 +275,13 @@ public class Schema extends Annotated {
         {
             String nsPrefix = name.substring(0,idx);
             name = name.substring(idx + 1);
-            String ns = (String) namespaces.get(nsPrefix);
+            String ns = (String) _namespaces.get(nsPrefix);
             if (ns == null)  {
                 String err = "addAttributeGroup: ";
                 err += "Namespace prefix not recognized '"+nsPrefix+"'";
                 throw new IllegalArgumentException(err);
             }
-            if (!ns.equals(targetNS)) {
+            if (!ns.equals(_targetNamespace)) {
                 String err = "AttributeGroup has different namespace " +
                  "than this Schema definition.";
                 throw new IllegalArgumentException(err);
@@ -278,7 +294,7 @@ public class Schema extends Annotated {
             throw new SchemaException(err);
         }
 
-        Object obj = attributeGroups.get(name);
+        Object obj = _attributeGroups.get(name);
 
         if (obj == attrGroup) return;
 
@@ -289,7 +305,7 @@ public class Schema extends Annotated {
             throw new SchemaException(err + name);
         }
 
-        attributeGroups.put(name, attrGroup);
+        _attributeGroups.put(name, attrGroup);
 
     } //-- addAttributeGroup
 
@@ -315,11 +331,11 @@ public class Schema extends Annotated {
             err += "belongs to a different Schema; type name: " + name;
             throw new SchemaException(err);
         }
-        if (complexTypes.get(name) != null) {
+        if (_complexTypes.get(name) != null) {
             String err = "a ComplexType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
-        complexTypes.put(name, complexType);
+        _complexTypes.put(name, complexType);
         complexType.setParent(this);
 
     } //-- addComplextype
@@ -347,12 +363,12 @@ public class Schema extends Annotated {
             String err = "an element declaration must contain a name.";
             throw new SchemaException(err);
         }
-        if (elements.get(name) != null) {
+        if (_elements.get(name) != null) {
             String err = "an element declaration already exists with the given name: ";
             throw new SchemaException(err + name);
         }
 
-        elements.put(name, elementDecl);
+        _elements.put(name, elementDecl);
 
 
     } //-- addElementDecl
@@ -373,12 +389,12 @@ public class Schema extends Annotated {
             String err = "a group declaration must contain a name.";
             throw new SchemaException(err);
         }
-        if (_group.get(name) != null) {
+        if (_groups.get(name) != null) {
             String err = "an group declaration already exists with the given name: ";
             throw new SchemaException(err + name);
         }
 
-        _group.put(name, group);
+        _groups.put(name, group);
     } //-- addModelGroup
 
     /**
@@ -390,12 +406,12 @@ public class Schema extends Annotated {
         throws SchemaException
     {
         String targetNamespace = schema.getTargetNamespace();
-        if (importedSchemas.get(targetNamespace)!=null)
+        if (_importedSchemas.get(targetNamespace)!=null)
         {
             String err = "a Schema has already been imported with the given namespace: ";
             throw new SchemaException(err + targetNamespace);
         }
-        importedSchemas.put(targetNamespace, schema);
+        _importedSchemas.put(targetNamespace, schema);
     } //-- addImportedSchema
 
     /**
@@ -403,7 +419,7 @@ public class Schema extends Annotated {
      * @param namespaces the list of namespaces
      */
     public void addNamespace(String prefix, String ns) {
-        namespaces.put(prefix, ns);
+        _namespaces.put(prefix, ns);
     } //-- setNamespaces
 
     /**
@@ -429,13 +445,13 @@ public class Schema extends Annotated {
             err += "belongs to a different Schema; type name: " + name;
             throw new SchemaException(err);
         }
-        if (simpleTypes.get(name) != null) {
+        if (_simpleTypes.get(name) != null) {
             String err = "a SimpleType already exists with the given name: ";
             throw new SchemaException(err + name);
         }
 
         simpleType.setParent(this);
-        simpleTypes.put(name, simpleType);
+        _simpleTypes.put(name, simpleType);
 
     } //-- addSimpleType
 
@@ -489,13 +505,23 @@ public class Schema extends Annotated {
         return simpleTypesFactory.createUserSimpleType(this, name, baseType, "restriction");
     } //-- createSimpleType
 
-
+    /**
+     * Returns the attributeFormDefault property of this Schema.
+     *
+     * @return the attributeFormDefault property of this Schema, or null
+     * if no default Form was set. If no default Form has been set, the
+     * user should assume Form.Unqualified.
+    **/
+    public Form getAttributeFormDefault() {
+        return _attributeFormDefault;
+    } //-- getAttributeFormDefault
+    
     /**
      * Returns an Enumeration of all top-level Attribute declarations
      * @return an Enumeration of all top-level Attribute declarations
     **/
     public Enumeration getAttributes() {
-        return attributes.elements();
+        return _attributes.elements();
     } //-- getAttributes
 
     /**
@@ -516,13 +542,13 @@ public class Schema extends Annotated {
         //-- Namespace prefix?
         String canonicalName = name;
         String nsprefix = "";
-        String ns = targetNS;
+        String ns = _targetNamespace;
         int colon = name.indexOf(':');
         if (colon != -1)
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) namespaces.get(nsprefix);
+            ns = (String) _namespaces.get(nsprefix);
             if (ns == null)  {
                 String err = "getAttribute: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -530,8 +556,8 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(targetNS)) )
-            return (AttributeDecl)attributes.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) )
+            return (AttributeDecl)_attributes.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
@@ -555,7 +581,7 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level AttributeGroup declarations
     **/
     public Enumeration getAttributeGroups() {
-        return attributeGroups.elements();
+        return _attributeGroups.elements();
     } //-- getAttributeGroups
 
     /**
@@ -576,13 +602,13 @@ public class Schema extends Annotated {
         //-- Namespace prefix?
         String canonicalName = name;
         String nsprefix = "";
-        String ns = targetNS;
+        String ns = _targetNamespace;
         int colon = name.indexOf(':');
         if (colon != -1)
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) namespaces.get(nsprefix);
+            ns = (String) _namespaces.get(nsprefix);
             if (ns == null)  {
                 String err = "getAttributeGroup: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -590,8 +616,8 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(targetNS)) )
-            return (AttributeGroup)attributeGroups.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) )
+            return (AttributeGroup)_attributeGroups.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null)
@@ -627,13 +653,13 @@ public class Schema extends Annotated {
         //-- Namespace prefix?
         String canonicalName = name;
         String nsprefix = "";
-        String ns = targetNS;
+        String ns = _targetNamespace;
         int colon = name.indexOf(':');
         if (colon != -1)
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) namespaces.get(nsprefix);
+            ns = (String) _namespaces.get(nsprefix);
             if (ns == null)  {
                 String err = "getComplexType: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -642,8 +668,8 @@ public class Schema extends Annotated {
         }
 
         //-- Get GetComplexType object
-        if ((ns==null) || (ns.equals(targetNS)) )
-            return (ComplexType)complexTypes.get(canonicalName);
+        if ((ns==null) || (ns.equals(_targetNamespace)) )
+            return (ComplexType)_complexTypes.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
@@ -663,9 +689,70 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level ComplexType declarations
     **/
     public Enumeration getComplexTypes() {
-        return complexTypes.elements();
+        return _complexTypes.elements();
     } //-- getComplextypes
 
+    /**
+     * Returns the ElementDecl of associated with the given name
+     * @return the ElementDecl of associated with the given name, or
+     *  null if no ElementDecl with the given name was found.
+    **/
+    public ElementDecl getElementDecl(String name) {
+
+        String ns = null;
+        if (name == null) {
+            String err = NULL_ARGUMENT + "getElementDecl: ";
+            err += " 'name' can not be null";
+            throw new IllegalArgumentException(err);
+        }
+
+        int idx = name.indexOf(':');
+        if (idx >= 0)
+        {
+            String nsPrefix = name.substring(0,idx);
+            name = name.substring(idx + 1);
+            ns = (String) _namespaces.get(nsPrefix);
+            if (ns == null)  {
+                String err = "getElementDecl: ";
+                err += "Namespace prefix not recognized '"+nsPrefix+"'";
+                throw new IllegalArgumentException(err);
+            }
+        }
+
+        if ((ns==null) || (ns.equals(_targetNamespace)) )
+            return (ElementDecl)_elements.get(name);
+        else {
+            Schema schema = getImportedSchema(ns);
+            if (schema!=null) {
+                String warning = "Warning : do not forget to generate the source ";
+                warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
+                System.out.println(warning);
+                return schema.getElementDecl(name);
+            }
+        }
+
+        return null;
+    } //--getElementDecl
+
+    /**
+     * Returns an Enumeration of all top-level element declarations
+     * @return an Enumeration of all top-level element declarations
+    **/
+    public Enumeration getElementDecls() {
+        return _elements.elements();
+    } //-- getElementDecls
+    
+    /**
+     * Returns the elementFormDefault property of this Schema.
+     *
+     * @return the elementFormDefault property of this Schema, or null
+     * if no default Form was set. If no default Form has been set, the
+     * user should assume Form.Unqualified.
+    **/
+    public Form getElementFormDefault() {
+        return _elementFormDefault;
+    } //-- getElementFormDefault
+    
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
@@ -689,7 +776,7 @@ public class Schema extends Annotated {
         if (colon >= 0) {
             canonicalName = name.substring(colon + 1);
             nsPrefix = name.substring(0,colon);
-            ns = (String) namespaces.get(nsPrefix);
+            ns = (String) _namespaces.get(nsPrefix);
             if (ns == null)  {
                 String err = "getSimpleType: ";
                 err += "Namespace prefix not recognised '"+name+"'";
@@ -703,7 +790,7 @@ public class Schema extends Annotated {
             //-- first try built-in types
             result= simpleTypesFactory.getBuiltInType(name);
             //if we have a built-in type not declared in the good namespace -> Exception
-             if ( (result != null) && (namespaces.contains(DEFAULT_SCHEMA_NS))) {
+             if ( (result != null) && (_namespaces.contains(DEFAULT_SCHEMA_NS))) {
                 String err = "getSimpleType: the simple type '"+name+
                              "' has not been declared in XML Schema namespace.";
                 throw new IllegalArgumentException(err);
@@ -711,12 +798,12 @@ public class Schema extends Annotated {
 
             //-- otherwise check user-defined types
             if (result == null)
-                result = (SimpleType)simpleTypes.get(name);
+                result = (SimpleType)_simpleTypes.get(name);
         }
-        else if (ns.equals(schemaNS))
+        else if (ns.equals(_schemaNamespace))
             result= simpleTypesFactory.getBuiltInType(canonicalName);
-        else if (ns.equals(targetNS))
-            result = (SimpleType)simpleTypes.get(canonicalName);
+        else if (ns.equals(_targetNamespace))
+            result = (SimpleType)_simpleTypes.get(canonicalName);
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null)
@@ -735,7 +822,7 @@ public class Schema extends Annotated {
      * @return an Enumeration of all SimpleType declarations
     **/
     public Enumeration getSimpleTypes() {
-        return simpleTypes.elements();
+        return _simpleTypes.elements();
     } //-- getSimpleTypes
 
     /**
@@ -746,55 +833,6 @@ public class Schema extends Annotated {
          return _schemaLocation;
      }
 
-    /**
-     * Returns the ElementDecl of associated with the given name
-     * @return the ElementDecl of associated with the given name, or
-     *  null if no ElementDecl with the given name was found.
-    **/
-    public ElementDecl getElementDecl(String name) {
-
-        String ns = null;
-        if (name == null) {
-            String err = NULL_ARGUMENT + "getElementDecl: ";
-            err += " 'name' can not be null";
-            throw new IllegalArgumentException(err);
-        }
-
-        int idx = name.indexOf(':');
-        if (idx >= 0)
-        {
-            String nsPrefix = name.substring(0,idx);
-            name = name.substring(idx + 1);
-            ns = (String) namespaces.get(nsPrefix);
-            if (ns == null)  {
-                String err = "getElementDecl: ";
-                err += "Namespace prefix not recognized '"+nsPrefix+"'";
-                throw new IllegalArgumentException(err);
-            }
-        }
-
-        if ((ns==null) || (ns.equals(targetNS)) )
-            return (ElementDecl)elements.get(name);
-        else {
-            Schema schema = getImportedSchema(ns);
-            if (schema!=null) {
-                String warning = "Warning : do not forget to generate the source ";
-                warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
-                System.out.println(warning);
-                return schema.getElementDecl(name);
-            }
-        }
-
-        return null;
-    } //--getElementDecl
-
-    /**
-     * Returns an Enumeration of all top-level element declarations
-     * @return an Enumeration of all top-level element declarations
-    **/
-    public Enumeration getElementDecls() {
-        return elements.elements();
-    } //-- getElementDecls
 
      /**
      * Returns the ModeGroup of associated with the given name
@@ -815,7 +853,7 @@ public class Schema extends Annotated {
         {
             String nsPrefix = name.substring(0,idx);
             name = name.substring(idx + 1);
-            ns = (String) namespaces.get(nsPrefix);
+            ns = (String) _namespaces.get(nsPrefix);
             if (ns == null)  {
                 String err = "getModelGroup: ";
                 err += "Namespace prefix not recognized '"+nsPrefix+"'";
@@ -823,8 +861,8 @@ public class Schema extends Annotated {
             }
         }
 
-        if ((ns==null) || (ns.equals(targetNS)) )
-            return (ModelGroup)_group.get(name);
+        if ((ns==null) || (ns.equals(_targetNamespace)) )
+            return (ModelGroup)_groups.get(name);
         else {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
@@ -843,7 +881,7 @@ public class Schema extends Annotated {
      * @return an Enumeration of all top-level ModelGroup declarations
     **/
     public Enumeration getModelGroups() {
-        return _group.elements();
+        return _groups.elements();
     } //-- getmodelGroup
 
     /**
@@ -853,7 +891,7 @@ public class Schema extends Annotated {
      * @return the Id for this Scheam, or null if no Id exists
     **/
     public String getId() {
-        return id;
+        return _id;
     } //-- getId
 
     /**
@@ -861,7 +899,7 @@ public class Schema extends Annotated {
      * @return the hashtable of the imported schemas
      */
      public Enumeration getImportedSchema() {
-         return importedSchemas.elements();
+         return _importedSchemas.elements();
      }
 
     /**
@@ -870,7 +908,7 @@ public class Schema extends Annotated {
      */
     public Schema getImportedSchema(String ns)
     {
-        return (Schema) importedSchemas.get(ns);
+        return (Schema) _importedSchemas.get(ns);
     } //-- getImportedSchema
 
     /**
@@ -878,7 +916,7 @@ public class Schema extends Annotated {
      * @return the namespaces declared for this Schema
     **/
     public Hashtable getNamespaces() {
-        return this.namespaces;
+        return _namespaces;
     } //-- getNamespaces
 
 
@@ -887,7 +925,7 @@ public class Schema extends Annotated {
      */
     public void addInclude(String include)
     {
-        includedSchemas.addElement(include);
+        _includedSchemas.addElement(include);
     } //-- addInclude
 
     /**
@@ -896,7 +934,7 @@ public class Schema extends Annotated {
      */
     public boolean includeProcessed(String includeFile)
     {
-        return includedSchemas.contains(includeFile);
+        return _includedSchemas.contains(includeFile);
     } //-- includeProcessed
 
     /**
@@ -910,7 +948,7 @@ public class Schema extends Annotated {
      *
     **/
     public String getSchemaNamespace() {
-        return this.schemaNS;
+        return _schemaNamespace;
     } //-- getSchemaNamespace
 
     /**
@@ -920,7 +958,7 @@ public class Schema extends Annotated {
      * namespace has been defined
     **/
     public String getTargetNamespace() {
-        return this.targetNS;
+        return this._targetNamespace;
     } //-- getTargetNamespace
 
 
@@ -932,7 +970,7 @@ public class Schema extends Annotated {
      * definition, or null if no version information exists.
     **/
     public String getVersion() {
-        return version;
+        return _version;
     } //-- getVersion
 
     /**
@@ -942,7 +980,7 @@ public class Schema extends Annotated {
      */
     public boolean isKnownNamespace(String namespaceURL)
     {
-        Enumeration urls = namespaces.elements();
+        Enumeration urls = _namespaces.elements();
         while(urls.hasMoreElements())
             if (urls.nextElement().equals(namespaceURL))
                 return true;
@@ -958,8 +996,8 @@ public class Schema extends Annotated {
     **/
     public boolean removeComplexType(ComplexType complexType) {
         if (complexType.isTopLevel()) {
-            if (complexTypes.contains(complexType)) {
-                complexTypes.remove(complexType.getName());
+            if (_complexTypes.contains(complexType)) {
+                _complexTypes.remove(complexType.getName());
                 complexType.setParent(null);
                 return true;
             }
@@ -975,8 +1013,8 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
     **/
     public boolean removeElement(ElementDecl element) {
-        if (elements.contains(element)) {
-            elements.remove(element.getName());
+        if (_elements.contains(element)) {
+            _elements.remove(element.getName());
             return true;
         }
         return false;
@@ -991,8 +1029,8 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
      */
     public boolean removeAttribute(AttributeDecl attribute) {
-        if (attributes.contains(attribute)) {
-            attributes.remove(attribute.getName());
+        if (_attributes.contains(attribute)) {
+            _attributes.remove(attribute.getName());
             return true;
         }
         return false;
@@ -1006,8 +1044,8 @@ public class Schema extends Annotated {
      * didn't exist in this Schema.
      */
     public boolean removeGroup(ModelGroup group) {
-        if (_group.contains(group)) {
-            _group.remove(group.getName());
+        if (_groups.contains(group)) {
+            _groups.remove(group.getName());
             return true;
         }
         return false;
@@ -1021,21 +1059,33 @@ public class Schema extends Annotated {
      * didn't exist in this Schema
     **/
     public boolean removeSimpleType(SimpleType simpleType) {
-        if (simpleTypes.contains(simpleType)) {
-            simpleTypes.remove(simpleType.getName());
+        if (_simpleTypes.contains(simpleType)) {
+            _simpleTypes.remove(simpleType.getName());
             return true;
         }
         return false;
     } //-- removeSimpleType
 
     /**
-     * Sets the name of this Schema definition
+     * Sets the attributeFormDefault property of this Schema.
+     *
+     * @param attributeFormDefault the Form value of the attributeFormDefault
+     * property for this Schema.
     **/
-    public void setName(String name) {
-        this.name = name;
-    } //-- setName
+    public void setAttributeFormDefault(Form attributeFormDefault) {
+        _attributeFormDefault = attributeFormDefault;
+    } //-- setAttributeFormDefault
 
-
+    /**
+     * Sets the elementFormDefault property of this Schema.
+     *
+     * @param elementFormDefault the Form value of the elementFormDefault
+     * property for this Schema.
+    **/
+    public void setElementFormDefault(Form elementFormDefault) {
+        _elementFormDefault = elementFormDefault;
+    } //-- setElementFormDefault
+    
     /**
      * Set the schemaLocation for this schema. This is useful
      * when this schema has been imported by another schema
@@ -1063,7 +1113,7 @@ public class Schema extends Annotated {
      * @param id the Id for this Schema
     **/
     public void setId(String id) {
-        this.id = id;
+        this._id = id;
     } //-- setId
 
     /**
@@ -1072,7 +1122,7 @@ public class Schema extends Annotated {
      * @see <B>&sect; 2.7 XML Schema Part 1: Structures</B>
     **/
     public void setTargetNamespace(String targetNamespace) {
-        this.targetNS = targetNamespace;
+        this._targetNamespace = targetNamespace;
     } //-- setTargetNamespace
 
     /**
@@ -1082,7 +1132,7 @@ public class Schema extends Annotated {
      * @param the version for this XML Schema defination.
     **/
     public void setVersion(String version) {
-        this.version = version;
+        _version = version;
     } //-- setVersion
 
 
