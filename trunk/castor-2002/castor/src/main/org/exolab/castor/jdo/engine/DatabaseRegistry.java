@@ -364,13 +364,18 @@ public class DatabaseRegistry
 
     public static DatabaseRegistry getDatabaseRegistry( Object obj )
     {
+        return getDatabaseRegistry(obj.getClass());
+    }
+
+    public static DatabaseRegistry getDatabaseRegistry( Class c )
+    {
         Enumeration      enum;
         DatabaseRegistry dbs;
 
         enum = _databases.elements();
         while ( enum.hasMoreElements() ) {
             dbs = (DatabaseRegistry) enum.nextElement();
-            if ( dbs._mapResolver.getDescriptor( obj.getClass() ) != null )
+            if ( dbs._mapResolver.getDescriptor( c ) != null )
                 return dbs;
         }
         return null;
