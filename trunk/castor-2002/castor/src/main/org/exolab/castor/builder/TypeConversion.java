@@ -242,7 +242,7 @@ public class TypeConversion {
                     return new XSTimeInstant();
                 //-- Time duration
                 case SimpleTypesFactory.TIME_DURATION_TYPE:
-                    return new XSTimeduration();
+                    return new XSTimeDuration();
                     //return new XSLong();
                 //-- decimal
                 case SimpleTypesFactory.DECIMAL_TYPE:
