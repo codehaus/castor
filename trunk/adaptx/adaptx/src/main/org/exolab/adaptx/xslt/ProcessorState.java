@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 1999  All rights reserved.
+ * (C) Copyright Keith Visco 1999-2004  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -24,7 +24,6 @@ import org.exolab.adaptx.net.URILocation;
 import org.exolab.adaptx.net.URIResolver;
 import org.exolab.adaptx.util.*;
 import org.exolab.adaptx.xml.*;
-import org.exolab.adaptx.xml.parser.DOMParser;
 import org.exolab.adaptx.xpath.*;
 import org.exolab.adaptx.xslt.dom.Root;
 import org.exolab.adaptx.xslt.functions.*;
@@ -35,9 +34,7 @@ import org.exolab.adaptx.xslt.util.ScopedVariableSet;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Properties;
 
-import org.xml.sax.*;
 
 /**
  * The current RuleProcessor environment.
@@ -87,16 +84,16 @@ public class ProcessorState extends XPathContext {
     **/
     private QuickStack calledTemplates   = null;
     
-    /**
-     * defined constants
-    **/
-    private Hashtable constants          = null;
     
     /**
      * ProcessorCallback for calling back into the RuleProcessor
     **/
     private ProcessorCallback processorCallback = null;
     
+    /**
+     * Attribute Value Template cache 
+     * (initialized upon demand)
+     */
     private HashMap   avtCache          = null;
     
     /**
@@ -119,7 +116,6 @@ public class ProcessorState extends XPathContext {
     **/
     private ScopedVariableSet _variables       = null;
     
-    private QuickStack  modes           = null;
     private QuickStack  xmlSpaceModes   = null;
     private QuickStack  handlers        = null;
     private QuickStack  nodeSetStack    = null;
@@ -170,14 +166,11 @@ public class ProcessorState extends XPathContext {
         
         this.stylesheet = xslStylesheet;
         
-        //-- since I use the VariableSetPool for both parameters
-        //-- and variables I am doubling the initial size
         actions           = new List();
-        avtCache          = new HashMap(1000);
         calledTemplates   = new QuickStack();
         _contextStack     = new QuickStack();
         _idIndexer        = new IDIndexer();
-        handlers        = new QuickStack();
+        handlers          = new QuickStack();
         namespaces        = new HashMap();
         nodeSetStack      = new QuickStack();
         nodes             = new QuickStack();
@@ -281,17 +274,6 @@ public class ProcessorState extends XPathContext {
     
     
     /**
-     * Returns the current set of attributes being processed
-     * @return the current set of attributes being processed
-    **/
-    //AttributeListImpl getAttributes() {
-    //    if (atts == null) {
-    //        atts = new AttributeListImpl();
-    //    }
-    //    return atts;
-    //} //-- getAttributes
-    
-    /**
      * Returns the current ResultFormatter being used to construct
      * the result tree.
      *
@@ -386,7 +368,6 @@ public class ProcessorState extends XPathContext {
      * @return true if a function with the given name exists
     **/
     public boolean isFunctionAvailable(String name, String namespace) {
-        System.out.println("#isFunctionAvailable");
         return false;
     } //-- isFunctionAvailable
     
@@ -406,7 +387,7 @@ public class ProcessorState extends XPathContext {
             ns = tmp;
         }
         
-        return stylesheet.XSLT_NAMESPACE.equals(ns);
+        return XSLTStylesheet.XSLT_NAMESPACE.equals(ns);
 
     } //-- isXSLTNamespace
     
@@ -496,10 +477,11 @@ public class ProcessorState extends XPathContext {
     
     /**
 	 * Returns the value of the given String as an AttributeValueTemplate
+     * 
 	 * @returns the value of the given String as an AttributeValueTemplate
 	 * @exception InvalidExprException when the String argument is not a valid 
 	 * AttrubueValueTemplate
-	**/
+	 */
     public AttributeValueTemplate getAttributeValueTemplate(String avtString) 
         throws XPathException
     {
@@ -508,7 +490,12 @@ public class ProcessorState extends XPathContext {
         
         if (avtString != null) {
             // look in cache first
-            avt = (AttributeValueTemplate) avtCache.get(avtString);
+            if (avtCache != null) {
+            	avt = (AttributeValueTemplate) avtCache.get(avtString);
+            }
+            else {
+            	avtCache = new HashMap(127);
+            }
             if (avt == null) {
                 avt = new AttributeValueTemplate(avtString);
                 // add to cache for performace
@@ -761,7 +748,7 @@ public class ProcessorState extends XPathContext {
         
         if (namespace == null) {
             if (idx < 0) {
-                namespace = stylesheet.XSLT_NAMESPACE;
+                namespace = XSLTStylesheet.XSLT_NAMESPACE;
             }
             else {
                 String prefix = name.substring(0, idx);
@@ -769,7 +756,7 @@ public class ProcessorState extends XPathContext {
             }
         }
         //-- Handle XSLT built-in functions
-        if (stylesheet.XSLT_NAMESPACE.equals(namespace)) {
+        if (XSLTStylesheet.XSLT_NAMESPACE.equals(namespace)) {
             
             if (Names.GENERATE_ID_FN.equals(localName))
                 return new GenerateIDFunctionCall(this);
