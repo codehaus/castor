@@ -327,15 +327,7 @@ public final class Introspector {
             }
             
             //-- Handle Collections
-            if (type.isArray()) {
-                isCollection = true;
-            }
-            else if (java.util.Enumeration.class.isAssignableFrom(type)){
-                isCollection = true;
-            }
-            else if (java.util.Vector.class.isAssignableFrom(type)) {
-                isCollection = true;
-            }
+            isCollection = (type.isArray() || isCollection(type));
                 
             XMLFieldDescriptorImpl fieldDesc 
                 = createFieldDescriptor(type, methodSet.fieldName, xmlName);
