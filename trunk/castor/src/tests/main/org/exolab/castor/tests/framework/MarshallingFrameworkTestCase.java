@@ -55,9 +55,12 @@ import org.exolab.castor.mapping.Mapping;
 
 import org.xml.sax.InputSource;
 
+import org.apache.tools.ant.BuildException;
 
 import java.io.InputStream;
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 /**
  * This class encapsulate all the logic to run the test patterns for the
@@ -150,11 +153,24 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         _rootClassName = rootType.getContent();
         _hasDump =   rootType.getDump();
         _hasRandom = rootType.getRandom();
+        
+        // Compile class files (if necessary)
+        verbose("-->Compiling any necessary source files");
+        try {
+            compileDirectory(_outputRootFile);
+        } catch (BuildException e) {
+            if (_printStack)
+                e.printStackTrace(System.out); 
+        }
+        
+        //-- Add outputRoot to classpath
+        ClassLoader loader = _test.getClass().getClassLoader();
+        loader = new URLClassLoader(new URL[] { _outputRootFile.toURL() }, loader);        
 
         if (_rootClassName == null)
             throw new Exception("No Root Object found in test descriptor");
 
-        _rootClass =  _test.getClassLoader().loadClass(_rootClassName);
+        _rootClass =  loader.loadClass(_rootClassName);
 
         // Try to load the mapping file if any, else we will use the introspector
 
@@ -168,12 +184,12 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         } else {
             verbose("##### TESTING MAPPING #####");
             verbose("Mapping file: " + mappingFilePath);
-            InputStream mappingFile = _test.getClassLoader().getResourceAsStream(mappingFilePath);
+            InputStream mappingFile = loader.getResourceAsStream(mappingFilePath);
 
             if (mappingFile == null)
                 throw new Exception("Unable to locate the mapping file '" + mappingFilePath + "' for the test '" + _test.name() + "'");
 
-            _mapping = new Mapping(_test.getClassLoader());
+            _mapping = new Mapping(loader);
             InputSource source = new InputSource(mappingFile);
             source.setSystemId(mappingFilePath);
             try {
