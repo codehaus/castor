@@ -111,15 +111,18 @@ public class DescriptorJClass extends JClass {
 
         JMethod     method = null;
         JSourceCode jsc    = null;
+        boolean extended = false;
 
-        //set the super class of the class descriptor
-        //assume that if the user has set up its own super class, there are no
-        //specific descriptors to describe it
+        //Make sure that the Descriptor is extended XMLClassDescriptor
+        //even when the user has specified a super class for all the generated
+        //classes
         String superClass = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
         if ( (_type.getSuperClass()==null) || (superClass != null) )
 			setSuperClass("org.exolab.castor.xml.util.XMLClassDescriptorImpl");
-		else
-			setSuperClass(_type.getSuperClass()+"Descriptor");
+		else {
+                extended = true;
+	    		setSuperClass(_type.getSuperClass()+"Descriptor");
+        }
         superClass = null;
 
         addImport("org.exolab.castor.xml.*");
@@ -131,6 +134,8 @@ public class DescriptorJClass extends JClass {
         addMember(new JMember(SGTypes.String,  "nsPrefix"));
         addMember(new JMember(SGTypes.String,  "nsURI"));
         addMember(new JMember(SGTypes.String,  "xmlName"));
+        //-- if there is a super class, the identity field must remain
+        //-- the same than the one in the super class
         addMember(new JMember(_XMLFieldDescriptorClass, "identity"));
 
         //-- create default constructor
@@ -195,6 +200,12 @@ public class DescriptorJClass extends JClass {
         //-- create getIdentity method
         method = new JMethod(_FieldDescriptorClass, "getIdentity");
         jsc = method.getSourceCode();
+        if (extended) {
+            jsc.add("if (identity == null)");
+            jsc.indent();
+            jsc.add("return super.getIdentity();");
+            jsc.unindent();
+        }
         jsc.add("return identity;");
         addMethod(method);
         _getIdentity = method;
