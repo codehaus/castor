@@ -1,5 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE schema PUBLIC "-//W3C/DTD XML Schema Version 1.0//EN"
-                        "http://www.w3.org/XML/Group/1999/09/23-xmlschema/structures/structures.dtd">
+                        "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.dtd">
 <!--
 
     The Castor JDO database configuration file XML Schema
