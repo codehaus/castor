@@ -64,6 +64,11 @@ public abstract class XMLType extends Annotated
         = "A null argument was passed to " + XMLType.class.getName();
 
     /**
+     * The ID of this datatype
+    **/
+    private String _id = null;
+
+    /**
      * The name of this type
      */
     private String name = null;
@@ -82,9 +87,22 @@ public abstract class XMLType extends Annotated
      * The name of the derivation method (if any)
      */
     private String derivationMethod= null;
+    
+    /**
+     * Default constructor
+    **/
+    public XMLType() {
+        super();
+    } //-- XMLType
 
-
-    ///////////////////////////////  Methods  //////////////////////////////////
+    /**
+     * Returns the Id for this ComplexType, or null if no Id has been set.
+     *
+     * @return the Id for this ComplexType, or null if no Id has been set.
+    **/
+    public String getId() {
+        return _id;
+    } //-- getId
 
     /**
      * Returns the name of this type (null if none was defined)
@@ -194,6 +212,16 @@ public abstract class XMLType extends Annotated
         this.derivationMethod= derivationMethod;
     }
 
+    /**
+     * Sets the Id for this XMLType. The Id must be globally unique
+     * within the Schema. Use a null value to remove the Id.
+     *
+     * @param id the unique Id for this XMLType
+    **/
+    public void setId(String id) {
+        _id = id;
+    } //-- setId
+    
     /**
      * Sets the parent for this XMLType
      *
