@@ -19,7 +19,7 @@ import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 
 /**
- * @author 
+ * @author <a href="http://castor.exolab.org">Castor-XML</a>
  * @version $Revision$ $Date$
 **/
 public class DataSourceRef implements java.io.Serializable {

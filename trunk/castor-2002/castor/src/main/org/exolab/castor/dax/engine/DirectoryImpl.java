@@ -179,7 +179,6 @@ public class DirectoryImpl
                 query.append( expr.substring( pos, next ) );
                 array = new Class[ types.size() ];
                 types.copyInto( array );
-                System.out.println( query.toString() );
                 return new SearchImpl( this, _dirEngine.getPersistence( _handler.getJavaClass() ).createQuery( query.toString(), array ) );
             }
         } catch ( QueryException except ) {

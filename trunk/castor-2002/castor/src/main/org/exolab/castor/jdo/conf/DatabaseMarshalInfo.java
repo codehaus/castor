@@ -15,7 +15,7 @@ import org.exolab.castor.xml.MarshalDescriptor;
 import org.exolab.castor.xml.SimpleMarshalDescriptor;
 
 /**
- * @author 
+ * @author <a href="http://castor.exolab.org">Castor-XML</a>
  * @version $Revision$ $Date$
 **/
 public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
@@ -112,9 +112,7 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
             classArgs[0] = Mapping.class;
             desc.setWriteMethod(Database.class.getMethod("addMapping", classArgs));
         }
-        catch(java.lang.NoSuchMethodException nsme) {
-            System.out.println( nsme );
-        };
+        catch(java.lang.NoSuchMethodException nsme) { };
         
         elements[3] = desc;
         

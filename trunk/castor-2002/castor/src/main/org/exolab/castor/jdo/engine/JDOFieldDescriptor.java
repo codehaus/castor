@@ -54,7 +54,6 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.IntegrityException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 

@@ -50,7 +50,6 @@ package org.exolab.castor.mapping.loader;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.IntegrityException;
 import org.exolab.castor.mapping.AccessMode;
 
 

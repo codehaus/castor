@@ -1,3 +1,11 @@
+Version 0.7.11  March 7, 2000
+-----------------------------
+
+Misc:    Updated build.xml file now builds docs tarball, and builds source
+         tarball/zip for expansion with a castor-x.x directory (contributed
+         by Kevin Burton)
+
+
 Version 0.7.10  March 3, 2000
 -----------------------------
 
