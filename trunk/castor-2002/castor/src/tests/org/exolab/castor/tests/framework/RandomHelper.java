@@ -46,6 +46,7 @@ package org.exolab.castor.tests.framework;
 
 import java.util.Random;
 import java.util.Vector;
+import java.util.ArrayList;
 
 /**
  * An helper class to assist in the generation of random instance of a given
@@ -86,37 +87,16 @@ public class RandomHelper {
      */
     private final static String PRINTABLE_CHAR = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_:.,=+~!@#$%^&*()[]{}\\|?";
 
-    /**
-     * Return a random string.
-     */
-    public static String rndString() {
-
-        int size = 1 + _rand.nextInt(MAX_STRING_LENGTH - 1);
-
-        char[] data = new char[size];
-
-        for (int i=0; i<size; ++i)
-            data[i] = rndPrintableChar();
-
-        return new String(data);
-    }
-    
-    /**
-     * Return a random printable character from the PRINTABLE_CHAR string
-     */
-    public static char rndPrintableChar() {
-        return PRINTABLE_CHAR.charAt(_rand.nextInt(PRINTABLE_CHAR.length()));
-    }
 
     /**
      * Create a vector of random length and populate it. If the class to put
      * into the vector implement CastorTestable, randomizeFields() will be
      * called on the objects.
      *
-     * @param vect the vector the populate
+     * @param vect the vector to populate
      * @param c the type of object to put in the vector
      */
-    public static Vector rndVector(Vector vect, Class c) 
+    public static Vector getRandom(Vector vect, Class c) 
         throws InstantiationException, IllegalAccessException {
 
         int size = _rand.nextInt(MAX_COLLECTION_LENGTH);
@@ -132,6 +112,78 @@ public class RandomHelper {
         }
 
         return vect;
+    }
+
+    /**
+     * Create an ArrayList of random length and populate it. If the class of the
+     * object contained into the vector implement CastorTestable,
+     * randomizeFields() will be called on the objects.
+     *
+     * @param al the ArrayList to populate
+     * @param c the type of object to put in the vector
+     */
+    public static ArrayList getRandom(ArrayList al, Class c)
+        throws InstantiationException, IllegalAccessException {
+        return new ArrayList(getRandom(new Vector(al), c));
+    }
+
+
+    /**
+     * Return a random string.
+     */
+    public static String getRandom(String s, Class c) {
+
+        int size = 1 + _rand.nextInt(MAX_STRING_LENGTH - 1);
+
+        char[] data = new char[size];
+
+        for (int i=0; i<size; ++i)
+            data[i] = rndPrintableChar();
+
+        return new String(data);
+    }
+    
+    /**
+     * Return a random int.
+     */
+    public static int getRandom(int i, Class c) {
+        return _rand.nextInt();
+    }
+
+    /**
+     * Return a random float.
+     */
+    public static float getRandom(float f, Class c) {
+        return _rand.nextFloat();
+    }
+
+
+    /**
+     * Return a random boolean.
+     */
+    public static boolean getRandom(boolean b, Class c) {
+        return _rand.nextBoolean();
+    }
+
+    /**
+     * Return a random long.
+     */
+    public static long getRandom(long l, Class c) {
+        return _rand.nextLong();
+    }
+
+    /**
+     * Return a random double.
+     */
+    public static double getRandom(double d, Class c) {
+        return _rand.nextDouble();
+    }
+
+    /**
+     * Return a random printable character from the PRINTABLE_CHAR string
+     */
+    public static char rndPrintableChar() {
+        return PRINTABLE_CHAR.charAt(_rand.nextInt(PRINTABLE_CHAR.length()));
     }
 
     /**
