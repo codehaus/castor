@@ -524,6 +524,14 @@ public class Lexer {
                             tok.type = Token.CNAME;
                         }
                     }
+                    else {
+                        //-- Check for attribute short-hand
+                        if ((last != null)  && (last.token.type == Token.AT_SYMBOL)) {
+                            if (tok.type != Token.WILDCARD) {
+                                tok.type = Token.CNAME;
+                            }
+                        }
+                    }
                     addToken(tok);
                 }
             }
@@ -878,7 +886,8 @@ public class Lexer {
         //pattern = "$foo mod 4";
         //pattern = "foo:*";
         //pattern = "div";
-        pattern = "(3)*(4)";
+        //pattern = "(3)*(4)";
+        pattern = "@text";
         
         System.out.println("Expr: "+pattern);
         Lexer exprLexer = null;
