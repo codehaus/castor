@@ -297,7 +297,7 @@
         <delete file="${classes}/MANIFEST.MF"/>
 
         <copy todir="${classes}">
-            <fileset dir="${source}/etc" includes="MANIFEST.MF" />
+            <fileset dir="${source}/etc" includes="MANIFEST.MF,log4j.properties" />
         </copy>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
         <copy todir="${classes}">
@@ -305,7 +305,7 @@
         </copy>
 
         <jar jarfile="${dist}/${archive}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
-             includes="LICENSE,README,org/**"/>
+             includes="LICENSE,README,org/**,log4j.properties"/>
 
         <!-- Castor XML Only Jar -->
         <jar jarfile="${dist}/${archive}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
@@ -552,12 +552,12 @@
         </java>
     </target>
     
-	<target name="prepare-eclipse-base" description="Copy base Eclipse project files to the root directory">
+    <target name="prepare-eclipse-base" description="Copy base Eclipse project files to the root directory">
         <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
     </target>
     
-	<target name="prepare-eclipse" depends="prepare-eclipse-base" 
-	              description="Copy Eclipse project files to the root directory">
+    <target name="prepare-eclipse" depends="prepare-eclipse-base" 
+                  description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
     </target>
     
@@ -565,7 +565,5 @@
             description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template.complete" tofile="${basedir}/.classpath" overwrite="true"/>
     </target>
-    
-    
 
 </project>
