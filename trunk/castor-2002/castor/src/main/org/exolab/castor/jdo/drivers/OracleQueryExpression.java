@@ -84,12 +84,19 @@ public final class OracleQueryExpression
           sql.append( getColumnList() );
         else
           sql.append( _select ).append(" ");
-        
+
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
-        enum = _tables.elements();
+        enum = _tables.keys();
         while ( enum.hasMoreElements() ) {
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) _tables.get( tableAlias );
+            if( tableAlias.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
             if ( enum.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }

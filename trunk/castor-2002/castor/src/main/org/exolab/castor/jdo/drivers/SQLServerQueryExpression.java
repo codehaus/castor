@@ -92,9 +92,16 @@ public final class SQLServerQueryExpression
         sql.append( JDBCSyntax.From );
 
         // Use HOLDLOCK to lock selected tables.
-        enum = _tables.elements();
+        enum = _tables.keys();
         while ( enum.hasMoreElements() ) {
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) _tables.get( tableAlias );
+            if( tableAlias.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
             if ( lock )
                 sql.append( " HOLDLOCK " );
             if ( enum.hasMoreElements() )

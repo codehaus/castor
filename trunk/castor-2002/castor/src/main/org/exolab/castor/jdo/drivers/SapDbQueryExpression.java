@@ -108,12 +108,12 @@ public final class SapDbQueryExpression
             if (left >= 0 && right >= 0) {
                 if (left > right) {
                     sorted.removeElement(join.leftTable);
-                    sorted.insertElementAt(join.leftTable, right + 1);
+                    sorted.insertElementAt(join.leftTable, right);
                 }
             } else if (left < 0 && right >= 0) {
-                sorted.insertElementAt(join.leftTable, right + 1);
+                sorted.insertElementAt(join.leftTable, right);
             } else if (left >= 0 && right < 0) {
-                sorted.insertElementAt(join.rightTable, left);
+                sorted.insertElementAt(join.rightTable, left + 1);
             } else { // (left < 0 && right < 0)
                 sorted.addElement(join.leftTable);
                 sorted.addElement(join.rightTable);
@@ -129,9 +129,17 @@ public final class SapDbQueryExpression
                 sorted.addElement(name);
             }
         }
+        // Append all the tables (from sorted) to the sql string.
         enum = sorted.elements();
         while ( enum.hasMoreElements() ) {
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) _tables.get( tableAlias );
+            if( tableAlias.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
             if ( enum.hasMoreElements() )
                 sql.append( JDBCSyntax.TableSeparator );
         }
