@@ -6,19 +6,36 @@
     </header>
     <section title="Mailing Lists">
 
-      <p><b>Note:</b> Presently we are hosting two mailing lists. Traffic is not too high,
+      <p><b>Note:</b> Presently we are hosting three mailing lists. Traffic is not too high,
          so if you are interested in keeping up to date with new releases, or have problems,
          questions or feedback please <a href="lists.xml">subscribe
          to the appropriate list</a>.
       </p>
 
-      <p>
-         <b>Note:</b> You can use a <b><font size="+1">searchable</font></b> archive of the castor-dev list at <a href="http://www.mail-archive.com/castor-dev%40exolab.org">
-         http://www.mail-archive.com/castor-dev%40exolab.org</a>  It appears there is a delay of one (1) or two (2) days for messages
-         to be archived at that site. You can also use the "unsearchable" archive listed below to look
-         at the very latest messages to the list.
-      </p>
 
+
+
+      <section title="castor-user">
+         <p><b>castor-user</b>  - <font color="red">NEW!</font></p>
+         <p>Moderate volume expected (possibly more than 15 messages a day) - mailing list dedicated
+            to the users of Castor.</p>
+
+         <p><mailing-list name="castor-user" description="The Castor User's Mailing List"
+                       server="exolab.org" manager="minimalist"/>
+
+            <p>
+                <b>Note:</b> please familiarize yourself with the <a href="#Guidelines">guidelines</a>
+                before posting to the list.
+            </p>
+
+            <b>Archives:</b>
+            <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
+              to be archived at that site.</p>
+            <ul> - The following archive was just set up and may not yet be available at mail-archive.com.
+               <li><url>http://www.mail-archive.com/castor-user%40exolab.org</url></li>
+            </ul>
+         </p>
+      </section>
 
       <section title="castor-dev">
          <p><b>castor-dev</b></p>
@@ -34,6 +51,9 @@
             </p>
 
             <b>Archives:</b>
+            <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
+              to be archived at that site.</p>
+
             <ul>
                <li><url>http://marc.theaimsgroup.com/?l=castor-dev</url></li>
                <li><url>http://www.mail-archive.com/castor-dev%40exolab.org</url></li>
@@ -53,16 +73,20 @@
                        server="exolab.org" manager="minimalist"/></p>
        </section>
     </section>
+
     <section title="Guidelines">
     <p>
     The following are some general "common-sense" guidelines for using the
     mailing lists:</p>
 
     <p>
-    Most people are already following these guidelines. To those people, I
+    Most people are already following these guidelines. To those people, we
     thank you. For those of you who are not ... please read carefully.
 
     <ol>
+
+       <li><p>Please be kind and respectful to your fellow castor users.</p></li>
+
        <li><p>Please refrain from using words and phrases like URGENT, IMPORTANT,
            MY WIFE WILL LEAVE ME IF YOU DO NOT RESPOND, etc, in the subject line
            of your postings. Or even in the body of the message for that matter.</p>
@@ -70,14 +94,13 @@
            <p>You may think that things which are URGENT, or IMPORTANT to you,
            are just as urgent and important to everyone else reading this
            list. You'd be surprised at just how wrong an assumption like
-           that can be. As a matter of fact, I personally tend to read
-           all such postings last and give them a low priority.</p></li>
+           that can be.</p></li>
 
        <li><p>Please use meaningful subject lines. "Newbie Question",
            is not meaningful what-so-ever.</p></li>
 
        <li><p>Please provide necessary information, where applicable.
-           Statements like, "I recieve a NullPointerException when
+           Statements like, "I receive a NullPointerException when
            using Castor, what's up with that?", are not very helpful,
            add unnecessary traffic on the list, and will probably
            never get an answer.</p></li>
@@ -88,17 +111,12 @@
            get quicker responses from developers or other users than
            long examples with lots of extraneous code/data.</p></li>
 
-       <li><p>Please read the documentation before posting. One of the
-           biggest problems is that there is not a lot of documentation
-           to Castor. At the same time, because it doesn't take long,
-           everyone should read what is written before posting.</p></li>
+       <li><p>Please read the documentation before posting. It doesn't take
+           long and it will save us valuable time from having to answer
+           questions that are already covered in the docs.</p></li>
 
        <li><p>Please check the mail archives before posting. Many questions
-           on this list have already been answered before. I am aware
-           that the current mail archive is not very good on a number
-           of issues (searching, reliability, etc). We are working
-           on these issues and hope to have a new archive system in
-           place shortly.</p></li>
+           on this list have already been answered before.</p></li>
 
        <li><p>Please refrain from posting confidential information. Once an
            e-mail is sent to the list, it goes out to all subscribers,
@@ -108,42 +126,41 @@
            check with your manager, supervisor, or the person in charge
            at your company.</p></li>
 
-       <li><p>Please be kind and respectful to your fellow castor users.
-           Remember, except for me, you were all newbies at one point.</p></li>
 
        <li><p>If you are going on vacation. Please enjoy yourself. We
            really want you to have fun and get some much needed
-           rest and relaxation. With that we being said and to be
+           rest and relaxation. With that being said and to be
            perfectly honest none of us really want to receive your
            automated vacation responses. So please either add a filter
            to your vacation response so it doesn't get sent to the
            list or users posting to the list, or simply remove yourself
            from the list before you go, and add yourself back when
            you return.</p></li>
-   
-       <li><p>Please refrain from sending emails to this mailing list formatted 
+
+       <li><p>Please refrain from sending emails to this mailing list formatted
            as text/html.</p></li>
 
     </ol>
     </p>
 
-     <section title="Use of HTML emails">
+
+    </section>
+
+     <section title="A note about HTML formatted e-mail">
        <p>
-       As stated above under 9., please <b>refrain</b> from sending emails to 
+       As stated in the guildelines above (see #10), please <b>refrain</b> from sending email to
        these mailing lists formatted as <b>'text/html'</b> under all circumstances.
        </p>
        <p>
-       Amongst other things, it complicates life for users not working on 
-       Windows and decreases usability of the mailing list archives, as it 
+       Amongst other things, it complicates life for users not working on
+       Windows and decreases usability of the mailing list archives, as it
        prevents text searches from returning useful results.
        </p>
        <p>
-       Additional information why we consider HTML emails to be avoided can be 
-       found <a href="http://www.birdhouse.org/etc/evilmail.html">here</a>.       
+       Additional information why we consider HTML emails to be avoided can be
+       found <a href="http://www.birdhouse.org/etc/evilmail.html">here</a>.
        </p>
      </section>
 
-    </section>
-       
   </body>
 </document>
