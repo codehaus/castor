@@ -515,7 +515,7 @@ public class XMLMappingLoader
                 }
             }
             //-- wrap collection in element?
-            else if (nodeType == NodeType.Element) {
+            if (nodeType == NodeType.Element) {
                 if (fieldMap.hasContainer() && (!fieldMap.getContainer())) {
                     xmlDesc = wrapCollection(xmlDesc);
                 }
@@ -622,6 +622,7 @@ public class XMLMappingLoader
         //-- we can't do this in the constructor because
         //-- XMLFieldDescriptorImpl will create a default one.
         newFieldDesc.setXMLName(null);
+        newFieldDesc.setMatches("*");
         
         //-- add the field descriptor to our new class descriptor
         classDesc.addFieldDescriptor(newFieldDesc);        
