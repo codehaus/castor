@@ -52,12 +52,14 @@
             </xsl:if>
             <table>
               <xsl:for-each select="$project/menu">
-                <tr bgcolor="&color-epsilon;">
-                  <td align="left" colspan="2"><xsl:value-of select="@name"/></td>
+                <tr>
+                  <td align="left" colspan="2">
+                    <font color="&color-alpha;"><xsl:value-of select="@name"/></font>
+                  </td>
                 </tr>
                 <xsl:for-each select="item">
                   <tr>
-                    <td width="15" align="right"><img src="images/bullets/square-small-white.gif" alt="*" height="12" width="12"/></td>
+                    <td width="15" valign="top" align="right"><img src="images/bullets/square-small-white.gif" alt="*" height="12" width="12"/></td>
                     <td><span class="alpha">
                       <font size="2"><a href="{@href}"><xsl:value-of select="@name"/></a></font>
                     </span></td>
