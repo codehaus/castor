@@ -64,52 +64,44 @@ import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.Connector;
-import org.exolab.castor.persist.types.Complex;
-import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
-import org.exolab.castor.persist.Relation;
 import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.persist.Key;
+import org.exolab.castor.persist.Relation;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.TransactionContextListener;
-//import org.exolab.castor.persist.sql.SQLConnector;
+import org.exolab.castor.persist.spi.Connector;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.types.Complex;
+import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.util.Messages;
 
 /**
- * A class to create and execute SQL queries of all kinds (LOOKUP, INSERT, UPDATE, DELETE, SELECT)
+ * A class to execute SQL queries of all kinds (LOOKUP, INSERT, UPDATE, DELETE, SELECT)
  * for SQLEngine.
  * It works it terms of EntityInfo, EntityFieldInfo, Entity.
  *
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
+ * @see SQLQueryBuilder
  */
-public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
+public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQueryKinds {
 
     /**
      * The maximum depth of the inheritance tree
      */
     private final static int MAX_DEPTH = 256;
 
-    private final static boolean DEBUG = true;
-
-    private final static byte LOOKUP = 1;
-
-    private final static byte SELECT = 2;
-
-    private final static byte INSERT = 3;
-
-    private final static byte UPDATE = 4;
-
-    private final static byte DELETE = 5;
-
     /**
-     * The HashMap of all instances of this class, maps SQLQueryExecutor.Key to SQLQueryExecutor.
+     * The maximum number of SQL columns that a complex field (foreign key or identity) consists of.
      */
-    private static HashMap _instances = new HashMap();
+    private final static int MAX_COMPLEX = 256;
+
+    private final static boolean DEBUG = true;
 
     /**
      * The kind of the SQL statement: LOOKUP (select without loading), SELECT, INSERT, UPDATE or DELETE
@@ -155,23 +147,38 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
     private final String _sql;
 
     /**
+     * The key generator, is used for INSERT statements only.
+     */
+    private final KeyGenerator _keyGen;
+
+    /**
+     * The log interceptor
+     */
+    private final LogInterceptor _logInterceptor;
+
+    /**
      * @param factory The persistence factory.
      * @param connector The SQL connection to add listener.
+     * @param log The log interceptor
      * @param info The description of the main Entity of this query.
      * @param sql The SQL statement to execute.
      * @param kind The kind of the SQL statement: LOOKUP (select without loading), SELECT, INSERT, UPDATE or DELETE
      * @param checkDirty Does the query checks for dirtiness (only UPDATE or DELETE)?
+     * @param keyGen The key generator, is used for INSERT statements only.
      */
-    private SQLQueryExecutor(BaseFactory factory, SQLConnector connector,
-                             EntityInfo info, String sql, byte kind, boolean checkDirty)
+    SQLQueryExecutor(BaseFactory factory, SQLConnector connector, LogInterceptor log,
+                     SQLEntityInfo info, String sql, byte kind, boolean checkDirty,
+                     KeyGenerator keyGen)
             throws MappingException {
         _factory = factory;
+        _connector = connector;
+        _logInterceptor = log;
         _sql = sql;
-        _info = SQLEntityInfo.getInstance(info);
+        _info = info;
         _kind = kind;
         _checkDirty = checkDirty;
         _canUseBatch = (_kind == UPDATE || _kind == DELETE);
-        _connector = connector;
+        _keyGen = keyGen;
     }
 
     /**
@@ -203,7 +210,9 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
         String[] entityClasses;
         Object[][] values;
         SQLEntityInfo subInfo;
-        Object[] temp = new Object[10]; // assume complex field max at 10
+        Object[] temp = new Object[MAX_COMPLEX];
+        Object[] temp2 = new Object[MAX_COMPLEX];
+        int level;
 
         try {
             useBatch = (_canUseBatch && conn.getMetaData().supportsBatchUpdates());
@@ -301,75 +310,20 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
             values[0] = new Object[_info.fieldInfo.length];
 
             count = 1;
-            for (int i = 0; i < _info.fieldInfo.length; i++) {
-                if (_info.fieldInfo[i] != null) {
-                    count = readEntityField(i, values[0], rs, count, _info.fieldInfo[i], temp);
-                }
-            }
+            // Skip identity fields
+            count += _info.idNames.length;
+            count = readEntity(values[0], rs, count, _info, temp);
             if (_info.subEntities == null) {
                 entity.entityClasses = entityClasses;
                 entity.values = values;
             } else {
-                // Now load subClasses
-                subInfo = _info;
-                for (int level = 1; level < MAX_DEPTH; level++) {
-                    boolean found = false;
-
-                    // the tree of sub-entities must go in the breadth-first order
-                    for (int sub = 0; sub < subInfo.subEntities.length; sub++) {
-                        // The first field for each entity should be its identity
-                        if (rs.getObject(count++) == null) {
-                            // skip all fields of this sub-entity
-                            // multi-column identity?
-                            for (int i = 0; i < subInfo.subEntities[sub].fieldInfo.length; i++) {
-                                count += subInfo.info.subEntities[sub].fieldInfo[i].fieldNames.length;
-                            }
-                        } else {
-                            subInfo = subInfo.subEntities[sub];
-                            entityClasses[level] = subInfo.info.entityClass;
-                            for (int i = 0; i < subInfo.fieldInfo.length; i++) {
-                                if (subInfo.fieldInfo[i] != null) {
-                                    count = readEntityField(i, values[level], rs, count, subInfo.fieldInfo[i], temp);
-                                }
-                            }
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) { // the deepest level of sub-entities is reached
-                        entity.entityClasses = new String[level];
-                        entity.values = new Object[level][];
-                        System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
-                        System.arraycopy(values, 0, entity.values, 0, level);
-                        break;
-                    }
-                }
+                // Now load sub-entities
+                level = loadSubEntityLevel(_info, 1, entityClasses, values, rs, count, temp, temp2);
+                entity.entityClasses = new String[level];
+                entity.values = new Object[level][];
+                System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
+                System.arraycopy(values, 0, entity.values, 0, level);
             }
-/*
-            if (_addInfo != null) {
-                for (int ent = 0; ent < _addInfo.length; ent++) {
-                    if (_out[i].path == null) {
-                        tmpEntity = entity;
-                    } else {
-                        tmpEntity = null;
-                        entityKey = null;
-                        if (entityMap == null) {
-                            entityMap = new HashMap();
-                        } else {
-                            entityKey = new EntityKey(_out[i].path);
-                            tmpEntity = entityMap.get(entityKey);
-                        }
-                        if (tmpEntity == null) {
-                            tmpEntity = new Entity(_out[i].info);
-                            entityMap.put(entityKey, tmpEntity);
-                        }
-                    }
-                    count = readEntityField(tmpEntity, rs, count, _out[i]);
-                }
-            }
-*/
-            // Now we split this into the set of isolated Entities
-            // (values of relation fields are other Entities).
         } catch (SQLException except) {
             throw new PersistenceException(Messages.format("persist.nested", except), except);
         }
@@ -384,12 +338,45 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
     }
 
 
+    /**
+     * Recursive method that loads sub-entities in depth-first order.
+     * @return The number of the first null level.
+     */
+    private int loadSubEntityLevel(SQLEntityInfo info, int level, String[] entityClasses, Object[][] values,
+                                   ResultSet rs, int count, Object[] temp, Object[] temp2)
+            throws PersistenceException {
+        SQLEntityInfo subInfo;
+
+        /*
+         * The tree of sub-entities must go in the depth-first order
+         * The algorithm of loading:
+         * 1) go in depth along the first branch until subEntity.id == null
+         * 2) skip all sub-entities of the null branch
+         * 3) go to the next subEntity on the same level as a null branch until subEntity.id != null
+         * 4) if all sub-entities are null, then stop
+         */
+        for (int sub = 0; sub < info.subEntities.length; sub++) {
+            subInfo = info.subEntities[sub];
+            // The first field for each entity should be its identity
+            if (readIdentity(rs, count, subInfo, temp, temp2) == null) {
+                count += info.idNames.length;
+                count = skipEntity(rs, count, subInfo);
+            } else {
+                entityClasses[level] = subInfo.info.entityClass;
+                count = readEntity(values[level], rs, count, subInfo, temp);
+                return loadSubEntityLevel(subInfo, level + 1, entityClasses, values, rs, count, temp, temp2);
+            }
+        }
+        return level;
+    }
+
     private void throwUpdateException(Key key, LockEngine lockEngine, Connection conn, Entity entity,
                                       SQLException except)
             throws PersistenceException, MappingException {
         SQLQueryExecutor lookup;
 
-        lookup = getInstance(_factory, _connector, entity.info, LOOKUP, false, false);
+        lookup = SQLQueryBuilder.getInstance(_factory, _connector, _logInterceptor,
+                                             entity.info, LOOKUP, false, false);
         try {
             lookup.executeEntity(key, lockEngine, conn, entity);
 
@@ -434,12 +421,72 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
     }
 
     /**
-     * Reads field value from the given ResultSet starting from the given index into the given Entity.
-     * @param count starting index.
+     * Reads all proprietary fields of the given EntityInfo from the given ResultSet.
+     * @param values The array of values, only one of them with the given index is to be loaded.
      * @param rs The result set.
+     * @param count starting index in the ResultSet.
      * @param info SQLFieldInfo decribing the field.
-     * @param entity The entity to put the value to.
-     * @return next index
+     * @param temp Auxilary array for reading Complex values.
+     * @return next index in the ResultSet.
+     */
+    private int readEntity(Object[] values, ResultSet rs, int count, SQLEntityInfo info, Object[] temp)
+            throws PersistenceException {
+        for (int i = 0; i < info.fieldInfo.length; i++) {
+            if (info.fieldInfo[i] != null) {
+                count = readEntityField(i, values, rs, count, info.fieldInfo[i], temp);
+            }
+        }
+        return count;
+    }
+
+    /**
+     * Skips Entity in the ResultSet. Also skips all sub-entities in depth-first order.
+     * @param rs The result set.
+     * @param count starting index in the ResultSet.
+     * @param info SQLFieldInfo decribing the field.
+     * @return next index in the ResultSet.
+     */
+    private int skipEntity(ResultSet rs, int count, SQLEntityInfo info)
+            throws PersistenceException {
+        for (int i = 0; i < info.fieldInfo.length; i++) {
+            if (info.fieldInfo[i] != null) {
+                count += info.fieldInfo[i].sqlType.length;
+            }
+        }
+        // now skip all sub-entities in depth-first order
+        for (int sub = 0; sub < info.subEntities.length; sub++) {
+            count = skipEntity(rs, count, info.subEntities[sub]);
+        }
+        return count;
+    }
+
+    /**
+     * Reads the identity.
+     */
+    private Object readIdentity(ResultSet rs, int count, SQLEntityInfo info, Object[] temp, Object[] temp2)
+            throws PersistenceException {
+        boolean isNull;
+
+        isNull = true;
+        for (int i = 0; i < info.idInfo.length; i++) {
+            count = readEntityField(i, temp2, rs, count, info.idInfo[i], temp);
+            if (temp2[i] != null) {
+                isNull = false;
+            }
+        }
+        return (isNull ? null : (info.idInfo.length == 1 ? temp2[0] : new Complex(info.idInfo.length, temp2)));
+    }
+
+
+    /**
+     * Reads field value from the ResultSet into the given position of the array of values.
+     * @param index The index of the field in the array of values.
+     * @param values The array of values, only one of them with the given index is to be loaded.
+     * @param rs The result set.
+     * @param count starting index in the result set.
+     * @param fldInfo SQLFieldInfo decribing the field.
+     * @param temp Auxilary array for reading Complex values.
+     * @return next index in the ResultSet.
      */
     private int readEntityField(int index, Object[] values, ResultSet rs, int count, SQLFieldInfo fldInfo,
                                 Object[] temp)
@@ -586,132 +633,8 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener {
     }
 
 
-
-    //------------------------------ Static methods -------------------------------------------
-
-
-    /**
-     * The factory method for creating instances of this class.
-     */
-    public static SQLQueryExecutor getInstance(BaseFactory factory, SQLConnector connector, EntityInfo info,
-                                               byte kind, boolean dirtyCheck, boolean withLock)
-            throws MappingException {
-        SQLQueryExecutor executor;
-        ExecutorKey key;
-        String sql;
-
-        key = new ExecutorKey(factory, connector, info.entityClass, kind, dirtyCheck, withLock);
-        executor = (SQLQueryExecutor) _instances.get(key);
-        if (executor == null) {
-            try {
-                switch (kind) {
-                case LOOKUP:
-                    sql = buildLookup(factory, info, withLock);
-                    break;
-                case SELECT:
-                    sql = buildSelect(factory, info, withLock);
-                    break;
-                case INSERT:
-                    sql = buildInsert(factory, info);
-                    break;
-                case UPDATE:
-                    sql = buildUpdate(factory, info, dirtyCheck);
-                    break;
-                case DELETE:
-                    sql = buildDelete(factory, info, dirtyCheck);
-                    break;
-                default:
-                    throw new IllegalStateException("Unknown kind of SQL query: " + kind);
-                }
-            } catch (QueryException except) {
-                except.printStackTrace();
-                throw new MappingException( except );
-            }
-            executor = new SQLQueryExecutor(factory, connector, info, sql, kind, dirtyCheck);
-            _instances.put(key, executor);
-        }
-        return executor;
-    }
-
-    private static String buildLookup(BaseFactory factory, EntityInfo info, boolean withLock)
-            throws QueryException {
-        QueryExpression query;
-        EntityFieldInfo idInfo;
-
-        query = factory.getQueryExpression();
-        for (int i = 0; i < info.idInfo.length; i++) {
-            idInfo = info.idInfo[i];
-            for (int j = 0; j < idInfo.fieldNames.length; j++) {
-                query.addParameter(info.entityClass, idInfo.fieldNames[j], QueryExpression.OpEquals);
-            }
-        }
-        return query.getStatement(withLock);
-    }
-
-    private static String buildSelect(BaseFactory factory, EntityInfo info, boolean withLock)
-            throws QueryException {
-        return null;
-    }
-
-    private static String buildInsert(BaseFactory factory, EntityInfo info)
-            throws QueryException {
-        return null;
-    }
-
-    private static String buildUpdate(BaseFactory factory, EntityInfo info, boolean dirtyCheck)
-            throws QueryException {
-        return null;
-    }
-
-    private static String buildDelete(BaseFactory factory, EntityInfo info, boolean dirtyCheck)
-            throws QueryException {
-        return null;
-    }
-
-
-
     //------------------------------ Inner classes -------------------------------------------
 
-
-    /**
-     * The key for the HashMap of all instances of this class
-     */
-    static class ExecutorKey {
-
-        final BaseFactory factory;
-
-        final SQLConnector connector;
-
-        final String entityClass;
-
-        final byte kind;
-
-        final boolean dirtyCheck;
-
-        final boolean withLock;
-
-        ExecutorKey(BaseFactory factory, SQLConnector connector, String entityClass, byte kind,
-                    boolean dirtyCheck, boolean withLock) {
-            this.factory = factory;
-            this.connector = connector;
-            this.entityClass = entityClass;
-            this.kind = kind;
-            this.dirtyCheck = dirtyCheck;
-            this.withLock = withLock;
-        }
-
-        public int hashCode() {
-            return entityClass.hashCode() + kind + (dirtyCheck ? 8 : 0) + (withLock ? 16 : 0);
-        }
-
-        public boolean equals(Object obj) {
-            ExecutorKey key = (ExecutorKey) obj;
-
-            return (entityClass.equals(key.entityClass) && (kind == key.kind) &&
-                    (dirtyCheck == key.dirtyCheck) && (withLock == key.withLock)) &&
-                    (factory == key.factory) && (connector == key.connector);
-        }
-    }
 
     static class EntityKey {
         final EntityFieldInfo[] path;

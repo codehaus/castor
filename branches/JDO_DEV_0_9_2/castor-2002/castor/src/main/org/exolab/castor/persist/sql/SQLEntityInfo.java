@@ -47,6 +47,7 @@
 package org.exolab.castor.persist.sql;
 
 import java.sql.Types;
+import java.util.ArrayList;
 import java.util.HashMap;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
@@ -75,6 +76,12 @@ public class SQLEntityInfo
     public final SQLFieldInfo[] idInfo;
 
     /**
+     * The names of SQL columns that the identity consists of.
+     * idNames.length may be more than idInfo.length if identity contains foreign keys.
+     */
+    public final String idNames[];
+
+    /**
      * The array is parallel to info.fieldInfo array, but on positions of join fields there are nulls.
      */
     public final SQLFieldInfo[] fieldInfo;
@@ -84,18 +91,34 @@ public class SQLEntityInfo
      */
     public final SQLEntityInfo[] subEntities;
 
+
     private SQLEntityInfo(EntityInfo info) throws MappingException {
+        ArrayList idNamesList = new ArrayList();
+        String[] fieldNames;
+
         this.info = info;
+
+        // "Linearize" the identity columns
         idInfo = new SQLFieldInfo[info.idInfo.length];
         for (int i = 0; i < idInfo.length; i++) {
             idInfo[i] = new SQLFieldInfo(info.idInfo[i]);
+            fieldNames = info.idInfo[i].fieldNames;
+            for (int j = 0; j < fieldNames.length; j++) {
+                idNamesList.add(fieldNames[j]);
+            }
         }
+        idNames = new String[idNamesList.size()];
+        idNamesList.toArray(idNames);
+
+        // Prepare field info
         fieldInfo = new SQLFieldInfo[info.fieldInfo.length];
         for (int i = 0; i < fieldInfo.length; i++) {
             if (!info.fieldInfo[i].join) {
                 fieldInfo[i] = new SQLFieldInfo(info.fieldInfo[i]);
             }
         }
+
+        // Prepare sub-entities info
         if (info.subEntities == null) {
             subEntities = null;
         } else {
