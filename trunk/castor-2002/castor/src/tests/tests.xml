@@ -68,7 +68,7 @@
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
     <case class="jdo.SerializableObject" />
-    <case class="jdo.OqlExtends" />
+    <!-- <case class="jdo.OqlExtends" /> -->
     <case class="jdo.ManyToManyKeyGen" />
 
     <!-- C -->
