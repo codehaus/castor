@@ -153,7 +153,11 @@ public class JDOMappingLoader
             throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
 
         // create a key generator descriptor
-        keyGenName = clsMap.getKeyGenerator();
+        if ( clsMap.getKeyGenerator() != null )
+            keyGenName = ((KeyGeneratorDef)clsMap.getKeyGenerator()).getName();
+        else
+            keyGenName = null;
+
         keyGenDesc = null;
         if ( keyGenName != null ) {
             String keyGenFactoryName;
@@ -186,7 +190,7 @@ public class JDOMappingLoader
         CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
         if ( cacheMapping != null ) 
             jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
-                    keyGenDesc, cacheMapping.getType(), cacheMapping.getCapacity() );
+                    keyGenDesc, cacheMapping.getType().toString(), cacheMapping.getCapacity() );
         else 
             jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
                     keyGenDesc, null, 0 );

@@ -166,10 +166,10 @@ public class XMLMappingLoader
           
             //-- node type
             if ( xml.getNode() != null )
-                nodeType = NodeType.getNodeType( xml.getNode() );
+                nodeType = NodeType.getNodeType( xml.getNode().toString() );
             
             //-- matches
-            match = xml.getMatch();
+            match = xml.getMatches();
         }
         
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
