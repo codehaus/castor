@@ -144,20 +144,69 @@
     </xsd:complexType>
   </xsd:element>
 
+  <!--
+       The 'bind-xml' element is used for specifying XML specific databinding
+       properties and behavior for a specific field. 'bind-xml' may only appear
+       as a child of a 'field' element.
+  -->
   <xsd:element name="bind-xml">
+    <xsd:annotation>
+       <xsd:documentation>
+          The 'bind-xml' element is used for specifying XML specific databinding
+          properties and behavior for a specific field. 'bind-xml' may only appear
+          as a child of a 'field' element.
+       </xsd:documentation>
+    </xsd:annotation>
     <xsd:complexType>
-      <xsd:attribute name="name" type="xsd:QName"  use="optional"/>
+
+      <!--
+         An optional attribute used for specifying the XML name for the
+         field associated with the 'bind-xml' element.
+       -->
+       <xsd:attribute name="name" type="xsd:QName"  use="optional">
+          <xsd:annotation>
+             <xsd:documentation>
+                An optional attribute used for specifying the XML name for the
+                field associated with the 'bind-xml' element.
+             </xsd:documentation>
+          </xsd:annotation>
+       </xsd:attribute>
+
       <xsd:attribute name="type" type="xsd:NMTOKEN"  use="optional"/>
+
+      <!--
+           Allows specifying how Castor should automatically determines
+           the XML name of this field when no name has been specified.
+      -->
+      <xsd:attribute name="auto-naming" use="optional">
+         <xsd:annotation>
+            <xsd:documentation>
+               Allows specifying how Castor should automatically determines
+               the XML name of this field when no name has been specified.
+               In most cases the XML name is determined by using the field name,
+               but in some cases the user may want to use the Class name of
+               the field type. This attribute allows choosing between the
+               two approaches. If this attribute is not specified, the field
+               name is used as the XML name.
+            </xsd:documentation>
+         </xsd:annotation>
+         <xsd:simpleType>
+            <xsd:restriction base="xsd:string">
+               <xsd:enumeration value="deriveByClass"/>
+               <xsd:enumeration value="deriveByField"/>
+            </xsd:restriction>
+         </xsd:simpleType>
+      </xsd:attribute>
 
       <!-- Allows overriding the matching rule -->
       <xsd:attribute name="matches" type="xsd:string" use="optional"/>
 
 
       <!-- Signal that this field should be marshalled as a reference -->
-      <xsd:attribute name="reference" type="boolean" use="optional"/>
+      <xsd:attribute name="reference" type="xsd:boolean" use="optional"/>
       <xsd:attribute name="node" use="optional">
          <xsd:simpleType>
-            <xsd:restriction base="string">
+            <xsd:restriction base="xsd:string">
                <xsd:enumeration value="attribute"/>
                <xsd:enumeration value="element"/>
                <xsd:enumeration value="text"/>
