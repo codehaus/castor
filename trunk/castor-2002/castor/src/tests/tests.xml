@@ -14,6 +14,7 @@
     <jtf:case class="jdo.StoredProcedure" />
   </jtf:category>
 
+<!--
   <jtf:category name="postgres" class="jdo.JDOCategory">
     <jtf:description>JDO tests for PostgreSQL 6.5/7</jtf:description>
     <jdo:jdo database-name="postgres" configuration="postgres.xml" />
@@ -25,6 +26,7 @@
     <jtf:case class="jdo.KeyGenGeneric" />
     <jtf:case class="jdo.KeyGenSequence" />
   </jtf:category>
+-->
 
   <jtf:category name="xml" class="xml.XMLCategory">
     <jtf:description>Tests for XML marshalling framework</jtf:description>

@@ -130,7 +130,9 @@ public class TestMaster
     public void addDetail( TestDetail detail )
     {
         _details.addElement( detail );
+        detail.setMaster( this );
     }
+
 
     public Vector getDetails()
     {
