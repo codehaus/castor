@@ -40,6 +40,8 @@
  *
  * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
+ * Date         Author              Changes
+ * 11/01/2000   Arnaud Blandin      Created
  */
 
 package org.exolab.castor.builder.types;
@@ -48,28 +50,25 @@ import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
- * The XML Schema Date type
+ * The XML Schema Century type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public final class XSDate extends XSTimePeriod {
+public final class XSCentury extends XSTimePeriod {
 
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType
-        = new JClass("org.exolab.castor.types.Date");
-        //("java.sql.Date");
+        = new JClass("org.exolab.castor.types.Century");
 
-    public XSDate() {
-        super("P1D");
-    } //-- XSDate
+    private String value = null;
 
-   /**
-     * Returns the Java code neccessary to create a new instance of the
-     * JType associated with this XSType
-     */
-     /**
+    public XSCentury() {
+        super("P100Y");
+    } //-- XSCentury
+
+    /**
      * Returns the Java code necessary to create a new instance of the
      * JType associated with this XSType
      */
@@ -85,4 +84,4 @@ public final class XSDate extends XSTimePeriod {
         return this.jType;
     }
 
-} //-- XSDate
+} //-- XSCentury

@@ -52,7 +52,7 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public class XSTime extends XSType {
+public final class XSTime extends XSRecurringDuration {
 
     /**
      * The JType represented by this XSType
@@ -64,20 +64,18 @@ public class XSTime extends XSType {
     private String value = null;
 
     public XSTime() {
-        super(XSType.TIME);
-    } //-- XSNMToken
+        super("P0Y","P1D");
+    } //-- XSTime
 
 
     /**
-     * Returns the Java code neccessary to create a new instance of the
+     * Returns the Java code necessary to create a new instance of the
      * JType associated with this XSType
      */
-    /*public String newInstanceCode() {
-    //--Time(0) by default
-        return "new "+getJType().getName()+"(0);";
-    } //-- newInstanceCode*/
+    public String newInstanceCode() {
+         return "new "+getJType().getName()+"();";
+    } //-- newInstanceCode
 
-    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -85,5 +83,4 @@ public class XSTime extends XSType {
     public JType getJType() {
         return this.jType;
     }
-
 } //-- XSTime

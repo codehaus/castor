@@ -41,48 +41,91 @@
  * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
  * $Id$
  */
-
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.javasource.*;
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.javasource.JType;
+import org.exolab.javasource.JClass;
+
+import java.text.ParseException;
+import java.util.Enumeration;
 
 /**
- * The XML Schema Date type
+ * The XML Schema TimePeriod type
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
+ * @see org.exolab.castor.types.TimePeriod
 **/
-public final class XSDate extends XSTimePeriod {
+public class XSTimePeriod extends XSRecurringDuration {
 
     /**
      * The JType represented by this XSType
-    **/
-    private static final JType jType
-        = new JClass("org.exolab.castor.types.Date");
-        //("java.sql.Date");
-
-    public XSDate() {
-        super("P1D");
-    } //-- XSDate
-
-   /**
-     * Returns the Java code neccessary to create a new instance of the
-     * JType associated with this XSType
      */
-     /**
-     * Returns the Java code necessary to create a new instance of the
-     * JType associated with this XSType
-     */
-    public String newInstanceCode() {
-         return "new "+getJType().getName()+"();";
-    } //-- newInstanceCode
+    private static final JType JTYPE
+        = new JClass("org.exolab.castor.types.TimePeriod");
 
-    /**
-     * Returns the JType that this XSType represents
-     * @return the JType that this XSType represents
-    **/
-    public JType getJType() {
-        return this.jType;
+    public XSTimePeriod() {
+       super("","P0Y");
     }
 
-} //-- XSDate
+    /**
+     * returns a TimePeriod with the duration facet set up
+     * @param duration the String value of the duration facet
+     * @return a TimePeriod the duration facet set up
+     */
+    public XSTimePeriod(String duration) {
+        super(duration,"P0Y");
+    }
+
+
+    public void setPeriod (TimeDuration period) {
+        throw new UnsupportedOperationException("in a time period type, the period facet must not be changed");
+    }
+
+
+
+    /**
+     * Reads and sets the facets for this XSTimePeriod
+     * @param simpleType the SimpleType containing the facets
+     */
+    public void setFacets(SimpleType simpleType) {
+
+       //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            try {
+                //duration
+                if (Facet.DURATION.equals(name))
+                    setDuration(TimeDuration.parse(facet.getValue()));
+
+            } catch(ParseException e) {
+                System.out.println("Error in setting the facets of timePeriod");
+                e.printStackTrace();
+                return;
+            }
+        }
+    }//setFacets
+
+
+    public JType getJType() {
+       return this.JTYPE;
+    }
+
+     /**
+	 * Returns the Java code neccessary to create a new instance of the
+	 * JType associated with this XSType
+	 */
+	public String newInstanceCode() {
+        String result="new "+getJType().getName()+"(";
+       //duration should never be null
+        result = result +"\""+ getDuration().toString()+"\"";
+        result = result +");";
+        return result;
+    }
+}//XSTimePeriod

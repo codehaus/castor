@@ -52,12 +52,12 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSPositiveInteger extends XSInteger {
-    
-    
+public final class XSPositiveInteger extends XSInteger {
+
+
     public XSPositiveInteger() {
         super();
         setMinInclusive(new Integer(1));
     } //-- XSInteger
-    
+
 } //-- XSPositiveInteger
