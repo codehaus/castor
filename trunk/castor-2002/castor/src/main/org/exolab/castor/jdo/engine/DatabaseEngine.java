@@ -81,20 +81,21 @@ public class DatabaseEngine
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
      */
-    DatabaseEngine( DatabaseSource dbs )
+    DatabaseEngine( DatabaseSource dbs, PrintWriter logWriter )
 	throws MappingException
     {
 	super( dbs.getName(), dbs.getMappingTable(), new PersistenceFactory() {
-	    public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc )
+	    public Persistence getPersistence( CacheEngine cache, ObjectDesc objDesc,
+					       PrintWriter logWriter )
 		{
 		    try {
-			return new SQLEngine( (JDOObjectDesc) objDesc, null );
+			return new SQLEngine( (JDOObjectDesc) objDesc, logWriter );
 		    } catch ( MappingException except ) {
 			Logger.getSystemLogger().println( except.toString() );
 			return null;
 		    }
 		}
-	} );
+	}, logWriter );
 	_dbs = dbs;
     }
 
@@ -106,7 +107,7 @@ public class DatabaseEngine
     }
 
 
-    static DatabaseEngine getDatabaseEngine( DatabaseSource dbs )
+    static DatabaseEngine getDatabaseEngine( DatabaseSource dbs, PrintWriter logWriter )
 	throws MappingException
     {
 	DatabaseEngine engine;
@@ -114,7 +115,7 @@ public class DatabaseEngine
 	synchronized ( _engines ) {
 	    engine = (DatabaseEngine) _engines.get( dbs );
 	    if ( engine == null ) {
-		engine = new DatabaseEngine( dbs );
+		engine = new DatabaseEngine( dbs, logWriter );
 		_engines.put( dbs, engine );
 	    }
 	    return engine;
