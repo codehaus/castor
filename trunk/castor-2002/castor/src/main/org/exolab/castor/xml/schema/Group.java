@@ -113,6 +113,20 @@ public class Group extends Particle
         _wildcard = new Vector();
     } //-- Group
 
+    /**
+     * Adds a wildcard to this Group model
+     * @param WildCard the wildcard to add
+     * @exception SchemaException thrown when the wildcard
+     * is an <anyAttribute> element
+     */
+     public void addWildcard(Wildcard wildcard)
+          throws SchemaException
+    {
+         if (wildcard.isAttributeWildcard())
+            throw new SchemaException("only <any> should be add in a group.");
+        _wildcard.addElement(wildcard);
+     }
+
 
     /**
      * Returns the Model Group Collection type for this Group
@@ -162,6 +176,13 @@ public class Group extends Particle
         return this.order;
     } //-- getOrder
 
+     /**
+      * Returns an enumeration of the different <any> wildcards held
+      * by this group.
+      */
+      public Enumeration getWildcard() {
+          return _wildcard.elements();
+      }
 
     /**
      * Sets if the group is a model group definition
@@ -260,28 +281,6 @@ public class Group extends Particle
     {
         _contentModel.addGroup(group);
     } //-- addGroup
-
-    /**
-     * Adds a wildcard to this Group model
-     * @param WildCard the wildcard to add
-     * @exception SchemaException thrown when the wildcard
-     * is an <anyAttribute> element
-     */
-     public void addWildcard(Wildcard wildcard)
-          throws SchemaException
-    {
-         if (wildcard.isAttributeWildcard())
-            throw new SchemaException("only <any> should be add in a group.");
-        _wildcard.add(wildcard);
-     }
-
-     /**
-      * Returns an enumeration of the different <any> wildcards held
-      * by this group.
-      */
-      public Enumeration getWildcard() {
-          return _wildcard.elements();
-      }
 
     /**
      * Returns an enumeration of all the Particles of this
