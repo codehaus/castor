@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1607 using contribution from Emir Causevic [emirc@gawab.com]
+       Added support for SAB DB to IdentityKeyGenerator.
+       (Werner - 20040427)
+
 JDO:   Fixed bug 1605 using contribution from Emir Causevic [emirc@gawab.com]
        Fixed various problems related to the setup of JDO test data with SAP DB.
        (Werner - 20040427)
