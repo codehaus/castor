@@ -254,8 +254,8 @@ Person person = (Person)unmarshaller.unmarshal(reader);
            <p>
               A mapping file may also be used to "describe" the classes which
               are to be marshalled. The mapping is loaded before any
-              marshalling/unmarshalling takes place. See <api>
-              org.exolab.castor.mapping.Mapping</api>
+              marshalling/unmarshalling takes place. See 
+              <api>org.exolab.castor.mapping.Mapping</api>
           </p>
            <p>
              The main advantage of run-time descriptors is that it takes very
