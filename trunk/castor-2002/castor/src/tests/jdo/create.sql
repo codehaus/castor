@@ -135,3 +135,12 @@ create table test_persistent (
 );
 create unique index test_persistent_pk on test_persistent ( id );
 
+-- The test stored procedure on PL/pgSQL
+drop function proc_check_permissions ( varchar, varchar);
+
+create function proc_check_permissions ( varchar, varchar)
+returns setof test_table as '
+select id, value1, value2 from test_table where value1 = $1
+union
+select id, value1, value2 from test_table where value2 = $2;
+' language 'sql';
