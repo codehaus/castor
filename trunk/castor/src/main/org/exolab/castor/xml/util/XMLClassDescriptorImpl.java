@@ -372,7 +372,6 @@ public class XMLClassDescriptorImpl extends Validator
                 if (desc.matches(name)) {
                       if (!desc.matches(WILDCARD)) return desc;
                       result = desc;
-                      break;
                 }
 
                 //handle container
