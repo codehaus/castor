@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+JDO:    Fixed Bug 1106 : JDO mapping with collection="array" does not work
+        (Mickael - 20030325)
+
 JDO:    Fixed Bug 1045 : date->char[yyyy-MM-dd hh:mm:ss] parameterized type not supported
         (Mickael - 20030325)
 

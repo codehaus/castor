@@ -115,6 +115,7 @@ public class Collections extends CastorTestCase {
 
         runOnce( TestColHashtable.class );
 
+        runArray();
     }
 
     public void runOnce( Class masterClass ) 
@@ -198,6 +199,118 @@ public class Collections extends CastorTestCase {
                 !testCol.containsItem( new TestItem( 104 ) ) )
             fail( "Related add/remove rollback failed!" + testCol );
 
+        // shoud test for update too
+    } 
+
+    /**
+     * Special case for array
+     */
+    public void runArray() 
+            throws PersistenceException, SQLException, Exception {
+
+        stream.println( "Running..." );
+        stream.println( "" );
+
+        // delete everything
+        _conn.createStatement().executeUpdate( "DELETE FROM test_col" );
+        _conn.createStatement().executeUpdate( "DELETE FROM test_item" );
+        _conn.commit();
+
+        // create new TestCol object with elements
+        _db.begin();
+        TestColArray testCol = new TestColArray();
+        testCol.setId( 1 );
+        _db.create( testCol );
+        TestItem[] items = new TestItem[5];
+        for ( int i=0; i < 5; i++ ) {
+            TestItem newItem = new TestItem( 100+i );
+            newItem.setTestCol(testCol);
+            items[i] = newItem;
+            _db.create( newItem );
+        }
+        testCol.setItems(items);
+        _db.commit();
+        // test if object created properly
+        _db.begin();
+        testCol = (TestColArray) _db.load( TestColArray.class, new Integer(1) );
+        if ( testCol == null )
+            fail( "Object creation failed!" );
+            
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 100 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 103 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related objects creation failed!" );
+
+        testCol.removeItem( new TestItem( 100 ) );
+        testCol.removeItem( new TestItem( 103 ) );
+
+        // update array
+        TestItem[] oldItems = testCol.getItems();
+        TestItem[] newItems = new TestItem[oldItems.length+2];
+        System.arraycopy(oldItems, 0, newItems, 0, oldItems.length);
+
+        TestItem newItem = new TestItem( 106 );
+        newItem.setTestCol(testCol);
+        newItems[newItems.length-2] = newItem;
+        _db.create( newItem );
+
+        newItem = new TestItem( 107 );
+        newItem.setTestCol(testCol);
+        newItems[newItems.length-1] = newItem;
+        _db.create( newItem );
+
+        testCol.setItems( newItems );
+
+
+        _db.commit();
+        
+        // test if add and remove work properly.
+        _db.begin();
+        testCol = (TestColArray) _db.load( TestColArray.class, new Integer(1) );
+        if ( testCol == null )
+            fail( "Object add/remove failed! " + testCol );
+
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 106 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 107 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related add/remove failed!" + testCol );
+
+        // test if add and remove rollback properly.
+        testCol.removeItem( new TestItem( 102 ) );
+        testCol.removeItem( new TestItem( 104 ) );
+
+        // update array
+        oldItems = testCol.getItems();
+        newItems = new TestItem[oldItems.length+2];
+        System.arraycopy(oldItems, 0, newItems, 0, oldItems.length);
+
+        newItem = new TestItem( 108 );
+        newItem.setTestCol(testCol);
+        newItems[newItems.length-2] = newItem;
+        _db.create( newItem );
+
+        newItem = new TestItem( 109 );
+        newItem.setTestCol(testCol);
+        newItems[newItems.length-1] = newItem;
+        _db.create( newItem );
+
+        testCol.setItems( newItems );
+
+        _db.rollback();
+
+        if ( testCol.itemSize() != 5 ||
+                !testCol.containsItem( new TestItem( 106 ) ) ||
+                !testCol.containsItem( new TestItem( 101 ) ) ||
+                !testCol.containsItem( new TestItem( 102 ) ) ||
+                !testCol.containsItem( new TestItem( 107 ) ) ||
+                !testCol.containsItem( new TestItem( 104 ) ) )
+            fail( "Related add/remove rollback failed!" + testCol );
         // shoud test for update too
     } 
 
