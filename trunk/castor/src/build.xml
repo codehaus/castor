@@ -118,7 +118,8 @@
             gen.jdo.conf     Use the Source Generator to create the classes for the jdo-conf.xsd
             gen.pvd          Use the Source Generator to create the classes for the pvd.xsd
             
-            prepare-eclipse  Put Eclipse project files into place.
+            prepare-eclipse  Put Eclipse project files into place (src/main only).
+            prepare-eclipse-complete  Put Eclipse project files into place.
         -----------------------------------------------------------
         </echo>
     </target>
@@ -529,10 +530,20 @@
         </java>
     </target>
     
-	<target name="prepare-eclipse" description="Copy Eclipse project files to the root directory">
-        <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
+	<target name="prepare-eclipse-base" description="Copy base Eclipse project files to the root directory">
         <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
     </target>
+    
+	<target name="prepare-eclipse" depends="prepare-eclipse-base" 
+	              description="Copy Eclipse project files to the root directory">
+        <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
+    </target>
+    
+    <target name="prepare-eclipse-complete" depends="prepare-eclipse-base" 
+            description="Copy Eclipse project files to the root directory">
+        <copy file="${project.eclipse}/classpath.template.complete" tofile="${basedir}/.classpath" overwrite="true"/>
+    </target>
+    
     
 
 </project>
