@@ -184,19 +184,14 @@ public final class LockEngine {
                     ClassMolder extend = molder.getExtends();
 
                     if ( extend == null ) {
-                        // create new LRU for the base type
+                        // create new Cache instance for the base type
                         Cache cache = null;
                         try {
                         	cache = CacheRegistry.getCache (molder.getCacheType(), molder.getCacheParam(), molder.getName());
-                        	// _log.debug ("Setting className for cache of type " + cache.getCacheType() + " to " + molder.getName());
-                        } 
-                        catch (InvalidCacheTypeException e) {
-                        	_log.error ("Problem creating performance cache instance", e);
-                        	throw new MappingException ("Problem creating performance cache instance", e);
                         } 
                         catch (CacheAcquireException e) {
-                            _log.error ("Problem creating performance cache instance." + e.getMessage(), e);
-                            throw new MappingException ("Problem creating performance cache instance", e);
+                            _log.error (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
+                            throw new MappingException (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
                         }
                         TypeInfo info = new TypeInfo( molder, new HashMap(), cache ); 
                         _typeInfo.put( molder.getName(), info );
