@@ -137,13 +137,20 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
+        //-- <type>
         if (name == SchemaNames.ARCHETYPE) {
             unmarshaller 
                 = new ArchetypeUnmarshaller(_schema, atts, _resolver);
         } 
+        //-- <element>
         else if (name == SchemaNames.ELEMENT) {
             unmarshaller 
                 = new ElementUnmarshaller(_schema, atts, _resolver);
+        }
+        //-- <datatype>
+        else if (name == SchemaNames.DATATYPE) {
+            unmarshaller 
+                = new DatatypeUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here
@@ -202,6 +209,12 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                 System.out.println("warning: top-level archetype with no name.");
             }
         }
+        else if (name == SchemaNames.DATATYPE) {
+            Datatype datatype = null;
+            datatype = ((DatatypeUnmarshaller)unmarshaller).getDatatype();
+            _schema.addDatatype(datatype);
+            _resolver.addResolvable(datatype.getReferenceId(), datatype);
+        }
         else if (name == SchemaNames.ELEMENT) {
             ElementDecl element = null;
             element = ((ElementUnmarshaller)unmarshaller).getElement();
@@ -209,7 +222,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             _schema.addElementDecl(element);
             _resolver.addResolvable(element.getReferenceId(), element);
         }
-        
         unmarshaller = null;
     } //-- endElement
     
