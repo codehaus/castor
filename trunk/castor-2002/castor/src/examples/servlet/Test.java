@@ -57,10 +57,9 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Transaction;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.util.Logger;
-import org.exolab.castor.jdo.ODMG;
 import org.exolab.castor.xml.Marshaller;
 import org.apache.xml.serialize.*;
 
@@ -81,9 +80,8 @@ public class Test
         throws ServletException
     {
         try {
-            ODMG          odmg;
+            JDO           jdo;
             Database      db;
-            Transaction   tx;
             OQLQuery      oql;
             Object        result;
 
@@ -98,17 +96,16 @@ public class Test
 
             // Load the mapping from the specified filed, and Open up the
             // database for read/write access
-            odmg = new ODMG();
-            odmg.loadDatabase( getClass().getResource( DatabaseFile ).toString(), null );
-            db = odmg.openDatabase( "test" );
+            JDO.loadDatabase( getClass().getResource( DatabaseFile ).toString(), null );
+            jdo = new JDO();
+            jdo.setDatabaseName( "test" );
+            db = jdo.getDatabase();
 
             // All ODMG database access requires a transaction
-            tx = odmg.newTransaction();
-            tx.begin();
+            db.begin();
 
             // Construct a new query to load all the products in the database
-            oql = odmg.newOQLQuery();
-            oql.create( "SELECT p FROM myapp.Product p" );
+            oql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
             result = oql.execute();
 
             // Print all the products as elements under the root element
@@ -127,7 +124,7 @@ public class Test
             // Close the document, transaction and database.
             response.getDocumentHandler().endElement( "products" );
             response.getDocumentHandler().endDocument();
-            tx.commit();
+            db.commit();
             db.close();
 
         } catch ( Exception except ) {

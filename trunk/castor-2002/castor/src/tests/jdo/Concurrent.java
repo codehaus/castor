@@ -1,140 +1,112 @@
 package jdo;
 
 
-import myapp.*;
 import java.io.PrintWriter;
-import org.odmg.Implementation;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
+import org.exolab.castor.jdo.JDOSource;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.PersistenceException;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.SQLException;
 
 
 /**
- * Simple test for key duplicity. Will report to the console failure to create
- * two groups with the same identifier, once in memory (in the same transaction)
- * and once in the database (two different transactions).
  */
 public class Concurrent
 {
 
 
-    private Implementation  odmg;
+    private JDOSource      _jdo;
 
 
-    private Database        db;
+    private Database       _db;
 
 
-    private PrintWriter     logger;
+    private PrintWriter    _logger;
 
 
-    private String          jdbcUri;
+    private String         _jdbcUri;
 
 
-    static final int        GroupId = 3;
+    static final String    JDBCName = "jdbc value";
 
 
-    public Concurrent( Implementation odmg, String dbName, PrintWriter logger,
+    static final String    JDOName = "jdo value";
+
+
+    public Concurrent( JDOSource jdo, PrintWriter logger,
 		       String driverClass, String jdbcUri )
-	throws Exception
+	throws PersistenceException
     {
-	this.odmg = odmg;
-	this.logger = logger;
-	db = odmg.newDatabase();
-	db.open( dbName, db.OPEN_READ_WRITE );
-
+        _jdo = jdo;
+        _logger = logger;
+        _db = _jdo.getDatabase();
+        _logger.println( "Opened JDO database " + _db );
+        
 	if ( driverClass == null )
 	    driverClass = "postgresql.Driver";
-	logger.println( "Using JDBC driver " + driverClass );
-	Class.forName( driverClass );
+	_logger.println( "Using JDBC driver " + driverClass );
+        try {
+            Class.forName( driverClass );
+        } catch ( ClassNotFoundException except ) {
+            throw new RuntimeException( except.toString() );
+        }
 
 	if ( jdbcUri == null )
-	    this.jdbcUri = "jdbc:postgresql:test?user=test&password=test";
+	    _jdbcUri = "jdbc:postgresql:test?user=test&password=test";
 	else
-	    this.jdbcUri = jdbcUri;
-	logger.println( "Using JDBC URI " + jdbcUri );
+	    _jdbcUri = jdbcUri;
+	_logger.println( "Using JDBC URI " + jdbcUri );
     }
 
 
     public void run()
+        throws PersistenceException, SQLException
     {
-	Transaction   tx;
 	OQLQuery      oql;
-	ProductGroup  group;
+        TestObject    object;
 	Connection    conn;
 
-	try {
-	    // Must be associated with an open transaction in order to
-	    // use the ODMG database
-	    tx = odmg.newTransaction();
-	    tx.begin();
-	    
-	    oql = odmg.newOQLQuery();
-	    oql.create( "SELECT pg FROM myapp.ProductGroup pg WHERE id = $1" );
-	    // If no such group exists in the database, create a new
-	    // object and persist it
-	    oql.bind( new Integer( GroupId ) );
-	    group = (ProductGroup) oql.execute();
-	    if ( group == null ) {
-		group = new ProductGroup();
-		group.id = GroupId;
-		group.name = "new group";
-		logger.println( "Creating new group: " + group );
-		db.makePersistent( group );
-	    } else {
-		group.name = "new group";
-		logger.println( "Query result: " + group );
-	    }
-	    logger.println( "Assured one group exists in the database" );
-	    tx.commit();
-	    
-	    tx.begin();
-	    oql.bind( new Integer( GroupId ) );
-	    group = (ProductGroup) oql.execute();
-	    
-	    JdbcThread jdbc;
-	    
-	    jdbc = new JdbcThread();
-	    jdbc.logger = logger;
-	    jdbc.jdbcUri = jdbcUri;
-	    jdbc.start();
-	    // Give JDBC thread 2 seconds to wait for lock
-	    jdbc.join();
-	    group.name = group.name + "XXX";
-	    
-	    tx.commit();
-	    db.close();
-	} catch ( Exception except ) {
-	    logger.println( except );
-	    except.printStackTrace( logger );
-	}
-    }
-
-
-    static class JdbcThread
-	extends Thread
-    {
-
-	PrintWriter logger;
-
-	String      jdbcUri;
-
-	public void run()
-	{
-	    Connection conn;
-
-	    try {
-		logger.println( "Attempting to update group from JDBC" );
-		conn = DriverManager.getConnection( jdbcUri );
-		conn.createStatement().execute( "UPDATE prod_group SET name='old_group' WHERE id=" + GroupId );
-		logger.println( "Succeeded to update group from JDBC" );
-		conn.close();
-	    } catch ( Exception except ) {
-		logger.println( "JDBC: " + except );
-	    }
-	}
-
+        // Open transaction in order to perform JDO operations
+        _db.begin();
+        
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute();
+        if ( object == null ) {
+            object = new TestObject();
+            object.id = TestObject.DefaultId;
+            object.name = TestObject.DefaultName;
+            _logger.println( "Creating new object: " + object );
+            _db.makePersistent( object );
+        } else {
+            object.name = TestObject.DefaultName;
+            _logger.println( "Updating object: " + object );
+        }
+        _db.commit();
+        
+        
+        // Open a new transaction in order to conduct test
+        _db.begin();
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute();
+        object.name = JDOName;
+        
+        // Perform direct JDBC access and override the value of that table
+        conn = DriverManager.getConnection( _jdbcUri );
+        conn.createStatement().execute( "UPDATE test_object SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
+        _logger.println( "Updated test object from JDBC" );
+        conn.close();
+        
+        // Commit JDO transaction, this should report object modified
+        // exception
+        _logger.println( "Committing JDO update" );
+        _db.commit();
+        _db.close();
     }
 
 

@@ -15,7 +15,6 @@ import java.sql.SQLException;
 import java.sql.DriverManager;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Transaction;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
@@ -67,14 +66,12 @@ public class Test
         OQLQuery      groupOql;
         OQLQuery      computerOql;
         Enumeration   enum;
-        Transaction   tx;
 
         db = jdo.getDatabase();
 
         // Must be associated with an open transaction in order to
         // use the ODMG database
-        tx = jdo.newTransaction();
-        tx.begin();
+        db.begin();
         logger.println( "Begin transaction" );
         
         // Create OQL queries for all three object types
@@ -114,7 +111,7 @@ public class Test
         // Checkpoint commits all the updates to the database
         // but leaves the transaction (and locks) open
         logger.println( "Transaction checkpoint" );
-        tx.checkpoint();
+        db.checkpoint();
         
         
         // If no such group exists in the database, create a new
@@ -190,14 +187,13 @@ public class Test
         }
         
         logger.println( "Commit transaction" );
-        tx.commit();
+        db.commit();
 
 
         Object     result;
         Serializer ser;
 
-        tx = jdo.newTransaction();
-        tx.begin();
+        db.begin();
         productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
 
         result = productOql.execute();
@@ -213,7 +209,7 @@ public class Test
             Marshaller.marshal( result, ser.asDocumentHandler() );
         ser.asDocumentHandler().endElement( "products" );
         ser.asDocumentHandler().endDocument();
-        tx.commit();
+        db.commit();
         db.close();
     }
 

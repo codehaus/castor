@@ -1,105 +1,101 @@
 package jdo;
 
 
-import myapp.*;
 import java.io.PrintWriter;
-import org.odmg.Implementation;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
-import org.odmg.ODMGException;
+import org.exolab.castor.jdo.JDOSource;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.PersistenceException;
 
 
 /**
- * Simple test for key duplicity. Will report to the console failure to create
- * two groups with the same identifier, once in memory (in the same transaction)
- * and once in the database (two different transactions).
  */
 public class DuplicateKey
 {
 
 
-    private Implementation  odmg;
+    private JDOSource      _jdo;
 
 
-    private Database        db;
+    private Database       _db;
 
 
-    private PrintWriter     logger;
+    private PrintWriter    _logger;
 
 
-    public DuplicateKey( Implementation odmg, String dbName, PrintWriter logger )
-	throws ODMGException
+    public DuplicateKey( JDOSource jdo, PrintWriter logger )
+	throws PersistenceException
     {
-	this.odmg = odmg;
-	this.logger = logger;
-	db = odmg.newDatabase();
-	db.open( dbName, db.OPEN_READ_WRITE );
+	_jdo = jdo;
+	_logger = logger;
+	_db = jdo.getDatabase();
+        _logger.println( "Opened JDO database " + _db );
     }
 
 
     public void run()
+	throws PersistenceException
     {
-	Transaction   tx;
 	OQLQuery      oql;
-	ProductGroup  group;
+	TestObject    object;
 
-	try {
-	    // Must be associated with an open transaction in order to
-	    // use the ODMG database
-	    tx = odmg.newTransaction();
-	    tx.begin();
+        // Open transaction in order to perform JDO operations
+        _db.begin();
+
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute();
+        if ( object == null ) {
+            object = new TestObject();
+            object.id = TestObject.DefaultId;
+            object.name = TestObject.DefaultName;
+            _logger.println( "Creating new object: " + object );
+            _db.makePersistent( object );
+        } else {
+            object.name = TestObject.DefaultName;
+            _logger.println( "Updating object: " + object );
+        }
+        _db.commit();
+
+
+        // Attempt to create a new object with the same identity,
+        // while one is in memory. Will report duplicate key from
+        // the cache engine.
+        _db.begin();
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute();
+
+        object = new TestObject();
+        object.id = TestObject.DefaultId;
+        object.name = TestObject.DefaultName;
+        _logger.println( "Creating new object: " + object );
+        _logger.println( "Will report duplicate identity from cache engine" );
+        try {
+            _db.makePersistent( object );
+        } catch ( Exception except ) {
+            _logger.println( except );
+	    except.printStackTrace( _logger );
+        }
+        _db.commit();
 	    
-	    oql = odmg.newOQLQuery();
-	    oql.create( "SELECT pg FROM myapp.ProductGroup pg WHERE id = $1" );
-	    // If no such group exists in the database, create a new
-	    // object and persist it
-	    oql.bind( new Integer( 3 ) );
-	    group = (ProductGroup) oql.execute();
-	    if ( group == null ) {
-		group = new ProductGroup();
-		group.id = 3;
-		group.name = "new group";
-		logger.println( "Creating new group: " + group );
-		db.makePersistent( group );
-	    } else {
-		logger.println( "Query result: " + group );
-	    }
-	    logger.println( "Assured one group exists in the database" );
-	    tx.commit();
-	    
-	    tx.begin();
-	    oql.bind( new Integer( 3 ) );
-	    group = (ProductGroup) oql.execute();
-	    group = new ProductGroup();
-	    group.id = 3;
-	    group.name = "new group";
-	    logger.println( "Creating new group: " + group );
-	    logger.println( "Will report duplicate identity" );
-	    try {
-		db.makePersistent( group );
-	    } catch ( Exception except ) {
-		logger.println( except );
-	    }
-	    tx.commit();
-	    
-	    tx.begin();
-	    
-	    group = new ProductGroup();
-	    group.id = 3;
-	    group.name = "new group";
-	    logger.println( "Creating new group: " + group );
-	    logger.println( "Will report duplicate identity" );
-	    try {
-		db.makePersistent( group );
-	    } catch ( Exception except ) {
-		logger.println( except );
-	    }
-	    tx.commit();
-	} catch ( Exception except ) {
-	    logger.println( except );
-	    except.printStackTrace( logger );
-	}
+        // Attempt to create a new object with the same identity,
+        // in the database. Will report duplicate key from SQL engine.
+        _db.begin();
+        object = new TestObject();
+        object.id = TestObject.DefaultId;
+        object.name = TestObject.DefaultName;
+        _logger.println( "Creating new object: " + object );
+        _logger.println( "Will report duplicate identity from SQL engine" );
+        try {
+            _db.makePersistent( object );
+        } catch ( Exception except ) {
+            _logger.println( except );
+	    except.printStackTrace( _logger );
+        }
+        _db.commit();
     }
 
 

@@ -589,8 +589,9 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
                 throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
             }
         }
-        if ( fieldMap.getCollection() != null )
+        if ( fieldMap.getCollection() != null ) {
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
+        }
 
         if ( fieldMap.getGetMethod() != null ||
              fieldMap.getSetMethod() != null ) {
