@@ -47,7 +47,6 @@
 package org.exolab.castor.jdo.drivers;
 
 
-import java.util.Hashtable;
 import java.util.Map;
 
 import org.exolab.castor.jdo.engine.JDBCSyntax;
