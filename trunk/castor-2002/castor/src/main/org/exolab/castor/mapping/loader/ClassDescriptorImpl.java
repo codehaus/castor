@@ -140,7 +140,13 @@ public class ClassDescriptorImpl
                 throw new MappingException( "mapping.classDoesNotExtend",
                                             _javaClass.getName(), extend.getJavaClass().getName() );
             _extends = extend;
-            _identities = ( identities == null ? ((ClassDescriptorImpl)_extends).getIdentities() : identities );
+            if ( _extends instanceof ClassDescriptorImpl )
+                _identities = ( identities == null ? ((ClassDescriptorImpl)_extends).getIdentities() : identities );
+            else
+                // a quick hack to fix a ClassCastException :-(
+                _identities = ( identities == null ? 
+                (_extends.getIdentity() == null? null : new FieldDescriptor[] { _extends.getIdentity() } ) 
+                : identities );
         } else {
             _extends = null;
             _identities = identities;
