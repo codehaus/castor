@@ -368,16 +368,22 @@
   </xsl:template>
 
   <xsl:template match="code-panel">
-    <table border="1" cellpadding="4" width="100%">
+    <p/>
+    <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
       <tr>
-        <td BGCOLOR="#CCCCCC">
-          <xsl:apply-templates/>
+        <td>
+          <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#ededed">
+            <tr>
+              <td><pre><xsl:apply-templates/></pre></td>
+            </tr>
+          </table>
         </td>
       </tr>
     </table>
     <xsl:if test="@caption">
 	  <i><xsl:value-of select="@caption"/></i>
     </xsl:if>
+    <br/>
   </xsl:template>
 
   <xsl:template match="code-block">
@@ -536,6 +542,23 @@
           </td></tr></table>
       </td></tr></table>
   </xsl:template>
+
+  <xsl:template match="tip">
+      <br />
+      <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
+        <tr>
+          <td>
+            <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#ededed">
+              <tr>
+                <td><b>Tip:</b></td>
+                <td><xsl:apply-templates/></td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+  </xsl:template>
+
 
 </xsl:stylesheet>
 
