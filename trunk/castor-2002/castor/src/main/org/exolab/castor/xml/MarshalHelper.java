@@ -166,6 +166,9 @@ public class MarshalHelper {
             //-- if method comes from the Object base class, ignore
             if (method.getDeclaringClass() == Object.class) continue;
             
+            //-- if method is static...ignore
+            if ((method.getModifiers() & Modifier.STATIC) != 0) continue;
+            
             String methodName = method.getName();
             
             //-- read methods
