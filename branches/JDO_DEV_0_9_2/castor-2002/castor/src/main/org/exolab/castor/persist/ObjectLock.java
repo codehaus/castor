@@ -111,7 +111,7 @@ final class ObjectLock {
     private final static int[] lock = new int[0];
 
     /* for debug only */
-    private private int    _id;
+    private int        _id;
 
     /**
      * Indicates if this object lock is run in debug mode. If true, messages
@@ -131,7 +131,7 @@ final class ObjectLock {
     /**
      * The object's identity.
      */
-    private Object              _identity;
+    private Object              _oid;
 
     /**
      * The object being locked.
@@ -149,7 +149,7 @@ final class ObjectLock {
      * The Key that being used to load the the current value, 
      * or being used to modified and committed sucessfully
      */
-    private Key                 _modifiedKey;
+    private Key                 _masterKey;
 
     /**
      * The latest timestamp of the value is being loaded, or being 
@@ -209,7 +209,7 @@ final class ObjectLock {
      * If the number is zero, and the lock isFree(), then it is safe
      * dispose this lock.
      */
-    private int                _gateCount;
+    private int                 _gateCount;
 
     /**
      * Indicates how many threads had invoked Object.wait() for this 
@@ -220,10 +220,10 @@ final class ObjectLock {
     /**
      *
      */
-    private Key                _confirmWaiting;
+    private Key                 _confirmWaiting;
 
 
-    private short              _confirmWaitingAction;
+    private short               _confirmWaitingAction;
 
     /**
      * Create a new lock for the specified object. Must not create two
@@ -367,68 +367,69 @@ final class ObjectLock {
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
 
         while ( true ) {
-            try {
-                if ( _deleted ) {
-                    throw new ObjectDeletedWaitingForLockException("Object deleted");
-                } else if ( _readLock == null && _writeLock == null && write ) {
-                    // the only key now, get write lock immediately
-                    _writeLock = key;
-                } else if ( _readLock == null && _writeLock == null && !write ) {
-                    // the only key now, get read lock immediately
-                    _readLock = new LinkTx( key, null );
+            if ( _deleted ) {
+                throw new ObjectDeletedWaitingForLockException("Object deleted");
+            } else if ( _readLock == null && _writeLock == null && write ) {
+                // the only key now, get write lock immediately
+                _writeLock = key;
+            } else if ( _readLock == null && _writeLock == null && !write ) {
+                // the only key now, get read lock immediately
+                _readLock = new LinkedTx( key, null );
+                return;
+            } else if ( _writeLock == null && _readLock.key == key 
+                    && _readLock.next == null && write ) {
+                // upgrade to write lock immediately
+                _readLock = null;
+                _writeLock = key;
+                return;
+            } else if ( _writeLock == key ) {
+                // this transaction already holding a write lock
+                if ( REACQUIRE_ALLOWED )
                     return;
-                } else if ( _writeLock == null && _readLock == key && _readLock.next == null && write ) {
-                    // upgrade to write lock immediately
-                    _readLock = null;
-                    _writeLock = key;
+                else
+                    throw new LockUpgradeFailedException( 
+                              Messages.message("persist.lockReacquireFailed") );
+            } else if ( _readLock.key == key && !write ) {
+                // this transaction already holding a read lock
+                if ( REACQUIRE_ALLOWED )
                     return;
-                } else if ( _writeLock == key ) {
-                    // this transaction already holding a write lock
-                    if ( REACQUIRE_ALLOWED )
-                        return;
-                    else
-                        throw new LockUpgradeFailedException( Message.message("persist.lockReacquireFailed") );
-                } else if ( _readLock.key == key && !write ) {
-                    // this transaction already holding a read lock
-                    if ( REACQUIRE_ALLOWED )
-                        return;
-                    else
-                        throw new LockUpgradeFailedException( Message.message("persist.lockReacquireFailed") );
-                } else if ( _readLock == null && !write ) {
-                    // other transaction is holding read lock
-                    acquireReadLockInternal( key, timeout );
-                } else if ( _readLock == null && write ) {
-                    // other transaction is holding write lock
-                    acquireWriteLockInternal( key, timeout );
-                } else if ( _readLock != null ) {
-                    // all other cases, find out if key has a read lock already
-                    LinkTx linked = _readLock;
-                    boolean alreadyReadLocked = false;
-                    while ( linked != null ) {
-                        if ( linked.key == key ) {
-                            alreadyReadLocked = true;
-                            break;
-                        }
-                        linked = linked.next;
+                else
+                    throw new LockUpgradeFailedException( 
+                              Messages.message("persist.lockReacquireFailed") );
+            } else if ( _readLock == null && !write ) {
+                // other transaction is holding read lock
+                acquireReadLockInternal( key, timeout );
+            } else if ( _readLock == null && write ) {
+                // other transaction is holding write lock
+                acquireWriteLockInternal( key, timeout );
+            } else if ( _readLock != null ) {
+                // all other cases, find out if key has a read lock already
+                LinkedTx linked = _readLock;
+                boolean alreadyReadLocked = false;
+                while ( linked != null ) {
+                    if ( linked.key == key ) {
+                        alreadyReadLocked = true;
+                        break;
                     }
-                    if ( write ) {
-                        // other transaction is holding write lock, wait for upgrade or
-                        // acquire a new write lock
-                        if ( alreadyReadLocked )
-                            upgradeLockInternal( key, timeout );
-                        else 
-                            acquireWriteLockInternal( key, timeout );
-                    } else {
-                        // this or other transaction already has read lock, add itself 
-                        // to the readlock list or complaint about reentrance
-                        if ( alreadyReadLocked ) {
-                            if ( REACQUIRE_ALLOWED )
-                                return;
-                            else
-                                throw new LockUpgradeFailedException( Message.message("persist.lockReacquireFailed") );
-                        } else
-                            _readLock = new LinkTx( key, _readLock );
-                    }
+                    linked = linked.next;
+                }
+                if ( write ) {
+                    // other transaction is holding write lock, wait for upgrade or
+                    // acquire a new write lock
+                    if ( alreadyReadLocked )
+                        upgradeLockInternal( key, timeout );
+                    else 
+                        acquireWriteLockInternal( key, timeout );
+                } else {
+                    // this or other transaction already has read lock, add itself 
+                    // to the readlock list or complaint about reentrance
+                    if ( alreadyReadLocked ) {
+                        if ( REACQUIRE_ALLOWED )
+                            return;
+                        else
+                            throw new LockUpgradeFailedException( Messages.message("persist.lockReacquireFailed") );
+                    } else
+                        _readLock = new LinkedTx( key, _readLock );
                 }
             }
         }
@@ -514,7 +515,8 @@ final class ObjectLock {
                     detectDeadlock( key, 10 );
                     
                     // Must wait for lock and then attempt to reacquire
-                    _writeWaiting = new LinkedTx( key, _writeWaiting );
+                    key.setNext( _writeWaiting );
+                    _writeWaiting = key;
                     
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -739,7 +741,8 @@ final class ObjectLock {
                     detectDeadlock( key, 10 );
                     
                     // Must wait for lock and then attempt to reacquire
-                    _writeWaiting = new LinkedTx( key, _writeWaiting );
+                    key.setNext( _writeWaiting );
+                    _writeWaiting = key;
                     
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -877,12 +880,12 @@ final class ObjectLock {
      * Key must have already holding a read lock, 
      * and the current thread must already synchronized with "this"
      */
-    private void upgradeLockInternal( Key key )
+    private void upgradeLockInternal( Key key, int timeout )
             throws LockUpgradeFailedException {
 
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
-            if ( _writeLock == null && _readLock == key && _readLock.next == null ) {
+            if ( _writeLock == null && _readLock.key == key && _readLock.next == null ) {
                 _readLock = null;
                 _writeLock = key;
                 return;
@@ -903,7 +906,8 @@ final class ObjectLock {
                     detectDeadlock( key, 10 );
 
                     // Must wait for lock and then attempt to upgrade
-                    _writeWaiting = new LinkedTx( key, _writeWaiting );
+                    key.setNext( _writeWaiting );
+                    _writeWaiting = key;
 
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -937,13 +941,13 @@ final class ObjectLock {
      * Key must hold neither read nor write lock before calling this method,
      * and the current thread must synchronized with "this"
      */
-    private void acquireReadLockInternal( Key key )
+    private void acquireReadLockInternal( Key key, int timeout )
             throws LockNotGrantedException, ObjectDeletedWaitingForLockException {
 
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
         while ( true ) {
             if ( _writeLock == null ) {
-                _readLock = new LinkTx( key, _readLock );
+                _readLock = new LinkedTx( key, _readLock );
                 return;
             } else {
                 // other transaction holding writeLock, waits for write
@@ -964,7 +968,8 @@ final class ObjectLock {
                     detectDeadlock( key, 10 );
 
                     // Must wait for lock and then attempt to upgrade
-                    _readWaiting = new LinkedTx( key, _readWaiting );
+                    key.setNext( _readWaiting );
+                    _readWaiting = key;
 
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -1005,7 +1010,7 @@ final class ObjectLock {
      * Key must hold neither read nor write lock before calling this method,
      * and the current thread must synchronized with "this"
      */
-    private void acquireWriteLockInternal( Key key )
+    private void acquireWriteLockInternal( Key key, int timeout )
             throws LockNotGrantedException, ObjectDeletedWaitingForLockException {
 
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
@@ -1032,7 +1037,8 @@ final class ObjectLock {
                     detectDeadlock( key, 10 );
 
                     // Must wait for lock and then attempt to upgrade
-                    _writeWaiting = new LinkedTx( key, _writeWaiting );
+                    key.setNext( _writeWaiting );
+                    _writeWaiting = key;
 
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -1155,34 +1161,34 @@ final class ObjectLock {
 
         try {
             if ( _writeWaiting != null ) {
-                if ( _writeWaiting.key == key ) {
-                    _writeWaiting = _writeWaiting.next;
+                if ( _writeWaiting == key ) {
+                    _writeWaiting = _writeWaiting.getNext();
                 } else {
-                    LinkedTx wait;
+                    Key wait;
                     
                     wait = _writeWaiting;
-                    while ( wait.next != null ) {
-                        if ( wait.next.key == key ) {
-                            wait.next = wait.next.next;
+                    while ( wait.getNext() != null ) {
+                        if ( wait.getNext() == key ) {
+                            wait.setNext( wait.getNext().getNext() );
                             break;
                         }
-                        wait = wait.next;
+                        wait.setNext( wait.getNext() );
                     }
                 }
             }
             if ( _readWaiting != null ) {
-                if ( _readWaiting.key == key ) {
-                    _readWaiting = _readWaiting.next;
+                if ( _readWaiting == key ) {
+                    _readWaiting = _readWaiting.getNext();
                 } else {
-                    LinkedTx wait;
+                    Key wait;
                     
                     wait = _readWaiting;
-                    while ( wait.next != null ) {
-                        if ( wait.next.key == key ) {
-                            wait.next = wait.next.next;
+                    while ( wait.getNext() != null ) {
+                        if ( wait.getNext() == key ) {
+                            wait.setNext( wait.getNext().getNext() );
                             break;
                         }
-                        wait = wait.next;
+                        wait.setNext( wait.getNext() );
                     }
                 }
             }
