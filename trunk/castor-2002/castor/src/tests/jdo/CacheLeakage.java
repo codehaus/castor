@@ -105,7 +105,7 @@ public class CacheLeakage extends CWTestCase {
     public CacheLeakage( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC08", "Cache leakage" );
+        super( "TC17", "Cache leakage" );
         _category = (JDOCategory) category;
         _errLeak = false;
         _errCount = false;
