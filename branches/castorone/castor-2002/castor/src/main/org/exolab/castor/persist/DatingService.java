@@ -194,6 +194,7 @@ class DatingService {
             needDependsClassMolder = new Hashtable();
 
         needDependsClassMolder.put( depName, me );
+        System.out.println("++++++++++++needDepends added "+depName+" me: "+me.getJavaClass().getName());
         return false;
     }
     Class resolve( String className ) throws ClassNotFoundException {
