@@ -870,7 +870,7 @@ public class Marshaller extends MarshalFramework {
             //-- remove capitalization
             name = _naming.toXMLName(name);
         }
-
+        
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         boolean saveType = false; /* flag for xsi:type */
@@ -904,61 +904,53 @@ public class Marshaller extends MarshalFramework {
                     String pkgName = className.substring(0,idx+1);
                     if (!_packages.contains(pkgName))
                         _packages.add(pkgName);
-            }
-
-            if (_marshalExtendedType) {
-				//  marshall as the actual value
-				classDesc = getClassDescriptor(_class);
-				
-				//-- check to see if we need to save the type
-				//-- information in the XML using xsi:type
-				//-- If we can resolve the class based on the
-				//-- XML name, we don't need to save the type.
-				if ((_class != descriptor.getFieldType()) && 
-				    (classDesc != null)) 
-				{
-				    String nsURI = classDesc.getNameSpaceURI();
-				    String tmpName = name;
-				    if (autoNameByClass) {
-				        if (classDesc.getXMLName() != null) 
-				            tmpName = classDesc.getXMLName();
-				    }
-				    
-				    ClassDescriptor tmpCDesc = 
-				        _cdResolver.resolveByXMLName(tmpName, nsURI, null);
-				    if (tmpCDesc != null) {
-				        saveType = (tmpCDesc.getClass() != classDesc.getClass());
-				    }
-				    else {
-				        saveType = true;
-				    }
-				}
-			} 
-			else {
-			    // marshall as the base field type
-				_class = descriptor.getFieldType();
-				classDesc = getClassDescriptor(_class);
-            }
-
-            //-- If we are marshalling an array as the top
-            //-- level object, or if we run into a multi
-            //-- dimensional array, use the special 
-            //-- ArrayDescriptor
-            if ((classDesc == null) && _class.isArray()) {
-                classDesc = new RootArrayDescriptor(_class);
-                if (atRoot) {
-                    containerField = (!_asDocument);
                 }
-            }
 
-			if (atRoot && _rootElement!=null)
-				name = _rootElement;
-			else if (descriptor.getXMLName()==null)
-			      if (classDesc != null) {
-                    name = classDesc.getXMLName();
-                  }
-            }
+                if (_marshalExtendedType) {
+				    //  marshall as the actual value
+				    classDesc = getClassDescriptor(_class);
+    				
+				    //-- check to see if we need to save the type
+				    //-- information in the XML using xsi:type
+				    //-- If we can resolve the class based on the
+				    //-- XML name, we don't need to save the type.
+				    if ((_class != descriptor.getFieldType()) && 
+				        (classDesc != null)) 
+				    {
+				        String nsURI = classDesc.getNameSpaceURI();
+				        String tmpName = name;
+				        if (autoNameByClass) {
+				            if (classDesc.getXMLName() != null) 
+				                tmpName = classDesc.getXMLName();
+				        }
+    				    
+				        ClassDescriptor tmpCDesc = 
+				            _cdResolver.resolveByXMLName(tmpName, nsURI, null);
+				        if (tmpCDesc != null) {
+				            saveType = (tmpCDesc.getClass() != classDesc.getClass());
+				        }
+				        else {
+				            saveType = true;
+				        }
+				    }
+			    } //-- end if (marshalExtendedType)
+			    else {
+			        // marshall as the base field type
+				    _class = descriptor.getFieldType();
+				    classDesc = getClassDescriptor(_class);
+                } 
 
+                //-- If we are marshalling an array as the top
+                //-- level object, or if we run into a multi
+                //-- dimensional array, use the special 
+                //-- ArrayDescriptor
+                if ((classDesc == null) && _class.isArray()) {
+                    classDesc = new RootArrayDescriptor(_class);
+                    if (atRoot) {
+                        containerField = (!_asDocument);
+                    }
+                }
+            } //-- end else not primitive
 
             if (classDesc == null) {
                 //-- make sure we are allowed to marshal Object
@@ -979,7 +971,8 @@ public class Marshaller extends MarshalFramework {
             if (classDesc.getXMLName() != null)
                 name = classDesc.getXMLName();
         }
-
+        
+        
         //------------------------------------------------/
         //- Next few sections of code deal with xsi:type -/
         //- prevention, if necessary                     -/
@@ -1257,8 +1250,18 @@ public class Marshaller extends MarshalFramework {
         else qName = name;
 
         try {
-            if (!containerField)
+            if (!containerField) {
+                //-- Make sure qName is not null
+                if (qName == null) {
+                    //-- hopefully this never happens, but if it does, it means
+                    //-- we have a bug in our naming logic
+                    String err = "Error in deriving name for type: " + 
+                        _class.getName() + ", please report bug to: " +
+                        "http://castor.exolab.org.";
+                    throw new IllegalStateException(err);
+                }
                 handler.startElement(qName, atts);
+            }
         }
         catch (org.xml.sax.SAXException sx) {
             throw new MarshalException(sx);
