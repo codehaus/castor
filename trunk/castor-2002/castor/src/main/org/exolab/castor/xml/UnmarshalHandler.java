@@ -69,6 +69,7 @@ import java.util.Hashtable;
 import java.util.Stack;
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.StringTokenizer;
 
 
 /**
@@ -1284,18 +1285,18 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- resolve waiting references
             resolveReferences(attValue, parent);
         }
+        //-- if this is an IDREF(S) then resolve reference(s)
         else if (descriptor.isReference()) {
-            value = _idResolver.resolve(attValue);
-            if (value == null) {
-                //-- save state to resolve later
-                ReferenceInfo refInfo
-                    = new ReferenceInfo(attValue, parent, descriptor);
-                refInfo.next
-                    = (ReferenceInfo)_resolveTable.remove(attValue);
-                _resolveTable.put(attValue, refInfo);
-
-                return;
+            if (descriptor.isMultivalued()) {
+                StringTokenizer st = new StringTokenizer(attValue);
+                while (st.hasMoreTokens()) {
+                    processIDREF(st.nextToken(), descriptor, parent);
+                }
             }
+            else processIDREF(attValue, descriptor, parent);
+            //-- object values have been set by processIDREF
+            //-- simply return
+            return;
         }
         else {
             //-- check for proper type and do type
@@ -1309,6 +1310,32 @@ public final class UnmarshalHandler extends MarshalFramework
         if (handler != null)
             handler.setValue(parent, value);
     } //-- processAttribute
+    
+    /**
+     * Processes the given IDREF
+     *
+     * @param idRef the ID of the object in which to reference
+     * @param descriptor the current FieldDescriptor
+     * @param parent the current parent object
+    **/
+    private void processIDREF
+        (String idRef, XMLFieldDescriptor descriptor, Object parent) 
+    {
+        Object value = _idResolver.resolve(idRef);
+        if (value == null) {
+            //-- save state to resolve later
+            ReferenceInfo refInfo
+                = new ReferenceInfo(idRef, parent, descriptor);
+            refInfo.next
+                = (ReferenceInfo)_resolveTable.remove(idRef);
+            _resolveTable.put(idRef, refInfo);
+        }
+        else {
+            FieldHandler handler = descriptor.getHandler();
+            if (handler != null)
+                handler.setValue(parent, value);
+        }
+    } //-- processIDREF
 
     /**
      * Processes the namespace declarations found in the given attribute list
