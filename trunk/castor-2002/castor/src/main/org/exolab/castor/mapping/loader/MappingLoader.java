@@ -448,6 +448,7 @@ public abstract class MappingLoader
         Method            getMethod = null;
         Method            setMethod = null;
         Method[]          getSequence = null;
+        Method[]          setSequence = null;
         
 
         // If the field type is supplied, grab it and use it to locate the
@@ -467,7 +468,7 @@ public abstract class MappingLoader
             getSetCollection = CollectionHandlers.isGetSetCollection( colType );
             if ( colType == Object[].class ) {
                 try {
-                    colType = resolveType( "[L" + fieldType.getName().replace( '.', '/' ) + ";" );
+                    colType = resolveType( "[L" + fieldType.getName() + ";" );
                 } catch ( ClassNotFoundException except ) {
                     throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
                 }
@@ -492,8 +493,8 @@ public abstract class MappingLoader
 
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                 int    point;
-                String seqName;
-                Vector seq = new Vector();
+                Vector getSeq = new Vector();
+                Vector setSeq = new Vector();
                 String methodName;
                 Method method;
                 
@@ -502,22 +503,40 @@ public abstract class MappingLoader
 
                 try {
                     while ( true ) {
+                        Class last;
+
                         point = fieldName.indexOf( '.' );
                         if ( point < 0 ) 
                             break;
+                        last = javaClass;
+                        // getter
                         methodName = "get" + capitalize( fieldName.substring( 0, point ) );
                         method = javaClass.getMethod( methodName, null );
                         fieldName = fieldName.substring( point + 1 );
-                        // Make sure method is public and not abstract/static.
-                        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                            ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                        // Make sure method is not abstract/static
+                        // (note: Class.getMethod() returns only public methods).
+                        if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                             ( method.getModifiers() & Modifier.STATIC ) != 0 )
                             throw new MappingException( "mapping.accessorNotAccessible",
                                                         methodName, javaClass.getName() );
+                        getSeq.addElement( method );
                         javaClass = method.getReturnType();
-                        seq.addElement( method );
+                        // setter;   Note: javaClass already changed, use "last"
+                        methodName = "set" + methodName.substring(3);
+                        try {
+                            method = last.getMethod( methodName, new Class[] { javaClass } );
+                            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                                method = null;
+                        } catch ( Exception except ) {
+                            method = null;
+                        }
+                        setSeq.addElement( method );
                     }
-                    if ( seq.size() > 0 ) 
-                        getSequence = (Method[]) seq.toArray(new Method[0]);
+                    if ( getSeq.size() > 0 ) {
+                        getSequence = (Method[]) getSeq.toArray(new Method[0]);
+                        setSequence = (Method[]) setSeq.toArray(new Method[0]);
+                    }
                     getMethod = findAccessor( javaClass, "get" + capitalize( fieldName ),
                                             ( colType == null ? fieldType : colType ), true );
                 } catch ( MappingException except ) {
@@ -570,7 +589,7 @@ public abstract class MappingLoader
             
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
-            handler = new FieldHandlerImpl( fieldName, getSequence, getMethod, setMethod, typeInfo );
+            handler = new FieldHandlerImpl( fieldName, getSequence, setSequence, getMethod, setMethod, typeInfo );
         }
 
         // If there is a create method, add it to the field handler
@@ -601,11 +620,11 @@ public abstract class MappingLoader
 
             try {
                 hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), null );
-                if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) == 0 ||
                      ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                     hasMethod = null;
                 try {
-                    if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                    if ( ( hasMethod.getModifiers() & Modifier.ABSTRACT ) == 0 ||
                          ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                         deleteMethod = null;
                     deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), null );
@@ -717,8 +736,9 @@ public abstract class MappingLoader
                         return null;
                 }
             }
-            // Make sure method is public and not abstract/static.
-            if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+            // Make sure method is not abstract/static.
+            // (note: Class.getMethod() returns only public methods).
+            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
                  ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );
