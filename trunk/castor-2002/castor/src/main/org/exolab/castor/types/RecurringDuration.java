@@ -432,7 +432,7 @@ public class RecurringDuration extends RecurringDurationBase{
     }//toString
 
     public static Object parse(String str) throws ParseException {
-        return parseRecurring(str);
+        return parseRecurringDuration(str);
     }
 
     /**
@@ -443,7 +443,7 @@ public class RecurringDuration extends RecurringDurationBase{
      *                        does not follow the rigth format (see the description
      *                        of this class)
      */
-    public static RecurringDuration parseRecurring(String str) throws ParseException {
+    public static RecurringDuration parseRecurringDuration(String str) throws ParseException {
 
         RecurringDuration result = new RecurringDuration();
 

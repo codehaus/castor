@@ -96,8 +96,8 @@ public class XSRecurringDuration extends XSType {
     {
         super(type);
         try {
-            _duration = (TimeDuration.parse(duration));
-            _period = (TimeDuration.parse(period));
+            _duration = (TimeDuration.parseTimeDuration(duration));
+            _period = (TimeDuration.parseTimeDuration(period));
         } catch (java.text.ParseException e) {
             System.out.println("Error in constructor of RecurringDuration: "+e);
             throw new IllegalArgumentException();
@@ -289,10 +289,10 @@ public class XSRecurringDuration extends XSType {
         try {
             Facet dur = simpleType.getFacet("duration");
             if (dur != null)
-                setDuration(TimeDuration.parse(dur.getValue()));
+                setDuration(TimeDuration.parseTimeDuration(dur.getValue()));
             Facet per = simpleType.getFacet("period");
             if (per != null)
-               setPeriod(TimeDuration.parse(per.getValue()));
+               setPeriod(TimeDuration.parseTimeDuration(per.getValue()));
          } catch(ParseException e) {
                 System.out.println("Error in setting the period and duration facets of recurringDuration");
                 e.printStackTrace();
@@ -307,16 +307,16 @@ public class XSRecurringDuration extends XSType {
             try {
                 //-- maxExclusive
                 if (Facet.MAX_EXCLUSIVE.equals(name))
-                    this.setMaxExclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                    this.setMaxExclusive(RecurringDuration.parseRecurringDuration(facet.getValue()));
                 //-- maxInclusive
                 else if (Facet.MAX_INCLUSIVE.equals(name))
-                    this.setMaxInclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                    this.setMaxInclusive(RecurringDuration.parseRecurringDuration(facet.getValue()));
                 //-- minExclusive
                 else if (Facet.MIN_EXCLUSIVE.equals(name))
-                    this.setMinExclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                    this.setMinExclusive(RecurringDuration.parseRecurringDuration(facet.getValue()));
                 //-- minInclusive
                 else if (Facet.MIN_INCLUSIVE.equals(name))
-                    this.setMinInclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                    this.setMinInclusive(RecurringDuration.parseRecurringDuration(facet.getValue()));
             } catch(ParseException e) {
                 System.out.println("Error in setting the facets of recurringDuration");
                 e.printStackTrace();

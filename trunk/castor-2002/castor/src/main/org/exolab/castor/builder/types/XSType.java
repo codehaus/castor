@@ -382,6 +382,27 @@ public abstract class XSType {
     }
 
     /**
+     * Returns true if the XSType represents an
+     * XML Schema date/time type
+     * @return true if the XSType represents an
+     * XML Schema date/time type
+     */
+    public boolean isDateTime() {
+        switch (type) {
+            case CENTURY:
+            case DATE:
+            case MONTH:
+            case RECURRING_DURATION:
+            case TIME:
+            case TIME_DURATION:
+            case TIME_PERIOD:
+            case YEAR:
+                return true;
+            default:
+                return false;
+        }
+    }
+    /**
      * Returns the name of this XSType
      * @return the name of this XSType
     **/
