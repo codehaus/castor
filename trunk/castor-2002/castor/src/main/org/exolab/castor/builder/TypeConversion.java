@@ -134,7 +134,6 @@ public class TypeConversion {
      * @return the XSType which represets the given Simpletype
     **/
     public static XSType convertType(SimpleType simpleType) {
-
         if (simpleType == null) return null;
 
         XSType xsType = null;
@@ -188,6 +187,9 @@ public class TypeConversion {
                 //-- boolean
                 case SimpleTypesFactory.BOOLEAN_TYPE:
                     return new XSBoolean();
+                //-- century
+                case SimpleTypesFactory.CENTURY_TYPE:
+                    return new XSCentury();
                 //-- date
                 case SimpleTypesFactory.DATE_TYPE:
                     return new XSDate();
@@ -218,6 +220,9 @@ public class TypeConversion {
                         xsLong.setFacets(simpleType);
                     return xsLong;
                 }
+                //-- month
+                case SimpleTypesFactory.MONTH_TYPE:
+                    return new XSMonth();
                 //-- negative-integer
                 case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
                 {
@@ -231,6 +236,23 @@ public class TypeConversion {
                     XSInteger xsInteger = new XSPositiveInteger();
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
+                }
+                //recurringDuration
+                case SimpleTypesFactory.RECURRING_DURATION_TYPE:
+                {
+                    XSRecurringDuration xsrecduration = new XSRecurringDuration();
+                    xsrecduration.setFacets(simpleType);
+                     if ((xsrecduration.getDuration()==null) ||
+                        (xsrecduration.getPeriod()==null)) {
+                            String err = "It is an error for recurringDuration to be";
+                            err += " used directly in a Schema \n";
+                            err += "you must set the duration facet AND the period one";
+                            System.out.println(err);
+                            return null;
+                            // later don't forget to
+                            //throw new ValidationException(err);
+                     }
+                    return xsrecduration;
                 }
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
@@ -250,6 +272,17 @@ public class TypeConversion {
                     return xsTimeD;
                 }
                     //return new XSLong();
+                //-- timePeriod
+                case SimpleTypesFactory.TIME_PERIOD_TYPE:
+                {
+                    XSTimePeriod xsTimeP = new XSTimePeriod();
+                    if (!simpleType.isBuiltInType())
+                        xsTimeP.setFacets(simpleType);
+                    return xsTimeP;
+                }
+                //-- year
+                case SimpleTypesFactory.YEAR_TYPE:
+                    return new XSYear();
                 //-- decimal
                 case SimpleTypesFactory.DECIMAL_TYPE:
                 {
@@ -324,7 +357,7 @@ public class TypeConversion {
     **/
     private static OrderedMap iCreateNameMap() {
 
-        OrderedMap nameMap = new OrderedMap(20);
+        OrderedMap nameMap = new OrderedMap(24);
 
         //-- #IDREF...temporary this will be changed, once
         //-- I add in the Resolver code
@@ -340,18 +373,22 @@ public class TypeConversion {
         nameMap.put("uriReference",         "java.lang.String");
         nameMap.put("binary",              "byte[]");
         nameMap.put("boolean",             "boolean");
+        nameMap.put("century",                "org.exolab.castor.types.Century");
         //nameMap.put("date",                "java.util.date");
         nameMap.put("date",                "org.exolab.castor.types.Date");
         nameMap.put("integer",             "int");
+        nameMap.put("month",                "org.exolab.castor.types.Month");
         nameMap.put("negativeInteger",     "int");
         nameMap.put("positiveInteger",     "int");
         nameMap.put("real",                "double");
+        nameMap.put("recuuringDuration",    "org.exolab.castor.types.RecurringDuration");
         nameMap.put("string",              "java.lang.String");
         //nameMap.put("time",                "java.sql.Time");
         nameMap.put("time",                "org.exolab.castor.types.Time");
         nameMap.put("timeDuration",        "org.exolab.castor.types.TimeDuration");
        // nameMap.put("timeDuration",        "long");
         nameMap.put("timeInstant",         "java.util.Date");
+        nameMap.put("year",                "org.exolab.castor.types.Year");
         nameMap.put("decimal",             "java.math.BigDecimal");
         nameMap.put("short",               "short");
         nameMap.put("int",		           "int");
