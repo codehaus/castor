@@ -165,12 +165,23 @@ public class JModifiers {
         this.visibility = vPackage;
     } //-- makePackage
     
+	/**
+	 * Returns true if the final qualifier is present.
+	 * <BR> This is only applicable to methods and classes.
+	 * @return true if the final qualifier is present
+	 **/
+	public boolean isFinal() 
+	{
+		return isFinal;
+	} //-- isAbstract
+    
     /**
      * Returns true if the abstract qualifier is present.
      * <BR> This is only applicable to methods and classes.
      * @return true if the abstract qualifier is present
     **/
-    public boolean isAbstract() {
+    public boolean isAbstract() 
+	{
         return isAbstract;
     } //-- isAbstract
     
