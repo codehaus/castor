@@ -493,12 +493,12 @@
     <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>
   </contributor>
 
+  <!-- Last names begin with Q-S -->
+
   <contributor type="Contributor">
     <name surname="Rader" given="Todd" />
     <description>A patch for RelationCollection to fix incorrect iteration deleted items are present.</description>
   </contributor>
-
-  <!-- Last names begin with Q-S -->
 
   <contributor type="Contributor">
     <name surname="Rehor" given="Petr" />
@@ -513,6 +513,12 @@
       PreparedStatement not closed in SQLEngine.delete,
       Exception during db.rollback() when db.update() fails,
       Time limited cache is expiring too fast</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Revie" given="Jon" />
+    <email>revie@rhinointernet.com</email>
+    <description>Bug fixes for logging statements.</description>
   </contributor>
 
   <contributor type="Contributor">
