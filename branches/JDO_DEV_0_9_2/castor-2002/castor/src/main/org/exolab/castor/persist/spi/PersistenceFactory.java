@@ -100,7 +100,7 @@ public interface PersistenceFactory
         throws MappingException;
 
 
-    public Connector getConnector( Database conf )
+    public Connector getConnector( LockEngine lockEngine, Database conf )
         throws MappingException, PersistenceException;
 
     /**

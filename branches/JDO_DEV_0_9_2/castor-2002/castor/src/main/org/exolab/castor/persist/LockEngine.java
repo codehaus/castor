@@ -188,7 +188,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
 
         _factory = factory;
 
-        _connector = factory.getConnector( conf );
+        _connector = factory.getConnector( this, conf );
 
         /*
         try {
@@ -310,15 +310,36 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         return null;
     }*/
 
-    public void commitConnection( TransactionContext tx ) 
-            throws PersistenceException {
+    public Connector getConnector() {
+        return _connector;
     }
 
-    public void rollbackConnection( TransactionContext tx ) {
+    public void startConnection( Key key ) 
+            throws PersistenceException {
+        if ( _conns.containsKey( key ) )
+            return;
+
+        _connector.start( key );
     }
 
-    public void closeConnection( TransactionContext tx ) 
+    public void commitConnection( Key key ) 
             throws PersistenceException {
+        _connector.commit( key );
+    }
+
+    public void rollbackConnection( Key key ) 
+            throws PersistenceException {
+        _connector.rollback( key );
+    }
+
+    public void closeConnection( Key key ) 
+            throws PersistenceException {
+        _connector.close( key );
+    }
+
+    public void prepareConnection( Key key ) 
+            throws PersistenceException {
+        _connector.prepare( key );
     }
 
     /**

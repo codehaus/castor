@@ -154,7 +154,7 @@ public final class SQLEngine implements Persistence {
     private QueryExpression     _sqlFinder;
 
 
-    private PersistenceFactory  _factory;
+    private BaseFactory  _factory;
 
 
     private String              _stampField;
@@ -184,18 +184,20 @@ public final class SQLEngine implements Persistence {
     private LockEngine           _lockEngine;
 
 
+    private SQLConnector         _connector;
 
 
-    SQLEngine( /*JDOClassDescriptor clsDesc*/ EntityInfo entityInfo, LockEngine lockEngine,
-               LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
-        throws MappingException {
+    SQLEngine( EntityInfo entityInfo, LockEngine lockEngine, LogInterceptor log, 
+            BaseFactory factory, SQLConnector connector, String stampField )
+            throws MappingException {
 
         _clsDesc = null; //clsDesc;
         _entityInfo = entityInfo;
         _lockEngine = lockEngine;
+        _connector = connector;
         _stampField = stampField;
         _factory = factory;
-        _logInterceptor = logInterceptor;
+        _logInterceptor = log;
         _keyGen = null;
         _type = _clsDesc.getJavaClass().getName();
         _mapTo = _clsDesc.getTableName();
