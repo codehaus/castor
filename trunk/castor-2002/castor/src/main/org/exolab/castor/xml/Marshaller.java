@@ -936,7 +936,8 @@ public class Marshaller {
     {
         if  (_validate) {
             //-- we must have a valid element before marshalling
-            Validator.validate(object, _cdResolver);
+            Validator validator = new Validator();
+            validator.validate(object, _cdResolver);
         }
     }
 

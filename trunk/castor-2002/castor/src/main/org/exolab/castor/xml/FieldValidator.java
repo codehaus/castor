@@ -58,7 +58,7 @@ import org.exolab.castor.mapping.ValidityException;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class FieldValidator {
+public class FieldValidator extends Validator {
     
     
     private int minOccurs =  0;  //-- default minimum occurance
@@ -133,11 +133,11 @@ public class FieldValidator {
     /**
      * Validates the given Object
      * @param object the Object that contains the field to validate
-     * @param validator the TypeValidator to use to perform
+     * @param validator the Validator to use to perform
      * validation of individual objects. This validator
      * is not guaranteed to be called.
     **/
-    public void validate(Object object, TypeValidator validator)
+    public void validate(Object object, ClassDescriptorResolver resolver)
         throws ValidationException
     {
         if (_descriptor == null) return;
@@ -164,9 +164,6 @@ public class FieldValidator {
         //-- check number of occurances occurance
         if (value != null) {
 
-            TypeValidator tval = hasTypeValidator() ? _validator : validator;
-            boolean doValidation = (tval != null);
-
             Class type = value.getClass();
             
             int size = 1;
@@ -175,9 +172,13 @@ public class FieldValidator {
                 byteArray = (type.getComponentType() == Byte.TYPE);
                 if (!byteArray) {
                     size = Array.getLength(value);
-                    if (doValidation) {
+                    if (_validator != null) {
                         for (int i = 0; i < size; i++)
-                            tval.validate(Array.get(value, i));
+                            _validator.validate(Array.get(value, i));
+                    }
+                    else {
+                        for (int i = 0; i < size; i++)
+                            super.validate(Array.get(value, i), resolver);
                     }
                 }
             }
@@ -191,19 +192,27 @@ public class FieldValidator {
                 while (enum.hasMoreElements()) {
                     ++size;
                     Object obj = enum.nextElement();
-                    if (doValidation) tval.validate(obj);
+                    if (_validator != null) 
+                        _validator.validate(obj);
+                    else
+                        super.validate(obj, resolver);
                 }
             }
             else if (value instanceof Vector) {
                 Vector vector = (Vector)value;
                 size = vector.size();
-                if (doValidation) {
-                    for (int i = 0; i < vector.size(); i++)
-                        tval.validate(vector.elementAt(i));
+                for (int i = 0; i < vector.size(); i++) {
+                    if (_validator != null)
+                        _validator.validate(vector.elementAt(i));
+                    else
+                        super.validate(vector.elementAt(i), resolver);
                 }
             }
             else {
-                if (doValidation) tval.validate(value);
+                if (_validator != null)
+                    _validator.validate(value);
+                else
+                    super.validate(value, resolver);
             }
             
             //-- Check size of collection

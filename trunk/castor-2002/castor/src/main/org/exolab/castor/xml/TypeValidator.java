@@ -61,4 +61,5 @@ public interface TypeValidator {
     public void validate(Object object)
         throws ValidationException;
     
+    
 } //-- TypeValidator

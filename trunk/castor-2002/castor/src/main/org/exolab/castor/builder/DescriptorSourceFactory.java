@@ -141,6 +141,19 @@ public class DescriptorSourceFactory {
         jsc.add("XMLFieldHandler         handler        = null;");
         jsc.add("FieldValidator          fieldValidator = null;");
 
+
+        //-- set grouping compositor
+        if (classInfo.isChoice()) {
+            jsc.add("");
+            jsc.add("//-- set grouping compositor");
+            jsc.add("setCompositorAsChoice();");
+        }
+        else if (classInfo.isSequence()) {
+            jsc.add("");
+            jsc.add("//-- set grouping compositor");
+            jsc.add("setCompositorAsSequence();");
+        }
+
         //jsc.add("Class[] emptyClassArgs = new Class[0];");
         //jsc.add("Class[] classArgs = new Class[1];");
 

@@ -330,7 +330,7 @@ public class SourceFactory  {
 
         return jClass;
 
-    } //-- ClassInfo
+    } //-- createSourceCode(ComplexType)
 
     /**
      * Creates the Java source code to support the given Simpletype
@@ -417,11 +417,86 @@ public class SourceFactory  {
 
         return jClass;
 
-    } //-- createClassSource
-
+    } //-- createSourceCode(SimpleType);
 
     /**
-     *
+     * Creates a new ClassInfo for the given XML Schema type declaration.
+     * The type declaration must be a top-level declaration.
+     * @param type the XML Schema type declaration to create the
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param packageName the package to which generated classes should belong
+	 * @param createMarshall whether or not to create marshalling framework methods
+    **/
+    public JClass createSourceCode
+        (Group group, SGStateInfo sgInfo, String packageName)
+    {
+        
+        String groupName = group.getName();
+        if (groupName == null) {
+            groupName = "Group" + sgInfo.getNextGroupNumber();
+        }
+
+        String className = JavaNaming.toJavaClassName(groupName);
+        className = resolveClassName(className, packageName);
+
+        FactoryState state
+            = new FactoryState(className, sgInfo, packageName);
+		ClassInfo classInfo = state.classInfo;
+        JClass    jClass    = state.jClass;
+
+		state.markAsProcessed(group);
+
+		initialize(jClass);
+        //-- set super class if necessary
+        String base = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
+        if (base != null)
+            jClass.setSuperClass(base);
+
+        //-- namespace information
+        //Schema  schema = group.getSchema();
+        //classInfo.setNamespaceURI(schema.getTargetNamespace());
+
+        //-- process annotation
+        String comment  = processAnnotations(group);
+        if (comment != null)
+            jClass.getJDocComment().setComment(comment);
+
+
+        processContentModel(group, state);
+
+
+		if (_createMarshall) {
+            //-- add imports required by the marshal methods
+            jClass.addImport("java.io.Writer");
+            jClass.addImport("java.io.Reader");
+           //-- #validate()
+           createValidateMethods(jClass);
+		   //-- Output Marshalling methods for non abstract classes
+		   if (jClass.getModifiers().isAbstract()==false)
+		   {
+			  //-- #marshal()
+			  createMarshalMethods(jClass);
+			  //-- #unmarshal()
+			  createUnmarshalMethods(jClass);
+		    }
+		}
+
+		//-- create Bound Properties code
+		if (state.hasBoundProperties())
+		    createPropertyChangeMethods(jClass);
+
+        sgInfo.bindReference(jClass, classInfo);
+        sgInfo.bindReference(group, classInfo);
+
+        return jClass;
+
+    } //-- createSourceCode(Group)
+    
+    
+    /**
+     * Creates Source Code from the given ClassDescriptor
+     * NOT YET IMPLEMENTED
     **
     public JClass createSourceCode(ClassDescriptor descriptor)
     {
@@ -669,7 +744,9 @@ public class SourceFactory  {
 
         jClass.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
-        jsc.add("org.exolab.castor.xml.Validator.validate(this, null);");
+        jsc.add("org.exolab.castor.xml.Validator validator = new ");
+        jsc.append("org.exolab.castor.xml.Validator();");
+        jsc.add("validator.validate(this);");
 
         //-- #isValid
         jMethod  = new JMethod(JType.Boolean, "isValid");
@@ -900,7 +977,19 @@ public class SourceFactory  {
                 }
                 //-- handle groups
                 case Structure.GROUP:
-                    processContentModel((Group)struct, state);
+                
+                    Group group = (Group) struct;
+                    //-- if not nested, set compositor
+                    if (contentModel instanceof ComplexType) {
+                        Order order = group.getOrder();
+                        if (order == Order.choice)
+                            state.classInfo.setAsChoice();
+                        else if (order == Order.seq)
+                            state.classInfo.setAsSequence();
+                        else
+                            state.classInfo.setAsAll();
+                    }
+                    processContentModel(group, state);
                     break;
                 default:
                     break;
@@ -1396,6 +1485,23 @@ class FactoryState implements ClassInfoResolver {
     **/
     boolean processed(ComplexType complex) {
        return _processed.contains(complex);
+    } //-- processed
+
+    /**
+     * Marks the given Group as having been processed.
+     * @param group the Group to mark as having
+     * been processed.
+    **/
+    void markAsProcessed(Group group) {
+        _processed.addElement(group);
+    } //-- markAsProcessed
+
+    /**
+     * Returns true if the given Group has been marked as processed
+     * @param group the Group to check for being marked as processed
+    **/
+    boolean processed(Group group) {
+       return _processed.contains(group);
     } //-- processed
 
 	/**
