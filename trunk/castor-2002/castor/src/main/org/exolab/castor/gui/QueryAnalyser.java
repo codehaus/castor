@@ -169,7 +169,7 @@ public class QueryAnalyser {
         
         /**Component initialization*/
         private void jbInit() throws Exception    {
-
+            ClassLoader cl = ClassLoader.getSystemClassLoader();
             //setIconImage(Toolkit.getDefaultToolkit().createImage(testframe.class.getResource("[Your Icon]")));
             contentPane = (JPanel) this.getContentPane();
             contentPane.setLayout(borderLayout1);
@@ -187,7 +187,7 @@ public class QueryAnalyser {
             btnExit.setMaximumSize(new Dimension(50, 39));
             btnExit.setMinimumSize(new Dimension(50, 39));
             btnExit.setActionCommand("");
-            btnExit.setIcon(new ImageIcon("images/exit.gif"));
+            btnExit.setIcon(new ImageIcon(cl.getResource("org/exolab/castor/gui/images/exit.gif")));
             btnExit.setMnemonic('0');
 
             btnExit.addActionListener(new java.awt.event.ActionListener() {
@@ -199,7 +199,7 @@ public class QueryAnalyser {
             execute.setMaximumSize(new Dimension(50, 39));
             execute.setMinimumSize(new Dimension(50, 39));
             execute.setActionCommand("");
-            execute.setIcon(new ImageIcon("images/fire.gif"));
+            execute.setIcon(new ImageIcon(cl.getResource("org/exolab/castor/gui/images/fire.gif")));
             execute.setMnemonic('0');
             execute.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -215,7 +215,7 @@ public class QueryAnalyser {
             btnNext.setMaximumSize(new Dimension(50, 39));
             btnNext.setMinimumSize(new Dimension(50, 39));
             btnNext.setActionCommand("");
-            btnNext.setIcon(new ImageIcon("images/arrw04e.gif"));
+            btnNext.setIcon(new ImageIcon(cl.getResource("org/exolab/castor/gui/images/arrw04e.gif")));
             btnNext.setMnemonic('0');
             btnNext.addActionListener(new java.awt.event.ActionListener() {
                 public void actionPerformed(ActionEvent e) {
@@ -225,7 +225,7 @@ public class QueryAnalyser {
             btnPrevious.setMaximumSize(new Dimension(50, 39));
             btnPrevious.setMinimumSize(new Dimension(50, 39));
             btnPrevious.setToolTipText("Goto previous Query");
-            btnPrevious.setIcon(new ImageIcon("images/arrw04d.gif"));
+            btnPrevious.setIcon(new ImageIcon(cl.getResource("org/exolab/castor/gui/images/arrw04d.gif")));
             btnPrevious.setMnemonic('0');
             contentPane.add(TabbedPane, BorderLayout.CENTER);
             contentPane.add(toolbar, BorderLayout.NORTH);
@@ -434,7 +434,8 @@ public class QueryAnalyser {
         private void loadHistory() {
             try{
                 Unmarshaller unmarshaller = new Unmarshaller(Class.forName("org.exolab.castor.gui.QueryHistory"));
-                mapping.loadMapping("Queryanlyser.xml");
+                ClassLoader cl = ClassLoader.getSystemClassLoader();
+                mapping.loadMapping(cl.getResource("org/exolab/castor/gui/Queryanlyser.xml"));
                 unmarshaller.setMapping(mapping);
 
                 FileReader reader = new FileReader("queryhistory.xml");
