@@ -107,6 +107,8 @@ public class SourceGenerator {
     
     private boolean warnOnOverwrite = true;
 
+    private String  destDir;
+
     /** 
      * The field info factory.
      */
@@ -331,6 +333,10 @@ public class SourceGenerator {
         }
         
     } //-- main
+
+    public void setDestDir(String destDir) {
+        this.destDir = destDir;
+    }
     
     /**
      * Sets the line separator to use when printing the source code
@@ -515,7 +521,7 @@ public class SourceGenerator {
         
         //-- print class
         jClass.setHeader(header);
-        jClass.print(lineSeparator);
+        jClass.print(destDir,lineSeparator);
         
         //-- create MarshalInfo and print
         
@@ -524,7 +530,7 @@ public class SourceGenerator {
             JClass desc 
                 = DescriptorSourceFactory.createSource(classInfo);
             desc.setHeader(header);
-            desc.print(lineSeparator);
+            desc.print(destDir,lineSeparator);
         }
         
         state.markAsProcessed(jClass);
