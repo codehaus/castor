@@ -49,14 +49,10 @@ package org.exolab.castor.persist;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.Externalizable;
 import java.io.IOException;
 import java.io.NotSerializableException;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
 import java.io.OptionalDataException;
 import java.io.Serializable;
 import java.lang.reflect.Method;
@@ -3210,6 +3206,7 @@ class SingleProxy
 	TransactionContext _tx;
 	LockEngine _engine;
 	ClassMolder _classMolder;
+	Class _clazz;
 	Object _identity;
 	Object _object;
 	AccessMode _accessMode;
@@ -3219,6 +3216,7 @@ class SingleProxy
 	private SingleProxy(TransactionContext tx,
 			LockEngine engine,
 			ClassMolder classMolder,
+			Class clazz,
 			Object identity,
 			Object object,
 			AccessMode accessMode) {
@@ -3228,6 +3226,7 @@ class SingleProxy
 		_tx = tx;
 		_engine = engine;
 		_classMolder = classMolder;
+		_clazz = clazz;
 		_identity = identity;
 		_object = object;
 		_accessMode = accessMode;
@@ -3236,10 +3235,9 @@ class SingleProxy
 	public static synchronized Object getProxy(TransactionContext tx, LockEngine engine, ClassMolder classMolder, Object identity, Object object, AccessMode accessMode) 
 		throws ObjectNotFoundException 
 	{
-		
-		SingleProxy sp = new SingleProxy(tx, engine, classMolder, identity, object, accessMode);
 		try {
 			Class clazz = Class.forName(classMolder.getName());
+			SingleProxy sp = new SingleProxy(tx, engine, classMolder, clazz, identity, object, accessMode);
 			return Enhancer.create(clazz, new Class[]{LazyCGLIB.class}, sp);
 		} catch (Throwable ex) {
 			if ( _log.isErrorEnabled()) {
@@ -3280,13 +3278,16 @@ class SingleProxy
 			_log.debug ("Serializing instance of " + _object.getClass().getName());
 			_log.debug ("_object = " + _object);
 			return _object;
+		} else if ( "interceptedClass".equals(methodName) ) {
+			return _clazz;
+		} else if ( "interceptedIdentity".equals(methodName) ) {
+			return _identity;
 		} else if ( "getClass".equals(methodName) ) {
 			return method.invoke(obj, args);
 		} else if ( "finalize".equals(methodName) ) {
 			return method.invoke(obj, args);
 		} else if ("getId".equals(methodName)) {
 			if (!hasMaterialized) {
-				_log.debug ("Returning old identity: " + _identity + ", as object has NOT materialized.");
 				return _identity;
 			}
 		}
