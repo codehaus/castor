@@ -93,7 +93,7 @@
 <!ATTLIST map-to
     table      NMTOKEN  #IMPLIED
     xml        NMTOKEN  #IMPLIED
-    ns-uri     NMTOKEN  #IMPLIED
+    ns-uri     CDATA    #IMPLIED
     ns-prefix  NMTOKEN  #IMPLIED
     ldap-dn    NMTOKEN  #IMPLIED
     ldap-oc    NMTOKEN  #IMPLIED>
