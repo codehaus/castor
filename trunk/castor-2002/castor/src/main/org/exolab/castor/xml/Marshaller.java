@@ -201,7 +201,7 @@ public class Marshaller {
         throws java.io.IOException, org.xml.sax.SAXException
     {
         Marshaller marshaller = new Marshaller();
-        marshaller.validate(object);
+        //marshaller.validate(object);
         marshaller.setLogWriter(logger);
         marshaller.setDebug(debug);
         marshaller.marshal(object, null, handler);
