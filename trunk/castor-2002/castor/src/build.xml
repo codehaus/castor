@@ -64,6 +64,7 @@
         <echo message="  examples Builds the example packages (including debugging info)"/>
         <echo message="  tests    Builds the test packages (including debugging info)"/>
         <echo message="  jar      Builds the binary JAR in the dist directory"/>
+        <echo message="  CTFjar   Builds the JAR of the Castor Testing Framework in the dist directory"/>
         <echo message="  doc      Builds the documentation"/>
         <echo message="  api      Builds the API JavaDocs"/>
         <echo message="  javadoc  Builds the full JavaDocs"/>
@@ -318,6 +319,18 @@
               manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
 -->
     </target>
+    
+    <target name="CTFjar" depends="tests">
+        <delete file="${dist}/CTF-${version}.jar"/>
+        <copy todir="${classes}">
+        	<fileset dir="${source}/etc" includes="MANIFEST.MF" />
+       	</copy>
+        <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <copy todir="${classes}">
+            <fileset dir="${source}/etc" includes="LICENSE,README" />
+        </copy>
+        <jar jarfile="${dist}/CTF-${version}.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" includes="LICENCE,README,org/**"/>
+     </target>
     <!-- Build the documentation -->
     <target name="doc" depends="prepare,clean">
         <mkdir dir="${build}/doc"/>
