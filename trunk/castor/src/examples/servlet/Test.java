@@ -54,7 +54,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.JDO2;
+import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.xml.Marshaller;
 
 
@@ -74,7 +74,7 @@ public class Test
         throws ServletException
     {
         try {
-            JDO2           jdo;
+            JDOManager           jdo;
             Database      db;
             OQLQuery      oql;
             Object        result;
@@ -91,8 +91,8 @@ public class Test
 
             // Load the mapping from the specified filed, and Open up the
             // database for read/write access
-            JDO2.loadConfiguration(getClass().getResource( DatabaseFile ).toString());
-            jdo = JDO2.createInstance ("test");
+            JDOManager.loadConfiguration(getClass().getResource( DatabaseFile ).toString());
+            jdo = JDOManager.createInstance ("test");
             db = jdo.getDatabase();
 
             // All ODMG database access requires a transaction
