@@ -433,7 +433,13 @@ public class SourceGenerator {
 		   sourceFactory.setMarshallCreation(createMarshall);
     } //-- setDescriptorCreation
 
-  	/**
+  	public void setDefaultProperties(Properties properties) {
+           //don't need to throw a IllegalArgumentException
+           if (properties == null)
+              return;
+           _default = properties;
+    }
+    /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
     **/
