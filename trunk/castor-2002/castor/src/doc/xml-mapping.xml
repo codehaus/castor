@@ -162,7 +162,7 @@
         &lt;?xml version="1.0"?>
 
         &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
-                                    "http://Castor.exolab.org/mapping.dtd">
+                                 "http://Castor.exolab.org/mapping.dtd">
 
         &lt;mapping>
                 &lt;description>Description of the mapping&lt;/description>
@@ -285,16 +285,16 @@ public class myclass {
 
                         &lt;field name="foo"
                                direct="true"
-                               ....
+                                ....
                                >
-                               &lt;xml name="foo-like" node="attribute"/>
+                                &lt;xml name="foo-like" node="attribute"/>
                         &lt;/field>
 
 
                         &lt;/field name="bar"
                                 ....
-                                >
-                             &lt;xml name="something" node="element"/>
+                               >
+                                &lt;xml name="something" node="element"/>
                         &lt;/field>
 
                &lt;/class>
@@ -312,12 +312,12 @@ public class myclass {
         <code>
         &lt;!ELEMENT map-to EMPTY>
         &lt;!ATTLIST map-to
-                     table      NMTOKEN  #IMPLIED
-                     xml        NMTOKEN  #IMPLIED
-                     ns-uri     NMTOKEN  #IMPLIED
-                     ns-prefix  NMTOKEN  #IMPLIED
-                     ldap-dn    NMTOKEN  #IMPLIED
-                     ldap-oc    NMTOKEN  #IMPLIED>
+                  table      NMTOKEN  #IMPLIED
+                  xml        NMTOKEN  #IMPLIED
+                  ns-uri     NMTOKEN  #IMPLIED
+                  ns-prefix  NMTOKEN  #IMPLIED
+                  ldap-dn    NMTOKEN  #IMPLIED
+                  ldap-oc    NMTOKEN  #IMPLIED>
         </code>
 
         <p>&lt;map-to> is used to specify the name of the element that should be associated
@@ -355,15 +355,15 @@ public class myclass {
         <code>
         &lt;!ELEMENT field ( description?, sql?, xml?, ldap? )>
         &lt;!ATTLIST field
-                     name           NMTOKEN  #REQUIRED
-                     type           NMTOKEN  #IMPLIED
-                     required       ( true | false )  "false"
-                     direct         ( true | false )  "false"
-                     lazy           ( true | false )  "false"
-                     get-method     NMTOKEN  #IMPLIED
-                     set-method     NMTOKEN  #IMPLIED
-                     create-method  NMTOKEN  #IMPLIED
-                     collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
+                  name           NMTOKEN  #REQUIRED
+                  type           NMTOKEN  #IMPLIED
+                  required       ( true | false )  "false"
+                  direct         ( true | false )  "false"
+                  lazy           ( true | false )  "false"
+                  get-method     NMTOKEN  #IMPLIED
+                  set-method     NMTOKEN  #IMPLIED
+                  create-method  NMTOKEN  #IMPLIED
+                  collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
         </code> 
 
         <p>&lt;field> is used to describe a property of a Java object we want to
@@ -529,10 +529,10 @@ public class myclass {
         <code>
         &lt;!ELEMENT bind-xml EMPTY>
         &lt;!ATTLIST bind-xml
-                     name     NMTOKEN  #IMPLIED
-                     type     NMTOKEN  #IMPLIED
-                     matches  NMTOKEN  #IMPLIED
-                     node     ( attribute | element | text )  #IMPLIED>
+                  name     NMTOKEN  #IMPLIED
+                  type     NMTOKEN  #IMPLIED
+                  matches  NMTOKEN  #IMPLIED
+                  node     ( attribute | element | text )  #IMPLIED>
         </code> 
 
         <p>&lt;xml> is used to describe how a given Java field should appear in an XML
@@ -562,30 +562,30 @@ public class myclass {
       <table border="1" cellpadding="4">
         <tr><td BGCOLOR="#CCCCCC">
             <code>
-        &lt;Order reference="12343-AHSHE-314159">
-                &lt;Client>
-                        &lt;Name>Paul Dupond&lt;/Name>
-                        &lt;Address>2000, Alameda de las Pulgas, San Mateo, CA 94403&lt;/Address>
-                &lt;/Client>
+&lt;Order reference="12343-AHSHE-314159">
+        &lt;Client>
+                &lt;Name>Paul Dupond&lt;/Name>
+                &lt;Address>2000, Alameda de las Pulgas, San Mateo, CA 94403&lt;/Address>
+        &lt;/Client>
 
-                &lt;Item reference="RF-0001">
-                        &lt;Description>Stuffed Penguin&lt;/Description>
-                        &lt;Quantity>10&lt;/Quantity>
-                        &lt;UnitPrice>8.95&lt;/UnitPrice>
-                &lt;/Item>
+        &lt;Item reference="RF-0001">
+                &lt;Description>Stuffed Penguin&lt;/Description>
+                &lt;Quantity>10&lt;/Quantity>
+                &lt;UnitPrice>8.95&lt;/UnitPrice>
+        &lt;/Item>
 
-                &lt;Item reference="RF-0034">
-                        &lt;Description>Chocolate&lt;/Description>
-                        &lt;Quantity>5&lt;/Quantity>
-                        &lt;UnitPrice>28.50&lt;/UnitPrice>
-                &lt;/Item>
+        &lt;Item reference="RF-0034">
+                &lt;Description>Chocolate&lt;/Description>
+                &lt;Quantity>5&lt;/Quantity>
+                &lt;UnitPrice>28.50&lt;/UnitPrice>
+        &lt;/Item>
 
-                &lt;Item reference="RF-3341">
-                        &lt;Description>Cookie&lt;/Description>
-                        &lt;Quantity>30&lt;/Quantity>
-                        &lt;UnitPrice>0.85&lt;/UnitPrice>
-                &lt;/Item>      
-        &lt;/Order>
+        &lt;Item reference="RF-3341">
+                &lt;Description>Cookie&lt;/Description>
+                &lt;Quantity>30&lt;/Quantity>
+                &lt;UnitPrice>0.85&lt;/UnitPrice>
+        &lt;/Item>      
+&lt;/Order>
             </code>
           </td></tr>
       </table>
@@ -678,27 +678,28 @@ public class MyOrder {
         <tr>
           <td BGCOLOR="#CCCCCC">
             <code>
-          public class ClientData {
 
-              private String _name;
-              private String _address;
+public class ClientData {
 
-              public void setName(String name) {
-                  _name = name;
-              }
+    private String _name;
+    private String _address;
 
-              public String getName() {
-                  return _name;
-              }
+    public void setName(String name) {
+        _name = name;
+    }
 
-              public void setAddress(String address) {
-                  _address = address;
-              }
+    public String getName() {
+        return _name;
+    }
 
-              public String getAddress() {
-                  return _address;
-              }
-          }
+    public void setAddress(String address) {
+        _address = address;
+    }
+
+    public String getAddress() {
+        return _address;
+    }
+}
             </code>
           </td>
         </tr>
@@ -713,11 +714,11 @@ public class MyOrder {
         <tr>
           <td BGCOLOR="#CCCCCC">
             <code>
-          public class Item {
-              public String _reference;
-              public int    _quantity;
-              public float  _unitPrice;
-          }
+public class Item {
+    public String _reference;
+    public int    _quantity;
+    public float  _unitPrice;
+}
             </code>
           </td>
         </tr>
@@ -735,70 +736,69 @@ public class MyOrder {
         <tr>
           <td BGCOLOR="#CCCCCC">
             <code>
-        &lt;?xml version="1.0"?>
-        &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
-                                    "http://Castor.exolab.org/mapping.dtd">
+&lt;?xml version="1.0"?>
+&lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                         "http://Castor.exolab.org/mapping.dtd">
 
-        &lt;mapping>
-                &lt;class name="MyOrder">
-                        &lt;map-to xml="Order"/>
+&lt;mapping>
+        &lt;class name="MyOrder">
+                &lt;map-to xml="Order"/>
         
-                        &lt;field name="Reference"
-                                  type="java.lang.String">
-                                &lt;bind-xml name="reference" node="attribute"/>
-                        &lt;/field>
+                &lt;field name="Reference"
+                       type="java.lang.String">
+                        &lt;bind-xml name="reference" node="attribute"/>
+                &lt;/field>
 
-                        &lt;field name="Total"
-                                  type="float">
-                                &lt;bind-xml name="total-price" node="attribute"/>
-                        &lt;/field>
+                &lt;field name="Total"
+                       type="float">
+                        &lt;bind-xml name="total-price" node="attribute"/>
+                &lt;/field>
 
-                        &lt;field name="ClientData"
-                                  type="ClientData">
-                                &lt;bind-xml name="Client"/>
-                        &lt;/field>
+                &lt;field name="ClientData"
+                       type="ClientData">
+                        &lt;bind-xml name="Client"/>
+                &lt;/field>
 
+                &lt;field name="ItemsList"
+                       type="Item"
+                          collection="vector">
+                        &lt;bind-xml name="Item"/>
+                &lt;/field>
+        &lt;/class>
 
-                        &lt;field name="ItemsList"
-                                  type="Item"
-                                  collection="vector">
-                                &lt;bind-xml name="Item"/>
-                        &lt;/field>
-                &lt;/class>
+        &lt;class name="ClientData">
+                &lt;field name="Name"
+                       type="java.lang.String">
+                        &lt;bind-xml name="Name" node="element"/>
+                &lt;/field>
 
-                &lt;class name="ClientData">
-                        &lt;field name="Name"
-                                  type="java.lang.String">
-                                &lt;bind-xml name="Name" node="element"/>
-                        &lt;/field>
+                &lt;field name="Address"
+                       type="java.lang.String">
+                        &lt;bind-xml name="Address" node="element"/>
+                &lt;/field>
+        &lt;/class>
 
-                        &lt;field name="Address"
-                                  type="java.lang.String">
-                                &lt;bind-xml name="Address" node="element"/>
-                        &lt;/field>
-                &lt;/class>
+        &lt;class name="Item">
+                &lt;field name="_reference"
+                       type="java.lang.String"
+                       direct="true">
+                        &lt;bind-xml name="reference" node="attribute"/>
+                &lt;/field>
 
-                &lt;class name="Item">
-                        &lt;field name="_reference"
-                                  type="java.lang.String"
-                                  direct="true">
-                                &lt;bind-xml name="reference" node="attribute"/>
-                        &lt;/field>
+                &lt;field name="_quantity"
+                       type="integer"
+                       direct="true">
+                        &lt;bind-xml name="Quantity" node="element"/>
+                &lt;/field>
 
-                        &lt;field name="_quantity"
-                                  type="integer"
-                                  direct="true">
-                                &lt;bind-xml name="Quantity" node="element"/>
-                        &lt;/field>
+                &lt;field name="_unitPrice"
+                       type="float"
+                       direct="true">
+                        &lt;bind-xml name="UnitPrice" node="element"/>
+                &lt;/field>
+        &lt;/class>
 
-                        &lt;field name="_unitPrice"
-                                  type="float"
-                                  direct="true">
-                                &lt;bind-xml name="UnitPrice" node="element"/>
-                        &lt;/field>
-                &lt;/class>
-
-        &lt;/mapping>
+&lt;/mapping>
             </code>
           </td>
         </tr>
