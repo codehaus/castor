@@ -179,7 +179,7 @@ public class JClass extends JStructure {
         JType type = jField.getType();
         while (type.isArray()) type = type.getComponentType();
         if ( !type.isPrimitive() )
-            addImport( ((JClass)type).getName());
+            addImport( type.getName());
 
     } //-- addField
 
@@ -721,13 +721,26 @@ public class JClass extends JStructure {
     public boolean removeConstructor(JConstructor constructor) {
         return _constructors.removeElement(constructor);
     } //-- removeConstructor
+
+
+	/**
+	 * Removes the given method from this JClass
+	 *
+	 * @param method the JMethod to remove
+	 * @return true if the method was removed, otherwise false.
+	 */
+	public boolean removeMethod(JMethod method) 
+	{
+		return _methods.removeElement(method);
+	} //-- removeMethod
     
     /**
      * Removes the field with the given name from this JClass
      *
      * @param name the name of the field to remove
     **/
-    public JField removeField(String name) {
+    public JField removeField(String name) 
+	{
         if (name == null) return null;
         
         JField field = (JField) _fields.remove(name);
