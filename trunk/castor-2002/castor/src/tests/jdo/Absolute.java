@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2002 (C) Intalio, Inc. All Rights Reserved.
  *
  */
 
@@ -76,8 +76,7 @@ import harness.CastorTestCase;
 
 
 /**
- * Test for many-to-many relationship. A many to many relationship
- * is stored in a relational database as a separated table.
+ * Test for OQLResults.absolute().
  */
 public class Absolute extends CastorTestCase {
 
@@ -90,61 +89,62 @@ public class Absolute extends CastorTestCase {
      *
      * @param category The test suite of these tests
      */
-    public Absolute( TestHarness category ) 
-    {
+    public Absolute( TestHarness category ) {
+
         super( category, "TC67", "Absolute" );
         _category = (JDOCategory) category;
     }
 
-   public void runTest() 
+    public void runTest()
             throws PersistenceException {
-            	removeRecords();
-            	createRecords();
-            	testAbsoluteA();
-            	testAbsoluteB();
-            	testAbsoluteC();
-	}
 
-    public void setUp() 
+        removeRecords();
+        createRecords();
+        testAbsoluteA();
+        testAbsoluteB();
+        testAbsoluteC();
+    }
+
+    public void setUp()
             throws PersistenceException {
+
         _db = _category.getDatabase( verbose );
     }
 
     public void removeRecords()
-            throws PersistenceException 
-    {
+            throws PersistenceException {
+
         _db.begin();
- 	QueryResults enum;
+        QueryResults enum;
          OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
-        while (enum.hasMore())
-        {
-		_db.remove(enum.next());
-	}
+        while (enum.hasMore()) {
+            _db.remove(enum.next());
+        }
         _db.commit();
-
     }
-    public void createRecords() 
-            throws PersistenceException 
-    {
-    	
+
+    public void createRecords()
+            throws PersistenceException {
+
         _db.begin();
             for ( int i=0; i<25; i++ ) {
                 TestRaceNone newTRN = new TestRaceNone();
                 newTRN.setId(i);
                 _db.create( newTRN );
-	}
-        _db.commit();    	
-	}
+            }
+        _db.commit();
+    }
+
     /**
     Very simple test to do a query and call .absolute(x)
     */
-    public void testAbsoluteA() 
-            throws PersistenceException 
-    {
+    public void testAbsoluteA()
+            throws PersistenceException {
+
         _db.begin();
- 	QueryResults enum;
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        QueryResults enum;
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
         assert("should have been able to move to 1", enum.absolute(1));
         assert("should have been able to move to 5",enum.absolute(5));
@@ -154,36 +154,36 @@ public class Absolute extends CastorTestCase {
         assert("should have been able to move to 25",enum.absolute(25));
         _db.commit();
     }
+
     /**
     test going through enumeration and calling absolute
     to simulate the .next(); call
     */
-    public void testAbsoluteB() 
-            throws PersistenceException 
-    {
+    public void testAbsoluteB()
+            throws PersistenceException {
+
         _db.begin();
- 	QueryResults enum;
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        QueryResults enum;
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
         int next = 1;
         boolean hasMore = true;
-        while (enum.hasMore() && hasMore ==true)
-        {
-        	System.out.println("at: " + next);
-        	hasMore = enum.absolute(next);
-        	next++;
-	}
+        while (enum.hasMore() && hasMore ==true) {
+            System.out.println("at: " + next);
+            hasMore = enum.absolute(next);
+            next++;
+        }
         _db.commit();
     }
-    
+
     /**
-    	both should fail as -50 is less than 0 and 99999 is greater than the 25 objects in the db
+        both should fail as -50 is less than 0 and 99999 is greater than the 25 objects in the db
     */
-    public void testAbsoluteC() 
-            throws PersistenceException 
-    {
+    public void testAbsoluteC()
+            throws PersistenceException {
+
         _db.begin();
-	 QueryResults enum;
+        QueryResults enum;
         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
         enum = oqlquery.execute(true);
         assert("shouldn't be able to move to -50", enum.absolute(-50) == false);
@@ -192,33 +192,30 @@ public class Absolute extends CastorTestCase {
     }
 
     /**
-    	Should fail with a non scrollable resultset.?
+        Should fail with a non scrollable resultset.?
     */
-    public void testAbsoluteD() 
-            throws PersistenceException 
-    {
-    	try
-    	{
-	        _db.begin();
-		 QueryResults enum;
-		  OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
-	        enum = oqlquery.execute(false);
-	        // following should fail.
-	        enum.absolute(5);
-	        _db.commit();
-		assert("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail",false);
-	}
-	catch (Exception e)
-	{
-		assert(true);
-	}
-    }    
-    
+    public void testAbsoluteD()
+            throws PersistenceException {
+
+        try {
+            _db.begin();
+            QueryResults enum;
+            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+            enum = oqlquery.execute(false);
+            // following should fail.
+            enum.absolute(5);
+            _db.commit();
+            assert("Shouldn't reach here, calling absolute on a non-scrollable resultset should fail",false);
+        } catch (Exception e) {
+            assert(true);
+        }
+    }
+
     public void tearDown()
             throws PersistenceException {
+
         if ( _db.isActive() ) _db.rollback();
         _db.close();
     }
 }
-
 
