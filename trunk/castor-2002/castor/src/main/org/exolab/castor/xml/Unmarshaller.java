@@ -92,7 +92,7 @@ public class Unmarshaller {
      * The flag indicating whether or not to validate during
      * unmarshalling
     **/
-    private boolean validate = true;
+    private boolean validate = false;
     
     //----------------/
     //- Constructors -/
@@ -105,7 +105,7 @@ public class Unmarshaller {
     public Unmarshaller(Class c) {
         super();
         this._class = c;
-	    this.debug = Configuration.debug();
+	this.debug = Configuration.debug();
     } //-- Unmarshaller(Class)
     
     
@@ -216,11 +216,20 @@ public class Unmarshaller {
                     marshalEx.setLocation(fileLocation);
                 }
             }
-            else message = sx.getMessage();
+	    else message = sx.getMessage();
+
+	    fileLocation = new FileLocation();
+	    fileLocation.setFilename(handler.getDocumentLocator().getSystemId());
+	    fileLocation.setLineNumber(handler.getDocumentLocator().getLineNumber());
+	    fileLocation.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+	    marshalEx.setLocation(fileLocation);
             
-            if (message == null) 
+            //if (message == null) 
                 message = sx.toString();
-            
+System.out.println( sx );
+System.out.println( sx.getException() );
+sx.getException().printStackTrace();
+
             marshalEx.setMessage(message);
             throw marshalEx;
         }
