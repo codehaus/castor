@@ -107,6 +107,19 @@ public final class Entity {
     public String[] entityClasses;
 
     /**
+     * Constructor
+     */ 
+    public Entity( EntityInfo info, Object identity ) {
+        super();
+        this.info = info;
+        this.identity = identity;
+    }
+
+    public Entity() {
+        super();
+    }
+
+    /**
      * Represent the actual values in the data store. The first dimension
      * of the array corresponds to entityClasses. The second dimension
      * corresponds to the field order in as declared in EntityInfo.fieldInfo
