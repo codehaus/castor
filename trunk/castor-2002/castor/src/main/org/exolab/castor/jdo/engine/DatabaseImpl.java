@@ -127,11 +127,7 @@ public final class DatabaseImpl
         // locking mode.
         DatabaseRegistry dbs;
         
-        try {
-            dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
-        } catch ( MappingException except ) {
-            throw new DatabaseNotFoundException( except.getMessage() );
-        }
+        dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );

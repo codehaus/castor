@@ -2,7 +2,7 @@
 <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                              "http://castor.exolab.org/mapping.dtd">
 -->
-<mapping-mapping>
+<mapping>
 
   <class-mapping class-name="org.exolab.castor.mapping.xml.Mapping">
     <xml-schema xml-name="mapping"/>
@@ -120,5 +120,5 @@
     </field-mapping>
   </class-mapping>
 
-</mapping-mapping>
+</mapping>
 

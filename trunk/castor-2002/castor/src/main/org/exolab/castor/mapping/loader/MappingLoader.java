@@ -271,11 +271,14 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
             try {
                 org.exolab.castor.xml.XMLMappingLoader xml;
                 
-                unm = new Unmarshaller( org.exolab.castor.mapping.xml.MappingMapping.class );
+                unm = new Unmarshaller( org.exolab.castor.mapping.xml.Mapping.class );
                 _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
                 xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
-                xml.loadMapping( (org.exolab.castor.mapping.xml.MappingMapping) unm.unmarshal( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) ) );
+                xml.loadMapping( (org.exolab.castor.mapping.xml.Mapping) unm.unmarshal( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) ) );
                 _cdr.setMappingLoader( xml );
+            } catch ( MappingException except ) {
+except.printStackTrace();
+                throw except;
             } catch ( Exception except ) {
                 throw new MappingException( except );
             }
