@@ -44,7 +44,6 @@ public class Xml implements java.io.Serializable {
 
     public Xml() {
         super();
-        System.out.println("created XML object");
     } //-- org.exolab.castor.mapping.xml.Xml()
 
 
