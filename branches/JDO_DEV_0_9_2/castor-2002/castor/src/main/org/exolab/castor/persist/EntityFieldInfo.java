@@ -57,13 +57,13 @@ import java.util.Arrays;
  */
 public final class EntityFieldInfo {
 
-    public final int CARDINALITY_UNDEFINED = 0;
+    public final static int CARDINALITY_UNDEFINED = 0;
 
-    public final int CARDINALITY_ONE_TO_ONE = 1;
+    public final static int CARDINALITY_ONE_TO_ONE = 1;
 
-    public final int CARDINALITY_ONE_TO_MANY = 2;
+    public final static int CARDINALITY_ONE_TO_MANY = 2;
 
-    public final int CARDINALITY_MANY_TO_ONE = 3;
+    public final static int CARDINALITY_MANY_TO_ONE = 3;
 
 
     /**
