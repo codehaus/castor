@@ -367,6 +367,16 @@
     <hr size="1" noshadow=""/><span class="bodyGrey"><xsl:apply-templates/><hr size="1" noshadow=""/></span>
   </xsl:template>
 
+  <xsl:template match="code-panel">
+    <table border="1" cellpadding="4">
+      <tr>
+        <td BGCOLOR="#CCCCCC">
+          <xsl:apply-templates/>
+        </td>
+      </tr>
+    </table>
+  </xsl:template>
+
   <xsl:template match="code">
     <span class="bodyBlack">
       <pre><xsl:apply-templates/></pre>
