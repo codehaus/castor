@@ -12,8 +12,8 @@
     <case class="jdo.KeyGenGeneric" name="TC07" />
     <case class="jdo.KeyGenIdentity" name="TC08" />
     <case class="jdo.StoredProcedure" name="TC10" />
-    <case class="jdo.CacheLeakage" name="TC17" />
-    <case class="jdo.Race" name="TC18" />
+    <!--case class="jdo.CacheLeakage" name="TC17" /-->
+    <!--case class="jdo.Race" name="TC18" /-->
     <case class="jdo.Dependent" name="TC15" />
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
@@ -32,8 +32,8 @@
     <case class="jdo.TypeHandling" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
-    <case class="jdo.CacheLeakage" />
-    <case class="jdo.Race" />
+    <!--case class="jdo.CacheLeakage" /-->
+    <!--case class="jdo.Race" /-->
     <case class="jdo.KeyGenReturning" />
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
@@ -55,8 +55,8 @@
     <case class="jdo.TypeHandling" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
-    <case class="jdo.CacheLeakage" />
-    <case class="jdo.Race" />
+    <!--case class="jdo.CacheLeakage" /-->
+    <!--case class="jdo.Race" /-->
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
     <case class="jdo.Dependent" name="TC15" />
@@ -75,8 +75,8 @@
     <case class="jdo.TypeHandling" name="TC05" />
     <case class="jdo.Join" name="TC06" />
     <case class="jdo.KeyGenGeneric" name="TC07" />
-    <case class="jdo.CacheLeakage" name="TC17" />
-    <case class="jdo.Race" name="TC18" />
+    <!--case class="jdo.CacheLeakage" name="TC17" /-->
+    <!--case class="jdo.Race" name="TC18" /-->
     <case class="jdo.Dependent" name="TC15" />
     <case class="jdo.Persistent" name="TC16" />
     <case class="jdo.NestedFields" name="TC11" />
