@@ -133,6 +133,10 @@ public class Schema extends Structure {
             addDatatype(new IntegerType(this));
             //-- long
             addDatatype(new LongType(this));
+            //-- negative-integer
+            addDatatype(new NegativeIntegerType(this));
+            //-- positive-integer
+            addDatatype(new PositiveIntegerType(this));
             //-- string
             addDatatype(new StringType(this));
             //-- timeInstant
