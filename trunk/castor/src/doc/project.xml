@@ -88,6 +88,10 @@
          <url>http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main</url>
          <display>CastorWiki</display>
       </navLink>
+      <navLink>
+        <url>rss/castor-announce.xml</url>
+        <display>RSS news feed</display>
+      </navLink>
     </section>
 
     <section name="XML">
