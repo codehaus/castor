@@ -213,7 +213,8 @@ public class MemberFactory {
             //-- XXX need to validate the value.
 
             //-- clean up value
-            if  (xsType.getType() == XSType.STRING)
+            //-- if the xsd field is mapped into a java.lang.String
+            if  (xsType.getJType().toString().equals("java.lang.String"))
             {
                 char ch = value.charAt(0);
                 switch (ch) {
