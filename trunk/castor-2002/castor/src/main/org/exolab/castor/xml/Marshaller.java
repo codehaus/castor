@@ -827,18 +827,10 @@ public class Marshaller {
     private boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
-
-        if ((type == Boolean.class)   ||
-            (type == Byte.class)      ||
-            (type == Character.class) ||
-            (type == Double.class)    ||
-            (type == Float.class)     ||
-            (type == Integer.class)   ||
-            (type == Long.class)      ||
-            (type == Short.class))
+        if ((type == Boolean.class) || (type == Character.class))
             return true;
-
-       return false;
+            
+        return (type.getSuperclass() == Number.class);
 
     } //-- isPrimitive
 
