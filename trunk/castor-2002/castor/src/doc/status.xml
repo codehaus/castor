@@ -84,8 +84,12 @@
 
     <section title="What's missing">
       <ul>
-        <li>Work is under way on a direct SQL->XML bridge which uses the same
-            mapping file but does not involve any Java objects in the process.</li>
+        <li>Work *was* under way on a direct SQL->XML bridge which uses the same
+            mapping file but does not involve any Java objects in the process.
+            The developer who was working on this feature left the company is
+            no longer has time to work on this. If any one is interested in working
+            on this feature...let us know!
+        </li>
 
         <li>The EJB CMP implementation is now developed in the scope of the
             OpenEJB project.</li>
@@ -96,6 +100,8 @@
         <li>More generic mapping API and mapping tools.</li>
 
         <li>Stored procedures, BLOBs, XML content.</li>
+
+        <li>Debugging tools.</li>
       </ul>
     </section>
 
@@ -118,7 +124,17 @@
        <section title="XML">
           <section title="Marshalling Framework">
             <ul>
-               <li>Integrate Castor's internal XML event API (kvisco)</li>
+               <li>Integrate Castor's internal XML event API. This also
+                   includes adding support for SAX-2.
+                   (kvisco)
+               </li>
+               <li>Use Mapping Framework's Collection Handlers to provide
+                   seamless support for JDK 1.2+ collections without
+                   breaking JDK 1.1 compatability.
+                   (kvisco)
+               </li>
+               <li>Improve error reporting. (all)</li>
+               <li>Improve documentation. (all)</li>
             </ul>
           </section>
           <section title="Source Code Generator">
@@ -127,8 +143,12 @@
                    an XML Schema for greater control over the generated source code.
                    (Arnaud)
                </li>
-               <li>Support Union type</li>
-               <li>Extensibility API</li>
+               <li>Fix naming collisions between generated classes for complexType
+                   and element when both have the same name.
+                   (Arnaud)
+               </li>
+               <li>Support Union type. </li>
+               <li>Extensibility API. </li>
             </ul>
          </section>
          <section title="Mapping">
@@ -140,6 +160,23 @@
             </ul>
          </section>
        </section>
+    </section>
+    <section title="When is the next release?">
+       <p>
+       Typically a release is done when all scheduled items for the release are finished
+       and tested. However, this can take a while to accomplish depending on the tasks,
+       therefore we may do "interim" releases that contain some of the features scheduled
+       for a particular release.  An interim release alls the community to take
+       advantage of the new features and bug fixes, without needing to wait until
+       all features of the release have been finished. An interim release can
+       be done at any time that the CVS is in a stable state and especially if
+       some important bug fixes are available.
+       </p>
+       <p>
+       The current tasks for the next release are being tracked in Bugzilla
+       (<a href="http://bugzilla.exolab.org">http://bugzilla.exolab.org</a>).
+       </p>
+
     </section>
   </body>
 </document>
