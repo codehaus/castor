@@ -74,6 +74,15 @@
     org.exolab.castor.jdo.drivers.HighLowKeyGeneratorFactory,\
     org.exolab.castor.jdo.drivers.IdentityKeyGeneratorFactory,\
     org.exolab.castor.jdo.drivers.SequenceKeyGeneratorFactory
+
+  # Collection handlers for the source code generator
+  #
+  org.exolab.castor.builder.type.j2=\
+    org.exolab.castor.builder.FieldInfoFactoryJ2
+  org.exolab.castor.builder.type.j1=\
+    org.exolab.castor.builder.FieldInfoFactory
+  org.exolab.castor.builder.type.odmg=\
+    org.exolab.castor.builder.FieldInfoFactoryODMG30
 </pre>
     </section>
 

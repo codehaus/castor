@@ -263,9 +263,9 @@ public class TypeHandling
             df = new SimpleDateFormat();
             df.applyPattern("yyyy/MM/dd");
             date = df.parse("2000/05/27");
-            df.applyPattern("hh:mm:ss.SSS");
+            df.applyPattern("HH:mm:ss.SSS");
             time = df.parse("02:16:01.234");
-            df.applyPattern("yyyy/MM/dd hh:mm:ss.SSS");
+            df.applyPattern("yyyy/MM/dd HH:mm:ss.SSS");
             timestamp = df.parse("2000/05/27 02:16:01.234");
             db.begin();
             oql.bind( TestTypes.DefaultId );
