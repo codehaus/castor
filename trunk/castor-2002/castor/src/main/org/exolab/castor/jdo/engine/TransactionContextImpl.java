@@ -54,8 +54,7 @@ import java.sql.SQLException;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
-import org.exolab.castor.persist.OID;
-import org.exolab.castor.persist.CacheEngine;
+import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.TransactionContext;
 
@@ -204,12 +203,12 @@ final class TransactionContextImpl
     }
 
 
-    public Object getConnection( CacheEngine cache )
+    public Object getConnection( PersistenceEngine engine )
 	throws PersistenceException
     {
 	Connection conn;
 
-	conn = (Connection) _conns.get( cache );
+	conn = (Connection) _conns.get( engine );
 	if ( conn == null ) {
 	    try {
 		// Get a new connection from the engine. Since the
@@ -217,10 +216,10 @@ final class TransactionContextImpl
 		// this sort of round trip. An attempt to have the
 		// transaction association in the engine inflates the
 		// code size in other places.
-		conn = ( (DatabaseEngine) cache ).createConnection();
+		conn = DatabaseSource.createConnection( engine );
 		if ( getXid() == null )
 		    conn.setAutoCommit( false );
-		_conns.put( cache, conn );
+		_conns.put( engine, conn );
 	    } catch ( SQLException except ) {
 		throw new PersistenceException( except );
 	    }
