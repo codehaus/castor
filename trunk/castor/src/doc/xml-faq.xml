@@ -53,13 +53,13 @@
                explicitly enabling namespace processing seems to fix the problem:
                <p/>
                <pre>
-                  in the castor.properties file change the following line:
+      in the castor.properties file change the following line:
 
-                  org.exolab.castor.parser.namespaces=false
+      org.exolab.castor.parser.namespaces=false
 
-                  to:
+      to:
 
-                  org.exolab.castor.parser.namespaces=true
+      org.exolab.castor.parser.namespaces=true
               </pre>
               Note: that work-around has only been tested with Xerces 2.5.
             </p>
@@ -70,6 +70,56 @@
                The get method will be called a second time during the
                validation process. To prevent this from happening
                simply disable validation on the Marshaller or Unmarshaller.
+            </p>
+            </section>
+
+            <section title="How can I speed up marshalling/unmarshalling performance?">
+            <p>
+
+               <ol>
+                  <li>Cache the descriptors!
+                   <p>
+                   <code>
+      import org.exolab.castor.xml.ClassDescriptorResolver;
+      import org.exolab.castor.xml.Unmarshaller;
+      import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
+
+      ...
+
+      ClassDescriptorResolver cdr = new ClassDescriptorResovlerImpl();
+
+      ...
+
+      Unmarshaller unm = new Unmarshaller(...);
+      unm.setResolver(cdr);
+                   </code>
+
+                   By reusing the same ClassDescriptorResolver any time you create an
+                   Unmarshaller instance, you will be reusing the existing class
+                   descriptors previously loaded.
+                   </p>
+                 </li>
+                 <li>Disable validation
+                     <p><code>unm.setValidation(false);</code></p>
+                 </li>
+                 <li>Reuse objects
+                     <p>
+                     To cut down on object creation, you can reuse an existing object
+                     model, but be careful this is an experimental feature.
+
+                     Create an Unmarshaller with your existing root object and set object
+                     reuse to true...
+
+                     <code>Unmarshaller unm = new Unmarshaller(myObjectRoot);</code>
+                     <code>unm.setReuseObjects(true);</code>
+                     </p>
+                  </li>
+                  <li>Try changing parsers to something other than Xerces.</li>
+                </ol>
+
+                There are probably other approaches you can use as well, but those seem
+                to be the most popular ones.  Let us know if you have a solution that you
+                think we should add here.
             </p>
             </section>
 
