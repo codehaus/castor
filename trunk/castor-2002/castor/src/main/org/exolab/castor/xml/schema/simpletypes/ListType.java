@@ -38,35 +38,148 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml.schema.simpletypes;
 
+import org.exolab.castor.xml.schema.Annotation;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Schema;
-
+import org.exolab.castor.xml.schema.SchemaException;
+import org.exolab.castor.xml.schema.Structure;
 
 /**
+ * Represents a SimpleType that is a "list" of a given
+ * SimpleType.
  *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
- * @version $Revision:
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @version $Revision$ $Id$
 **/
 public class ListType extends SimpleType
 {
+    
     /**
-     *  The type atomic type the list is based on.
+     * The local annotation for this ListType
     **/
-    private AtomicType _type= null;
+    private Annotation _annotation = null;
+    
+    /**
+     *  The SimpleType the list is based on.
+    **/
+    private SimpleType _itemType= null;
 
-    /** Sets the atomic type the list is based on. **/
-    public void setType(AtomicType type) { _type= type; }
 
-    /** Gets the type atomic type the list is based on. **/
-    public AtomicType getListElementsType() { return _type; }
+    private boolean _hasReference = false;
+    
+    /**
+     * Creates a new ListType.
+     *
+     * @param schema the Schema for this ListType (Cannot be null)
+    **/
+    public ListType(Schema schema) 
+        throws SchemaException
+    {
+        super();
+        
+        if (schema == null) {
+            String err = "The Schema argument to the constructor of ListType "+
+                "may not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        super.setSchema(schema);
+    } //-- ListType
 
-}
+
+    /** 
+     * Returns the simpleType for the items of this ListType.
+     *
+     * @return the simpleType for the items of this ListType.
+    **/
+    public SimpleType getItemType() { 
+        if (_hasReference) {
+            SimpleType simpleType = resolveReference(_itemType);
+            if (simpleType == null) {
+                String err = "Unable to resolve type: " + _itemType.getName();
+                throw new IllegalStateException(err);
+            }
+            _hasReference = false;
+            _itemType = simpleType;
+        }
+        return _itemType; 
+    } //-- getItemType
+
+    /**
+     * Returns the annotation which appears local to this Union, or
+     * null if no local annotation has been set.
+     *
+     * @return the annotation which is local to this Union. 
+    **/
+    public Annotation getLocalAnnotation() {
+        return _annotation;
+    } //-- getLocalAnnotation
+
+    /**
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
+    **/
+    public short getStructureType() {
+        return Structure.SIMPLE_TYPE; //-- should be changed to LIST
+    } //-- getStructureType
+    
+    /** 
+     * Sets the SimpleType for this ListType (the type of
+     * item that instances of this list holds).
+     *
+     * @param type the SimpleType for this ListType.
+    **/
+    public void setItemType(SimpleType type) { 
+        _itemType = type; 
+        _hasReference = false;
+    } //-- setItemType
+    
+    /** 
+     * Sets the SimpleType for this ListType (the type of
+     * item that instances of this list holds).
+     *
+     * @param typeName the name of the SimpleType for this ListType.
+    **/
+    public void setItemType(String typeName) { 
+        if (typeName == null) {
+            _itemType = null;
+            _hasReference = false;
+        }
+        else {
+            _itemType = createReference(typeName); 
+            _hasReference = true;
+        }
+    } //-- setItemType
+    /**
+     * Sets an annotation which is local to this Union.
+     *
+     * @param annotation the local annotation to set for this Union.
+    **/
+    public void setLocalAnnotation(Annotation annotation) {
+        _annotation = annotation;
+    } //-- setLocalAnnotation
+    
+    /**
+     * Sets the Schema for this Union. This method overloads the 
+     * SimpleType#setSchema method to prevent the Schema from being
+     * changed.
+     *
+     * @param the schema that this Union belongs to.
+    **/
+    public void setSchema(Schema schema) {
+        if (schema != getSchema()) {
+            String err = "The Schema of an Union cannot be changed.";
+            throw new IllegalStateException(err);
+        }
+    } //-- void setSchema
+
+} //-- ListType
 
 
