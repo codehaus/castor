@@ -244,7 +244,7 @@
     <name surname="Coleman" given="Alan"/>
     <email>alan@kenamea.com</email>
     <company id="kenamea"/>
-    <description>Contributions to Castor XML (patch for bug 1319)</description>
+    <description>Contributions to Castor XML (patch for bugs 1319, 1322)</description>
   </contributor>
 
   <contributor type="Contributor">
