@@ -6,6 +6,10 @@
     <section title="News">
   
        <ul>
+           <li><b>Release 0.9.6</b>: Changed section about the jdo-conf.dtd to bring it in-line with the
+               changed syntax requirements. Please note that the new root element is named 
+               'jdo-conf', a 'transaction-demarcation' element is required and that for parameter 
+               specification only 'param' elements are used.</li>
            <li>Added a new section about the use of 
                <a href="#JdoConfFactory">JdoConfFactory</a> to specify a database
                configuration without the need to write XML configuration files.</li>
@@ -221,20 +225,23 @@
     <p>For validation, the configuration file should include the following
        document type definition. For DTD validation use:
       <pre><![CDATA[
-  <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                             "http://castor.exolab.org/jdo-conf.dtd">
+  <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+                            "http://castor.exolab.org/jdo-conf.dtd">
       ]]></pre>
       For XML Schema validation use:
       <pre><![CDATA[
-  <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN"
+  <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN"
                              "http://castor.exolab.org/jdo-conf.xsd">
       ]]></pre>
       The Castor namespace URI is <tt>http://castor.exolab.org/</tt>.</p>
 
       <p>The Castor JDO database configuration DTD is:
          <pre><![CDATA[
+  <!ELEMENT jdo-conf ( database+, transaction-demarcation )>
+
   <!ELEMENT database ( ( driver | data-source | jndi )?,
                        mapping+ )>
+                       
   <!ATTLIST database
             name ID      #REQUIRED
             engine CDATA "generic">
@@ -248,19 +255,29 @@
             url        CDATA #REQUIRED
             class-name CDATA #IMPLIED>
 
-  <!ELEMENT param EMPTY>
-  <!ATTLIST param
-            name  CDATA #REQUIRED
-            value CDATA #REQUIRED>
-
-  <!ELEMENT data-source ( params )>
+  <!ELEMENT data-source ( param* )>
   <!ATTLIST data-source
             class-name CDATA #REQUIRED>
 
   <!ELEMENT jndi ANY>
   <!ATTLIST jndi
             name CDATA #REQUIRED>
+
+  <!ELEMENT transaction-demarcation ( transaction-manager? )>
+  <!ATTLIST transaction-demarcation
+            mode CDATA #REQUIRED>
+
+  <!ELEMENT transaction-manager ( param* )>
+  <!ATTLIST transaction-manager
+            name CDATA #REQUIRED>
+            
+  <!ELEMENT param EMPTY>
+  <!ATTLIST param
+            name  CDATA #REQUIRED
+            value CDATA #REQUIRED>
+
       ]]></pre></p>
+
 
     </section>
 
