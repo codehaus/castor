@@ -75,7 +75,12 @@ public final class MySQLQueryExpression
         sql = getStandardStatement( lock, false );
 
         if ( _limit != null )
-            sql.append( JDBCSyntax.Limit ).append( _limit );
+        {
+            sql.append(JDBCSyntax.Limit);
+            if (_offset != null)
+                sql.append(_offset).append(",");
+            sql.append(_limit);
+        }
 
         // Do not use FOR UPDATE to lock query.
         // return getStandardStatement( lock, false ).toString();
