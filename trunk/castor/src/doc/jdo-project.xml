@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.exolab.org/jdo-project.xml">
+  <properties>
+    <title>Castor JDO Project Plan</title>
+    <author email="ferret@frii.com">Bruce Snyder</author>
+    <abstract>
+    This document outlines all work that has been identified for Castor JDO. 
+    </abstract>
+    <status>Draft</status>
+  </properties>
+
+  <body>
+    <title>Castor JDO Refactoring Project Plan</title>
+
+    <section title="Introduction">
+
+      <p>
+      Below is a list of tasks that have been identified for refactoring
+      Castor JDO. This list is continually evolving and should be checked
+      often. There are no scheduled release dates for these items. This
+      is because Castor JDO is entirely a volunteer effort and team members
+      contribute in their spare time. Some of these tasks are in progress 
+      and some have not been started at all.
+      </p>
+
+      <p>
+      There is always plenty of work to be done. If you would like to 
+      participate, please let us know. If you see a task that you would like to
+      work on but has already been assigned to someone, that doesn't mean that
+      you can't help out or even take it over. Simply contact the JDO project 
+      leader (available <a href="http://www.castor.org/contributors.html">here</a>). 
+      </p>
+
+    </section>
+
+    <section title="Tasks">
+
+    <p>
+    <table border="1" cellspacing="0" cellpadding="2">
+    <tr bgcolor="#dddddd">
+        <th>Label</th>
+        <th>Description</th>
+        <th>Volunteer Name</th>
+        <th>Status</th>
+        <th>Date Started</th>
+        <th>Notes</th>
+    </tr>
+
+    <tr>
+        <td>Logging Refactoring</td>
+        <td>
+        <a href="http://jakarta.apache.org/commons/logging.html">
+        Jakarta Commons Logging</a> Switching the logging mechanism in Castor 
+        over to using the Commons Logging with Log4J as the default logger. 
+        Not only will this help to improve the logging quality, but it will
+        also allow users to choose their logging framework of choice. 
+        </td>
+        <td>Bruce Snyder</td>
+        <td>started</td>
+        <td>5 May 2003</td>
+        <td>Not sure if Jakarta Commons Logging should be used in Castor
+        because of the inability to configure some finer features in Log4J.
+        See <a
+        href="http://www.zdnet.com.au/builder/program/java/story/0,2000034779,20272367,00.htm">this
+        article</a> for some info. This article may be talking about
+        programmatic configuration of Log4J which I'm not really worried
+        about. All of the configuration in Castor will take place in a
+        properties or XML file. 
+        </td>
+    </tr>
+
+    <tr>
+        <td>CTF-JDO Improvements</td>
+        <td>
+        Writing test cases is a critical effort to the evolution of
+        Castor JDO. All bug fixes and new functionality must contain test 
+        cases unless the bug fix is trivial. All test cases are written
+        using the Castor Test Framework for JDO (CTF-JDO). Information 
+        on the CTF-JDO can be found <a href="test-framework.html">here</a>.
+        <br />
+        <br />
+        The verison of <a href="http://junit.org">JUnit</a> used by Castor is
+        quite outdated (version 3.5). This needs to be updated to the latest
+        version (as of this writing, version 3.8.1). There is a certain amount
+        of work involved with this in changing all assert() calls to the
+        newer, more specific assert calls (e.g. assertTrue(), assertEquals(),
+        assertNull(), assertNotNull(), etc.). Also look into the use of 
+        <a href="http://www.openfuture.de/Log4Unit/">Log4Unit</a> as opposed
+        to JUnit. Log4Unit is an extension to JUnit that provides a logging
+        component to JUnit to provide better logging for both failures and
+        successes. 
+        <br />
+        <br />
+        In addition to using JUnit, a database specific extension to JUnit
+        called <a href="http://dbunit.sf.net/">DbUnit</a> should be
+        considered. DbUnit helps to manage test data sets by
+        importing/exporting flat XML data sets to/from a database. 
+        </td>
+        <td>Bruce Snyder</td>
+        <td colspan="2">not started</td>
+        <td> </td>
+    </tr>
+
+    <tr>
+        <td>OQL Engine Refactoring</td>
+        <td>
+        The Castor OQL engine should be re-implemented using <a
+        href="http://antlr.org">ANTLR</a>. This will make maintenance and
+        adding features incredibly easier. 
+        </td>
+        <td>open</td>
+        <td colspan="2">not started</td>
+        <td> </td>
+    </tr>
+
+    <tr>
+        <td>ClassMolder Refactoring</td>
+        <td>
+        The ClassMolder should be broken up into several classes to make use 
+        of a dual strategy pattern.
+        </td>
+        <td>open</td>
+        <td colspan="2">not started</td>
+        <td> </td>
+    </tr>
+
+    <tr>
+        <td>J2EE Transaction Factory</td>
+        <td>In 2002 I started adding an API for a TransactionManagerFactory so
+        that Castor JDO can make use of a J2EE container's transaction
+        manager (e.g. JBoss, Weblogic, Websphere, etc.).</td>
+        <td>Werner Guttmann/Bruce Snyder</td>
+        <td>started</td>
+        <td>Apr 2003</td>
+        <td>Werner and I have been working together to get his implemenation
+        working. It's proceeding and I expect that it will be working by the
+        end of May 2003.</td>
+    </tr>
+
+    <tr>
+        <td></td>
+        <td></td>
+        <td>open</td>
+        <td>not started</td>
+        <td></td>
+        <td></td>
+    </tr>
+
+    <tr>
+        <td>Must fix bugs</td>
+        <td>
+        There are a few bugs that *must* be fixed, specifically 
+        <a href="http://bugzilla.exolab.org/show_bug.cgi?id=986">986</a>, 
+        <a href="http://bugzilla.exolab.org/show_bug.cgi?id=925">925</a>, 
+        <a href="http://bugzilla.exolab.org/show_bug.cgi?id=997">997</a>. 
+        These bugs have been around for quite a while and should have been 
+        fixed long ago. 
+        </td>
+        <td>open</td>
+        <td colspan="2">not started</td>
+        <td> </td>
+    </tr>
+
+    <tr>
+        <td>Javadocs improvement</td>
+        <td>
+        This task surrounds patches from the community, but oftentimes it 
+        also includes items written by committers. The task of patches from 
+        the community for docs is nearly caught up. But the effort to continually
+        improve the docs should be carried out by everyone.
+        </td>
+        <td>all team members</td>
+        <td colspan="2">ongoing effort</td>
+        <td> </td>
+    </tr>
+
+    </table>
+    </p>
+
+    </section>
+
+  </body>
+</document>
