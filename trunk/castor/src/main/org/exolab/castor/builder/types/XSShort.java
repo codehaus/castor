@@ -71,7 +71,7 @@ public final class XSShort extends XSPatternBase {
 	private boolean _asWrapper = false;
 
 	public XSShort() {
-		this(SourceGenerator.usePrimitiveWrapper());
+		this(false);
 	}
 
 	public XSShort(boolean asWrapper) {
@@ -264,7 +264,7 @@ public final class XSShort extends XSPatternBase {
 	 * to an Object
 	**/
 	public String createToJavaObjectCode(String variableName) {
-		if (SourceGenerator.usePrimitiveWrapper())
+		if (_asWrapper)
 			return super.createToJavaObjectCode(variableName);
 		else {
 			StringBuffer sb = new StringBuffer("new Short(");

@@ -76,7 +76,7 @@ public class XSInteger extends XSPatternBase {
     //private Integer value = null;
 
     public XSInteger() {
-        this(SourceGenerator.usePrimitiveWrapper());
+        this(false);
     }
     public XSInteger(boolean asWrapper) {
         super(XSType.INTEGER_TYPE);

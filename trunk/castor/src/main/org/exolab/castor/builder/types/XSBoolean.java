@@ -65,7 +65,7 @@ public final class XSBoolean extends XSType {
     private boolean _asWrapper = false;
 
     public XSBoolean() {
-        this(SourceGenerator.usePrimitiveWrapper());
+        this(false);
     }
 
     public XSBoolean(boolean asWrapper) {
@@ -95,7 +95,7 @@ public final class XSBoolean extends XSType {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        if (SourceGenerator.usePrimitiveWrapper())
+        if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
             StringBuffer sb = new StringBuffer("new Boolean(");

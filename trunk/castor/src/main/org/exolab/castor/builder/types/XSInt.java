@@ -75,7 +75,7 @@ public final class XSInt extends XSPatternBase {
 
     //private Integer value = null;
     public XSInt() {
-        this(SourceGenerator.usePrimitiveWrapper());
+        this(false);
     }
     public XSInt(boolean asWrapper) {
         super(XSType.INT_TYPE);
@@ -277,7 +277,7 @@ public final class XSInt extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-       if (SourceGenerator.usePrimitiveWrapper())
+       if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
             StringBuffer sb = new StringBuffer("new Integer(");

@@ -74,7 +74,7 @@ public final class XSDouble extends XSPatternBase {
 
 
     public XSDouble() {
-       this(SourceGenerator.usePrimitiveWrapper());
+       this(false);
     }
 
     public XSDouble(boolean asWrapper) {
@@ -262,7 +262,7 @@ public final class XSDouble extends XSPatternBase {
      * to an Object
     **/
     public String createToJavaObjectCode(String variableName) {
-        if (SourceGenerator.usePrimitiveWrapper())
+        if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
             StringBuffer sb = new StringBuffer("new Double(");

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -62,6 +62,11 @@ public final class XSNegativeInteger extends XSInteger {
 
     public XSNegativeInteger() {
         super();
+        super.setMaxInclusive(-1);
+    } //-- XSInteger
+
+    public XSNegativeInteger(boolean asWrapper) {
+        super(asWrapper);
         super.setMaxInclusive(-1);
     } //-- XSInteger
 

@@ -72,7 +72,7 @@ public final class XSLong extends XSPatternBase {
 	private boolean _asWrapper = false;
 
 	public XSLong() {
-		this(SourceGenerator.usePrimitiveWrapper());
+		this(false);
 	}
 
 	public XSLong(boolean asWrapper) {
@@ -267,7 +267,7 @@ public final class XSLong extends XSPatternBase {
 	 * to an Object
 	**/
 	public String createToJavaObjectCode(String variableName) {
-		if (SourceGenerator.usePrimitiveWrapper())
+		if (_asWrapper)
 			return super.createToJavaObjectCode(variableName);
 		else {
 			StringBuffer sb = new StringBuffer("new Long(");

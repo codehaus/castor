@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -59,5 +59,11 @@ public final class XSPositiveInteger extends XSInteger {
         super();
         setMinInclusive(new Integer(1));
     } //-- XSInteger
+    
+    public XSPositiveInteger(boolean asWrapper) {
+        super(asWrapper);
+        setMinInclusive(new Integer(1));
+    } //-- XSInteger
+    
 
 } //-- XSPositiveInteger
