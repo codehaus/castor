@@ -36,7 +36,7 @@ import org.exolab.adaptx.xpath.XPathException;
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class AndExpr extends XPathExpression {
+class AndExpr implements XPathExpression {
 
     
     private static String AND = " and ";

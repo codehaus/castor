@@ -26,6 +26,7 @@ import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.xpath.NumberResult;
+import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
 
 /**
  * Represents the XPath Number expression

@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,24 +29,26 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
- * A class that represents the XSL text() function call
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * A class that represents the XPath text() node test
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 class TextExpression
-    extends NodeExpression 
+    extends NodeExpressionImpl 
 {
     
 
     /**
-     * Creates a new TextFunctionCall
-    **/
+     * Creates a new TextExpression
+     */
     public TextExpression()
     {
-    } //-- TextFunctionCall
+        super();
+    } //-- TextExpression
     
 
     /**
@@ -56,7 +58,7 @@ class TextExpression
      * @return The XPathResult (not null).
      * @exception XPathException if an error occured while 
      * evaluating this expression.
-    **/
+     */
     public XPathResult evaluate( XPathContext context )
         throws XPathException
     {        
@@ -102,7 +104,7 @@ class TextExpression
      * @return true if the given node is matched by this MatchExpr
      * @exception XPathException when an error occurs during
      * evaluation
-    **/
+     */
     public boolean matches( XPathNode node, XPathContext context )
         throws XPathException
     {
@@ -110,4 +112,4 @@ class TextExpression
     } //-- matches
 
     
-} //-- TextFunctionCall
+} //-- TextExpression

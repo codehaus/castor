@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -16,6 +16,7 @@
  * lost profits even if the Copyright owner has been advised of the
  * possibility of their occurrence.
  *
+ * $Id$
  */
 
 
@@ -28,14 +29,16 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 
 /**
- * Represents an ParentExpr
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * Represents an Parent Expression: ".."
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
 **/
 class ParentExpr
-    extends NodeExpression
+    extends NodeExpressionImpl
 {
 
     

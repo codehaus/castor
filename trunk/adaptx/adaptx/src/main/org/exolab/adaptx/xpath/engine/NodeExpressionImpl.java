@@ -28,74 +28,42 @@ import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
-import org.exolab.adaptx.xpath.NodeSet;
 import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
- * Represents a comment() expression
+ * The basic implementation of an XPath node expression.
  *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
  */
-class CommentExpr extends NodeExpressionImpl {
+abstract class NodeExpressionImpl implements NodeExpression
+{
 
-      //----------------/
-     //- Constructors -/
-    //----------------/
-
-    public CommentExpr() {
-        super();
-    } //-- CommentExpr
-
+    
+    
+    
       //------------------/
      //- Public Methods -/
     //------------------/
-
-
-    /**
-     * Returns the String representation of this Expr
-     */
-    public String toString() {
-        return "comment()";
-    } //-- toString
-
-    /**
-     * Evaluates the expression and returns the XPath result.
-     *
-     * @param context The XPathContext to use during evaluation.
-     * @return The XPathResult (not null).
-     * @exception XPathException if an error occured while 
-     * evaluating this expression.
-     */
-    public XPathResult evaluate(XPathContext context)
-        throws XPathException
-    {
-        NodeSet nodeSet = context.newNodeSet();
-        XPathNode node = context.getNode();
-        if (node == null) return nodeSet;
-        
-        XPathNode child = node.getFirstChild();
-        while (child != null) {
-            if (matches(child, context))
-                nodeSet.add(child);
-            child = child.getNext();
-        }
-        return nodeSet;
-    } //-- evaluate
-
-    /**
-     * Returns the type of this Expr
-     */
-    public short getExprType() { return XPathExpression.NODE_TEST; }
-
-
+    
     /**
      * Returns the type of this NodeExpr
+     *
      * @return the type of this NodeExpr
      */
-    public short getNodeExprType() { return NodeExpression.COMMENT_EXPR; }
+    public abstract short getNodeExprType();
 
-
+    
+    /**
+     * Returns the QName matched by this NodeExpression.
+     * The value may be null, for example if this is a
+     * TEXT_EXPR or a WILDCARD_EXPR.
+     *
+     * @return the QName matched by this NodeExpression.
+     */
+    public String getName() {
+        return null;
+    } //-- getName
+    
     /**
      * Determines if the given node is matched by this MatchExpr with
      * respect to the given context.
@@ -105,13 +73,8 @@ class CommentExpr extends NodeExpressionImpl {
      * @exception XPathException when an error occurs during
      * evaluation
      */
-    public boolean matches(XPathNode node, XPathContext context)
-        throws XPathException
-    {
-        if (node == null) return false;
-        if (node.getNodeType() == XPathNode.COMMENT)
-            return true;
-        return false;
-    } //-- matches
+    public abstract boolean matches( XPathNode node, XPathContext context )
+        throws XPathException;
 
-} //-- CommentExpr
+    
+} //-- NodeExpr

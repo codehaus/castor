@@ -35,7 +35,7 @@ import org.exolab.adaptx.xpath.XPathException;
  * Represents an Subtraction Expr. 
  * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
 **/
-class SubtractionExpr extends BinaryExpr {
+class SubtractionExpr extends BinaryExprImpl {
 
     
     

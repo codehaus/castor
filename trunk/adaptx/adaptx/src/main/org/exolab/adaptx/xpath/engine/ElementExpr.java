@@ -29,7 +29,7 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
  * Represents an element node expression
@@ -38,7 +38,7 @@ import org.exolab.adaptx.xpath.NodeSet;
  * @version $Revision$ $Date$
  */
 class ElementExpr
-    extends NodeExpression
+    extends NodeExpressionImpl
 {
     
     //-- BEGIN TEMPORARY
@@ -141,7 +141,7 @@ class ElementExpr
      * @return The XPathResult (not null).
      * @exception XPathException if an error occured while 
      * evaluating this expression.
-    **/
+     */
     public XPathResult evaluate( XPathContext context )
         throws XPathException 
     {
@@ -153,7 +153,7 @@ class ElementExpr
         XPathNode child = node.getFirstChild();
         while ( child != null ) {
             if (matches(child, context)) {
-                nodeSet.add( node );
+                nodeSet.add( child );
             }
             child = child.getNext();
         }

@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,17 +29,17 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.UnionExpr;
 
 /**
  * This class represents a SelectExpr
  * <PRE>
  * [1] SelectExpr ::= UnionExpr
  * </PRE>
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class SelectExpr extends XPathExpression {
+public final class SelectExpr implements XPathExpression {
     
     /**
      * The UnionExpr for this SelectExpr
@@ -83,13 +83,13 @@ class SelectExpr extends XPathExpression {
         return selectNodes(context);
     } //-- evaluate
     
+    public UnionExpr getUnionExpr() {
+        return unionExpr;
+    } //-- setUnionExpr
+    
       //---------------------/
      //- Protected Methods -/
     //---------------------/
-    
-    protected void getUnionExpr(UnionExpr unionExpr) {
-        this.unionExpr = unionExpr;
-    } //-- setUnionExpr
     
     /**
      * Selects all nodes matching this SelectExpr

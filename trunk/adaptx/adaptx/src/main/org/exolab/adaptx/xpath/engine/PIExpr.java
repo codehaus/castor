@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,14 +29,15 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.NodeExpression;
 
 /**
- * Represents a PIExpr
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * Represents a PI Expression (processing-instruction())
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
-class PIExpr extends NodeExpression {
+ */
+class PIExpr extends NodeExpressionImpl {
     
       //----------------/
      //- Constructors -/
@@ -57,7 +58,7 @@ class PIExpr extends NodeExpression {
     
     /**
      * Returns the String representation of this NodeExpr
-    **/
+     */
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(Names.PI_FN);
@@ -75,7 +76,7 @@ class PIExpr extends NodeExpression {
      * @return The XPathResult (not null).
      * @exception XPathException if an error occured while 
      * evaluating this expression.
-    **/
+     */
     public XPathResult evaluate(XPathContext context)
         throws XPathException
     {
@@ -94,7 +95,9 @@ class PIExpr extends NodeExpression {
     } //-- evaluate
 
     
-    public short getExprType() { return XPathExpression.BOOLEAN; }
+    public short getExprType() { 
+        return XPathExpression.NODE_TEST;
+    }
     
     
     public String getTarget() { return this.target; }
@@ -102,7 +105,7 @@ class PIExpr extends NodeExpression {
     /**
      * Returns the type of this NodeExpr
      * @return the type of this NodeExpr
-    **/
+     */
     public short getNodeExprType() { return NodeExpression.PI_EXPR; }
     
     
@@ -116,7 +119,7 @@ class PIExpr extends NodeExpression {
      * @return true if the given node is matched by this MatchExpr
      * @exception InvalidExprException when an invalid expression is
      * encountered during evaluation
-    **/
+     */
     public boolean matches(XPathNode node, XPathContext context)
         throws XPathException
     {

@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,16 +29,17 @@ import org.exolab.adaptx.xpath.XPathContext;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
-
+import org.exolab.adaptx.xpath.expressions.MatchExpression;
+import org.exolab.adaptx.xpath.expressions.PathComponent;
+import org.exolab.adaptx.xpath.expressions.PredicateExpr;
 
 /**
  * The base class for filters (now basically called paths)
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ *
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
-abstract class FilterBase
-    extends XPathExpression
-    implements MatchExpression
+ */
+public abstract class FilterBase implements PathComponent
 {
 
 
@@ -49,7 +50,7 @@ abstract class FilterBase
     private int ancestryOp;
 
 
-    PredicateExpr _predicate = null;
+    PredicateExprImpl _predicate = null;
     
     
     /**
@@ -69,7 +70,7 @@ abstract class FilterBase
     public void addPredicate( XPathExpression expr )
         throws XPathException
     {
-        addPredicate( new PredicateExpr( expr ) );
+        addPredicate( new PredicateExprImpl( expr ) );
     } //-- addPredicate
     
 
@@ -78,15 +79,15 @@ abstract class FilterBase
      * List.
      * @param expr the Expr to add to the predicate list
     **/
-    public void addPredicate( PredicateExpr predicate )
+    public void addPredicate( PredicateExprImpl predicate )
         throws XPathException
     {
         if ( _predicate == null )
             _predicate = predicate;
         else {
-            PredicateExpr last = _predicate;
+            PredicateExprImpl last = _predicate;
             while ( last.hasNext() )
-                last = last.getNext();
+                last = (PredicateExprImpl)last.getNext();
             last.setNext( predicate );
         }
     } //-- addPredicate
@@ -233,17 +234,17 @@ abstract class FilterBase
         if ( _predicate == null )
             return null;
         if ( _predicate == expr )
-            _predicate = _predicate.getNext();
+            _predicate = (PredicateExprImpl)_predicate.getNext();
         else {
-            PredicateExpr next = _predicate.getNext();
-            PredicateExpr prev = _predicate;
+            PredicateExprImpl next = (PredicateExprImpl)_predicate.getNext();
+            PredicateExprImpl prev = _predicate;
             while ( next != null ) {
                 if ( next == expr ) {
-                    prev.setNext( next.getNext() );
+                    prev.setNext( (PredicateExprImpl) next.getNext() );
                     return next;
                 }
                 prev = next;
-                next = next.getNext();
+                next = (PredicateExprImpl) next.getNext();
             }
         }
         return null;

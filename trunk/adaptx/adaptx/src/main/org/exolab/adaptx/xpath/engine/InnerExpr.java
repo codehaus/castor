@@ -26,6 +26,8 @@ import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathResult;
 
+import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
+
 /**
  * Represents the XPath primary expression: '(' + expr + ')'
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
