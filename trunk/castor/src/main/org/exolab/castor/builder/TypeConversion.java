@@ -73,19 +73,52 @@ public class TypeConversion {
 
     private static final String TYPES_PACKAGE = "types";
 
+    private BuilderConfiguration _config = null;
+    
+    /**
+     * Creates a new TypeConversion instance
+     *
+     * @param config the BuilderConfiguration instance (must not be null).
+     */
+    public TypeConversion(BuilderConfiguration config) {
+        if (config == null) {
+            String error = "The argument 'config' must not be null.";
+            throw new IllegalArgumentException(error);
+        }
+        _config = config;
+    } //-- TypeConversion
+    
     /**
      * Converts the given Simpletype to the appropriate XSType.
+     *
+     * @param simpleType the SimpleType to convert to an XSType instance
      * @return the XSType which represets the given Simpletype
-    **/
-    public static XSType convertType(SimpleType simpleType) {
-        return convertType(simpleType, SourceGenerator.usePrimitiveWrapper(), null);
+     */
+    public XSType convertType(SimpleType simpleType) {
+        return convertType(simpleType, _config.usePrimitiveWrapper(), null);
     }
 
-    public static XSType convertType(SimpleType simpleType, String packageName) {
-         return convertType(simpleType, SourceGenerator.usePrimitiveWrapper(), packageName);
+    /**
+     * Converts the given Simpletype to the appropriate XSType.
+     *
+     * @param simpleType the SimpleType to convert to an XSType instance
+     * @param packageName the packageName for any new class types
+     * @return the XSType which represets the given Simpletype
+     */
+    public XSType convertType(SimpleType simpleType, String packageName) {
+         return convertType(simpleType, _config.usePrimitiveWrapper(), packageName);
     }
     
-    public static XSType convertType(SimpleType simpleType, boolean useWrapper, String packageName) {
+    /**
+     * Converts the given Simpletype to the appropriate XSType.
+     *
+     * @param simpleType the SimpleType to convert to an XSType instance
+     * @param useWrapper a boolean that when true indicates that primitive wrappers
+     * be used instead of the actual primitives (e.g. java.lang.Integer instead of int)
+     * @param packageName the packageName for any new class types
+     * @return the XSType which represets the given Simpletype
+     */
+    public XSType convertType(SimpleType simpleType, boolean useWrapper, String packageName) {
         if (simpleType == null) return null;
 
         XSType xsType = null;
@@ -143,7 +176,7 @@ public class TypeConversion {
                 //--byte
                 case SimpleTypesFactory.BYTE_TYPE:
                 {
-                    XSByte xsByte = new XSByte();
+                    XSByte xsByte = new XSByte(useWrapper);
                     if (!simpleType.isBuiltInType())
                         xsByte.setFacets(simpleType);
                     return xsByte;
@@ -274,7 +307,7 @@ public class TypeConversion {
                 //-- nonPositiveInteger
                 case SimpleTypesFactory.NON_POSITIVE_INTEGER_TYPE:
                 {
-                    XSInteger xsInteger = new XSNonPositiveInteger();
+                    XSInteger xsInteger = new XSNonPositiveInteger(useWrapper);
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
@@ -282,7 +315,7 @@ public class TypeConversion {
                 //-- nonNegativeInteger
                 case SimpleTypesFactory.NON_NEGATIVE_INTEGER_TYPE:
                 {
-                    XSInteger xsInteger = new XSNonNegativeInteger();
+                    XSInteger xsInteger = new XSNonNegativeInteger(useWrapper);
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
@@ -290,7 +323,7 @@ public class TypeConversion {
                 //-- negative-integer
                 case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
                 {
-                    XSInteger xsInteger = new XSNegativeInteger();
+                    XSInteger xsInteger = new XSNegativeInteger(useWrapper);
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
@@ -306,7 +339,7 @@ public class TypeConversion {
                 //-- positive-integer
                 case SimpleTypesFactory.POSITIVE_INTEGER_TYPE:
                 {
-                    XSInteger xsInteger = new XSPositiveInteger();
+                    XSInteger xsInteger = new XSPositiveInteger(useWrapper);
                     xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
@@ -341,7 +374,7 @@ public class TypeConversion {
 
                         if (packageName == null) {
                             String ns = simpleType.getSchema().getTargetNamespace();
-                            packageName = SourceGenerator.lookupPackageNamespace(ns);
+                            packageName = _config.lookupPackageByNamespace(ns);
                         }
                         if ((packageName  != null) && (packageName .length() > 0))
                             packageName  = packageName  + '.' + TYPES_PACKAGE;
@@ -468,7 +501,7 @@ public class TypeConversion {
         } else
         //--Integer
         if (javaType.equals(TypeNames.INTEGER)) {
-            return new XSInteger();
+            return new XSInteger(true);
         } else
         if (javaType.equals(TypeNames.INT)) {
             return new XSInt();
