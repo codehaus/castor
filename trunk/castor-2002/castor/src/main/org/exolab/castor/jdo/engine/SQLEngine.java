@@ -361,7 +361,7 @@ public final class SQLEngine implements Persistence {
                 _separateConnections.put( dr, conn );
             } catch ( SQLException except ) {
             	//except.printStackTrace();
-                throw new PersistenceException( "persist.cannotCreateSeparateConn" );
+                throw new PersistenceException( Messages.message("persist.cannotCreateSeparateConn"), except );
             }
         } //else
         //	System.out.println("reusing already established connection for keygenerator...");
@@ -502,7 +502,7 @@ public final class SQLEngine implements Persistence {
         }
 
         if ( identity == null )
-            throw new PersistenceException( "persist.noIdentity" );
+            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
 
         return idToJava( 0, identity );
     }
@@ -516,7 +516,7 @@ public final class SQLEngine implements Persistence {
         Object            sqlId;
 
         if ( _extends == null && _keyGen == null && identity == null )
-            throw new PersistenceException( "persist.noIdentity" );
+            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
 
         try {
             // Must create record in the parent table first.
@@ -629,7 +629,7 @@ public final class SQLEngine implements Persistence {
             if ( Boolean.TRUE.equals( isDupKey ) ) {
                 throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), identity ) );
             } else if ( Boolean.FALSE.equals( isDupKey ) ) {
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
             // else unknown, let's check directly.
 
@@ -870,7 +870,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
 
@@ -914,7 +914,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
 
@@ -958,7 +958,7 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
 
@@ -1073,7 +1073,7 @@ public final class SQLEngine implements Persistence {
 
         } catch ( SQLException except ) {
             except.printStackTrace();
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
         return stamp;
     }
@@ -1569,7 +1569,7 @@ public final class SQLEngine implements Persistence {
                     } catch ( SQLException e2 ) { }
                 }
                 _resultSetDone = true;
-                throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql );
+                throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql, except );
             }
         }
 
@@ -1673,7 +1673,7 @@ public final class SQLEngine implements Persistence {
 
             } catch ( SQLException except ) {
                 _lastIdentity = null;
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
         }
 
@@ -1820,7 +1820,7 @@ public final class SQLEngine implements Persistence {
                     _resultSetDone = true;
                 }
             } catch ( SQLException except ) {
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
 
             return stamp;
