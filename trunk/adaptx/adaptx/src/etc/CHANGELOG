@@ -4,6 +4,16 @@ Adaptx (C) 1998-2004 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 The following are changes from different versions of Adaptx
 
 
+Version 0.9.13, June 22, 2004
+------------------------------
+
+-- Backed out previous fix in 0.9.12. It was an incorrect fix,
+   there was actually no bug with the node-set comparisons
+   after triple-checking the XPath spec. When comparing two nodesets
+   sometimes they can both be equal and not-equal at the same time,
+   and sometimes they can both be never and equal, and never not-equal.
+   It's very confusing, but the previous implementation had it correct.
+
 
 Version 0.9.12, June 14, 2004
 ------------------------------
