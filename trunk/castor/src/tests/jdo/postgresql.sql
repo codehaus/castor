@@ -10,6 +10,18 @@ create unique index test_table_pk
    on test_table ( id );
 
 
+drop table test_table2;
+
+create table test_table2 (
+  id      int           not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)
+);
+
+create unique index test_table2_pk
+   on test_table2 ( id );
+
+
 drop table test_group_person;
 
 create table test_group_person (
