@@ -8,18 +8,20 @@
       <section title="Castor XML">
         <ul>
           <li>Automatic XML data binding for class definitions which adhere
-              to the Java Beans design pattern (often referred to as default introspection).
+              to the Java Beans design pattern. This is often referred to as default introspection
+              in our documentation.
           </li>
           <li>Java to XML mapping automates transformation of Java objects to and from
-              XML documents and provides Java object validation</li>
-
+              XML documents and provides Java object validation
+          </li>
           <li>
-             An XML based mapping file to specify XML bindings for existing object models.
+             An XML based mapping file to specify XML bindings for existing object models
+              (see <a href="xml-mapping.xml">xml-mapping</a>).
           </li>
 
           <li>Source Code generator can produce Java class definitions,
               XML binding information, and validation code based on
-              a given XML schema.
+              a given XML schema (see <a href="sourcegen.xml">Source Generator</a>)
           </li>
 
           <li>Supports the W3C XML Schema 1.0 Recommendation (2001-05-02).
@@ -138,12 +140,12 @@
        <section title="XML">
           <section title="Marshalling Framework">
             <ul>
-               <li>Integrate Castor's internal XML event API. This also
-                   includes adding support for SAX-2.
-                   (kvisco)
-               </li>
+               <li>Improve SAX-2 support for Marshaller instead of using XMLReaderAdapter (kvisco)</li>
+               <li>Improve ID/Key reference handling, including improvements to IDResolver. (kvisco)</li>
+               <li>Improve ClassDescriptorResolverImpl to support nested Resolver (kvisco)</li>
                <li>Improve error reporting. (all)</li>
                <li>Improve documentation. (all)</li>
+               <li>Improve performance. (kvisco, afawcett)</li>
                <li>Provide a JAXB compatibility layer. (kvisco + arnaud)</li>
                <li>
                   For more items, please use
@@ -167,7 +169,9 @@
                <li>
                    Support for element containers, also called element wrappers.
                </li>
-               <li>Improved mapping of Hashtables + Maps.</li>
+               <li>Improve Collection handling in default FieldHandler</li>
+               <li>Improve mapping file usability</li>
+               <li>Improve namespace support</li>
                <li>
                   For more items, please use
                   <a href="http://bugzilla.exolab.org">Bugzilla</a>
@@ -175,6 +179,12 @@
 
             </ul>
          </section>
+         <section title="Miscellaneous">
+            <ul>
+               <li>Support for creating an XML Schema from Java Object Model.</li>
+            </ul>
+         </section>
+
        </section>
     </section>
     <section title="When is the next release?">
