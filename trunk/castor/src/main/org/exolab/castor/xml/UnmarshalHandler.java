@@ -472,7 +472,10 @@ public final class UnmarshalHandler extends MarshalFramework
         throws SAXException
     {
         if (debug) {
-            System.out.println("#characters");
+            StringBuffer sb = new StringBuffer(21 + length);
+            sb.append("#characters: ");
+            sb.append(ch, start, length);
+            message(sb.toString());
         }
         
         //-- If we are skipping elements that have appeared in the XML but for
@@ -763,8 +766,10 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         
         //-- check to see if we have already read in
-        //-- an element of this type
-        if (!descriptor.isMultivalued() ) {
+        //-- an element of this type. 
+        //-- (Q: if we have a container, do we possibly need to 
+        //--     also check the container's multivalued status?)
+        if ( ! descriptor.isMultivalued() ) {
             if (state.isUsed(descriptor)) {
                 String err = "element \"" + name;
                 err += "\" occurs more than once. (" + descriptor + ")";
@@ -1250,22 +1255,27 @@ public final class UnmarshalHandler extends MarshalFramework
             }
         } //-- end null descriptor
         
-        
+        /// DEBUG: System.out.println("path: " + path);
+
         //-- Save targetState (used in endElement)
         if (targetState != parentState) {
             state.targetState = targetState;
             parentState = targetState; //-- reassign
         }
-            
-        /// DEBUG: System.out.println("path: " + path);
 
         Object object = parentState.object;
         //--container support
         if (descriptor.isContainer()) {
             //create a new state to set the container as the object
             //don't save the current state, it will be recreated later
+            
+            if (debug) {
+                message("#container: " + descriptor.getFieldName());
+            }
             _stateInfo.pop();
+            
             state = new UnmarshalState();
+            
             // swap states so that container comes before the
             // the state for the item contained within the container
             _stateInfo.push(state);
@@ -1308,9 +1318,11 @@ public final class UnmarshalHandler extends MarshalFramework
             return;
         }
         //--End of the container support
+        
+        
 
         //-- Find object type and create new Object of that type
-       state.fieldDesc = descriptor;
+        state.fieldDesc = descriptor;
 
         /* <update>
             *  we need to add this code back in, to make sure
