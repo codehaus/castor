@@ -2493,6 +2493,9 @@ public class ClassMolder
 
         for ( int i=0; i < _fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
+
+            _log.debug( "Reverting field: " + ( ( FieldMolder ) _fhs[i] ).getName() );
+
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
                 Object temp = fields[i];
@@ -2559,7 +2562,9 @@ public class ClassMolder
                         _fhs[i].setValue( object, cp.getCollection(), tx.getClassLoader());
 
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            cp.add( v.get(j), tx.fetch( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
+                            Object obj = tx.fetch( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
+                            if ( obj != null )
+                                cp.add( v.get(j), obj );
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );
