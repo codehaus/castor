@@ -531,16 +531,12 @@ public class XMLFieldDescriptorImpl
     public boolean matches(String xmlName) {
 
         if (xmlName != null) {
-
             if (isWild) return true;
             else if (_matches.size() > 0) {
                 for (int i = 0; i < _matches.size(); i++) {
                     if (xmlName.equals( _matches.get(i) ) )
                         return true;
                 }
-            }
-            else if ((_container) && (_classDescriptor != null)) {
-                return (_classDescriptor.getFieldDescriptor(xmlName, null) != null);
             }
             else
                 return xmlName.equals(this._xmlName);
