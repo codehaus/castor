@@ -126,24 +126,24 @@ public final class Cache
         switch ( type ) {
         case CACHE_COUNT_LIMITED :
             if ( param > 0 ) 
-                _cache = new CountLimitedLRU( param );
+                _cache = new LRU.CountLimited( param );
             else 
-                _cache = new NoCache();
+                _cache = new LRU.NoCache();
             break;
         case CACHE_TIME_LIMITED :
             if ( param > 0 ) 
-                _cache = new TimeLimitedLRU( param );
+                _cache = new LRU.TimeLimited( param );
             else 
-                _cache = new NoCache();
+                _cache = new LRU.NoCache();
             break;
         case CACHE_UNLIMITED :
-            _cache = new UnlimitedLRU();
+            _cache = new LRU.Unlimited();
             break;
         case CACHE_NONE :
-            _cache = new NoCache();
+            _cache = new LRU.NoCache();
             break;
         default :
-            _cache = new CountLimitedLRU( 100 );
+            _cache = new LRU.CountLimited( 100 );
         }
     }
     
