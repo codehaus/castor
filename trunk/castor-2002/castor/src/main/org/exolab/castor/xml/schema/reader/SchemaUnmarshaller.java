@@ -60,7 +60,7 @@ import java.util.Hashtable;
 public class SchemaUnmarshaller extends SaxUnmarshaller {
 
 
-    
+
     public static final String XSD_NAMESPACE
         = "http://www.w3.org/2000/10/XMLSchema";
 
@@ -68,7 +68,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     public static final String[] UNSUPPORTED_NAMESPACES = {
         "http://www.w3.org/1999/XMLSchema"
     };
-        
+
       //--------------------/
      //- Member Variables -/
     //--------------------/
@@ -157,7 +157,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
         if ((nsURI != null) && (nsURI.length() > 0))
             _schema.setTargetNamespace(nsURI);
-            
+
         _schema.setId(atts.getValue(SchemaNames.ID_ATTR));
         _schema.setVersion(atts.getValue(SchemaNames.VERSION_ATTR));
 
@@ -166,7 +166,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     /**
      * Handles namespace attributes
     **/
-    private void handleXMLNS(String attName, String attValue) 
+    private void handleXMLNS(String attName, String attValue)
         throws SAXException
     {
 
@@ -187,7 +187,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //-- register namespace
         namespaces.put(prefix, attValue);
-        
+
         //-- check for old namespaces
         for (int i = 0; i < UNSUPPORTED_NAMESPACES.length; i++) {
             if (attValue.equals(UNSUPPORTED_NAMESPACES[i]))
@@ -196,10 +196,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                     " XML Schema Candidate Release (October)");
         }
 		_schema.addNamespace(prefix, attValue);
-		
+
     } //-- handleXMLNS
 
-    private void processNamespaces(AttributeList atts) 
+    private void processNamespaces(AttributeList atts)
         throws SAXException
     {
         if (atts == null) return;
@@ -308,13 +308,13 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
-            unmarshaller 
-                = new IncludeUnmarshaller(_schema, atts, _resolver);
+            unmarshaller
+                = new IncludeUnmarshaller(_schema, atts, _resolver, getDocumentLocator());
         }
         //-- <import>
         else if (name == SchemaNames.IMPORT) {
-            unmarshaller 
-                = new ImportUnmarshaller(_schema, atts, _resolver);
+            unmarshaller
+                = new ImportUnmarshaller(_schema, atts, _resolver, getDocumentLocator());
         }
         else {
             //-- we should throw a new Exception here

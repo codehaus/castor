@@ -56,21 +56,39 @@ import java.util.Vector;
 
 public class IncludeUnmarshaller extends SaxUnmarshaller
 {
+
     public IncludeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver, Locator locator)
 		throws SAXException
     {
         super();
         setResolver(resolver);
-	
+
 		String include = atts.getValue("schemaLocation");
 		if (include==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
-	
-		if (schema.includeProcessed(include))
+        //if the path is relative Xerces append the "user.Dir"
+        //we need to keep the base directory of the document
+        //if the doesn't exist we suppose 'include' is a relative path
+        // note: URI not supported (just system path)
+        if (!new java.io.File(include).exists()) {
+             String temp = locator.getSystemId();
+             if (temp != null) {
+                //remove 'file://'
+                temp = temp.substring(7);
+                if (java.io.File.separatorChar =='\\')
+                    temp = temp.substring(1);
+                temp = temp.substring(0,temp.lastIndexOf('/')+1);
+                include = temp + include;
+                temp = null;
+             }
+        }
+
+        if (schema.includeProcessed(include))
 			return;
-		schema.addInclude(include);
-		
+
+        schema.addInclude(include);
+
 		Parser parser = null;
 		try {
 		parser = Configuration.getParser();
@@ -85,16 +103,16 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 			schemaUnmarshaller.setSchema(schema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
-		}			
-			
+		}
+
 		try {
 		    parser.parse(new InputSource(include));
 		}
 		catch(java.io.IOException ioe) {
 		    throw new SAXException("Error reading include file '"+include+"'");
-		}	
-	}	
-	
+		}
+	}
+
 
     /**
      * Sets the name of the element that this UnknownUnmarshaller handles
@@ -103,7 +121,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
     public String elementName() {
         return SchemaNames.INCLUDE;
     } //-- elementName
-	
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -111,5 +129,5 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
     public Object getObject() {
         return null;
     } //-- getObject
-	
+
 }
