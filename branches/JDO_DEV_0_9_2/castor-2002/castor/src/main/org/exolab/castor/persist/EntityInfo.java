@@ -93,7 +93,7 @@ public final class EntityInfo {
     /**
      * The super entity of this entity
      */
-    public final EntityInfo superEntity;
+    public EntityInfo superEntity;
 
     /**
      * The discriminator the Bridge Layer should be used to determines
@@ -112,8 +112,7 @@ public final class EntityInfo {
      */
     public EntityInfo( String entityClass, EntityFieldInfo[] idInfo,
                        EntityFieldInfo[] fieldInfo, EntityInfo[] subEntities, 
-                       EntityInfo superEntity, Object discriminator, 
-                       KeyGeneratorDescriptor keyGen ) {
+                       Object discriminator, KeyGeneratorDescriptor keyGen ) {
         this.entityClass   = entityClass;
         this.superEntity    = superEntity;
         this.discriminator  = discriminator;
