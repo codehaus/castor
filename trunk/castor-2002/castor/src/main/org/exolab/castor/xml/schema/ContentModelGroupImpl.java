@@ -126,10 +126,35 @@ class ContentModelGroupImpl implements ContentModelGroup {
         _contentModel.addElement(group);
     } //-- addGroup
 
+    /**
+     * Returns an enumeration of all the Particles contained
+     * within this ContentModelGroup
+     * 
+     * @return an enumeration of all the Particels contained
+     * within this ContentModelGroup
+    **/
     public Enumeration enumerate() {
         return _contentModel.elements();
     } //-- enumerate
 
-    public int getChildrenCount() { return _contentModel.size(); }
+    /**
+     * Returns the Particle at the specified index
+     * @param index the index of the particle to return
+     * @returns the CMParticle at the specified index
+    **/
+    public Particle getParticle(int index) {
+        return (Particle) _contentModel.elementAt(index);
+    } //-- getParticle
+    
+    /**
+     * Returns the number of particles contained within
+     * this ContentModelGroup
+     *
+     * @return the number of particles
+    **/
+    public int getParticleCount() {
+        return _contentModel.size();
+    } //-- getParticleCount
+
 
 } //-- ContentModelGroup

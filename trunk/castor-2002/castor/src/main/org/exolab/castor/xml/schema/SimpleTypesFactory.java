@@ -47,6 +47,7 @@ package org.exolab.castor.xml.schema;
 
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.io.InputStream;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -61,6 +62,7 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.schema.simpletypes.*;
 import org.exolab.castor.xml.schema.simpletypes.factory.*;
 
+import org.xml.sax.InputSource;
 
 /**
  * SimpleTypesFactory provides code constants for every built
@@ -162,6 +164,24 @@ public class SimpleTypesFactory
     public static final int RECURRING_DAY_TYPE            = 43;
 
 
+    /**
+     * The resource location for the built-in types
+     * property files
+    **/
+    static final String RESOURCE_LOCATION =
+        "/org/exolab/castor/util/resources/";
+        
+    /**
+     * The resource for the mapping properties
+    **/
+    static final String TYPE_MAPPINGS = RESOURCE_LOCATION + 
+        "SimpleTypesMapping.properties";
+
+    /**
+     * The resource for the Simple types
+    **/
+    static final String TYPE_DEFINITIONS = RESOURCE_LOCATION +
+        "SimpleTypes.properties";    
     /**
      * Holds simpletypesfactory.Type instances that record information about
      * xml schema built in types.
@@ -325,17 +345,25 @@ public class SimpleTypesFactory
     private synchronized void loadTypesDefinitions()
     {
         if ( (_typesByName == null) && (_typesByCode == null) ) {
+            
+            InputStream is = null;
+            
 	        try
              {  //Load the mapping file
 		        Mapping mapping= new Mapping(getClass().getClassLoader());
 		        mapping.setLogWriter(getLogWriter());
-				mapping.loadMapping( Configuration.getSimpleTypesMappingFileLocation() );
-
+		        
+		        is = this.getClass().getResourceAsStream(TYPE_MAPPINGS);
+				mapping.loadMapping( new InputSource(is) );
+				
                 //unmarshall the list of built in simple types
 		        Unmarshaller unmarshaller= new Unmarshaller(TypeList.class);
 		        unmarshaller.setMapping(mapping);
-                java.net.URL url= Configuration.getSimpleTypesDefinitionLocation();
-		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(url.openStream()) );
+		        //-- turn off validation
+		        unmarshaller.setValidation(false);
+		        
+                is = this.getClass().getResourceAsStream(TYPE_DEFINITIONS);
+		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(is) );
 
                 //print what we just read (only in debug mode and if we have a logWriter)
 		        if (Configuration.debug() && getLogWriter()!= null)
@@ -357,11 +385,12 @@ public class SimpleTypesFactory
 	        catch (Exception except)
 	        {
                 //Of course, this should not happen if the config files are there.
-                System.out.println(Messages.message("schema.cantLoadBuiltInTypes"));
+                System.out.println(Messages.message("schema.cantLoadBuiltInTypes")
+                    + "\n  initial exception: " + except);
                 throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
 	        }
         }
-    }
+    } //-- loadTypeDefinitions
 
 
     /**
