@@ -47,6 +47,7 @@
 package org.exolab.castor.persist;
 
 
+import java.math.BigDecimal;
 import java.util.Enumeration;
 import java.util.Vector;
 import java.io.ObjectOutputStream;
@@ -751,10 +752,12 @@ public final class ClassHandler
         if ( value == null )
         return ( original != null );
         if ( field.relation != null )
-        value = field.relation.getIdentity( value );
+            value = field.relation.getIdentity( value );
             if ( value == null )
                 return ( original != null );
-            else
+            else if (value instanceof BigDecimal) 
+                return ( ( (BigDecimal) value ).compareTo( original ) != 0 );
+            else 
                 return ! value.equals( original );
         } else {
             // The field will always return an enumeration, the original
