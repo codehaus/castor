@@ -213,7 +213,8 @@ public final class HsqlQueryExpression
     /**
      * Add the outer join condition to the buffer
      * @param buffer The StringBuffer which is being appended
-     * @param join The join that will provide the condition columns
+     * @param leftColumns The columns of the left participant.
+     * @param rightColumns The column of the right participant.
      * @param leftTable The name of the left participant which may be a table
      *   name or an alias name
      * @param rightTable The name of the right participant which may be a table
@@ -708,7 +709,7 @@ final class HsqlAliasInfo
 
   /**
    * Return any alias for the given table
-   * @param name a not null table name
+   * @param table a not null table name
    * @return an alias for the input table; or null if the table has no aliases
    *   because it does not participate in more than one outer join
    */
