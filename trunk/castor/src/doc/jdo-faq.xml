@@ -890,7 +890,59 @@ Database db = jdo.getDatabase();
     </section>
    
    <section title="Lazy Loading related questions">
-       <section title="How do I configure the JDO mapping to use the lazy loading feature?">
+   
+       <section title="How do I configure the JDO mapping to use the lazy loading feature for 1:1 relations?">
+
+           <p>Let us convert one of the classes from the 
+              <a href="http://castor.exolab.org/examples.html">JDO examples</a> to use 
+              lazy-loading.</p>
+
+           <p>In the example model, every Product belongs to one ProductGroup. This is 
+              reflected in the conventional mapping as below. Here's the mapping for 
+              Product:</p>
+
+           <code><code-panel><![CDATA[
+<!--  Mapping for Product  -->
+<class name="myapp.Product"
+       identity="id">
+   <description>Product definition</description>
+   <map-to table="prod" xml="product" />
+   <field name="id" type="integer">
+       <sql name="id" type="integer" />
+       <xml name="id" node="attribute"/>
+   </field>
+ 
+   <!-- more fields ... -->
+
+    <!--  Product has reference to ProductGroup,
+          many products may reference same group  -->
+    <field name="group" type="myapp.ProductGroup">
+      <sql name="group_id" />
+      <bind-xml name="group" node="element" />
+    </field>
+    
+</class>
+]]></code-panel></code>
+
+           <p>Let us now make the relationship between Product and ProductGroup use 
+              lazy loading. The relevant field in Product can be re-written like so:</p>
+
+           <code>
+               <code-panel>
+    &lt;field name="group" type="myapp.ProductGroup" <b>lazy="true"</b>&gt;
+      &lt;sql name="group_id" /&gt;
+      &lt;bind-xml name="group" node="element" /&gt;
+    &lt;/field&gt;
+               </code-panel>
+           </code>
+
+           <p>There have been one change only. We have placed the attribute lazy="true" in 
+              the field element. Note that no change is required in the ProductDetail 
+              mapping.</p>
+
+       </section>
+       
+       <section title="How do I configure the JDO mapping to use the lazy loading feature for 1:m and M:N relations?">
            <p>
            Let us convert one of the classes from the <a href="http://castor.exolab.org/examples.html">
            JDO examples</a> to use lazy-loading.
