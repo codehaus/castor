@@ -632,7 +632,7 @@ public class XMLClassDescriptorImpl extends Validator
             case CHOICE:
 
                 boolean found = false;
-                String fieldName = null;
+                XMLFieldDescriptor fieldDesc = null;
 
                 //-- handle elements, affected by choice
                 for (int i = 0; i < elementDescriptors.size(); i++) {
@@ -641,13 +641,24 @@ public class XMLClassDescriptorImpl extends Validator
                     FieldHandler handler = desc.getHandler();
                     if (handler.getValue(object) != null) {
                         if (found) {
-                            String err = "The element '" + desc.getXMLName();
-                            err += "' cannot exist at the same time that ";
-                            err += "element '" + fieldName + "' also exists.";
+                            String err = null;
+                            if (desc.isContainer()) {
+                                err = "The group '" + desc.getFieldName();
+                                err += "' cannot exist at the same time that ";
+                                if (fieldDesc.isContainer())
+                                    err += "the group '" + fieldDesc.getFieldName();
+                                else err += "the element '" + fieldDesc.getXMLName();
+                                err +="' also exists.";
+                            }
+                            else {
+                                 err = "The element '" + desc.getXMLName();
+                                 err += "' cannot exist at the same time that ";
+                                 err += "element '" + fieldDesc.getXMLName() + "' also exists.";
+                            }
                             throw new ValidationException(err);
                         }
                         found = true;
-                        fieldName = desc.getXMLName();
+                        fieldDesc = desc;
 
                         FieldValidator fieldValidator = desc.getValidator();
                         if (fieldValidator != null)
