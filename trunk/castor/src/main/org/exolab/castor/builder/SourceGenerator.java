@@ -329,14 +329,9 @@ public class SourceGenerator
             throw new IllegalArgumentException(err);
         }
                 
-        //--map the targetNamespace of the schema with the packageName defined
+        //--map the schemaLocation of the schema with the packageName defined
         if (packageName != null) {
-            String targetNamespace = schema.getTargetNamespace();
-            //-- adjust targetNamespace
-            if (targetNamespace == null)
-                targetNamespace = "";
-                
-            setNamespacePackageMapping(targetNamespace, packageName);
+            setLocationPackageMapping(schema.getSchemaLocation(), packageName);
         }
         
         sInfo.packageName = packageName;

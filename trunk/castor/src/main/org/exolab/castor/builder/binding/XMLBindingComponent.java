@@ -880,7 +880,7 @@ public class XMLBindingComponent implements BindingComponent {
      */
     public String getJavaPackage() {
 
-        if (_javaPackage == null) {
+       if (_javaPackage == null) {
             String packageName = null;
             String schemaLocation = getSchemaLocation();
             String targetNamespace = getTargetNamespace();
@@ -897,14 +897,16 @@ public class XMLBindingComponent implements BindingComponent {
                 }//--switch
             }
             if  ((packageName == null)|| (packageName.length() ==0) ) {
-                //--highest priority is schemaLocation
-                if (schemaLocation != null) {
+                //--highest priority is targetNamespace
+            	if (( packageName == null || packageName.length() ==0))
+            	{   
+            		//--look for a namespace mapping
+            		packageName = _config.lookupPackageByNamespace(targetNamespace);
+            		
+            	}
+            	
+            	if ( (schemaLocation != null) && ( packageName == null || packageName.length() ==0) ){
                     packageName = _config.lookupPackageByLocation(schemaLocation);
-                }
-                if (( packageName == null || packageName.length() ==0))
-                {
-                    //--look for a namespace mapping
-                    packageName = _config.lookupPackageByNamespace(targetNamespace);
                 }
             }
             _javaPackage = packageName;
