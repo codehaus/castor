@@ -69,7 +69,6 @@ import org.exolab.castor.mapping.xml.TypeMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.Container;
 import org.exolab.castor.mapping.xml.Include;
-import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.util.Messages;
 
 
