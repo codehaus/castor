@@ -92,11 +92,11 @@ public class ElementDecl extends Particle {
     private Schema schema = null;
 
     private boolean nullable = false;
-    
+
     private String _default = null;
-	
-	private String _block;
-    
+	private String _fixed = null;
+    private String _block;
+
     /**
      * Creates a new default element definition
      * @param schema, the XML Schema to which this element declartion
@@ -133,19 +133,29 @@ public class ElementDecl extends Particle {
     public String getDefaultValue() {
         return _default;
     } //-- getDefaultValue
-    
+
     /**
-     * Returns the name of this Element declaration. The name of the 
+     * Returns the fixed value of this element definition.
+     *
+     * @return the fixed value of this element definition,
+     * or null if no default was specified.
+     */
+    public String getFixedValue() {
+        return _fixed;
+    } //-- getFixedValue
+
+    /**
+     * Returns the name of this Element declaration. The name of the
      * referenced element is returned if the 'ref' attribute was used.
      * @return the name of this element declaration
     **/
     public String getName() {
 		return getName(false);
 	}
-    
+
     /**
      * Returns the name of this Element declaration
-     * @param ingoreRef If True the name of the referenced 
+     * @param ingoreRef If True the name of the referenced
      * element (if specified) is returned
      * @return the name of this element declaration
     **/
@@ -213,7 +223,7 @@ public class ElementDecl extends Particle {
     public boolean isNullable() {
         return nullable;
     } //-- isNullable
-    
+
     /**
      * Returns true if this element definition simply references another
      * element Definition
@@ -240,7 +250,16 @@ public class ElementDecl extends Particle {
     public void setDefaultValue(String value) {
         this._default = value;
     } //-- setDefaultValue
-    
+
+    /**
+     * Sets the fixed value for this element definition.
+     *
+     * @param value the fixed value for this element definition.
+    **/
+    public void setFixedValue(String value) {
+        this._fixed = value;
+    } //-- setDefaultValue
+
     /**
      * Sets the name of the element that this Element definition defines
      * @param name the name of the defined element
@@ -259,7 +278,7 @@ public class ElementDecl extends Particle {
     public void setNullable(boolean nullable) {
         this.nullable = nullable;
     } //-- setNullable
-    
+
     /**
      * Sets the reference for this element definition
      * @param reference the Element definition that this definition references
@@ -279,7 +298,7 @@ public class ElementDecl extends Particle {
     public void setReference(String reference) {
         this.elementRef = reference;
     } //-- setReference
-    
+
     /**
      * Sets the XMLType for this Element declaration.
      * @param type the XMLType for this element declaration.
@@ -315,7 +334,7 @@ public class ElementDecl extends Particle {
 	{
 		return _block;
 	}
-	
+
 	/**
 	 * Sets the value of the 'block' attribute for this element
 	 */
@@ -323,7 +342,7 @@ public class ElementDecl extends Particle {
 	{
 		_block = block;
 	}
-	
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
