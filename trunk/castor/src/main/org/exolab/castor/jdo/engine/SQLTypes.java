@@ -53,7 +53,6 @@ import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.MimeBase64Encoder;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -63,7 +62,9 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 
 /**
@@ -94,7 +95,46 @@ public final class SQLTypes
 
     private static final char RightParamSeparator = ']';
 
-
+    /**
+     * Time zone based on setting in castor.properties file (or
+     * default time zone if not specified)
+     */
+    private static final TimeZone dbTimeZone;
+    
+    static {
+    	String zone = LocalConfiguration.getInstance().getProperty(
+    			"org.exolab.castor.jdo.defaultTimeZone", "");
+    	
+    	if (zone.length() == 0) {
+    		dbTimeZone = TimeZone.getDefault();
+    	} else {
+    		dbTimeZone = TimeZone.getTimeZone(zone);
+    	}
+    }
+    
+    /**
+     * Thread local Calendar instance pool.
+     */
+    private static final ThreadLocal threadSafeCalendar = new ThreadLocal() {
+    	// The Calendar passed to ResultSet.getTimestamp() etc can actually
+    	// be modified depending on the database driver implementation.  To guard
+    	// against synchronization issues, we need to pass either a local
+    	// instance (which is expensive, creating one for each call), or create
+    	// a thread-local instance (which only gets created once per thread).
+    	// The latter is what this is for.
+    	public Object initialValue() {
+    		return new GregorianCalendar();
+    	}
+    };
+    
+    private static Calendar getCalendar() {
+    	// we have to reset the time zone each time in case the result set
+    	// implementation changes it.
+    	Calendar c = (Calendar) threadSafeCalendar.get();
+    	c.setTimeZone(dbTimeZone);
+    	return c;
+    }
+    
     /**
      * Grabs the LOB buffer size from castor.properties
      */
@@ -184,10 +224,11 @@ public final class SQLTypes
         if ( right < 0 )
             right = sqlTypeName.length();
 
-        if ( left >= 0 )
+        if ( left >= 0 ) {
             return sqlTypeName.substring( left + 1, right );
-        else
-            return null;
+        }
+
+        return null;
     }
 
 
@@ -345,11 +386,11 @@ public final class SQLTypes
             intVal = rs.getInt( index );
             return ( rs.wasNull() ? null : new Integer( intVal ) );
         case Types.TIME:
-            return rs.getTime( index );
+            return rs.getTime( index, getCalendar() );
         case Types.DATE:
-            return rs.getDate( index );
+            return rs.getDate( index, getCalendar() );
         case Types.TIMESTAMP:
-            return rs.getTimestamp( index );
+            return rs.getTimestamp( index, getCalendar() );
         case Types.FLOAT:
         case Types.DOUBLE:
             doubleVal = rs.getDouble( index );
