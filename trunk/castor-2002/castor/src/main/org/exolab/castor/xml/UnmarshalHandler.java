@@ -47,6 +47,7 @@ package org.exolab.castor.xml;
 
 //-- Castor imports
 import org.exolab.castor.util.MimeBase64Decoder;
+import org.exolab.castor.util.List;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.FieldHandler;
 
@@ -940,8 +941,14 @@ public class UnmarshalHandler implements DocumentHandler {
             }
         }
         
+        //-- First loop through Attribute Descriptors.
+        //-- Then, if we have any attributes which
+        //-- haven't been processed we can ask
+        //-- the XMLClassDescriptor for the FieldDescriptor.
         
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
+        
+        List processedAtts = new List(atts.getLength());
         
         for (int i = 0; i < descriptors.length; i++) {
             
@@ -961,68 +968,13 @@ public class UnmarshalHandler implements DocumentHandler {
             */
             
             String attName = descriptor.getXMLName();
+            
             String attValue = atts.getValue(attName);
-            if (attValue == null) {
-                //-- error handling
-                /*
-                if (debug) {
-                    buf.setLength(0);
-                    buf.append("no attribute value with name \'");
-                    buf.append(attName);
-                    buf.append("\' exists in element \'");
-                    buf.append(state.elementName);
-                    buf.append("\'");
-                    message(buf.toString());
-                }
-                */
-                
-                if (descriptor.isRequired()) {
-                    String err = classDesc.getXMLName() + " is missing " +
-                        "required attribute: " + attName;
-                    if (_locator != null) {
-                        err += "\n  - line: " + _locator.getLineNumber() +
-                            " column: " + _locator.getColumnNumber();
-                    }
-                    throw new SAXException(err);
-                }
-                else continue;
-            }
             
-            Object value = attValue;
+            if (attName != null) processedAtts.add(attName);
             
-            //-- if this is the identity then save id
-            if (classDesc.getIdentity() == descriptor) {
-                _idReferences.put(attValue, state.object);
-                //-- resolve waiting references
-                resolveReferences(attValue, state.object);
-            }
-            else if (descriptor.isReference()) {
-                value = _idReferences.get(attValue);
-                if (value == null) {
-                    //-- save state to resolve later 
-                    ReferenceInfo refInfo 
-                        = new ReferenceInfo(attValue, object, descriptor);
-                    refInfo.next 
-                        = (ReferenceInfo)_resolveTable.remove(attValue);
-                    _resolveTable.put(attValue, refInfo);
-                    continue;
-                }
-            }
-            else {
-                //-- check for proper type and do type
-                //-- conversion
-                Class type = descriptor.getFieldType();
-                if (isPrimitive(type))
-                    value = MarshalHelper.toPrimitiveObject(type, attValue);
-            }
-                
             try {
-                
-                
-                FieldHandler handler = descriptor.getHandler();
-                
-                if (handler != null)
-                    handler.setValue(object, value);
+                processAttribute(attName, attValue, descriptor, classDesc, object);
             }
             catch(java.lang.IllegalStateException ise) {
                 String err = "unable to add attribute \"" + attName + "\" to ";
@@ -1031,8 +983,101 @@ public class UnmarshalHandler implements DocumentHandler {
                 throw new SAXException(err);
             }
         }
+        //-- loop through remaining attributes if necessary
+        int len = atts.getLength();
+        if (len != processedAtts.size()) {
+            for (int i = 0; i < len; i++) {   
+                String attName = atts.getName(i);
+                if (processedAtts.contains(attName)) continue;
+                XMLFieldDescriptor descriptor =
+                    classDesc.getFieldDescriptor(attName, NodeType.Attribute);
+                if (descriptor == null) continue;
+                String attValue = atts.getValue(i);
+                try {
+                    processAttribute(attName, attValue, descriptor, classDesc, object);
+                }
+                catch(java.lang.IllegalStateException ise) {
+                    String err = "unable to add attribute \"" + attName + "\" to ";
+                    err += state.fieldDesc.getXMLName();
+                    err += "due to the following error: " + ise;
+                    throw new SAXException(err);
+                }
+            }
+        }
         
     } //-- processAttributes
+    
+    /**
+     * Processes the given Attribute
+    **/
+    private void processAttribute
+        (String attName, String attValue, 
+         XMLFieldDescriptor descriptor, 
+         XMLClassDescriptor classDesc,
+         Object parent) throws org.xml.sax.SAXException
+    {
+        
+        Object value = attValue;
+        
+        if (attValue == null) {
+            
+            //-- error handling
+            /*
+            if (debug) {
+                buf.setLength(0);
+                buf.append("no attribute value with name \'");
+                buf.append(attName);
+                buf.append("\' exists in element \'");
+                buf.append(state.elementName);
+                buf.append("\'");
+                message(buf.toString());
+            }
+            */
+                
+            if (descriptor.isRequired()) {
+                String err = classDesc.getXMLName() + " is missing " +
+                    "required attribute: " + attName;
+                if (_locator != null) {
+                    err += "\n  - line: " + _locator.getLineNumber() +
+                        " column: " + _locator.getColumnNumber();
+                }
+                throw new SAXException(err);
+            }
+            else return;
+        }
+        
+        //-- if this is the identity then save id
+        if (classDesc.getIdentity() == descriptor) {
+            _idReferences.put(attValue, parent);
+            //-- resolve waiting references
+            resolveReferences(attValue, parent);
+        }
+        else if (descriptor.isReference()) {
+            value = _idReferences.get(attValue);
+            if (value == null) {
+                //-- save state to resolve later 
+                ReferenceInfo refInfo 
+                    = new ReferenceInfo(attValue, parent, descriptor);
+                refInfo.next 
+                    = (ReferenceInfo)_resolveTable.remove(attValue);
+                _resolveTable.put(attValue, refInfo);
+                
+                return;
+            }
+        }
+        else {
+            //-- check for proper type and do type
+            //-- conversion
+            Class type = descriptor.getFieldType();
+            if (isPrimitive(type))
+                value = MarshalHelper.toPrimitiveObject(type, attValue);
+        }
+        FieldHandler handler = descriptor.getHandler();
+                
+        if (handler != null)
+            handler.setValue(parent, value);
+    } //-- processAttribute
+    
     
     /**
      * Sends a message to all observers. Currently the only observer is
