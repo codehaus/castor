@@ -26,16 +26,13 @@
            <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
            <tr><td>db2</td><td>DB/2</td></tr>
            <tr><td>informix</td><td>Informix</td></tr>
-           <tr><td>postgresql</td><td>PostgreSQL 6.5 and 7</td></tr>
+           <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
            <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
            <tr><td>instantdb</td><td>InstantDB</td></tr>
            <tr><td>interbase</td><td>Interbase</td></tr>
            <tr><td>mysql</td><td>MySQL</td></tr>
            <tr><td>sapdb</td><td>SAP DB</td></tr>
          </table></p>
-      <p><small>Don't use PostgreSQL with Castor! For now PostgreSQL doesn't support outer joins,
-                so in many cases Castor OQL queries return incorrect results.
-                </small></p>
       <p><small>Note: Castor doesn't work with JDBC-ODBC bridge from Sun.
                 In particular, MS Access is not supported.
                 </small></p>
@@ -90,7 +87,7 @@
          the <tt>param</tt> element. The DTD for the <tt>param</tt> element is undefined
          and depends on the DataSource being used.</p>
 
-      <p>For example, to configure a PostgreSQL 7.0 DataSource, use:
+      <p>For example, to configure a PostgreSQL 7.1 DataSource, use:
          <pre><![CDATA[
   <data-source class-name="org.postgresql.PostgresqlDataSource">
     <param host="host" database="db"
