@@ -47,59 +47,58 @@
 package org.exolab.castor.persist;
 
 
-import java.math.BigDecimal;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.OptionalDataException;
 import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Set;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.OptionalDataException;
+import java.math.BigDecimal;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Hashtable;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.NoSuchElementException;
-import org.exolab.castor.jdo.Persistent;
+import java.util.Set;
+import java.util.Vector;
 
-import org.exolab.castor.jdo.TimeStampable;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectDeletedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOCallback;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.loader.FieldHandlerImpl;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.CallbackInterceptor;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
+import org.exolab.castor.jdo.engine.SQLEngine;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
+import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.xml.ClassMapping;
+import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
-import java.sql.Connection;
 
 
 /**
@@ -120,9 +119,11 @@ import java.sql.Connection;
  *
  *
  * @author <a href="yip@intalio.com">Thomas Yip</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  */
 
-public class ClassMolder {
+public class ClassMolder 
+{
 
     /**
      * The fully qualified name of the java data object class which this ClassMolder
@@ -499,9 +500,9 @@ public class ClassMolder {
      *
      * @return  Vector of all of the <tt>ClassMolder</tt>s from a MappingLoader
      */
-    public static Vector resolve( MappingLoader loader, LockEngine lock,
-            PersistenceFactory factory, LogInterceptor logInterceptor )
-            throws MappingException, ClassNotFoundException {
+    public static Vector resolve( MappingLoader loader, LockEngine lock, PersistenceFactory factory )
+        throws MappingException, ClassNotFoundException 
+    {
 
         Vector result = new Vector();
         Enumeration enum;
@@ -515,7 +516,7 @@ public class ClassMolder {
         enum = loader.listJavaClasses();
         while ( enum.hasMoreElements() ) {
             desc = (ClassDescriptor) loader.getDescriptor((Class)enum.nextElement());
-            persist = factory.getPersistence( desc, logInterceptor );
+            persist = factory.getPersistence( desc );
             mold = new ClassMolder( ds, loader, lock, desc, persist );
             result.add( mold );
         }
@@ -1812,6 +1813,12 @@ public class ClassMolder {
 
         long lockTimestamp = locker.getTimeStamp();
         long objectTimestamp = _timeStampable? ((TimeStampable)object).jdoGetTimeStamp(): 1;
+
+        /*
+        System.out.println( "++++++++++++++++++ locker: " + locker.toString() );
+        System.out.println( "++++++++++++++++++ lockTimestamp: " + lockTimestamp );
+        System.out.println( "++++++++++++++++++ objectTimestamp: " + objectTimestamp );
+        */
 
         if ( objectTimestamp > 0 && oid.getIdentity() != null ) {
             // valid range of timestamp
