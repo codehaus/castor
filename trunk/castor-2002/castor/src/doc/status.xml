@@ -57,6 +57,16 @@
 
           <li>Cache control at JDO configuration and mapping file specification - no-cache option,
               cache object limit, cache time limit, LRU removal deamon</li>
+
+          <li>New architecture separating the responsibility of the CacheEngine from
+              that of the persistent object, in order to better support relations
+              (especially many-many) and better handle dependency object commits.</li>
+
+          <li>Multi column primary keys and contained objects.</li>
+
+          <li>Mapping file supporting object dependency and relations. </li>
+
+          <li>Serializable field type</li>
         </ul>
       </section>
 
@@ -84,8 +94,7 @@
         <li>Consolidation between the SQL and LDAP engine through a shared
             DataStore API, potentially supporting other relational back-ends.</li>
 
-        <li>Mapping file supporting object dependency and relations. More generic
-            mapping API and mapping tools.</li>
+        <li>More generic mapping API and mapping tools.</li>
 
         <li>Stored procedures, BLOBs, XML content.</li>
       </ul>
@@ -96,21 +105,13 @@
          <ul>
             <li>Add type convertors to bind parameters and load() method</li>
 
-            <li>New architecture separating the responsibility of the CacheEngine from
-                  that of the persistent object, in order to better support relations
-                  (especially many-many) and better handle dependency object commits.</li>
-
-            <li>Multi column primary keys and contained objects.</li>
-
             <li>DataStore API replacing existing persist SPI. Consolidation of JDO and DAX.</li>
 
             <li>New mapping DTD</li>
 
-            <li>Remove excessive methods in source code generator</li>
-
             <li>Support for read-only fields</li>
 
-            <li>Serializable, SQLData, DOM field types</li>
+            <li>SQLData, DOM and Castor XML data object field types</li>
 
             <li>Stored procedures</li>
          </ul>
@@ -119,6 +120,7 @@
           <section title="Source Code Generator">
             <ul>
                <li>Finish support for XML Schema (Grouping, remaining datatypes, etc)</li>
+               <li>Remove excessive methods in source code generator</li>
                <li>Create "customization" input file</li>
                <li>Extensibility API</li>
             </ul>
