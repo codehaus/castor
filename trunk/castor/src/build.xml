@@ -132,7 +132,7 @@
     </target>
 
     <!-- Prepare target directories -->
-    <target name="prepare">
+    <target name="prepare" unless="prepare.executed">
         <mkdir dir="${build}"/>
         <mkdir dir="${classes}"/>
         <mkdir dir="${dist}"/>
@@ -156,6 +156,7 @@
         </copy>
         <available property="castor-build.present" file="${user.home}/castor-build.properties" />
         <antcall target="-castor-build.check" />
+        <property name="prepare.executed" value="true" />
     </target>
 
     <target name="-castor-build.check"
