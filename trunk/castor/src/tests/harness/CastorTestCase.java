@@ -73,7 +73,14 @@ public class CastorTestCase extends TestCase {
         setDescription( description );
         setSuite( suite );
     }
-   
+
+    /**
+	 * @param name
+	 */
+	public CastorTestCase(String name) {
+        super (name);
+	}
+
     private void clearCache() {
         try {
             if (suite instanceof JDOCategory) {
@@ -85,13 +92,6 @@ public class CastorTestCase extends TestCase {
         }
     }
 
-    /**
-	 * @param name
-	 */
-	public CastorTestCase(String name) {
-        super (name);
-	}
-    
 	public static void setVerboseStream( PrintStream verboseStream ) {
         stream = verboseStream;
     }
