@@ -190,16 +190,15 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        //-- Use JVM internal String
-        name = name.intern();
-
-        if (name == SchemaNames.ATTRIBUTE) {
+        //-- attribute declarations
+        if (SchemaNames.ATTRIBUTE.equals(name)) {
             allowRefines = false;
             allowContentModel = false;
             unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
         }
-        else if (name == SchemaNames.ELEMENT) {
+        //-- element declarations
+        else if (SchemaNames.ELEMENT.equals(name)) {
             allowRefines = false;
             if (allowContentModel)
                 unmarshaller
@@ -207,11 +206,12 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             else
                 outOfOrder(name);
         }
-        else if (name == SchemaNames.GROUP) {
+        //-- ModelGroup declarations (choice, all, sequence, group)
+        else if (SchemaNames.isGroupName(name)) {
             allowRefines = false;
             if (allowContentModel)
                 unmarshaller
-                    = new GroupUnmarshaller(_schema, atts, getResolver());
+                    = new GroupUnmarshaller(_schema, name, atts, getResolver());
             else
                 outOfOrder(name);
         }
@@ -242,29 +242,30 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        //-- Use JVM internal String
-        name = name.intern();
-
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
-        if (name == SchemaNames.ATTRIBUTE) {
+        //-- attribute declarations
+        if (SchemaNames.ATTRIBUTE.equals(name)) {
             AttributeDecl attrDecl =
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
 
             _complexType.addAttributeDecl(attrDecl);
         }
-        else if (name == SchemaNames.ELEMENT) {
+        //-- element declarations
+        else if (SchemaNames.ELEMENT.equals(name)) {
 
             ElementDecl element =
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _complexType.addElementDecl(element);
         }
-        else if (name == SchemaNames.GROUP) {
+        //-- group declarations (all, choice, group, sequence)
+        else if (SchemaNames.isGroupName(name)) {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _complexType.addGroup(group);
         }
-        else if (name == SchemaNames.ANNOTATION) {
+        //-- annotation
+        else if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
             _complexType.addAnnotation(ann);
         }
