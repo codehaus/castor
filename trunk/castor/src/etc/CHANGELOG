@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1708 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Added (general JDO) Utils class.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1708
+       (Werner - 20040817)
+
 JDO:   Fixed bug 1221. Added the ability to specify an OFFSET clause
        with LIMIT clauses with contribution from Lance Lavandowska
        [lance@aptura.com]. This patch provides support for postgreSQL,
