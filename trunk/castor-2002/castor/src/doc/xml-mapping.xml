@@ -49,10 +49,10 @@
       <p>It is possible to use the mapping and Castor default behavior in conjunction:
         when Castor has to handle an object or an XML data but can't find information
         about it in the mapping file, it will rely on its default behavior. Castor will
-        use Java Reflection API to introspect the Java objects to determine what to do.</p>
+        use the Java Reflection API to introspect the Java objects to determine what to do.</p>
 
       <p><b>Note:</b> Castor can't handle all possible mappings. In some complex cases, it may be
-        necessary to rely on XSL transformation in conjunction with Castor to adapt the
+        necessary to rely on an XSL transformation in conjunction with Castor to adapt the
         XML document to a more friendly format.</p>
 
 
@@ -62,7 +62,7 @@
           object, it will:</p>
         
         <ul>
-          <li>use the mapping information if any to find the name of the element to create</li>
+          <li>use the mapping information, if any, to find the name of the element to create</li>
         </ul>
 
         <p>or</p>
@@ -101,16 +101,16 @@
 
       <section title="2.2 Unmarshalling Behavior">
 
-        <p>When Castor find an element while unmarshalling a document, it will try to use
+        <p>When Castor finds an element while unmarshalling a document, it will try to use
           the mapping information to determine which object to instantiate. If no mapping
           information is present, Castor will use the name of the element to try to find
           the name of a class to instantiate (for example, for an element named
-          'test-element' Castor will try to instantiate a class named 'TestElement' if no
+          'test-element', Castor will try to instantiate a class named 'TestElement' if no
           information is given in the mapping file). Castor will then use the field
           information of the mapping file to handle the content of the element.</p>
 
         <p>If the class is not described in the mapping file, Castor will instrospect the
-          class using Java Reflection API to determine if there is any function of the
+          class using the Java Reflection API to determine if there is any function of the
           form getXxxYyy()/setXxxYyy(&lt;type> x). This accessor will be associated with XML
           element/attribute named 'xxx-yyy'. In the future, we will provide a way to
           override this default behavior.</p>
@@ -120,11 +120,12 @@
           public variables of the form:</p>
 
         <code>
-          public &lt;type> xxxxYYY;
+          public &lt;type> xxxYYY;
         </code>
 
-        <p>and expect element/attribute with name 'xxx-yyy'. The only handled (up to
-          version 0.8.10) collections for &lt;type> is java.lang.Vector and array.</p>
+        <p>and expect an element/attribute name 'xxx-yyy'. The only handled
+          collections for &lt;type> are java.lang.Vector and array. (up to version
+          0.8.10)</p>
 
         <p>For primitive &lt;type>, Castor will look for an attribute first and then an
           element. If &lt;type> is not a primitive type, Castor will look for an element
@@ -228,7 +229,7 @@
         <ul>
              <li><b>description</b>: an optional &lt;description></li>
 
-             <li><b>cache-type:</b> for more information on this fields, see JDO
+             <li><b>cache-type:</b> for more information on this field, see JDO
              documentation</li>
 
              <li><b>an optional &lt;map-to></b>. Used if the name of the element is not the
@@ -287,14 +288,14 @@ public class myclass {
                                direct="true"
                                 ....
                                >
-                                &lt;xml name="foo-like" node="attribute"/>
+                                &lt;bind-xml name="foo-like" node="attribute"/>
                         &lt;/field>
 
 
                         &lt;/field name="bar"
                                 ....
                                >
-                                &lt;xml name="something" node="element"/>
+                                &lt;bind-xml name="something" node="element"/>
                         &lt;/field>
 
                &lt;/class>
@@ -428,11 +429,11 @@ public class myclass {
               to be null and need to be instantiated.</p>
 
             <p>For hashtable and map, Castor will add an object with put(object, object): the object
-              is both the key and the value. This will improved in the future.</p></li>
+              is both the key and the value. This will be improved in the future.</p></li>
         </ul>
 
         <p>It is necessary to use a collection when the content model of the
-          element expect more than one element of the specified type.</p>
+          element expects more than one element of the specified type.</p>
 
 
         <p><b>2. Determine the signature of the function</b></p>
@@ -498,7 +499,7 @@ public class myclass {
           <li><b>direct:</b> if true, Castor will expect a public variable in the object
             and will modify it directly</li>
 
-          <li><b>collection:</b> if a parent expect more than one occurrence of
+          <li><b>collection:</b> if a parent expects more than one occurrence of
             one of its element, it is necessary to specify which collection
             Castor will use to handle them. The type specified is used to
             define the type of the content inside the collection.</li>
@@ -535,19 +536,19 @@ public class myclass {
                   node     ( attribute | element | text )  #IMPLIED>
         </code> 
 
-        <p>&lt;xml> is used to describe how a given Java field should appear in an XML
+        <p>&lt;bind-xml> is used to describe how a given Java field should appear in an XML
           document. It is used both for marshalling and unmarshalling.</p>
 
         <p>Description of the attributes:</p>
         <ul>
-          <li><b>name:</b> the name of the element or attributes</li>
+          <li><b>name:</b> the name of the element or attribute</li>
 
           <li><b>type:</b> xsi::type</li>
           
           <li><b>matches:</b> not used</li>
           
           <li><b>node:</b> indicates if the name corresponds to an attribute, an element,
-            or text content. By default, primitive are assumed to be an attribute
+            or text content. By default, primitive types are assumed to be an attribute
             otherwise the node is assumed to be an element</li>
         </ul>
 
@@ -555,8 +556,8 @@ public class myclass {
     </section>
     <section title="4. Usage Pattern">
 
-      <p>Here is an example of how Castor Mapping can be used. We want to map XML
-        document like the following one (called 'order.xml') into the below object
+      <p>Here is an example of how Castor Mapping can be used. We want to map an XML
+        document like the following one (called 'order.xml').
         model.</p>
 
       <table border="1" cellpadding="4">
@@ -564,7 +565,7 @@ public class myclass {
             <code>
 &lt;Order reference="12343-AHSHE-314159">
         &lt;Client>
-                &lt;Name>Paul Dupond&lt;/Name>
+                &lt;Name>Jean Smith&lt;/Name>
                 &lt;Address>2000, Alameda de las Pulgas, San Mateo, CA 94403&lt;/Address>
         &lt;/Client>
 
@@ -590,7 +591,7 @@ public class myclass {
           </td></tr>
       </table>
 
-      <p>In the following object model composed of 3 classes:</p>
+      <p>Into the following object model composed of 3 classes:</p>
       <ul>
         <li><b>MyOrder:</b> represent an order</li>
         <li><b>Client:</b> used to store information on the client</li>
@@ -725,7 +726,7 @@ public class Item {
       </table>
 
       <p>The XML document and the java object model can be connected by using the
-        folliwing mapping file:</p>
+        following mapping file:</p>
 
       <table border="1" cellpadding="4">
         <tr>
@@ -805,9 +806,9 @@ public class Item {
       </table>
 
       <p>The following class is an example of how to use Castor XML Mapping to
-        manipulate the file 'order.xml'. It unmarshall the document 'order.xml',
-        compute the total price, set the total price in the java object and
-        marshall the object model back into XML with the calculated price.</p>
+        manipulate the file 'order.xml'. It unmarshals the document 'order.xml',
+        computes the total price, sets the total price in the java object and
+        marshals the object model back into XML with the calculated price.</p>
 
       <table border="1" cellpadding="4">
         <tr>
@@ -840,7 +841,7 @@ public class main {
             <comment>// 1. Load the mapping information from the file</comment>
             mapping.loadMapping( "mapping.xml" );
 
-            <comment>// 2. Unmarshall the data</comment>
+            <comment>// 2. Unmarshal the data</comment>
             Unmarshaller unmar = new Unmarshaller(mapping);
             MyOrder order = (MyOrder)unmar.unmarshal(new InputSource(new FileReader("order.xml")));
 
@@ -849,7 +850,7 @@ public class main {
             System.out.println("Order total price = " + total);
             order.setTotal(total);
 
-            <comment>// 4. marshall the data with the total price back and print the XML in the console</comment>
+            <comment>// 4. marshal the data with the total price back and print the XML in the console</comment>
             Marshaller marshaller = new Marshaller(new OutputStreamWriter(System.out));
             marshaller.setMapping(mapping);
             marshaller.marshal(order);
