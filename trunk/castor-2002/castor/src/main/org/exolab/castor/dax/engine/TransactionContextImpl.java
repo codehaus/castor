@@ -89,6 +89,11 @@ final class TransactionContextImpl
     }
 
 
+    protected void closeConnections()
+    {
+    }
+
+
     public Object getConnection( PersistenceEngine engine )
     {
         return _conn;

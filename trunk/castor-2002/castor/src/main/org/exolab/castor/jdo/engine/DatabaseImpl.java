@@ -188,6 +188,8 @@ public class DatabaseImpl
                     }
                     throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
                 }
+            } else {
+                _ctx.close();
             }
         } finally {
             _dbEngine = null;
