@@ -40,6 +40,9 @@
  *
  * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ *
  * $Id$
  */
 
@@ -67,6 +70,8 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.handlers.EnumFieldHandler;
+import org.exolab.castor.mapping.handlers.TransientFieldHandler;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
@@ -79,7 +84,7 @@ import org.exolab.castor.util.Messages;
  * scheme typically by extending this class.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public abstract class MappingLoader
@@ -106,6 +111,25 @@ public abstract class MappingLoader
      * The prefix for the "is" method for booleans
     **/
     private static final String IS_METHOD_PREFIX = "is";
+    
+    /**
+     * Empty array of class types used for reflection
+     */
+    private static final Class[] EMPTY_ARGS = new Class[0];
+
+
+    /**
+     * The string argument for the valueOf method, used
+     * for introspection when searching for type-safe
+     * enumeration style classes.
+     */
+    private static final Class[] STRING_ARG = { String.class };
+
+    /**
+     * Factory method name for type-safe enumerations. 
+    **/
+    private static final String VALUE_OF = "valueOf";
+    
     
     //----------------------/
     //- Instance Variables -/
@@ -754,7 +778,49 @@ public abstract class MappingLoader
                 ((GeneralizedFieldHandler)exfHandler).setFieldHandler(handler);
                 handler = custom;
             }
-            else typeInfo = typeInfoRef.typeInfo;
+            else {
+                
+                boolean isTypeSafeEnum = false;
+            	//-- check for type-safe enum style classes
+                if ((fieldType != null) && (!isPrimitive(fieldType))) {
+                    //-- make sure no default constructor
+                    Constructor cons = null;
+                    try {
+                        cons = fieldType.getConstructor(EMPTY_ARGS);
+                        if (!Modifier.isPublic(cons.getModifiers())) {
+                            cons = null;
+                        }
+                    }
+                    catch(NoSuchMethodException nsmx) {
+                        //-- Do nothing
+                    }
+                    try {
+                        if (cons == null) {
+                            //-- make sure a valueOf factory method
+                            //-- exists and no user specified handler exists
+                            Method method = fieldType.getMethod(VALUE_OF, STRING_ARG);
+                            Class returnType = method.getReturnType();
+                            if ((returnType != null) && fieldType.isAssignableFrom(returnType)) {
+                                
+                                int mods = method.getModifiers();
+                                if (Modifier.isStatic(mods)) {
+                                    //-- Use EnumFieldHandler
+                                    handler = new EnumFieldHandler(fieldType, handler, method);
+                                    typeInfo.setImmutable(true);
+                                    isTypeSafeEnum = true;
+                                }
+                            }
+                        }
+                    }
+                    catch(NoSuchMethodException nsmx) {
+                        //-- Do nothing
+                    }
+                }
+                //-- reset proper TypeInfo
+                if (!isTypeSafeEnum) typeInfo = typeInfoRef.typeInfo;
+
+            }
+            
         }
                 
         FieldDescriptorImpl fieldDesc 
@@ -785,6 +851,10 @@ public abstract class MappingLoader
         throws MappingException
     {
         
+        //-- prevent introspection of transient fields
+        if (fieldMap.getTransient()) {
+        	return new TransientFieldHandler();
+        }
         
         CollectionHandler colHandler         = null;
         Class             colType            = null;
@@ -1272,6 +1342,24 @@ public abstract class MappingLoader
             return name;
         return Character.toUpperCase( first ) + name.substring( 1 );
     }
+    
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private static boolean isPrimitive(Class type) {
+
+        if (type.isPrimitive()) return true;
+
+        if ((type == Boolean.class) || (type == Character.class))
+            return true;
+
+        return (type.getSuperclass() == Number.class);
+
+    } //-- isPrimitive
+    
 
 
     /**
@@ -1281,5 +1369,7 @@ public abstract class MappingLoader
     class TypeInfoReference {
         TypeInfo typeInfo = null;
     } //-- TypeInfoReference
+    
+    
     
 } //-- MappingLoader
