@@ -48,12 +48,12 @@ package org.exolab.castor.persist.spi;
 
 
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.DuplicateIdentityException;
-import org.exolab.castor.persist.ObjectNotFoundException;
-import org.exolab.castor.persist.ObjectDeletedException;
-import org.exolab.castor.persist.ObjectModifiedException;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.persist.TransactionContext;
 
 

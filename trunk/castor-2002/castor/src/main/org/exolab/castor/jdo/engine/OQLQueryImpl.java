@@ -53,16 +53,16 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.ODMGRuntimeException;
-import org.exolab.castor.jdo.QueryInvalidException;
+import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.ObjectNotFoundException;
-import org.exolab.castor.persist.PersistenceException;
-import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -97,7 +97,7 @@ public class OQLQueryImpl
     public void bind( Object obj )
     {
         if ( _query == null ) {
-            throw new ODMGRuntimeException( "Must create query before using it" );
+            throw new IllegalStateException( "Must create query before using it" );
         }
         if ( _fieldNum == _query.getParameterCount() )
             throw new IllegalArgumentException( "Only " + _query.getParameterCount() +
@@ -115,7 +115,7 @@ public class OQLQueryImpl
 
 
     public void create( String oql )
-        throws QueryInvalidException
+        throws QueryException
     {
         StringTokenizer    token;
         String             objType;
@@ -132,39 +132,39 @@ public class OQLQueryImpl
         sql = new StringBuffer();
         token = new StringTokenizer( oql );
         if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "SELECT" ) )
-            throw new QueryInvalidException( "Query must start with SELECT" );
+            throw new QueryException( "Query must start with SELECT" );
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing object name" );
+            throw new QueryException( "Missing object name" );
         objName = token.nextToken();
         if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "FROM" ) )
-            throw new QueryInvalidException( "Object must be followed by FROM" );
+            throw new QueryException( "Object must be followed by FROM" );
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing object type" );
+            throw new QueryException( "Missing object type" );
         objType = token.nextToken();
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing object name" );
+            throw new QueryException( "Missing object name" );
         if ( ! objName.equals( token.nextToken() ) )
-            throw new QueryInvalidException( "Object name not same in SELECT and FROM" );
+            throw new QueryException( "Object name not same in SELECT and FROM" );
         
         try {
             _objClass = Class.forName( objType );
         } catch ( ClassNotFoundException except ) {
-            throw new QueryInvalidException( "Could not find class " + objType );
+            throw new QueryException( "Could not find class " + objType );
         }
         _dbEngine = DatabaseSource.getPersistenceEngine( _objClass ); 
         if ( _dbEngine == null )
-            throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
+            throw new QueryException( "Cold not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
         clsDesc = engine.getDescriptor();
 
         expr = engine.getFinder();
         if ( token.hasMoreTokens() ) {
             if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
-                throw new QueryInvalidException( "Missing WHERE clause" );
+                throw new QueryException( "Missing WHERE clause" );
             parseField( clsDesc, token, expr, types );
             while ( token.hasMoreTokens() ) {
                 if ( ! token.nextToken().equals( "AND" ) )
-                    throw new QueryInvalidException( "Only AND supported in WHERE clause" );
+                    throw new QueryException( "Only AND supported in WHERE clause" );
                 parseField( clsDesc, token, expr, types );
             }
         }
@@ -174,14 +174,14 @@ public class OQLQueryImpl
         try {
             _query = engine.createQuery( expr, array );
         } catch ( QueryException except ) {
-            throw new QueryInvalidException( except.getMessage() );
+            throw new QueryException( except.getMessage() );
         }
     }
     
     
     private void parseField( JDOClassDescriptor clsDesc, StringTokenizer token,
                              QueryExpression expr, Vector types )
-        throws QueryInvalidException
+        throws QueryException
     {
         String               name;
         String               op;
@@ -190,13 +190,13 @@ public class OQLQueryImpl
         JDOFieldDescriptor   field;
         
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing field name" );
+            throw new QueryException( "Missing field name" );
         name = token.nextToken();
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing operator" );
+            throw new QueryException( "Missing operator" );
         op = token.nextToken();
         if ( ! token.hasMoreTokens() )
-            throw new QueryInvalidException( "Missing field value" );
+            throw new QueryException( "Missing field value" );
         
         value = token.nextToken();
         if ( name.indexOf( "." ) > 0 )
@@ -219,7 +219,7 @@ public class OQLQueryImpl
         }
         
         if ( field == null )
-            throw new QueryInvalidException( "The field " + name + " was not found" );
+            throw new QueryException( "The field " + name + " was not found" );
         if ( value.startsWith( "$" ) ) {
             expr.addParameter( clsDesc.getTableName(), field.getSQLName(), op );
             types.addElement( field.getFieldType() );
@@ -230,7 +230,7 @@ public class OQLQueryImpl
     
     
     public Object execute()
-        throws org.exolab.castor.jdo.QueryException
+        throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         TransactionContext tx;
         QueryResults       results = null;
@@ -259,16 +259,12 @@ public class OQLQueryImpl
             if ( set.size() == 1 )
                 return set.elementAt( 0 );
             return set.elements();
-        } catch ( QueryException except ) {
-            throw new org.exolab.castor.jdo.QueryException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-            throw new TransactionNotInProgressException( except.getMessage() );
         } catch ( LockNotGrantedException except ) {
-            throw new ODMGRuntimeException( except.toString() );
+            throw new PersistenceExceptionImpl( except.toString() );
         } catch ( PersistenceException except ) {
             if ( Logger.debug() )
                 except.printStackTrace( Logger.getSystemLogger() );
-            throw new ODMGRuntimeException( except.toString() );
+            throw except;
         } finally {
             if ( results != null )
                 results.close();

@@ -47,7 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.exolab.castor.jdo.ODMGRuntimeException;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.persist.ClassHandler;
 
@@ -89,11 +89,12 @@ public class NameBinding
 
 
     public Class getType()
+        throws PersistenceException
     {
         try {
             return getClass().getClassLoader().loadClass( type );
         } catch ( Exception except ) {
-            throw new ODMGRuntimeException( "Nested exception: " + except.toString() );
+            throw new PersistenceException( "Nested exception: " + except.toString() );
         }
     }
 

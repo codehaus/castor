@@ -48,8 +48,15 @@ package org.exolab.castor.persist;
 
 
 import javax.transaction.Status;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -145,7 +152,7 @@ public final class QueryResults
     {
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException();
+            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
         try {
             _lastIdentity = _query.nextIdentity( _lastIdentity );
         } catch ( PersistenceException except ) {
@@ -197,9 +204,9 @@ public final class QueryResults
         
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException();
+            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
         if ( _lastIdentity == null )
-            throw new IllegalStateException( "Not called after 'nextIdentity' returned an identity" );
+            throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
         synchronized ( _tx ) {
             // Get the next OID from the query engine. The object is
@@ -218,7 +225,7 @@ public final class QueryResults
                 if ( entry.deleted )
                     // Object has been deleted in this transaction, so skip
                     // to next object.
-                    throw new ObjectNotFoundException( handler.getJavaClass(), _lastIdentity );
+                    throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), _lastIdentity );
                 else {
                     if ( _accessMode == AccessMode.Exclusive &&
                          ! oid.isExclusive() ) {
@@ -227,8 +234,8 @@ public final class QueryResults
                         // problem. We cannot return an object that is not
                         // synchronized with the database, but we cannot
                         // synchronize a live object.
-                        throw new PersistenceException( "persist.lockConflict",
-                                                        _query.getResultType(), _lastIdentity );
+                        throw new PersistenceExceptionImpl( "persist.lockConflict",
+                                                            _query.getResultType(), _lastIdentity );
                     } else {
                         // Either read only or exclusive mode, and we
                         // already have an object in that mode, so we

@@ -52,8 +52,23 @@ import java.util.Enumeration;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.exolab.castor.jdo.ObjectNotPersistentException;
+import org.exolab.castor.jdo.TransactionAbortedException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -310,11 +325,11 @@ public abstract class TransactionContext
             // object has been created in this transaction, it cannot be
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
-                throw new PersistenceException( "persist.multipleLoad", object.getClass(), identity );
+                throw new PersistenceExceptionImpl( "persist.multipleLoad", object.getClass(), identity );
             if ( entry.deleted )
-                throw new ObjectNotFoundException( object.getClass(), identity );
+                throw new ObjectNotFoundExceptionImpl( object.getClass(), identity );
             if ( object.getClass() != entry.object.getClass() )
-                throw new PersistenceException( "persist.typeMismatch", object.getClass(), entry.object.getClass() );
+                throw new PersistenceExceptionImpl( "persist.typeMismatch", object.getClass(), entry.object.getClass() );
             if ( entry.created )
                 return false;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
@@ -323,8 +338,7 @@ public abstract class TransactionContext
                 // problem. We cannot return an object that is not
                 // synchronized with the database, but we cannot
                 // synchronize a live object.
-                throw new PersistenceException( "persist.lockConflict",
-                                                object.getClass(), identity );
+                throw new PersistenceExceptionImpl( "persist.lockConflict", object.getClass(), identity );
             }
             return false;
         }
@@ -342,7 +356,7 @@ public abstract class TransactionContext
         } catch ( LockNotGrantedException except ) {
             throw except;
         } catch ( ClassNotPersistenceCapableException except ) {
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
 
         // Need to copy the contents of this object from the cached
@@ -426,13 +440,11 @@ public abstract class TransactionContext
             // object has been created in this transaction, it cannot be
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
-                throw new PersistenceException( "persist.multipleLoad",
-                                                handler.getJavaClass(), identity );
+                throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
             if ( entry.deleted )
-                throw new ObjectNotFoundException( handler.getJavaClass(), identity );
+                throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), identity );
             if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceException( "persist.typeMismatch",
-                                                handler.getJavaClass(), entry.object.getClass() );
+                throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
                 return entry.object;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
@@ -441,8 +453,7 @@ public abstract class TransactionContext
                 // problem. We cannot return an object that is not
                 // synchronized with the database, but we cannot
                 // synchronize a live object.
-                throw new PersistenceException( "persist.lockConflict",
-                                                handler.getJavaClass(), identity );
+                throw new PersistenceExceptionImpl( "persist.lockConflict", handler.getJavaClass(), identity );
             }
             return entry.object;
         }
@@ -459,7 +470,7 @@ public abstract class TransactionContext
         } catch ( LockNotGrantedException except ) {
             throw except;
         } catch ( ClassNotPersistenceCapableException except ) {
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
 
         // Need to copy the contents of this object from the cached
@@ -553,16 +564,16 @@ public abstract class TransactionContext
         */
         // Make sure the object has not beed persisted in this transaction.
         if ( getObjectEntry( object ) != null )
-            throw new PersistenceException( "persist.objectAlreadyPersistent", object.getClass(), identity );
+            throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
-            throw new ClassNotPersistenceCapableException( object.getClass() );
+            throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName() ) );
 
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
         if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
-            throw new DuplicateIdentityException( object.getClass(), identity );
+            throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
         oid = new OID( handler, identity );
         entry = addObjectEntry( object, oid, engine );
         entry.created = true;
@@ -613,11 +624,10 @@ public abstract class TransactionContext
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
         if ( entry == null )
-            throw new ObjectNotPersistentException( object.getClass() );
+            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         // Cannot delete same object twice
         if ( entry.deleted )
-            throw new PersistenceException( "persist.cannotDeleteTwice",
-                                            object.getClass(), entry.oid.getIdentity() );
+            throw new PersistenceExceptionImpl( "persist.cannotDeleteTwice", object.getClass(), entry.oid.getIdentity() );
 
         // If the object has been created in this transaction and had no
         // identity we don't need to remove it from persistent storage
@@ -685,14 +695,14 @@ public abstract class TransactionContext
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
         if ( entry == null || entry.deleted )
-            throw new ObjectNotPersistentException( object.getClass() );
+            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         try {
             entry.engine.writeLock( this, entry.oid, timeout );
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
             removeObjectEntry( object );
-            throw new ObjectNotPersistentException( object.getClass() );
+            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         } catch ( LockNotGrantedException except ) {
             // Can't get lock, but may still keep running
             throw except;
@@ -727,7 +737,7 @@ public abstract class TransactionContext
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
         if ( entry == null || entry.deleted )
-            throw new ObjectNotPersistentException( object.getClass() );
+            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
         removeObjectEntry( object );
@@ -760,9 +770,9 @@ public abstract class TransactionContext
         int         count;
 
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionAbortedException( "persist.markedRollback" );
+            throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
         if ( _status != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException();
+            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
 
         // No objects in this transaction -- this is a read only transaction
         if ( _objects.size() == 0 ) {
@@ -796,8 +806,7 @@ public abstract class TransactionContext
                         handler = entry.engine.getClassHandler( entry.object.getClass() );
                         identity = handler.getIdentity( entry.object );
                         if ( identity == null )
-                            throw new TransactionAbortedException( "persist.noIdentity",
-                                                                   handler.getJavaClass(), null );
+                            throw new TransactionAbortedExceptionImpl( "persist.noIdentity", handler.getJavaClass(), null );
                         entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
                         entry.prepared = true;
                     }
@@ -813,7 +822,7 @@ public abstract class TransactionContext
                 entry.prepared = false;
             }
             // Any error is reported as transaction aborted
-            throw new TransactionAbortedException( except );
+            throw new TransactionAbortedExceptionImpl( except );
         }
     }
 
@@ -837,11 +846,11 @@ public abstract class TransactionContext
         ObjectEntry entry;
 
         if ( _xid != null )
-            throw new TransactionNotInProgressException( "persist.checkpointNotSupported" );
+            throw new TransactionNotInProgressException( Messages.message( "persist.checkpointNotSupported" ) );
         // Never commit transaction that has been marked for rollback
         if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
             rollback();
-            throw new TransactionAbortedException( "persist.markedRollback" );
+            throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
         }
         // Prepare the transaction
         prepare();
@@ -880,7 +889,7 @@ public abstract class TransactionContext
             rollback();
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
-            throw new TransactionAbortedException( except );
+            throw new TransactionAbortedExceptionImpl( except );
         } finally {
             enum = _objects.elements();
             while ( enum.hasMoreElements() ) {
@@ -911,10 +920,10 @@ public abstract class TransactionContext
         // Never commit transaction that has been marked for rollback
         if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
             rollback();
-            throw new TransactionAbortedException( "persist.markedRollback" );
+            throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
         }
         if ( _status != Status.STATUS_PREPARED )
-            throw new IllegalStateException( "persist.missingPrepare" );
+            throw new IllegalStateException( Messages.message( "persist.missingPrepare" ) );
 
         try {
             _status = Status.STATUS_COMMITTING;
@@ -950,7 +959,7 @@ public abstract class TransactionContext
             // Any error that happens, we're going to rollback the transaction.
             _status = Status.STATUS_MARKED_ROLLBACK;
             rollback();
-            throw new TransactionAbortedException( except );
+            throw new TransactionAbortedExceptionImpl( except );
         }
     }
 
@@ -973,7 +982,7 @@ public abstract class TransactionContext
 
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_PREPARED &&
              _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException();
+            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
 
         // Go through all the connections opened in this transaction,
         // rollback and close them one by one.

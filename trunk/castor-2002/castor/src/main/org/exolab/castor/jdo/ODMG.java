@@ -52,18 +52,6 @@ import java.io.Reader;
 import java.io.PrintWriter;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
-import org.odmg.Implementation;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
-import org.odmg.DArray;
-import org.odmg.DBag;
-import org.odmg.DList;
-import org.odmg.DMap;
-import org.odmg.DSet;
-import org.odmg.ODMGRuntimeException;
-import org.odmg.NotImplementedException;
-import org.odmg.ObjectNotPersistentException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
@@ -78,7 +66,6 @@ import org.exolab.castor.jdo.engine.DatabaseSource;
  * @version $Revision$ $Date$
  */
 public class ODMG
-    implements Implementation
 {
 
 
@@ -130,41 +117,12 @@ public class ODMG
     }
     
     
-    public DArray newDArray()
-    {
-        throw new NotImplementedException( "Collections are not supported in this release" );
-    }
-    
-    
-    public DBag newDBag()
-    {
-        throw new NotImplementedException( "Collections are not supported in this release" );
-    }
-    
-    
-    public DList newDList()
-    {
-        throw new NotImplementedException( "Collections are not supported in this release" );
-    }
-    
-    
-    public DMap newDMap()
-    {
-        throw new NotImplementedException( "Collections are not supported in this release" );
-    }
-
-
-    public DSet newDSet()
-    {
-        throw new NotImplementedException( "Collections are not supported in this release" );
-    }
-
-
-    public Database newDatabase()
+    public Database openDatabase( String name )
+        throws DatabaseNotFoundException
     {
         DatabaseImpl db;
         
-        db = new DatabaseImpl();
+        db = new DatabaseImpl( name );
         if ( _logWriter != null )
             db.setLogWriter( _logWriter );
         return db;
@@ -239,3 +197,4 @@ public class ODMG
 
 
 }
+

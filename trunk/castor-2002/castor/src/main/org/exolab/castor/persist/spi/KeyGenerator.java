@@ -48,7 +48,7 @@ package org.exolab.castor.persist.spi;
 
 
 import java.sql.Connection;
-import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.jdo.PersistenceException;
 
 
 /**

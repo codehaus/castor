@@ -5,29 +5,22 @@ package org.exolab.castor.jdo;
 /**
  * The interface to an OQL query object.
  *
- * @author David Jordan (as Java Editor of the Object Data Management Group)
+ * @author David Jordan (OMG)
  * @version ODMG 3.0
+ * @version $Revision$ $Date$
  */
 public interface OQLQuery
-    extends org.odmg.OQLQuery
 {
 
 
     /**
-     * Create an OQL query from the string parameter.
-     * In order to execute a query, an <code>OQLQuery</code> object must be created
-     * by calling <code>Implementation.newOQLQuery</code>, then calling the
-     * <code>create</code> method with the query string.
-     * The <code>create</code> method might throw <code>QueryInvalidException</code>
-     * if the query could not be compiled properly. Some implementations may not want
-     * to compile the query before <code>execute</code> is called. In this case
-     * <code>QueryInvalidException</code> is thrown when <code>execute</code> is called.
+     * Creates an OQL query from the string parameter.
      *
-     * @param query An OQL query.
-     * @throws QueryInvalidException The query syntax is invalid.
+     * @param query An OQL query
+     * @throws QueryException The query syntax is invalid
      */
     public void create( String query )
-        throws QueryInvalidException;
+        throws QueryException;
 
 
     /**
@@ -69,7 +62,7 @@ public interface OQLQuery
      * @throws QueryException An exception has occurred while executing the query.
      */
     public Object execute()
-        throws QueryException;
+        throws QueryException, PersistenceException, TransactionNotInProgressException;
 
 
 }

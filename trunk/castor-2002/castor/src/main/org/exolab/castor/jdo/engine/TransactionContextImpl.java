@@ -54,10 +54,12 @@ import java.sql.SQLException;
 import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.PersistenceEngine;
-import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TransactionAbortedException;
+import org.exolab.castor.persist.TransactionAbortedExceptionImpl;
 
 
 /**
@@ -129,9 +131,9 @@ final class TransactionContextImpl
             // [oleg] Check for rollback exception based on X/Open error code
             if ( except.getSQLState() != null &&
                  except.getSQLState().startsWith( "40" ) )
-                throw new TransactionAbortedException( except );
+                throw new TransactionAbortedExceptionImpl( except );
             
-            throw new TransactionAbortedException( except );
+            throw new TransactionAbortedExceptionImpl( except );
         } finally {
             if ( ! keepOpen ) {
                 enum = _conns.elements();
@@ -185,7 +187,7 @@ final class TransactionContextImpl
                     conn.setAutoCommit( false );
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
         }
         return conn;

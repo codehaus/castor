@@ -51,6 +51,15 @@ import java.io.PrintWriter;
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
@@ -295,7 +304,7 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( type );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableException( type );
+            throw new ClassNotPersistenceCapableExceptionImpl( type );
 
         // Create an OID to represent the object and see if we
         // have a lock (i.e. object is cached).
@@ -310,7 +319,7 @@ public final class CacheEngine
                 fields = (Object[]) lock.acquire( tx, accessMode == AccessMode.Exclusive, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
-                throw new ObjectNotFoundException( type, identity );
+                throw new ObjectNotFoundExceptionImpl( type, identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
@@ -436,7 +445,7 @@ public final class CacheEngine
                 fields = (Object[]) lock.acquire( tx, false, timeout );
             } catch ( ObjectDeletedWaitingForLockException except ) {
                 // This is equivalent to object not existing
-                throw new ObjectNotFoundException( query.getResultType(), identity );
+                throw new ObjectNotFoundExceptionImpl( query.getResultType(), identity );
             }
             // Get the actual OID of the object, this one contains the
             // object's stamp that will be used for dirty checking.
@@ -545,7 +554,7 @@ public final class CacheEngine
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableException( object.getClass() );
+            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
 
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
@@ -562,7 +571,7 @@ public final class CacheEngine
                         fields = (Object[]) lock.acquire( tx, true, 0 );
                     } catch ( LockNotGrantedException except ) {
                         // Someone else is using the object, definite duplicate key
-                        throw new DuplicateIdentityException( object.getClass(), identity );
+                        throw new DuplicateIdentityExceptionImpl( object.getClass(), identity );
                     }
                     // Dump the memory image of the object, it might have been deleted
                     // from persistent storage
@@ -608,7 +617,7 @@ public final class CacheEngine
             try {
                 typeInfo.handler.checkValidity( object );
             } catch ( ValidityException except ) {
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
             fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
@@ -852,12 +861,12 @@ public final class CacheEngine
             try {
                 return create( tx, object, identity );
             } catch ( ClassNotPersistenceCapableException except ) {
-                throw new PersistenceException( "persist.internal", except.toString() );
+                throw new PersistenceExceptionImpl( "persist.internal", except.toString() );
             }
         } else {
             // Identity change not supported
             if ( ! identity.equals( oldIdentity ) )
-                throw new PersistenceException( "persist.changedIdentity",
+                throw new PersistenceExceptionImpl( "persist.changedIdentity",
                                                 typeInfo.javaClass.getName(), identity );
 
             // Check if object has been modified, and whether it can be stored.
@@ -866,7 +875,7 @@ public final class CacheEngine
             try {
                 typeInfo.handler.checkValidity( object );
             } catch ( ValidityException except ) {
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
 
             // The object has an old identity, it existed before, one need

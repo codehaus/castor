@@ -47,14 +47,14 @@
 package org.exolab.castor.jdo.engine;
 
 
+import javax.transaction.Status;
 import org.exolab.castor.jdo.Transaction;
-import org.exolab.castor.jdo.TransactionInProgressException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.jdo.ODMGRuntimeException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
-import javax.transaction.Status;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.FastThreadLocal;
 import org.exolab.castor.util.Messages;
@@ -136,7 +136,7 @@ public final class TransactionImpl
             -- _threadCount;
         } else {
             // Not inside transaction
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new IllegalStateException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         }
     }
     
@@ -144,9 +144,9 @@ public final class TransactionImpl
     public synchronized void begin()
     {
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new IllegalStateException( Messages.message( "jdo.odmg.threadNotOwner" ) );
         if ( _txContext != null && _txContext.isOpen() )
-            throw new TransactionInProgressException( Messages.message( "jdo.odmg.txInProgress" ) );
+            throw new IllegalStateException( Messages.message( "jdo.odmg.txInProgress" ) );
         _txContext = new TransactionContextImpl();
     }
 
@@ -158,6 +158,7 @@ public final class TransactionImpl
 
 
     public void commit()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
     {
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
@@ -168,21 +169,19 @@ public final class TransactionImpl
         if ( _txContext == null || ! _txContext.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.threadNotSingleOwner" ) );
+            throw new PersistenceExceptionImpl( "jdo.odmg.threadNotSingleOwner" );
         try {
             _txContext.prepare();
             _txContext.commit();
-        } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+        } catch ( TransactionAbortedException except ) {
             if ( Logger.debug() )
                 except.printStackTrace( Logger.getSystemLogger() );
             try {
                 _txContext.rollback();
-            } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
+            } catch ( TransactionNotInProgressException except2 ) {
                 // This should never happen
             }
-            throw new TransactionAbortedException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-            throw new TransactionNotInProgressException( except.getMessage() );
+            throw except;
         } finally {
             _txContext = null;
         }
@@ -190,6 +189,7 @@ public final class TransactionImpl
 
 
     public void abort()
+        throws TransactionNotInProgressException, PersistenceException
     {
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
@@ -198,11 +198,9 @@ public final class TransactionImpl
         if ( _txContext == null || ! _txContext.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new ODMGRuntimeException( Messages.message( "jdo.odmg.threadNotSingleOwner" ) );
+            throw new PersistenceExceptionImpl( "jdo.odmg.threadNotSingleOwner" );
         try {
             _txContext.rollback();
-        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-            throw new TransactionNotInProgressException( except.getMessage() );
         } finally {
             _txContext = null;
         }
@@ -210,6 +208,7 @@ public final class TransactionImpl
 
     
     public void checkpoint()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
     {
         // Thread must be inside transaction, transaction must be open
         if ( _txLocal.get() != this )
@@ -220,24 +219,22 @@ public final class TransactionImpl
             throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
         try {
             _txContext.checkpoint();
-        } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+        } catch ( TransactionAbortedException except ) {
             if ( Logger.debug() )
                 except.printStackTrace( Logger.getSystemLogger() );
             try {
                 _txContext.rollback();
-            } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
+            } catch ( TransactionNotInProgressException except2 ) {
                 // This should never happen
             }
             _txContext = null;
-            throw new TransactionAbortedException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-            throw new TransactionNotInProgressException( except.getMessage() );
+            throw except;
         }
     }
 
 
     public void lock( Object obj, int lockMode )
-        throws LockNotGrantedException
+        throws LockNotGrantedException, PersistenceException
     {
         if ( _txLocal.get() != this )
             throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
@@ -245,22 +242,13 @@ public final class TransactionImpl
             throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
-        try {
-            if ( lockMode == WRITE )
-                _txContext.writeLock( obj, DefaultWaitLockTimeout );
-        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-            throw new LockNotGrantedException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
-            throw new ObjectNotPersistentException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-            throw new TransactionNotInProgressException( except.getMessage() );
-        } catch ( org.exolab.castor.persist.PersistenceException except ) {
-            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-        }
+        if ( lockMode == WRITE )
+            _txContext.writeLock( obj, DefaultWaitLockTimeout );
     }
 
 
     public boolean tryLock( Object obj, int lockMode )
+        throws PersistenceException
     {
         try {
             lock( obj, lockMode );
