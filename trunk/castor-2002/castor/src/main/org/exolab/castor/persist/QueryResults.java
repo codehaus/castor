@@ -175,10 +175,10 @@ public final class QueryResults
      * identity.
      * <p>
      * If the object has been deleted in this transaction, this method
-     * will report an {@link ObjectDeletedException}. However, the
+     * will report an {@link ObjectNotFoundException}. However, the
      * caller may iterate to and obtain the next object.
      * <p>
-     * This method is equivalent to {@link TransactionContext#load}
+     * This method is equivalent to {@link TransactionContext#fetch}
      * with a know cache engine, identity and lock and acts on the query
      * results rather than issuing a new query to load the object.
      *
@@ -191,7 +191,6 @@ public final class QueryResults
      *  persistence engine
      * @throws TransactionNotInProgressException The transaction
      *  has been closed
-     * @see TransactionContext#load
      */
     public Object fetch()
         throws TransactionNotInProgressException, PersistenceException,

@@ -105,10 +105,6 @@ public final class RelationHandler
      * Returns true if the relation is a many relation. Both one-many
      * and many-many relations deal with a collection of related
      * objects.
-     * <p>
-     * If this method returns false, use {@link #getRelated} to obtain
-     * the related object. If this method returns true, use {@link
-     * #getCollection} to obtain the related objects.
      *
      * @return True if a many relation
      */

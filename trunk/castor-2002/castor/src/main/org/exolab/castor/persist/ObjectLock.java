@@ -188,7 +188,7 @@ final class ObjectLock
      * transaction must only call this method for any given object
      * from a single thread and must mark the lock it is trying to
      * acquire and return it from a call to {@link
-     * TransactionContext#getWaitingOnLock} if the call to this method
+     * TransactionContext#getWaitOnLock} if the call to this method
      * has not returned yet. If a read lock is available for the
      * transaction and a write lock is requested, the read lock is
      * cancelled whether or not the write is acquired.
