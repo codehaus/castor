@@ -118,7 +118,8 @@
          <pre><![CDATA[
   <database name="ebiz" engine="oracle">
     <driver class-name="oracle.jdbc.driver.OracleDriver"
-            url="jdbc:oracle:thin:@machine:post:SID?user=scott">
+            url="jdbc:oracle:thin:@machine:post:SID">
+š š š <param name="user" value="scott" />
       <param name="password" value="tiger" />
     </driver>
     <mapping href="products.xml" />
@@ -169,7 +170,8 @@
           <td valign="top">Oracle Thin Driver</td>
           <td valign="top"><pre><![CDATA[
   <driver class-name="oracle.jdbc.driver.OracleDriver"
-          url="jdbc:oracle:thin:@host:post:SID?user=scott">
+          url="jdbc:oracle:thin:@host:post:SID">
+š š <param name="user" value="scott" />
     <param name="password" value="tiger" />
   </driver>]]></pre></td>
         </tr>
