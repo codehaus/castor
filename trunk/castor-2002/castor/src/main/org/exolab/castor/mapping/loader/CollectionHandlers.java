@@ -113,6 +113,28 @@ final class CollectionHandlers
 
 
     /**
+     * Returns true if the collection requires get/set methods.
+     * <tt>java.util</tt> collections only require a get method,
+     * but an array collection required both get and set methods.
+     *
+     * @parfam javaClass The collection's java class
+     * @return True if collection requires get/set methods, false
+     *  if collection requires only get method
+     * @throws MappingException The collection class is not supported
+     */
+    public static boolean isGetSetCollection( Class javaClass )
+        throws MappingException
+    {
+        if ( _info == null )
+            loadInfo();
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.equals( javaClass ) )
+                return _info[ i ].getSetCollection;
+        throw new MappingException( "mapping.noCollectionHandler", javaClass.getName() );
+    }
+
+
+    /**
      * Called once to load collection handler information for the various
      * collection handlers (Java 1.1, Java 1.2) based on the configuration
      * file.
@@ -168,12 +190,19 @@ final class CollectionHandlers
          * The collection handler instance.
          */
         final CollectionHandler handler;
+
+        /**
+         * True for collections that require both get and set methods.
+         */
+        final boolean           getSetCollection;
         
-        Info( String shortName, Class javaClass, CollectionHandler handler )
+        Info( String shortName, Class javaClass, boolean getSetCollection,
+              CollectionHandler handler )
         {
             this.shortName = shortName;
             this.javaClass = javaClass;
             this.handler = handler;
+            this.getSetCollection = getSetCollection;
         }
 
     }

@@ -453,40 +453,55 @@ public abstract class MappingLoader
         if ( fieldMap.getCollection() != null )
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
 
-        // First look up the get accessors
-        if ( fieldMap.getGetMethod() != null ) {
-            getMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
+        // If get/set methods not specified, use field names to determine them.
+        if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
+
+            if ( fieldMap.getName() == null )
+                throw new MappingException( "" );
+            getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
                                       ( colType == null ? fieldType : colType ), true );
             if ( getMethod == null )
                 throw new MappingException( "mapping.accessorNotFound",
-                                            fieldMap.getGetMethod(), ( colType == null ? fieldType : colType ),
+                                            "get" + capitalize( fieldMap.getName() ),
+                                            ( colType == null ? fieldType : colType ),
                                             javaClass.getName() );
             if ( fieldType == null && colType == null )
                 fieldType = getMethod.getReturnType();
-        } else if ( fieldMap.getName() != null ) {
-            if ( getMethod == null )
-                getMethod = findAccessor( javaClass, "get" + capitalize( fieldMap.getName() ),
-                                          ( colType == null ? fieldType : colType ), true );
-            if ( getMethod != null && fieldType == null && colType == null )
-                fieldType = getMethod.getReturnType();
-        }
 
-        // Second look up the set/add accessor
-        if ( fieldMap.getSetMethod() != null ) {
-            setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
-                                      ( colType == null ? fieldType : colType ), false );
-            if ( setMethod == null )
-                throw new MappingException( "mapping.accessorNotFound",
-                                            fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
-                                            javaClass.getName() );
-            if ( fieldType == null )
-                fieldType = setMethod.getParameterTypes()[ 0 ];
-        } else if ( fieldMap.getName() != null ) {
-            if ( setMethod == null )
+            if ( colType == null || CollectionHandlers.isGetSetCollection( colType ) ) {
                 setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), false );
-            if ( setMethod != null && fieldType == null )
-                fieldType = setMethod.getParameterTypes()[ 0 ];
+                if ( setMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                "set" + capitalize( fieldMap.getName() ),
+                                                ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
+            }
+
+        } else {
+            // First look up the get accessors
+            if ( fieldMap.getGetMethod() != null ) {
+                getMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
+                                          ( colType == null ? fieldType : colType ), true );
+                if ( getMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                fieldMap.getGetMethod(), ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
+                if ( fieldType == null && colType == null )
+                    fieldType = getMethod.getReturnType();
+            }
+
+            // Second look up the set/add accessor
+            if ( fieldMap.getSetMethod() != null ) {
+                setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
+                                          ( colType == null ? fieldType : colType ), false );
+                if ( setMethod == null )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
+                if ( fieldType == null )
+                    fieldType = setMethod.getParameterTypes()[ 0 ];
+            }
         }
 
         // If accessors found, use them to construct field handler,

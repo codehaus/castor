@@ -82,7 +82,7 @@ public final class J2CollectionHandlers
      */
     private static CollectionHandlers.Info[] _colHandlers = new CollectionHandlers.Info[] {
         // For Collection/ArrayList (1.2)
-        new CollectionHandlers.Info( "collection", Collection.class, new CollectionHandler() {
+        new CollectionHandlers.Info( "collection", Collection.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new ArrayList();
@@ -105,16 +105,12 @@ public final class J2CollectionHandlers
                     return 0;
                 return ( (Collection) collection ).size();
             }
-            public boolean isGetSetCollection()
-            {
-                return false;
-            }
             public String toString() {
                 return "Collection";
             }
         } ),
         // For Set/HashSet (1.2)
-        new CollectionHandlers.Info( "set", Set.class, new CollectionHandler() {
+        new CollectionHandlers.Info( "set", Set.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new HashSet();
@@ -137,16 +133,12 @@ public final class J2CollectionHandlers
                     return 0;
                 return ( (Set) collection ).size();
             }
-            public boolean isGetSetCollection()
-            {
-                return false;
-            }
             public String toString() {
                 return "Set";
             }
         } ),
         // For Map/HashMap (1.2)
-        new CollectionHandlers.Info( "map", Map.class, new CollectionHandler() {
+        new CollectionHandlers.Info( "map", Map.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
                     collection = new HashMap();
@@ -168,10 +160,6 @@ public final class J2CollectionHandlers
                 if ( collection == null )
                     return 0;
                 return ( (HashMap) collection ).size();
-            }
-            public boolean isGetSetCollection()
-            {
-                return false;
             }
             public String toString() {
                 return "Map";
