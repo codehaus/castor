@@ -91,6 +91,16 @@ public final class UnmarshalHandler extends MarshalFramework
     private static final Class[]  EMPTY_CLASS_ARGS  = new Class[0];
     private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
     private static final String   EMPTY_STRING      = "";
+    
+    /**
+     * Attribute name for default namespace declaration
+    **/
+    private static final String   XMLNS             = "xmlns";
+    
+    /**
+     * Attribute prefix for prefixed namespace declaration
+    **/
+    private static final String   XMLNS_PREFIX      = "xmlns:";
 
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
@@ -161,6 +171,11 @@ public final class UnmarshalHandler extends MarshalFramework
      */
      private org.exolab.castor.types.AnyNode _node = null;
 
+     /**
+      * The namespace stack
+      */
+     private Namespaces _namespaces = null;
+     
     //----------------/
     //- Constructors -/
     //----------------/
@@ -185,6 +200,7 @@ public final class UnmarshalHandler extends MarshalFramework
         _resolveTable = new Hashtable();
         buf           = new StringBuffer();
         _topClass     = _class;
+        _namespaces   = new Namespaces();
     } //-- UnmarshalHandler(Class)
 
     public Object getObject() {
@@ -313,13 +329,22 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             else return;
         }
+        
         if (_stateInfo.empty()) {
             throw new SAXException("missing start element: " + name);
         }
 
-        if (hasNameSpace(name)) {
-            name = getLocalPart(name);
+        //-- * Begin Namespace Handling
+        //-- XXX Note: This code will change when we update the XML event API
+        
+        int idx = name.indexOf(':');
+        if (idx >= 0) {
+            name = name.substring(idx+1);
         }
+        //-- remove current namespace scoping
+        _namespaces = _namespaces.getParent();
+        
+        //-- * End Namespace Handling
 
         UnmarshalState state = (UnmarshalState) _stateInfo.pop();
 
@@ -552,12 +577,24 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.startElement(name,atts);
            return;
         }
-        //-- handle namespaces
+        
+        //-- The namespace of the given element
         String namespace = null;
-
-        if (hasNameSpace(name)) {
-            name = getLocalPart(name);
+        
+        //-- Begin Namespace Handling :
+        //-- XXX Note: This code will change when we update the XML event API
+        
+        _namespaces = _namespaces.createNamespaces();
+        processNamespaces(atts);
+        
+        String prefix = "";
+        int idx = name.indexOf(':');
+        if (idx >= 0) {
+            prefix = name.substring(0,idx);
+            name = name.substring(idx+1);
         }
+        namespace = _namespaces.getNamespaceURI(prefix);
+        //-- End Namespace Handling
 
         UnmarshalState state = null;
 
@@ -932,7 +969,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 if (classDesc == null) {
                     //-- use parent to get package information
                     String pkg = pClass.getName();
-                    int idx = pkg.lastIndexOf('.');
+                    idx = pkg.lastIndexOf('.');
                     if (idx > 0) {
                         pkg = pkg.substring(0,idx+1);
                         cname = pkg + cname;
@@ -1109,28 +1146,6 @@ public final class UnmarshalHandler extends MarshalFramework
         return null;
     } //-- getInstanceType
 
-    /**
-     * Returns true if the given NCName (element name) is qualified
-     * with a namespace prefix
-     * @return true if the given NCName is qualified with a namespace
-     * prefix
-    **/
-    private boolean hasNameSpace(String ncName) {
-        return (ncName.indexOf(':')>0 );
-    } //-- hasNameSpace
-
-    /**
-     * Returns the local part of the given NCName. The local part is anything
-     * following the namespace prefix. If there is no namespace prefix
-     * the returned name will be the same as the given name.
-     * @return the local part of the given NCName.
-    **/
-    private String getLocalPart(String ncName) {
-        int idx = ncName.indexOf(':');
-        if (idx >= 0) return ncName.substring(idx+1);
-        return ncName;
-    } //-- getLocalPart
-
 
     /**
      * Processes the given attribute list, and attempts to add each
@@ -1295,7 +1310,27 @@ public final class UnmarshalHandler extends MarshalFramework
             handler.setValue(parent, value);
     } //-- processAttribute
 
-
+    /**
+     * Processes the namespace declarations found in the given attribute list
+     *
+     * @param atts the AttributeList containing the namespace declarations
+    **/
+    private void processNamespaces(AttributeList atts) {
+        if (atts == null) return;
+        
+        for (int i = 0; i < atts.getLength(); i++) {
+            String attName = atts.getName(i);
+            if (attName.equals(XMLNS)) {
+                _namespaces.addNamespace("", atts.getValue(i));
+            }
+            else if (attName.startsWith(XMLNS_PREFIX)) {
+                String prefix = attName.substring(XMLNS_PREFIX.length());
+                _namespaces.addNamespace(prefix, atts.getValue(i));
+            }
+        }
+        
+    } //-- method: processNamespaces
+    
     /**
      * Sends a message to all observers. Currently the only observer is
      * the logger.
