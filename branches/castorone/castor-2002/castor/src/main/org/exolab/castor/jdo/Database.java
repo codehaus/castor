@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Intalio, Inc.  For written permission,
+ *    permission of Exoffice Technologies.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Intalio, Inc. Exolab is a registered
- *    trademark of Intalio, Inc.
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,7 +47,7 @@
 package org.exolab.castor.jdo;
 
 
-
+import org.exolab.castor.persist.PersistenceInfoGroup;
 
 /**
  * An open connection to the database. This object represents an open
@@ -94,7 +94,7 @@ package org.exolab.castor.jdo;
  * db.close();
  * </pre>
  *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  * @see JDO#getDatabase
  * @see Query
@@ -192,6 +192,10 @@ public interface Database
     public Query getQuery();
 
 
+
+    public PersistenceInfoGroup getScope();
+
+
     /**
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
@@ -210,12 +214,25 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity )
+    public Object load( Class type, Object[] identities )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
 
+    public Object load( Class type, Object identity )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+    public Object load( Class type, Object identity, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+
     /**
+     * <b>Experimental</b>
+     * <p>
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
      * the same identity in the same transaction will return the same
@@ -234,7 +251,7 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity, short accessMode )
+    public Object load( Class type, Object[] identities, short accessMode )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
@@ -287,6 +304,8 @@ public interface Database
 
 
     /**
+     * <b>Experimental</b>
+     * <p>
      * Creates a new object in persistent storage. The object will be
      * persisted only if the transaction commits.
      * <p>
@@ -295,12 +314,6 @@ public interface Database
      * transaction. If the identity is null, duplicate identity check
      * occurs when the transaction completes and the object is not
      * visible to queries until the transaction commits.
-     * <p>
-     * It is recommended to use this method in "long" transaction scenario:
-     * the object was read in one of the previous "short" transaction, 
-     * modified and now is being "included"in the current "short" transaction.
-     * The object must implement interface {@link TimeStampable} in order to 
-     * perform dirty checking.
      *
      * @param object The object to create
      * @throws TransactionNotInProgressException Method called while
@@ -309,13 +322,12 @@ public interface Database
      *  persistent capable
      * @throws PersistenceException An error reported by the
      *  persistence engine
-     * @throws ObjectModifiedException Dirty checking mechanism may immediately
-     *  report that the object was modified in the database during the long 
-     *  transaction.
      */
+
     public void update( Object object )
-        throws ClassNotPersistenceCapableException, ObjectModifiedException,
+        throws ClassNotPersistenceCapableException,
                TransactionNotInProgressException, PersistenceException;
+
 
 
     /**
@@ -437,7 +449,7 @@ public interface Database
      * @param object The object
      * @return True if persistent in this transaction
      */
-    public boolean isPersistent( Object object );
+    //public boolean isPersistent( Object object );
 
 
     /**
@@ -451,7 +463,7 @@ public interface Database
      * @param object The object
      * @return The object's identity, or null
      */
-    public Object getIdentity( Object object );
+    public Object[] getIdentities( Object object );
 
 
     /**
@@ -479,13 +491,6 @@ public interface Database
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException;
 
-    /**
-     * Get the underlying JDBC Connection.
-     * Only for internal / advanced use !
-     * Never try to close it (is done by castor).
-     */
-    public Object /* java.sql.Connection */ getConnection()
-    throws org.exolab.castor.jdo.PersistenceException ;
 
 }
 
