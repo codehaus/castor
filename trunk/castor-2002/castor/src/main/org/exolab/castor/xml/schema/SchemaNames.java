@@ -94,6 +94,7 @@ public class SchemaNames {
     //-- Attr name definitions
     public static final String ABSTRACT         = "abstract";
     public static final String BASE_ATTR        = "base";
+    public static final String BLOCK_ATTR       = "block";
     public static final String DEFAULT_ATTR     = "default";
     public static final String ID_ATTR          = "id";
     public static final String MAX_OCCURS_ATTR  = "maxOccurs";

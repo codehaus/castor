@@ -125,6 +125,36 @@ public class ComplexTypeUnmarshaller extends SaxUnmarshaller {
 			   _complexType.setContentType(ContentType.valueOf("elementOnly"));
 		}
 
+        //-- base and derivedBy
+        String base = atts.getValue(SchemaNames.BASE_ATTR);
+        if ((base != null) && (base.length() > 0)) {
+
+            String derivedBy = atts.getValue("derivedBy");
+            _complexType.setDerivationMethod(derivedBy);
+            if ((derivedBy == null) ||
+                (derivedBy.length() == 0) ||
+                (derivedBy.equals("extension")))
+            {
+                XMLType baseType= schema.getType(base);
+                if (baseType == null)
+                    _complexType.setBase(base); //the base type has not been read
+                else
+                    _complexType.setBaseType(baseType);
+            }
+            else if (derivedBy.equals("restrictions")) {
+                String err = "restrictions not yet supported for <type>.";
+                throw new SAXException(err);
+            }
+            else {
+                String err = "invalid value for derivedBy attribute of ";
+                err += "<type>: " + derivedBy;
+                throw new SAXException(err);
+            }
+
+        }
+
+		//-- @block
+        _complexType.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));		
 
     } //-- ComplexTypeUnmarshaller
 

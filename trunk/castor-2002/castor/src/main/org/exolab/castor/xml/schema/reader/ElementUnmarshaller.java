@@ -169,6 +169,9 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             _element.setMaxOccurs(minOccurs);
         else
             _element.setMaxOccurs(1);
+		
+        //-- @block
+        _element.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
         
         charUnmarshaller = new CharacterUnmarshaller();
     } //-- ElementUnmarshaller
