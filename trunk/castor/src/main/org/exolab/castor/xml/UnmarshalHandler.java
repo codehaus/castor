@@ -1111,13 +1111,14 @@ public final class UnmarshalHandler extends MarshalFramework
         UnmarshalState targetState = parentState;
         int count = 0;
         boolean isWrapper = false;
+        XMLClassDescriptor oldClassDesc = classDesc;
         while (descriptor == null) {
             
             descriptor = classDesc.getFieldDescriptor(name, NodeType.Element);
             
             //-- Namespace patch, should be moved to XMLClassDescriptor, but
             //-- this is the least intrusive patch at the moment. kv - 20030423
-            if (descriptor != null) {
+            if ((descriptor != null) && (!descriptor.isContainer())) {
                 if ((namespace != null) && (namespace.length() > 0)) {
                     if (!namespaceEquals(namespace, descriptor.getNameSpaceURI())) {
                         descriptor = null;
@@ -1173,6 +1174,9 @@ public final class UnmarshalHandler extends MarshalFramework
         
         //-- The field descriptor is still null, we face a problem
         if (descriptor == null) {
+            
+            //-- reset classDesc
+            classDesc = oldClassDesc;
             
             //-- isWrapper?
             if (isWrapper) {
