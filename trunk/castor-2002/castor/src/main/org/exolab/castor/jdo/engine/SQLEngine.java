@@ -1630,7 +1630,7 @@ public final class SQLEngine implements Persistence {
         {
             try {
                 if( _lastIdentity == null ) {
-                    if ( ! _rs.next() ) {
+                    if ( _resultSetDone || !_rs.next() ) {
                         _resultSetDone = true;
                         return null;
                     }
