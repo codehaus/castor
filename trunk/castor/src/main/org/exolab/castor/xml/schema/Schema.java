@@ -1221,6 +1221,27 @@ public class Schema extends Annotated {
     } //-- removeGroup
 
     /**
+     * Removes the given Schema definition from this Schema definition's 
+     * list of imported schenma
+     *
+     * @param schema the Schema to remove from this Schema's import list
+     *
+     * @return true if the Schema was removed, otherwise false
+     */
+    public synchronized boolean removeImportedSchema(Schema schema)
+    {
+        if (schema == null) return false;
+        String targetNamespace = schema.getTargetNamespace();
+        if (targetNamespace == null) targetNamespace = "";
+        Schema tmp = (Schema)_importedSchemas.get(targetNamespace);
+        if (schema.equals(tmp)) {
+            _importedSchemas.remove(targetNamespace);
+            return true;
+        }
+        return false;
+    } //-- removeImportedSchema
+    
+    /**
      * Removes the namespace from the set of namespace declarations for 
      * this Schema definition.
      *
