@@ -670,10 +670,11 @@ public class SourceFactory  {
             StringBuffer comment = new StringBuffer();
             while (enum.hasMoreElements()) {
                 Annotation ann = (Annotation) enum.nextElement();
-                Enumeration infos = ann.getInfo();
-                while (infos.hasMoreElements()) {
-                    Info info = (Info) infos.nextElement();
-                    String content = info.getContent();
+                Enumeration documentations = ann.getDocumentation();
+                while (documentations.hasMoreElements()) {
+                    Documentation documentation = 
+                        (Documentation) documentations.nextElement();
+                    String content = documentation.getContent();
                     if ( content != null) comment.append(content);
                 }
             }

@@ -51,11 +51,11 @@ import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
 /**
- * A class for Unmarshalling XML Schema <appinfo> elements
+ * A class for Unmarshalling XML Schema <documentation> elements
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class InfoUnmarshaller extends SaxUnmarshaller {
+public class DocumentationUnmarshaller extends SaxUnmarshaller {
 
 
       //--------------------/
@@ -75,7 +75,7 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
     /**
      * The Attribute reference for the Attribute we are constructing
     **/
-    private Info _info = null;
+    private Documentation _documentation = null;
     
     private StringBuffer sb = null;
     
@@ -85,22 +85,22 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
     //----------------/
 
     /**
-     * Creates a new InfoUnmarshaller
+     * Creates a new DocumentationUnmarshaller
      * @param atts the AttributeList
     **/
-    public InfoUnmarshaller(AttributeList atts) 
+    public DocumentationUnmarshaller(AttributeList atts) 
         throws SAXException
     {
         super();
         
-        _info = new Info();
+        _documentation = new Documentation();
         
         //-- handle attributes
         String attValue = null;
             
-        _info.setBase(atts.getValue(SchemaNames.BASE_ATTR));
+        _documentation.setBase(atts.getValue(SchemaNames.BASE_ATTR));
         
-    } //-- InfoUnmarshaller
+    } //-- DocumentationUnmarshaller
 
       //-----------/
      //- Methods -/
@@ -113,7 +113,7 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
      * handles
     **/
     public String elementName() {
-        return SchemaNames.INFO;
+        return SchemaNames.DOCUMENTATION;
     } //-- elementName
 
     /**
@@ -122,7 +122,7 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
     **/
     public void finish() {
         if (sb != null) {
-            _info.setContent(sb.toString());
+            _documentation.setContent(sb.toString());
             sb = null;
         }
     } //-- finish
@@ -130,17 +130,17 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
     /**
      * 
     **/
-    public Info getInfo() {
+    public Documentation getDocumentation() {
         if (sb != null) finish();
-        return _info;
-    } //-- getInfo
+        return _documentation;
+    } //-- getDocumentation
 
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
     **/
     public Object getObject() {
-        return getInfo();
+        return getDocumentation();
     } //-- getObject
     
     /**
@@ -179,4 +179,4 @@ public class InfoUnmarshaller extends SaxUnmarshaller {
         
     } //-- characters
 
-} //-- InfoUnmarshaller
+} //-- DocumentationUnmarshaller

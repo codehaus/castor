@@ -64,9 +64,9 @@ public class Annotation extends Structure {
     private Vector appInfoList = null;
     
     /**
-     * List of <info> objects
+     * List of <documentation> objects
     **/
-    private Vector infoList = null;
+    private Vector documentationList = null;
     
     
     /**
@@ -74,7 +74,7 @@ public class Annotation extends Structure {
     **/
     public Annotation() {
         appInfoList = new Vector();
-        infoList = new Vector();
+        documentationList = new Vector();
     } //-- Annotation
     
     /**
@@ -86,12 +86,12 @@ public class Annotation extends Structure {
     } //-- addAppInfo
     
     /**
-     * Adds the given Info to this Annotation
-     * @param info the info to add to this Annotation
+     * Adds the given Documentation to this Annotation
+     * @param documentation the documentation to add to this Annotation
     **/
-    public void addInfo(Info info) {
-        if (info != null) infoList.addElement(info);
-    } //-- addInfo
+    public void addDocumentation(Documentation documentation) {
+        if (documentation != null) documentationList.addElement(documentation);
+    } //-- addDocumentation
 
     /**
      * Returns an enumeration of all AppInfo elements for this Annotation
@@ -102,12 +102,12 @@ public class Annotation extends Structure {
     } //-- getAppInfo
     
     /**
-     * Returns an enumeration of all info elements for this Annotation
-     * @return an enumeration of all info elements for this Annotation
+     * Returns an enumeration of all documentation elements for this Annotation
+     * @return an enumeration of all documentation elements for this Annotation
     **/
-    public Enumeration getInfo() {
-        return infoList.elements();
-    } //-- getInfo
+    public Enumeration getDocumentation() {
+        return documentationList.elements();
+    } //-- getDocumentation
     
     /**
      * Removes the given AppInfo from this Annotation
@@ -118,12 +118,12 @@ public class Annotation extends Structure {
     } //-- removeAppInfo
 
     /**
-     * Removes the given Info from this Annotation
-     * @param info the Info to remove
+     * Removes the given Documentation from this Annotation
+     * @param documentation the Documentation to remove
     **/
-    public void removeInfo(Info info) {
-        if (info != null) infoList.removeElement(info);
-    } //-- removeInfo
+    public void removeDocumentation(Documentation documentation) {
+        if (documentation != null) documentationList.removeElement(documentation);
+    } //-- removeDocumentation
     
     //-------------------------------/
     //- Implementation of Structure -/
