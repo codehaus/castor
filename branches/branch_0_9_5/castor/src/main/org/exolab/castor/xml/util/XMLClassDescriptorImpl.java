@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -55,7 +55,6 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.*;
 
 
@@ -853,8 +852,9 @@ public class XMLClassDescriptorImpl extends Validator
                     buffer.append('(');
                     String sep = " | ";
                     for (int i = 0; i < localElements.length; i++) {
-                        XMLFieldDescriptor  desc = localElements[i];                        
-                        if (desc != null) continue;
+                        XMLFieldDescriptor  desc = localElements[i];
+                        
+                        if (desc == null) continue;
                         
                         FieldValidator fieldValidator = desc.getValidator();
                         if (fieldValidator.getMinOccurs() > 0) {
