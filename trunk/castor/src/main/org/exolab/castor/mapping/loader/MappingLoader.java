@@ -59,6 +59,7 @@ import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.ExtendedFieldHandler;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.GeneralizedFieldHandler;
@@ -710,7 +711,7 @@ public abstract class MappingLoader
         //-- If we're using an ExtendedFieldHandler we need to set the 
         //-- FieldDescriptor
         if (exfHandler != null)
-            exfHandler.setFieldDescriptor(fieldDesc);
+            ((FieldHandlerFriend)exfHandler).setFieldDescriptor(fieldDesc);
 
         return fieldDesc;
     } //-- createFieldDesc
@@ -1143,10 +1144,10 @@ public abstract class MappingLoader
                         return null;
                 }
             }
-            // Make sure method is not abstract/static.
+            // Make sure method is public and not static.
             // (note: Class.getMethod() returns only public methods).
-            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
-                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
+            //if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+            if ( ( method.getModifiers() & Modifier.STATIC ) != 0 )
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );
             return method;
