@@ -78,6 +78,9 @@ public class DescriptorJClass extends JClass {
     private static JType xfdArrayClass = 
         _XMLFieldDescriptorClass.createArray();
 
+    private static JType _TypeValidatorClass 
+        = new JClass("org.exolab.castor.xml.TypeValidator");
+    
 
     //-- methods defined by org.exolab.castor.xml.XMLClassDescriptor
     private JMethod _getAttributeDescriptors = null;
@@ -85,6 +88,7 @@ public class DescriptorJClass extends JClass {
     private JMethod _getElementDescriptors   = null;
     private JMethod _getNameSpacePrefix      = null;
     private JMethod _getNameSpaceURI         = null;
+    private JMethod _getValidator            = null;
     private JMethod _getXMLName              = null;
     
     //-- methods defined by org.exolab.castor.mapping.ClassDescriptor
@@ -112,8 +116,10 @@ public class DescriptorJClass extends JClass {
         JSourceCode jsc    = null;
         
         addInterface("org.exolab.castor.xml.XMLClassDescriptor");
+        
         addImport("org.exolab.castor.xml.*");
         addImport("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
+        addImport("org.exolab.castor.xml.FieldValidator");
         
         addMember(new JMember(xfdArrayClass,   "elements") );
         addMember(new JMember(xfdArrayClass,   "attributes") );
@@ -168,6 +174,13 @@ public class DescriptorJClass extends JClass {
         jsc.add("return nsURI;");
         addMethod(method);
         _getNameSpaceURI = method;
+        
+        //-- create getValidator method
+        method = new JMethod(_TypeValidatorClass, "getValidator");
+        jsc = method.getSourceCode();
+        jsc.add("return null;");
+        addMethod(method);
+        _getValidator = method;
         
         //-- create getXMLName method
         method = new JMethod(SGTypes.String, "getXMLName");
@@ -282,7 +295,6 @@ public class DescriptorJClass extends JClass {
     public JMethod getJavaClassMethod() {
         return _getJavaClass;
     } // getJavaClassMethod
-    
     
     //-------------------/
     //- Private Methods -/

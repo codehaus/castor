@@ -97,7 +97,7 @@ public class MemberFactory {
         
         XSType xsType = new XSClass(SGTypes.Object, "any");
         String memberName = "obj";
-        String vName = "_anyList";
+        String vName = "_anyObject";
         String xmlName = "object";
         CollectionInfo cInfo = infoFactory.createCollection(xsType, vName, xmlName);
         XSList xsList = cInfo.getXSList();
