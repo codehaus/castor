@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
  * $Id
  */
@@ -133,15 +133,53 @@ public class Database implements java.io.Serializable {
 
     /**
     **/
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
+
+    /**
+    **/
     public java.lang.String getReferenceId() {
         return this._name;
     } //-- java.lang.String getReferenceId() 
 
     /**
     **/
-    public java.lang.String getName() {
-        return this._name;
-    } //-- java.lang.String getName() 
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
+
+    /**
+     * 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
     **/
@@ -214,5 +252,22 @@ public class Database implements java.io.Serializable {
         this._name = _name;
     } //-- void setName(java.lang.String) 
 
+    /**
+     * 
+     * @param reader
+    **/
+    public static org.exolab.castor.jdo.conf.Database unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.jdo.conf.Database) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.Database.class, reader);
+    } //-- org.exolab.castor.jdo.conf.Database unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

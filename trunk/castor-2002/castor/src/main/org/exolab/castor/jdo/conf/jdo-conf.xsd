@@ -17,9 +17,9 @@
 
   <element name="database">
     <type content="elemOnly" order="seq">
-      <element ref="driver" maxOccurs="1" />
-      <element ref="data-source" maxOccurs="1" />
-      <element ref="jndi" maxOccurs="1" />
+      <element ref="driver" minOccurs="0" maxOccurs="1" />
+      <element ref="data-source" minOccurs="0" maxOccurs="1" />
+      <element ref="jndi" minOccurs="0" maxOccurs="1" />
       <element ref="mapping" minOccurs="1" />
       <attribute name="name" type="ID" minOccurs="1" />
       <attribute name="engine" type="string" minOccurs="0" default="generic" />

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
  * $Id
  */
@@ -15,6 +15,8 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
@@ -41,6 +43,8 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
 
     private java.lang.String xmlName;
 
+    private org.exolab.castor.xml.XMLFieldDescriptor identity;
+
 
       //----------------/
      //- Constructors -/
@@ -48,15 +52,16 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
 
     public DataSourceDescriptor() {
         xmlName = "data-source";
-        XMLFieldDescriptorImpl desc = null;
-        XMLFieldHandler handler = null;
+        XMLFieldDescriptorImpl  desc           = null;
+        XMLFieldHandler         handler        = null;
+        FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[1];
         //-- _className
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_className", "class-name", NodeType.Attribute);
         desc.setImmutable(true);
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -78,7 +83,15 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
                 return null;
             }
         } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
         attributes[0] = desc;
+        
+        //-- validation code for: _className
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
         
@@ -111,6 +124,11 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
         desc.setRequired(true);
         desc.setMultivalued(false);
         elements[0] = desc;
+        
+        //-- validation code for: _params
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        desc.setValidator(fieldValidator);
         
     } //-- org.exolab.castor.jdo.conf.DataSourceDescriptor()
 
@@ -171,7 +189,7 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity() {
-        return null;
+        return identity;
     } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
 
     /**
@@ -194,13 +212,14 @@ public class DataSourceDescriptor implements org.exolab.castor.xml.XMLClassDescr
 
     /**
     **/
+    public org.exolab.castor.xml.TypeValidator getValidator() {
+        return null;
+    } //-- org.exolab.castor.xml.TypeValidator getValidator() 
+
+    /**
+    **/
     public java.lang.String getXMLName() {
         return xmlName;
     } //-- java.lang.String getXMLName() 
-
-    public TypeValidator getValidator()
-    {
-        return null;
-    }
 
 }
