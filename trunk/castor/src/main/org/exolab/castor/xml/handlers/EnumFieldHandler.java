@@ -40,6 +40,9 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ *
  * $Id$
  */
 
@@ -53,13 +56,15 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Array;
 
 /**
- * A specialized MarshalDescriptor for the XML Schema
+ * A specialized FieldHandler for the XML Schema
  * enumeration types
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="keith AT kvisco  DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class EnumFieldHandler implements FieldHandler {
 
+    private static final Class[] STRING_ARGS = new Class[] { String.class };
 
     private Class _enumType = null;
 
@@ -80,7 +85,7 @@ public class EnumFieldHandler implements FieldHandler {
     public EnumFieldHandler(Class enumType, FieldHandler handler) {
         this.handler = handler;
         init(enumType);
-    } //-- EnumMarshalDescriptor
+    } //-- EnumFieldHandler
 
 
     private void init(Class type) {
@@ -92,12 +97,10 @@ public class EnumFieldHandler implements FieldHandler {
         }
 
         this._enumType = type;
-        Class[] params = new Class[1];
-        params[0] = String.class;
 
         Method method = null;
         try {
-            method = type.getMethod("valueOf", params);
+            method = type.getMethod("valueOf", STRING_ARGS);
         }
         catch(NoSuchMethodException nsme) {
             String err = type.getName() +
@@ -230,7 +233,7 @@ public class EnumFieldHandler implements FieldHandler {
                 getClass().isInstance(obj));
     } //-- equals
 
-} //-- EnumMarshalDescriptor
+} //-- EnumFieldHandler
 
 
 
