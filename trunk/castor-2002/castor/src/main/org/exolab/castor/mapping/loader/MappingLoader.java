@@ -370,9 +370,9 @@ public abstract class MappingLoader
         // The identity field is removed from the list of fields.
         identities = null;
         boolean idfield = false;
-        if ( clsMap.getIdentity() != null ) {
+        String[] ids = clsMap.getIdentity();
+        if (( ids != null ) && ( ids.length > 0)) {
             //System.out.println("getId....");
-            String[] ids = clsMap.getIdentity();
             //breakApart( clsMap.getIdentity(), ' ' );
             newFields = new FieldDescriptor[fields.length - ids.length];
             //System.out.println("field.length: "+fields.length+" id.length: "+ids.length);
