@@ -65,6 +65,32 @@ JDO:     "CALL" OQL queries now work with Oracle stored functions
 JDO:     Added type convertors BigDecimal <-> Boolean
          (contributed by Markus Fritz <mfritz@justis.de>)
 
+JDO:     Fixes multiple request of same object with DBLocked
+	 (Oleg Nitz and Markus Fritz)
+
+JDO:	 Hypersonic SQL driver 
+	 (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>;
+
+JDO:	 Changes to Persistent interface enable developer to use database 
+	 operations inside jdoStore, jdoCreate, jdoRemove.
+	 (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:	 Cache control at JDO configuration and mapping file specification - 
+	 no-cache option, cache count limit, cache time limit, LRU removal 
+	 deamon (Thomas Yip <yip@intalio.com>)
+
+JDO:	 Bug fix: for created objects fetch() returned oid instead of object 
+	 (contributed by Chris Stevenson <chris@ssabsa.sa.gov.au>)
+
+JDO:     SQL Date types handling is improved.
+	 (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:	 Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
+	 (<nissim@panix.com>)
+
+JDO:	 fix string conversion to surround with ' and escape internal ' fix for 
+	 bug with like. (<nissim@panix.com>)
+
 
 Version 0.8.7  June 2, 2000
 ---------------------------

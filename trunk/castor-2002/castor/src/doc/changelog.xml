@@ -2,13 +2,76 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.8.8  June 13, 2000"><pre>
+    <section title="Version 0.8.8  July 20, 2000"><pre>
+XML:     Added support for the Unmarshaller to automatically determine the Class of the
+         root element, based on a given Mapping, or ClassDescriptorResolver
+
+XML:     Added support for the "has" method for primitives in the generated source
+
+XML:     Added support for specifying the destination output directory for the
+         generated source code
+
+XML:     Added support for fixed attributes, this currently works for string
+         or integer values
+
+JDO:     Fixed bug: NULL value in database was read as 0 for Java wrappers
+         of primitive types (Long, Integer, etc.), now they are read as "null".
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Changes to org.exolab.castor.jdo.Persistent interface:
+         - now it can be used to perform additional database operations during
+           loading/storing/creating/deleting objects, e.g. to implement some
+           types of relations that are not supported by Castor yet,
+           see TestPersistent.java and Persistent.java in src/test/jdo.
+         - now jdoStore has the boolean parameter "modified", which is
+           convenient for setting fields like "modification time".
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Changed the inner SELECT syntax in MaxKeyGenerator to make it work
+         with Hypersonic SQL.
+         (Contributed by Santiago Arriaga &lt;santiago@catnet.com.mx&gt;)
+
+JDO:     Hypersonic SQL driver.
+         (Contributed by Santiago Arriaga &lt;santiago.arriaga@catnet.com.mx&gt;)
+
+JDO:     Changed KeyGeneratorFactory interface for better perfomance:
+         now the target primary key SQL type is passed to the key generator,
+         and no type conversions are performed after the key is generated.
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Added support for attributes of application type and for nested
+         attributes. Assume that you have an attribute "balance" of
+         applicatation type "Balance" which has methods "getBigDecimal"
+         and "setBigDecimal", then you can write in mapping.xml
+           &lt;field name="balance.bigDecimal"...
+         and Castor will get and set the attribute value as
+         getBalance().getBigDecimal() and getBalance().setBigDecimal(value).
+         Note, that getBalance() may be null, in this case when setting
+         a non-null value Castor will first do setBalance(new Balance()), 
+         and then getBalance().setBigDecimal(value).
+         Another example of usage of the this feature is attribute "address"
+         with nested attributes "country", "zipCode", etc.
+         These attributes also may be of application type or nested, e.g.
+           &lt;field name="address.country.string"...
+         (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     Small fix: now fields in mapping.xml may have no "sql" sub-element,
+         e.g. the field may be only for XML marshalling, other fields
+         may be persisted through JDO. (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+
+JDO:     "CALL" OQL queries now work with Oracle stored functions
+         returning REF CURSOR (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
+         and PostgreSQL stored functions returning instance
+         (contributed by Rostislav Beloff &lt;ros@domainforfree.com&gt;)
+
+JDO:     Added type convertors BigDecimal &lt;-&gt; Boolean
+         (contributed by Markus Fritz &lt;mfritz@justis.de&gt;)
 
 JDO:     Fixes multiple request of same object with DBLocked
 	 (Oleg Nitz and Markus Fritz)
 
 JDO:	 Hypersonic SQL driver 
-	 (Contributed by Santiago Arriaga &tl;santiago.arriaga@catnet.com.mx&gt;
+	 (Contributed by Santiago Arriaga &lt;santiago.arriaga@catnet.com.mx&gt;
 
 JDO:	 Changes to Persistent interface enable developer to use database 
 	 operations inside jdoStore, jdoCreate, jdoRemove.
@@ -29,7 +92,6 @@ JDO:	 Bug fix: small bugs w/ BETWEEN in parser...reported by Vladmir Sekissov.
 
 JDO:	 fix string conversion to surround with ' and escape internal ' fix for 
 	 bug with like. (&lt;nissim@panix.com&gt;)
-
     </pre></section>
     <section title="Version 0.8.7  June 2, 2000"><pre>
 JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga
