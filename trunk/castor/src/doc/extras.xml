@@ -5,7 +5,7 @@
 
     <header>
        <p>
-          - <b><font color="red">New</font></b> - Patrick van Kaan's <a href="#Castor-Taglib">Castor-Taglib</a>
+          - <b><font color="red">New</font></b> - Alexey Efimov's <a href="#Phantom-Castor">Phantom-Castor</a>
        </p>
     </header>
 
@@ -19,6 +19,29 @@
           support, questions, or concerns.
           </b>
        </p>
+       <section title="Phantom-Castor">
+       <p>
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    Phantom-Castor contains components to ease the construction 
+                    of JDO applications using Castor. It provides easier use of 
+                    mappings with building OQL queries.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Current Author:</td>
+                    <td>Alexey Efimov</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://sf.net/projects/phantom-castor</url></td>
+                </tr>
+            </table>
+       </p>
+       </section>
+
        <section title="Castor-Taglib">
        <p>
             <table border="0">
@@ -295,7 +318,9 @@
 
     <section title="Products that make use of Castor">
     <p>
+    <font color="red">
     Does your project or product make use of Castor, but it's not listed here?
+    </font>
     <a href="mailto:info@exolab.org">Send us</a> the info on it and we'll post
     it here!
     </p>
