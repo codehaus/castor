@@ -139,7 +139,7 @@ final class TransactionContextImpl
 //					_log.error( "Exception occured in commitConnections", except );
 //					throw new TransactionAbortedException( "Exception in commitConnections" , except );
 //					
-				}
+//				}
 				
             }
 
