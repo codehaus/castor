@@ -354,9 +354,11 @@ public final class FieldHandlerImpl
     }
 
     /**
-     * Mutator method used by {@link MappingLoader}.
+     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
      */
-    void setReadMethod( Method method )
+    public void setReadMethod( Method method )
         throws MappingException
     {
         if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
@@ -370,9 +372,11 @@ public final class FieldHandlerImpl
     }
 
     /**
-     * Mutator method used by {@link MappingLoader}.
+     * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
+     * Please understand how this method is used before you start
+     * playing with it! :-)
      */
-    void setWriteMethod( Method method )
+    public void setWriteMethod( Method method )
         throws MappingException
     {
         if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
