@@ -38,36 +38,106 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $$
  */
 
 
 package jdo;
 
-import org.exolab.castor.jdo.PersistenceException;
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
-import harness.CastorTestCase;
+
+import java.math.BigDecimal;
+import java.sql.Clob;
+import java.io.InputStream;
 
 
 /**
- * Test for IDENTITY key generator.
+ * Test tyoe handling against test_types.
  */
-public class KeyGenIdentity extends KeyGenGeneric {
+public class TestLOB
+{
 
-    public KeyGenIdentity( TestHarness category ) {
 
-        super( category, "TC44" , "Key generator: IDENTITY" );
+    private long            _id;
+
+    private byte[]          _blob;
+
+    private String          _clob;
+
+    private InputStream     _blob2;
+
+    private Clob            _clob2;
+
+    static final int       DefaultId = 3;
+
+    public TestLOB()
+    {
     }
 
-    public void runTest()
-            throws PersistenceException, Exception {
 
-        testOneKeyGen( TestIdentityObject.class, TestIdentityExtends.class );
+    public void setId( long id )
+    {
+        _id = id;
     }
+
+
+    public long getId()
+    {
+        return _id;
+    }
+
+    public void setBlob( byte[] blob )
+    {
+        _blob = blob;
+    }
+
+
+    public byte[] getBlob()
+    {
+        return _blob;
+    }
+
+
+    public void setClob( String clob )
+    {
+        _clob = clob;
+    }
+
+
+    public String getClob()
+    {
+        return _clob;
+    }
+
+    /**
+    public void setBlob2( InputStream blob2 )
+    {
+        _blob2 = blob2;
+    }
+
+
+    public InputStream getBlob2()
+    {
+        return _blob2;
+    }**/
+
+
+    public void setClob2( Clob clob2 )
+    {
+        _clob2 = clob2;
+    }
+
+
+    public Clob getClob2()
+    {
+        return _clob2;
+    }
+
+    public String toString()
+    {
+        return "" + _id;
+    }
+
 
 }

@@ -51,18 +51,13 @@ import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWBaseApplication;
-import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
-public class Case
-{
-
+public class Case {
 
     private String  _className;
-
 
     public void setClassName( String className )
     {
@@ -76,22 +71,14 @@ public class Case
     }
 
 
-    public CWTestCase createTestCase( CWTestCategory category )
-        throws CWClassConstructorException
-    {
+    public CastorTestCase createTestCase( TestHarness category ) 
+            throws Exception {
         Class       catClass;
         Constructor cnst;
 
-        try {
-            catClass = getClass().forName( _className );
-            cnst = catClass.getConstructor( new Class[] { CWTestCategory.class } );
-            return (CWTestCase) cnst.newInstance( new Object[] { category } );
-        } catch ( InvocationTargetException except ) {
-            throw new CWClassConstructorException( (Exception) except.getTargetException() );
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except );
-        }
+        catClass = getClass().forName( _className );
+        cnst = catClass.getConstructor( new Class[] { TestHarness.class } );
+        return (CastorTestCase) cnst.newInstance( new Object[] { category } );
     }
-
 
 }

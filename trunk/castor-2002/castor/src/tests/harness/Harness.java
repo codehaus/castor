@@ -49,15 +49,11 @@ package harness;
 
 import java.util.Vector;
 import java.util.Enumeration;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWBaseApplication;
-import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
 
-public class Harness
-{
-
+public class Harness {
 
     private String  _name;
 
@@ -68,81 +64,52 @@ public class Harness
     private Vector  _categories = new Vector();
 
 
-    public void setName( String name )
-    {
+    public void setName( String name ) {
         _name = name;
     }
 
 
-    public String getName()
-    {
+    public String getName() {
         return _name;
     }
 
 
-    public void setDescription( String description )
-    {
+    public void setDescription( String description ) {
         _description = description;
     }
 
 
-    public String getDescription()
-    {
+    public String getDescription() {
         return _description;
     }
 
 
-    public void setCategory( Category category )
-    {
+    public void setCategory( Category category ) {
         _categories.addElement( category );
     }
 
 
-    public Enumeration getCategory()
-    {
+    public Enumeration getCategory() {
         return _categories.elements();
     }
 
 
-    public CWBaseApplication createTestHarness()
-        throws CWClassConstructorException
-    {
+    public TestHarness createTestHarness( String branch ) 
+            throws Exception {
+
         TestHarness harness;
 
-        harness = new TestHarness( _name );
-        for ( int i = 0 ; i < _categories.size() ; ++i )
-            harness.add( ( (Category) _categories.elementAt( i ) ).createTestCategory() );
+        String sub = (branch==null||branch.equals(""))?null
+            :branch.substring( branch.indexOf(".")==-1?branch.length():branch.indexOf(".")+1 );
+
+        harness = new TestHarness( null, _name, _description );
+        for ( int i = 0 ; i < _categories.size(); ++i ) {
+            TestHarness cat = (TestHarness) ((Category)_categories.elementAt( i )).createTestCategory(harness,sub);
+            if ( sub == null || sub.equals("") || sub.startsWith( cat.getName() ) ) {
+                harness.addTest( cat );
+            }
+        }
         return harness;
-    }
-
-
-    public static class TestHarness
-        extends CWBaseApplication
-    {
-
-        private Vector _categories = new Vector();
-
-        TestHarness( String name )
-            throws CWClassConstructorException
-        {
-            super( name );
-        }
-
-        void addCategory( CWTestCategory category )
-        {
-            _categories.addElement( category );
-        }
-
-        protected Enumeration getCategoryClassNames()
-        {
-            return _categories.elements();
-        }
-        
-        protected String getApplicationName()
-        {
-            return getClass().getName();
-        }
-
     }
 
 }

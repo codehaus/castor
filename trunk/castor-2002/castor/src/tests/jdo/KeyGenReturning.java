@@ -46,31 +46,29 @@
 
 package jdo;
 
-
-import org.exolab.castor.jdo.Database;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+import org.exolab.castor.jdo.PersistenceException;
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  * Test for RETURNING key generator.
  */
-public class KeyGenReturning
-    extends KeyGenGeneric
-{
+public class KeyGenReturning extends KeyGenGeneric {
 
+    public KeyGenReturning( TestHarness category ) {
 
-    public KeyGenReturning( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC43", "Key generator: SEQUENCE in RETURNING mode", category );
+        super( category, "TC44" , "Key generator: IDENTITY" );
     }
 
-    protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
-            throws Exception
-    {
-        return testOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
+    public void runTest()
+            throws PersistenceException, Exception {
+
+        testOneKeyGen( TestReturningObject.class, TestReturningExtends.class );
     }
 
 }
+

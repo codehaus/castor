@@ -56,74 +56,51 @@ import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  * Test for generic key generators (MAX and HIGH/LOW).
  */
-public class KeyGenGeneric
-    extends CWTestCase
-{
-
+public class KeyGenGeneric extends CastorTestCase {
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
-    public KeyGenGeneric( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        this( "TC41", "Key generators: MAX, HIGH/LOW", category );
+    public KeyGenGeneric( TestHarness category ) {
+        this( category, "TC41", "Key generators: MAX, HIGH/LOW" );
     }
 
-
-    public KeyGenGeneric( String name, String description, CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( name, description );
+    public KeyGenGeneric( TestHarness category, String name, String description ) {
+        super( category, name, description );
         _category = (JDOCategory) category;
     }
 
-
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException {
+        _db = _category.getDatabase( verbose );
     }
 
+    public void runTest()
+            throws PersistenceException, Exception {
 
-    public void postExecute()
-    {
-        super.postExecute();
+        testOneKeyGen( TestMaxObject.class, TestMaxExtends.class );
+
+        testOneKeyGen( TestHighLowObject.class, TestHighLowExtends.class );
+
     }
 
-
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            db = _category.getDatabase( stream.verbose() );
-            result = testAllKeyGens( stream, db );
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
-        }
-        return result;
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
     }
-
-    protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
-            throws Exception
-    {
-        return testOneKeyGen( stream, db, TestMaxObject.class, TestMaxExtends.class )
-                && testOneKeyGen( stream, db, TestHighLowObject.class, TestHighLowExtends.class );
-    }
-
 
     /**
      * The main goal of the test is to verify key generators in the case
@@ -131,10 +108,9 @@ public class KeyGenGeneric
      * For each key generator we have a pair of classes: TestXXXObject and
      * TestXXXExtends which use key generator XXX.
      */
-    protected boolean testOneKeyGen( CWVerboseStream stream, Database db,
-                                  Class objClass, Class extClass )
-            throws Exception
-    {
+    protected boolean testOneKeyGen( Class objClass, Class extClass )
+            throws PersistenceException, Exception {
+
         OQLQuery            oql;
         TestKeyGenObject    object;
         TestKeyGenObject    ext;
@@ -144,62 +120,61 @@ public class KeyGenGeneric
         result = true;
 
         // Open transaction in order to perform JDO operations
-        db.begin();
+        _db.begin();
 
         // Create first object
         object = (TestKeyGenObject) objClass.newInstance();
-        stream.writeVerbose( "Creating first object: " + object );
-        db.create( object );
-        stream.writeVerbose( "Created first object: " + object );
+        stream.println( "Creating first object: " + object );
+        _db.create( object );
+        stream.println( "Created first object: " + object );
 
         // Create second object
         ext = (TestKeyGenObject) extClass.newInstance();
-        stream.writeVerbose( "Creating second object: " + ext );
-        db.create( ext );
-        stream.writeVerbose( "Created second object: " + ext );
+        stream.println( "Creating second object: " + ext );
+        _db.create( ext );
+        stream.println( "Created second object: " + ext );
 
-        db.commit();
+        _db.commit();
 
-        db.begin();
+        _db.begin();
 
         // Find the first object and remove it 
-        //object = (TestKeyGenObject) db.load( objClass, object.getId() );
-        oql = db.getOQLQuery();
+        //object = (TestKeyGenObject) _db.load( objClass, object.getId() );
+        oql = _db.getOQLQuery();
         oql.create( "SELECT object FROM " + objClass.getName() +
                        " object WHERE id = $1" );
         oql.bind( object.getId() );
         enum = oql.execute();
-        stream.writeVerbose( "Removing first object: " + object );
+        stream.println( "Removing first object: " + object );
         if ( enum.hasMore() ) {
             object = (TestKeyGenObject) enum.next();
-            db.remove( object );
-            stream.writeVerbose( "OK: Removed" );
+            _db.remove( object );
+            stream.println( "OK: Removed" );
         } else {
-            stream.writeVerbose( "Error: Not found" );
+            stream.println( "Error: Not found" );
             result = false;
         }
 
         // Find the second object and remove it
-        //ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
-        oql = db.getOQLQuery();
+        //ext = (TestKeyGenObject) _db.load( extClass, ext.getId() );
+        oql = _db.getOQLQuery();
         oql.create( "SELECT ext FROM " + extClass.getName() +
                        " ext WHERE id = $1" );
         oql.bind( ext.getId() );
         enum = oql.execute();
-        stream.writeVerbose( "Removing second object: " + ext );
+        stream.println( "Removing second object: " + ext );
         if ( enum.hasMore() ) {
             ext = (TestKeyGenObject) enum.next();
-            db.remove( ext );
-            stream.writeVerbose( "OK: Removed" );
+            _db.remove( ext );
+            stream.println( "OK: Removed" );
         } else {
-            stream.writeVerbose( "Error: Not found" );
+            stream.println( "Error: Not found" );
             result = false;
         }
 
-        db.commit();
+        _db.commit();
 
         return result;
     }
-
 
 }

@@ -113,7 +113,7 @@
     <field name="zip" type="string" >
       <sql name="zip" type="varchar" />
     </field>
-    <field name="Person" type="jdo.TestLazyPerson" lazy="true">
+    <field name="Person" type="jdo.TestLazyPerson">
       <sql name="fname lname"/>
     </field>
   </class>
@@ -440,6 +440,26 @@
     </field>
   </class>
 
+  <class name="jdo.TestLOB" access="shared" identity="id">
+    <description>Test type handling of CLOB and BLOB</description>
+    <map-to table="test_lob" />
+    <field name="id" type="long">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="blob" type="bytes" >
+      <sql name="blob_val" type="blob" dirty="ignore" />
+    </field>
+    <field name="clob" type="string" >
+      <sql name="clob_val" type="clob" dirty="ignore" />
+    </field>
+    <!-- <field name="blob2" type="stream" >
+      <sql name="blob_val2" type="blob" dirty="ignore" />
+    </field> -->
+    <field name="clob2" type="clob" >
+      <sql name="clob_val2" type="clob" dirty="ignore" />
+    </field>
+  </class>
+
 
   <!-- Classes for testing type handling -->
   <class name="jdo.TestTypes" access="shared" identity="id">
@@ -476,23 +496,10 @@
     <field name="timestamp2" type="date" >
       <sql name="num_date" type="numeric[YMDhmsS]" />
     </field>
-    <field name="blob" type="bytes" >
-      <sql name="blob_val" type="blob" dirty="ignore" />
-    </field>
-    <field name="clob" type="string" >
-      <sql name="clob_val" type="clob" dirty="ignore" />
-    </field>
-    <field name="blob2" type="stream" >
-      <sql name="blob_val2" type="blob" dirty="ignore" />
-    </field>
-    <field name="clob2" type="clob" >
-      <sql name="clob_val2" type="clob" dirty="ignore" />
-    </field>
     <field name="timestamp3" type="string" >
       <sql name="date_str" type="timestamp" />
     </field>
   </class>
-
 
   <!-- Classes for key generator testing -->
   <class name="jdo.TestMaxObject" identity="id" key-generator="MAX">

@@ -51,12 +51,11 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Collection;
+import java.util.Vector;
+import java.util.Random;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
-import java.lang.Math;
-import java.util.Vector;
-import java.util.Random;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -67,17 +66,18 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
-import java.util.ArrayList;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  * Test for serializable depedent object
  */
-public class SerializableObject extends CWTestCase {
+public class SerializableObject extends CastorTestCase {
 
     private Database       _db;
 
@@ -88,125 +88,112 @@ public class SerializableObject extends CWTestCase {
     private JDOCategory    _category;
 
 
-    public SerializableObject( CWTestCategory category )
-            throws CWClassConstructorException {
+    public SerializableObject( TestHarness category ) {
 
-        super( "TC29", "Serializable" );
+        super( category, "TC29", "Serializable" );
         _category = (JDOCategory) category;
     }
 
-    public void preExecute() {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException, SQLException {
+
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection(); 
     }
 
-    public void postExecute() {
-        super.postExecute();
+    public void runTest() 
+            throws PersistenceException, SQLException {
+
+        stream.println( "Running..." );
+        stream.println( "" );
+
+        // delete everything
+        _conn.createStatement().executeUpdate( "DELETE test_serial" );
+        _conn.commit();
+
+        // create new object with an serializable dependent object
+        _db.begin();
+        TestSerial master = new TestSerial();
+        master.setId( 1 );
+        master.setSerializableObject( new TestSerializableObject() );
+        master.getSerializableObject().aCoolString = "Very cool!";
+        master.getSerializableObject().ints = new int[] { 1, 3, 5, 7, 9 };
+        _db.create( master );
+        _db.commit();
+
+        // test if object created properly
+        _db.begin();
+        TestSerial testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
+        if ( testSerial == null )
+            fail( "Object creation failed!" );
+            
+        if ( testSerial.getSerializableObject() == null ||
+                !testSerial.getSerializableObject().aCoolString.equals("Very cool!") ||
+                testSerial.getSerializableObject().ints == null ||
+                testSerial.getSerializableObject().ints.length != 5 ||
+                testSerial.getSerializableObject().ints[0] != 1 ||
+                testSerial.getSerializableObject().ints[1] != 3 ||
+                testSerial.getSerializableObject().ints[2] != 5 ||
+                testSerial.getSerializableObject().ints[3] != 7 ||
+                testSerial.getSerializableObject().ints[4] != 9 )
+            fail( "dependent objects creation failed!" + testSerial );
+
+        // modify the object
+        testSerial.getSerializableObject().ints[1] = 103;
+        testSerial.getSerializableObject().ints[3] = 107;
+        testSerial.getSerializableObject().aCoolString = "Very very cool!";
+        _db.commit();
+
+        _db.begin();
+        testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
+        if ( testSerial == null )
+            fail( "dependent modfiication failed!" + testSerial );
+            
+        if ( testSerial.getSerializableObject() == null ||
+                !testSerial.getSerializableObject().aCoolString.equals("Very very cool!") ||
+                testSerial.getSerializableObject().ints == null ||
+                testSerial.getSerializableObject().ints.length != 5 ||
+                testSerial.getSerializableObject().ints[0] != 1 ||
+                testSerial.getSerializableObject().ints[1] != 103 ||
+                testSerial.getSerializableObject().ints[2] != 5 ||
+                testSerial.getSerializableObject().ints[3] != 107 ||
+                testSerial.getSerializableObject().ints[4] != 9 )
+            fail( "dependent modification failed!" + testSerial );
+
+        // set the field to null;
+        testSerial.getSerializableObject().ints = null;
+        testSerial.getSerializableObject().aCoolString = null;
+        _db.commit();
+
+        _db.begin();
+        testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
+        if ( testSerial == null )
+            fail( "dependent modfiication failed!" + testSerial );
+            
+        if ( testSerial.getSerializableObject() == null ||
+                testSerial.getSerializableObject().aCoolString != null ||
+                testSerial.getSerializableObject().ints != null )
+            fail( "dependent modification failed!" + testSerial );
+
+        // setSerializableObject( null );
+        testSerial.setSerializableObject( null );
+        _db.commit();
+
+        _db.begin();
+        testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
+        if ( testSerial == null )
+            fail( "dependent modfiication failed!" + testSerial );
+            
+        if ( testSerial.getSerializableObject() != null )
+            fail( "dependent modification failed!" + testSerial );
+        _db.commit();
     }
 
-
-    public boolean run( CWVerboseStream stream ) {
-        try {
-
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection(); 
-
-            stream.writeVerbose( "Running..." );
-            stream.writeVerbose( "" );
-
-            // delete everything
-            _conn.createStatement().executeUpdate( "DELETE test_serial" );
-            _conn.commit();
-
-            // create new object with an serializable dependent object
-            _db.begin();
-            TestSerial master = new TestSerial();
-            master.setId( 1 );
-            master.setSerializableObject( new TestSerializableObject() );
-            master.getSerializableObject().aCoolString = "Very cool!";
-            master.getSerializableObject().ints = new int[] { 1, 3, 5, 7, 9 };
-            _db.create( master );
-            _db.commit();
-
-            // test if object created properly
-            _db.begin();
-            TestSerial testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
-            if ( testSerial == null )
-                throw new Exception( "Object creation failed!" );
-                
-            if ( testSerial.getSerializableObject() == null ||
-                    !testSerial.getSerializableObject().aCoolString.equals("Very cool!") ||
-                    testSerial.getSerializableObject().ints == null ||
-                    testSerial.getSerializableObject().ints.length != 5 ||
-                    testSerial.getSerializableObject().ints[0] != 1 ||
-                    testSerial.getSerializableObject().ints[1] != 3 ||
-                    testSerial.getSerializableObject().ints[2] != 5 ||
-                    testSerial.getSerializableObject().ints[3] != 7 ||
-                    testSerial.getSerializableObject().ints[4] != 9 )
-                throw new Exception( "dependent objects creation failed!" + testSerial );
-
-            // modify the object
-            testSerial.getSerializableObject().ints[1] = 103;
-            testSerial.getSerializableObject().ints[3] = 107;
-            testSerial.getSerializableObject().aCoolString = "Very very cool!";
-            _db.commit();
-
-            _db.begin();
-            testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
-            if ( testSerial == null )
-                throw new Exception( "dependent modfiication failed!" + testSerial );
-                
-            if ( testSerial.getSerializableObject() == null ||
-                    !testSerial.getSerializableObject().aCoolString.equals("Very very cool!") ||
-                    testSerial.getSerializableObject().ints == null ||
-                    testSerial.getSerializableObject().ints.length != 5 ||
-                    testSerial.getSerializableObject().ints[0] != 1 ||
-                    testSerial.getSerializableObject().ints[1] != 103 ||
-                    testSerial.getSerializableObject().ints[2] != 5 ||
-                    testSerial.getSerializableObject().ints[3] != 107 ||
-                    testSerial.getSerializableObject().ints[4] != 9 )
-                throw new Exception( "dependent modification failed!" + testSerial );
-
-            // set the field to null;
-            testSerial.getSerializableObject().ints = null;
-            testSerial.getSerializableObject().aCoolString = null;
-            _db.commit();
-
-            _db.begin();
-            testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
-            if ( testSerial == null )
-                throw new Exception( "dependent modfiication failed!" + testSerial );
-                
-            if ( testSerial.getSerializableObject() == null ||
-                    testSerial.getSerializableObject().aCoolString != null ||
-                    testSerial.getSerializableObject().ints != null )
-                throw new Exception( "dependent modification failed!" + testSerial );
-
-            // setSerializableObject( null );
-            testSerial.setSerializableObject( null );
-            _db.commit();
-
-            _db.begin();
-            testSerial = (TestSerial) _db.load( TestSerial.class, new Integer(1) );
-            if ( testSerial == null )
-                throw new Exception( "dependent modfiication failed!" + testSerial );
-                
-            if ( testSerial.getSerializableObject() != null )
-                throw new Exception( "dependent modification failed!" + testSerial );
-            _db.commit();
-
-        } catch ( Exception e ) {
-            e.printStackTrace();
-
-            stream.writeVerbose( "Exception: "+ e );
-            try {
-                if ( _db.isActive() )
-                    _db.close();
-                return false;
-            } catch ( Exception ex ) {
-                return false;
-            }
-        }
-        return true;
+    public void tearDown()
+            throws PersistenceException, SQLException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+        _conn.close();
     }
 }
 

@@ -15,37 +15,28 @@ import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 /**
+ * Test on Inheritance support of data objects. This test marshall data
+ * objects that make uses of the inhertance support of Castor and unmarshall
+ * the marshalling result to see if they are matching each other.
  */
-public class Inheritance
-    extends CWTestCase
-{
+public class Inheritance extends CastorTestCase {
 
 
-    public Inheritance( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC02", "Test inheritence of objects/elements" );
+    public Inheritance( TestHarness category ) {
+        super( category, "TC02", "Test inheritence of objects/elements" );
     }
 
 
-    public void preExecute()
-    {
-        super.preExecute();
-    }
+    public boolean run( CWVerboseStream stream ) {
 
-
-    public void postExecute()
-    {
-        super.postExecute();
-    }
-
-
-    public boolean run( CWVerboseStream stream )
-    {
         boolean result = true;
-
         try {
             Mapping      mapping;
             Marshaller   marshaller;

@@ -55,17 +55,17 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
  */
-public class StoredProcedure
-    extends CWTestCase
-{
+public class StoredProcedure extends CastorTestCase {
 
     private final String USER1 = "user1"; 
     private final String USER2 = "user2";
@@ -74,112 +74,97 @@ public class StoredProcedure
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
-    public StoredProcedure( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC48", "Stored procedure query" );
+
+    public StoredProcedure( TestHarness category ) {
+        super( category, "TC48", "Stored procedure query" );
         _category = (JDOCategory) category;
     }
 
 
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp()
+            throws PersistenceException {
+        _db = _category.getDatabase( verbose );
     }
 
+    public void runTest()
+            throws PersistenceException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
-
-
-    public boolean run( CWVerboseStream stream ) 
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            TestObject    object;
-            Enumeration   enum;
-            int resCnt;
-            
-            // Open transaction in order to perform JDO operations
-            db = _category.getDatabase( stream.verbose() );
-            db.begin();
-            
-            // Remove all objects.
-            // Then create three objects with the given field values.
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
-            enum = oql.execute();
-            while ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                db.remove( object );
-            }
-            db.commit();
-
-            db.begin();
-            object = new TestObject();
-            object.setId( 1 );
-            object.setValue1( USER1 );
-            stream.writeVerbose( "Creating the first new object: " + object );
-            db.create( object );
-
-            object = new TestObject();
-            object.setId( 2 );
-            object.setValue1( USER1 );
-            object.setValue2( GROUP2 );
-            stream.writeVerbose( "Creating the second new object: " + object );
-            db.create( object );
-
-            object = new TestObject();
-            object.setId( 3 );
-            object.setValue1( USER2 );
-            object.setValue2( GROUP1 );
-            stream.writeVerbose( "Creating the second new object: " + object );
-            db.create( object );
-
-            db.commit();
-
-            // Now get the created objects using the stored procedure
-            // The stored procedure sp_check_permission stands for some
-            // application-specific algorithm of checking permissions and 
-            // returns the set of all objects to which access is granted.
-            // In this test we assume that value1 holds the name of the user
-            // who created the object, and value2 holds the name of the group
-            // who has read access to the object. We pass the user name "user1" 
-            // and the name of his group "group1" and fetch sequencially two
-            // result sets: one by the rule "creator can access object", second
-            // by the rule "read access group".
-            // We expect to fetch objects with identities 1,2,3.
-            db.begin();
-            oql = db.getOQLQuery( "CALL proc_check_permissions($,$) AS jdo.TestObject" );
-            oql.bind( USER1 );
-            oql.bind( GROUP1 );
-            enum = oql.execute();
-
-            resCnt = 0;
-            for (int i = 1; enum.hasMoreElements(); i++ ) {
-                object = (TestObject) enum.nextElement();
-                stream.writeVerbose( "Fetched object: " + object );
-                resCnt++;
-            }
-            if ( resCnt != 3 ) {
-                stream.writeVerbose( "Error: Wrong number of objects in the result" );
-                result = false;
-            }
-            db.commit();
-
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        OQLQuery      oql;
+        TestObject    object;
+        Enumeration   enum;
+        int resCnt;
+        
+        // Open transaction in order to perform JDO operations
+        _db.begin();        
+        // Remove all objects.
+        // Then create three objects with the given field values.
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
+        enum = oql.execute();
+        while ( enum.hasMoreElements() ) {
+            object = (TestObject) enum.nextElement();
+            _db.remove( object );
         }
-        return result;
+        _db.commit();
+
+        _db.begin();
+        object = new TestObject();
+        object.setId( 1 );
+        object.setValue1( USER1 );
+        stream.println( "Creating the first new object: " + object );
+        _db.create( object );
+
+        object = new TestObject();
+        object.setId( 2 );
+        object.setValue1( USER1 );
+        object.setValue2( GROUP2 );
+        stream.println( "Creating the second new object: " + object );
+        _db.create( object );
+
+        object = new TestObject();
+        object.setId( 3 );
+        object.setValue1( USER2 );
+        object.setValue2( GROUP1 );
+        stream.println( "Creating the second new object: " + object );
+        _db.create( object );
+
+        _db.commit();
+
+        // Now get the created objects using the stored procedure
+        // The stored procedure sp_check_permission stands for some
+        // application-specific algorithm of checking permissions and 
+        // returns the set of all objects to which access is granted.
+        // In this test we assume that value1 holds the name of the user
+        // who created the object, and value2 holds the name of the group
+        // who has read access to the object. We pass the user name "user1" 
+        // and the name of his group "group1" and fetch sequencially two
+        // result sets: one by the rule "creator can access object", second
+        // by the rule "read access group".
+        // We expect to fetch objects with identities 1,2,3.
+        _db.begin();
+        oql = _db.getOQLQuery( "CALL proc_check_permissions($,$) AS jdo.TestObject" );
+        oql.bind( USER1 );
+        oql.bind( GROUP1 );
+        enum = oql.execute();
+
+        resCnt = 0;
+        for (int i = 1; enum.hasMoreElements(); i++ ) {
+            object = (TestObject) enum.nextElement();
+            stream.println( "Fetched object: " + object );
+            resCnt++;
+        }
+        if ( resCnt != 3 ) {
+            stream.println( "Error: Wrong number of objects in the result" );
+            fail("Wrong number of objects in the result");
+        }
+        _db.commit();
     }
 
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 
 }

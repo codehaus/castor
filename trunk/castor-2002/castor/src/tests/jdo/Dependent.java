@@ -60,264 +60,234 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 
 /**
+ * Test for dependent relationship between data objects.
+ *
+ *
  */
-public class Dependent
-    extends CWTestCase
-{
-
-
-    private Connection     _conn;
-
+public class Dependent extends CastorTestCase {
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
-    public Dependent( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC24", "Dependent objects tests" );
+    /**
+     * Constructor
+     *
+     * @param category The test suite for these tests
+     */
+    public Dependent( TestHarness category ) {
+        super( category, "TC24", "Dependent objects tests" );
         _category = (JDOCategory) category;
     }
 
+    /**
+     * Get a JDO database
+     */
+    public void setUp()
+            throws PersistenceException {
 
-    public void preExecute()
-    {
-        super.preExecute();
+        _db = _category.getDatabase( verbose );
     }
 
+    public void runTest()
+            throws PersistenceException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
+        OQLQuery      oql;
+        OQLQuery      groupOql;
+        TestMaster    master;
+        TestGroup     group;
+        TestDetail    detail;
+        QueryResults  qres;
+        TestMaster    master2;
+        int           cnt;
+        
+        _db = _category.getDatabase( verbose );
 
+        stream.println( "Delete everything" );
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
+        qres = oql.execute();
 
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            OQLQuery      groupOql;
-            TestMaster    master;
-            TestGroup     group;
-            TestDetail    detail;
-            QueryResults  qres;
-            TestMaster    master2;
-            int           cnt;
-            
-            db = _category.getDatabase( stream.verbose() );
-
-            stream.writeVerbose( "Delete everything" );
-            db.begin();
-            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
-            qres = oql.execute();
-
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.next() );
-            }
-            oql.close();
-            stream.writeVerbose( "Deleting " + cnt + " master objects" );
-			/*
-            oql = db.getOQLQuery( "SELECT detail FROM jdo.TestDetail detail" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " detail objects" );
-            oql = db.getOQLQuery( "SELECT detail2 FROM jdo.TestDetail2 detail2" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            stream.writeVerbose( "Deleting " + cnt + " detail2 objects" );
-			*/
-            oql = db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
-            qres = oql.execute();
-            for ( cnt = 0; qres.hasMore(); cnt++ ) {
-                db.remove( qres.nextElement() );
-            }
-            oql.close();
-            stream.writeVerbose( "Deleting " + cnt + " group objects" );
-            db.commit();
-
-            stream.writeVerbose( "Attempt to create master with details" );
-            db.begin();
-            master = new TestMaster();
-            master.addDetail( new TestDetail( 5 ) );
-            detail = new TestDetail( 6 );
-            detail.addDetail2( new TestDetail2() );
-            detail.addDetail2( new TestDetail2() );
-            master.addDetail( detail );
-            detail = new TestDetail( 7 );
-            detail.addDetail2( new TestDetail2() );
-            detail.addDetail2( new TestDetail2() );
-            master.addDetail( detail );
-            group = new TestGroup();
-            db.create( group );
-            master.setGroup( group );
-            db.create( master );
-            db.commit();
-
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getGroup() == null ) {
-                    stream.writeVerbose( "Error: loaded master without group: " + master );
-                    result  = false;
-                } else if ( master.getGroup().getId() != TestGroup.DefaultId ) {
-                    stream.writeVerbose( "Error: loaded master with wrong group: " + master );
-                    result  = false;
-                }
-                if ( master.getDetails() == null ||
-                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master without three details: " + master );
-                    result  = false;
-                }
-                detail = master.findDetail( 5 );
-                if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
-                    stream.writeVerbose( "Error: loaded detail 5 with details2: " + qres.next() );
-                    result = false;
-                }
-                detail = master.findDetail( 6 );
-                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
-                    stream.writeVerbose( "Error: loaded detail 6 without two details: " + detail );
-                    result  = false;
-                }
-                detail = master.findDetail( 7 );
-                if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
-                    stream.writeVerbose( "Error: loaded detail 7 without two details: " + detail );
-                    result  = false;
-                }
-            } else {
-                stream.writeVerbose( "Error: failed to create master with details and group" );
-                result = false;
-            }
-            if ( result )
-                stream.writeVerbose( "Created master with details: " + master );
-            db.commit();
-            if ( ! result )
-                return false;
-
-
-            stream.writeVerbose( "Attempt to change details" );
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master == null ) {
-                stream.writeVerbose( "Error: failed to find master with details group" );
-                return false;
-            }
-            // remove detail with id == 5
-            master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
-            // remove detail with id == 6 explicitly
-            detail = (TestDetail) master.findDetail( 6 );
-            master.getDetails().remove( master.getDetails().indexOf( detail ) );
-            //db.remove( detail );
-            // add new detail
-            master.addDetail( new TestDetail( 8 ) );
-            // add new detail and create it explicitely
-            detail = new TestDetail( 9 );
-            master.addDetail( detail );
-            //db.create( detail );
-            // delete, then create detail with id == 7 explicitly
-            detail = (TestDetail) master.findDetail( 7 );
-            master.getDetails().remove( master.getDetails().indexOf( detail ) );
-            //db.remove( detail );
-            master.addDetail( detail );
-            //db.create( detail );
-            db.commit();
-            db.begin();
-            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            if ( master != null ) {
-                if ( master.getDetails().size() == 0 ||
-                     master.getDetails().contains( new TestDetail( 5 ) ) ||
-                     master.getDetails().contains( new TestDetail( 6 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 8 ) ) ||
-                     ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
-                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
-                    result  = false;
-                } else {
-                    stream.writeVerbose( "Details changed correctly: " + master );
-                }
-            } else {
-                stream.writeVerbose( "Error: master not found" );
-                result = false;
-            }
-            db.commit();
-
-            stream.writeVerbose( "Test OQL query" );
-            db.begin();
-            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.value1=$1" );
-            oql.bind(TestDetail.DefaultValue);
-            qres = oql.execute();
-            if ( qres.hasMore() ) {
-                stream.writeVerbose( "OK: correct result of query 1 " );
-            } else {
-                stream.writeVerbose( "Error: incorrect result of query 1 " );
-                result = false;
-            }
-            oql.bind(TestDetail.DefaultValue + "*");
-            qres = oql.execute();
-            if ( qres.hasMore() ) {
-                stream.writeVerbose( "Error: incorrect result of query 2 " );
-                result = false;
-            } else {
-                stream.writeVerbose( "OK: correct result of query 2 " );
-            }
-            oql.close();
-            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.details2.value1=$1" );
-            oql.bind(TestDetail2.DefaultValue);
-            qres = oql.execute();
-            if ( qres.hasMore() ) {
-                stream.writeVerbose( "OK: correct result of query 3 " );
-            } else {
-                stream.writeVerbose( "Error: incorrect result of query 3 " );
-                result = false;
-            }
-            oql.bind(TestDetail2.DefaultValue + "*");
-            qres = oql.execute();
-            if ( qres.hasMore() ) {
-                stream.writeVerbose( "Error: incorrect result of query 4 " );
-                result = false;
-            } else {
-                stream.writeVerbose( "OK: correct result of query 4 " );
-            }
-            oql.close();
-            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.group=$1" );
-            oql.bind(group);
-            qres = oql.execute();
-            if ( qres.hasMore() ) {
-                stream.writeVerbose( "OK: correct result of query 5 " );
-            } else {
-                stream.writeVerbose( "Error: incorrect result of query 5 " );
-                result = false;
-            }
-            oql.close();
-            db.commit();
-
-            if ( ! result )
-                return false;
-
-
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        for ( cnt = 0; qres.hasMore(); cnt++ ) {
+            _db.remove( qres.next() );
         }
-        return result;
+        oql.close();
+        stream.println( "Deleting " + cnt + " master objects" );
+
+
+        oql = _db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
+        qres = oql.execute();
+        for ( cnt = 0; qres.hasMore(); cnt++ ) {
+            _db.remove( qres.nextElement() );
+        }
+        oql.close();
+        stream.println( "Deleting " + cnt + " group objects" );
+        _db.commit();
+
+        stream.println( "Attempt to create master with details" );
+        _db.begin();
+        master = new TestMaster();
+        master.addDetail( new TestDetail( 5 ) );
+        detail = new TestDetail( 6 );
+        detail.addDetail2( new TestDetail2() );
+        detail.addDetail2( new TestDetail2() );
+        master.addDetail( detail );
+        detail = new TestDetail( 7 );
+        detail.addDetail2( new TestDetail2() );
+        detail.addDetail2( new TestDetail2() );
+        master.addDetail( detail );
+        group = new TestGroup();
+        _db.create( group );
+        master.setGroup( group );
+        _db.create( master );
+        _db.commit();
+
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getGroup() == null ) {
+                stream.println( "Error: loaded master without group: " + master );
+                fail("loaded master without group: " + master);
+            } else if ( master.getGroup().getId() != TestGroup.DefaultId ) {
+                stream.println( "Error: loaded master with wrong group: " + master );
+                fail("loaded master with wrong group: " + master);
+            }
+            if ( master.getDetails() == null ||
+                 ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ) {
+                stream.println( "Error: loaded master without three details: " + master );
+                fail("loaded master without three details: " + master);
+            }
+            detail = master.findDetail( 5 );
+            if ( detail.getDetails2() != null && detail.getDetails2().size() != 0 ) {
+                stream.println( "Error: loaded detail 5 with details2: " + qres.next() );
+                fail("loaded detail 5 with details2: " + qres.next());
+            }
+            detail = master.findDetail( 6 );
+            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
+                stream.println( "Error: loaded detail 6 without two details: " + detail );
+                fail("loaded detail 6 without two details: " + detail);
+            }
+            detail = master.findDetail( 7 );
+            if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
+                stream.println( "Error: loaded detail 7 without two details: " + detail );
+                fail("loaded detail 7 without two details: " + detail);
+            }
+        } else {
+            stream.println( "Error: failed to create master with details and group" );
+            fail("failed to create master with details and group");
+        }
+        stream.println( "Created master with details: " + master );
+        _db.commit();
+
+
+        stream.println( "Attempt to change details" );
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master == null ) {
+            stream.println( "Error: failed to find master with details group" );
+            fail("failed to find master with details group" );
+        }
+        // remove detail with id == 5
+        master.getDetails().remove( master.getDetails().indexOf( master.findDetail( 5 ) ) );
+        // remove detail with id == 6 explicitly
+        detail = (TestDetail) master.findDetail( 6 );
+        master.getDetails().remove( master.getDetails().indexOf( detail ) );
+        // add new detail
+        master.addDetail( new TestDetail( 8 ) );
+        // add new detail and create it explicitely
+        detail = new TestDetail( 9 );
+        master.addDetail( detail );
+        // delete, then create detail with id == 7 explicitly
+        detail = (TestDetail) master.findDetail( 7 );
+        master.getDetails().remove( master.getDetails().indexOf( detail ) );
+        master.addDetail( detail );
+        _db.commit();
+        _db.begin();
+        master = (TestMaster) _db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+        if ( master != null ) {
+            if ( master.getDetails().size() == 0 ||
+                 master.getDetails().contains( new TestDetail( 5 ) ) ||
+                 master.getDetails().contains( new TestDetail( 6 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 8 ) ) ||
+                 ! master.getDetails().contains( new TestDetail( 9 ) ) ) {
+                stream.println( "Error: loaded master has wrong set of details: " + master );
+                fail("loaded master has wrong set of details: " + master);
+            } else {
+                stream.println( "Details changed correctly: " + master );
+            }
+        } else {
+            stream.println( "Error: master not found" );
+            fail("master not found");
+        }
+        _db.commit();
+
+        stream.println( "Test OQL query" );
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.value1=$1" );
+        oql.bind(TestDetail.DefaultValue);
+        qres = oql.execute();
+        if ( qres.hasMore() ) {
+            stream.println( "OK: correct result of query 1 " );
+        } else {
+            stream.println( "Error: incorrect result of query 1 " );
+            fail("incorrect result of query 1");
+        }
+        oql.bind(TestDetail.DefaultValue + "*");
+        qres = oql.execute();
+        if ( qres.hasMore() ) {
+            stream.println( "Error: incorrect result of query 2 " );
+            fail("incorrect result of query 2");
+        } else {
+            stream.println( "OK: correct result of query 2 " );
+        }
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.details2.value1=$1" );
+        oql.bind(TestDetail2.DefaultValue);
+        qres = oql.execute();
+        if ( qres.hasMore() ) {
+            stream.println( "OK: correct result of query 3 " );
+        } else {
+            stream.println( "Error: incorrect result of query 3 " );
+            fail("incorrect result of query 3");
+        }
+        oql.bind(TestDetail2.DefaultValue + "*");
+        qres = oql.execute();
+        if ( qres.hasMore() ) {
+            stream.println( "Error: incorrect result of query 4 " );
+            fail("incorrect result of query 4");
+        } else {
+            stream.println( "OK: correct result of query 4 " );
+        }
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.group=$1" );
+        oql.bind(group);
+        qres = oql.execute();
+        if ( qres.hasMore() ) {
+            stream.println( "OK: correct result of query 5 " );
+        } else {
+            stream.println( "Error: incorrect result of query 5 " );
+            fail("incorrect result of query 5");
+        }
+        oql.close();
+        _db.commit();
+
     }
 
-
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 }

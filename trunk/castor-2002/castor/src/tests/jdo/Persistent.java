@@ -57,213 +57,193 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 /**
  */
-public class Persistent
-    extends CWTestCase
-{
+public class Persistent extends CastorTestCase {
 
 
     private JDOCategory    _category;
 
+    private Database       _db;
 
-    public Persistent( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC47", "Persistence interface tests" );
+    public Persistent( TestHarness category ) {
+        super( category, "TC47", "Persistence interface tests" );
         _category = (JDOCategory) category;
     }
 
-
-    public void preExecute()
-    {
-        super.preExecute();
+    public void setUp() 
+            throws PersistenceException {
+        _db = _category.getDatabase( verbose );
     }
 
+    public void runTest() 
+            throws PersistenceException {
 
-    public void postExecute()
-    {
-        super.postExecute();
-    }
+        OQLQuery      oql;
+        TestPersistent parent;
+        TestPersistent child;
+        QueryResults  qres;
+        long          beforeModTime;
+        long          afterModTime;
+        long          modTime;
+        TestPersistRelated related;
 
-
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
-        Database db;
-
-        try {
-            OQLQuery      oql;
-            TestPersistent parent;
-            TestPersistent child;
-            QueryResults  qres;
-            long          beforeModTime;
-            long          afterModTime;
-            long          modTime;
-            TestPersistRelated related;
-
-            db = _category.getDatabase( stream.verbose() );
-
-            stream.writeVerbose( "Delete everything" );
-            db.begin();
-            oql = db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE id=$1" );
-            oql.bind( TestPersistent.DefaultId );
-            qres = oql.execute();
-            while ( qres.hasMore() ) {
-                db.remove( qres.next() );
-            }
-            oql.close();
-            oql = db.getOQLQuery( "SELECT g FROM jdo.TestGroup g" );
-            qres = oql.execute();
-            while ( qres.hasMore() ) {
-                db.remove( qres.next() );
-            }
-            oql.close();
-            oql = db.getOQLQuery( "SELECT r FROM jdo.TestPersistRelated r" );
-            qres = oql.execute();
-            while ( qres.hasMore() ) {
-                db.remove( qres.next() );
-            }
-            oql.close();
-            db.commit();
-
-            stream.writeVerbose( "Attempt to create parent with children" );
-            db.begin();
-            parent = new TestPersistent();
-            parent.setGroup( new TestGroup() );
-            parent.addChild( new TestPersistent( 71 ) );
-            parent.addChild( new TestPersistent( 72 ) );
-            child = new TestPersistent( 73 );
-            child.addChild( new TestPersistent( 731 ) );
-            child.addChild( new TestPersistent( 732 ) );
-            parent.addChild( child );
-            related = new TestPersistRelated();
-            parent.setRelated( related );
-            db.create( parent );
-            db.commit();
-            db.begin();
-            parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
-            if ( parent != null ) {
-                if ( parent.getGroup() == null ||
-                        parent.getGroup().getId() != TestGroup.DefaultId ) {
-                    stream.writeVerbose( "Error: loaded parent without group: " + parent );
-                    result  = false;
-                }
-                if ( parent.getRelated() == null ) {
-                    stream.writeVerbose( "Error: loaded parent without related: " + parent );
-                    result  = false;
-                }
-                if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
-                     parent.findChild( 71 ) == null ||
-                     parent.findChild( 72 ) == null ||
-                     parent.findChild( 73 ) == null ) {
-                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );
-                    result  = false;
-                }
-                child = parent.findChild( 73 );
-                if ( child == null || child.getChildren() == null ||
-                     child.getChildren().size() != 2 ||
-                     child.findChild( 731 ) == null ||
-                     child.findChild( 732 ) == null ) {
-                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
-                    result  = false;
-                }
-                child.setValue1("new value");
-            } else {
-                stream.writeVerbose( "Error: failed to create parent with children" );
-                result = false;
-            }
-            if ( result )
-                stream.writeVerbose( "Created parent with children: " + parent );
-            beforeModTime = System.currentTimeMillis() / 1000;
-            db.commit();
-            afterModTime = System.currentTimeMillis() / 1000;
-            db.begin();
-            parent = (TestPersistent) db.load( TestPersistent.class, new Integer( 7 ) );
-            child = parent.findChild( 73 );
-            if ( child == null ) {
-                stream.writeVerbose( "Error: child not loaded" );
-                result  = false;
-            } else if ( child.getModificationTime() == null ) {
-                stream.writeVerbose( "Error: wrong modification time: " + child );
-                result  = false;
-            } else {
-                modTime = child.getModificationTime().getTime() / 1000;
-                if ( modTime < beforeModTime || modTime  > afterModTime ) {
-                    stream.writeVerbose( "Error: wrong modification time: " + child );
-                    result  = false;
-                }
-            }
-            db.commit();
-
-            stream.writeVerbose( "Long transaction test" );
-            parent.setValue1( "long transaction parent" );
-            parent.getChildren().removeElement( parent.findChild( 71 ) );
-            child = new TestPersistent( 74 );
-            child.setValue1( "long transaction child" );
-            child.addChild( new TestPersistent( 741 ) );
-            parent.addChild( child );
-            parent.findChild( 73 ).getChildren().removeElement(
-                    parent.findChild( 73 ).findChild( 731 ) );
-            parent.findChild( 73 ).addChild( new TestPersistent( 733 ) );
-            db.begin();
-            db.update( parent );
-            db.commit();
-            db.begin();
-            parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
-            if ( parent != null ) {
-                if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
-                     ! "long transaction parent".equals( parent.getValue1() ) ||
-                     parent.findChild( 71 ) != null ||
-                     parent.findChild( 72 ) == null ||
-                     parent.findChild( 73 ) == null ||
-                     parent.findChild( 74 ) == null ) {
-                    stream.writeVerbose( "Error: loaded parent without three children: " + parent );
-                    result  = false;
-                }
-                child = parent.findChild( 73 );
-                if ( child == null || child.getChildren() == null || 
-                     child.getChildren().size() != 2 ||
-                     child.findChild( 731 ) != null ||
-                     child.findChild( 732 ) == null ||
-                     child.findChild( 733 ) == null ) {
-                    stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
-                    result  = false;
-                }
-                child = parent.findChild( 74 );
-                if ( child == null || child.getChildren() == null || 
-                     child.getChildren().size() != 1 ||
-                     ! "long transaction child".equals( child.getValue1() ) ||
-                     child.findChild( 741 ) == null ) {
-                    stream.writeVerbose( "Error: loaded child without one grandchildren: " + child );
-                    result  = false;
-                }
-            } else {
-                stream.writeVerbose( "Error: failed to create parent with children" );
-                result = false;
-            }
-            if ( result )
-                stream.writeVerbose( "Created parent with children: " + parent );
-            db.commit();
-
-            if ( ! result )
-                return false;
-
-
-            db.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        stream.println( "Delete everything" );
+        _db.begin();
+        oql = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE id=$1" );
+        oql.bind( TestPersistent.DefaultId );
+        qres = oql.execute();
+        while ( qres.hasMore() ) {
+            _db.remove( qres.next() );
         }
-        return result;
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT g FROM jdo.TestGroup g" );
+        qres = oql.execute();
+        while ( qres.hasMore() ) {
+            _db.remove( qres.next() );
+        }
+        oql.close();
+        oql = _db.getOQLQuery( "SELECT r FROM jdo.TestPersistRelated r" );
+        qres = oql.execute();
+        while ( qres.hasMore() ) {
+            _db.remove( qres.next() );
+        }
+        oql.close();
+        _db.commit();
+
+        stream.println( "Attempt to create parent with children" );
+        _db.begin();
+        parent = new TestPersistent();
+        parent.setGroup( new TestGroup() );
+        parent.addChild( new TestPersistent( 71 ) );
+        parent.addChild( new TestPersistent( 72 ) );
+        child = new TestPersistent( 73 );
+        child.addChild( new TestPersistent( 731 ) );
+        child.addChild( new TestPersistent( 732 ) );
+        parent.addChild( child );
+        related = new TestPersistRelated();
+        parent.setRelated( related );
+        _db.create( parent );
+        _db.commit();
+        _db.begin();
+        parent = (TestPersistent) _db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
+        if ( parent != null ) {
+            if ( parent.getGroup() == null ||
+                    parent.getGroup().getId() != TestGroup.DefaultId ) {
+                stream.println( "Error: loaded parent without group: " + parent );
+                fail("group not found");
+            }
+            if ( parent.getRelated() == null ) {
+                stream.println( "Error: loaded parent without related: " + parent );
+                fail("related not found");
+            }
+            if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
+                 parent.findChild( 71 ) == null ||
+                 parent.findChild( 72 ) == null ||
+                 parent.findChild( 73 ) == null ) {
+                stream.println( "Error: loaded parent without three children: " + parent );
+                fail("children size mismatched");
+            }
+            child = parent.findChild( 73 );
+            if ( child == null || child.getChildren() == null ||
+                 child.getChildren().size() != 2 ||
+                 child.findChild( 731 ) == null ||
+                 child.findChild( 732 ) == null ) {
+                stream.println( "Error: loaded child without two grandchildren: " + child );
+                fail("garndchildren not found");
+            }
+            child.setValue1("new value");
+        } else {
+            stream.println( "Error: failed to create parent with children" );
+            fail("failed to create parent with children");
+        }
+
+
+        stream.println( "Created parent with children: " + parent );
+        beforeModTime = System.currentTimeMillis() / 1000;
+        _db.commit();
+        afterModTime = System.currentTimeMillis() / 1000;
+        _db.begin();
+        parent = (TestPersistent) _db.load( TestPersistent.class, new Integer( 7 ) );
+        child = parent.findChild( 73 );
+        if ( child == null ) {
+            stream.println( "Error: child not loaded" );
+            fail("child load failed");
+        } else if ( child.getModificationTime() == null ) {
+            stream.println( "Error: wrong modification time: " + child );
+            fail("modification time incorrect");
+        } else {
+            modTime = child.getModificationTime().getTime() / 1000;
+            if ( modTime < beforeModTime || modTime  > afterModTime ) {
+                stream.println( "Error: wrong modification time: " + child );
+                fail("modificationo time incorrect");
+            }
+        }
+        _db.commit();
+
+        stream.println( "Long transaction test" );
+        parent.setValue1( "long transaction parent" );
+        parent.getChildren().removeElement( parent.findChild( 71 ) );
+        child = new TestPersistent( 74 );
+        child.setValue1( "long transaction child" );
+        child.addChild( new TestPersistent( 741 ) );
+        parent.addChild( child );
+        parent.findChild( 73 ).getChildren().removeElement(
+                parent.findChild( 73 ).findChild( 731 ) );
+        parent.findChild( 73 ).addChild( new TestPersistent( 733 ) );
+        _db.begin();
+        _db.update( parent );
+        _db.commit();
+        _db.begin();
+        parent = (TestPersistent) _db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
+        if ( parent != null ) {
+            if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
+                 ! "long transaction parent".equals( parent.getValue1() ) ||
+                 parent.findChild( 71 ) != null ||
+                 parent.findChild( 72 ) == null ||
+                 parent.findChild( 73 ) == null ||
+                 parent.findChild( 74 ) == null ) {
+                stream.println( "Error: loaded parent without three children: " + parent );
+                fail("children size mismatched");
+            }
+            child = parent.findChild( 73 );
+            if ( child == null || child.getChildren() == null || 
+                 child.getChildren().size() != 2 ||
+                 child.findChild( 731 ) != null ||
+                 child.findChild( 732 ) == null ||
+                 child.findChild( 733 ) == null ) {
+                stream.println( "Error: loaded child without two grandchildren: " + child );
+                fail("grandchildren size mismatched");
+            }
+            child = parent.findChild( 74 );
+            if ( child == null || child.getChildren() == null || 
+                 child.getChildren().size() != 1 ||
+                 ! "long transaction child".equals( child.getValue1() ) ||
+                 child.findChild( 741 ) == null ) {
+                stream.println( "Error: loaded child without one grandchildren: " + child );
+                fail("grandchildren size mismatched");
+            }
+        } else {
+            stream.println( "Error: failed to create parent with children" );
+            fail("failed to create parent with children");
+        }
+
+        stream.println( "Created parent with children: " + parent );
+        _db.commit();
+
     }
 
+    public void tearDown()
+            throws PersistenceException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+    }
 
 }

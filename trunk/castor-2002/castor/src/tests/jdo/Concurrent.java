@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,25 +51,26 @@ import java.io.IOException;
 import java.util.Enumeration;
 import java.sql.Connection;
 import java.sql.SQLException;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
+import org.exolab.castor.jdo.PersistenceException;
 
+import junit.framework.TestSuite;
+import junit.framework.TestCase;
+import junit.framework.Assert;
+import harness.TestHarness;
+import harness.CastorTestCase;
 
 /**
  * Concurrent access test. Tests a JDO modification and concurrent
  * JDBC modification to determine if JDO can detect the modification
  * with dirty checking.
  */
-public class Concurrent
-    extends CWTestCase
-{
+public class Concurrent extends CastorTestCase {
 
 
     private Database       _db;
@@ -87,179 +88,271 @@ public class Concurrent
     static final String    JDOValue = "jdo value";
 
 
-    public Concurrent( CWTestCategory category )
-        throws CWClassConstructorException
-    {
-        super( "TC02", "Concurrent access" );
+    /** 
+     * Constructor
+     */
+    public Concurrent( TestHarness category ) {
+        super( category, "TC02", "Concurrent access" );
         _category = (JDOCategory) category;
     }
 
+    /**
+     * Initializes fields
+     */
+    public void setUp() 
+            throws PersistenceException, SQLException {
 
-    public void preExecute()
-    {
-        super.preExecute();
+        _db = _category.getDatabase( verbose );
+        _conn = _category.getJDBCConnection(); 
     }
 
+    /**
+     * Calls the individual tests embedded in this test case
+     */
+    public void runTest() 
+            throws PersistenceException, SQLException {
 
-    public void postExecute()
-    {
-        super.postExecute();
+        testAccessModeShared();
+
+        testAccessModeExclusive();
+
+        testAccessModeDbLocked();
     }
 
+    /**
+     * Test for concurrent modification detection in Shared Mode.
+     * (Optimistic Locking Mode)
+     * This test contains two parts. The first part test if Castor 
+     * JDO can detect concurrent modification done directly via
+     * JDBC in Shared Mode. The second part test if Castor can
+     * ignores concurrent modification done to fields that 
+     * indicates dirty check should not be done.
+     */
+    public void testAccessModeShared() 
+            throws PersistenceException, SQLException {
 
-    public boolean run( CWVerboseStream stream )
-    {
-        boolean result = true;
+        stream.println( "Running in access mode shared" );
+        // part 1
+        testDirtyChecked( Database.Shared );
 
-        try {
-            _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection(); 
+        // part 2
+        testDirtyIgnored( Database.Shared );
+        stream.println( "" );
+    }
 
-            stream.writeVerbose( "Running in access mode shared" );
-            if ( ! runOnce( stream, Database.Shared ) )
-                result = false;
-            stream.writeVerbose( "" );
-            stream.writeVerbose( "Running in access mode exclusive" );
-            if ( ! runOnce( stream, Database.Exclusive ) )
-                result = false;
-            stream.writeVerbose( "" );
-            stream.writeVerbose( "Running in access mode db-locked" );
-            if ( ! runOnce( stream, Database.DbLocked ) )
-                result = false;
-            stream.writeVerbose( "" );
-            _db.close();
-            _conn.close();
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+    /**
+     * Test for concurrent modification detection in Exclusive Mode.
+     * (Pessimistic Locking Mode)
+     * This test contains two parts. The first part test if Castor 
+     * JDO can detect concurrent modification done directly via
+     * JDBC in Shared Mode. The second part test if Castor can
+     * ignores concurrent modification done to fields that 
+     * indicates dirty check should not be done.
+     */
+    public void testAccessModeExclusive() 
+            throws PersistenceException, SQLException {
+
+        stream.println( "Running in access mode exclusive" );
+        // part 1
+        testDirtyChecked( Database.Exclusive );
+
+        // part 2
+        testDirtyIgnored( Database.Exclusive );
+
+        stream.println( "" );
+    }
+
+    /**
+     * Test for concurrent modification detection in DbLocked Mode.
+     * (Pessimistic Locking Mode plus database row lock)
+     * This test contains two parts. The first part test if Castor 
+     * JDO can detect concurrent modification done directly via
+     * JDBC in Shared Mode. The second part test if Castor can
+     * ignores concurrent modification done to fields that 
+     * indicates dirty check should not be done.
+     * (note: some databases don't support database lock and will
+     * fails this test case)
+     */
+    public void testAccessModeDbLocked()
+            throws PersistenceException, SQLException {
+
+        stream.println( "Running in access mode db-locked" );
+        // part 1
+        testDirtyChecked( Database.DbLocked );
+
+        // part 2
+        testDirtyIgnored( Database.DbLocked );
+
+        stream.println( "" );
+    }
+
+    /**
+     * This method is called by the tests and preform the actual
+     * concurrent modification test.
+     *
+     * @param accessMode the access mode that is used in the concurrent
+     *        modification tests
+     */
+    private void testDirtyChecked( short accessMode )
+            throws PersistenceException, SQLException {
+
+        OQLQuery      oql;
+        TestObject    object;
+        QueryResults   enum;
+
+        // Open transaction in order to perform JDO operations
+        _db.begin();
+    
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            object = (TestObject) enum.next();
+            stream.println( "Retrieved object: " + object );
+            object.setValue1( TestObject.DefaultValue1 );
+            object.setValue2( TestObject.DefaultValue2 );
+        } else {
+            object = new TestObject();
+            stream.println( "Creating new object: " + object );
+            _db.create( object );
         }
-        return result;
-    }
-
-
-    private boolean runOnce( CWVerboseStream stream, short accessMode )
-    {
-        boolean result = true;
-
-        try {
-            OQLQuery      oql;
-            TestObject    object;
-            QueryResults   enum;
-
-            // Open transaction in order to perform JDO operations
-            _db.begin();
+        _db.commit();
         
-            // Determine if test object exists, if not create it.
-            // If it exists, set the name to some predefined value
-            // that this test will later override.
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMore() ) {
-                object = (TestObject) enum.next();
-                stream.writeVerbose( "Retrieved object: " + object );
-                object.setValue1( TestObject.DefaultValue1 );
-                object.setValue2( TestObject.DefaultValue2 );
-            } else {
-                object = new TestObject();
-                stream.writeVerbose( "Creating new object: " + object );
-                _db.create( object );
-            }
-            _db.commit();
-            
-            
-            // Open a new transaction in order to conduct test
-            _db.begin();
-            oql.bind( new Integer( TestObject.DefaultId ) );
-            object = (TestObject) oql.execute( accessMode ).nextElement();
-            object.setValue1( JDOValue );
-            
-            // Perform direct JDBC access and override the value of that table
-            if ( accessMode != Database.DbLocked ) {
-                _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
-                                                 "' WHERE id=" + TestObject.DefaultId );
-                stream.writeVerbose( "OK: Updated test object from JDBC" );
-            } else {
-                Thread th = new Thread() {
-                    public void run() {
-                        try {
-                            _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
-                                                             "' WHERE id=" + TestObject.DefaultId );
-                        } catch (Exception ex) {
-                        }
-                    }
-                };
-                th.start();
-                synchronized (this) {
+        
+        // Open a new transaction in order to conduct test
+        _db.begin();
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute( accessMode ).nextElement();
+        object.setValue1( JDOValue );
+        
+        // Perform direct JDBC access and override the value of that table
+        if ( accessMode != Database.DbLocked ) {
+            _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
+                                             "' WHERE id=" + TestObject.DefaultId );
+            stream.println( "OK: Updated test object from JDBC" );
+        } else {
+            Thread th = new Thread() {
+                public void run() {
                     try {
-                        wait(5000);
-                        if (th.isAlive()) {
-                            th.interrupt();
-                            stream.writeVerbose( "OK: Cannot update test object from JDBC" );
-                        } else {
-                            stream.writeVerbose( "Error: Updated test object from JDBC" );
-                        }
-                    } catch (InterruptedException ex) {
+                        _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
+                                                         "' WHERE id=" + TestObject.DefaultId );
+                    } catch (Exception ex) {
                     }
                 }
-            }
-
-            // Commit JDO transaction, this should report object modified
-            // exception
-            stream.writeVerbose( "Committing JDO update: dirty checking field modified" );
-            if ( accessMode != Database.DbLocked ) {
+            };
+            th.start();
+            synchronized (this) {
                 try {
-                    _db.commit();
-                    stream.writeVerbose( "Error: ObjectModifiedException not thrown" );
-                    result = false;
-                } catch ( ObjectModifiedException except ) {
-                    stream.writeVerbose( "OK: ObjectModifiedException thrown" );
-                }
-            } else {
-                try {
-                    _db.commit();
-                    stream.writeVerbose( "OK: ObjectModifiedException not thrown" );
-                    // After _db.commit the concurrent update will be performed, undo it.
-                    _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDOValue +
-                                                     "' WHERE id=" + TestObject.DefaultId );
-                } catch ( ObjectModifiedException except ) {
-                    result = false;
-                    stream.writeVerbose( "Error: ObjectModifiedException thrown" );
+                    wait(5000);
+                    if (th.isAlive()) {
+                        th.interrupt();
+                        stream.println( "OK: Cannot update test object from JDBC" );
+                    } else {
+                        stream.println( "Error: Updated test object from JDBC" );
+                        fail("Updated test object from JDBC");
+                    }
+                } catch (InterruptedException ex) {
                 }
             }
+        }
 
-            // Open a new transaction in order to conduct test
-            _db.begin();
-            oql.bind( new Integer( TestObject.DefaultId ) );
-            object = (TestObject) oql.execute( accessMode ).nextElement();
-            object.setValue2( JDOValue );
-            
-            // Perform direct JDBC access and override the value of that table
-            if ( accessMode != Database.DbLocked ) {
-                _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
-                                                 "' WHERE id=" + TestObject.DefaultId );
-                stream.writeVerbose( "Updated test object from JDBC" );
-            }
-        
-            // Commit JDO transaction, this should report object modified
-            // exception
-            stream.writeVerbose( "Committing JDO update: no dirty checking field not modified" );
+        // Commit JDO transaction, this should report object modified
+        // exception
+        stream.println( "Committing JDO update: dirty checking field modified" );
+        if ( accessMode != Database.DbLocked ) {
             try {
                 _db.commit();
-                stream.writeVerbose( "OK: ObjectModifiedException not thrown" );
+                stream.println( "Error: ObjectModifiedException not thrown" );
+                fail("ObjectModifiedException not thrown");
             } catch ( ObjectModifiedException except ) {
-                result = false;
-                stream.writeVerbose( "Error: ObjectModifiedException thrown" );
+                stream.println( "OK: ObjectModifiedException thrown" );
             }
-        } catch ( Exception except ) {
-            stream.writeVerbose( "Error: " + except );
-            except.printStackTrace();
-            result = false;
+        } else {
+            try {
+                _db.commit();
+                stream.println( "OK: ObjectModifiedException not thrown" );
+                // After _db.commit the concurrent update will be performed, undo it.
+                _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDOValue +
+                                                 "' WHERE id=" + TestObject.DefaultId );
+            } catch ( ObjectModifiedException except ) {
+                stream.println( "Error: ObjectModifiedException thrown" );
+                fail("ObjectModifiedException not thrown");
+            }
         }
-        return result;
     }
 
+    /**
+     * This method is called by the tests and preform the actual
+     * concurrent modification test.
+     *
+     * @param accessMode the access mode that is used in the concurrent
+     *        modification tests
+     */
+    private void testDirtyIgnored( short accessMode )
+            throws PersistenceException, SQLException {
+
+        OQLQuery      oql;
+        TestObject    object;
+        QueryResults   enum;
+
+        // Open transaction in order to perform JDO operations
+        _db.begin();
+    
+        // Determine if test object exists, if not create it.
+        // If it exists, set the name to some predefined value
+        // that this test will later override.
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+        oql.bind( TestObject.DefaultId );
+        enum = oql.execute();
+        if ( enum.hasMore() ) {
+            object = (TestObject) enum.next();
+            stream.println( "Retrieved object: " + object );
+            object.setValue1( TestObject.DefaultValue1 );
+            object.setValue2( TestObject.DefaultValue2 );
+        } else {
+            object = new TestObject();
+            stream.println( "Creating new object: " + object );
+            _db.create( object );
+        }
+        _db.commit();
+
+        // Open a new transaction in order to conduct test
+        _db.begin();
+        oql.bind( new Integer( TestObject.DefaultId ) );
+        object = (TestObject) oql.execute( accessMode ).nextElement();
+        object.setValue2( JDOValue );
+        
+        // Perform direct JDBC access and override the value of that table
+        if ( accessMode != Database.DbLocked ) {
+            _conn.createStatement().execute( "UPDATE test_table SET value2='" + JDBCValue +
+                                             "' WHERE id=" + TestObject.DefaultId );
+            stream.println( "Updated test object from JDBC" );
+        }
+    
+        // Commit JDO transaction, this should report object modified
+        // exception
+        stream.println( "Committing JDO update: no dirty checking field not modified" );
+        try {
+            _db.commit();
+            stream.println( "OK: ObjectModifiedException not thrown" );
+        } catch ( ObjectModifiedException except ) {
+            stream.println( "Error: ObjectModifiedException thrown" );
+            fail("ObjectModifiedException thrown");
+        }
+    }
+
+    /**
+     * Close the database and JDBC connection
+     */
+    public void tearDown() 
+            throws PersistenceException, SQLException {
+        if ( _db.isActive() ) _db.rollback();
+        _db.close();
+        _conn.close();
+    }
 
 }
 
