@@ -262,7 +262,7 @@ public class Marshaller {
         if (_class.isArray())
             byteArray = (_class.getComponentType() == Byte.TYPE);
         
-        
+        descriptor = null;
         if (descriptor == null)
             descriptor = new XMLFieldDescriptorImpl(_class, "root", null, null);
 
