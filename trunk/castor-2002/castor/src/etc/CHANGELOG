@@ -1,5 +1,5 @@
-Version 0.8.4  May 0? 2000
------------------------------
+Version 0.8.4  May 5 2000
+--------------------------
 
 XML:     Fixed a ClassLoader issue with the ClassDescriptorResolver
 
@@ -22,6 +22,10 @@ JDO:     Fixed bug in Database when used as sychronized resource in a J2EE envir
          Calling close() will not rollback the transaction until the J2EE server has
          completed two-phase commit and notified it. Database must be registerd with
          a JTA transaction manager using the setTransactionManager option.
+
+JDO:     Fixed bug in key generator when using non-primitive value (e.g. Integer, String).
+         Previously SQLEngine create was never called, now it is called and object properly
+         recorded in transaction.
 
 Mapping: Fixed bug that caused exception with inheritance, now inheritance works
          correctly if classes are specified in proper order in the mapping file.
