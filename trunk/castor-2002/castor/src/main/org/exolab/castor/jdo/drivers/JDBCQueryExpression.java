@@ -76,6 +76,7 @@ public class JDBCQueryExpression
 
     protected Vector    _joins = new Vector();
 
+    protected String    _select;
 
     protected String    _where;
 
@@ -103,7 +104,12 @@ public class JDBCQueryExpression
     public void addColumn( String tableName, String columnName )
     {
         _tables.put( tableName, tableName );
-        _cols.addElement( _factory.quoteName( tableName + JDBCSyntax.TableColumnSeparator + columnName ) );
+        _cols.addElement( tableName + JDBCSyntax.TableColumnSeparator + columnName  );
+    }
+
+    public void addTable( String tableName )
+    {
+        _tables.put( tableName, tableName );
     }
 
 
@@ -140,6 +146,12 @@ public class JDBCQueryExpression
     }
 
 
+    public void addSelect( String selectClause )
+    {
+        _select = selectClause;
+    }
+
+
     public void addWhereClause( String where )
     {
         _where = where;
@@ -159,11 +171,19 @@ public class JDBCQueryExpression
             return "1";
 
         sql = new StringBuffer();
-        for ( int i = 0 ; i < _cols.size() ; ++i ) {
+        int i = 0;
+        for ( i = 0 ; i < _cols.size() ; ++i ) {
             if ( i > 0 )
                 sql.append( JDBCSyntax.ColumnSeparator );
             sql.append( (String) _cols.elementAt( i ) );
         }
+
+        if ( _select != null )
+          if ( i > 0 )
+            sql.append( JDBCSyntax.ColumnSeparator ).append( _select );
+          else
+            sql.append( _select );
+
         return sql.toString();
     }
 
@@ -205,7 +225,12 @@ public class JDBCQueryExpression
         sql.append( JDBCSyntax.Select );
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
-        sql.append( getColumnList() );
+        
+        if ( _select == null )
+          sql.append( getColumnList() );
+        else
+          sql.append( _select ).append(" ");
+          
         sql.append( JDBCSyntax.From );
 
         tables = (Hashtable) _tables.clone();

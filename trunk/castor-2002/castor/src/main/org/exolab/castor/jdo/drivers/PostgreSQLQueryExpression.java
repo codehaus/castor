@@ -79,7 +79,14 @@ public final class PostgreSQLQueryExpression
         sql.append( JDBCSyntax.Select );
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
-        sql.append( getColumnList() );
+
+          
+        if ( _select == null )
+          sql.append( getColumnList() );
+        else
+          sql.append( _select ).append(" ");
+
+        
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
         enum = _tables.elements();

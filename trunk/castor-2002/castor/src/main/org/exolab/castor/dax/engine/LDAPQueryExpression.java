@@ -79,7 +79,14 @@ public class LDAPQueryExpression
     {
     }
 
+    public void addSelect( String selectClause )
+    {
+    }
 
+    public void addTable( String tableName )
+    {
+    }
+    
     public void addParameter( String tableName, String columnName, String condOp )
     {
     }
