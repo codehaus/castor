@@ -440,7 +440,7 @@ public class DescriptorSourceFactory {
                 case XSType.NMTOKENS_TYPE:
                     //-- use CollectionFieldHandler
                     jsc.add("desc.setHandler( new CollectionFieldHandler(");
-                    jsc.append("handler));");
+                    jsc.append("handler, new NameValidator(NameValidator.NMTOKEN)));");
                     break;
                 case XSType.IDREF_TYPE:
                 case XSType.IDREFS_TYPE:
