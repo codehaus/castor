@@ -25,6 +25,7 @@
          <table border="1" cellpadding="4">
            <tr><td>MAX</td><td>"MAX( pk ) + 1" generic algorithm</td></tr>
            <tr><td>HIGH/LOW</td><td>HIGH/LOW generic algorithm</td></tr>
+           <tr><td>UUID</td><td>UUID generic algorithm</td></tr>
            <tr><td>IDENTITY</td><td>Supports autoincrement identity fields in
                                   Sybase ASE/ASA, MS SQL Server and Hypersonic SQL</td></tr>
            <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle and PostgreSQL</td></tr>
@@ -138,6 +139,16 @@
       <p>Note, that the class HighLowKeyGenerator is not final, so you can 
          extend it in order to implement other variants of HIGH/LOW
          algorithm (for example, HIGH/MID/LOW or char key values).</p>
+    </section>
+
+    <section title="UUID key generator">
+      <p>This key generator generates global unique primary keys.
+         The generated key is a combination of the IP address, the current
+         time in milliseconds since 1970 and a static counter.
+         The complete key consists of a 30 character fixed length string.</p>
+      <p>This algorithm has no parameters.
+         Primary key must have type <tt>char</tt>, <tt>varchar</tt> or
+         <tt>longvarchar</tt>.</p>
     </section>
 
     <section title="IDENTITY key generator">
