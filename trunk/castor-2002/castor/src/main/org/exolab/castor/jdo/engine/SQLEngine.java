@@ -257,7 +257,7 @@ Will be adding this later.
         stmt = null;
         try {
             // Must create record in parent table first.
-            // All other relations have been created before hand.
+            // All other dependents are created afterwards.
             if ( _extends != null )
                 identity = _extends.create( conn, fields, identity );
 
@@ -348,7 +348,7 @@ Will be adding this later.
 
         try {
             // Must store record in parent table first.
-            // All other relations have been created before hand.
+            // All other dependents are stored independently.
             if ( _extends != null )
                 _extends.store( conn, fields, identity, original, stamp );
 
@@ -412,15 +412,15 @@ Will be adding this later.
         PreparedStatement stmt = null;
 
         try {
-            // Must delete record in parent table first.
-            // All other relations will be deleted after wards.
-            if ( _extends != null )
-                _extends.delete( conn, identity );
-
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             stmt.setObject( 1, identity );
             stmt.execute();
             stmt.close();
+
+            // Must delete record in parent table last.
+            // All other dependents have been deleted before.
+            if ( _extends != null )
+                _extends.delete( conn, identity );
         } catch ( SQLException except ) {
             try {
                 // Close the insert/select statement
