@@ -44,44 +44,22 @@
  */
 
 
-package org.exolab.castor.persist.sql.drivers;
+package org.exolab.castor.persist.oql;
 
-
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Vector;
-import org.exolab.castor.persist.sql.JDBCSyntax;
-import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.jdo.QueryException;
 
 
 /**
- * QueryExpression for DB 2.
+ * Exception thrown to indicate that invalid syntax was encountered by 
+ * the Parser.
  *
- * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:nissim@nksystems.com">Nissim Karpenstein</a>
  * @version $Revision$ $Date$
  */
-public final class DB2QueryExpression
-    extends JDBCQueryExpression
-{
+public class OQLSyntaxException extends QueryException {
 
-
-    public DB2QueryExpression( PersistenceFactory factory )
-    {
-        super( factory );
-    }
-
-
-    public String getStatement( boolean lock )
-    {
-        StringBuffer sql;
-
-        sql = getStandardStatement( lock, false );
-        if (lock) {
-            sql.append( " FOR UPDATE" );
-        }
-        return sql.toString();
-    }
-
+	public OQLSyntaxException( String message ) {
+    super( message );
+  }
+	
 }
-
-

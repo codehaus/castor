@@ -162,6 +162,15 @@ public interface QueryExpression
     public void addTable( String tableName );
 
     /**
+     * Add a table with an alias to the from clause.
+     *
+     * @param tableName The name of the table to add to the select clause
+     * @param tableAlias The name of the alias under which the where clauses will access it
+     */
+    public void addTable( String tableName, String tableAlias );
+
+
+    /**
      * Add a query paramater.
      *
      * @param tableName The table name
@@ -197,24 +206,24 @@ public interface QueryExpression
      * @param whereClause The WHERE clause to add (without the word WHERE).
      */
     public void addWhereClause( String whereClause );
-    
+
 
     /**
-     * Adds an order by clause.  Caller is responsible for making sure all 
+     * Adds an order by clause.  Caller is responsible for making sure all
      * tables mentioned in the order by clause are included in the fromClause.
      *
-     * @param orderClause The ORDER BY clause to add (without the words 
+     * @param orderClause The ORDER BY clause to add (without the words
      *    ORDER BY).
      */
     public void addOrderClause( String orderClause );
-    
+
 
     /**
-     * Adds an limit clause. 
-     * @param limitClause The LIMIT clause to add (without the word 
+     * Adds an limit clause.
+     * @param limitClause The LIMIT clause to add (without the word
      *    LIMIT).
      */
-    public void addLimitClause( String limitClause );  
+    public void addLimitClause( String limitClause );
 
 
     /**
@@ -227,6 +236,19 @@ public interface QueryExpression
      */
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn );
+
+
+    /**
+     * Add an inner join with an alias for the right table
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column name on the left side
+     * @param rightTable The table name on the right side
+     * @param rightColumn The column name on the right side
+     * @param rightTableAlias The alias name to use for the table on the right side
+     */
+    public void addInnerJoin( String leftTable, String leftColumn,
+                              String rightTable, String rightColumn, String rightTableAlias );
 
 
     /**
@@ -245,6 +267,19 @@ public interface QueryExpression
 
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn );
+
+
+    /**
+     * Add an inner join with an alias for the right table
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column names on the left side
+     * @param rightTable The table names on the right side
+     * @param rightColumn The column name on the right side
+     * @param rightTableAlias The alias name to use for the table on the right side
+     */
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn, String rightTableAlias );
 
 
     public void addOuterJoin( String leftTable, String[] leftColumn,
