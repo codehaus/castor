@@ -215,7 +215,7 @@ public class ClassMolder {
     /**
      * Create priority
      */
-    private int     _priority = -1; 
+    private int     _priority = -1;
 
     /**
      * Constructor
@@ -607,18 +607,18 @@ public class ClassMolder {
     }
 
     /**
-     * Determines the create priority of the data object class represented by 
-     * this ClassMolder. Concpetually, this method determines the order of 
+     * Determines the create priority of the data object class represented by
+     * this ClassMolder. Concpetually, this method determines the order of
      * which data object should be created. Priority of zero means the object
      * can be created without depending on other data object.
-     * 
+     *
      * This method should only be called after DatingService is closed.
      */
     public int getPriority() {
         if ( _priority == -1 ) {
             int maxPrior = 0;
             for ( int i = 0; i < _fhs.length; i++ ) {
-                if ( _fhs[i].isPersistanceCapable() 
+                if ( _fhs[i].isPersistanceCapable()
                         && _fhs[i].getEnclosingClassMolder() != this
                         && _fhs[i].getFieldClassMolder() != this
                         && _fhs[i].isStored()
@@ -896,12 +896,12 @@ public class ClassMolder {
 
         // set the new timeStamp into the data object
         if ( object instanceof TimeStampable )
-            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );   
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
 
         // set the identity into the object
         setIdentity( tx, object, createdId );
 
-        // after the creation, we must make sure we add the entry in the 
+        // after the creation, we must make sure we add the entry in the
         // relation table for all many-to-many relationship
         for ( int i=0; i<_fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -1266,7 +1266,7 @@ public class ClassMolder {
                                 fieldClassMolder.removeRelation( tx, deref, this, object );
                         }
 
-                        // yip: user're pretty easily to run into cache 
+                        // yip: user're pretty easily to run into cache
                         // integrity problem here, if user forgot to create
                         // "value" explicitly. Let's put error message here
                         if ( value != null && !tx.isRecorded( value ) )
