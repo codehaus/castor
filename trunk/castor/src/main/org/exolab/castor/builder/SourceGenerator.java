@@ -100,7 +100,9 @@ import java.net.URL;
  * @author <a href="mailto:nsgreen@thazar.com">Nathan Green</a> - Contributions.
  * @version $Revision$ $Date$
 **/
-public class SourceGenerator {
+public class SourceGenerator 
+    extends BuilderConfiguration
+{
 
 
     //-------------/
@@ -176,174 +178,19 @@ public class SourceGenerator {
     private static final String IMPORT_WARNING
         = "Warning: Do not forget to generate source code for the following imported schema: ";
 
-
-
-    /**
-     * Names of properties used in the configuration file.
-     */
-    public static class Property
-    {
-        /**
-         * Property specifying whether or not to generate source code
-         * for bound properties. Currently all properties will be
-         * treated as bound properties if this flag is set to true.
-         * A value of 'true' enables bound properties.
-         * <pre>
-         * org.exolab.castor.builder.boundproperties
-         * </pre>
-         */
-         public static final String BOUND_PROPERTIES =
-            "org.exolab.castor.builder.boundproperties";
-
-
-        /**
-         * Property specifying whether or not to generate source code
-         * for extra collection methods. 
-         * <pre>
-         * org.exolab.castor.builder.extraCollectionMethods
-         * </pre>
-         */
-         public static final String EXTRA_COLLECTION_METHODS =
-            "org.exolab.castor.builder.extraCollectionMethods";
-            
-        /**
-         * Property specifying the super class for
-         * all generated classes
-         * <pre>
-         * org.exolab.castor.builder.superclass
-         * </pre>
-         */
-         public static final String SUPER_CLASS =
-            "org.exolab.castor.builder.superclass";
-
-		/**
-         * Property specifying how element's and type's are mapped into a Java
-         * class hierarchy by the Source Generator.
-         * The value must contain one of the following.
-         * 'element' outputs a Java class hierarchy based on element
-         * names used in the XML Schema. This is the default.
-         * 'type' outputs a Java class hierarchy based on the type
-         * information defined in the XML Schema.
-         * <pre>
-         * org.exolab.castor.builder.javaclassmapping
-         * </pre>
-         */
-        public static final String JavaClassMapping = "org.exolab.castor.builder.javaclassmapping";
-
-		/**
-		 * Property listing mapping between XML namespaces and Java packages.
-		 */
-		public static final String NamespacePackagesOld = "org.exolab.castor.builder.nspackages";
-		public static final String NamespacePackages = "org.exolab.castor.xml.nspackages";
-
-        /**
-         * Property specifying if we want to have the equals method
-         * generated for each generated class
-         */
-        public static final String EqualsMethod = "org.exolab.castor.builder.equalsmethod";
-
-        /**
-         * Property specifying if we want to use Wrapper Objects instead
-         * of primitives (eg java.lang.Float instead of float)
-         */
-        public static final String Wrapper = "org.exolab.castor.builder.primitivetowrapper";
-
-        /**
-         * Property specifying if we want to have a 'public static final String'
-         * generated for each attribute and element name used within a class descriptor
-         */
-        public static final String ClassDescFieldNames = "org.exolab.castor.builder.classdescfieldnames";
-
-
-        /**
-         * The name of the configuration file.
-         * <pre>
-         * castor.properties
-         * </pre>
-         */
-        public static final String FileName = "castorbuilder.properties";
-
-        static final String ResourceName = "/org/exolab/castor/builder/castorbuilder.properties";
-
-    } //--Property
-
-    /**
-     * The flag indicating which type of binding we are
-     * configured for
-    **/
-    private static int  _bindingType = ELEMENT_BINDING;
-
-    /**
-     * bound properties flag
-    **/
-    private static boolean _boundProperties = false;
-
     /**
      * Castor configuration
      */
     private Configuration _config = null;
     
     /**
-     * Set to true if we generate an 'equals' method for each
-     * generated class
+     * The XMLBindingComponent used to create Java classes from an XML Schema
      */
-     private static boolean _equalsMethod = false;
-     private static boolean _hasLocalEquals = false;
-     
-     /**
-      * Boolean to indicate extra collection methods such as setXXX(Vector)
-      * should be generated.
-      */
-     private static boolean _generateExtraCollectionMethods = false;
-     
+    private XMLBindingComponent _bindingComponent = null;
 
 
-    /**
-     * Set to true if we generate a 'public static final String'
-     * for each element and attribute in a class descriptor
-     */
-    private static boolean _classDescFieldNames = false;
-    private static boolean _hasLocalClassField = false;
 
-     /**
-      * Set to true if you want to use Object instead of
-      * primitive (eg java.lang.Float instead of float).
-      */
-    private static boolean _wrapper = false;
-    private static boolean _hasLocalWrapper = false;
-
-	/**
-     * The default properties loaded from the configuration file.
-     */
-    private static Properties _default;
-    
-    /**
-     * A boolean indicated whether or not the properties have been loaded
-     */
-    private static boolean _loaded = false;
-    
-    /**
-    * The XMLBindingComponent used to create Java classes from an XML Schema
-    */
-    private XMLBindingComponent _bindingComponent = new XMLBindingComponent();
-
-	/**
-	 * Namespace URL to Java package mapping
-	 */
-	private static java.util.Hashtable _nspackages = null;
-    static {
-        _nspackages = new Hashtable();
-    }
-
-	/**
-	 * schemaLocation to Java package mapping
-	 */
-	private static java.util.Hashtable _locpackages = null;
-    static {
-        _locpackages = new Hashtable();
-    }
-
-        //----------------------/
+    //----------------------/
     //- Instance Variables -/
     //----------------------/
 
@@ -378,6 +225,11 @@ public class SourceGenerator {
 	*/
 	private boolean _testable  = false;
 
+    /**
+     * The DescriptorSourceFactory instance
+     */
+    private DescriptorSourceFactory _descSourceFactory = null;
+    
     /**
      * The field info factory.
     **/
@@ -427,14 +279,15 @@ public class SourceGenerator {
             _infoFactory = new FieldInfoFactory();
         else
             _infoFactory = infoFactory;
-        //--reset static properties that can be set through the API
-        _hasLocalClassField = false;
-        _hasLocalEquals = false;
-        _hasLocalWrapper =false;
         
-        _sourceFactory = new SourceFactory(infoFactory);
+        load();
+        
+        _sourceFactory = new SourceFactory(this, _infoFactory);
+        _descSourceFactory = new DescriptorSourceFactory(this);
+        
         _header = new JComment(JComment.HEADER_STYLE);
         _header.appendComment(DEFAULT_HEADER);
+        _bindingComponent = new XMLBindingComponent(this);
         //--set the binding 
         setBinding(binding);
 
@@ -453,7 +306,7 @@ public class SourceGenerator {
             throw new IllegalArgumentException(err);
         }
             
-        SGStateInfo sInfo = new SGStateInfo(schema);
+        SGStateInfo sInfo = new SGStateInfo(schema, this);
         //--make sure the XML Schema is valid
         try {
             schema.validate();
@@ -469,8 +322,8 @@ public class SourceGenerator {
             //-- adjust targetNamespace
             if (targetNamespace == null)
                 targetNamespace = "";
-            if ((_nspackages.get(targetNamespace)) == null)
-                _nspackages.put(targetNamespace, packageName);
+            if ((lookupPackageByNamespace(targetNamespace)) == null)
+                setNamespacePackageMapping(targetNamespace, packageName);
         }
         sInfo.packageName = packageName;
         sInfo.setDialog(_dialog);
@@ -578,209 +431,6 @@ public class SourceGenerator {
 
 
     /**
-     * Returns the default configuration file. Changes to the returned
-     * properties set will affect all Castor functions relying on the
-     * default configuration.
-     *
-     * @return The default configuration
-     */
-    public static synchronized Properties getDefault() {
-        if (_default == null)
-            load();
-        return _default;
-    }
-
-    /**
-     * Returns a property from the default configuration file.
-     * Equivalent to calling <tt>getProperty</tt> on the result
-     * of {@link #getDefault}.
-     *
-     * @param name The property name
-     * @param default The property's default value
-     * @return The property's value
-     */
-    public static String getProperty( String name, String defValue ) {
-        return getDefault().getProperty( name, defValue );
-    }
-
-    /**
-     * Returns true if bound properties are enabled.
-     *
-     * Enabling bound properties is controlled via
-     * the org.exolab.castor.builder.boundproperties item
-     * in the castorbuilder.properties file. The value is
-     * either 'true' or 'false'.
-     *
-     * @return true if bound properties are enabled.
-    **/
-    public static boolean boundPropertiesEnabled() {
-        //--ensure the property is loaded
-        //--this is needed when specifying properties at run-time by setDefaultProperties
-        boolean bound = getDefault().getProperty(Property.BOUND_PROPERTIES,"").equalsIgnoreCase("true");
-        return  _boundProperties || bound;
-    } //-- boundPropertiesEnabled
-
-	/**
-     * Returns true if we generate an 'equals' method for
-     * each generated class.
-     *
-     * Enabling this property is controlled via
-     * the org.exolab.castor.builder.equalsmethod item
-     * in the castorbuilder.properties file. The value is
-     * either 'true' or 'false'.
-     *
-     * @return true if bound properties are enabled.
-    **/
-    public static boolean equalsMethod() {
-        //--ensure the property is loaded
-        //--this is needed when specifying properties at run-time by setDefaultProperties
-        boolean equals = getDefault().getProperty(Property.EqualsMethod,"").equalsIgnoreCase("true");
-        if (_hasLocalEquals)
-            return _equalsMethod;
-        else 
-            return equals;
-    } //-- equalsMethod
-
-    /**
-     * Sets the 'equalsmethod' property
-     * @param boolean the value we want to use
-     */
-     public static void setEqualsMethod(boolean equals) {
-         _equalsMethod = equals;
-         _hasLocalEquals = true;
-     }
-
-	/**
-     * Returns true if we generate a 'public static final String' for the
-     * name of each attribute and element described by the class descriptor
-     *
-     * Enabling this property is controlled via
-     * the org.exolab.castor.builder.classdescfieldnames item
-     * in the castorbuilder.properties file. The value is
-     * either 'true' or 'false'.
-     *
-     * @return true if bound properties are enabled.
-    **/
-    public static boolean classDescFieldNames() {
-        //--ensure the property is loaded
-        //--this is needed when specifying properties at run-time by setDefaultProperties
-        boolean classDesc = getDefault().getProperty(Property.ClassDescFieldNames,"").equalsIgnoreCase("true");
-        if (_hasLocalClassField)
-            return _classDescFieldNames;
-        else 
-            return classDesc;
-    } //-- classDescFieldNames
-
-    /**
-     * Sets the 'classDescFieldNames' property
-     * @param boolean the value we want to ues
-     */
-     public static void setClassDescFieldNames(boolean classDescFieldNames) {
-         //ensure the other properties are loaded
-         getDefault();
-         _classDescFieldNames = classDescFieldNames;
-         _hasLocalClassField = true;
-     } //-- setClassDescFieldNames
-
-     /**
-      * Returns true if primitive types have to be used
-      * as Objects (eg. replacing float by java.lang.Float).
-      */
-    public static boolean usePrimitiveWrapper() {
-        //--ensure the property is loaded
-       //--this is needed when specifying properties at run-time by setDefaultProperties
-        boolean wrapper = getDefault().getProperty("org.exolab.castor.builder.primitivetowrapper","").equalsIgnoreCase("true");
-        if (_hasLocalWrapper)
-            return _wrapper;
-        else 
-            return wrapper;
-    }
-     /**
-      * Sets the 'primitivetowrapper' property
-      * @param boolean the value we want to use.
-      */
-      public static void setPrimitiveWrapper(boolean wrapper) {
-          _wrapper = wrapper;
-          _hasLocalWrapper = true;
-      }
-
-    /**
-	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
-     *
-	 * @return True if the Source Generator is mapping schema elements to Java classes.
-	 */
-	public static boolean mappingSchemaElement2Java() {
-	    //-- call getDefault to ensure we loaded the properties
-	    getDefault();
-
-	    return (_bindingType == ELEMENT_BINDING);
-	} //-- mappingSchemaElement2Java
-
-	/**
-	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'type' value.
-     *
-	 * @return True if the Source Generator is mapping schema types to Java classes.
-	 */
-	public static boolean mappingSchemaType2Java() {
-	    //-- call getDefault to ensure we loaded the properties
-	    getDefault();
-
-	    return (_bindingType == TYPE_BINDING);
-	} //-- mappingSchemaType2Java
-
-	/**
-	 * Gets a Java package to an XML namespace URL
-	 */
-	public static String lookupPackageNamespace(String nsURL) {
-        if (nsURL == null) nsURL = "";
-
-		//-- Ensure properties have been loaded
-		getDefault();
-
-		// Lookup Java package via NS
-		String javaPackage = (String) _nspackages.get(nsURL);
-		if(javaPackage==null)
-			return "";
-		else
-			return javaPackage;
-	}
-
-    /**
-	 * Gets a Java package to a schema location.
-	 */
-	public static String lookupPackageLocation(String schemaLocation)
-	{
-        if (schemaLocation == null) return "";
-        
-        // Lookup Java package via schemaLocation
-		//--Full path
-        String javaPackage = (String) _locpackages.get(schemaLocation);
-		if(javaPackage==null) {
-			//--maybe a relative schemaLocation was given
-            while(schemaLocation.startsWith(".")) {
-                 if (schemaLocation.startsWith("./")) {
-                     schemaLocation = schemaLocation.substring(2);
-                 } else if (schemaLocation.startsWith("../")) {
-                     schemaLocation = schemaLocation.substring(3);
-                 }
-            }
-            Enumeration keys = _locpackages.keys();
-            boolean found = false;
-            while (keys.hasMoreElements() && !found) {
-                String key = (String)keys.nextElement();
-                if (schemaLocation.endsWith(key)) {
-                    javaPackage = (String) _locpackages.get(key);
-                    found = true;
-                }
-            }
-            if (javaPackage == null)
-            javaPackage = "";
-		}
-
-        return javaPackage;
-	}
-
-    /**
      * Returns the version number of this SourceGenerator
      *
      * @return the version number of this SourceGenerator
@@ -863,16 +513,6 @@ public class SourceGenerator {
 		   _sourceFactory.setTestable(testable);
     } //-- setTestable
 
-    /**
-     * Override the properties
-     */
-    public static void setDefaultProperties(Properties properties) {
-        _loaded = false;
-        _default = properties;
-        load();
-    }
-  	
- 
    /**
     * Sets the binding to use with this instance of the SourceGenerator.
     *
@@ -882,17 +522,10 @@ public class SourceGenerator {
     public void setBinding(ExtendedBinding binding) {
         if (binding != null) {
             processNamespaces(binding.getPackage());
-            BindingType type = binding.getDefaultBindingType();
-            if (type != null ) {
-                if (type.getType() == BindingType.ELEMENT_TYPE)
-                    _bindingType = ELEMENT_BINDING;
-                else if (type.getType() == BindingType.TYPE_TYPE)
-                    _bindingType = TYPE_BINDING;
-            }
         }
         //--initialize the XMLBindingComponent
         _bindingComponent.setBinding(binding);
-    }
+    } //-- setBinding
 
    /**
     * Sets the binding to use given the path name of a Castor Binding File.
@@ -1203,13 +836,50 @@ public class SourceGenerator {
 
     } //-- createClasses
 
+    /**
+	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
+     *
+	 * @return True if the Source Generator is mapping schema elements to Java classes.
+	 */
+	public boolean mappingSchemaElement2Java() {
+	    if (_bindingComponent != null) {
+	        ExtendedBinding binding = _bindingComponent.getBinding();
+	        if (binding != null) {
+                BindingType type = binding.getDefaultBindingType();
+                if (type != null ) {
+                    return (type.getType() == BindingType.ELEMENT_TYPE);
+                }
+            }
+	    }
+	    return super.mappingSchemaElement2Java();
+	} //-- mappingSchemaElement2Java
+
+	/**
+	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'type' value.
+     *
+	 * @return True if the Source Generator is mapping schema types to Java classes.
+	 */
+	public boolean mappingSchemaType2Java() {
+	    if (_bindingComponent != null) {
+	        ExtendedBinding binding = _bindingComponent.getBinding();
+	        if (binding != null) {
+                BindingType type = binding.getDefaultBindingType();
+                if (type != null ) {
+                    return (type.getType() == BindingType.TYPE_TYPE);
+                }
+            }
+	    }
+	    return super.mappingSchemaType2Java();
+	} //-- mappingSchemaType2Java
+
+
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
 
 	    if (elementDecl == null) return;
         //-- when mapping schema types, only interested in producing classes
 	    //-- for elements with anonymous complex types
 	    XMLType xmlType = elementDecl.getType();
-        if (SourceGenerator.mappingSchemaType2Java()) {
+        if (mappingSchemaType2Java()) {
             if (elementDecl.isReference() ||
                ((xmlType != null) && (xmlType.getName() != null)))
                 return;            
@@ -1258,9 +928,20 @@ public class SourceGenerator {
       private void createClasses(Group group, SGStateInfo sInfo) {
         if (group == null)
            return;
+           
+        
         //-- don't generate classes for empty groups
-        if (group.getParticleCount() == 0)
-            return;
+        if (group.getParticleCount() == 0) {
+            if (group instanceof ModelGroup) {
+                ModelGroup mg = (ModelGroup)group;
+                if (mg.isReference()) {
+                    mg = mg.getReference();
+                    if (mg.getParticleCount() == 0)
+                        return;
+                }
+            }
+            else return;
+        }
             
         _bindingComponent.setView(group);
         JClass[] classes = _sourceFactory.createSourceCode(_bindingComponent, sInfo);
@@ -1415,7 +1096,7 @@ public class SourceGenerator {
             PackageType temp = packages[i];
             PackageTypeChoice choice = temp.getPackageTypeChoice();
             if (choice.getNamespace() != null) {
-                _nspackages.put(choice.getNamespace(), temp.getName());
+                setNamespacePackageMapping(choice.getNamespace(), temp.getName());
             }
             else if (choice.getSchemaLocation() != null) {
                 //1--Handle relative locations
@@ -1432,7 +1113,7 @@ public class SourceGenerator {
                      currentDir = currentDir.substring(0, lastDir+1);
                      tempLocation = currentDir + tempLocation;
                 }
-                _locpackages.put(tempLocation, temp.getName());
+                setLocationPackageMapping(tempLocation, temp.getName());
                 currentDir = null;
                 tempLocation = null;
             }
@@ -1488,8 +1169,7 @@ public class SourceGenerator {
 
         if (_createDescriptors && (classInfo != null)) {
 
-            JClass desc
-                = DescriptorSourceFactory.createSource(classInfo);
+            JClass desc = _descSourceFactory.createSource(classInfo);
 
             allowPrinting = true;
             if (state.promptForOverwrite()) {
@@ -1518,128 +1198,6 @@ public class SourceGenerator {
 
         state.markAsProcessed(jClass);
     } //-- processJClass
-
-
-
-   
-    /**
-     * Returns true if extra methods for collection fields should
-     * be generated. Such methods include set/get methods for
-     * the actual collection in addition to the array methods.
-     *
-     * Enabling extra collection methods is controlled via
-     * the org.exolab.castor.builder.extraCollectionMethods 
-     * property in the castorbuilder.properties file. The value is
-     * either 'true' or 'false'.
-     *
-     * @return true if extra collection methods are enabled.
-    **/
-    public static boolean generateExtraCollectionMethods() {
-        if (_default != null) {
-            boolean result = getDefault().getProperty(Property.EXTRA_COLLECTION_METHODS,"").equalsIgnoreCase("true");
-            _generateExtraCollectionMethods = result;
-        }
-        return  _generateExtraCollectionMethods;
-    } //-- generateExtraCollectionMethods
-	
-
-    /**
-     * Called by {@link #getDefault} to load the configuration the
-     * first time. Will not complain about inability to load
-     * configuration file from one of the default directories, but if
-     * it cannot find the JAR's configuration file, will throw a
-     * run time exception.
-     */
-    protected static synchronized void load()
-    {
-        
-		if (_default == null) {
-		    //-- load defaults from JAR
-  		    _default = Configuration.loadProperties( Property.ResourceName, Property.FileName);
-  		    //-- load local defaults
-        
-            // Get overriding configuration from the classpath,
-            // ignore if not found. If found, merge any existing
-            // properties.
-            try {      
-                InputStream is = SourceGenerator.class.getResourceAsStream("/" + Property.FileName);
-                if (is != null) {
-                    _default.load( is );
-                    is.close();
-                }      
-            } catch ( Exception except ) {
-                // Do nothing
-            }
-  		    
-  		}
-  		
-  		Configuration rtconf =  LocalConfiguration.getInstance();
-
-        // Parse XML namespace and package list from both castor.properties and
-        // castorbuilder.properties
-		processNamespacePackageMappings(rtconf.getProperty( Property.NamespacePackagesOld, ""));
-		processNamespacePackageMappings(rtconf.getProperty( Property.NamespacePackages, ""));
-		processNamespacePackageMappings(_default.getProperty( Property.NamespacePackagesOld, ""));
-		processNamespacePackageMappings(_default.getProperty( Property.NamespacePackages, ""));
-		
-
-		//-- bound properties
-		String prop = _default.getProperty( Property.BOUND_PROPERTIES, "");
-		_boundProperties = prop.equalsIgnoreCase("true");
-
-
-        //-- Equals method?
-        prop = _default.getProperty( Property.EqualsMethod, "");
-		if (!_hasLocalEquals)
-  		    _equalsMethod = prop.equalsIgnoreCase("true");
-
-		//-- Extra Collection Methods?
-		prop = _default.getProperty( Property.EXTRA_COLLECTION_METHODS, "");
-		_generateExtraCollectionMethods = prop.equalsIgnoreCase("true");
-
-        //-- Primitive to Wrapper
-        prop = _default.getProperty(Property.Wrapper, "");
-        if (!_hasLocalWrapper)
-            _wrapper = _wrapper;
-
-		//-- Generate public field names in class descriptors?
-		prop = _default.getProperty( Property.ClassDescFieldNames, "");
-		if (!_hasLocalClassField)
-		    _classDescFieldNames = _classDescFieldNames;
-          
-        //-- backward compatibility with 0.9.3.9
-        prop = _default.getProperty(JavaNaming.UPPER_CASE_AFTER_UNDERSCORE_PROPERTY, null);
-        if (prop != null) {
-            JavaNaming.upperCaseAfterUnderscore = Boolean.valueOf(prop).booleanValue();
-        }
-        
-        initBindingType();
-        _loaded = true;
-
-    } //-- load
-
-    protected static void processNamespacePackageMappings(String mappings) {
-        if (mappings == null) return;
-		StringTokenizer tokens = new StringTokenizer(mappings, ",");
-		while(tokens.hasMoreTokens()) {
-			String token = tokens.nextToken();
-			int comma = token.indexOf('=');
-			if(comma==-1)
-				continue;
-			String ns = token.substring(0,comma).trim();
-			String javaPackage = token.substring(comma+1).trim();
-			_nspackages.put(ns, javaPackage);
-		}
-    }
-    
-    /**
-     * Called by #load to initialize the binding type
-    **/
-    protected static void initBindingType() {
-		String prop = getDefault().getProperty( Property.JavaClassMapping,  ELEMENT_VALUE);
-		if (prop.toLowerCase().equals(TYPE_VALUE))
-		    _bindingType = TYPE_BINDING;
-    } //-- initBindingType
 
     /**
      * <p>Returns a string which is the URI of a file.
