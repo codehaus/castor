@@ -120,7 +120,8 @@
 
 
   <!-- Build the documentation -->
-  <target name="doc" depends="prepare">
+  <target name="doc" depends="prepare,main">
+    <taskdef  name="style" classname="org.exolab.castor.tools.XSLTProcess" />
     <mkdir    dir="${build}/doc" />
     <style    basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
               includes="**.xml" excludes="style/**,project.xml" />
@@ -247,6 +248,14 @@
          dest="." package="${project}" />
   </target>
 
+
+  <target name="oes" depends="prepare,main">
+    <ant antfile="${source}/xsdcomp.xml" target="xsdcomp">
+      <property name="schema" value="${source}/examples/oes/imports.xsd" />
+      <property name="package" value="oes.imports" />
+      <property name="dest" value="${build}/examples/oes" />
+    </ant>
+  </target>
 
 </project>
 
