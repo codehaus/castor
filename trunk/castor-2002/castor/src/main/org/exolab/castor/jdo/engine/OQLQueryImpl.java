@@ -130,7 +130,8 @@ public class OQLQueryImpl
         _dbImpl = dbImpl;
     }
 
-   public void bind( Object value )
+
+    public void bind( Object value )
     {
 
         if ( _expr == null && _spCall == null )
@@ -211,12 +212,6 @@ public class OQLQueryImpl
     public void bind( long value )
     {
         bind( new Long( value ) );
-    }
-
-
-    public void bind( String value )
-    {
-        bind( (Object) value );
     }
 
 
@@ -451,6 +446,25 @@ public class OQLQueryImpl
 
         public boolean hasMoreElements()
         {
+            try {
+                return hasMore( true );
+            } catch ( PersistenceException except ) {
+                // Will never happen
+                return false;
+            }
+        }
+
+
+        public boolean hasMore()
+            throws PersistenceException
+        {
+            return hasMore( false );
+        }
+
+
+        public boolean hasMore( boolean skipError )
+            throws PersistenceException
+        {
             Object identity;
 
             if ( _lastObject != null )
@@ -466,6 +480,8 @@ public class OQLQueryImpl
                             break;
                     } catch ( PersistenceException except ) {
                         identity = _results.nextIdentity();
+                        if ( ! skipError )
+                            throw except;
                     }
                 }
                 if ( identity == null ) {
@@ -475,12 +491,34 @@ public class OQLQueryImpl
             } catch ( PersistenceException except ) {
                 _results.close();
                 _results = null;
+                if ( ! skipError )
+                    throw except;
             }
             return ( _lastObject != null );
         }
 
 
         public Object nextElement()
+            throws NoSuchElementException
+        {
+            try {
+                return next( true );
+            } catch ( PersistenceException except ) {
+                // Will never happen
+                return null;
+            }
+        }
+
+
+        private Object next()
+            throws PersistenceException, NoSuchElementException
+        {
+            return next( false );
+        }
+        
+
+        private Object next( boolean skipError )
+            throws PersistenceException, NoSuchElementException
         {
             Object identity;
 
@@ -503,6 +541,8 @@ public class OQLQueryImpl
                         if ( result != null )
                             return result;
                     } catch ( PersistenceException except ) {
+                        if ( ! skipError )
+                            throw except;
                     }
                     identity = _results.nextIdentity();
                 }
@@ -513,8 +553,19 @@ public class OQLQueryImpl
             } catch ( PersistenceException except ) { 
                 _results.close();
                 _results = null;
+                if ( ! skipError )
+                    throw except;
             }
             throw new NoSuchElementException();
+        }
+
+
+        public void close()
+        {
+            if ( _results != null ) {
+                _results.close();
+                _results = null;
+            }
         }
 
 
