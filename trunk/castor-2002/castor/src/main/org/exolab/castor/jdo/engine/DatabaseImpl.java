@@ -256,6 +256,21 @@ public class DatabaseImpl
     }
 
 
+    public void update( Object object )
+        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+               TransactionNotInProgressException, PersistenceException
+    {
+        TransactionContext tx;
+        ClassHandler       handler;
+
+        tx = getTransaction();
+        handler = _dbEngine.getClassHandler( object.getClass() );
+        if ( handler == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+        tx.update( _dbEngine, object, handler.getIdentity( object ) );
+    }
+
+
     /**
      * @deprecated
      */
@@ -442,6 +457,7 @@ public class DatabaseImpl
             } catch ( TransactionAbortedException except ) {
                 if ( _logInterceptor != null )
                     _logInterceptor.exception( except );
+                _ctx.rollback();
             }
             _ctx = null;
             return;
@@ -454,6 +470,12 @@ public class DatabaseImpl
             _ctx = null;
             throw new IllegalStateException( "Unexpected state: afterCompletion called with status " + status );
         }
+    }
+
+
+    public boolean isActive()
+    {
+        return ( _ctx != null && _ctx.isOpen() );
     }
 
 
