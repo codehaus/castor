@@ -60,16 +60,49 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public class CacheManager {
+	
+	/**
+	 * Database instance
+	 */
     private Database db;
 
+    /**
+     * Lock engine
+     */
     private LockEngine lockEngine;
 
+    /**
+     * Currently active transaction context.
+     */
     private TransactionContext transactionContext;
 
+    
+    /**
+     * Creates an instance of this class.
+     * @param db Database instance.
+     * @param transactionContext Active transaction context.
+     * @param lockEngine Lock engine
+     */
     public CacheManager(Database db, TransactionContext transactionContext, LockEngine lockEngine) {
         this.db = db;
         this.transactionContext = transactionContext;
         this.lockEngine = lockEngine;
+    }
+
+    /**
+     * Indicates whether am instance of cls is currently cached
+     * @param cls The class type.
+     * @param identity The object identity.
+     * @return True if the object is cached.
+     * @throws PersistenceException If a problem occured resolving the object's cache membership.
+     */
+    public boolean isCached ( Class cls, Object identity) throws PersistenceException
+    {
+        if ( transactionContext != null && transactionContext.isOpen()  ) {
+            return transactionContext.isCached(lockEngine, lockEngine.getClassMolder(cls), cls, identity);
+        }
+        
+        throw new PersistenceException ("isCached() has to be called within an active transaction.");
     }
 
     /**
