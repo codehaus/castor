@@ -526,13 +526,32 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.createMethodNotFound",
                                             fieldMap.getCreateMethod(), javaClass.getName() );
             }
-        } else if ( fieldMap.getName() != null ) {
-            // XXX Only need to do this is the field is not a simple type
+        } else if ( fieldMap.getName() != null && ! Types.isSimpleType( fieldType ) ) {
             try {
                 Method method;
 
                 method = javaClass.getMethod( "create" + capitalize( fieldMap.getName() ), null );
                 handler.setCreateMethod( method );
+            } catch ( Exception except ) { }
+        }
+
+        // If there is an has/delete method, add them to field handler
+        if ( fieldMap.getName() != null ) {
+            Method hasMethod = null;
+            Method deleteMethod = null;
+
+            try {
+                hasMethod = javaClass.getMethod( "has" + capitalize( fieldMap.getName() ), null );
+                if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                     ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
+                    hasMethod = null;
+                try {
+                    if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                         ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
+                        deleteMethod = null;
+                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldMap.getName() ), null );
+                } catch ( Exception except ) { }
+                handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
 
@@ -641,8 +660,8 @@ public abstract class MappingLoader
                 }
             }
             // Make sure method is public and not abstract/static.
-            if ( method.getModifiers() != Modifier.PUBLIC &&
-                 method.getModifiers() != ( Modifier.PUBLIC | Modifier.SYNCHRONIZED ) )
+            if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                 ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );
             return method;
