@@ -157,7 +157,7 @@ public class JDO
     /**
      * The log intercpetor to which all logging and tracing messages
      * will be sent.
-     * @deprected There is no need for this member due to the implementation
+     * @deprecated There is no need for this member due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      * @see #_log
      */
@@ -259,7 +259,7 @@ public class JDO
      * logging and tracing messages will be printed.
      *
      * @return The log writer, null if disabled
-     * @deprected There is no need for this method due to the implementation
+     * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
     public void setLogWriter( PrintWriter logWriter )
@@ -278,7 +278,7 @@ public class JDO
      * logging and tracing messages are sent.
      *
      * @param logInterceptor The log interceptor, null if disabled
-     * @deprected There is no need for this method due to the implementation
+     * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
     public void setLogInterceptor( LogInterceptor logInterceptor )
@@ -327,7 +327,7 @@ public class JDO
      * Returns the log interceptor for this database source.
      *
      * @return The log interceptor, null if disabled
-     * @deprected There is no need for this method due to the implementation
+     * @deprecated There is no need for this method due to the implementation
      * of Log4J which is controlled via the log4j.properties file.
      */
     public LogInterceptor getLogInterceptor()

@@ -1,6 +1,9 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1472 as noted by Jon Revie [revie@rhinointernet.com]
+       (Bruce - 20031206)
+
 JDO:   Fixed bug 1466 as noted by [arthurb@cs.uu.nl].
        (Bruce - 20031203)
 
