@@ -110,6 +110,11 @@ public class ElementDecl extends ContentModelType
     **/
     private Archetype archetype = null;
     
+    /**
+     * The Datatype of this ElementDecl
+    **/
+    private Datatype datatype   = null;
+    
     Resolver _resolver = null;
     
     /**
@@ -166,17 +171,55 @@ public class ElementDecl extends ContentModelType
         else return name;
     } //-- getName
     
+    /**
+     * Returns the Archetype of this ElementDecl. If the element content
+     * did not define an archetype, is a simple type (defined by a 
+     * 'datatype'declaration) or is a built-in type the this method will 
+     * return null.
+     * @return the archetype of this ElementDecl
+    **/
     public Archetype getArchetype() {
         if (archetype == null) {
+            
             //-- try resolving
             if (_resolver != null) {
-                return (Archetype) _resolver.resolve("archetype:"+typeRef);
+                Object obj = null;
+                //-- check datatype first
+                obj = _resolver.resolve("datatype:"+typeRef);
+                
+                //-- if datatype found...return null archetype
+                //-- since datatype has higher precedence
+                if (obj != null) return null;
+                obj = _resolver.resolve("archetype:"+typeRef);
+                if (obj != null) archetype = (Archetype)obj;
             }
         }
         return archetype;
     } //-- getAttributes
 
-    
+    /**
+     * Returns the Datatype of this ElementDecl. If the element content
+     * is defined by an archetype a built-in type the this method
+     * will return null;
+     * @return the archetype of this ElementDecl
+    **/
+    public Datatype getDatatype() {
+        
+        if (archetype != null) return null;
+        
+        if (datatype == null) {
+            //-- try resolving
+            if (_resolver != null) {
+                Object obj = null;
+                //-- check datatype first
+                obj = _resolver.resolve("datatype:"+typeRef);
+                if (obj != null) datatype = (Datatype)obj;
+            }
+        }
+        return datatype;
+        
+    } //-- getDatatype
+
     /**
      * Returns the type of this SchemaBase
      * @return the type of this SchemaBase
