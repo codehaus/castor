@@ -174,6 +174,12 @@ public class JDO
 
 
     /**
+     * The transaction manager
+     */
+    private TransactionManager tm = null;
+
+
+    /**
      * The application class loader.
      */
     private ClassLoader    _classLoader;
@@ -464,13 +470,14 @@ public class JDO
 
         if ( _tmName != null ) {
             InitialContext     ctx;
-            TransactionManager tm;
             Transaction        tx;
             DatabaseImpl       dbImpl;
             
             try {
-                ctx = new InitialContext();
-                tm = (TransactionManager) ctx.lookup( _tmName );
+                if(tm == null) {
+                    ctx = new InitialContext();
+                    tm = (TransactionManager) ctx.lookup( _tmName );
+                }
                 tx = tm.getTransaction();
                 if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
                     dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor, tx, _classLoader );
