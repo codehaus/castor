@@ -418,26 +418,31 @@ public class SourceGenerator {
 
 
         //-- create classes for sub-elements if necessary
-        ComplexType complexType = elementDecl.getComplexType();
+        XMLType xmlType = elementDecl.getType();
+        
 
-        if (complexType != null) {
+        //-- No type definition
+        if (xmlType == null) {
+            String typeRef = elementDecl.getTypeReference();
+            System.out.print("'type' or 'simpleType' with name '" + typeRef);
+            System.out.print("' not found for element: ");
+            System.out.println(elementDecl.getName());
+            return;
+        }
+        //-- ComplexType
+        else if (xmlType.isComplexType()) {
+            
             JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
-            processComplexType(complexType, sInfo);
+                                                        
+            processComplexType((ComplexType)xmlType, sInfo);
 
             processJClass(jClass, sInfo);
         }
+        //-- SimpleType
         else {
-            SimpleType simpleType = elementDecl.getSimpleType();
-            if (simpleType == null) {
-                String typeRef = elementDecl.getTypeRef();
-                System.out.print("'type' or 'simpleType' with name '" + typeRef);
-                System.out.print("' not found for element: ");
-                System.out.println(elementDecl.getName());
-                return;
-            }
-            processSimpleType(simpleType, sInfo);
+            processSimpleType((SimpleType)xmlType, sInfo);
         }
 
     }  //-- createClasses
