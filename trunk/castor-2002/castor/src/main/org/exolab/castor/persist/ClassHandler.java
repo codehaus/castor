@@ -70,6 +70,7 @@ import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.util.Messages;
 
@@ -756,7 +757,7 @@ public final class ClassHandler
             if ( value == null )
                 return ( original != null );
             else if (value instanceof BigDecimal) 
-                return ( original != null && ( (BigDecimal) value ).compareTo( original ) != 0 );
+                return ( original == null || ( (BigDecimal) value ).compareTo( original ) != 0 );
             else 
                 return ! value.equals( original );
         } else {
@@ -839,6 +840,13 @@ public final class ClassHandler
                 }
             }
         }
+    }
+
+    /**
+     * Apply type convertor to convert the identity from field type to sql type.
+     */
+    public Object convertIdentity( Object identity ) {
+        return ( (FieldHandlerImpl) _identity.handler).convertFrom( identity );        
     }
 
 

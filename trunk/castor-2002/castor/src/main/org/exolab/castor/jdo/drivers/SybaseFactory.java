@@ -112,6 +112,19 @@ public class SybaseFactory
     {
         return new MultiRSCallQuery( call, paramTypes, javaClass, fields, sqlTypes );
     }
+
+
+    /**
+     * Sybase handles TIMESTAMP incorrectly: dirty checking fails.
+     */
+    public Class adjustSqlType( Class sqlType )
+    {
+        if (sqlType == java.sql.Timestamp.class) {
+            return java.sql.Date.class;
+        } else {
+            return sqlType;
+        }
+    }
 }
 
 

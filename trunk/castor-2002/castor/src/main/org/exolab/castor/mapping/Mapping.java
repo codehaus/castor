@@ -213,6 +213,7 @@ public class Mapping
      * subsequent method calls.
      *
      * @param engine The mapping engine
+     * @param param Arbitrary parameter that is to be passed to resolver.loadMapping()
      * @return A mapping resolver
      * @throws MappingException A mapping error occured preventing
      *  descriptors from being generated from the loaded mapping
@@ -220,7 +221,7 @@ public class Mapping
      * @see #XML
      * @see #DAX
      */
-    public MappingResolver getResolver( EngineMapping engine )
+    public MappingResolver getResolver( EngineMapping engine, Object param )
         throws MappingException
     {
         MappingResolver resolver;
@@ -245,7 +246,7 @@ public class Mapping
                 // method is called a second time
                 resolver = loaderImpl;
                 _resolvers.put( engine, resolver );
-                loaderImpl.loadMapping( _mapping );
+                loaderImpl.loadMapping( _mapping, param );
             } catch ( Exception except ) {
                 throw new MappingException( except );
             }

@@ -200,7 +200,7 @@ public class Unmarshaller {
         throws MappingException
     {
         _cdResolver = new ClassDescriptorResolverImpl(loader);
-        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML, null ) );
     } //-- setMapping
     
     /**
@@ -270,14 +270,14 @@ public class Unmarshaller {
         }
         catch(org.xml.sax.SAXException sx) {
             MarshalException marshalEx = new MarshalException(sx);
-			if(handler.getDocumentLocator()!=null)
-			{
-				FileLocation location = new FileLocation();
-				location.setFilename(handler.getDocumentLocator().getSystemId());
-				location.setLineNumber(handler.getDocumentLocator().getLineNumber());
-				location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
-				marshalEx.setLocation(location);
-			}
+            if(handler.getDocumentLocator()!=null)
+            {
+                FileLocation location = new FileLocation();
+                location.setFilename(handler.getDocumentLocator().getSystemId());
+                location.setLineNumber(handler.getDocumentLocator().getLineNumber());
+                location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+                marshalEx.setLocation(location);
+            }
             throw marshalEx;
         }
         return handler.getObject();

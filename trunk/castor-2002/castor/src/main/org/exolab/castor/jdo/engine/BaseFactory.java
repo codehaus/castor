@@ -100,6 +100,18 @@ public abstract class BaseFactory
     {
         return null;
     }
+
+
+    /**
+     * Most of databases has some problems with some SQL types.
+     * Usually it is enough to merely replace one SQL type by another.
+     * @param sqlType The correspondent Java class for the SQL type in mapping.xml
+     * @return The correspondent Java class for the SQL type that should be used instead.
+     */
+    public Class adjustSqlType( Class sqlType )
+    {
+        return sqlType;
+    }
 }
 
 

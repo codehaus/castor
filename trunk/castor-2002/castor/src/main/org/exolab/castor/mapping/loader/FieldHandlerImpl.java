@@ -361,6 +361,24 @@ public final class FieldHandlerImpl
             throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor",  value.getClass().getName() ) );
         }
     }
+
+
+    /** 
+     * Convert from the Java type to sql type.
+     * This is a hack for ClassHandler.convertIdentity(), 
+     * which is needed for JDO.load().
+     * To be removed in castorone.
+     */
+    public Object convertFrom( Object value ) {
+        // If there is a convertor, apply it
+        if ( _convertFrom == null || value == null )
+            return value;
+        try {
+            return _convertFrom.convert( value, _convertParam );
+        } catch ( ClassCastException except ) {
+            throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor",  value.getClass().getName() ) );
+        }
+    }
     
 
     public void setValue( Object object, Object value )

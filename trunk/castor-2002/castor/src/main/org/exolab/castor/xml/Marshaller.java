@@ -138,7 +138,7 @@ public class Marshaller {
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
-	private Hashtable		 _cdCache      = null;	
+    private Hashtable        _cdCache      = null;  
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
     
@@ -202,7 +202,7 @@ public class Marshaller {
         _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
-		_cdCache         = new Hashtable(3);		
+        _cdCache         = new Hashtable(3);        
         _parents         = new Stack();
     } //-- initialize();
     
@@ -239,7 +239,7 @@ public class Marshaller {
         throws MappingException
     {
         _cdResolver = new ClassDescriptorResolverImpl();
-        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML, null ) );
     } //-- setMapping
 
     /**
@@ -385,7 +385,7 @@ public class Marshaller {
         //-- calculate Object's name
         String name = descriptor.getXMLName();
         
-        if (name == null) {			
+        if (name == null) {         
             name = _class.getName();
             //-- remove package information from name
             int idx = name.lastIndexOf('.');
@@ -430,8 +430,8 @@ public class Marshaller {
                 }
                 
                 classDesc = getClassDescriptor(_class);
-				if (descriptor.getXMLName()==null)
-					name = classDesc.getXMLName();
+                if (descriptor.getXMLName()==null)
+                    name = classDesc.getXMLName();
             }
             
             if (classDesc == null) {
@@ -759,7 +759,7 @@ public class Marshaller {
         _cdCache.put(name, classDesc);
         return classDesc;
     }
-	
+    
     /**
      * Sets the flag to turn on and off debugging
      * @param debug the flag indicating whether or not debug information

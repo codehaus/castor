@@ -67,6 +67,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.mapping.xml.Param;
+import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -96,6 +97,13 @@ public class JDOMappingLoader
      * See {@link #loadMapping}.
      */
     private Hashtable _keyGenDescs = new Hashtable();
+
+
+    /**
+     * The JDO PersistenceFactory (aka BaseFactory) is used for adjusting
+     * SQL type for the given database.
+     */
+    private BaseFactory _factory;
 
 
     /**
@@ -187,17 +195,23 @@ public class JDOMappingLoader
         TypeConvertor convertorTo = null;
         TypeConvertor convertorFrom = null;
         String        convertorParam = null;
+        String        typeName = null;
+        Class         sqlType = null;
 
+        fieldType = Types.typeFromPrimitive( fieldType );
         if ( fieldMap.getSql() != null && fieldMap.getSql().getType() != null ) {
-            String typeName;
-            Class sqlType;
-
-            fieldType = Types.typeFromPrimitive( fieldType );
             typeName = fieldMap.getSql().getType();
             sqlType = SQLTypes.typeFromName( typeName );
-            if ( fieldType != sqlType ) {
-                convertorTo = Types.getConvertor( sqlType, fieldType );
-                convertorFrom = Types.getConvertor( fieldType, sqlType );
+        } else {
+            sqlType = fieldType;
+        }
+        if ( _factory != null ) {
+            sqlType = _factory.adjustSqlType( sqlType );
+        }
+        if ( fieldType != sqlType ) {
+            convertorTo = Types.getConvertor( sqlType, fieldType );
+            convertorFrom = Types.getConvertor( fieldType, sqlType );
+            if ( typeName != null ) {
                 convertorParam = SQLTypes.paramFromName( typeName );
             }
         }
@@ -227,15 +241,23 @@ public class JDOMappingLoader
             sqlType = fieldDesc.getFieldType();
         else
             sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
+        if ( _factory != null ) {
+            sqlType = _factory.adjustSqlType( sqlType );
+        }
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sqlType,
             ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
     }
 
-    public void loadMapping( MappingRoot mapping )
+    /**
+     * @param param The persistenceFactory which is used to adjust
+     * SQL types.
+     */
+    public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
         Enumeration enum;
+        _factory = (BaseFactory) param;
         // Load the key generator definitions and check for duplicate names
         enum = mapping.enumerateKeyGeneratorDef();
         while ( enum.hasMoreElements() ) {
@@ -253,7 +275,7 @@ public class JDOMappingLoader
             _keyGenDefs.put( name, keyGenDef );
         }
 
-        super.loadMapping( mapping );
+        super.loadMapping( mapping, param );
 
         _keyGenDefs = null;
         _keyGenDescs = null;

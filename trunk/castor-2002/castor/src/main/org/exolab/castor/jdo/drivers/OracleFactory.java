@@ -105,6 +105,20 @@ public final class OracleFactory
     {
         return new ReturnedRSCallQuery( call, paramTypes, javaClass, fields, sqlTypes );
     }
+
+    /**
+     * For INTEGER type ResultSet.getObject() returns BigDecimal:
+     * dependent objects with integer identity cause type conversion error
+     * (need to fix SimpleQueryExecutor).
+     */
+    public Class adjustSqlType( Class sqlType )
+    {
+        if (sqlType == java.lang.Integer.class) {
+            return java.math.BigDecimal.class;
+        } else {
+            return sqlType;
+        }
+    }
 }
 
 

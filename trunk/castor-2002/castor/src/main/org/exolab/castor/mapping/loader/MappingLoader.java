@@ -192,9 +192,10 @@ public abstract class MappingLoader
      * files.
      *
      * @param mapping The mapping information
+     * @param param Arbitrary parameter that can be used by subclasses
      * @throws MappingException The mapping file is invalid
      */
-    public void loadMapping( MappingRoot mapping )
+    public void loadMapping( MappingRoot mapping, Object param )
         throws MappingException
     {
         Enumeration   enum;
