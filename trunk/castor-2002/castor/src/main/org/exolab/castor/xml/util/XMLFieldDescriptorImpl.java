@@ -292,6 +292,12 @@ public class XMLFieldDescriptorImpl
         if (!(obj instanceof XMLFieldDescriptor))
             return false;
         XMLFieldDescriptor descriptor = (XMLFieldDescriptor)obj;
+        if (_handler == null) {
+            return (obj == this);
+        }
+        else if (descriptor.getHandler() == null) {
+            return false;
+        }
         return (_handler.equals(descriptor.getHandler()));
     } //-- equals
     
