@@ -336,7 +336,8 @@ public class DescriptorSourceFactory {
             jsc.indent();
             jsc.add("return ");
             
-            if (xsType.isPrimitive() || 
+            if (xsType.isEnumerated()       ||
+                xsType.isPrimitive()        || 
                 xsType.getJType().isArray() ||
                 (xsType.getType() == XSType.STRING))
             {
