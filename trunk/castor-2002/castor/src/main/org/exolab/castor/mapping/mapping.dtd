@@ -19,7 +19,7 @@
     same collection.
 
  -->
-<!ELEMENT mapping ( description?, include*, class+, key-generator*, relation* )>
+<!ELEMENT mapping ( description?, include*, class+, key-generator* )>
 
 
 <!--
@@ -71,27 +71,6 @@
     identity        CDATA    #IMPLIED
     access          ( read-only | shared | exclusive | db-locked )  "shared"
     key-generator   IDREF    #IMPLIED >
-
-
-
-<!--
-    Specifies a many-to-many relation between two Java type. Each relation
-    contains exactly two related element. 
- -->
-<!ELEMENT relation ( description?, map-to?, related, related ) >
-<!ATTLIST relation 
-    name           NMTOKEN  #REQUIRED>
-
-
-<!--
-    Specifies an entity of a many-to-many relation. See <relation/>.
- -->
-<!ELEMENT related ( description?, sql?, xml?, ldap? ) >
-<!ATTLIST related
-    name           NMTOKEN  #REQUIRED
-    type           NMTOKEN  #IMPLIED>
-
-
 
 
 <!--
