@@ -25,7 +25,7 @@ design, which is important in larger projects. </p>
 
     <section title="What is in Castor JDO 0.9">
         <p>
-            Castor JDO is transactional. Data objects loaded in Castor are properly locked and isolated from other transactions. Castor supports full 2-phase commit, as defined in XXXX. Castor supports several locking modes, including "shared", "exclusive", "database locked", and "read-only". </p>
+            Castor JDO is transactional. Data objects loaded in Castor are properly locked and isolated from other transactions. Castor supports full 2-phase commit via xa.Synchronzation. Castor supports several locking modes, including "shared", "exclusive", "database locked", and "read-only". </p>
         <p>
         <ul>
             <li><b>Shared access</b>, the default, is useful for situations in which it is common for two or more transactions to read the same objects, and/or update different objects. </li>
@@ -51,7 +51,7 @@ design, which is important in larger projects. </p>
             Other features include a type converter for all Java primitive types.  </p>
 
         <p>
-            (RKH - What does the following mean?) No pre-processor or class enhancer is needed or used for data-binding and object persistence. Custom ClassDescriptor for faster java data object field access (will put back soon). </p>
+            No pre-processor (aka pre-compiler), class enhancer (bytecodes modification) is needed or used for data-binding and object persistence.</p>
 
         <p>
             Castor JDO works in an application that uses multiple ClassLoaders, making it possible to use in an EJB container or servlet, for example. A Castor-defined callback interface, "Persistent", can be implemented if the objects wants to be notified on Castor events: jdoLoad(), jdoCreate(), jdoRemove() and jdoTransient(). This makes it possible to create user-defined actions to take at various times in an object's life cycle.</p>
@@ -123,13 +123,13 @@ design, which is important in larger projects. </p>
             Related objects’ life cycle is independent to each other, meaning that they have to be created, removed and (RKH - isn't this inconsistent with the response to my recent mailing list posting about locking behavior?) updated (for long transaction) independently. </p>
 
         <p>
-            In dependent relations, one data object class must de declared as depends on one other data object class in the mapping file, and such object is called a dependent data object class. A data object class without <i>depends</i> declared in the mapping is called master object. A master object can be depended by zero or more dependent data object class. </p>
+            In dependent relations, one data object class must be declared as depends on one other data object class in the mapping file, and such object is called a dependent data object class. A data object class without <i>depends</i> declared in the mapping is called master object. A master object can be depended by zero or more dependent data object class. </p>
 
         <p>
             As of Castor 0.9, a dependent object class can be related to other master data object classes including extended classes, but cannot depend on more than one master class.</p>
 
         <p>
-            If an object class declared as <i>depends</i> on other class, it may not be created, removed or updated separately. Attempting to create, remove or update an independent object will be result in ObjectNotPersistcapableException. A note is that Castor doesn’t allow a dependent object instance to change its master object instance during a transaction. Each dependent object can have only one master object. Both dependent and master object must have identities, and may or may not associate with key-generators. </p>
+            If an object class declared as <i>depends</i> on other class, it may not be created, removed or updated separately. Attempting to create, remove or update an dependent object will be result in ObjectNotPersistcapableException. A note is that Castor doesn’t allow a dependent object instance to change its master object instance during a transaction. Each dependent object can have only one master object. Both dependent and master object must have identities, and may or may not associate with key-generators. </p>
 
         <p>
             Here is the DTD for declaring dependent object:
