@@ -48,6 +48,10 @@ package org.exolab.castor.xml;
 
 import org.exolab.castor.xml.util.*;
 
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.ValidityException;
+
 import java.util.Enumeration;
 import java.util.Vector;
 import java.lang.reflect.*;
@@ -102,27 +106,33 @@ public class Validator {
         //-- we cannot validate object if ClassDescriptor is null
         if (classDesc == null) return;
         
-        //-- quick hack...no validation will occur until I change this!
+        FieldDescriptor[] fields = classDesc.getFields();
         
-        return;
-        
-        /*
-        ValidationRule[] rules = mInfo.getValidationRules();
-        
-        if (rules != null) {
-            for (int i = 0; i < rules.length; i++)
-		if ( rules[ i ] != null )
-		    validate(object, rules[i], mInfo);
+        if (fields != null) {
+            for (int i = 0; i < fields.length; i++) {
+                FieldDescriptor fieldDesc = fields[i];
+                if (fieldDesc == null) continue;
+                FieldHandler handler = fieldDesc.getHandler();
+                try {
+                    if (handler != null) handler.checkValidity(object);
+                }
+                catch(ValidityException vx) {
+                    throw new ValidationException(vx);
+                }
+            }
         }
-        */
         
     } //-- validate
     
+    /*
     private void validate
-        (Object object, ValidationRule vRule, MarshalInfo mInfo) 
+        (Object object, FieldDescriptor fieldDesc) 
         throws ValidationException
     {
      
+        //-- probably pointless, but just to be safe
+        if (fieldDesc == null) return;
+        
         switch(vRule.getType()) {
             case ValidationRule.ATTRIBUTE:
                 MarshalDescriptor[] atts = mInfo.getAttributeDescriptors();
@@ -241,6 +251,7 @@ public class Validator {
         }
     } //-- validate(Object, ValidationRule, MarshalDescriptor)
         
+    */
     
     /**
      * Validates an Object model, ClassDescriptor classes will be used

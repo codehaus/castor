@@ -50,33 +50,7 @@ package org.exolab.castor.xml;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class ValidationRule {
-    
-    /**
-     * The attribute type
-    **/
-    public static final short ATTRIBUTE = 0;
-    
-    /**
-     * The element type
-    **/
-    public static final short ELEMENT   = 1;
-    
-    /**
-     * A collection or group 
-    **/
-    public static final short GROUP     = 2;
-    
-    /**
-     * The text (#PCDATA) type
-    **/
-    public static final short TEXT      = 3;
-    
-        
-    /**
-     * The name of the node that this validation rule applies to
-    **/
-    private String name = null;
+public class SimpleTypeValidator implements TypeValidator {
     
     /**
      * The minimum occurance that the node must appear
@@ -89,68 +63,26 @@ public abstract class ValidationRule {
     private int maxOccurs = -1;
     
     /**
-     * The TypeValidator used for Attribute rules, or Element
-     * rules that contain Text content
+     * The type validate to delegate validation to
     **/
-    private TypeValidator typeValidator = null;
+    private TypeValidator validator = null;
     
     /**
-     * Creates a default ValidationRule
+     * Creates a default SimpleTypeValidator
     **/
-    public ValidationRule() {
+    public SimpleTypeValidator() {
         super();
-    } //-- ValidationRule
+    } //-- SimpleTypeValidator
     
     /**
-     * Creates a ValidationRule for elements of the given name
-     * @param name the name of the element that this ValidationRule
-     * validates
+     * Creates a SimpleTypeValidator using the given TypeValidator for
+     * delegating validation
     **/
-    public ValidationRule(String name) {
+    public SimpleTypeValidator(TypeValidator validator) {
         super();
-        this.name = name;
-    } //-- ValidationRule(String)
-    
-    /**
-     * Returns the maximum number of occurances that objects described by
-     * this descriptor may appear
-     * @return the maximum number of occurances that objects described by
-     * this descriptor may appear, -1 will be returned if no maximum has
-     * been set
-    **/
-    public int getMaxOccurs() {
-        return maxOccurs;
-    } //-- getMaxOccurs
+        this.validator = validator;
+    } //-- SimpleTypeValidator
 
-    /**
-     * Returns the minimum number of occurances that objects described by
-     * this descriptor may appear
-     * @return the minimum number of occurances that objects described by
-     * this descriptor may appear, 0 will be returned by default
-    **/
-    public int getMinOccurs() {
-        return minOccurs;
-    } //-- getMaxOccurs
-    
-    
-    /**
-     * Return the name of the node to which this ValidationRule applies
-     * @return the name of the node to which this ValidationRule applies
-    **/
-    public String getName() {
-        return name;
-    } //-- getName
-    
-    /**
-     * Returns the type of this ValidationRule
-     * @return the type of this ValidationRule 
-    **/
-    public abstract short getType();
-    
-    public TypeValidator getTypeValidator() {
-        return typeValidator;
-    } //-- getTypeValidator
-    
     /**
      * Sets the maximum occurance that the described field may occur
      * @param maxOccurs the maximum occurance that the descibed field 
@@ -170,11 +102,12 @@ public abstract class ValidationRule {
     } //-- setMinOccurs
     
     /**
-     * Sets the TypeValidator for this ValidationRule. TypeValidators will
-     * only apply to Attribute rules, or Element rules with text content
+     * Validates the given Object
+     * @param object the Object to validate
     **/
-    public void setTypeValidator(TypeValidator typeValidator) {
-        this.typeValidator = typeValidator;
-    } //-- setTypeValidator
+    public void validate(Object object)
+        throws ValidationException {
+            if (validator != null) validator.validate(object);
+    } //-- validate
     
-} //-- ContentValidator
+} //-- SimpleTypeValidator
