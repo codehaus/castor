@@ -650,7 +650,13 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        return new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient() );
+        
+        FieldDescriptorImpl fieldDesc =
+            new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient() );
+        
+        fieldDesc.setRequired(fieldMap.getRequired());
+        
+        return fieldDesc;
     }
 
 
