@@ -88,7 +88,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		}			
 			
 		try {
-		    parser.parse(new InputSource(new URL(include).openStream()));
+		    parser.parse(new InputSource(include));
 		}
 		catch(java.io.IOException ioe) {
 		    throw new SAXException("Error reading include file '"+include+"'");
