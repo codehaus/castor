@@ -90,12 +90,6 @@ public class Group extends Particle
     private boolean _isModelGroupDefinition= false;
 
     /**
-     * A Vector that contains all the possible <any> element
-     * that can appear in this Group
-     */
-     private Vector _wildcard;
-
-    /**
      * The parent for this Group (either another Group or a ComplexType)
     **/
     private Structure _parent = null;
@@ -115,7 +109,6 @@ public class Group extends Particle
         super();
         this.name  = name;
         _contentModel = new ContentModelGroupImpl();
-        _wildcard = new Vector();
     } //-- Group
 
     /**
@@ -129,7 +122,7 @@ public class Group extends Particle
     {
          if (wildcard.isAttributeWildcard())
             throw new SchemaException("only <any> should be add in a group.");
-        _wildcard.addElement(wildcard);
+        _contentModel.addWildcard(wildcard);
      }
 
     /**
@@ -137,10 +130,10 @@ public class Group extends Particle
      * @param wilcard the Wildcard to remove.
      * @return true if the wildcard has been successfully removed, false otherwise.
      */
-     public boolean removeWildCard(Wildcard wildcard) {
+     public boolean removeWildcard(Wildcard wildcard) {
          if (wildcard == null)
             return false;
-         return _wildcard.remove(wildcard);
+         return _contentModel.removeWildcard(wildcard);
      }
 
     /**
@@ -199,14 +192,6 @@ public class Group extends Particle
     public Structure getParent() {
         return _parent;
     } //-- getParent
-
-    /**
-     * Returns an enumeration of the different <any> wildcards held
-     * by this group.
-    */
-    public Enumeration getWildcard() {
-        return _wildcard.elements();
-    }
 
     /**
      * Sets if the group is a model group definition

@@ -1487,15 +1487,6 @@ public class SourceFactory  {
                             gInfo.setAsSequence();
                     }
 
-                    //-- if there some wildcard elements? (<any>)
-                    Enumeration wildcards = group.getWildcard();
-
-                    while (wildcards.hasMoreElements()) {
-                        Wildcard wildcard = (Wildcard)wildcards.nextElement();
-                        FieldInfo fieldForAny = memberFactory.createFieldInfoForAny();
-                        handleField(fieldForAny, state);
-                    }
-
                     //-- create source code for the group,if necessary
                     if (!((contentModel instanceof ComplexType)||
                         (contentModel instanceof ModelGroup)) )
@@ -1542,6 +1533,12 @@ public class SourceFactory  {
                             err +="\"";
                             throw new IllegalStateException(err);
                     }
+                    break;
+
+                case Structure.WILDCARD:
+                    Wildcard wildcard = (Wildcard)struct;
+                    FieldInfo fieldForAny = memberFactory.createFieldInfoForAny();
+                    handleField(fieldForAny, state);
                     break;
 
                 default:

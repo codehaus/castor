@@ -71,6 +71,20 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
     } //-- ContentModelGroup
 
     /**
+     * Adds a wildcard to this contentModelGroup
+     * @param WildCard the wildcard to add
+     * @exception SchemaException thrown when the wildcard
+     * is an <anyAttribute> element
+     */
+     public void addWildcard(Wildcard wildcard)
+          throws SchemaException
+    {
+         if (wildcard.isAttributeWildcard())
+            throw new SchemaException("only <any> should be add in a group.");
+        _contentModel.addElement(wildcard);
+     }
+
+    /**
      * Adds the given ElementDecl to this ContentModelGroup
      * @param elementDecl the ElementDecl to add
      * @exception SchemaException when an ElementDecl already
@@ -192,6 +206,18 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         //remove the resolvable reference???
         return _contentModel.remove(group);
      }
+
+    /**
+     * Removes the given Wildcard from this Group.
+     * @param wilcard the Wildcard to remove.
+     * @return true if the wildcard has been successfully removed, false otherwise.
+     */
+     public boolean removeWildcard(Wildcard wildcard) {
+         if (wildcard == null)
+            return false;
+         return _contentModel.remove(wildcard);
+     }
+
 
     /**
      * Returns an enumeration of all the Particles contained
