@@ -252,10 +252,21 @@ public class MarshalHelper {
                     descriptors.put(xmlName, fieldDesc);
                     classDesc.addFieldDescriptor(fieldDesc);
                 }
+                
                 //-- collection
+                boolean isAdd = false;
                 if (methodName.startsWith(ADD)) {
                     fieldDesc.setNodeType(NodeType.Element);
                     fieldDesc.setMultivalued(true);
+                    isAdd = true;
+                }
+                else { 
+                    if (type.isArray() || 
+                       (type == java.util.Vector.class)) 
+                    {
+                        fieldDesc.setNodeType(NodeType.Element);
+                        fieldDesc.setMultivalued(true);
+                    }
                 }
                 
                 FieldHandlerImpl handler 
@@ -286,7 +297,11 @@ public class MarshalHelper {
                 }
                 else {
                     try {
-                        handler.setWriteMethod(method);
+                        if (isAdd)
+                            handler.setAddMethod(method);
+                        else
+                            handler.setWriteMethod(method);
+                        
                         //-- look for createMethod
                         method = (Method)createMethods.remove(xmlName);
                         if (method != null) handler.setCreateMethod(method);
@@ -599,7 +614,11 @@ public class MarshalHelper {
                 ++i;
                 cbuff.setCharAt(i, Character.toLowerCase(ch));
             }
-            else ucPrev = false;
+            //-- do not add '-' if preceeded by '.'
+            else if (ch == '.') 
+                ucPrev = true;
+            else 
+                ucPrev = false;
         }
         return cbuff.toString();
     }
