@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,7 +47,6 @@
 package org.exolab.castor.xml;
 
 
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.FieldDescriptor;
 
 
@@ -56,7 +55,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
  * XML-related information, type conversion, etc.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public interface XMLFieldDescriptor extends FieldDescriptor {
@@ -230,6 +229,17 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * a Map or Hashtable, otherwise false.
      */
     public boolean isMapped();
+    
+    /**
+     * Returns true if the field described by this descriptor
+     * may be nillable. A nillable field is one that may
+     * have empty content and still be valid. Please see
+     * the XML Schema 1.0 Recommendation for more information
+     * on nillable.
+     * 
+     * @return true if the field may be nillable.
+     */
+    public boolean isNillable();
     
     /**
      * Returns true if the field described by this descriptor is
