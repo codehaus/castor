@@ -2,7 +2,184 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.9.3 June 27, 2001"><pre>
 
+XML:    Added fix to CollectionInfoJ2 for unbounded collections. (kvisco)
+           - reported by Julien Viet
+
+XML:    Added nested Exception support for SimpleTypesFactory (kvisco)
+
+XML:    Added nested Exception support for FieldHandlerImpl (kvisco)
+
+XML:    Fixed CollectionInfoODMG30,  applied patch by Bernd Deichmann (kvisco)
+
+XML:    Added the auto-complete feature and transient field support to 
+        the mapping file. (Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+XML:    Fix a bug that creates infinite loop when cross-importing 
+        (or including) schemas(Arnaud).
+
+XML:    Added the support for the facets min/max Ex/Inclusive for the date/time 
+        types and added complete implementation of date/time W3C XML Schema 
+        datatypes (Arnaud).
+
+XML:    Added new supports for XML Schema Recommendation datatypes and remove 
+        old references to the Candidate Recommendation document (Arnaud).
+
+XML:    Added push behavior for the unmarshaller with SAX producer. Made some 
+        functions public and UnmarshalHandler final.
+        (Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+XML:    Remove the xsi:type when using the generated descriptors.(Arnaud)
+
+XML:    Support for the &lt;any> element in the Marshalling Framework.(Arnaud)
+
+XML:    Added setRootElement method to Marshaller.java to override default root 
+        element name for document. Usefull when using classes generated via 
+        'type' mapping, as the root element name is not known.
+        (Andrew Fawcett, andrew.fawcett@coda.com)
+
+XML:    Fix the Marshaller to handle correctly Vector by keeping the 
+        xsi:type information (Bug reported by Eric Kaplan 
+        (eric.kaplan@armanta.com) (Arnaud)
+
+XML:    Fix the SourceGenerator to handle correctly the 'types' package 
+        when a Date/Time type is used as an attribute.(thanks to
+        Maria Gray &lt;maria.gray@datalex.ie>,
+        Christopher P. van Buskirk &lt;Chris.vanBuskirk@vanderbilt.edu> and
+        Dean Thompson &lt;dthompson@medebiz.net> for their proposed solutions) (Arnaud)
+
+XML:    Removed a dependency to xerces jar in Configuration.java 
+        (Patch submitted by Marc-Antoine Parent &lt;Marc-Antoine_Parent@Mitel.COM> 
+        and committed by Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+XML:    Fix a bug in the validation framework. (Arnaud)
+
+XML:    Supports the &lt;any> element in the Source Generator.(Arnaud)
+
+XML:    Support the wildcards &lt;any> and &lt;anyAttribute> in the Schema Object Model.
+        (Arnaud)
+
+XML:    Improved grouping support....now handles maxOccurs > 1. Nested groups
+        are no longer simply flattened. (kvisco)
+
+XML:    Added object container support. Handle element and attributes, as 
+        well as container in container. Object container are object that 
+        exist in the object model, but will not appear directly in the XML 
+        document. There will be no element associated to this object, but 
+        its child will appear in its parent element.
+        (Sebastien Gignoux &lt;gignoux@intalio.com>)
+
+JDO:    Fixed a problem in HypersonicSQL driver in which it creates invalid
+        statements in case when there are mixture of outer joins and regular
+        joins. The problem relates to the table aliassing.
+        (Kesha Sibilev &lt;ksibilev@powernetinc.com>)
+
+JDO:    Fixed an ObjectNotPersistentException in ClassMolder.preStore().
+        This method is trying to obtain write lock on the collection
+        instance instead of doing that on the actual object.
+        (Kesha Sibilev &lt;ksibilev@powernetinc.com>)
+
+JDO:    Fixed when deleting an object which participates in the many-to-many
+        relationship the corresponding record in the relation table is not 
+        being deleted problem. (Kesha Sibilev &lt;ksibilev@powernetinc.com>)
+
+JDO:    Fixed the addMethod is not cloned for mutliple class loader enviorment
+        problem. (Ralf Purnhagen &lt;purnhar@gmx.net>)
+
+JDO:    Fixed identity name in complex identities not being recongnized problem
+        by an OQLQuery. (Ted X. Toth &lt;tedx@elegiant.com>)
+
+JDO:    Added support for aliases in generated SQL queries.
+        Before in some cases OQL queries were incorrectly translated into SQL.
+        (Thorsten Thielen &lt;thorsten@ipcon.de>)
+
+JDO:    Shortened the name for aliases in generated SQL queries to
+        support database that allows limited columns name length.
+        (Thorsten Thielen &lt;thorsten@ipcon.de>)
+
+JDO:    Added support for SQL functions in OQL queries.
+        (Thorsten Thielen &lt;thorsten@ipcon.de>)
+
+JDO:    Fixed a bug which cause "remove(Object)" always return false.
+        (Steve Vaughan &lt;snmvaughan92@yahoo.com>)
+
+JDO:    Fixed a problem that Castor JDO is trying to creates an related object
+        on the m side of a 1:m relationship when the object should be updated.
+        (Kim Madsen &lt;kim.madsen@inceptor.com>)
+
+JDO:    Added SQL Direct Interface. Syntax:
+        "CALL SQL &lt;sql expression> AS classname". The fields that are returned
+        with you sql query must be the same, as the equivalent OQL Query would do.
+        Tip: you may turn on Castor logging and study the generated SQL
+        statements. (Thorsten Mauch &lt;mauch@imkenberg.de>)
+
+JDO:    Added the overdued &lt;sql many-key="??"/> and &lt;sql many-table="??"/>
+        attributes into the mapping.dtd file.
+        (reported by Vladimir Tsichevski &lt;wowa@jet.msk.su>)
+
+JDO:    Fixed a AOBException in RelationCollection used by lazy loaoding.
+        (submitted by Steve Bate &lt;mail@technoetic.com>)
+
+JDO:    Fixed a "too many open cursor" errors caused by JDBC statement not
+        released. (Submitted by Steve Bate [mail@technoetic.com])
+
+JDO:    Fixed an IllegalArgumentException being thrown the second time a value
+        or function query was bound.
+        (Submitted by Steve Bate [mail@technoetic.com])
+
+JDO:    Added IdentityKeyGenerator support for Informix.
+        (Submitted by David Tinker [david@hemtech.co.za])
+
+JDO:    Fixed an ArrayOutOfBoundsException occurs in lazy loaded collection's
+        iterator. (Submitted by Georg Schneider [h8825037@obelix.wu-wien.ac.at])
+
+JDO:    Fixed: Loading with "db-locked" mode is now always load from the
+        Database. (yip)
+
+JDO:    Moved the callback of storing(...) into TransactionContext.java. (yip)
+
+JDO:    Added the option for custom CallbackInterceptor. (yip)
+
+JDO:    Added an option to let users specify the instance of object to be
+        loaded into, in the Database.load(...) method. (note, only for
+        simple object with no persistence relationship) (yip)
+
+JDO:    Reduced the number of TimeThread used by Time-limited cache.
+
+JDO:    Fixed a bug that cause ObjectDeletedException being thrown at commit
+        time, for one-many and many-many relationship when an object on the
+        many side is deleted. (yip)
+        (reported by many people)
+
+JDO:    Fixed a many-many relationship update (long-trasaction) problem. (yip)
+
+JDO:    Rewritten a major part of ClassMolder.update(...) to better handle
+        one-many and many-many relationship with key-generator and update. (yip)
+
+JDO:    As part of the rewritten mentioned above, update is now behavior like
+        create if the TimeStampable.jdoGetTimeStamp return NO_TIMESTAMP if
+        autoStore is set true. (yip)
+
+JDO:    Added a final static variable TimeStampable NO_TIMESTAMP. (yip)
+
+JDO:    Added database to transaction association pooling.
+        This option only affects JDO if transactionManager is set and
+        a transaction is associated with the thread that call
+        getDatabase(). If jdo Database pooling is enabled, JDO will
+        first search in the pool to see if there is already a Database
+        for the current transaction. If found, it returns the database;
+        if not, it create a new one, associates it will the transaction
+        and return the newly created Database. (yip)
+
+JDO:    (misc) Added a BatchUpdateSQL utility to helps executing a batch
+        of sql create statements in the jdo test directory. (yip)
+
+JDO:    (misc) Ported test cases and test harness framework from JTF to 
+        JUnit (yip)
+
+JDO:    (misc) Javadoc to test cases (yip)
+    </pre></section>
     <section title="Version 0.9.2 March 28, 2001 - also includes version 0.9.1"><pre>
 
 XML:    Added fix for collections, reported by Ozgur Balsoy. This bug was introduced
@@ -67,6 +244,7 @@ JDO:    Added support for table names such as "user.tablename".
 
 JDO:    Fixed bug: object modifications were determined incorrectly in some cases.
         (David J Snowsill &lt;david.snowsill@calibreft.com.au>, oleg)
+
     </pre></section>
 
     <section title="Version 0.9 February, 15 2001"><pre>
