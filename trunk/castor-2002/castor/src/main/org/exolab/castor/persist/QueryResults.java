@@ -49,6 +49,7 @@ package org.exolab.castor.persist;
 
 import javax.transaction.Status;
 import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
@@ -71,9 +72,9 @@ public final class QueryResults
     
     
     /**
-     * The cache engine against which this query was executed.
+     * The persistence engine against which this query was executed.
      */
-    private CacheEngine         _cache;
+    private PersistenceEngine   _engine;
     
     
     /**
@@ -95,10 +96,11 @@ public final class QueryResults
     private Object              _lastIdentity;
     
 
-    QueryResults( TransactionContext tx, CacheEngine cache, PersistenceQuery query, int accessMode )
+    QueryResults( TransactionContext tx, PersistenceEngine engine,
+		  PersistenceQuery query, int accessMode )
     {
 	_tx = tx;
-	_cache = cache;
+	_engine = engine;
 	_query = query;
 	_accessMode = accessMode;
     }
@@ -112,7 +114,7 @@ public final class QueryResults
 	    throw new TransactionNotInProgressException();
 	
 	// Get the next OID from the query engine. The object is
-	// already loaded into the cache engine at this point and
+	// already loaded into the persistence engine at this point and
 	// has a lock based on the original query (i.e. read write
 	// or exclusive). If no next record return null.
 	return _query.nextIdentity();
@@ -151,7 +153,7 @@ public final class QueryResults
 		// deleted in this transaction, it cannot be re-loaded. If the
 		// object has been created in this transaction, it cannot be
 		// re-loaded but no error is reported.
-		if ( entry.cache != _cache )
+		if ( entry.engine != _engine )
 		    throw new PersistenceException( "persist.multipleLoad", obj.getClass(), identity );
 		if ( entry.deleted )
 		    throw new ObjectNotFoundException( obj.getClass(), identity );
@@ -173,18 +175,18 @@ public final class QueryResults
 	    }
 
 	    // Get the next OID from the query engine. The object is
-	    // already loaded into the cache engine at this point and
+	    // already loaded into the persistence engine at this point and
 	    // has a lock based on the original query (i.e. read write
 	    // or exclusive). If no next record return null.
-	    objDesc = _cache.getObjectDesc( _query.getResultType() );
+	    objDesc = _engine.getObjectDesc( _query.getResultType() );
 	    oid = new OID( objDesc, identity );
 	    
 	    // Did we already load (or created) this object in this
 	    // transaction.
-	    entry = _tx.getObjectEntry( _cache, oid );
+	    entry = _tx.getObjectEntry( _engine, oid );
 	    if ( entry != null ) {
 		// The object has already been loaded in this transaction
-		// and is available from the cache engine.
+		// and is available from the persistence engine.
 		if ( entry.deleted )
 		    // Object has been deleted in this transaction, so skip
 		    // to next object.
@@ -203,7 +205,7 @@ public final class QueryResults
 			// Either read only or exclusive mode, and we
 			// already have an object in that mode, so we
 			// return that object.
-			_cache.copyObject( _tx, oid, obj );
+			_engine.copyObject( _tx, oid, obj );
 			return true;
 		    }
 		}
@@ -212,14 +214,14 @@ public final class QueryResults
 		// must create a new record for this object. We only
 		// record the object in the transaction if in read-write
 		// or exclusive mode.
-		_cache.fetch( _tx, _query, identity,
+		_engine.fetch( _tx, _query, identity,
 			      ( _accessMode == TransactionContext.AccessMode.Exclusive ),
 			      _tx.getLockTimeout() );
-		_cache.copyObject( _tx, oid, obj );
+		_engine.copyObject( _tx, oid, obj );
 		if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
-		    _cache.releaseLock( _tx, oid );
+		    _engine.releaseLock( _tx, oid );
 		else
-		    _tx.addObjectEntry( obj, oid, _cache );
+		    _tx.addObjectEntry( obj, oid, _engine );
 		return true;
 	    }
 	}

@@ -53,21 +53,19 @@ import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
 import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
  * A transaction context is required in order to perform operations
- * against the database. The transaction context is mapped to {@link
- * org.odmg.Transaction} for the ODMG API and into {@link
- * javax.transaction.xa.XAResource} for XA databases. The only way
- * to begin a new transaction is through the creation of a new
- * transaction context. All database access must be performed
- * through a transaction context.
+ * against the database. The transaction context is mapped to an
+ * API transaction or an XA transaction. The only way to begin a
+ * new transaction is through the creation of a new transaction context.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class TransactionContext
+public abstract class TransactionContext
 {
 
 
@@ -140,21 +138,36 @@ public class TransactionContext
     private Hashtable   _objects = new Hashtable();
 
 
-    private Hashtable   _caches = new Hashtable();
+    /**
+     * A list of all the engines associated with this transaction and
+     * all the OIDs loaded from them. The persistence engine is used
+     * as the key, the value is a hashtable. In that hashtable {@link OID}
+     * is the key and {@link ObjectEntry} is the value.
+     */
+    private Hashtable   _engineOids = new Hashtable();
 
 
     /**
-     * The transaction status.
+     * The transaction status. See {@link Status} for list of valid values.
      */
     private int         _status;
 
 
+    /**
+     * The timeout waiting to acquire a new lock. Specified in seconds.
+     */
     private int         _lockTimeout = 30;
 
 
+    /**
+     * The Xid of this transaction is generated from an XA resource.
+     */
     private Xid         _xid;
 
 
+    /**
+     * The timeout of this transaction. Specified in seconds.
+     */
     private int         _txTimeout = 30;
 
 
@@ -179,16 +192,81 @@ public class TransactionContext
     }
 
 
+    /**
+     * Sets the timeout of this transaction. The timeout is specified
+     * in seconds.
+     */
+    public void setTransactionTimeout( int timeout )
+    {
+	_txTimeout = timeout;
+    }
+
+
+    /**
+     * Returns the timeout of this transaction. The timeout is specified
+     * in seconds.
+     */
+    public int getTransactionTimeout()
+    {
+	return _txTimeout;
+    }
+
+
+    /**
+     * Returns the timeout waiting to acquire a lock. The timeout is
+     * specified in seconds.
+     */
     public int getLockTimeout()
     {
 	return _lockTimeout;
     }
 
 
+    /**
+     * Sets the timeout waiting to acquire a lock. The timeout is
+     * specified in seconds.
+     */
     public void setLockTimeout( int timeout )
     {
 	_lockTimeout = ( timeout >= 0 ? timeout : 0 );
     }
+
+
+    /**
+     * The derived class must implement this method and return an open
+     * connection for the specified engine. The connection should be
+     * created only one for a given engine in the same transaction.
+     *
+     * @param engine The persistence engine
+     * @return An open connection
+     * @throws PersistenceException An error occured talking to the
+     *   persistence engine
+     */
+    public abstract Object getConnection( PersistenceEngine engine )
+	throws PersistenceException;
+
+
+    /**
+     * The derived class must implement this method and commit all the
+     * connections used in this transaction. If the <tt>keepOpen</tt>
+     * flag is true, the connections must remain open. Otherwise, the
+     * connections may be closed.
+     *
+     * @param keepOpen True if connections should be kept open
+     * @throws PersistenceException An error occured talking to the
+     *   persistence engine
+     */
+    protected abstract void commitConnections( boolean keepOpen )
+	throws PersistenceException;
+
+
+    /**
+     * The derived class must implement this method and rollback all
+     * the connections used in this transaction. The connections may
+     * be closed, as they will not be reused in this transaction.
+     * This operation is guaranteed to succeed.
+     */
+    protected abstract void rollbackConnections();
 
 
     /**
@@ -213,7 +291,7 @@ public class TransactionContext
      * with exclusive lock and once with read-write lock will result in
      * an exception.
      *
-     * @param cache The cache engine
+     * @param engine The persistence engine
      * @param obj The object to load
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
@@ -227,7 +305,7 @@ public class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized boolean load( CacheEngine cache, Object obj,
+    public synchronized boolean load( PersistenceEngine engine, Object obj,
 				      Object identity, int accessMode )
 	throws TransactionNotInProgressException, ObjectNotFoundException,
 	       LockNotGrantedException, PersistenceException
@@ -249,7 +327,7 @@ public class TransactionContext
 	    // deleted in this transaction, it cannot be re-loaded. If the
 	    // object has been created in this transaction, it cannot be
 	    // re-loaded but no error is reported.
-	    if ( entry.cache != cache )
+	    if ( entry.engine != engine )
 		throw new PersistenceException( "persist.multipleLoad", obj.getClass(), identity );
 	    if ( entry.deleted )
 		throw new ObjectNotFoundException( obj.getClass(), identity );
@@ -269,12 +347,12 @@ public class TransactionContext
 	    return false;
 	}
 
-	// Load (or reload) the object through the cache engine with the
+	// Load (or reload) the object through the persistence engine with the
 	// requested lock. This might report failure (object no longer exists),
 	// hold until a suitable lock is granted (or fail to grant), or
 	// report error with the persistence engine.
 	try {
-	    oid = cache.load( this, obj.getClass(), identity,
+	    oid = engine.load( this, obj.getClass(), identity,
 			      ( accessMode == AccessMode.Exclusive ),
 			      _lockTimeout );
 	} catch ( ObjectNotFoundException except ) {
@@ -291,12 +369,12 @@ public class TransactionContext
 	// If the mode is read-only we release the lock and forget about
 	// it in the contents of this transaction. Otherwise we record
 	// the object in this transaction. 
-	cache.copyObject( this, oid, obj );
+	engine.copyObject( this, oid, obj );
 	if ( entry == null ) {
 	    if ( accessMode == AccessMode.ReadOnly ) {
-		cache.releaseLock( this, oid );
+		engine.releaseLock( this, oid );
 	    } else {
-		entry = addObjectEntry( obj, oid, cache );
+		entry = addObjectEntry( obj, oid, engine );
 	    }
 	}
 	return true;
@@ -308,10 +386,10 @@ public class TransactionContext
      * access mode. The query is performed in this transaction, and
      * the returned query results can only be used while this
      * transaction is open. It is assumed that the query mechanism is
-     * compatible with the cache engine.
+     * compatible with the persistence engine.
      * 
-     * @param cache The cache engine
-     * @param query A query against the cache engine
+     * @param engine The persistence engine
+     * @param query A query against the persistence engine
      * @param accessMode The access mode
      * @return A query result iterator
      * @throws TransactionNotInProgressException Method called while
@@ -320,7 +398,7 @@ public class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized QueryResults query( CacheEngine cache, PersistenceQuery query, int accessMode )
+    public synchronized QueryResults query( PersistenceEngine engine, PersistenceQuery query, int accessMode )
 	throws TransactionNotInProgressException, QueryException,
 	       PersistenceException
     {
@@ -328,8 +406,8 @@ public class TransactionContext
 	    throw new TransactionNotInProgressException();
 	// Need to execute query at this point. This will result in a
 	// new result set from the query, or an exception.
-	query.execute( getConnection( cache ), ( accessMode == AccessMode.Exclusive ) );
-	return new QueryResults( this, cache, query, accessMode );
+	query.execute( getConnection( engine ), ( accessMode == AccessMode.Exclusive ) );
+	return new QueryResults( this, engine, query, accessMode );
     }
 
 
@@ -342,7 +420,7 @@ public class TransactionContext
      * transaction completes and the object is not visible in this
      * transaction.
      *
-     * @param cache The cache engine
+     * @param engine The persistence engine
      * @param obj The object to persist
      * @param identity The object's identity (may be null)
      * @return The object's OID
@@ -355,7 +433,7 @@ public class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized OID create( CacheEngine cache, Object obj, Object identity )
+    public synchronized OID create( PersistenceEngine engine, Object obj, Object identity )
 	throws TransactionNotInProgressException, DuplicateIdentityException,
 	       ClassNotPersistenceCapableException, PersistenceException
     {
@@ -368,17 +446,17 @@ public class TransactionContext
 	// Make sure the object has not beed persisted in this transaction.
 	if ( getObjectEntry( obj ) != null )
 	    throw new PersistenceException( "persist.objectAlreadyPersistent", obj, identity );
-	objDesc = cache.getObjectDesc( obj.getClass() );
+	objDesc = engine.getObjectDesc( obj.getClass() );
 	if ( objDesc == null )
 	    throw new ClassNotPersistenceCapableException( obj.getClass() );
 
 	// Create the object. This can only happen once for each object in
 	// all transactions running on the same engine, so after creation
 	// add a new entry for this object and use this object as the view
-	if ( identity != null && getObjectEntry( cache, new OID( objDesc, identity ) ) != null )
+	if ( identity != null && getObjectEntry( engine, new OID( objDesc, identity ) ) != null )
 	    throw new DuplicateIdentityException( obj.getClass(), identity );
-	oid = cache.create( this, obj, identity );
-	entry = addObjectEntry( obj, oid, cache );
+	oid = engine.create( this, obj, identity );
+	entry = addObjectEntry( obj, oid, engine );
 	entry.created = true;
 	return oid;
     }
@@ -422,7 +500,7 @@ public class TransactionContext
 	// If the object has been created in this transaction and had no
 	// identity we don't need to remove it from persistent storage
 	if ( entry.oid.getIdentity() == null ) {
-	    entry.cache.releaseLock( this, entry.oid );
+	    entry.engine.releaseLock( this, entry.oid );
 	    removeObjectEntry( obj );
 	    return;
 	}
@@ -430,7 +508,7 @@ public class TransactionContext
 	// prevents object form being deleted while someone else is
 	// looking at it.
 	try {
-	    entry.cache.writeLock( this, entry.oid, _lockTimeout );
+	    entry.engine.writeLock( this, entry.oid, _lockTimeout );
 	    // Mark object as deleted. This will prevent it from being viewed
 	    // in this transaction and will handle it properly at commit time.
 	    // The write lock will prevent it from being viewed in another
@@ -485,7 +563,7 @@ public class TransactionContext
 	if ( entry == null || entry.deleted )
 	    throw new ObjectNotPersistentException( obj.getClass() );
 	try {
-	    entry.cache.writeLock( this, entry.oid, timeout );
+	    entry.engine.writeLock( this, entry.oid, timeout );
 	} catch ( ObjectDeletedException except ) {
 	    // Object has been deleted outside this transaction,
 	    // forget about it
@@ -525,7 +603,7 @@ public class TransactionContext
 	if ( entry == null || entry.deleted )
 	    throw new ObjectNotPersistentException( obj.getClass() );
 	// Release the lock, forget about the object in this transaction
-	entry.cache.releaseLock( this, entry.oid );
+	entry.engine.releaseLock( this, entry.oid );
 	removeObjectEntry( obj );
     }
 
@@ -576,19 +654,19 @@ public class TransactionContext
 		// removal attempts. Otherwise the object is stored in
 		// the database.
 		if ( entry.deleted ) {
-		    entry.cache.delete( this, entry.oid );
+		    entry.engine.delete( this, entry.oid );
 		} else {
 		    Object     identity;
 		    ObjectDesc objDesc;
 
 		    // When storing the object it's OID might change
 		    // if the primary identity has been changed
-		    objDesc = entry.cache.getObjectDesc( entry.obj.getClass() );
+		    objDesc = entry.engine.getObjectDesc( entry.obj.getClass() );
 		    identity = objDesc.getIdentityField().getValue( entry.obj );
 		    if ( identity == null )
 			throw new TransactionAbortedException( "persist.noIdentity", 
 							       objDesc.getObjectType(), null );
-		    entry.oid = entry.cache.store( this, entry.oid, entry.obj, identity, _lockTimeout );
+		    entry.oid = entry.engine.store( this, entry.oid, entry.obj, identity, _lockTimeout );
 		}
 	    }
 	    _status = Status.STATUS_PREPARED;
@@ -638,21 +716,21 @@ public class TransactionContext
 
 	    // Assuming all went well in the connection department,
 	    // no deadlocks, etc. clean all the transaction locks with
-	    // regards to the cache engine.
+	    // regards to the persistence engine.
 	    enum = _objects.elements();
 	    while ( enum.hasMoreElements() ) {
 		entry = (ObjectEntry) enum.nextElement();
 		if ( entry.deleted ) {
 		    // Object has been deleted inside transaction,
 		    // engine must forget about it.
-		    entry.cache.forgetObject( this, entry.oid );
+		    entry.engine.forgetObject( this, entry.oid );
 		    removeObjectEntry( entry.obj );
 		} else {
 		    // Object has been created/accessed inside the
 		    // transaction must retain the database lock
 		    // (which is always write lock since object was
 		    // just updated)
-		    entry.cache.writeLock( this, entry.oid, 0 );
+		    entry.engine.writeLock( this, entry.oid, 0 );
 		    entry.created = false;
 		}
 	    }
@@ -700,25 +778,25 @@ public class TransactionContext
 
 	    // Assuming all went well in the connection department,
 	    // no deadlocks, etc. clean all the transaction locks with
-	    // regards to the cache engine.
+	    // regards to the persistence engine.
 	    enum = _objects.elements();
 	    while ( enum.hasMoreElements() ) {
 		entry = (ObjectEntry) enum.nextElement();
 		if ( entry.deleted ) {
 		    // Object has been deleted inside transaction,
 		    // engine must forget about it.
-		    entry.cache.forgetObject( this, entry.oid );
+		    entry.engine.forgetObject( this, entry.oid );
 		} else {
 		    // Object has been created/accessed inside the
 		    // transaction, release its lock.
-		    entry.cache.updateObject( this, entry.oid, entry.obj );
-		    entry.cache.releaseLock( this, entry.oid );
+		    entry.engine.updateObject( this, entry.oid, entry.obj );
+		    entry.engine.releaseLock( this, entry.oid );
 		}
 	    }
 	    // Forget about all the objects in this transaction,
 	    // and mark it as completed.
 	    _objects.clear();
-	    _caches.clear();
+	    _engineOids.clear();
 	    _status = Status.STATUS_COMMITTED;
 
 	} catch ( Exception except ) {
@@ -763,27 +841,20 @@ public class TransactionContext
 		if ( entry.created ) {
 		    // Object has been created in this transaction,
 		    // it no longer exists, forgt about it in the engine.
-		    entry.cache.forgetObject( this, entry.oid );
+		    entry.engine.forgetObject( this, entry.oid );
 		} else {
 		    // Object has been queried (possibly) deleted in this
 		    // transaction, release the lock and revert to the old value.
-		    entry.cache.copyObject( this, entry.oid, entry.obj );
-		    entry.cache.releaseLock( this, entry.oid );
+		    entry.engine.copyObject( this, entry.oid, entry.obj );
+		    entry.engine.releaseLock( this, entry.oid );
 		}
 	    } catch ( Exception except ) { }
 	}
 	// Forget about all the objects in this transaction,
 	// and mark it as completed.
 	_objects.clear();
-	_caches.clear();
+	_engineOids.clear();
 	_status = Status.STATUS_ROLLEDBACK;
-    }
-
-
-    public Object getConnection( CacheEngine cache )
-	throws PersistenceException
-    {
-	return null;
     }
 
 
@@ -817,32 +888,9 @@ public class TransactionContext
     }
 
 
-    protected void commitConnections( boolean keepOpen )
-	throws PersistenceException
-    {
-    }
-
-
-    protected void rollbackConnections()
-    {
-    }
-
-
     protected Xid getXid()
     {
 	return _xid;
-    }
-
-
-    void setTransactionTimeout( int timeout )
-    {
-	_txTimeout = timeout;
-    }
-
-
-    int getTransactionTimeout()
-    {
-	return _txTimeout;
     }
 
 
@@ -880,36 +928,36 @@ public class TransactionContext
      *
      * @param obj The object to record
      * @param oid The object's OID
-     * @param cache The cache engine used to create this object
+     * @param engine The persistence engine used to create this object
      */
-    ObjectEntry addObjectEntry( Object obj, OID oid, CacheEngine cache )
+    ObjectEntry addObjectEntry( Object obj, OID oid, PersistenceEngine engine )
     {
 	ObjectEntry entry;
-	Hashtable   cacheOids;
+	Hashtable   engineOids;
  
 	entry = new ObjectEntry();
-	entry.cache = cache;
+	entry.engine = engine;
 	entry.oid = oid;
 	entry.obj = obj;
 	_objects.put( obj, entry );
-	cacheOids = (Hashtable) _caches.get( cache );
-	if ( cacheOids == null ) {
-	    cacheOids = new Hashtable();
-	    _caches.put( cache, cacheOids );
+	engineOids = (Hashtable) _engineOids.get( engine );
+	if ( engineOids == null ) {
+	    engineOids = new Hashtable();
+	    _engineOids.put( engine, engineOids );
 	}
-	cacheOids.put( oid, entry );
+	engineOids.put( oid, entry );
 	return entry;
     }
 
 
-    ObjectEntry getObjectEntry( CacheEngine cache, OID oid )
+    ObjectEntry getObjectEntry( PersistenceEngine engine, OID oid )
     {
-	Hashtable cacheOids;
+	Hashtable engineOids;
 
-	cacheOids = (Hashtable) _caches.get( cache );
-	if ( cacheOids == null )
+	engineOids = (Hashtable) _engineOids.get( engine );
+	if ( engineOids == null )
 	    return null;
-	return (ObjectEntry) cacheOids.get( oid );
+	return (ObjectEntry) engineOids.get( oid );
     }
 
 
@@ -942,7 +990,7 @@ public class TransactionContext
 	entry = (ObjectEntry) _objects.remove( obj );
 	if ( entry == null )
 	    return null;
-	( (Hashtable) _caches.get( entry.cache ) ).remove( entry.oid );
+	( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
 	return entry;
     }
 
@@ -961,15 +1009,15 @@ public class TransactionContext
     static class ObjectEntry
     {
 
-	CacheEngine  cache;
+	PersistenceEngine  engine;
 
-	OID          oid;
+	OID                oid;
 
-	Object       obj;
+	Object             obj;
 
-	boolean      deleted;
+	boolean            deleted;
 
-	boolean      created;
+	boolean            created;
 
     }
 
