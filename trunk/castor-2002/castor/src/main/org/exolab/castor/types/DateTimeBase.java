@@ -42,6 +42,7 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 08/30/2001   Arnaud Blandin  added to Calendar() (patch from Sébastien Stormacq [S.Stormacq@aubay-si.lu])
  * 05/29/2001   Arnaud Blandin  Added order methods
  * 05/22/2001   Arnaud Blandin  Created
  */
@@ -50,6 +51,8 @@ package org.exolab.castor.types;
 
 import org.exolab.castor.xml.ValidationException;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.text.ParseException;
@@ -864,4 +867,15 @@ public abstract class DateTimeBase
         else return false;
 
     }//equals
+
+     /**
+      * converts this Date/Time into a local java Calendar.
+      * @return a local calendar representing this Date or Time
+      */
+     public Calendar toCalendar(){
+       Calendar result = new GregorianCalendar();
+       result.setTime(toDate());
+       return result;
+     }//toCalendar()
+
 }//-- DateTimeBase
