@@ -227,20 +227,33 @@ public class JavaNaming {
         int next = 0;
 
         boolean uppercase = upperFirst;
+        
+        //-- initialize lowercase, this is either (!uppercase) or
+        //-- false depending on if the first two characters
+        //-- are uppercase
         boolean lowercase = (!uppercase);
+        if ((size > 1) && lowercase) {
+            if (Character.isUpperCase(ncChars[0]) && 
+                Character.isUpperCase(ncChars[1]))
+                lowercase = false;
+        }
 
         for (int i = 0; i < size; i++) {
             char ch = ncChars[i];
 
             switch(ch) {
-                case'.' :
+                case '.':
 				case ' ':
                     ncChars[next++] = '_';
                     break;
                 case ':':
                 case '-':
+                    uppercase = true;
+                    break;
                 case '_':
                     uppercase = true;
+                    ncChars[next] = ch;
+                    ++next;
                     break;
                 default:
                     if (uppercase) {
@@ -260,14 +273,17 @@ public class JavaNaming {
     } //-- toJavaName
 
 
-    /* for debuging *
+    /* for debuging
     public static void main(String[] args) {
 
-        String[] names = new String[4];
-        names[0] = "name";
-        names[1] = "myName";
-        names[2] = "my-name";
-        names[3] = "my----name";
+        String[] names = {
+            "name",
+            "myName",
+            "my-name",
+            "my----name",
+            "my_name",
+            "NAME"
+        };
 
         System.out.println("JavaXMLNaming Tests: ");
         System.out.println();
