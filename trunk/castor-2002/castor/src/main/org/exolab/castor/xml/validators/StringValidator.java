@@ -157,7 +157,7 @@ public class StringValidator extends PatternValidator
         char[] chars = value.toCharArray();
         int length = chars.length;
 
-        for (int i=0; i<=length; i++) {
+        for (int i=0; i<length; i++) {
             switch (chars[i]) {
                 case '\t':
                 case '\r':
@@ -175,7 +175,7 @@ public class StringValidator extends PatternValidator
             char[] temp = new char[chars.length];
             int temp_count = 0;
             int i = 0;
-            while (i<length) {
+            while (i<length-1) {
                 if (chars[i] ==' ') {
                     //--put the first space
                     temp[temp_count] = chars[i];
@@ -191,9 +191,10 @@ public class StringValidator extends PatternValidator
                 i++;
             }
             //--we are at the end
-            if (chars[i]!=' ')
+            if (chars[i] != ' ')
                 temp[temp_count] = chars[i];
-            length = temp_count;
+
+            length = ++temp_count;
             chars = temp;
         }
 
@@ -256,6 +257,7 @@ public class StringValidator extends PatternValidator
         }
         validate(object.toString());
     } //-- validate
+
 
 } //-- StringValidator
 
