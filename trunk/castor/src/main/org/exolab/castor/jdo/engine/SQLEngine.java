@@ -54,6 +54,7 @@ import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.persist.spi.*;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.SqlBindParser;
 
 import java.sql.*;
 import java.util.*;
@@ -1746,26 +1747,32 @@ public final class SQLEngine implements Persistence {
         public void execute( Object conn, AccessMode accessMode, boolean scrollable )
             throws QueryException, PersistenceException
         {
+             // create SQL statement from _sql, replacing bind expressions like "?1" by "?"
+            String sql = getJdbcSql();
+
             _lastIdentity = null;
+
             try {
                 if (scrollable)
                 {
-                  _stmt = ( (Connection) conn ).prepareStatement( _sql, java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE, java.sql.ResultSet.CONCUR_READ_ONLY );
+                    _stmt = ( (Connection) conn ).prepareStatement( sql, java.sql.ResultSet.TYPE_SCROLL_INSENSITIVE, java.sql.ResultSet.CONCUR_READ_ONLY );
                 }
                 else
                 {
-                _stmt = ( (Connection) conn ).prepareStatement( _sql );
+                    _stmt = ( (Connection) conn ).prepareStatement( sql );
                 }
 
-                for ( int i = 0 ; i < _values.length ; ++i ) {
-                    _stmt.setObject( i + 1, _values[ i ] );
-                    _values[ i ] = null;
-                }
-                
+                 // bind variable values on _values to the JDBC statement _stmt using the bind variable order in _sql 
+                bindJdbcValues();
+
+                 // erase bind values
+                for(int i=0; i<_values.length; ++i)
+                    _values[i] = null;
+
                 if(_log.isDebugEnabled()){
                     _log.debug (Messages.format ("jdo.executingSql", _sql));
                 }
-                
+
                 _rs = _stmt.executeQuery();
                 _resultSetDone = false;
             } catch ( SQLException except ) {
@@ -1782,6 +1789,34 @@ public final class SQLEngine implements Persistence {
             }
         }
 
+        private String getJdbcSql()
+        {
+            StringBuffer sb = new StringBuffer();
+            SqlBindParser parser = new SqlBindParser(_sql);
+
+            while(parser.next()) {
+                sb.append(parser.getLastExpr());
+                sb.append(JDBCSyntax.Parameter);
+            }
+
+            sb.append(parser.getLastExpr());
+
+            return sb.toString();
+        }
+
+        private void bindJdbcValues() throws SQLException
+        {
+            SqlBindParser parser = new SqlBindParser(_sql);
+
+            for(int i=1; parser.next(); ++i) {
+                int bindNum = parser.getParamNumber();
+
+                if (bindNum == 0)
+                    bindNum = i;	// handle CALL SQL statements with unnumbered bind variables
+
+                _stmt.setObject(i, _values[bindNum-1]);
+            }
+        }
 
         // Load a number of sql columns (from the current row of _rs) into an identity.
         private Object loadIdentity() throws SQLException, PersistenceException
