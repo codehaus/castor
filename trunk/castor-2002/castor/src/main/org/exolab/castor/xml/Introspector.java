@@ -54,6 +54,7 @@ import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.List;
 
 import java.io.IOException;
@@ -97,6 +98,12 @@ public final class Introspector {
     **/
     private XMLNaming _naming = null;
     
+    
+    /**
+     * The NodeType to use for primitives
+    **/
+    private NodeType _primitiveNodeType = null;
+    
     static {
         _defaultNaming 
             = org.exolab.castor.util.Configuration.getXMLNaming();
@@ -108,7 +115,8 @@ public final class Introspector {
     
     public Introspector() {
         super();
-        _naming = _defaultNaming;
+        _naming            = _defaultNaming;
+        setPrimitiveNodeType(Configuration.getPrimitiveNodeType()); 
     } //-- Introspector
     
     /**
@@ -489,6 +497,21 @@ public final class Introspector {
     } //-- setNaming
     
     /**
+     * Sets the NodeType for primitives. If the
+     * NodeType is NodeType.Element, all primitives will
+     * be treated as Elements, otherwise all primitives
+     * will be treated as Attributes.
+     *
+     * @param nodeType the NodeType to use for primitive values.
+    **/
+    public void setPrimitiveNodeType(NodeType nodeType) {
+        if (nodeType == NodeType.Element)
+            _primitiveNodeType = nodeType;
+        else 
+            _primitiveNodeType = NodeType.Attribute;
+    } //-- setPrimitiveNodeType
+    
+    /**
      * Converts the given xml name to a Java name.
      * @param name the name to convert to a Java Name
      * @param upperFirst a flag to indicate whether or not the
@@ -540,7 +563,7 @@ public final class Introspector {
         }
         //-- primitive types are converted to attributes by default
         else if (type.isPrimitive()) {
-            fieldDesc.setNodeType(NodeType.Attribute);
+            fieldDesc.setNodeType(_primitiveNodeType);
         }
         else {
             fieldDesc.setNodeType(NodeType.Element);
