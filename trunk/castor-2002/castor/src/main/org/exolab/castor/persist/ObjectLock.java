@@ -211,46 +211,45 @@ final class ObjectLock
 	// Must make sure not to lose consistency.
 	    
 	while ( true ) {
-	    // Repeat forever until lock is acquired or timeout
-
-	    if ( _writeLock == tx ) {
-		// Already have write lock, can acquire object
-		return _object;
-	    } else if ( _readLock == null && _writeLock == null ) {
-		// No locks, can acquire immediately
-		if ( write )
-		    _writeLock = tx;
-		else
-		    _readLock = new LinkedTx( tx, null );
-		return _object;
-	    } else if ( write && _writeLock == null &&
-			_readLock.tx == tx && _readLock.next == null ) {
-		// Upgrading from read to write, no other locks, can upgrade
-		// Order is important in case thread is stopped in the middle
-		_readLock = null;
-		_writeLock = tx;
-		return _object;
-	    } else if ( ! write && _writeLock == null && _writeWaiting == null ) {
-		// Looking for read lock and no write locks, can acquire
-                // But only if not other transaction is waiting for write lock first
-		// Make sure we do not wait twice for the same lock
-		LinkedTx read;
-		
-		read = _readLock;
-		while ( read != null ) {
-		    if ( read.tx == tx )
-			return _object;
-		    read = read.next;
-		}
-		_readLock = new LinkedTx( tx, _readLock );
-		return _object;
-	    } else {
-		// Don't wait if timeout is zero
-		if ( timeout == 0 )
-		    throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
-                                                           "persist.readLockTimeout" );
-		
-		try {
+            try {
+                // Repeat forever until lock is acquired or timeout
+                
+                if ( _writeLock == tx ) {
+                    // Already have write lock, can acquire object
+                    return _object;
+                } else if ( _readLock == null && _writeLock == null ) {
+                    // No locks, can acquire immediately
+                    if ( write )
+                        _writeLock = tx;
+                    else
+                        _readLock = new LinkedTx( tx, null );
+                    return _object;
+                } else if ( write && _writeLock == null &&
+                            _readLock.tx == tx && _readLock.next == null ) {
+                    // Upgrading from read to write, no other locks, can upgrade
+                    // Order is important in case thread is stopped in the middle
+                    _readLock = null;
+                    _writeLock = tx;
+                    return _object;
+                } else if ( ! write && _writeLock == null && _writeWaiting == null ) {
+                    // Looking for read lock and no write locks, can acquire
+                    // But only if not other transaction is waiting for write lock first
+                    // Make sure we do not wait twice for the same lock
+                    LinkedTx read;
+                    
+                    read = _readLock;
+                    while ( read != null ) {
+                        if ( read.tx == tx )
+                            return _object;
+                        read = read.next;
+                    }
+                    _readLock = new LinkedTx( tx, _readLock );
+                    return _object;
+                } else {
+                    // Don't wait if timeout is zero
+                    if ( timeout == 0 )
+                        throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
+                                                               "persist.readLockTimeout" );
 		    // Detect possibility of dead-lock. Must remain in wait-on-lock
 		    // position until lock is granted or exception thrown.
 		    tx.setWaitOnLock( this );
@@ -272,7 +271,7 @@ final class ObjectLock
 		    } catch ( InterruptedException except ) {
 			// If the thread is interrupted, come out with the proper message
 			throw new LockNotGrantedExceptionImpl( write ? "persist.writeLockTimeout" :
-							   "persist.readLockTimeout" );
+                                                               "persist.readLockTimeout" );
 		    }
 		    if ( _object == null ) {
 			// If object has been deleted while waiting for lock, report deletion.
@@ -286,12 +285,12 @@ final class ObjectLock
 			timeout = 0;
 		    removeWaiting( tx );
 		    tx.setWaitOnLock( null );
-		} finally {
-		    // Must always remove waiting transaction.
-		    removeWaiting( tx );
-		    tx.setWaitOnLock( null );
-		}
-	    }
+                }
+            } finally {
+                // Must always remove waiting transaction.
+                removeWaiting( tx );
+                tx.setWaitOnLock( null );
+            }
 	}
     }
 
