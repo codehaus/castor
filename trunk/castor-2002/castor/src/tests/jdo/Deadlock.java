@@ -72,15 +72,23 @@ public class Deadlock
     private Database       _db;
 
 
+    private Database       _first;
+
+
+    private Database       _second;
+
+
     public static final long  Wait = 1000;
 
 
-    public Deadlock()
+    public Deadlock( TestBase testBase )
         throws CWClassConstructorException
     {
         super( "TC02", "Test deadlock detection" );
         try {
-            _db = JDOTests.getDatabase();
+            _db = testBase.getDatabase();
+            _first = testBase.getDatabase();
+            _second = testBase.getDatabase();
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }
@@ -117,6 +125,8 @@ public class Deadlock
                 result = false;
             stream.writeVerbose( "" );
             _db.close();
+            _first.close();
+            _second.close();
         } catch ( Exception except ) {
             try {
                 stream.writeVerbose( "Error: " + except );
@@ -178,12 +188,12 @@ public class Deadlock
             SecondThread second;
             
             first = new FirstThread();
-            first._db = JDOTests.getDatabase();
+            first._db = _first;
             first._stream = stream;
             first._accessMode = accessMode;
             first.start();
             second = new SecondThread();
-            second._db = JDOTests.getDatabase();
+            second._db = _second;
             second._stream = stream;
             second._accessMode = accessMode;
             second.start();
@@ -191,7 +201,7 @@ public class Deadlock
             first.join();
             second.join();
             result = first._result & second._result;
-            
+
         } catch ( Exception except ) {
             try {
                 stream.writeVerbose( "Error: " + except );
@@ -254,7 +264,6 @@ public class Deadlock
                 _stream.writeVerbose( "First: Committing" );
                 _db.commit();
                 _stream.writeVerbose( "First: Committed" );
-                _db.close();
             } catch ( Exception except ) {
                 _result = false;
                 try {
@@ -322,7 +331,6 @@ public class Deadlock
                         _stream.writeVerbose( "Error: " + except );
                     }
                     _db.rollback();
-                    _db.close();
                     return;
                 }
                 object.setFirst( TestObject.DefaultFirst + ":2" );
@@ -339,7 +347,6 @@ public class Deadlock
                 _result = false;
                 _stream.writeVerbose( "Error: deadlock not detected" );
                 _stream.writeVerbose( "Second: Committed" );
-                _db.close();
             } catch ( TransactionAbortedException except ) {
                 try {
                     if ( except.getException() instanceof LockNotGrantedException )

@@ -71,12 +71,12 @@ public class DuplicateKey
     private Database       _db;
 
 
-    public DuplicateKey()
+    public DuplicateKey( TestBase testBase )
         throws CWClassConstructorException
     {
         super( "TC03", "Test duplicate key" );
         try {
-            _db = JDOTests.getDatabase();
+            _db = testBase.getDatabase();
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }

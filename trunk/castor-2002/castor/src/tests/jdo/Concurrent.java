@@ -82,13 +82,13 @@ public class Concurrent
     static final String    JDOValue = "jdo value";
 
 
-    public Concurrent()
+    public Concurrent( TestBase testBase )
         throws CWClassConstructorException
     {
         super( "TC01", "Test dirty checking" );
         try {
-            _db = JDOTests.getDatabase();
-            _conn = JDOTests.getJDBCConnection(); 
+            _db = testBase.getDatabase();
+            _conn = testBase.getJDBCConnection(); 
         } catch ( Exception except ) {
             throw new CWClassConstructorException( except.toString() );
         }

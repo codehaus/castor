@@ -49,19 +49,19 @@ package jdo;
 
 import java.io.IOException;
 import java.util.Enumeration;
+import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
- * Tests that read only objects are not stored in the database.
  */
-public class ReadOnly
+public class TypeHandling
     extends CWTestCase
 {
 
@@ -69,13 +69,10 @@ public class ReadOnly
     private Database       _db;
 
 
-    static final String    NewValue = "new value";
-
-
-    public ReadOnly( TestBase testBase )
+    public TypeHandling( TestBase testBase )
         throws CWClassConstructorException
     {
-        super( "TC04", "Read only test" );
+        super( "TC05", "Test type handling" );
         try {
             _db = testBase.getDatabase();
         } catch ( Exception except ) {
@@ -104,10 +101,10 @@ public class ReadOnly
             OQLQuery      oql;
             TestObject    object;
             Enumeration   enum;
-
+            
             // Open transaction in order to perform JDO operations
             _db.begin();
-        
+            
             // Determine if test object exists, if not create it.
             // If it exists, set the name to some predefined value
             // that this test will later override.
@@ -116,36 +113,26 @@ public class ReadOnly
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 object = (TestObject) enum.nextElement();
-                object.setFirst( TestObject.DefaultFirst );
-                object.setSecond( TestObject.DefaultSecond );
+                stream.writeVerbose( "Updating object: " + object );
             } else {
                 object = new TestObject();
                 stream.writeVerbose( "Creating new object: " + object );
                 _db.create( object );
-            } 
+            }
             _db.commit();
 
             _db.begin();
+            stream.writeVerbose( "Creating new object: " + object );
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
-            enum = oql.execute( Database.ReadOnly );
-            object = (TestObject) enum.nextElement();
-            stream.writeVerbose( "Retrieved object: " + object );
-            object.setFirst( NewValue );
-            stream.writeVerbose( "Modified object: " + object );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
+                object.setFirst( null );
+                object.setSecond( null );
+            }
             _db.commit();
             
-            _db.begin();
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute( Database.ReadOnly );
-            object = (TestObject) enum.nextElement();
-            stream.writeVerbose( "Retrieved object: " + object );
-            if ( object.getFirst().equals( NewValue ) ) {
-                result = false;
-                stream.writeVerbose( "Error: modified object was stored" );
-            } else
-                stream.writeVerbose( "OK: object is read-only" );
-            _db.commit();
-
             _db.close();
         } catch ( Exception except ) {
             try {
@@ -159,4 +146,3 @@ public class ReadOnly
 
 
 }
-

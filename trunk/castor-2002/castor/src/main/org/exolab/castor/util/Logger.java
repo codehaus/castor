@@ -79,9 +79,9 @@ public class Logger
 
 
     /**
-     * The underlying print writer.
+     * The default system logger.
      */
-    private static PrintWriter  _logger = new Logger( System.out ).setPrefix( Prefix );
+    private static PrintWriter  _system = new Logger( System.out ).setPrefix( Prefix );
 
 
     /**
@@ -128,7 +128,7 @@ public class Logger
      */
     public static PrintWriter getSystemLogger()
     {
-        return _logger;
+        return _system;
     }
 
 
@@ -136,11 +136,11 @@ public class Logger
      * Sets the default logger. This logger is used to produce
      * system messages.
      */
-    public static void setSystemLogger( PrintWriter logger )
+    public static void setSystemLogger( PrintWriter system )
     {
-        if ( logger == null )
-            throw new NullPointerException( "Argument 'logger' is null" );
-        _logger = logger;
+        if ( system == null )
+            throw new NullPointerException( "Argument 'system' is null" );
+        _system = system;
     }
 
 
