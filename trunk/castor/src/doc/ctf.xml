@@ -107,6 +107,12 @@
                <td>Required</td>
              </tr>
              <tr>
+               <td align="center">Configuration</td>
+               <td>N/A</td>
+               <td>The configuration object (see below)</td>
+               <td>Optional</td>
+             </tr>
+             <tr>
                <td align="center">Mapping_File</td>
                <td>N/A</td>
                <td>The name of the mapping file to (if any)</td>
@@ -182,6 +188,12 @@
                <td>A boolean that indicates if set to true that the test case intents to fail (Exception thrown)</td>
                <td>Optional</td>
              </tr>
+              <tr>
+               <td align="center">Configuration</td>
+               <td>N/A</td>
+               <td>The configuration object (see below)</td>
+               <td>Optional</td>
+             </tr>
             </table>
         </section>
       </section>
@@ -209,6 +221,64 @@
              </table>
           </section>
        
+       <section title="Configuration">
+          <table border="1" cellspacing="0">
+             <tr>
+               <th align="center">Tag</th><th>Description</th><th>Optional?</th>
+             </tr>
+             <tr>
+               <td align="center">Marshal</td>
+               <td>If present, the Marshaller will be configured</td>
+               <td>Optional</td>
+             </tr>
+             <tr>
+               <td align="center">Unmarshal</td>
+               <td>If present, the Unmarshaller will be configured</td>
+               <td>Optional</td>
+             </tr>
+           </table>
+	       <section title="Call-Method">
+	           <table border="1" cellspacing="0">
+	             <tr>
+	               <th align="center">Tag</th><th>Attributes</th><th>Description</th><th>Optional?</th>
+	             </tr>
+	             <tr>
+	               <td align="center">Call-Method</td>
+	               <td>
+	                  <ul>
+	                    <li><i>name</i>: the name of the method to call on the Marshaller or Unmarshaller.</li>
+	                  </ul>
+	               </td>
+	               <td>Root tag for defining a method call</td>
+	               <td>Required</td>
+	             </tr>
+	             <tr>
+	               <td align="center">Value</td>
+	               <td>
+	                  <ul>
+	                    <li><i>type</i>: the fully qualified name of the java type representing an argument of the method.</li>
+	                  </ul>
+	               </td>
+	               <td>The content of that tag represents the value to be passed in to the method called (this element can occur more than once).</td>
+	               <td>Optional</td>
+	             </tr>
+	           </table>
+	       </section>
+	       
+	       <p>The following code excerpt illustrates how to configure the Marshaller by suppressing all the XSITypes.</p>
+	       <code>
+&lt;Configuration>
+    &lt;Marshal>
+        &lt;Call-method name="setSuppressXSIType">
+            &lt;Value type="boolean">true&lt;/Value>
+         &lt;/Call-method>
+    &lt;/Marshal>
+&lt;/Configuration>
+	       </code>
+           
+           <p>Please note that the Configuration element can be present at the MarshallingTestCase level and at the UnitTestCase level, the highest priority
+           going to the Configuration element present at the UnitTestCase level.</p>
+       </section>
 
       
       <section title="Implementing CastorTestable">
