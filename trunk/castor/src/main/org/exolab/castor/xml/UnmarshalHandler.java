@@ -600,10 +600,11 @@ public final class UnmarshalHandler extends MarshalFramework
                     --length;
                 }
              }
+             
              if (state.buffer == null) state.buffer = new StringBuffer();
              else {
                 //-- content exists, add a space
-                if (!state.wsPreserve) {
+                if ((!state.wsPreserve) && (length-start > 0)) {
                 	if (state.trailingWhitespaceRemoved || removedLeadingWhitespace)
                     {
                 		state.buffer.append(' ');
@@ -848,7 +849,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
             }
         }
-
+        
         //-- We're finished processing the object, so notify the
         //-- Listener (if any).
         if ( _unmarshalListener != null && state.object != null ) {
@@ -865,7 +866,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 if (_resolveTable != null) {
                     Enumeration enumeration = _resolveTable.keys();
                     while (enumeration.hasMoreElements()) {
-                        String msg = "unable to resolve reference: " + enumeration.nextElement();                        
+                        Object ref = enumeration.nextElement();
+                        //if (ref.toString().startsWith(MapItem.class.getName())) continue;
+                        String msg = "unable to resolve reference: " + ref;                        
                         if (first == null) {
                             first = new ValidationException(msg);
                             last = first;
@@ -895,7 +898,7 @@ public final class UnmarshalHandler extends MarshalFramework
             }
             return;
         }
-
+         
         //-- Add object to parent if necessary
 
         if (descriptor.isIncremental()) {
@@ -906,7 +909,7 @@ public final class UnmarshalHandler extends MarshalFramework
         }
 
         Object val = state.object;
-
+        
         //--special code for AnyNode handling
         if (_node != null) {
            val = _node;
