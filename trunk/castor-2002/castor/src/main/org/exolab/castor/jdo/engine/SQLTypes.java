@@ -275,20 +275,48 @@ public final class SQLTypes
             throws SQLException
     {
         Object value;
+        long longVal;
+        int intVal;
+        boolean boolVal;
+        double doubleVal;
+        float floatVal;
+        short shortVal;
+        byte byteVal;
 
         switch ( sqlType ) {
-        case Types.TIME:       value = rs.getTime( index ); break;
-        case Types.DATE:       value = rs.getDate( index ); break;
-        case Types.TIMESTAMP:  value = rs.getTimestamp( index ); break;
-        case Types.INTEGER:    value = new Integer( rs.getInt( index ) ); break;
-        case Types.LONGVARBINARY:
-        case Types.VARBINARY:
-        case Types.BINARY:
-            return rs.getBytes(index);
         case Types.CHAR:
         case Types.VARCHAR:
         case Types.LONGVARCHAR:
             return rs.getString(index);
+        case Types.DECIMAL:
+        case Types.NUMERIC:
+            return rs.getBigDecimal( index );
+        case Types.INTEGER:
+            intVal = rs.getInt( index );
+            return ( rs.wasNull() ? null : new Integer( intVal ) );
+        case Types.TIME:
+            return rs.getTime( index );
+        case Types.DATE:
+            return rs.getDate( index );
+        case Types.TIMESTAMP:
+            return rs.getTimestamp( index ); 
+        case Types.DOUBLE:
+            doubleVal = rs.getDouble( index );
+            return ( rs.wasNull() ? null : new Double( doubleVal ) );
+        case Types.FLOAT:
+        case Types.REAL:
+            floatVal = rs.getFloat( index );
+            return ( rs.wasNull() ? null : new Float( floatVal ) );
+        case Types.SMALLINT:
+            shortVal = rs.getShort( index );
+            return ( rs.wasNull() ? null : new Short( shortVal ) );
+        case Types.TINYINT:
+            byteVal = rs.getByte( index );
+            return ( rs.wasNull() ? null : new Byte( byteVal ) );
+        case Types.LONGVARBINARY:
+        case Types.VARBINARY:
+        case Types.BINARY:
+            return rs.getBytes(index);
         case Types.BLOB:
             try {
                 Blob blob = rs.getBlob( index );
@@ -319,10 +347,15 @@ public final class SQLTypes
             } catch ( IOException e ) {
                 throw new SQLException("IOException thrown while reading CLOB into a string!");
             }
+        case Types.BIGINT:
+            longVal = rs.getLong( index );
+            return ( rs.wasNull() ? null : new Long( longVal ) );
+        case Types.BIT:
+            boolVal = rs.getBoolean( index );
+            return ( rs.wasNull() ? null : new Boolean( boolVal ) );
         default:               
-			value = rs.getObject( index ); break;
+            return rs.getObject( index ); 
         }
-        return ( rs.wasNull() ? null : value );
     }
 
 
