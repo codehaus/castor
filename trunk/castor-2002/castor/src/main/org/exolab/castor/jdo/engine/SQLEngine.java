@@ -159,7 +159,8 @@ final class SQLEngine
 
             keyGenDesc = _clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
-                _keyGen = KeyGeneratorRegistry.getKeyGenerator( _factory, keyGenDesc );
+                _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
+                        _factory, keyGenDesc, _logInterceptor );
             }
         }
         try {

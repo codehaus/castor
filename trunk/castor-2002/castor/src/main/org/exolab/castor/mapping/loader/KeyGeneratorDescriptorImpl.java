@@ -49,6 +49,7 @@ package org.exolab.castor.mapping.loader;
 
 import java.util.Properties;
 import org.exolab.castor.mapping.KeyGeneratorDescriptor;
+import org.exolab.castor.persist.KeyGeneratorRegistry;
 
 
 /**
@@ -61,16 +62,36 @@ import org.exolab.castor.mapping.KeyGeneratorDescriptor;
 public final class KeyGeneratorDescriptorImpl implements KeyGeneratorDescriptor
 {
 
+    private final String _name;
+
+
     private final String _keyGenFactoryName;
 
 
     private final Properties _params;
 
 
-    public KeyGeneratorDescriptorImpl( String keyGenFactoryName, Properties params ) {
+    private final KeyGeneratorRegistry _keyGenReg;
+
+
+    public KeyGeneratorDescriptorImpl( String name, String keyGenFactoryName,
+            Properties params, KeyGeneratorRegistry keyGenReg ) {
+        _name = name;
         _keyGenFactoryName = keyGenFactoryName;
         _params = params;
+        _keyGenReg = keyGenReg;
     }
+
+    /**
+     * Returns the name of the key generator, i.e. the name of the key
+     * generator factory or the alias if it is used.
+     *
+     * @return Key generator name.
+     */
+    public String getName() {
+        return _name;
+    }
+
 
     /**
      * Returns the name of the key generator factory.
@@ -91,30 +112,15 @@ public final class KeyGeneratorDescriptorImpl implements KeyGeneratorDescriptor
         return _params;
     }
 
-    public boolean equals( Object obj ) {
-        KeyGeneratorDescriptorImpl k;
 
-        if ( obj == null || !(obj instanceof KeyGeneratorDescriptorImpl) ) {
-            return false;
-        }
-
-        k = (KeyGeneratorDescriptorImpl) obj;
-
-        if ( _keyGenFactoryName == null && k._keyGenFactoryName != null ) {
-            return false;
-        }
-        if ( !_keyGenFactoryName.equals( k._keyGenFactoryName ) ) {
-            return false;
-        }
-
-        if ( _params == null && k._params != null ) {
-            return false;
-        }
-        if ( !_params.equals( k._params ) ) {
-            return false;
-        }
-
-        return true;
+    /**
+     * Returns the key generator registry object.
+     *
+     * @return key generator registry object.
+     */
+    public KeyGeneratorRegistry getKeyGeneratorRegistry() {
+        return _keyGenReg;
     }
+
 }
 
