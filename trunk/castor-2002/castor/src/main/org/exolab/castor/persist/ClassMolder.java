@@ -1987,6 +1987,14 @@ public class ClassMolder {
                 }
             }
         }
+
+        for( int i=0; i < _fhs.length; i++ ) {
+            if( _fhs[i].isManyToMany() ) {
+                _fhs[i].getRelationLoader().deleteRelation(
+                  (Connection)tx.getConnection(oid.getLockEngine()),
+                  ids);
+            }
+        }
     }
 
     /**
