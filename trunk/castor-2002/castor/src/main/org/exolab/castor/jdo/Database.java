@@ -368,16 +368,18 @@ public interface Database
 
 
     /**
-     * <b>Experimental</b>
+     * Update a data object which is queried/loaded/created in <b>another
+     * transaction</b>. This method is used only for long transaction 
+     * support. Calling this method for data object queried/loaded/created
+     * in the same transaction results in Exception.
      * <p>
-     * Creates a new object in persistent storage. The object will be
-     * persisted only if the transaction commits.
+     * For example, the data object may be sent to a client application and 
+     * dispayed to a user. After that the objects is being modified in the
+     * client application, the object returns back and is update to the 
+     * database in the second transaction. 
      * <p>
-     * If the object has an identity then duplicate identity check happens
-     * in this method, and the object is visible to queries in this
-     * transaction. If the identity is null, duplicate identity check
-     * occurs when the transaction completes and the object is not
-     * visible to queries until the transaction commits.
+     * See <a href="http://castor.exolab.org/long-transact.html">Long 
+     * Transaction</a> on Castor website.
      *
      * @param object The object to create
      * @throws TransactionNotInProgressException Method called while
@@ -459,9 +461,16 @@ public interface Database
 
     /**
      * Commits and closes the transaction. All changes made to persistent
-     * objects during the transaction are made persistent, objects
-     * created during the transaction are made durable, and objects
-     * removed during the transaction are removed from the database.
+     * objects during the transaction are made persistent; objects created 
+     * during the transaction are made durable; and, objects removed during 
+     * the transaction are removed from the database.
+     * <p>
+     * In other words, any modifications to any data objects which are 
+     * queried/loaded/created/update to this database is automatically 
+     * stored to the database and visible to subsequence transactions. 
+     * (ie. update is solely used for long transaction support and should
+     * not be called for any data object queried/loaded/created in the 
+     * this transaction.)
      * <p>
      * If the transaction cannot commit, the entire transaction rolls
      * back and a {@link TransactionAbortedException} exception is
