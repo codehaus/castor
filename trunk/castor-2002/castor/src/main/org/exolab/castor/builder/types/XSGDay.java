@@ -92,7 +92,7 @@ public class XSGDay extends XSType {
      * Returns the maximum exclusive value that this XSGDay can hold.
      * @return the maximum exclusive value that this XSGDay can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public GDay getMaxExclusive() {
         return _maxExclusive;
@@ -102,7 +102,7 @@ public class XSGDay extends XSType {
      * Returns the maximum inclusive value that this XSGDay can hold.
      * @return the maximum inclusive value that this XSGDay can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public GDay getMaxInclusive() {
         return _maxInclusive;
@@ -113,8 +113,8 @@ public class XSGDay extends XSType {
      * Returns the minimum exclusive value that this XSGDay can hold.
      * @return the minimum exclusive value that this XSGDay can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public GDay getMinExclusive() {
         return _minExclusive;
@@ -124,7 +124,7 @@ public class XSGDay extends XSType {
      * Returns the minimum inclusive value that this XSGDay can hold.
      * @return the minimum inclusive value that this can XSGDay hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public GDay getMinInclusive() {
         return _minInclusive;
@@ -133,7 +133,7 @@ public class XSGDay extends XSType {
     /**
      * Sets the maximum exclusive value that this XSGDay can hold.
      * @param max the maximum exclusive value this XSGDay can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(GDay max) {
         _maxExclusive = max;
@@ -143,7 +143,7 @@ public class XSGDay extends XSType {
     /**
      * Sets the maximum inclusive value that this XSGDay can hold.
      * @param max the maximum inclusive value this XSGDay can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(GDay max) {
         _maxInclusive = max;
@@ -154,7 +154,7 @@ public class XSGDay extends XSType {
     /**
      * Sets the minimum exclusive value that this XSGDay can hold.
      * @param max the minimum exclusive value this XSGDay can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(GDay min) {
         _minExclusive = min;
@@ -164,7 +164,7 @@ public class XSGDay extends XSType {
     /**
      * Sets the minimum inclusive value that this XSGDay can hold.
      * @param max the minimum inclusive value this XSGDay can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(GDay min) {
         _minInclusive = min;

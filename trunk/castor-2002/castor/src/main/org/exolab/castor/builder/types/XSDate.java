@@ -96,7 +96,7 @@ public final class XSDate extends XSType{
      * Returns the maximum exclusive value that this XSDate can hold.
      * @return the maximum exclusive value that this XSDate can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Date getMaxExclusive() {
         return _maxExclusive;
@@ -106,7 +106,7 @@ public final class XSDate extends XSType{
      * Returns the maximum inclusive value that this XSDate can hold.
      * @return the maximum inclusive value that this XSDate can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Date getMaxInclusive() {
         return _maxInclusive;
@@ -117,8 +117,8 @@ public final class XSDate extends XSType{
      * Returns the minimum exclusive value that this XSDate can hold.
      * @return the minimum exclusive value that this XSDate can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Date getMinExclusive() {
         return _minExclusive;
@@ -128,7 +128,7 @@ public final class XSDate extends XSType{
      * Returns the minimum inclusive value that this XSDate can hold.
      * @return the minimum inclusive value that this can XSDate hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Date getMinInclusive() {
         return _minInclusive;
@@ -137,7 +137,7 @@ public final class XSDate extends XSType{
     /**
      * Sets the maximum exclusive value that this XSDate can hold.
      * @param max the maximum exclusive value this XSDate can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Date max) {
         _maxExclusive = max;
@@ -147,7 +147,7 @@ public final class XSDate extends XSType{
     /**
      * Sets the maximum inclusive value that this XSDate can hold.
      * @param max the maximum inclusive value this XSDate can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Date max) {
         _maxInclusive = max;
@@ -158,7 +158,7 @@ public final class XSDate extends XSType{
     /**
      * Sets the minimum exclusive value that this XSDate can hold.
      * @param max the minimum exclusive value this XSDate can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Date min) {
         _minExclusive = min;
@@ -168,7 +168,7 @@ public final class XSDate extends XSType{
     /**
      * Sets the minimum inclusive value that this XSInt can hold.
      * @param max the minimum inclusive value this XSInt can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Date min) {
         _minInclusive = min;

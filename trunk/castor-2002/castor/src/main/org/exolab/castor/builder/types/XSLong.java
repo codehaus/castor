@@ -92,7 +92,7 @@ public final class XSLong extends XSPatternBase {
      * Returns the maximum exclusive value that this XSLong can hold.
      * @return the maximum exclusive value that this XSLong can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Long getMaxExclusive() {
         return maxExclusive;
@@ -102,7 +102,7 @@ public final class XSLong extends XSPatternBase {
      * Returns the maximum inclusive value that this XSLong can hold.
      * @return the maximum inclusive value that this XSLong can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Long getMaxInclusive() {
         return maxInclusive;
@@ -113,8 +113,8 @@ public final class XSLong extends XSPatternBase {
      * Returns the minimum exclusive value that this XSLong can hold.
      * @return the minimum exclusive value that this XSLong can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Long getMinExclusive() {
         return minExclusive;
@@ -124,7 +124,7 @@ public final class XSLong extends XSPatternBase {
      * Returns the minimum inclusive value that this XSLong can hold.
      * @return the minimum inclusive value that this XSLong can hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Long getMinInclusive() {
         return minInclusive;
@@ -147,7 +147,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSLong can hold.
      * @param max the maximum exclusive value this XSLong can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(long max) {
         maxExclusive = new Long(max);
@@ -157,7 +157,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSLong can hold.
      * @param max the maximum exclusive value this XSLong can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Long max) {
         maxExclusive = max;
@@ -167,7 +167,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSLong can hold.
      * @param max the maximum inclusive value this XSLong can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(long max) {
         maxInclusive = new Long(max);
@@ -177,7 +177,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSLong can hold.
      * @param max the maximum inclusive value this XSLong can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Long max) {
         maxInclusive = max;
@@ -188,7 +188,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSLong can hold.
      * @param max the minimum exclusive value this XSLong can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(long min) {
         minExclusive = new Long(min);
@@ -198,7 +198,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSLong can hold.
      * @param max the minimum exclusive value this XSLong can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Long min) {
         minExclusive = min;
@@ -208,7 +208,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSLong can hold.
      * @param max the minimum inclusive value this XSLong can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(long min) {
         minInclusive = new Long(min);
@@ -218,7 +218,7 @@ public final class XSLong extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSLong can hold.
      * @param max the minimum inclusive value this XSLong can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Long min) {
         minInclusive = min;

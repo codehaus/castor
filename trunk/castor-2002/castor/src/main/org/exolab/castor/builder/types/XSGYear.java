@@ -93,7 +93,7 @@ public class XSGYear extends XSType {
      * Returns the maximum exclusive value that this XSGYear can hold.
      * @return the maximum exclusive value that this XSGYear can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public GYear getMaxExclusive() {
         return _maxExclusive;
@@ -103,7 +103,7 @@ public class XSGYear extends XSType {
      * Returns the maximum inclusive value that this XSGYear can hold.
      * @return the maximum inclusive value that this XSGYear can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public GYear getMaxInclusive() {
         return _maxInclusive;
@@ -114,8 +114,8 @@ public class XSGYear extends XSType {
      * Returns the minimum exclusive value that this XSGYear can hold.
      * @return the minimum exclusive value that this XSGYear can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public GYear getMinExclusive() {
         return _minExclusive;
@@ -125,7 +125,7 @@ public class XSGYear extends XSType {
      * Returns the minimum inclusive value that this XSGYear can hold.
      * @return the minimum inclusive value that this can XSGYear hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public GYear getMinInclusive() {
         return _minInclusive;
@@ -134,7 +134,7 @@ public class XSGYear extends XSType {
     /**
      * Sets the maximum exclusive value that this XSGYear can hold.
      * @param max the maximum exclusive value this XSGYear can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(GYear max) {
         _maxExclusive = max;
@@ -144,7 +144,7 @@ public class XSGYear extends XSType {
     /**
      * Sets the maximum inclusive value that this XSGYear can hold.
      * @param max the maximum inclusive value this XSGYear can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(GYear max) {
         _maxInclusive = max;
@@ -155,7 +155,7 @@ public class XSGYear extends XSType {
     /**
      * Sets the minimum exclusive value that this XSGYear can hold.
      * @param max the minimum exclusive value this XSGYear can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(GYear min) {
         _minExclusive = min;
@@ -165,7 +165,7 @@ public class XSGYear extends XSType {
     /**
      * Sets the minimum inclusive value that this XSGYear can hold.
      * @param max the minimum inclusive value this XSGYear can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(GYear min) {
         _minInclusive = min;

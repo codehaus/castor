@@ -92,7 +92,7 @@ public class XSGMonth extends XSType {
      * Returns the maximum exclusive value that this XSGMonth can hold.
      * @return the maximum exclusive value that this XSGMonth can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public GMonth getMaxExclusive() {
         return _maxExclusive;
@@ -102,7 +102,7 @@ public class XSGMonth extends XSType {
      * Returns the maximum inclusive value that this XSGMonth can hold.
      * @return the maximum inclusive value that this XSGMonth can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public GMonth getMaxInclusive() {
         return _maxInclusive;
@@ -113,8 +113,8 @@ public class XSGMonth extends XSType {
      * Returns the minimum exclusive value that this XSGMonth can hold.
      * @return the minimum exclusive value that this XSGMonth can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public GMonth getMinExclusive() {
         return _minExclusive;
@@ -124,7 +124,7 @@ public class XSGMonth extends XSType {
      * Returns the minimum inclusive value that this XSGMonth can hold.
      * @return the minimum inclusive value that this can XSGMonth hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public GMonth getMinInclusive() {
         return _minInclusive;
@@ -133,7 +133,7 @@ public class XSGMonth extends XSType {
     /**
      * Sets the maximum exclusive value that this XSGMonth can hold.
      * @param max the maximum exclusive value this XSGMonth can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(GMonth max) {
         _maxExclusive = max;
@@ -143,7 +143,7 @@ public class XSGMonth extends XSType {
     /**
      * Sets the maximum inclusive value that this XSGMonth can hold.
      * @param max the maximum inclusive value this XSGMonth can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(GMonth max) {
         _maxInclusive = max;
@@ -154,7 +154,7 @@ public class XSGMonth extends XSType {
     /**
      * Sets the minimum exclusive value that this XSGMonth can hold.
      * @param max the minimum exclusive value this XSGMonth can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(GMonth min) {
         _minExclusive = min;
@@ -164,7 +164,7 @@ public class XSGMonth extends XSType {
     /**
      * Sets the minimum inclusive value that this XSGMonth can hold.
      * @param max the minimum inclusive value this XSGMonth can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(GMonth min) {
         _minInclusive = min;

@@ -91,7 +91,7 @@ public class XSGYearMonth extends XSType {
      * Returns the maximum exclusive value that this XSGYearMonth can hold.
      * @return the maximum exclusive value that this XSGYearMonth can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public GYearMonth getMaxExclusive() {
         return _maxExclusive;
@@ -101,7 +101,7 @@ public class XSGYearMonth extends XSType {
      * Returns the maximum inclusive value that this XSGYearMonth can hold.
      * @return the maximum inclusive value that this XSGYearMonth can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public GYearMonth getMaxInclusive() {
         return _maxInclusive;
@@ -112,8 +112,8 @@ public class XSGYearMonth extends XSType {
      * Returns the minimum exclusive value that this XSGYearMonth can hold.
      * @return the minimum exclusive value that this XSGYearMonth can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public GYearMonth getMinExclusive() {
         return _minExclusive;
@@ -123,7 +123,7 @@ public class XSGYearMonth extends XSType {
      * Returns the minimum inclusive value that this XSGYearMonth can hold.
      * @return the minimum inclusive value that this can XSGYearMonth hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public GYearMonth getMinInclusive() {
         return _minInclusive;
@@ -132,7 +132,7 @@ public class XSGYearMonth extends XSType {
     /**
      * Sets the maximum exclusive value that this XSGYearMonth can hold.
      * @param max the maximum exclusive value this XSGYearMonth can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(GYearMonth max) {
         _maxExclusive = max;
@@ -142,7 +142,7 @@ public class XSGYearMonth extends XSType {
     /**
      * Sets the maximum inclusive value that this XSGYearMonth can hold.
      * @param max the maximum inclusive value this XSGYearMonth can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(GYearMonth max) {
         _maxInclusive = max;
@@ -153,7 +153,7 @@ public class XSGYearMonth extends XSType {
     /**
      * Sets the minimum exclusive value that this XSGYearMonth can hold.
      * @param max the minimum exclusive value this XSGYearMonth can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(GYearMonth min) {
         _minExclusive = min;
@@ -163,7 +163,7 @@ public class XSGYearMonth extends XSType {
     /**
      * Sets the minimum inclusive value that this XSGYearMonth can hold.
      * @param max the minimum inclusive value this XSGYearMonth can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(GYearMonth min) {
         _minInclusive = min;
