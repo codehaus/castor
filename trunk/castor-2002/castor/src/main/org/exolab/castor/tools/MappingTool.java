@@ -79,6 +79,7 @@ import java.io.Writer;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Properties;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
@@ -335,10 +336,28 @@ public class MappingTool
             String fieldName = fdesc.getFieldName();
             Class fieldType = fdesc.getFieldType();
             
+            //-- check to make sure we can find the accessors...
+            //-- if we used introspection we don't need to
+            //-- enter this block...only when descriptors
+            //-- were generated using the source code generator
+            //-- or by hand.
             if ((!introspected) && fieldName.startsWith(UNDERSCORE)) {
+                
                 //-- check to see if we need to remove underscore
                 if (!_mappingLoader.canFindAccessors(cls, fieldName, fieldType))
                     fieldName = fieldName.substring(1);
+                
+                //-- check to see if we need to remove "List" prefix
+                //-- used by generated source code
+                if (!_mappingLoader.canFindAccessors(cls, fieldName, fieldType)) 
+                {
+                    if (fieldName.endsWith("List")) {
+                        int len = fieldName.length()-4;
+                        String tmpName = fieldName.substring(0, len);
+                        if (_mappingLoader.canFindAccessors(cls, tmpName, fieldType))
+                            fieldName = tmpName;                            
+                    }
+                }
             }
             
             fieldMap = new FieldMapping();
@@ -357,10 +376,17 @@ public class MappingTool
             if (fdesc.isRequired())  fieldMap.setRequired( true );
             if (fdesc.isTransient()) fieldMap.setTransient( true );
             if ( fdesc.isMultivalued() ) {
-                if (isArray)
+                
+                //-- try to guess collection type
+                
+                if (isArray || 
+                    _mappingLoader.returnsArray(cls, fieldName, fieldType)) 
+                {
                     fieldMap.setCollection( CollectionType.ARRAY );
-                else
+                }
+                else {
                     fieldMap.setCollection( CollectionType.ENUMERATE );
+                }
             }
                 
             //-- handle XML Specific information
@@ -434,12 +460,40 @@ public class MappingTool
             super(null, null);
         }
         
+
+        /**
+         * Returns true if the get method returns an array.
+         * This method is used for greater compatability with
+         * generated descriptors.
+         *
+         * @return if get method returns an array.
+        **/
+        boolean returnsArray(Class claz, String fieldName, Class type) {
+            
+            try {
+                Class array = null;
+                if (type.isArray()) {
+                    array = type;
+                }
+                else {
+                    array = Array.newInstance(type, 0).getClass();
+                }
+                //-- getMethod
+                String prefix = JavaNaming.toJavaClassName(fieldName);
+                String method = GET + prefix;
+                boolean isGet = true;
+                if (findAccessor(claz, method, array, isGet) != null)
+                    return true;
+            }
+            catch(Exception ex) {}
+            return false;
+        }
         
         boolean canFindAccessors(Class claz, String fieldName, Class type) {
             
             try {
                 //-- getMethod
-                String prefix = JavaNaming.toJavaMemberName(fieldName, true);
+                String prefix = JavaNaming.toJavaClassName(fieldName);
                 String method = GET + prefix;
                 boolean isGet = true;
                 if (findAccessor(claz, method, type, isGet) != null)
