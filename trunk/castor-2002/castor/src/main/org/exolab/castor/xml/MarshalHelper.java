@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,13 +38,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.xml.descriptors.*;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
@@ -65,11 +66,16 @@ import java.util.Hashtable;
  * basically the common code base between the two. This
  * class handles the introspection to dynamically create
  * descriptors.
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class MarshalHelper {
     
+    /**
+     * The XSI Namespace URI
+    **/
+    public static final String XSI_NAMESPACE 
+        = "http://www.w3.org/1999/XMLSchema-instance";
           
     private static final String ADD     = "add";
     private static final String GET     = "get";
@@ -79,9 +85,11 @@ public class MarshalHelper {
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
     
-    private static final StringClassDescriptor stringClassDescriptor =
-        new StringClassDescriptor();
+    private static final StringClassDescriptor _StringClassDescriptor 
+        = new StringClassDescriptor();
 
+    private static final VectorClassDescriptor _VectorClassDescriptor 
+        = new VectorClassDescriptor();
     
     /**
      * Creates an XMLClassDescriptor for the given class by using Reflection.
@@ -115,7 +123,13 @@ public class MarshalHelper {
         
         //-- handle Strings
         if (c == String.class)
-            return stringClassDescriptor;
+            return _StringClassDescriptor;
+        
+        //-- handle Vectors...we need to make this
+        //-- plug&play for JDK 1.2
+        if (c == java.util.Vector.class) {
+            return new VectorClassDescriptor();
+        }
         
         //-- handle base objects
         if ((c == Void.class) || 
@@ -324,11 +338,22 @@ public class MarshalHelper {
                 
                 Class type = field.getType();       
                 boolean isCollection = false;
+                //-- contentType of collection
+                Class contentType = type;
                 if (type.isArray()) {
                     type = type.getComponentType();
                     isCollection = true;
+                    //contentType = type;
                 }                
                 if (!isDescriptable(type)) continue;
+                
+                //-- Built-in support for JDK 1.1 Collections
+                //-- we need to a pluggable interface for 
+                //-- JDK 1.2+
+                if (type == java.util.Vector.class) {
+                    isCollection = true;
+                    //contentType = java.lang.Object.class;
+                }
                 
                 String fieldName = field.getName();
                 String xmlName = toXMLName(fieldName);
@@ -343,8 +368,9 @@ public class MarshalHelper {
                 descriptors.put(xmlName, fieldDesc);
                 classDesc.addFieldDescriptor(fieldDesc);
                 
-                TypeInfo typeInfo        = new TypeInfo(type);
-                FieldHandlerImpl handler = null;
+                TypeInfo typeInfo = new TypeInfo(type);
+                
+                FieldHandler handler = null;
 
                 try {
                     handler = new FieldHandlerImpl(field, typeInfo);
@@ -522,6 +548,19 @@ public class MarshalHelper {
         
         return primitive;
     } //-- toPrimitiveObject
+    
+    /**
+     * Creates the XML Name for the given class
+     * 
+     * @param c the Class to create the XML Name for
+    **/
+    public static String createXMLName(Class c) {
+        //-- create default XML name
+        String name = c.getName();
+        int idx = name.lastIndexOf('.');
+        if (idx >= 0) name = name.substring(idx+1);
+        return toXMLName(name);
+    } //-- createXMLName
     
     /**
      * Converts the given name to an XML name. It would be nearly
