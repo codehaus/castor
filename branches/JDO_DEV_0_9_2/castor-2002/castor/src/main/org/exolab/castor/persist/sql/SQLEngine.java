@@ -66,26 +66,29 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.persist.ClassMolder;
+//import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.types.Complex;
 import java.util.ArrayList;
 import java.util.HashSet;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.EntityFieldInfo;
 
 
 /**
@@ -167,25 +170,25 @@ public final class SQLEngine implements Persistence {
     private KeyGenerator         _keyGen;
 
 
-    private ClassMolder          _mold;
+    //private ClassMolder          _mold;
 
 
 
 
-    SQLEngine( JDOClassDescriptor clsDesc,
+    SQLEngine( /*JDOClassDescriptor clsDesc*/ Entity entity,
                LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
         throws MappingException {
 
-        _clsDesc = clsDesc;
+        _clsDesc = null; //clsDesc;
         _stampField = stampField;
         _factory = factory;
         _logInterceptor = logInterceptor;
         _keyGen = null;
-        _type = clsDesc.getJavaClass().getName();
-        _mapTo = clsDesc.getTableName();
+        _type = _clsDesc.getJavaClass().getName();
+        _mapTo = _clsDesc.getTableName();
 
         if ( _clsDesc.getExtends() == null ) {
-            KeyGeneratorDescriptor keyGenDesc = clsDesc.getKeyGeneratorDescriptor();
+            KeyGeneratorDescriptor keyGenDesc = _clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
                 int[] tempType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
@@ -220,7 +223,7 @@ public final class SQLEngine implements Persistence {
          *
          */
         // then, we put depended class ids in the back
-        JDOClassDescriptor base = clsDesc;
+        JDOClassDescriptor base = _clsDesc;
 
         // make sure there is no forbidded cases
 		/*
@@ -235,7 +238,7 @@ public final class SQLEngine implements Persistence {
         }*/
 
         // walk until the base class which this class extends
-        base = clsDesc;
+        base = _clsDesc;
         Stack stack = new Stack();
         stack.push( base );
         while ( base.getExtends() != null ) {
@@ -245,7 +248,7 @@ public final class SQLEngine implements Persistence {
             stack.push( base );
             // do we need to add loop detection?
         }
-        if ( base != clsDesc ) {
+        if ( base != _clsDesc ) {
             _extTable = base.getTableName();
         }
 
@@ -255,7 +258,7 @@ public final class SQLEngine implements Persistence {
         // [oleg] except for SQL name, it may differ.
         JDOClassDescriptor jdoBase = (JDOClassDescriptor) base;
         FieldDescriptor[] baseIdDescriptors = base.getIdentities();
-        FieldDescriptor[] idDescriptors = clsDesc.getIdentities();
+        FieldDescriptor[] idDescriptors = _clsDesc.getIdentities();
 
         for ( int i=0; i < baseIdDescriptors.length; i++ ) {
             if ( baseIdDescriptors[i] instanceof JDOFieldDescriptor ) {
@@ -305,9 +308,9 @@ public final class SQLEngine implements Persistence {
             FieldDescriptor[] fieldDescriptors = base.getFields();
             for ( int i=0; i<fieldDescriptors.length; i++ ) {
                 if ( stack.empty() ) {
-                    fieldsInfo.add( new FieldInfo( clsDesc, fieldDescriptors[i], clsDesc.getTableName(), !extendField ) );
+                    fieldsInfo.add( new FieldInfo( _clsDesc, fieldDescriptors[i], _clsDesc.getTableName(), !extendField ) );
                 } else {
-                    fieldsInfo.add( new FieldInfo( clsDesc, fieldDescriptors[i], base.getTableName(), extendField ) );
+                    fieldsInfo.add( new FieldInfo( _clsDesc, fieldDescriptors[i], base.getTableName(), extendField ) );
                 }
             }
         }
@@ -320,16 +323,17 @@ public final class SQLEngine implements Persistence {
 
         try {
             buildSql();
-            buildFinder( clsDesc );
+            buildFinder( _clsDesc );
         } catch ( QueryException except ) {
             except.printStackTrace();
             throw new MappingException( except );
         }
     }
 
+    /*
 	public Persistence.FieldInfo[] getInfo() {
 		return _fields;
-	}
+	}*/
 
     /**
      * Mutator method for setting extends SQLEngine
@@ -362,8 +366,8 @@ public final class SQLEngine implements Persistence {
     {
         String sql;
 
-        if ( accessMode == null )
-            accessMode = _clsDesc.getAccessMode();
+        //if ( accessMode == null )
+        //    accessMode = _clsDesc.getAccessMode();
         sql = query.getStatement( accessMode == AccessMode.DbLocked);
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( sql );
@@ -1262,7 +1266,7 @@ public final class SQLEngine implements Persistence {
         return _clsDesc.toString();
     }
 
-    static final class FieldInfo implements Persistence.FieldInfo {
+    static final class FieldInfo /*implements Persistence.FieldInfo*/ {
 
         final String  tableName;
 
