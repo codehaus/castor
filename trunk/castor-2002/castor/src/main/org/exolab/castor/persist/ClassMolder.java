@@ -613,6 +613,12 @@ public class ClassMolder {
     public Object load( TransactionContext tx, OID oid, DepositBox locker,
             Object object, AccessMode suggestedAccessMode )
             throws ObjectNotFoundException, PersistenceException {
+            return load( tx, oid, locker, object, suggestedAccessMode, null );
+        }
+
+    public Object load( TransactionContext tx, OID oid, DepositBox locker,
+            Object object, AccessMode suggestedAccessMode, QueryResults results )
+            throws ObjectNotFoundException, PersistenceException {
 
         Connection conn;
         ClassMolder fieldClassMolder;
@@ -632,8 +638,16 @@ public class ClassMolder {
         fields = (Object[]) locker.getObject( tx );
         if ( fields == null || accessMode == AccessMode.DbLocked ) {
             fields = new Object[_fhs.length];
+            if( results != null ) {
+                //System.out.println( "thth: Actually using it ;-)" );
+                stamp = results.getQuery().fetch( fields, oid.getIdentity() );
+            } else {
             conn = (Connection)tx.getConnection(oid.getLockEngine());
             stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
+            }
+/*            for( int i = 0; i < fields.length; i++ ) {
+                System.out.println( "OID = "+oid+"  fields["+i+"] = '"+fields[i]+"'" );
+            } */
             oid.setDbLock( accessMode == AccessMode.DbLocked );
             locker.setObject( tx, fields );
         }

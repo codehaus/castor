@@ -473,7 +473,15 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized Object load( LockEngine engine, ClassMolder molder,
-            Object identity, Object objectToBeLoaded, AccessMode suggestedAccessMode )
+                                     Object identity, Object objectToBeLoaded,
+                                     AccessMode suggestedAccessMode )
+            throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
+        return load( engine, molder, identity, objectToBeLoaded, suggestedAccessMode, null );
+    }
+
+    public synchronized Object load( LockEngine engine, ClassMolder molder,
+              Object identity, Object objectToBeLoaded, AccessMode suggestedAccessMode,
+              QueryResults results )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
 
         ObjectEntry entry = null;
@@ -534,7 +542,7 @@ public abstract class TransactionContext
             else
                 object = molder.newInstance( _db.getClassLoader() );
             entry = addObjectEntry( oid, object );
-            oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout );
+            oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout, results );
 
             // rehash the object entry, because oid might have changed!
             entry = removeObjectEntry( object );
