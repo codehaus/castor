@@ -67,8 +67,7 @@ package org.exolab.castor.persist;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class AccessMode
-{
+public final class AccessMode {
 
     /**
      * Read only access. Objects can be read but are not made
@@ -125,6 +124,41 @@ public class AccessMode
         throw new IllegalArgumentException( "Unrecognized access mode" );
     }
 
+    /**
+     * Returns the effective access mode that is the product of the current 
+     * accessMode and the suggested access mode.
+     * <p>
+     * If the both of the current accessMode and the suggested mode is shared,
+     * the effective mode is shared.
+     * <p>
+     * If one of the accessMode is readOnly, the effective mode is readOnly.
+     * <p>
+     * If one of the accessMode is dbLocked, and the other is not 
+     * readOnly, the effective mode is dbLocked.
+     * <p>
+     * If one of the accessMode is exclusive, and the other is not
+     * readOnly or dbLocked, the effective mode is exclusive.
+     *
+     * @param suggested The accessMode to be combined to the current mode
+     * @return The combined accessMode
+     */
+    public AccessMode getEffectiveMode( AccessMode suggested ) {
+
+        if ( _name.equals( suggested._name ) )
+            return this;
+
+        if ( _name.equals("read-only") || suggested._name.equals("read-only") )
+            return ReadOnly;
+
+        if ( _name.equals("db-locked") || suggested._name.equals("db-locked") )
+            return DbLocked;
+
+        if ( _name.equals("exclusive") || suggested._name.equals("exclusive") )
+            return Exclusive;
+
+        // in case of exception, we simply return the orignal mode
+        return this;
+    }
 
     /**
      * The name of this access mode as it would appear in a
