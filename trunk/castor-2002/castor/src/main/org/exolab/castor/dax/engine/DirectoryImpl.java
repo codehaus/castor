@@ -201,14 +201,20 @@ public class DirectoryImpl
         // clsDesc = _dirEngine.getClassDesc();
         try {
             if ( _tx != null ) {
-                object = handler.newInstance();
-                _tx.fetch( _dirEngine, handler, object, rdn, AccessMode.Shared );
+                object = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
+                if ( object == null ) {
+                    object = handler.newInstance();
+                    _tx.load( _dirEngine, handler, object, rdn, AccessMode.Shared );
+                }
             } else {
                 TransactionContext tx;
                 
                 tx = new TransactionContextImpl( _conn );
-                object = handler.newInstance();
-                _tx.fetch( _dirEngine, handler, object, rdn, AccessMode.Shared );
+                object = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
+                if ( object == null ) {
+                    object = handler.newInstance();
+                    _tx.load( _dirEngine, handler, object, rdn, AccessMode.Shared );
+                }
                 tx.commit();
             }
         } catch ( ObjectNotFoundException except ) {

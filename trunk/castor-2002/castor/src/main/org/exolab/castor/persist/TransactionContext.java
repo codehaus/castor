@@ -263,6 +263,44 @@ public abstract class TransactionContext
     protected abstract void rollbackConnections();
 
 
+    public synchronized Object fetch( PersistenceEngine engine, ClassHandler handler,
+                                      Object identity, AccessMode accessMode )
+        throws ObjectNotFoundException, LockNotGrantedException, PersistenceException
+    {
+        ObjectEntry entry;
+        OID         oid;
+
+        oid = new OID( handler, identity );
+        entry = getObjectEntry( engine, oid );
+        if ( entry != null ) {
+            // If the object has been loaded in this transaction from a
+            // different engine this is an error. If the object has been
+            // deleted in this transaction, it cannot be re-loaded. If the
+            // object has been created in this transaction, it cannot be
+            // re-loaded but no error is reported.
+            if ( entry.engine != engine )
+                throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
+            if ( entry.deleted )
+                throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), identity );
+            if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
+                throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
+            if ( entry.created )
+                return oid;
+            if ( ( accessMode == AccessMode.Exclusive ||
+                   accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
+                // If we are in exclusive mode and object has not been
+                // loaded in exclusive mode before, then we have a
+                // problem. We cannot return an object that is not
+                // synchronized with the database, but we cannot
+                // synchronize a live object.
+                throw new PersistenceExceptionImpl( "persist.lockConflict", handler.getJavaClass(), identity );
+            }
+            return entry.object;
+        }
+        return null;
+    }
+
+
     /**
      * Obtains an object for use within the transaction. Before an
      * object can be used in a transaction it must be fetched.
@@ -298,7 +336,7 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized OID fetch( PersistenceEngine engine, ClassHandler handler,
+    public synchronized void load( PersistenceEngine engine, ClassHandler handler,
                                    Object object, Object identity, AccessMode accessMode )
         throws ObjectNotFoundException, LockNotGrantedException, PersistenceException
     {
@@ -324,7 +362,7 @@ public abstract class TransactionContext
             if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
-                return oid;
+                return;
             if ( ( accessMode == AccessMode.Exclusive ||
                    accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
                 // If we are in exclusive mode and object has not been
@@ -334,7 +372,7 @@ public abstract class TransactionContext
                 // synchronize a live object.
                 throw new PersistenceExceptionImpl( "persist.lockConflict", handler.getJavaClass(), identity );
             }
-            return oid;
+            return;
         }
 
         // Load (or reload) the object through the persistence engine with the
@@ -369,7 +407,6 @@ public abstract class TransactionContext
             removeObjectEntry( object );
             engine.releaseLock( this, oid );
         }
-        return oid;
     }
 
 

@@ -198,8 +198,11 @@ public class DatabaseImpl
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = handler.newInstance();
-        tx.fetch( _dbEngine, handler, object, identity, null );
+        object = tx.fetch( _dbEngine, handler, identity, null );
+        if ( object == null ) {
+            object = handler.newInstance();
+            tx.load( _dbEngine, handler, object, identity, null );
+        }
         return object;
     }
 
@@ -233,8 +236,11 @@ public class DatabaseImpl
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = handler.newInstance();
-        tx.fetch( _dbEngine, handler, object, identity, mode );
+        object = tx.fetch( _dbEngine, handler, identity, mode );
+        if ( object == null ) {
+            object = handler.newInstance();
+            tx.load( _dbEngine, handler, object, identity, mode );
+        }
         return object;
     }
 
