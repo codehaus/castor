@@ -54,6 +54,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.types.AnyNode;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
+import org.exolab.castor.xml.handlers.EnumFieldHandler;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.List;
@@ -256,7 +257,7 @@ public class Marshaller extends MarshalFramework {
      * set by the user.
     **/
     private AttributeSetImpl _topLevelAtts = null;
-    
+
     /**
      * The validation flag
     **/
@@ -283,13 +284,13 @@ public class Marshaller extends MarshalFramework {
      *
      * @param handler the ContentHandler to "marshal" to.
     **/
-    public Marshaller( ContentHandler handler ) 
+    public Marshaller( ContentHandler handler )
         throws IOException
     {
         if ( handler == null )
             throw new IllegalArgumentException( "Argument 'handler' is null." );
-            
-        
+
+
         //-- wrap content handler to be compatable with
         //-- document handler
         if (handler instanceof DocumentHandler)
@@ -823,6 +824,10 @@ public class Marshaller extends MarshalFramework {
         if (saveType && (descriptor.getHandler() instanceof DateFieldHandler))
             saveType = false;
         //-- XXXX end Date fix
+        //-- XXX Enumeration fix
+        if (saveType && (descriptor.getHandler() instanceof EnumFieldHandler))
+            saveType = false;
+        //-- XXX end Enumeration fix
 
         if (saveType) {
              // When the type of the instance of the field is not the
@@ -900,7 +905,7 @@ public class Marshaller extends MarshalFramework {
         //---------------------/
         //- handle attributes -/
         //---------------------/
-        
+
         AttributeListImpl atts = new AttributeListImpl();
 
         //-- user defined attributes
@@ -908,7 +913,7 @@ public class Marshaller extends MarshalFramework {
             //-- declare xsi prefix if necessary
             if (_topLevelAtts.getSize() > 0)
                 _namespaces.addNamespace(XSI_PREFIX, XSI_NAMESPACE);
-                
+
             for (int i = 0; i < _topLevelAtts.getSize(); i++) {
                 String attName = _topLevelAtts.getName(i);
                 String ns = _topLevelAtts.getNamespace(i);
@@ -923,9 +928,9 @@ public class Marshaller extends MarshalFramework {
                     _topLevelAtts.getValue(i));
             }
         }
-        
+
         //-- process attr descriptors
-        
+
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
         for (int i = 0; i < descriptors.length; i++) {
 
@@ -1321,11 +1326,11 @@ public class Marshaller extends MarshalFramework {
             //-- to be added later.
         }
         else {
-            _topLevelAtts.setAttribute(XSI_NO_NAMESPACE_SCHEMA_LOCATION, 
+            _topLevelAtts.setAttribute(XSI_NO_NAMESPACE_SCHEMA_LOCATION,
                 schemaLocation, XSI_NAMESPACE);
         }
     } //-- setNoNamespaceSchemaLocation
-    
+
     /**
      * Sets the value for the xsi:schemaLocation attribute.
      * When set, this attribute will appear on the root element
@@ -1340,11 +1345,11 @@ public class Marshaller extends MarshalFramework {
             //-- to be added later.
         }
         else {
-            _topLevelAtts.setAttribute(XSI_SCHEMA_LOCATION, 
+            _topLevelAtts.setAttribute(XSI_SCHEMA_LOCATION,
                 schemaLocation, XSI_NAMESPACE);
         }
     } //-- setSchemaLocation
-    
+
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
      * a XMLClassDescriptor could not be found, this method will attempt to
