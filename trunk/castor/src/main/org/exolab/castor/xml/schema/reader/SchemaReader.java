@@ -322,23 +322,22 @@ public class SchemaReader {
         _uriResolver = uriresolver;
     }
 
-    private void handleException(XMLException xx)
+    /**
+     * Handle an exception which is one of our own XMLExceptions.
+     * @param xmlException the XMLException to handle.
+     * @throws IOException
+     */
+    private void handleException(XMLException xmlException)
         throws IOException
     {
-        Exception except = xx.getException();
-        if (except == null) {
-            except = xx;
-        }
-        else if (except instanceof SAXException) {
-            handleException((SAXException)except);
-        }
-        else if (except instanceof XMLException) {
-            handleException((XMLException)except);
-        }
-
-        throw new NestedIOException(except);
+        throw new NestedIOException(xmlException);
     } //-- handleException
 
+    /**
+     * Handle an exception which is a foreign SAXException.
+     * @param sx The SAXException to handle.
+     * @throws IOException
+     */
     private void handleException(SAXException sx)
         throws IOException
     {
