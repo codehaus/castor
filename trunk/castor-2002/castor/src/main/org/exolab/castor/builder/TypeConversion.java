@@ -185,11 +185,27 @@ public class TypeConversion {
                 //-- double
                 case BuiltInType.DOUBLE_TYPE:
                     return new XSReal();
-                //-- integer, negative-integer, positive-integer
+                //-- integer
                 case BuiltInType.INTEGER_TYPE:
+                {
+                    XSInteger xsInteger = new XSInteger();
+                    readIntegerFacets(datatype, xsInteger);
+                    return xsInteger;
+                }
+                //-- negative-integer 
                 case BuiltInType.NEGATIVE_INTEGER_TYPE:
+                {
+                    XSInteger xsInteger = new XSNegativeInteger();
+                    readIntegerFacets(datatype, xsInteger);
+                    return xsInteger;
+                }
+                //-- positive-integer
                 case BuiltInType.POSITIVE_INTEGER_TYPE:
-                    return toXSInteger(datatype);
+                {
+                    XSInteger xsInteger = new XSPositiveInteger();
+                    readIntegerFacets(datatype, xsInteger);
+                    return xsInteger;
+                }
                 case BuiltInType.LONG_TYPE:
                     return new XSLong();
                 //-- string
@@ -221,8 +237,7 @@ public class TypeConversion {
     
     public static String getSchemaTypeName(String javaTypeName) {
         return sjNameMap.getNameByObject(javaTypeName);
-    } //-- getSchemaTypeName;
-        
+    } //-- getSchemaTypeNam        
         
       //-------------------/
      //- Private Methods -/
@@ -233,21 +248,9 @@ public class TypeConversion {
      * @param datatype the Datatype to convert
      * @return the XSInteger representation of the given Datatype
     **/
-    private static XSInteger toXSInteger(Datatype datatype) {
-        
-        XSInteger xsInteger = null;
-        
-        switch ( ((BuiltInType)datatype).getType() ) {
-            case BuiltInType.NEGATIVE_INTEGER_TYPE:
-                xsInteger = new XSNegativeInteger();
-                break;
-            case BuiltInType.POSITIVE_INTEGER_TYPE:
-                xsInteger = new XSPositiveInteger();
-                break;
-            default:
-                xsInteger = new XSInteger();
-                break;
-        }
+    private static void readIntegerFacets
+        (Datatype datatype, XSInteger xsInteger) 
+    {
         
         //-- copy valid facets
         Enumeration enum = datatype.getFacets();
@@ -271,7 +274,6 @@ public class TypeConversion {
             
         }
         
-        return xsInteger;
     } //-- toXSInteger
     
     /**
