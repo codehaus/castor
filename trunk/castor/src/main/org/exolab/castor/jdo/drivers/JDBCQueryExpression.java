@@ -58,6 +58,7 @@ import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.jdo.oql.SyntaxNotSupportedException;
+import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
@@ -80,12 +81,9 @@ public class JDBCQueryExpression
 
     protected Hashtable _tables = new Hashtable();
 
-
     protected Vector    _cols = new Vector();
 
-
     protected Vector    _conds = new Vector();
-
 
     protected Vector    _joins = new Vector();
 
@@ -93,9 +91,7 @@ public class JDBCQueryExpression
 
     protected String    _where;
 
-
     protected String    _order;
-
 
     protected String    _limit;
     protected int	    _limitFirstBindIdx;
@@ -105,16 +101,29 @@ public class JDBCQueryExpression
     protected int	    _offsetFirstBindIdx;
     protected int	    _offsetLastBindIdx;
 
-
     protected boolean   _distinct = false;
-
 
     protected PersistenceFactory  _factory;
 
+	/**
+	 * MetaInfo as acquired from the RDBMS
+	 */
+    protected DbMetaInfo _dbInfo;
 
     public JDBCQueryExpression( PersistenceFactory factory )
     {
         _factory = factory;
+    }
+
+
+    /**
+     * Store database meta information
+     *
+     * @param dbInfo DbMetaInfo instance
+     */    
+    public void setDbMetaInfo( DbMetaInfo dbInfo )
+    {
+        _dbInfo = dbInfo;
     }
 
 
@@ -353,7 +362,12 @@ public class JDBCQueryExpression
     }
     
     /**
-     * This should work for JDBC drivers with a full support of JDBC specification.
+	 * Creates a SQL statement.
+     * In genral, for a RDBMS/JDBC driver with a full support of the SQL standard/JDBC 
+	 * specification, this will return a valid SQL statement. For some features,
+	 * a particular RDBMS might indidate that it doe snot support this feature by 
+	 * throwing a SyntaxNotSupportedException.
+     * @throws SyntaxNotSupportedException If the RDBMS does not support a particular feature.
      */
     public String getStatement( boolean lock ) throws SyntaxNotSupportedException
     {
