@@ -42,7 +42,7 @@ JDO:   Fixed bug 1704 using contribution from Stein M. Hugubakken [dulci@start.n
 JDO:   Fixed bug 1511 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added functionality to clear/reset the database configuration.
        Added functionality to configure Castor JDO via an in-memory JDOConf instance
-       (plus a factoyr class for creating JdoConf instances).
+       (plus a factory class for creating JdoConf instances).
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1511
        (Werner - 20040917)
 
