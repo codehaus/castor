@@ -48,6 +48,7 @@ package org.exolab.castor.xml.schema.reader;
 //-- imported classes and packages
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.simpletypes.ListType;
 import org.xml.sax.*;
 
 /**
@@ -198,8 +199,9 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
                 = new SimpleTypeRestrictionUnmarshaller(_simpleTypeDef, atts);
         }
         else if (SchemaNames.LIST.equals(name)) {
-           foundList = true;
-           unmarshaller = new SimpleTypeListUnmarshaller(_simpleTypeDef, atts);
+            foundList = true;
+            Schema schema = _simpleTypeDef.getSchema();
+            unmarshaller = new SimpleTypeListUnmarshaller(schema, atts);
         }
         else if (SchemaNames.UNION.equals(name)) {
             foundUnion = true;
@@ -231,6 +233,11 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation annotation = (Annotation)unmarshaller.getObject();
             _simpleTypeDef.setAnnotation(annotation);
+        }
+        else if (SchemaNames.LIST.equals(name)) {
+            _simpleType = (SimpleType)unmarshaller.getObject();
+            _simpleTypeDef.copyInto(_simpleType);
+            
         }
         else if (SchemaNames.UNION.equals(name)) {
             _simpleType = (SimpleType)unmarshaller.getObject();
