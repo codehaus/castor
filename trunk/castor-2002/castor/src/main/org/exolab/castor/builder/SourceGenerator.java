@@ -1228,11 +1228,11 @@ public class SourceGenerator {
                  (temp.getType().getName().equals("java.lang.String")))
                   jsc.add("result += \"Field "+name+":\" +"+name+"+\"\\n\";");
             else {
-                jsc.add("if ("+name+".getClass().isAssignableFrom(CastorTestable.class))");
+                jsc.add("if ( ("+name+" != null) && ("+name+".getClass().isAssignableFrom(CastorTestable.class)))");
                 jsc.indent();
                 jsc.add("result += ((CastorTestable)"+name+").dumpFields();");
                 jsc.unindent();
-                jsc.add("else result += \"Field "+name+":\" +"+name+".toString()+\"\\n\";");
+                jsc.add("else result += \"Field "+name+":\" +"+name+"+\"\\n\";");
             }
             jsc.add("");
         }
