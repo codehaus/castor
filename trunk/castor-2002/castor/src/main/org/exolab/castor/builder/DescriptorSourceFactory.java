@@ -1070,7 +1070,7 @@ public class DescriptorSourceFactory {
                 jsc.add("{ //-- local scope");
                 jsc.indent();
                 jsc.add("NameValidator nv = new NameValidator(NameValidator.CDATA);");
-                XSCdata xsCdata = (XSCdata)xsType;
+                XSCData xsCdata = (XSCData)xsType;
                 if ( (xsCdata.hasMinLength()) && (!xsCdata.hasLength()) ){
                     jsc.add("nv.setMinLength(");
                     jsc.append(Integer.toString(xsCdata.getMinLength()));
