@@ -49,6 +49,7 @@ package org.exolab.castor.builder.util;
 import org.exolab.castor.builder.ClassInfo;
 import org.exolab.castor.builder.ClassInfoResolver;
 
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
@@ -59,7 +60,7 @@ import java.util.Hashtable;
 **/
 public class ClassInfoResolverImpl implements ClassInfoResolver {
     
-    Hashtable _cache = null;
+    private Hashtable _cache = null;
     
     public ClassInfoResolverImpl() {
         _cache = new Hashtable();
@@ -79,6 +80,13 @@ public class ClassInfoResolverImpl implements ClassInfoResolver {
         }
         _cache.put(key, classInfo);
     } //-- bindReference
+    
+    /**
+     * Returns all the keys used for binding ClassInfo objects
+    **/
+    public Enumeration keys() {
+        return _cache.keys();
+    } //-- keys
     
     /**
      * Returns the ClassInfo which has been bound to the given key
