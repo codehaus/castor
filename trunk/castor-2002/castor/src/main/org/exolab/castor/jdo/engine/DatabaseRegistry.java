@@ -82,7 +82,7 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class DatabaseSource
+public class DatabaseRegistry
 {
 
 
@@ -107,7 +107,7 @@ public class DatabaseSource
     /**
      * The map resolver for this database source.
      */
-    private MappingResolver    _mapResolver;
+    private MappingResolver   _mapResolver;
 
 
     /**
@@ -139,7 +139,7 @@ public class DatabaseSource
 
 
     /**
-     * Construct a new database source using a JDBC driver.
+     * Construct a new database registry using a JDBC driver.
      *
      * @param name The database name
      * @param mapResolver The mapping resolver
@@ -150,8 +150,8 @@ public class DatabaseSource
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
-    DatabaseSource( String name, MappingResolver mapResolver, PersistenceFactory factory,
-                    String jdbcUrl, Properties jdbcProps, PrintWriter logWriter )
+    DatabaseRegistry( String name, MappingResolver mapResolver, PersistenceFactory factory,
+                      String jdbcUrl, Properties jdbcProps, PrintWriter logWriter )
         throws MappingException
     {
         _name = name;
@@ -164,7 +164,7 @@ public class DatabaseSource
 
 
     /**
-     * Construct a new database source using a <tt>DataSource</tt>.
+     * Construct a new database registry using a <tt>DataSource</tt>.
      *
      * @param name The database name
      * @param mapResolver The mapping resolver
@@ -174,7 +174,7 @@ public class DatabaseSource
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
-    DatabaseSource( String name, MappingResolver mapResolver, PersistenceFactory factory,
+    DatabaseRegistry( String name, MappingResolver mapResolver, PersistenceFactory factory,
                     DataSource dataSource, PrintWriter logWriter )
         throws MappingException
     {
@@ -199,10 +199,10 @@ public class DatabaseSource
     }
 
 
-    static DatabaseSource registerDatabase( String name, String engine, PrintWriter logWriter )
+    static DatabaseRegistry registerDatabase( String name, String engine, PrintWriter logWriter )
         throws MappingException
     {
-        DatabaseSource     dbs;
+        DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
         if ( _defaultMapping == null ) {
@@ -210,7 +210,7 @@ public class DatabaseSource
 
             try {
                 mapping = new JDOMappingLoader( null );
-                mapping.loadMapping( new InputSource( DatabaseSource.class.getClassLoader().getResourceAsStream( DefaultMapping ) ) );
+                mapping.loadMapping( new InputSource( DatabaseRegistry.class.getClassLoader().getResourceAsStream( DefaultMapping ) ) );
                 _defaultMapping = mapping;
             } catch ( IOException except ) {
                 throw new MappingException( except );
@@ -221,8 +221,8 @@ public class DatabaseSource
             throw new MappingException( "jdo.noSuchEngine", engine );
 
         if ( name.startsWith( "jdbc:" ) ) {
-            dbs = new DatabaseSource( name, _defaultMapping, factory,
-                                      name, null, logWriter );
+            dbs = new DatabaseRegistry( name, _defaultMapping, factory,
+                                        name, null, logWriter );
         } else if ( name.startsWith( "java:" ) ) {
             Object obj;
 
@@ -234,8 +234,8 @@ public class DatabaseSource
                 throw new MappingException( except );
             }
             if ( obj instanceof DataSource )
-                dbs = new DatabaseSource( name, _defaultMapping, factory,
-                                          (DataSource) obj, logWriter );
+                dbs = new DatabaseRegistry( name, _defaultMapping, factory,
+                                            (DataSource) obj, logWriter );
             else
                 throw new MappingException( "jdo.jndiNameNotFound", name );
             _databases.put( name, dbs );
@@ -252,7 +252,7 @@ public class DatabaseSource
         JDOMappingLoader   mapping;
         Mapping[]          mappings;
         Database           database;
-        DatabaseSource     dbs;
+        DatabaseRegistry   dbs;
         PersistenceFactory factory;
 
         unm = new Unmarshaller( Database.class );
@@ -304,16 +304,16 @@ public class DatabaseSource
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
-                dbs = new DatabaseSource( database.getName(), mapping, factory,
-                                          database.getDriver().getUrl(), props, logWriter );
+                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                                            database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
                 DataSource ds;
 
                 ds = (DataSource) database.getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
-                dbs = new DatabaseSource( database.getName(), mapping, factory,
-                                          ds, logWriter );
+                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                                            ds, logWriter );
             } else if ( database.getJndi() != null ) {
                 Object    ds;
 
@@ -327,8 +327,8 @@ public class DatabaseSource
                 if ( ! ( ds instanceof DataSource ) )
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
 
-                dbs = new DatabaseSource( database.getName(), mapping, factory,
-                                          (DataSource) ds, logWriter );
+                dbs = new DatabaseRegistry( database.getName(), mapping, factory,
+                                            (DataSource) ds, logWriter );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }
@@ -355,12 +355,12 @@ public class DatabaseSource
 
     static PersistenceEngine getPersistenceEngine( Class objType )
     {
-        Enumeration    enum;
-        DatabaseSource dbs;
+        Enumeration      enum;
+        DatabaseRegistry dbs;
 
         enum = _databases.elements();
         while ( enum.hasMoreElements() ) {
-            dbs = (DatabaseSource) enum.nextElement();
+            dbs = (DatabaseRegistry) enum.nextElement();
             if ( dbs._mapResolver.getDescriptor( objType ) != null )
                 return dbs._engine;
         }
@@ -368,20 +368,20 @@ public class DatabaseSource
     }
 
 
-    static PersistenceEngine getPersistenceEngine( DatabaseSource dbs )
+    static PersistenceEngine getPersistenceEngine( DatabaseRegistry dbs )
     {
         return dbs._engine;
     }
 
 
-    static DatabaseSource getDatabaseSource( Object obj )
+    static DatabaseRegistry getDatabaseRegistry( Object obj )
     {
-        Enumeration    enum;
-        DatabaseSource dbs;
+        Enumeration      enum;
+        DatabaseRegistry dbs;
 
         enum = _databases.elements();
         while ( enum.hasMoreElements() ) {
-            dbs = (DatabaseSource) enum.nextElement();
+            dbs = (DatabaseRegistry) enum.nextElement();
             if ( dbs._mapResolver.getDescriptor( obj.getClass() ) != null )
                 return dbs;
         }
@@ -389,12 +389,12 @@ public class DatabaseSource
     }
 
 
-    public static synchronized DatabaseSource getDatabaseSource( String name )
+    public static synchronized DatabaseRegistry getDatabaseRegistry( String name )
         throws MappingException
     {
-        DatabaseSource dbs;
+        DatabaseRegistry dbs;
 
-        dbs = (DatabaseSource) _databases.get( name );
+        dbs = (DatabaseRegistry) _databases.get( name );
         return dbs;
     }
 
@@ -402,9 +402,9 @@ public class DatabaseSource
     static Connection createConnection( PersistenceEngine engine )
         throws SQLException
     {
-        DatabaseSource dbs;
+        DatabaseRegistry dbs;
 
-        dbs = (DatabaseSource) _byEngine.get( engine );
+        dbs = (DatabaseRegistry) _byEngine.get( engine );
         if ( dbs._dataSource != null )
             return dbs._dataSource.getConnection();
         else
