@@ -45,7 +45,7 @@ design, which is important in larger projects. </p>
             Castor supports different cardinalities of relationship, including one-to-one, one-to-many and many-to-many. It also supports both object and database record inheritance. It distinguishes between related (i.e. association) and dependent (i.e. aggregation) relationships during an object's life cycle, automatically creating and deleting dependent objects at appropriate times in the independent object's life cycle. Multiple-column primary keys, and a variety of key generators are supported. </p>
 
         <p>
-            Castor automatically manages persistence for objects that contain Java collection types, including array, Vector, Hashtable, Collection, Set, and Map. Lazy loading of collections is implemented to reduce unnecessary database loading. Lazy loading can be turned on or off for each individual field of any supported collection type. </p>
+            Castor automatically manages persistence for objects that contain Java collection types, including Vector, Hashtable, Collection, Set, and Map. Lazy loading of collections is implemented to reduce unnecessary database loading. Lazy loading can be turned on or off for each individual field of any supported collection type. </p>
 
         <p>
             Other features include a type converter for all Java primitive types.  </p>
