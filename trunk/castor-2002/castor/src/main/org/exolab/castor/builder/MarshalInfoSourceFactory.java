@@ -485,6 +485,41 @@ public class MarshalInfoSourceFactory {
         }
         
         switch (xsType.getType()) {
+            
+            case XSType.NEGATIVE_INTEGER:
+            case XSType.POSITIVE_INTEGER: 
+            case XSType.INTEGER:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("IntegerValidator iv = new IntegerValidator();");
+                XSInteger xsInteger = (XSInteger)xsType;
+                if (xsInteger.hasMinimum()) {
+                    Integer min = xsInteger.getMinExclusive();
+                    if (min != null)
+                        jsc.add("iv.setMinExclusive(");
+                    else {
+                        min = xsInteger.getMinInclusive();
+                        jsc.add("iv.setMinInclusive(");
+                    }
+                    jsc.append(min.toString());
+                    jsc.append(");");
+                }
+                if (xsInteger.hasMaximum()) {
+                    Integer max = xsInteger.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("iv.setMaxExclusive(");
+                    else {
+                        max = xsInteger.getMaxInclusive();
+                        jsc.add("iv.setMaxInclusive(");
+                    }
+                    jsc.append(max.toString());
+                    jsc.append(");");
+                }
+                
+                jsc.add("bvr.setTypeValidator(iv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
             case XSType.STRING:
                 jsc.add("bvr.setTypeValidator(new StringValidator());");
                 break;
