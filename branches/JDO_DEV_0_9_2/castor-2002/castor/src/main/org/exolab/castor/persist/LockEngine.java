@@ -173,10 +173,10 @@ public final class LockEngine /*implements TransactionContextListener*/ {
     public LockEngine( PersistenceFactory factory, 
             org.exolab.castor.jdo.conf.Database conf,
             LogInterceptor logInterceptor )
-            throws MappingException {
+            throws MappingException, PersistenceException {
 
         _logInterceptor = logInterceptor;
-    
+
         _factory = factory;
 
         _connector = factory.getConnector( conf );

@@ -50,7 +50,7 @@ import java.util.Vector;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.jdo.engine.SQLTypes;
+import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 
 /**

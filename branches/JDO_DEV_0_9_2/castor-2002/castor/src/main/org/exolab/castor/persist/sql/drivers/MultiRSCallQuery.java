@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.persist.sql.drivers;
 
 
 import java.util.Vector;
@@ -59,8 +59,8 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.jdo.engine.SQLEngine;
-import org.exolab.castor.jdo.engine.SQLTypes;
+import org.exolab.castor.persist.sql.SQLEngine;
+import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;

@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.persist.sql.drivers;
 
 
 import org.exolab.castor.persist.spi.QueryExpression;

@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.engine;
+package org.exolab.castor.persist.sql;
 
 
 import java.util.Vector;
@@ -64,6 +64,8 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.engine.JDOClassDescriptor;
+import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -87,6 +89,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.types.Complex;
+import org.exolab.castor.persist.types.SQLTypes;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 

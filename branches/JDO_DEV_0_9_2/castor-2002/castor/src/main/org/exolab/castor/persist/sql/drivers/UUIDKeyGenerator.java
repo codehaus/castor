@@ -40,6 +40,8 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id$
+ *
  */
 
 /**
@@ -65,7 +67,7 @@
 **/
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.persist.sql.drivers;
 
 
 import java.math.BigDecimal;
@@ -80,8 +82,8 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.sql.JDBCSyntax;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.util.Messages;
 
 /**
