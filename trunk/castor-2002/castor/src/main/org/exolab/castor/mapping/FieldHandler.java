@@ -88,29 +88,29 @@ public interface FieldHandler
 
 
     /**
-     * Checks the field integrity. Returns successfully if the field
+     * Checks the field validity. Returns successfully if the field
      * can be stored, is valid, etc, throws an exception otherwise.
      *
      * @param object The object
-     * @throws IntegrityException The field is invalid, is required and
-     *  null, or any other integrity violation
+     * @throws ValidityException The field is invalid, is required and
+     *  null, or any other validity violation
      * @throws IllegalStateException The Java object has changed and
      *  is no longer supported by this handler, or the handler
      *  is not compatiable with the Java object
      */
-    public void checkIntegrity( Object object )
-        throws IntegrityException, IllegalStateException;
+    public void checkValidity( Object object )
+        throws ValidityException, IllegalStateException;
 
 
     /**
      * Creates a new instance of the object described by this field.
      *
-     * @param object The object for which the field is created
+     * @param parent The object for which the field is created
      * @return A new instance of the field's value
      * @throws IllegalStateException This field is a simple type and
      *  cannot be instantiated
      */
-    public Object newInstance( Object object )
+    public Object newInstance( Object parent )
         throws IllegalStateException;
 
 

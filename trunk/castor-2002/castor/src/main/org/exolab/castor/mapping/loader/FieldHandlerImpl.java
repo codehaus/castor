@@ -54,7 +54,7 @@ import java.lang.reflect.InvocationTargetException;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.IntegrityException;
+import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.util.Messages;
 
 
@@ -283,15 +283,15 @@ public final class FieldHandlerImpl
     }
 
 
-    public void checkIntegrity( Object object )
-        throws IntegrityException
+    public void checkValidity( Object object )
+        throws ValidityException
     {
         try {
             if ( _required ) {
                 if ( ( _field != null && _field.get( object ) == null ) ||
                      ( _field == null && _getMethod.invoke( object, null ) == null ) )
-                throw new IntegrityException( "mapping.requiredField",
-                                              object.getClass().getName(), _fieldName );
+                throw new ValidityException( "mapping.requiredField",
+                                             object.getClass().getName(), _fieldName );
             }
         } catch ( IllegalAccessException except ) {
             // This should never happen
