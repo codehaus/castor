@@ -112,13 +112,18 @@ final class TransactionContextImpl
         _globalTx = globalTx;
     }
 	
+    /**
+     * Create a new transaction context.
+     * @param db Database instance
+     * @param globalTx Indicates whether we run as part of a global transaction.
+     * @param transaction A JTA Transasction instance. 
+     */
 	public TransactionContextImpl( Database db, boolean globalTx , javax.transaction.Transaction transaction )
     	throws javax.transaction.SystemException
 	{
         super( db , transaction );
         _globalTx = globalTx;
     }
-	
 
     protected void commitConnections()
         throws TransactionAbortedException
