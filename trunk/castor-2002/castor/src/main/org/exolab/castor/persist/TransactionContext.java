@@ -773,6 +773,7 @@ public abstract class TransactionContext
                     } else {
                         Object       identity;
                         ClassHandler handler;
+                        OID          oid;
                         
                         // When storing the object it's OID might change
                         // if the primary identity has been changed
@@ -780,7 +781,11 @@ public abstract class TransactionContext
                         identity = handler.getIdentity( entry.object );
                         if ( identity == null )
                             throw new TransactionAbortedExceptionImpl( "persist.noIdentity", handler.getJavaClass(), null );
-                        entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+                        oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+                        if ( oid != null ) {
+                            entry.oid = oid;
+                            entry.modified = true;
+                        }
                         entry.prepared = true;
                     }
                 }
@@ -853,7 +858,10 @@ public abstract class TransactionContext
                     // transaction must retain the database lock
                     // (which is always write lock since object was
                     // just updated)
-                    entry.engine.writeLock( this, entry.oid, 0 );
+                    if ( entry.modified ) {
+                        entry.engine.updateObject( this, entry.oid, entry.object );
+                        entry.engine.writeLock( this, entry.oid, 0 );
+                    }
                     entry.created = false;
                 }
             }
@@ -920,7 +928,8 @@ public abstract class TransactionContext
                 } else {
                     // Object has been created/accessed inside the
                     // transaction, release its lock.
-                    entry.engine.updateObject( this, entry.oid, entry.object );
+                    if ( entry.modified )
+                        entry.engine.updateObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
             }
@@ -941,10 +950,9 @@ public abstract class TransactionContext
 
     /*
      * Rolls back all changes and closes the transaction releasing all
-     * locks on all objects. All objects are now transient and
-     * reverted to their previous values, if they were queried in this
-     * transaction. This method may be called at any point during the
-     * transaction.
+     * locks on all objects. All objects are now transient, if they were
+     * queried in this transaction. This method may be called at any point
+     * during the transaction.
      *
      * @throws  TransactionNotInProgressException Method called while
      *   transaction is not in progress
@@ -1198,6 +1206,12 @@ public abstract class TransactionContext
          * True if the object has been prepared and may be committed.
          */
         boolean                  prepared;
+
+        /**
+         * True if the object has been modified in the transaction,
+         * stored during the preparation stage and is write locked.
+         */
+        boolean                  modified;
 
         ObjectEntry( PersistenceEngine  engine, Object object )
         {
