@@ -52,7 +52,6 @@ import java.util.Vector;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.AttributeList;
-import org.xml.sax.HandlerBase;
 import netscape.ldap.LDAPEntry;
 import netscape.ldap.LDAPAttribute;
 import netscape.ldap.LDAPAttributeSet;

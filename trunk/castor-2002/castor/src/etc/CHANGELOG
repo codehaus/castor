@@ -1,10 +1,18 @@
-Version 0.7.8
+Version 0.7.8  February 10, 2000
 -------------------------------
 
-XML:    Fixed bug with package name for top-level types, reported by
-        Kevin Burton
-XML:    Added support for "annotation" as a child for most of the structures.
-XML:    Added more support for "datatype"
+JDO:     Fixed bug in SQLEngine not deleting row. (Contributed by
+         Oleg Nitz)
+
+JDO:     Fixed examples not setting reference of related class for
+         Inventory (Contributed by Steve Muench)
+
+XML:     Fixed bug with package name for top-level types, reported by
+         Kevin Burton
+
+XML:     Added support for "annotation" as a child for most of the structures.
+
+XML:     Added more support for "datatype"
 
 
 Version 0.7.7  February 2, 2000
