@@ -98,28 +98,57 @@ public class TypeHandling
 
         try {
             OQLQuery      oql;
-            TestObject    object;
+            TestTypes     types;
             Enumeration   enum;
             
             // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
-            db.begin();
             
             // Determine if test object exists, if not create it.
             // If it exists, set the name to some predefined value
             // that this test will later override.
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
+            db.begin();
+            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
+            // This one tests that bind performs type conversion
+            oql.bind( (long) TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                stream.writeVerbose( "Updating object: " + object );
+                types = (TestTypes) enum.nextElement();
+                stream.writeVerbose( "Updating object: " + types );
             } else {
-                object = new TestObject();
-                stream.writeVerbose( "Creating new object: " + object );
-                db.create( object );
+                types = new TestTypes();
+                stream.writeVerbose( "Creating new object: " + types );
+                db.create( types );
             }
             db.commit();
+
+
+            stream.writeVerbose( "Testing date/time conversion" );
+            db.begin();
+            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
+            // This one tests that bind performs type conversion
+            oql.bind( (long) TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                stream.writeVerbose( "Date type: " + types.getDate().getClass() );
+                stream.writeVerbose( "Time type: " + types.getTime().getClass() );
+                stream.writeVerbose( "Deleting object: " + types );
+                db.remove( types );
+            } else {
+                stream.writeVerbose( "Error: Could not load types object" );
+                result = false; 
+            }
+            db.commit();
+            db.begin();
+            types = new TestTypes();
+            stream.writeVerbose( "Creating new object: " + types );
+            db.create( types );
+            db.commit();
+            stream.writeVerbose( "OK: Handled date/time types" );
+
+
+            /*
 
             stream.writeVerbose( "Testing null in required field" );
             db.begin();
@@ -151,6 +180,7 @@ public class TypeHandling
             }
             db.commit();
             stream.writeVerbose( "OK: Stored null in non-required field" );
+            */
 
             db.close();
         } catch ( Exception except ) {

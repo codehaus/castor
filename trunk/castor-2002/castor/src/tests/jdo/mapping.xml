@@ -63,6 +63,22 @@
   </class>
 
 
+  <!-- Classes for testing type handling -->
+  <class name="jdo.TestTypes" access="shared" identity="id">
+    <description>Test various type handling and conversions</description>
+    <map-to table="test_types" />
+    <field name="id" type="long">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="date" type="java.util.Date">
+      <sql name="tdt" type="date" />
+    </field>
+    <field name="time" type="java.util.Date">
+      <sql name="ttm" type="time" />
+    </field>
+  </class>
+
+
   <!-- Classes for key generator testing -->
   <class name="jdo.TestMaxObject" identity="id" key-generator="MAX">
     <description>Table used for MAX key generator testing</description>
