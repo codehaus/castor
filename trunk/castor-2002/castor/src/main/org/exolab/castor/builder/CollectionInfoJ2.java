@@ -60,7 +60,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         createAddMethod(method);
                             
         JType jType = getContentType().getJType();
-        method = new JMethod(new JClass("java.util.Collection"), "get"+cName);
+        method = new JMethod(new JClass("java.util.Enumeration"), "get"+cName);
         methods[ 1 ] = method;
         createGetMethod(method);
 
