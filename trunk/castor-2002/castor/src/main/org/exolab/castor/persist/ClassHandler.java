@@ -756,7 +756,7 @@ public final class ClassHandler
             if ( value == null )
                 return ( original != null );
             else if (value instanceof BigDecimal) 
-                return ( ( (BigDecimal) value ).compareTo( original ) != 0 );
+                return ( original != null && ( (BigDecimal) value ).compareTo( original ) != 0 );
             else 
                 return ! value.equals( original );
         } else {
