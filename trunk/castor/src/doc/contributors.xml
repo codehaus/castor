@@ -345,6 +345,13 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Layes" given="Jonathan"/>
+    <email>jlayes@zaplet.com</email>
+    <company id="zaplet"/>
+    <description>Some bug fixes to XML Unmarshaller</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Liebner" given="Stefan"/>
     <email>MailLiebner@gmx.ne</email>
     <description>Submitted code for generating mapping file from existing SQL database.</description>
@@ -934,6 +941,11 @@
   </company>
 
   <!-- Company Names (T-Z) -->
+
+  <company id="zaplet">
+    <name>Zaplet</name>
+    <url>www.zaplet.com</url>
+  </company>
 
   <!-- description of contributor types -->
 
