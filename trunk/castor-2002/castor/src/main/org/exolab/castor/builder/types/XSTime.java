@@ -92,7 +92,7 @@ public final class XSTime extends XSType{
      * Returns the maximum exclusive value that this XSTime can hold.
      * @return the maximum exclusive value that this XSTime can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Time getMaxExclusive() {
         return _maxExclusive;
@@ -102,7 +102,7 @@ public final class XSTime extends XSType{
      * Returns the maximum inclusive value that this XSTime can hold.
      * @return the maximum inclusive value that this XSTime can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Time getMaxInclusive() {
         return _maxInclusive;
@@ -113,8 +113,8 @@ public final class XSTime extends XSType{
      * Returns the minimum exclusive value that this XSTime can hold.
      * @return the minimum exclusive value that this XSTime can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Time getMinExclusive() {
         return _minExclusive;
@@ -124,7 +124,7 @@ public final class XSTime extends XSType{
      * Returns the minimum inclusive value that this XSTime can hold.
      * @return the minimum inclusive value that this can XSTime hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Time getMinInclusive() {
         return _minInclusive;
@@ -133,7 +133,7 @@ public final class XSTime extends XSType{
     /**
      * Sets the maximum exclusive value that this XSTime can hold.
      * @param max the maximum exclusive value this XSTime can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Time max) {
         _maxExclusive = max;
@@ -143,7 +143,7 @@ public final class XSTime extends XSType{
     /**
      * Sets the maximum inclusive value that this XSTime can hold.
      * @param max the maximum inclusive value this XSTime can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Time max) {
         _maxInclusive = max;
@@ -154,7 +154,7 @@ public final class XSTime extends XSType{
     /**
      * Sets the minimum exclusive value that this XSTime can hold.
      * @param max the minimum exclusive value this XSTime can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Time min) {
         _minExclusive = min;
@@ -164,7 +164,7 @@ public final class XSTime extends XSType{
     /**
      * Sets the minimum inclusive value that this XSTime can hold.
      * @param max the minimum inclusive value this XSTime can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Time min) {
         _minInclusive = min;

@@ -68,7 +68,7 @@ public class TimeValidator implements TypeValidator {
    /**
      * Sets the maximum exclusive value that this RecurringDuration can hold.
      * @param max the maximum exclusive value this RecurringDuration can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Time max) {
         _maxExclusive = max;
@@ -78,7 +78,7 @@ public class TimeValidator implements TypeValidator {
     /**
      * Sets the maximum inclusive value that this Recurring Duration can hold.
      * @param max the maximum inclusive value this RecurringDuration can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Time max) {
         _maxInclusive = max;
@@ -89,7 +89,7 @@ public class TimeValidator implements TypeValidator {
     /**
      * Sets the minimum exclusive value that this RecurringDuration can hold.
      * @param max the minimum exclusive value this RecurringDuration can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Time min) {
         _minExclusive = min;
@@ -99,7 +99,7 @@ public class TimeValidator implements TypeValidator {
     /**
      * Sets the minimum inclusive value that this RecurringDuration can hold.
      * @param max the minimum inclusive value this RecurringDuration can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Time min) {
         _minInclusive = min;

@@ -103,7 +103,7 @@ public  class XSDecimal extends XSType
      * Returns the maximum exclusive value that this XSInteger can hold.
      * @return the maximum exclusive value that this XSInteger can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public java.math.BigDecimal  getMaxExclusive() {
         return _maxExclusive;
@@ -113,7 +113,7 @@ public  class XSDecimal extends XSType
      * Returns the maximum inclusive value that this XSInteger can hold.
      * @return the maximum inclusive value that this XSInteger can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public java.math.BigDecimal  getMaxInclusive() {
         return _maxInclusive;
@@ -124,8 +124,8 @@ public  class XSDecimal extends XSType
      * Returns the minimum exclusive value that this XSInteger can hold.
      * @return the minimum exclusive value that this XSInteger can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public java.math.BigDecimal  getMinExclusive() {
         return _minExclusive;
@@ -135,7 +135,7 @@ public  class XSDecimal extends XSType
      * Returns the minimum inclusive value that this XSInteger can hold.
      * @return the minimum inclusive value that this XSInteger can hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public java.math.BigDecimal  getMinInclusive() {
         return _minInclusive;
@@ -168,7 +168,7 @@ public  class XSDecimal extends XSType
     /**
      * Sets the maximum exclusive value that this XSDecimal can hold.
      * @param max the maximum exclusive value this XSDecimal can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(java.math.BigDecimal  max) {
         _maxExclusive = max;
@@ -179,7 +179,7 @@ public  class XSDecimal extends XSType
     /**
      * Sets the maximum inclusive value that this XSDecimal can hold.
      * @param max the maximum inclusive value this XSDecimal can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(java.math.BigDecimal  max) {
         _maxInclusive = max;
@@ -190,7 +190,7 @@ public  class XSDecimal extends XSType
     /**
      * Sets the minimum exclusive value that this XSDecimal can hold.
      * @param max the minimum exclusive value this XSDecimal can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(java.math.BigDecimal min) {
         _minExclusive = min;
@@ -201,7 +201,7 @@ public  class XSDecimal extends XSType
     /**
      * Sets the minimum inclusive value that this XSDecimalcan hold.
      * @param max the minimum inclusive value this XSDecimal can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(java.math.BigDecimal  min) {
         _minInclusive = min;

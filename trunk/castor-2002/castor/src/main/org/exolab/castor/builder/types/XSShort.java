@@ -93,7 +93,7 @@ public final class XSShort extends XSPatternBase {
      * Returns the maximum exclusive value that this XSShort can hold.
      * @return the maximum exclusive value that this XSShort can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Short getMaxExclusive() {
         return maxExclusive;
@@ -103,7 +103,7 @@ public final class XSShort extends XSPatternBase {
      * Returns the maximum inclusive value that this XSShort can hold.
      * @return the maximum inclusive value that this XSShort can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Short getMaxInclusive() {
         return maxInclusive;
@@ -114,8 +114,8 @@ public final class XSShort extends XSPatternBase {
      * Returns the minimum exclusive value that this XSShort can hold.
      * @return the minimum exclusive value that this XSShort can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Short getMinExclusive() {
         return minExclusive;
@@ -125,7 +125,7 @@ public final class XSShort extends XSPatternBase {
      * Returns the minimum inclusive value that this XSShort can hold.
      * @return the minimum inclusive value that this XSShort can hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Short getMinInclusive() {
         return minInclusive;
@@ -148,7 +148,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSShort can hold.
      * @param max the maximum exclusive value this XSShort can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(short max) {
         maxExclusive = new Short(max);
@@ -158,7 +158,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSShort can hold.
      * @param max the maximum exclusive value this XSShort can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Short max) {
         maxExclusive = max;
@@ -168,7 +168,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSShort can hold.
      * @param max the maximum inclusive value this XSShort can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(short max) {
         maxInclusive = new Short(max);
@@ -178,7 +178,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSShort can hold.
      * @param max the maximum inclusive value this XSShort can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Short max) {
         maxInclusive = max;
@@ -189,7 +189,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSShort can hold.
      * @param max the minimum exclusive value this XSShort can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(short min) {
         minExclusive = new Short(min);
@@ -199,7 +199,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSShort can hold.
      * @param max the minimum exclusive value this XSShort can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Short min) {
         minExclusive = min;
@@ -209,7 +209,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSShort can hold.
      * @param max the minimum inclusive value this XSShort can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(short min) {
         minInclusive = new Short(min);
@@ -219,7 +219,7 @@ public final class XSShort extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSShort can hold.
      * @param max the minimum inclusive value this XSShort can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Short min) {
         minInclusive = min;

@@ -94,7 +94,7 @@ public final class XSByte extends XSPatternBase {
      * Returns the maximum exclusive value that this XSByte can hold.
      * @return the maximum exclusive value that this XSByte can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Byte getMaxExclusive() {
         return maxExclusive;
@@ -104,7 +104,7 @@ public final class XSByte extends XSPatternBase {
      * Returns the maximum inclusive value that this XSByte can hold.
      * @return the maximum inclusive value that this XSByte can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Byte getMaxInclusive() {
         return maxInclusive;
@@ -115,8 +115,8 @@ public final class XSByte extends XSPatternBase {
      * Returns the minimum exclusive value that this XSByte can hold.
      * @return the minimum exclusive value that this XSByte can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Byte getMinExclusive() {
         return minExclusive;
@@ -126,7 +126,7 @@ public final class XSByte extends XSPatternBase {
      * Returns the minimum inclusive value that this XSByte can hold.
      * @return the minimum inclusive value that this XSByte can hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Byte getMinInclusive() {
         return minInclusive;
@@ -144,7 +144,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSByte can hold.
      * @param max the maximum exclusive value this XSByte can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(byte max) {
         maxExclusive = new Byte(max);
@@ -154,7 +154,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSByte can hold.
      * @param max the maximum exclusive value this XSByte can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Byte max) {
         maxExclusive = max;
@@ -164,7 +164,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSByte can hold.
      * @param max the maximum inclusive value this XSByte can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(byte max) {
         maxInclusive = new Byte(max);
@@ -174,7 +174,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSByte can hold.
      * @param max the maximum inclusive value this XSByte can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Byte max) {
         maxInclusive = max;
@@ -185,7 +185,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSByte can hold.
      * @param max the minimum exclusive value this XSByte can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(byte min) {
         minExclusive = new Byte(min);
@@ -195,7 +195,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSByte can hold.
      * @param max the minimum exclusive value this XSByte can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Byte min) {
         minExclusive = min;
@@ -205,7 +205,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSByte can hold.
      * @param max the minimum inclusive value this XSByte can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(byte min) {
         minInclusive = new Byte(min);
@@ -215,7 +215,7 @@ public final class XSByte extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSByte can hold.
      * @param max the minimum inclusive value this XSByte can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Byte min) {
         minInclusive = min;

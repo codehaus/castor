@@ -94,7 +94,7 @@ public final class XSInt extends XSPatternBase {
      * Returns the maximum exclusive value that this XSInt can hold.
      * @return the maximum exclusive value that this XSInt can hold. If
      * no maximum exclusive value has been set, Null will be returned
-     * @see getMaxInclusive
+     * @see #getMaxInclusive
     **/
     public Integer getMaxExclusive() {
         return maxExclusive;
@@ -104,7 +104,7 @@ public final class XSInt extends XSPatternBase {
      * Returns the maximum inclusive value that this XSInt can hold.
      * @return the maximum inclusive value that this XSInt can hold. If
      * no maximum inclusive value has been set, Null will be returned
-     * @see getMaxExclusive
+     * @see #getMaxExclusive
     **/
     public Integer getMaxInclusive() {
         return maxInclusive;
@@ -115,8 +115,8 @@ public final class XSInt extends XSPatternBase {
      * Returns the minimum exclusive value that this XSInt can hold.
      * @return the minimum exclusive value that this XSInt can hold. If
      * no minimum exclusive value has been set, Null will be returned
-     * @see getMinInclusive
-     * @see setMaxInclusive
+     * @see #getMinInclusive
+     * @see #setMaxInclusive
     **/
     public Integer getMinExclusive() {
         return minExclusive;
@@ -126,7 +126,7 @@ public final class XSInt extends XSPatternBase {
      * Returns the minimum inclusive value that this XSInt can hold.
      * @return the minimum inclusive value that this XSInt can hold. If
      * no minimum inclusive value has been set, Null will be returned
-     * @see getMinExclusive
+     * @see #getMinExclusive
     **/
     public Integer getMinInclusive() {
         return minInclusive;
@@ -149,7 +149,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSInt can hold.
      * @param max the maximum exclusive value this XSInt can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(int max) {
         maxExclusive = new Integer(max);
@@ -159,7 +159,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum exclusive value that this XSInt can hold.
      * @param max the maximum exclusive value this XSInt can be
-     * @see setMaxInclusive
+     * @see #setMaxInclusive
     **/
     public void setMaxExclusive(Integer max) {
         maxExclusive = max;
@@ -169,7 +169,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSInt can hold.
      * @param max the maximum inclusive value this XSInt can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(int max) {
         maxInclusive = new Integer(max);
@@ -179,7 +179,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the maximum inclusive value that this XSInt can hold.
      * @param max the maximum inclusive value this XSInt can be
-     * @see setMaxExclusive
+     * @see #setMaxExclusive
     **/
     public void setMaxInclusive(Integer max) {
         maxInclusive = max;
@@ -190,7 +190,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSInt can hold.
      * @param max the minimum exclusive value this XSInt can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(int min) {
         minExclusive = new Integer(min);
@@ -200,7 +200,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the minimum exclusive value that this XSInt can hold.
      * @param max the minimum exclusive value this XSInt can be
-     * @see setMinInclusive
+     * @see #setMinInclusive
     **/
     public void setMinExclusive(Integer min) {
         minExclusive = min;
@@ -210,7 +210,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSInt can hold.
      * @param max the minimum inclusive value this XSInt can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(int min) {
         minInclusive = new Integer(min);
@@ -220,7 +220,7 @@ public final class XSInt extends XSPatternBase {
     /**
      * Sets the minimum inclusive value that this XSInt can hold.
      * @param max the minimum inclusive value this XSInt can be
-     * @see setMinExclusive
+     * @see #setMinExclusive
     **/
     public void setMinInclusive(Integer min) {
         minInclusive = min;
