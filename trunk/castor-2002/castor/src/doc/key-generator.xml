@@ -129,6 +129,10 @@
            <tr><td>grab-size</td><td>The number of new keys the key
                    generator should grab from the sequence table at a time.</td>
                    <td>Optional, default="10"</td></tr>
+           <tr><td>same-connection</td><td>To use the same Connection for writing to the sequence table, values:
+                                "true"/"false". This is needed when working in EJB environment,
+                                though less efficient.</td>
+                   <td>Optional, default="false"</td></tr>
          </table></p>
       <p>Note, that the class HighLowKeyGenerator is not final, so you can 
          extend it in order to implement other variants of HIGH/LOW
