@@ -78,7 +78,7 @@ import org.exolab.castor.util.DTDResolver;
  */
 public class BatchUpdateSQL {
     private static boolean verbose;
-    private static int firstUrl;
+    private static int cur;
     private static boolean skipgrants;
     private static boolean fromIS;
 
@@ -91,45 +91,34 @@ public class BatchUpdateSQL {
         System.out.println( "    pipe           -- create script is piped" );
     }
     public static void main( String args[] ) throws Exception {
-        if ( args.length < 2 ) {
+        while ( cur < args.length && args[cur].startsWith( "-" ) ) {
+            if ( args[cur].equals("-verbose") ) {
+                verbose  = true;
+            } else if ( args[cur].equals("-skipgrants") ) {
+                skipgrants = true;
+            } else if ( args[cur].equals("-pipe") ) {
+                fromIS = true;
+            }
+            cur++;
+        }
+        if ( (fromIS && cur >= args.length) || (!fromIS && cur >= (args.length-1)) ) {
             printUsage();
             return;
         }
-
-        if ( args[0].equals("-verbose") || args[1].equals("-verbose") || args[1].equals("-verbose") ) {
-            verbose = true;
+        if ( (fromIS && cur < (args.length-1)) || (!fromIS && cur < (args.length-2)) ) {
+            System.out.print( "argument(s) ignored:\t" );
+            for ( int i = (cur+(fromIS?1:2)); i < args.length; i++ ) {
+                System.out.print( args[i] + "\t" );
+            }
+            System.out.println();
         }
 
-        if ( args[0].equals("-skipgrants") || args[1].equals("-skipgrants") || args[2].equals("-skipgrants") ) {
-            skipgrants = true;
-        }
-
-        if ( args[0].equals("-pipe") || args[1].equals("-pipe") || args[2].equals("-pipe") ) {
-            fromIS = true;
-        }
-
-        // skip non valid options
-        for ( int i = firstUrl; i < args.length; i++ ) {
-            if ( args[i].startsWith("-") )
-                firstUrl++;
-            else
-                break;
-        }
-
-        if ( args.length == firstUrl+1 ) {
-            fromIS = true;
-        }
-        if ( args.length == firstUrl+2 && fromIS == true ) {
-            printUsage();
-            return;
-        }
-
-        Connection c = getConnection( args[firstUrl] );
+        Connection c = getConnection( args[cur] );
         Statement stat = c.createStatement();
         BufferedReader r;
         if ( !fromIS ) {
             r = new BufferedReader( 
-                   new InputStreamReader( (new URL(args[firstUrl+1])).openStream() ) );
+                   new InputStreamReader( (new URL(args[cur+1])).openStream() ) );
         } else {
             r = new BufferedReader( new InputStreamReader( System.in ) );
         }
