@@ -28,7 +28,7 @@ import junit.framework.*;
 import junit.extensions.*;
 import org.xml.sax.InputSource;
 
-import com.intalio.XMLDiff.*;
+import com.intalio.utils.XMLDiff;
 
 /**
  * This class is used to test the introspection feature of Castor.
