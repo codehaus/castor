@@ -115,6 +115,16 @@ public interface Persistent
 
 
     /**
+     * Called to indicate that an object is to be created in persistent
+     * storage. This method is called during db.create().
+     *
+     * @param db The database in which this object will be created
+     */
+    public void jdoBeforeCreate( Database db )
+        throws Exception;
+
+
+    /**
      * Called to indicate that an object has been created in persistent
      * storage. This method is called during db.create().
      */

@@ -550,6 +550,9 @@ public abstract class TransactionContext
         }
 
         try {
+            if ( handler.getCallback() != null ) {
+                handler.getCallback().creating( object, _db );
+            }
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
             if ( entry == null) 

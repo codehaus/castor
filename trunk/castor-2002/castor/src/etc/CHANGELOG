@@ -1,6 +1,10 @@
 Version 0.8.9
 -------------
 
+JDO:    jdoBeforeCreate() callback method has been added to Persistent
+        interface. It is called during db.create() just before creating
+        object in the persistent storage (Oleg Nitz).
+
 JDO:    InstantDB driver (contributed by I. Burak Ozyurt <bozyurt@san.rr.com>).
 
 JDO:    Replacing of extended object in the cache on load of extending object
