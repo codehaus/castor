@@ -13,7 +13,7 @@ drop table   test_master;
 create table test_master (
   id        int           not null,
   value     varchar(200)  not null,
-  group_id  int           not null
+  group_id  int           null
 );
 create unique index test_master_pk
   on test_master ( id );
