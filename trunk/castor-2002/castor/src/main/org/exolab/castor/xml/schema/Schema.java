@@ -95,7 +95,7 @@ public class Schema extends Annotated {
      * The attributeFormDefault property
     **/
     private Form _attributeFormDefault = null;
-    
+
     /**
      * The global AttribteGroups for this Schema
     **/
@@ -110,7 +110,7 @@ public class Schema extends Annotated {
      * The value of the block attribute.
     **/
     private BlockList _block = null;
-    
+
     /**
      * A list of defined architypes
     **/
@@ -120,7 +120,7 @@ public class Schema extends Annotated {
      * The elementFormDefault attribute for this Schema
     **/
     private Form _elementFormDefault = null;
-    
+
     /**
      * A list of defined elements
     **/
@@ -130,17 +130,17 @@ public class Schema extends Annotated {
      * The value of the final attribute.
     **/
     private FinalList _final = null;
-    
+
     /**
      * A list of defined top-levels groups
      */
     private Hashtable _groups = null;
-    
+
     /**
      * The ID for this Schema
     **/
     private String _id = null;
-    
+
     /**
      * A list of imported schemas
     **/
@@ -173,7 +173,7 @@ public class Schema extends Annotated {
      * A list of defined SimpleTypes
     **/
     private Hashtable _simpleTypes = null;
-    
+
     /**
      * The targetNamespace for this Schema
     **/
@@ -184,11 +184,11 @@ public class Schema extends Annotated {
      * attribute
     **/
     private String _version  = null;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
-    
+
     /**
      * Creates a new SchemaDef
     **/
@@ -524,7 +524,7 @@ public class Schema extends Annotated {
     public Form getAttributeFormDefault() {
         return _attributeFormDefault;
     } //-- getAttributeFormDefault
-    
+
     /**
      * Returns an Enumeration of all top-level Attribute declarations
      * @return an Enumeration of all top-level Attribute declarations
@@ -640,7 +640,7 @@ public class Schema extends Annotated {
     public BlockList getBlockDefault() {
         return _block;
     } //-- getBlockDefault
-    
+
     /**
      * Gets a built in type's name given its code.
      */
@@ -748,7 +748,7 @@ public class Schema extends Annotated {
     public Enumeration getElementDecls() {
         return _elements.elements();
     } //-- getElementDecls
-    
+
     /**
      * Returns the elementFormDefault property of this Schema.
      *
@@ -759,7 +759,7 @@ public class Schema extends Annotated {
     public Form getElementFormDefault() {
         return _elementFormDefault;
     } //-- getElementFormDefault
-    
+
     /**
      * Returns the default FinalList for this Schema.
      *
@@ -768,7 +768,7 @@ public class Schema extends Annotated {
     public FinalList getFinalDefault() {
         return _final;
     } //-- getFinalDefault
-    
+
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
@@ -803,7 +803,7 @@ public class Schema extends Annotated {
         //-- Get SimpleType object
         SimpleType result = null;
         if (ns == null) {
-            
+
             //-- first check user-defined types
             result = (SimpleType)_simpleTypes.get(name);
             if (result != null) {
@@ -1125,7 +1125,7 @@ public class Schema extends Annotated {
     } //-- setBlockDefault
 
     /**
-     * Sets the default Block values for this Schema. 
+     * Sets the default Block values for this Schema.
      *
      * @param block the default Block values to set for this Schema.
     **/
@@ -1142,7 +1142,7 @@ public class Schema extends Annotated {
     public void setElementFormDefault(Form elementFormDefault) {
         _elementFormDefault = elementFormDefault;
     } //-- setElementFormDefault
-    
+
     /**
      * Sets the default FinalList for this Schema.
      *
@@ -1153,14 +1153,14 @@ public class Schema extends Annotated {
     } //-- setFinalDefault
 
     /**
-     * Sets the default final values for this Schema. 
+     * Sets the default final values for this Schema.
      *
      * @param finalValues the default final values to set for this Schema.
     **/
     public void setFinalDefault(String finalValues) {
         _final = new FinalList(finalValues);
     } //-- setFinalDefault
-    
+
     /**
      * Set the schemaLocation for this schema. This is useful
      * when this schema has been imported by another schema
@@ -1197,6 +1197,8 @@ public class Schema extends Annotated {
      * @see <B>&sect; 2.7 XML Schema Part 1: Structures</B>
     **/
     public void setTargetNamespace(String targetNamespace) {
+        if (targetNamespace != null && targetNamespace.length() == 0)
+            throw new IllegalStateException("an empty string is not a valid namespace.");
         this._targetNamespace = targetNamespace;
     } //-- setTargetNamespace
 
