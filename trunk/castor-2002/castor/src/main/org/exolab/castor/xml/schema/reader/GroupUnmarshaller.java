@@ -129,8 +129,10 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.GROUP.equals(element)) {
             //-- set name
             _group.setName(atts.getValue("name"));
+            _group.setIsModelGroupDefinition(true);
         }
         else {
+            _group.setIsModelGroupDefinition(false);
 
             if (SchemaNames.SEQUENCE.equals(element)) {
                 _group.setOrder(Order.seq);
