@@ -2,11 +2,17 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1763.
+       Improved exception handling in the persist.cache package, by ensuring proper exception
+       chaining.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1763
+       (Werner - 20041013)
+
 JDO:   Fixed bug 1628.
        Brought configuration of <data-source> in line with <driver>, switching
        from <params> to a sequence of <param> elements.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1628
-       (Werner - 20040901)
+       (Werner - 20041011)
 
 JDO:   Added the Castor Ant Task and an Ant target to the build jar.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=885
