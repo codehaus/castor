@@ -313,8 +313,8 @@ public abstract class TransactionContext
                 throw new PersistenceException( "persist.multipleLoad", object.getClass(), identity );
             if ( entry.deleted )
                 throw new ObjectNotFoundException( object.getClass(), identity );
-            if ( object.getClass() != entry.javaClass )
-                throw new PersistenceException( "persist.typeMismatch", object.getClass(), entry.javaClass );
+            if ( object.getClass() != entry.object.getClass() )
+                throw new PersistenceException( "persist.typeMismatch", object.getClass(), entry.object.getClass() );
             if ( entry.created )
                 return false;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
@@ -430,9 +430,9 @@ public abstract class TransactionContext
                                                 handler.getJavaClass(), identity );
             if ( entry.deleted )
                 throw new ObjectNotFoundException( handler.getJavaClass(), identity );
-            if ( ! handler.getJavaClass().isAssignableFrom( entry.javaClass ) )
+            if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceException( "persist.typeMismatch",
-                                                handler.getJavaClass(), entry.javaClass );
+                                                handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
                 return entry.object;
             if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
@@ -757,6 +757,7 @@ public abstract class TransactionContext
         Enumeration enum;
         ObjectEntry entry;
         Object      object;
+        int         count;
 
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( "persist.markedRollback" );
@@ -771,33 +772,46 @@ public abstract class TransactionContext
 
         try {
             _status = Status.STATUS_PREPARING;
-            enum = _objects.elements();
-            while ( enum.hasMoreElements() ) {
-                entry = (ObjectEntry) enum.nextElement();
-                // If the object has been deleted, it is removed from the
-                // underlying database. This call will detect duplicate
-                // removal attempts. Otherwise the object is stored in
-                // the database.
-                if ( entry.deleted ) {
-                    entry.engine.delete( this, entry.javaClass, entry.oid.getIdentity() );
-                } else {
-                    Object       identity;
-                    ClassHandler handler;
-
-                    // When storing the object it's OID might change
-                    // if the primary identity has been changed
-                    handler = entry.engine.getClassHandler( entry.javaClass );
-                    identity = handler.getIdentity( entry.object );
-                    if ( identity == null )
-                        throw new TransactionAbortedException( "persist.noIdentity",
-                                                               handler.getJavaClass(), null );
-                    entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+            count = 0;
+            while ( count < _objects.size() ) {
+                count = 0;
+                enum = _objects.elements();
+                while ( enum.hasMoreElements() ) {
+                    entry = (ObjectEntry) enum.nextElement();
+                    // If the object has been deleted, it is removed from the
+                    // underlying database. This call will detect duplicate
+                    // removal attempts. Otherwise the object is stored in
+                    // the database.
+                    if ( entry.prepared )
+                        ++count;
+                    else if ( entry.deleted ) {
+                        entry.engine.delete( this, entry.object.getClass(), entry.oid.getIdentity() );
+                        entry.prepared = true;
+                    } else {
+                        Object       identity;
+                        ClassHandler handler;
+                        
+                        // When storing the object it's OID might change
+                        // if the primary identity has been changed
+                        handler = entry.engine.getClassHandler( entry.object.getClass() );
+                        identity = handler.getIdentity( entry.object );
+                        if ( identity == null )
+                            throw new TransactionAbortedException( "persist.noIdentity",
+                                                                   handler.getJavaClass(), null );
+                        entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
+                        entry.prepared = true;
+                    }
                 }
             }
             _status = Status.STATUS_PREPARED;
             return true;
         } catch ( Exception except ) {
             _status = Status.STATUS_MARKED_ROLLBACK;
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                entry.prepared = false;
+            }
             // Any error is reported as transaction aborted
             throw new TransactionAbortedException( except );
         }
@@ -867,6 +881,12 @@ public abstract class TransactionContext
             if ( except instanceof TransactionAbortedException )
                 throw (TransactionAbortedException) except;
             throw new TransactionAbortedException( except );
+        } finally {
+            enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                entry = (ObjectEntry) enum.nextElement();
+                entry.prepared = false;
+            }
         }
     }
 
@@ -998,38 +1018,6 @@ public abstract class TransactionContext
 
 
     /**
-     * Returns true if the object is persistent in this transaction.
-     *
-     * @param engine The persistence engine used to create this object
-     * @param oid The object's OID
-     * @return True if persistent in transaction
-     */
-    public boolean isPersistent( PersistenceEngine engine, Class type, Object identity )
-    {
-        return ( getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) ) != null );
-    }
-
-
-    public void markDelete( PersistenceEngine engine, Class type, Object identity )
-        throws LockNotGrantedException, PersistenceException
-    {
-        ObjectEntry entry;
-
-        entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
-        if ( entry != null && ! entry.deleted ) {
-            entry.deleted = true;
-            try {
-                entry.engine.writeLock( this, entry.oid, _lockTimeout );
-            } catch ( ObjectDeletedException except ) {
-                // Object has been deleted outside this transaction,
-                // forget about it
-                removeObjectEntry( entry.object );
-            }
-        }
-    }
-
-
-    /**
      * Returns the status of this transaction.
      */
     public int getStatus()
@@ -1076,6 +1064,31 @@ public abstract class TransactionContext
     ObjectLock getWaitOnLock()
     {
         return _waitOnLock;
+    }
+
+
+    /**
+     * Marks an object for deletion. Used during the preparation stage to
+     * delete an attached relation by marking the object for deletion
+     * (if not already deleted) and preparing it a second time.
+     */
+    void markDelete( PersistenceEngine engine, Class type, Object identity )
+        throws LockNotGrantedException, PersistenceException
+    {
+        ObjectEntry entry;
+
+        entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
+        if ( entry != null && ! entry.deleted ) {
+            entry.deleted = true;
+            entry.prepared = false;
+            try {
+                entry.engine.writeLock( this, entry.oid, _lockTimeout );
+            } catch ( ObjectDeletedException except ) {
+                // Object has been deleted outside this transaction,
+                // forget about it
+                removeObjectEntry( entry.object );
+            }
+        }
     }
 
 
@@ -1173,23 +1186,40 @@ public abstract class TransactionContext
     static final class ObjectEntry
     {
 
+        /**
+         * The engine with which the object was loaded/created.
+         */
         final PersistenceEngine  engine;
 
+        /**
+         * The object.
+         */
         final Object             object;
 
-        final Class              javaClass;
-
+        /**
+         * The OID of the object.
+         */
         OID                      oid;
 
+        /**
+         * True if the object has been marked for deletion.
+         */
         boolean                  deleted;
 
+        /**
+         * True if the object has been created in this transaction.
+         */
         boolean                  created;
+
+        /**
+         * True if the object has been prepared and may be committed.
+         */
+        boolean                  prepared;
 
         ObjectEntry( PersistenceEngine  engine, Object object )
         {
             this.engine = engine;
             this.object = object;
-            javaClass = object.getClass();
         }
 
     }
