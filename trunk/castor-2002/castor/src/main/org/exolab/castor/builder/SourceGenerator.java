@@ -227,6 +227,12 @@ public class SourceGenerator {
          */
         public static final String EqualsMethod = "org.exolab.castor.builder.equalsmethod";
 
+        /**
+         * Property specifying if we want to use Wrapper Objects instead
+         * of primitives (eg java.lang.Float instead of float)
+         */
+        public static final String Wrapper = "org.exolab.castor.builder.primitivetowrapper";
+
 
         /**
          * The name of the configuration file.
@@ -265,6 +271,12 @@ public class SourceGenerator {
      */
      private static boolean _equalsMethod = false;
 
+     /**
+      * Set to true if you want to use Object instead of
+      * primitive (eg java.lang.Float instead of float).
+      */
+      private static boolean _wrapper = false;
+
 	/**
      * The default properties loaded from the configuration file.
      */
@@ -273,7 +285,10 @@ public class SourceGenerator {
 	/**
 	 * Namespace URL to Java package mapping
 	 */
-	private static java.util.Hashtable _nspackages;
+	private static java.util.Hashtable _nspackages = null;
+    static {
+        _nspackages = new Hashtable();
+    }
 
 
     /**
@@ -727,7 +742,7 @@ public class SourceGenerator {
 
             //only create classes for types that are not imported
             if (xmlType.getSchema() == elementDecl.getSchema())
-                 processComplexType((ComplexType)xmlType, sInfo);            
+                 processComplexType((ComplexType)xmlType, sInfo);
 
             for (int i = 0; i < classes.length; i++)
                  processJClass(classes[i], sInfo);
@@ -991,8 +1006,10 @@ public class SourceGenerator {
      * @return true if bound properties are enabled.
     **/
     public static boolean boundPropertiesEnabled() {
-        getDefault();
-        return _boundProperties;
+        //ensure the property is loaded
+        //this is needed when specifying properties at run-time by setDefaultProperties
+        boolean bound = getDefault().getProperty(Property.BOUND_PROPERTIES,"").equalsIgnoreCase("true");
+        return  _boundProperties || bound;
     } //-- boundPropertiesEnabled
 
 	/**
@@ -1007,18 +1024,37 @@ public class SourceGenerator {
      * @return true if bound properties are enabled.
     **/
     public static boolean equalsMethod() {
+        //ensure the property is loaded
+        //this is needed when specifying properties at run-time by setDefaultProperties
+        boolean equals = getDefault().getProperty(Property.EqualsMethod,"").equalsIgnoreCase("true");
         return _equalsMethod;
-    } //-- boundPropertiesEnabled
+    } //-- equalsMethod
 
     /**
      * Sets the 'equalsmethod' property
-     * @param boolean the value we want to ues
+     * @param boolean the value we want to use
      */
      public static void setEqualsMethod(boolean equals) {
-         //ensure the other properties are loaded
-         getDefault();
          _equalsMethod = equals;
      }
+
+     /**
+      * Returns true if primitive types have to be used
+      * as Objects (eg. replacing float by java.lang.Float).
+      */
+    public static boolean usePrimitiveWrapper() {
+        //ensure the property is loaded
+       //this is needed when specifying properties at run-time by setDefaultProperties
+        boolean wrapper = getDefault().getProperty("org.exolab.castor.builder.primitivetowrapper","").equalsIgnoreCase("true");
+        return _wrapper || wrapper;
+    }
+     /**
+      * Sets the 'primitivetowrapper' property
+      * @param boolean the value we want to use.
+      */
+      public static void setPrimitiveWrapper(boolean wrapper) {
+          _wrapper = wrapper;
+      }
     /**
 	 * Tests the org.exolab.castor.builder.javaclassmapping property for the 'element' value.
 	 * @return True if the Source Generator is mapping schema elements to Java classes.
@@ -1088,7 +1124,6 @@ public class SourceGenerator {
 		_default = Configuration.loadProperties( Property.ResourceName, Property.FileName);
 
 		// Parse XML namespace and package list
-		_nspackages = new Hashtable();
 		String prop = _default.getProperty( Property.NamespacePackages, "");
 		StringTokenizer tokens = new StringTokenizer(prop, ",");
 		while(tokens.hasMoreTokens())
@@ -1104,13 +1139,17 @@ public class SourceGenerator {
 
 		//-- bound properties
 		prop = _default.getProperty( Property.BOUND_PROPERTIES, "");
-		_boundProperties = prop.equalsIgnoreCase("true");
+		_boundProperties = _boundProperties || prop.equalsIgnoreCase("true");
 
         //-- Equals method?
         prop = _default.getProperty( Property.EqualsMethod, "");
-		_equalsMethod = prop.equalsIgnoreCase("true");
+		_equalsMethod = _equalsMethod || prop.equalsIgnoreCase("true");
 
-		initBindingType();
+        //-- Primitive to Wrapper
+        prop = _default.getProperty(Property.Wrapper, "");
+        _wrapper = _wrapper || prop.equalsIgnoreCase("true");
+
+        initBindingType();
 
     } //-- load
 
