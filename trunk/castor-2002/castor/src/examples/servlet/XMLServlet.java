@@ -70,7 +70,7 @@ import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
 import com.kvisco.xsl.*;
 import com.kvisco.xsl.util.*;
-
+import com.kvisco.net.impl.URILocationImpl;
 
 /**
  * Extends {@link HttpServlet} to provide XML output capabilities.
@@ -224,8 +224,8 @@ public abstract class XMLServlet
             try {
                 _stylesheet = _xslReader.read(path);
             }
-            catch(XSLException xslx) {
-                throw new IllegalArgumentException(xslx.toString());
+            catch(Exception ex) {
+                throw new IllegalArgumentException(ex.toString());
             }
             //_stylesheet = new XSLTInputSource( _ctx.getResourceAsStream( path ) );
             
@@ -240,10 +240,12 @@ public abstract class XMLServlet
                 
             String uri = source.getSystemId();
             try {
-                _stylesheet = _xslReader.read(source.getCharacterStream(), uri);
+                URILocationImpl location 
+                    = new URILocationImpl(source.getCharacterStream(), uri);
+                _stylesheet = _xslReader.read(location);
             }
-            catch(XSLException xslx) {
-                throw new IllegalArgumentException(xslx.toString());
+            catch(Exception ex) {
+                throw new IllegalArgumentException(ex.toString());
             }
             //_stylesheet = new XSLTInputSource( source );
         }
