@@ -381,10 +381,7 @@ public class DatabaseImpl
     }
     
     /**
-     * Get's the CacheManager-instance.
-     * Call getCacheManager for every Database-instances.
-     * 
-     * @return the CacheManager-instance.
+     * @see Database#getCacheManager()
      */
     public CacheManager getCacheManager() {
         if(cacheManager == null)
