@@ -145,6 +145,10 @@
         <display>The Examples</display>
       </navLink>
       <navLink>
+        <url>test-framework.xml</url>
+        <display>Test Framework - JDO</display>
+      </navLink>
+      <navLink>
         <url>conf-lib.xml</url>
         <display>Configuration</display>
       </navLink>
