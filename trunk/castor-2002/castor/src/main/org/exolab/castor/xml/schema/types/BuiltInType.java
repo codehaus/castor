@@ -148,35 +148,56 @@ public abstract class BuiltInType extends Datatype {
     
     
     /**
+     * the name of the negative integer type
+    **/
+    public static final String NEGATIVE_INTEGER_NAME    = "negative-integer";
+    
+    /**
+     * the type associated with negative-integer
+    **/
+    public static final short  NEGATIVE_INTEGER_TYPE    = 9;
+    
+    /**
      * The name of the NMTOKEN type
     **/
-    public static final String NMTOKEN_NAME        = "NMTOKEN";
+    public static final String NMTOKEN_NAME             = "NMTOKEN";
     
     /**
      * The type associated with NMTOKEN
     **/
-    public static final short  NMTOKEN_TYPE        = 9;
+    public static final short  NMTOKEN_TYPE             = 10;
+    
+    /**
+     * the name of the positive integer type
+    **/
+    public static final String POSITIVE_INTEGER_NAME    = "positive-integer";
+    
+    /**
+     * the type associated with positive-integer
+    **/
+    public static final short  POSITIVE_INTEGER_TYPE    = 11;
+    
     
     /**
      * The name of the string type
     **/
-    public static final String STRING_NAME         = "string";
+    public static final String STRING_NAME              = "string";
     
     /**
      * The type associated with string
     **/
-    public static final short  STRING_TYPE         = 10;
+    public static final short  STRING_TYPE              = 12;
             
 
     /**
      * The name of the timeInstant type
     **/
-    public static final String TIME_INSTANT_NAME   = "timeInstant";
+    public static final String TIME_INSTANT_NAME        = "timeInstant";
     
     /**
      * The type associated with timeInstant
     **/
-    public static final short  TIME_INSTANT_TYPE   = 11;
+    public static final short  TIME_INSTANT_TYPE        = 13;
     
     
     //----------------/
