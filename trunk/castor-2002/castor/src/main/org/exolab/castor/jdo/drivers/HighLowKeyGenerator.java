@@ -163,8 +163,9 @@ public class HighLowKeyGenerator implements KeyGenerator
                 sql = JDBCSyntax.Select + _seqValue + JDBCSyntax.From + _seqTable +
                     JDBCSyntax.Where + _seqKey + QueryExpression.OpEquals +
                     JDBCSyntax.Parameter;
-                stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
-                                                ResultSet.CONCUR_UPDATABLE );
+                stmt = conn.prepareStatement( sql );
+                // stmt = conn.prepareStatement( sql, ResultSet.TYPE_FORWARD_ONLY,
+                //                                 ResultSet.CONCUR_UPDATABLE );
                 stmt.setString(1, tableName);
 
                 rs = stmt.executeQuery();
@@ -206,8 +207,9 @@ public class HighLowKeyGenerator implements KeyGenerator
                     max = _grabSize;
                 }
             } catch ( SQLException ex ) {
+ex.printStackTrace();
                 throw new PersistenceException( Messages.format(
-                        "persist.keyGenSQL", ex.toString() ) );
+                        "persist.keyGenSQL", ex.toString() ), ex );
             } finally {
                 if ( stmt != null ) {
                     try {
