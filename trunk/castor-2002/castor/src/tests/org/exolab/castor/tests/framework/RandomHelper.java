@@ -128,7 +128,7 @@ public class RandomHelper {
      */
     public static ArrayList getRandom(ArrayList al, Class c)
         throws InstantiationException, IllegalAccessException {
-        return new ArrayList(getRandom(new Vector(al), c));
+        return new ArrayList(RandomHelper.getRandom(new Vector(al), c));
     }
 
 
@@ -165,7 +165,6 @@ public class RandomHelper {
     public static TimeDuration getRandom(TimeDuration date, Class c) {
         long randLong = (long)_rand.nextInt();
         randLong = (randLong > 0)?randLong : -randLong;
-        System.out.println(randLong);
         return new TimeDuration(randLong);
     }
 
