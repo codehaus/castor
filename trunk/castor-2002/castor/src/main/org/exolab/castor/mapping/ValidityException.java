@@ -60,24 +60,24 @@ import org.exolab.castor.util.CastorException;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class IntegrityException
+public class ValidityException
     extends CastorException
 {
 
 
-    public IntegrityException( String message, Object arg1 )
+    public ValidityException( String message, Object arg1 )
     {
         super( message, arg1 );
     }
 
 
-    public IntegrityException( String message, Object arg1, Object arg2 )
+    public ValidityException( String message, Object arg1, Object arg2 )
     {
         super( message, arg1, arg2 );
     }
 
 
-    public IntegrityException( Exception except )
+    public ValidityException( Exception except )
     {
         super( "mapping.nested", except.getMessage() );
     }
