@@ -760,8 +760,8 @@ public class SourceGenerator {
 	public static String lookupPackageLocation(String schemaLocation)
 	{
         if (schemaLocation == null) return "";
-
-		// Lookup Java package via schemaLocation
+        
+        // Lookup Java package via schemaLocation
 		//--Full path
         String javaPackage = (String) _locpackages.get(schemaLocation);
 		if(javaPackage==null) {
@@ -777,7 +777,7 @@ public class SourceGenerator {
             boolean found = false;
             while (keys.hasMoreElements() && !found) {
                 String key = (String)keys.nextElement();
-                if (key.endsWith(schemaLocation)) {
+                if (schemaLocation.endsWith(key)) {
                     javaPackage = (String) _locpackages.get(key);
                     found = true;
                 }
@@ -1346,7 +1346,9 @@ public class SourceGenerator {
 
         if (cmGroup == null)
             return;
-
+        //Some special code to handle the fact that the enumerate method will simply skip 
+        //the first group is the number of particle is one
+    
         Enumeration enum = cmGroup.enumerate();
 
         while (enum.hasMoreElements()) {
@@ -1371,6 +1373,7 @@ public class SourceGenerator {
                     break;
             }
         }
+    
     } //-- processContentModel
 
     /**
@@ -1420,7 +1423,23 @@ public class SourceGenerator {
                 _nspackages.put(choice.getNamespace(), temp.getName());
             }
             else if (choice.getSchemaLocation() != null) {
-                _locpackages.put(choice.getSchemaLocation(), temp.getName());
+                //1--Handle relative locations
+                String tempLocation = choice.getSchemaLocation(); 
+                String currentDir = System.getProperty("user.dir");
+                currentDir = currentDir.replace('\\', '/');
+                if (tempLocation.startsWith("./")) {
+                    tempLocation = tempLocation.substring(1);
+                    tempLocation = currentDir+tempLocation;
+                }
+                else if (tempLocation.startsWith("../")) {
+                     tempLocation = tempLocation.substring(3);
+                     int lastDir = currentDir.lastIndexOf('/');
+                     currentDir = currentDir.substring(0, lastDir+1);
+                     tempLocation = currentDir + tempLocation;
+                }
+                _locpackages.put(tempLocation, temp.getName());
+                currentDir = null;
+                tempLocation = null;
             }
         }
     }
