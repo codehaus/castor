@@ -7,6 +7,14 @@
       <p>Reference: <api package="org.exolab.castor.jdo">The Java Data Objects API</api></p>
     </header>
 
+	<section title="News">
+	
+	   <ul>
+	      <li><b>Release 0.9.6:</b> Changed above sections to use the new JDO2 object to load 
+	          configuration  and create Database instances.</li>
+	   </ul>
+	
+	</section>
     <section title="Opening A JDO Database">
 
       <p>Castor JDO supports two type of environments, client applications and J2EE servers.
