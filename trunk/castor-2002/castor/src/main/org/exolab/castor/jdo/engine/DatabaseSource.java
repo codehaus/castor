@@ -66,11 +66,12 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.mapping.Databases;
 import org.exolab.castor.jdo.mapping.Database;
 import org.exolab.castor.jdo.mapping.Param;
-import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.Include;
-import org.exolab.castor.jdo.schema.DTDResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.DTDResolver;
+import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.spi.Persistence;
@@ -96,7 +97,7 @@ public class DatabaseSource
     private DataSource        _dataSource;
 
 
-    private MappingTable      _mapTable = MappingTable.getDefaultMapping();
+    private MappingResolver    _mapResolver;
 
 
     private String            _dbName;
@@ -105,42 +106,42 @@ public class DatabaseSource
     private PersistenceEngine _engine;
 
 
+    private static MappingResolver _defaultMapping;
+
+
     private static Hashtable  _engines = new Hashtable();
     private static Hashtable  _dataSources = new Hashtable();
 
 
-    DatabaseSource( String dbName, String url, Properties props, MappingTable mapTable )
+    DatabaseSource( String dbName, String url, Properties props, MappingResolver mapResolver )
 	throws MappingException
     {
 	_driverUrl = url;
 	_driverProps = props;
-	if ( mapTable != null )
-	    _mapTable = mapTable;
+	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
 	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
 	_engines.put( _engine, this );
     }
 
 
-    DatabaseSource( String dbName, DataSource dataSource, MappingTable mapTable )
+    DatabaseSource( String dbName, DataSource dataSource, MappingResolver mapResolver )
 	throws MappingException
     {
 	_dataSource = dataSource;
-	if ( mapTable != null )
-	    _mapTable = mapTable;
+	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
 	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
 	_engines.put( _engine, this );
     }
 
 
-    DatabaseSource( String dbName, MappingTable mapTable )
+    DatabaseSource( String dbName, MappingResolver mapResolver )
 	throws MappingException
     {
-	if ( mapTable != null )
-	    _mapTable = mapTable;
+	_mapResolver = ( mapResolver == null ? _defaultMapping : mapResolver );
 	_dbName = dbName;
-	_engine = new PersistenceEngineFactory().createEngine(  mapTable, new SQLEngineFactory(), null );
+	_engine = new PersistenceEngineFactory().createEngine( _mapResolver, new SQLEngineFactory(), null );
 	_engines.put( _engine, this );
     }
 
@@ -153,7 +154,7 @@ public class DatabaseSource
 	enum = _dataSources.elements();
 	while ( enum.hasMoreElements() ) {
 	    dbs = (DatabaseSource) enum.nextElement();
-	    if ( dbs._mapTable.getDescriptor( objType ) != null )
+	    if ( dbs._mapResolver.getDescriptor( objType ) != null )
 		return dbs._engine;
 	}
 	return null;
@@ -180,7 +181,7 @@ public class DatabaseSource
     {
 	Unmarshaller unm;
 
-	unm = new Unmarshaller( Databases.class );
+	unm = new Unmarshaller( Mapping.class );
 	try {
 	    if ( resolver == null )
 		unm.setEntityResolver( new DTDResolver() );
@@ -188,7 +189,7 @@ public class DatabaseSource
 		unm.setEntityResolver( new DTDResolver( resolver ) );
 	    if ( logWriter != null )
 		unm.setLogWriter( logWriter );
-	    loadMapping( (Databases) unm.unmarshal( source ) );
+	    loadMapping( (Mapping) unm.unmarshal( source ) );
 	} catch ( MappingException except ) {
 	    throw except;
 	} catch ( Exception except ) {
@@ -197,14 +198,15 @@ public class DatabaseSource
     }
 
 
-    public static synchronized void loadMapping( Databases databases )
+    public static synchronized void loadMapping( Mapping mapping )
 	throws MappingException
     {
-	Enumeration  enum;
-	Enumeration  mapping;
-	Database     db;
-	MappingTable mapTable;
+	Enumeration      enum;
+	JDOMappingHelper mapHelper;
 
+	mapHelper = new JDOMappingHelper( DatabaseSource.class.getClassLoader(), mapping );
+	_defaultMapping = mapHelper;
+	/*
 	enum = databases.listDatabases();
 	while ( enum.hasMoreElements() ) {
 	    db = (Database) enum.nextElement();
@@ -233,7 +235,6 @@ public class DatabaseSource
 	    while ( mapping.hasMoreElements() ) {
 		mapTable.addMapping( (Mapping) mapping.nextElement() );
 	    }
-
 
 	    if ( db.getDriver() != null ) {
 		Properties  props;
@@ -281,11 +282,12 @@ public class DatabaseSource
 		registerMapping( db.getDbName(), mapTable );
 	    }
 	}
+	*/
     }
 
 
     public static synchronized DatabaseSource registerDriver( String dbName, String url, Properties props,
-							      MappingTable mapTable )
+							      MappingResolver mapResovler )
 	throws MappingException
     {
 	DatabaseSource dbs;
@@ -303,7 +305,7 @@ public class DatabaseSource
 	    }
 	    if ( props == null )
 		props = new Properties();
-	    dbs = new DatabaseSource( dbName, url, props, mapTable );
+	    dbs = new DatabaseSource( dbName, url, props, mapResovler );
 	    _dataSources.put( dbName, dbs );
 	    return dbs;
 	}
@@ -311,7 +313,7 @@ public class DatabaseSource
 
 
     public static synchronized DatabaseSource registerDataSource( String dbName, DataSource dataSource,
-								  MappingTable mapTable )
+								  MappingResolver mapResovler )
 	throws MappingException
     {
 	DatabaseSource dbs;
@@ -321,14 +323,14 @@ public class DatabaseSource
 		throw new MappingException( "A database with the name " + dbName + " is already registered" );
 	    if ( dataSource == null )
 		throw new NullPointerException( "Argument 'dataSource' is null" );
-	    dbs = new DatabaseSource( dbName, dataSource, mapTable );
+	    dbs = new DatabaseSource( dbName, dataSource, mapResovler );
 	    _dataSources.put( dbName, dbs );
 	    return dbs;
 	}
     }
 
 
-    public static synchronized DatabaseSource registerMapping( String dbName, MappingTable mapTable )
+    public static synchronized DatabaseSource registerMapping( String dbName, MappingResolver mapResovler )
 	throws MappingException
     {
 	DatabaseSource dbs;
@@ -336,7 +338,7 @@ public class DatabaseSource
 	synchronized ( _dataSources ) {
 	    if ( _dataSources.get( dbName ) != null )
 		throw new MappingException( "A database with the name " + dbName + " is already registered" );
-	    dbs = new DatabaseSource( dbName, mapTable );
+	    dbs = new DatabaseSource( dbName, mapResovler );
 	    _dataSources.put( dbName, dbs );
 	    return dbs;
 	}
@@ -351,7 +353,7 @@ public class DatabaseSource
 	enum = _dataSources.elements();
 	while ( enum.hasMoreElements() ) {
 	    dbs = (DatabaseSource) enum.nextElement();
-	    if ( dbs._mapTable.getDescriptor( obj.getClass() ) != null )
+	    if ( dbs._mapResolver.getDescriptor( obj.getClass() ) != null )
 		return dbs;
 	}
 	return null;
@@ -384,9 +386,9 @@ public class DatabaseSource
     }
 
 
-    MappingTable getMappingTable()
+    MappingResolver getMappingTable()
     {
-	return _mapTable;
+	return _mapResolver;
     }
 
 
@@ -418,7 +420,7 @@ public class DatabaseSource
 		throw new MappingException( except );
 	    }
 	    if ( obj instanceof DataSource ) {
-		return registerDataSource( dbName, (DataSource) obj, null );
+		return registerDataSource( dbName, (DataSource) obj, _defaultMapping );
 	    } else {
 		throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
 	    }
