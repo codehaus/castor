@@ -335,7 +335,7 @@ public class SimpleTypesFactory
 		        Unmarshaller unmarshaller= new Unmarshaller(TypeList.class);
 		        unmarshaller.setMapping(mapping);
                 java.net.URL url= Configuration.getSimpleTypesDefinitionLocation();
-		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new FileReader( url.getFile() ) );
+		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(url.openStream()) );
 
                 //print what we just read (only in debug mode and if we have a logWriter)
 		        if (Configuration.debug() && getLogWriter()!= null)
@@ -348,7 +348,7 @@ public class SimpleTypesFactory
                 _typesByCode= new Hashtable();
 		        for( int index= 0; index < types.size(); index++)
 		        {
-		            Type type= (Type)(types.get(index));
+		            Type type= (Type)(types.elementAt(index));
                     _typesByName.put(type.getName(), type);
                     type.setSimpleType(createSimpleType(type));
                     _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
@@ -356,6 +356,7 @@ public class SimpleTypesFactory
 	        }
 	        catch (Exception except)
 	        {
+				except.printStackTrace(System.out);
                 //Of course, this should not happen if the config files are there.
                 System.out.println(Messages.message("schema.cantLoadBuiltInTypes"));
                 throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
@@ -400,7 +401,7 @@ public class SimpleTypesFactory
         //Adds the facets to the result
         Vector facets= type.getFacet();
         for (int index= 0; index < facets.size(); index++) {
-            TypeProperty prop= (TypeProperty)facets.get(index);
+            TypeProperty prop= (TypeProperty)facets.elementAt(index);
             if (!prop.getPseudo()) {
                 //adds a "real" facet (defined in the xml specs)
                 result.addFacet( new Facet(prop.getName(), prop.getValue()) );
