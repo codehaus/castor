@@ -86,22 +86,13 @@ public interface OQLQuery
     extends Query
 {
 
-
     /**
      * Creates an OQL query from the supplied statement.
      *
      * @param query An OQL query statement
-     * @throws QueryException The query syntax is invalid
+     * @throws PersistenceException
      */
     public void create( String query )
-        throws QueryException;
-
+        throws PersistenceException;
 
 }
-
-
-
-
-
-
-
