@@ -138,6 +138,7 @@ public class Test
             group = new ProductGroup();
             group.setId( 3 );
             group.setName( "a group" );
+            db.create( group );
             writer.println( "Creating new group: " + group );
         } else {
             group = (ProductGroup) enum.nextElement();

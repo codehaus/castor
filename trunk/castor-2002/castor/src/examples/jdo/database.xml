@@ -1,12 +1,14 @@
 <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
                            "http://castor.exolab.org/jdo-conf.dtd">
+<!--
 <database name="test" engine="postgresql" >
   <data-source class-name="postgresql.PostgresqlDataSource">
     <params user="test" password="test" database-name="test"/>
   </data-source>
   <mapping href="mapping.xml" />
 </database>
-<!--
+-->
+
 <database name="test" engine="sybase" >
   <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource">
     <params user="sa" password="natasha" 
@@ -15,5 +17,4 @@
   <mapping href="mapping.xml" />
 </database>
 
--->
 
