@@ -797,6 +797,9 @@ public abstract class TransactionContext
 
             oid = engine.update( this, oid, object, null, _lockTimeout );
 
+            removeObjectEntry( object );
+            entry = addObjectEntry( oid, object );
+
             //if ( oid == null ) {
             //    oid = create( engine, molder, object, depended );
             //}

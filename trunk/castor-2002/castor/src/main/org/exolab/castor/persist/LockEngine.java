@@ -613,10 +613,17 @@ public final class LockEngine {
             }*/
             oid = lock.getOID();
 
-            typeInfo.molder.update( tx, oid, lock, object, suggestedAccessMode );
+            Object newid = typeInfo.molder.update( tx, oid, lock, object, suggestedAccessMode );
 
             succeed = true;
 
+            if ( newid != null && !newid.equals(oid.getIdentity()) ) {
+                OID newoid = new OID( oid.getLockEngine(), oid.getMolder(), oid.getDepends(), newid );
+
+                typeInfo.rename( oid, newoid, tx );
+
+                return newoid;
+            }
             /*
             if ( accessMode == AccessMode.DbLocked )
                 oid.setDbLock( true );

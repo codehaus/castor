@@ -208,6 +208,11 @@ public class ClassMolder {
 
 
     /**
+     * True if the representing class implements the interface TimeStampable
+     */
+    private boolean _timeStampable;
+
+    /**
      * Constructor
      *
      * @param ds      is the helper class for resolving depends and extends relationship
@@ -231,6 +236,8 @@ public class ClassMolder {
         _name = clsMap.getName();
 
         _accessMode = AccessMode.getAccessMode( clsMap.getAccess().toString() );
+
+        _timeStampable = TimeStampable.class.isAssignableFrom( clsDesc.getJavaClass() );
 
         ds.register( _name, this );
 
@@ -1153,7 +1160,7 @@ public class ClassMolder {
                 // so... I introduced "canCreate" that means that value != null and is not persistent
                 // and changed "newFields != null" to "value != null"
                 // </oleg>
-                // if ids are the same and not canCreate
+                // if ids are the same or not canCreate
                 //    if object is deleted
                 //        warn
                 //    if object are the same
@@ -1644,7 +1651,7 @@ public class ClassMolder {
      * @param locker the dirty check cache of the object
      * @param object the object to be stored
      */
-    public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode suggestedAccessMode )
+    public Object update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode suggestedAccessMode )
             throws PersistenceException, ObjectModifiedException {
 
         ClassMolder fieldClassMolder;
@@ -1656,91 +1663,83 @@ public class ClassMolder {
         Object stamp;
         Object[] temp;
         int fieldType;
-        long timestamp;
         Object o;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
 
         fields = (Object[]) locker.getObject( tx );
 
-        if ( fields == null ) {
-            if ( !isDependent() ) {
-                throw new ObjectModifiedException("Object is cleared from cache.");
-            } else {
+        if ( !isDependent() && !_timeStampable )
+            throw new IllegalArgumentException("A master object that involves in a long transaction must be a TimeStampable!");
+
+        long lockTimestamp = locker.getTimeStamp();
+        long objectTimestamp = _timeStampable? ((TimeStampable)object).jdoGetTimeStamp(): 1;
+
+        if ( objectTimestamp > 0 ) {
+            // valid range of timestamp
+
+            if ( _timeStampable && objectTimestamp != lockTimestamp )
+                throw new ObjectModifiedException("Timestamp mismatched!");
+
+            if ( !_timeStampable && isDependent() && fields == null  ) {
+                // allow a dependent object not implements timeStampable
                 fields = new Object[_fhs.length];
                 Connection conn = (Connection)tx.getConnection(oid.getLockEngine());
                 stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
                 locker.setObject( tx, fields );
             }
-        }
 
-        timestamp = locker.getTimeStamp();
+            ids = oid.getIdentity();
 
-        ids = oid.getIdentity();
+            // load the original field into the transaction. so, store will
+            // have something to compare later.
+            try {
+                for ( int i=0; i <_fhs.length; i++ ) {
+                    fieldType = _fhs[i].getFieldType();
+                    switch (fieldType) {
+                    case FieldMolder.PRIMITIVE:
+                        break;
+                    case FieldMolder.SERIALIZABLE:
+                        break;
+                    case FieldMolder.PERSISTANCECAPABLE:
+                        fieldClassMolder = _fhs[i].getFieldClassMolder();
+                        fieldEngine = _fhs[i].getFieldLockEngine();
+                        o = _fhs[i].getValue( object, tx.getClassLoader() );
+                        if ( _fhs[i].isDependent() ) {
+                            // depedent class won't have persistenceInfo in LockEngine
+                            // must look at fieldMolder for it
 
-        // If the object implements TimeStampable interface, verify
-        // the object's timestamp against the cache
-        if ( object instanceof TimeStampable ) {
-            TimeStampable ts = (TimeStampable) object;
-            if ( ts.jdoGetTimeStamp() != timestamp ) {
-                throw new ObjectModifiedException( "Time stamp mismatched!" );
-                    /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
-            }
-        } else if ( !isDependent() ) {
-            throw new IllegalArgumentException("A long transaction object must implement the TimeStampable interface!");
-        }
-
-        // load the original field into the transaction. so, store will
-        // have something to compare later.
-        try {
-            for ( int i=0; i <_fhs.length; i++ ) {
-                fieldType = _fhs[i].getFieldType();
-                switch (fieldType) {
-                case FieldMolder.PRIMITIVE:
-                    break;
-                case FieldMolder.SERIALIZABLE:
-                    break;
-                case FieldMolder.PERSISTANCECAPABLE:
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-                    o = _fhs[i].getValue( object, tx.getClassLoader() );
-                    if ( _fhs[i].isDependent() ) {
-                        // depedent class won't have persistenceInfo in LockEngine
-                        // must look at fieldMolder for it
-
-                        // load the cached dependent object from the data store.
-                        // The loaded will be compared with the new one
-                        if ( fields[i] != null ) {
-                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
-                            if ( o != null )
+                            if ( o != null && !tx.isRecorded(o) )
                                 tx.update( fieldEngine, fieldClassMolder, o, oid );
-                        }
-                    } else if ( tx.isAutoStore() ) {
-                        if ( fields[i] != null ) {
-                            if ( o != null && fields[i] == fieldClassMolder.getActualIdentity( tx, o ) )
+
+                            // load the cached dependent object from the data store.
+                            // The loaded will be compared with the new one
+                            if ( fields[i] != null )
+                                tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
+                        } else if ( tx.isAutoStore() ) {
+                            if ( o != null && !tx.isRecorded(o) )
                                 tx.update( fieldEngine, fieldClassMolder, o, null );
 
-                        } else if ( o != null ) {
-                            tx.create( fieldEngine, fieldClassMolder, o, null );
+                            if ( fields[i] != null )
+                                tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
                         }
-                    }
-                    break;
+                        break;
 
-                case FieldMolder.ONE_TO_MANY:
-                case FieldMolder.MANY_TO_MANY:
-                    fieldClassMolder = _fhs[i].getFieldClassMolder();
-                    fieldEngine = _fhs[i].getFieldLockEngine();
-                    if ( _fhs[i].isDependent() ) {
-                        if ( !_fhs[i].isLazy() ) {
-                            Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
-                            ArrayList v = (ArrayList)fields[i];
-                            ArrayList newSetOfIds = new ArrayList();
-                            if ( v != null ) {
+                    case FieldMolder.ONE_TO_MANY:
+                        fieldClassMolder = _fhs[i].getFieldClassMolder();
+                        fieldEngine = _fhs[i].getFieldLockEngine();
+                        if ( _fhs[i].isDependent() ) {
+                            if ( !_fhs[i].isLazy() ) {
+                                Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
+                                ArrayList v = (ArrayList)fields[i];
+                                ArrayList newSetOfIds = new ArrayList();
+
+                                // iterate the collection of this data object field
                                 while ( itor.hasNext() ) {
                                     Object element = itor.next();
                                     Object actualIdentity = fieldClassMolder.getActualIdentity( tx, element );
                                     newSetOfIds.add( actualIdentity );
-                                    if ( v.contains( actualIdentity ) ) {
+                                    if ( v != null && v.contains( actualIdentity ) ) {
                                         if ( !tx.isRecorded( element ) )
                                             tx.update( fieldEngine, fieldClassMolder, element, oid );
                                     } else {
@@ -1748,7 +1747,36 @@ public class ClassMolder {
                                             tx.create( fieldEngine, fieldClassMolder, element, oid );
                                     }
                                 }
+                                if ( v != null ) {
+                                    for ( int j=0,l=v.size(); j<l; j++ ) {
+                                        if ( !newSetOfIds.contains( v.get(j) ) ) {
+                                            // load all the dependent object in cache for modification
+                                            // check at commit time.
+                                            tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+
+                                        }
+                                    }
+                                }
+                            } else {
+                                ArrayList avlist = (ArrayList) fields[i];
+                                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                                fieldEngine = _fhs[i].getFieldLockEngine();
+                                RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, avlist );
                             }
+                        } else if ( tx.isAutoStore() ) {
+                            Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
+                            ArrayList v = (ArrayList)fields[i];
+                            ArrayList newSetOfIds = new ArrayList();
+
+                            // iterate the collection of this data object field
+                            while ( itor.hasNext() ) {
+                                Object element = itor.next();
+                                Object actualIdentity = fieldClassMolder.getActualIdentity( tx, element );
+                                newSetOfIds.add( actualIdentity );
+                                if ( !tx.isRecorded( element ) )
+                                    tx.update( fieldEngine, fieldClassMolder, element, null );
+                            }
+                            // load all old objects for comparison in the preStore state
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     if ( !newSetOfIds.contains( v.get(j) ) ) {
@@ -1756,41 +1784,253 @@ public class ClassMolder {
                                         // load all the dependent object in cache for modification
                                         // check at commit time.
                                         tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
-
                                     }
                                 }
                             }
-                        } else {
-                            ArrayList avlist = (ArrayList) fields[i];
-                            fieldClassMolder = _fhs[i].getFieldClassMolder();
-                            fieldEngine = _fhs[i].getFieldLockEngine();
-                            RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, avlist );
                         }
-                    } else if ( tx.isAutoStore() ) {
-                        Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
-                        ArrayList v = (ArrayList)fields[i];
-                        ArrayList newSetOfIds = new ArrayList();
-                        if ( v != null ) {
+                        break;
+                    case FieldMolder.MANY_TO_MANY:
+                        fieldClassMolder = _fhs[i].getFieldClassMolder();
+                        fieldEngine = _fhs[i].getFieldLockEngine();
+                        if ( tx.isAutoStore() ) {
+                            Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
+                            ArrayList v = (ArrayList)fields[i];
+                            ArrayList newSetOfIds = new ArrayList();
+
+                            // iterate the collection of this data object field
                             while ( itor.hasNext() ) {
                                 Object element = itor.next();
                                 Object actualIdentity = fieldClassMolder.getActualIdentity( tx, element );
                                 newSetOfIds.add( actualIdentity );
-                                if ( v.contains( actualIdentity ) ) {
-                                    if ( !tx.isRecorded( element ) )
-                                        tx.update( fieldEngine, fieldClassMolder, element, null );
-                                } else {
-                                    if ( !tx.isRecorded( element ) )
-                                        tx.create( fieldEngine, fieldClassMolder, element, null );
+                                if ( !tx.isRecorded( element ) ) {
+                                    OID updatedOID = tx.update( fieldEngine, fieldClassMolder, element, null );
+                                }
+                            }
+                            // load all old objects for comparison in the preStore state
+                            if ( v != null ) {
+                                for ( int j=0,l=v.size(); j<l; j++ ) {
+                                    if ( !newSetOfIds.contains( v.get(j) ) ) {
+                                        System.out.println( "load object with id of: "+v.get(j) );
+                                        // load all the dependent object in cache for modification
+                                        // check at commit time.
+                                        tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                                    }
                                 }
                             }
                         }
-                        if ( v != null ) {
-                            for ( int j=0,l=v.size(); j<l; j++ ) {
-                                if ( !newSetOfIds.contains( v.get(j) ) ) {
-                                    System.out.println( "load object with id of: "+v.get(j) );
-                                    // load all the dependent object in cache for modification
-                                    // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                        break;
+                    }
+                }
+            } catch ( ObjectNotFoundException e ) {
+                throw new ObjectModifiedException("dependent object deleted concurrently");
+            }
+            return ids;
+        } else if ( objectTimestamp == TimeStampable.NO_TIMESTAMP ) {
+            // work almost like create, except update the sub field instead of create
+            fields = new Object[_fhs.length];
+            ids = oid.getIdentity();
+
+            // copy the object to cache should make a new field now,
+            for ( int i=0; i<_fhs.length; i++ ) {
+                fieldType = _fhs[i].getFieldType();
+
+                switch (fieldType) {
+                case FieldMolder.PRIMITIVE: // primitive includes int, float, Date, Time etc
+                    fields[i] = _fhs[i].getValue( object, tx.getClassLoader() );
+                    break;
+
+                case FieldMolder.PERSISTANCECAPABLE:
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null ) {
+                        if ( !_fhs[i].isDependent() ) {
+                            Object fid = fieldClassMolder.getIdentity( tx, o );
+                            if ( fid != null ) {
+                                fields[i] = fid;
+                            }
+                        } // dependent object will be created at preStore state
+                    }
+                    break;
+
+                case FieldMolder.SERIALIZABLE:
+                    try {
+                        Object dependent = _fhs[i].getValue( object, tx.getClassLoader() );
+                        if ( dependent != null ) {
+                            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                            ObjectOutputStream os = new ObjectOutputStream( bos );
+                            os.writeObject( dependent );
+                            fields[i] = bos.toByteArray();
+                        } else {
+                            fields[i] = null;
+                        }
+                    } catch ( IOException e ) {
+                        throw new PersistenceException( "Error during serializing dependent object", e );
+                    }
+                    break;
+
+                case FieldMolder.ONE_TO_MANY:
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null && !_fhs[i].isDependent() ) {
+                        ArrayList fids = extractIdentityList( tx, fieldClassMolder, o );
+                        fields[i] = fids;
+                    } // dependent objects will be created at preStore state
+                    break;
+
+                case FieldMolder.MANY_TO_MANY:
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null ) {
+                        ArrayList fids = extractIdentityList( tx, fieldClassMolder, o );
+                        fields[i] = fids;
+                    }
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Field type invalid!");
+                }
+            }
+
+            // ask Persistent to create the object into the persistence storage
+            Object createdId = _persistence.create( (Connection)tx.getConnection(oid.getLockEngine()),
+                    fields, ids );
+
+            if ( createdId == null )
+                throw new PersistenceException("Identity can't be created!");
+
+            // if the creation succeed, we set the field into the dirty checking
+            // cache.
+            locker.setObject( tx, fields );
+            oid.setDbLock( true );
+
+            // set the identity into the object
+            setIdentity( tx, object, createdId );
+
+            boolean autoCreated = false;
+
+            // iterate all the fields and create all the dependent object.
+            for ( int i=0; i<_fhs.length; i++ ) {
+                fieldType = _fhs[i].getFieldType();
+                switch (fieldType) {
+                case FieldMolder.PRIMITIVE:
+                case FieldMolder.SERIALIZABLE:
+                    // nothing need to be done here for primitive
+                    break;
+
+                case FieldMolder.PERSISTANCECAPABLE:
+                    // create dependent object if exists
+                    autoCreated = false;
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null ) {
+                        if ( _fhs[i].isDependent() ) {
+                            // creation of dependent object should be delayed to the
+                            // preStore state.
+                            // otherwise, in the case of keygenerator being used in both
+                            // master and dependent object, and if an dependent
+                            // object is replaced by another before commit, the
+                            // orginial dependent object will not be removed.
+                            //
+                            // the only disadvantage for that appoarch is that an
+                            // OQL Query will not able to include the newly generated
+                            // dependent object.
+                            /*
+                            if ( !tx.isPersistent( o ) ) {
+                                tx.create( fieldEngine, fieldClassMolder, o, oid );
+                            } else {}
+                                // fail-fast principle: if the object depend on another object,
+                               // throw exception
+                             */
+                            //if ( !tx.isDepended( oid, o ) )
+                            //    throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
+                        } else if ( tx.isAutoStore() ) {
+                            if ( !tx.isRecorded( o ) ) {
+                                // related object should be created right the way, if autoStore
+                                // is enabled, to obtain a database lock on the row. If both side
+                                // uses keygenerator, the current object will be updated in the
+                                // store state.
+                                OID fieldOid = tx.update( fieldEngine, fieldClassMolder, o, null );
+                                if ( _isKeyGenUsed ) {
+                                    fields[i] = fieldOid.getIdentity();
+                                    autoCreated = true;
+                                }
+                                // if _fhs[i].isStore is true for this field,
+                                // and if key generator is used
+                                // and if the related object is replaced this object by null
+                                // and if everything else is not modified
+                                // then, objectModifiedException will be thrown
+                                // there are two solutions, first introduce preCreate state,
+                                // and walk the create graph, and create non-store object
+                                // first. However, it doesn't guarantee solution. because
+                                // every object may have field which uses key-generator
+                                // second, we can do another SQLStatement at the very end of
+                                // this method.
+                                // note, one-many and many-many doesn't affected, because
+                                // it is always non-store fields.
+                            }
+                        }
+                    }
+                    break;
+
+                case FieldMolder.ONE_TO_MANY:
+                    // create dependent objects if exists
+                    autoCreated = false;
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null ) {
+                        Iterator itor = getIterator( o );
+                        while (itor.hasNext()) {
+                            Object oo = itor.next();
+                            if ( _fhs[i].isDependent() ) {
+                                /*
+                                if ( !tx.isPersistent( oo ) ) {
+                                    autoCreated = true;
+                                    tx.create( fieldEngine, fieldClassMolder, oo, oid );
+                                } else
+                                    // fail-fast principle: if the object depend on another object,
+                                    // throw exception
+                                    if ( !tx.isDepended( oid, oo ) )
+                                        throw new PersistenceException("Dependent object may not change its master");
+                                 */
+                            } else if ( tx.isAutoStore() ) {
+                                if ( !tx.isRecorded( o ) ) {
+                                    OID fieldOid = tx.update( fieldEngine, fieldClassMolder, oo, null );
+                                    if ( _isKeyGenUsed ) {
+                                        ((ArrayList)fields[i]).add( fieldOid.getIdentity() );
+                                        autoCreated = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case FieldMolder.MANY_TO_MANY:
+                    // create relation if the relation table
+                    fieldClassMolder = _fhs[i].getFieldClassMolder();
+                    fieldEngine = _fhs[i].getFieldLockEngine();
+                    o = _fhs[i].getValue( object, tx.getClassLoader() );
+                    if ( o != null ) {
+                        Iterator itor = getIterator( o );
+                        // many-to-many relation is never dependent relation
+                        while (itor.hasNext()) {
+                            Object oo = itor.next();
+                            if ( tx.isPersistent( oo ) ) {
+                                _fhs[i].getRelationLoader().createRelation(
+                                (Connection)tx.getConnection(oid.getLockEngine()),
+                                createdId, fieldClassMolder.getIdentity( tx, oo ) );
+                            } else if ( tx.isAutoStore() ) {
+                                if ( !tx.isRecorded( oo ) ) {
+                                    OID fieldOid = tx.update( fieldEngine, fieldClassMolder, oo, null );
+                                    if ( _isKeyGenUsed ) {
+                                        ((ArrayList)fields[i]).add( fieldOid.getIdentity() );
+                                        autoCreated = true;
+                                    }
                                 }
                             }
                         }
@@ -1798,8 +2038,20 @@ public class ClassMolder {
                     break;
                 }
             }
-        } catch ( ObjectNotFoundException e ) {
-            throw new ObjectModifiedException("dependent object deleted concurrently");
+
+            if ( autoCreated ) {
+                // set the object into DespositBox again, if changes made
+                locker.setObject( tx, fields );
+            }
+
+            // set the new timeStamp into the data object
+            if ( object instanceof TimeStampable ) {
+                ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+            }
+            return createdId;
+        } else {
+            System.err.println( "object: "+object+" timestamp: "+objectTimestamp+"lockertimestamp: "+lockTimestamp );
+            throw new ObjectModifiedException("Invalid object timestamp detected.");
         }
     }
 
