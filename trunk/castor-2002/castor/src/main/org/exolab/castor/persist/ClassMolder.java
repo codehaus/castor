@@ -1122,45 +1122,53 @@ public class ClassMolder {
                 break;
 
             case FieldMolder.PERSISTANCECAPABLE:
+                boolean canCreate = false;
+
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 value = _fhs[i].getValue( object, tx.getClassLoader() );
-                if ( value != null )
+                if ( value != null ) {
                     newfields[i] = fieldClassMolder.getIdentity( tx, value );
+                    canCreate = !tx.isPersistent( value ) && !tx.isDeleted( value ) ;
+                }
 
                 // | yip: don't delete the following comment,
                 //      until it proved working by time. :-P
-                // if ids are the same
+                // <oleg> if a key generator is used, identity is null before creation,
+                // so... I introduced "canCreate" that means that value != null and is not persistent
+                // and changed "newFields != null" to "value != null"
+                // </oleg>
+                // if ids are the same and not canCreate
                 //    if object is deleted
                 //        warn
                 //    if object are the same
                 //        done
                 //    not the same
                 //        exception
-                // ids not the same
+                // ids not the same or canCreate
                 //    if depend
                 //       if old is not null
                 //          delete old
                 //          removeRelation
-                //       if new is not null
+                //       if canCreate
                 //          create new
                 //    not depend and autoStore
                 //       if old is not null
                 //          removeRelation
-                //       if new is not null
+                //       if canCreate
                 //          createObject
                 //    not depend nor autoStore
                 //       if old is not null
                 //          removeRelation
                 //       if new is not null
-                if ( isEquals( fields[i], newfields[i] ) ) {
+                if ( isEquals( fields[i], newfields[i] ) && ! canCreate ) {
                     if ( !_debug )
                         break;
 
                     if ( fields[i] == null )
                         break; // do the next field if both are null
 
-                    if ( value != null && !tx.isDeleted(value) ) {
+                    if ( value != null && tx.isDeleted(value) ) {
                         System.err.println("Warning: deleted object found!");
                         if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
                             updatePersist = true;
@@ -1184,19 +1192,15 @@ public class ClassMolder {
                                 tx.delete( reldel );
                         }
 
-                        if ( newfields[i] != null )
-                            if ( !tx.isPersistent( value ) )
-                                // should be created if transaction have no record of the object
-                                tx.create( fieldEngine, fieldClassMolder, value, oid );
+                        if ( canCreate )
+                            tx.create( fieldEngine, fieldClassMolder, value, oid );
 
                     } else {
                         if ( fields[i] != null )
                             fieldClassMolder.removeRelation( tx, value, this, object );
 
-                        if ( newfields[i] != null )
-                            if ( tx.isAutoStore() )
-                                if ( !tx.isPersistent( value ) && !tx.isDeleted( value ) )
-                                    tx.create( fieldEngine, fieldClassMolder, value, null );
+                        if ( tx.isAutoStore() && canCreate )
+                            tx.create( fieldEngine, fieldClassMolder, value, null );
                     }
                 }
                 break;
@@ -1210,8 +1214,8 @@ public class ClassMolder {
                     Collection removed = getRemovedIdsList( tx, orgFields, value, fieldClassMolder );
                     Iterator removedItor = removed.iterator();
                     if ( removedItor.hasNext() ) {
-                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() ) 
-                            updatePersist = true;    
+                        if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() )
+                            updatePersist = true;
                         updateCache = true;
                     }
                     while ( removedItor.hasNext() ) {
