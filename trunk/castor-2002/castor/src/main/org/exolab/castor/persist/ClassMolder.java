@@ -48,11 +48,24 @@ package org.exolab.castor.persist;
 
 
 import java.math.BigDecimal;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.OptionalDataException;
+import java.io.IOException;
 import java.util.Date;
-import java.util.Hashtable;
-import java.util.Enumeration;
+import java.util.Map;
+import java.util.Set;
+import java.util.Vector;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.Collection;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -83,8 +96,6 @@ import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Messages;
 import java.sql.Connection;
-import java.util.Vector;
-import java.util.ArrayList;
 
 
 /**
@@ -191,6 +202,7 @@ public class ClassMolder {
      */
     private boolean _isKeyGenUsed;
 
+
     /**
      * Constructor
      *
@@ -200,7 +212,8 @@ public class ClassMolder {
      * @param classDescriptor   the classDescriptor for the base class
      * @param persist the Persistent for the base class
      */
-    ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, ClassDescriptor clsDesc, Persistence persist )
+    ClassMolder( DatingService ds, MappingLoader loader, LockEngine lock, 
+            ClassDescriptor clsDesc, Persistence persist )
             throws ClassNotFoundException, MappingException {
 
         ClassMapping clsMap = ((ClassDescriptorImpl) clsDesc).getMapping();
@@ -509,11 +522,13 @@ public class ClassMolder {
      *                       removed from the object
      * @param related        the object to be removed
      */
-    private boolean removeRelation( TransactionContext tx, Object object, ClassMolder relatedMolder, Object relatedObject ) {
+    private boolean removeRelation( TransactionContext tx, Object object, 
+            ClassMolder relatedMolder, Object relatedObject )  {
 
         boolean removed = false;
         boolean updateCache = false;
         boolean updatePersist = false;
+        ClassMolder relatedBaseMolder = null;
         for ( int i=0; i < _fhs.length; i++ ) {
             int fieldType = _fhs[i].getFieldType();
             ClassMolder fieldClassMolder;
@@ -521,7 +536,12 @@ public class ClassMolder {
             case FieldMolder.PERSISTANCECAPABLE:
                 // de-reference the object
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                if ( fieldClassMolder == relatedMolder ) {
+
+                relatedBaseMolder = relatedMolder;
+                while ( fieldClassMolder != relatedBaseMolder && relatedBaseMolder != null ) {
+                    relatedBaseMolder = relatedBaseMolder._extends;
+                }
+                if ( fieldClassMolder == relatedBaseMolder ) {
                     Object related = _fhs[i].getValue( object );
                     if ( related == relatedObject ) {
                         _fhs[i].setValue( object, null );
@@ -536,11 +556,23 @@ public class ClassMolder {
             case FieldMolder.MANY_TO_MANY:
                 // remove the object from the collection
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
-                if ( fieldClassMolder == relatedMolder ) {
+                relatedBaseMolder = relatedMolder;
+                while ( fieldClassMolder != relatedBaseMolder && relatedBaseMolder != null ) {
+                    relatedBaseMolder = relatedBaseMolder._extends;
+                }
+                if ( fieldClassMolder == relatedBaseMolder ) {
                     // same action to be taken for lazy and non lazy collection
+                    boolean changed = false;
                     Object related = _fhs[i].getValue( object );
                     ArrayList alist = (ArrayList) related;
-                    boolean changed = alist.remove( relatedObject );
+                    Iterator itor = getIterator( related );
+                    while ( itor.hasNext() ) {
+                        Object o = itor.next();
+                        if ( o == relatedObject ) {
+                            changed = true;
+                            itor.remove();
+                        }
+                    }
                     if ( changed ) {
                         updateCache = true;
                         updatePersist = false;
@@ -613,6 +645,29 @@ public class ClassMolder {
                     _fhs[i].setValue( object, null );
                 break;
 
+            case FieldMolder.SERIALIZABLE:
+                // deserialize byte[] into java object
+                try {
+                    byte[] bytes = (byte[]) fields[i];
+                    if ( bytes != null ) {
+                        // The following code can be updated, after Blob-->InputStream
+                        // to enhance performance.
+                        ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
+                        ObjectInputStream os = new ObjectInputStream( bis );
+                        Object o = os.readObject();
+                        _fhs[i].setValue( object, o );
+                    } else {
+                        _fhs[i].setValue( object, null );
+                    }
+                } catch ( OptionalDataException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( ClassNotFoundException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( IOException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                }
+                break;
+
             case FieldMolder.PERSISTANCECAPABLE:
                 // field is not primitive type. Related object will be loaded
                 // thru the transaction in action if needed.
@@ -646,13 +701,14 @@ public class ClassMolder {
                     // lazy loading is not specified, load all objects into
                     // the collection and set the Collection as the data object
                     // field.
-                    ArrayList col = new ArrayList();
+
+                    CollectionProxy cp = CollectionProxy.create( _fhs[i].getCollectionType() );
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            col.add( tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
+                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
                         }
-                        _fhs[i].setValue( object, col );
+                        _fhs[i].setValue( object, cp.getCollection() );
                     } else {
                         _fhs[i].setValue( object, null );
                     }
@@ -729,12 +785,28 @@ public class ClassMolder {
                 }
                 break;
 
+            case FieldMolder.SERIALIZABLE:
+                try {
+                    Object dependent = _fhs[i].getValue( object );
+                    if ( dependent != null ) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        ObjectOutputStream os = new ObjectOutputStream( bos );
+                        os.writeObject( dependent );
+                        fields[i] = bos.toByteArray();
+                    } else {
+                        fields[i] = null;
+                    }
+                } catch ( IOException e ) {
+                    throw new PersistenceException( "Error during serializing dependent object", e );
+                }
+                break;
+
             case FieldMolder.ONE_TO_MANY:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
-                    fids = getIds( fieldClassMolder, o );
+                    fids = extractIdentityList( fieldClassMolder, o );
                     fields[i] = fids;
                 }
                 break;
@@ -744,7 +816,7 @@ public class ClassMolder {
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
-                    fids = getIds( fieldClassMolder, o );
+                    fids = extractIdentityList( fieldClassMolder, o );
                     fields[i] = fids;
                 }
                 break;
@@ -779,6 +851,7 @@ public class ClassMolder {
             fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
+            case FieldMolder.SERIALIZABLE:
                 // nothing need to be done here for primitive
                 break;
 
@@ -952,6 +1025,63 @@ public class ClassMolder {
                     }
                 }
                 break;
+
+            case FieldMolder.SERIALIZABLE:
+                // deserialize byte[] into java object
+                try {
+                    byte[] bytes = (byte[]) fields[i];
+                    Object fieldValue = _fhs[i].getValue( object );
+                    if ( fieldValue == null ) {
+                        if ( bytes != null ) {
+                            updateCache = true;
+                            if ( _fhs[i].isStored() ) {
+                                if ( _fhs[i].isCheckDirty() ) {
+                                    modified = true;
+                                    lockrequired = true;
+                                } else {
+                                    modified = true;
+                                }
+                            }
+                        }
+                    } else {
+                        if ( bytes == null ) {
+                            updateCache = true;
+                            if ( _fhs[i].isStored() ) {
+                                if ( _fhs[i].isCheckDirty() ) {
+                                    modified = true;
+                                    lockrequired = true;
+                                } else {
+                                    modified = true;
+                                }
+                            }
+                        } else {
+                            // The following code can be updated, after Blob-->InputStream
+                            // to enhance performance.
+                            ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
+                            ObjectInputStream os = new ObjectInputStream( bis );
+                            Object dependent = os.readObject();
+                            if ( dependent.equals( fieldValue ) ) {
+                                updateCache = true;
+                                if ( _fhs[i].isStored() ) {
+                                    if ( _fhs[i].isCheckDirty() ) {
+                                        modified = true;
+                                        lockrequired = true;
+                                    } else {
+                                        modified = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                } catch ( OptionalDataException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( ClassNotFoundException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( IOException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                }
+                break;
+
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1011,98 +1141,64 @@ public class ClassMolder {
                 value = _fhs[i].getValue( object );
                 orgFields = (ArrayList)fields[i];
                 if ( ! (value instanceof Lazy) ) {
-                    // get a list of all of the identities from the object
-
-                    itor = getIterator( value );
-                    ArrayList v = (ArrayList) value;
-                    list = new ArrayList( v.size() );
-                    for ( int j=0; j<v.size(); j++ ) {
-                        list.add( fieldClassMolder.getIdentity( v.get(j) ) );
-                    }
-
-                    ArrayList cachedList = (ArrayList)fields[i];
-                    if ( !isEquals( cachedList, list ) ) {
+                    Collection removed = getRemovedIdsList( orgFields, value, fieldClassMolder );                        
+                    Iterator removedItor = removed.iterator();
+                    if ( removedItor.hasNext() ) {
                         updateCache = true;
                         if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
                                 modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
                         }
+                    }
+                    while ( removedItor.hasNext() ) {
+                        Object removedId = removedItor.next();
+                        Object reldel = tx.fetch( fieldEngine, fieldClassMolder, removedId, null );
+                        if ( reldel != null ) {
+                            if ( _fhs[i].isDependent() ) 
+                                tx.delete( reldel );
+                            else
+                                fieldClassMolder.removeRelation( tx, reldel, this, object );
+                        } else {
+                            // should i notify user that the object does not exist?
+                            // user can't delete dependent object himself. So, must
+                            // error.
+                        }                                
+                    }
 
-                        if ( orgFields != null && list != null ) {
-                            // remove dereferenced relation
-                            for ( int j=0; j<orgFields.size(); j++ ) {
-                                if ( !list.contains( orgFields.get(j) ) ) {
-                                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, orgFields.get(j), null );
-                                    if ( reldel != null ) {
-                                        if ( _fhs[i].isDependent() )
-                                            tx.delete( reldel );
-                                        else
-                                            fieldClassMolder.removeRelation( tx, reldel, this, object );
-                                    } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't delete dependent object himself. So, must
-                                        // error.
-                                    }
-                                }
-                            }
-                            // add relation which added after it's created or loaded
-                            for ( int j=0; j<list.size(); j++ ) {
-                                if ( !orgFields.contains( list.get(j) ) ) {
-                                    if ( _fhs[i].isDependent() ) {
-                                        if ( !tx.isPersistent( v.get(j) ) ) {
-                                            tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
-                                        } else {
-                                        // should i notify user that the object does not exist?
-                                        // user can't create dependent object himself. So, must
-                                        // error.
-                                        }
-                                    }
-                                }
-                            }
-                        } else if ( orgFields != null ) {
-                            for ( int j=0; j<orgFields.size(); j++ ) {
-                                Object reldel = tx.fetch( fieldEngine, fieldClassMolder, orgFields.get(j), null );
-                                if ( reldel != null ) {
-                                    if ( _fhs[i].isDependent() )
-                                        tx.delete( reldel );
-                                    else
-                                        fieldClassMolder.removeRelation( tx, reldel, this, object );
-                                } else {
-                                    // should i notify user that the object does not exist?
-                                    // user can't delete dependent object himself. So, must
-                                    // error.
-                                }
-                            }
-                        } else {    // list != null
-                            for ( int j=0; j<list.size(); j++ ) {
-                                if ( _fhs[i].isDependent() ) {
-                                    if ( !tx.isPersistent( v.get(j) ) ) {
-                                        tx.create( fieldEngine, fieldClassMolder, v.get(j), oid );
-                                    } else {
-                                    // should i notify user that the object does not exist?
-                                    // user can't create dependent object himself. So, must
-                                    // error.
-                                    }
-                                }
-                            }
+                    Collection added = getAddedValuesList( orgFields, value, fieldClassMolder );
+                    Iterator addedItor = added.iterator();
+                    if ( addedItor.hasNext() ) {
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
+                                modified = true;
                         }
-                        //}
+                    }
+                    while ( addedItor.hasNext() ) {
+                        Object addedValue = addedItor.next();
+                        if ( _fhs[i].isDependent() ) {
+                            if ( !tx.isPersistent( addedValue ) ) {
+                                tx.create( fieldEngine, fieldClassMolder, addedValue, oid );
+                            } else {
+                                // should i notify user that the object does not exist?
+                                // user can't create dependent object himself. So, must
+                                // error.                                   
+                            }
+                        }                                
                     }
                 } else {
                     RelationCollection lazy = (RelationCollection) value;
                     ArrayList deleted = lazy.getDeleted();
                     if ( deleted != null ) {
                         if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
                                 modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
                         }
 
                         //if ( _fhs[i].isDependent() ) {
@@ -1124,12 +1220,10 @@ public class ClassMolder {
                     ArrayList added = lazy.getAdded();
                     if ( added != null ) {
                         if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
                                 modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
                         }
 
                         if ( _fhs[i].isDependent() ) {
@@ -1154,7 +1248,75 @@ public class ClassMolder {
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
                 value = _fhs[i].getValue( object );
+                orgFields = (ArrayList) fields[i];
                 if ( ! (value instanceof Lazy) ) {
+                    Collection removed = getRemovedIdsList( orgFields, value, fieldClassMolder );                        
+                    Iterator removedItor = removed.iterator();
+                    if ( removedItor.hasNext() ) {
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
+                                modified = true;
+                        }
+                    }
+                    while ( removedItor.hasNext() ) {
+                        Object id = removedItor.next();
+                        // must be loaded thur transaction, so that the related object
+                        // is properly locked and updated before we delete it.
+                        Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null );
+                        if ( reldel != null ) {
+                            tx.writeLock( reldel, tx.getLockTimeout() );
+                         
+                            _fhs[i].getRelationLoader().deleteRelation( 
+                            (Connection)tx.getConnection(oid.getLockEngine()), 
+                            oid.getIdentity(), id );
+
+                            fieldClassMolder.removeRelation( tx, reldel, this, object );
+                        } else {
+                            // the object not there, and we try to delete the rubbish relation,
+                            // if there is
+                            _fhs[i].getRelationLoader().deleteRelation( 
+                            (Connection)tx.getConnection(oid.getLockEngine()), 
+                            oid.getIdentity(), id );
+                        }
+                    }
+
+                    Collection added = getAddedValuesList( orgFields, value, fieldClassMolder );
+                    Iterator addedItor = added.iterator();
+                    if ( addedItor.hasNext() ) {
+                        updateCache = true;
+                        if ( _fhs[i].isStored() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
+                                modified = true;
+                        }
+                    }
+                    while ( addedItor.hasNext() ) {
+                        Object addedField = addedItor.next();
+                        // must be loaded thur transaction, so that the related object
+                        // is properly locked and updated before we create it.
+                        //Object reladd = tx.load( fieldEngine, fieldClassMolder, list.get(j), null );
+                        //if ( reladd != null ) {
+                            tx.writeLock( value, tx.getLockTimeout() );
+                         
+                            _fhs[i].getRelationLoader().createRelation( 
+                            (Connection)tx.getConnection(oid.getLockEngine()), 
+                            oid.getIdentity(), fieldClassMolder.getIdentity( addedField ) );
+                        //} else {
+                            // ignored if object not found, if later in transaction 
+                            // the other side of object is added. then, the relation 
+                            // will be added if the other side of object is just 
+                            // deleted in this transaction, then it seem to be an 
+                            // non-critical error ignore it seem to better than annoy 
+                            // user
+                        //}
+                    }
+
+                    // old code 
+                    /*
                     itor = getIterator( value );
 
                     ArrayList v = (ArrayList) value;
@@ -1273,18 +1435,16 @@ public class ClassMolder {
                                 }
                             }
                         }
-                    }
+                    } */
                 } else {
                     RelationCollection lazy = (RelationCollection) value;
                     ArrayList deleted = lazy.getDeleted();
                     if ( deleted != null ) {
                         if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
                                 modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
                         }
 
                         itor = deleted.iterator();
@@ -1310,12 +1470,10 @@ public class ClassMolder {
                     if ( added != null ) {
                         updateCache = true;
                         if ( _fhs[i].isStored() ) {
-                            if ( _fhs[i].isCheckDirty() ) {
+                            if ( _fhs[i].isCheckDirty() )
+                                modified = lockrequired = true;
+                            else
                                 modified = true;
-                                lockrequired = true;
-                            } else {
-                                modified = true;
-                            }
                         }
 
                         itor = added.iterator();
@@ -1399,6 +1557,9 @@ public class ClassMolder {
             case FieldMolder.PRIMITIVE:
                 newfields[i] = _fhs[i].getValue( object );
                 break;
+            case FieldMolder.SERIALIZABLE:
+                
+                break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1419,6 +1580,116 @@ public class ClassMolder {
     }
 
     /**
+     * It is assumed the returned collection will not be modified. Any modification 
+     * to the returned collection may or may not affect the original collection or map. 
+     */
+    private Collection getAddedValuesList( ArrayList orgIds, Object collection, ClassMolder ch ) {
+
+        if ( collection == null )
+            return new ArrayList(0);
+
+        if ( collection instanceof Map ) {
+            if ( orgIds == null || orgIds.size() == 0 ) {
+                if ( collection == null )
+                    return new ArrayList(0);
+                else 
+                    return ((Map) collection).values();
+            }
+
+            Map newMap = (Map) collection;
+            ArrayList added = new ArrayList( newMap.size() );
+            Iterator newItor = newMap.entrySet().iterator();
+            while ( newItor.hasNext() ) {
+                Map.Entry newId = (Map.Entry) newItor.next();
+                if ( !orgIds.contains( newId.getKey() ) )
+                    added.add( newId.getValue() );
+            }
+            return added;
+        } 
+
+        if ( collection instanceof Collection ) {
+            if ( orgIds == null || orgIds.size() == 0 ) {
+                if ( collection == null )
+                    return new ArrayList(0);
+                else
+                    return (Collection) collection;
+            }
+
+            if ( collection == null )
+                return new ArrayList(0);
+
+            Collection newValues = (Collection) collection;
+            ArrayList added = new ArrayList( newValues.size() );
+            Iterator newItor = newValues.iterator();
+            while ( newItor.hasNext() ) {
+                Object newValue = newItor.next();
+                Object newId = ch.getIdentity( newValue );
+                if ( newId == null || !orgIds.contains( newId ) )
+                    added.add( newValue );
+            }
+            return added;
+        }
+        
+        throw new IllegalArgumentException( "Collection type "+collection.getClass().getName()+" is not supported!" );
+    }
+
+    /**
+     * It is assumed the returned collection will not be modified. Any modification 
+     * to the returned collection may or may not affect the original collection or map. 
+     */
+    private Collection getRemovedIdsList( ArrayList orgIds, Object collection, ClassMolder ch ) {
+
+        if ( collection == null ) {
+            if ( orgIds == null )
+                return new ArrayList(0);
+            else
+                return orgIds;
+        } 
+
+        if ( collection instanceof Map ) {
+            if ( orgIds == null || orgIds.size() == 0 )
+                return new ArrayList(0);
+
+            Map newMap = (Map) collection;
+            Iterator orgItor = orgIds.iterator();
+            ArrayList removed = new ArrayList( orgIds.size() );
+            while ( orgItor.hasNext() ) {
+                Object id = orgItor.next();
+                if ( !newMap.containsKey( id ) )
+                    removed.add( id );
+            }
+            return removed;
+        }
+
+        if ( collection instanceof Collection ) {
+            if ( orgIds == null || orgIds.size() == 0 )
+                return new ArrayList(0);
+
+            Collection newCol = (Collection) collection;
+            Iterator orgItor = orgIds.iterator();
+            ArrayList removed = new ArrayList(0);
+
+            // make a new map of key and value of the new collection
+            HashMap newMap = new HashMap();
+            Iterator newColItor = newCol.iterator();
+            while ( newColItor.hasNext() ) {
+                Object newObject = newColItor.next();
+                Object newId = ch.getIdentity( newObject );
+                if ( newId != null )
+                    newMap.put( newId, newObject );
+            }
+            while ( orgItor.hasNext() ) {
+                Object id = orgItor.next();
+                if ( !newMap.containsKey( id ) )
+                    removed.add( id );
+            }
+            return removed;
+        }
+
+        throw new IllegalArgumentException( "Collection type "+collection.getClass().getName()+" is not supported!" );
+    }
+
+    /**
      * Update the object which loaded or created in the other transaction to
      * the persistent storage.
      *
@@ -1432,7 +1703,6 @@ public class ClassMolder {
 
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
-        Iterator itor;
         Object[] fields;
         Object ids;
         AccessMode am;
@@ -1481,6 +1751,8 @@ public class ClassMolder {
                 switch (fieldType) {
                 case FieldMolder.PRIMITIVE:
                     break;
+                case FieldMolder.SERIALIZABLE:
+                    break;
                 case FieldMolder.PERSISTANCECAPABLE:
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1509,25 +1781,22 @@ public class ClassMolder {
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     if ( _fhs[i].isDependent() ) {
                         if ( !_fhs[i].isLazy() ) {
-                            Collection al = (Collection) _fhs[i].getValue( object );
+                            Iterator itor = getIterator( _fhs[i].getValue( object ) );
                             ArrayList v = (ArrayList)fields[i];
-                            if ( al != null ) {
-                                if ( v != null ) {
-                                    Iterator it = al.iterator();
-                                    while ( it.hasNext() ) {
-                                        Object element = it.next();
-                                        if ( v.contains( fieldClassMolder.getIdentity( element ) ) ) {
-                                            tx.update( fieldEngine, fieldClassMolder, element, oid );
-                                        } else {
-                                            tx.create( fieldEngine, fieldClassMolder, element, oid );
-                                        }
+                            if ( v != null ) {
+                                while ( itor.hasNext() ) {
+                                    Object element = itor.next();
+                                    if ( v.contains( fieldClassMolder.getIdentity( element ) ) ) {
+                                        tx.update( fieldEngine, fieldClassMolder, element, oid );
+                                    } else {
+                                        tx.create( fieldEngine, fieldClassMolder, element, oid );
                                     }
                                 }
                             }
-                            ArrayList col = new ArrayList();
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
-                                    // load all the object
+                                    // load all the dependent object in cache for modification 
+                                    // check at commit time.
                                     tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
                                 }
                             }
@@ -1588,6 +1857,22 @@ public class ClassMolder {
                 // should give some attemp to reduce new object array
                 fields[i] = _fhs[i].getValue( object );
                 break;
+
+            case FieldMolder.SERIALIZABLE:
+                try {
+                    Object o = _fhs[i].getValue( object );
+                    if ( o != null ) {
+                        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                        ObjectOutputStream os = new ObjectOutputStream( bos );
+                        os.writeObject( o );
+                        fields[i] = bos.toByteArray();
+                    } else {
+                        fields[i] = null;
+                    }
+                } catch ( IOException e ) {
+                    // It won't happen. ByteArrayOutputStream will not throw IOException
+                }
+                break;
             case FieldMolder.PERSISTANCECAPABLE:
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
@@ -1606,7 +1891,7 @@ public class ClassMolder {
                 value = _fhs[i].getValue( object );
                 if ( value != null ) {
                     if ( !(value instanceof Lazy) ) {
-                        fids = getIds( fieldClassMolder, value );
+                        fids = extractIdentityList( fieldClassMolder, value );
                         fields[i] = fids;
                     } else {
                         RelationCollection lazy = (RelationCollection) value;
@@ -1622,7 +1907,7 @@ public class ClassMolder {
                 value = _fhs[i].getValue( object );
                 if ( value != null ) {
                     if ( !(value instanceof Lazy ) ) {
-                        fids = getIds( fieldClassMolder, value );
+                        fids = extractIdentityList( fieldClassMolder, value );
                         fields[i] = fids;
                     } else {
                         RelationCollection lazy = (RelationCollection) value;
@@ -1764,6 +2049,7 @@ public class ClassMolder {
             int fieldType = _fhs[i].getFieldType();
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
+            case FieldMolder.SERIALIZABLE:
                 break;
             case FieldMolder.PERSISTANCECAPABLE:
                 // persistanceCapable include many_to_one
@@ -1813,9 +2099,9 @@ public class ClassMolder {
                         }
                     }
 
-                    ArrayList blist = (ArrayList) _fhs[i].getValue( object );
-                    for ( int j=0; j<blist.size(); j++ ) {
-                        Object fobject = blist.get(j);
+                    Iterator itor = getIterator( _fhs[i].getValue( object ) );
+                    while ( itor.hasNext() ) {
+                        Object fobject = itor.next();
                         if ( fobject != null && tx.isPersistent( fobject ) ) {
                             tx.delete( fobject );
                         }
@@ -1833,9 +2119,9 @@ public class ClassMolder {
                         }
                     }
 
-                    ArrayList blist = (ArrayList) _fhs[i].getValue( object );
-                    for ( int j=0; j<blist.size(); j++ ) {
-                        Object fobject = blist.get(j);
+                    Iterator itor = getIterator( _fhs[i].getValue( object ) );
+                    while ( itor.hasNext() ) {
+                        Object fobject = itor.next();
                         if ( fobject != null && tx.isPersistent( fobject ) ) {
                             fieldClassMolder.removeRelation( tx, fobject, this, object );
                         }
@@ -1869,9 +2155,9 @@ public class ClassMolder {
                     }
                 }
 
-                ArrayList blist = (ArrayList) _fhs[i].getValue( object );
-                for ( int j=0; j<blist.size(); j++ ) {
-                    Object fobject = blist.get(j);
+                Iterator itor = getIterator( _fhs[i].getValue( object ) );
+                while ( itor.hasNext() ) {
+                    Object fobject = itor.next();
                     if ( fobject != null && tx.isPersistent( fobject ) ) {
                         fieldClassMolder.removeRelation( tx, fobject, this, object );
                     }
@@ -1915,15 +2201,34 @@ public class ClassMolder {
             case FieldMolder.PRIMITIVE:
                 Object temp = fields[i];
                 break;
+            case FieldMolder.SERIALIZABLE:
+                // deserialize byte[] into java object
+                try {
+                    byte[] bytes = (byte[]) fields[i];
+                    if ( bytes != null ) {
+                        // The following code can be updated, after Blob-->InputStream
+                        // to enhance performance.
+                        ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
+                        ObjectInputStream os = new ObjectInputStream( bis );
+                        Object o = os.readObject();
+                        _fhs[i].setValue( object, o );
+                    } else {
+                        _fhs[i].setValue( object, null );
+                    }
+                } catch ( OptionalDataException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( ClassNotFoundException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                } catch ( IOException e ) {
+                    throw new PersistenceException( "Error while deserializing an dependent object", e );
+                }
+                break;
             case FieldMolder.PERSISTANCECAPABLE:
 
                 fieldClassMolder = _fhs[i].getFieldClassMolder();
                 fieldEngine = _fhs[i].getFieldLockEngine();
 
                 if ( fields[i] != null ) {
-                    // will load() work as we wanted if the the
-                    // persistenceCapable field was deleted in
-                    // the transaction?
                     value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
                     _fhs[i].setValue( object, value );
                 } else {
@@ -1932,24 +2237,30 @@ public class ClassMolder {
                 break;
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
+
                 Object o = fields[i];
                 if ( o == null ) {
                     _fhs[i].setValue( object, null );
                 } else if ( !(o instanceof Lazy) ) {
                     ArrayList col = new ArrayList();
-                    //(ArrayList)_fhs[i].getCollectionType().newInstance();
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
 
-                    ArrayList v = (ArrayList)fields[i];
-                    for ( int j=0,l=v.size(); j<l; j++ ) {
-                        col.add( tx.load( fieldEngine, fieldClassMolder, v.get(j), null ) );
+                    CollectionProxy cp = CollectionProxy.create( _fhs[i].getCollectionType() );
+                    ArrayList v = (ArrayList) fields[i];
+                    if ( v != null ) {
+                        for ( int j=0,l=v.size(); j<l; j++ ) {
+                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
+                        }
+                        _fhs[i].setValue( object, cp.getCollection() );
+                    } else {
+                        _fhs[i].setValue( object, null );
                     }
-                    _fhs[i].setValue( object, col );
                 } else {
                     ArrayList list = (ArrayList) fields[i];
                     fieldClassMolder = _fhs[i].getFieldClassMolder();
                     fieldEngine = _fhs[i].getFieldLockEngine();
+
                     RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
                     _fhs[i].setValue( object, relcol );
                 }
@@ -2204,7 +2515,7 @@ public class ClassMolder {
     }
 
     /**
-     * Mutator method to set the deepends ClassMolder
+     * Mutator method to set the depends ClassMolder
      *
      */
     void setDepends( ClassMolder dep ) {
@@ -2213,19 +2524,34 @@ public class ClassMolder {
     }
 
     /**
-     * Return the iterator of a Collection
+     * Return the iterator on values of the specified Collection
+     * Or, return the iterator on values of the specified Map
      *
      * @param o - a Collection
      */
     private Iterator getIterator( Object o ) {
-        if ( o instanceof Collection ) {
+        if ( o == null ) {
+            return new Iterator() {
+                public boolean hasNext() {
+                    return false;
+                }
+                public Object next() {
+                    throw new NoSuchElementException();
+                }
+                public void remove() {
+                    throw new UnsupportedOperationException();
+                }
+            };
+        } else if ( o instanceof Collection ) {
             return ((Collection) o).iterator();
-        } else if ( o instanceof Vector ) {
-            return null;
+        } else if ( o instanceof Map ) {
+            return ((Map) o).values().iterator();
         } else {
-            return null;
+            throw new IllegalArgumentException();
         }
     }
+
+
 
     /**
      * Return all the object identity of a Collection of object of the same
@@ -2235,31 +2561,26 @@ public class ClassMolder {
      * @param o - a Collection or Vector containing
      * @return a list of <tt>Object[]</tt>s which contains object identity
      */
-    private ArrayList getIds( ClassMolder molder, Object o ) {
-        ArrayList v = null;
-        Vector vo;
-        Iterator i;
-        Collection c;
-        Enumeration e;
-        if ( o instanceof Collection ) {
-            c = (Collection) o ;
-            i = c.iterator();
-            v = new ArrayList( c.size() );
-            while ( i.hasNext() ) {
-                v.add( molder.getIdentity( i.next() ) );
+    private ArrayList extractIdentityList( ClassMolder molder, Object col ) {
+        if ( col == null ) {
+            return new ArrayList();
+        } else if ( col instanceof Collection ) {
+            ArrayList idList = new ArrayList();
+            Iterator itor = ((Collection)col).iterator();
+            while ( itor.hasNext() ) {
+                idList.add( molder.getIdentity( itor.next() ) );
             }
-        } else if ( o instanceof Vector ) {
-            vo = (Vector) o;
-            e = vo.elements();
-            v = new ArrayList( vo.size() );
-            while ( e.hasMoreElements() ) {
-                v.add( molder.getIdentity( e.nextElement() ) );
+            return idList; 
+        } else if ( col instanceof Map ) {
+            ArrayList idList = new ArrayList();
+            Iterator itor = ((Map)col).keySet().iterator();
+            while ( itor.hasNext() ) {
+                idList.add( itor.next() );
             }
-        } else if ( o != null ) {
-            v = null;
-            throw new RuntimeException("expecting collection");
+            return idList;
+        } else {
+            throw new IllegalArgumentException("A Collection or Map is expected!");
         }
-        return v;
     }
 
     public String toString() {
@@ -2272,6 +2593,64 @@ public class ClassMolder {
     public boolean isKeyGeneratorUsed() {
         return _isKeyGenUsed;
     }
+
 }
 
+/**
+ * This class is a proxy for different types of Colleciton and Maps.
+ */
+abstract class CollectionProxy {
+
+    abstract Object getCollection();
+
+    abstract void add( Object key, Object value );
+
+    static CollectionProxy create( Class cls ) {
+        if ( cls == Vector.class ) {
+            return new ColProxy( new Vector() );
+        } else if ( cls == ArrayList.class ) {
+            return new ColProxy( new ArrayList() );
+        } else if ( cls == Collection.class ) {
+            return new ColProxy( new ArrayList() );
+        } else if ( cls == Set.class ) {
+            return new ColProxy( new HashSet() );
+        } else if ( cls == HashSet.class ) {
+            return new ColProxy( new HashSet() );   
+        } else if ( cls == Hashtable.class ) {
+            return new MapProxy( new Hashtable() );
+        } else if ( cls == HashMap.class ) {
+            return new MapProxy( new HashMap() );
+        } else if ( cls == Map.class ) {
+            return new MapProxy( new HashMap() );
+        } else {
+            throw new IllegalArgumentException("Collection Proxy doesn't exist for it type");
+        }
+    }
+
+    private static class ColProxy extends CollectionProxy {
+        private Collection _col;
+        private ColProxy( Collection col ) {
+            _col = col;
+        }
+        Object getCollection() {
+            return _col;
+        }
+        void add( Object key, Object value ) {
+            _col.add( value );
+        }
+    }
+
+    private static class MapProxy extends CollectionProxy {
+        private Map _map;
+        private MapProxy( Map map ) {
+            _map = map;
+        }
+        Object getCollection() {
+            return _map;
+        }
+        void add( Object key, Object value ) {
+            _map.put( key, value );
+        }
+    }
+}
 
