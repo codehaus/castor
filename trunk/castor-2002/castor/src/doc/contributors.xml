@@ -59,6 +59,13 @@
     <description>Submitted code for generating mapping file from existing SQL database.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Arriaga" given="Santiago"/>
+    <email>santiago@catnet.com.mx</email>
+    <description>Added Informix and Hypersonic SQL to the list of supported databases.</description>
+  </contributor>
+
+
   <contributor type="Feedback">
     <name surname="Sahuc" given="Sebastien"/>
     <email>ssahuc@imediation.com</email>
