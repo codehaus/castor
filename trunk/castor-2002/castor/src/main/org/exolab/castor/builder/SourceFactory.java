@@ -565,7 +565,17 @@ public class SourceFactory  {
                     typeName = ((ElementDecl)struct).getName();
                     break;
             }
-            typeName += "Type";
+            //-- In case of naming collision we append current
+            //-- class name
+            FactoryState fstate = sgState.getCurrentFactoryState();
+            if (fstate != null) {
+                typeName = JavaNaming.toJavaClassName(typeName);
+                typeName = fstate.jClass.getLocalName() + typeName;
+            }
+            else {
+                //-- otherwise just append "Type"
+                typeName += "Type";
+            }
         }
 
         String className   = JavaNaming.toJavaClassName(typeName);
