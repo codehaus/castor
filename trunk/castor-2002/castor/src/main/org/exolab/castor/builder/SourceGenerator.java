@@ -1145,6 +1145,11 @@ public class SourceGenerator {
         jMethod.addParameter(new JParameter(SGTypes.Object, "obj"));
         jclass.addMethod(jMethod);
         JSourceCode jsc = jMethod.getSourceCode();
+        jsc.add("if ( this == obj )");
+        jsc.indent();
+        jsc.add("return true;");
+        jsc.unindent();
+        jsc.add("");
         jsc.add("if (obj instanceof "+jclass.getName(true)+") {");
         jsc.add("");
         jsc.indent();
