@@ -1974,6 +1974,15 @@ public class Marshaller extends MarshalFramework {
              }
              return;
         }
+        else if (target instanceof Enumeration) {
+            Enumeration enum = (Enumeration)target;
+            while (enum.hasMoreElements()) {
+                Object item = enum.nextElement();
+                if (item != null)
+                    processContainerAttributes(item, containerFieldDesc, atts);
+            }
+            return;
+        }
 
         Object containerObject = containerFieldDesc.getHandler().getValue(target);
 
