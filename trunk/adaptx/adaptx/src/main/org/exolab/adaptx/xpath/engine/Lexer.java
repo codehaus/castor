@@ -515,8 +515,12 @@ public class Lexer {
                     //-- make sure we are not in the middle of a path
                     //-- expression, otherwise switch to CNAME
                     else if ((tok.type == Token.AND_OPNAME) || 
-                             (tok.type == Token.OR_OPNAME)) {
-                        if ((last == null) || isOperator(last.token)) {
+                             (tok.type == Token.OR_OPNAME)) 
+                    {
+                        if ((last == null) || 
+                            (last.token.type == Token.NULL) ||
+                            isOperator(last.token)) 
+                        {
                             tok.type = Token.CNAME;
                         }
                     }
