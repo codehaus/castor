@@ -104,6 +104,17 @@ public final class SQLEntityInfo
      */
     public final SQLEntityInfo[] superEntities;
 
+    /**
+     * The offset of the first field in the entity
+     * (aka, the sum of the number of field for all super entities)
+     */
+    public final int fieldOffset;
+
+    /**
+     * The length of 'values' array in Entity instance
+     */
+    public final int valuesLength;
+
     private SQLEntityInfo(EntityInfo info) throws PersistenceException {
         ArrayList idNamesList = new ArrayList();
         String[] fieldNames;
@@ -118,6 +129,8 @@ public final class SQLEntityInfo
         // finishes and all fields are set. This problem is solved by synchronization block in getInstance().
         _instances.put(info, this);
 
+        fieldOffset = info.getFieldOffset();
+                
         // "Linearize" the identity columns
         idInfo = new SQLFieldInfo[info.idInfo.length];
         for (int i = 0; i < idInfo.length; i++) {
@@ -135,8 +148,8 @@ public final class SQLEntityInfo
         for (level = 0; superInfo.superEntity != null; level++) {
             superInfo = superInfo.superEntity;
         }
+        valuesLength = superInfo.getMaxLength();
         superEntities = new SQLEntityInfo[level + 1];
-        superInfo = info;
         superEntities[level] = this;
         for (level--; level >= 0; level--) {
             superInfo = superInfo.superEntity;
@@ -208,3 +221,4 @@ public final class SQLEntityInfo
         return info.hashCode();
     }
 }
+

@@ -325,17 +325,11 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
         if (_factory.supportsSetNullInWhere()) {
             return dirtyCheckNulls;
         }
-        for (int sub = 0; sub < original.entityClasses.length; sub++) {
-            if (!original.entityClasses[sub].equals(_info.info.entityClass)) {
-                continue;
+        for (int i = 0; i < _info.fieldInfo.length; i++) {
+            if (original.values[_info.fieldOffset + i] == null &&
+                    _info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck) {
+                dirtyCheckNulls.set(i);
             }
-            for (int i = 0; i < original.values[sub].length; i++) {
-                if (original.values[sub][i] == null &&
-                        _info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck) {
-                    dirtyCheckNulls.set(i);
-                }
-            }
-            break;
         }
         return dirtyCheckNulls;
     }

@@ -95,11 +95,6 @@ import org.exolab.castor.util.Messages;
 public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQueryKinds {
 
     /**
-     * The maximum depth of the inheritance tree
-     */
-    private final static int MAX_DEPTH = 256;
-
-    /**
      * The maximum number of SQL columns that a complex field (foreign key or identity) consists of.
      */
     private final static int MAX_COMPLEX = 256;
@@ -211,6 +206,7 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
         int count;
         Entity tmpEntity;
         Relation relation2;
+        int offset;
 
         try {
             useBatch = (_canUseBatch && conn.getMetaData().supportsBatchUpdates());
@@ -247,16 +243,11 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
             count = 1;
 
             if (_kind == UPDATE || _kind == INSERT) {
-                for (int sub = 0; sub < entity.entityClasses.length; sub++) {
-                    if (!entity.entityClasses[sub].equals(_info.info.entityClass)) {
-                        continue;
+                for (int i = 0; i < _info.fieldInfo.length; i++) {
+                    if (_info.fieldInfo[i] != null) {
+                        count = bindField(entity.values[_info.fieldOffset + i], 
+                                          stmt, count, _info.fieldInfo[i]);
                     }
-                    for (int i = 0; i < _info.fieldInfo.length; i++) {
-                        if (_info.fieldInfo[i] != null) {
-                            count = bindField(entity.values[sub][i], stmt, count, _info.fieldInfo[i]);
-                        }
-                    }
-                    break;
                 }
             }
 
@@ -271,17 +262,12 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
 
             // Dirty checking
             if ((_kind == UPDATE || _kind == DELETE) && _dirtyCheckNulls != null) {
-                for (int sub = 0; sub < original.entityClasses.length; sub++) {
-                    if (!original.entityClasses[sub].equals(_info.info.entityClass)) {
-                        continue;
+                for (int i = 0; i < _info.fieldInfo.length; i++) {
+                    if (_info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck
+                            && !_dirtyCheckNulls.get(i)) {
+                        count = bindField(original.values[_info.fieldOffset + i], 
+                                          stmt, count, _info.fieldInfo[i]);
                     }
-                    for (int i = 0; i < _info.fieldInfo.length; i++) {
-                        if (_info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck
-                                && !_dirtyCheckNulls.get(i)) {
-                            count = bindField(original.values[sub][i], stmt, count, _info.fieldInfo[i]);
-                        }
-                    }
-                    break;
                 }
             }
 
@@ -327,7 +313,7 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
                 relation2 = null;
                 while (rs.next()) {
                     entity = new Entity();
-                    entity.info = _info.superEntities[0].info;
+                    entity.base = _info.superEntities[0].info;
                     loadEntity(entity, rs);
                     list.add(entity.identity);
                     lockEngine.addEntity(key, entity);
@@ -359,8 +345,6 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
      */
     private void loadEntity(Entity entity, ResultSet rs)
             throws PersistenceException {
-        String[] entityClasses;
-        Object[][] values;
         SQLEntityInfo curInfo;
         Object[] temp = new Object[MAX_COMPLEX];
         Object[] temp2 = new Object[MAX_COMPLEX];
@@ -368,13 +352,7 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
         int count;
 
         // prepare the entity for loading
-        if (_info.subEntities == null) {
-            entityClasses = new String[_info.superEntities.length];
-            values = new Object[_info.superEntities.length][];
-        } else {
-            entityClasses = new String[MAX_DEPTH];
-            values = new Object[MAX_DEPTH][];
-        }
+        entity.values = new Object[_info.valuesLength];
 
         count = 1;
 
@@ -382,8 +360,6 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
         // the following loop process super-entities and this class
         for (level = 0; level < _info.superEntities.length; level++) {
             curInfo = _info.superEntities[level];
-            entityClasses[level] = curInfo.info.entityClass;
-            values[level] = new Object[curInfo.fieldInfo.length];
 
             // identity fields
             entity.identity = readIdentity(rs, count, curInfo, temp, temp2);
@@ -392,29 +368,22 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
             // Fill all fields that are a part of identity (it's possible for top level only)
             if (level == 0) {
                 if (curInfo.idPos.length == 1) {
-                    values[0][curInfo.idPos[0]] = entity.identity;
+                    entity.values[curInfo.idPos[0]] = entity.identity;
                 } else {
                     Complex complex = (Complex) entity.identity;
                     for (int i = 0; i < curInfo.idPos.length; i++) {
-                        values[0][curInfo.idPos[i]] = complex.get(i);
+                        entity.values[curInfo.idPos[i]] = complex.get(i);
                     }
                 }
             }
 
             // Load other fields
-            count = readEntity(values[level], rs, count, curInfo, temp);
+            count = readEntity(entity.values, rs, count, curInfo, temp);
         }
 
         // Now load sub-entities
-        if (_info.subEntities == null) {
-            entity.entityClasses = entityClasses;
-            entity.values = values;
-        } else {
-            level = loadSubEntityLevel(_info, level, entityClasses, values, rs, count, temp, temp2);
-            entity.entityClasses = new String[level];
-            entity.values = new Object[level][];
-            System.arraycopy(entityClasses, 0, entity.entityClasses, 0, level);
-            System.arraycopy(values, 0, entity.values, 0, level);
+        if (_info.subEntities != null) {
+            loadSubEntityLevel(_info, entity, rs, count, temp, temp2);
         }
     }
 
@@ -474,9 +443,8 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
 
     /**
      * Recursive method that loads sub-entities in depth-first order.
-     * @return The number of the first null level.
      */
-    private int loadSubEntityLevel(SQLEntityInfo info, int level, String[] entityClasses, Object[][] values,
+    private void loadSubEntityLevel(SQLEntityInfo info, Entity entity,
                                    ResultSet rs, int count, Object[] temp, Object[] temp2)
             throws PersistenceException {
         SQLEntityInfo subInfo;
@@ -496,12 +464,11 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
                 count += info.idNames.length;
                 count = skipEntity(rs, count, subInfo);
             } else {
-                entityClasses[level] = subInfo.info.entityClass;
-                count = readEntity(values[level], rs, count, subInfo, temp);
-                return loadSubEntityLevel(subInfo, level + 1, entityClasses, values, rs, count, temp, temp2);
+                count = readEntity(entity.values, rs, count, subInfo, temp);
+                entity.actual = subInfo.info;
+                loadSubEntityLevel(subInfo, entity, rs, count, temp, temp2);
             }
         }
-        return level;
     }
 
     private void throwUpdateException(Key key, LockEngine lockEngine, Connection conn, Entity entity,
@@ -566,7 +533,7 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
             throws PersistenceException {
         for (int i = 0; i < info.fieldInfo.length; i++) {
             if (info.fieldInfo[i] != null) {
-                count = readEntityField(i, values, rs, count, info.fieldInfo[i], temp);
+                count = readEntityField(i, values, info.fieldOffset, rs, count, info.fieldInfo[i], temp);
             }
         }
         return count;
@@ -602,7 +569,7 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
 
         isNull = true;
         for (int i = 0; i < info.idInfo.length; i++) {
-            count = readEntityField(i, temp2, rs, count, info.idInfo[i], temp);
+            count = readEntityField(i, temp2, info.fieldOffset, rs, count, info.idInfo[i], temp);
             if (temp2[i] != null) {
                 isNull = false;
             }
@@ -621,7 +588,8 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
      * @param temp Auxilary array for reading Complex values.
      * @return next index in the ResultSet.
      */
-    private int readEntityField(int index, Object[] values, ResultSet rs, int count, SQLFieldInfo fldInfo,
+    private int readEntityField(int index, Object[] values, int fieldOffset,
+                                ResultSet rs, int count, SQLFieldInfo fldInfo,
                                 Object[] temp)
             throws PersistenceException {
         boolean isNull;
@@ -638,12 +606,13 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
             }
         }
         if (isNull) {
-            values[index] = null;
+            values[fieldOffset + index] = null;
         } else {
             if (fldInfo.sqlType.length == 1) {
-                values[index] = temp[0];
+                values[fieldOffset + index] = temp[0];
             } else {
-                values[index] = new Complex(fldInfo.sqlType.length, temp);
+                values[fieldOffset + index] =
+                        new Complex(fldInfo.sqlType.length, temp);
             }
         }
         return count;
@@ -765,3 +734,4 @@ public final class SQLQueryExecutor implements SQLConnector.ConnectorListener, S
         }
     }
 }
+
