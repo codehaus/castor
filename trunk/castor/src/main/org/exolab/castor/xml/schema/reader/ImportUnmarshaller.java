@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -78,7 +78,9 @@ public class ImportUnmarshaller extends ComponentReader
 		    return; 
 		}
 
+        boolean hasLocation = (schemaLocation != null);
         if (schemaLocation != null) {
+            
             if (schemaLocation.indexOf("\\") != -1) {
                 String err = "'" + schemaLocation + 
                     "' is not a valid URI as defined by IETF RFC 2396.";
@@ -127,7 +129,7 @@ public class ImportUnmarshaller extends ComponentReader
 
         //-- Schema object to hold import schema
 		boolean addSchema = false;
-		Schema importedSchema = schema.getImportedSchema(namespace);
+		Schema importedSchema = schema.getImportedSchema(namespace, true);
 
         //-- Have we already imported this XML Schema file?
 		if (state.processed(schemaLocation)) {
@@ -148,7 +150,26 @@ public class ImportUnmarshaller extends ComponentReader
 			    addSchema = true;
 			}
 		}
-		else alreadyLoaded = true;
+		else {
+		    //-- check schema location, if different, allow merge
+		    if (hasLocation) {
+		        String tmpLocation = importedSchema.getSchemaLocation();
+		        alreadyLoaded = schemaLocation.equals(tmpLocation);
+		    }
+		    else { 
+		        //-- only namespace can be used, no way to distinguish
+		        //-- multiple imports...mark as alreadyLoaded
+		        //-- see W3C XML Schema 1.0 Recommendation (part 1)
+		        //-- section 4.2.3...
+		        //-- <quote>... Given that the schemaLocation [attribute] is only 
+		        //--   a hint, it is open to applications to ignore all but the 
+		        //--   first <import> for a given namespace, regardless of the 
+		        //--  ·actual value· of schemaLocation, but such a strategy
+                //--  risks missing useful information when new schemaLocations 
+                //--  are offered.</quote>
+		        alreadyLoaded = true;
+		    }
+		}
 
         state.markAsProcessed(schemaLocation, importedSchema);
 
