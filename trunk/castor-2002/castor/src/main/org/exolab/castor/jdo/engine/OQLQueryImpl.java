@@ -64,6 +64,7 @@ import org.exolab.castor.util.Messages;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
+import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.Query;
 import org.exolab.castor.persist.ObjectNotFoundException;

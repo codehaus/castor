@@ -55,6 +55,7 @@ import org.odmg.LockNotGrantedException;
 import org.odmg.ODMGRuntimeException;
 import org.odmg.ObjectNotPersistentException;
 import javax.transaction.Status;
+import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.FastThreadLocal;
 import org.exolab.castor.util.Messages;
 
@@ -67,20 +68,20 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class TransactionImpl
-    implements org.odmg.Transaction
+    implements Transaction
 {
 
 
-    private TransactionContext     _txContext;
+    private TransactionContextImpl  _txContext;
 
 
-    private int                    _threadCount;
+    private int                     _threadCount;
 
 
-    private static FastThreadLocal _txLocal = new FastThreadLocal();
+    private static FastThreadLocal  _txLocal = new FastThreadLocal();
 
 
-    private int                    DefaultWaitLockTimeout = 10000;
+    private int                     DefaultWaitLockTimeout = 10000;
 
 
 
@@ -146,7 +147,7 @@ public final class TransactionImpl
 	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
 	if ( _txContext != null && _txContext.isOpen() )
 	    throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.txInProgress" ) );
-	_txContext = new TransactionContext();
+	_txContext = new TransactionContextImpl();
     }
 
 
