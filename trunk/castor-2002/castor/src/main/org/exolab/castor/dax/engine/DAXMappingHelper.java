@@ -76,57 +76,69 @@ public class DAXMappingHelper
 {
 
 
-    public DAXMappingHelper( ClassLoader loader, Mapping mapping )
+    public DAXMappingHelper( ClassLoader loader )
         throws MappingException
     {
-	Enumeration   enum;
-	ClassMapping  clsMap;
-	ClassDesc     clsDesc;
-
-	enum = mapping.enumerateClassMapping();
-	while ( enum.hasMoreElements() ) {
-	    clsMap = (ClassMapping) enum.nextElement();
-	    clsDesc = createDescriptor( loader, clsMap );
-	    if ( clsDesc != null )
-		addDescriptor( clsDesc );
-	}
+        super( loader );
     }
 
 
-    protected ClassDesc createDescriptor( ClassLoader loader, ClassMapping objMap )
+    protected void loadMapping( Mapping mapping )
         throws MappingException
     {
-	ClassDesc clsDesc;
-	FieldDesc  attrSet;
-
-	if ( objMap.getLdapEntry() == null )
-	    return null;
-	clsDesc = super.createDescriptor( loader, objMap );
-	if ( clsDesc.getIdentity() == null ) {
-	    return null;
-	}
-	return new DAXClassDesc( clsDesc, null, objMap.getLdapEntry().getObjectClass() );
+        Enumeration   enum;
+        ClassMapping  clsMap;
+        ClassDesc     clsDesc;
+        
+        enum = mapping.enumerateClassMapping();
+        while ( enum.hasMoreElements() ) {
+            clsMap = (ClassMapping) enum.nextElement();
+            clsDesc = createDescriptor( clsMap );
+            if ( clsDesc != null ) {
+                addDescriptor( clsDesc );
+            } else {
+                if ( getLogWriter() != null ) {
+                    getLogWriter().println( "Ignored mapping for class " + clsMap.getClassName() + " - not SQL information available" );
+                }
+            }
+        }
     }
 
 
-    protected FieldDesc[] createFieldDescs( ClassLoader loader, Class objType, FieldMapping[] fieldMaps )
-	throws MappingException
+    protected ClassDesc createDescriptor( ClassMapping objMap )
+        throws MappingException
     {
-	Vector      fields;
-	FieldDesc   fieldDesc;
-	FieldDesc[] array;
+        ClassDesc clsDesc;
+        FieldDesc  attrSet;
+        
+        if ( objMap.getLdapEntry() == null )
+            return null;
+        clsDesc = super.createDescriptor( objMap );
+        if ( clsDesc.getIdentity() == null ) {
+            return null;
+        }
+        return new DAXClassDesc( clsDesc, null, objMap.getLdapEntry().getObjectClass() );
+    }
 
-	fields = new Vector();
-	for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
-	    if ( fieldMaps[ i ].getLdapInfo() != null ) {
-		fieldDesc = createFieldDesc( loader, objType, fieldMaps[ i ] );
-		fieldDesc = new DAXFieldDesc( fieldDesc, fieldMaps[ i ].getLdapInfo().getName() );
-		fields.addElement( fieldDesc );
-	    }
-	}
-	array = new FieldDesc[ fields.size() ];
-	fields.copyInto( array );
-	return array;
+
+    protected FieldDesc[] createFieldDescs( Class objType, FieldMapping[] fieldMaps )
+        throws MappingException
+    {
+        Vector      fields;
+        FieldDesc   fieldDesc;
+        FieldDesc[] array;
+        
+        fields = new Vector();
+        for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
+            if ( fieldMaps[ i ].getLdapInfo() != null ) {
+                fieldDesc = createFieldDesc( objType, fieldMaps[ i ] );
+                fieldDesc = new DAXFieldDesc( fieldDesc, fieldMaps[ i ].getLdapInfo().getName() );
+                fields.addElement( fieldDesc );
+            }
+        }
+        array = new FieldDesc[ fields.size() ];
+        fields.copyInto( array );
+        return array;
     }
 
 
