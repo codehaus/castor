@@ -131,6 +131,13 @@ public class SourceGenerator {
     private static final String CASTOR_TESTABLE_MSG
         = "The generated classes will implement org.exolab.castor.tests.CastorTestable";
 
+    /**
+     * Warning message to remind users to create source
+     * code for imported schema.
+    **/
+    private static final String IMPORT_WARNING 
+        = "Warning: Do not forget to generate source code for the following imported schema: ";
+         
     //----------------------/
     //- Instance Variables -/
     //----------------------/
@@ -700,8 +707,20 @@ public class SourceGenerator {
 
     private void createClasses(Schema schema, SGStateInfo sInfo) {
 
-        Enumeration structures = schema.getElementDecls();
 
+        //-- ** print warnings for imported schemas **
+        Enumeration enum = schema.getImportedSchema();
+        while (enum.hasMoreElements()) {
+            Schema importedSchema = (Schema)enum.nextElement();
+            System.out.println();
+            System.out.println(IMPORT_WARNING + 
+                importedSchema.getSchemaLocation());
+        }
+        
+        //-- ** Generate code for all TOP-LEVEL structures **
+        
+        Enumeration structures = schema.getElementDecls();
+        
         //-- handle all top-level element declarations
         while (structures.hasMoreElements())
             createClasses((ElementDecl)structures.nextElement(), sInfo);
