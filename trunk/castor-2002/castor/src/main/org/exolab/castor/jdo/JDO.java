@@ -180,6 +180,13 @@ public class JDO
 
 
     /**
+     * The resolver can be used to resolve cached entities, e.g.
+     * for external mapping documents. 
+     */
+    private EntityResolver _entityResolver;
+
+
+    /**
      * Constructs a new JDO database factory. Must call {@link
      * #setDatabaseName} before calling {@link #getDatabase}.
      */
@@ -263,6 +270,28 @@ public class JDO
     public ClassLoader getClassLoader()
     {
         return _classLoader;
+    }
+
+
+    /**
+     * Sets the entity resolver.
+     * The resolver can be used to resolve cached entities, e.g.
+     * for external mapping documents.
+     * Note, that you cannot create two Database instances that differ
+     * only in a resolver.
+     */
+    public void setEntityResolver( EntityResolver entityResolver)
+    {
+        _entityResolver = entityResolver;
+    }
+
+
+    /**
+     * Returns the entity resolver.
+     */
+    public EntityResolver getEntityResolver()
+    {
+        return _entityResolver;
     }
 
 
@@ -427,7 +456,7 @@ public class JDO
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, _classLoader );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), _entityResolver, _logInterceptor, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
@@ -493,7 +522,6 @@ public class JDO
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
-        _classLoader = loader;
     }
     
     
@@ -516,7 +544,6 @@ public class JDO
         throws MappingException
     {
         DatabaseRegistry.loadDatabase( source, resolver, null, loader );
-        _classLoader = loader;
     }
 
 
