@@ -289,8 +289,9 @@ public class XMLFieldDescriptorImpl
      * is considered equal.
     **/
     public boolean equals(Object obj) {
-        if (!(obj instanceof XMLFieldDescriptor))
+        if ((obj == null) || (!(obj instanceof XMLFieldDescriptor)))
             return false;
+            
         XMLFieldDescriptor descriptor = (XMLFieldDescriptor)obj;
         if (_handler == null) {
             return (obj == this);
