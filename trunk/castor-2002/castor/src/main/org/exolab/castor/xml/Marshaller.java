@@ -769,7 +769,9 @@ public class Marshaller extends MarshalFramework {
 
         //-- Look for attributes in container fields, 
         //-- (also handle container in container)
+        /* REMOVED For now (KV)
         processContainerAttributes(object, classDesc, atts);
+        */
 
 
 
