@@ -444,8 +444,7 @@ public class DescriptorSourceFactory {
             jsc.add("desc.setImmutable(true);");
         }
         else if (xsType.getType() == XSType.DECIMAL_TYPE) {
-            jsc.add("desc.setHandler( new DecimalFieldHandler(");
-            jsc.append("handler));");
+            jsc.add("desc.setHandler(handler);");
             jsc.add("desc.setImmutable(true);");
         }
         //-- Handle special Collection Types such as NMTOKENS and IDREFS
