@@ -490,7 +490,7 @@ public class TypeConversion {
         nameMap.put("binary",              "byte[]");
         nameMap.put("boolean",             "boolean");
         //nameMap.put("date",                "java.util.date");
-        nameMap.put("date",                "org.exolab.castor.types.DateType");
+        nameMap.put("date",                "org.exolab.castor.types.Date");
         nameMap.put("integer",             "int");
         nameMap.put("negativeInteger",     "int");
         nameMap.put("positiveInteger",     "int");
