@@ -196,6 +196,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             if (attName.equals(XMLNS) || attName.startsWith(XMLNS_PREFIX))
                 handleXMLNS(attName, atts.getValue(i));
         }
+		_schema.setNamespaces(namespaces);
     } //-- processNamespaces
 
 
@@ -294,6 +295,11 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.INCLUDE) {
             unmarshaller 
                 = new IncludeUnmarshaller(_schema, atts, _resolver, includes);
+        }
+        //-- <import>
+        else if (name == SchemaNames.IMPORT) {
+            unmarshaller 
+                = new ImportUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here

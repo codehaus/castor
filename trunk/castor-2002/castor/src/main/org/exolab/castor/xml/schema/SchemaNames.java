@@ -71,6 +71,7 @@ public class SchemaNames {
     public static final String DOCUMENTATION    = "documentation";
     public static final String SCHEMA           = "schema";
     public static final String INCLUDE          = "include";
+    public static final String IMPORT           = "import";	
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
     public static final String MAX_INCLUSIVE    = "maxInclusive";
     public static final String MIN_EXCLUSIVE    = "minExclusive";
