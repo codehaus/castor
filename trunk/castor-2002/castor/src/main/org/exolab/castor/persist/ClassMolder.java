@@ -1835,7 +1835,7 @@ public class ClassMolder {
                                         tx.markUpdate( fieldEngine, fieldClassMolder, element, null );
                                 } else {
                                     if ( !tx.isRecorded( element ) )
-                                        tx.markCreate( fieldEngine, fieldClassMolder, element, null );
+                                        tx.markUpdate( fieldEngine, fieldClassMolder, element, null );
                                 }
                             }
                             // load all old objects for comparison in the preStore state
@@ -1868,7 +1868,7 @@ public class ClassMolder {
                                         tx.markUpdate( fieldEngine, fieldClassMolder, element, null );
                                 } else {
                                     if ( !tx.isRecorded( element ) )
-                                        tx.markCreate( fieldEngine, fieldClassMolder, element, null );
+                                        tx.markUpdate( fieldEngine, fieldClassMolder, element, null );
                                 }
                             }
                             // load all old objects for comparison in the preStore state
