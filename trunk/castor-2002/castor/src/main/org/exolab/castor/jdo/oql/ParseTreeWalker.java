@@ -101,6 +101,7 @@ public class ParseTreeWalker implements TokenTypes
   public static final int DEPENDANT_OBJECT_VALUE = 5;
   public static final int DEPENDANT_VALUE = 6;
 
+  public static final int MAX_TABLE_LENGTH = 30;
 
   /**
    * Creates a new parse tree walker.  Which checks the tree for errors, and
@@ -873,6 +874,20 @@ public class ParseTreeWalker implements TokenTypes
           } else {
               index = i.intValue();
           }
+          // fix for oracle support. If we have a 30 character table name, adding
+          // anything to it (_#) will cause it to be too long and will make oracle
+          // barf. the length we are trying to evaluate is: 
+          // length of the table name + the length of the index number we are using
+          // + the _ character.
+          String stringIndex = String.valueOf(index);
+          if(tableAlias.length() + stringIndex.length() + 1 > MAX_TABLE_LENGTH) {
+              // use a substring of the original table name, rather than the table alias
+              // because if we truncate the table alias it could become "ununique"
+              // (by truncating the _# we add) by truncating the table name
+              // beforehand we are guaranteed uniqueness as long as the index is
+              // not reused.
+              tableAlias = tableAlias.substring(MAX_TABLE_LENGTH - (stringIndex.length() + 1));
+          }
           // If table name contains '.', it should be replaced, since such names aren't allowed for aliases
           tableAlias = tableAlias.replace('.', '_') + "_" + index;
       }
@@ -941,7 +956,7 @@ public class ParseTreeWalker implements TokenTypes
                 if ( i > 1 ) {
                     manyTableAlias = buildTableAlias( manyTableAlias, path, i - 1 );
                     sourceTableAlias = buildTableAlias( sourceTableAlias, path, i - 1 );
-		}
+      }
 
                 _queryExpr.addInnerJoin( sourceClass.getTableName(),
                                          identity.getSQLName(),
