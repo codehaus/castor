@@ -67,6 +67,7 @@ import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.util.Messages;
@@ -159,7 +160,7 @@ public abstract class TransactionContext
      * @see #getWaitOnLock
      * @see ObjectLock
      */
-    private ObjectLock  _waitOnLock;
+    private ObjectLock                 _waitOnLock;
 
 
     /**
@@ -167,7 +168,7 @@ public abstract class TransactionContext
      * Actually the vector contains instances of {@link ObjectEntry}.
      * @see #addObjectEntry
      */
-    private final Vector  _objects = new Vector();
+    private final Vector               _objects = new Vector();
 
 
     /**
@@ -176,7 +177,7 @@ public abstract class TransactionContext
      * as the key, the value is a hashtable. In that hashtable {@link OID}
      * is the key and {@link ObjectEntry} is the value.
      */
-    private final Hashtable   _engineOids = new Hashtable();
+    private final Hashtable            _engineOids = new Hashtable();
 
 
     /**
@@ -188,49 +189,57 @@ public abstract class TransactionContext
      * is the value.
      * @see #addObjectEntry
      */
-    private final Hashtable  _readOnlyObjects = new Hashtable();
+    private final Hashtable            _readOnlyObjects = new Hashtable();
 
 
     /**
      * The transaction status. See {@link Status} for list of valid values.
      */
-    private int         _status;
+    private int                        _status;
 
 
     /**
      * The timeout waiting to acquire a new lock. Specified in seconds.
      */
-    private int         _lockTimeout = 30;
+    private int                        _lockTimeout = 30;
 
 
     /**
      * The Xid of this transaction is generated from an XA resource.
      */
-    private final Xid   _xid;
+    private final Xid                  _xid;
 
 
     /**
      * The timeout of this transaction. Specified in seconds.
      */
-    private int         _txTimeout = 30;
+    private int                        _txTimeout = 30;
 
 
     /**
      * FIFO linked list of objects deleted in this transaction.
      */
-    private ObjectEntry  _deletedList;
+    private ObjectEntry                _deletedList;
 
 
     /**
      * The database to which this transaction belongs.
      */
-    private Database     _db;
+    private Database                   _db;
 
     /**
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
      */
-    private boolean _autoStore;
+    private boolean                    _autoStore;
+
+
+    /**
+     * The default callback interceptor for the data object in 
+     * this transaction.
+     */
+    private CallbackInterceptor        _callback;
+
 
     /**
      * Create a new transaction context. This method is used by the
@@ -255,13 +264,40 @@ public abstract class TransactionContext
         _db = db;
     }
 
+    /**
+     * Enable or disable autoStore. 
+     * If enabled, all new objects, which is reachable from other 
+     * object that is quried, loaded, created in the transaction, 
+     * will be created when the transaction is committed.
+     */
     public void setAutoStore( boolean autoStore ) {
         _autoStore = autoStore;
     }
 
+    /**
+     * Test if autoStore options is enabled or not.
+     */
     public boolean isAutoStore() {
         return _autoStore;
     }
+
+    /**
+     * Overrides the default callback interceptor by a custom 
+     * interceptor for this database source.
+     * <p>
+     * The interceptor is a callback that notifies data objects 
+     * on persistent state events.
+     * <p>
+     * If callback interceptor is not overrided, events will be
+     * sent to data object that implements the org.exolab.castor.jdo.Persistent 
+     * interface.
+     *
+     * @param callback The callback interceptor, null if disabled
+     */
+    public void setCallback( CallbackInterceptor callback ) {
+        _callback = callback;
+    }
+
 
     public PersistenceInfoGroup getScope() {
         return _db.getScope();
@@ -514,7 +550,10 @@ public abstract class TransactionContext
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction.
         try {
-            if ( molder.getCallback() != null ) {
+            if ( _callback != null ) {
+                _callback.using( object, _db );
+                _callback.loaded( object, toDatabaseAccessMode( accessMode ) );
+            } else if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
                 molder.getCallback().loaded( object, toDatabaseAccessMode( accessMode ) );
             }
@@ -637,9 +676,11 @@ public abstract class TransactionContext
         }
 
         try {
-            if ( molder.getCallback() != null ) {
+            if ( _callback != null ) {
+                _callback.creating( object, _db );
+            } else if ( molder.getCallback() != null ) {
                 molder.getCallback().creating( object, _db );
-            }
+            } 
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
             if ( entry == null)
@@ -654,14 +695,20 @@ public abstract class TransactionContext
             entry = addObjectEntry( oid, object );
 
             entry.created = true;
-            if ( molder.getCallback() != null ) {
+            if ( _callback != null ) {
+                _callback.using( object, _db );
+                _callback.created( object );
+            } else if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
                 molder.getCallback().created( object );
             }
             return oid;
         } catch ( Exception except ) {
-            if ( molder.getCallback() != null )
+            if ( _callback != null ) {
+                _callback.releasing( object, false );
+            } else if ( molder.getCallback() != null ) {
                 molder.getCallback().releasing( object, false );
+            } 
             removeObjectEntry( object );
             if ( except instanceof DuplicateIdentityException )
                 throw (DuplicateIdentityException) except;
@@ -757,10 +804,13 @@ public abstract class TransactionContext
         }
 
         try {
-            if ( molder.getCallback() != null ) {
+            if ( _callback != null ) {
+                _callback.using( object, _db );
+                _callback.updated( object );
+            } else if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
                 molder.getCallback().updated( object );
-            }
+            } 
         } catch ( Exception except ) {
             release( object );
             if ( except instanceof PersistenceException )
@@ -804,8 +854,11 @@ public abstract class TransactionContext
             throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass().getName(), entry.oid.getIdentity() ) );
 
         try {
-            if ( entry.molder.getCallback() != null )
+            if ( _callback != null ) {
+                _callback.removing( entry.object );
+            } else if ( entry.molder.getCallback() != null ) {
                 entry.molder.getCallback().removing( entry.object );
+            } 
         } catch ( Exception except ) {
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
@@ -834,8 +887,11 @@ public abstract class TransactionContext
                 deleted.nextDeleted = entry;
             }
             try {
-                if ( entry.molder.getCallback() != null )
+                if ( _callback != null ) {
+                    _callback.removed( entry.object );
+                } else if ( entry.molder.getCallback() != null ) {
                     entry.molder.getCallback().removed( entry.object );
+                } 
             } catch ( Exception except ) {
                 throw new PersistenceException( Messages.format("persist.nested",except) );
             }
@@ -1001,8 +1057,11 @@ public abstract class TransactionContext
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
         removeObjectEntry( object );
-        if ( entry.molder.getCallback() != null )
+        if ( _callback != null ) {
+            _callback.releasing( object, false );
+        } else if ( entry.molder.getCallback() != null ) {
             entry.molder.getCallback().releasing( object, false );
+        }
     }
 
 
@@ -1064,10 +1123,7 @@ public abstract class TransactionContext
 
                         // When storing the object it's OID might change
                         // if the primary identity has been changed
-
-                        /* what is the following line for?
-                        identities = entry.molder.getIdentities( entry.object );
-                        */
+                        // yip: is it true?
                         oid = entry.engine.preStore( this, entry.oid, entry.object, _lockTimeout );
                         if ( oid != null ) {
                             entry.oid = oid;
@@ -1087,6 +1143,24 @@ public abstract class TransactionContext
                     entry.engine.store( this, entry.oid, entry.object );
                 if ( !entry.deleted && entry.updateCacheNeeded )
                     entry.engine.softLock( this, entry.oid, _lockTimeout );
+
+                // do the callback
+                if ( !entry.deleted && _callback != null ) {
+                    try {
+                        _callback.storing( entry.object, entry.updateCacheNeeded );
+                    } catch ( Exception except ) {
+                        throw new TransactionAbortedException( 
+                            Messages.format("persist.nested", except), except );
+                    }
+                } else if ( !entry.deleted && entry.molder.getCallback() != null ) {
+                    try {
+                        entry.molder.getCallback().storing( entry.object, entry.updateCacheNeeded );
+                        // updatePersistNeeded implies updatePersistNeeded
+                    } catch ( Exception except ) {
+                        throw new TransactionAbortedException( 
+                            Messages.format("persist.nested", except), except );
+                    }
+                }
             }
 
             _status = Status.STATUS_PREPARING;
@@ -1169,8 +1243,11 @@ public abstract class TransactionContext
                 } 
                 entry.engine.releaseLock( this, entry.oid );
             }
-            if ( entry.molder.getCallback() != null )
+            if ( _callback != null ) {
+                _callback.releasing( entry.object, true );
+            } else if ( entry.molder.getCallback() != null ) {
                 entry.molder.getCallback().releasing( entry.object, true );
+            }
         }
         // Forget about all the objects in this transaction,
         // and mark it as completed.
@@ -1230,8 +1307,11 @@ public abstract class TransactionContext
                     entry.engine.revertObject( this, entry.oid, entry.object );
                     entry.engine.releaseLock( this, entry.oid );
                 }
-                if ( entry.molder.getCallback() != null )
+                if ( _callback != null ) {
+                    _callback.releasing( entry.object, false );
+                } else if ( entry.molder.getCallback() != null ) {
                     entry.molder.getCallback().releasing( entry.object, false );
+                }
             } catch ( Exception except ) {
                 // maybe we should remove it, when castor become stable
             }
@@ -1451,8 +1531,12 @@ public abstract class TransactionContext
         if ( entry != null && ! entry.deleted ) {
             try {
 
-                if ( entry.molder != null && entry.molder.getCallback() != null )
+                if ( entry.molder != null && _callback != null ) {
+                    // yip: why do we need to check for entry.molder? Isn't it implied
+                    _callback.removing( entry.object );
+                } else if ( entry.molder != null && entry.molder.getCallback() != null ) {
                     entry.molder.getCallback().removing( entry.object );
+                } 
             } catch ( Exception except ) {
                 throw new PersistenceException( Messages.format("persist.nested", except) );
             }
@@ -1473,8 +1557,11 @@ public abstract class TransactionContext
                     deleted.nextDeleted = entry;
                 }
                 try {
-                    if ( entry.molder.getCallback() != null )
+                    if ( _callback != null ) {
+                        _callback.removed( entry.object );
+                    } else if ( entry.molder.getCallback() != null ) {
                         entry.molder.getCallback().removed( entry.object );
+                    }
                 } catch ( Exception except ) {
                     throw new PersistenceException( Messages.format("persist.nested",except) );
                 }
