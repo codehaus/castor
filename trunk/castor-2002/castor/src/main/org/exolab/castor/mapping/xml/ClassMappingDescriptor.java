@@ -91,8 +91,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         desc.setValidator(fieldValidator);
         
         //-- _extends
-        desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_extends", "extends", NodeType.Attribute);
-        desc.setReference(true);
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_extends", "extends", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
@@ -105,14 +104,14 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
             {
                 try {
                     ClassMapping target = (ClassMapping) object;
-                    target.setExtends( (java.lang.Object) value);
+                    target.setExtends( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new java.lang.Object();
+                return new java.lang.String();
             }
         } );
         desc.setHandler(handler);
