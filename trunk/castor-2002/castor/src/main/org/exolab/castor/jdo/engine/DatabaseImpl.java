@@ -111,11 +111,14 @@ public final class DatabaseImpl
     private int                DefaultWaitLockTimeout = 10000;
 
 
+    // XXX Need accessors to set this and way to pass it to transaction
     private int                _lockTimeout = DefaultWaitLockTimeout;
 
 
     private PrintWriter        _logWriter;
 
+
+    private String             _dbName;
 
 
     public DatabaseImpl( String dbName, PrintWriter logWriter )
@@ -135,17 +138,8 @@ public final class DatabaseImpl
             _logWriter = logWriter;
             _dbEngine.setLogWriter( _logWriter );
         }
+        _dbName = dbName;
     }
-
-
-    /*
-    public DatabaseImpl( PersistenceEngine dbEngine )
-    {
-        if ( dbEngine == null )
-            throw new IllegalArgumentException( "Argument 'dbEngine' is null" );
-        _dbEngine = dbEngine;
-    }
-    */
 
 
     PersistenceEngine getPersistenceEngine()
@@ -274,6 +268,18 @@ public final class DatabaseImpl
     }
 
 
+    public boolean isPersistent( Object object )
+    {
+        TransactionContext tx;
+        
+        if ( _dbEngine == null )
+            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
+        if ( _ctx != null && _ctx.isOpen()  )
+            return _ctx.isPersistent( object );
+        return false;
+    }
+
+
     public OQLQuery getOQLQuery()
     {
         return new OQLQueryImpl( this );
@@ -314,15 +320,18 @@ public final class DatabaseImpl
 
     public void begin()
     {
+        // If inside XA transation throw IllegalStateException
         if ( _ctx != null && _ctx.isOpen() )
             throw new IllegalStateException( Messages.message( "jdo.txInProgress" ) );
         _ctx = new TransactionContextImpl( null );
+        _ctx.setLockTimeout( _lockTimeout );
     }
 
 
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
     {
+        // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
@@ -348,6 +357,7 @@ public final class DatabaseImpl
     public void rollback()
         throws TransactionNotInProgressException, PersistenceException
     {
+        // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         try {
@@ -361,6 +371,7 @@ public final class DatabaseImpl
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException
     {
+        // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
@@ -638,6 +649,12 @@ public final class DatabaseImpl
     public int getTransactionTimeout()
     {
         return 0;
+    }
+
+
+    public String toString()
+    {
+        return _dbName;
     }
 
 
