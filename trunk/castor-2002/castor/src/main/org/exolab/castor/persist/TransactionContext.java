@@ -53,6 +53,7 @@ import javax.transaction.Status;
 import javax.transaction.xa.Xid;
 import javax.transaction.xa.XAResource;
 import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
@@ -95,33 +96,6 @@ public abstract class TransactionContext
      * access mechanism.
      */
 
-
-    /**
-     * Defines the types of access allowed on an object. Determines
-     * what locks to use when retrieving the object in a transaction.
-     */
-    public static class AccessMode
-    {
-        
-        /**
-         * Object is retrieved for read-write, a read lock is acquired.
-         */    
-        public static final int ReadWrite = 0;
-        
-        /**
-         * Object is retrieved for exclusive access, a write lock is acquired
-         * and the object is always synchronized with  persistent storage.
-         */
-        public static final int Exclusive = 1;
-        
-        /**
-         * Object is retrieved for read only access, no lock is acquired and
-         * changes to the object are not reflected when the transaction commits.
-         */
-        public static final int ReadOnly = 2;
-        
-    }
-    
 
     /**
      * Set while transaction is waiting for a lock.
@@ -312,7 +286,7 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized boolean load( PersistenceEngine engine, Object obj,
-                                      Object identity, int accessMode )
+                                      Object identity, AccessMode accessMode )
         throws TransactionNotInProgressException, ObjectNotFoundException,
                LockNotGrantedException, PersistenceException
     {
@@ -321,7 +295,7 @@ public abstract class TransactionContext
         
         if ( _status != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
-        
+
         // Handle the case where object has already been loaded in
         // the context of this transaction. The case where object
         // has been loaded in another transaction is handled by the
@@ -357,10 +331,10 @@ public abstract class TransactionContext
         // requested lock. This might report failure (object no longer exists),
         // hold until a suitable lock is granted (or fail to grant), or
         // report error with the persistence engine.
+        accessMode = AccessMode.getAccessMode( engine.getClassDesc( obj.getClass() ), accessMode );
         try {
             oid = engine.load( this, obj.getClass(), identity,
-                               ( accessMode == AccessMode.Exclusive ),
-                               _lockTimeout );
+                               accessMode, _lockTimeout );
         } catch ( ObjectNotFoundException except ) {
             removeObjectEntry( obj );
             throw except;
@@ -388,6 +362,118 @@ public abstract class TransactionContext
 
 
     /**
+     * Obtains an object for use within the transaction. Before an
+     * object can be used in a transaction it must be fetched.
+     * Multiple access to the same object within the transaction will
+     * return the same object instance (except for read-only access).
+     * This method is similar to {@link #load} except that it will
+     * load the object only once within a transaction and always
+     * return the same instance.
+     * <p>
+     * If the object is loaded for read-only then no lock is acquired
+     * and updates to the object are not reflected at commit time.
+     * If the object is loaded for read-write then a read lock is
+     * acquired (unless timeout or deadlock detected) and the object
+     * is stored at commit time. The object is then considered persistent
+     * and may be deleted or upgraded to write lock. If the object is
+     * loaded for exclusive access then a write lock is acquired and the
+     * object is synchronized with the persistent copy.
+     * <p>
+     * Attempting to load the object twice in the same transaction, once
+     * with exclusive lock and once with read-write lock will result in
+     * an exception.
+     *
+     * @param engine The persistence engine
+     * @param clsDesc The descriptor of object to fetch
+     * @param identity The object's identity
+     * @param accessMode The access mode (see {@link AccessMode})
+     * @return The object (single instance per transaction)
+     *  the values in persistent storage
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public synchronized Object fetch( PersistenceEngine engine, ClassDesc clsDesc,
+                                      Object identity, AccessMode accessMode )
+        throws TransactionNotInProgressException, ObjectNotFoundException,
+               LockNotGrantedException, PersistenceException
+    {
+        ObjectEntry entry;
+        OID         oid;
+        Object      obj;
+        
+        if ( _status != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException();
+
+        oid = new OID( clsDesc, identity );
+        entry = getObjectEntry( engine, oid );
+        if ( entry != null ) {
+            // If the object has been loaded in this transaction from a
+            // different engine this is an error. If the object has been
+            // deleted in this transaction, it cannot be re-loaded. If the
+            // object has been created in this transaction, it cannot be
+            // re-loaded but no error is reported.
+            if ( entry.engine != engine )
+                throw new PersistenceException( "persist.multipleLoad",
+                                                clsDesc.getJavaClass(), identity );
+            if ( entry.deleted )
+                throw new ObjectNotFoundException( clsDesc.getJavaClass(), identity );
+            if ( clsDesc.getJavaClass() != entry.obj.getClass() )
+                throw new PersistenceException( "persist.typeMismatch",
+                                                clsDesc.getJavaClass(), entry.obj.getClass() );
+            if ( entry.created )
+                return entry.obj;
+            if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
+                // If we are in exclusive mode and object has not been
+                // loaded in exclusive mode before, then we have a
+                // problem. We cannot return an object that is not
+                // synchronized with the database, but we cannot
+                // synchronize a live object.
+                throw new PersistenceException( "persist.lockConflict",
+                                                clsDesc.getJavaClass(), identity );
+            }
+            return entry.obj;
+        }
+
+        // Load (or reload) the object through the persistence engine with the
+        // requested lock. This might report failure (object no longer exists),
+        // hold until a suitable lock is granted (or fail to grant), or
+        // report error with the persistence engine.
+        accessMode = AccessMode.getAccessMode( clsDesc, accessMode );
+        try {
+            oid = engine.load( this, clsDesc.getJavaClass(), identity, accessMode, _lockTimeout );
+        } catch ( ObjectNotFoundException except ) {
+            throw except;
+        } catch ( LockNotGrantedException except ) {
+            throw except;
+        } catch ( ClassNotPersistenceCapableException except ) {
+            throw new PersistenceException( except );
+        }
+        
+        // Need to copy the contents of this object from the cached
+        // copy and deal with it based on the transaction semantics.
+        // If the mode is read-only we release the lock and forget about
+        // it in the contents of this transaction. Otherwise we record
+        // the object in this transaction. 
+        obj = clsDesc.newInstance();
+        engine.copyObject( this, oid, obj );
+        if ( entry == null ) {
+            if ( accessMode == AccessMode.ReadOnly ) {
+                engine.releaseLock( this, oid );
+            } else {
+                entry = addObjectEntry( obj, oid, engine );
+            }
+        }
+        return obj;
+    }
+
+
+    /**
      * Perform a query using the query mechanism and in the specified
      * access mode. The query is performed in this transaction, and
      * the returned query results can only be used while this
@@ -404,7 +490,8 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized QueryResults query( PersistenceEngine engine, PersistenceQuery query, int accessMode )
+    public synchronized QueryResults query( PersistenceEngine engine, PersistenceQuery query,
+                                            AccessMode accessMode )
         throws TransactionNotInProgressException, QueryException,
                PersistenceException
     {
@@ -412,7 +499,7 @@ public abstract class TransactionContext
             throw new TransactionNotInProgressException();
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
-        query.execute( getConnection( engine ), ( accessMode == AccessMode.Exclusive ) );
+        query.execute( getConnection( engine ), accessMode );
         return new QueryResults( this, engine, query, accessMode );
     }
 
@@ -451,7 +538,7 @@ public abstract class TransactionContext
             throw new TransactionNotInProgressException();
         // Make sure the object has not beed persisted in this transaction.
         if ( getObjectEntry( obj ) != null )
-            throw new PersistenceException( "persist.objectAlreadyPersistent", obj, identity );
+            throw new PersistenceException( "persist.objectAlreadyPersistent", obj.getClass(), identity );
         clsDesc = engine.getClassDesc( obj.getClass() );
         if ( clsDesc == null )
             throw new ClassNotPersistenceCapableException( obj.getClass() );
@@ -660,7 +747,7 @@ public abstract class TransactionContext
                 // removal attempts. Otherwise the object is stored in
                 // the database.
                 if ( entry.deleted ) {
-                    entry.engine.delete( this, entry.oid );
+                    entry.engine.delete( this, entry.obj, entry.oid.getIdentity() );
                 } else {
                     Object     identity;
                     ClassDesc clsDesc;
@@ -672,7 +759,7 @@ public abstract class TransactionContext
                     if ( identity == null )
                         throw new TransactionAbortedException( "persist.noIdentity", 
                                                                clsDesc.getJavaClass(), null );
-                    entry.oid = entry.engine.store( this, entry.oid, entry.obj, identity, _lockTimeout );
+                    entry.oid = entry.engine.store( this, entry.obj, identity, _lockTimeout );
                 }
             }
             _status = Status.STATUS_PREPARED;
