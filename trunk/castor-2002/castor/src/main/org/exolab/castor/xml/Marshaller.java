@@ -1086,7 +1086,7 @@ public class Marshaller extends MarshalFramework {
                 
                 
             // recursively process containers
-            processContainerAttributes(target, containerClassDesc, atts);
+            processContainerAttributes(containerObject, containerClassDesc, atts);
         }
 
     } //-- processContainerAttributes
