@@ -177,8 +177,8 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
                     "definition.");
 
             foundRestriction = true;
-
-            error( "restriction currently not supported.");
+			unmarshaller=
+			new ComplexContentRestrictionUnmarshaller(_complexType, atts, getResolver());
         }
         //-- annotation
         else if (name.equals(SchemaNames.ANNOTATION)) {
