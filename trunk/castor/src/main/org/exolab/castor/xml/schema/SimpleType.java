@@ -106,7 +106,12 @@ public abstract class SimpleType extends XMLType
     **/
     private int typeCode= SimpleTypesFactory.INVALID_TYPE;
 
-
+    /**
+     * An attribute that indicates if this SimpleType is
+     * a redefinition
+     */
+    private boolean _redefinition = false;
+    
     /**
      * Default constructor
      */
@@ -251,6 +256,23 @@ public abstract class SimpleType extends XMLType
     public boolean isBuiltInType() {
         return SimpleTypesFactory.isBuiltInType( typeCode );
     } //-- isBuiltInType
+    
+    /**
+     * Returns true if this simpleType is a redefinition.
+     * 
+     * @return true if this simpleType is a redefinition.
+     */
+    public boolean isRedefined() {
+    	return _redefinition;
+    }
+    
+
+    /**
+     * Sets this Group has redefined. 
+     */
+    public void setRedefined() {
+    	_redefinition = true;
+    }
     
     /**
      * Gets the code for this simple type 

@@ -64,6 +64,12 @@ class SchemaUnmarshallerState {
     private Configuration _config    = null;
     
     private Hashtable     _processed = null;
+    
+    /**
+     * A boolean that indicates whether or not to 
+     * cache included XML Schemas
+     */
+    boolean cacheIncludedSchemas = false;
 
     /**
      * Creates a new SchemaUnmarshallerState

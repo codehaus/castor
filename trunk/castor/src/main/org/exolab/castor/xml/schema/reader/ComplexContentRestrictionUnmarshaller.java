@@ -154,6 +154,7 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
 			    
 			    */
             }
+            _complexType.setBase(base);
 			_complexType.setBaseType(baseType);
 
 		}

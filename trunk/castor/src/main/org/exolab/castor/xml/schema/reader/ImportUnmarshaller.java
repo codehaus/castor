@@ -49,11 +49,7 @@ package org.exolab.castor.xml.schema.reader;
 import org.exolab.castor.net.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.util.Configuration;
 import org.xml.sax.*;
-
-import java.net.URL;
-import java.util.Vector;
 
 public class ImportUnmarshaller extends ComponentReader
 {
