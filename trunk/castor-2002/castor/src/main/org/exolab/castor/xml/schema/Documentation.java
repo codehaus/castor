@@ -51,15 +51,15 @@ import java.util.Enumeration;
 import java.util.Vector;
 
 /**
- * A class which represents the XML Schema Info element
+ * A class which represents the XML Schema Documentation element
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class Info extends Structure {
+public class Documentation extends Structure {
     
     
     /**
-     * The text content of this AppInfo
+     * The text content of this Documentation
     **/
     private String content = null;
     
@@ -74,14 +74,14 @@ public class Info extends Structure {
     private String base = null;
     
     /**
-     * Creates a new Info
+     * Creates a new Documentation
     **/
-    public Info() {
+    public Documentation() {
         objects = new Vector(3);
     } //-- Annotation
     
     /**
-     * Adds the given Object to this Info
+     * Adds the given Object to this Documentation
      * @param object the Object to add
     **/
     public void add(Object object) {
@@ -90,31 +90,31 @@ public class Info extends Structure {
     } //-- add
     
     /**
-     * Returns the String content of this Info
-     * @return the String content of this Info
+     * Returns the String content of this Documentation
+     * @return the String content of this Documentation
     **/
     public String getContent() {
         return content;
     } //-- getContent
     
     /**
-     * Returns an Enumeration of all objects contained by this Info.
-     * @return an Enumeration of all objects contained by this Info.
+     * Returns an Enumeration of all objects contained by this Documentation.
+     * @return an Enumeration of all objects contained by this Documentation.
     **/
     public Enumeration getObjects() {
         return objects.elements();
     } //-- getObjects
     
     /**
-     * Returns the base property of this Info
-     * @return the base property of this Info
+     * Returns the base property of this Documentation
+     * @return the base property of this Documentation
     **/
     public String getBase() {
         return base;
     } //-- getBase
     
     /**
-     * Removes the given Object from this Info
+     * Removes the given Object from this Documentation
      * @param object the Object to remove
     **/
     public void remove(Object object) {
@@ -122,15 +122,15 @@ public class Info extends Structure {
     } //-- remove
 
     /**
-     * Sets the String content for this Info
-     * @param content the String content for this Info
+     * Sets the String content for this Documentation
+     * @param content the String content for this Documentation
     **/
     public void setContent(String content) {
         this.content = content;
     } //-- setContent
     
     /**
-     * Sets the base property for this Info
+     * Sets the base property for this Documentation
      * @param base the value of the base property
     **/
     public void setBase(String base) {
@@ -160,4 +160,4 @@ public class Info extends Structure {
         //-- do nothing
     } //-- validate
     
-} //-- Info
+} //-- Documentation

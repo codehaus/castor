@@ -342,11 +342,11 @@ public class MemberFactory {
     **/
     private String createComment(Annotation annotation) {        
         if (annotation == null) return null;
-        Enumeration enum = annotation.getInfo();        
+        Enumeration enum = annotation.getDocumentation();        
         if (enum.hasMoreElements()) {
             //-- just use first <info>
-            Info info = (Info) enum.nextElement();
-            return info.getContent();
+            Documentation documentation = (Documentation) enum.nextElement();
+            return documentation.getContent();
         }
         return null;
     } //-- createComment

@@ -145,8 +145,8 @@ public class AnnotationUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.APPINFO.equals(name)) {
             unmarshaller = new AppInfoUnmarshaller(atts);
         }
-        else if (SchemaNames.INFO.equals(name)) {
-            unmarshaller = new InfoUnmarshaller(atts);
+        else if (SchemaNames.DOCUMENTATION.equals(name)) {
+            unmarshaller = new DocumentationUnmarshaller(atts);
         }
         else illegalElement(name);
     
@@ -176,7 +176,7 @@ public class AnnotationUnmarshaller extends SaxUnmarshaller {
         }
         //-- info
         else {
-            _annotation.addInfo( (Info)unmarshaller.getObject());
+            _annotation.addDocumentation( (Documentation)unmarshaller.getObject());
         }
         unmarshaller = null;
     } //-- endElement
