@@ -26,6 +26,7 @@ import org.exolab.adaptx.util.*;
 import org.exolab.adaptx.xml.*;
 import org.exolab.adaptx.xml.parser.DOMParser;
 import org.exolab.adaptx.xpath.*;
+import org.exolab.adaptx.xslt.dom.Root;
 import org.exolab.adaptx.xslt.functions.*;
 
 import org.exolab.adaptx.xslt.util.ResultFormatter;
@@ -617,6 +618,21 @@ public class ProcessorState extends XPathContext {
             xpc.setNodeSet(nodeSet, position);
         }
     } //-- setNodeSet
+    
+    /**
+     * Returns the document URI of the given XPathNode,
+     * or null if it's not found
+     */
+    public String getDocumentURI(XPathNode node) {
+        if (node == null) return null;
+        XPathNode root = node.getRootNode();
+        if (root != null) {
+            if (root instanceof Root) {
+                return ((Root)root).getDocumentURI();
+            }
+        }
+        return null;
+    } //-- getDocumentURI
     
 
     /**
