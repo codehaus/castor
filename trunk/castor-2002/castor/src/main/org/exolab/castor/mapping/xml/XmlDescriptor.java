@@ -53,7 +53,7 @@ public class XmlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
     //----------------/
 
     public XmlDescriptor() {
-        xmlName = "xml";
+        xmlName = "bind-xml";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;

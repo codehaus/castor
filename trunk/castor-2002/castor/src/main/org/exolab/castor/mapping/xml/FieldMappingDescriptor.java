@@ -461,7 +461,10 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setValidator(fieldValidator);
         
         //-- _xml
-        desc = new XMLFieldDescriptorImpl(Xml.class, "_xml", "xml", NodeType.Element);
+        desc = new XMLFieldDescriptorImpl(Xml.class, "_xml", "bind-xml", NodeType.Element);
+        //-- begin backward compatibility
+        desc.setMatches("bind-xml xml");
+        //-- end backward compatibility
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
