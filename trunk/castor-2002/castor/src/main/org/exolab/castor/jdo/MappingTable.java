@@ -49,7 +49,8 @@ package org.exolab.castor.jdo;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
-import org.exolab.castor.jdo.desc.ObjectDesc;
+import org.exolab.castor.MappingException;
+import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.ObjectMapping;
 
@@ -76,27 +77,27 @@ public class MappingTable
     }
 
 
-    public ObjectDesc getDescriptor( Class type )
+    public JDOObjectDesc getDescriptor( Class type )
     {
-	ObjectDesc desc;
+	JDOObjectDesc desc;
 
-	desc = (ObjectDesc) _mapping.get( type.getName() );
+	desc = (JDOObjectDesc) _mapping.get( type.getName() );
 	return desc;
     }
 
 
-    public ObjectDesc getDescriptor( String type )
+    public JDOObjectDesc getDescriptor( String type )
     {
-	ObjectDesc desc;
+	JDOObjectDesc desc;
 
-	desc = (ObjectDesc) _mapping.get( type );
+	desc = (JDOObjectDesc) _mapping.get( type );
 	return desc;
     }
 
 
-    public void addDescriptor( ObjectDesc desc )
+    public void addDescriptor( JDOObjectDesc desc )
     {
-	_mapping.put( desc.getObjectClass().getName(), desc );
+	_mapping.put( desc.getObjectType().getName(), desc );
     }
 
 
@@ -115,7 +116,7 @@ public class MappingTable
     public void addMapping( ObjectMapping objMap )
 	throws MappingException
     {
-	ObjectDesc desc;
+	JDOObjectDesc desc;
 
 	desc = MappingHelper.createObjectDesc( objMap, this );
 	addDescriptor( desc );
@@ -125,7 +126,7 @@ public class MappingTable
     public void addMapping( Mapping mapping )
 	throws MappingException
     {
-	ObjectDesc  desc;
+	JDOObjectDesc  desc;
 	Enumeration enum;
 
 	enum = mapping.listObjects();
@@ -143,7 +144,7 @@ public class MappingTable
 
 	enum = mapping.listDescriptors();
 	while ( enum.hasMoreElements() ) {
-	    addDescriptor( (ObjectDesc) enum.nextElement() );
+	    addDescriptor( (JDOObjectDesc) enum.nextElement() );
 	}
     }
 
