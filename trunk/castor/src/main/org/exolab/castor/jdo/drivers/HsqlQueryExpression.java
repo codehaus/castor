@@ -499,7 +499,7 @@ public final class HsqlQueryExpression
     */
    private void addColumnList(StringBuffer buffer, HsqlAliasInfo aliasInfo)
    {
-     if ( _cols.size() == 0 ) // ? (Preserved from superclass)
+     if ( _cols.size() == 0  && _select == null ) // ? (Preserved from superclass)
      {
        buffer.append("1");
        return;
