@@ -377,7 +377,7 @@ public class XMLClassDescriptorImpl extends Validator
                 }
 
                 //handle container
-                if ( (result == null) && desc.isContainer() ) {
+                if ( desc.isContainer() ) {
                     XMLClassDescriptor xcd = (XMLClassDescriptor)desc.getClassDescriptor();
                     //prevent endless loop
                     if (xcd != this) {
