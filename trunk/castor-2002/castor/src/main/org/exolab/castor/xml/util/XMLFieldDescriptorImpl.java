@@ -60,17 +60,17 @@ import java.util.StringTokenizer;
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class XMLFieldDescriptorImpl 
+public class XMLFieldDescriptorImpl
     implements XMLFieldDescriptor
 {
 
 
     private static final String WILD_CARD = "*";
-    
+
     private static final String NULL_CLASS_ERR
         = "The 'type' argument passed to the constructor of "
          + "XMLFieldDescriptorImpl may not be null.";
-        
+
     private static final String NULL_FIELD_NAME_ERR
         = "The 'fieldName' argument passed to the constructor of "
          + "XMLFieldDescriptorImpl may not be null.";
@@ -86,70 +86,70 @@ public class XMLFieldDescriptorImpl
      * are finished being populated.
     **/
     private boolean incremental = false;
-    
+
     /**
      * A flag to indicate that the Object described by this
      * descriptor is multivalued
     **/
     private boolean multivalued = false;
-    
+
     /**
      * The namespace prefix that is to be used when marshalling
     **/
     private String nsPrefix = null;
-    
+
     /**
      * The namespace URI used for both marshalling and unmarshalling
     **/
     private String nsURI = null;
-    
+
     /**
      * The type class descriptor, if this field is of a type
      * known by a descriptor.
      */
     private XMLClassDescriptor  _classDescriptor;
-    
-    
+
+
     /**
      * The Java (programmatic) name of the field being described
     **/
     private String _fieldName = null;
-    
+
     /**
      * The Class type of described field
     **/
     private Class _fieldType = null;
-    
+
     /**
      * The field handler for get/set field value.
      */
     private FieldHandler  _handler = null;
-    
+
     /**
      * True if the field type is immutable.
      */
     private boolean _immutable = false;
-    
+
     /**
      * The node type (attribute, element, text).
      */
     private NodeType _nodeType = null;
-    
+
     /**
      * True if the field is a reference to another Object in the hierarchy.
     **/
     public boolean _isReference = false;
-    
+
     /**
      * indicates a required field when true
     **/
     public boolean _required = false;
-    
+
     /**
      * True if the field is transient and should not be saved/stored.
      */
     private boolean _transient = false;
-    
+
     /**
      * True if the field is a container field
      */
@@ -161,49 +161,55 @@ public class XMLFieldDescriptorImpl
     private String _xmlName    = null;
 
     private List _matches = null;
-    
+
     private boolean isWild = false;
-    
+
     private FieldValidator _validator = null;
-    
+
     /**
      * The DescriptorResolver...only used for
      * default matching
     **/
     private MappingResolver _resolver = null;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
-    
+
     /**
      * This a private constructor to handle common code among
-     * constructors     
+     * constructors
     **/
     private XMLFieldDescriptorImpl() {
         _matches = new List();
     } //-- XMLFieldDescriptorImpl
-    
+
     public XMLFieldDescriptorImpl
-        (Class fieldType, String fieldName, String xmlName, NodeType nodeType) 
+        (Class fieldType, String fieldName, String xmlName, NodeType nodeType)
     {
         this();
-        
-        if (fieldType == null) 
+
+        if (fieldType == null)
             throw new IllegalArgumentException(NULL_CLASS_ERR);
-            
+
         if (fieldName == null)
             throw new IllegalArgumentException(NULL_FIELD_NAME_ERR);
-        
-        this._fieldType  = fieldType;
+
+        //////////////Hack for AnyNode//////////////////
+        //if the field type is an AnyNode Castor must treat it as
+        //an object to avoid changes in the Marshalling framework
+        if (fieldType == org.exolab.castor.types.AnyNode.class)
+               _fieldType = java.lang.Object.class;
+        //////////////////////////////////////////////////
+        else this._fieldType  = fieldType;
         this._fieldName  = fieldName;
         this._xmlName    = xmlName;
         this._nodeType   = nodeType;
         this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
-        
+
     } //-- XMLFieldDescriptorImpl
-    
-    
+
+
     /**
      * Construct a new field descriptor for the specified field. This is
      * an XML field descriptor wrapping a field descriptor and adding XML
@@ -218,22 +224,28 @@ public class XMLFieldDescriptorImpl
         ( FieldDescriptor fieldDesc, String xmlName, NodeType nodeType )
         throws MappingException
     {
-        
+
         this();
 
 	if ( fieldDesc instanceof XMLFieldDescriptor )
-          this._contClsDescriptor = 
+          this._contClsDescriptor =
               ( (XMLFieldDescriptor)fieldDesc
                 ).getContainingClassDescriptor();
-              
+
         this._handler         = fieldDesc.getHandler();
         this._fieldName       = fieldDesc.getFieldName();
-        this._fieldType       = fieldDesc.getFieldType();
+         //////////////Hack for AnyNode//////////////////
+        //if the field type is an AnyNode Castor must treat it as
+        //an object to avoid changes in the Marshalling framework
+        if (fieldDesc.getFieldType() == org.exolab.castor.types.AnyNode.class)
+               _fieldType = java.lang.Object.class;
+        //////////////////////////////////////////////////
+        else this._fieldType  = fieldDesc.getFieldType();
         this._transient       = fieldDesc.isTransient();
         this._immutable       = fieldDesc.isImmutable();
         this._required        = fieldDesc.isRequired();
         this.multivalued      = fieldDesc.isMultivalued();
-        
+
         ClassDescriptor cd    = fieldDesc.getClassDescriptor();
         if (cd != null) {
             if (cd instanceof XMLClassDescriptor)
@@ -241,18 +253,18 @@ public class XMLFieldDescriptorImpl
             else
                 this._classDescriptor = new XMLClassDescriptorAdapter(cd, null);
         }
-        
+
         //-- check for instances of java.util.Date
         if (java.util.Date.class.isAssignableFrom(_fieldType)) {
             if (!(_handler instanceof DateFieldHandler)) {
                 _handler = new DateFieldHandler(_handler);
             }
         }
-        
+
         //-- handle xml name
-        if ( xmlName == null ) xmlName = getFieldName();        
+        if ( xmlName == null ) xmlName = getFieldName();
         _xmlName = xmlName;
-        
+
         if (nodeType == null) {
             if (this.multivalued)
                 _nodeType = NodeType.Element;
@@ -260,7 +272,7 @@ public class XMLFieldDescriptorImpl
                 _nodeType = NodeType.Attribute;
         }
         else _nodeType = nodeType;
-        
+
         if (_required) {
             _validator = new FieldValidator();
             _validator.setMinOccurs(1);
@@ -270,7 +282,7 @@ public class XMLFieldDescriptorImpl
     //------------------/
     //- Public Methods -/
     //------------------/
-    
+
     /**
      * Set the class which contains this field
      */
@@ -298,7 +310,7 @@ public class XMLFieldDescriptorImpl
     public ClassDescriptor getClassDescriptor() {
         return _classDescriptor;
     } //-- getClassDescriptor
-    
+
     /**
      * Return the collection handler of this field type. Returns null
      * if the field is not a collection.
@@ -308,7 +320,7 @@ public class XMLFieldDescriptorImpl
     public CollectionHandler getCollectionHandler() {
         return null;
     } //-- getCollectionHandler
-    
+
     /**
      * Returns the name of the field.
      *
@@ -326,7 +338,7 @@ public class XMLFieldDescriptorImpl
     public Class getFieldType() {
         return _fieldType;
     } //-- getFieldType
-    
+
     /**
      * Returns the handler of the field. In order to persist or marshal
      * a field descriptor will be associated with a handler.
@@ -356,11 +368,11 @@ public class XMLFieldDescriptorImpl
     public String getNameSpacePrefix() {
         return nsPrefix;
     } //-- getNameSpacePrefix
-    
+
     /**
-     * Returns the namespace URI to be used when marshalling and 
+     * Returns the namespace URI to be used when marshalling and
      * unmarshalling as XML.
-     * 
+     *
      * @return the namespace URI.
     **/
     public String getNameSpaceURI() {
@@ -375,7 +387,7 @@ public class XMLFieldDescriptorImpl
     /**
      * Returns a specific validator for the field described by
      * this descriptor. A null value may be returned
-     * if no specific validator exists. 
+     * if no specific validator exists.
      *
      * @return the type validator for the described field
     **/
@@ -403,7 +415,7 @@ public class XMLFieldDescriptorImpl
     public boolean isIncremental() {
         return incremental;
     } //-- isIncremental
-    
+
     /**
      * Returns true if the Object described by this descriptor can
      * contain more than one value
@@ -413,16 +425,16 @@ public class XMLFieldDescriptorImpl
     public boolean isMultivalued() {
         return multivalued;
     } //-- isMultivalued
-    
+
     /**
      * Returns true if the field described by this descriptor is
-     * a reference (ie. IDREF) to another object in the 
+     * a reference (ie. IDREF) to another object in the
      * "Object Model" (XML tree)
     **/
     public boolean isReference() {
         return this._isReference;
     } //-- isReference
-    
+
     /**
      * Returns true if the field described by this descriptor is a required
      * field
@@ -432,7 +444,7 @@ public class XMLFieldDescriptorImpl
     public boolean isRequired() {
         return _required;
     } //-- isRequired
-    
+
     /**
      * Returns true if the field is transient. Transient fields are
      * never persisted or marshalled.
@@ -470,21 +482,21 @@ public class XMLFieldDescriptorImpl
     public boolean matches(String xmlName) {
 
         if (xmlName != null) {
-            
+
             if (isWild) return true;
             else if (_matches.size() > 0) {
                 for (int i = 0; i < _matches.size(); i++) {
-                    if (xmlName.equals( _matches.get(i) ) ) 
+                    if (xmlName.equals( _matches.get(i) ) )
                         return true;
                 }
             }
             else if ((_container) && (_classDescriptor != null)) {
                 return (_classDescriptor.getFieldDescriptor(xmlName, null) != null);
-            } 
+            }
             else
                 return xmlName.equals(this._xmlName);
         }
-        
+
         return false;
     } //-- matches
 
@@ -508,18 +520,18 @@ public class XMLFieldDescriptorImpl
     public void setHandler(FieldHandler handler) {
         this._handler = handler;
     } //-- setHandler
-    
+
     /**
      * Sets the incremental flag which indicates whether this member
      * can be added before the unmarshaller is finished unmarshalling it.
      * @param incremental the boolean which if true indicated that this
-     * member can safely be added before the unmarshaller is finished 
+     * member can safely be added before the unmarshaller is finished
      * unmarshalling it.
     **/
     public void setIncremental(boolean incremental) {
         this.incremental = incremental;
     } //-- setIncremental
-    
+
     /**
      * Sets the immutable flag which indicates that changes
      * to this Field result in a new Object to be created, such
@@ -532,7 +544,7 @@ public class XMLFieldDescriptorImpl
     public void setImmutable(boolean immutable) {
         this._immutable = immutable;
     } //-- setImmutable
-    
+
     /**
      * This is a space separated list of xml names that this
      * Field descriptor matches. A '*' is wild.
@@ -542,7 +554,7 @@ public class XMLFieldDescriptorImpl
     public void setMatches(String matchExpr) {
         isWild = false;
         if ((matchExpr == null) || (matchExpr.length() == 0)) return;
-        
+
         StringTokenizer st = new StringTokenizer(matchExpr);
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
@@ -554,21 +566,21 @@ public class XMLFieldDescriptorImpl
         }
 
     } //-- setMatches
-    
+
     public void setMultivalued(boolean multivalued) {
         this.multivalued = multivalued;
     } //-- setMultivalued
-    
+
     /**
-     * Sets the flag indicating that the field described by this 
+     * Sets the flag indicating that the field described by this
      * descriptor is a reference to another field in the object model.
-     * 
+     *
      * @param isReference, true if the field is a reference to another field.
     **/
     public void setReference(boolean isReference) {
         this._isReference = isReference;
     } //-- setReference
-    
+
     /**
      * Sets the namespace prefix used when marshalling as XML.
      * @param nsPrefix the namespace prefix used when marshalling
@@ -577,7 +589,7 @@ public class XMLFieldDescriptorImpl
     public void setNameSpacePrefix(String nsPrefix) {
         this.nsPrefix = nsPrefix;
     } //-- setNameSpacePrefix
-    
+
     /**
      * Sets the namespace URI used when marshalling and unmarshalling as XML.
      * @param nsURI the namespace URI used when marshalling and
@@ -586,16 +598,16 @@ public class XMLFieldDescriptorImpl
     public void setNameSpaceURI(String nsURI) {
         this.nsURI = nsURI;
     } //-- setNameSpaceURI
-    
+
     /**
      * Sets the XML node type for the described field
      *
      * @param nodeType the NodeType for the described field
     **/
     public void setNodeType(NodeType nodeType) {
-        this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );        
+        this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
     } //-- setNodeType
-    
+
     /**
      * Sets the whether or not the described field is required
      * @param required the flag indicating whether or not the
@@ -614,22 +626,22 @@ public class XMLFieldDescriptorImpl
     public void setTransient(boolean isTransient) {
         _transient = isTransient;
     } //-- isTransient
-    
+
     public void setValidator(FieldValidator validator) {
-        
+
         //-- remove reference from current FieldValidator
         if (_validator != null) {
             _validator.setDescriptor((XMLFieldDescriptor)null);
         }
-        
+
         this._validator = validator;
-        
+
         if (_validator != null) {
             _validator.setDescriptor((XMLFieldDescriptor)this);
         }
-            
+
     } //-- setValidator
-    
+
     /**
      * Sets the xml name for the described field
      *
@@ -638,7 +650,7 @@ public class XMLFieldDescriptorImpl
     public void setXMLName(String xmlName) {
         _xmlName = xmlName;
     } //-- setXMLName
-    
+
     public String toString()
     {
         return "XMLFieldDesciptor: " + _fieldName + " AS " + _xmlName;
@@ -647,7 +659,7 @@ public class XMLFieldDescriptorImpl
     //---------------------/
     //- Protected Methods -/
     //---------------------/
-    
+
     /**
      * Returns true if a call to #setMatches has been made with a non-null,
      * or non-zero-length value.
@@ -659,17 +671,17 @@ public class XMLFieldDescriptorImpl
     protected boolean hasNonDefaultMatching() {
         return (isWild || (_matches.size() > 0));
     } //-- hasNonDefaultMatching
-    
+
     /**
      * Sets the DescriptorResolver for following relationships
      * among descriptors and types. This is used by the default
      * matching scheme
      *
-     * @param resolver the DescriptorResolver to use 
+     * @param resolver the DescriptorResolver to use
     **/
     protected void setDescriptorResolver(MappingResolver resolver) {
         _resolver = resolver;
     } //-- setDescriptorResolver
-    
+
 } //-- XMLFieldDescriptor
 
