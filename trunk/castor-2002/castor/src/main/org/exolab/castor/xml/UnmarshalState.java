@@ -80,6 +80,8 @@ class UnmarshalState {
     **/
     XMLClassDescriptor classDesc = null;
 
+    boolean primitiveOrImmutable = false;
+    
     private Vector markedList = null;
     
     UnmarshalState() {
