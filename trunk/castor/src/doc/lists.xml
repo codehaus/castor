@@ -12,17 +12,17 @@
          to the appropriate list</a>.
       </p>
 
-      <section title="castor-announce">
-         <p><b>castor-announce</b></p>
+      <section title="announce">
+         <p><b>announce</b></p>
          <p>Low volume (possibly more than 1 message per week) mailing list for special
             announcements about Castor, such as new releases.</p>
 
-         <p><mailing-list name="castor-announce" description="The Castor Announcement Mailing List"
-                       server="exolab.org" manager="minimalist"/></p>
+         <p><mailing-list name="announce" description="The Castor Announcement Mailing List"
+                       server="codehaus.org"/></p>
        </section>
 
-      <section title="castor-user">
-         <p><b>castor-user</b>  - <font color="red">NEW!</font></p>
+      <section title="user">
+         <p><b>user</b></p>
          <p>Moderate volume expected (possibly more than 15 messages a day) mailing list dedicated
             to the <b>users</b> of Castor.</p>
 
@@ -34,23 +34,20 @@
            <li>Problems using Castor.</li>
          </ul>
 
-         <p><mailing-list name="castor-user" description="The Castor User's Mailing List"
-                       server="exolab.org" manager="minimalist"/></p>
+         <p><mailing-list name="user" description="The Castor User's Mailing List"
+                       server="codehaus.org" /></p>
 
          <p><b>Note:</b> Please familiarize yourself with the <a href="#Guidelines">guidelines</a>
              before posting to the list.</p>
 
          <p><b>Archives:</b></p>
-         <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
-            to be archived at that site.</p>
-
          <ul>
-            <li><url>http://www.mail-archive.com/castor-user%40exolab.org</url></li>
+            <li><a href="http://archive.castor.codehaus.org/user">Archives at the Codehaus</a></li>
          </ul>
 
       </section>
 
-      <section title="castor-dev">
+      <section title="dev">
          <p>Moderate volume (possibly more than 15 messages a day) mailing list dedicated
             to the <b>developers</b> of Castor.</p>
 
@@ -66,27 +63,22 @@
             believe that feedback from the user community on many of these issues is
             essential for the progress of the project.</p>
 
-         <p><mailing-list name="castor-dev" description="The Castor Developer's Mailing List"
-                       server="exolab.org" manager="minimalist"/></p>
+         <p><mailing-list name="dev" description="The Castor Developer's Mailing List"
+                       server="codehaus.org" /></p>
 
          <p><b>Note:</b> Please familiarize yourself with the <a href="#Guidelines">guidelines</a>
             before posting to the list.</p>
 
          <p><b>Archives:</b></p>
-         <p><b>Note:</b> There may be a delay of one (1) or two (2) days for messages
-            to be archived at that site.</p>
-
          <ul>
-            <li><a href="http://marc.theaimsgroup.com/?l=castor-dev">Mailing list ARCives at AIMS</a></li>
-            <li><url>http://www.mail-archive.com/castor-dev%40exolab.org</url></li>
-            <li><url>http://hypermail.linklord.com/castor-dev/</url></li>
+            <li><a href="http://archive.castor.codehaus.org/dev">Archives at the Codehaus</a></li>
          </ul>
 
       </section>
 
     </section>
 
-    <section title="castor-users vs. castor-dev">
+    <section title="user vs. dev">
 
        <p>Please use above mailing lists for what they are intended for. Please use
           the descriptions above to target your message to the correct mailing list.</p>
@@ -96,7 +88,7 @@
 
        <p><b>Note</b>: Having said that, there might be a valid case for cross-posting
           a message (e.g. us confirming that a problem is a result of a bug, and hence
-          referring you to castor-dev for further discussions), but in general
+          referring you to 'dev' for further discussions), but in general
           the use of this should be restricted as much as possible.</p>
     </section>
 
@@ -108,7 +100,7 @@
           and you encounter.</p>
 
        <section title="Acronyms">
-          <p>Especially on (but not necessarily restricted to) 'castor-dev', we will be much
+          <p>Especially on (but not necessarily restricted to) 'dev', we will be much
              more interactive about many of the issues mentioned above. As such, we have
              decided to structure our messages more thoroughly, and have come up with the
              following set of acronyms to show our intention:</p>
