@@ -162,6 +162,10 @@ public class EnumFieldHandler implements FieldHandler {
         handler.setValue(target, obj);        
         
     } //-- setValue
+
+    public void resetValue(Object targer)
+    {
+    }
     
     /**
      * Checks the field validity. Returns successfully if the field

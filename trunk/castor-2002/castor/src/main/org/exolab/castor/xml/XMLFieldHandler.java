@@ -116,6 +116,14 @@ public class XMLFieldHandler
         //-- source code generator
         
     } //-- setValue
+
+
+    public void resetValue( Object object )
+        throws IllegalStateException, IllegalArgumentException
+    {
+        //-- Do nothing, this method is overloaded by the
+        //-- source code generator
+    }
         
 
 
