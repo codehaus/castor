@@ -5,7 +5,7 @@
 
     <header>
        <p>
-          - <b><font color="red">New</font></b> - Shelly Mujtaba's <a href="#JDOMapper">JDOMapper</a>
+          - <b><font color="red">New</font></b> - Patrick van Kaan's <a href="#Castor-Taglib">Castor-Taglib</a>
        </p>
     </header>
 
@@ -19,7 +19,40 @@
           support, questions, or concerns.
           </b>
        </p>
-       <section title="Castor-Doclet">
+       <section title="Castor-Taglib">
+       <p>
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                        The Castor Taglib allows you to execute OQL queries in 
+                        your JSP page (using Castor JDO). It also helps you to 
+                        integrate Castor JDO with Java application servers like 
+                        Tomcat, making use of JNDI and Tyrex for managed transactions.
+                        <br />
+                        <br />
+                        It is intended that support for more servlet containers 
+                        will be added.
+                        <br />
+                        <br />
+                        The taglib is compatible with JSTL 1.0, and allows you 
+                        to use expression language (EL) to pass values dynamically 
+                        to the attributes of certain tags. 
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Current Author:</td>
+                    <td>Patrick van Kaan</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td><url>http://castor-taglib.sourceforge.net</url></td>
+                </tr>
+            </table>
+        </p>
+       </section>
+
+       <section title="Castor Doclet">
          <p>
             <table border="0">
                 <tr>
@@ -36,13 +69,13 @@
                 </tr>
                 <tr>
                     <td valign="top">URL:</td>
-                    <td> <url>http://castordoclet.sourceforge.net</url></td>
+                    <td><url>http://castordoclet.sourceforge.net</url></td>
                 </tr>
             </table>
          </p>
        </section>
 
-       <section title="Castor-Oil">
+       <section title="Castor Oil">
          <p>
             <table border="0">
                 <tr>
@@ -165,28 +198,6 @@
                 </tr>
             </table>
          </p>
-       </section>
-
-       <section title="Castor Doclet">
-        <p>
-            <table border="0">
-                <tr>
-                    <td align="top">Description:</td>
-                    <td>
-                     The purpose of the castor doclet is to generate this mapping 
-                     file from simple Javadoc tags added in the source code.
-                    </td>
-                </tr>
-                <tr>
-                    <td align="top">Author:</td>
-                    <td>Mickael Guessant</td>
-                </tr>
-                <tr>
-                    <td align="top">URL:</td>
-                    <td><url>http://castordoclet.sourceforge.net/</url></td>
-                </tr>
-            </table>
-        </p>
        </section>
 
        <section title="XDoclet">
