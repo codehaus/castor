@@ -2,7 +2,9 @@
  * This class was automatically generated with 
  * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
- * $Id
+ * $Id$
+ *
+ * Note: This file has been modified by hand.
  */
 
 package org.exolab.castor.mapping.xml;
@@ -267,6 +269,48 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
     public org.exolab.castor.mapping.ClassDescriptor getExtends() {
         return null;
     } //-- org.exolab.castor.mapping.ClassDescriptor getExtends() 
+
+    /**
+     * Returns the XML field descriptor matching the given
+     * xml name and nodeType. If NodeType is null, then
+     * either an AttributeDescriptor, or ElementDescriptor
+     * may be returned. Null is returned if no matching
+     * descriptor is available.
+     *
+     * @param name the xml name to match against
+     * @param nodeType, the NodeType to match against, or null if
+     * the node type is not known.
+     * @return the matching descriptor, or null if no matching
+     * descriptor is available.
+     *
+    **/
+    public XMLFieldDescriptor getFieldDescriptor
+        (String name, NodeType nodeType) 
+    {
+        
+        boolean wild = (nodeType == null);
+        
+        if (wild || (nodeType == NodeType.Element)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < elements.length; i++) {
+                desc = elements[i];
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+        
+        if (wild || (nodeType == NodeType.Attribute)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < attributes.length; i++) {
+                desc = attributes[i];
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+        
+        return null;
+        
+    } //-- getFieldDescriptor
 
     /**
     **/
