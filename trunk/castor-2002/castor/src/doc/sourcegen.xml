@@ -81,6 +81,14 @@
          </ul>
       </p>
 
+      <p>Collection types
+        <ul>
+          <li>Java 1.1 (default): java.util.Vector</li>
+          <li>Java 1.2: use the option <tt>types -j2</tt>, collection type is java.util.Collection</li>
+          <li>ODMG 3.0: use the option <tt>types -odmg</tt>, collection tyoe is odmg.DArray</li>
+        </ul>
+      </p>
+
   </section>
 
   <section title="Supported XML Schema Structures">
