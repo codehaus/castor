@@ -936,7 +936,9 @@ public class Marshaller extends MarshalFramework {
                         	tmpDesc = _cdResolver.resolveByXMLName(name, nsURI, null);
                             if (tmpDesc != null) {
                             	Class tmpType = tmpDesc.getJavaClass();
-                                if (tmpType != null) {
+                                if ((tmpType != null) && 
+                                    (tmpType.getName().equals(_class.getName()))) 
+                                {
                                 	containsDesc = (!tmpType.isInterface());
                                 }
                             }
@@ -961,9 +963,9 @@ public class Marshaller extends MarshalFramework {
                                 //-- from the xml name
                                 classDesc = getClassDescriptor(_class);                                
                                 if (classDesc != null) {
-                                    String tmpName1 = classDesc.getXMLName();
-                                    String tmpName2 = _naming.toXMLName(_class.getName());
-                                    if (tmpName2.equals(tmpName1))
+                                    String tmpName = classDesc.getXMLName();
+                                    //String tmpName2 = _naming.toXMLName(_class.getName());
+                                    if (name.equals(tmpName))
                                         saveType = false;
                                 }
                             }
