@@ -183,7 +183,7 @@
         </copy>
     </target>
 
-    <target name="compile.jdo" depends="prepare,compile.xml,gen.jdo.conf" 
+    <target name="compile.jdo" depends="prepare,compile.xml" 
             description="Compile the Castor JDO packages">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" 
                debug="on" deprecation="${deprecation}"
