@@ -19,6 +19,20 @@
 -->	
 
 		<item>
+			<title>Mailing list changes</title>
+			<link>http://castor.codehaus.org/news.html#item22</link>
+			<description>
+				This is to announce that we finally moved our mailing lists to the 
+				Codehaus (http://www.codehaus.org). For a period of 14 days, we'll be monitoring 
+				the old lists at Exolab, mainly referring you to the lists mentioned above. After 
+				this period, we will turn off these lists at our discretion. For details, please
+				see http://castor.codehaus.org/news.html.
+			</description>
+			<author>Werner Guttmann</author>
+			<guid isPermaLink="false">{2a847937-1b5f-90c4-5be1-347a3b84d29}</guid>
+			<pubDate>Wed, 30 Mar 2005 22:23:24 GMT</pubDate>
+		</item>
+		<item>
 			<title>RSS feed available</title>
 			<link>http://castor.codehaus.org/news.html#item21</link>
 			<description>
