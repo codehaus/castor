@@ -116,7 +116,7 @@ public class URIUtils {
 	        url = new URL(href);
 	        return url.openStream();
 	    }
-	    catch (MalformedURLException muex) {};
+	    catch (MalformedURLException muex) {}
 
 	    //-- join document base + href
 	    String xHref = null;
@@ -134,7 +134,7 @@ public class URIUtils {
 	        url = new URL(xHref);
 	        return url.openStream();
 	    }
-	    catch(MalformedURLException muex) {};
+	    catch(MalformedURLException muex) {}
 
 	    // Try local files
 	    File iFile = new File(href);
@@ -290,7 +290,7 @@ public class URIUtils {
 	        url = null; //-- to remove compiler warnings
 	        return href;
 	    }
-	    catch(MalformedURLException muex) {};
+	    catch(MalformedURLException muex) {}
 
 
 	    //-- join document base + href
@@ -354,7 +354,7 @@ public class URIUtils {
 	        url = null; //-- to remove compiler warnings
 	        return fileURL;
 	    }
-	    catch(MalformedURLException muex) {};
+	    catch(MalformedURLException muex) {}
 	    
 	    //-- At this point we we're unsucessful at trying to resolve
 	    //-- the href + documentbase, this could be due to a custom

@@ -33,7 +33,6 @@ public class DTDInitialParser implements DTDInitialParserConstants {
       case TEXT_UNIT:
       case BEGIN_PE_DECL:
       case PE_REFERENCE_D:
-        ;
         break;
       default:
         jj_la1[0] = jj_gen;
@@ -97,7 +96,6 @@ public class DTDInitialParser implements DTDInitialParserConstants {
       break;
     default:
       jj_la1[2] = jj_gen;
-      ;
     }
     jj_consume_token(END_PE_DECL);
   }
@@ -119,7 +117,6 @@ public class DTDInitialParser implements DTDInitialParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ENTITY_VALUE_TEXT_DQ:
         case PE_REFERENCE_DQ:
-          ;
           break;
         default:
           jj_la1[3] = jj_gen;
@@ -158,7 +155,6 @@ public class DTDInitialParser implements DTDInitialParserConstants {
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case ENTITY_VALUE_TEXT_SQ:
         case PE_REFERENCE_SQ:
-          ;
           break;
         default:
           jj_la1[5] = jj_gen;

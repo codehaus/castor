@@ -1510,7 +1510,7 @@ public class Marshaller extends MarshalFramework {
                 try {
                     obj = cdesc.getHandler().getValue(object);
                 }
-                catch(IllegalStateException ise) {};
+                catch(IllegalStateException ise) {}
                 
                 if (obj != null) {
                     char[] chars = null;

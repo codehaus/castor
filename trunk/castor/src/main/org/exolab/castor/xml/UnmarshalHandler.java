@@ -1482,7 +1482,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     try {
                         _topClass = loadClass(instanceClassname, null);
                     }
-                    catch(ClassNotFoundException cnfe) {};
+                    catch(ClassNotFoundException cnfe) {}
                         
                     if (_topClass == null) {
                         classDesc = getClassDescriptor(instanceClassname);
