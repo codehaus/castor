@@ -279,64 +279,67 @@ public class DatabaseRegistry
                     mapping.loadMapping( mappingUrl );
                 }
             }
-
-            if ( database.getDriver() != null ) {
+            
+            if (database.getDatabaseChoice() == null) {
+                throw new MappingException( "jdo.missingDataSource", database.getName() );
+            }
+            
+            if ( database.getDatabaseChoice().getDriver() != null ) {
                 // JDO configuration file specifies a driver, use the driver
                 // properties to create a new registry object.
                 Properties  props;
                 Enumeration params;
                 Param       param;
 
-                String driverName = database.getDriver().getClassName();
-
+                String driverName = database.getDatabaseChoice().getDriver().getClassName();
                 if ( driverName != null ) {
                     try {
-                        Class.forName( database.getDriver().getClassName() ).newInstance();
+                        Class.forName( database.getDatabaseChoice().getDriver().getClassName() ).newInstance();
                     } catch ( Exception except ) {
                         throw new MappingException( except );
                     }
                 }
-                if ( DriverManager.getDriver( database.getDriver().getUrl() ) == null )
-                    throw new MappingException( "jdo.missingDriver", database.getDriver().getUrl() );
+                if ( DriverManager.getDriver( database.getDatabaseChoice().getDriver().getUrl() ) == null )
+                    throw new MappingException( "jdo.missingDriver", database.getDatabaseChoice().getDriver().getUrl() );
 
                 props = new Properties();
-                params = database.getDriver().enumerateParam();
+                params = database.getDatabaseChoice().getDriver().enumerateParam();
                 while ( params.hasMoreElements() ) {
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );
                 }
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
-                                            database.getDriver().getUrl(), props );
+                                            database.getDatabaseChoice().getDriver().getUrl(), props );
                 _log.debug( "Using driver: " + driverName );
-            } else if ( database.getDataSource() != null ) {
+            } else if ( database.getDatabaseChoice().getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
                 // DataSource which was configured from the JDO configuration file
                 // to create a new registry object.
                 DataSource ds;
 
-                ds = (DataSource) database.getDataSource().getParams();
+                ds = (DataSource) database.getDatabaseChoice().getDataSource().getParams();
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory, ds );
-                _log.debug( "Using DataSource: " + database.getDataSource().getClassName() );
-            } else if ( database.getJndi() != null ) {
+                _log.debug( "Using DataSource: " + database.getDatabaseChoice().getDataSource().getClassName() );
+            } else if ( database.getDatabaseChoice().getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
                 // locate the DataSource object frome the JNDI namespace and use it.
                 Object    ds;
 
                 try {
-                    ds = new InitialContext().lookup( database.getJndi().getName() );
+                    ds = new InitialContext().lookup( database.getDatabaseChoice().getJndi().getName() );
                 } catch ( NameNotFoundException except ) {
-                    throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName() );
                 } catch ( NamingException except ) {
                     throw new MappingException( except );
                 }
                 if ( ! ( ds instanceof DataSource ) )
-                    throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
+                    throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName() );
 
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
                                             (DataSource) ds );
-                _log.debug( "Using DataSource from JNDI ENC: " + database.getJndi().getName() );
+                _log.debug( "Using DataSource from JNDI ENC: " + database.getDatabaseChoice().getJndi().getName() );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }
