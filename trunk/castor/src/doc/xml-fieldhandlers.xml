@@ -3,6 +3,11 @@
 <!-- $Id$ -->
 
 <document url="http://castor.exolab.org/xml-fieldhandlers.html">
+
+  <properties>
+     <author email="keith AT kvisco DOT com">Keith Visco</author>
+  </properties>
+
   <body>
     <title>Castor XML: Writing Custom FieldHandlers</title>
 
@@ -295,6 +300,13 @@ Root#getDate : Mon May 10 00:00:00 CDT 2004
          same FieldHandler for fields from different classes that require the
          same conversion.
        </p>
+       <body-note>
+         <b>Note:</b>
+         Currently the GeneralizedFieldHandler cannot be used from a
+         <i>binding-file</i> for use with the SourceGenerator, an
+         enhancement patch will be checked into CVS for this feature,
+         shortly after 0.9.6 final is released.
+       </body-note>
       <p>
         The same FieldHandler we used above can be written as a GeneralizedFieldHandler
         as such:
@@ -327,14 +339,15 @@ public class MyDateHandler
     }
 
     /**
-     * This method is used to convert the value when the getValue method
-     * is called. The getValue method will obtain the actual field value
-     * from given 'parent' object. This convert method is then invoked
-     * with the field's value. The value returned from this
-     * method will be the actual value returned by getValue method.
+     * This method is used to convert the value when the
+     * getValue method is called. The getValue method will
+     * obtain the actual field value from given 'parent' object.
+     * This convert method is then invoked with the field's
+     * value. The value returned from this method will be
+     * the actual value returned by getValue method.
      *
-     * @param value the object value to convert after performing a get
-     * operation
+     * @param value the object value to convert after
+     *  performing a get operation
      * @return the converted value.
      */
     public Object convertUponGet(Object value) {
@@ -346,13 +359,14 @@ public class MyDateHandler
 
 
     /**
-     * This method is used to convert the value when the setValue method
-     * is called. The setValue method will call this method to obtain
-     * the converted value. The converted value will then be used as
-     * the value to set for the field.
+     * This method is used to convert the value when the
+     * setValue method is called. The setValue method will
+     * call this method to obtain the converted value.
+     * The converted value will then be used as the value to
+     * set for the field.
      *
-     * @param value the object value to convert before performing a set
-     * operation
+     * @param value the object value to convert before
+     *  performing a set operation
      * @return the converted value.
      */
     public Object convertUponSet(Object value) {
@@ -368,8 +382,9 @@ public class MyDateHandler
     }
 
     /**
-     * Returns the class type for the field that this GeneralizedFieldHandler
-     * converts to and from. This should be the type that is used in the
+     * Returns the class type for the field that this
+     * GeneralizedFieldHandler converts to and from. This
+     * should be the type that is used in the
      * object model.
      *
      * @return the class type of of the field
@@ -379,12 +394,13 @@ public class MyDateHandler
     }
 
     /**
-     * Creates a new instance of the object described by this field.
+     * Creates a new instance of the object described by
+     * this field.
      *
      * @param parent The object for which the field is created
      * @return A new instance of the field's value
-     * @throws IllegalStateException This field is a simple type and
-     *  cannot be instantiated
+     * @throws IllegalStateException This field is a simple
+     *  type and cannot be instantiated
      */
     public Object newInstance( Object parent )
         throws IllegalStateException
@@ -672,7 +688,7 @@ public class Test {
     <section title="Collections and FieldHandlers">
        <p>
          <body-note>The <i>GeneralizedFieldHandler</i> checked into the CVS
-         version (main branch) of Castor automatically supports iterating over
+         version (main branch / 0.9.6 Final) of Castor automatically supports iterating over
          the items of a collection and passing them one-by-one to the
          <i>convertUponGet</i>. For backward compatibility or to handle
          the collection iteration yourself, simply add the following to
