@@ -310,8 +310,11 @@ public class Marshaller {
             name = MarshalHelper.toXMLName(name);
         }
             
-        XMLClassDescriptor classDesc 
-            = (XMLClassDescriptor)descriptor.getClassDescriptor();
+        //-- obtain the class descriptor
+        XMLClassDescriptor classDesc = null;
+        
+        if (_class == descriptor.getFieldType())
+            classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
 
         if (classDesc == null) {
             
