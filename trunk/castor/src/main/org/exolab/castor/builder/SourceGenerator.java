@@ -1238,21 +1238,25 @@ public class SourceGenerator
             error.append("Warning: A class name generation conflict has occured between ");
             if (a1 != null) {
                 error.append(SchemaNames.getStructureName(a1));
+                error.append(" '");
+                error.append(ExtendedBinding.getSchemaLocation(a1));
             }
-            else {
+            else {                
                 error.append(classInfo.getNodeTypeName());
+                error.append(" '");
+                error.append(classInfo.getNodeName());
             }
-            error.append(" '");
-            error.append(classInfo.getNodeName());
             error.append("' and ");
             if (a2 != null) {
                 error.append(SchemaNames.getStructureName(a2));
+                error.append(" '");
+                error.append(ExtendedBinding.getSchemaLocation(a2));
             }
             else {
                 error.append(temp.getNodeTypeName());
+                error.append(" '");
+                error.append(temp.getNodeName());
             }
-            error.append(" '");
-            error.append(temp.getNodeName());
             error.append("'. Please use a Binding file to solve this problem.");
             error.append("Continue anyway [not recommended] ");
             
