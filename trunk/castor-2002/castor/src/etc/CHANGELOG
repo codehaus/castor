@@ -1,6 +1,9 @@
 Version 0.8  January 21, 2000
 -----------------------------
 
+ XML: Added support for Validation during Unmarshalling. By
+      default this is enabled.
+
 Misc: ObjectDesc, FieldDesc and related classed have no been
       consolidated from the three modules and placed in a single
       package org.exolab.castor.desc.
@@ -44,9 +47,9 @@ JDO: Temporary fix to rollback of objects in lieu of missing
 
 JDO: Perliminary code for XAResource support in Castor JDO
 
-XML: Added some support for derived archetypes (types) 
+XML: Added some support for derived archetypes (types)
      - only extension derivation is possible at this time,
-      so deriveBy must be "extension". 
+      so deriveBy must be "extension".
 
 XML: Added binary, and boolean types to the source code generator
      for Castor XML
