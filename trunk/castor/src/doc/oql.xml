@@ -7,6 +7,15 @@
                 Reference: <api package="org.exolab.castor.jdo.oql">The Java OQL to SQL translator</api></p>
         </header>
 
+        <section title="News">
+            <p><b>Release 0.9.6</b>:<br/>
+               <ul>
+                  <li>Added support for a limit clause and an offset clause.</li>
+                  <li>Added an <a href="#Examples">example section</a>.</li>
+               </ul>
+            </p>
+        </section>
+
         <section title="Status">
             <p>
                 The Castor OQL implementation is currently in phase 3 of development. 
@@ -113,6 +122,7 @@ selectExpr              ::= <B>select</B> [<B>distinct</B>]
                             [whereClause]
                             [groupClause]
                             [orderClause]
+                            [limitClause [offsetClause]]
 
 projectionAttributes    ::= projectionList
                           | *
@@ -134,6 +144,10 @@ groupClause             ::= <B>group by</B> fieldList {havingClause}
 havingClause            ::= <B>having</B> expr
 
 orderClause             ::= <B>order by</B> sortCriteria
+
+limitClause             ::= <B>limit </B> queryParam
+
+offsetClause            ::= <b>offset</b> queryParam
 
 sortCriteria            ::= sortCriterion {, sortCriterion }
 
@@ -850,6 +864,116 @@ _expr = pt.getQueryExpr();
                                 queries selecting multiple fields or as
                                 comma separated list or * </li></ul></TD></TR>
             </TBODY></TABLE></p>
+        </section>
+    <section title="Examples">
+
+       <p>Please find below various examples of OQL queries using the Java class files 
+          as outlined below.</p>
+
+       <section title="Java class files">
+       
+          <p>The following fragment shows the Java class declaration for the Product class:</p>
+       
+          <table border="1" cellpadding="4">
+             <tr>
+                <td BGCOLOR="#CCCCCC">
+                   <code>
+package myapp;
+
+public class Product 
+{
+    private int       _id;
+
+    private String    _name; 
+
+    private float     _price; 
+
+    private ProductGroup _group;
+
+
+    public int getId() { ... }
+
+    public void setId( int anId ) { ... }
+
+    public String getName() { ... }
+
+    public void setName( String aName ) { ... }
+
+    public float getPrice() { ... }
+
+    public void setPrice( float aPrice ) { ... }
+
+    public ProductGroup getProductGroup() { ... }
+
+    public void setProductGroup( ProductGroup aProductGroup ) { ... }
+}
+               </code>
+            </td>
+         </tr>
+      </table>
+
+      <p>The following fragment shows the Java class declaration for the ProductGroup class:</p>
+      
+      <table border="1" cellpadding="4">
+              <tr>
+                <td BGCOLOR="#CCCCCC">
+                    <code>
+
+
+public class ProductGroup
+{
+
+    private int       _id;
+
+    private String    _name;
+
+    public int getId() { ... }
+
+    public void setId( int id ) { ... }
+
+    public String getName() { ... }
+
+    public void setName( String name ) { ... }
+
+}
+                  </code>
+               </td>
+            </tr>
+         </table>
+      </section>
+      
+      <section title="Limit Clause">
+      
+         <p>The following code fragment shows an OQL query that uses the LIMIT keyword 
+            to select the first 10 ProductGroup instances.</p>
+      
+         <table border="1" cellpadding="4">
+            <tr>
+               <td BGCOLOR="#CCCCCC">
+                  <code>
+query = db.getOQLQuery("select p from ProductGroup as p <b><font color="red">LIMIT $1</font></b>");
+query.bind(10);
+                  </code>
+               </td>
+            </tr>
+         </table>
+         
+         <p>Below is the same OQL query again, restricting the number of ProductGroup instances
+            returned to 10, though this time it is specified that the ProductGroup 
+            instances 11 to 20 should be returned.</p>
+
+         <table border="1" cellpadding="4">
+            <tr>
+               <td BGCOLOR="#CCCCCC">
+                  <code>
+query = db.getOQLQuery ("select p from ProductGroup as p <b>LIMIT $1 <font color="red">OFFSET $2</font></b>");
+query.bind(10);
+                  </code>
+               </td>
+            </tr>
+         </table>
+      
+      </section>
     </section>
-</body>
+    </body>
 </document>
