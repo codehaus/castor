@@ -59,7 +59,7 @@ import org.exolab.castor.util.CastorException;
  * @version $Revision$ $Date$
  */
 public class DuplicateIdentityException
-    extends CastorException
+    extends PersistenceException
 {
 
     
