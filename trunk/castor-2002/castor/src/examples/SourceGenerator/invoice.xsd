@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<schema xmlns="http://www.w3.org/2000/10/XMLSchema" 
+<schema xmlns="http://www.w3.org/2001/XMLSchema" 
 		targetNamespace="http://castor.exolab.org/Test/Invoice">
 
    <annotation>
@@ -55,7 +55,7 @@
       	  <sequence>
           	<element name="carrier" type="string"/>
           	<element name="option"  type="string"/>
-          	<element name="estimated-delivery" type="timeDuration"/>
+          	<element name="estimated-delivery" type="duration"/>
       	  </sequence>
       </complexType>
    </element>
@@ -125,8 +125,8 @@
    <!-- Cool price type -->
    <simpleType name="PriceType">
    		<restriction base="decimal">
-   			<scale value="2"/>
-    		<precision value="5"/>
+   			<fractionDigits value="2"/>
+    		<totalDigits value="5"/>
     		<minInclusive value="1"/>
    			<maxInclusive value="100"/>
    		</restriction>

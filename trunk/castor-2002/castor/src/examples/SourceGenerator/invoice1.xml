@@ -13,9 +13,9 @@
    </ship-to>
 
    <item InStock="true" Category="Open Source Project">
-   		<Id>CAS 0.8.12 TOR</Id>
+   		<Id>CAS 0.9.3 TOR</Id>
    		<Quantity>1</Quantity>
-   		<Price>5</Price>
+   		<Price>100.00</Price>
    	</item>
    	
    <shipping-method>
