@@ -957,8 +957,14 @@ public final class CacheEngine
                                 for ( int j = 0 ; j < origIdentity.length ; ++j ) {
                                     if ( origIdentity[ j ] != null &&
                                          origIdentity[ j ].equals( relIdentity ) ) {
-                                        isOriginal = true;
+                                        ClassHandler relHandler;
+                                        OID relOid;
+
+                                        relHandler = ((TypeInfo) _typeInfo.get( related.getClass() )).handler;
+                                        relOid = new OID( relHandler, origIdentity[ j ] );
+                                        isOriginal = ! tx.getObjectEntry( this, relOid ).deleted;
                                         origIdentity[ j ] = null;
+                                        break;
                                     }
                                 }
                                 if ( ! isOriginal && ! tx.isPersistent( related ) )
