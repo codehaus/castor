@@ -354,36 +354,6 @@ public class ClassMolder {
             _callback = new JDOCallback();
     }
 
-    /**
-     * Break a string into array of substring which serparated
-     * by a delimitator
-     */
-    private String[] breakApart( String strings, char delimit ) {
-        if ( strings == null )
-            return new String[0];
-        Vector v = new Vector();
-        int start = 0;
-        int count = 0;
-        while ( count < strings.length() ) {
-            if ( strings.charAt( count ) == delimit ) {
-                if ( start < (count - 1) ) {
-                    v.add( strings.substring( start, count ) );
-                    count++;
-                    start = count;
-                    continue;
-                }
-            }
-            count++;
-        }
-        if ( start < (count - 1) ) {
-            v.add( strings.substring( start, count ) );
-        }
-
-        String[] result = new String[v.size()];
-        v.copyInto( result );
-        return result;
-    }
-
     /*
      * Get the all the id fields of a class
      * If the class, C, is a dependent class, then
@@ -1076,7 +1046,6 @@ public class ClassMolder {
                 if ( value != null )
                     newfields[i] = fieldClassMolder.getIdentity( tx, value );
 
-                // the following code probably can be optimized if needed
                 if ( !isEquals( fields[i], newfields[i] ) ) {
                     if ( _fhs[i].isStored() && _fhs[i].isCheckDirty() ) 
                         updatePersist = true;    
