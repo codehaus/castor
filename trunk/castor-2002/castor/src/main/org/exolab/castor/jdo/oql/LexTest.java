@@ -76,7 +76,7 @@ public class LexTest implements TokenTypes {
     tokenTypes.put(new Integer(KEYWORD_WHERE), "KEYWORD_WHERE");
     tokenTypes.put(new Integer(KEYWORD_OR), "KEYWORD_OR");
     tokenTypes.put(new Integer(KEYWORD_AND), "KEYWORD_AND");
-    tokenTypes.put(new Integer(EQUAL), "EQUAL");
+    tokenTypes.put(new Integer(EQUAL), "EQUAL"); // 10
     tokenTypes.put(new Integer(NOT_EQUAL), "NOT_EQUAL");
     tokenTypes.put(new Integer(KEYWORD_LIKE), "KEYWORD_LIKE");
     tokenTypes.put(new Integer(LT), "LT");
@@ -86,7 +86,7 @@ public class LexTest implements TokenTypes {
     tokenTypes.put(new Integer(PLUS), "PLUS");
     tokenTypes.put(new Integer(MINUS), "MINUS");
     tokenTypes.put(new Integer(CONCAT), "CONCAT");
-    tokenTypes.put(new Integer(TIMES), "TIMES");
+    tokenTypes.put(new Integer(TIMES), "TIMES"); // 20
     tokenTypes.put(new Integer(DIVIDE), "DIVIDE");
     tokenTypes.put(new Integer(KEYWORD_MOD), "KEYWORD_MOD");
     tokenTypes.put(new Integer(KEYWORD_ABS), "KEYWORD_ABS");
@@ -98,7 +98,7 @@ public class LexTest implements TokenTypes {
     tokenTypes.put(new Integer(KEYWORD_UNDEFINED), "KEYWORD_UNDEFINED");
     tokenTypes.put(new Integer(BOOLEAN_LITERAL), "BOOLEAN_LITERAL");
     tokenTypes.put(new Integer(LONG_LITERAL), "LONG_LITERAL");
-    tokenTypes.put(new Integer(DOUBLE_LITERAL), "DOUBLE_LITERAL");
+    tokenTypes.put(new Integer(DOUBLE_LITERAL), "DOUBLE_LITERAL"); // 30
     tokenTypes.put(new Integer(CHAR_LITERAL), "CHAR_LITERAL");
     tokenTypes.put(new Integer(STRING_LITERAL), "STRING_LITERAL");
     tokenTypes.put(new Integer(DATE_LITERAL), "DATE_LITERAL");
