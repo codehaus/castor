@@ -63,7 +63,6 @@ import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
-import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.RelationContext;
 import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.mapping.AccessMode;
@@ -130,9 +129,6 @@ class SQLEngine
     private RelationDesc[]   _loadRelations;
 
 
-    private SQLRelated[]     _related;
-
-
     private SQLEngine        _extends;
 
 
@@ -150,7 +146,6 @@ class SQLEngine
         buildRemoveSql();
         buildStoreSql();
         buildLoadSql();
-        buildRelated( logWriter );
         if ( logWriter != null ) {
             logWriter.println( "SQL for " + _clsDesc.getJavaClass().getName() +
                                ": " + _sqlLoad );
@@ -501,29 +496,6 @@ class SQLEngine
     {
         if ( _extends != null ) 
             _extends.changeIdentity( conn, obj, oldIdentity, newIdentity );
-    }
-
-
-    protected void buildRelated( PrintWriter logWriter )
-        throws MappingException
-    {
-        RelationDesc[] rels;
-        Vector         engines;
-        
-        engines = new Vector();
-        rels = _clsDesc.getRelations();
-        if ( rels != null ) {
-            for ( int i = 0 ; i < rels.length ; ++i ) {
-                /*
-                if ( rels[ i ].isAttached() ) {
-                    engines.addElement( new SQLRelated( related[ i ], _clsDesc,
-                                                        related[ i ].getParentField(), logWriter ) );
-                }
-                */
-            }
-            _related = new SQLRelated[ engines.size() ];
-            engines.copyInto( _related );
-        }
     }
 
 
