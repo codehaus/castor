@@ -28,9 +28,9 @@
 				<!-- Test for the SourceGenerator OR the Marshalling Framework-->
 				<xsd:choice>
 					<!-- Test case for the SourceGenerator-->
-					<xsd:element ref="SourceGeneratorTest" minOccurs="1" maxOccurs="1"/>
+					<xsd:element ref="SourceGeneratorTest" minOccurs="0" maxOccurs="1"/>
 					<!-- Test case for the Marshalling Framework-->
-					<xsd:element ref="MarshallingTest" minOccurs="1" maxOccurs="1"/>
+					<xsd:element ref="MarshallingTest" minOccurs="0" maxOccurs="1"/>
 				</xsd:choice>
 			</xsd:sequence>
 		</xsd:complexType>		
