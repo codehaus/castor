@@ -132,6 +132,7 @@ public class Marshaller {
     **/
     static private boolean _validate = false;
 
+    
     /**
      * The current namespace scoping
     **/
@@ -284,6 +285,20 @@ public class Marshaller {
         _nsURIKeyHash.put(nsURI, nsPrefix);
 
     } //-- setNamespacePrefix
+
+    /**
+     * Sets the ClassDescriptorResolver to use during unmarshalling
+     * @param cdr the ClassDescriptorResolver to use
+     * @see setMapping
+     * <BR />
+     * <B>Note:</B> This method will nullify any Mapping
+     * currently being used by this Marshaller
+    **/
+    public void setResolver( ClassDescriptorResolver cdr ) {
+
+        if (cdr != null) _cdResolver = cdr;
+
+    } //-- setResolver
 
     /**
      * Sets whether or not to validate the object model
