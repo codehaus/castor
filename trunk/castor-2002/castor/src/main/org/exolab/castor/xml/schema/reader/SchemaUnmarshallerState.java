@@ -82,7 +82,7 @@ class SchemaUnmarshallerState {
      * @param schema the Schema to check for being marked as processed
      */
     boolean processed(Schema schema) {
-        return _processed.containsValue(schema);
+        return _processed.contains(schema);
     } //-- processed
 
     /**
