@@ -58,8 +58,8 @@ go
 drop table test_pks_person
 go
 create table test_pks_person (
-  fname varchar(15)    not null,
-  lname varchar(15)    not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
   bday  datetime 
 )
 go
@@ -72,8 +72,8 @@ go
 drop table test_pks_employee
 go
 create table test_pks_employee (
-  fname varchar(15)    not null,
-  lname varchar(15)    not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
   start_date datetime null
 )
 go
@@ -85,8 +85,8 @@ go
 drop table test_pks_payroll
 go
 create table test_pks_payroll (
-  fname varchar(15)    not null,
-  lname varchar(15)    not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
   id int               not null,
   holiday int,
   hourly_rate int
@@ -100,8 +100,8 @@ go
 drop table test_pks_address
 go
 create table test_pks_address (
-  fname varchar(15)    not null,
-  lname varchar(15)    not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
   id int               not null,
   street varchar(30) null,
   city  varchar(30) null,
@@ -117,11 +117,11 @@ go
 drop table test_pks_contract
 go
 create table test_pks_contract (
-  fname varchar(15)    not null,
-  lname varchar(15)    not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
   policy_no int        not null,
   contract_no int      not null,
-  c_comment varchar(30)  null
+  c_comment varchar(100)  null
 )
 go
 create unique index test_pks_contract_fk on test_pks_contract( fname, lname )
@@ -144,7 +144,7 @@ drop table test_pks_category
 go
 create table test_pks_category (
   id  int              not null,
-  name varchar(20)     not null
+  name varchar(100)     not null
 )
 go
 create unique index test_pks_category_pk on test_pks_category( id )
