@@ -204,7 +204,7 @@ final class TransactionContextImpl
                     conn.setAutoCommit( false );
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
         }
         return conn;
