@@ -238,6 +238,8 @@ public class DescriptorSourceFactory {
             //-- skip transient members
             if (member.isTransient()) continue;
             
+            boolean isEnumerated = false;
+            
             jsc.add("//-- ");
             jsc.append(member.getName());
                 
@@ -257,13 +259,7 @@ public class DescriptorSourceFactory {
                     jsc.add("desc.setImmutable(true);");
                     break;
                 case XSType.CLASS:
-                    //XSClass xsClass = (XSClass)xsType;
-                    //if (xsClass.isEnumerated()) {
-                    //    jsc.append("EnumMarshalDescriptor(");
-                    //    jsc.append(xsClass.getName());
-                    //    jsc.append(".class,\"");
-                    //    break;
-                    //}
+                    isEnumerated = ((XSClass)xsType).isEnumerated();
                     break;
                 case XSType.IDREF:
                     jsc.add("desc.setReference(true);");
@@ -276,7 +272,8 @@ public class DescriptorSourceFactory {
             }
             //-- handler access methods
                 
-            jsc.add("desc.setHandler( new XMLFieldHandler() {");
+            
+            jsc.add("handler = (new XMLFieldHandler() {");
             jsc.indent();
             
             //-- read method
@@ -356,6 +353,18 @@ public class DescriptorSourceFactory {
             jsc.unindent();
             jsc.add("} );");
             
+            if (isEnumerated) {
+                jsc.add("desc.setHandler( new EnumFieldHandler(");
+                jsc.append(classType(xsType.getJType()));
+                jsc.append(", handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else if (xsType.getType() == XSType.TIME_INSTANT) {
+                jsc.add("desc.setHandler( new DateFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
+            else jsc.add("desc.setHandler(handler);");
             
             //-- namespace
             if (nsURI != null) {
@@ -434,8 +443,8 @@ public class DescriptorSourceFactory {
             }
             else {
                 
-                if (xsType.getType() == XSType.LIST)
-                    xsType = ((SGList)member).getContent().getSchemaType();
+                if (xsType.getType() == XSType.COLLECTION)
+                    xsType = ((CollectionInfo)member).getContent().getSchemaType();
                     
                 jsc.add("desc = new XMLFieldDescriptorImpl(");
                 jsc.append(classType(xsType.getJType()));
@@ -553,6 +562,11 @@ public class DescriptorSourceFactory {
                 jsc.append(", handler));");
                 jsc.add("desc.setImmutable(true);");
             }
+            else if (xsType.getType() == XSType.TIME_INSTANT) {
+                jsc.add("desc.setHandler( new DateFieldHandler(");
+                jsc.append("handler));");
+                jsc.add("desc.setImmutable(true);");
+            }
             else jsc.add("desc.setHandler(handler);");
             
             //-- namespace
@@ -616,7 +630,7 @@ public class DescriptorSourceFactory {
         JMember jMember = member.createMember();
         
         
-        if (xsType.getType() != XSType.LIST) {
+        if (xsType.getType() != XSType.COLLECTION) {
             if (member.isRequired()) {
                 jsc.add("bvr.setMinOccurs(1);");
             }
@@ -669,10 +683,10 @@ public class DescriptorSourceFactory {
                 jsc.add("bvr.setTypeValidator(new NameValidator(");
                 jsc.append("NameValidator.NMTOKEN));");
                 break;
-            case XSType.LIST:
+            case XSType.COLLECTION:
                 XSList xsList = (XSList)xsType;
-                SGList sgList = (SGList)member;
-                FieldInfo content = sgList.getContent();
+                CollectionInfo cInfo = (CollectionInfo)member;
+                FieldInfo content = cInfo.getContent();
                 
                 jsc.add("bvr.setMinOccurs(");
                 jsc.append(Integer.toString(xsList.getMinimumSize()));

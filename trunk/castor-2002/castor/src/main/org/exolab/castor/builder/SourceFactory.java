@@ -64,8 +64,43 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public class SourceFactory  {
+
+
+    /** 
+     * The type factory.
+    **/
+    private FieldInfoFactory infoFactory = null;
     
-        
+
+    /** 
+     * The member factory.
+    **/
+    private MemberFactory memberFactory = null;
+
+    
+    /** 
+     * Creates a new SourceFactory using the default FieldInfo factory.
+    **/
+    public SourceFactory() {
+        this(null);
+    } //-- SourceFactory
+    
+
+    /** 
+     * Creates a new SourceFactory with the given FieldInfoFactory
+     * @param infoFactory the FieldInfoFactory to use
+    */
+    public SourceFactory(FieldInfoFactory infoFactory) {
+        super();    
+        if (infoFactory == null) 
+            this.infoFactory = new FieldInfoFactory();
+        else
+            this.infoFactory = infoFactory;
+            
+        this.memberFactory = new MemberFactory(infoFactory);
+    } //-- SourceFactory
+    
+
     //------------------/
     //- Public Methods -/
     //------------------/
@@ -78,7 +113,7 @@ public class SourceFactory  {
      * @param packageName the package to use when generating source
      * from this ClassInfo
     **/
-    public static JClass createSourceCode
+    public JClass createSourceCode
         (ElementDecl element, ClassInfoResolver resolver, String packageName) 
     {
         
@@ -150,7 +185,7 @@ public class SourceFactory  {
      * @param packageName the package to which generated classes should
      * belong
     **/
-    public static JClass createSourceCode
+    public JClass createSourceCode
         (Archetype type, ClassInfoResolver resolver, String packageName) 
     {
         if (type == null)
@@ -213,7 +248,7 @@ public class SourceFactory  {
      * @param datatype the Datatype to create the Java source for
      * @return the JClass representation of the given Datatype
     **/
-    public static JClass createSourceCode
+    public JClass createSourceCode
         (Datatype datatype, ClassInfoResolver resolver, String packageName) 
     {
         
@@ -267,7 +302,7 @@ public class SourceFactory  {
     /**
      *
     **
-    public static JClass createSourceCode(ClassDescriptor descriptor) 
+    public JClass createSourceCode(ClassDescriptor descriptor) 
     {
         
         //-- handle null arguments
@@ -311,7 +346,7 @@ public class SourceFactory  {
     /**
      * Initializes the given JClass
     **/
-    private static void initialize(JClass jClass) {
+    private void initialize(JClass jClass) {
         
         
         jClass.addInterface("java.io.Serializable");
@@ -331,7 +366,7 @@ public class SourceFactory  {
      * Creates the #marshal methods for the given JClass
      * @param parent the JClass to create the #marshal methods for
     **/
-    private static void createMarshalMethods(JClass parent) {
+    private void createMarshalMethods(JClass parent) {
         
         //-- create main marshal method
         JMethod jMethod = new JMethod(null,"marshal");
@@ -363,7 +398,7 @@ public class SourceFactory  {
         
     } //-- createMarshalMethods
     
-    private static void createUnmarshalMethods(JClass parent) {
+    private void createUnmarshalMethods(JClass parent) {
         
         //-- create main marshal method
         JMethod jMethod = new JMethod(parent,"unmarshal");
@@ -385,7 +420,7 @@ public class SourceFactory  {
      * Creates the Validate methods for the given JClass
      * @param jClass the JClass to create the Validate methods for
     **/
-    private static void createValidateMethods(JClass jClass) {
+    private void createValidateMethods(JClass jClass) {
         
         JMethod     jMethod = null;
         JSourceCode jsc     = null;
@@ -423,7 +458,7 @@ public class SourceFactory  {
     /**
      * Resolves the className out of the given name and the packageName
     **/
-    private static String resolveClassName(String name, String packageName) {
+    private String resolveClassName(String name, String packageName) {
         if ((packageName != null) && (packageName.length() > 0)) {
             return packageName+"."+name;
         }
@@ -434,7 +469,7 @@ public class SourceFactory  {
      * @param archetype the Archetype for this ClassInfo
      * @param resolver the ClassInfoResolver for resolving "derived" types.
     **/    
-    private static void processArchetype
+    private void processArchetype
         (Archetype archetype, FactoryState state) 
     {
         
@@ -494,7 +529,7 @@ public class SourceFactory  {
         Enumeration enum = archetype.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
-            FieldInfo fieldInfo = MemberFactory.createFieldInfo(attr);
+            FieldInfo fieldInfo = memberFactory.createFieldInfo(attr);
             handleField(fieldInfo, state);
         }
         
@@ -510,11 +545,11 @@ public class SourceFactory  {
             (contentType == ContentType.any)) 
         {
             
-            FieldInfo fieldInfo = MemberFactory.createFieldInfoForText();
+            FieldInfo fieldInfo = memberFactory.createFieldInfoForText();
             handleField(fieldInfo, state);
             
             if (contentType == ContentType.any) {
-                fieldInfo = MemberFactory.createFieldInfoForAny();
+                fieldInfo = memberFactory.createFieldInfoForAny();
                 handleField(fieldInfo, state);
             }
                 
@@ -523,7 +558,7 @@ public class SourceFactory  {
     } //-- processArchetype
 
 
-    private static void handleField(FieldInfo fieldInfo, FactoryState state) {
+    private void handleField(FieldInfo fieldInfo, FactoryState state) {
         
         if (fieldInfo == null) return;
         
@@ -549,7 +584,7 @@ public class SourceFactory  {
      * Processes the given ContentModelGroup
      * @param contentModel the ContentModelGroup to process
     **/
-    private static void processContentModel
+    private void processContentModel
         (ContentModelGroup contentModel, FactoryState state) 
     {
         
@@ -566,7 +601,7 @@ public class SourceFactory  {
             switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
                     fieldInfo 
-                        = MemberFactory.createFieldInfo((ElementDecl)struct);
+                        = memberFactory.createFieldInfo((ElementDecl)struct);
                     handleField(fieldInfo, state);
                     break;
                 case Structure.GROUP:
@@ -584,7 +619,7 @@ public class SourceFactory  {
      * @param annotated the Annotated structure to process
      * @return the generated comment
     **/
-    private static String processAnnotations(Annotated annotated) {
+    private String processAnnotations(Annotated annotated) {
         //-- process annotations
         Enumeration enum = annotated.getAnnotations();
         if (enum.hasMoreElements()) {
@@ -607,7 +642,7 @@ public class SourceFactory  {
      * Creates all the necessary enumeration code from the given 
      * datatype
     **/
-    private static void processEnumeration
+    private void processEnumeration
         (Datatype datatype, FactoryState state) 
     {
         
