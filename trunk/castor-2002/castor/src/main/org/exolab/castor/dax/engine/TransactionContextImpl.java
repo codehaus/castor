@@ -79,7 +79,7 @@ final class TransactionContextImpl
     }
 
 
-    protected void commitConnections( boolean keepOpen )
+    protected void commitConnections()
     {
     }
 

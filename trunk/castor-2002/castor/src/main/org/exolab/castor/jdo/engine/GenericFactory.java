@@ -47,12 +47,12 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.PrintWriter;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**
@@ -78,15 +78,16 @@ public class GenericFactory
     }
 
 
-    public Persistence getPersistence( ClassDescriptor clsDesc, PrintWriter logWriter )
+    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException
     {
 	if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
 	    return null;
         try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, logWriter, this, null );
+            return new SQLEngine( (JDOClassDescriptor) clsDesc, logInterceptor, this, null );
         } catch ( MappingException except ) {
-            logWriter.println( except.toString() );
+            if ( logInterceptor != null )
+                logInterceptor.exception( except );
             return null;
         }
     }

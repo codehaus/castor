@@ -47,7 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.PrintWriter;
 import java.util.Vector;
 import java.sql.SQLException;
 import java.sql.Connection;
@@ -73,6 +72,7 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -129,26 +129,26 @@ final class SQLEngine
     private String              _stampField;
 
 
-    private PrintWriter         _logWriter;
+    private LogInterceptor       _logInterceptor;
 
 
     private JDOClassDescriptor   _clsDesc;
 
 
-    SQLEngine( JDOClassDescriptor clsDesc, PrintWriter logWriter,
+    SQLEngine( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor,
                PersistenceFactory factory, String stampField )
         throws MappingException
     {
         _clsDesc = clsDesc;
         _stampField = stampField;
         _factory = factory;
-        _logWriter = logWriter;
+        _logInterceptor = logInterceptor;
         if ( _clsDesc.getExtends() != null )
             _extends = new SQLEngine( (JDOClassDescriptor) _clsDesc.getExtends(), null,
 				      _factory, _stampField );
         try {
-            buildSql( _clsDesc, _logWriter );
-            buildFinder( _clsDesc, _logWriter );
+            buildSql( _clsDesc, _logInterceptor );
+            buildFinder( _clsDesc, _logInterceptor );
         } catch ( QueryException except ) {
             throw new MappingException( except );
         }
@@ -167,7 +167,12 @@ final class SQLEngine
     public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
-        return new SQLQuery( this, query.getStatement( _clsDesc.getAccessMode() == AccessMode.Locked), types );
+        String sql;
+
+        sql = query.getStatement( _clsDesc.getAccessMode() == AccessMode.DbLocked);
+        if ( _logInterceptor != null )
+            _logInterceptor.queryStatement( sql );
+        return new SQLQuery( this, sql, types );
     }
 
 
@@ -361,7 +366,7 @@ final class SQLEngine
         Object            stamp = null;
 
         try {
-            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.Locked ) ? _sqlLoadLock : _sqlLoad );
+            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             stmt.setObject( 1, identity );
 
             rs = stmt.executeQuery();
@@ -402,7 +407,7 @@ final class SQLEngine
     }
 
 
-    private void buildSql( JDOClassDescriptor clsDesc, PrintWriter logWriter )
+    private void buildSql( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor )
             throws QueryException
     {
         StringBuffer         sql;
@@ -447,17 +452,17 @@ final class SQLEngine
         }
         sql.append( ')' );
         _sqlCreate = sql.toString();
-        if ( logWriter != null )
-            logWriter.println( "SQL for creating " + clsDesc.getJavaClass().getName() +
-                               ": " + _sqlCreate );
+        if ( logInterceptor != null )
+            logInterceptor.storeStatement( "SQL for creating " + clsDesc.getJavaClass().getName() +
+                                           ": " + _sqlCreate );
 
 
         sql = new StringBuffer( "DELETE FROM " ).append( clsDesc.getTableName() );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
-        if ( logWriter != null )
-            logWriter.println( "SQL for deleting " + clsDesc.getJavaClass().getName() +
-                               ": " + _sqlRemove );
+        if ( logInterceptor != null )
+            logInterceptor.storeStatement( "SQL for deleting " + clsDesc.getJavaClass().getName() +
+                                           ": " + _sqlRemove );
 
 
         sql = new StringBuffer( "UPDATE " );
@@ -481,13 +486,13 @@ final class SQLEngine
             }
         }
         _sqlStoreDirty = sql.toString();
-        if ( logWriter != null )
-            logWriter.println( "SQL for updating " + clsDesc.getJavaClass().getName() +
-                               ": " + _sqlStoreDirty );
+        if ( logInterceptor != null )
+            logInterceptor.storeStatement( "SQL for updating " + clsDesc.getJavaClass().getName() +
+                                           ": " + _sqlStoreDirty );
     }
 
 
-    private void buildFinder( JDOClassDescriptor clsDesc, PrintWriter logWriter )
+    private void buildFinder( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException, QueryException
     {
         Vector          fields;
@@ -501,9 +506,9 @@ final class SQLEngine
         _sqlLoadLock = expr.getStatement( true );
         _fields = new FieldInfo[ fields.size() ];
         fields.copyInto( _fields );
-        if ( logWriter != null )
-            logWriter.println( "SQL for loading " + clsDesc.getJavaClass().getName() +
-                               ":  " + _sqlLoad );
+        if ( logInterceptor != null )
+            logInterceptor.storeStatement( "SQL for loading " + clsDesc.getJavaClass().getName() +
+                                           ":  " + _sqlLoad );
 
         _sqlFinder = _factory.getQueryExpression();
         addLoadSql( clsDesc, _sqlFinder, fields, true, false, true );

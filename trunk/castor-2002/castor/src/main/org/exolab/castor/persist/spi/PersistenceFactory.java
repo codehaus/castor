@@ -85,13 +85,13 @@ public interface PersistenceFactory
      * the specified object type.
      *
      * @param clsDesc The class descriptor
-     * @param logWriter Writer to use for logging errors and tracing
-     *  messages (may be null)
+     * @param logInterceptor Interceptor to write log messages to
+     *  (may be null)
      * @return A suiteable persistence implementation, or null
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( ClassDescriptor clsDesc, PrintWriter logWriter )
+    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
         throws MappingException;
 
 

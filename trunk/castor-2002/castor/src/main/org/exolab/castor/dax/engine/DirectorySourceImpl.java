@@ -67,6 +67,9 @@ import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.xml.Unmarshaller;
+import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.OutputLogInterceptor;
+
 
 
 /**
@@ -79,7 +82,7 @@ import org.exolab.castor.xml.Unmarshaller;
  * @see Directory
  */
 public class DirectorySourceImpl
-    implements DirectorySource, XADirectorySource
+    implements DirectorySource
 {
 
     
@@ -93,9 +96,6 @@ public class DirectorySourceImpl
     private static MappingResolver  _mapResolver;
 
 
-    private PrintWriter _logWriter;
-
-
     private LDAPUrl     _url;
 
 
@@ -103,6 +103,9 @@ public class DirectorySourceImpl
 
 
     private int         _protocol = Protocol.LDAPv2;
+
+
+    private LogInterceptor _logInterceptor;
 
 
     public void setURL( String url )
@@ -142,49 +145,17 @@ public class DirectorySourceImpl
     public Directory getDirectory()
         throws DirectoryException
     {
-        return new DirectoryImpl( getConnection( null, null ), _url, _mapResolver, _logWriter );
+        return new DirectoryImpl( getConnection( null, null ), _url, _mapResolver, _logInterceptor );
     }
     
     
     public Directory getDirectory( String userDN, String password )
         throws DirectoryException
     {
-        return new DirectoryImpl( getConnection( userDN, password ), _url, _mapResolver, _logWriter );
+        return new DirectoryImpl( getConnection( userDN, password ), _url, _mapResolver, _logInterceptor );
     }
     
     
-    public XADirectory getXADirectory()
-        throws DirectoryException
-    {
-        return null;
-        // return new XADirectoryImpl( new DirectoryImpl( getConnection( null, null ),
-        //                             _url, _mapResolver, _logWriter ) );
-    }
-    
-    
-    public XADirectory getXADirectory(  String userDN, String password )
-        throws DirectoryException
-    {
-        return null;
-        // return new XADirectoryImpl( new DirectoryImpl( getConnection( userDN, password ),
-        //                             _url, _mapResolver, _logWriter ) );
-    }
-
-
-    /**
-     * Returns the log writer for this directory source.
-     * <p>
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
-     *
-     * @return The log writer, null if disabled
-     */
-    public PrintWriter getLogWriter()
-    {
-        return _logWriter;
-    }
-
-
     /**
      * Sets the log writer for this directory source.
      * <p>
@@ -195,7 +166,10 @@ public class DirectorySourceImpl
      */
     public void setLogWriter( PrintWriter logWriter )
     {
-        _logWriter = logWriter;
+        if ( logWriter == null)
+            _logInterceptor = null;
+        else
+            _logInterceptor = new OutputLogInterceptor( logWriter );
     }
 
 

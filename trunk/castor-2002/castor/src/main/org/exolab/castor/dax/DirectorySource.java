@@ -86,17 +86,6 @@ public interface DirectorySource
 
 
     /**
-     * Returns the log writer for this directory source.
-     * <p>
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
-     *
-     * @return The log writer, null if disabled
-     */
-    public PrintWriter getLogWriter();
-
-
-    /**
      * Sets the log writer for this directory source.
      * <p>
      * The log writer is a character output stream to which all
