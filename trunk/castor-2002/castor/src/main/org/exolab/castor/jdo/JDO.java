@@ -55,6 +55,7 @@ import java.util.Hashtable;
 import org.xml.sax.InputSource;
 import org.xml.sax.EntityResolver;
 import java.rmi.Remote;
+import javax.naming.InitialContext;
 import javax.naming.Referenceable;
 import javax.naming.Reference;
 import javax.naming.StringRefAddr;
@@ -62,7 +63,11 @@ import javax.naming.RefAddr;
 import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
+import javax.naming.NameNotFoundException;
 import javax.naming.spi.ObjectFactory;
+import javax.transaction.TransactionManager;
+import javax.transaction.Transaction;
+import javax.transaction.Status;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
@@ -157,6 +162,12 @@ public class JDO
      * Description of this database.
      */
     private String         _description = "Castor JDO";
+
+
+    /**
+     * The look up name for a transaction manager.
+     */
+    private String         _tmName = "java:comp/TransactionManager";
 
 
     /**
@@ -322,6 +333,32 @@ public class JDO
 
 
     /**
+     * Sets the JNDI name of the transaction manager. If set, JDO will look
+     * up this name through JNDI and if available register itself
+     * for synchronization and take part in a distributed transaction.
+     * <p>
+     * The standard name for this property is <tt>transactionManager</tt>.
+     *
+     * @param tmName The JNDI name of the transaction manager
+     */
+    public void setTransactionManager( String tmName )
+    {
+        _tmName = tmName;
+    }
+
+
+    /**
+     * Returns the JNDI name of the transaction manager.
+     *
+     * @returns The JNDI name of the transaction manager
+     */
+    public String getTransactionManager()
+    {
+        return _tmName;
+    }
+
+
+    /**
      * Opens and returns a connection to the database. Throws an
      * {@link DatabaseNotFoundException} if the database named was not
      * set in the constructor or with a call to {@link #setDatabaseName},
@@ -346,7 +383,31 @@ public class JDO
                 throw new DatabaseNotFoundException( Messages.format( "persist.nested", except.toString() ) );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logWriter );
+
+        if ( _tmName != null ) {
+            InitialContext     ctx;
+            TransactionManager tm;
+            Transaction        tx;
+            DatabaseImpl       dbImpl;
+            
+            try {
+                ctx = new InitialContext();
+                tm = (TransactionManager) ctx.lookup( _tmName );
+                tx = tm.getTransaction();
+                if ( tx.getStatus() == Status.STATUS_ACTIVE ) {
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logWriter, tx );
+                    tx.registerSynchronization( dbImpl );
+                    return dbImpl;
+                }
+             } catch ( NameNotFoundException except ) {
+                // No TransactionManager object. Just ignore.
+            } catch ( Exception except ) {
+                // NamingException, SystemException, RollbackException
+                if ( _logWriter != null )
+                    _logWriter.println( except );
+            }
+        }
+        return new DatabaseImpl( _dbName, _lockTimeout, _logWriter, null );
     }
 
 
@@ -421,6 +482,8 @@ public class JDO
             ref.add( new StringRefAddr( "databaseName", _dbName ) );
         if ( _dbConf != null )
             ref.add( new StringRefAddr( "configuration", _dbConf ) );
+        if ( _tmName != null )
+            ref.add( new StringRefAddr( "transactionManager", _dbConf ) );
         ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
  	return ref;
     }
@@ -457,6 +520,9 @@ public class JDO
 		addr = ref.get( "lockTimeout" );
 		if ( addr != null )
                     ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
+		addr = ref.get( "transactionManager" );
+		if ( addr != null )
+                    ds._tmName = (String) addr.getContent();
 		return ds;
 
 	    } else
