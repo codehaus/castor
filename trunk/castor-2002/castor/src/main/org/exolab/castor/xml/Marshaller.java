@@ -452,7 +452,6 @@ public class Marshaller {
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
                 saveType = (descriptor.getFieldType() == Object.class);
-
             }
             else {
                 //-- save package information for use when searching
@@ -489,6 +488,37 @@ public class Marshaller {
             }
         }
 
+
+        //--- Remove 'xsi:type' attributes when Castor is able to infer the information from the mapping file 
+
+        // XML Name associated with the element we are marshalling
+        String xmlElementName = classDesc.getXMLName();
+
+        // We try to find if there is a XMLClassDescriptor associated with the XML name of the element
+        XMLClassDescriptor xmlElementNameClassDescriptor = _cdResolver.resolveByXMLName(xmlElementName, null);
+
+        if (xmlElementNameClassDescriptor != null) {
+            // We want to test that if Castor encounter an element named
+            // 'xmlElementName' it is able to infer the java type to be instantiated by
+            // using the information of the mapping file. We test that:
+            //
+            //    - the class descriptor resolver find a descriptor of the same
+            //      java type than the current object
+            //
+            //    - that the class returned by the resolver is assignable to the
+            //      given object or collection. 
+            //
+            // This mecanism is equivalent to the one found in the
+            // Unamrshalhandler.
+            if (xmlElementNameClassDescriptor.getJavaClass() == classDesc.getJavaClass() &&
+                descriptor.getFieldType().isAssignableFrom(xmlElementNameClassDescriptor.getJavaClass())) {
+                // If the test is true, we know that Castor is able to find the
+                // proper class to instantiate only with the 'xmlElementName' as element
+                // name and the mapping file, so we don't need the 'xsi:type' attributes
+                saveType = false;
+                name =  xmlElementName;
+            }
+        } //--- End of "Remove 'xsi:type' ..."
 
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();

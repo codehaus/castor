@@ -1,6 +1,11 @@
 Version (CVS)
 -------------
 
+XML:    Added some logic to avoid unnecessary use of 'xsi:type' when
+        marshalling. The logic check if Castor is able to find the proper java
+        class to instantiate from the mapping file information.
+        (Sebastien Gignoux <gignoux@intalio.com>) 
+
 XML:    Solved a performance bug for unmarshalling of primitive type. We don't try anymore 
         to generate a Class Descriptor for primitive type as we know that not only it 
         fails but it is deadly slow (due to getMethods() call). Now, unmarhsalling speed 
