@@ -62,8 +62,8 @@ import org.exolab.castor.mapping.xml.FieldMapping;
 
 
 /**
- * A JDO implementation of mapping helper. Creates JDO class
- * descriptors from the mapping file.
+ * A JDO implementation of mapping helper. Creates JDO class descriptors
+ * from the mapping file.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -73,10 +73,13 @@ public class JDOMappingHelper
 {
 
 
-    static class Names
-    {
-        public static final String DirtyCheck = "check";
-    }
+    /**
+     * The type for the name of a compiled class.
+     */
+    private static final String CompiledType = "JDO";
+
+
+    private static final String DirtyCheck = "check";
 
 
     public JDOMappingHelper( ClassLoader loader )
@@ -132,6 +135,11 @@ public class JDOMappingHelper
         if ( clsMap.getSqlTable() == null )
             return ClassDesc.NoDescriptor;
 
+        // See if we have a compiled descriptor.
+        clsDesc = loadClassDescriptor( clsMap.getClassName(), CompiledType, JDOClassDesc.class );
+        if ( clsDesc != null )
+            return clsDesc;
+
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         // This class may only extend a JDO class, otherwise no mapping will be
@@ -150,8 +158,7 @@ public class JDOMappingHelper
             idFields = ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
             for ( int i = 0 ; i < idFields.length ; ++i )
                 if ( ! ( idFields[ i ] instanceof JDOFieldDesc ) )
-                    throw new MappingException( "The identity field " + idFields[ i ] +
-                                                " does not have SQL information to map it" );
+                    throw new MappingException( "jdo.identityNotJDO", idFields[ i ] );
         }
         
         return new JDOClassDesc( clsDesc, clsMap.getSqlTable().getTableName() );
@@ -180,7 +187,7 @@ public class JDOMappingHelper
         else
             sqlName = fieldMap.getSqlInfo().getName();
         return new JDOFieldDesc( fieldDesc, sqlName, sqlType,
-                                 Names.DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ) );
+                                 DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ) );
     }
 
 
