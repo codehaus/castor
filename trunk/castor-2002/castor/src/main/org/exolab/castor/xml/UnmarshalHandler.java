@@ -448,6 +448,7 @@ public class UnmarshalHandler implements DocumentHandler {
             }
             _topState.classDesc = classDesc;
             _topState.type = _topClass;
+
             //-- try to create instance of the given Class
             try {
                 _topState.object = _topClass.newInstance();

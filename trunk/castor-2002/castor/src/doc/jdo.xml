@@ -175,16 +175,16 @@ db.close();
         <p>The following code snippet uses an OQL query to load all the objects in a given group.
            Note that product and group are related objects, the JDBC query involves a join:
            <code>
-OQLQuery    oql;
-Enumeration enum;
+OQLQuery     oql;
+QueryResults resulst;
 
 <comment>// Construct a new query and bind its parameters</comment>
 oql = db.getOQLQuery( "SELECT p FROM Product p WHERE Group=$" );
 oql.bind( groupId );
 <comment>// Retrieve results and print each one</comment>
-enum = oql.execute();
-while ( enum.hasMoreElements() ) {
-  System.out.println( enum.nextElement() );
+results = oql.execute();
+while ( results.hasMore() ) {
+  System.out.println( results.next() );
 }
            </code></p>
 
@@ -192,10 +192,10 @@ while ( enum.hasMoreElements() ) {
            their price by 25%, and store them back to the database (in this case using
            a client application transaction):
             <code>
-while ( enum.hasMoreElements() ) {
+while ( results.hasMore() ) {
   Product prod;
 
-  prod = (Product) enum.nextElement();
+  prod = (Product) results.next();
   prod.markDown( 0.25 );
   prod.setOnSale( true );
 }
@@ -208,7 +208,7 @@ db.close();
            created from the database using an OQL statement. If there are any parameters, the
            second step involves binding these paramaters. Parameters are bound in the same
            order as they appear in the OQL statement. The third step involves executing the
-           query and obtaining a result set of type <tt>java.util.Enumeration</tt>.</p>
+           query and obtaining a result set of type <api>org.exolab.castor.jdo.JDO</api>.</p>
  
         <p>A query can be created once and executed multiple times. Each time it is executed
            the bound parameters are lost, and must be supplied a second time. The result of
