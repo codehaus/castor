@@ -31,7 +31,7 @@ drop table test_many_group
 go
 create table test_many_group (
   gid       int           not null,
-  value    varchar(100)  not null
+  value1    varchar(100)  not null
 )
 go
 create unique index test_many_group_pk on test_many_group ( gid )
@@ -43,7 +43,7 @@ drop table test_many_person
 go
 create table test_many_person (
    pid      int          not null,
-   value   varchar(100) not null,
+   value1   varchar(100) not null,
    helloworld varchar(100) null,
    sthelse varchar(100) null
 )
@@ -60,7 +60,7 @@ go
 create table test_pks_person (
   fname varchar(100)    not null,
   lname varchar(100)    not null,
-  bday  datetime 
+  bday  datetime
 )
 go
 
@@ -200,7 +200,7 @@ drop table test_master
 go
 create table test_master (
   id       numeric(10,0)    not null,
-  value    varchar(200)   not null,
+  value1    varchar(200)   not null,
   group_id numeric(10,0)  null
 )
 go
@@ -216,7 +216,7 @@ go
 create table test_detail (
   detail_id  numeric(10,0)  not null,
   master_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
+  value1      varchar(200 )  not null
 )
 go
 create unique index test_detail_pk on test_detail ( detail_id )
@@ -230,7 +230,7 @@ drop table test_group
 go
 create table test_group (
   id     numeric(10,0)  not null,
-  value  varchar(200)   not null
+  value1  varchar(200)   not null
 )
 go
 create unique index test_group_pk on test_group ( id )
@@ -252,7 +252,7 @@ create table test_types (
   bool_val char(1)        null,
   int_date integer        null,
   str_time char(12)       null,
-  num_date numeric(17,0)  null 
+  num_date numeric(17,0)  null
 )
 go
 create unique index test_types_pk on test_types (id)
@@ -273,7 +273,7 @@ create unique index test_keygen_pk on test_keygen ( id )
 go
 grant all on test_keygen to test
 go
- 
+
 
 -- test_keygen_ext
 drop table test_keygen_ext
@@ -363,7 +363,7 @@ create table test_detail2
 (
   detail2_id  numeric(10,0)  not null,
   detail_id  numeric(10,0)  not null,
-  value      varchar(200 )  not null
+  value1      varchar(200 )  not null
 )
 go
 create unique index test_detail2_pk on test_detail2 ( detail2_id )
@@ -380,7 +380,7 @@ create table test_persistent (
   id       integer         not null,
   ctime    datetime        not null,
   mtime    datetime        null,
-  value    varchar(200)    not null,
+  value1    varchar(200)    not null,
   parent_id integer        null,
   group_id numeric(10,0)   not null
 )

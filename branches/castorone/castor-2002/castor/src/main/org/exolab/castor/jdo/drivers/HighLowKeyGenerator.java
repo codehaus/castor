@@ -81,6 +81,10 @@ public class HighLowKeyGenerator implements KeyGenerator
 
     private final static String GRAB_SIZE = "grab-size";
 
+    private final static String SAME_CONNECTION = "same-connection";
+
+    private final static String GLOBAL = "global";
+
     private final PersistenceFactory _factory;
     
     private final int _sqlType;
@@ -109,6 +113,9 @@ public class HighLowKeyGenerator implements KeyGenerator
     
     // maximum possible values after which database operation is needed
     private Hashtable _maxValues = new Hashtable();
+
+    // to generate globally unique identities
+    private boolean _global;
 
 
     /**
@@ -150,7 +157,8 @@ public class HighLowKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.wrongKeyGenParam",
                                         factorStr, GRAB_SIZE, getClass().getName() ) );
         _grabSizeD = new BigDecimal( _grabSizeI );
-        _sameConnection = "true".equals( params.getProperty("same-connection") );
+        _sameConnection = "true".equals( params.getProperty( SAME_CONNECTION ) );
+        _global = "true".equals( params.getProperty( GLOBAL ) );
     }
 
     /**
@@ -170,6 +178,9 @@ public class HighLowKeyGenerator implements KeyGenerator
         Object max;
         boolean inRange;
 
+        if ( _global ) {
+            tableName = "<GLOBAL>";
+        }
         last = _lastValues.get( tableName );
         max = _maxValues.get( tableName );
         if ( last != null ) {    
@@ -252,13 +263,15 @@ public class HighLowKeyGenerator implements KeyGenerator
                         // for the case of switching from some other key generator 
                         // to HIGH/LOW
                         stmt.close();
-                        stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" + 
-                                                    primKeyName + ") FROM " + tableName);
-                        rs = stmt.executeQuery();
+                        if ( ! _global ) {
+                            stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" +
+                                                          primKeyName + ") FROM " + tableName);
+                            rs = stmt.executeQuery();
+                        }
                         if ( _sqlType == Types.INTEGER ) {
                             int maxPK = 0;
 
-                            if ( rs.next() ) {
+                            if ( ! _global && rs.next() ) {
                                 maxPK = rs.getInt(1);
                             }
                             last = new Integer( maxPK + 1 );
@@ -266,7 +279,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                         } else {
                             BigDecimal maxPK = null; 
 
-                            if ( rs.next() ) {
+                            if ( ! _global && rs.next() ) {
                                 maxPK = rs.getBigDecimal(1);
                             }
                             if ( maxPK == null ) {

@@ -58,7 +58,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public final class OracleFactory
+public class OracleFactory
     extends GenericFactory
 {
 

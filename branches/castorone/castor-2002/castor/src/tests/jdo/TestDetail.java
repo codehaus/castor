@@ -104,13 +104,13 @@ public class TestDetail
     }
 
 
-    public void setValue( String value )
+    public void setValue1( String value )
     {
         _value = value;
     }
 
 
-    public String getValue()
+    public String getValue1()
     {
         return _value;
     }

@@ -83,7 +83,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
     public IdentityKeyGenerator( PersistenceFactory factory, int sqlType ) throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("sybase") && !fName.equals("sql-server") && 
+        if ( !fName.equals("sybase") && !fName.equals("sql-server") && !fName.equals("sapdb") &&
                 !fName.equals("hsql")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );

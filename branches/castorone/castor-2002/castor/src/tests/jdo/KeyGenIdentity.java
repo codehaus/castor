@@ -64,7 +64,7 @@ public class KeyGenIdentity
     public KeyGenIdentity( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC42", "Key generator: IDENTITY", category );
+        super( "TC44", "Key generator: IDENTITY", category );
     }
 
 

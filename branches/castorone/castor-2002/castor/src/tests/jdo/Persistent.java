@@ -160,7 +160,7 @@ public class Persistent
                     stream.writeVerbose( "Error: loaded child without two grandchildren: " + child );
                     result  = false;
                 }
-                child.setValue("new value");
+                child.setValue1("new value");
             } else {
                 stream.writeVerbose( "Error: failed to create parent with children" );
                 result = false;
@@ -189,10 +189,10 @@ public class Persistent
             db.commit();
 
             stream.writeVerbose( "Long transaction test" );
-            parent.setValue( "long transaction parent" );
+            parent.setValue1( "long transaction parent" );
             parent.getChildren().removeElement( parent.findChild( 71 ) );
             child = new TestPersistent( 74 );
-            child.setValue( "long transaction child" );
+            child.setValue1( "long transaction child" );
             child.addChild( new TestPersistent( 741 ) );
             parent.addChild( child );
             parent.findChild( 73 ).getChildren().removeElement(
@@ -205,7 +205,7 @@ public class Persistent
             parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
             if ( parent != null ) {
                 if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
-                     ! "long transaction parent".equals( parent.getValue() ) ||
+                     ! "long transaction parent".equals( parent.getValue1() ) ||
                      parent.findChild( 71 ) != null ||
                      parent.findChild( 72 ) == null ||
                      parent.findChild( 73 ) == null ||
@@ -225,7 +225,7 @@ public class Persistent
                 child = parent.findChild( 74 );
                 if ( child == null || child.getChildren() == null || 
                      child.getChildren().size() != 1 ||
-                     ! "long transaction child".equals( child.getValue() ) ||
+                     ! "long transaction child".equals( child.getValue1() ) ||
                      child.findChild( 741 ) == null ) {
                     stream.writeVerbose( "Error: loaded child without one grandchildren: " + child );
                     result  = false;
