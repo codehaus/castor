@@ -74,7 +74,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
 
         if (fieldHandler == null) {
             String err = "The FieldHandler argument passed to " +
-                "the constructor of DateFieldHandler must not be null.";
+                "the constructor of CollectionFieldHandler must not be null.";
             throw new IllegalArgumentException(err);
         }
         this.handler = fieldHandler;
@@ -115,14 +115,16 @@ public class CollectionFieldHandler extends XMLFieldHandler {
         String result = "";
         if (temp.getClass().isArray()) {
             int size = Array.getLength(temp);
-            int i=0;
-            while (i < size-1) {
-                Object obj = Array.get(temp, i);
-                result += obj.toString()+' ';
-                i++;
+            if (size !=0) {
+                int i=0;
+                while (i < size) {
+                    Object obj = Array.get(temp, i);
+                    result += obj.toString()+' ';
+                    i++;
+                }
+                //remove the last ' '
+                result=result.substring(0,result.length()-2);
             }
-            Object obj = Array.get(temp, i);
-            result += obj.toString();
         }
         return result;
     }
