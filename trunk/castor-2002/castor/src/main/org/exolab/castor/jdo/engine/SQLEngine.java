@@ -198,30 +198,35 @@ public final class SQLEngine
 
     public PersistenceQuery createCall( String spCall, Class[] types )
     {
-        String[] fields;
-        int[]    sqlTypes;
-        int      count; 
+        FieldDescriptor[] fields;   
+        String[] jdoFields0;
+        String[] jdoFields;
+        int[] sqlTypes0;
+        int[] sqlTypes;
+        int count; 
 
         if ( _logInterceptor != null )
             _logInterceptor.queryStatement( spCall );
+
+        fields = _clsDesc.getFields();
+        jdoFields0 = new String[ fields.length + 1 ];
+        sqlTypes0 = new int[ fields.length + 1 ];
         // the first field is the identity
-        count = 1; 
-        for ( int i = 0; i < _fields.length; i++ ) 
-            if ( _fields[i].load )
-                ++count;
-        fields = new String[ count ];
-        sqlTypes = new int[ count ];
-        fields[ 0 ] = _clsDesc.getIdentity().getFieldName();
-        sqlTypes[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
         count = 1;
-        for ( int i = 0; i < _fields.length; i++ ) {
-            if ( ! _fields[i].load )
-                continue;
-            fields[ count ] = _fields[i].name;
-            sqlTypes[ count ] = _fields[i].sqlType;
-            ++count;
+        jdoFields0[ 0 ] = _clsDesc.getIdentity().getFieldName();
+        sqlTypes0[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof JDOFieldDescriptor ) {
+                jdoFields0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLName();
+                sqlTypes0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLType();
+                ++count;
+            }
         }
-        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), fields, sqlTypes );
+        jdoFields = new String[ count ];
+        sqlTypes = new int[ count ];
+        System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
+        System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
+        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), jdoFields, sqlTypes );
     }
 
 
