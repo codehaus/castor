@@ -136,7 +136,7 @@ public class FieldDescriptorImpl
         _fieldType = typeInfo.getFieldType();
         _required = typeInfo.isRequired();
         _transient = trans;
-        _multi = ( typeInfo.getCollectionType() != null );
+        _multi = ( typeInfo.getCollectionHandler() != null );
     }
 
 

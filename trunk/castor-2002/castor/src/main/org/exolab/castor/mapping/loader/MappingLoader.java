@@ -61,6 +61,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
@@ -431,13 +432,15 @@ public abstract class MappingLoader
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
-        TypeInfo         typeInfo;
-        Class            fieldType = null;
-        Class            colType = null;
-        FieldHandlerImpl handler;
-        String           fieldName;
-        Method           getMethod = null;
-        Method           setMethod = null;
+        TypeInfo          typeInfo;
+        Class             fieldType = null;
+        Class             colType = null;
+        CollectionHandler colHandler = null;
+        boolean           getSetCollection = true;
+        FieldHandlerImpl  handler;
+        String            fieldName;
+        Method            getMethod = null;
+        Method            setMethod = null;
 
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor. 
@@ -450,8 +453,18 @@ public abstract class MappingLoader
         }
         // If the field is declared as a collection, grab the collection type as
         // well and use it to locate the field/accessor.
-        if ( fieldMap.getCollection() != null )
+        if ( fieldMap.getCollection() != null ) {
             colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
+            colHandler = CollectionHandlers.getHandler( colType );
+            getSetCollection = CollectionHandlers.isGetSetCollection( colType );
+            if ( colType == Object[].class ) {
+                try {
+                    colType = resolveType( "[L" + fieldType.getName() + ";" );
+                } catch ( ClassNotFoundException except ) {
+                    throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
+                }
+            }
+        }
 
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
@@ -468,7 +481,7 @@ public abstract class MappingLoader
             if ( fieldType == null && colType == null )
                 fieldType = getMethod.getReturnType();
 
-            if ( colType == null || CollectionHandlers.isGetSetCollection( colType ) ) {
+            if ( colType == null || getSetCollection ) {
                 setMethod = findAccessor( javaClass, "set" + capitalize( fieldMap.getName() ),
                                           ( colType == null ? fieldType : colType ), false );
                 if ( setMethod == null )
@@ -507,7 +520,7 @@ public abstract class MappingLoader
         // If accessors found, use them to construct field handler,
         // if not, access field directly
         if ( getMethod != null || setMethod != null ) {
-            typeInfo = getTypeInfo( fieldType, colType, fieldMap );
+            typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
 
             fieldName = fieldMap.getName();
             if ( fieldName == null )
@@ -523,7 +536,7 @@ public abstract class MappingLoader
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
             if ( fieldType == null )
                 fieldType = field.getType();
-            typeInfo = getTypeInfo( fieldType, colType, fieldMap );
+            typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         }
 
@@ -571,11 +584,11 @@ public abstract class MappingLoader
     }
 
 
-    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
+    protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
     {
         return new TypeInfo( Types.typeFromPrimitive( fieldType ), null, null,
-                             fieldMap.getRequired(), null, colType );
+                             fieldMap.getRequired(), null, colHandler );
     }
 
 
@@ -693,6 +706,7 @@ public abstract class MappingLoader
      */
     protected ClassDescriptor loadClassDescriptor( String clsName )
     {
+        /** Temporarily disabled
         clsName = clsName + CompiledSuffix;
         try {
             Object obj;
@@ -704,6 +718,8 @@ public abstract class MappingLoader
         } catch ( Exception except ) {
             return null;
         }
+        */
+        return null;
     }
 
 
