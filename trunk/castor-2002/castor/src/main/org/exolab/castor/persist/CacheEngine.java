@@ -1,4 +1,3 @@
-
 /**
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided

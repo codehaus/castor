@@ -76,11 +76,11 @@ import org.exolab.exceptions.CWClassConstructorException;
  */
 public class Race extends CWTestCase {
 
-	private final static int NUM_OF_RACING_THREADS = 2;
+	private final static int NUM_OF_RACING_THREADS = 4;
 
-	private final static int NUM_OF_VALUE_PAIRS = 1;
+	private final static int NUM_OF_VALUE_PAIRS = 2;
 
-	private final static int NUM_OF_TRIALS = 500;
+	private final static int NUM_OF_TRIALS = 20;
 
     private JDOCategory    _category;
 
@@ -230,16 +230,23 @@ public class Race extends CWTestCase {
 									db.commit();
 									isOk = true;
 								} else {
-									System.out.println("Error: "+" element not found!! missed in cache????");
+									stream.writeVerbose("Error: "+" element not found!! missed in cache????");
 									if ( db.isActive() ) try { db.rollback(); } catch ( Exception e ) {}
 									break little;
 								}
 							} else {
-								db.load( 
+								stream.writeVerbose( "trying Database.load()" );
+								TestRace tr = (TestRace) db.load( TestRace.class, new Integer(i) );
+								tr.incValue1();
+								db.commit();
+								isOk = true;
 							}
 						} catch ( TransactionAbortedException e ) {
 							// this exception should happen one in a while.
 							stream.writeVerbose( "Excepted exception: "+e );
+							stream.writeVerbose( "Excepted exception: "+e );
+							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
+						} catch ( LockNotGrantedException e ) {
 							stream.writeVerbose( "Excepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
 						} catch ( QueryException e ) {
@@ -254,10 +261,6 @@ public class Race extends CWTestCase {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
 							break out;
-//						} catch ( LockNotGrantedException e ) {
-//							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
-//							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
-//							break out;
 						} catch ( Exception e ) {
 							stream.writeVerbose( "Thread will be killed. Unexcepted exception: "+e );
 							if ( db.isActive() ) try { db.rollback(); } catch ( Exception ee ) {}
