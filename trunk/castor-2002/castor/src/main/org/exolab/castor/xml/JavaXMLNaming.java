@@ -89,6 +89,10 @@ public class JavaXMLNaming {
            // handle error 
            return name; //-- for now just return name
         }        
+		// Remove namespace prefix (Andrew Fawcett, temporary until namespace changes go in)
+        int colon = name.indexOf(':');
+        if (colon != -1)
+            name = name.substring(colon + 1);		
         return toJavaName(name, true);
         
     } //-- toJavaClassName
