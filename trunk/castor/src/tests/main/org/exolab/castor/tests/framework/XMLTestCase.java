@@ -474,7 +474,7 @@ public abstract class XMLTestCase extends TestCase {
                 if ((_failure != null) && (_failure.getContent() == true))
                     assertTrue(result != 0);
                 else {
-                    assertEquals("The Marshalled object differ from the gold file", result, 0);
+                    assertEquals("The Marshalled object differ from the gold file", 0, result);
                     assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
                 }
             }
@@ -501,7 +501,7 @@ public abstract class XMLTestCase extends TestCase {
                if ((_failure != null) && (_failure.getContent() == true))
                     assertTrue(result != 0);
                 else {
-                    assertEquals("The Marshalled object differ from the gold file", result, 0);
+                    assertEquals("The Marshalled object differ from the gold file", 0, result);
                     assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
                 }
 
