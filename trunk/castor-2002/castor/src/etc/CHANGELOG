@@ -39,6 +39,12 @@ XML & JDO:
 	Regenerated data objects in the org.exolab.castor.mapping.xml package,
 	using an updated version of schema (Nov 2000).
 
+XML & JDO:
+        Now the return type of get-method must be a super-class of or equal to
+	the class declared in mapping.xml (was: sub-class).
+	Note, that now "arraylist" can be used as a value of "collection"
+	attribute in mapping.xml 
+
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
 
