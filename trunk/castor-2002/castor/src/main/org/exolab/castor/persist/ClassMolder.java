@@ -587,7 +587,7 @@ public class ClassMolder {
 
                     if ( related instanceof RelationCollection ) {
                         RelationCollection lazy = (RelationCollection)related;
-                        change = lazy.remove( relatedObject );
+                        changed = lazy.remove( relatedObject );
                     } else {
                         Iterator itor = getIterator( related );
                         while ( itor.hasNext() ) {
