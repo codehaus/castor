@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
  * $Id
  */

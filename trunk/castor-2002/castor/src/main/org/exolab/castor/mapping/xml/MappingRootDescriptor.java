@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
  * $Id
  */
@@ -15,6 +15,8 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
@@ -49,9 +51,10 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
     //----------------/
 
     public MappingRootDescriptor() {
-        xmlName = "mapping-root";
-        XMLFieldDescriptorImpl desc = null;
-        XMLFieldHandler handler = null;
+        xmlName = "mapping";
+        XMLFieldDescriptorImpl  desc           = null;
+        XMLFieldHandler         handler        = null;
+        FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[0];
@@ -87,6 +90,11 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         desc.setMultivalued(false);
         elements[0] = desc;
         
+        //-- validation code for: _description
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
+        
         //-- _includeList
         desc = new XMLFieldDescriptorImpl(Include.class, "_includeList", "include", NodeType.Element);
         handler = (new XMLFieldHandler() {
@@ -114,6 +122,11 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         desc.setHandler(handler);
         desc.setMultivalued(true);
         elements[1] = desc;
+        
+        //-- validation code for: _includeList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        desc.setValidator(fieldValidator);
         
         //-- _classMappingList
         desc = new XMLFieldDescriptorImpl(ClassMapping.class, "_classMappingList", "class", NodeType.Element);
@@ -144,6 +157,11 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         desc.setMultivalued(true);
         elements[2] = desc;
         
+        //-- validation code for: _classMappingList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        desc.setValidator(fieldValidator);
+        
         //-- _keyGeneratorDefList
         desc = new XMLFieldDescriptorImpl(KeyGeneratorDef.class, "_keyGeneratorDefList", "key-generator", NodeType.Element);
         handler = (new XMLFieldHandler() {
@@ -171,6 +189,11 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
         desc.setHandler(handler);
         desc.setMultivalued(true);
         elements[3] = desc;
+        
+        //-- validation code for: _keyGeneratorDefList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        desc.setValidator(fieldValidator);
         
     } //-- org.exolab.castor.mapping.xml.MappingRootDescriptor()
 
@@ -254,14 +277,14 @@ public class MappingRootDescriptor implements org.exolab.castor.xml.XMLClassDesc
 
     /**
     **/
+    public org.exolab.castor.xml.TypeValidator getValidator() {
+        return null;
+    } //-- org.exolab.castor.xml.TypeValidator getValidator() 
+
+    /**
+    **/
     public java.lang.String getXMLName() {
         return xmlName;
     } //-- java.lang.String getXMLName() 
-
-
-    public TypeValidator getValidator()
-    {
-        return null;
-    }
 
 }
