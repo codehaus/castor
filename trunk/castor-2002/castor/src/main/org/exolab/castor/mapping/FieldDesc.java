@@ -67,7 +67,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see ObjectDesc
+ * @see ClassDesc
  */
 public class FieldDesc
 {
@@ -396,13 +396,11 @@ public class FieldDesc
      */
     public void setValue( Object obj, Object value )
     {
+	if ( value == null && _required ) {
+	    if ( _default != null )
+		value = _default;
+	}
 	try {
-	    if ( value == null && _required ) {
-		if ( _default != null )
-		    value = _default;
-		else
-		    throw new IllegalArgumentException( "Field " + toString() + " is required, null value used" );
-	    }
 	    if ( _setMethod == null )
 		_field.set( obj, value );
 	    else
@@ -410,11 +408,11 @@ public class FieldDesc
 	} catch ( IllegalArgumentException except ) {
 	    // Graceful way of dealing with unwrapping exception
 	    if ( value == null ) {
-		throw new IllegalArgumentException( "Type conversion error: could not set null to field " +
+		throw new IllegalArgumentException( "Type conversion error: could not set null to " +
 						    toString() + " of type " + _fieldType.getName() +
 						    "; original error: " + except.getMessage() );
 	    } else {
-		throw new IllegalArgumentException( "Type conversion error: failed to set value of type " +
+		throw new IllegalArgumentException( "Type conversion error: failed to set value of " +
 						    value.getClass().getName() + " in field " + toString() +
 						    " of type " + _fieldType.getName() + "; original error: " +
 						    except.getMessage() );
@@ -447,6 +445,43 @@ public class FieldDesc
 	else
 	    // XXX Need to perform cloning or serialization here
 	    setValue( target, getValue( source ) );
+    }
+
+
+    /**
+     * Determines if the field can be stored. Returns null if the field
+     * can be stored, or a message indicating the reason why the field
+     * cannot be stored. For example, if a required field is null.
+     *
+     * @param obj The object
+     * @return Null if can store, otherwise a message indicate why
+     *  the field cannot be stored
+     */
+    public String canStore( Object obj )
+    {
+	if ( getValue( obj ) == null && _required )
+	    return toString() + " is required, null value used";
+	return null;
+    }
+
+
+    /**
+     * Determines if the field has been modified from its original
+     * cached value. Returns true if the field has been modified.
+     *
+     * @param obj The object
+     * @param cached The cached copy
+     * @return True if the field has been modified
+     */
+    public boolean isModified( Object obj, Object cached )
+    {
+	Object value;
+
+	value = getValue( obj );
+	if ( value == null )
+	    return ( getValue( cached ) == null );
+	else
+	    return ( value.equals( getValue( cached ) ) );
     }
 
 

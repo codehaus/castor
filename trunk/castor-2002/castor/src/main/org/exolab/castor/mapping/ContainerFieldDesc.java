@@ -96,5 +96,27 @@ public class ContainerFieldDesc
     }
 
 
+    public String canStore( Object obj )
+    {
+	String reason;
+
+	for ( int i = 0 ; i < _contained.length ; ++i ) {
+	    reason = _contained[ i ].canStore( obj );
+	    if ( reason != null )
+		return reason;
+	}
+	return null;
+    }
+
+
+    public boolean isModified( Object obj, Object cached )
+    {
+	for ( int i = 0 ; i < _contained.length ; ++i )
+	    if ( _contained[ i ].isModified( obj, cached ) )
+		return true;
+	return false;
+    }
+	
+
 }
 
