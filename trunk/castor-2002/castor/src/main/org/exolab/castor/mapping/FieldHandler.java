@@ -88,15 +88,7 @@ public interface FieldHandler
 
 
     /**
-     * Checks the field validity. Returns successfully if the field
-     * can be stored, is valid, etc, throws an exception otherwise.
-     *
-     * @param object The object
-     * @throws ValidityException The field is invalid, is required and
-     *  null, or any other validity violation
-     * @throws IllegalStateException The Java object has changed and
-     *  is no longer supported by this handler, or the handler
-     *  is not compatiable with the Java object
+     * @deprecated No longer supported
      */
     public void checkValidity( Object object )
         throws ValidityException, IllegalStateException;
