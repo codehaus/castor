@@ -76,7 +76,9 @@ public class TypeConversion {
         XSType xsType = null;
 
         //-- enumerated types
-        if (simpleType.hasFacet("enumeration")) {
+        //-- not sure it is needed since ENUMERATION
+        //-- is a special case handle in SourceFactory
+       /* if (simpleType.hasFacet("enumeration")) {
             String className = JavaNaming.toJavaClassName(simpleType.getName());
 			className = SourceGenerator.getQualifiedClassName(
 							simpleType.getSchema().getTargetNamespace(),
@@ -84,7 +86,7 @@ public class TypeConversion {
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
             return xsClass;
-        }
+        }*/
 
         //-- determine base type
         SimpleType base = simpleType;
