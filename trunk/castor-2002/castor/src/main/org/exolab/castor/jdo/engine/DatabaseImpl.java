@@ -151,8 +151,10 @@ public final class DatabaseImpl
         throws PersistenceException
     {
         try {
-            if ( _ctx != null && _ctx.isOpen() )
+            if ( _ctx != null && _ctx.isOpen() ) {
                 _ctx.rollback();
+                throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
+            }
         } finally {
             _ctx = null;
             _dbEngine = null;
