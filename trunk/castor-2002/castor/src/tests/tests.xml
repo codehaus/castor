@@ -35,6 +35,7 @@
     <case class="jdo.DuplicateKey" />
     <case class="jdo.ReadOnly" />
     <case class="jdo.Join" />
+    <case class="jdo.TypeHandling" />
     <case class="jdo.KeyGenGeneric" />
     <case class="jdo.KeyGenSequence" />
     <case class="jdo.KeyGenReturning" />

@@ -67,10 +67,10 @@ public class KeyGenReturning
         super( "TC11", "Key generator: RETURNING", category );
     }
 
-    protected void TestAllKeyGens( CWVerboseStream stream, Database db) 
+    protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
             throws Exception
     {
-        TestOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
+        return TestOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
     }
 
 }
