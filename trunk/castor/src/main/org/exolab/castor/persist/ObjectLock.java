@@ -246,7 +246,7 @@ final class ObjectLock implements DepositBox {
     }
 
     /**
-     * Return true if there is any transaction called {@ink enter}, 
+     * Return true if there is any transaction called {@link enter},
      * but not yet called {@link leave}.
      */ 
     boolean isEntered() {
