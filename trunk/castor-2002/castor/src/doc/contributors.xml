@@ -448,6 +448,15 @@
 
   <!-- Last names begin with M-P -->
 
+  <contributor type="Feedback">
+    <name surname="Paradies" given="Thomas"/>
+    <email>paradies@transit-online.de</email>
+    <description>
+       Bug report and patch for default Serializer configuration with respect
+       to UTF-8 encoding.
+    </description>
+  </contributor>
+
   <!-- Last names begin with Q-S -->
 
   <contributor type="Feedback">
