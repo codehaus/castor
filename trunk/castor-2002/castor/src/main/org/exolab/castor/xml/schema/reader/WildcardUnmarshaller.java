@@ -112,6 +112,15 @@ public class WildcardUnmarshaller extends SaxUnmarshaller {
         init(schema, element, atts, resolver);
     }
 
+    public WildcardUnmarshaller
+        (AttributeGroup attGroup, Schema schema, String element, AttributeList atts, Resolver resolver)
+    {
+        super();
+        _wildcard = new Wildcard(attGroup);
+        init(schema, element, atts, resolver);
+    }
+
+
     /**
      * Creates a new WildcardUnmarshaller
      * @param schema the Schema to which the Wildcard belongs

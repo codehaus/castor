@@ -92,6 +92,14 @@ public final class AttributeGroupReference
         _reference = reference;
     } //-- AttributeGroup
 
+    /**
+     * Returns the anyAttribute set in this attribute group if any.
+     * @return the anyAttribute set in this attribute group if any.
+     */
+    public Wildcard getAnyAttribute() {
+        return resolveReference().getAnyAttribute();
+    }
+
 
     /**
      * Gets the name of the attribute group this class refers to.

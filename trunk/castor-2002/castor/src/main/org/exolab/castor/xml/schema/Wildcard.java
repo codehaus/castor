@@ -84,6 +84,11 @@ public class Wildcard extends Particle {
      */
      private Group _group;
 
+     /**
+      * The Attribute Group that holds the wildcard
+      */
+      private AttributeGroup _attGroup;
+
     /**
      * the processContent of this wildcard.
      * (strict by default)
@@ -107,10 +112,19 @@ public class Wildcard extends Particle {
 
     /**
      * The wildcard is embedded in a ModelGroup (<group>)
-     * @param ModelGroup the group that contains this wildcard
+     * @param group the ModelGoup that contains this wildcard
      */
     public Wildcard(Group group) {
         _group = group;
+        init();
+    }
+
+    /**
+     * The wildcard is embedded in an AttributeGroup.
+     * @param attGroup the AttributeGroup that contains this wildcard
+     */
+    public Wildcard(AttributeGroup attGroup) {
+        _attGroup = attGroup;
         init();
     }
 
@@ -155,7 +169,7 @@ public class Wildcard extends Particle {
      * @return the complexType that contains this wildcard (can be null).
      */
     public ComplexType getComplexType() {
-         return _complexType;
+        return _complexType;
     }
 
     /**
@@ -163,7 +177,15 @@ public class Wildcard extends Particle {
      * @return the model group that contains this wildcard (can be null).
      */
     public Group getModelGroup() {
-         return _group;
+        return _group;
+    }
+
+    /**
+     * Returns the AttributeGroup that contains this wilcard (can return null)
+     * @return the AttributeGroup that contains this wilcard (can return null)
+     */
+    public AttributeGroup getAttributeGroup() {
+        return _attGroup;
     }
 
     /**
