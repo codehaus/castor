@@ -53,7 +53,7 @@ import java.util.Iterator;
 
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.types.*;
+import org.exolab.castor.xml.schema.SimpleTypesFactory;
 import org.exolab.castor.xml.dtd.parser.*;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -507,66 +507,62 @@ public class Converter {
 
        AttributeDecl schemaAttribute = new AttributeDecl(schema,
                                                          dtdAttribute.getName());
-       if (dtdAttribute.isStringType()) {
 
-          schemaAttribute.setSimpleTypeRef(BuiltInType.STRING_NAME);
+       SimpleType type= null;
 
-       } else if (dtdAttribute.isIDType()) {
-
-          schemaAttribute.setSimpleTypeRef(BuiltInType.ID_NAME);
-
-       } else if (dtdAttribute.isIDREFType()) {
-
-          schemaAttribute.setSimpleTypeRef(BuiltInType.IDREF_NAME);
-
-       } else if (dtdAttribute.isIDREFSType()) {
-
-          //-- built-in datatype IDREFS is not yet implemented,
-          //-- so this type reference refers to the name of "absent" datatype
-          schemaAttribute.setSimpleTypeRef("IDREFS");
-
-       } else if (dtdAttribute.isENTITYType()) {
-
-          //-- built-in datatype ENTITY is not yet implemented,
-          //-- so this type reference refers to the name of "absent" datatype
-          schemaAttribute.setSimpleTypeRef("ENTITY");
-
-       } else if (dtdAttribute.isENTITIESType()) {
-
-          //-- built-in datatype ENTITIES is not yet implemented,
-          //-- so this type reference refers to the name of "absent" datatype
-          schemaAttribute.setSimpleTypeRef("ENTITIES");
-
-       } else if (dtdAttribute.isNMTOKENType()) {
-
-          schemaAttribute.setSimpleTypeRef(BuiltInType.NMTOKEN_NAME);
-
-       } else if (dtdAttribute.isNMTOKENSType()) {
-
-          //-- built-in datatype NMTOKENS is not yet implemented,
-          //-- so this type reference refers to the name of "absent" datatype
-          schemaAttribute.setSimpleTypeRef("NMTOKENS");
-
-       } else if (dtdAttribute.isNOTATIONType()) {
-
-          //-- built-in datatype NOTATION is not yet implemented,
-          //-- so this type reference refers to the name of "absent" datatype
-          schemaAttribute.setSimpleTypeRef("NOTATION");
-          //-- do nothing else for now
-
-       } else if (dtdAttribute.isEnumerationType()) {
-
+       if (dtdAttribute.isStringType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.STRING_TYPE) );
+       }
+       else if (dtdAttribute.isIDType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ID_TYPE) );
+       }
+       else if (dtdAttribute.isIDREFType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREF_TYPE) );
+       }
+       else if (dtdAttribute.isIDREFSType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREFS_TYPE) );
+       }
+       else if (dtdAttribute.isENTITYType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITY_TYPE) );
+       }
+       else if (dtdAttribute.isENTITIESType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITIES_TYPE) );
+       }
+       else if (dtdAttribute.isNMTOKENType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKEN_TYPE) );
+       }
+       else if (dtdAttribute.isNMTOKENSType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKENS_TYPE) );
+       }
+       else if (dtdAttribute.isNOTATIONType())
+       {
+           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NOTATION_TYPE) );
+       }
+       else if (dtdAttribute.isEnumerationType())
+       {
           //-- current (08/22/2000) implementation of Schema attribute declaration
           //-- does not provide facility for inline type definition of an attribute
           //-- (it has only 'String typeRef' field for reference to the existing
           //-- top-level datatype).
           //-- do nothing for now
-
-       } else {
+       }
+       else
+       {
           String err = "Converter: attribute \"" + dtdAttribute.getName();
           err += "\" has unspecified type.";
           throw new DTDException(err);
        }
+
+       if (type != null)
+           schemaAttribute.setSimpleType(type);
 
        if (dtdAttribute.isREQUIRED()) {
 
