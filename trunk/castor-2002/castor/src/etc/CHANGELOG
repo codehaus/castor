@@ -2,6 +2,13 @@
 Version (CVS)
 -------------
 
+XML: Fixed bug in the generated descriptors to correctly generate validation code when
+     collections are used.
+     (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
+   
+XML: Added QName support in the marshalling framework (when used via the mapping or via
+     the Source Code Generator) (Arnaud)
+
 
 XML: Added special code to prevent creating a default XML name when using the "matches" 
      attribute for bind-xml element in the mapping file. (kvisco) 20010815
