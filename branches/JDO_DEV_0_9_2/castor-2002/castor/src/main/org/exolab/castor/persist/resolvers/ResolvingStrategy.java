@@ -93,8 +93,11 @@ public abstract class ResolvingStrategy {
     public abstract void store( TransactionContext tx, OID id, 
             Object objectToBeStored, Entity entityToBeStored );
 
+    public abstract void revert( TransactionContext tx, OID id, 
+            Object objectToBeStored, Entity entityToBeReverted );
 
-    public abstract void markDeleted( TransactionContext tx, OID id, 
+
+    public abstract void markDelete( TransactionContext tx, OID id, 
             Object objectToBeDeleted, Entity entityToBeDeleted, 
             int timeout );
 
