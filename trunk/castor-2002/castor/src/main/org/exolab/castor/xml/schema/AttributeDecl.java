@@ -94,12 +94,12 @@ public final class AttributeDecl extends Annotated {
      * A flag to indicate a fixed value
     **/
     private boolean _fixed = false;
-    
+
     /**
      * The default namespace form for this AttributeDecl (optional).
     **/
     private Form _form = null;
-    
+
     /**
      * The id for this AttributeDecl
     **/
@@ -114,7 +114,7 @@ public final class AttributeDecl extends Annotated {
      * The Schema to which this AttributeDecl belongs
     **/
     private Schema _schema = null;
-    
+
     /**
      * The simple type for this AttributeDecl.
     **/
@@ -126,7 +126,7 @@ public final class AttributeDecl extends Annotated {
      * is OPTIONAL by default.
     **/
     private short _useFlag = OPTIONAL;
-    
+
     /**
      * The default or fixed value for attributes instances of this
      * attribute declaration.
@@ -167,11 +167,11 @@ public final class AttributeDecl extends Annotated {
         _schema  = schema;
     } //-- AttributeDecl
 
-    
+
     /**
      * Returns the Form for this attribute declaration. The Form object species
      * whether or not names are qualified or unqualified for instances of
-     * this attribute declaration. If null, the Form should be obtained from the 
+     * this attribute declaration. If null, the Form should be obtained from the
      * parent Schema.
      *
      * @return the Form for this attribute declaration, or null if not set.
@@ -179,7 +179,7 @@ public final class AttributeDecl extends Annotated {
     public Form getForm() {
         return _form;
     } //-- getForm
-    
+
     /**
      * Returns the Id for this attribute declaration
      *
@@ -195,7 +195,7 @@ public final class AttributeDecl extends Annotated {
      * @return the name of attributes defined by this AttributeDecl.
     **/
     public String getName() {
-        return _name;
+        return getName(false);
     } //-- getName
 
     /**
@@ -211,7 +211,7 @@ public final class AttributeDecl extends Annotated {
         }
 		else return _name;
     } //-- getName
-    
+
     /**
      * Returns the data type associated with this AttributeDecl.
      *
@@ -223,6 +223,17 @@ public final class AttributeDecl extends Annotated {
         return (SimpleType)_simpleType.getType();
     } //-- getSimpleType
 
+    /**
+     * Returns the AttributeDecl that this attribute definition references.
+     * This will return null if this attribute definition does not reference
+     * a different attribute definition.
+     * @return the AttributeDecl that this attribute definition references
+    **/
+    public AttributeDecl getReference() {
+        if (_attributeRef != null)
+            return _schema.getAttribute(_attributeRef);
+        return null;
+    } //-- getReference
     /**
      * Returns the Schema that this AttributeGroupDecl belongs to.
      *
@@ -330,7 +341,7 @@ public final class AttributeDecl extends Annotated {
     public void setForm(Form form) {
         _form = form;
     } //-- setForm
-    
+
     /**
      * Sets the Id for this attribute declaration
      *
