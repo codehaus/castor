@@ -63,6 +63,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
+import org.exolab.castor.mapping.xml.types.AutoNamingType;
 import org.exolab.castor.util.Configuration;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
@@ -260,6 +261,8 @@ public class XMLMappingLoader
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
         BindXml xml = fieldMap.getBindXml();
 
+        boolean deriveNameByClass = false;
+        
         if (xml != null) {
             //-- xml name
             xmlName = xml.getName();
@@ -273,6 +276,12 @@ public class XMLMappingLoader
 
             //-- reference
             isReference = xml.getReference();
+            
+            //-- autonaming
+            AutoNamingType autoName = xml.getAutoNaming();
+            if (autoName != null) {
+                deriveNameByClass = (autoName == AutoNamingType.DERIVEBYCLASS);
+            }
         }
 
         if (nodeType == null) {
@@ -282,13 +291,23 @@ public class XMLMappingLoader
                 nodeType = NodeType.Element;
         }
 
-        if ((xmlName == null) && (match == null)) {
+        //-- Create XML name if necessary. Note if name is to be derived
+        //-- by class..we just make sure we set the name to null...
+        //-- the Marshaller does this during runtime. This allows
+        //-- Collections to be handled properly.
+        if ((!deriveNameByClass) && ((xmlName == null) && (match == null)))
+        {
             xmlName = _naming.toXMLName( fieldDesc.getFieldName() );
             match = xmlName + ' ' + fieldDesc.getFieldName();
         }
 
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
 
+        //-- If deriveNameByClass we need to reset the name to
+        //-- null because XMLFieldDescriptorImpl tries to be smart
+        //-- and automatically creates the name.
+        xmlDesc.setXMLName(null);
+        
         //-- matches
         if (match != null) {
             xmlDesc.setMatches(match);
