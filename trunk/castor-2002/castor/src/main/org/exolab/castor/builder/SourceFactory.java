@@ -96,7 +96,7 @@ public class SourceFactory  {
 	 */
 	private boolean _testable = false;
 
-    
+
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
@@ -117,7 +117,7 @@ public class SourceFactory  {
             this.infoFactory = infoFactory;
 
         this.memberFactory = new MemberFactory(infoFactory);
-        
+
     } //-- SourceFactory
 
    /**
@@ -168,7 +168,7 @@ public class SourceFactory  {
         if (sgState == null) {
             throw new IllegalStateException("SGStateInfo may not be null.");
         }
-        
+
         FactoryState state = null;
         JClass[] classes = new JClass[1];
 		boolean createGroupItem = false;
@@ -190,7 +190,7 @@ public class SourceFactory  {
         className = resolveClassName(className, sgState.packageName);
 
         state = new FactoryState(className, sgState);
-		//-- mark this element as being processed in this current
+        //-- mark this element as being processed in this current
         //-- state to prevent the possibility of endless recursion
         ElementDecl tmpDecl = element;
         while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();
@@ -231,45 +231,41 @@ public class SourceFactory  {
 
             //-- If anonymous complex type, we need to process
             //-- the complex type
-			if ( ! complexType.isTopLevel() ) {
-				//process the complexType only if it has not been proceed
-				 if (!state.processed(complexType))
-					processComplexType( complexType, state);
-                 if (createGroupItem) {
-                     sgState.bindReference(jClass, classInfo);
-                     classes[1] = jClass;
+            if ( ! complexType.isTopLevel() ) {
+	       //process the complexType only if it has not been proceed
+               if (!state.processed(complexType))
+     		  processComplexType( complexType, state);
+               if (createGroupItem) {
+                   sgState.bindReference(jClass, classInfo);
+                   classes[1] = jClass;
 
-                      //-- create main group class
-                      String fname = element.getName() + "Item";
-                      fname  = JavaNaming.toJavaMemberName(fname, false);
-                      FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass),
-                                                           "_items", fname);
-                      fInfo.setContainer(true);
-                      className = className.substring(0,className.length()-4);
+                   //-- create main group class
+                   String fname = element.getName() + "Item";
+                   fname  = JavaNaming.toJavaMemberName(fname, false);
+                   FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass),
+                                                                  "_items", fname);
+                   fInfo.setContainer(true);
+                   className = className.substring(0,className.length()-4);
+                   state     = new FactoryState(className, sgState);
+		   classInfo = state.classInfo;
+                   jClass    = state.jClass;
+		   initialize(jClass);
+                   classInfo.addFieldInfo(fInfo);
+                   fInfo.createJavaField(jClass);
+                   fInfo.createAccessMethods(jClass);
+                   fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
+                   //-- set super class if necessary
+                   if (base != null) jClass.setSuperClass(base);
+             	   //-- name information
+                   classInfo.setNodeName(element.getName());
+                   //-- namespace information
+                   classInfo.setNamespaceURI(schema.getTargetNamespace());
 
-                      state     = new FactoryState(className, sgState);
-		              classInfo = state.classInfo;
-                      jClass    = state.jClass;
-		              initialize(jClass);
+                   //-- mark as a container
+                   classInfo.setContainer(true);
+               }
 
-                      classInfo.addFieldInfo(fInfo);
-                      fInfo.createJavaField(jClass);
-                      fInfo.createAccessMethods(jClass);
-                      fInfo.generateInitializerCode(jClass.getConstructor(0).getSourceCode());
-
-                      //-- set super class if necessary
-                      if (base != null) jClass.setSuperClass(base);
-             	     //-- name information
-                     classInfo.setNodeName(element.getName());
-
-                      //-- namespace information
-                      classInfo.setNamespaceURI(schema.getTargetNamespace());
-
-                      //-- mark as a container
-                      classInfo.setContainer(true);
-                  }
-
-				 derived = (state.jClass.getSuperClass() != null);
+               derived = (state.jClass.getSuperClass() != null);
             }
             //-- top-level complex type...just extend it
             else {
@@ -321,7 +317,7 @@ public class SourceFactory  {
 
         sgState.bindReference(jClass, classInfo);
         sgState.bindReference(element, classInfo);
-        
+
         classes[0] = jClass;
         return classes;
     } //-- createSourceCode
@@ -345,7 +341,7 @@ public class SourceFactory  {
 
         if (!type.isTopLevel())
             throw new IllegalArgumentException("ComplexType is not top-level.");
-            
+
         if (sgState == null)
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
 
@@ -436,7 +432,7 @@ public class SourceFactory  {
 
             //-- mark as a container
             classInfo.setContainer(true);
-            
+
         }
 
         //-- process annotation
@@ -499,7 +495,7 @@ public class SourceFactory  {
                 "built-in SimpleType.";
             throw new IllegalArgumentException(err);
         }
-        
+
         if (sgState == null) {
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
         }
@@ -592,9 +588,9 @@ public class SourceFactory  {
             throw new IllegalArgumentException("Group may not be null.");
         }
         if (sgState == null) {
-            throw new IllegalArgumentException("SGStateInfo may not be null.");            
+            throw new IllegalArgumentException("SGStateInfo may not be null.");
         }
-        
+
         String groupName = group.getName();
         if (groupName == null) {
             groupName = sgState.getGroupNaming().createClassName(group);
@@ -687,7 +683,7 @@ public class SourceFactory  {
 
             //-- mark as a container
             classInfo.setContainer(true);
-        }        
+        }
 
         //-- process annotation
         String comment  = processAnnotations(group);
@@ -1267,7 +1263,6 @@ public class SourceFactory  {
         if ((contentType == ContentType.mixed) ||
             (contentType == ContentType.any))
         {
-
             FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
             handleField(fieldInfo, state);
         }
@@ -1311,7 +1306,6 @@ public class SourceFactory  {
         //------------------------------/
         //- handle elements and groups -/
         //------------------------------/
-
 
         Enumeration enum = contentModel.enumerate();
 
@@ -1375,12 +1369,20 @@ public class SourceFactory  {
                 case Structure.GROUP:
                     Group group = (Group) struct;
                     boolean nested = false;
+                    GroupInfo gInfo = state.classInfo.getGroupInfo();
                     int max = group.getMaxOccurs();
                     if ((max < 0) || (max > 1)) {
-                        GroupInfo gInfo = state.classInfo.getGroupInfo();
                         gInfo.setMaxOccurs(max);
                         gInfo.setMinOccurs(group.getMinOccurs());
                     }
+                    //set the compositor
+                    if (group.getOrder() == Order.choice)
+                        gInfo.setAsChoice();
+                    else if (group.getOrder() == Order.all)
+                        gInfo.setAsAll();
+                    else if (group.getOrder() == Order.seq)
+                        gInfo.setAsSequence();
+
                     //-- if there some wildcard elements? (<any>)
                     Enumeration wildcards = group.getWildcard();
 
@@ -1392,9 +1394,9 @@ public class SourceFactory  {
 
                     //-- create source code for the group,if necessary
                     if (!((contentModel instanceof ComplexType)||
-                        (contentModel instanceof ModelGroup)) ) 
+                        (contentModel instanceof ModelGroup)) )
                     {
-                        fieldInfo = memberFactory.createFieldInfo(group, 
+                        fieldInfo = memberFactory.createFieldInfo(group,
                             state.getSGStateInfo());
                         handleField(fieldInfo, state);
                     }
@@ -1421,7 +1423,7 @@ public class SourceFactory  {
                     //get the contentModel and proccess it
                     if (tmp.getContentModelGroup() != null) {
                           if (tmp.getName() != null) {
-                              fieldInfo = memberFactory.createFieldInfo(tmp, 
+                              fieldInfo = memberFactory.createFieldInfo(tmp,
                                 state.getSGStateInfo());
                               handleField(fieldInfo, state);
                               break;
@@ -1858,7 +1860,7 @@ class FactoryState implements ClassInfoResolver {
 
     JClass       jClass           = null;
     ClassInfo    classInfo        = null;
-    
+
     String packageName         = null;
 
     private ClassInfoResolver _resolver  = null;
@@ -1881,13 +1883,13 @@ class FactoryState implements ClassInfoResolver {
     protected FactoryState
         (String className, SGStateInfo sgState)
     {
-        
+
         if (sgState == null)
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
-            
+
         _sgState     = sgState;
         _processed   = new Vector();
-        
+
 		//keep the elements and complexType already processed
 		//if (resolver instanceof FactoryState)
 		   //_processed = ((FactoryState)resolver)._processed;
@@ -1925,7 +1927,7 @@ class FactoryState implements ClassInfoResolver {
     SGStateInfo getSGStateInfo() {
         return _sgState;
     } //-- getSGStateInfo
-    
+
     /**
      * Marks the given element as having been processed.
      * @param complexType the Element to mark as having
