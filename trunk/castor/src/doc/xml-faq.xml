@@ -123,6 +123,60 @@
             </p>
             </section>
 
+            <section title="How do I ignore elements during unmarshalling?">
+            <p>
+
+               <ol>
+                  <li>Use the Unmarshaller#setIgnoreExtraElements() method:
+                   <p>
+                   <code>
+      Unmarshaller unm = new Unmarshaller(...);
+      unm.setIgnoreExtraElements(true);
+                   </code>
+
+                   If any elements appear in the XML instance and Castor cannot find
+                   mappings for, they will be skipped.
+                   </p>
+                 </li>
+                 <li>You can also set the "org.exolab.castor.xml.strictelements" property in the
+                     castor.properties file:
+                     <p><code>org.exolab.castor.xml.strictelements=false</code></p>
+                 </li>
+                </ol>
+            </p>
+            </section>
+
+            <section
+                title="Where does Castor search for the castor.properties file?">
+            <p>
+               Castor loads the castor.properties in the following order:
+               <ol>
+                 <li>From classpath (usually from the jar file)</li>
+                 <li>From {java.home}/lib (if present)</li>
+                 <li>From the local working directory</li>
+               </ol>
+                Each properties file overrides the previous. So you don't have to come up
+                with a properties file with all the properties and values, just the ones you
+                want to change. This also means you don't have to touch the properties file
+                found in the jar file.
+            </p>
+            <p>
+                Note: You can also use LocalConfiguration.getInstance().getProperties() to change the
+                properties values programatically.
+            </p>
+            </section>
+
+            <section
+                title="Can I programmatically change the properties found in the castor.properties file?">
+
+            <p>
+                Yes, many of these properties can be set directly on the Marshaller or Unmarshaller, but
+                you can also use <i>LocalConfiguration.getInstance().getProperties()</i> to change the
+                properties values programatically.
+            </p>
+            </section>
+
+
         </section>
     </section>
 
@@ -173,6 +227,16 @@
             <p>
                For a class mapping, use the &lt;map-to&gt; element. For more information see
                the <a href="xml-mapping.xml">XML Mapping documentation</a>.
+            </p>
+            </section>
+
+            <section title="How do I prevent a field from being marshalled?">
+            <p>
+               Set the <b>transient</b> attribute on the &lt;bind-xml&gt; element to true:
+               <code>
+  &lt;bind-xml transient="true"/&gt;
+               </code>
+               Note: You can also set transient="true" on the &lt;field&gt; element.
             </p>
             </section>
 
@@ -270,6 +334,7 @@
                It's not 100% perfect, but it does a reasonable job.
             </p>
             </section>
+
         </section>
     </section>
 
