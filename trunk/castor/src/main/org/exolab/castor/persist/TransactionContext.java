@@ -271,19 +271,14 @@ public abstract class TransactionContext
     public TransactionContext( Database db )
     {
         _xid = null;
-        _status = Status.STATUS_ACTIVE;
+        _status = -1;
         _db = db;
     }
 
-
-    /**
-     * Create a new transaction context. This method is used by the
-     * XA transaction model, see {@link XAResourceImpl}.
-     */
     public TransactionContext( Database db, Xid xid )
     {
         _xid = xid;
-        _status = Status.STATUS_ACTIVE;
+        _status = -1;
         _db = db;
     }
 
@@ -416,6 +411,13 @@ public abstract class TransactionContext
     public void setLockTimeout( int timeout )
     {
         _lockTimeout = ( timeout >= 0 ? timeout : 0 );
+    }
+    
+    /**
+     * Sets the status of the current transaction to STATUS_ATIVE
+     */
+    public void setStatusActive() {
+        _status = Status.STATUS_ACTIVE;
     }
 
 
@@ -1582,7 +1584,7 @@ public abstract class TransactionContext
                 entry = _deletedList;
                while ( entry != null ) {
                   if (entry.molder.getPriority() == i) {
-                    entry.engine.delete( this, entry.oid, entry.object );
+                    entry.engine.delete( this, entry.oid );
                   }
                   entry = entry.nextDeleted;
                 }
