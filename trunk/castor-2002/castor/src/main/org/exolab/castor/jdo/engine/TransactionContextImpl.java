@@ -57,6 +57,7 @@ import javax.transaction.xa.XAResource;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.CacheEngine;
 import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.persist.TransactionContext;
 
 
 /**
@@ -71,8 +72,8 @@ import org.exolab.castor.persist.PersistenceException;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-final class TransactionContext
-    extends org.exolab.castor.persist.TransactionContext
+final class TransactionContextImpl
+    extends TransactionContext
 {
 
 
@@ -88,7 +89,7 @@ final class TransactionContext
      * Create a new transaction context. This method is used by the
      * ODMG transaction model, see {@link TransactionImpl}.
      */
-    public TransactionContext()
+    public TransactionContextImpl()
     {
 	super();
     }
@@ -98,7 +99,7 @@ final class TransactionContext
      * Create a new transaction context. This method is used by the
      * JTA transaction model, see {@link XAResourceImpl}.
      */
-    public TransactionContext( Xid xid )
+    public TransactionContextImpl( Xid xid )
     {
 	super( xid );
     }
