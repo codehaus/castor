@@ -932,8 +932,10 @@ public class ParseTreeWalker implements TokenTypes
 	      // (JDOClassDescriptor) field.getClassDescriptor();
 	      (JDOClassDescriptor) field.getContainingClassDescriptor();
 	  
-          if ( clsDesc == null )
-            clsDesc = _clsDesc;
+          if ( clsDesc == null ) {
+	      throw new IllegalStateException( "ContainingClass of "+
+					       field.toString()+" is null !" );
+	  }
                   
           return _queryExpr.encodeColumn( clsDesc.getTableName(), 
 					  field.getSQLName() );
