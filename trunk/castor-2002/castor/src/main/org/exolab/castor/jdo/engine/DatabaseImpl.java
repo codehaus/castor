@@ -55,6 +55,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
@@ -259,7 +260,7 @@ public class DatabaseImpl
 
 
     public void update( Object object )
-        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+        throws ClassNotPersistenceCapableException,
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
@@ -464,7 +465,7 @@ public class DatabaseImpl
 
     public void afterCompletion( int status )
     {
-        if ( _transaction == null || _ctx == null )
+        if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
             throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
             return;
@@ -519,7 +520,7 @@ public class DatabaseImpl
      * Never try to close it (is done by castor).
      */
     public Object /* java.sql.Connection */ getConnection()
-	throws org.exolab.castor.jdo.PersistenceException
+    throws org.exolab.castor.jdo.PersistenceException
     { return _ctx.getConnection( _dbEngine ); }
 
 }

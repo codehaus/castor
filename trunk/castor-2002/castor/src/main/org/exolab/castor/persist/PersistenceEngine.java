@@ -213,19 +213,32 @@ public interface PersistenceEngine
      * persistent and must not have the identity of a persistent object.
      * The object's OID is returned. The OID is guaranteed to be unique
      * for this engine even if no identity was specified.
+     * If the object implements TimeStampable interface, verify 
+     * the object's timestamp.
      *
      * @param tx The transaction context
-     * @param object The object to update
-     * @param identity The identity of the object, or null
+     * @param type The type of the object to load
+     * @param object The object
+     * @param accessMode The desired access mode
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
      * @return The object's OID
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
      * @throws PersistenceException An error reported by the
      *  persistence engine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
      */
-    public OID update( TransactionContext tx, Object object, Object identity )
-        throws DuplicateIdentityException, PersistenceException,
-               ClassNotPersistenceCapableException;
+    public OID update( TransactionContext tx, Class type, Object object,
+                       AccessMode accessMode, int timeout )
+        throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
+               PersistenceException, ClassNotPersistenceCapableException;
 
 
     /**

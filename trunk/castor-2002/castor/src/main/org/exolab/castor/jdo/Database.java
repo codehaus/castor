@@ -299,6 +299,12 @@ public interface Database
      * transaction. If the identity is null, duplicate identity check
      * occurs when the transaction completes and the object is not
      * visible to queries until the transaction commits.
+     * <p>
+     * It is recommended to use this method in "long" transaction scenario:
+     * the object was read in one of the previous "short" transaction, 
+     * modified and now is being "included"in the current "short" transaction.
+     * The object must implement interface {@link TimeStampable} in order to 
+     * perform dirty checking.
      *
      * @param object The object to create
      * @throws TransactionNotInProgressException Method called while
@@ -307,9 +313,12 @@ public interface Database
      *  persistent capable
      * @throws PersistenceException An error reported by the
      *  persistence engine
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
      */
     public void update( Object object )
-        throws ClassNotPersistenceCapableException,
+        throws ClassNotPersistenceCapableException, ObjectModifiedException,
                TransactionNotInProgressException, PersistenceException;
 
 

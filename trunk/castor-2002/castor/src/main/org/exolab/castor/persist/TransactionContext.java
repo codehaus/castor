@@ -573,14 +573,20 @@ public abstract class TransactionContext
      *  persistence engine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long 
+     *  transaction.
      */
     public synchronized OID update( PersistenceEngine engine, Object object,
                                     Object identity )
-        throws DuplicateIdentityException, ClassNotPersistenceCapableException, PersistenceException
+        throws DuplicateIdentityException, ObjectModifiedException,
+               ClassNotPersistenceCapableException, PersistenceException
     {
         OID          oid;
         ObjectEntry  entry;
         ClassHandler handler;
+        AccessMode   accessMode = null;
+        Object       tmp;
 
         // Make sure the object has not beed persisted in this transaction.
         entry = getObjectEntry( object );
@@ -595,16 +601,47 @@ public abstract class TransactionContext
         if ( identity == null )
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
+        // Check the object's timestamp
+        accessMode = handler.getAccessMode( accessMode );
+        try {
+            oid = engine.update( this, handler.getJavaClass(), object, accessMode, _lockTimeout );
+        } catch ( ObjectNotFoundException except ) {
+            throw except;
+        } catch ( LockNotGrantedException except ) {
+            throw except;
+        } catch ( ClassNotPersistenceCapableException except ) {
+            throw new PersistenceExceptionImpl( except );
+        }
+
         // Update the object. This can only happen once for each object in
         // all transactions running on the same engine, so after updating
         // add a new entry for this object and use this object as the view
-
-        if ( getObjectEntry( engine, new OID( handler, identity ) ) != null )
-            throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identity ) );
-        oid = new OID( handler, identity );
-        entry = addObjectEntry( object, oid, engine );
-        if ( handler.getCallback() != null )
-            handler.getCallback().using( object, _db );
+        
+        // Instantiate a temporary object and fill it from the cache
+        tmp = handler.newInstance();
+        addObjectEntry( tmp, oid, engine );
+        try {
+            engine.copyObject( this, oid, tmp );
+            // Now overwrite the values that was either loaded from the cache or
+            // from the database with the new values
+            handler.fillFromCopy( object, this, engine );
+            removeObjectEntry( tmp );
+            // Replace the temporary object by the orignal
+            addObjectEntry( object, oid, engine );
+            if ( handler.getCallback() != null ) {
+                handler.getCallback().using( object, _db );
+                handler.getCallback().loaded( object );
+            }
+        } catch ( Exception except ) {
+            removeObjectEntry( tmp );
+            removeObjectEntry( object );
+            engine.forgetObject( this, oid );
+            if ( handler.getCallback() != null )
+                handler.getCallback().releasing( object, false );
+            if ( except instanceof PersistenceException )
+                throw (PersistenceException) except;
+            throw new PersistenceExceptionImpl( except );
+        }
         return oid;
     }
 
