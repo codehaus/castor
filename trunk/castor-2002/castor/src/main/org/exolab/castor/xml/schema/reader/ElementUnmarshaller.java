@@ -131,7 +131,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         int minOccurs = 1;
         if (attValue != null) {
             minOccurs = toInt(attValue);
-            _element.setMinimumOccurance(minOccurs);
+            _element.setMinOccurs(minOccurs);
         }
         
         /*
@@ -143,12 +143,10 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
         if (attValue != null) {
             if (MAX_OCCURS_WILDCARD.equals(attValue)) attValue = "-1";
-            else {
-                int maxOccurs = toInt(attValue);
-                _element.setMaximumOccurance(maxOccurs);
-            }
+            int maxOccurs = toInt(attValue);
+            _element.setMaxOccurs(maxOccurs);
         }
-        else _element.setMaximumOccurance(minOccurs);
+        else _element.setMaxOccurs(minOccurs);
         
         //-- @schemaAbbrev
         _element.setSchemaAbbrev(atts.getValue("schemaAbbrev"));

@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -57,7 +57,15 @@ import org.xml.sax.*;
 **/
 public class GroupUnmarshaller extends SaxUnmarshaller {
 
-
+      //--------------------------/
+     //- Static Class Variables -/
+    //--------------------------/
+     
+    private static final int ALL         = 1;
+    private static final int CHOICE      = 2;
+    private static final int MODEL_GROUP = 3;
+    private static final int SEQUENCE    = 4;
+        
       //--------------------/
      //- Member Variables -/
     //--------------------/
@@ -82,36 +90,60 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     **/
     private Schema _schema = null;
     
+    /**
+     * The element name of the Group to be unmarshalled.
+    **/
+    private String _element = SchemaNames.GROUP;
+
+    
       //----------------/
      //- Constructors -/
     //----------------/
+    
     /**
-     * Creates a new ArchetypeUnmarshaller
-     * @param schema the Schema to which the Archetype belongs
+     * Creates a new GroupUnmarshaller
+     * @param schema the Schema to which the Group belongs
+     * @param the element name for this type of group
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
     public GroupUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
-    {
+        (Schema schema, String element, AttributeList atts, Resolver resolver) 
+    {        
         super();
         setResolver(resolver);
         this._schema = schema;
         
         _group = new Group();
-        //_group.useResolver(resolver);
         
         //-- handle attributes
         String attValue = null;
         
-        //-- name
-        _group.setName(atts.getValue("name"));
-            
-        //-- collection
-        attValue = atts.getValue("collection");
-        if (attValue != null) {
-            _group.setCollection(Collection.valueOf(attValue));
+        
+        //-- MODEL GROUP
+        if (SchemaNames.GROUP.equals(element)) {
+            //-- set name
+            _group.setName(atts.getValue("name"));
         }
+        else {
+            
+            if (SchemaNames.SEQUENCE.equals(element)) {
+                _group.setOrder(Order.seq);
+            }
+            else if (SchemaNames.CHOICE.equals(element)) {
+                _group.setOrder(Order.choice);
+            }
+            else if (SchemaNames.ALL.equals(element)) {
+                _group.setOrder(Order.all);
+            }
+            else {
+                String err = "Invalid group element name: '" +
+                    element + "'";
+                throw new IllegalArgumentException(err); 
+            }
+        }
+        
+        _element = element;
         
         //-- maxOccurs
         attValue = atts.getValue("maxOccurs");
@@ -123,10 +155,11 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         if (attValue != null) 
             _group.setMaxOccurs(toInt(attValue));
         
-        //-- order
-        attValue = atts.getValue("order");
-        if (attValue != null)
-            _group.setOrder(Order.valueOf(attValue));
+        //-- id
+        _group.setId(atts.getValue("id"));
+        
+        //-- ref
+        //Not yet supported
         
     } //-- GroupUnmarshaller
 
@@ -141,15 +174,21 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
      * handles
     **/
     public String elementName() {
-        return "group";
+        return _element;
     } //-- elementName
 
+    
     /**
-     * 
+     * Returns the Group that was unmarshalled by this Unmarshaller.
+     * This method should only be called after unmarshalling
+     * has been completed.
+     *
+     * @return the unmarshalled Group
     **/
     public Group getGroup() {
         return _group;
     } //-- getGroup
+    
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -173,16 +212,13 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        //-- Use JVM internal String
-        name = name.intern();
-                
-        if (name == SchemaNames.ELEMENT) {
+        if (SchemaNames.ELEMENT.equals(name)) {
             unmarshaller 
                 = new ElementUnmarshaller(_schema, atts, getResolver());
         }
-        else if (name == SchemaNames.GROUP) {
+        else if (SchemaNames.isGroupName(name)) {
             unmarshaller 
-                = new GroupUnmarshaller(_schema, atts, getResolver());
+                = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
         else {
             StringBuffer err = new StringBuffer("illegal element <");
@@ -217,18 +253,15 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             }
         }
         
-        //-- Use JVM internal String
-        name = name.intern();
-        
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
         
-        if (name == SchemaNames.ELEMENT) {
+        if (SchemaNames.ELEMENT.equals(name)) {
             ElementDecl element = 
                 ((ElementUnmarshaller)unmarshaller).getElement();
             _group.addElementDecl(element);
         }
-        else if (name == SchemaNames.GROUP) {
+        else if (SchemaNames.isGroupName(name)) {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _group.addGroup(group);
         }
@@ -243,5 +276,5 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             unmarshaller.characters(ch, start, length);
         }
     } //-- characters
-
+    
 } //-- GroupUnmarshaller
