@@ -60,6 +60,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -252,7 +253,7 @@ public class OQLQueryImpl
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
         _expr = walker.getQueryExpression();
-        _paramInfo = walker.getParamInfo();
+        _paramInfo = (Hashtable) _expr.postProcessParamInfo((Map) walker.getParamInfo());
         _projectionType = walker.getProjectionType();
         _pathInfo = walker.getPathInfo();
 
@@ -277,7 +278,7 @@ public class OQLQueryImpl
             ParamInfo info = (ParamInfo) e.nextElement();
             for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
             {
-                int paramIndex = ( (Integer) f.nextElement() ).intValue();
+                int paramIndex = ((Integer) f.nextElement()).intValue();
                 _bindTypes[ paramIndex - 1 ] = (info.getSQLType() == null ? info.getTheClass()
                                                                           : info.getSQLType());
             }
