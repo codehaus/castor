@@ -105,7 +105,7 @@ public class Unmarshaller {
     public Unmarshaller(Class c) {
         super();
         this._class = c;
-	this.debug = Configuration.debug();
+	    this.debug = Configuration.debug();
     } //-- Unmarshaller(Class)
     
     
@@ -163,6 +163,43 @@ public class Unmarshaller {
     {
         return unmarshal(new InputSource(reader));
     } //-- unmarshal(Reader reader)
+
+    /**
+     * Unmarshals Objects of this Unmarshaller's Class type. 
+     * The Class must specify the proper access methods 
+     * (setters/getters) in order for instances of the Class
+     * to be properly unmarshalled.
+     * @param eventProducer the EventProducer which produces
+     * the SAX events
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
+    **/
+    public Object unmarshal(EventProducer eventProducer) 
+        throws MarshalException, ValidationException
+    {
+        UnmarshalHandler handler = new UnmarshalHandler(_class);
+        handler.setLogWriter(pw);
+        handler.setDebug(debug);
+        eventProducer.setDocumentHandler(handler);
+        try {
+            eventProducer.start();
+        }
+        catch(org.xml.sax.SAXException sx) {
+            MarshalException marshalEx = new MarshalException(sx);
+	        FileLocation location = new FileLocation();
+	        location.setFilename(handler.getDocumentLocator().getSystemId());
+	        location.setLineNumber(handler.getDocumentLocator().getLineNumber());
+	        location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
+	        marshalEx.setLocation(location);
+
+            throw marshalEx;
+        }
+        return handler.getObject();
+        
+    } //-- unmarshal(EventProducer)
+        
+        
 
     /**
      * Unmarshals Objects of this Unmarshaller's Class type. 
