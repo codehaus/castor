@@ -333,7 +333,10 @@ public class SchemaUnmarshaller extends ComponentReader {
         if (skipAll) return;
 
 
-        handleNamespaces(nsDecls);
+        //-- process namespaces...unless we are inside an 
+        //-- annotation
+        if (_annotationDepth == 0)
+            handleNamespaces(nsDecls);
 
         //-- backward compatibility, we'll need to
         //-- remove this at some point

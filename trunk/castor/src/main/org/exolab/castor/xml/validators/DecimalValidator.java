@@ -159,7 +159,7 @@ public class DecimalValidator implements TypeValidator
     **/
     public void setMinInclusive(BigDecimal minValue) {
         _min = minValue;
-        _hasMinExclusive = true;
+        _hasMinExclusive = false;
     } //-- setMinInclusive
 
     /**
@@ -228,7 +228,8 @@ public class DecimalValidator implements TypeValidator
         }
 
         if (_min != null) {
-            if (bd.compareTo(_min)==-1) {
+        	
+            if (bd.compareTo(_min)== -1) {
                 String err = bd + " is less than the minimum allowable ";
                 err += "value of " + _min;
                 throw new ValidationException(err);

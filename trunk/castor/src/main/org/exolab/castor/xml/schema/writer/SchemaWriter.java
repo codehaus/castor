@@ -591,8 +591,9 @@ public class SchemaWriter {
             //--Any Facets to process?
             //--only relevant for the simpleContent with restriction
             if (complexType.isSimpleContent() && complexType.isRestricted()) {
-                if (complexType.getContentType().getType() == ContentType.SIMPLETYPE) {
-                    SimpleType simpleType = complexType.getContentType().getSimpleType();
+                if (complexType.getContentType().getType() == ContentType.SIMPLE) {
+                    SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
+                    SimpleType simpleType = simpleContent.getSimpleType();
                     //-- process facets
                     Enumeration enum = simpleType.getLocalFacets();
                     while (enum.hasMoreElements()) {
@@ -1285,7 +1286,15 @@ public class SchemaWriter {
 
         //-- handle restriction
         SimpleType base = (SimpleType)simpleType.getBaseType();
-        if ((base != null) && (!(simpleType instanceof ListType))) {
+        boolean isRestriction = false;
+        if (base != null) {
+            if (simpleType instanceof ListType) {
+                isRestriction = (base instanceof ListType);
+            }
+            else isRestriction = true;
+        }
+        
+        if (isRestriction) {
 
             String ELEM_RESTRICTION = schemaPrefix + RESTRICTION;
 

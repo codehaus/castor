@@ -61,6 +61,7 @@ import org.exolab.castor.xml.schema.Resolver;
 import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.xml.schema.SchemaException;
 import org.exolab.castor.xml.schema.SchemaNames;
+import org.exolab.castor.xml.schema.SimpleContent;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Wildcard;
 import org.exolab.castor.xml.schema.XMLType;
@@ -127,8 +128,12 @@ public class ExtensionUnmarshaller extends ComponentReader {
         if ((base != null) && (base.length() > 0)) {
 
             XMLType baseType= _schema.getType(base);
-		    if (baseType == null)
+		    if (baseType == null) {
                 _complexType.setBase(base); //the base type has not been read
+                if (_complexType.isSimpleContent()) {
+                    _complexType.setContentType(new SimpleContent(_schema, base));
+                }
+            }
 		    else {
 				 //--we cannot extend a simpleType in <complexContent>
 				 if ( (baseType.isSimpleType()) &&
@@ -139,16 +144,15 @@ public class ExtensionUnmarshaller extends ComponentReader {
 				 }
                  _complexType.setBaseType(baseType);
                 if (_complexType.isSimpleContent()) {
-                    ContentType content = ContentType.valueOf("simpleType");
                     //--set the content type
                     if (baseType.isSimpleType()) {
-                	    content.setSimpleType((SimpleType)baseType);
-                	    _complexType.setContentType(content);
-                    } else {
+                        SimpleType simpleType = (SimpleType)baseType;
+                	    _complexType.setContentType(new SimpleContent(simpleType));
+                    } 
+                    else {
                         ComplexType temp = (ComplexType)baseType;
-                        content.setSimpleType(temp.getContentType().getSimpleType());
-                        _complexType.setContentType(content);
-                        temp = null;
+                        SimpleContent simpleContent = (SimpleContent) temp.getContentType();
+                        _complexType.setContentType(simpleContent.copy());
                     }
                 }
                    
