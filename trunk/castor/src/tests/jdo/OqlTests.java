@@ -78,12 +78,12 @@ import harness.CastorTestCase;
 public class OqlTests extends CastorTestCase {
 
     private JDOCategory    _category;
-
     private Database       _db;
 
-    private OQLQuery       _oql;
 
-    private QueryResults   _results;
+	protected static final int MIN_ID = 10;
+	protected static final int MAX_ID = 29;
+
 
     public OqlTests( TestHarness category ) 
     {
@@ -101,7 +101,7 @@ public class OqlTests extends CastorTestCase {
      * @todo Populate the database
      */
     public void runTest()
-       throws PersistenceException, Exception 
+       throws PersistenceException 
     {
         // The following statement only prints in -verbose mode
         stream.println( "Not yet implemented" );
@@ -111,8 +111,9 @@ public class OqlTests extends CastorTestCase {
         // after each test and I don't think that we want to populate/truncate
         // the database for each test. We're just selecting the data we're not
         // manipulating it. 
-
         populateDatabase();
+
+		testBasicSelect();
     }
 
     /*
@@ -120,14 +121,151 @@ public class OqlTests extends CastorTestCase {
      * repopulate it. It needs to be generic enough to work across databases
      * so I would prefer to use straight JDBC calls. 
      */
-    public void populateDatabase()
-    {}
+    public void populateDatabase() throws PersistenceException
+    {
+	     // delete all from TEST_TABLE
+	    _db.begin();
+		OQLQuery query = _db.getOQLQuery("select x from jdo.TestObject x");
+		QueryResults res = query.execute();
+		try {
+			while(res.hasMore())
+				_db.remove(res.next());
+		} finally {
+			res.close();
+		}
+	    _db.commit();
+
+	     // fill TEST_TABLE
+	    _db.begin();
+
+		for(int i=MIN_ID; i<=MAX_ID; ++i) {
+			TestObject obj = new TestObject();
+			obj.setId(i);
+			obj.setValue1(TestObject.DefaultValue1 + " " + Integer.toString(i));
+			_db.create(obj);
+		}
+
+	    _db.commit();
+	}
 
     /*
      * Test many different variations of the basic SELECT statement.
      */
-    public void testBasicSelect()
-    {}
+    public void testBasicSelect() throws PersistenceException
+    {
+		OQLQuery query;
+
+		_db.begin();
+
+	     // get default TestObject
+	    //TestObject defObj = (TestObject)_db.load(TestObject.class, new Integer(TestObject.DefaultId));
+		//assertTrue(obj==defObj);
+
+
+		 // fetch all available data
+		query = _db.getOQLQuery("select x from jdo.TestObject x");
+		tryQuery(query, MAX_ID-MIN_ID+1);
+
+		 // query only one object, expecting one
+		assertTrue("internal error: MIN_ID<=15 && MAX_ID>=15", MIN_ID<=15 && MAX_ID>=15);
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id=15");
+		assertTrue("internal error", MIN_ID>1);
+		tryQuery(query, 1);
+
+		 // query only one object, expecting none
+		assertTrue("internal error: MIN_ID>1", MIN_ID>1);
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id=1");
+		tryQuery(query, 0);
+
+
+		 // query using bind variable parameter, find one object
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id=$1");
+		query.bind(MIN_ID);
+		tryQuery(query, 1);
+
+		 // query using bind variable parameter, find nothing
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id=$1");
+		query.bind(MIN_ID-1);
+		tryQuery(query, 0);
+
+
+		 // query using 1 bind variable parameter, find all but the first and last object
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id>$1 and id<$2");
+		query.bind(MIN_ID);
+		query.bind(MAX_ID);
+		tryQuery(query, MAX_ID+1-MIN_ID-2);
+
+
+		 // query using "BETWEEN" operator, finding all records
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id between $1 and $2");
+		query.bind(MIN_ID);
+		query.bind(MAX_ID);
+		tryQuery(query, MAX_ID+1-MIN_ID);
+
+
+		 // query using "IN" operator
+		assertTrue("internal error: MIN_ID<=15 && MAX_ID>=18", MIN_ID<=15 && MAX_ID>=15);
+		assertTrue("internal error: MIN_ID>5", MIN_ID>5);
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id in list(5, 15, 18)");
+		tryQuery(query, 2);
+
+		 // query using "IN" operator and bind variables, find all objects
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id in list($1, $2, $3)");
+		query.bind(MIN_ID);
+		query.bind((MIN_ID+MAX_ID)/2);
+		query.bind(MAX_ID);
+		tryQuery(query, 3);
+
+		 // query using "IN" operator and bind variables, find some objects
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id in list($1, $2)");
+		query.bind(MIN_ID);
+		query.bind(MAX_ID+5);
+		tryQuery(query, 1);
+
+		 // query using "IN" operator and string values, find one object
+		query = _db.getOQLQuery("select x from jdo.TestObject x where value1 in list(\"XXX\", \"one 21\", 'A')");
+		tryQuery(query, 1);
+
+		// TODO [WG]: Causes issues with mySQL; needs some further investigation.
+//		 // query using "IN" operator with mixed string and number values, should fail with an exception
+//		boolean exc = false;
+//		try {
+//			query = _db.getOQLQuery("select x from jdo.TestObject x where value1 in list(\"XXX\", \"one 21\", 999)");
+//			tryQuery(query, 1);
+//		} catch(Exception e) {
+//			exc = true;
+//		}
+//		assertTrue("Exception expected", exc);
+
+
+		_db.commit();
+	}
+
+    /*
+     * test received result set
+     */
+    public void tryQuery(OQLQuery query, int count_expected) throws PersistenceException
+    {
+		QueryResults res = query.execute();
+		int count = 0;
+
+		try {
+			while(res.hasMore()) {
+				TestObject obj = (TestObject) res.next();
+
+				String val1_expected = TestObject.DefaultValue1 + " " + Integer.toString(obj.getId());
+				assertEquals("value1", val1_expected, obj.getValue1());
+
+				assertEquals("value2", TestObject.DefaultValue2, obj.getValue2());
+
+				++count;
+			}
+		} finally {
+			res.close();
+		}
+
+		assertEquals("number of objects found", count_expected, count);
+	}
 
     /*
      * Test the ORDER BY clause.
@@ -173,7 +311,7 @@ public class OqlTests extends CastorTestCase {
      * @todo Truncate the database
      */
     public void tearDown()
-        throws PersistenceException 
+        throws PersistenceException
     {
         if ( _db.isActive() ) _db.rollback();
         _db.close();
