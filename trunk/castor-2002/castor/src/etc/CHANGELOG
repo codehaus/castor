@@ -1,12 +1,20 @@
 Version (CVS)
 -------------
 
+
+XML:	Added support for restriction in simpleContent and enhanced complexType support
+	(Arnaud <blandin@intalio.com>)	
+
+XML: 	Added the command-line option '-nomarshall' which aims at preventing the
+	generation of the marshalling framework specific methods (marshall, unmarshall, validate)
+	(Arnaud <blandin@intalio.com>)
+
+XML:   Added setNSPrefixAtRoot method. When used in conjunction with setNamespaceMapping this
+	will insert the namepsace declarations at the root node.
+	(Andrew Fawcett, andrew.fawcett@coda.com)
+
 XML:    Fixed collection handling for introspected class. 
         (Sebastien Gignoux <gignoux@intalio.com>)
-
-XML:    Added setNSPrefixAtRoot method. When used in conjunction with setNamespaceMapping this
-        will insert the namepsace declarations at the root node.
-        (Andrew Fawcett, andrew.fawcett@coda.com)
 
 XML:    Bug fix for using addXxx methods.
         (Fix submitted by Michael Thyen <mthyen@excite.com>)
