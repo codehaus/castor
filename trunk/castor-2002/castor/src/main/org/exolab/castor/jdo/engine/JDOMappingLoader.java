@@ -128,18 +128,19 @@ public class JDOMappingLoader
     protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
         throws MappingException
     {
-        TypeConvertor convertorTo;
-        TypeConvertor convertorFrom;
+        TypeConvertor convertorTo = null;
+        TypeConvertor convertorFrom = null;
 
         if ( fieldMap.getSqlInfo() != null && fieldMap.getSqlInfo().getType() != null ) {
             Class sqlType;
 
             fieldType = Types.typeFromPrimitive( fieldType );
             sqlType = SQLTypes.typeFromName( fieldMap.getSqlInfo().getType() );
-            convertorTo = Types.getConvertor( sqlType, fieldType );
-            convertorFrom = Types.getConvertor( fieldType, sqlType );
-        } else
-            convertorTo = convertorFrom = null;
+            if ( fieldType != sqlType ) {
+                convertorTo = Types.getConvertor( sqlType, fieldType );
+                convertorFrom = Types.getConvertor( fieldType, sqlType );
+            }
+        }
         return new TypeInfo( fieldType, convertorTo, convertorFrom,
                              fieldMap.getRequired(), null, colType );
     }
