@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug 1903 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Enclose debug-statements with isDebugEnabled when string-concatenation is used in the debug-call.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1903
+       (Stein - 20050324)
+
 JDO:   Fixed bug 1916 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Fixed typo in transaction manager class for WAS v4 and add note that
        database pooling should be enabled for WAS v4 and v5.

@@ -31,6 +31,27 @@
               Short description says all ...
             </summary>
 			<bugs>
+			<bug id="1903">
+					<description>
+						Surrounded logging-statements with isDebugEnabled() if the
+						logging-string is assembled.
+					</description>
+					<contributor>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</contributor>
+					<submitter>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</submitter>
+					<reporter>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</reporter>
+					<type>Bug</type>
+					<module>All</module>
+					<date>20050324</date>
+				</bug>
 				<bug id="1916">
 					<description>
 						Fixed typo in transaction manager class for WAS v4
