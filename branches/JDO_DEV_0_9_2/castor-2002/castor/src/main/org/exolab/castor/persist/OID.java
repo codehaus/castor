@@ -75,18 +75,22 @@ public final class OID {
     /**
      * The full qualified name of the object's type.
      */
-    private final String    _name;
+    private final String     _name;
 
     /**
      * The LockEngine of the object
      */
-    // 092: private final LockEngine  _engine;
+    private LockEngine  _engine;
 
     /**
      * The ClassMolder of the object
      */
-    private final Resolver _molder;
+    private Resolver _molder;
 
+    /**
+     * The Java Class of the object that this OID represent
+     */
+    private Class _class;
 
     /**
      * The OID of depended object
@@ -172,16 +176,36 @@ public final class OID {
         return _molder;
     }
 
+    /**
+     * Get the Java Class of the object that this OID represent
+     */
+    public Class getJavaClass() {
+        return _class;
+    }
+
+    /**
+     * Set the Java Class of the object that this OID represent
+     */
+    public void setJavaClass( Class cls ) {
+        _class = cls;
+    }
+
 
     /**
      * Get the LockEngine of this object
      *
      * @return the LockEngine of this object.
      */
-     /*
-    LockEngine getLockEngine() {
+    public LockEngine getLockEngine() {
         return _engine;
-    }*/
+    }
+
+    /**
+     * Set the LockEngine
+     */
+    public void setLockEngine( LockEngine engine ) {
+        _engine = engine;
+    }
 
     /**
      * Returns the OID's stamp. The stamp may be used to efficiently
@@ -251,7 +275,7 @@ public final class OID {
      *
      * @return The object's identity, or null
      */
-    Object getIdentity() {
+    public Object getIdentity() {
         return _identity;
     }
 
@@ -263,7 +287,7 @@ public final class OID {
      *
      * @return The object's type's full name
      */
-    String getName() {
+    public String getName() {
         return _name;
     }
     
