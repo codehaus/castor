@@ -44,10 +44,10 @@
  */
 package org.exolab.castor.persist.resolvers;
 
-import org.exolab.castor.persist.OID;
-import org.exolab.castor.persist.Entity;
-import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.AccessMode;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.session.OID;
+import org.exolab.castor.persist.session.TransactionContext;
 
 /**
  * Each RelationScheme responsible to one Collection or Map type

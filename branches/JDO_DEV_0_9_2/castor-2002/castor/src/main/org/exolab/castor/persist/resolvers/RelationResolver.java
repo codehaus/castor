@@ -44,11 +44,10 @@
  */
 package org.exolab.castor.persist.resolvers;
 
-
-import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.AccessMode;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.session.TransactionContext;
+import org.exolab.castor.persist.session.OID;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
