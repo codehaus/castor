@@ -59,7 +59,7 @@ import java.util.Enumeration;
 **/
 public class Schema extends Annotated {
 
-    
+
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/1999/XMLSchema";
 
@@ -67,28 +67,28 @@ public class Schema extends Annotated {
     private static final String NULL_ARGUMENT
         = "A null argument was passed to " +
            Schema.class.getName() + "#";
-           
+
     /**
      * The SimpleTypesFactory used by this Schema
      */
     private static SimpleTypesFactory simpleTypesFactory
         = new SimpleTypesFactory();
-        
+
     //--------------------/
     //- Member Variables -/
     //--------------------/
-    
+
     /**
      * The ID for this Schema
     **/
     private String id       = null;
-    
+
     private String name     = null;
-    
+
     private String schemaNS = null;
-    
+
     /**
-     * The targetNamespace 
+     * The targetNamespace
     **/
     private String targetNS = null;
 
@@ -102,12 +102,12 @@ public class Schema extends Annotated {
      * The global AttribteGroups for this Schema
     **/
     private Hashtable attributeGroups = null;
-    
+
     /**
      * The global attributes for this Schema
     **/
     private Hashtable attributes = null;
-    
+
     /**
      * A list of defined architypes
     **/
@@ -153,7 +153,7 @@ public class Schema extends Annotated {
     **/
     public Schema(String schemaNS) {
         super();
-        
+
         attributes      = new Hashtable();
         attributeGroups = new Hashtable();
         complexTypes    = new Hashtable();
@@ -162,15 +162,16 @@ public class Schema extends Annotated {
 		importedSchemas = new Hashtable();
 		includedSchemas = new Vector();
 		namespaces      = new Hashtable();
-		
+
         this.schemaNS = schemaNS;
-        
+
         init();
     } //-- ScehamDef
 
     private void init() {
 
     } //-- init
+
 
     /**
      * Adds the given attribute definition to this Schema definition
@@ -179,45 +180,45 @@ public class Schema extends Annotated {
      * @exception SchemaException if an AttributeDecl
      * already exisits with the same name
     **/
-    public void addAttribute(AttributeDecl attribute) 
+    public void addAttribute(AttributeDecl attribute)
         throws SchemaException
     {
         if (attribute == null) return;
-        
+
         if (attribute.getSchema() != this) {
             String err = "invalid attempt to add an AttributeDecl which ";
             err += "belongs to a different Schema; " + name;
             throw new SchemaException(err);
         }
-        
+
         Object obj = attributes.get(name);
-        
+
         if (obj == attribute) return;
-        
+
         if (obj != null) {
             String err = "Error attempting to add an AttributeDecl to this " +
                 "Schema definition, an AttributeDecl already exists with " +
                 "the given name: ";
             throw new SchemaException(err + name);
         }
-        
+
         attributes.put(name, attribute);
-        
+
     } //-- addAttribute
-    
+
     /**
      * Adds the given attribute group definition to this Schema
      * definition.
      *
      * @param attrGroup the AttributeGroupDecl to add
-     * @exception SchemaException if an AttributeGroupDecl 
+     * @exception SchemaException if an AttributeGroupDecl
      * already exisits with the same name
     **/
-    public void addAttributeGroup(AttributeGroupDecl attrGroup) 
+    public void addAttributeGroup(AttributeGroupDecl attrGroup)
         throws SchemaException
     {
         if (attrGroup == null) return;
-        
+
         String name = attrGroup.getName();
 
         //-- handle namespace prefix, if necessary
@@ -238,26 +239,26 @@ public class Schema extends Annotated {
 			    throw new IllegalArgumentException(err);
 			}
 		}
-		
+
         if (attrGroup.getSchema() != this) {
             String err = "invalid attempt to add an AttributeGroup which ";
             err += "belongs to a different Schema; " + name;
             throw new SchemaException(err);
         }
-        
+
         Object obj = attributeGroups.get(name);
-        
+
         if (obj == attrGroup) return;
-        
+
         if (obj != null) {
             String err = "Error attempting to add an AttributeGroup to this " +
                 "Schema definition, an AttributeGroup already exists with " +
                 "the given name: ";
             throw new SchemaException(err + name);
         }
-        
+
         attributeGroups.put(name, attrGroup);
-        
+
     } //-- addAttributeGroup
 
 
@@ -315,7 +316,7 @@ public class Schema extends Annotated {
 
 
     } //-- addElementDecl
-    
+
 	/**
 	 * Adds the given Schema definition to this Schema definition as an imported schenma
 	 * @param schema the Schema to add to this Schema as an imported schema
@@ -332,7 +333,7 @@ public class Schema extends Annotated {
 		}
 		importedSchemas.put(targetNamespace, schema);
 	} //-- addImportedSchema
-	
+
 	/**
 	 * Adds to the namespaces declared in this Schema
 	 * @param namespaces the list of namespaces
@@ -340,7 +341,7 @@ public class Schema extends Annotated {
 	public void addNamespace(String prefix, String ns) {
 		namespaces.put(prefix, ns);
 	} //-- setNamespaces
-	
+
     /**
      * Adds the given SimpletType definition to this Schema defintion
      * @param simpletype the SimpleType to add to this Schema
@@ -418,7 +419,7 @@ public class Schema extends Annotated {
      * or null if no Attribute association is found.
     **/
     public AttributeDecl getAttribute(String name) {
-        
+
 		//-- Null?
         if (name == null)  {
             String err = NULL_ARGUMENT + "getAttribute: ";
@@ -452,7 +453,7 @@ public class Schema extends Annotated {
 		}
 
 		return null;
-        
+
     } //-- getAttribute
 
     /**
@@ -462,7 +463,7 @@ public class Schema extends Annotated {
      * or null if no AttributeGroup association is found.
     **/
     public AttributeGroup getAttributeGroup(String name) {
-        
+
 		//-- Null?
         if (name == null)  {
             String err = NULL_ARGUMENT + "getAttributeGroup: ";
@@ -496,9 +497,9 @@ public class Schema extends Annotated {
 		}
 
 		return null;
-        
+
     } //-- getAttributeGroup
-    
+
     /**
      * Gets a built in type's name given its code.
      */
@@ -506,7 +507,7 @@ public class Schema extends Annotated {
         return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
     } //-- getBuiltInTypeName
 
-    
+
     /**
      * Returns the ComplexType of associated with the given name
      * @return the ComplexType of associated with the given name, or
@@ -533,7 +534,7 @@ public class Schema extends Annotated {
 			ns = (String) namespaces.get(nsprefix);
 			if (ns == null)  {
 			    String err = "getComplexType: ";
-			    err += "Namespace prefix not recognised '"+name+"'";
+			    err += "Namespace prefix not recognized '"+name+"'";
 			    throw new IllegalArgumentException(err);
 			}
 		}
@@ -630,8 +631,41 @@ public class Schema extends Annotated {
      *  null if no ElementDecl with the given name was found.
     **/
     public ElementDecl getElementDecl(String name) {
-        return (ElementDecl)elements.get(name);
-    } //-- getElementDecl
+
+        String ns = null;
+        if (name == null) {
+            String err = NULL_ARGUMENT + "getElementDecl: ";
+            err += " 'name' can not be null";
+            throw new IllegalArgumentException(err);
+        }
+
+        int idx = name.indexOf(':');
+        if (idx >= 0)
+		{
+			String nsPrefix = name.substring(0,idx);
+            name = name.substring(idx + 1);
+			ns = (String) namespaces.get(nsPrefix);
+			if (ns == null)  {
+			    String err = "getElementDecl: ";
+			    err += "Namespace prefix not recognized '"+nsPrefix+"'";
+			    throw new IllegalArgumentException(err);
+			}
+        }
+
+        if ((ns==null) || (ns.equals(targetNS)) )
+			return (ElementDecl)elements.get(name);
+		else {
+			Schema schema = getImportedSchema(ns);
+			if (schema!=null) {
+                String warning = "Warning : do not forget to generate the source ";
+                warning += "for the schema with this targetNamespace"+schema.getTargetNamespace();
+                System.out.println(warning);
+               return schema.getElementDecl(name);
+            }
+		}
+
+        return null;
+    } //--getElementDecl
 
     /**
      * Returns an Enumeration of all top-level element declarations
@@ -650,7 +684,7 @@ public class Schema extends Annotated {
     public String getId() {
         return id;
     } //-- getId
-    
+
 	/**
 	 * Returns an imported schema by it's namespace
 	 * @return The imported schema
@@ -659,7 +693,7 @@ public class Schema extends Annotated {
 	{
 		return (Schema) importedSchemas.get(ns);
 	} //-- getImportedSchema
-	
+
     /**
      * Returns the namespaces declared for this Schema
      * @return the namespaces declared for this Schema
@@ -667,7 +701,7 @@ public class Schema extends Annotated {
     public Hashtable getNamespaces() {
         return this.namespaces;
     } //-- getNamespaces
-    
+
 
 	/**
 	 * Indicates that the given XML Schema file has been processed via an <xsd:include>
@@ -713,7 +747,7 @@ public class Schema extends Annotated {
 
     /**
      * Returns the version information of the XML Schema definition
-     * represented by this Schema instance. 
+     * represented by this Schema instance.
      *
      * @return the version information of the XML Schema
      * definition, or null if no version information exists.
@@ -721,7 +755,7 @@ public class Schema extends Annotated {
     public String getVersion() {
         return version;
     } //-- getVersion
-    
+
 	/**
 	 * Returns True if the namespace is known to this schema
 	 * @param namespace the namespace URL
@@ -735,7 +769,7 @@ public class Schema extends Annotated {
 				return true;
 		return false;
 	}
-	
+
     /**
      * Removes the given top level ComplexType from this Schema
      * @param complexType the ComplexType to remove
@@ -808,13 +842,13 @@ public class Schema extends Annotated {
     /**
      * Sets the version information for the XML Schema defintion
      * represented by this Schema instance.
-     * 
+     *
      * @param the version for this XML Schema defination.
     **/
     public void setVersion(String version) {
         this.version = version;
     } //-- setVersion
-    
+
 
     /** Gets the type factory, package private */
     static SimpleTypesFactory getTypeFactory() { return simpleTypesFactory; }
