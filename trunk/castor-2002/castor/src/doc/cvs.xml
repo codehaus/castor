@@ -40,6 +40,15 @@
 
     </section>
 
+    <section title="Behind A Firewall?">
+      <p>
+         Sometimes firewalls are configured in such a way that users behind the firewall
+         cannot access the CVS port. If you fall into this category, don't worry, we're
+         thinking about you! Just download the latest daily snapshot of the CVS at:
+         <url>ftp://ftp.exolab.org/pub/castor/castor_daily_snapshot.tgz</url>
+      </p>
+    </section>
+
     <section title="Guidelines For Code Contribution">
 
       <p>All code contributions must be under the license and copyright of the
