@@ -192,8 +192,7 @@ public class DescriptorSourceFactory {
             FieldInfo member = elements[i];
             //-- skip transient members
             if (member.isTransient()) continue;
-            boolean collection = (member.getSchemaType().getType() == XSType.COLLECTION);
-            if (base != null && !collection && base.getElementField(member.getNodeName()) != null)
+            if (base != null && base.getElementField(member.getNodeName()) != null)
                 createRestrictedDescriptor(member, jsc);
             else createDescriptor(classDesc, member, localClassName, nsURI, jsc);
         }
