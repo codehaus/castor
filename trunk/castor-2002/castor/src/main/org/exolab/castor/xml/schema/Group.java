@@ -86,8 +86,14 @@ public class Group extends Particle
     /**
      * True if was created for a group tag, false otherwise
      *  (all, choice, sequence)
-     *  */
+     */
     private boolean _isModelGroupDefinition= false;
+
+    /**
+     * A Vector that contains all the possible <any> element
+     * that can appear in this Group
+     */
+     private Vector _wildcard;
 
     /**
      * Creates a new Group, with no name
@@ -104,6 +110,7 @@ public class Group extends Particle
         super();
         this.name  = name;
         _contentModel = new ContentModelGroupImpl();
+        _wildcard = new Vector();
     } //-- Group
 
 
@@ -248,6 +255,28 @@ public class Group extends Particle
     {
         _contentModel.addGroup(group);
     } //-- addGroup
+
+    /**
+     * Adds a wildcard to this Group model
+     * @param WildCard the wildcard to add
+     * @exception SchemaException thrown when the wildcard
+     * is an <anyAttribute> element
+     */
+     public void addWildcard(Wildcard wildcard)
+          throws SchemaException
+    {
+         if (wildcard.isAttributeWildcard())
+            throw new SchemaException("only <any> should be add in a group.");
+        _wildcard.add(wildcard);
+     }
+
+     /**
+      * Returns an enumeration of the different <any> wildcards held
+      * by this group.
+      */
+      public Enumeration getWildcard() {
+          return _wildcard.elements();
+      }
 
     /**
      * Returns an enumeration of all the Particles of this
