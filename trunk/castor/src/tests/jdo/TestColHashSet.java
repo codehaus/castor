@@ -102,7 +102,7 @@ public class TestColHashSet extends TestCol {
             _item = new HashSet();
 
         _item.add( _item );
-        item.setTestCol( this );;
+        item.setTestCol( this );
     }
 
 }

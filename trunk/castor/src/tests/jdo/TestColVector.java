@@ -103,6 +103,6 @@ public class TestColVector extends TestCol {
             _item = new Vector();
 
         _item.add( item );
-        item.setTestCol( this );;
+        item.setTestCol( this );
     }
 }

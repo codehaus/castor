@@ -101,7 +101,7 @@ public class TestColHashtable extends TestCol {
             _item = new Hashtable();
 
         _item.put( new Integer( item.getId() ), item );
-        item.setTestCol( this );;
+        item.setTestCol( this );
     }
 
 }
