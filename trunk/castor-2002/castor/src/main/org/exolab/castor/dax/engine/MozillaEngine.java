@@ -163,7 +163,7 @@ public class MozillaEngine
                 clsDesc = (DAXClassDescriptor) clsDesc.getExtends();
             }
             ( (LDAPConnection) conn ).add( new LDAPEntry( dn, ldapSet ) );
-            return null;
+            return identity;
         } catch ( LDAPException except ) {
             if ( except.getLDAPResultCode() == LDAPException.ENTRY_ALREADY_EXISTS )
                 throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
