@@ -260,6 +260,13 @@ public final class CacheEngine
     }
 
 
+    public void setLogWriter( PrintWriter logWriter )
+    {
+        if ( logWriter != null )
+            _logWriter = logWriter;
+    }
+
+
     public PrintWriter getLogWriter()
     {
         return _logWriter;
@@ -334,7 +341,7 @@ public final class CacheEngine
                 // the database and obtain a lock on the object.
                 try {
                     if ( _logWriter != null )
-                        _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
+                        _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
                                             " (" + identity + ")" );
                     oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                          fields, identity, accessMode ) );
@@ -369,7 +376,7 @@ public final class CacheEngine
             fields = typeInfo.handler.newFieldSet();
             try {
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() + " ("
+                    _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() + " ("
                                         + identity + ")" );
                 oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                      fields, identity, accessMode ) );
@@ -460,7 +467,7 @@ public final class CacheEngine
                 // the database and obtain a lock on the object.
                 try {
                     if ( _logWriter != null )
-                        _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
+                        _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
                                             " (" + identity + ")" );
                     oid.setStamp( query.fetch( fields, identity ) );
                     oid.setExclusive( true );
@@ -494,7 +501,7 @@ public final class CacheEngine
             fields = typeInfo.handler.newFieldSet();
             try {
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Loading " + typeInfo.javaClass.getName() +
+                    _logWriter.println( "Castor: Loading " + typeInfo.javaClass.getName() +
                                         " (" + identity + ")" );
                 oid.setStamp( query.fetch( fields, identity ) );
             } catch ( ObjectNotFoundException except ) {
@@ -580,7 +587,7 @@ public final class CacheEngine
                     lock.delete( tx );
                 }
                 if ( _logWriter != null )
-                    _logWriter.println( "PE: Creating " + typeInfo.javaClass.getName() + " ("
+                    _logWriter.println( "Castor: Creating " + typeInfo.javaClass.getName() + " ("
                                         + identity + ")" );
             }
 
@@ -690,7 +697,7 @@ public final class CacheEngine
         }
 
         if ( _logWriter != null )
-            _logWriter.println( "PE: Deleting " + typeInfo.javaClass.getName() + " ("
+            _logWriter.println( "Castor: Deleting " + typeInfo.javaClass.getName() + " ("
                                 + oid.getIdentity() + ")" );
         typeInfo.persist.delete( tx.getConnection( this ), oid.getIdentity() );
 
@@ -881,7 +888,7 @@ public final class CacheEngine
             // The object has an old identity, it existed before, one need
             // to store the new contents.
             if ( _logWriter != null )
-                _logWriter.println( "PE: Storing " + typeInfo.javaClass.getName() + " (" +
+                _logWriter.println( "Castor: Storing " + typeInfo.javaClass.getName() + " (" +
                                     identity + ")" );
 
             fields = typeInfo.handler.newFieldSet();
