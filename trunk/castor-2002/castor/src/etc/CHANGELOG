@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML: Added code to Source Code Generator to create 'add(index, object)' method for list fields.
+	(andrew.fawcett@coda.com, Andrew Fawcett)
+
 XML: Fixed bug with 'equals' implementation not being generated for classes representing <xsd:complexType>'s
 	(andrew.fawcett@coda.com, Andrew Fawcett)
 

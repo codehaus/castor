@@ -73,6 +73,38 @@ public class CollectionInfoODMG30 extends CollectionInfo {
 
     } //-- createAddMethod
 
+    /**
+     * Creates implementation of add method with index.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
+    **/
+    public void createAddInsertMethod(JMethod method) {
+
+        JSourceCode jsc = method.getSourceCode();
+
+        int maxSize = getXSList().getMaximumSize();
+        if (maxSize > 0) {
+            jsc.add("if (!(");
+            jsc.append(getName());
+            jsc.append(".size() < ");
+            jsc.append(Integer.toString(maxSize));
+            jsc.append(")) {");
+            jsc.indent();
+            jsc.add("throw new IndexOutOfBoundsException();");
+            jsc.unindent();
+            jsc.add("}");
+        }
+        jsc.add(getName());
+        jsc.append(".add(index, ");
+        jsc.append(getContentType().createToJavaObjectCode(getContentName()));
+        jsc.append(");");
+
+        //-- bound properties
+        if (isBound())
+            createBoundPropertyCode(jsc);
+
+    } //-- createAddMethod
 
     /**
      * Creates implementation of object[] get() method.
