@@ -299,8 +299,8 @@ create table list_types (
   o_text TEXT null,
   o_datetime datetime null,
   o_smalldatetime SMALLDATETIME null,
-  o_binary(10) BINARY null,
-  o_varbinary(10) VARBINARY null,
+  o_binary BINARY(10) null,
+  o_varbinary VARBINARY(10) null,
   o_image IMAGE null,
   o_int   INT null,
 )
@@ -381,7 +381,8 @@ create table test_persistent (
   ctime    datetime        not null,
   mtime    datetime        null,
   value    varchar(200)    not null,
-  parent_id integer        null
+  parent_id integer        null,
+  group_id numeric(10,0)   not null
 )
 go
 create unique index test_persistent_pk on test_persistent ( id )

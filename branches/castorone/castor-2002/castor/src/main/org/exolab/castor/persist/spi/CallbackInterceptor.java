@@ -78,13 +78,24 @@ public interface CallbackInterceptor
 
     /**
      * Called to indicate that an object is to be stored in persistent
-     * stored.
+     * storage.
      *
      * @param object The object
      * @param modified Is the object modified?
      * @throws Exception An exception occured, the object cannot be stored
      */
     public void storing( Object object, boolean modified )
+        throws Exception;
+
+
+    /**
+     * Called to indicate that an object is to be created in persistent
+     * storage.
+     *
+     * @param object The object
+     * @param db The database in which this object will be created
+     */
+    public void creating( Object object, Database db )
         throws Exception;
 
 

@@ -408,6 +408,8 @@ public abstract class TransactionContext
             throw except;
         } catch ( ClassNotPersistenceCapableException except ) {
             removeObjectEntry( object );
+            // maybe we should remove it, when castor become stable
+            except.printStackTrace();
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
 
@@ -422,12 +424,13 @@ public abstract class TransactionContext
                 molder.getCallback().loaded( object, toDatabaseAccessMode( accessMode ) );
             }
         } catch ( Exception except ) {
-            removeObjectEntry( object );
-            engine.forgetObject( this, oid );
-            if ( molder.getCallback() != null )
-                molder.getCallback().releasing( object, false );
-            if ( except instanceof PersistenceException )
-                throw (PersistenceException) except;
+            release( object );
+            //removeObjectEntry( object );
+            //engine.forgetObject( this, oid );
+            //if ( molder.getCallback() != null )
+            //    molder.getCallback().releasing( object, false );
+            //if ( except instanceof PersistenceException )
+            //    throw (PersistenceException) except;
             throw new PersistenceException( Messages.format("persist.nested", except) );
         }
 
@@ -539,6 +542,9 @@ public abstract class TransactionContext
         }
 
         try {
+            if ( molder.getCallback() != null ) {
+                molder.getCallback().creating( object, _db );
+            }
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
             if ( entry == null) 
@@ -626,6 +632,9 @@ public abstract class TransactionContext
             //I don't see other way.
             release( entry.object );
             //[Yip] Hum, i don't understand why
+            //[Oleg] Assume that one object B is referenced by object A
+            // in two ways (indirectly). Then during update(A) update(B) would  
+            // be called twice.
             //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
@@ -658,7 +667,6 @@ public abstract class TransactionContext
             }
         } catch ( Exception except ) {
             release( object );
-            removeObjectEntry( object );
             if ( except instanceof PersistenceException )
                 throw (PersistenceException) except;
             throw new PersistenceException( except.getMessage(), except );

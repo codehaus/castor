@@ -454,7 +454,7 @@ public class ClassMolder {
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
                 temp = (Object[]) fields[i];
-                if ( temp[0] != null ) 
+                if ( temp != null ) 
                     _fhs[i].setValue( object, temp[0] );
                 else
                     _fhs[i].setValue( object, null );
@@ -1351,7 +1351,7 @@ public class ClassMolder {
                 o = _fhs[i].getValue( object );
                 if ( o != null ) {
                     fid = fieldClassMolder.getIdentities( o );
-                    fields[i] = fid[0];
+                    fields[i] = fid; // [oleg] IMHO was wrong: fid[0]
                 } else {
                     fields[i] = null;
                 }
