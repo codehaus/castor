@@ -110,7 +110,7 @@ public class TypeInfo
      * @param fieldType The field type
     **/
     public TypeInfo(Class fieldType) {
-        _fieldType = Types.typeFromPrimitive( fieldType );
+        this(fieldType, null, null, false, null, null );
     } //-- TypeInfo
     
     /**
