@@ -328,6 +328,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         else if (name == SchemaNames.SIMPLE_TYPE) {
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
+        //-- <group>
+        else if (name == SchemaNames.GROUP) {
+             unmarshaller = new ModelGroupUnmarshaller(_schema, atts, _resolver);
+        }
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
             unmarshaller
@@ -356,8 +360,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     public void endElement(String name) throws SAXException {
 
         if (skipAll) return;
-
-        String rawName = name;
 
         //-- handle namespaces
         String namespace = null;
@@ -435,11 +437,19 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             _schema.addSimpleType(simpleType);
             _resolver.addResolvable(simpleType.getReferenceId(), simpleType);
         }
+        //--<element>
         else if (name == SchemaNames.ELEMENT) {
             ElementDecl element = null;
             element = ((ElementUnmarshaller)unmarshaller).getElement();
             _schema.addElementDecl(element);
         }
+        //--<group>
+        else if (name == SchemaNames.GROUP) {
+            ModelGroup group = null;
+            group = (ModelGroup) (((ModelGroupUnmarshaller)unmarshaller).getGroup());
+            _schema.addModelGroup(group);
+        }
+
         unmarshaller = null;
     } //-- endElement
 

@@ -56,51 +56,78 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ModelGroup extends Particle {
+public class ModelGroup extends Particle
+       implements Referable
+{
 
-    
+
     /**
      * The name of this ModelGroup
     **/
     private String    name       = null;
-    
+
     /**
      *
     **/
     private boolean   export     = false;
-    
-    
+
+    /**
+     * the name of the ModelGroup referenced
+     */
+     private String groupRef = null;
+
     /**
      * An ordered list of all ModelGroup definitions
     **/
     private Vector modelDefs;
-    
+
+    /**
+     * the implementation of ContentModelGroup
+    **/
+    private ContentModelGroup _contentModel = null;
+
+
     /**
      * An unordered list of just the the element declarations
     **/
     private Hashtable elements;
-    
+
     /**
      *
     **/
     private Order order = Order.all;
-    
+    /**
+     * the schema that contains this model group
+     */
+     private Schema _schema = null;
+
     /**
      * Creates a new ModelGroup, with no name
     **/
     public ModelGroup() {
         this(null);
     } //-- ModelGroup
-    
+
+    /**
+     * Creates a new ModelGroup definition
+     * @param schema, the XML Schema to which this ModelGroup
+     * belongs
+     */
+    public ModelGroup(Schema schema) {
+        this(null, schema);
+    }
+
     /**
      * Creates a new ModelGroup with the given name
      * @param name of the ModelGroup
     **/
-    public ModelGroup(String name) {
+    public ModelGroup(String name, Schema schema) {
         super();
         this.name  = name;
+        _schema = schema;
         modelDefs = new Vector();
         elements = new Hashtable();
+        _contentModel = new ContentModelGroupImpl();
     } //-- ModelGroup
 
 
@@ -112,7 +139,7 @@ public class ModelGroup extends Particle {
      * @exception SchemaException when this Archetype content
      * model is either "empty" or "textOnly"
     **/
-    public void addElementDecl(ElementDecl elementDecl) 
+    public void addElementDecl(ElementDecl elementDecl)
         throws SchemaException
     {
         //-- check for naming collisions
@@ -121,14 +148,14 @@ public class ModelGroup extends Particle {
             err += elementDecl.getName() + ", already exists in this scope.";
             throw new SchemaException(err);
         }
-        
+
         //-- add element to modelDefs
         modelDefs.addElement(elementDecl);
         //-- save elements in cache for doing name lookups
         elements.put(elementDecl.getName(), elementDecl);
     } //-- addElementDecl
-    
-    
+
+
     /**
      * Adds the given ModelGroup to this ModelGroup
      * @param modelGroup the ModelGroup to add to this ModelGroup
@@ -138,20 +165,39 @@ public class ModelGroup extends Particle {
             modelDefs.addElement(modelGroup);
         }
     } //-- addModelGroup
-    
-    
-    /** 
+
+    /**
+     * Gets the contentModelGroup
+     * @returns the contentModelGroup
+     */
+     public ContentModelGroup getContentModelGroup() {
+        return _contentModel;
+     }
+
+     /**
+     * Adds the given Group to this ContentModelGroup
+     * @param group the Group to add
+     * @exception SchemaException when a group with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(Group group)
+        throws SchemaException
+    {
+        _contentModel.addGroup(group);
+    } //-- addGroup
+
+    /**
      * Returns an ordered Enumeration of all the ContentModelType
      * definitions (element, group, modelGroupRef)+
     **/
     public Enumeration getDeclarations() {
-        return modelDefs.elements();   
+        return modelDefs.elements();
     } //-- getDeclarations
-    
+
     public boolean getExport() {
         return this.export;
     } //-- getExport
-    
+
     /**
      * Returns the name of this ModelGroup, or null if no name was defined
      * @return the name of this ModelGroup, or null if no name was defined
@@ -159,7 +205,7 @@ public class ModelGroup extends Particle {
     public String getName() {
         return name;
     } //-- getName
-    
+
     public Order getOrder() {
         return order;
     } //-- getOrder
@@ -171,16 +217,26 @@ public class ModelGroup extends Particle {
     public void setName(String name) {
         this.name = name;
     } //--setName
-    
+
     public void setOrder(Order order) {
         if (order == null) this.order = Order.all;
         this.order = order;
     }
-    
+
+
+    /**
+     * Sets the reference for this ModelGroup definition
+     * @param reference the name of the ModelGroup that this
+     * definition references
+    **/
+    public void setReference(String reference) {
+        this.groupRef = reference;
+    } //-- setReference
+
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
@@ -188,7 +244,35 @@ public class ModelGroup extends Particle {
     public short getStructureType() {
         return Structure.MODELGROUP;
     } //-- getStructureType
-    
+
+    /**
+     * Returns the Id used to Refer to this Object
+     * @return the Id used to Refer to this Object
+     * @see Referable
+    **/
+    public String getReferenceId() {
+        if (name != null) return "group:"+name;
+        return null;
+    } //-- getReferenceId
+
+    /**
+     * Returns the reference if any
+     * @returns the reference if any
+     */
+     public ModelGroup getReference() {
+        if (groupRef != null)
+            return _schema.getModelGroup(groupRef);
+        return null;
+    } //-- getReference
+
+
+     /**
+      * Returns true if this ModelGroup is referencing another one
+      * @returns true if this ModelGroup is referencing another one
+      */
+     public boolean hasReference() {
+         return (groupRef.length() !=0);
+     }
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
@@ -199,5 +283,5 @@ public class ModelGroup extends Particle {
     {
         //-- do nothing
     } //-- validate
-    
+
 } //-- Group

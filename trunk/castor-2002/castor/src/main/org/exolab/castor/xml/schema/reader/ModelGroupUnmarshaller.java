@@ -51,21 +51,17 @@ import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
 /**
- * A class for Unmarshalling ModelGroups
+ * A class for Unmarshalling ModelGroups Definition
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * @version $Revisio:$ $Date$
 **/
-public class GroupUnmarshaller extends SaxUnmarshaller {
+public class ModelGroupUnmarshaller extends SaxUnmarshaller {
 
       //--------------------------/
      //- Static Class Variables -/
     //--------------------------/
 
-    private static final int ALL         = 1;
-    private static final int CHOICE      = 2;
-    private static final int MODEL_GROUP = 3;
-    private static final int SEQUENCE    = 4;
-
+    private static final int MODEL_GROUP = 1;
     /**
      * The value of the maximum occurance wild card
      */
@@ -88,68 +84,39 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     /**
      * The ModelGroup reference for the ModelGroup we are constructing
     **/
-    private Group _group = null;
+    private ModelGroup _group = null;
 
     /**
      * The Schema being "unmarshalled"
     **/
     private Schema _schema = null;
 
-    /**
-     * The element name of the Group to be unmarshalled.
-    **/
-    private String _element = SchemaNames.GROUP;
-
-
       //----------------/
      //- Constructors -/
     //----------------/
 
     /**
-     * Creates a new GroupUnmarshaller
-     * @param schema the Schema to which the Group belongs
+     * Creates a new ModelGroupUnmarshaller
+     * @param schema the Schema to which the ModelGroup belongs
      * @param the element name for this type of group
      * @param atts the AttributeList
      * @param resolver the resolver being used for reference resolving
     **/
-    public GroupUnmarshaller
-        (Schema schema, String element, AttributeList atts, Resolver resolver)
+    public ModelGroupUnmarshaller
+        (Schema schema, AttributeList atts, Resolver resolver)
     {
         super();
         setResolver(resolver);
         this._schema = schema;
 
-        _group = new Group();
+        _group = new ModelGroup(_schema);
+
         //-- handle attributes
         String attValue = null;
 
 
-        //-- MODEL GROUP
-        if (SchemaNames.GROUP.equals(element)) {
-            //-- set name
-            _group.setName(atts.getValue("name"));
-            _group.setIsModelGroupDefinition(true);
-        }
-        else {
-            _group.setIsModelGroupDefinition(false);
-
-            if (SchemaNames.SEQUENCE.equals(element)) {
-                _group.setOrder(Order.seq);
-            }
-            else if (SchemaNames.CHOICE.equals(element)) {
-                _group.setOrder(Order.choice);
-            }
-            else if (SchemaNames.ALL.equals(element)) {
-                _group.setOrder(Order.all);
-            }
-            else {
-                String err = "Invalid group element name: '" +
-                    element + "'";
-                throw new IllegalArgumentException(err);
-            }
-        }
-
-        _element = element;
+        //-- set name
+        _group.setName(atts.getValue("name"));
 
         /*
          * @maxOccurs
@@ -169,23 +136,19 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             _group.setMinOccurs(toInt(attValue));
 
         //-- id
-        _group.setId(atts.getValue("id"));
+        //-- not yet supported
 
-    } //-- GroupUnmarshaller
+        //-- @ref
+        attValue = atts.getValue("ref");
+        if (attValue != null)
+            _group.setReference(attValue);
+
+    } //-- ModelGroupUnmarshaller
 
       //-----------/
      //- Methods -/
     //-----------/
 
-    /**
-     * Returns the name of the element that this SaxUnmarshaller
-     * handles
-     * @return the name of the element that this SaxUnmarshaller
-     * handles
-    **/
-    public String elementName() {
-        return _element;
-    } //-- elementName
 
 
     /**
@@ -195,7 +158,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
      *
      * @return the unmarshalled Group
     **/
-    public Group getGroup() {
+    public ModelGroup getGroup() {
         return _group;
     } //-- getGroup
 
@@ -206,6 +169,14 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return getGroup();
     } //-- getObject
+
+    /**
+     * Sets the name of the element that this UnknownUnmarshaller handles
+     * @param name the name of the element that this unmarshaller handles
+    **/
+    public String elementName() {
+        return SchemaNames.GROUP;
+    } //-- elementName
 
     /**
      * @param name
@@ -222,24 +193,10 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        if (SchemaNames.ELEMENT.equals(name)) {
-            unmarshaller
-                = new ElementUnmarshaller(_schema, atts, getResolver());
-        }
-        //--group
-        else if (name.equals(SchemaNames.GROUP))
-        {
-            unmarshaller
-                = new ModelGroupUnmarshaller(_schema, atts, getResolver());
-        }
-
-        //--all, sequence, choice
-        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
-        {
+        if (SchemaNames.isGroupName(name)) {
             unmarshaller
                 = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
-
         else {
             StringBuffer err = new StringBuffer("illegal element <");
             err.append(name);
@@ -273,24 +230,13 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
             }
         }
 
-        //-- have unmarshaller perform any necessary clean up
-        unmarshaller.finish();
-
-        if (SchemaNames.ELEMENT.equals(name)) {
-            ElementDecl element =
-                ((ElementUnmarshaller)unmarshaller).getElement();
-            _group.addElementDecl(element);
-        }
-        else if (name.equals(SchemaNames.GROUP)) {
-            ModelGroup group = ((ModelGroupUnmarshaller)unmarshaller).getGroup();
-            _group.addGroup(group);
-        }
-        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
-        {
+         if (SchemaNames.isGroupName(name)) {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _group.addGroup(group);
         }
 
+        //-- have unmarshaller perform any necessary clean up
+        unmarshaller.finish();
         unmarshaller = null;
     } //-- endElement
 
@@ -303,4 +249,4 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         }
     } //-- characters
 
-} //-- GroupUnmarshaller
+} //-- ModelGroupUnmarshaller

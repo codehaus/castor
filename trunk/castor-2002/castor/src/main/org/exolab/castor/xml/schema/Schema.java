@@ -133,6 +133,10 @@ public class Schema extends Annotated {
     private Hashtable elements = null;
 
     /**
+     * A list of defined top-levels groups
+     */
+    private Hashtable _group = null;
+    /**
      * A list of imported schemas
      */
     private Hashtable importedSchemas = null;
@@ -167,6 +171,7 @@ public class Schema extends Annotated {
         complexTypes    = new Hashtable();
         simpleTypes     = new Hashtable();
         elements        = new Hashtable();
+        _group          = new Hashtable();
         importedSchemas = new Hashtable();
         includedSchemas = new Vector();
         namespaces      = new Hashtable();
@@ -324,6 +329,30 @@ public class Schema extends Annotated {
 
 
     } //-- addElementDecl
+
+     /**
+     * Adds the given Group declaration to this Schema definition
+     * @param group the Group to add to this SchemaDef
+     * @exception SchemaException when an Group already
+     * exists with the same name as the given ElementDecl
+    **/
+    public void addModelGroup(ModelGroup group)
+        throws SchemaException
+    {
+
+        String name = group.getName();
+
+        if (name == null) {
+            String err = "a group declaration must contain a name.";
+            throw new SchemaException(err);
+        }
+        if (_group.get(name) != null) {
+            String err = "an group declaration already exists with the given name: ";
+            throw new SchemaException(err + name);
+        }
+
+        _group.put(name, group);
+    } //-- addModelGroup
 
     /**
      * Adds the given Schema definition to this Schema definition as an imported schenma
@@ -713,6 +742,56 @@ public class Schema extends Annotated {
     public Enumeration getElementDecls() {
         return elements.elements();
     } //-- getElementDecls
+
+     /**
+     * Returns the ModeGroup of associated with the given name
+     * @return the ModelGroup of associated with the given name, or
+     *  null if no ModelGroup with the given name was found.
+    **/
+    public ModelGroup getModelGroup(String name) {
+
+        String ns = null;
+        if (name == null) {
+            String err = NULL_ARGUMENT + "getModelGroup: ";
+            err += " 'name' can not be null";
+            throw new IllegalArgumentException(err);
+        }
+
+        int idx = name.indexOf(':');
+        if (idx >= 0)
+        {
+            String nsPrefix = name.substring(0,idx);
+            name = name.substring(idx + 1);
+            ns = (String) namespaces.get(nsPrefix);
+            if (ns == null)  {
+                String err = "getModelGroup: ";
+                err += "Namespace prefix not recognized '"+nsPrefix+"'";
+                throw new IllegalArgumentException(err);
+            }
+        }
+
+        if ((ns==null) || (ns.equals(targetNS)) )
+            return (ModelGroup)_group.get(name);
+        else {
+            Schema schema = getImportedSchema(ns);
+            if (schema!=null) {
+                String warning = "Warning : do not forget to generate the source ";
+                warning += "for the schema with this targetNamespace"+schema.getTargetNamespace();
+                System.out.println(warning);
+               return schema.getModelGroup(name);
+            }
+        }
+
+        return null;
+    } //--getModelGroup
+
+    /**
+     * Returns an Enumeration of all top-level ModelGroup declarations
+     * @return an Enumeration of all top-level ModelGroup declarations
+    **/
+    public Enumeration getModelGroups() {
+        return _group.elements();
+    } //-- getmodelGroup
 
     /**
      * Returns the Id for this Schema, as specified by the
