@@ -199,15 +199,31 @@ public class DirectorySourceImpl
     }
 
 
+    public static synchronized void loadMapping( InputSource source, ClassLoader loader )
+        throws MappingException
+    {
+        loadMapping( source, null, null, loader );
+    }
+
+
     public static synchronized void loadMapping( InputSource source,
                                                  EntityResolver resolver,
                                                  PrintWriter logWriter )
         throws MappingException
     {
+       loadMapping(source, resolver, logWriter, null);
+    }
+
+    public static synchronized void loadMapping( InputSource source,
+                                                 EntityResolver resolver,
+                                                 PrintWriter logWriter,
+                                                 ClassLoader loader )
+        throws MappingException
+    {
         Mapping mapping;
 
         try {
-            mapping = new Mapping( null );
+            mapping = new Mapping( loader );
             mapping.setEntityResolver( resolver );
             mapping.setLogWriter( logWriter );
             mapping.loadMapping( source );
