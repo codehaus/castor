@@ -119,7 +119,7 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
         throws XMLException
     {
         super();
-	    setResolver(resolver);
+	    setResolver(resolver);	    
 	    _complexType  = complexType;
         _complexType.setDerivationMethod(SchemaNames.RESTRICTION);
         _complexType.setRestriction(true);
@@ -277,6 +277,10 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
                     "elements, must appear before any attribute elements.");
 
 			unmarshaller = new FacetUnmarshaller(name, atts);
+			if (_simpleTypeDef == null) {
+			    SimpleContent content = (SimpleContent)_complexType.getContentType();
+			    _simpleTypeDef = new SimpleTypeDefinition(_schema, content.getTypeName(),_id);
+			}
         }
         else if (SchemaNames.ATTRIBUTE.equals(name)) {
              foundAttribute = true;
