@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<schema targetNamespace="http://castor.exolab.org/Test/Invoice">
+<schema xmlns="http://www.w3.org/1999/XMLSchema" 
+		targetNamespace="http://castor.exolab.org/Test/Invoice">
 
    <annotation>
       <documentation>
@@ -98,7 +99,7 @@
    
    <!-- Telephone Number -->
    <simpleType name="TelephoneNumber" base="string">
-   		<length value="8"/>
+   		<length value="12"/>
    		<pattern value="[0-9]{3}-[0-9]{3}-[0-9]{4}"/>
    </simpleType> 
 
