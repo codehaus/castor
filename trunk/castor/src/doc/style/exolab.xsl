@@ -129,7 +129,6 @@
           <!-- build the page navigation first, section by section -->
           <xsl:variable name="sections" select=".//section"/>
           <xsl:if test="$sections"><HR size="1"/>
-          <h2>Contents:</h2>
           </xsl:if>
           <xsl:for-each select="$sections">
           <span class="bodyGrey">
