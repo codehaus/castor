@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1812 using contribution from Gregory Block [gblock@ctoforaday]
+       Fixed various problems related to ClassLoader usage.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1812
+       (Werner - 20041214)
+
 JDO:   Fixed bug 1793 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Changed SimpleQueryExecutor to reuse the current JDBC Connection, fixing
        visibility issues.
