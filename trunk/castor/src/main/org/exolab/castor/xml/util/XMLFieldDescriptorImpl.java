@@ -40,18 +40,29 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ *
  * $Id$
  */
 
 
 package org.exolab.castor.xml.util;
 
-
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.GeneralizedFieldHandler;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
-import org.exolab.castor.mapping.*;
-import org.exolab.castor.xml.*;
-import org.exolab.castor.util.List;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 import java.util.Properties;
 
@@ -59,7 +70,7 @@ import java.util.Properties;
  * XML field descriptor. Wraps {@link FieldDescriptor} and adds
  * XML-related information, type conversion, etc.
  *
- * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class XMLFieldDescriptorImpl
@@ -118,6 +129,12 @@ public class XMLFieldDescriptorImpl
      * The field handler for get/set field value.
      */
     private FieldHandler  _handler = null;
+    
+    /**
+     * Cached reference to _handler if the
+     * FieldHandler is a GeneralizedFieldHandler.
+     */
+    private GeneralizedFieldHandler  _gfhandler = null;
 
     /**
      * True if the field type is immutable.
@@ -313,8 +330,8 @@ public class XMLFieldDescriptorImpl
               ( (XMLFieldDescriptor)fieldDesc
                 ).getContainingClassDescriptor();
 
-        this._handler         = fieldDesc.getHandler();
-        this._fieldName       = fieldDesc.getFieldName();
+        setHandler(fieldDesc.getHandler());
+        _fieldName            = fieldDesc.getFieldName();
          //////////////Hack for AnyNode//////////////////
         //if the field type is an AnyNode Castor must treat it as
         //an object to avoid changes in the Marshalling framework
@@ -336,9 +353,14 @@ public class XMLFieldDescriptorImpl
         }
 
         //-- check for instances of java.util.Date
+        /* Note to self:
+         * This logic really doesn't belong here, as it can
+         * interfere with user specified handlers. It should
+         * go into XMLMappingLoader. 
+         */
         if (_fieldType != null) {
             if (java.util.Date.class.isAssignableFrom(_fieldType)) {
-                if (!(_handler instanceof DateFieldHandler)) {
+                if (_handler instanceof FieldHandlerImpl) {
                     _handler = new DateFieldHandler(_handler);
                 }
             }
@@ -487,6 +509,11 @@ public class XMLFieldDescriptorImpl
      * @return Field type
      */
     public Class getFieldType() {
+        if (_gfhandler != null) {
+            if (_gfhandler.getFieldType() != null) {
+            	return _gfhandler.getFieldType();
+            }
+        }
         return _fieldType;
     } //-- getFieldType
 
@@ -862,7 +889,13 @@ public class XMLFieldDescriptorImpl
      * by this FieldDescriptor
     **/
     public void setHandler(FieldHandler handler) {
-        this._handler = handler;
+        _handler = handler;
+        if (handler instanceof GeneralizedFieldHandler) {
+        	_gfhandler = (GeneralizedFieldHandler)handler;
+        }
+        else {
+        	_gfhandler = null;
+        }
     } //-- setHandler
 
     /**
@@ -958,7 +991,7 @@ public class XMLFieldDescriptorImpl
         if ((matchExpr == null) || (matchExpr.length() == 0)) return;
 
         StringTokenizer st = new StringTokenizer(matchExpr);
-        List names = new List();
+        ArrayList names = new ArrayList();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (WILD_CARD.equals(token)) {
