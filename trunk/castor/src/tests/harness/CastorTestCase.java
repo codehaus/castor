@@ -73,7 +73,14 @@ public class CastorTestCase extends TestCase {
         setDescription( description );
         setSuite( suite );
     }
-    public static void setVerboseStream( PrintStream verboseStream ) {
+    /**
+	 * @param name2
+	 */
+	public CastorTestCase(String name) {
+        super (name);
+	}
+    
+	public static void setVerboseStream( PrintStream verboseStream ) {
         stream = verboseStream;
     }
     public static PrintStream getVerboseStream() {
