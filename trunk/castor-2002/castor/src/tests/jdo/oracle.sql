@@ -9,6 +9,33 @@ create unique index test_table_pk
 grant all on test_table to test;
 
 
+-- test_table_ex
+drop table test_table_ex;
+
+create table test_table_ex (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+);
+
+create unique index test_table_ex_pk on test_table_ex ( id );
+
+grant all on test_table_ex to test;
+
+
+-- test_race
+drop table test_race;
+
+create table test_race (
+  id      int          not null,
+  value1  int          not null
+);
+
+create unique index test_race_pk on test_race ( id );
+
+grant all on test_race to test;
+
+
 drop table   test_master;
 create table test_master (
   id       numeric(10,0)    not null,
@@ -66,7 +93,7 @@ create table test_keygen (
 create unique index test_keygen_pk
   on test_keygen ( id );
 grant all on test_keygen to test;
- 
+
 
 -- test_keygen_ext
 drop table test_keygen_ext;

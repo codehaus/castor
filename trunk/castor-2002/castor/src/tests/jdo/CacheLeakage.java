@@ -93,11 +93,11 @@ public class CacheLeakage extends CWTestCase {
     static final String    JDOValue = "jdo value";
 
 
-	static final int CACHE_SIZE = 10; //CacheEngine.DEFAULT_CACHE_VALUE;
+    static final int CACHE_SIZE = 10; //CacheEngine.DEFAULT_CACHE_VALUE;
 
 
     public CacheLeakage( CWTestCategory category ) throws CWClassConstructorException {
-        super( "TC11", "Cache Leakage" );
+        super( "TC17", "Cache Leakage" );
         _category = (JDOCategory) category;
     }
 
@@ -112,141 +112,170 @@ public class CacheLeakage extends CWTestCase {
         super.postExecute();
     }
 
-	private int deleteTable( CWVerboseStream stream, Connection conn, String table ) {
+    private int deleteTable( CWVerboseStream stream, Connection conn, String table ) {
         // Perform direct JDBC access and delete everyting in the table
-		try {
-	        int del = _conn.createStatement().executeUpdate( "DELETE FROM "+ table );
-			stream.writeVerbose( "Rows deleted from " + table + ": " + del );
-	        _conn.commit();
-			return del;
-		} catch ( Exception e ) {
-			return 0;
-		}
-	}
+        try {
+            int del = _conn.createStatement().executeUpdate( "DELETE FROM "+ table );
+            stream.writeVerbose( "Rows deleted from " + table + ": " + del );
+            _conn.commit();
+            return del;
+        } catch ( Exception e ) {
+            return 0;
+        }
+    }
 
     public boolean run( CWVerboseStream stream ) {
         OQLQuery      oql;
         TestObjectEx    object;
         Enumeration   enum;
-		Database db2;
+        Database db2;
 
         boolean result = true;
 
         try {
             _db = _category.getDatabase( stream.verbose() );
-            _conn = _category.getJDBCConnection(); 
+            _conn = _category.getJDBCConnection();
             _conn.setAutoCommit( false );
 
-			// - delete all row of a table
-			deleteTable( stream, _conn, "test_table_ex" );
+            // - delete all row of a table
+            deleteTable( stream, _conn, "test_table_ex" );
 
             // Open transaction in order to perform JDO operations
-            _db.begin();			
-			// - create "cachesize * 2" objects for count limited
-			Object[] ooo = new Object[Math.max(1,CACHE_SIZE*2)];
-			for ( int i=0; i<ooo.length; i++ ) {
-				ooo[i] = new TestObjectEx();
-				_db.create( ooo[i] );
-			}
+            _db.begin();
+            // - create "cachesize * 2" objects for count limited
+            Object[] ooo = new Object[Math.max(1,CACHE_SIZE*2)];
+            for ( int i=0; i<ooo.length; i++ ) {
+                ooo[i] = new TestObjectEx();
+                _db.create( ooo[i] );
+            }
 
-			int count;
-			// create the same object again. see if DuplicatedIdentity throws 
-			for ( int j=0; j<100; j++ ) {
-				db2 = _category.getDatabase( stream.verbose() );
-				db2.begin();
-				count = 0;
-				// - create "cachesize - 5" objects for count limited
-				for ( int i=0; i<ooo.length; i++ ) {
-					try {
-						db2.create( ooo[i] );
-					} catch ( DuplicateIdentityException e ) {
-						// good. expected exception throws
-						count++;
-					}
-				}
-				db2.commit();
+            int count;
+            int trial = 10;
+            // create the same object again. see if DuplicatedIdentity throws
+            count = 0;
+            for ( int j=0; j<trial; j++ ) {
+                db2 = _category.getDatabase( stream.verbose() );
+                db2.begin();
 
-				if ( count != ooo.length ) {
-					result = false;
-					stream.writeVerbose( "Error: some object ate by the cache" );
-				} else {
-					stream.writeVerbose( "all objects in the cache" );
-				}
-			}
+                // - create "cachesize - 5" objects for count limited
+                for ( int i=0; i<ooo.length; i++ ) {
+                    try {
+                        db2.create( ooo[i] );
+                    } catch ( DuplicateIdentityException e ) {
+                        // good. expected exception throws
+                        count++;
+                    }
+                }
+                db2.commit();
+            }
 
-			// - check if each object have the right value
-			stream.writeVerbose( "checking if each object have the right value" );
+            if ( count != (ooo.length * trial) ) {
+                result = false;
+                stream.writeVerbose( "Error: some object ate by the cache" );
+            } else {
+                stream.writeVerbose( "all objects in the cache" );
+            }
+
+
+            // - check if each object have the right value
+            stream.writeVerbose( "checking if each object have the right value" );
+            count = 0;
             oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObjectEx object WHERE id = $1" );
-			breakpoint:
-			for ( int i=0; i<ooo.length; i++ ) {
-				//stream.writeVerbose( "Object identity of " + i + " " + _db.getIdentity(ooo[i]) );
+            breakpoint:
+            for ( int i=0; i<ooo.length; i++ ) {
+                //stream.writeVerbose( "Object identity of " + i + " " + _db.getIdentity(ooo[i]) );
+                oql.bind( i );
+                enum = oql.execute();
+                if ( enum.hasMoreElements() ) {
+                    object = (TestObjectEx) enum.nextElement();
+                    //stream.writeVerbose( "Retrieved object: " + object );
+                    if ( object.getId() != i || object.getIntValue2() != i ) {
+                        System.out.println("selecting for check: "+object.getId());
+                        stream.writeVerbose( "Error: wrong object" );
+                        result = false;
+                        break breakpoint;
+                    }
 
-	            oql.bind( i );
-	            enum = oql.execute();
-	            if ( enum.hasMoreElements() ) {
-	                object = (TestObjectEx) enum.nextElement();
-	                //stream.writeVerbose( "Retrieved object: " + object );
-					if ( object.getId() != i || object.getIntValue2() != i ) {
-						System.out.println("selecting for check: "+object.getId());
-						stream.writeVerbose( "Error: wrong object" );
-						result = false;
-						break breakpoint;
-					} 
+                    if ( enum.hasMoreElements() ) {
+                        stream.writeVerbose( "Error: two objects with the same id" );
+                        result = false;
+                        break breakpoint;
+                    }
+                } else {
+                    result = false;
+                    stream.writeVerbose( "Error: Object id=" + i + " not exist!" );
+                    break breakpoint;
+                }
+            }
+            _db.commit();
+            if ( count == ooo.length ) {
+                stream.writeVerbose( "all objects has the right value" );
+            }
 
-					if ( enum.hasMoreElements() ) {
-						stream.writeVerbose( "Error: two objects with the same id" );
-						result = false;
-						break breakpoint;
-					}
-				} else {
-					result = false;
-					stream.writeVerbose( "Error: Object id=" + i + " not exist!" );
-					break breakpoint;
-				}
-			}
-			_db.commit();
-
-			stream.writeVerbose( "checking if each object in the database" );
-			// check the database using sql, see if everything is there
+            stream.writeVerbose( "checking if each object in the database" );
+            // check the database using sql, see if everything is there
             ResultSet rs = _conn.createStatement().executeQuery( "SELECT * FROM test_table_ex" );
-			int temp = 0;
-			while ( rs.next() ) {
-				temp++;
-			}
+            int temp = 0;
+            while ( rs.next() ) {
+                temp++;
+            }
             _conn.commit();
-			if ( temp != ooo.length ) {
-				result = false;
-				stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
-			}
+            if ( temp != ooo.length ) {
+                result = false;
+                stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
+            } else {
+                stream.writeVerbose( "size match!" );
+            }
 
-			stream.writeVerbose( "force the cache to dispose all the object and test if it is still valid" );
-			// force the cache to dispose all the object and test if it is still valid
-			if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_TIME_LIMITED ) {
-				Thread.currentThread().sleep( 1500 * CacheEngine.DEFAULT_CACHE_VALUE );
-			} else if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_COUNT_LIMITED ) {
-				_db.begin();
-				count = 0;
-				// - create "cachesize - 5" objects for count limited
-				for ( int i=0; i<ooo.length; i++ ) {
-					try {
-						_db.create( ooo[i] );
-					} catch ( DuplicateIdentityException e ) {
-						count++;
-						stream.writeVerbose( "expected exception: " + e );
-					}
-				}
-				_db.commit();
+            stream.writeVerbose( "force the cache to dispose all the object and test if it is still valid" );
+            // force the cache to dispose all the object and test if it is still valid
+            if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_TIME_LIMITED ) {
+                Thread.currentThread().sleep( 1500 * CacheEngine.DEFAULT_CACHE_VALUE );
+                _db.begin();
+                count = 0;
+                // - create "cachesize - 5" objects for count limited
+                for ( int i=0; i<ooo.length; i++ ) {
+                    try {
+                        _db.create( ooo[i] );
+                    } catch ( DuplicateIdentityException e ) {
+                        count++;
+                        stream.writeVerbose( "expected exception: " + e );
+                    }
+                }
+                _db.commit();
 
-				if ( count != ooo.length ) {
-					result = false;
-					stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
-				}
-			}
+                if ( count != ooo.length ) {
+                    result = false;
+                    stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
+                } else {
+                    stream.writeVerbose( "size match!" );
+                }
+            } else if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_COUNT_LIMITED ) {
+                _db.begin();
+                count = 0;
+                // - create "cachesize - 5" objects for count limited
+                for ( int i=0; i<ooo.length; i++ ) {
+                    try {
+                        _db.create( ooo[i] );
+                    } catch ( DuplicateIdentityException e ) {
+                        count++;
+                        stream.writeVerbose( "expected exception: " + e );
+                    }
+                }
+                _db.commit();
+
+                if ( count != ooo.length ) {
+                    result = false;
+                    stream.writeVerbose( "Error: size mismatch on object number and table rows. Object: " + ooo.length + " table row: " + temp );
+                } else {
+                    stream.writeVerbose( "size match!" );
+                }
+            }
 
             _db.close();
             _conn.close();
 
-		} catch ( Exception except ) {
+        } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
             except.printStackTrace();
             result = false;
