@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -49,7 +49,7 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
     public CacheTypeMappingDescriptor() {
         super();
         nsURI = "http://castor.exolab.org/";
-        xmlName = "cache-type";
+        xmlName = "cache-type-mapping";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;

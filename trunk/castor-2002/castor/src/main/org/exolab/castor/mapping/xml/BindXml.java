@@ -14,7 +14,7 @@ package org.exolab.castor.mapping.xml;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.mapping.xml.types.TypeType;
+import org.exolab.castor.mapping.xml.types.NodeType;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
@@ -24,30 +24,29 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class CacheTypeMapping implements java.io.Serializable {
+public class BindXml implements java.io.Serializable {
 
 
       //--------------------------/
      //- Class/Member Variables -/
     //--------------------------/
 
-    private org.exolab.castor.mapping.xml.types.TypeType _type = org.exolab.castor.mapping.xml.types.TypeType.valueOf("count-limited");;
+    private java.lang.String _name;
 
-    private int _capacity;
+    private java.lang.String _type;
 
-    /**
-     * keeps track of state for field: _capacity
-    **/
-    private boolean _has_capacity;
+    private java.lang.String _matches;
+
+    private org.exolab.castor.mapping.xml.types.NodeType _node;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public CacheTypeMapping() {
+    public BindXml() {
         super();
-    } //-- org.exolab.castor.mapping.xml.CacheTypeMapping()
+    } //-- org.exolab.castor.mapping.xml.BindXml()
 
 
       //-----------/
@@ -56,31 +55,31 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
     **/
-    public void deleteCapacity()
+    public java.lang.String getMatches()
     {
-        this._has_capacity= false;
-    } //-- void deleteCapacity() 
+        return this._matches;
+    } //-- java.lang.String getMatches() 
 
     /**
     **/
-    public int getCapacity()
+    public java.lang.String getName()
     {
-        return this._capacity;
-    } //-- int getCapacity() 
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
     **/
-    public org.exolab.castor.mapping.xml.types.TypeType getType()
+    public org.exolab.castor.mapping.xml.types.NodeType getNode()
+    {
+        return this._node;
+    } //-- org.exolab.castor.mapping.xml.types.NodeType getNode() 
+
+    /**
+    **/
+    public java.lang.String getType()
     {
         return this._type;
-    } //-- org.exolab.castor.mapping.xml.types.TypeType getType() 
-
-    /**
-    **/
-    public boolean hasCapacity()
-    {
-        return this._has_capacity;
-    } //-- boolean hasCapacity() 
+    } //-- java.lang.String getType() 
 
     /**
     **/
@@ -119,32 +118,49 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _capacity
+     * @param _matches
     **/
-    public void setCapacity(int _capacity)
+    public void setMatches(java.lang.String _matches)
     {
-        this._capacity = _capacity;
-        this._has_capacity = true;
-    } //-- void setCapacity(int) 
+        this._matches = _matches;
+    } //-- void setMatches(java.lang.String) 
+
+    /**
+     * 
+     * @param _name
+    **/
+    public void setName(java.lang.String _name)
+    {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param _node
+    **/
+    public void setNode(org.exolab.castor.mapping.xml.types.NodeType _node)
+    {
+        this._node = _node;
+    } //-- void setNode(org.exolab.castor.mapping.xml.types.NodeType) 
 
     /**
      * 
      * @param _type
     **/
-    public void setType(org.exolab.castor.mapping.xml.types.TypeType _type)
+    public void setType(java.lang.String _type)
     {
         this._type = _type;
-    } //-- void setType(org.exolab.castor.mapping.xml.types.TypeType) 
+    } //-- void setType(java.lang.String) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader reader)
+    public static org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.CacheTypeMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.CacheTypeMapping.class, reader);
-    } //-- org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.BindXml) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.BindXml.class, reader);
+    } //-- org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader) 
 
     /**
     **/
