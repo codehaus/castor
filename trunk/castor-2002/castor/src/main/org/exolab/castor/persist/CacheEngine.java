@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.MappingTable;
 import org.exolab.castor.util.Logger;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -206,91 +207,87 @@ public class CacheEngine
 	if ( typeInfo == null )
 	    throw new ClassNotPersistenceCapableException( type );
 
-	// Must prevent concurrent attempt to retrieve the same object
-	// Best way to do that is through the type
-	synchronized ( typeInfo ) {
-	    // Create an OID to represent the object and see if we
-	    // have a lock (i.e. object is cached).
-	    oid = new OID( typeInfo.objDesc, identity );
-	    lock = getLock( oid );
-
-	    if ( lock != null ) {
-
-		// Object has been loaded before, must acquire lock
-		// on it (write in exclusive mode)
-		try {
-		    obj = lock.acquire( tx, exclusive, timeout );
-		} catch ( ObjectDeletedWaitingForLockException except ) {
-		    // This is equivalent to object not existing
-		    throw new ObjectNotFoundException( type, identity );
-		}
-		// Get the actual OID of the object, this one contains the
-		// object's stamp that will be used for dirty checking.
-		oid = getOID( obj );
-
-		// XXX Problem, obj might be parent class but attempting
-		//     to load derived class, will still return parent class
-		//     Need to solve by swapping to a new object
-
-		if ( exclusive && ! oid.isExclusive() ) {
-		    // Exclusive mode we always synchronize the object with
-		    // the database and obtain a lock on the object.
-		    try {
-			oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
-							     obj, identity, true ) );
-			oid.setExclusive( true );
-		    } catch ( ObjectNotFoundException except ) {
-			// Object was not found in persistent storge, must dump
-			// it from the cache
-			removeLock( oid );
-			removeOID( obj );
-			lock.delete( tx );
-			throw except;
-		    } catch ( PersistenceException except ) {
-			// Report any error talking to the persistence engine
-			removeLock( oid );
-			removeOID( obj );
-			lock.delete( tx );
-			throw except;
-		    }
-		    // At this point the object is known to exist in
-		    // persistence storage and we have a write lock on it.
-		    return oid;
-		} else {
-		    // Non-exclusive mode, we do not attempt to touch the database
-		    // at this point, simply return the object's oid.
-		    return oid;
-		}
-
-	    } else {
-		
-		// Object has not been loaded yet, or cleared from the cache.
-		// The object is now loaded and a lock is acquired.
-		obj = typeInfo.objDesc.createNew();
-		typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	// Create an OID to represent the object and see if we
+	// have a lock (i.e. object is cached).
+	oid = new OID( typeInfo.objDesc, identity );
+	lock = getLock( oid );
+	
+	if ( lock != null ) {
+	    
+	    // Object has been loaded before, must acquire lock
+	    // on it (write in exclusive mode)
+	    try {
+		obj = lock.acquire( tx, exclusive, timeout );
+	    } catch ( ObjectDeletedWaitingForLockException except ) {
+		// This is equivalent to object not existing
+		throw new ObjectNotFoundException( type, identity );
+	    }
+	    // Get the actual OID of the object, this one contains the
+	    // object's stamp that will be used for dirty checking.
+	    oid = getOID( obj );
+	    
+	    // XXX Problem, obj might be parent class but attempting
+	    //     to load derived class, will still return parent class
+	    //     Need to solve by swapping to a new object
+	    
+	    if ( exclusive && ! oid.isExclusive() ) {
+		// Exclusive mode we always synchronize the object with
+		// the database and obtain a lock on the object.
 		try {
 		    oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
 							 obj, identity, true ) );
+		    oid.setExclusive( true );
 		} catch ( ObjectNotFoundException except ) {
-		    // Object was not found in persistent storge
+		    // Object was not found in persistent storge, must dump
+		    // it from the cache
+		    removeLock( oid );
+		    removeOID( obj );
+		    lock.delete( tx );
 		    throw except;
 		} catch ( PersistenceException except ) {
 		    // Report any error talking to the persistence engine
+		    removeLock( oid );
+		    removeOID( obj );
+		    lock.delete( tx );
 		    throw except;
 		}
-		// Create a lock for the object, register the lock and OID.
-		// The lock is created for read or write depending on the
-		// mode.
-		lock = new ObjectLock( obj );
-		try {
-		    lock.acquire( tx, exclusive, 0 );
-		} catch ( Exception except ) {
-		    // This should never happen since we just created the lock
-		}
-		setLock( oid, lock );
-		setOID( obj, oid );
+		// At this point the object is known to exist in
+		// persistence storage and we have a write lock on it.
+		return oid;
+	    } else {
+		// Non-exclusive mode, we do not attempt to touch the database
+		// at this point, simply return the object's oid.
 		return oid;
 	    }
+	    
+	} else {
+	    
+	    // Object has not been loaded yet, or cleared from the cache.
+	    // The object is now loaded and a lock is acquired.
+	    obj = typeInfo.objDesc.createNew();
+	    typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	    try {
+		oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
+						     obj, identity, true ) );
+	    } catch ( ObjectNotFoundException except ) {
+		// Object was not found in persistent storge
+		throw except;
+	    } catch ( PersistenceException except ) {
+		// Report any error talking to the persistence engine
+		throw except;
+	    }
+	    // Create a lock for the object, register the lock and OID.
+	    // The lock is created for read or write depending on the
+	    // mode.
+	    lock = new ObjectLock( obj );
+	    try {
+		lock.acquire( tx, exclusive, 0 );
+	    } catch ( Exception except ) {
+		// This should never happen since we just created the lock
+	    }
+	    setLock( oid, lock );
+	    setOID( obj, oid );
+	    return oid;
 	}
     } 
 
@@ -306,85 +303,81 @@ public class CacheEngine
 	TypeInfo   typeInfo;
 
 	typeInfo = (TypeInfo) _typeInfo.get( query.getObjectDesc().getObjectType() );
-	// Must prevent concurrent attempt to retrieve the same object
-	// Best way to do that is through the type
-	synchronized ( typeInfo ) {
-	    // Create an OID to represent the object and see if we
-	    // have a lock (i.e. object is cached).
-	    oid = new OID( typeInfo.objDesc, identity );
-	    lock = getLock( oid );
-
-	    if ( lock != null ) {
-
-		// Object has been loaded before, must acquire lock on it
-		try {
-		    obj = lock.acquire( tx, false, timeout );
-		} catch ( ObjectDeletedWaitingForLockException except ) {
-		    // This is equivalent to object not existing
-		    throw new ObjectNotFoundException( query.getObjectDesc().getObjectType(), identity );
-		}
-		// Get the actual OID of the object, this one contains the
-		// object's stamp that will be used for dirty checking.
-		oid = getOID( obj );
-
-		// XXX Problem, obj might be parent class but attempting
-		//     to load derived class, will still return parent class
-		//     Need to solve by swapping to a new object
-
-		if ( exclusive && ! oid.isExclusive() ) {
-		    // Exclusive mode we always synchronize the object with
-		    // the database and obtain a lock on the object.
-		    try {
-			oid.setStamp( query.fetch( obj ) );
-			oid.setExclusive( true );
-		    } catch ( ObjectNotFoundException except ) {
-			// Object was not found in persistent storge, must dump
-			// it from the cache
-			removeLock( oid );
-			removeOID( obj );
-			lock.delete( tx );
-			throw except;
-		    } catch ( PersistenceException except ) {
-			// Report any error talking to the persistence engine
-			removeLock( oid );
-			removeOID( obj );
-			lock.delete( tx );
-			throw except;
-		    }
-		    // At this point the object is known to exist in
-		    // persistence storage and we have a write lock on it.
-		    return oid;
-		} else {
-		    // Non-exclusive mode, we do not attempt to touch the database
-		    // at this point, simply return the object's oid.
-		    return oid;
-		}
-
-	    } else {
-		
-		// Object has not been loaded yet, or cleared from the cache.
-		// The object is now loaded from the query and a lock is acquired.
-		obj = typeInfo.objDesc.createNew();
-		typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	// Create an OID to represent the object and see if we
+	// have a lock (i.e. object is cached).
+	oid = new OID( typeInfo.objDesc, identity );
+	lock = getLock( oid );
+	
+	if ( lock != null ) {
+	    
+	    // Object has been loaded before, must acquire lock on it
+	    try {
+		obj = lock.acquire( tx, false, timeout );
+	    } catch ( ObjectDeletedWaitingForLockException except ) {
+		// This is equivalent to object not existing
+		throw new ObjectNotFoundException( query.getObjectDesc().getObjectType(), identity );
+	    }
+	    // Get the actual OID of the object, this one contains the
+	    // object's stamp that will be used for dirty checking.
+	    oid = getOID( obj );
+	    
+	    // XXX Problem, obj might be parent class but attempting
+	    //     to load derived class, will still return parent class
+	    //     Need to solve by swapping to a new object
+	    
+	    if ( exclusive && ! oid.isExclusive() ) {
+		// Exclusive mode we always synchronize the object with
+		// the database and obtain a lock on the object.
 		try {
 		    oid.setStamp( query.fetch( obj ) );
+		    oid.setExclusive( true );
+		} catch ( ObjectNotFoundException except ) {
+		    // Object was not found in persistent storge, must dump
+		    // it from the cache
+		    removeLock( oid );
+		    removeOID( obj );
+		    lock.delete( tx );
+		    throw except;
 		} catch ( PersistenceException except ) {
 		    // Report any error talking to the persistence engine
+		    removeLock( oid );
+		    removeOID( obj );
+		    lock.delete( tx );
 		    throw except;
 		}
-		// Create a lock for the object, register the lock and OID.
-		// The lock is created for read or write depending on the
-		// mode.
-		lock = new ObjectLock( obj );
-		try {
-		    lock.acquire( tx, exclusive, 0 );
-		} catch ( Exception except ) {
-		    // This should never happen since we just created the lock
-		}
-		setLock( oid, lock );
-		setOID( obj, oid );
+		// At this point the object is known to exist in
+		// persistence storage and we have a write lock on it.
+		return oid;
+	    } else {
+		// Non-exclusive mode, we do not attempt to touch the database
+		// at this point, simply return the object's oid.
 		return oid;
 	    }
+	    
+	} else {
+	    
+	    // Object has not been loaded yet, or cleared from the cache.
+	    // The object is now loaded from the query and a lock is acquired.
+	    obj = typeInfo.objDesc.createNew();
+	    typeInfo.objDesc.getIdentityField().setValue( obj, identity );
+	    try {
+		oid.setStamp( query.fetch( obj ) );
+	    } catch ( PersistenceException except ) {
+		// Report any error talking to the persistence engine
+		throw except;
+	    }
+	    // Create a lock for the object, register the lock and OID.
+	    // The lock is created for read or write depending on the
+	    // mode.
+	    lock = new ObjectLock( obj );
+	    try {
+		lock.acquire( tx, exclusive, 0 );
+	    } catch ( Exception except ) {
+		// This should never happen since we just created the lock
+	    }
+	    setLock( oid, lock );
+	    setOID( obj, oid );
+	    return oid;
 	}
     }
 
@@ -422,14 +415,28 @@ public class CacheEngine
 	typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
 	if ( typeInfo == null )
 	    throw new ClassNotPersistenceCapableException( obj.getClass() );
+	// Must prevent concurrent attempt to create the same object
+	// Best way to do that is through the type
 	synchronized ( typeInfo ) {
 	    oid = new OID( typeInfo.objDesc, identity );
 	    if ( identity != null ) {
 		// If the object has a known identity at creation time, perform
 		// duplicate identity check. Otherwise, create the object in
 		// persistent storage acquiring a lock on the object.
-		if ( getLock( oid ) != null )
-		    throw new DuplicateIdentityException( obj.getClass(), identity );
+		lock = getLock( oid );
+		if ( lock != null ) {
+		    try {
+			locked = lock.acquire( tx, true, 0 );
+		    } catch ( LockNotGrantedException except ) {
+			// Someone else is using the object, definite duplicate key
+			throw new DuplicateIdentityException( obj.getClass(), identity );
+		    }
+		    // Dump the memory image of the object, it might have been deleted
+		    // from persistent storage
+		    removeLock( oid );
+		    removeOID( obj );
+		    lock.delete( tx );
+		}
 		oid.setStamp( typeInfo.persist.create( tx.getConnection( this ),
 						       obj, identity ) );
 		oid.setExclusive( true );
@@ -479,20 +486,18 @@ public class CacheEngine
 	TypeInfo   typeInfo;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    // Get the lock from the OID. Assure the object has a write
-	    // lock -- since this was done during the transaction, we
-	    // don't wait to acquire the lock.
-	    lock = getLock( oid );
-	    if ( lock == null )
-		throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
-	    try {
-		obj = lock.acquire( tx, true, 0 );
-	    } catch ( LockNotGrantedException except ) {
-		throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
-	    }
-	    typeInfo.persist.delete( tx.getConnection( this ), obj, oid.getIdentity() );
+	// Get the lock from the OID. Assure the object has a write
+	// lock -- since this was done during the transaction, we
+	// don't wait to acquire the lock.
+	lock = getLock( oid );
+	if ( lock == null )
+	    throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
+	try {
+	    obj = lock.acquire( tx, true, 0 );
+	} catch ( LockNotGrantedException except ) {
+	    throw new IllegalStateException( "Internal error: attempt to delete object for which no lock was acquired" );
 	}
+	typeInfo.persist.delete( tx.getConnection( this ), obj, oid.getIdentity() );
     }
 
 
@@ -536,65 +541,62 @@ public class CacheEngine
 	TypeInfo   typeInfo;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    lock = getLock( oid );
-	    if ( lock == null )
-		throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
-	    if ( ! lock.hasLock( tx, false ) )
-		throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
-
-	    // Must acquire a write lock on the object in order to proceed to
-	    // storing the object. Will wait until another transaction releases
-	    // its lock on the object.
-	    locked = lock.acquire( tx, true, timeout );
-
-	    // If the object has a identity, it was retrieved/created before and
-	    // need only be stored. If the object has no identity, the object must
-	    // be created at this point.
-	    oldIdentity = oid.getIdentity();
-	    if ( oldIdentity == null ) {
-		// The object has no old identity. This is an object that was
-		// created during this transaction and must now be created in
-		// persistent storage. A new OID is required to check for
-		// duplicate identity.
-		oid = new OID( typeInfo.objDesc, identity );
-		if ( getLock( oid ) != null )
-		    throw new DuplicateIdentityException( obj.getClass(), identity );
-		oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), obj, identity ) );
-		removeLock( removeOID( locked ) );
-		setLock( oid, lock );
-		setOID( locked, oid );
-	    } else if ( identity == oldIdentity || identity.equals( oldIdentity ) ) {
-		// The object has an old identity, it existed before, one need
-		// to store the new contents.
-		if ( oid.isExclusive() )
-		    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, identity,
-							  null, null ) );
-		else
-		    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, identity,
-							  locked, oid.getStamp() ) );
-		oid.setExclusive( false );
-	    } else {
-System.out.println( oldIdentity + "=" + identity );
-		// The object identity has changed, need to modify the identity
-		// and then store the new object value. This requires a new OID.
-		// If the transaction is rolledback, both old and new OID will be
-		// removed.
-		if ( oid.isExclusive() )
-		    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, oldIdentity,
-							  null, null ) );
-		else
-		    oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, oldIdentity,
-							  locked, oid.getStamp() ) );
-		typeInfo.persist.changeIdentity( tx.getConnection( this ), obj, oldIdentity, identity );
-		removeLock( removeOID( locked ) );
-		oid = new OID( typeInfo.objDesc, identity );
-		if ( getLock( oid ) != null )
-		    throw new DuplicateIdentityException( obj.getClass(), identity );
-		removeLock( removeOID( locked ) );
-		setLock( oid, lock );
-		setOID( locked, oid );
-	    }
+	lock = getLock( oid );
+	if ( lock == null )
+	    throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
+	if ( ! lock.hasLock( tx, false ) )
+	    throw new IllegalStateException( "Internal error: attempt to store object for which no lock was acquired" );
+	
+	// Must acquire a write lock on the object in order to proceed to
+	// storing the object. Will wait until another transaction releases
+	// its lock on the object.
+	locked = lock.acquire( tx, true, timeout );
+	
+	// If the object has a identity, it was retrieved/created before and
+	// need only be stored. If the object has no identity, the object must
+	// be created at this point.
+	oldIdentity = oid.getIdentity();
+	if ( oldIdentity == null ) {
+	    // The object has no old identity. This is an object that was
+	    // created during this transaction and must now be created in
+	    // persistent storage. A new OID is required to check for
+	    // duplicate identity.
+	    oid = new OID( typeInfo.objDesc, identity );
+	    if ( getLock( oid ) != null )
+		throw new DuplicateIdentityException( obj.getClass(), identity );
+	    oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), obj, identity ) );
+	    removeLock( removeOID( locked ) );
+	    setLock( oid, lock );
+	    setOID( locked, oid );
+	} else if ( identity == oldIdentity || identity.equals( oldIdentity ) ) {
+	    // The object has an old identity, it existed before, one need
+	    // to store the new contents.
+	    if ( oid.isExclusive() )
+		oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, identity,
+						      null, null ) );
+	    else
+		oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, identity,
+						      locked, oid.getStamp() ) );
+	    oid.setExclusive( false );
+	} else {
+	    // The object identity has changed, need to modify the identity
+	    // and then store the new object value. This requires a new OID.
+	    // If the transaction is rolledback, both old and new OID will be
+	    // removed.
+	    if ( oid.isExclusive() )
+		oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, oldIdentity,
+						      null, null ) );
+	    else
+		oid.setStamp( typeInfo.persist.store( tx.getConnection( this ), obj, oldIdentity,
+						      locked, oid.getStamp() ) );
+	    typeInfo.persist.changeIdentity( tx.getConnection( this ), obj, oldIdentity, identity );
+	    removeLock( removeOID( locked ) );
+	    oid = new OID( typeInfo.objDesc, identity );
+	    if ( getLock( oid ) != null )
+		throw new DuplicateIdentityException( obj.getClass(), identity );
+	    removeLock( removeOID( locked ) );
+	    setLock( oid, lock );
+	    setOID( locked, oid );
 	}
 	return oid;
     }
@@ -628,29 +630,27 @@ System.out.println( oldIdentity + "=" + identity );
 	Object     obj;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    lock = getLock( oid );
-	    if ( lock == null )
-		throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
-	    if ( ! lock.hasLock( tx, false ) )
-		throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
-
-	    // Attempt to obtain a lock on the database. If this attempt
-	    // fails, release the lock and report the exception.
-	    obj = lock.acquire( tx, true, timeout );
-	    try {
-		typeInfo.persist.writeLock( tx.getConnection( this ), obj, oid.getIdentity() );
-	    } catch ( ObjectDeletedException except ) {
-		removeLock( oid );
-		removeOID( obj );
-		lock.delete( tx );
-		throw except;
-	    } catch ( PersistenceException except ) {
-		removeLock( oid );
-		removeOID( obj );
-		lock.delete( tx );
-		throw except;
-	    }
+	lock = getLock( oid );
+	if ( lock == null )
+	    throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
+	if ( ! lock.hasLock( tx, false ) )
+	    throw new IllegalStateException( "Internal error: attempt to lock object which is not persistent" );
+	
+	// Attempt to obtain a lock on the database. If this attempt
+	// fails, release the lock and report the exception.
+	obj = lock.acquire( tx, true, timeout );
+	try {
+	    typeInfo.persist.writeLock( tx.getConnection( this ), obj, oid.getIdentity() );
+	} catch ( ObjectDeletedException except ) {
+	    removeLock( oid );
+	    removeOID( obj );
+	    lock.delete( tx );
+	    throw except;
+	} catch ( PersistenceException except ) {
+	    removeLock( oid );
+	    removeOID( obj );
+	    lock.delete( tx );
+	    throw except;
 	}
     }
 
@@ -675,22 +675,24 @@ System.out.println( oldIdentity + "=" + identity );
 	Object     locked;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    lock = getLock( oid );
-	    if ( lock == null )
-		throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
-	    // Acquire a read lock on the object. This method is generarlly
-	    // called after a successful return from load(), so we don't
-	    // want to wait for the lock.
-	    try {
-		locked = lock.acquire( tx, false, 0 );
-		typeInfo.objDesc.copyInto( locked, obj );
-	    } catch ( LockNotGrantedException except ) {
-		// If this transaction has no write lock on the object,
-		// something went foul.
-		Logger.getSystemLogger().println( "copyObject: " + except.toString() );
-		throw new IllegalStateException( except.toString() );
+	lock = getLock( oid );
+	if ( lock == null )
+	    throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
+	// Acquire a read lock on the object. This method is generarlly
+	// called after a successful return from load(), so we don't
+	// want to wait for the lock.
+	try {
+	    locked = lock.acquire( tx, false, 0 );
+	    if ( ! obj.getClass().isAssignableFrom( locked.getClass() ) ) {
+		throw new IllegalArgumentException( Messages.format( "persist.typeMismatch",
+								     obj.getClass(), locked.getClass() ) );
 	    }
+	    typeInfo.objDesc.copyInto( locked, obj );
+	} catch ( LockNotGrantedException except ) {
+	    // If this transaction has no write lock on the object,
+	    // something went foul.
+	    Logger.getSystemLogger().println( "copyObject: " + except.toString() );
+	    throw new IllegalStateException( except.toString() );
 	}
     }
 
@@ -713,22 +715,20 @@ System.out.println( oldIdentity + "=" + identity );
 	Object     locked;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    lock = getLock( oid );
-	    if ( lock == null )
-		throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
-	    // Acquire a write lock on the object. This method is always
-	    // called after a successful return from store(), so we don't
-	    // need to wait for the lock
-	    try {
-		locked = lock.acquire( tx, true, 0 );
-		typeInfo.objDesc.copyInto( obj, locked );
-	    } catch ( LockNotGrantedException except ) {
-		// If this transaction has no write lock on the object,
-		// something went foul.
-		Logger.getSystemLogger().println( "updateObject: " + except.toString() );
-		throw new IllegalStateException( except.toString() );
-	    }
+	lock = getLock( oid );
+	if ( lock == null )
+	    throw new IllegalStateException( "Internal error: attempt to copy object which is not persistent" );
+	// Acquire a write lock on the object. This method is always
+	// called after a successful return from store(), so we don't
+	// need to wait for the lock
+	try {
+	    locked = lock.acquire( tx, true, 0 );
+	    typeInfo.objDesc.copyInto( obj, locked );
+	} catch ( LockNotGrantedException except ) {
+	    // If this transaction has no write lock on the object,
+	    // something went foul.
+	    Logger.getSystemLogger().println( "updateObject: " + except.toString() );
+	    throw new IllegalStateException( except.toString() );
 	}
     }
 
@@ -747,11 +747,9 @@ System.out.println( oldIdentity + "=" + identity );
 	TypeInfo   typeInfo;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    oid.setExclusive( false );
-	    lock = getLock( oid );
-	    lock.release( tx );
-	}
+	oid.setExclusive( false );
+	lock = getLock( oid );
+	lock.release( tx );
     }
 
 
@@ -772,19 +770,17 @@ System.out.println( oldIdentity + "=" + identity );
 	TypeInfo   typeInfo;
 
 	typeInfo = (TypeInfo) _typeInfo.get( oid.getObjectType() );
-	synchronized ( typeInfo ) {
-	    lock = getLock( oid );
-	    try {
-		obj = lock.acquire( tx, true, 0 );
-		removeLock( oid );
-		removeOID( obj );
-		lock.delete( tx );
-	    } catch ( LockNotGrantedException except ) {
-		// If this transaction has no write lock on the object,
-		// something went foul.
-		Logger.getSystemLogger().println( "forgetObject: " + except.toString() );
-		throw new IllegalStateException( except.toString() );
-	    }
+	lock = getLock( oid );
+	try {
+	    obj = lock.acquire( tx, true, 0 );
+	    removeLock( oid );
+	    removeOID( obj );
+	    lock.delete( tx );
+	} catch ( LockNotGrantedException except ) {
+	    // If this transaction has no write lock on the object,
+	    // something went foul.
+	    Logger.getSystemLogger().println( "forgetObject: " + except.toString() );
+	    throw new IllegalStateException( except.toString() );
 	}
     }
 
