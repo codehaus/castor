@@ -189,6 +189,12 @@ public class MemberFactory {
             case XSType.ID:
                 fieldInfo = infoFactory.createIdentity(memberName);
                 break;
+            case XSType.COLLECTION:
+                 fieldInfo = infoFactory.createCollection( ((XSList) xsType).getContentType(),
+                                                             memberName,
+                                                             ((XSList) xsType).getContentType().getName()
+                                                              );
+                 break;
             default:
                 fieldInfo = infoFactory.createFieldInfo(xsType, memberName);
                 break;
@@ -334,7 +340,7 @@ public class MemberFactory {
 
         }
         else {
-            fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
+             fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
         }
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName());
@@ -386,14 +392,14 @@ public class MemberFactory {
 			refs.put(e.getName(), e);
 			if (e.isReference())
 				continue;
-				
+
 			// Is element using a named complexType?
 			XMLType xmlType = e.getType();
 			if (xmlType!=null)
 				className = xmlType.getName();
 			if (className==null)
 				// No type, then class is the element name (elements using anonymous complexType's)
-				className = e.getName(false); 
+				className = e.getName(false);
 		}
 		return className;
 	}
