@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
+       Updates Eclipse related project files.
+       (Werner - 20040319)
+
 
 Version 0.9.5.3, March 09, 2004
 -------------------------------
