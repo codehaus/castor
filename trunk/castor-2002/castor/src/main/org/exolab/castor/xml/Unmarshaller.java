@@ -66,48 +66,48 @@ import java.io.PrintWriter;
  * @version $Revision$ $Date$
 **/
 public class Unmarshaller {
-    
+
     //----------------------------/
     //- Private Member Variables -/
     //----------------------------/
-    
+
     /**
      * The Class that this Unmarshaller was created with
     **/
     Class _class = null;
-    
+
     /**
      * The class descriptor resolver
     **/
     private ClassDescriptorResolver _cdResolver = null;
-    
+
     /**
      * The EntityResolver used for resolving entities
     **/
     EntityResolver entityResolver = null;
 
     private ClassLoader loader = null;
-    
+
     /**
      * The print writer used for log information
     **/
     private PrintWriter pw = null;
-    
+
     /**
      * The flag indicating whether or not to display debug information
     **/
     private boolean debug = false;
-    
+
     /**
      * The flag indicating whether or not to validate during
      * unmarshalling
     **/
     private boolean validate = false;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
-    
+
 
     /**
      * Creates a new Unmarshaller with the given Class
@@ -130,16 +130,17 @@ public class Unmarshaller {
         super();
         this._class = c;
         this.debug = Configuration.debug();
+        this.validate = Configuration.validation();
         this.loader = loader;
         _cdResolver = new ClassDescriptorResolverImpl(loader);
     } //-- Unmarshaller(Class)
-    
-    
+
+
     /**
      * Creates a new Unmarshaller with the given Mapping
      * @param mapping, the Mapping to use
     **/
-    public Unmarshaller(Mapping mapping) 
+    public Unmarshaller(Mapping mapping)
         throws MappingException
     {
         super();
@@ -149,7 +150,7 @@ public class Unmarshaller {
             this.loader = mapping.getClassLoader();
         }
     } //-- Unmarshaller(Mapping)
-    
+
     /**
      * Sets the ClassLoader to use when loading new classes
      * @param loader the ClassLoader to use
@@ -157,19 +158,19 @@ public class Unmarshaller {
     public void setClassLoader(ClassLoader loader) {
         this.loader = loader;
     } //-- setClassLoader
-    
-    
+
+
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
      * System.out will be used to display debug information
      * @param debug the flag indicating whether to generate debug information.
-     * A value of true, will turn debuggin on. 
+     * A value of true, will turn debuggin on.
      * @see #setLogWriter.
     **/
     public void setDebug(boolean debug) {
         this.debug = debug;
     } //-- setDebug
-    
+
     /**
      * Sets the EntityResolver to use when resolving system and
      * public ids with respect to entites and Document Type.
@@ -179,7 +180,7 @@ public class Unmarshaller {
     public void setEntityResolver(EntityResolver entityResolver) {
         this.entityResolver = entityResolver;
     } //-- entityResolver
-    
+
     /**
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
@@ -198,40 +199,41 @@ public class Unmarshaller {
     {
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl(loader);
-        
+
         _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getResolver( Mapping.XML ) );
     } //-- setMapping
-    
+
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
      * @param cdr the ClassDescriptorResolver to use
      * @see setMapping
-     * <BR />     
+     * <BR />
      * <B>Note:</B> This method will nullify any Mapping
      * currently being used by this Unmarshaller
     **/
     public void setResolver( ClassDescriptorResolver cdr ) {
-        
+
         if (cdr != null)
             _cdResolver = cdr;
         else
             _cdResolver = new ClassDescriptorResolverImpl(loader);
-            
+
     } //-- setResolver
-    
+
     /**
      * Sets the flag for validation
-     * @param validate, a boolean to indicate whether or not 
-     * validation should be done during umarshalling. <br />
+     * @param validate, a boolean to indicate whether or not
+     * validation should be done during umarshalling. <br/>
      * By default validation will be performed.
     **/
     public void setValidation(boolean validate) {
         this.validate = validate;
     } //-- setValidation
-    
+
+
     /**
-     * Unmarshals Objects of this Unmarshaller's Class type. 
-     * The Class must specify the proper access methods 
+     * Unmarshals Objects of this Unmarshaller's Class type.
+     * The Class must specify the proper access methods
      * (setters/getters) in order for instances of the Class
      * to be properly unmarshalled.
      * @param reader the Reader to read the XML from
@@ -239,15 +241,15 @@ public class Unmarshaller {
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
     **/
-    public Object unmarshal(Reader reader) 
+    public Object unmarshal(Reader reader)
         throws MarshalException, ValidationException
     {
         return unmarshal(new InputSource(reader));
     } //-- unmarshal(Reader reader)
 
     /**
-     * Unmarshals Objects of this Unmarshaller's Class type. 
-     * The Class must specify the proper access methods 
+     * Unmarshals Objects of this Unmarshaller's Class type.
+     * The Class must specify the proper access methods
      * (setters/getters) in order for instances of the Class
      * to be properly unmarshalled.
      * @param eventProducer the EventProducer which produces
@@ -256,7 +258,7 @@ public class Unmarshaller {
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
     **/
-    public Object unmarshal(EventProducer eventProducer) 
+    public Object unmarshal(EventProducer eventProducer)
         throws MarshalException, ValidationException
     {
         UnmarshalHandler handler = new UnmarshalHandler(_class);
@@ -280,14 +282,14 @@ public class Unmarshaller {
             throw marshalEx;
         }
         return handler.getObject();
-        
+
     } //-- unmarshal(EventProducer)
-        
-        
+
+
 
     /**
-     * Unmarshals Objects of this Unmarshaller's Class type. 
-     * The Class must specify the proper access methods 
+     * Unmarshals Objects of this Unmarshaller's Class type.
+     * The Class must specify the proper access methods
      * (setters/getters) in order for instances of the Class
      * to be properly unmarshalled.
      * @param source the InputSource to read the XML from
@@ -295,23 +297,23 @@ public class Unmarshaller {
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
     **/
-    public Object unmarshal(InputSource source) 
+    public Object unmarshal(InputSource source)
         throws MarshalException, ValidationException
     {
         Parser parser = Configuration.getParser();
-        
+
         if (parser == null)
             throw new MarshalException("unable to create parser");
-            
+
         if (entityResolver != null)
             parser.setEntityResolver(entityResolver);
-            
+
         UnmarshalHandler handler = new UnmarshalHandler(_class);
         handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);
         handler.setDebug(debug);
         parser.setDocumentHandler(handler);
-            
+
         //parser.setErrorHandler(unmarshaller);
         try {
             parser.parse(source);
@@ -320,7 +322,7 @@ public class Unmarshaller {
             throw new MarshalException(ioe);
         }
         catch(org.xml.sax.SAXException sx) {
-            
+
             MarshalException marshalEx = new MarshalException(sx);
             if ( handler.getDocumentLocator() != null ) {
                 FileLocation location = new FileLocation();
@@ -331,10 +333,10 @@ public class Unmarshaller {
             }
             throw marshalEx;
         }
-        
+
         return handler.getObject();
     } //-- unmarshal(InputSource)
-    
+
     /**
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
@@ -345,12 +347,12 @@ public class Unmarshaller {
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
     **/
-    public static Object unmarshal(Class c, Reader reader) 
+    public static Object unmarshal(Class c, Reader reader)
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
         return unmarshaller.unmarshal(reader);
-    } //-- void unmarshal(Writer) 
+    } //-- void unmarshal(Writer)
 
     /**
      * Unmarshals Objects of the given Class type. The Class must specify
@@ -362,12 +364,12 @@ public class Unmarshaller {
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
     **/
-    public static Object unmarshal(Class c, InputSource source) 
+    public static Object unmarshal(Class c, InputSource source)
         throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
         return unmarshaller.unmarshal(source);
-    } //-- void unmarshal(Writer) 
-    
+    } //-- void unmarshal(Writer)
+
 } //-- Unmarshaller
 
