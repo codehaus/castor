@@ -60,10 +60,19 @@ public class Normalize
     public XPathResult evaluate( XPathContext context )
         throws XPathException
     {
-        if ( getParameterCount() != 1 )
+        
+        int paramCount = getParameterCount();
+        if ( paramCount > 1 )
             throw new XPathException( INVALID_NUMBER_PARAMS + this );
             
-        String value = getParameter( 0 ).evaluate( context ).stringValue();
+        String value = null;
+        if ( paramCount == 1 ) {
+            value = getParameter( 0 ).evaluate( context ).stringValue();
+        } 
+        else {
+            XPathNode node = context.getNode();
+            value = node.getStringValue();
+        }
         value = XMLUtils.stripSpace( value, true, true );
         return new StringResult( value );
     } //-- evaluate
