@@ -73,14 +73,14 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
     private int depth = 0;
 
     /**
-     * The Attribute reference for the Attribute we are constructing
+     * The SimpleTypeDefinition we are unmarshalling
     **/
-    private SimpleType _simpleType = null;
+    private SimpleTypeDefinition _simpleTypeDef = null;
 
-    /**
-     * A reference to the Schema definition
-    **/
-    private Schema _schema = null;
+    private boolean foundAnnotation   = false;
+    private boolean foundList         = false;
+    private boolean foundRestriction  = false;
+    private boolean foundUnion        = false;
 
       //----------------/
      //- Constructors -/
@@ -93,33 +93,16 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * @param resolver the resolver being used for reference resolving
     **/
     public SimpleTypeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver)
+        (Schema schema, AttributeList atts)
         throws SAXException
     {
         super();
-        setResolver(resolver);
-        this._schema = schema;
-
-
-        //-- get name
+        
         String name = atts.getValue(SchemaNames.NAME_ATTR);
+        String id   = atts.getValue(SchemaNames.ID_ATTR);
 
-        //-- get base type
-        String base = atts.getValue(SchemaNames.BASE_ATTR);
-
-        //-- get derivation method
-        String derivation = atts.getValue(SchemaNames.DERIVED_BY);
-
-        _simpleType = schema.createUserSimpleType(name, base, derivation);
-
-        if (_simpleType == null) {
-            System.out.println("Error in SimpleTypeUnmarshaller: the simpleType could not be created");
-        }
-
-        //_simpletype.useResolver(resolver);
-
-        //-- handle other attributes
-        String attValue = null;
+        _simpleTypeDef = new SimpleTypeDefinition(schema, name, id);
+        
 
     } //-- SimpleTypeUnmarshaller
 
@@ -141,7 +124,7 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
      * Returns the SimpleType created
     **/
     public SimpleType getSimpleType() {
-        return _simpleType;
+        return _simpleTypeDef.createSimpleType();
     } //-- getSimpletype
 
     /**
@@ -152,6 +135,13 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         return getSimpleType();
     } //-- getObject
 
+    public void finish() throws SAXException {
+        if (!(foundList || foundUnion || foundRestriction))
+            error ("Invalid 'simpleType'; missing 'restriction' "+
+                "| 'union' | 'list'.");
+                
+    } //-- finish
+    
     /**
      * @param name
      * @param atts
@@ -168,9 +158,45 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
         }
 
         if (SchemaNames.ANNOTATION.equals(name)) {
+            
+            if (foundAnnotation) 
+                error("Only one (1) annotation may appear as a child of "+
+                    "'simpleType'.");
+            
+            if (foundList || foundUnion || foundRestriction)
+                error("An annotation may only appear as the first child "+
+                    "of 'simpleType'.");
+            
+            foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
-        else unmarshaller = new FacetUnmarshaller(name, atts);
+        else if (SchemaNames.RESTRICTION.equals(name)) {
+            
+            if (foundList)
+                error("A 'simpleType' cannot have both a 'list' and a "+
+                    "'restriction' in the same definition.");
+                    
+            if (foundUnion)
+                error("A 'simpleType' cannot have both a 'union' and a "+
+                    "'restriction' in the same definition.");
+
+                    
+            foundRestriction = true;
+            
+            unmarshaller 
+                = new SimpleTypeRestrictionUnmarshaller(_simpleTypeDef, atts);
+        }
+        else if (SchemaNames.LIST.equals(name)) {
+            foundList = true;
+            
+            error("'list' elements are not yet supported.");
+        }
+        else if (SchemaNames.UNION.equals(name)) {
+            foundUnion = true;
+            
+            error("'union' elements are not yet supported.");
+        }
+        else illegalElement(name);
 
     } //-- startElement
 
@@ -194,11 +220,7 @@ public class SimpleTypeUnmarshaller extends SaxUnmarshaller {
 
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation annotation = (Annotation)unmarshaller.getObject();
-            _simpleType.addAnnotation(annotation);
-        }
-        else {
-            Facet facet = (Facet)unmarshaller.getObject();
-            if (facet != null) _simpleType.addFacet(facet);
+            _simpleTypeDef.setAnnotation(annotation);
         }
 
         unmarshaller = null;

@@ -164,9 +164,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            unmarshaller = new SimpleTypeUnmarshaller(_schema,
-                                                      atts,
-                                                      getResolver());
+            unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
         else {
             illegalElement(name);

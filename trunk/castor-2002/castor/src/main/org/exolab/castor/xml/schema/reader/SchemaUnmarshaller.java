@@ -59,10 +59,16 @@ import java.util.Hashtable;
 **/
 public class SchemaUnmarshaller extends SaxUnmarshaller {
 
+
+    
     public static final String XSD_NAMESPACE
-        = "http://www.w3.org/1999/XMLSchema";
+        = "http://www.w3.org/2000/10/XMLSchema";
 
 
+    public static final String[] UNSUPPORTED_NAMESPACES = {
+        "http://www.w3.org/1999/XMLSchema"
+    };
+        
       //--------------------/
      //- Member Variables -/
     //--------------------/
@@ -160,7 +166,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     /**
      * Handles namespace attributes
     **/
-    private void handleXMLNS(String attName, String attValue) {
+    private void handleXMLNS(String attName, String attValue) 
+        throws SAXException
+    {
 
         if ((attName == null) || (!attName.startsWith(XMLNS))) {
             throw new IllegalArgumentException(attName +
@@ -179,11 +187,21 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //-- register namespace
         namespaces.put(prefix, attValue);
+        
+        //-- check for old namespaces
+        for (int i = 0; i < UNSUPPORTED_NAMESPACES.length; i++) {
+            if (attValue.equals(UNSUPPORTED_NAMESPACES[i]))
+                error("The following namespace \"" + attValue +
+                    "\" is no longer supported. Please update to " +
+                    " XML Schema Candidate Release (October)");
+        }
 		_schema.addNamespace(prefix, attValue);
 		
     } //-- handleXMLNS
 
-    private void processNamespaces(AttributeList atts) {
+    private void processNamespaces(AttributeList atts) 
+        throws SAXException
+    {
         if (atts == null) return;
         //-- loop through atts
         for (int i = 0; i < atts.getLength(); i++) {
@@ -240,8 +258,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //-- check namespace
         if (!XSD_NAMESPACE.equals(namespace)) {
-            throw new SAXException(rawName +
-                " has not been declared in the XML Schema namespace");
+            error("'"+ rawName + "' has not been declared in the XML "+
+                "Schema namespace.");
         }
 
         //-- Do delagation if necessary
@@ -286,8 +304,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         //-- <simpleType>
         else if (name == SchemaNames.SIMPLE_TYPE) {
-            unmarshaller
-                = new SimpleTypeUnmarshaller(_schema, atts, _resolver);
+            unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {

@@ -55,7 +55,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-class FacetList {
+public class FacetList {
 
     /**
      * The list of facets
@@ -65,7 +65,7 @@ class FacetList {
     /**
      * Creates a new FacetList
     **/
-    FacetList() {
+    public FacetList() {
         facets = new List();
     } //-- FacetList
 
@@ -73,7 +73,7 @@ class FacetList {
      * Adds the given Facet to this list
      * @param facet the facet to add
     **/
-    void add(Facet facet) {
+    public void add(Facet facet) {
         if (facet != null) facets.add(facet);
     } //-- add
     
@@ -81,7 +81,7 @@ class FacetList {
      * Returns the facet at the given index
      * @param index the index of the Facet to return
     **/
-    Facet get(int index) {
+    public Facet get(int index) {
         return (Facet)facets.get(index);
     } //-- get
     
@@ -89,7 +89,7 @@ class FacetList {
      * Removes the given Facet from this list
      * @param facet the Facet to remove
     **/
-    void remove(Facet facet) {
+    public void remove(Facet facet) {
         facets.remove(facet);
     } //-- remove
     
@@ -97,7 +97,7 @@ class FacetList {
      * Returns the number of Facets in this list
      * @return the number of Facets in this list
     **/
-    int size() {
+    public int size() {
         return facets.size();
     } //-- size
     
@@ -105,7 +105,7 @@ class FacetList {
      * Returns an Enumeration of the Facets in this list
      * @return an Enumeration of the Facets in this list
     **/
-    Enumeration enumerate() {
+    public Enumeration enumerate() {
         return new FacetListEnumerator(this);
     } //-- enumerate
     
