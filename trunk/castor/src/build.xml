@@ -107,6 +107,7 @@
             release          Cleans and builds all the release packages
                              (JAR, source, doc, tarball) in the dist directory
             main             Builds the main packages (including debugging info)
+            tests            (shorthand for compile.tests)
             compile.xml      Compile the Castor XML packages
             compile.jdo      Compile the Castor JDO packages
             compile.examples Builds the example packages (including debugging info)
@@ -282,6 +283,7 @@
             </fileset>
         </copy>
     </target>
+    <target name="tests" depends="compile.tests" description="Build the tests packages"/>
 
     <target name="-test.category.test"
         description="An internal target to test if the test.category property is set">
@@ -290,24 +292,24 @@
         </condition>
     </target>
 
-    <target name="-test.category.isset" depends="-test.category.test" 
+    <target name="-test.category.isset" depends="-test.category.test"
         if="test.category.present" description="An internal target to check the state of the test.category.present property">
         <echo>Executing test category: ${test.category}</echo>
     </target>
 
-    <target name="-test.category.isnotset" depends="-test.category.test" 
+    <target name="-test.category.isnotset" depends="-test.category.test"
         unless="test.category.present" description="An internal target to check the state of the test.category.present property">
         <fail>
         -
         +-------------------------------------------------------------------------------
         | FAILURE CAUSE: Please set the test.category property to the test(s) to execute.
-        |                (examples: -Dtest.category=castor.mysql 
+        |                (examples: -Dtest.category=castor.mysql
         |                        or -Dtest.category=castor.mysql.TC01)
         +-------------------------------------------------------------------------------
         </fail>
     </target>
 
-    <target name="jdo.tests" depends="compile.tests, -test.category.isset, -test.category.isnotset" 
+    <target name="jdo.tests" depends="compile.tests, -test.category.isset, -test.category.isnotset"
         description="Executes the JUnit tests for Castor JDO">
         <java classname="Main" classpathref="build.classpath" fork="true">
             <arg line="-verbose ${test.category}" />
@@ -355,7 +357,7 @@
               includes="LICENSE,README,
               org/exolab/castor/*,
               org/exolab/castor/builder/**,
-              org/exolab/castor/core/**,  
+              org/exolab/castor/core/**,
               org/exolab/castor/mapping/**,
               org/exolab/castor/net/**,
               org/exolab/castor/tools/**,
@@ -414,14 +416,14 @@
          </copy>
 
         <replace dir="${build-doc}" token="$$VERSION$$" value="${version}">
-           <include name="index.html"/>   
-           <include name="download.html" />   
-        </replace>   
+           <include name="index.html"/>
+           <include name="download.html" />
+        </replace>
 
         <replace dir="${build-doc}" token="$$RELEASE_DATE$$" value="${release_date}">
-           <include name="index.html"/>   
-        </replace>   
-   
+           <include name="index.html"/>
+        </replace>
+
         <mkdir dir="${build}/doc/ora-mar-2k"/>
 
         <copy todir="${build}/doc/ora-mar-2k">
