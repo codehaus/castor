@@ -76,17 +76,17 @@ public class SimpleTypeRestrictionUnmarshaller extends SaxUnmarshaller {
      * The simpleType we are unmarshalling
     **/
     private SimpleTypeDefinition  _typeDefinition = null;
-    
+
     private Schema      _schema          = null;
     private boolean     foundAnnotation  = false;
     private boolean     foundSimpleType  = false;
     private boolean     foundFacets      = false;
-    
-    /** 
+
+    /**
      * The base simpleType (ie the one we are restricting)
     **/
-    private SimpleType _baseType = null;
-    
+   // private SimpleType _baseType = null;
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -105,13 +105,13 @@ public class SimpleTypeRestrictionUnmarshaller extends SaxUnmarshaller {
 
         _typeDefinition  = typeDefinition;
         _schema          = typeDefinition.getSchema();
-        
+
         //-- base
         String base = atts.getValue(SchemaNames.BASE_ATTR);
         if ((base != null) && (base.length() > 0)) {
 
             XMLType baseType= _schema.getType(base);
-            if (baseType == null) 
+            if (baseType == null)
                 _typeDefinition.setBaseTypeName(base);
             else if (baseType.getStructureType() == Structure.COMPLEX_TYPE) {
                 String err = "The base type of a simpleType cannot "+
@@ -120,7 +120,7 @@ public class SimpleTypeRestrictionUnmarshaller extends SaxUnmarshaller {
             }
             else _typeDefinition.setBaseType( (SimpleType) baseType);
         }
-        
+
 
     } //-- RestrictionUnmarshaller
 
@@ -160,34 +160,34 @@ public class SimpleTypeRestrictionUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
-        
+
+
         //-- annotation
         if (name.equals(SchemaNames.ANNOTATION)) {
-            
+
             if (foundFacets || foundSimpleType)
                 error("An annotation must appear as the first child " +
                     "of 'restriction' elements.");
-                    
+
             if (foundAnnotation)
                 error("Only one (1) annotation may appear as a child of "+
                     "'restriction' elements.");
-            
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            if (foundSimpleType) 
+            if (foundSimpleType)
                 error("Only one (1) 'simpleType' may appear as a child of "+
                     "'restriction' elements.");
-                    
+
             if (foundFacets)
                 error("A 'simpleType', as a child of 'restriction' "+
                     "elements, must appear before any facets.");
-            
+
             foundSimpleType = true;
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
-            
+
         }
         else if (FacetUnmarshaller.isFacet(name)) {
             foundFacets = true;
