@@ -48,7 +48,6 @@ package org.exolab.castor.persist;
 
 
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.mapping.AccessMode;
 
 
 /**
@@ -66,22 +65,17 @@ final class FetchContext
     private final PersistenceEngine  _engine;
 
 
-    private final AccessMode         _accessMode;
-
-
     FetchContext( TransactionContext tx, PersistenceEngine engine )
     {
         _tx = tx;
         _engine = engine;
-        // XXX Where do we get this from?
-        _accessMode = null;
     }
 
 
-    Object fetch( ClassHandler handler, Object identity )
+    Object fetch( ClassHandler handler, Object object, Object identity )
         throws PersistenceException
     {
-        return _tx.fetch( _engine, handler, identity, _accessMode );
+        return _tx.fetch( _engine, handler, object, identity, null );
     }
 
 
