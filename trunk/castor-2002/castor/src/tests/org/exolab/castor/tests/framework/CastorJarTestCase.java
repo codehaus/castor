@@ -162,7 +162,7 @@ public class CastorJarTestCase extends TestCase {
             return null; // TODO : fail better
         }
 
-        String suiteName = _testDescriptor.getName() + " - [" + _jarFile.getName() + "]";
+        String suiteName = _testDescriptor.getName();
         TestSuite suite = new TestSuite(suiteName);
 
         verbose("Creating '" + suiteName + "' test suite");
