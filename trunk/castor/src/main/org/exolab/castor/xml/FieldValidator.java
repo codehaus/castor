@@ -61,6 +61,8 @@ import org.exolab.castor.mapping.ValidityException;
 public class FieldValidator extends Validator {
     
     
+    private static final String ERROR_NAME = "-error-if-this-is-used-";
+    
     private int minOccurs =  0;  //-- default minimum occurance
     private int maxOccurs = -1;  //-- default maximum occurance [none]
 
@@ -193,8 +195,11 @@ public class FieldValidator extends Validator {
         Object value = handler.getValue(object);
         
         if ((value == null) && (_descriptor.isRequired())) {
-            String err = _descriptor.getXMLName();
-            err += " is a required field.";
+            String err = "The field '" + _descriptor.getFieldName() + "' ";
+            if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
+                err += "(whose xml name is '" + _descriptor.getXMLName() + ") ";
+            }
+            err += "is a required field.";
             throw new ValidationException(err);
         }
         
