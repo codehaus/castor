@@ -274,16 +274,7 @@
 
   <xsd:element name="cache-type">
      <xsd:complexType>
-        <xsd:attribute name="type" use="optional" default="count-limited">
-           <xsd:simpleType>
-              <xsd:restriction base="xsd:string">
-                 <xsd:enumeration value="none"/>
-                 <xsd:enumeration value="count-limited"/>
-                 <xsd:enumeration value="time-limited"/>
-                 <xsd:enumeration value="unlimited"/>
-              </xsd:restriction>
-           </xsd:simpleType>
-        </xsd:attribute>
+        <xsd:attribute name="type" type="xsd:string" use="optional" default="count-limited" />
         <xsd:attribute name="capacity" type="xsd:integer" use="optional"/>
     </xsd:complexType>
   </xsd:element>
