@@ -439,20 +439,36 @@ public class BuilderConfiguration {
 		    //-- load defaults from JAR
   		    _defaultProps = Configuration.loadProperties( Property.ResourceName, Property.FileName);
   		    //-- load local defaults
-        
+       
+            boolean found = false;
             // Get overriding configuration from the classpath,
             // ignore if not found. If found, merge any existing
             // properties.
             try {      
                 InputStream is = SourceGenerator.class.getResourceAsStream("/" + Property.FileName);
                 if (is != null) {
+                    found = true;
                     _defaultProps.load( is );
                     is.close();
                 }      
             } catch ( Exception except ) {
-                // Do nothing
+                //-- do nothing
             }
-  		    
+            
+            //-- if not found, either it doesn't exist, or "." is not part of the
+            //-- class path, try looking at local working directory
+            if (!found) {
+                try {      
+                    File file = new File(Property.FileName);
+                    if (file.exists() && file.canRead()) {
+                        InputStream is = new FileInputStream(file);
+                        _defaultProps.load( is );
+                        is.close();
+                    }
+                } catch ( Exception except ) {
+                    //-- do nothing
+                }
+            }
   		}
   		
   		Configuration rtconf =  LocalConfiguration.getInstance();

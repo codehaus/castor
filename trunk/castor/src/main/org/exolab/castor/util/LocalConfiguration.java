@@ -576,6 +576,23 @@ public final class LocalConfiguration extends Configuration {
         } catch ( Exception except ) {
             // Do nothing
         }
+        
+        //-- if not found, either it doesn't exist, or "." is not part of the
+        //-- class path, try looking at local working directory
+        if (!found) {
+            try {      
+                File file = new File(fileOrResourceName);
+                if (file.exists() && file.canRead()) {
+                    InputStream is = new FileInputStream(file);
+                    _props.load( is );
+                    is.close();
+                    found = true;
+                }
+            } catch ( Exception except ) {
+                //-- do nothing
+            }
+        }
+        
 
 
         //-- Cannot find any castor.properties file(s).
