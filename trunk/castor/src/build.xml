@@ -18,6 +18,8 @@
         -->
         <property file="${user.home}/castor-build.properties"/>
 
+        <property environment="env" />
+        <property name="build.sh.class.path" value="${env.CLASSPATH}" />
         <property name="name" value="Castor"/>
         <property name="source" value="src"/>
         <property name="main" value="${source}/main"/>
@@ -28,6 +30,7 @@
         <property name="lib" value="lib"/>
         <property name="doc" value="${source}/doc"/>
         <property name="schema" value="${source}/schema"/>
+        <property name="gen.src" value="gen-src"/>
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
         <property name="main.opt.debug" value="true"/>
@@ -140,8 +143,8 @@
     <target name="main" depends="prepare"
             description="The default target for compilation; includes debug and deprecation info">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" debug="on" deprecation="${deprecation}">
-        <classpath refid="build.classpath"/>
-    </javac>
+            <classpath refid="build.classpath"/>
+        </javac>
         <copy todir="${classes}">
             <fileset dir="${main}">
                 <patternset refid="support.files" />
@@ -152,11 +155,11 @@
     <target name="all" depends="clean,main,examples,tests"
             description="Same as the default target, but also calls clean, main, examples and tests targets"/>
 
-    <target name="main-opt" depends="prepare"
+    <target name="main.opt" depends="prepare"
             description="Same as the default target, but with optimization, no debug and no deprecation">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
-        <classpath refid="build.classpath"/>
-    </javac>
+            <classpath refid="build.classpath"/>
+        </javac>
         <copy todir="${classes}">
             <fileset dir="${main}">
                 <patternset refid="support.files" />
@@ -237,7 +240,7 @@
 
     </target>
 
-    <target name="jar" depends="main-opt" description="Build the castor.jar and castor-xml.jar files">
+    <target name="jar" depends="main.opt" description="Build the castor.jar and castor-xml.jar files">
         <delete file="${dist}/${archive}.jar"/>
         <delete file="${classes}/MANIFEST.MF"/>
 
@@ -286,7 +289,8 @@
         <jar jarfile="${dist}/CTF-${version}.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" includes="LICENCE,README,org/**"/>
      </target>
 
-    <target name="doc" depends="clean,prepare" description="Build the HTML docs">
+    <target name="doc" depends="prepare" description="Build the HTML docs">
+        <delete dir="${build}/doc"/>
         <mkdir dir="${build}/doc"/>
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
             includes="**.xml" excludes="style/**,project.xml"
@@ -373,10 +377,10 @@
     <target name="release" depends="clean,jar,source,docs,tarball"
             description="An alias to call the clean, jar, source, docs and tarball targets"/>
 
-    <target name="tarball" depends="prepare,jar" description="Build the binary distrutions (tarball and zip archives)">
+    <target name="tarball" depends="prepare,doc,jar" description="Build the binary distrutions (tarball and zip archives)">
         <delete file="${dist}/${archive}.tgz"/>
         <delete file="${dist}/${archive}.zip"/>
-        <deltree dir="${build}/${archive}"/>
+        <delete dir="${build}/${archive}"/>
         <mkdir dir="${build}/${archive}"/>
         <copy todir="${build}/${archive}">
             <fileset dir="${etc}" includes="README,LICENSE,CHANGELOG,sourceGen*"/>
@@ -434,5 +438,43 @@
             </classpath>
       </java>
    </target>
+
+    <target name="generate.jdo.conf" 
+            description="Use the Source Generator to create the classes for the jdo-conf.xsd">
+        <delete dir="${gen.src}"/>
+        <mkdir dir="${gen.src}"/>
+        <java classname="org.exolab.castor.builder.SourceGenerator">
+            <arg value="-i"/>
+            <arg value="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd"/>
+            <arg value="-package"/>
+            <arg value="org.exolab.castor.jdo.conf"/>
+            <arg value="-dest"/>
+            <arg value="${gen.src}"/>
+            <arg value="-line-separator"/>
+            <arg value="unix"/>
+            <arg value="-types"/>
+            <arg value="j2"/>
+        </java>
+        <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
+            <src path="${gen.src}" />
+            <classpath refid="build.classpath"/>
+        </javac>
+    </target>
+
+    <target name="gen.pvd" 
+            description="Use the Source Generator to create the classes for the pvd.xsd">
+        <java classname="org.exolab.castor.builder.SourceGenerator">
+            <arg value="-i"/>
+            <arg value="pvd/pvd.xsd"/>
+            <arg value="-package"/>
+            <arg value="com.digitalglobe.mp.pvd"/>
+            <arg value="-dest"/>
+            <arg value="pvd"/>
+            <arg value="-line-separator"/>
+            <arg value="unix"/>
+            <arg value="-types"/>
+            <arg value="j2"/>
+        </java>
+    </target>
 
 </project>
