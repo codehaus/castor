@@ -449,7 +449,7 @@ public interface Database
      * @param object The object
      * @return True if persistent in this transaction
      */
-    //public boolean isPersistent( Object object );
+    public boolean isPersistent( Object object );
 
 
     /**
