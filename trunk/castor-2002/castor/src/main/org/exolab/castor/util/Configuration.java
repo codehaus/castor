@@ -65,6 +65,7 @@ import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
 
@@ -107,6 +108,17 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Serializer = "org.exolab.castor.serializer";
+        
+        /**
+         * Property specifying the type of node to use for
+         * primitive values, either "element" or "attribute"
+         * <pre>
+         * org.exolab.castor.xml.introspector.primitive.nodetype
+         * </pre>
+         */
+        public static final String PrimitiveNodeType 
+            = "org.exolab.castor.xml.introspector.primitive.nodetype";
+
 
         /**
          * Property specifying the class name of the XML parser to use.
@@ -141,8 +153,8 @@ public abstract class Configuration
          * </pre>
          *
          */
-        public static final String Naming = "org.exolab.castor.xml.naming";
-        
+        public static final String Naming = "org.exolab.castor.xml.naming";        
+
         /**
          * Property specifying whether to use validation in the Marshalling Framework
          * <pre>
@@ -150,7 +162,7 @@ public abstract class Configuration
          * </pre>
          */
          public static final String MarshallingValidation = "org.exolab.castor.marshalling.validation";
-
+         
         /**
          * Property specifying whether XML documents should be indented by default.
          * <pre>
@@ -235,6 +247,10 @@ public abstract class Configuration
     **/
     private static XMLNaming _naming = null;
     
+    /**
+     * The NodeType assigned to java primitives
+    **/
+    private static NodeType _primitiveNodeType = null;
     
     /**
      * Returns true if the default configuration specified debugging.
@@ -396,7 +412,28 @@ public abstract class Configuration
         return parser;
     }
 
-
+    /**
+     * Returns the NodeType to use for Java primitives.
+     * A null value will be returned if no NodeType was specified,
+     * indicating the default NodeType should be used.
+     *
+     * @return the NodeType assigned to Java primitives, or null
+     * if no NodeType was specified.
+    **/
+    public static NodeType getPrimitiveNodeType() {
+        
+        if (_primitiveNodeType != null) 
+            return _primitiveNodeType;
+            
+        String prop = getProperty(Property.PrimitiveNodeType, null);
+        if (prop == null) 
+            return null;
+        else {
+            _primitiveNodeType = NodeType.getNodeType(prop);
+            return _primitiveNodeType;
+        }
+    } //-- getPrimitiveNodeType
+    
     /**
      * Returns a new instance of the specified Regular Expression
      * Evaluator, or null if no validator was specified
