@@ -50,6 +50,7 @@ package org.exolab.castor.mapping.loader;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.CollectionHandler;
 
 
 /**
@@ -65,10 +66,7 @@ public class DelegateFieldDescriptor
     /**
      * The actual field descriptor.
      */
-    private FieldDescriptor  _desc;
-
-
-    private boolean    _required;
+    private final FieldDescriptor  _desc;
 
 
     protected DelegateFieldDescriptor( FieldDescriptor desc )
@@ -112,6 +110,12 @@ public class DelegateFieldDescriptor
     public boolean isTransient()
     {
         return _desc.isTransient();
+    }
+
+
+    public CollectionHandler getCollectionHandler()
+    {
+        return _desc.getCollectionHandler();
     }
 
 
