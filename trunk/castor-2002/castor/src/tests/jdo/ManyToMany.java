@@ -303,7 +303,7 @@ public class ManyToMany extends CastorTestCase {
                     fail("Error: people in group is not the same as expected!");
                 }
             } else {
-                fail("Error: related object not found!");
+                fail("Error: related object not found[1]!");
             }
         } else {
             fail("Error: object not found!");
@@ -363,7 +363,7 @@ public class ManyToMany extends CastorTestCase {
                 }
 
             } else {
-                fail("Error: related object not found!");
+                fail("Error: related object not found[2]!");
             }
         } else {
             fail("Error: object not found!");
@@ -526,7 +526,7 @@ public class ManyToMany extends CastorTestCase {
                 }
 
             } else {
-                fail("Error: related object not found!");
+                fail("Error: related object not found[3]!");
             }
         } else {
             fail("Error: object not found!");
@@ -550,7 +550,7 @@ public class ManyToMany extends CastorTestCase {
         groupA = (TestManyGroup)tempItor.next();
         if ( groupA.getId() != groupAId )
             fail( "Error: unexpected group found" );
-        if ( !tempItor.hasNext() )
+        if ( tempItor.hasNext() )
             fail( "Error: too many group" );
         _db.commit();
     }
