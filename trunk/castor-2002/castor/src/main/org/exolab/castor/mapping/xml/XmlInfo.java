@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class XmlInfo implements java.io.Serializable {
@@ -27,20 +30,11 @@ public class XmlInfo implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vNodeType;
+    private java.lang.String _nodeType;
 
-    /**
-     * 
-    **/
-    private java.lang.String vType;
+    private java.lang.String _type;
 
-    /**
-     * 
-    **/
-    private java.lang.String vName;
+    private java.lang.String _name;
 
 
       //----------------/
@@ -49,7 +43,7 @@ public class XmlInfo implements java.io.Serializable {
 
     public XmlInfo() {
         super();
-    } //-- XmlInfo()
+    } //-- org.exolab.castor.mapping.xml.XmlInfo()
 
 
       //-----------/
@@ -58,50 +52,21 @@ public class XmlInfo implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getNodeType() {
-        return this.vNodeType;
-    } //-- java.lang.String getNodeType() 
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
-     * @param vNodeType
     **/
-    public void setNodeType(java.lang.String vNodeType) {
-        this.vNodeType = vNodeType;
-    } //-- void setNodeType(java.lang.String) 
+    public java.lang.String getNodeType() {
+        return this._nodeType;
+    } //-- java.lang.String getNodeType() 
 
     /**
     **/
     public java.lang.String getType() {
-        return this.vType;
+        return this._type;
     } //-- java.lang.String getType() 
-
-    /**
-     * @param vType
-    **/
-    public void setType(java.lang.String vType) {
-        this.vType = vType;
-    } //-- void setType(java.lang.String) 
-
-    /**
-    **/
-    public java.lang.String getName() {
-        return this.vName;
-    } //-- java.lang.String getName() 
-
-    /**
-     * @param vName
-    **/
-    public void setName(java.lang.String vName) {
-        this.vName = vName;
-    } //-- void setName(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -116,6 +81,7 @@ public class XmlInfo implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -128,6 +94,7 @@ public class XmlInfo implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -140,12 +107,45 @@ public class XmlInfo implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _name
+    **/
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param _nodeType
+    **/
+    public void setNodeType(java.lang.String _nodeType) {
+        this._nodeType = _nodeType;
+    } //-- void setNodeType(java.lang.String) 
+
+    /**
+     * 
+     * @param _type
+    **/
+    public void setType(java.lang.String _type) {
+        this._type = _type;
+    } //-- void setType(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static XmlInfo unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.XmlInfo unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (XmlInfo) Unmarshaller.unmarshal(XmlInfo.class, reader);
-    } //-- XmlInfo unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.XmlInfo) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.XmlInfo.class, reader);
+    } //-- org.exolab.castor.mapping.xml.XmlInfo unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

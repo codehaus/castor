@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class FieldMapping implements java.io.Serializable {
@@ -27,60 +30,27 @@ public class FieldMapping implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vCollection;
+    private java.lang.String _collection;
 
-    /**
-     * 
-    **/
-    private java.lang.String vSetMethod;
+    private java.lang.String _setMethod;
 
-    /**
-     * 
-    **/
-    private java.lang.String vGetMethod;
+    private java.lang.String _createMethod;
 
-    /**
-     * 
-    **/
-    private java.lang.String vCreateMethod;
+    private java.lang.String _getMethod;
 
-    /**
-     * 
-    **/
-    private java.lang.String vType;
+    private java.lang.String _type;
 
-    /**
-     * 
-    **/
-    private boolean vRequired;
+    private boolean _required = false;
 
-    /**
-     * 
-    **/
-    private java.lang.String vName;
+    private java.lang.String _name;
 
-    /**
-     * 
-    **/
-    private java.lang.String vDescription;
+    private Description _description;
 
-    /**
-     * 
-    **/
-    private SqlInfo vSqlInfo;
+    private SqlInfo _sqlInfo;
 
-    /**
-     * 
-    **/
-    private XmlInfo vXmlInfo;
+    private XmlInfo _xmlInfo;
 
-    /**
-     * 
-    **/
-    private LdapInfo vLdapInfo;
+    private LdapInfo _ldapInfo;
 
 
       //----------------/
@@ -89,7 +59,7 @@ public class FieldMapping implements java.io.Serializable {
 
     public FieldMapping() {
         super();
-    } //-- FieldMapping()
+    } //-- org.exolab.castor.mapping.xml.FieldMapping()
 
 
       //-----------/
@@ -99,153 +69,68 @@ public class FieldMapping implements java.io.Serializable {
     /**
     **/
     public java.lang.String getCollection() {
-        return this.vCollection;
+        return this._collection;
     } //-- java.lang.String getCollection() 
-
-    /**
-     * @param vCollection
-    **/
-    public void setCollection(java.lang.String vCollection) {
-        this.vCollection = vCollection;
-    } //-- void setCollection(java.lang.String) 
-
-    /**
-    **/
-    public java.lang.String getSetMethod() {
-        return this.vSetMethod;
-    } //-- java.lang.String getSetMethod() 
-
-    /**
-     * @param vSetMethod
-    **/
-    public void setSetMethod(java.lang.String vSetMethod) {
-        this.vSetMethod = vSetMethod;
-    } //-- void setSetMethod(java.lang.String) 
-
-    /**
-    **/
-    public java.lang.String getGetMethod() {
-        return this.vGetMethod;
-    } //-- java.lang.String getGetMethod() 
-
-    /**
-     * @param vGetMethod
-    **/
-    public void setGetMethod(java.lang.String vGetMethod) {
-        this.vGetMethod = vGetMethod;
-    } //-- void setGetMethod(java.lang.String) 
 
     /**
     **/
     public java.lang.String getCreateMethod() {
-        return this.vCreateMethod;
+        return this._createMethod;
     } //-- java.lang.String getCreateMethod() 
 
     /**
-     * @param vCreateMethod
     **/
-    public void setCreateMethod(java.lang.String vCreateMethod) {
-        this.vCreateMethod = vCreateMethod;
-    } //-- void setCreateMethod(java.lang.String) 
+    public Description getDescription() {
+        return this._description;
+    } //-- Description getDescription() 
 
     /**
     **/
-    public java.lang.String getType() {
-        return this.vType;
-    } //-- java.lang.String getType() 
-
-    /**
-     * @param vType
-    **/
-    public void setType(java.lang.String vType) {
-        this.vType = vType;
-    } //-- void setType(java.lang.String) 
-
-    /**
-    **/
-    public boolean getRequired() {
-        return this.vRequired;
-    } //-- boolean getRequired() 
-
-    /**
-     * @param vRequired
-    **/
-    public void setRequired(boolean vRequired) {
-        this.vRequired = vRequired;
-    } //-- void setRequired(boolean) 
-
-    /**
-    **/
-    public java.lang.String getName() {
-        return this.vName;
-    } //-- java.lang.String getName() 
-
-    /**
-     * @param vName
-    **/
-    public void setName(java.lang.String vName) {
-        this.vName = vName;
-    } //-- void setName(java.lang.String) 
-
-    /**
-    **/
-    public java.lang.String getDescription() {
-        return this.vDescription;
-    } //-- java.lang.String getDescription() 
-
-    /**
-     * @param vDescription
-    **/
-    public void setDescription(java.lang.String vDescription) {
-        this.vDescription = vDescription;
-    } //-- void setDescription(java.lang.String) 
-
-    /**
-    **/
-    public SqlInfo getSqlInfo() {
-        return this.vSqlInfo;
-    } //-- SqlInfo getSqlInfo() 
-
-    /**
-     * @param vSqlInfo
-    **/
-    public void setSqlInfo(SqlInfo vSqlInfo) {
-        this.vSqlInfo = vSqlInfo;
-    } //-- void setSqlInfo(SqlInfo) 
-
-    /**
-    **/
-    public XmlInfo getXmlInfo() {
-        return this.vXmlInfo;
-    } //-- XmlInfo getXmlInfo() 
-
-    /**
-     * @param vXmlInfo
-    **/
-    public void setXmlInfo(XmlInfo vXmlInfo) {
-        this.vXmlInfo = vXmlInfo;
-    } //-- void setXmlInfo(XmlInfo) 
+    public java.lang.String getGetMethod() {
+        return this._getMethod;
+    } //-- java.lang.String getGetMethod() 
 
     /**
     **/
     public LdapInfo getLdapInfo() {
-        return this.vLdapInfo;
+        return this._ldapInfo;
     } //-- LdapInfo getLdapInfo() 
 
     /**
-     * @param vLdapInfo
     **/
-    public void setLdapInfo(LdapInfo vLdapInfo) {
-        this.vLdapInfo = vLdapInfo;
-    } //-- void setLdapInfo(LdapInfo) 
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
     **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
+    public boolean getRequired() {
+        return this._required;
+    } //-- boolean getRequired() 
+
+    /**
+    **/
+    public java.lang.String getSetMethod() {
+        return this._setMethod;
+    } //-- java.lang.String getSetMethod() 
+
+    /**
+    **/
+    public SqlInfo getSqlInfo() {
+        return this._sqlInfo;
+    } //-- SqlInfo getSqlInfo() 
+
+    /**
+    **/
+    public java.lang.String getType() {
+        return this._type;
+    } //-- java.lang.String getType() 
+
+    /**
+    **/
+    public XmlInfo getXmlInfo() {
+        return this._xmlInfo;
+    } //-- XmlInfo getXmlInfo() 
 
     /**
     **/
@@ -260,6 +145,7 @@ public class FieldMapping implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -272,6 +158,7 @@ public class FieldMapping implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -284,12 +171,109 @@ public class FieldMapping implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _collection
+    **/
+    public void setCollection(java.lang.String _collection) {
+        this._collection = _collection;
+    } //-- void setCollection(java.lang.String) 
+
+    /**
+     * 
+     * @param _createMethod
+    **/
+    public void setCreateMethod(java.lang.String _createMethod) {
+        this._createMethod = _createMethod;
+    } //-- void setCreateMethod(java.lang.String) 
+
+    /**
+     * 
+     * @param _description
+    **/
+    public void setDescription(Description _description) {
+        this._description = _description;
+    } //-- void setDescription(Description) 
+
+    /**
+     * 
+     * @param _getMethod
+    **/
+    public void setGetMethod(java.lang.String _getMethod) {
+        this._getMethod = _getMethod;
+    } //-- void setGetMethod(java.lang.String) 
+
+    /**
+     * 
+     * @param _ldapInfo
+    **/
+    public void setLdapInfo(LdapInfo _ldapInfo) {
+        this._ldapInfo = _ldapInfo;
+    } //-- void setLdapInfo(LdapInfo) 
+
+    /**
+     * 
+     * @param _name
+    **/
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param _required
+    **/
+    public void setRequired(boolean _required) {
+        this._required = _required;
+    } //-- void setRequired(boolean) 
+
+    /**
+     * 
+     * @param _setMethod
+    **/
+    public void setSetMethod(java.lang.String _setMethod) {
+        this._setMethod = _setMethod;
+    } //-- void setSetMethod(java.lang.String) 
+
+    /**
+     * 
+     * @param _sqlInfo
+    **/
+    public void setSqlInfo(SqlInfo _sqlInfo) {
+        this._sqlInfo = _sqlInfo;
+    } //-- void setSqlInfo(SqlInfo) 
+
+    /**
+     * 
+     * @param _type
+    **/
+    public void setType(java.lang.String _type) {
+        this._type = _type;
+    } //-- void setType(java.lang.String) 
+
+    /**
+     * 
+     * @param _xmlInfo
+    **/
+    public void setXmlInfo(XmlInfo _xmlInfo) {
+        this._xmlInfo = _xmlInfo;
+    } //-- void setXmlInfo(XmlInfo) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static FieldMapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (FieldMapping) Unmarshaller.unmarshal(FieldMapping.class, reader);
-    } //-- FieldMapping unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.FieldMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.FieldMapping.class, reader);
+    } //-- org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class LdapInfo implements java.io.Serializable {
@@ -27,15 +30,9 @@ public class LdapInfo implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vAccess;
+    private java.lang.String _access = "both";
 
-    /**
-     * 
-    **/
-    private java.lang.String vName;
+    private java.lang.String _name;
 
 
       //----------------/
@@ -44,7 +41,7 @@ public class LdapInfo implements java.io.Serializable {
 
     public LdapInfo() {
         super();
-    } //-- LdapInfo()
+    } //-- org.exolab.castor.mapping.xml.LdapInfo()
 
 
       //-----------/
@@ -54,36 +51,14 @@ public class LdapInfo implements java.io.Serializable {
     /**
     **/
     public java.lang.String getAccess() {
-        return this.vAccess;
+        return this._access;
     } //-- java.lang.String getAccess() 
-
-    /**
-     * @param vAccess
-    **/
-    public void setAccess(java.lang.String vAccess) {
-        this.vAccess = vAccess;
-    } //-- void setAccess(java.lang.String) 
 
     /**
     **/
     public java.lang.String getName() {
-        return this.vName;
+        return this._name;
     } //-- java.lang.String getName() 
-
-    /**
-     * @param vName
-    **/
-    public void setName(java.lang.String vName) {
-        this.vName = vName;
-    } //-- void setName(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -98,6 +73,7 @@ public class LdapInfo implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -110,6 +86,7 @@ public class LdapInfo implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -122,12 +99,37 @@ public class LdapInfo implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _access
+    **/
+    public void setAccess(java.lang.String _access) {
+        this._access = _access;
+    } //-- void setAccess(java.lang.String) 
+
+    /**
+     * 
+     * @param _name
+    **/
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static LdapInfo unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.LdapInfo unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (LdapInfo) Unmarshaller.unmarshal(LdapInfo.class, reader);
-    } //-- LdapInfo unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.LdapInfo) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.LdapInfo.class, reader);
+    } //-- org.exolab.castor.mapping.xml.LdapInfo unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

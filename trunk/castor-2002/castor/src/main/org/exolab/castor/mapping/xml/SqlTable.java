@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class SqlTable implements java.io.Serializable {
@@ -27,10 +30,7 @@ public class SqlTable implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vTableName;
+    private java.lang.String _tableName;
 
 
       //----------------/
@@ -39,7 +39,7 @@ public class SqlTable implements java.io.Serializable {
 
     public SqlTable() {
         super();
-    } //-- SqlTable()
+    } //-- org.exolab.castor.mapping.xml.SqlTable()
 
 
       //-----------/
@@ -49,23 +49,8 @@ public class SqlTable implements java.io.Serializable {
     /**
     **/
     public java.lang.String getTableName() {
-        return this.vTableName;
+        return this._tableName;
     } //-- java.lang.String getTableName() 
-
-    /**
-     * @param vTableName
-    **/
-    public void setTableName(java.lang.String vTableName) {
-        this.vTableName = vTableName;
-    } //-- void setTableName(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -80,6 +65,7 @@ public class SqlTable implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -92,6 +78,7 @@ public class SqlTable implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -104,12 +91,29 @@ public class SqlTable implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _tableName
+    **/
+    public void setTableName(java.lang.String _tableName) {
+        this._tableName = _tableName;
+    } //-- void setTableName(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static SqlTable unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.SqlTable unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (SqlTable) Unmarshaller.unmarshal(SqlTable.class, reader);
-    } //-- SqlTable unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.SqlTable) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.SqlTable.class, reader);
+    } //-- org.exolab.castor.mapping.xml.SqlTable unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

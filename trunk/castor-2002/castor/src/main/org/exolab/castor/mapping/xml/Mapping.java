@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -20,6 +22,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class Mapping implements java.io.Serializable {
@@ -29,20 +32,11 @@ public class Mapping implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vDescription;
+    private Description _description;
 
-    /**
-     * 
-    **/
-    private java.util.Vector vIncludeList;
+    private java.util.Vector _includeList;
 
-    /**
-     * 
-    **/
-    private java.util.Vector vClassList;
+    private java.util.Vector _classMappingList;
 
 
       //----------------/
@@ -51,9 +45,9 @@ public class Mapping implements java.io.Serializable {
 
     public Mapping() {
         super();
-        vIncludeList = new Vector();
-        vClassList = new Vector();
-    } //-- Mapping()
+        _includeList = new Vector();
+        _classMappingList = new Vector();
+    } //-- org.exolab.castor.mapping.xml.Mapping()
 
 
       //-----------/
@@ -61,175 +55,106 @@ public class Mapping implements java.io.Serializable {
     //-----------/
 
     /**
-    **/
-    public java.lang.String getDescription() {
-        return this.vDescription;
-    } //-- java.lang.String getDescription() 
-
-    /**
-     * @param vDescription
-    **/
-    public void setDescription(java.lang.String vDescription) {
-        this.vDescription = vDescription;
-    } //-- void setDescription(java.lang.String) 
-
-    /**
-     * @param vInclude
-    **/
-    public void addInclude(Include vInclude) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        vIncludeList.addElement(vInclude);
-    } //-- void addInclude(Include) 
-
-    /**
-     * @param index
-    **/
-    public Include getInclude(int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > vIncludeList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (Include) vIncludeList.elementAt(index);
-    } //-- Include getInclude(int) 
-
-    /**
-    **/
-    public Include[] getIncludes() {
-        int size = vIncludeList.size();
-        Include[] mArray = new Include[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (Include) vIncludeList.elementAt(index);
-        }
-        return mArray;
-    } //-- Include[] getInclude() 
-
-    /**
-     * @param vInclude
-     * @param index
-    **/
-    public void setInclude(Include vInclude, int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > vIncludeList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        vIncludeList.setElementAt(vInclude, index);
-    } //-- void setInclude(Include, int) 
-
-    /**
-    **/
-    public int getIncludeCount() {
-        return vIncludeList.size();
-    } //-- int getIncludeCount() 
-
-    /**
-    **/
-    public java.util.Enumeration enumerateIncludes() {
-        return vIncludeList.elements();
-    } //-- java.util.Enumeration enumerateInclude() 
-
-    /**
-     * @param index
-    **/
-    public Include removeInclude(int index) {
-        Object obj = vIncludeList.elementAt(index);
-        vIncludeList.removeElementAt(index);
-        return (Include) obj;
-    } //-- Include removeInclude(int) 
-
-    /**
-    **/
-    public void removeAllInclude() {
-        vIncludeList.removeAllElements();
-    } //-- void removeAllInclude() 
-
-    /**
+     * 
      * @param vClassMapping
     **/
     public void addClassMapping(ClassMapping vClassMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
-        vClassList.addElement(vClassMapping);
+        _classMappingList.addElement(vClassMapping);
     } //-- void addClassMapping(ClassMapping) 
 
     /**
+     * 
+     * @param vInclude
+    **/
+    public void addInclude(Include vInclude) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _includeList.addElement(vInclude);
+    } //-- void addInclude(Include) 
+
+    /**
+    **/
+    public java.util.Enumeration enumerateClassMapping() {
+        return _classMappingList.elements();
+    } //-- java.util.Enumeration enumerateClassMapping() 
+
+    /**
+    **/
+    public java.util.Enumeration enumerateInclude() {
+        return _includeList.elements();
+    } //-- java.util.Enumeration enumerateInclude() 
+
+    /**
+     * 
      * @param index
     **/
     public ClassMapping getClassMapping(int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vClassList.size())) {
+        if ((index < 0) || (index > _classMappingList.size())) {
             throw new IndexOutOfBoundsException();
         }
         
-        return (ClassMapping) vClassList.elementAt(index);
+        return (ClassMapping) _classMappingList.elementAt(index);
     } //-- ClassMapping getClassMapping(int) 
 
     /**
     **/
     public ClassMapping[] getClassMapping() {
-        int size = vClassList.size();
+        int size = _classMappingList.size();
         ClassMapping[] mArray = new ClassMapping[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (ClassMapping) vClassList.elementAt(index);
+            mArray[index] = (ClassMapping) _classMappingList.elementAt(index);
         }
         return mArray;
     } //-- ClassMapping[] getClassMapping() 
 
     /**
-     * @param vClassMapping
-     * @param index
-    **/
-    public void setClassMapping(ClassMapping vClassMapping, int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > vClassList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        vClassList.setElementAt(vClassMapping, index);
-    } //-- void setClassMapping(ClassMapping, int) 
-
-    /**
     **/
     public int getClassMappingCount() {
-        return vClassList.size();
+        return _classMappingList.size();
     } //-- int getClassMappingCount() 
 
     /**
     **/
-    public java.util.Enumeration enumerateClassMapping() {
-        return vClassList.elements();
-    } //-- java.util.Enumeration enumerateClassMapping() 
+    public Description getDescription() {
+        return this._description;
+    } //-- Description getDescription() 
 
     /**
+     * 
      * @param index
     **/
-    public ClassMapping removeClassMapping(int index) {
-        Object obj = vClassList.elementAt(index);
-        vClassList.removeElementAt(index);
-        return (ClassMapping) obj;
-    } //-- ClassMapping removeClassMapping(int) 
-
-    /**
-    **/
-    public void removeAllClassMapping() {
-        vClassList.removeAllElements();
-    } //-- void removeAllClassMapping() 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
+    public Include getInclude(int index) 
+        throws java.lang.IndexOutOfBoundsException
     {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
+        //-- check bounds for index
+        if ((index < 0) || (index > _includeList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        return (Include) _includeList.elementAt(index);
+    } //-- Include getInclude(int) 
+
+    /**
+    **/
+    public Include[] getInclude() {
+        int size = _includeList.size();
+        Include[] mArray = new Include[size];
+        for (int index = 0; index < size; index++) {
+            mArray[index] = (Include) _includeList.elementAt(index);
+        }
+        return mArray;
+    } //-- Include[] getInclude() 
+
+    /**
+    **/
+    public int getIncludeCount() {
+        return _includeList.size();
+    } //-- int getIncludeCount() 
 
     /**
     **/
@@ -244,6 +169,7 @@ public class Mapping implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -256,6 +182,7 @@ public class Mapping implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -268,12 +195,91 @@ public class Mapping implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+    **/
+    public void removeAllClassMapping() {
+        _classMappingList.removeAllElements();
+    } //-- void removeAllClassMapping() 
+
+    /**
+    **/
+    public void removeAllInclude() {
+        _includeList.removeAllElements();
+    } //-- void removeAllInclude() 
+
+    /**
+     * 
+     * @param index
+    **/
+    public ClassMapping removeClassMapping(int index) {
+        Object obj = _classMappingList.elementAt(index);
+        _classMappingList.removeElementAt(index);
+        return (ClassMapping) obj;
+    } //-- ClassMapping removeClassMapping(int) 
+
+    /**
+     * 
+     * @param index
+    **/
+    public Include removeInclude(int index) {
+        Object obj = _includeList.elementAt(index);
+        _includeList.removeElementAt(index);
+        return (Include) obj;
+    } //-- Include removeInclude(int) 
+
+    /**
+     * 
+     * @param vClassMapping
+     * @param index
+    **/
+    public void setClassMapping(ClassMapping vClassMapping, int index) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _classMappingList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        _classMappingList.setElementAt(vClassMapping, index);
+    } //-- void setClassMapping(ClassMapping, int) 
+
+    /**
+     * 
+     * @param _description
+    **/
+    public void setDescription(Description _description) {
+        this._description = _description;
+    } //-- void setDescription(Description) 
+
+    /**
+     * 
+     * @param vInclude
+     * @param index
+    **/
+    public void setInclude(Include vInclude, int index) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _includeList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        _includeList.setElementAt(vInclude, index);
+    } //-- void setInclude(Include, int) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static Mapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Mapping unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (Mapping) Unmarshaller.unmarshal(Mapping.class, reader);
-    } //-- Mapping unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Mapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Mapping.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Mapping unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

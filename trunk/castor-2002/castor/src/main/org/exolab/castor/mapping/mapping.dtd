@@ -165,7 +165,8 @@
 <!ATTLIST sql-info
     name NMTOKEN #IMPLIED
     type NMTOKEN #IMPLIED
-    fore-key NMTOKEN #IMPLIED
+    many-table NMTOKEN #IMPLIED
+    many-key NMTOKEN #IMPLIED
     dirty (check|ignore) "check"
     access (none|read|write|both) "both">
 

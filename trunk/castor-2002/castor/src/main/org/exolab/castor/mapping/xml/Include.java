@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class Include implements java.io.Serializable {
@@ -27,10 +30,7 @@ public class Include implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vHref;
+    private java.lang.String _href;
 
 
       //----------------/
@@ -39,7 +39,7 @@ public class Include implements java.io.Serializable {
 
     public Include() {
         super();
-    } //-- Include()
+    } //-- org.exolab.castor.mapping.xml.Include()
 
 
       //-----------/
@@ -49,23 +49,8 @@ public class Include implements java.io.Serializable {
     /**
     **/
     public java.lang.String getHref() {
-        return this.vHref;
+        return this._href;
     } //-- java.lang.String getHref() 
-
-    /**
-     * @param vHref
-    **/
-    public void setHref(java.lang.String vHref) {
-        this.vHref = vHref;
-    } //-- void setHref(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -80,6 +65,7 @@ public class Include implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -92,6 +78,7 @@ public class Include implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -104,12 +91,29 @@ public class Include implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _href
+    **/
+    public void setHref(java.lang.String _href) {
+        this._href = _href;
+    } //-- void setHref(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static Include unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (Include) Unmarshaller.unmarshal(Include.class, reader);
-    } //-- Include unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Include) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Include.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

@@ -23,31 +23,26 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class XmlSchema implements java.io.Serializable {
+public class Description implements java.io.Serializable {
 
 
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _prefix;
-
-    private java.lang.String _systemId;
-
-    private java.lang.String _publicId;
-
-    private java.lang.String _name;
-
-    private java.lang.String _namespace;
+    /**
+     * internal character storage
+    **/
+    private java.lang.String _content = "";
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public XmlSchema() {
+    public Description() {
         super();
-    } //-- org.exolab.castor.mapping.xml.XmlSchema()
+    } //-- org.exolab.castor.mapping.xml.Description()
 
 
       //-----------/
@@ -56,33 +51,9 @@ public class XmlSchema implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getName() {
-        return this._name;
-    } //-- java.lang.String getName() 
-
-    /**
-    **/
-    public java.lang.String getNamespace() {
-        return this._namespace;
-    } //-- java.lang.String getNamespace() 
-
-    /**
-    **/
-    public java.lang.String getPrefix() {
-        return this._prefix;
-    } //-- java.lang.String getPrefix() 
-
-    /**
-    **/
-    public java.lang.String getPublicId() {
-        return this._publicId;
-    } //-- java.lang.String getPublicId() 
-
-    /**
-    **/
-    public java.lang.String getSystemId() {
-        return this._systemId;
-    } //-- java.lang.String getSystemId() 
+    public java.lang.String getContent() {
+        return this._content;
+    } //-- java.lang.String getContent() 
 
     /**
     **/
@@ -124,53 +95,21 @@ public class XmlSchema implements java.io.Serializable {
 
     /**
      * 
-     * @param _name
+     * @param _content
     **/
-    public void setName(java.lang.String _name) {
-        this._name = _name;
-    } //-- void setName(java.lang.String) 
-
-    /**
-     * 
-     * @param _namespace
-    **/
-    public void setNamespace(java.lang.String _namespace) {
-        this._namespace = _namespace;
-    } //-- void setNamespace(java.lang.String) 
-
-    /**
-     * 
-     * @param _prefix
-    **/
-    public void setPrefix(java.lang.String _prefix) {
-        this._prefix = _prefix;
-    } //-- void setPrefix(java.lang.String) 
-
-    /**
-     * 
-     * @param _publicId
-    **/
-    public void setPublicId(java.lang.String _publicId) {
-        this._publicId = _publicId;
-    } //-- void setPublicId(java.lang.String) 
-
-    /**
-     * 
-     * @param _systemId
-    **/
-    public void setSystemId(java.lang.String _systemId) {
-        this._systemId = _systemId;
-    } //-- void setSystemId(java.lang.String) 
+    public void setContent(java.lang.String _content) {
+        this._content = _content;
+    } //-- void setContent(java.lang.String) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.XmlSchema unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Description unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.XmlSchema) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.XmlSchema.class, reader);
-    } //-- org.exolab.castor.mapping.xml.XmlSchema unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Description) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Description.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Description unmarshal(java.io.Reader) 
 
     /**
     **/
