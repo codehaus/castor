@@ -411,6 +411,34 @@ public class Group extends Particle
         return Structure.GROUP;
     } //-- getStructureType
 
+   /**
+    * A helper method that returns true if this group
+    * contains an <any> element.
+    * @return  method that returns true if this group
+    * contains an <any> element.
+    */
+    public boolean hasAny() {
+        boolean result = false;
+        Enumeration enum = _contentModel.enumerate();
+        while (enum.hasMoreElements() && !result) {
+            Structure struct = (Structure)enum.nextElement();
+            switch (struct.getStructureType()) {
+                case Structure.ELEMENT:
+                    break;
+                case Structure.GROUP:
+                case Structure.MODELGROUP:
+                    result = ((Group)struct).hasAny();
+                    break;
+                case Structure.WILDCARD:
+                    result = true;
+                    break;
+                default:
+                    break;
+            }
+        }
+        return result;
+    }
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
