@@ -465,19 +465,31 @@ public final class ClassHandler
             if ( _fields[ i ].relation == null )
                 fields[ i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
             else if ( _fields[ i ].multi ) {
-                Vector     vector;
+                Vector      vector;
                 Enumeration enum;
 
                 vector = new Vector();
                 enum = (Enumeration) _fields[ i ].relation.getRelated( source );
-                while ( enum.hasMoreElements() ) {
-                    vector.addElement( copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
-                                                  _fields[ i ].relation.getIdentity( enum.nextElement() ) ) );
+                if ( enum != null ) {
+                    Object related;
+
+                    while ( enum.hasMoreElements() ) {
+                        related = enum.nextElement();
+                        if ( related != null )
+                            vector.addElement( copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
+                                                          _fields[ i ].relation.getIdentity( related ) ) );
+                    }
                 }
                 fields[ i ] = vector;
             } else {
-                fields[ i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
-                    _fields[ i ].relation.getIdentity( _fields[ i ].relation.getRelated( source ) ) );
+                Object related;
+
+                related = _fields[ i ].relation.getRelated( source );
+                if ( related == null )
+                    fields[ i ] = null;
+                else
+                    fields[ i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
+                                             _fields[ i ].relation.getIdentity( related ) );
             }
         }
     }
