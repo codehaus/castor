@@ -58,11 +58,11 @@ import java.sql.Types;
 import java.text.MessageFormat;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
-import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -161,7 +161,6 @@ public final class SequenceKeyGenerator implements KeyGenerator
         ResultSet rs;
         int value;
         String seqName;
-        String currval;
         String table;
 
         seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
@@ -241,7 +240,6 @@ public final class SequenceKeyGenerator implements KeyGenerator
         StringBuffer sb;
         int lp1;  // the first left parenthesis, which starts fields list
         int lp2;  // the second left parenthesis, which starts values list
-        char c;
 
         if ( _style == BEFORE_INSERT ) {
             return insert;

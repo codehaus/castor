@@ -47,9 +47,8 @@
 package org.exolab.castor.jdo.drivers;
 
 
-import java.sql.SQLException;
-import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**

@@ -52,7 +52,6 @@ package org.exolab.castor.jdo.drivers;
 
 
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
