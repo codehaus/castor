@@ -1,6 +1,7 @@
-<!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+<!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                            "http://castor.exolab.org/mapping.dtd">
 <mapping>
+  <include href="tc166/mapping.xml"/>
 
   <!-- Mapping for TestObject to test_table
        Single object mapping, shared access, dirty checking on all fields -->
@@ -307,6 +308,7 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
+  
   <class name="jdo.TestObject2" access="shared" identity="id" key-generator="MAX">
     <description>Table used for timestamp testing</description>
     <map-to table="test_table2" />
@@ -320,6 +322,7 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
+  
   <class name="jdo.TestObject3" access="shared" identity="id">
     <description>Table used for primitive rollback testing</description>
     <map-to table="test_table3" />
@@ -336,6 +339,7 @@
       <sql name="number" type="numeric" />
     </field>
   </class>
+  
   <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
     <description>Table used for cache testing</description>
     <map-to table="test_table_extends" />
@@ -376,8 +380,8 @@
 
   <class name="jdo.TestRaceCount" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <map-to table="test_race" />
     <cache-type type="count-limited" capacity="10"/>
+    <map-to table="test_race" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -388,8 +392,8 @@
 
   <class name="jdo.TestRaceTime" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <map-to table="test_race" />
     <cache-type type="time-limited" capacity="5"/>
+    <map-to table="test_race" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -400,8 +404,8 @@
 
   <class name="jdo.TestRaceUnlimited" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <map-to table="test_race" />
     <cache-type type="unlimited"/>
+    <map-to table="test_race" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -412,8 +416,8 @@
 
   <class name="jdo.TestRaceNone" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <map-to table="test_race" />
     <cache-type type="none"/>
+    <map-to table="test_race" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -452,7 +456,6 @@
       <sql many-key="master_id"/>
     </field>
   </class>
-
 
   <class name="jdo.TestDetail" depends="jdo.TestMaster" access="shared" identity="id">
     <description>Test detail table</description>
@@ -518,7 +521,6 @@
       <sql many-key="master_id"/>
     </field>
   </class>
-
 
   <class name="jdo.TestDetailKeyGen" depends="jdo.TestMasterKeyGen" access="shared" identity="id" key-generator="MAX">
     <description>Test detail table</description>
@@ -599,7 +601,6 @@
     </field>
   </class>
 
-
   <!-- Classes for testing type handling -->
   <class name="jdo.TestTypes" access="shared" identity="id">
     <description>Test various type handling and conversions</description>
@@ -651,7 +652,6 @@
       <sql name="long_date" type="bigint" />
     </field>
   </class>
-
 
   <!-- Classes for testing type handling -->
   <class name="jdo.TestConversion" access="shared" identity="id">
@@ -739,7 +739,6 @@
     </field>
   </class>
 
-
   <!-- Classes for key generator testing -->
   <class name="jdo.TestMaxObject" identity="id" key-generator="MAX">
     <description>Table used for MAX key generator testing</description>
@@ -759,21 +758,6 @@
       <sql name="ext" type="varchar"/>
     </field>
   </class>
-
-  <key-generator name="HIGH-LOW">
-    <param name="table" value="test_seqtable"/>
-    <param name="key-column" value="table_name"/>
-    <param name="value-column" value="max_id"/>
-    <param name="grab-size" value="1000"/>
-  </key-generator>
-  
-  <key-generator name="HIGH-LOW" alias="HLSC">
-    <param name="table" value="test_seqtable"/>
-    <param name="key-column" value="table_name"/>
-    <param name="value-column" value="max_id"/>
-    <param name="grab-size" value="1000"/>
-    <param name="same-connection" value="true"/>
-  </key-generator>
 
   <class name="jdo.TestHighLowObject" identity="id" key-generator="HIGH-LOW">
     <description>Table used for HIGH-LOW key generator testing</description>
@@ -813,7 +797,6 @@
     </field>
   </class>
 
-
   <class name="jdo.TestSequenceObject" identity="id" key-generator="SEQUENCE">
     <description>Table used for SEQUENCE key generator testing</description>
     <map-to table="test_keygen" />
@@ -851,10 +834,6 @@
       <sql name="ext" type="varchar"/>
     </field>
   </class>
-
-  <key-generator name="SEQUENCE" alias="RETURNING">
-    <param name="returning" value="true"/>
-  </key-generator>
 
   <class name="jdo.TestReturningObject" identity="id" key-generator="RETURNING">
     <description>Table used for SEQUENCE key generator testing in RETURNING
@@ -897,7 +876,6 @@
       <sql name="ext" type="varchar"/>
     </field>
   </class>
-
 
   <class name="jdo.TestPersistent" access="shared" identity="id">
     <description>Test Persistent interface handling</description>
@@ -975,8 +953,8 @@
 
   <class name="jdo.TestCol" identity="id">
     <description>Table used for testing different collection types support</description>
-    <map-to table="test_col" />
     <cache-type type="none" />
+    <map-to table="test_col" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -988,8 +966,8 @@
 
   <class name="jdo.TestItem" identity="id">
     <description>Table used for testing different collection types support</description>
-    <map-to table="test_item" />
     <cache-type type="none" />
+    <map-to table="test_item" />
     <field name="id" type="integer">
       <sql name="iid" type="integer" />
     </field>
@@ -1151,25 +1129,42 @@
     </field>
   </class>
 
+  <class name="jdo.Brother" identity="id" key-generator="SEQUENCE">
+    <map-to table="circ_brother" />
+    <field name="id" type="long">
+      <sql name="brother_id" type="integer" />
+    </field>
+    <field name="sister" type="jdo.Sister">
+      <sql name="brother_sibling" />
+    </field>
+  </class>
 
-    <class name="jdo.Brother" identity="id" key-generator="SEQUENCE">
-        <map-to table="circ_brother" />
-        <field name="id" type="long">
-            <sql name="brother_id" type="integer" />
-        </field>
-        <field name="sister" type="jdo.Sister">
-            <sql name="brother_sibling" />
-        </field>
-    </class>
+  <class name="jdo.Sister" identity="id" key-generator="SEQUENCE">
+    <map-to table="circ_sister" />
+    <field name="id" type="long">
+      <sql name="sister_id" type="integer" />
+    </field>
+    <field name="brother" type="jdo.Brother">
+      <sql name="sister_sibling" />
+    </field>
+  </class>
 
-    <class name="jdo.Sister" identity="id" key-generator="SEQUENCE">
-        <map-to table="circ_sister" />
-        <field name="id" type="long">
-            <sql name="sister_id" type="integer" />
-        </field>
-        <field name="brother" type="jdo.Brother">
-            <sql name="sister_sibling" />
-        </field>
-    </class>
+  <key-generator name="HIGH-LOW">
+    <param name="table" value="test_seqtable"/>
+    <param name="key-column" value="table_name"/>
+    <param name="value-column" value="max_id"/>
+    <param name="grab-size" value="1000"/>
+  </key-generator>
+  
+  <key-generator name="HIGH-LOW" alias="HLSC">
+    <param name="table" value="test_seqtable"/>
+    <param name="key-column" value="table_name"/>
+    <param name="value-column" value="max_id"/>
+    <param name="grab-size" value="1000"/>
+    <param name="same-connection" value="true"/>
+  </key-generator>
 
+  <key-generator name="SEQUENCE" alias="RETURNING">
+    <param name="returning" value="true"/>
+  </key-generator>
 </mapping>
