@@ -61,6 +61,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.lang.reflect.*;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
@@ -176,28 +177,20 @@ public final class Introspector {
                 MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
         
-        XMLClassDescriptorImpl classDesc 
-            = new IntrospectedXMLClassDescriptor(c);
-        
         //--------------------------/
         //- handle complex objects -/
         //--------------------------/
         
-        Method[] methods = c.getMethods();
-        Hashtable descriptors     = null;
-        Hashtable createMethods   = null;
-        List      dateDescriptors = null;
+        XMLClassDescriptorImpl classDesc 
+            = new IntrospectedXMLClassDescriptor(c);
         
-        //-- make sure we have methods before creating
-        //-- the hashtables and lists
-        if (methods.length > 0) {
-            descriptors     = new Hashtable();
-            createMethods   = new Hashtable();
-            dateDescriptors = new List(3);
-        }
+        Method[] methods = c.getMethods();
+        List      dateDescriptors = new List(3);
+        Hashtable methodSets      = new Hashtable();
         
         int methodCount = 0;
         
+        //-- create method sets
         for (int i = 0; i < methods.length; i++) {
             Method method = methods[i];
             
@@ -212,211 +205,183 @@ public final class Introspector {
             //-- read methods
             if (methodName.startsWith(GET)) {
                 if (method.getParameterTypes().length != 0) continue;
-                                
+                //-- disable direct field access
                 ++methodCount;
-                
-                //-- caclulate name from Method name
-                String fieldName = methodName.substring(3);
-                fieldName = JavaNaming.toJavaMemberName(fieldName);
-                String xmlName   = _naming.toXMLName(fieldName);
-                
+                //-- make sure return type is "descriptable" 
+                //-- and not null
                 Class type = method.getReturnType();
-                
                 if (type == null) continue;
                 if (!isDescriptable(type)) continue;
                 
-                //-- Handle Collections
-                boolean isCollection = false;
-                if (type.isArray()) {
-                    isCollection = true;
-                }
-                else if (java.util.Enumeration.class.isAssignableFrom(type)){
-                    isCollection = true;
-                }
-                else if (java.util.Vector.class.isAssignableFrom(type)) {
-                    isCollection = true;
-                }
-                
-                XMLFieldDescriptorImpl fieldDesc 
-                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
-                
-                if (fieldDesc == null) {
-                    fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
-                    descriptors.put(xmlName, fieldDesc);
-                    classDesc.addFieldDescriptor(fieldDesc);
-                }
-                
-                if (isCollection) {
-                    fieldDesc.setMultivalued(true);
-                    fieldDesc.setNodeType(NodeType.Element);
-                }
-                
-                FieldHandlerImpl handler 
-                    = (FieldHandlerImpl)fieldDesc.getHandler();
-                
-                if (handler == null) {
-                    TypeInfo typeInfo = new TypeInfo(type);
-                    try {
-                        handler = new FieldHandlerImpl(fieldName,
-                                                       null,
-                                                       null,
-                                                       method,
-                                                       null, 
-                                                       typeInfo);
-                    }
-                    catch (MappingException mx) {
-                        throw new MarshalException(mx);
-                    }
-                    
-                    //-- check for instances of java.util.Date
-                    if (java.util.Date.class.isAssignableFrom(type)) {
-                        //handler = new DateFieldHandler(handler);
-                        dateDescriptors.add(fieldDesc);
-                    }
-                        
-                    fieldDesc.setHandler(handler);
-                }
-                else {
-                    try {
-                        handler.setReadMethod(method);
-                        //-- look for createMethod
-                        method = (Method)createMethods.remove(xmlName);
-                        if (method != null) handler.setCreateMethod(method);
-                    }
-                    catch(MappingException mx) {
-                        throw new MarshalException(mx);
-                    }
-                }
-                
-            } //-- end read method
-            //-- write methods
-            else if (methodName.startsWith(ADD) ||
-                     methodName.startsWith(SET) ) {
-                
-                if (method.getParameterTypes().length != 1) continue;
-                
-                ++methodCount;
-                
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(3);
                 fieldName = JavaNaming.toJavaMemberName(fieldName);
-                String xmlName   = _naming.toXMLName(fieldName);
                 
-                Class type = method.getParameterTypes()[0];
-                if (!isDescriptable(type)) continue;
-                
-                XMLFieldDescriptorImpl fieldDesc 
-                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
-                    
-                //-- For clean up purposes keep track of
-                //-- whether or not this is an "add" method
-                boolean isAdd = false;
-                
-                //-- collection
-                boolean isCollection = false;                
-                if (methodName.startsWith(ADD)) {
-                    isCollection = true;
-                    isAdd = true;
+                MethodSet methodSet = (MethodSet)methodSets.get(fieldName);
+                if (methodSet == null) {
+                    methodSet = new MethodSet(fieldName);
+                    methodSets.put(fieldName, methodSet);
                 }
-                else if (type.isArray() || 
-                        (type == java.util.Vector.class)) 
-                {
-                    isCollection = true;
+                methodSet.get = method;
+            }
+            //-- write methods (collection item)
+            else if (methodName.startsWith(ADD)) {
+                if (method.getParameterTypes().length != 1) continue;
+                //-- disable direct field access
+                ++methodCount;
+                //-- make sure parameter type is "descriptable" 
+                if (!isDescriptable(method.getParameterTypes()[0])) continue;
+                //-- caclulate name from Method name
+                String fieldName = methodName.substring(3);
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
+                MethodSet methodSet = (MethodSet) methodSets.get(fieldName);
+                if (methodSet == null) {
+                    methodSet = new MethodSet(fieldName);
+                    methodSets.put(fieldName, methodSet);
                 }
-                
-                if (fieldDesc == null) {
-                    fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
-                    descriptors.put(xmlName, fieldDesc);
-                    classDesc.addFieldDescriptor(fieldDesc);
+                methodSet.add = method;
+            }
+            //-- write method (singleton or collection)
+            else if (methodName.startsWith(SET)) {
+                if (method.getParameterTypes().length != 1) continue;
+                //-- disable direct field access
+                ++methodCount;
+                //-- make sure parameter type is "descriptable" 
+                if (!isDescriptable(method.getParameterTypes()[0])) continue;
+                //-- caclulate name from Method name
+                String fieldName = methodName.substring(3);
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
+                MethodSet methodSet = (MethodSet) methodSets.get(fieldName);
+                if (methodSet == null) {
+                    methodSet = new MethodSet(fieldName);
+                    methodSets.put(fieldName, methodSet);
                 }
-                
-                if (isCollection) {
-                    fieldDesc.setNodeType(NodeType.Element);
-                    fieldDesc.setMultivalued(true);
-                }
-                
-                FieldHandlerImpl handler 
-                    = (FieldHandlerImpl)fieldDesc.getHandler();
-                
-                if (handler == null) {
-                    TypeInfo typeInfo = new TypeInfo(type);
-                    try {
-                        handler = new FieldHandlerImpl(fieldName,
-                                                       null,
-                                                       null,
-                                                       null,
-                                                       method, 
-                                                       typeInfo);
-                        //-- clean up
-                        if (isAdd) handler.setAddMethod(method);
-                    }
-                    catch (MappingException mx) {
-                        throw new MarshalException(mx);
-                    }
-                   
-                    //-- check for instances of java.util.Date
-                    if (java.util.Date.class.isAssignableFrom(type)) {
-                        //handler = new DateFieldHandler(handler);
-                        dateDescriptors.add(fieldDesc);
-                    }
-                        
-                        
-                    fieldDesc.setHandler(handler);
-                }
-                else {
-                    try {
-                        if (isAdd)
-                            handler.setAddMethod(method);
-                        else
-                            handler.setWriteMethod(method);
-                        
-                        //-- look for createMethod
-                        method = (Method)createMethods.remove(xmlName);
-                        if (method != null) handler.setCreateMethod(method);
-                    }
-                    catch(MappingException mx) {
-                        throw new MarshalException(mx);
-                    }
-                }
-            } //-- end write methods
-            //-- create methods
+                methodSet.set = method;
+            }
             else if (methodName.startsWith(CREATE)) {
                 if (method.getParameterTypes().length != 0) continue;
-                
+                Class type = method.getReturnType();
+                //-- make sure return type is "descriptable" 
+                //-- and not null
+                if (!isDescriptable(type)) continue;
                 //-- caclulate name from Method name
                 String fieldName = methodName.substring(CREATE.length());
                 fieldName = JavaNaming.toJavaMemberName(fieldName);
-                String xmlName   = _naming.toXMLName(fieldName);
+                MethodSet methodSet = (MethodSet) methodSets.get(fieldName);
+                if (methodSet == null) {
+                    methodSet = new MethodSet(fieldName);
+                    methodSets.put(fieldName, methodSet);
+                }
+                methodSet.create = method;
+            }
+        } //-- end create method sets
+        
+        
+        //-- Loop Through MethodSets and create
+        //-- descriptors
+        Enumeration enum = methodSets.elements();
+        
+        while (enum.hasMoreElements()) {
+            
+            MethodSet methodSet = (MethodSet) enum.nextElement();
+            
+            //-- create XMLFieldDescriptor
+            String xmlName = _naming.toXMLName(methodSet.fieldName);
                 
-                Class type = method.getReturnType();
-                                
-                if (!isDescriptable(type)) continue;
-                
-                XMLFieldDescriptorImpl fieldDesc 
-                    = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
-                
-                if (fieldDesc == null) {
-                    //-- add create method to hash and loop...
-                    createMethods.put(xmlName, method);
+            boolean isCollection = false;
+            
+            //-- calculate class type
+            //-- 1st check for add-method, then set or get method
+            Class type = null;
+            if (methodSet.add != null) {
+                type = methodSet.add.getParameterTypes()[0];
+                isCollection = true;
+            }
+            
+            Class colType = null;
+            //-- if there was no add method, use get/set methods
+            //-- to calculate type.
+            if (type == null) {
+                if (methodSet.get != null) {
+                    type = methodSet.get.getReturnType();
+                }
+                else if (methodSet.set != null) {
+                    type = methodSet.set.getParameterTypes()[0];
+                }
+                else {
+                    //-- if we make it here, the only method found
+                    //-- was a create method, which is useless by itself.
                     continue;
                 }
+            }
+            //-- other calculate type of collection
+            else {
+                if (methodSet.get != null) {
+                    colType = methodSet.get.getReturnType();
+                }
+                else if (methodSet.set != null) {
+                    colType = methodSet.set.getParameterTypes()[0];
+                }
+            }
+            
+            //-- Handle Collections
+            if (type.isArray()) {
+                isCollection = true;
+            }
+            else if (java.util.Enumeration.class.isAssignableFrom(type)){
+                isCollection = true;
+            }
+            else if (java.util.Vector.class.isAssignableFrom(type)) {
+                isCollection = true;
+            }
                 
-                FieldHandlerImpl handler 
-                    = (FieldHandlerImpl)fieldDesc.getHandler();
-                try {
-                    handler.setCreateMethod(method);
-                }
-                catch(MappingException mx) {
-                    throw new MarshalException(mx);
-                }
-            } //-- end create method
+            XMLFieldDescriptorImpl fieldDesc 
+                = createFieldDescriptor(type, methodSet.fieldName, xmlName);
+                
+            classDesc.addFieldDescriptor(fieldDesc);
+                
+            if (isCollection) {
+                fieldDesc.setMultivalued(true);
+                fieldDesc.setNodeType(NodeType.Element);
+            }
+                
+            TypeInfo typeInfo = new TypeInfo(type);
+            FieldHandlerImpl handler = null;
+            try {
+                handler = new FieldHandlerImpl(methodSet.fieldName,
+                                                null,
+                                                null,
+                                                methodSet.get,
+                                                methodSet.set, 
+                                                typeInfo);
+                //-- clean up
+                if (methodSet.add != null) 
+                    handler.setAddMethod(methodSet.add);
+                                                
+                if (methodSet.create != null) 
+                    handler.setCreateMethod(methodSet.create);
+                    
+            }
+            catch (MappingException mx) {
+                throw new MarshalException(mx);
+            }
+                    
+            //-- check for instances of java.util.Date
+            if (java.util.Date.class.isAssignableFrom(type)) {
+                //handler = new DateFieldHandler(handler);
+                dateDescriptors.add(fieldDesc);
+            }
+                        
+            fieldDesc.setHandler(handler);
             
         } //-- end of method loop
         
         //-- If we didn't find any methods we can try
         //-- direct field access
         if (methodCount == 0) {           
+            
             Field[] fields = c.getFields();            
+            Hashtable descriptors = new Hashtable();
             for (int i = 0; i < fields.length; i++) {                
                 Field field = fields[i];
                 
@@ -673,6 +638,43 @@ public final class Introspector {
         return (type.getSuperclass() == Number.class);
        
     } //-- isPrimitive
+    
+    /**
+     * A simple struct for holding a set of accessor methods
+    **/
+    class MethodSet {
+        
+        /**
+         * A reference to the add method.
+        **/
+        Method add    = null;
+        
+        /**
+         * A reference to the create method.
+        **/
+        Method create = null;
+        
+        /**
+         * A reference to the get method.
+        **/
+        Method get    = null;
+        
+        /**
+         * A reference to the set method.
+        **/
+        Method set    = null;
+        
+        /**
+         * The fieldName for the field accessed by the methods in
+         * this method set.
+        **/
+        String fieldName = null;
+        
+        MethodSet(String fieldName) {
+            super();
+            this.fieldName = fieldName;
+        }
+    } //-- inner class: MethodSet
     
 } //-- Introspector
 
