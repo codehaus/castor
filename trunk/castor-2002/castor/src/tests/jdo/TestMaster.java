@@ -80,6 +80,7 @@ public class TestMaster
     {
         _id = DefaultId;
         _value = DefaultValue;
+        _group = null;
         _details = new Vector();
     }
 

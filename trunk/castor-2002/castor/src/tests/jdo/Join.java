@@ -54,6 +54,7 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
 import org.exolab.jtf.CWTestCategory;
@@ -61,10 +62,8 @@ import org.exolab.exceptions.CWClassConstructorException;
 
 
 /**
- * Tests for duplicate key detection. Tests both duplicate key detection
- * in memory and in the database.
  */
-public class DuplicateKey
+public class Join
     extends CWTestCase
 {
 
@@ -72,7 +71,7 @@ public class DuplicateKey
     private JDOCategory    _category;
 
 
-    public DuplicateKey( String name, String description, CWTestCategory category )
+    public Join( String name, String description, CWTestCategory category )
         throws CWClassConstructorException
     {
         super( name, description );
@@ -99,72 +98,42 @@ public class DuplicateKey
 
         try {
             OQLQuery      oql;
-            TestObject    object;
+            OQLQuery      groupOql;
+            TestMaster    master;
+            TestGroup     group;
             Enumeration   enum;
             
-            // Open transaction in order to perform JDO operations
             db = _category.getDatabase( stream.verbose() );
             db.begin();
-            
-            // Determine if test object exists, if not create it.
-            // If it exists, set the name to some predefined value
-            // that this test will later override.
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
+            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE id = $1" );
+            oql.bind( TestMaster.DefaultId );
             enum = oql.execute();
+            while ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+                db.remove( master );
+                stream.writeVerbose( "Deleting old master" );
+            }
+            groupOql = db.getOQLQuery( "SELECT group FROM jdo.TestGroup group WHERE id = $1" );
+            groupOql.bind( TestGroup.DefaultId );
+            enum = groupOql.execute();
             if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                stream.writeVerbose( "Updating object: " + object );
+                group = (TestGroup) enum.nextElement();
+                stream.writeVerbose( "Using existing group: " + group );
             } else {
-                object = new TestObject();
-                stream.writeVerbose( "Creating new object: " + object );
-                db.create( object );
-            }
-            db.commit();
-            
-
-            // Attempt to create a new object with the same identity,
-            // while one is in memory. Will report duplicate key from
-            // the cache engine.
-            db.begin();
-            oql.bind( new Integer( TestObject.DefaultId ) );
-            enum = oql.execute();
-            while ( enum.hasMoreElements() )
-                enum.nextElement();
-            
-            object = new TestObject();
-            stream.writeVerbose( "Creating new object: " + object );
-            stream.writeVerbose( "Will report duplicate identity from cache engine" );
-            try {
-                db.create( object );
-                result = false;
-                stream.writeVerbose( "Error: DuplicateIdentityException not thrown" );
-            } catch ( DuplicateIdentityException except ) {
-                stream.writeVerbose( "OK: DuplicateIdentityException thrown" );
-            } catch ( Exception except ) {
-                result = false;
-                stream.writeVerbose( "Error: " + except );
+                group = new TestGroup();
+                db.create( group );
+                stream.writeVerbose( "Creating new group: " + group );
             }
             db.commit();
 
-	    
-            // Attempt to create a new object with the same identity,
-            // in the database. Will report duplicate key from SQL engine.
             db.begin();
-            object = new TestObject();
-            stream.writeVerbose( "Creating new object: " + object );
-            stream.writeVerbose( "Will report duplicate identity from SQL engine" );
-            try {
-                db.create( object );
-                result = false;
-                stream.writeVerbose( "Error: DuplicateIdentityException not thrown" );
-            } catch ( DuplicateIdentityException except ) {
-                stream.writeVerbose( "OK: DuplicateIdentityException thrown" );
-            } catch ( Exception except ) {
-                // result = false;
-                stream.writeVerbose( "Error: " + except );
-            }
+            groupOql.bind( TestGroup.DefaultId );
+            group = (TestGroup) groupOql.execute().nextElement();
+            master = new TestMaster();
+            master.setGroup( group );
+            db.create( master );
             db.commit();
+
             db.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );

@@ -79,6 +79,9 @@ public class Deadlock
     private Database       _second;
 
 
+    private JDOCategory    _category;
+
+
     public static final long  Wait = 1000;
 
 
@@ -86,13 +89,7 @@ public class Deadlock
         throws CWClassConstructorException
     {
         super( name, description );
-        try {
-            _db = ( (JDOCategory) category ).getDatabase();
-            _first = ( (JDOCategory) category ).getDatabase();
-            _second = ( (JDOCategory) category ).getDatabase();
-        } catch ( Exception except ) {
-            throw new CWClassConstructorException( except.toString() );
-        }
+        _category = (JDOCategory) category;
     }
 
 
@@ -113,6 +110,10 @@ public class Deadlock
         boolean result = true;
 
         try {
+            _db = _category.getDatabase( stream.verbose() );
+            _first = _category.getDatabase( stream.verbose() );
+            _second = _category.getDatabase( stream.verbose() );
+
             stream.writeVerbose( "Running in access mode shared" );
             if ( ! runOnce( stream, Database.Shared ) )
                 result = false;

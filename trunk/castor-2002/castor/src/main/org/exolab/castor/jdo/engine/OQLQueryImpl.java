@@ -216,7 +216,11 @@ public class OQLQueryImpl
         if ( _dbEngine == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+        if ( engine == null )
+            throw new QueryException( "Could not find an engine supporting class " + objType );
         clsDesc = engine.getDescriptor();
+        if ( engine == null )
+            throw new QueryException( "Could not descriptor for class " + objType );
 
         _expr = engine.getFinder();
         if ( token.hasMoreTokens() ) {

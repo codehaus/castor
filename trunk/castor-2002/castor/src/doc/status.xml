@@ -104,9 +104,6 @@
 
         <li>Add type convertors to bind parameters and load() method</li>
 
-        <li>KeyGenerator - use one from SQLEngine, way to specify the key generator from the mapping file,
-            way to pass a key generator parameter on database creation</li>
-
         <li>Support for read-only fields</li>
 
         <li>Cache control at JDO configuration and mapping file specification - no-cache option,

@@ -104,14 +104,14 @@ public class Harness
     }
 
 
-    public CWBaseApplication createTestHarness( boolean verbose )
+    public CWBaseApplication createTestHarness()
         throws CWClassConstructorException
     {
         TestHarness harness;
 
         harness = new TestHarness( _name );
         for ( int i = 0 ; i < _categories.size() ; ++i )
-            harness.add( ( (Category) _categories.elementAt( i ) ).createTestCategory( verbose ) );
+            harness.add( ( (Category) _categories.elementAt( i ) ).createTestCategory() );
         return harness;
     }
 

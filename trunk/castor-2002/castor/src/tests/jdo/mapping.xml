@@ -10,13 +10,58 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
-    <field name="first" type="string">
+    <field name="first" type="string" required="true">
       <sql name="first" type="varchar"/>
     </field>
     <field name="second" type="string">
       <sql name="second" type="varchar" dirty="ignore"/>
     </field>
   </class>
+
+
+  <class name="jdo.TestMaster" access="shared" identity="id">
+    <description>Test master table</description>
+    <map-to table="test_master" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="value" type="string"  required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="group" type="jdo.TestGroup" required="true">
+      <sql name="group_id" />
+    </field>
+    <field name="detail" type="jdo.TestDetail" collection="enumerate">
+    </field>
+  </class>
+
+
+  <class name="jdo.TestDetail" access="shared" identity="id">
+    <description>Test detail table</description>
+    <map-to table="test_detail" />
+    <field name="id" type="integer">
+      <sql name="detail_id" type="integer" />
+    </field>
+    <field name="value" type="string" required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="master" type="jdo.TestMaster" required="true">
+      <sql name="master_id" />
+    </field>
+  </class>
+
+
+  <class name="jdo.TestGroup" access="shared" identity="id">
+    <description>Test groups table</description>
+    <map-to table="test_group" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="value" type="string"  required="true">
+      <sql name="value" type="varchar" />
+    </field>
+  </class>
+
 
 </mapping>
 

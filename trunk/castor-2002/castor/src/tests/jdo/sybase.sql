@@ -9,9 +9,9 @@ create unique index test_table_pk on test_table ( id )
 go
 
 create table test_master (
-  id      int          not null,
-  value   varchar(200) not null,
-  one_of  int          not null
+  id       int          not null,
+  value    varchar(200) not null,
+  group_id int          not null
 )
 go
 
