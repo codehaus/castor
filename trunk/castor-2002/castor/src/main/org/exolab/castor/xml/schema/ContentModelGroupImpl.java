@@ -91,7 +91,7 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
             throw new SchemaException(err);
         }
 
-        //_resolver.addResolvable(key, elementDecl);
+        _resolver.addResolvable(key, elementDecl);
 
         //-- add to content model
         _contentModel.addElement(elementDecl);
@@ -165,6 +165,32 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
     public Enumeration enumerate() {
         return _contentModel.elements();
     } //-- enumerate
+
+    /**
+     * Returns the element declaration with the given name, or null if no
+     * element declaration with that name exists in this ContentModelGroup.
+     *
+     * @param name the name of the element.
+     * @return the ElementDecl with the given name, or null if no
+     * ElementDecl exists in this ContentModelGroup.
+    **/
+    public ElementDecl getElementDecl(String name) {
+        if (name == null) return null;
+        
+        if (_resolver != null) {
+            String key = "element:"+name;
+            return (ElementDecl) _resolver.resolve(key);
+        }
+        for (int i = 0; i < _contentModel.size(); i++) {
+            Particle p = (Particle) _contentModel.elementAt(i);
+            if (p.getStructureType() == Structure.ELEMENT) {
+                ElementDecl e = (ElementDecl)p;
+                if (name.equals(e.getName()))
+                    return e;
+            }
+        }
+        return null;
+    } //-- getElementDecl
 
     /**
      * Returns the maximum number of occurances that this ContentModelGroup
