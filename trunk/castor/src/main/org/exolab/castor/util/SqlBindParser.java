@@ -241,9 +241,9 @@ final public class SqlBindParser
     /**
      * Binds values to prepared SQL statement using the given
      * sql string as reference for the bind variable order.
+     * @param stmt JDBC statement
      * @param pre_sql SQL statement string with bind variables of the form "?1"
-     * @param sql
-     * @param values
+     * @param values array of bind values
      * @throws SQLException
      */
     public static void bindJdbcValues(PreparedStatement stmt, String pre_sql, Object[] values) throws SQLException

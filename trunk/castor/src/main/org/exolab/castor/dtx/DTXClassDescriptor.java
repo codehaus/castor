@@ -45,24 +45,9 @@
 
 package org.exolab.castor.dtx;
 
-import java.io.*;
 import java.util.*;
-import java.sql.*;
-import org.xml.sax.*;
-import org.exolab.castor.jdo.*;
-import org.exolab.castor.jdo.engine.*;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.Sql;
-import org.exolab.castor.mapping.xml.MapTo;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.*;
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.reader.*;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.QueryExpression;
 
 /* This is more of a ClassHolder or a
  * PleaseStoreThisClassInfoForMeThing.  It's useful for going quickly

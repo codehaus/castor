@@ -52,7 +52,7 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 
 
 /**
- * JDO field descriptor. Wraps {@link FieldDescriptor} and adds
+ * JDO field descriptor. Wraps {@link FieldDescriptorImpl} and adds
  * SQL-related information, type conversion, and set/get for JDBC.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>

@@ -46,8 +46,7 @@
 
 package jdo;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
+
 /**
  * Test object for different collection types.
  */

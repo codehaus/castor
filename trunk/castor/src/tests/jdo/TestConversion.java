@@ -48,8 +48,6 @@ package jdo;
 
 
 import java.math.BigDecimal;
-import java.sql.Clob;
-import java.io.InputStream;
 
 
 /**

@@ -232,7 +232,7 @@ public class URIUtils {
      * I needed this method because the JDK doesn't do this
      * automatically when creating URLs.
      *
-     * @param uri the absolute URI to normalize
+     * @param absoluteURL the absolute URI to normalize
      */
     public static String normalize(String absoluteURL) 
         throws MalformedURLException

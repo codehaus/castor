@@ -11,16 +11,8 @@ package org.exolab.castor.builder.binding;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.Writer;
-import java.util.Enumeration;
 import java.util.Vector;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.ContentHandler;
 
 /**
  * 
@@ -346,8 +338,7 @@ public class ClassType implements java.io.Serializable {
     /**
      * Sets the value of field 'abstract'.
      * 
-     * @param _abstract
-     * @param abstract the value of field 'abstract'.
+     * @param _abstract the value of field 'abstract'.
     **/
     public void setAbstract(boolean _abstract)
     {
@@ -380,8 +371,7 @@ public class ClassType implements java.io.Serializable {
     /**
      * Sets the value of field 'extends'.
      * 
-     * @param _extends
-     * @param extends the value of field 'extends'.
+     * @param _extends the value of field 'extends'.
     **/
     public void setExtends(java.lang.String _extends)
     {
@@ -391,8 +381,7 @@ public class ClassType implements java.io.Serializable {
     /**
      * Sets the value of field 'final'.
      * 
-     * @param _final
-     * @param final the value of field 'final'.
+     * @param _final the value of field 'final'.
     **/
     public void setFinal(boolean _final)
     {
@@ -443,8 +432,7 @@ public class ClassType implements java.io.Serializable {
     /**
      * Sets the value of field 'package'.
      * 
-     * @param _package
-     * @param package the value of field 'package'.
+     * @param _package the value of field 'package'.
     **/
     public void setPackage(java.lang.String _package)
     {

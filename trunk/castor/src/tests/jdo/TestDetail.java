@@ -47,8 +47,6 @@
 package jdo;
 
 
-import java.util.Enumeration;
-import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
 

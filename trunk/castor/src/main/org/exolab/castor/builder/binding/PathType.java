@@ -11,8 +11,6 @@ package org.exolab.castor.builder.binding;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.Serializable;
-import org.exolab.castor.xml.*;
 
 /**
  * 

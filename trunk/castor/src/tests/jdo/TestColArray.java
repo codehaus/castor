@@ -47,7 +47,6 @@
 package jdo;
 
 
-import java.util.ArrayList;
 import java.util.Iterator;
 
 /**

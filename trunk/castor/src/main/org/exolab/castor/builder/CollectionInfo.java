@@ -55,8 +55,6 @@ import org.exolab.castor.builder.types.*;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
-import java.util.Vector;
-
 /**
  * A helper used for generating source that deals with Collections
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -95,7 +93,7 @@ public class CollectionInfo extends FieldInfo {
     
     /**
      * Creates a new CollectionInfo
-     * @param contextType the content type of the collection, ie. the type
+     * @param contentType the content type of the collection, ie. the type
      * of objects that the collection will contain
      * @param name the name of the Collection
      * @param elementName the element name for each element in collection
@@ -708,7 +706,7 @@ public class CollectionInfo extends FieldInfo {
      * @param extraMethods a boolean that when true indicates that
      * extra collection accessor methods should be created. False
      * by default.
-     * @see setReferenceMethodSuffix
+     * @see #setReferenceMethodSuffix
      */
     public void setCreateExtraMethods(boolean extraMethods) {
         _extraMethods = extraMethods;
@@ -722,7 +720,7 @@ public class CollectionInfo extends FieldInfo {
      * the extra collection methods. If null or emtpty the default
      * value, as specified by DEFAULT_REFERENCE_SUFFIX will
      * used.
-     * @see setCreateExtraMethods
+     * @see #setCreateExtraMethods
      */
     public void setReferenceMethodSuffix(String suffix) {
         if ((suffix == null) || (suffix.length() == 0)) {

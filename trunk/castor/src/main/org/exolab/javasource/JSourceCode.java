@@ -104,7 +104,7 @@ public class JSourceCode {
      * Adds the given statement to this JSourceCode. The statement
      * will be added on a new line.
      * @param statement the statement to add
-     * @param the indentSize is the size of the indentation to use
+     * @param indentSize indentSize is the size of the indentation to use
      * when printing this JSourceCode
      * @see #print
     **/

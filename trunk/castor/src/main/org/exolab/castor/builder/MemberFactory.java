@@ -175,7 +175,6 @@ public class MemberFactory {
     /**
      * Creates a FieldInfo to hold the value of a choice.
      * 
-     * @param xsType the type of content
      * @return the new FieldInfo
      */
     public FieldInfo createFieldInfoForChoiceValue() {

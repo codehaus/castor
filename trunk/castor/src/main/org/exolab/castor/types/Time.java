@@ -51,8 +51,8 @@ package org.exolab.castor.types;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
-import java.util.TimeZone;
 import java.util.Date;
+import java.util.TimeZone;
 
 /**
  * <p>Describes an XML schema Time.
@@ -116,7 +116,7 @@ public class Time extends DateTimeBase {
     /**
      * Constructs a XML Schema Time instance given a long representing the time in milliseconds.
      * By default a Time is not UTC and is local.
-     * @param the long value that represents the time instance.
+     * @param l The long value that represents the time instance.
      */
     public Time (long l) {
         if (l>86400000L)
@@ -198,7 +198,7 @@ public class Time extends DateTimeBase {
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
             df.setTimeZone(timeZone);
         }
 

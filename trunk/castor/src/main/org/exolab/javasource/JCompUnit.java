@@ -301,7 +301,7 @@ public class JCompUnit {
     /**
      * Prints the source code for this JClass in the current directory 
      * with the default line seperator of the the runtime platform.
-     * @see print(String, String)
+     * @see #print(String, String)
     **/
     public void print() {
         print(null,null);
@@ -311,7 +311,7 @@ public class JCompUnit {
      * Prints the source code for this JClass
      * with the default line seperator of the the runtime platform.
      * @param destDir the destination directory to generate the file.
-     * @see print(String, String)
+     * @see #print(String, String)
     **/
     public void print(String destDir) {
         print(destDir, null);

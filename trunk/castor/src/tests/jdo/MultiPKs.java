@@ -46,37 +46,19 @@
 
 package jdo;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.ResultSet;
 import java.sql.Statement;
-import java.sql.PreparedStatement;
-import java.util.Vector;
-import java.util.Random;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Collection;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.TransactionNotInProgressException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.persist.spi.Complex;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
 import harness.CastorTestCase;
-
+import harness.TestHarness;
 
 /**
  * Test for multiple columns primary Keys. These tests create data objects

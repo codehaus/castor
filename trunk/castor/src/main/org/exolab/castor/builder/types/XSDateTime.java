@@ -85,7 +85,7 @@ public final class XSDateTime extends XSType {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSDateTime.jType;
     }
 
     /**

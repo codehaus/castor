@@ -48,11 +48,9 @@ package org.exolab.castor.tests.framework;
 
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 
 import org.exolab.adaptx.xslt.dom.XPNReader;
-import org.exolab.adaptx.xslt.dom.XPNBuilder;
 import org.exolab.adaptx.xpath.XPathNode;
 import org.exolab.adaptx.xml.XMLDiff;
 

@@ -46,25 +46,13 @@
 
 package jdo;
 
-import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.mapping.AccessMode;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 

@@ -11,14 +11,7 @@ package org.exolab.castor.builder.binding;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
-import java.io.Reader;
-import java.io.Serializable;
-import java.io.Writer;
 import org.exolab.castor.xml.*;
-import org.exolab.castor.xml.MarshalException;
-import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.ContentHandler;
 
 /**
  * 
@@ -122,8 +115,7 @@ public class ComponentBindingTypeChoice implements java.io.Serializable {
     /**
      * Sets the value of field 'interface'.
      * 
-     * @param _interface
-     * @param interface the value of field 'interface'.
+     * @param _interface the value of field 'interface'.
     **/
     public void setInterface(Interface _interface)
     {

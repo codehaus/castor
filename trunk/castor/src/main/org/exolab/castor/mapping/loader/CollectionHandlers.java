@@ -54,7 +54,6 @@ import java.util.StringTokenizer;
 import java.lang.reflect.Method;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
-import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 
 

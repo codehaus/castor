@@ -53,7 +53,6 @@ import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.Method;
 
 
 /**
@@ -96,7 +95,7 @@ public interface XMLServletResponse
      * @throws IOException An I/O exception creating a document handler
      * @throws SAXException An error occured creating a document handler
      * @throws IllegalStateException If this method was called after
-     *  a call to {@link #getOutputStream} or {@link #getWriter}
+     *  a call to {@link #getOutputStream()} or {@link #getWriter()}
      */
     public DocumentHandler getDocumentHandler()
         throws IOException, SAXException, IllegalStateException;

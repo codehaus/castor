@@ -49,7 +49,8 @@ package org.exolab.castor.tools;
 
 import java.io.IOException;
 import java.io.File;
-import java.io.FileReader;
+
+import org.apache.tools.ant.Project;
 import org.apache.tools.ant.Task;
 import org.apache.tools.ant.BuildException;
 import org.exolab.castor.builder.SourceGenerator;
@@ -119,13 +120,13 @@ public class XSDCompiler
 
         if (lineSep != null) {
             if ("win".equals(lineSep) || "\r\n".equals(lineSep)) {
-                project.log("Using Windows style line separation.",project.MSG_VERBOSE);
+                project.log("Using Windows style line separation.",Project.MSG_VERBOSE);
                 lineSep = "\r\n";
             } else if ("unix".equals(lineSep) || "\n".equals(lineSep)) {
-                project.log("Using UNIX style line separation.",project.MSG_VERBOSE);
+                project.log("Using UNIX style line separation.",Project.MSG_VERBOSE);
                 lineSep = "\n";
             } else if ("mac".equals(lineSep) || "\r".equals(lineSep)) {
-                project.log("Using Macintosh style line separation.",project.MSG_VERBOSE);
+                project.log("Using Macintosh style line separation.",Project.MSG_VERBOSE);
                 lineSep = "\r";
             } else
                 throw new BuildException("Invalid line-separator style.");
@@ -137,7 +138,7 @@ public class XSDCompiler
             try {
                 sgen = new SourceGenerator((FieldInfoFactory)Class.forName(typeFactory).newInstance());
             } catch(Exception ex) {
-                project.log("Type factory "+typeFactory+" is invalid.",project.MSG_INFO);
+                project.log("Type factory "+typeFactory+" is invalid.",Project.MSG_INFO);
                 throw new BuildException(ex);
             }
         } else {
@@ -148,12 +149,12 @@ public class XSDCompiler
         sgen.setSuppressNonFatalWarnings(force);
         sgen.setDestDir(destDir.toString());
         if (force)
-            project.log("Suppressing non fatal warnings.",project.MSG_VERBOSE);
+            project.log("Suppressing non fatal warnings.",Project.MSG_VERBOSE);
         
         try {
             sgen.generateSource(schema.getAbsolutePath(), pkgName);
         } catch(IOException ex) {
-	    project.log("Failed to compile " + schema,project.MSG_INFO);
+	    project.log("Failed to compile " + schema,Project.MSG_INFO);
             throw new BuildException(ex);
         }
     } //-- execute

@@ -103,8 +103,8 @@ public final class URILocationImpl extends URILocation {
 	 * Returns the absolute URI for this URILocation
 	 *
 	 * @return the absolute URI for this URILocation
-	 * @see getRelativeURI
-	 * @see getBaseURI
+	 * @see #getRelativeURI
+	 * @see #getBaseURI
 	**/
 	public String getAbsoluteURI() {
 	    return _absoluteURI;
@@ -116,8 +116,8 @@ public final class URILocationImpl extends URILocation {
 	 * will be equivalent to the document base for the URL.
 	 *
 	 * @return the base location of this URILocation
-	 * @see getAbsoluteURI
-	 * @see getRelativeURI
+	 * @see #getAbsoluteURI
+	 * @see #getRelativeURI
 	**/
 	public String getBaseURI() {
 	    if (_documentBase == null)
@@ -148,8 +148,8 @@ public final class URILocationImpl extends URILocation {
 	 * Returns the relative URI for this URILocation
 	 *
 	 * @return the relative URI for this URILocation
-	 * @see getAbsoluteURI
-	 * @see getBaseURI
+	 * @see #getAbsoluteURI
+	 * @see #getBaseURI
 	**/
 	public String getRelativeURI() {
 

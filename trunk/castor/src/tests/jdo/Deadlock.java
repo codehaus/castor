@@ -47,7 +47,6 @@
 package jdo;
 
 
-import java.io.IOException;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -55,9 +54,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
-import junit.framework.Assert;
+
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -286,11 +283,11 @@ public class Deadlock extends CastorTestCase {
                 start = System.currentTimeMillis();
 
                 // Load first object and change something about it (otherwise will not write)
-                _theTest.stream.println( "1.1: Loading object " + TestObject.DefaultId );
+                CastorTestCase.stream.println( "1.1: Loading object " + TestObject.DefaultId );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId ), _accessMode );
                 object.setValue1( TestObject.DefaultValue1 + ":1" );
-                _theTest.stream.println( "1.2: Modified to " + object );
+                CastorTestCase.stream.println( "1.2: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
@@ -301,11 +298,11 @@ public class Deadlock extends CastorTestCase {
                 // sleep( start + Wait - System.currentTimeMillis() );
                 //start = System.currentTimeMillis();
                 
-                _theTest.stream.println( "1.3: Loading object " + ( TestObject.DefaultId  + 1 ) );
+                CastorTestCase.stream.println( "1.3: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
                 object.setValue2( TestObject.DefaultValue2 + ":1" );
-                _theTest.stream.println( "1.4: Modified to " + object );
+                CastorTestCase.stream.println( "1.4: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
                 if ( _second.isAlive() ) {
@@ -319,7 +316,7 @@ public class Deadlock extends CastorTestCase {
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _theTest.stream.println( "1.5: Committing" );
+                CastorTestCase.stream.println( "1.5: Committing" );
                 _db.commit();
 
                 if ( _second.isAlive() ) {
@@ -328,11 +325,11 @@ public class Deadlock extends CastorTestCase {
                     }
                 }
 
-                _theTest.stream.println( "1.6: Committed" );
+                CastorTestCase.stream.println( "1.6: Committed" );
                 _resultOk = true;
             } catch ( Exception except ) {
                 _theTest._firstProblem = except;
-                _theTest.stream.println( "1.X: " + except );
+                CastorTestCase.stream.println( "1.X: " + except );
             } finally {
                 try {
                     if ( _db.isActive() )
@@ -386,11 +383,11 @@ public class Deadlock extends CastorTestCase {
                 //start = System.currentTimeMillis();
                 
                 // Load first object and change something about it (otherwise will not write)
-                _theTest.stream.println( "2.1: Loading object " + ( TestObject.DefaultId + 1 ) );
+                CastorTestCase.stream.println( "2.1: Loading object " + ( TestObject.DefaultId + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
                                                new Integer( TestObject.DefaultId + 1 ), _accessMode );
                 object.setValue2( TestObject.DefaultValue2 + ":2" );
-                _theTest.stream.println( "2.2: Modified to " + object );
+                CastorTestCase.stream.println( "2.2: Modified to " + object );
                 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
@@ -401,24 +398,24 @@ public class Deadlock extends CastorTestCase {
                 // sleep( start + Wait - System.currentTimeMillis() );
                 // start = System.currentTimeMillis();
                 
-                _theTest.stream.println( "2.3: Loading object " + TestObject.DefaultId );
+                CastorTestCase.stream.println( "2.3: Loading object " + TestObject.DefaultId );
                 try {
                     object = (TestObject) _db.load( TestObject.class,
                                                     new Integer( TestObject.DefaultId ), _accessMode );
                 } catch ( LockNotGrantedException except ) {
                     if ( _accessMode == Database.Exclusive ||
                          _accessMode == Database.DbLocked ) {
-                        _theTest.stream.println( "2.X OK: Deadlock detected" );
+                        CastorTestCase.stream.println( "2.X OK: Deadlock detected" );
                     } else {
                         _theTest._secondProblem = except;
-                        _theTest.stream.println( "2.X Error: " + except );
+                        CastorTestCase.stream.println( "2.X Error: " + except );
                     }
                     _db.rollback();
                     _resultOk = true;
                     return;
                 }
                 object.setValue1( TestObject.DefaultValue1 + ":2" );
-                _theTest.stream.println( "2.4: Modified to " + object );
+                CastorTestCase.stream.println( "2.4: Modified to " + object );
 
                 // Notify the other thread that it may proceed and suspend
                 synchronized ( _lock ) {
@@ -431,27 +428,27 @@ public class Deadlock extends CastorTestCase {
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
-                _theTest.stream.println( "2.5: Committing" );
+                CastorTestCase.stream.println( "2.5: Committing" );
                 _db.commit();
 
                 synchronized ( _lock ) {
                     _lock.notify();
                 }
-                _theTest.stream.println( "2.6 Error: deadlock not detected" );
-                _theTest.stream.println( "2.6 Second: Committed" );
+                CastorTestCase.stream.println( "2.6 Error: deadlock not detected" );
+                CastorTestCase.stream.println( "2.6 Second: Committed" );
                 _theTest._secondProblem = new Exception("deadlock not detected");
             } catch ( TransactionAbortedException except ) {
                 if ( except.getException() instanceof LockNotGrantedException ) {
-                    _theTest.stream.println( "2.X OK: Deadlock detected" );
+                    CastorTestCase.stream.println( "2.X OK: Deadlock detected" );
                     _resultOk = true;
                 } else {
                     _theTest._secondProblem = except;
-                    _theTest.stream.println( "2.X Error: " + except );
+                    CastorTestCase.stream.println( "2.X Error: " + except );
                 }
-                _theTest.stream.println( "2.X Second: aborting" );
+                CastorTestCase.stream.println( "2.X Second: aborting" );
             } catch ( Exception except ) {
                 _theTest._secondProblem = except;
-                _theTest.stream.println( "2.X Error: " + except );
+                CastorTestCase.stream.println( "2.X Error: " + except );
             } finally {
                 try {
                     if ( _db.isActive() )

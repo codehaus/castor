@@ -333,7 +333,7 @@ public class ClassInfo extends XMLInfo {
      * Sets the base class of this classInfo.
      * A classInfo can indeed extend another classInfo to reflect the extension
      * mechanism used in the XML Schema
-     * @param the base class of this classInfo.
+     * @param base: the base class of this classInfo.
      */
     public void setBaseClass(ClassInfo base) {
         _baseClass = base;

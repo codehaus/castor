@@ -49,14 +49,9 @@
 
 package org.exolab.castor.types;
 
-import org.exolab.castor.xml.ValidationException;
-
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Date;
-import java.util.StringTokenizer;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 
 /**
  * <p>The base class for date/time XML Schema types.
@@ -157,7 +152,7 @@ public abstract class DateTimeBase
     /**
      * set the Year field
      * Note: 0000 is not allowed
-     * @param the year to set up
+     * @param year year to set up
      */
     public void setYear(short year)
         throws OperationNotSupportedException
@@ -364,7 +359,7 @@ public abstract class DateTimeBase
 
     /**
      * Sets the millisecond field for this date/time type
-     * @param millsecond the millisecond to set
+     * @param millisecond the millisecond to set
      * @throws OperationNotSupportedException this exception is thrown when
      *         changing the value of the second field is not allowed
      */
@@ -564,7 +559,7 @@ public abstract class DateTimeBase
      * Adding Duration to dateTimes (W3C XML Schema, part 2 appendix E).</a>
      * This version is using the algorithm defined in the document from W3C, next version
      * may optimize it.
-     * @param Duration the duration to add
+     * @param duration the duration to add
      */
      public void addDuration(Duration duration) {
           int temp = 0;

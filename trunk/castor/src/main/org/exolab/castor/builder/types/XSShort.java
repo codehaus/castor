@@ -46,7 +46,6 @@
 package org.exolab.castor.builder.types;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -115,8 +114,8 @@ public final class XSShort extends XSPatternBase {
 	 * Returns the minimum exclusive value that this XSShort can hold.
 	 * @return the minimum exclusive value that this XSShort can hold. If
 	 * no minimum exclusive value has been set, Null will be returned
-	 * @see #getMinInclusive
-	 * @see #setMaxInclusive
+	 * @see #getMinInclusive()
+	 * @see #setMaxInclusive(short)
 	**/
 	public Short getMinExclusive() {
 		return minExclusive;
@@ -147,7 +146,7 @@ public final class XSShort extends XSPatternBase {
 	/**
 	 * Sets the maximum exclusive value that this XSShort can hold.
 	 * @param max the maximum exclusive value this XSShort can be
-	 * @see #setMaxInclusive
+	 * @see #setMaxInclusive(Short)
 	**/
 	public void setMaxExclusive(short max) {
 		maxExclusive = new Short(max);
@@ -157,7 +156,7 @@ public final class XSShort extends XSPatternBase {
 	/**
 	 * Sets the maximum exclusive value that this XSShort can hold.
 	 * @param max the maximum exclusive value this XSShort can be
-	 * @see #setMaxInclusive
+	 * @see #setMaxInclusive(short)
 	**/
 	public void setMaxExclusive(Short max) {
 		maxExclusive = max;
@@ -167,7 +166,7 @@ public final class XSShort extends XSPatternBase {
 	/**
 	 * Sets the maximum inclusive value that this XSShort can hold.
 	 * @param max the maximum inclusive value this XSShort can be
-	 * @see #setMaxExclusive
+	 * @see #setMaxExclusive(Short)
 	**/
 	public void setMaxInclusive(short max) {
 		maxInclusive = new Short(max);
@@ -177,7 +176,7 @@ public final class XSShort extends XSPatternBase {
 	/**
 	 * Sets the maximum inclusive value that this XSShort can hold.
 	 * @param max the maximum inclusive value this XSShort can be
-	 * @see #setMaxExclusive
+	 * @see #setMaxExclusive(short)
 	**/
 	public void setMaxInclusive(Short max) {
 		maxInclusive = max;
@@ -186,8 +185,8 @@ public final class XSShort extends XSPatternBase {
 
 	/**
 	 * Sets the minimum exclusive value that this XSShort can hold.
-	 * @param max the minimum exclusive value this XSShort can be
-	 * @see #setMinInclusive
+	 * @param min the minimum exclusive value this XSShort can be
+	 * @see #setMinInclusive(Short)
 	**/
 	public void setMinExclusive(short min) {
 		minExclusive = new Short(min);
@@ -196,8 +195,8 @@ public final class XSShort extends XSPatternBase {
 
 	/**
 	 * Sets the minimum exclusive value that this XSShort can hold.
-	 * @param max the minimum exclusive value this XSShort can be
-	 * @see #setMinInclusive
+	 * @param min the minimum exclusive value this XSShort can be
+	 * @see #setMinInclusive(short)
 	**/
 	public void setMinExclusive(Short min) {
 		minExclusive = min;
@@ -206,8 +205,8 @@ public final class XSShort extends XSPatternBase {
 
 	/**
 	 * Sets the minimum inclusive value that this XSShort can hold.
-	 * @param max the minimum inclusive value this XSShort can be
-	 * @see #setMinExclusive
+	 * @param min the minimum inclusive value this XSShort can be
+	 * @see #setMinExclusive(Short)
 	**/
 	public void setMinInclusive(short min) {
 		minInclusive = new Short(min);
@@ -216,8 +215,8 @@ public final class XSShort extends XSPatternBase {
 
 	/**
 	 * Sets the minimum inclusive value that this XSShort can hold.
-	 * @param max the minimum inclusive value this XSShort can be
-	 * @see #setMinExclusive
+	 * @param min the minimum inclusive value this XSShort can be
+	 * @see #setMinExclusive(short)
 	**/
 	public void setMinInclusive(Short min) {
 		minInclusive = min;
@@ -226,7 +225,7 @@ public final class XSShort extends XSPatternBase {
 
 	/**
 	 * Reads and sets the facets for XSShort
-	 * @param simpletype the Simpletype containing the facets
+	 * @param simpleType the Simpletype containing the facets
 	 **/
 	public void setFacets(SimpleType simpleType) {
 		//-- copy valid facets

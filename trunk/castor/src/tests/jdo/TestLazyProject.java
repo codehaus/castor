@@ -2,9 +2,6 @@
 
 package jdo;
 
-import java.util.Collection;
-import java.util.Date;
-
 
 public class TestLazyProject {
     private int _id;

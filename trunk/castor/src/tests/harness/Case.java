@@ -47,13 +47,8 @@
 package harness;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
 
 public class Case {
 
@@ -76,7 +71,7 @@ public class Case {
         Class       catClass;
         Constructor cnst;
 
-        catClass = getClass().forName( _className );
+        catClass = Class.forName( _className );
         cnst = catClass.getConstructor( new Class[] { TestHarness.class } );
         return (CastorTestCase) cnst.newInstance( new Object[] { category } );
     }

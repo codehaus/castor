@@ -47,7 +47,6 @@
 package jdo;
 
 import java.util.Collection;
-import java.util.Iterator;
 import org.exolab.castor.jdo.TimeStampable;
 
 /**

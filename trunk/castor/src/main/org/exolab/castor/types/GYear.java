@@ -50,7 +50,8 @@ package org.exolab.castor.types;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.util.SimpleTimeZone;
-import java.util.GregorianCalendar;
+import java.util.TimeZone;
+
 /**
  * Describe an XML schema gYear type.
  * <p>The format is defined by W3C XML Schema Recommendation and ISO8601
@@ -88,7 +89,6 @@ public class GYear extends GYearMonth {
     /**
      * Instantiates a new gYear given the value
      * of the month and the value of the day.
-     * @param century the month value
      * @param year the year value
      */
     public GYear(int year) {
@@ -173,7 +173,7 @@ public class GYear extends GYearMonth {
             offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
-            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+            timeZone.setID(TimeZone.getAvailableIDs(offset)[0]);
             df.setTimeZone(timeZone);
         }
 

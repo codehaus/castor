@@ -208,7 +208,7 @@ public final class XSQName extends XSPatternBase {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSQName.jType;
     }
     
     /**

@@ -45,7 +45,6 @@
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.castor.xml.schema.SimpleType;
 
 import org.exolab.javasource.*;
@@ -126,7 +125,7 @@ public final class XSBoolean extends XSType {
     /**
      * Returns a JSourceCode that contains the validation method for this XSBoolean.
      * 
-     * @param fixed a fixed value to use if any
+     * @param fixedValue a fixed value to use if any
      * @param jsc the JSourceCode to fill in.
      */
     public void validationCode (JSourceCode jsc, String fixedValue, String fieldValidatorInstanceName) {

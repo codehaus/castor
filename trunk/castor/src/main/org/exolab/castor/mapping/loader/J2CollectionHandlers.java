@@ -48,7 +48,6 @@ package org.exolab.castor.mapping.loader;
 
 
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +55,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MapItem;
 

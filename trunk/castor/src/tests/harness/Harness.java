@@ -50,9 +50,6 @@ package harness;
 import java.util.Vector;
 import java.util.Enumeration;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-
 public class Harness {
 
     private String  _name;

@@ -59,8 +59,8 @@ public abstract class URILocation {
 	 * Returns the absolute URI for this URILocation
 	 *
 	 * @return the absolute URI for this URILocation
-	 * @see getRelativeURI
-	 * @see getBaseURI
+	 * @see #getRelativeURI
+	 * @see #getBaseURI
 	**/
 	public abstract String getAbsoluteURI();
 
@@ -70,8 +70,8 @@ public abstract class URILocation {
 	 * will be equivalent to the document base for the URL.
 	 *
 	 * @return the base location of this URILocation
-	 * @see getAbsoluteURI
-	 * @see getRelativeURI
+	 * @see #getAbsoluteURI
+	 * @see #getRelativeURI
 	**/
 	public abstract String getBaseURI();
 
@@ -90,8 +90,8 @@ public abstract class URILocation {
 	 * Returns the relative URI for this URILocation
 	 *
 	 * @return the relative URI for this URILocation
-	 * @see getAbsoluteURI
-	 * @see getBaseURI
+	 * @see #getAbsoluteURI
+	 * @see #getBaseURI
 	**/
 	public abstract String getRelativeURI();
 

@@ -6,12 +6,6 @@ package soak.model;
 
 
 
-import java.math.BigDecimal;
-import java.util.Vector;
-import java.util.Date;
-
-
-
 public class Phone implements java.io.Serializable {
 
     private short countryCode;

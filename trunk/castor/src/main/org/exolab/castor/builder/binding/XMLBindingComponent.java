@@ -325,7 +325,7 @@ public class XMLBindingComponent implements BindingComponent {
      * Returns the hashCode value for this object.
      *
      * @return the hashcode value for this object.
-     * @see java.lang.hashCode()
+     * @see java.lang.Object#hashCode()
      */
     public int hashCode() {
 
@@ -987,7 +987,7 @@ public class XMLBindingComponent implements BindingComponent {
      * Returns an array of the different interface names implemented by the class
      * that will represent the current XMLBindingComponent. Null is returned if
      * no class binding is defined for the wrapped XML Schema structure.
-     * @return
+     * @return array of interface names
      */
     public String[] getImplements() {
         if (getType() == CLASS) {

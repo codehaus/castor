@@ -52,7 +52,7 @@ import org.apache.commons.logging.LogFactory;
 
 
 /**
- * UnLimited is Map which implements the {@link LRU} interface.
+ * UnLimited is Map which implements the {@link Unlimited} interface.
  * <p>
  * Every object being put in the Map will live until it is
  * removed manually.

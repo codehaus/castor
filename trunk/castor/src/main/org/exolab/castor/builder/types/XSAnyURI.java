@@ -92,7 +92,7 @@ public final class XSAnyURI extends XSType {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSAnyURI.jType;
     }
 
     public String toString() {
@@ -102,7 +102,7 @@ public final class XSAnyURI extends XSType {
     /**
      * Returns a JSourceCode that contains the validation method for this XSAnyURI.
      * 
-     * @param fixed a fixed value to use if any
+     * @param fixedValue a fixed value to use if any
      * @param jsc the JSourceCode to fill in.
      */
      public void validationCode (JSourceCode jsc, String fixedValue, String fieldValidatorInstanceName) {

@@ -2,7 +2,6 @@ package myapp;
 
 
 import java.util.Vector;
-import java.util.Enumeration;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
@@ -10,7 +9,6 @@ import org.exolab.castor.jdo.TimeStampable;
 
 public class Product implements Persistent, TimeStampable
 {
-
 
     private int          _id;
 

@@ -58,7 +58,6 @@ import javax.sql.DataSource;
 import javax.naming.InitialContext;
 import org.xml.sax.InputSource;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;

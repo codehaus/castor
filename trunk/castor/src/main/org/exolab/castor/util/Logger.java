@@ -50,8 +50,6 @@ package org.exolab.castor.util;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.io.PrintWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Date;
 
 

@@ -256,7 +256,7 @@ public interface BindingComponent {
 	 * Returns the hashCode value for this object.
 	 *
 	 * @return the hashcode value for this object.
-	 * @see java.lang.Object#hashcode()
+	 * @see java.lang.Object#hashCode()
 	 */
 	public int hashCode();
 	

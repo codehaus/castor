@@ -528,13 +528,10 @@ public class SourceGenerator
     
 
    /**
-     * Sets whether or not to create the XML marshalling framework specific
-     * methods (marshall, unmarshall, validate) in the generated classes.
-	 * By default, these methods are generated.
+     * Sets whether or not to implement CastorTestable
 	 *
-     * @param createMarshall a boolean, when true indicates
-     * to generated the marshalling framework methods
-     *
+     * @param testable a boolean, when true indicates
+     * to implement CastorTestable
      */
     public void setTestable(boolean testable) {
         if (_sourceFactory != null)
@@ -1176,7 +1173,7 @@ public class SourceGenerator
    /**
     * Called by setBinding to fill in the mapping between namespaces and
     * Java packages.
-    * @param Package[] the array of package element
+    * @param packages the array of package element
     */
     private void processNamespaces(PackageType[] packages) {
         if (packages.length == 0)
@@ -1213,7 +1210,7 @@ public class SourceGenerator
      * Processes the given JClass by creating the
      * corresponding MarshalInfo and print the Java classes
      *
-     * @param classInfo the classInfo to process
+     * @param jClass the classInfo to process
     **/
     private void processJClass(JClass jClass, SGStateInfo state) {
 

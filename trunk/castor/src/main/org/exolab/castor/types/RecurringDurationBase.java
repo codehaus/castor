@@ -55,10 +55,8 @@ package org.exolab.castor.types;
 import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.xml.ValidationException;
 
-import java.util.Date;
-import java.util.StringTokenizer;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+
 /**
  * <p>The base class for recurring Duration types.
  * <p>This base class contains all the time fields (including the time zone ones)
@@ -125,8 +123,6 @@ public abstract class RecurringDurationBase
      * duration and period set up
      * @param duration the TimeDuration representing the duration facet
      * @param period the TimeDuration reprensenting the period facet
-     * @return a recurringDurationBase with the facets
-     *           duration and period set up
      */
     protected RecurringDurationBase(TimeDuration duration, TimeDuration period)
     {
@@ -144,8 +140,6 @@ public abstract class RecurringDurationBase
      * duration and period set up
      * @param duration the String representing the duration facet
      * @param period the String reprensenting the period facet
-     * @return a recurringDurationBase with the facets
-     *          duration and period set up
      * @throws IllegalArgumentException this exception is thrown when the parameter strings
      *                                  are not corresponding to valid TimeDuration
      */
@@ -167,8 +161,6 @@ public abstract class RecurringDurationBase
      * @param duration the String representing the duration facet
      * @param period the String reprensenting the period facet
      * @param values an array of shorts which contains the values of the fields
-     * @return a recurringDurationBase with the facets
-     *          duration and period set up
      * @throws IllegalArgumentException this exception is thrown when the values array
      *                                  is not of length 6.
      * @see #setValues

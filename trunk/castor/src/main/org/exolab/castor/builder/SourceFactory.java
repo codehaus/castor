@@ -210,7 +210,7 @@ public class SourceFactory {
      * @param extraMethods a boolean that when true indicates that
      * extra collection accessor methods should be created. False
      * by default.
-     * @see setReferenceMethodSuffix
+     * @see org.exolab.castor.builder.SourceFactory#setReferenceMethodSuffix
      */
     public void setCreateExtraMethods(boolean extraMethods) {
         infoFactory.setCreateExtraMethods(extraMethods);
@@ -223,20 +223,17 @@ public class SourceFactory {
      * @param suffix the method suffix to use when creating
      * the extra collection methods. If null or emtpty the default
      * value, as specified in CollectionInfo will be used.
-     * @see setCreateExtraMethods
+     * @see org.exolab.castor.builder.SourceFactory#setCreateExtraMethods
      */
     public void setReferenceMethodSuffix(String suffix) {
         infoFactory.setReferenceMethodSuffix(suffix);
     } //-- setReferenceMethodSuffix
     
     /**
-     * Sets whether or not to create the XML marshalling framework specific
-     * methods (marshall, unmarshall, validate) in the generated classes.
-	 * By default, these methods are generated.
+     * Sets whether or not to implement CastorTestable
 	 *
      * @param testable a boolean, when true indicates
-     * to generate testing framework methods
-     *
+     * to implement CastorTestable
      */
     public void setTestable(boolean testable) {
            _testable = testable;

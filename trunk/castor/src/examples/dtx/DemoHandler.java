@@ -8,7 +8,6 @@
 
 package dtx;
 
-import org.xml.sax.HandlerBase;
 import org.xml.sax.InputSource;
 import org.xml.sax.Locator;
 import org.xml.sax.AttributeList;

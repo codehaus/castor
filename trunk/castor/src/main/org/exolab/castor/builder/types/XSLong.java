@@ -45,10 +45,8 @@
 
 package org.exolab.castor.builder.types;
 
-import org.exolab.castor.xml.FieldValidator;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.schema.SimpleType;
-import org.exolab.castor.builder.SourceGenerator;
 import org.exolab.javasource.*;
 
 import java.util.Enumeration;
@@ -116,8 +114,8 @@ public final class XSLong extends XSPatternBase {
 	 * Returns the minimum exclusive value that this XSLong can hold.
 	 * @return the minimum exclusive value that this XSLong can hold. If
 	 * no minimum exclusive value has been set, Null will be returned
-	 * @see #getMinInclusive
-	 * @see #setMaxInclusive
+	 * @see #getMinInclusive()
+	 * @see #setMaxInclusive(long)
 	**/
 	public Long getMinExclusive() {
 		return minExclusive;
@@ -148,7 +146,7 @@ public final class XSLong extends XSPatternBase {
 	/**
 	 * Sets the maximum exclusive value that this XSLong can hold.
 	 * @param max the maximum exclusive value this XSLong can be
-	 * @see #setMaxInclusive
+	 * @see #setMaxInclusive(Long)
 	**/
 	public void setMaxExclusive(long max) {
 		maxExclusive = new Long(max);
@@ -158,7 +156,7 @@ public final class XSLong extends XSPatternBase {
 	/**
 	 * Sets the maximum exclusive value that this XSLong can hold.
 	 * @param max the maximum exclusive value this XSLong can be
-	 * @see #setMaxInclusive
+	 * @see #setMaxInclusive(long)
 	**/
 	public void setMaxExclusive(Long max) {
 		maxExclusive = max;
@@ -168,7 +166,7 @@ public final class XSLong extends XSPatternBase {
 	/**
 	 * Sets the maximum inclusive value that this XSLong can hold.
 	 * @param max the maximum inclusive value this XSLong can be
-	 * @see #setMaxExclusive
+	 * @see #setMaxExclusive(Long)
 	**/
 	public void setMaxInclusive(long max) {
 		maxInclusive = new Long(max);
@@ -178,7 +176,7 @@ public final class XSLong extends XSPatternBase {
 	/**
 	 * Sets the maximum inclusive value that this XSLong can hold.
 	 * @param max the maximum inclusive value this XSLong can be
-	 * @see #setMaxExclusive
+	 * @see #setMaxExclusive(long)
 	**/
 	public void setMaxInclusive(Long max) {
 		maxInclusive = max;
@@ -187,8 +185,8 @@ public final class XSLong extends XSPatternBase {
 
 	/**
 	 * Sets the minimum exclusive value that this XSLong can hold.
-	 * @param max the minimum exclusive value this XSLong can be
-	 * @see #setMinInclusive
+	 * @param min the minimum exclusive value this XSLong can be
+	 * @see #setMinInclusive(Long)
 	**/
 	public void setMinExclusive(long min) {
 		minExclusive = new Long(min);
@@ -197,8 +195,8 @@ public final class XSLong extends XSPatternBase {
 
 	/**
 	 * Sets the minimum exclusive value that this XSLong can hold.
-	 * @param max the minimum exclusive value this XSLong can be
-	 * @see #setMinInclusive
+	 * @param min the minimum exclusive value this XSLong can be
+	 * @see #setMinInclusive(long)
 	**/
 	public void setMinExclusive(Long min) {
 		minExclusive = min;
@@ -207,8 +205,8 @@ public final class XSLong extends XSPatternBase {
 
 	/**
 	 * Sets the minimum inclusive value that this XSLong can hold.
-	 * @param max the minimum inclusive value this XSLong can be
-	 * @see #setMinExclusive
+	 * @param min the minimum inclusive value this XSLong can be
+	 * @see #setMinExclusive(Long)
 	**/
 	public void setMinInclusive(long min) {
 		minInclusive = new Long(min);
@@ -217,8 +215,8 @@ public final class XSLong extends XSPatternBase {
 
 	/**
 	 * Sets the minimum inclusive value that this XSLong can hold.
-	 * @param max the minimum inclusive value this XSLong can be
-	 * @see #setMinExclusive
+	 * @param min the minimum inclusive value this XSLong can be
+	 * @see #setMinExclusive(long)
 	**/
 	public void setMinInclusive(Long min) {
 		minInclusive = min;
@@ -228,8 +226,7 @@ public final class XSLong extends XSPatternBase {
 	/**
 	 * Reads and sets the facets for XSTimeDuration
 	 * override the readFacet method of XSType
-	 * @param simpletype the Simpletype containing the facets
-	 * @param xsType the XSType to set the facets of
+	 * @param simpleType the Simpletype containing the facets
 	 * @see org.exolab.castor.builder.types.XSType#getFacets
 	 */
 	public void setFacets(SimpleType simpleType) {

@@ -47,17 +47,8 @@
 package jdo;
 
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.Vector;
 import java.util.Collection;
 import java.util.ArrayList;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.Query;
-import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.Persistent;
-import org.exolab.castor.jdo.TimeStampable;
 
 
 /**

@@ -43,13 +43,10 @@
  * $Id$
  */
 
-
 package org.exolab.castor.util;
-
 
 import java.text.*;
 import java.util.*;
-
 
 /**
  * I18N message formatting class. A static factory for obtaining
@@ -101,7 +98,6 @@ public class Messages
         return format( message, new Object[] { arg1 } );
     }
 
-    
     /**
      * Format the named message using two argument and return the
      * full message text.
@@ -183,9 +179,7 @@ public class Messages
     /**
      * Set the locale to use for loading messages. Calling this method
      * will reload all the messages based on the new locale name.
-     *
-     * @param message The message name
-     * @return The full message text
+     * @param locale 
      */
     public static void setLocale( Locale locale )
     {
@@ -235,6 +229,5 @@ public class Messages
         }
         
     }
-    
-    
+
 }

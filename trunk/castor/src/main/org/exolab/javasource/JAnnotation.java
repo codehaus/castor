@@ -166,7 +166,6 @@ public class JAnnotation
 	
 	/**
 	 * Returns the JAnnotationType associated with this JAnnotation
-	 * @return
 	 */
 	public JAnnotationType getAnnotationType()
 	{
@@ -202,7 +201,7 @@ public class JAnnotation
 	
 	/**
 	 * Sets the "value" annotation element value as a list of annotation values
-	 * @param annotationValue
+	 * @param annotationValues
 	 */
 	public void setValue(JAnnotation[] annotationValues)
 	{
@@ -222,7 +221,7 @@ public class JAnnotation
 	/**
 	 * Sets the given annotation element value as a list
 	 * @param elementName
-	 * @param stringValue
+	 * @param stringValues
 	 */
 	public void setElementValue(String elementName, String[] stringValues)
 	{
@@ -242,7 +241,7 @@ public class JAnnotation
 	/**
 	 * Sets the given annotation element values as a list of annotation values
 	 * @param elementName
-	 * @param annotationValue
+	 * @param annotationValues
 	 */
 	public void setElementValue(String elementName, JAnnotation[] annotationValues)
 	{
@@ -311,7 +310,7 @@ public class JAnnotation
 	 *   if the value type is not known. This will either be a String or JAnnotation
 	 *   as single value or as an array.
 	 * @param elementName
-	 * @return
+	 * @return annotation element value as Object
 	 */
 	public Object getElementValueObject(String elementName)
 	{
@@ -320,8 +319,8 @@ public class JAnnotation
 	
 	/**
 	 * Returns the given annotation element value as a JAnnotation
-	 * @param elementValue
-	 * @return
+	 * @param elementName
+	 * @return annotation element value as a JAnnotation
      * @exception IllegalArgumentException when the element value is not a JAnnotation
 	 */
 	public JAnnotation getElementValueAnnotation(String elementName)
@@ -335,7 +334,7 @@ public class JAnnotation
 	
 	/**
 	 * Returns the given annotation element value as a JAnnotation list
-	 * @param elementValue
+	 * @param elementName
 	 * @return
      * @exception IllegalArgumentException when the element value is not a JAnnotation[]
 	 */
@@ -350,7 +349,7 @@ public class JAnnotation
 	
 	/**
 	 * Returns the names of the elements set by this annotation
-	 * @return
+	 * @return array of element names
 	 */
 	public String[] getElementNames()
 	{

@@ -71,7 +71,7 @@ public final class XSId extends XSType {
      * @return the JType that this XSType represents
     **/
     public JType getJType() {
-        return this.jType;
+        return XSId.jType;
     }
 
     public void setFacets(SimpleType simpletype) {}

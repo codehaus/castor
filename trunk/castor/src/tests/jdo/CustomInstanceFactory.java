@@ -48,32 +48,19 @@ package jdo;
 
 
 import java.io.IOException;
-import java.util.Date;
-import java.util.Enumeration;
-import java.io.Serializable;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.io.Externalizable;
-import java.io.IOException;
-import org.exolab.castor.jdo.DataObjects;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDO;
-import org.exolab.castor.jdo.JDO2;
-import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
-import harness.TestHarness;
 import harness.CastorTestCase;
+import harness.TestHarness;
 
 /**
  * Test for the behaviors the InstanceFactory interface.

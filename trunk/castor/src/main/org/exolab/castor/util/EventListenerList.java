@@ -54,7 +54,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.EventListener;
-import java.beans.*;
 
 /**
  * <p>This class is an efficient repository for EventListeners based
@@ -262,8 +261,7 @@ public class EventListenerList implements Serializable {
   /**
    * Removes the listener as a listener of the specified type.
    *
-   * @param t the type of the listener to be removed
-   * @param l the listener to be removed
+   * @param listenerToRemove the listener to be removed
    * @exception IllegalArgumentException if the specified listener is
    * null
    */

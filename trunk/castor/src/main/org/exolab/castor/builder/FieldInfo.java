@@ -173,7 +173,7 @@ public class FieldInfo extends XMLInfo {
     /**
      * Creates a new FieldInfo with the given XML Schema type
      * and the given member name
-     * @param XSType the XML Schema type of this member
+     * @param type the XML Schema type of this member
      * @param name the name of the member
     **/
     public FieldInfo(XSType type, String name) {
@@ -188,7 +188,6 @@ public class FieldInfo extends XMLInfo {
     /**
      * Creates the JMembers for this FieldInfo, sometimes a "field"
      * requires more than one java field
-     * @return a JMember which has the appropriate type and name
      * for this FieldInfo
     **/
     public void createJavaField(JClass jClass) {

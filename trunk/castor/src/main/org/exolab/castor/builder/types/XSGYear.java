@@ -87,7 +87,7 @@ public class XSGYear extends XSType {
     } //-- newInstanceCode
 
     public JType getJType() {
-        return this.jType;
+        return XSGYear.jType;
     }
 
     /**
@@ -155,7 +155,7 @@ public class XSGYear extends XSType {
 
     /**
      * Sets the minimum exclusive value that this XSGYear can hold.
-     * @param max the minimum exclusive value this XSGYear can be
+     * @param min the minimum exclusive value this XSGYear can be
      * @see #setMinInclusive
     **/
     public void setMinExclusive(GYear min) {
@@ -165,7 +165,7 @@ public class XSGYear extends XSType {
 
     /**
      * Sets the minimum inclusive value that this XSGYear can hold.
-     * @param max the minimum inclusive value this XSGYear can be
+     * @param min the minimum inclusive value this XSGYear can be
      * @see #setMinExclusive
     **/
     public void setMinInclusive(GYear min) {
@@ -185,8 +185,7 @@ public class XSGYear extends XSType {
     /**
      * Reads and sets the facets for XSXSGYear
      * override the readFacet method of XSType
-     * @param simpletype the Simpletype containing the facets
-     * @param xsType the XSType to set the facets of
+     * @param simpleType the Simpletype containing the facets
      * @see org.exolab.castor.builder.types.XSType#getFacets
      */
 

@@ -75,7 +75,6 @@ public class TimePeriod extends RecurringDuration{
     /**
      * returns a TimePeriod with the duration facet set up
      * @param duration the String value of the duration facet
-     * @return a TimePeriod the duration facet set up
      */
     public TimePeriod(String duration) {
         super(duration,"P0Y");

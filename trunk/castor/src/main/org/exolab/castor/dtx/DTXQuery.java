@@ -51,18 +51,11 @@ import java.sql.*;
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributeListImpl;
 import org.exolab.castor.jdo.*;
-import org.exolab.castor.jdo.engine.*;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.Sql;
 import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.util.*;
-import org.exolab.castor.xml.schema.*;
-import org.exolab.castor.xml.schema.reader.*;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
 
@@ -123,11 +116,9 @@ public class DTXQuery {
     }
 
     /**
-     * Set the DocumentHandler that will receive the results (as SAX
-     * events) for this query. By default, the query will use the
-     * document handler of its DTXEngine.
+     * Set the log writer.
      *
-     * @param handler The DocumentHandler to use.
+     * @param logWriter The log writer to use.
      */
 
     public void setLogWriter(PrintWriter logWriter) {
@@ -271,8 +262,6 @@ public class DTXQuery {
      * This method executes the query. All results of the query are
      * sent to the DocumentHandler specified by setHandler() as SAX
      * events.
-     *
-     * @param handler The DocumentHandler to use.
      */
 
     public void execute() throws DTXException {

@@ -50,7 +50,6 @@ package org.exolab.castor.mapping.loader;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.CollectionHandler;
 
 
 /**

@@ -144,7 +144,7 @@ public interface JAnnotatedElement
 	/**
 	 * Removes the JAnnotation from this source element for the given JAnnotationType,
 	 *   throws a IllegalArgumentException if no JAnnotation has been added.
-	 * @param annotation
+	 * @param annotationType
 	 * @return The JAnnotation that was associated with this source element
 	 */
 	public JAnnotation removeAnnotation(JAnnotationType annotationType)

@@ -59,7 +59,7 @@ package org.exolab.castor.jdo;
  * (bound) before executing the query. Execution of the query will
  * result in an enumeration of all the objects found by the query.
  * The query can be re-executed by binding new parameters and calling
- * the {@link #execute} method a second time. A query can be
+ * the {@link #execute()} method a second time. A query can be
  * re-execute while objects are still retrieved from a previous
  * execution.
  *

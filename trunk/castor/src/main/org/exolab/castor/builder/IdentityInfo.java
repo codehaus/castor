@@ -48,8 +48,6 @@ package org.exolab.castor.builder;
 import org.exolab.castor.builder.types.*;
 import org.exolab.javasource.*;
 
-import java.util.Vector;
-
 /**
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
@@ -59,7 +57,7 @@ public class IdentityInfo extends FieldInfo {
     
     public IdentityInfo(String name) {
         super(new XSId(), name);
-        setNodeType(FieldInfo.ATTRIBUTE_TYPE);
+        setNodeType(XMLInfo.ATTRIBUTE_TYPE);
     } //-- SGId
     
     public JMethod[] createAccessMethods() {

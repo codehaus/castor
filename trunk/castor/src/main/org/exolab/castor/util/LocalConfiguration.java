@@ -620,7 +620,7 @@ public final class LocalConfiguration extends Configuration {
     }
 
     /**
-     * Calls {@link #getDefault} to load the configuration the
+     * Calls {@link #getDefault()} to load the configuration the
      * first time and then looks for a local configuration to
      * merge in with the defaults. Will not complain about inability 
      * to load local configuration file from one of the default 

@@ -194,7 +194,7 @@ abstract class JStructure extends JType
     /**
      * Adds the given import to this JStructure
      *
-     * @param the className of the class to import.
+     * @param className name of the class to import.
      */
     public void addImport(String className) {
         if (className == null) return;
@@ -237,7 +237,7 @@ abstract class JStructure extends JType
     
 	/**
 	 * Adds approprite imports for these JAnnotation's
-	 * @param annotation
+	 * @param annotations
 	 */
 	protected void addImport(JAnnotation[] annotations)
 	{
@@ -437,7 +437,6 @@ abstract class JStructure extends JType
 
 	/**
 	 * Returns the object managing the annotations for this JStructure
-	 * @return
 	 */
 	protected JAnnotatedElementHelper getAnnotatedElementHelper()
 	{

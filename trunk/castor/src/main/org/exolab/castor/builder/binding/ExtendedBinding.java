@@ -187,10 +187,10 @@ public class ExtendedBinding extends Binding {
      * This is a direct lookup in the hashtable, null is returned if no ComponentBindingType 
      * corresponds to the given Schema Location XPath.
      * 
-     * @param XPath the schema location xpath
+     * @param xPath the schema location xpath
      * @return The ComponentBindingType that correspond to the given Schema Location XPath,
      * Null is returned when no ComponentBindingType is found.
-     * @see getSchemaLocation
+     * @see org.exolab.castor.builder.binding.ExtendedBinding#getSchemaLocation(Structure)
      */
     private ComponentBindingType lookupComponentBindingType(String xPath) {
         if (xPath == null)
