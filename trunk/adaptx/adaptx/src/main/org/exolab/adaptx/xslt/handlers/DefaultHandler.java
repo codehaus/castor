@@ -29,6 +29,8 @@ import org.exolab.adaptx.xslt.XSLOutput;
 import org.xml.sax.*;
 import java.io.*;
 
+import org.apache.log4j.Logger;
+
 /* 
  Note: 
  I don't simply include serialize.* because I don't want a 
@@ -36,7 +38,6 @@ import java.io.*;
  org.exolab.adaptx.xslt.OutputFormat which is part of this Package
 */
 import org.apache.xml.serialize.BaseMarkupSerializer;
-import org.apache.xml.serialize.SerializerFactory;
 import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.XMLSerializer;
 import org.apache.xml.serialize.TextSerializer;
@@ -69,7 +70,9 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
     /**
      * The write to serialize data to
     **/
-    Writer _out = null;
+    private Writer _writer = null;
+    
+    private OutputStream _ostream = null;
     
     /**
      * The Serializer used for printing output
@@ -91,32 +94,63 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
     **/
     private Event _saved = null;
     
+    
+    private Logger _logger = Logger.getLogger("org.exolab.adaptx.xslt");
+    
+    
       //----------------/
      //- Constructors -/
     //----------------/
     
     /**
      * Creates a new DefaultHandler
-    **/
+     */
     public DefaultHandler(Writer out) {
         this(out, null);
     } //-- DefaultHandler
+    
+    /**
+     * Creates a new DefaultHandler
+     */
+    public DefaultHandler(OutputStream out) {
+        this(out, null);
+    } //-- DefaultHandler
+    
 
     /**
      * Creates a new DefaultHandler
-    **/
+     */
     public DefaultHandler(Writer out, OutputFormat format) {
         super();
         
         //-- initialize out...if null use System.out
         if (out == null)
-            this._out = new OutputStreamWriter(System.out);
+            _ostream = System.out;
         else 
-            this._out = out;
+            _writer = out;
             
         setOutputFormat(format);
         init();
     } //-- DefaultHandler
+    
+    /**
+     * Creates a new DefaultHandler
+     */
+    public DefaultHandler(OutputStream out, OutputFormat format) {
+        super();
+        
+        //-- initialize out...if null use System.out
+        if (out == null)
+            _ostream = System.out;
+        else 
+            _ostream = out;
+            
+        setOutputFormat(format);
+        init();
+    } //-- DefaultHandler
+    
+    
+    
 
       //------------------/
      //- Public Methods -/
@@ -183,7 +217,7 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
     {
         _serializer.endDocument();
         try {
-            if (_out != null) _out.flush();
+            if (_writer != null) _writer.flush();
         }
         catch(java.io.IOException ioe) {
             //-- Ignore exception, writer may have
@@ -207,7 +241,7 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
         --depth;
         if (depth == 0) {
             try {
-                if (_out != null) _out.flush();
+                if (_writer != null) _writer.flush();
             }
             catch(java.io.IOException ioe) {
                 //-- Ignore exception, writer may have
@@ -233,7 +267,7 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
         --depth;
         if (depth == 0) {
             try {
-                if (_out != null) _out.flush();
+                if (_writer != null) _writer.flush();
             }
             catch(java.io.IOException ioe) {
                 //-- Ignore exception, writer may have
@@ -385,6 +419,8 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
     public void startElement(String name, AttributeList atts) 
         throws org.xml.sax.SAXException 
     {
+        //System.out.println("#startElement: " + name);
+        
         if ((!_hasElements) && (_chooseMethod)) {
             initSerializer(name);
             _chooseMethod = false;
@@ -475,21 +511,42 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
         
         if (_hasElements) return;
         
+        if (_ostream != null) {
+            
+            //-- handle encoding
+            String encoding = null;
+            if (_format != null) {
+            	encoding = _format.getEncoding();
+            }
+            if (encoding != null) {
+                _logger.debug("using encoding: " + encoding);
+                try {
+                	_writer = new OutputStreamWriter(_ostream, encoding);
+                }
+                catch(UnsupportedEncodingException uex) {
+                	_logger.warn(uex);
+                    _writer = new OutputStreamWriter(_ostream);
+                }
+            }
+            else
+                _writer = new OutputStreamWriter(_ostream);
+        }
+        
         if (method == null) {
             _chooseMethod = true;
             if (_serializer == null) {
-                _serializer = new XMLSerializer(_out, _apOutputFormat);
+                _serializer = new XMLSerializer(_writer, _apOutputFormat);
             }
         }
         else if ("html".equalsIgnoreCase(method))
-            _serializer = new HTMLSerializer(_out, _apOutputFormat); 
+            _serializer = new HTMLSerializer(_writer, _apOutputFormat); 
         else if ("text".equalsIgnoreCase(method)) {
             _serializer = new TextSerializer();
-            _serializer.setOutputCharStream( _out);
+            _serializer.setOutputCharStream( _writer);
             _serializer.setOutputFormat( _apOutputFormat );
         }
         else 
-            _serializer = new XMLSerializer(_out, _apOutputFormat);
+            _serializer = new XMLSerializer(_writer, _apOutputFormat);
         
         try {
             _serializer.asDocumentHandler();
@@ -536,7 +593,7 @@ public class DefaultHandler implements ContentHandler, ResultHandler {
             oldFormat.getDoctypeSystemId());
         
         //-- Encoding (currently not supported by XSL:P)
-        //newFormat.setEncoding(oldFormat.getEnconding());
+        newFormat.setEncoding(oldFormat.getEncoding());
         
         //-- Indenting
         newFormat.setIndenting(oldFormat.getIndent());
