@@ -328,7 +328,11 @@ public class SchemaWriter {
         boolean hasAnonymousType = false;
         if (!element.isReference()) {
              XMLType type = element.getType();
-             if (type.getName() == null) {
+             
+             if (type == null) {
+                //-- no type?
+             }
+             else if (type.getName() == null) {
                  hasAnonymousType = true;
              } else {
                     if (type instanceof SimpleType && ((SimpleType)type).isBuiltInType()){
