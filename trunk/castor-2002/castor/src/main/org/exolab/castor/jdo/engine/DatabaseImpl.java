@@ -526,7 +526,7 @@ public class DatabaseImpl
 
     public void afterCompletion( int status )
     {
-        if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
+        if ( _transaction == null || _ctx == null )
             throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
             return;
