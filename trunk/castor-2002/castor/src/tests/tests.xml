@@ -41,6 +41,7 @@
     <!-- -->
     <!-- -->
     <case class="jdo.Persistent" />
+    <case class="jdo.CustomInstanceFactory" />
     <!-- <case class="jdo.StoredProcedure" /> -->
 
     <!-- D -->
@@ -85,12 +86,14 @@
     <case class="jdo.KeyGenReturning" />
     <!-- -->
     <case class="jdo.Persistent" />
+    <case class="jdo.CustomInstanceFactory" />
 
     <!-- D -->
     <!-- jdo.ListTypes is a helper class for
               writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
   </category>
+
   <category name="mysql" class="jdo.JDOCategory">
     <description>JDO tests for MySQL</description>
     <jdo database-name="mysql" configuration="mysql.xml" />
@@ -122,6 +125,7 @@
     <case class="jdo.KeyGenIdentity" />
     <!-- -->
     <case class="jdo.Persistent" />
+    <case class="jdo.CustomInstanceFactory" />
 
     <!-- D -->
     <!-- <case class="jdo.ListTypes" /> -->
@@ -159,6 +163,7 @@
     <case class="jdo.KeyGenSequence" />
     <!-- -->
     <case class="jdo.Persistent" />
+    <case class="jdo.CustomInstanceFactory" />
 
     <!-- D -->
     <!-- jdo.ListTypes is a helper class for
@@ -199,6 +204,7 @@
     <!-- -->
     <!-- -->
     <case class="jdo.Persistent" />
+    <case class="jdo.CustomInstanceFactory" />
 
     <!-- D -->
   </category>
