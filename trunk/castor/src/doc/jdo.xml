@@ -20,10 +20,12 @@
       <section title="Client Application">
 
         <p>Client applications are responsible for defining the JDO database configuration,
-           and managing the transaction explicitly. The database is configured through a
-           separate XML file which links to the mapping file. In the example code I refer to the
-           database file as <tt>database.xml</tt>, but any name can be used. See
-           <a href="database-conf.xml">Castor JDO Database Configuration</a> for more information.</p>
+           and managing the transaction explicitly. The database is by default configured through
+           a separate XML file which links to the mapping file. (Alternatively, it can be configured 
+           using the utility class <api class="org.exolab.castor.util.JdoConfFactory">JdoConfFactory</api>).</p>
+
+		<p>In the example code I refer to the database file as <tt>database.xml</tt>, but any name can be used.
+		   See <a href="database-conf.xml">Castor JDO Database Configuration</a> for more information.</p>
 
         <p><api>org.exolab.castor.jdo.JDO</api> defines the database name and properties and is used
            to open a database connection. The database configuration is loaded on demand by setting
@@ -58,6 +60,9 @@ db.commit();
 db.close();
            </code></p>
 
+		<p>For an example showing how to set up a database configuration on the fly without
+		the need of a preconfigured XML configuration file) see
+		<a href="database-conf.xml#JdoConfFactory">JdoConfFactory</a>.</p>
       </section>
 
       <section title="J2EE Application">
