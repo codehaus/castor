@@ -74,7 +74,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
     private final int _sqlType;
 
 
-    private final boolean _isHSQL;
+    private final String _fName;
 
 
     /**
@@ -83,17 +83,17 @@ public final class IdentityKeyGenerator implements KeyGenerator
     public IdentityKeyGenerator( PersistenceFactory factory, int sqlType ) throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("sybase") && !fName.equals("sql-server") && !fName.equals("sapdb") &&
-                !fName.equals("hsql")) {
+        if ( !fName.equals("sybase") && !fName.equals("sql-server") &&
+                !fName.equals("hsql") && !fName.equals("mysql")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
-        _isHSQL = fName.equals("hsql");
+        _fName = fName;
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
-        if ( sqlType != Types.INTEGER && _isHSQL )
+        if ( sqlType != Types.INTEGER && _fName.equals("hsql") )
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
     }
@@ -115,13 +115,16 @@ public final class IdentityKeyGenerator implements KeyGenerator
         ResultSet rs;
 
         try {
-            if ( _isHSQL ) {
+            if ( _fName.equals("hsql") ) {
                 CallableStatement cstmt;
 
                 cstmt = conn.prepareCall( "{call IDENTITY()}" );
                 stmt = cstmt; //  for "finally"
                 cstmt.execute();
                 rs = cstmt.getResultSet();
+            } else if ( _fName.equals("mysql") ) {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery( "SELECT LAST_INSERT_ID()");
             } else {
                 stmt = conn.createStatement();
                 rs = stmt.executeQuery( "SELECT @@identity");
@@ -152,7 +155,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
 
 
     /**
-     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ?
      */
     public final byte getStyle() {
         return AFTER_INSERT;
