@@ -951,7 +951,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     _anyUnmarshaller.startElement(name, atts);
                     //first element so depth can only be one at this point
                     _depth = 1;
-                    state.object = new Object();
+                    state.object = _anyUnmarshaller.getStartingNode();
                     state.type = _class;
                     //don't need to continue
                      return;
