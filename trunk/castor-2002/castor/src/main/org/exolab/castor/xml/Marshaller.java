@@ -600,8 +600,11 @@ public class Marshaller extends MarshalFramework {
                 classDesc = _StringClassDescriptor;
                 //-- check to see if we need to save the xsi:type
                 //-- for this class
-                saveType = (_class != descriptor.getFieldType());
-            } else {
+                if (_class != descriptor.getFieldType()) {
+                    saveType = (!descriptor.getFieldType().isPrimitive());
+                }
+            } 
+            else {
                 //-- save package information for use when searching
                 //-- for MarshalInfo classes
                 String className = _class.getName();
