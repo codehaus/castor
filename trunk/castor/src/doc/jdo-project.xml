@@ -115,6 +115,23 @@
         </p>
         </section>
 
+        <section title="OQL Query Externalization">
+        <p>
+        <b>Description:</b><br />
+        Castor should include a mechanism for OQL queries to be externalized
+        in the object mapping descriptor. 
+        </p>
+        <p>
+        <b>Volunteer:</b><br />
+        <b>Status:</b> not started<br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        This would allow for named queries that do not require recompilation 
+        for changes. These queries would be specified in the &lt;class> elements 
+        and would just be included automatically via Castor XML unmarshalling.
+        </p>
+        </section>
+
         <section title="ClassMolder Refactoring">
         <p>
         <b>Description:</b><br />
