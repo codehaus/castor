@@ -77,8 +77,9 @@ public abstract class Structure implements java.io.Serializable {
     public static final short SCHEMA              = 17;
     public static final short SIMPLE_CONTENT      = 18;
     public static final short SIMPLE_TYPE         = 19;
-    public static final short UNIQUE              = 20;
-    public static final short WILDCARD            = 21;
+    public static final short UNION               = 20;
+    public static final short UNIQUE              = 21;
+    public static final short WILDCARD            = 22;
 
     //-- should be removed eventually
     public static final short UNKNOWN         = -1;
