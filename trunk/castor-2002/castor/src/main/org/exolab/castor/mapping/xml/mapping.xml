@@ -10,13 +10,19 @@
       <xml-info name="description" node-type="element"/>
     </field-mapping>
     <field-mapping set-method="addInclude" type="org.exolab.castor.mapping.xml.Include">
-      <xml-info name="include"/>
+      <xml-info name="include" node-type="element"/>
     </field-mapping>
     <field-mapping set-method="addClassMapping" type="org.exolab.castor.mapping.xml.ClassMapping">
-      <xml-info name="class"/>
+      <xml-info name="class" node-type="element"/>
     </field-mapping>
   </class-mapping>
 
+  <class-mapping class-name="org.exolab.castor.mapping.xml.SqlTable">
+    <xml-schema xml-name="sql-table"/>
+    <field-mapping set-method="setTableName" type="string">
+      <xml-info name="table-name"/>
+    </field-mapping>
+  </class-mapping>
 
   <class-mapping class-name="org.exolab.castor.mapping.xml.ClassMapping">
     <xml-schema xml-name="class"/>
@@ -33,7 +39,7 @@
       <xml-info name="description" node-type="element"/>
     </field-mapping>
     <field-mapping set-method="setSqlTable"
-                   type="org.exolab.castor.mapping.xml.SqlTable">
+                   type="org.exolab.castor.mapping.xml.SqlTable" node-type="element">
       <xml-info name="sql-table"/>
     </field-mapping>
     <field-mapping set-method="setXmlSchema"
