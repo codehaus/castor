@@ -107,13 +107,27 @@ public interface ClassDescriptorResolver {
     public XMLClassDescriptor resolve(String className, ClassLoader loader);
     
     /**
-     * Returns the XMLClassDescriptor for the given xml name
+     * Returns the first XMLClassDescriptor that matches the given
+     * XML name and namespaceURI. Null is returned if no descriptor
+     * can be found.
+     *
      * @param className the class name to find the XMLClassDescriptor for
      * @param loader the ClassLoader to use
-     * @return the XMLClassDescriptor for the given class name
+     * @return the XMLClassDescriptor for the given XML name
     **/
     public XMLClassDescriptor resolveByXMLName
-        (String xmlName, ClassLoader loader);
+        (String xmlName, String namespaceURI, ClassLoader loader);
+
+    /**
+     * Returns an enumeration of XMLClassDescriptor objects that
+     * match the given xml name
+     *
+     * @param className the class name to find the XMLClassDescriptor for
+     * @param loader the ClassLoader to use
+     * @return an enumeration of XMLClassDescriptor objects.
+    **/
+    public ClassDescriptorEnumeration resolveAllByXMLName
+        (String xmlName, String namespaceURI, ClassLoader loader);
     
     /**
      * Sets the mapping loader for this ClassDescriptorResolver
