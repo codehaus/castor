@@ -32,7 +32,7 @@ go
 create table test_race
 (
   id      int          not null,
-  value1  int	       not null
+  value1  int          not null
 )
 go
 create unique index test_race_pk on test_race ( id )
@@ -93,6 +93,7 @@ create table test_types (
   tdt      datetime       not null,
   ttm      smalldatetime  not null,
   int_val  integer        null,
+  long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
@@ -198,3 +199,20 @@ go
 grant all on test_detail2 to test
 go
 
+
+
+-- test_persistent
+drop table test_persistent
+go
+create table test_persistent (
+  id       integer         not null,
+  ctime    datetime        not null,
+  mtime    datetime        null,
+  value    varchar(200)    not null,
+  parent_id integer        null
+)
+go
+create unique index test_persistent_pk on test_persistent ( id )
+go
+grant all on test_persistent to test
+go

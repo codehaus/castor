@@ -52,6 +52,7 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Properties;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -1045,6 +1046,14 @@ public final class CacheEngine
 
 	            // Check if object has been modified, and whether it can be stored.
 	            modified = typeInfo.handler.isModified( object, original );
+                if ( typeInfo.handler.getCallback() != null ) {
+                    try {
+                        typeInfo.handler.getCallback().storing( object, modified != ClassHandler.Unmodified );
+                    } catch ( Exception except ) {
+                        throw new PersistenceExceptionImpl( except );
+                    }
+                    modified = typeInfo.handler.isModified( object, original );
+                }
 	            if ( modified == ClassHandler.Unmodified )
 	                return null;
 	            try {

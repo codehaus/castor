@@ -75,14 +75,22 @@ public class JDOCallback
     }
 
 
-    public void storing( Object object )
+    public void storing( Object object, boolean modified )
         throws Exception
     {
-        ( (Persistent) object ).jdoStore();
+        ( (Persistent) object ).jdoStore( modified );
+    }
+
+
+    public void created( Object object )
+        throws Exception
+    {
+        ( (Persistent) object ).jdoCreate();
     }
 
 
     public void removing( Object object )
+        throws Exception
     {
         ( (Persistent) object ).jdoRemove();
     }

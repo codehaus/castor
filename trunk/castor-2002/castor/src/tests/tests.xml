@@ -15,6 +15,7 @@
     <case class="jdo.CacheLeakage" name="TC11" />
     <case class="jdo.Race" name="TC12" />
     <case class="jdo.Dependent" name="TC15" />
+    <case class="jdo.Persistent" name="TC16" />
   </category>
   <category name="oracle" class="jdo.JDOCategory">
     <description>JDO tests for Oracle8i</description>
@@ -30,6 +31,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.Race" />
     <case class="jdo.KeyGenReturning" />
+    <case class="jdo.Persistent" name="TC16" />
   </category>
 
   <category name="oleak" class="jdo.JDOCategory">

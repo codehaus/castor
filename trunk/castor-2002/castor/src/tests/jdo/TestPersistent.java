@@ -1,0 +1,309 @@
+/**
+ * Redistribution and use of this software and associated documentation
+ * ("Software"), with or without modification, are permitted provided
+ * that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain copyright
+ *    statements and notices.  Redistributions must also contain a
+ *    copy of this document.
+ *
+ * 2. Redistributions in binary form must reproduce the
+ *    above copyright notice, this list of conditions and the
+ *    following disclaimer in the documentation and/or other
+ *    materials provided with the distribution.
+ *
+ * 3. The name "Exolab" must not be used to endorse or promote
+ *    products derived from this Software without prior written
+ *    permission of Exoffice Technologies.  For written permission,
+ *    please contact info@exolab.org.
+ *
+ * 4. Products derived from this Software may not be called "Exolab"
+ *    nor may "Exolab" appear in their names without prior written
+ *    permission of Exoffice Technologies. Exolab is a registered
+ *    trademark of Exoffice Technologies.
+ *
+ * 5. Due credit should be given to the Exolab Project
+ *    (http://www.exolab.org/).
+ *
+ * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
+ * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+ * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
+ * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ *
+ * $Id$
+ */
+
+
+package jdo;
+
+
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.Vector;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Query;
+import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.jdo.Persistent;
+
+
+/**
+ * Test object mapping to test_persistent used for Persistent test.
+ */
+public class TestPersistent implements Persistent
+{
+
+
+    static final int       DefaultId = 7;
+
+
+    static final String    DefaultValue = "persistent";
+
+
+    private int            _id;
+
+
+    private String         _value;
+
+
+    private Date           _creationTime;
+
+
+    private Date           _modificationTime;
+
+
+    private Integer        _parentId;
+
+
+    private TestPersistent _parent;
+
+
+    private Vector         _children;
+
+
+    private Vector         _origChildren;
+
+
+    private Database       _db;
+
+
+    public TestPersistent()
+    {
+        this( DefaultId );
+    }
+
+
+    public TestPersistent( int id )
+    {
+        _id = id;
+        _value = DefaultValue;
+        _children = new Vector();
+        _creationTime = new Date();
+    }
+
+
+    public void setId( int id )
+    {
+        _id = id;
+    }
+
+
+    public int getId()
+    {
+        return _id;
+    }
+
+
+    public void setParentId( Integer parentId )
+    {
+        _parentId = parentId;
+    }
+
+
+    public Integer getParentId()
+    {
+        return _parentId;
+    }
+
+
+    public void setValue( String value )
+    {
+        _value = value;
+    }
+
+
+    public String getValue()
+    {
+        return _value;
+    }
+
+
+    public void setCreationTime( Date creationTime )
+    {
+        _creationTime = creationTime;
+    }
+
+
+    public Date getCreationTime()
+    {
+        return _creationTime;
+    }
+
+
+    public void setModificationTime( Date modificationTime )
+    {
+        _modificationTime = modificationTime;
+    }
+
+
+    public Date getModificationTime()
+    {
+        return _modificationTime;
+    }
+
+
+    public void setParent( TestPersistent parent )
+    {
+        _parent = parent;
+        _parentId = ( _parent == null ? null : new Integer( _parent._id ) );
+    }
+
+
+    public TestPersistent getParent()
+    {
+        return _parent;
+    }
+
+
+    public void addChild( TestPersistent child )
+    {
+        _children.addElement( child );
+        child.setParent( this );
+    }
+
+
+    public Vector getChildren()
+    {
+        return _children;
+    }
+
+
+    public TestPersistent findChild(int id)
+    {
+        Enumeration enum;
+        TestPersistent child;
+
+        enum = _children.elements();
+        while ( enum.hasMoreElements() ) {
+            child = (TestPersistent) enum.nextElement();
+            if ( child.getId() == id ) {
+                return child;
+            }
+        }
+        return null;
+    }
+
+
+    public void jdoPersistent( Database db )
+    {
+        _db = db;
+    }            
+
+
+    public void jdoTransient() 
+    {
+    }                        
+
+
+    public void jdoLoad()
+        throws Exception
+    {
+        Query        qry;
+        QueryResults res;
+        
+        if ( _parentId != null ) 
+            _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId );
+        
+        qry = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE parentId=$1" );
+        qry.bind( _id );
+        res = qry.execute();
+        while ( res.hasMore() )
+            _children.add( res.next() );
+        _origChildren = (Vector) _children.clone();
+    }
+
+
+    public void jdoStore( boolean modified )
+        throws Exception
+    {
+        Object child;
+
+        if ( modified ) 
+            _modificationTime = new Date();
+
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) {
+            child = enum.nextElement();
+            if ( ! _origChildren.contains(child) ) 
+                _db.create( child );
+        }
+        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) {
+            child = enum.nextElement();
+            if ( ! _children.contains(child) ) 
+                _db.remove( child );
+        }
+    }
+
+
+    public void jdoCreate() 
+        throws Exception
+    {
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) 
+            _db.create( enum.nextElement() );
+        _origChildren = (Vector) _children.clone();
+    }                   
+         
+    
+    public void jdoRemove() 
+        throws Exception
+    {
+        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) 
+            _db.remove( enum.nextElement() );
+    }                   
+         
+    
+    public boolean equals( Object other )
+    {
+        if ( other == this )
+            return true;
+        if ( other != null && other instanceof TestPersistent ) {
+            if ( ( (TestPersistent) other )._id == _id &&
+                 ( (TestPersistent) other )._value.equals( _value ) )
+                return true;
+        }
+        return false;
+    }
+
+
+    public String toString()
+    {
+        String children = "";
+
+        for ( int i = 0 ; i < _children.size() ; ++i ) {
+            if ( i > 0 )
+                children = children + ", ";
+            children = children + _children.elementAt( i ).toString();
+        }
+        return _id + " / " + _value + " / " + _modificationTime + " (" + _parentId + ") { " + children + " }";
+    }
+
+
+}

@@ -85,6 +85,7 @@ create table test_types (
   tdt      date           not null,
   ttm      date           not null,
   int_val  integer        null,
+  long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
   int_date integer        null,
@@ -130,4 +131,14 @@ drop sequence   test_keygen_seq;
 create sequence test_keygen_seq;
 grant all on test_keygen_seq to test;
 
+-- test_persistent
+drop table test_persistent;
+create table test_persistent (
+  id       integer         not null,
+  ctime    date            not null,
+  mtime    date            null,
+  value    varchar(200)    not null,
+  parent_id integer        null
+);
+create unique index test_persistent_pk on test_persistent ( id );
 

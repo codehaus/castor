@@ -97,22 +97,31 @@ public interface Persistent
 
     /**
      * Called to indicate that an object is to be stored in persistent
-     * stored. This method is called at commit time on all persistent
+     * storage. This method is called at commit time on all persistent
      * objects in this transaction. Managed fields may not necessarily be
      * persisted if the object has not been identified as modified.
      *
+     * @param modified Is the object modified?
      * @throws Exception An exception occured, the object cannot be stored
      */
-    public void jdoStore()
+    public void jdoStore( boolean modified )
         throws Exception;
 
 
     /**
-     * Called to indicate that an object is to be removed from persistent
-     * storge. This method is called at commit time on all objects deleted
-     * during the transaction.
+     * Called to indicate that an object has been created in persistent
+     * storage. This method is called during db.create().
      */
-    public void jdoRemove();
+    public void jdoCreate()
+        throws Exception;
+    
+
+    /**
+     * Called to indicate that an object is to be removed from persistent
+     * storage. This method is called during db.remove().
+     */
+    public void jdoRemove()
+        throws Exception;
     
 
 }

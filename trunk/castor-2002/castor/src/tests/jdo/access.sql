@@ -26,7 +26,7 @@ drop table test_group;
 create table test_group ( id int not null, "value" varchar(200)  not null );
 create unique index test_group_pk on test_group ( id );
 drop table test_types;
-create table test_types ( id int not null, tdt date not null, ttm date not null, int_val integer null, char_val char(1) null, bool_val char(1) null );
+create table test_types ( id int not null, tdt date not null, ttm date not null, int_val integer null, long_val numeric(18,0) null, char_val char(1) null, bool_val char(1) null );
 create unique index test_types_pk on test_types ( id );
 drop table test_keygen; 
 create table test_keygen ( id int not null, attr  varchar(200)  not null );
@@ -37,3 +37,7 @@ create unique index test_keygen_ext_pk on test_keygen_ext ( id );
 drop table test_seqtable;
 create table test_seqtable ( table_name varchar(200) not null, max_id int );
 create unique index test_seqtable_pk on test_seqtable ( table_name );
+drop table test_persistent;
+create table test_persistent ( id integer not null, ctime date not null, mtime date null, value varchar(200) not null, parent_id integer null);
+create unique index test_persistent_pk on test_persistent ( id );
+

@@ -115,12 +115,14 @@
     <field name="date" type="java.util.Date">
       <sql name="tdt" type="timestamp" />
     </field>
-    <!-- Dirty check fails due to small precision of Sybase smalldatetime -->
     <field name="time" type="java.util.Date">
       <sql name="ttm" type="timestamp" dirty="ignore" />
     </field>
     <field name="intValue" type="integer" required="false" >
       <sql name="int_val" type="integer" dirty="ignore" />
+    </field>
+    <field name="longValue" type="long" required="false" >
+      <sql name="long_val" type="numeric" dirty="ignore" />
     </field>
     <field name="charValue" type="char" required="false" >
       <sql name="char_val" type="char" />
@@ -251,6 +253,28 @@
       <sql name="ext" type="varchar"/>
     </field>
   </class>
+
+
+  <class name="jdo.TestPersistent" access="shared" identity="id">
+    <description>Test Persistent interface handling</description>
+    <map-to table="test_persistent" />
+    <field name="id" type="integer">
+      <sql name="id" />
+    </field>
+    <field name="creationTime" type="java.util.Date" required="true">
+      <sql name="ctime" type="date" />
+    </field>
+    <field name="modificationTime" type="java.util.Date" required="false">
+      <sql name="mtime" type="date" />
+    </field>
+    <field name="value" type="string"  required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="parentId" type="integer" required="false">
+      <sql name="parent_id" />
+    </field>
+  </class>
+
 
 </mapping>
 
