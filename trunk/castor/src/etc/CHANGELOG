@@ -1,6 +1,9 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1452. 
+       (Bruce - 20031110)
+
 XML:   Add a new option in the CTF to allow dynamic configuration
        of the marshalling framework by using the java reflection.
        (Arnaud - 20031017)

@@ -594,7 +594,6 @@ public final class SQLEngine implements Persistence {
                     } else {
                         if ( _fields[i].columns.length != 1 )
                             throw new PersistenceException( "Complex field expected! ");
-                        Object value = toSQL( i, 0, fields[i]);
 
                         SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
                     }
