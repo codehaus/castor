@@ -1645,7 +1645,6 @@ public final class SQLEngine implements Persistence {
                     // "skip" all rows till the first one with a new identity.
                     fetchRaw( null );
                 }
-                clearRaw();
 
                 identity = loadIdentity();
 
