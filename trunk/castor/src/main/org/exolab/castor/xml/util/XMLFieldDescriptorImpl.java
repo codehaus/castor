@@ -202,8 +202,7 @@ public class XMLFieldDescriptorImpl
      */
     private String _xmlPath    = null;
 
-
-
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -377,10 +376,29 @@ public class XMLFieldDescriptorImpl
         else if (tmpHandler == null) {
             return false;
         }
+               
+        //-- the following line is causing some issues when
+        //-- used against a FieldHandlerImpl because the
+        //-- equals method for FieldHandlerImpl is the default
+        //-- replacing with a slightly more generic comparison
+        //-- but this should probably change in the future (kv)
+        //return (_handler.equals(tmpHandler));
+        return (_handler.getClass().isInstance(tmpHandler));
         
-        return (_handler.equals(tmpHandler));
     } //-- equals
 
+    /**
+     * Returns the hashCode for this XMLFieldDescriptor
+     */
+    public int hashCode() {
+        int hash = 17;
+        hash = 17 * _fieldName.hashCode();
+        hash = hash * 17 * _fieldType.hashCode();
+        if (_handler != null)
+            hash = hash * 17 * _handler.hashCode();
+        return hash;
+    }
+    
     /**
      * Set the class which contains this field
      */
