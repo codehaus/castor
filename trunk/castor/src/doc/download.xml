@@ -10,15 +10,17 @@
       <include href="license.xml"/>
     </section>
 
+<!--
     <section title="Release Candidates">
       <ul><b>Castor 0.9.6 RC1</b>
          <p>For FTP access use <url>ftp://ftp.exolab.org/pub/castor/castor_0.9.6/</url></p>
       </ul>
    </section>
+-->
 
     <section title="Latest Stable Release">
       <ul><b>Lastest Released Version: Castor $VERSION$</b>
-        <li><a href="changelog.xml">What changed?</a></li>
+        <li><a href="release-notes.xml">What changed?</a></li>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
             <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
             <br/>&#xA0;</li>
