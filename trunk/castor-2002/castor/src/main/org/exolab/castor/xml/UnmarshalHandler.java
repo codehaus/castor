@@ -1190,16 +1190,14 @@ public class UnmarshalHandler extends MarshalFramework
             return _stringDescriptor;
             
         if (_class.isArray()) return null;
-        
-            
+        if (isPrimitive(_class)) return null;
 
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
 
         XMLClassDescriptor classDesc = null;
-
-        if (!isPrimitive(_class))
-            classDesc = _cdResolver.resolve(_class);
+            
+        classDesc = _cdResolver.resolve(_class);
 
         if (classDesc != null) return classDesc;
 
