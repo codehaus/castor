@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1690.
+       Improved exception handling for the transactionmanager package.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1690
+       (Werner - 20040806)
+
 JDO:   Fixed bug 1709 using contribution from Donnie Armstrong. [donnie@attempt4.com]
        Added new TransactionManagerFactory for IBM WebSphere 5.1.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1709
