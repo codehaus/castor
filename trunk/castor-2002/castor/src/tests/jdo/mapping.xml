@@ -371,6 +371,7 @@
       <sql name="master_id" />
     </field>
     <field name="details2" type="jdo.TestDetail2" collection="arraylist" required="false">
+      <sql many-key="detail_id"/>
     </field>
   </class>
 
