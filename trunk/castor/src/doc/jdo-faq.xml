@@ -833,6 +833,37 @@ Database db = jdo.getDatabase();
         </section>
 
     </section>
+    
+    <section title="RDBMS-specific issues">
+    
+    	<section title = "mySQL">
+
+    		<section title="Use of DATETIME fields in general">
+    	
+    			<p>mySQL in it's current releases (4.0.x and 4.1.x) does not store fractions of a 
+    			   second in fields of type DATETIME that are mapped to java.sql.TimeStamp fields.
+    			   As a result, Castor will throw ObjectModifiedExceptions during commits as Castor 
+    			   internally maintains fractions of a seconds. </p> 
+    			<p>There's no immediate workaround, other than <b>manually</b> setting the fraction 
+    			   portion of the time(stamp) information to 0.</p>
+    		</section>
+    		
+    		<section title="Use of TIMESTAMP fields &amp; NULLs in long transactions">
+    		
+    			<p>In MySQL, fields of type 'Timestamp' exhibit special behaviour wih regards to 
+    			   NULLs. When inserting a "NULL" into such a field, it actually inserts the 
+    			   current date and time. This causes problems for Castor's caching mechanism since 
+    			   Castor internally believes the field is still NULL. If you subsequently perform 
+    			   an update on the entry whilst it is still in the cache, an 
+    			   ObjectModifiedException will be thrown, because Castor believes that the database 
+    			   record has changed in the meantime.</p>
+
+                <p>The workaround is to use a DATETIME field instead of TIMESTAMP.</p>
+                
+    		</section>
+    		
+    	</section>
+    </section>
 
     <section title="Integrating Castor's logging with Log4J">
 
