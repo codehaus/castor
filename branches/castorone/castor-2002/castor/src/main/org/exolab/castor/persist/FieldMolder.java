@@ -272,7 +272,6 @@ public class FieldMolder {
                             }
                         }
                     }
-                //System.out.println("_setMethod: "+_setMethod+" "+object);
                 if ( object != null ) {
                     if ( value == null && _deleteMethod != null )
                         _deleteMethod.invoke( object, null );

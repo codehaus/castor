@@ -1206,7 +1206,7 @@ public final class LockEngine {
                 entry = (ObjectLock) locks.get( oid );
 
                 if ( entry == null ) 
-                    throw new IllegalStateException("No lock to release!");
+                    throw new IllegalStateException("No lock to release! "+oid);
 
                 entry.enter();
             }
