@@ -370,20 +370,23 @@
             when the type of this field is a persistent Java class that is defined
             elsewhere in the mapping.</li>
   
-            <li><b>many-key:</b> Specifies the name of the column that holds the 
-            foreign key to this object. That column is in the database table
-            that stores objects of the Java type of this field. Used <em>only</em> for
-            'to-many' relations.</li>
-  
-            <li><b>many-table:</b> Specifies the name of the bridge table that contains
-            the primary keys of the object on each side of the relationship. This is <em>only</em>
-            used for many-to-many relationships.</li>
-  
             <li><b>read-only:</b> If true, the column in the relational database
             table will only be read, not updated or deleted.</li>
   
             <li><b>dirty:</b> If the value is 'ignore', the field will not be checked
             against the database for modification.</li>
+          </ul>
+          
+          <p>There are two more attributes used <b>only</b> with 'to-many' relations.</p>
+             
+          <ul>
+            <li><b>many-key:</b> Specifies the name of the column that holds the 
+            foreign key to this object. That column is in the database table
+            that stores objects of the Java type of this field.</li>
+  
+            <li><b>many-table:</b> Specifies the name of the bridge table that contains
+            the primary keys of the object on each side of the relationship. This is <em>only</em>
+            used for many-to-many relationships.</li>
           </ul>
           </p>
 
