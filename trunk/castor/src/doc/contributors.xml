@@ -245,6 +245,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Causevic" given="Emir"/>
+    <email>emirc@gawab.com</email>
+    <description>Contributed patch for SapDbFactory to add the currval function.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Child" given="Terry"/>
     <email>tmchild@gmx.net</email>
     <description>Contributed Interbase driver.</description>

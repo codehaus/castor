@@ -129,7 +129,8 @@ public final class SapDbFactory
         // Add all supported functions in SAP DB here
         String[] knownFunctions = new String[] 
         {
-            "nextval"
+            "nextval",
+            "currval"
         };
 
         for ( int i = 0; i < knownFunctions.length; ++i )
