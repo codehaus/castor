@@ -116,6 +116,14 @@ public class DateFieldHandler extends XMLFieldHandler {
      */
     private FieldHandler _handler = null;
     
+    /**
+     * A boolean to indicate milliseconds should be
+     * suppressed upon formatting to a String
+     * (marshalling)
+     */
+    private static boolean _suppressMillis = false;
+    
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -280,6 +288,18 @@ public class DateFieldHandler extends XMLFieldHandler {
             TIMEZONE = (TimeZone)timeZone.clone();
         }
     } //-- setDefaultTimeZone
+    
+    /**
+     * Sets a flag indicating whether or not Milliseconds should
+     * be suppressed upon formatting a dateTime as a String
+     *
+     * @param suppressMills a boolean when true indicates that millis
+     * should be suppressed during conversion of a dateTime to a String
+     */
+    public static void setSuppressMillis(boolean suppressMillis) {
+        _suppressMillis = suppressMillis;
+    } //-- setAlwaysUseUTCTime
+    
 
     //-------------------/
     //- Private Methods -/
@@ -334,7 +354,45 @@ public class DateFieldHandler extends XMLFieldHandler {
         char[] chars = dateTime.toCharArray();
         int i   = 0;
         boolean timezone    = false;
-        for ( ; i < chars.length; i++) {
+        int length = chars.length;
+        
+        //-- remove leading whitspace
+        while (i < length) {
+            boolean isWhitespace = false;
+            switch(chars[i]) {
+                case ' ':
+                case '\r':
+                case '\t':
+                case '\n':
+                    isWhitespace = true;
+                    break;
+                default:
+                    break;
+            }
+            if (!isWhitespace)
+                break;
+            ++i;
+        }
+        
+        //-- remove trailing whitespace
+        while ((length-1) > i) {
+            boolean isWhitespace = false;
+            switch(chars[length-1]) {
+                case ' ':
+                case '\r':
+                case '\t':
+                case '\n':
+                    isWhitespace = true;
+                    break;
+                default:
+                    break;
+            }
+            if (!isWhitespace)
+                break;
+            --length;            
+        }
+        
+        for ( ; i < length; i++) {
             char ch = chars[i];
             switch(ch) {
                 case '-':
@@ -456,7 +514,7 @@ public class DateFieldHandler extends XMLFieldHandler {
 	            int millis = 0;
 	            count = 0;
 	            value = 0;
-	            for (; i < chars.length; i++) {
+	            for (; i < length; i++) {
 	                char ch = chars[i];
 	                switch(ch) {
 	                    case ':':
@@ -587,12 +645,14 @@ public class DateFieldHandler extends XMLFieldHandler {
         buffer.append(value);
         
         //-- Milliseconds
-        buffer.append('.');
-        value = cal.get(Calendar.MILLISECOND);
-        for (int tmp = 100; value < tmp; tmp = tmp / 10)
-            buffer.append(0);
-        if (value > 0) 
-            buffer.append(value);
+        if (!_suppressMillis) {
+            buffer.append('.');
+            value = cal.get(Calendar.MILLISECOND);
+            for (int tmp = 100; value < tmp; tmp = tmp / 10)
+                buffer.append(0);
+            if (value > 0) 
+                buffer.append(value);
+        }
         
         //-- TimeZone
         value = cal.get(Calendar.ZONE_OFFSET);
