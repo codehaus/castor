@@ -9,6 +9,7 @@
     <jtf:case name="TC04" class-name="jdo.ReadOnly" />
     <jtf:case name="TC05" class-name="jdo.TypeHandling"/>
     <jtf:case name="TC06" class-name="jdo.Join" />
+    <jtf:case name="TC07" class-name="jdo.KeyGenGeneric" />
   </jtf:category>
 
   <jtf:category name="postgres" class-name="jdo.JDOCategory">
@@ -19,6 +20,7 @@
     <jtf:case name="TC03" class-name="jdo.DuplicateKey" />
     <jtf:case name="TC04" class-name="jdo.ReadOnly" />
     <jtf:case name="TC05" class-name="jdo.TypeHandling" />
+    <jtf:case name="TC07" class-name="jdo.KeyGenGeneric" />
   </jtf:category>
 
 </jtf:harness>
