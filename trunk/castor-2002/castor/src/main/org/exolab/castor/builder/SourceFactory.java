@@ -226,7 +226,7 @@ public class SourceFactory  {
 				//process the complexType only if it has not been proceed
 				 if (!state.processed(complexType))
 					processComplexType( complexType, state);
-                  if (createGroupItem) {
+                 if (createGroupItem) {
                      resolver.bindReference(jClass, classInfo);
                      classes[1] = jClass;
 
@@ -678,6 +678,9 @@ public class SourceFactory  {
 
         resolver.bindReference(jClass, classInfo);
         resolver.bindReference(group, classInfo);
+
+        //should be removed when the naming algorithm will be in place
+        state.classInfo.setSchemaType(new XSClass(state.jClass, group.getName()));
 
         classes[0] = jClass;
 
@@ -1155,8 +1158,6 @@ public class SourceFactory  {
         Schema schema = complexType.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
 
-
-
         //- Handle derived types
         XMLType base = complexType.getBaseType();
 
@@ -1353,9 +1354,8 @@ public class SourceFactory  {
                         handleField(fieldForAny, state);
                     }
 
-                    //-- if not nested, set compositor
-                    if (!(contentModel instanceof ComplexType)||
-                        (contentModel instanceof ModelGroup) )
+                    if (!((contentModel instanceof ComplexType)||
+                        (contentModel instanceof ModelGroup)) )
                            nested = true;
                     //--maxOccurs is one we set the compositor
                     if (max == 1) {
@@ -1369,17 +1369,14 @@ public class SourceFactory  {
                     }
                     //-- create source code for the group,if necessary
                     if (nested) {
-                        System.out.println(group.getName());
-                        createSourceCode(group, state, state.packageName);
                         fieldInfo = memberFactory.createFieldInfo(group, state);
                         handleField(fieldInfo, state);
-                        break;
                     }
                     //--else we just flatten the group
                     else {
                        processContentModel(group, state);
-                       break;
                     }
+                    break;
                 //--In case of a ModelGroup: it can only be a reference to
                 //-- a top-level <group> (invalid schema if not).
                 //-- No validation on cross referencing since this validation
@@ -1408,9 +1405,7 @@ public class SourceFactory  {
                             err +="\"";
                             throw new IllegalStateException(err);
                     }
-
-                     //--if not we proceed the nested (all, choice, sequence)
-                     break;
+                    break;
 
                 default:
                     break;
