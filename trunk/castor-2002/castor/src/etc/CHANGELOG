@@ -1,6 +1,8 @@
 Version 0.8.9
 -------------
 
+JDO:    Interbase driver (contributed by Terry Child <tmchild@gmx.net>).
+
 JDO:    Added UUID key generator.
         (contributed by Thomas Fach <thomas.fach@publica.de>)
 
