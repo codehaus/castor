@@ -1,6 +1,20 @@
 Version 0.8.1   April 4, 2000
 -----------------------------
 
+XML:     Added back inheritence support inside XMLClassDescriptor,
+         which was in MarshalInfo, but removed during the upgrade.
+
+XML:     Fixed bug with creating default XML name in XMLClassDescriptorImpl
+
+XML:     Fixed bug with unmarshalling primitive String types.
+            -- reported by Remy Maucherat and Kevin Burton
+
+XML:     Fixed bug with namespace support during marshalling of primitive
+         and immutable types
+
+XML:     Added back namespace support, which was temporarily removed during
+         the upgrade
+
 JDO:     Added Locked mode to provide locking at the database level, as
          opposed to Exclusive mode which provides locking at the cache
          level. Added support for loading/querying with a given access mode.
