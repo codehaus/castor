@@ -45,6 +45,11 @@
 
 package org.exolab.castor.xml;
 
+import java.lang.reflect.Array;
+import java.util.Enumeration;
+import java.util.Vector;
+
+
 /**
  * A class for defining simple rules used for validating a content model
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
@@ -102,12 +107,112 @@ public class SimpleTypeValidator implements TypeValidator {
     } //-- setMinOccurs
     
     /**
+     * Sets the TypeValidator to delegate validation to
+     * @param validator the TypeValidator to delegate validation to
+    **/
+    public void setValidator(TypeValidator validator) {
+        this.validator = validator;
+    } //-- setValidator
+    
+    /**
      * Validates the given Object
      * @param object the Object to validate
     **/
     public void validate(Object object)
-        throws ValidationException {
-            if (validator != null) validator.validate(object);
+        throws ValidationException 
+    {
+        
+        boolean required = (minOccurs > 0);
+        
+        if ((object == null) && (required)) {
+            String err = "This field is required and cannot be null.";
+            throw new ValidationException(err);
+        }
+        
+        if (object != null) {
+            Class type = object.getClass();
+            
+            int size = 1;
+            boolean byteArray = false;
+            if (type.isArray()) {
+                byteArray = (type.getComponentType() == Byte.TYPE);
+                if (!byteArray) size = Array.getLength(object);
+            }
+            
+            //-- check minimum
+            if (size < minOccurs) {
+                String err = "A minimum of " + minOccurs
+                    + " instance(s) of this field are required.";
+                throw new ValidationException(err);
+            }
+            
+            //-- check maximum
+            if ((maxOccurs >= 0) && (size > maxOccurs)) {
+                String err = "A maximum of " + maxOccurs + 
+                    " instance(s) of this field are required.";
+                throw new ValidationException(err);
+            }
+            
+            if (validator == null) return;
+            
+            //-- check type
+            if (isPrimitive(type) || (type == String.class)) {
+                validator.validate(object);
+            }
+            else if (byteArray) { 
+                //-- do nothing for now
+            }
+            else if (type.isArray()) {
+                size = Array.getLength(object);
+                for (int i = 0; i < size; i++) {
+                    validator.validate(Array.get(object, i));
+                }
+            }
+            else if (object instanceof java.util.Enumeration) {
+                Enumeration enum = (Enumeration)object;
+                while (enum.hasMoreElements())
+                    validator.validate(enum.nextElement());
+            }
+            else if (object instanceof java.util.Vector) {
+                Vector vector = (Vector)object;
+                for (int i = 0; i < vector.size(); i++) {
+                    validator.validate(vector.elementAt(i));
+                }
+            }
+            else validator.validate(object);
+        }
+            
     } //-- validate
+    
+    //-------------------/
+    //- Private Methods -/
+    //-------------------/
+    
+    /**
+     * Returns true if the given class type should be
+     * treated as a primitive. Wrapper objects such
+     * as java.lang.Integer, and java.lang.Float, will
+     * be treated as primitives.
+     * @param type the Class to check
+     * @return true if the given class should be treated
+     * as a primitive type.
+    **/
+    private boolean isPrimitive(Class type) {
+        
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class)) 
+            return true;
+            
+       return false;
+       
+    } //-- isPrimitive
     
 } //-- SimpleTypeValidator
