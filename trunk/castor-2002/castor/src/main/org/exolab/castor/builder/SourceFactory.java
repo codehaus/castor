@@ -153,7 +153,7 @@ public class SourceFactory  {
         XMLType type = element.getType();
 
         boolean derived = false;
-
+        
         // No Type?
         if (type == null) {
             // ???
@@ -164,7 +164,8 @@ public class SourceFactory  {
             ComplexType complexType = (ComplexType)type;
 
             if ( ! element.hasTypeReference() ) {
-                processComplexType( (ComplexType)type, state);
+                processComplexType( (ComplexType)type, state);                
+                derived = (state.jClass.getSuperClass() != null);
             }
             else {
 
@@ -173,6 +174,7 @@ public class SourceFactory  {
 
                 superClass = resolveClassName(superClass, packageName);
                 jClass.setSuperClass(superClass);
+                derived = true;
             }
         }
         // SimpleType
@@ -195,6 +197,10 @@ public class SourceFactory  {
         createMarshalMethods(jClass);
         //-- #unmarshal()
         createUnmarshalMethods(jClass);
+        
+		//-- create Bound Properties code
+		if (state.hasBoundProperties() && (!derived))
+		    createPropertyChangeMethods(jClass);
 
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
@@ -260,7 +266,7 @@ public class SourceFactory  {
 
         //-- #validate()
         createValidateMethods(jClass);
-		//-- Output Marshalling methods for none abstract classes
+		//-- Output Marshalling methods for non abstract classes
 		if (jClass.getModifiers().isAbstract()==false)
 		{
 			//-- #marshal()
@@ -268,6 +274,10 @@ public class SourceFactory  {
 			//-- #unmarshal()
 			createUnmarshalMethods(jClass);
 		}
+		
+		//-- create Bound Properties code
+		if (state.hasBoundProperties())
+		    createPropertyChangeMethods(jClass);
 
 		if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
@@ -352,6 +362,10 @@ public class SourceFactory  {
             processEnumeration(simpleType, state);
         }
 
+		//-- create Bound Properties code
+		if (state.hasBoundProperties())
+		    createPropertyChangeMethods(jClass);
+		
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(simpleType, classInfo);
@@ -425,6 +439,122 @@ public class SourceFactory  {
 
     } //-- initialize
 
+    /**
+     * Creates the #marshal methods for the given JClass
+     * @param parent the JClass to create the #marshal methods for
+    **/
+    private void createPropertyChangeMethods(JClass parent) {
+
+		parent.addImport("java.beans.PropertyChangeEvent");
+		parent.addImport("java.beans.PropertyChangeListener");
+		
+        //-- add vector to hold listeners
+        String vName = "propertyChangeListeners";
+        JMember jMember = new JMember(SGTypes.Vector, vName);
+        jMember.getModifiers().makePrivate();
+        parent.addMember(jMember);
+            
+            
+        JSourceCode jsc = parent.getConstructor(0).getSourceCode();
+        jsc.add("propertyChangeListeners = new Vector();");
+        
+        //---------------------------------/
+        //- notifyPropertyChangeListeners -/
+        //---------------------------------/
+        
+        JMethod jMethod = new JMethod(null,"notifyPropertyChangeListeners");
+        jMethod.getModifiers().makeProtected();
+        
+        String desc = "Notifies all registered "+
+            "PropertyChangeListeners when a bound property's value "+
+            "changes.";
+            
+        JDocComment jdc = jMethod.getJDocComment();
+        JDocDescriptor jdDesc = null;
+        
+        jdc.appendComment(desc);
+        
+        jMethod.addParameter(new JParameter(SGTypes.String, "fieldName"));
+        jdDesc = jdc.getParamDescriptor("fieldName");
+        jdDesc.setDescription("the name of the property that has changed.");
+        
+        jMethod.addParameter(new JParameter(SGTypes.Object, "oldValue"));
+        jdDesc = jdc.getParamDescriptor("oldValue");
+        jdDesc.setDescription("the old value of the property.");
+        
+        jMethod.addParameter(new JParameter(SGTypes.Object, "newValue"));
+        jdDesc = jdc.getParamDescriptor("newValue");
+        jdDesc.setDescription("the new value of the property.");
+        
+        parent.addMethod(jMethod);
+        jsc = jMethod.getSourceCode();
+        jsc.add("java.beans.PropertyChangeEvent event = new ");
+        jsc.append("java.beans.PropertyChangeEvent");
+        jsc.append("(this, fieldName, oldValue, newValue);");
+        jsc.add("");
+        jsc.add("for (int i = 0; i < ");
+        jsc.append(vName);
+        jsc.append(".size(); i++) {");
+        jsc.indent();
+        jsc.add("((java.beans.PropertyChangeListener) ");
+        jsc.append(vName);
+        jsc.append(".elementAt(i)).");
+        jsc.append("propertyChange(event);");
+        jsc.unindent();
+        jsc.add("}");
+        
+        //-----------------------------/
+        //- addPropertyChangeListener -/
+        //-----------------------------/
+        
+        JType jType = new JClass("java.beans.PropertyChangeListener");
+        jMethod = new JMethod(null,"addPropertyChangeListener");
+        
+        desc = "Registers a PropertyChangeListener with this class.";
+            
+        jdc = jMethod.getJDocComment();
+        jdc.appendComment(desc);
+        
+        jMethod.addParameter(new JParameter(jType, "pcl"));
+        desc = "The PropertyChangeListener to register.";
+        jdDesc = jdc.getParamDescriptor("pcl");
+        jdDesc.setDescription(desc);
+                
+        parent.addMethod(jMethod);
+        
+        jsc = jMethod.getSourceCode();
+        jsc.add(vName);
+        jsc.append(".addElement(pcl);");
+        
+        //--------------------------------/
+        //- removePropertyChangeListener -/
+        //--------------------------------/
+        
+        jMethod = new JMethod(JType.Boolean,"removePropertyChangeListener");
+        
+        desc = "Removes the given PropertyChangeListener "+
+            "from this classes list of ProperyChangeListeners.";
+            
+        jdc = jMethod.getJDocComment();
+        jdc.appendComment(desc);
+        
+        jMethod.addParameter(new JParameter(jType, "pcl"));
+        desc = "The PropertyChangeListener to remove.";
+        jdDesc = jdc.getParamDescriptor("pcl");
+        jdDesc.setDescription(desc);
+        
+        desc = "true if the given PropertyChangeListener was removed.";
+        jdc.addDescriptor(JDocDescriptor.createReturnDesc(desc));
+        
+        parent.addMethod(jMethod);
+        
+        jsc = jMethod.getSourceCode();
+        jsc.add("return ");
+        jsc.append(vName);
+        jsc.append(".removeElement(pcl);");
+        
+    } //-- createPropertyChangeMethods
+        
     /**
      * Creates the #marshal methods for the given JClass
      * @param parent the JClass to create the #marshal methods for
@@ -644,6 +774,8 @@ public class SourceFactory  {
         //-- do not create access methods for transient fields
         if (!fieldInfo.isTransient()) {
             fieldInfo.createAccessMethods(state.jClass);
+            if (fieldInfo.isBound()) 
+                state.setBoundProperties(true);
         }
 
         //-- Add initialization code
@@ -908,6 +1040,12 @@ class FactoryState implements ClassInfoResolver {
     private ClassInfoResolver _resolver = null;
     private Vector            _processed = null;
 
+    /**
+     * Keeps track of whether or not the BoundProperties
+     * methods have been created
+    **/
+    private boolean           _bound = false;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -936,6 +1074,10 @@ class FactoryState implements ClassInfoResolver {
             _resolver = resolver;
 
         this.packageName = packageName;
+        
+        //-- boundProperties
+        _bound = SourceGenerator.boundPropertiesEnabled();
+        
     } //-- FactoryState
 
     //-----------/
@@ -968,6 +1110,25 @@ class FactoryState implements ClassInfoResolver {
         return _processed.contains(element);
     } //-- processed
 
+    /**
+     * Returns true if any bound properties have been found
+     *
+     * @return true if any bound properties have been found
+    **/
+    boolean hasBoundProperties() {
+        return _bound;
+    } //-- hasBoundProperties
+    
+    /**
+     * Allows setting the bound properties flag
+     *
+     * @param bound the new value of the bound properties flag
+     * @see #hasBoundProperties
+    **/
+    void setBoundProperties(boolean bound) {
+        _bound = bound;
+    } //-- setBoundProperties
+    
     /**
      * Returns the ClassInfo which has been bound to the given key
      * @param key the object to which the ClassInfo has been bound

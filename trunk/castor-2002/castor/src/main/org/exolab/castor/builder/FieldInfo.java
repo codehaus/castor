@@ -97,7 +97,12 @@ public class FieldInfo extends XMLInfo {
      * be created for this FieldInfo
     **/
     private boolean _transient = false;
-        
+    
+    /**
+     * A flag to indicate a bound property
+    **/
+    private boolean _bound = false;
+    
     /**
      * Creates a new FieldInfo with the given XML Schema type
      * and the given member name
@@ -107,6 +112,7 @@ public class FieldInfo extends XMLInfo {
     public FieldInfo(XSType type, String name) {
         this.name    = name;
         setSchemaType(type);
+        _bound = SourceGenerator.boundPropertiesEnabled();
     } //-- FieldInfo
 
     //------------------/
@@ -200,14 +206,44 @@ public class FieldInfo extends XMLInfo {
         //-- create set method
         method = new JMethod(null, "set"+mname);
         jClass.addMethod(method);
-        method.addParameter(new JParameter(jType, this.name));
+        
+        String paramName = this.name;
+        if (paramName.indexOf('_') == 0)
+            paramName = paramName.substring(1);
+        
+        method.addParameter(new JParameter(jType, paramName));
         jsc = method.getSourceCode();
+        
+        //-- bound properties
+        if (_bound) {
+            // save old value
+            jsc.add("Object old");
+            jsc.append(mname);
+            jsc.append(" = ");
+            jsc.append(xsType.createToJavaObjectCode(getName()));
+            jsc.append(";");
+        } 
+        
+        //-- set new value
         jsc.add("this.");
         jsc.append(getName());
         jsc.append(" = ");
-        jsc.append(getName());
+        jsc.append(paramName);
         jsc.append(";");
         
+        //-- bound properties
+        if (_bound) {
+            //notify listeners
+            jsc.add("notifyPropertyChangeListeners(\"");
+            jsc.append(getName());
+            jsc.append("\", old");
+            jsc.append(mname);
+            jsc.append(", ");
+            jsc.append(xsType.createToJavaObjectCode(getName()));
+            jsc.append(");");
+        } 
+        
+        //-- hasProperty
         if (needs_has) {
             jsc.add("this._has");
             jsc.append(getName());
@@ -305,6 +341,15 @@ public class FieldInfo extends XMLInfo {
     } //-- getName
     
     /**
+     * Returns true if this FieldInfo represents a bound property
+     *
+     * @return true if this FieldInfo represents a bound property
+    **/
+    public boolean isBound() {
+        return _bound;
+    } //-- isBound
+    
+    /**
      * Returns true if this FieldInfo is a transient member. Transient
      * members are members which should be ignored by the 
      * Marshalling framework
@@ -338,6 +383,16 @@ public class FieldInfo extends XMLInfo {
     public ClassInfo getDeclaringClassInfo() {
         return this.declaringClassInfo;
     } //-- getDeclaringClassInfo
+    
+    /**
+     * Sets whether or not this FieldInfo represents a bound property
+     *
+     * @param bound the flag when true indicates that this FieldInfo
+     * represents a bound property
+    **/
+    public void setBound(boolean bound) {
+        _bound = bound;
+    } //-- setBound
     
     public void setDeclaringClassInfo(ClassInfo declaringClassInfo) {
         this.declaringClassInfo = declaringClassInfo;
