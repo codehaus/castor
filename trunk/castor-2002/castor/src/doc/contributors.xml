@@ -144,6 +144,14 @@
     </description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Soysa" given="Manjuka"/>
+    <email>manjuka@visto.com</email>
+    <description>Feedback on generated enumerations,
+         suggested adding the "enumerate" method.
+    </description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Stewart" given="George"/>
     <email>georgestewartiv@yahoo.com</email>
