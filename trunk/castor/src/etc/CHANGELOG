@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1790 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added additional debug statements during binding of SQL parameters.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1790
+       (Werner - 20041122)
+
 XML:   Fixed bug 1718. Milliseconds are represented as 'long' in a Duration.
        (Arnaud - 20041111)
 
