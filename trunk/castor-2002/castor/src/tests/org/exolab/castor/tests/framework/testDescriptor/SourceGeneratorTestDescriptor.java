@@ -101,6 +101,84 @@ public class SourceGeneratorTestDescriptor extends org.exolab.castor.xml.util.XM
         }
         desc.setValidator(fieldValidator);
         
+        //-- _propertyFile
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_propertyFile", "Property_File", NodeType.Element);
+        desc.setImmutable(true);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                SourceGeneratorTest target = (SourceGeneratorTest) object;
+                return target.getPropertyFile();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    SourceGeneratorTest target = (SourceGeneratorTest) object;
+                    target.setPropertyFile( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/Test");
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _propertyFile
+        fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
+        //-- _fieldInfoFactory
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_fieldInfoFactory", "FieldInfoFactory", NodeType.Element);
+        desc.setImmutable(true);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                SourceGeneratorTest target = (SourceGeneratorTest) object;
+                return target.getFieldInfoFactory();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    SourceGeneratorTest target = (SourceGeneratorTest) object;
+                    target.setFieldInfoFactory( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/Test");
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _fieldInfoFactory
+        fieldValidator = new FieldValidator();
+        { //-- local scope
+            StringValidator sv = new StringValidator();
+            sv.setWhiteSpace("preserved");
+            fieldValidator.setValidator(sv);
+        }
+        desc.setValidator(fieldValidator);
+        
         //-- _rootObject
         desc = new XMLFieldDescriptorImpl(RootObject.class, "_rootObject", "Root_Object", NodeType.Element);
         handler = (new XMLFieldHandler() {
