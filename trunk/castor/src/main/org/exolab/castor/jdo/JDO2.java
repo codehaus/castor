@@ -158,8 +158,7 @@ public class JDO2
      * specified, the first attempt to load a database of this type
      * will use the specified configuration file.
      */
-    // private String _jdoConf;
-    private InputSource _jdoConf;
+    private InputSource _jdoConfURI;
     
     /**
      * The log intercpetor to which all logging and tracing messages
@@ -255,6 +254,7 @@ public class JDO2
      */
     private JDO2()
     {
+    	super();
     }
 
     /**
@@ -280,29 +280,28 @@ public class JDO2
     throws MappingException 
     {
         if (!DatabaseRegistry.hasDatabaseRegistries()) {
-            throw new MappingException ("Configuration has not been loaded yet. Please make sure you call JDOOld.loadConfiguration().");
+            throw new MappingException (Messages.message ("jdo.missing.jdo.configuration"));
         }
         
-        if (DatabaseRegistry.getDatabaseRegistry (databaseName) != null) {
-            
-            JDO2 jdoInstance = (JDO2) _jdoInstances.get (databaseName);
-            
-            if (jdoInstance == null) {
-                jdoInstance = new JDO2 (databaseName);
-                
-                jdoInstance.setConfiguration (_source);
-                jdoInstance.setEntityResolver(_entityResolver);
-                jdoInstance.setClassLoader(_classLoader);
-                
-                _jdoInstances.put ("databaseName", jdoInstance);
-                
-                _log.debug ("Successfully created JDO instance: " + jdoInstance);
-            }
-            
-            return jdoInstance;
-        } else {
-            throw new MappingException ("No configuration has been loaded for the database " + databaseName);
+        if (DatabaseRegistry.getDatabaseRegistry (databaseName) == null) {
+            throw new MappingException (Messages.format ("jdo.missing.database.configuration", databaseName));
         }
+            
+        JDO2 jdoInstance = (JDO2) _jdoInstances.get (databaseName);
+        
+        if (jdoInstance == null) {
+        	jdoInstance = new JDO2 (databaseName);
+        	
+        	jdoInstance.setConfiguration (_source);
+        	jdoInstance.setEntityResolver(_entityResolver);
+        	jdoInstance.setClassLoader(_classLoader);
+        	
+        	_jdoInstances.put (databaseName, jdoInstance);
+        	
+        	_log.debug ("Successfully created JDO instance: " + jdoInstance);
+        }
+        
+        return jdoInstance;
     }
 
     /**
@@ -500,7 +499,7 @@ public class JDO2
      * Sets the URL of the database configuration file. If the URL is
      * specified, the first attempt to load a database of this type
      * will use the specified configuration file. If the URL is not
-     * specified, use one of the {@link #loadConfiguration} methods
+     * specified, use one of the {@link #loadConfiguration(String)} methods
      * instead.
      * <p>
      * The standard name for this property is <tt>configuration</tt>.
@@ -509,7 +508,7 @@ public class JDO2
      */
     public void setConfiguration (InputSource source)
     {
-        _jdoConf = source;
+        _jdoConfURI = source;
     }
 
     /**
@@ -521,7 +520,7 @@ public class JDO2
      */
     public InputSource getConfiguration()
     {
-        return _jdoConf;
+        return _jdoConfURI;
     }
 
     /**
@@ -548,11 +547,11 @@ public class JDO2
                 return;
             } else
                 throw new IllegalStateException("JDO Pooling started. It can not be set to false");
-        } else {
-            if ( _txDbPool == null ) 
-                _txDbPool = new TxDatabaseMap();
-            return;
         }
+        
+        if ( _txDbPool == null ) 
+        	_txDbPool = new TxDatabaseMap();
+        return;
     }
 
     /**
@@ -598,20 +597,20 @@ public class JDO2
         throws DatabaseNotFoundException, PersistenceException
     {
         if ( _databaseName == null )
-            throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
+            throw new IllegalStateException( Messages.message ("jdo.missing.database.name"));
         if ( DatabaseRegistry.getDatabaseRegistry( _databaseName ) == null ) {
-            if ( _jdoConf == null )
+            if ( _jdoConfURI == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _databaseName ) );
             try {
-                DatabaseRegistry.loadDatabase( _jdoConf, _entityResolver, _classLoader );
+                DatabaseRegistry.loadDatabase( _jdoConfURI, _entityResolver, _classLoader );
             } catch ( MappingException except ) {
-                throw new DatabaseNotFoundException( except );
+                throw new DatabaseNotFoundException( Messages.format ("jdo.problem.loading.conf", _jdoConfURI), except );
             }
         }
         
         // load transaction manager factory registry configuration
         try {
-            TransactionManagerFactoryRegistry.load (_jdoConf, _entityResolver);
+            TransactionManagerFactoryRegistry.load (_jdoConfURI, _entityResolver);
         }
         catch (TransactionManagerAcquireException e) {
             throw new PersistenceException (Messages.message ("jdo.transaction.problemToInitializeTransactionManagerFactory"), e); 
@@ -622,7 +621,7 @@ public class JDO2
             String transactionMode = null;
             try {
                 TransactionDemarcation demarcation =
-                    JDOConfLoader.getTransactionDemarcation(_jdoConf, _entityResolver);
+                    JDOConfLoader.getTransactionDemarcation(_jdoConfURI, _entityResolver);
                      
                 String demarcationMode =demarcation.getMode();
 
@@ -766,66 +765,69 @@ public class JDO2
     
     public synchronized Reference getReference()
     {
-    Reference ref;
-
-    // We use same object as factory.
-    ref = new Reference( getClass().getName(), getClass().getName(), null );
-
-        if ( _description != null )
-            ref.add( new StringRefAddr( "description", _description ) );
-        if ( _databaseName != null )
-            ref.add( new StringRefAddr( "databaseName", _databaseName ) );
-        if ( _jdoConf != null )
-            ref.add( new StringRefAddr( "configuration", _jdoConf.toString() ) );
-        ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
-    return ref;
+    	Reference ref;
+    	
+    	// We use same object as factory.
+    	ref = new Reference( getClass().getName(), getClass().getName(), null );
+    	
+    	if ( _description != null )
+    		ref.add( new StringRefAddr( "description", _description ) );
+    	if ( _databaseName != null )
+    		ref.add( new StringRefAddr( "databaseName", _databaseName ) );
+    	if ( _jdoConfURI != null )
+    		ref.add( new StringRefAddr( "configuration", _jdoConfURI.toString() ) );
+    	ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
+    	return ref;
     }
-
-
+    
+    
     public Object getObjectInstance( Object refObj, Name name, Context nameCtx, Hashtable env )
-        throws NamingException
-    {
-    Reference ref;
-
-    // Can only reconstruct from a reference.
-    if ( refObj instanceof Reference ) {
-        ref = (Reference) refObj;
-        // Make sure reference is of datasource class.
-        if ( ref.getClassName().equals( getClass().getName() ) ) {
-
-        JDO2     ds;
-        RefAddr addr;
-
-        try {
-            ds = (JDO2) Class.forName( ref.getClassName() ).newInstance();
-        } catch ( Exception except ) {
-            throw new NamingException( except.toString() );
-        }
-        addr = ref.get ("description");
-        if ( addr != null ) {
-            ds._description = (String) addr.getContent();
-        }
-        addr = ref.get ("databaseName");
-        if ( addr != null ) {
-            ds._databaseName = (String) addr.getContent();
-        }
-        addr = ref.get ("configuration");
-        if ( addr != null ) {
-            ds._jdoConf = (InputSource) addr.getContent();
-        }
-        addr = ref.get ("lockTimeout");
-        if ( addr != null ) {
-            ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
-        }
-        return ds;
-
-        } else
-        throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
-    } else if ( refObj instanceof Remote )
-        return refObj;
-    else
-        return null;
-    }
+    throws NamingException
+	{
+    	Reference ref;
+    	
+    	// Can only reconstruct from a reference.
+    	if ( refObj instanceof Reference ) {
+    		ref = (Reference) refObj;
+    		
+    		// Make sure reference is of datasource class.
+    		if ( !ref.getClassName().equals( getClass().getName() ) ) {
+    			throw new NamingException( Messages.format ("jdo.reference.wrong.type", ref.getClassName()) );
+    		}
+    			
+    		JDO2     ds;
+    		RefAddr addr;
+    		
+    		try {
+    			ds = (JDO2) Class.forName( ref.getClassName() ).newInstance();
+    		} catch ( Exception except ) {
+    			NamingException ne = new NamingException (Messages.format ("jdo.problem.loading.class", ref.getClassName()));
+    			ne.setRootCause(except);
+    			throw ne;
+    		}
+    		addr = ref.get ("description");
+    		if ( addr != null ) {
+    			ds._description = (String) addr.getContent();
+    		}
+    		addr = ref.get ("databaseName");
+    		if ( addr != null ) {
+    			ds._databaseName = (String) addr.getContent();
+    		}
+    		addr = ref.get ("configuration");
+    		if ( addr != null ) {
+    			ds._jdoConfURI = (InputSource) addr.getContent();
+    		}
+    		addr = ref.get ("lockTimeout");
+    		if ( addr != null ) {
+    			ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
+    		}
+    		return ds;
+    			
+    	} else if ( refObj instanceof Remote )
+    		return refObj;
+    	else
+    		return null;
+	}
 
 }
 
