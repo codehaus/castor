@@ -675,9 +675,12 @@ public class FieldMolder {
                 // method name. Look up the field and potentially check the
                 // return type.
                 method = javaClass.getMethod( methodName, new Class[ 0 ] );
-                if ( fieldType == null )
+                if ( fieldType == null ) {
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
+                } else if ( fieldType == java.io.Serializable.class && java.io.Serializable.class.isAssignableFrom( method.getReturnType() ) ) {
+                    // special case
+                } else if ( ! Types.typeFromPrimitive( method.getReturnType() ).isAssignableFrom( Types.typeFromPrimitive( fieldType ) ) )
+                //else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {

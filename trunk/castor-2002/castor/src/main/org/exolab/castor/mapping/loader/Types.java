@@ -1108,7 +1108,8 @@ public class Types
             public String toString() { return "castor.types.Date->sql.Date"; }
         } ),
 
-        // InputStream convertors
+        // It's a special case for Serializable
+        // Because Serializable need the right ClassLoader when serializing, we convert to byte[] and vice-versa
         new TypeConvertorInfo( java.io.Serializable.class, java.io.InputStream.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 return new java.io.ByteArrayInputStream((byte[]) obj);
@@ -1129,6 +1130,21 @@ public class Types
                 } catch ( java.io.IOException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
+            }
+            public String toString() { return "io.InputStream->bytes"; }
+        } ),
+
+        // It's a special case for Serializable
+        // Because Serializable need the right ClassLoader when serializing, we convert to byte[] and vice-versa
+        new TypeConvertorInfo( java.io.Serializable.class, byte[].class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return obj;
+            }
+            public String toString() { return "bytes->io.InputStream"; }
+        } ),
+        new TypeConvertorInfo( byte[].class, java.io.Serializable.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return obj;
             }
             public String toString() { return "io.InputStream->bytes"; }
         } )
