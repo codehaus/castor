@@ -66,6 +66,17 @@ abstract class MarshalFramework {
     public static final String XSI_NAMESPACE
         = "http://www.w3.org/2001/XMLSchema-instance";
 
+    /**
+     * The name of the Schema location attribute
+    **/
+    public static final String XSI_SCHEMA_LOCATION = "schemaLocation";
+
+    /**
+     * The name of the no namespace schema location attribute
+    **/
+    public static final String XSI_NO_NAMESPACE_SCHEMA_LOCATION 
+        = "noNamespaceSchemaLocation";
+    
     //-----------------------------/
     //- Protected class variables -/
     //-----------------------------/

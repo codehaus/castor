@@ -252,6 +252,12 @@ public class Marshaller extends MarshalFramework {
     private Serializer       _serializer   = null;
 
     /**
+     * The set of optional top-level attributes
+     * set by the user.
+    **/
+    private AttributeSetImpl _topLevelAtts = null;
+    
+    /**
      * The validation flag
     **/
     private boolean _validate = false;
@@ -362,6 +368,7 @@ public class Marshaller extends MarshalFramework {
         _validate        = Configuration.marshallingValidation();
         _naming          = XMLNaming.getInstance();
         _processingInstructions = new List(3);
+        _topLevelAtts    = new AttributeSetImpl();
     } //-- initialize();
 
     /**
@@ -890,9 +897,35 @@ public class Marshaller extends MarshalFramework {
             _namespaces = _namespaces.createNamespaces();
         }
 
-        //-- handle Attributes
+        //---------------------/
+        //- handle attributes -/
+        //---------------------/
+        
         AttributeListImpl atts = new AttributeListImpl();
 
+        //-- user defined attributes
+        if (atRoot) {
+            //-- declare xsi prefix if necessary
+            if (_topLevelAtts.getSize() > 0)
+                _namespaces.addNamespace(XSI_PREFIX, XSI_NAMESPACE);
+                
+            for (int i = 0; i < _topLevelAtts.getSize(); i++) {
+                String attName = _topLevelAtts.getName(i);
+                String ns = _topLevelAtts.getNamespace(i);
+                String prefix = null;
+                if ((ns != null) && (ns.length() > 0)) {
+                    prefix = _namespaces.getNonDefaultNamespacePrefix(ns);
+                }
+                if ((prefix != null) && (prefix.length() > 0)) {
+                    attName = prefix + ':' + attName;
+                }
+                atts.addAttribute(attName, CDATA,
+                    _topLevelAtts.getValue(i));
+            }
+        }
+        
+        //-- process attr descriptors
+        
         XMLFieldDescriptor[] descriptors = classDesc.getAttributeDescriptors();
         for (int i = 0; i < descriptors.length; i++) {
 
@@ -1274,6 +1307,44 @@ public class Marshaller extends MarshalFramework {
         }
     } //-- setEncoding
 
+    /**
+     * Sets the value for the xsi:noNamespaceSchemaLocation attribute.
+     * When set, this attribute will appear on the root element
+     * of the marshalled document.
+     *
+     * @param schemaLocation the URI location of the schema
+     * to which the marshalled document is an instance of.
+    **/
+    public void setNoNamespaceSchemaLocation(String schemaLocation) {
+        if (schemaLocation == null) {
+            //-- remove if necessary
+            //-- to be added later.
+        }
+        else {
+            _topLevelAtts.setAttribute(XSI_NO_NAMESPACE_SCHEMA_LOCATION, 
+                schemaLocation, XSI_NAMESPACE);
+        }
+    } //-- setNoNamespaceSchemaLocation
+    
+    /**
+     * Sets the value for the xsi:schemaLocation attribute.
+     * When set, this attribute will appear on the root element
+     * of the marshalled document.
+     *
+     * @param schemaLocation the URI location of the schema
+     * to which the marshalled document is an instance of.
+    **/
+    public void setSchemaLocation(String schemaLocation) {
+        if (schemaLocation == null) {
+            //-- remove if necessary
+            //-- to be added later.
+        }
+        else {
+            _topLevelAtts.setAttribute(XSI_SCHEMA_LOCATION, 
+                schemaLocation, XSI_NAMESPACE);
+        }
+    } //-- setSchemaLocation
+    
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
      * a XMLClassDescriptor could not be found, this method will attempt to
