@@ -77,12 +77,13 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 //import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.AccessMode;
-import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.Key;
 import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
+import org.exolab.castor.persist.Relation;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
@@ -493,14 +494,14 @@ public final class SQLEngine implements Persistence {
      * If the identity is null, an identity might be created and returned
      * by this method.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to create
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void create( TransactionContext tx, Object conn, Entity entity )
+    public void create( Key key, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException {
 
         PreparedStatement stmt = null;
@@ -518,7 +519,7 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null ) {
                 // | quick and very dirty hack to try to make multiple class on the same table work
                 if ( !_extends._mapTo.equals( _mapTo ) ) {
-                    _extends.create( tx, conn, entity );
+                    _extends.create( key, conn, entity );
                 }
             }
 
@@ -735,7 +736,7 @@ public final class SQLEngine implements Persistence {
      * call to {@link #load}. These arguments are null for objects
      * retrieved with an exclusive lock.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to store
      * @param original The original entity, or null
@@ -745,7 +746,7 @@ public final class SQLEngine implements Persistence {
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void store( TransactionContext tx, Object conn, Entity entity, Entity original )
+    public void store( Key key, Object conn, Entity entity, Entity original )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
 
         PreparedStatement stmt = null;
@@ -761,7 +762,7 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null ) {
                 // | quick and very dirty hack to try to make multiple class on the same table work
                 if ( !_extends._mapTo.equals( _mapTo ) ) {
-                    _extends.store( tx, conn, entity, original );
+                    _extends.store( key, conn, entity, original );
                 }
             }
             stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( origFields ) );
@@ -887,12 +888,12 @@ public final class SQLEngine implements Persistence {
      * locks on the object must be retained until the transaction has
      * completed.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to delete
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( TransactionContext tx, Object conn, Entity entity )
+    public void delete( Key key, Object conn, Entity entity )
         throws PersistenceException {
 
         PreparedStatement stmt = null;
@@ -924,7 +925,7 @@ public final class SQLEngine implements Persistence {
             // Must delete record in parent table last.
             // All other dependents have been deleted before.
             if ( _extends != null )
-                _extends.delete( tx, conn, entity );
+                _extends.delete( key, conn, entity );
         } catch ( SQLException except ) {
             try {
                 // Close the insert/select statement
@@ -945,21 +946,21 @@ public final class SQLEngine implements Persistence {
      * succeed when the transaction completes, without attempting to
      * reload the object.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to lock
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( TransactionContext tx, Object conn, Entity entity )
+    public void writeLock( Key key, Object conn, Entity entity )
         throws ObjectDeletedException, PersistenceException {
 
         PreparedStatement stmt = null;
         try {
             // Must obtain lock on record in parent table first.
             if ( _extends != null )
-                _extends.writeLock( tx, conn, entity );
+                _extends.writeLock( key, conn, entity );
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 
@@ -1005,7 +1006,7 @@ public final class SQLEngine implements Persistence {
      * #store}). If <tt>lock</tt> is true the object must be
      * locked in persistence storage to prevent concurrent updates.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to load into
      * @param accessMode The access mode (null equals shared)
@@ -1014,7 +1015,7 @@ public final class SQLEngine implements Persistence {
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
+    public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException {
 
         PreparedStatement stmt;
@@ -1149,7 +1150,7 @@ public final class SQLEngine implements Persistence {
      * the supplied value. Conceptually, the specified field is a foreign key
      * field; the supplied values is the value the foreign key.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param field The field on the "many" side of the relation
      * @param value The value of the field
@@ -1157,7 +1158,7 @@ public final class SQLEngine implements Persistence {
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public void loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+    public void loadRelated( Key key, Object conn, Relation relation, AccessMode accessMode )
             throws PersistenceException {
     }
 

@@ -69,6 +69,7 @@ import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.Key;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.TransactionContextListener;
 import org.exolab.castor.util.Messages;
@@ -88,18 +89,18 @@ public class SQLQueryExecutor implements TransactionContextListener
 
 
     /**
-     * The HashMap maps TransactionContext to batch PreparedStatements, which are executed at the end
+     * The HashMap maps Key to batch PreparedStatements, which are executed at the end
      * of the transactions.
-     * We assume that one TransactionContext uses one Connection,
-     * otherwise the key for the HashMap would be a pair of TransactionContext and Connection.
+     * We assume that one Key uses one Connection,
+     * otherwise the key for the HashMap would be a pair of Key and Connection.
      */
     private HashMap _batchStmt;
 
     /**
-     * The HashMap maps TransactionContext to ordinary PreparedStatements, which are executed immediately.
+     * The HashMap maps Key to ordinary PreparedStatements, which are executed immediately.
      * Thus we prepare each statement only once during transaction.
-     * We assume that one TransactionContext uses one Connection,
-     * otherwise the key for the HashMap would be a pair of TransactionContext and Connection.
+     * We assume that one Key uses one Connection,
+     * otherwise the key for the HashMap would be a pair of Key and Connection.
      */
     private HashMap _ordinaryStmt;
 
@@ -171,7 +172,7 @@ public class SQLQueryExecutor implements TransactionContextListener
     /**
      * @param old is used for UPDATE only.
      */
-    public void execute(TransactionContext tx, Connection conn, Entity entity, Entity entity2)
+    public void execute(Key key, Connection conn, Entity entity, Entity entity2)
             throws PersistenceException {
         boolean useBatch;
         PreparedStatement stmt = null;
@@ -186,11 +187,11 @@ public class SQLQueryExecutor implements TransactionContextListener
                 if (_batchStmt == null) {
                     _batchStmt = new HashMap();
                 } else {
-                    stmt = (PreparedStatement) _batchStmt.get(tx);
+                    stmt = (PreparedStatement) _batchStmt.get(key);
                 }
                 if (stmt == null) {
                     stmt = conn.prepareStatement(_sql);
-                    _batchStmt.put(tx, stmt);
+                    _batchStmt.put(key, stmt);
                     // TODO: uncomment when this method becomes available
                     //tx.addListener(this);
                 }
@@ -198,11 +199,11 @@ public class SQLQueryExecutor implements TransactionContextListener
                 if (_ordinaryStmt == null) {
                     _ordinaryStmt = new HashMap();
                 } else {
-                    stmt = (PreparedStatement) _ordinaryStmt.get(tx);
+                    stmt = (PreparedStatement) _ordinaryStmt.get(key);
                 }
                 if (stmt == null) {
                     stmt = conn.prepareStatement(_sql);
-                    _ordinaryStmt.put(tx, stmt);
+                    _ordinaryStmt.put(key, stmt);
                 }
             }
 
@@ -231,10 +232,10 @@ public class SQLQueryExecutor implements TransactionContextListener
                 } else {
                     try {
                         if (stmt.executeUpdate() <= 0) {
-                            throwUpdateException(tx, conn, entity, null);
+                            throwUpdateException(key, conn, entity, null);
                         }
                     } catch (SQLException except) {
-                        throwUpdateException(tx, conn, entity, except);
+                        throwUpdateException(key, conn, entity, except);
                     }
                 }
             }
@@ -251,7 +252,7 @@ public class SQLQueryExecutor implements TransactionContextListener
         }
     }
 
-    private void throwUpdateException(TransactionContext tx, Connection conn, Entity entity, SQLException except)
+    private void throwUpdateException(Key key, Connection conn, Entity entity, SQLException except)
             throws PersistenceException {
         boolean entityExists = false;
 
@@ -447,7 +448,7 @@ public class SQLQueryExecutor implements TransactionContextListener
         PreparedStatement stmt;
 
         // TODO: uncomment when this method becomes available
-        //tx.removeListener(this);
+        // tx.removeListener(this);
         stmt = (PreparedStatement) _ordinaryStmt.remove(tx);
         try {
             stmt.close();
