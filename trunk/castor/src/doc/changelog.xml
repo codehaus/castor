@@ -12,6 +12,48 @@
     </pre></section>
     -->
 
+    <section title="Version 0.9.5.2 September 28, 2003"><pre>
+
+XML:   Some Unmarshalling performance improvements.
+       (kvisco - 20030927)
+
+XML:   Added SchemaReader#setErrorHandler method. Patch provided
+       by Nick Betteridge.
+       (kvisco - 20030925)
+
+XML:   Updated to use XMLReader instead of SAX Parser by
+       default.
+       (kvisco - 20030925)
+
+XML:   Added direct support for SAX 2 ContentHandler in the
+       UnmarshalHandler.
+       (kvisco - 20030925)
+
+XML:   Added SimpleType#removeFacets method. Patch provided
+       by Nick Betteridge.
+       (kvisco - 20030925)
+
+XML:   Fixed NullPointerException when trying to marshal a
+       Vector as the root object.
+       (kvisco - 20030923)
+
+XML:   Fix for bug 1322, this is an improved patch for handling
+       primitives in the XMLFieldDescriptorImpl#canAccept method.
+       Proposed patch from Alan Coleman.
+       (kvisco - 20030923)
+
+XML:   Fix for bug 1407, make sure namespace/package mapping is
+       properly set. This fixes the improper include of the "types" package,
+       missing the remainder of the package name.
+       (kvisco - 20030919)
+
+
+XML:   Fix for location paths that contain two or more ancestor paths.
+       Fix provided by Scott Schenksj.
+       (kvisco - 20030918)
+
+    </pre></section>
+
     <section title="Version 0.9.5.1 September 16, 2003"><pre>
 
 XML:    Fix for bug 1314, make sure we use LocalConfiguration to return
