@@ -45,11 +45,13 @@
 
 package org.exolab.castor.xml.schema;
 
-import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.Namespaces;
+import org.exolab.castor.xml.ValidationException;
 
 import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
+
 
 /**
  * A class representing an XML Schema Definition. This class also 
@@ -172,7 +174,7 @@ public class Schema extends Annotated {
     /**
      * A list of namespaces declared in this schema
      */
-    private Hashtable _namespaces = null;
+    private Namespaces _namespaces = null;
 
     /**
      * The schemaLocation hint provided in the 'import' tag.
@@ -243,7 +245,7 @@ public class Schema extends Annotated {
         _groups           = new Hashtable();
         _importedSchemas  = new Hashtable();
         _includedSchemas  = new Vector();
-        _namespaces       = new Hashtable();
+        _namespaces       = new Namespaces();
 
         _schemaNamespace = schemaNS;
         if (_schemaNamespace == null) {
@@ -325,7 +327,7 @@ public class Schema extends Annotated {
         {
             String nsPrefix = name.substring(0,idx);
             name = name.substring(idx + 1);
-            String ns = (String) _namespaces.get(nsPrefix);
+            String ns = (String) _namespaces.getNamespaceURI(nsPrefix);
             if (ns == null)  {
                 String err = "addAttributeGroup: ";
                 err += "Namespace prefix not recognized '"+nsPrefix+"'";
@@ -471,8 +473,7 @@ public class Schema extends Annotated {
      * @param namespaces the list of namespaces
      */
     public void addNamespace(String prefix, String ns) {
-        if (prefix == null) prefix = "";
-        _namespaces.put(prefix, ns);
+        _namespaces.addNamespace(prefix, ns);
     } //-- setNamespaces
 
     /**
@@ -600,7 +601,7 @@ public class Schema extends Annotated {
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) _namespaces.get(nsprefix);
+            ns = (String) _namespaces.getNamespaceURI(nsprefix);
             if (ns == null)  {
                 String err = "getAttribute: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -655,7 +656,7 @@ public class Schema extends Annotated {
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) _namespaces.get(nsprefix);
+            ns = (String) _namespaces.getNamespaceURI(nsprefix);
             if (ns == null)  {
                 String err = "getAttributeGroup: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -715,7 +716,7 @@ public class Schema extends Annotated {
         {
             canonicalName = name.substring(colon + 1);
             nsprefix = name.substring(0,colon);
-            ns = (String) _namespaces.get(nsprefix);
+            ns = (String) _namespaces.getNamespaceURI(nsprefix);
             if (ns == null)  {
                 String err = "getComplexType: ";
                 err += "Namespace prefix not recognized '"+name+"'";
@@ -764,7 +765,7 @@ public class Schema extends Annotated {
         {
             String nsPrefix = name.substring(0,idx);
             name = name.substring(idx + 1);
-            ns = (String) _namespaces.get(nsPrefix);
+            ns = (String) _namespaces.getNamespaceURI(nsPrefix);
             if (ns == null)  {
                 String err = "getElementDecl: ";
                 err += "Namespace prefix not recognized '"+nsPrefix+"'";
@@ -837,7 +838,7 @@ public class Schema extends Annotated {
         if (colon >= 0) {
             nsPrefix = name.substring(0,colon);
             name = name.substring(colon + 1);
-            ns = (String) _namespaces.get(nsPrefix);
+            ns = (String) _namespaces.getNamespaceURI(nsPrefix);
             if (ns == null)  {
                 String err = "getSimpleType: ";
                 err += "Namespace prefix not recognised '"+nsPrefix+"'";
@@ -846,7 +847,7 @@ public class Schema extends Annotated {
             }
         }
         else {
-            ns = (String) _namespaces.get(nsPrefix);
+            ns = (String) _namespaces.getNamespaceURI(nsPrefix);
         }
 
         //--if at this point, there is no namespace
@@ -880,7 +881,7 @@ public class Schema extends Annotated {
         //--Is the declaration in the default namespace (if any)
         boolean isDefaultNS = false;
         if (namespace == null) {
-            namespace = (String)_namespaces.get("");
+            namespace = (String)_namespaces.getNamespaceURI("");
             isDefaultNS = true;
         }
 
@@ -1002,7 +1003,7 @@ public class Schema extends Annotated {
         {
             String nsPrefix = name.substring(0,idx);
             name = name.substring(idx + 1);
-            ns = (String) _namespaces.get(nsPrefix);
+            ns = (String) _namespaces.getNamespaceURI(nsPrefix);
             if (ns == null)  {
                 String err = "getModelGroup: ";
                 err += "Namespace prefix not recognized '"+nsPrefix+"'";
@@ -1078,7 +1079,7 @@ public class Schema extends Annotated {
      */
     public final String getNamespace(String prefix) {
         if (prefix == null) prefix = "";
-        return (String)_namespaces.get(prefix);
+        return (String)_namespaces.getNamespaceURI(prefix);
     } //-- getNamespace
 
     /**
@@ -1086,7 +1087,7 @@ public class Schema extends Annotated {
      *
      * @return the namespaces declared for this Schema
      */
-    public Hashtable getNamespaces() {
+    public Namespaces getNamespaces() {
         return _namespaces;
     } //-- getNamespaces
 
@@ -1152,11 +1153,7 @@ public class Schema extends Annotated {
      */
     public boolean isKnownNamespace(String namespaceURL)
     {
-        Enumeration urls = _namespaces.elements();
-        while(urls.hasMoreElements())
-            if (urls.nextElement().equals(namespaceURL))
-                return true;
-        return false;
+        return (_namespaces.getNamespacePrefix(namespaceURL) != null);
     }
 
     /**
@@ -1231,7 +1228,7 @@ public class Schema extends Annotated {
      */
     public boolean removeNamespace(String prefix) {
         if (prefix == null) prefix = "";
-        return (_namespaces.remove(prefix) != null);
+        return _namespaces.removeNamespace(prefix);
     } //-- removeNamespace
     
     /**
@@ -1338,7 +1335,7 @@ public class Schema extends Annotated {
         if (colon >= 0) {
             localName = typeName.substring(colon + 1);
             prefix = typeName.substring(0,colon);
-            ns = (String) _namespaces.get(prefix);
+            ns = (String) _namespaces.getNamespaceURI(prefix);
             if (ns == null)  {
                 String err = "Schema#getType: ";
                 err += "Namespace prefix not recognised '"+typeName+"'";
@@ -1348,7 +1345,7 @@ public class Schema extends Annotated {
         
         //-- use default namespace if necessary
         if (ns == null) {
-            ns = (String)_namespaces.get(prefix);
+            ns = (String)_namespaces.getNamespaceURI(prefix);
         }
         
         //--if at this point, there is no namespace
@@ -1497,14 +1494,7 @@ public class Schema extends Annotated {
      * given namespace.
     **/
     protected String getNamespacePrefix(String namespace) {
-        if (namespace == null) return null;
-        Enumeration enum = _namespaces.keys();
-        while (enum.hasMoreElements()) {
-            String prefix = (String)enum.nextElement();
-            if (namespace.equals(_namespaces.get(prefix)))
-                return prefix;
-        }
-        return null;
+        return _namespaces.getNamespacePrefix(namespace);
     }
 
 } //-- Schema
