@@ -129,7 +129,6 @@ public class FieldInfo extends XMLInfo {
     public FieldInfo(XSType type, String name) {
         this.name    = name;
         setSchemaType(type);
-        _bound = SourceGenerator.boundPropertiesEnabled();
     } //-- FieldInfo
 
     //------------------/
