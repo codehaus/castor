@@ -214,6 +214,26 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
     public XMLFieldDescriptor getFieldDescriptor
         (String name, NodeType nodeType)
     {
+        boolean wild = (nodeType == null);
+
+        if (wild || (nodeType == NodeType.Element)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < elements.length; i++) {
+                desc = elements[i];
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+
+        if (wild || (nodeType == NodeType.Attribute)) {
+            XMLFieldDescriptor desc = null;
+            for (int i = 0; i < attributes.length; i++) {
+                desc = attributes[i];
+                if (desc == null) continue;
+                if (desc.matches(name)) return desc;
+            }
+        }
+
         return null;
 
     } //-- getFieldDescriptor
