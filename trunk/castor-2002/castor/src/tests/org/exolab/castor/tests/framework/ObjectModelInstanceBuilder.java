@@ -61,6 +61,6 @@ public interface ObjectModelInstanceBuilder {
     /**
      * Generate and return a new instance from the hard-coded data.
      */
-    public Object buildInstance();
+    public Object buildInstance() throws Exception;
 
 }
