@@ -127,6 +127,15 @@ public class TypeConversion {
                 //-- century
                 case SimpleTypesFactory.CENTURY_TYPE:
                     return new XSCentury();
+                //-- CDATA
+                case SimpleTypesFactory.CDATA_TYPE:
+                {
+                    XSCdata xsCdata = new XSCdata();
+                    if (!simpleType.isBuiltInType())
+                        xsCdata.setFacets(simpleType);
+                    return xsCdata;
+                }
+
                 //-- date
                 case SimpleTypesFactory.DATE_TYPE:
                     return new XSDate();

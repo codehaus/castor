@@ -64,21 +64,26 @@ public abstract class XSType {
     /**
      * The name of the binary type
     **/
-    public static final String BINARY_NAME         = "binary";
+    public static final String BINARY_NAME = "binary";
 
     /**
      * The name of the boolean type
     **/
-    public static final String BOOLEAN_NAME        = "boolean";
+    public static final String BOOLEAN_NAME = "boolean";
 
+    /**
+     * The name of the CDATA type
+     */
+     public static final String CDATA_NAME = "CDATA";
     /**
      * The name of the the century type
      */
-     public static final String CENTURY_NAME        = "century";
+     public static final String CENTURY_NAME = "century";
+
     /**
      * The name of the decimal type
     **/
-    public static final String DECIMAL_NAME        = "decimal";
+    public static final String DECIMAL_NAME = "decimal";
 
     /**
      * The name of the date type
@@ -88,7 +93,7 @@ public abstract class XSType {
     /**
      * The name of the double type
     **/
-    public static final String DOUBLE_NAME         = "double";
+    public static final String DOUBLE_NAME = "double";
 
     /**
      * The name of the float type
@@ -98,12 +103,12 @@ public abstract class XSType {
     /**
      * The name of the ID type
     **/
-    public static final String ID_NAME             = "ID";
+    public static final String ID_NAME = "ID";
 
     /**
      * The name of the IDREF type
     **/
-    public static final String IDREF_NAME          = "IDREF";
+    public static final String IDREF_NAME = "IDREF";
 
     /**
      * The Name of the IDREFS type
@@ -113,23 +118,23 @@ public abstract class XSType {
     /**
      * The name of the integer type
     **/
-    public static final String INTEGER_NAME        = "integer";
+    public static final String INTEGER_NAME = "integer";
 
 
     /**
      * The name of the long type
     **/
-    public static final String LONG_NAME           = "long";
+    public static final String LONG_NAME = "long";
 
     /**
      * The name for the month type
      */
-     public static final String MONTH_NAME              = "month";
+     public static final String MONTH_NAME = "month";
 
     /**
      * The name of the NCName type
     **/
-    public static final String NCNAME_NAME         = "NCName";
+    public static final String NCNAME_NAME = "NCName";
 
     /**
      * The name of the negative-interger type
@@ -155,17 +160,17 @@ public abstract class XSType {
     /**
      * the name of the recurring duration type
      */
-     public static final String RECURRING_DURATION_NAME     ="recurringDuration";
+     public static final String RECURRING_DURATION_NAME ="recurringDuration";
 
     /**
      * The name of the string type
     **/
-    public static final String STRING_NAME         = "string";
+    public static final String STRING_NAME  = "string";
 
     /**
      * The name of the timeInstant type
     **/
-    public static final String TIME_INSTANT_NAME   = "timeInstant";
+    public static final String TIME_INSTANT_NAME = "timeInstant";
 
     /**
      * the name of the timeDuration type
@@ -188,16 +193,16 @@ public abstract class XSType {
     /**
      * the name of the year type
      */
-     public static final String YEAR_NAME           = "year";
+     public static final String YEAR_NAME = "year";
     /**
 	 * The name of the short type
 	 */
-	public static final String SHORT_NAME			= "short";
+	public static final String SHORT_NAME = "short";
 
 	/**
 	 * The name of the int type
 	 */
-	public static final String INT_NAME				= "int";
+	public static final String INT_NAME = "int";
 
 
     public static final short NULL               = -1;
@@ -209,33 +214,34 @@ public abstract class XSType {
     //--
     public static final short BINARY             =  1;
     public static final short BOOLEAN            =  2;
-    public static final short DECIMAL            =  3;
-    public static final short DOUBLE             =  4;
-    public static final short ID                 =  5;
-    public static final short IDREF              =  6;
-    public static final short IDREFS             =  7;
-    public static final short INTEGER            =  8;
-    public static final short COLLECTION         =  9;
-    public static final short DATE               = 10;
-    public static final short LONG               = 11;
-    public static final short NCNAME             = 12;
-    public static final short NEGATIVE_INTEGER   = 13;
-    public static final short NMTOKEN            = 14;
-    public static final short POSITIVE_INTEGER   = 15;
-    public static final short STRING             = 16;
-    public static final short TIME               = 17;
-    public static final short TIME_INSTANT       = 18;
-    public static final short TIME_DURATION      = 19;
-    public static final short URIREFERENCE       = 20;
-	public static final short SHORT				 = 21;
-	public static final short INT				 = 22;
-    public static final short CENTURY            = 23;
-    public static final short MONTH              = 24;
-    public static final short YEAR               = 25;
-    public static final short RECURRING_DURATION = 26;
-    public static final short QNAME              = 27;
-    public static final short TIME_PERIOD        = 28;
-    public static final short FLOAT              = 29;
+    public static final short CENTURY            =  3;
+    public static final short CDATA              = 30;
+    public static final short COLLECTION         =  4;
+    public static final short DATE               =  5;
+    public static final short DECIMAL            =  6;
+    public static final short DOUBLE             =  7;
+    public static final short FLOAT              =  8;
+    public static final short ID                 =  9;
+    public static final short IDREF              = 10;
+    public static final short IDREFS             = 11;
+    public static final short INT				 = 12;
+    public static final short INTEGER            = 13;
+    public static final short LONG               = 14;
+    public static final short MONTH              = 15;
+    public static final short NCNAME             = 16;
+    public static final short NEGATIVE_INTEGER   = 17;
+    public static final short NMTOKEN            = 18;
+    public static final short POSITIVE_INTEGER   = 19;
+    public static final short QNAME              = 20;
+    public static final short RECURRING_DURATION = 21;
+    public static final short SHORT				 = 22;
+    public static final short STRING             = 23;
+    public static final short TIME               = 24;
+    public static final short TIME_DURATION      = 25;
+    public static final short TIME_INSTANT       = 26;
+    public static final short TIME_PERIOD        = 27;
+    public static final short URIREFERENCE       = 28;
+	public static final short YEAR               = 29;
     private short   type       = NULL;
 
     /**
@@ -365,6 +371,8 @@ public abstract class XSType {
                 return BINARY_NAME;
             case BOOLEAN:
                 return BOOLEAN_NAME;
+            case CDATA:
+                return CDATA_NAME;
             case CENTURY:
                 return CENTURY_NAME;
             case DATE:

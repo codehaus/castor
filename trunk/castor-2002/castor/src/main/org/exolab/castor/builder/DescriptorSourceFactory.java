@@ -1063,6 +1063,47 @@ public class DescriptorSourceFactory {
                 jsc.unindent();
                 jsc.add("}");
                 break;
+
+             case XSType.CDATA:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("NameValidator nv = new NameValidator(NameValidator.CDATA);");
+                XSCdata xsCdata = (XSCdata)xsType;
+                if ( (xsCdata.hasMinLength()) && (!xsCdata.hasLength()) ){
+                    jsc.add("nv.setMinLength(");
+                    jsc.append(Integer.toString(xsCdata.getMinLength()));
+                    jsc.append(");");
+                }
+                if ( (xsCdata.hasMaxLength()) && (!xsCdata.hasLength()) ) {
+                    jsc.add("nv.setMaxLength(");
+                    jsc.append(Integer.toString(xsCdata.getMaxLength()));
+                    jsc.append(");");
+                }
+                if ( xsCdata.hasLength()) {
+                    jsc.add("nv.setLength(");
+                    jsc.append(Integer.toString(xsCdata.getLength()));
+                    jsc.append(");");
+                }
+                //-- fixed values
+                if (fixed != null) {
+                    jsc.add("nv.setFixedValue(\"");
+                    jsc.append(fixed);
+                    jsc.append("\");");
+                }
+                //-- pattern facet
+                pattern = xsCdata.getPattern();
+                if (pattern != null) {
+                    jsc.add("nv.setPattern(\"");
+                    jsc.append(escapePattern(pattern));
+                    jsc.append("\");");
+                }
+
+                jsc.add("fieldValidator.setValidator(nv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
+
+
             case XSType.NCNAME:
                 jsc.add("fieldValidator.setValidator(new NameValidator());");
                 break;
