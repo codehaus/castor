@@ -1354,6 +1354,8 @@ public class Marshaller extends MarshalFramework {
         }
 
         ++depth;
+        Stack wrappers = null;
+        
         //-- marshal elements
         for (int i = 0; i < descriptors.length; i++) {
 
@@ -1371,39 +1373,80 @@ public class Marshaller extends MarshalFramework {
             
             //-- handle XML path
             String path = elemDescriptor.getLocationPath();
-            Stack wrappers = null;
+            String currentLoc = null;
+            //-- Wrapper/Location cleanup
+            if (wrappers != null) {
+                try {
+                    while (!wrappers.empty()) {
+                        WrapperInfo wInfo = (WrapperInfo)wrappers.peek();
+                        if (path != null) {
+                            if (wInfo.location.equals(path)) {
+                                path = null;
+                                break;
+                            }
+                            else if (path.startsWith(wInfo.location + "/")) {
+                                path = path.substring(wInfo.location.length()+1);
+                                currentLoc = wInfo.location;
+                                break;
+                            }
+                        }
+                        handler.endElement(wInfo.qName);
+                        wrappers.pop();
+                    }
+                }
+                catch(SAXException sx) {
+                    throw new MarshalException(sx);
+                }
+            }
+            
+            
             if (path != null) {
                 _attributes.clear();
-                wrappers = new Stack();
-                int idx = -1;
+                if (wrappers == null) {
+                    wrappers  = new Stack();
+                }
                 try {
-                    while ((idx = path.indexOf('/')) > 0) {
-                        String elemName = path.substring(0, idx);
+                    while (path != null) {
+                        
+                        String elemName = null;
+                        int idx = path.indexOf('/');
+                        
+                        if (idx > 0) {
+                            elemName = path.substring(0, idx);
+                            path = path.substring(idx+1);
+                        }
+                        else {
+                            elemName = path;
+                            path = null;
+                        }
+                        
+                        //-- save current location without namespace
+                        //-- information for now.
+                        if (currentLoc == null)
+                            currentLoc = elemName;
+                        else
+                            currentLoc = currentLoc + "/" + elemName;
+                            
                         if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
                             elemName = nsPrefix + ':' + elemName;
                         }
-                        wrappers.push(elemName);
-                        handler.startElement(elemName, _attributes);
-                        path = path.substring(idx+1);
-                    }
-                    _attributes.clear();
-                    if (nestedAttCount > 0) {
-                        for (int na = 0; na < nestedAtts.length; na++) {
-                            if (nestedAtts[na] == null) continue;
-                            String tmpPath = nestedAtts[na].getLocationPath();
-                            if (tmpPath.equals(elemDescriptor.getLocationPath())) {
-                                processAttribute(object, nestedAtts[na],_attributes);
-                                nestedAtts[na] = null;
-                                --nestedAttCount;
+                        wrappers.push(new WrapperInfo(elemName, currentLoc));
+                        
+                        
+                        _attributes.clear();
+                        if (nestedAttCount > 0) {
+                            for (int na = 0; na < nestedAtts.length; na++) {
+                                if (nestedAtts[na] == null) continue;
+                                String tmpPath = nestedAtts[na].getLocationPath();
+                                if (tmpPath.equals(currentLoc)) {
+                                    processAttribute(object, nestedAtts[na],_attributes);
+                                    nestedAtts[na] = null;
+                                    --nestedAttCount;
+                                }
                             }
                         }
+                        handler.startElement(elemName, _attributes);
                     }
-                    String elemName = path;
-                    if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
-                        elemName = nsPrefix + ':' + elemName;
-                    }
-                    wrappers.push(elemName);
-                    handler.startElement(elemName, _attributes);
                 }
                 catch(SAXException sx) {
                     throw new MarshalException(sx);
@@ -1431,17 +1474,90 @@ public class Marshaller extends MarshalFramework {
             //-- otherwise just marshal object as is
             else marshal(obj, elemDescriptor, handler);
             
-            if (wrappers != null) {
+        }
+        
+        //-- Wrapper/Location cleanup for elements
+        if (wrappers != null) {
+            try {
+                while (!wrappers.empty()) {
+                    WrapperInfo wInfo = (WrapperInfo)wrappers.pop();
+                    handler.endElement(wInfo.qName);
+                }
+            }
+            catch(SAXException sx) {
+                throw new MarshalException(sx);
+            }
+        }
+        
+        //-- Handle any additional attribute locations that were
+        //-- not handled when dealing with wrapper elements
+        if (nestedAttCount > 0) {
+            if (wrappers == null) wrappers = new Stack();
+            for (int i = 0; i < nestedAtts.length; i++) {
+                if (nestedAtts[i] == null) continue;
+                String path = nestedAtts[i].getLocationPath();
+                //-- Make sure attribute has value before continuing
+                //-- We really could use a FieldHandler#hasValue() 
+                //-- method (since sometimes getValue() methods may
+                //-- be expensive and we don't always want to call it
+                //-- multiple times)
+                if (nestedAtts[i].getHandler().getValue(object) == null) {
+                    nestedAtts[i] = null;
+                    -- nestedAttCount;
+                    continue;
+                }
+                String currentLoc = null;
                 try {
+                    while (path != null) {                        
+                        int idx = path.indexOf('/');
+                        String elemName = null;
+                        if (idx > 0) {
+                            elemName = path.substring(0,idx);
+                            path = path.substring(idx+1);
+                        }
+                        else {
+                            elemName = path;
+                            path = null;
+                        }
+                        if (currentLoc == null)
+                            currentLoc = elemName;
+                        else
+                            currentLoc = currentLoc + "/" + elemName;
+                            
+                        if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
+                            elemName = nsPrefix + ':' + elemName;
+                        }
+                        wrappers.push(elemName);
+                        
+                        _attributes.clear();
+                        if (path == null) {
+                            processAttribute(object, nestedAtts[i],_attributes);
+                            nestedAtts[i] = null;
+                            --nestedAttCount;
+                        }
+                        if (nestedAttCount > 0) {
+                            for (int na = i+1; na < nestedAtts.length; na++) {
+                                if (nestedAtts[na] == null) continue;
+                                String tmpPath = nestedAtts[na].getLocationPath();
+                                if (tmpPath.equals(currentLoc)) {
+                                    processAttribute(object, nestedAtts[na],_attributes);
+                                    nestedAtts[na] = null;
+                                    --nestedAttCount;
+                                }
+                            }
+                        }
+                        handler.startElement(elemName, _attributes);
+                    }
+                
                     while (!wrappers.empty()) {
                         handler.endElement((String)wrappers.pop());
                     }
-                }
-                catch(SAXException sx) {
-                    throw new MarshalException(sx);
-                }
+                } catch (Exception e) {
+                    throw new MarshalException(e);
+                }        
             }
-        }
+        } // if (nestedAttCount > 0)
+
         //-- finish element
         try {
             if (!containerField)
@@ -1896,6 +2012,21 @@ public class Marshaller extends MarshalFramework {
             context.setConfiguration(_config);
             context.setResolver(_cdResolver);
             validator.validate(object, context);
+        }
+    }
+    
+    /**
+     * Inner-class used for handling wrapper elements 
+     * and locations
+     */
+    static class WrapperInfo {
+        
+        String qName = null;
+        String location = null;
+        
+        WrapperInfo(String qName, String location) {
+            this.qName = qName;
+            this.location = location;
         }
     }
 
