@@ -101,10 +101,11 @@ public class JDBCQueryExpression
         _distinct = distinct;
     }
 
+
     public void addColumn( String tableName, String columnName )
     {
         _tables.put( tableName, tableName );
-        _cols.addElement( tableName + JDBCSyntax.TableColumnSeparator + columnName  );
+        _cols.addElement( _factory.quoteName( tableName + JDBCSyntax.TableColumnSeparator + columnName ) );
     }
 
     public void addTable( String tableName )
