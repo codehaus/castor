@@ -158,19 +158,19 @@ public class MemberFactory {
         
         if (datatype != null) {
             
-            if (datatype.hasFacet(Facet.ENUMERATION)) 
+            if (datatype.hasFacet(Facet.ENUMERATION)) {
                 enumeration = true;
             
-            //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
-            ClassInfo cInfo = null;
-            if (resolver != null) {
-                cInfo = resolver.resolve(datatype);
-            }
+                //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
+                ClassInfo cInfo = null;
+                if (resolver != null) {
+                    cInfo = resolver.resolve(datatype);
+                }
             
-            if (cInfo != null)
-                xsType = cInfo.getSchemaType();
-            else
-                xsType = TypeConversion.convertType(datatype);
+                if (cInfo != null)
+                    xsType = cInfo.getSchemaType();
+            }
+            else xsType = TypeConversion.convertType(datatype);
         }
         else
             xsType = new XSString();
@@ -254,16 +254,18 @@ public class MemberFactory {
         Datatype datatype = eDecl.getDatatype();
         if (datatype != null) {
             
-            //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
-            ClassInfo cInfo = null;
-            if (resolver != null) {
-                cInfo = resolver.resolve(datatype);
+            //-- handle special case for enumerated types
+            if (datatype.hasFacet(Facet.ENUMERATION)) {
+                //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
+                ClassInfo cInfo = null;
+                if (resolver != null) {
+                    cInfo = resolver.resolve(datatype);
+                }
+                
+                if (cInfo != null)
+                    xsType = cInfo.getSchemaType();
             }
-            
-            if (cInfo != null)
-                xsType = cInfo.getSchemaType();
-            else 
-                xsType = TypeConversion.convertType(datatype);
+            else xsType = TypeConversion.convertType(datatype);
         }
         else {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());
