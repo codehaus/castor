@@ -69,13 +69,13 @@ public class TestTypes
     private java.util.Date _timestamp;
 
 
-    private String         _optional;
+    private int            _intValue;
 
 
-    private boolean        _exists;
+    private boolean        _intExists = false;
 
 
-    static final int      DefaultId = 3;
+    static final int       DefaultId = 3;
 
 
     public TestTypes()
@@ -132,6 +132,31 @@ public class TestTypes
     public java.util.Date getTimestamp()
     {
         return _timestamp;
+    }
+
+
+    public void setIntValue( int value )
+    {
+        _intValue = value;
+        _intExists = true;
+    }
+
+
+    public int getIntValue()
+    {
+        return _intValue;
+    }
+
+
+    public boolean hasIntValue()
+    {
+        return _intExists;
+    }
+
+
+    public void deleteIntValue()
+    {
+        _intExists = false;
     }
 
 

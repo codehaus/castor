@@ -69,10 +69,15 @@ public class TestDetail
     static final String    DefaultValue = "group";
 
 
+    public TestDetail( int id )
+    {
+        _id = id;
+        _value = DefaultValue;
+    }
+
+
     public TestDetail()
     {
-        _id = DefaultId;
-        _value = DefaultValue;
     }
 
 
@@ -115,6 +120,19 @@ public class TestDetail
     public String toString()
     {
         return _id + " / " + _value + " / " + _master.getId();
+    }
+
+
+    public boolean equals( Object other )
+    {
+        if ( other == this )
+            return true;
+        if ( other != null && other instanceof TestDetail ) {
+            if ( ( (TestDetail) other )._id == _id &&
+                 ( (TestDetail) other )._value.equals( _value ) )
+                return true;
+        }
+        return false;
     }
 
 

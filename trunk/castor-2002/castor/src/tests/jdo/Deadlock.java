@@ -186,17 +186,21 @@ public class Deadlock
             // suceeding and second failing
             FirstThread  first;
             SecondThread second;
+            Object       lock = new Object();
             
             first = new FirstThread();
             first._db = _first;
             first._stream = stream;
             first._accessMode = accessMode;
-            first.start();
+            first._lock = lock;
             second = new SecondThread();
             second._db = _second;
             second._stream = stream;
             second._accessMode = accessMode;
+            second._lock = lock;
+
             second.start();
+            first.start();
 
             first.join();
             second.join();
@@ -228,6 +232,9 @@ public class Deadlock
         private short            _accessMode;
 
 
+        private Object           _lock;
+
+
         public void run()
         {
             TestObject   object;
@@ -244,9 +251,14 @@ public class Deadlock
                 object.setValue1( TestObject.DefaultValue1 + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
+                // Notify the other thread that it may proceed and suspend
+                synchronized ( _lock ) {
+                    _lock.notify();
+                    _lock.wait();
+                }
                 // Give the other thread a 2 second opportunity.
-                sleep( start + Wait - System.currentTimeMillis() );
-                start = System.currentTimeMillis();
+                // sleep( start + Wait - System.currentTimeMillis() );
+                //start = System.currentTimeMillis();
                 
                 _stream.writeVerbose( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 object = (TestObject) _db.load( TestObject.class,
@@ -254,8 +266,13 @@ public class Deadlock
                 object.setValue2( TestObject.DefaultValue2 + ":1" );
                 _stream.writeVerbose( "First: Modified to " + object );
                 
+                // Notify the other thread that it may proceed and suspend
+                synchronized ( _lock ) {
+                    _lock.notify();
+                    _lock.wait();
+                }
                 // Give the other thread a 2 second opportunity.
-                sleep( Math.max( start + Wait - System.currentTimeMillis(), 0 ) );
+                //sleep( Math.max( start + Wait - System.currentTimeMillis(), 0 ) );
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
@@ -290,6 +307,9 @@ public class Deadlock
         private short            _accessMode;
 
 
+        private Object           _lock;
+
+
         public void run()
         {
             TestObject   object;
@@ -299,9 +319,13 @@ public class Deadlock
             try {
                 _db.begin();
                 
+                // Suspend
+                synchronized ( _lock ) {
+                    _lock.wait();
+                }
                 // Give the other thread a 2 second opportunity.
-                sleep( Wait / 2 );
-                start = System.currentTimeMillis();
+                //sleep( Wait / 2 );
+                //start = System.currentTimeMillis();
                 
                 // Load first object and change something about it (otherwise will not write)
                 _stream.writeVerbose( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
@@ -310,9 +334,14 @@ public class Deadlock
                 object.setValue2( TestObject.DefaultValue2 + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
                 
+                // Notify the other thread that it may proceed and suspend
+                synchronized ( _lock ) {
+                    _lock.notify();
+                    _lock.wait();
+                }
                 // Give the other thread a 2 second opportunity.
-                sleep( start + Wait - System.currentTimeMillis() );
-                start = System.currentTimeMillis();
+                // sleep( start + Wait - System.currentTimeMillis() );
+                // start = System.currentTimeMillis();
                 
                 _stream.writeVerbose( "Second: Loading object " + TestObject.DefaultId );
                 try {
@@ -332,9 +361,14 @@ public class Deadlock
                 object.setValue1( TestObject.DefaultValue1 + ":2" );
                 _stream.writeVerbose( "Second: Modified to " + object );
 
+                // Notify the other thread that it may proceed and suspend
+                synchronized ( _lock ) {
+                    _lock.notify();
+                    _lock.wait( 3000 );
+                }
                 // Give the other thread a 2 second opportunity.
-                sleep( start + Wait - System.currentTimeMillis() );
-                start = System.currentTimeMillis();
+                //sleep( start + Wait - System.currentTimeMillis() );
+                //start = System.currentTimeMillis();
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.

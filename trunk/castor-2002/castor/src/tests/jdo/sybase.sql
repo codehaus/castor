@@ -17,9 +17,9 @@ go
 drop table test_master
 go
 create table test_master (
-  id       int          not null,
-  value    varchar(200) not null,
-  group_id int          not null
+  id       numeric(10,0)    not null,
+  value    varchar(200)   not null,
+  group_id numeric(10,0)  null
 )
 go
 create unique index test_master_pk on test_master ( id )
@@ -32,9 +32,9 @@ go
 drop table test_detail
 go
 create table test_detail (
-  detail_id  int          not null,
-  master_id  int          not null,
-  value      varchar(200) not null
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null,
+  value      varchar(200 )  not null
 )
 go
 create unique index test_detail_pk on test_detail ( detail_id )
@@ -47,8 +47,8 @@ go
 drop table test_group
 go
 create table test_group (
-  id     int          not null,
-  value  varchar(200) not null
+  id     numeric(10,0)  not null,
+  value  varchar(200)   not null
 )
 go
 create unique index test_group_pk on test_group ( id )
@@ -61,9 +61,10 @@ go
 drop table test_types
 go
 create table test_types (
-  id     numeric(10,0) not null,
-  tdt    datetime      not null,
-  ttm    smalldatetime not null
+  id       numeric(10,0)  not null,
+  tdt      datetime       not null,
+  ttm      smalldatetime  not null,
+  int_val  integer        null
 )
 go
 create unique index test_types_pk on test_types (id)

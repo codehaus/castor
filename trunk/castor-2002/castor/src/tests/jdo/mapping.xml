@@ -23,15 +23,15 @@
     <description>Test master table</description>
     <map-to table="test_master" />
     <field name="id" type="integer">
-      <sql name="id" type="integer" />
+      <sql name="id" type="numeric" />
     </field>
     <field name="value" type="string"  required="true">
       <sql name="value" type="varchar" />
     </field>
-    <field name="group" type="jdo.TestGroup" required="true">
+    <field name="group" type="jdo.TestGroup" required="false">
       <sql name="group_id" />
     </field>
-    <field name="details" type="jdo.TestDetail" collection="vector">
+    <field name="details" type="jdo.TestDetail" collection="vector" required="false">
     </field>
   </class>
 
@@ -40,7 +40,7 @@
     <description>Test detail table</description>
     <map-to table="test_detail" />
     <field name="id" type="integer">
-      <sql name="detail_id" type="integer" />
+      <sql name="detail_id" type="numeric" />
     </field>
     <field name="value" type="string" required="true">
       <sql name="value" type="varchar" />
@@ -55,7 +55,7 @@
     <description>Test groups table</description>
     <map-to table="test_group" />
     <field name="id" type="integer">
-      <sql name="id" type="integer" />
+      <sql name="id" type="numeric" />
     </field>
     <field name="value" type="string"  required="true">
       <sql name="value" type="varchar" />
@@ -75,6 +75,9 @@
     </field>
     <field name="time" type="java.util.Date">
       <sql name="ttm" type="time" />
+    </field>
+    <field name="intValue" type="integer">
+      <sql name="int_val" type="integer" />
     </field>
   </class>
 

@@ -1,3 +1,15 @@
+Version 0.8.6  May 12, 2000
+---------------------------
+
+JDO:     Fixed bug when related object is null and SQL_OTHER type is passed to JDBC
+         driver; now properly passes type of identity field. (Reported by
+         Eitan Suez <eitan@uptodata.com>).
+
+Mapping: Date type no longer defaults to new date() when field is null, field is no
+         longer set to default when null. (Reported by Lincoln Spiteri
+         <Lincoln.Spiteri@mobisle.com>).
+
+
 Version 0.8.5  May 12, 2000
 ---------------------------
 

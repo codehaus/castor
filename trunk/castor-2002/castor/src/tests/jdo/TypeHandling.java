@@ -148,7 +148,65 @@ public class TypeHandling
             stream.writeVerbose( "OK: Handled date/time types" );
 
 
+            stream.writeVerbose( "Testing null in integer field" );
+            db.begin();
+            oql.bind( (double) TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                types.setIntValue( 5 );
+                types.deleteIntValue();
+            }
+            db.commit();
+            db.begin();
+            oql.bind( (double) TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( types.getIntValue() != 0 || types.hasIntValue() ) {
+                    stream.writeVerbose( "Error: null integer value was set" );
+                    result = false;
+                }
+                types.setIntValue( 5 );
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            db.begin();
+            oql.bind( (double) TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( types.getIntValue() != 5 || ! types.hasIntValue() ) {
+                    stream.writeVerbose( "Error: null integer value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+
+
             /*
+            stream.writeVerbose( "Creating new object: " + object );
+            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
+            oql.bind( TestObject.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                object = (TestObject) enum.nextElement();
+                object.setValue1( null );
+            }
+            try {
+                db.commit();
+                stream.writeVerbose( "OK: Failed to detect validity exception" );
+                result = false;
+            } catch ( TransactionAbortedException except ) {
+                stream.writeVerbose( "OK: Detected validity exception: " + except.getMessage() );
+            }
 
             stream.writeVerbose( "Testing null in required field" );
             db.begin();

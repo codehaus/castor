@@ -126,6 +126,29 @@ public class Join
             }
             db.commit();
 
+
+            stream.writeVerbose( "Attempt to create master with no group" );
+            db.begin();
+            master = new TestMaster();
+            db.create( master );
+            db.commit();
+            db.begin();
+            oql.bind( TestMaster.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+                db.remove( master );
+                stream.writeVerbose( "Created master with no group: " + master );
+            } else {
+                stream.writeVerbose( "Error: failed to create master with no group" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+
+
+            stream.writeVerbose( "Attempt to create master with a group" );
             db.begin();
             groupOql.bind( TestGroup.DefaultId );
             group = (TestGroup) groupOql.execute().nextElement();
@@ -133,6 +156,58 @@ public class Join
             master.setGroup( group );
             db.create( master );
             db.commit();
+            db.begin();
+            oql.bind( TestMaster.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+                if ( master.getGroup() == null || master.getGroup().getId() != TestGroup.DefaultId ) {
+                    stream.writeVerbose( "Error: loaded master without any group: " + master );
+                    result  = false;
+                } else {
+                    db.remove( master );
+                    stream.writeVerbose( "Created master with group: " + master );
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to create master with group" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            
+
+            stream.writeVerbose( "Attempt to create master with details" );
+            db.begin();
+            master = new TestMaster();
+            master.addDetail( new TestDetail( TestDetail.DefaultId ) );
+            master.addDetail( new TestDetail( TestDetail.DefaultId + 1 ) );
+            master.addDetail( new TestDetail( TestDetail.DefaultId + 2 ) );
+            db.create( master );
+            db.commit();
+            db.begin();
+            oql.bind( TestMaster.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                master = (TestMaster) enum.nextElement();
+                if ( master.getDetails().size() == 0 ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId ) ) ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 1 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 2 ) ) ) {
+                    stream.writeVerbose( "Error: loaded master without three details: " + master );
+                    result  = false;
+                } else {
+                    db.remove( master );
+                    stream.writeVerbose( "Created master with details: " + master );
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to create master with details group" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+
 
             db.close();
         } catch ( Exception except ) {
