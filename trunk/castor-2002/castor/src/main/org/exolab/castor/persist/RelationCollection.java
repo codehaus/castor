@@ -251,9 +251,9 @@ public class RelationCollection implements Collection, Lazy {
                 return lazyLoad( id );
             } else {
                 // skip to the first "not deleted" id
-                id = _ids.get(cursor++);
+                id = _ids.get(cursor++ - _added.size() );
                 while ( _deleted.contains(id) ) {
-                    id = _ids.get(cursor++);
+                    id = _ids.get(cursor++ - _added.size());
                 }
                 o = _loaded.get( id );
                 if ( o != null )
