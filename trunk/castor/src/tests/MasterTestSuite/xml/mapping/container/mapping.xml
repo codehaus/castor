@@ -27,7 +27,12 @@
                 </field>
                 <field name="X"
                        type="X">
-                        <bind-xml name="X"/>
+                        <bind-xml name="X">
+                           <property>
+                               <name>xml:space</name>
+                               <value>preserve</value>
+                           </property>
+                        </bind-xml>
                 </field>
                 <field name="Z"
                        type="X">
@@ -45,11 +50,11 @@
 
         <class name="X">
                 <field name="Id"
-                       type="integer"> 
+                       type="integer">
                         <bind-xml name="id" node="attribute"/>
                 </field>
                 <field name="Content"
-                       type="string"> 
+                       type="string">
                         <bind-xml node="text"/>
                 </field>
         </class>
@@ -64,22 +69,22 @@
                         <bind-xml name="S"/>
                 </field>
                 <field name="T"
-                       type="integer"> 
+                       type="integer">
                         <bind-xml name="T" node="attribute"/>
                 </field>
                 <field name="U"
-                       type="string"> 
+                       type="string">
                         <bind-xml name="U" node="attribute"/>
                 </field>
         </class>
 
         <class name="R">
                 <field name="Id"
-                       type="integer"> 
+                       type="integer">
                         <bind-xml name="id" node="attribute"/>
                 </field>
                 <field name="Content"
-                       type="string"> 
+                       type="string">
                         <bind-xml node="text"/>
                 </field>
         </class>
