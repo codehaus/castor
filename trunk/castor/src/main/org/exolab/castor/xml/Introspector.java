@@ -48,6 +48,7 @@ package org.exolab.castor.xml;
 import org.exolab.castor.xml.descriptors.CoreDescriptors;
 import org.exolab.castor.xml.handlers.ContainerFieldHandler;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
+import org.exolab.castor.xml.handlers.DefaultFieldHandlerFactory;
 import org.exolab.castor.xml.util.ContainerElement;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
@@ -84,7 +85,7 @@ import java.util.Vector;
  */
 public final class Introspector {
     
-          
+    
     /**
      * The property name for enabling collection wrapping.
      * The property controls whether or not collections 
@@ -122,6 +123,10 @@ public final class Introspector {
     private static final String SET     = "set";
     private static final String CREATE  = "create";
     
+    /**
+     * The default FieldHandlerFactory
+     */
+    private FieldHandlerFactory DEFAULT_HANDLER_FACTORY = new DefaultFieldHandlerFactory();
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
 
@@ -907,7 +912,10 @@ public final class Introspector {
                         type.getConstructor( EMPTY_CLASS_ARGS );
                     }
                     catch ( NoSuchMethodException e ) { 
-                        return false;
+                        //-- Allow any built-in descriptor classes
+                        //-- that don't have default constructors
+                        //-- such as java.sql.Date, java.sql.Time, etc.
+                        return (CoreDescriptors.getDescriptor(type) != null);
                     }
                 }
             }
@@ -1043,6 +1051,11 @@ public final class Introspector {
                 tmp = tmp.getSuperclass();
             }
         }
+        
+        //-- check DefaultFieldHandlerFactory
+        if (DEFAULT_HANDLER_FACTORY.isSupportedType(type))
+            return DEFAULT_HANDLER_FACTORY;
+            
         return null;
     } //-- getHandlerFactory
     
@@ -1149,10 +1162,10 @@ public final class Introspector {
                 }
                 catch ( NoSuchMethodException e ) { 
                     
-                    //-- allow java.sql.Date
-                    if (type == java.sql.Date.class) return true;
-                    
-                    return false;
+                    //-- Allow any built-in descriptor classes
+                    //-- that don't have default constructors
+                    //-- such as java.sql.Date, java.sql.Time, etc.
+                    return (CoreDescriptors.getDescriptor(type) != null);
                 }
             }
         }
