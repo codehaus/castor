@@ -1,7 +1,6 @@
 <project name="Castor" default="main" basedir=".">
 
   <target name="init">
-    <property name="project" value="castor" />
 
     <property name="source" value="src" />
     <property name="main" value="${source}/main" />
@@ -13,10 +12,9 @@
     <property name="doc" value="${source}/doc" />
     <property name="schema" value="${source}/schema" />
 
-    <property name="classpath" value="${classpath}:${classes}" />
-    <property name="build.compiler" file="classic" />
-    <property name="deprecation" value="false" />
     <property file="${etc}/VERSION" />
+    <property name="classpath" value="${classpath}:${classes}" />
+    <property name="deprecation" value="false" />
     <property name="archive" value="${project}-${version}" />
   </target>
 
@@ -24,7 +22,7 @@
   <!-- Display all the targets -->
   <target name="targets">
     <echo message=""/>
-    <echo message="ANT build for ${project} ${version}"/>
+    <echo message="ANT build for ${name} ${version}"/>
     <echo message=""/>
     <echo message="The following targets are available:"/>
     <echo message="  targets  Lists the build targets"/>
@@ -70,17 +68,6 @@
     <deltree dir="${dist}"/>
     <deltree dir="${schema}"/>
   </target>
-
-
-  <target name="newspec" depends="prepare">
-    <javac srcdir="${source}/newspec" destdir="${classes}/newspec" excludes="**/package.html"
-           classpath="${classpath}" debug="on" deprecation="${deprecation}" />
-    <mkdir    dir="${build}/doc/newspec" />
-    <style    basedir="${source}/doc" destdir="${build}/doc" style="style/print.xsl"
-              includes="newspec/**.xml" excludes="style/**,project.xml" />
-    <copydir  src="${source}/newspec/doc" dest="${build}/doc/newspec" includes="*.xsd" />
-  </target>
-
 
 
   <!-- Build all the sources with debug and deprecation -->
@@ -148,19 +135,12 @@
               includes="**.xml" excludes="style/**,project.xml" />
     <copydir  src="${doc}" dest="${build}/doc" includes="license.txt,document.dtd" />
     <copydir  src="${doc}/images" dest="${build}/doc/images" />
-    <copydir  src="${doc}/style" dest="${build}/doc/style" includes="images/**,*.css" />
-
-    <mkdir    dir="${build}/doc/print" />
-    <style    basedir="${doc}" destdir="${build}/doc/print" style="style/print.xsl"
-              includes="**.xml" excludes="style/**,project.xml" />
-    <copydir  src="${doc}" dest="${build}/doc/print" includes="license.txt,document.dtd" />
-    <copydir  src="${doc}/images" dest="${build}/doc/print/images" />
+    <copydir  src="${doc}/style/images" dest="${build}/doc/images" includes="*.gif" />
+    <copydir  src="${doc}/style" dest="${build}/doc/" includes="*.css" />
 
     <copydir  src="${schema}" includes="*.dtd,*.xsd" dest="${build}/doc" />
     <replace  file="${build}/doc/index.html" token="$$VERSION$$" value="${version}" />
-    <replace  file="${build}/doc/print/index.html" token="$$VERSION$$" value="${version}" />
     <replace  file="${build}/doc/download.html" token="$$VERSION$$" value="${version}" />
-    <replace  file="${build}/doc/print/download.html" token="$$VERSION$$" value="${version}" />
 
     <mkdir    dir="${build}/doc/ora-mar-2k" />
     <copydir  src="${doc}/ora-mar-2k" dest="${build}/doc/ora-mar-2k" />
@@ -170,10 +150,8 @@
   <target name="javadoc" depends="prepare">
     <mkdir    dir="${build}/doc" />
     <mkdir    dir="${build}/doc/javadoc" />
-    <property name="copyright"
-              value="Exoffice Technologies, Inc. (C) 2000. All rights reserved  http://castor.exolab.org" />
     <javadoc  sourcepath="${main}" destdir="${build}/doc/javadoc" dir="."
-              doctitle="Castor JavaDoc" windowtitle="Castor JavaDoc" bottom="${copyright}"
+              doctitle="${name} JavaDoc" windowtitle="{$name} JavaDoc" bottom="${copyright}"
               package="true" author="true" version="true" noindex="true"
               packagenames="org.*" />
   </target>
@@ -182,10 +160,8 @@
   <target name="api" depends="prepare">
     <mkdir    dir="${build}/doc" />
     <mkdir    dir="${build}/doc/api" />
-    <property name="copyright"
-              value="Exoffice Technologies, Inc. (C) 2000. All rights reserved  http://castor.exolab.org" />
     <javadoc  sourcepath="${main}" destdir="${build}/doc/api" dir="."
-              doctitle="Castor API" windowtitle="Castor API" bottom="${copyright}"
+              doctitle="${Name} API" windowtitle="${Name} API" bottom="${copyright}"
               public="true" author="true"
               packagenames="org.exolab.castor.jdo,org.exolab.castor.dax,
                             org.exolab.castor.xml,org.exolab.castor.dsml,org.exolab.castor.mapping" />
@@ -265,7 +241,7 @@
 
   <!-- Update the sources from the CVS -->
   <target name="cvs" depends="clean">
-    <cvs cvsRoot=":pserver:anoncvs@virtuals.exoffice.com:/cvs/${project}"
+    <cvs cvsRoot=":pserver:anoncvs@${project}.exolab.org:/cvs/${project}"
          dest="." package="${project}" />
   </target>
 

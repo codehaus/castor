@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <dsml>
     <directory-entries>
-        <entry dn="uid=arkin, ou=People, dc=exoffice, dc=com">
+        <entry dn="uid=arkin, ou=People, dc=intalio, dc=com">
             <objectclass>
                 <oc-value>top</oc-value>
                 <oc-value>person</oc-value>
@@ -19,7 +19,7 @@
                 <value>Assaf</value>
             </attr>
             <attr name="mail">
-                <value>arkin@exoffice.com</value>
+                <value>arkin@intalio.com</value>
             </attr>
             <attr name="ou">
                 <value>People</value>
@@ -28,7 +28,7 @@
                 <value>Test</value>
             </attr>
         </entry>
-        <entry dn="uid=ismael, ou=People, dc=exoffice, dc=com">
+        <entry dn="uid=ismael, ou=People, dc=intalio, dc=com">
             <objectclass>
                 <oc-value>top</oc-value>
                 <oc-value>person</oc-value>
@@ -46,14 +46,14 @@
                 <value>Ismael</value>
             </attr>
             <attr name="mail">
-                <value>ghalimi@exoffice.com</value>
+                <value>ghalimi@intalio.com</value>
             </attr>
             <attr name="ou">
                 <value>People</value>
                 <value>Manager</value>
             </attr>
         </entry>
-        <entry dn="cn=Test, dc=exoffice, dc=com">
+        <entry dn="cn=Test, dc=intalio, dc=com">
 <!--
 	    <objectclass>
                <oc-value>top</oc-value>
@@ -64,7 +64,7 @@
             </attr>
 -->
         </entry>
-        <entry dn="cn=Photo, dc=exoffice, dc=com">
+        <entry dn="cn=Photo, dc=intalio, dc=com">
             <objectclass>
                 <oc-value>top</oc-value>
                 <oc-value>person</oc-value>

@@ -58,7 +58,7 @@
 
       <p>You must modify <tt>search.xml</tt>, <tt>import.xml</tt> and
          <tt>test.xml</tt> and adapt them to your LDAP directory structure.
-         The default files assumes the root directory dc=exoffice,dc=com and
+         The default files assumes the root directory dc=intalio,dc=com and
          includes some sample LDAP entries.</p>
 
       <p>Usage:
@@ -73,7 +73,7 @@
 ]]></code>
          For example:
          <code>
-  example.sh dsml mozilla ldap.exoffice.org dc=exoffice,dc=com secret
+  example.sh dsml mozilla ldap.intalio.com dc=intalio,dc=com secret
          </code></p>
 
     </section>

@@ -40,8 +40,8 @@
          zips.</small></p>
 
       <p><small>All the JARs included with Castor and used for building Castor
-         are available for distribution free of charge and without restriction,
-         subject to US export regulation.</small></p>
+         are available for distribution free of charge, subject to the respective
+         license agreements.</small></p>
 
       <p><small>All implementation JARs (i.e. non APIs) are available under an
          open source license and available from our FTP server.
@@ -51,3 +51,6 @@
     </header>
   </body>
 </document>
+
+
+

@@ -1,78 +1,119 @@
-body {
-	text-align:       justify;
-	font-family:      "Myriad Web",Arial,Helvetica,sans-serif;
-	font-size:        10;
-	background-color: #666699;
-	color:            #424264;
-	left-margin:      0;
-	top-margin:       0;
+BODY { 
+	background: #ffffff; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	font-size: 8px;
 }
 
-a:link {color:      #666699;}
-a:active {color:    #ffff66;}
-a:visited {color:   #666699;}
-
-div {
-	font-size:        10pt;
+A:link, 
+A:visited, 
+A:active { 
+	text-decoration: none 
 }
 
-div.small {
-	font-size:        7pt;
+.userdata	{ 
+	behavior: url('#default#userdata'); 
 }
 
-h1 {
-	color:            #666699;
-	font-size:        12pt;
-	font-weight:      bold;
+.bg { 
+	background-repeat: no-repeat
 }
 
-h2 {
-	color:            #666699;
-	font-size:        10pt;
-	font-weight:      bold;
+.pageTitle {
+	font-size: 12px; 
+	font-family: "Helvetica", "Arial", "sans-serif"; 
+	line-height: 20px; 
+	font-weight: bold; 
+	color: #666666;
 }
 
-h3 {
-	color:            #666699;
-	font-size:        8pt;
-	font-weight:      bold;
+.bodyGrey { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 14px; color: #666666;
 }
 
-span.alpha {
-	color:            #ffffff;
-        text-decoration:  none
+.bodyBlack { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 14px; color: #000000;
+}
+
+.legalBlack { 
+	font-size: 10px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 14px; color: #000000;
+}
+
+.legalGrey { 
+	font-size: 9px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 14px; color: #999999;
+}
+
+.bigGrey { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 14px; color: #666666;
+}
+
+.projectBlack { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif";
+	line-height: 11px; color: #000000;
+}
+
+.header { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	line-height: 14px; 
+	font-weight: bold; 
+	color: #181818;
+}
+
+.menuTopOn { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	line-height: 0px; 
+	color: #6763a9;
+}
+
+.menuTopOff { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	line-height: 0px; 
+	color: #999999;
+}
+
+.menuProjectOn { 
+	font-size: 12px; 
+	font-family: "Helvetica", "Arial", "sans-serif"; 
+	line-height: 20px; 
+	font-weight: bold; 
+	color: #cbcbeb;
+}
+
+.menuProjectOff { 
+	font-size: 12px; 
+	font-family: "Helvetica", "Arial", "sans-serif"; 
+	line-height: 20px; 
+	font-weight: bold; 
+	color: #ffffff;
+}
+
+.subMenuOn { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	line-height: 20px; 
+	font-weight: bold; 
+	color: #4d4b7e;
+}
+
+.subMenuOff { 
+	font-size: 11px; 
+	font-family: "Tahoma", "Helvetica", "Arial", "sans-serif"; 
+	line-height: 20px; 
+	font-weight: bold; 
+	color: #cbcbeb;
 }
 
 
-span.alpha a:link {
-	color:            #bfbffe;
-        text-decoration:  none
-}
-
-span.alpha a:visited {
-	color:            #bfbffe;
-}
-
-span.alpha a:active {
-	color:            #bfbffe;
-}
-
-span.alpha h1 {
-	color:            #666699;
-	font-size:        12pt;
-	font-weight:      bold;
-}
-
-span.alpha h2 {
-	color:            #666699;
-	font-size:        10pt;
-	font-weight:      bold;
-}
-
-span.beta {
-	color:            #666699;
-}
-
-span.small {
-	font-size:        7pt;
-}

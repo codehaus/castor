@@ -23,8 +23,8 @@ public class Test
 	    DirectorySourceImpl.loadMapping( new InputSource( Test.class.getResource( "mapping.xml" ).toString() ) );
 
 	    dirs = new DirectorySourceImpl();
-	    dirs.setURL( "ldap://localhost/ou=people,dc=exoffice,dc=com" );
-	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
+	    dirs.setURL( "ldap://localhost/ou=people,dc=intalio,dc=com" );
+	    dir = dirs.getDirectory( "dc=intalio,dc=com", "secret" );
 	    dir.begin();
 
 	    User                user;
@@ -45,11 +45,11 @@ public class Test
       user = (User) dir.read( "arkin" );
 	    if ( user == null || user != null ) {
 		user = new User();
-    user.setUid( "arkin" );
-    user.setFirst( "Assaf" );
-    user.setLast( "Arkin" );
-    user.setFull( "Assaf Arkin" );
-    user.setEmail( new String[] { "arkin@intalio.com" } );
+		user.setUid( "kvisco" );
+		user.setFirst( "Keith" );
+		user.setLast( "Visco" );
+		user.setFull( "Keith Visco" );
+		user.setEmail( new String[] { "kvisco@intalio.com" } );
 		System.out.println( "Creating: " + user );
 		dir.create( user );
 	    } else {
@@ -63,8 +63,8 @@ public class Test
 	    Record              rec;
 
 	    dirs = new DirectorySourceImpl();
-	    dirs.setURL( "ldap://localhost/dc=exoffice,dc=com" );
-	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
+	    dirs.setURL( "ldap://localhost/dc=intalio,dc=com" );
+	    dir = dirs.getDirectory( "dc=intalio,dc=com", "secret" );
 	    dir.begin();
       rec = (Record) dir.read( new RDN( "people", "arkin" ) );
 	    System.out.println( rec );
