@@ -615,11 +615,14 @@ public final class CacheEngine
             fields = typeInfo.handler.newFieldSet();
             typeInfo.handler.copyInto( object, fields );
 
-
             if ( _logInterceptor != null )
                 _logInterceptor.creating( typeInfo.javaClass, identity );
-            //  Create the object in persistent storage acquiring a lock on the object.
+            // Create the object in persistent storage acquiring a lock on the object.
+            // If no identity was given for the object, this method will attempt to
+            // create an identity using a key generator.
             identity = typeInfo.persist.create( tx.getConnection( this ), fields, identity );
+            if ( identity == null )
+                throw new PersistenceExceptionImpl( "persist.noIdentity" );
             typeInfo.handler.setIdentity( object, identity );
             oid = new OID( typeInfo.handler, identity );
             oid.setDbLock( true );

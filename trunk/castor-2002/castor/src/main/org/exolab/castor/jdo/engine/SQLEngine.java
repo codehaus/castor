@@ -241,14 +241,15 @@ Will be adding this later.
         try {
             // Must create record in parent table first.
             // All other relations have been created before hand.
-            if ( _extends != null ) {
+            if ( _extends != null )
                 identity = _extends.create( conn, fields, identity );
-            }
+
+            if ( _keyGen == null && identity == null )
+                throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
             // Generate key before INSERT
-            if ( _keyGen != null && _keyGen.isBeforeInsert() ) {
+            if ( _keyGen != null && _keyGen.isBeforeInsert() )
                 identity = generateKey( conn );
-            }
 
             // Must remember that SQL column index is base one
             stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
@@ -270,10 +271,8 @@ Will be adding this later.
             stmt.close();
 
             // Generate key after INSERT
-            if ( _keyGen != null && !_keyGen.isBeforeInsert() ) {
+            if ( _keyGen != null && !_keyGen.isBeforeInsert() )
                 identity = generateKey( conn );
-            }
-
             return identity;
         } catch ( SQLException except ) {
             // [oleg] Check for duplicate key based on X/Open error code
