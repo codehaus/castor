@@ -198,7 +198,10 @@ table, values:
          the name of the correspondent table, you can set "sequence" parameter
          of the key generator to "{0}_seq" (the default value).
          In this case the key generator will use sequence "a_seq" for table 
-         "a", "b_seq" for table "b", etc.</p>
+         "a", "b_seq" for table "b", etc.  Castor also allows for inserting 
+         the primary key into the sequence name as well.  This is accomplished 
+         by including the {1} tag into the "sequence" parameter. Example: 
+         "{0}_{1}_seq"</p>
       <p>Actually the SEQUENCE key generator is "4 in 1". 
          With PostgreSQL it performs "SELECT nextval(sequenceName)" before 
          INSERT and produces identity value that is then used in INSERT.
