@@ -67,7 +67,7 @@ public class XSTimePeriod extends XSRecurringDuration {
         = new JClass("org.exolab.castor.types.TimePeriod");
 
     public XSTimePeriod() {
-       super("","P0Y");
+       super(XSType.TIME_PERIOD,"","P0Y");
     }
 
     /**
@@ -75,8 +75,8 @@ public class XSTimePeriod extends XSRecurringDuration {
      * @param duration the String value of the duration facet
      * @return a TimePeriod the duration facet set up
      */
-    public XSTimePeriod(String duration) {
-        super(duration,"P0Y");
+    public XSTimePeriod(short type,String duration) {
+        super(type,duration,"P0Y");
     }
 
 

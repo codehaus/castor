@@ -39,11 +39,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
- * $Id$
+ * $Id
  */
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.types.RecurringDuration;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.javasource.JType;
@@ -72,22 +73,28 @@ public class XSRecurringDuration extends XSType {
     private static final JType JTYPE
         = new JClass("org.exolab.castor.types.RecurringDuration");
 
+    private RecurringDuration _maxInclusive;
+    private RecurringDuration _maxExclusive;
+    private RecurringDuration _minInclusive;
+    private RecurringDuration _minExclusive;
+
+
     public XSRecurringDuration() {
         super(XSType.RECURRING_DURATION);
 
     }
 
-    public XSRecurringDuration(TimeDuration duration, TimeDuration period) {
-        super(XSType.RECURRING_DURATION);
+    public XSRecurringDuration(short type,TimeDuration duration, TimeDuration period) {
+        super(type);
         _duration=duration;
         _period=period;
     }
 
 
-    public XSRecurringDuration(String duration, String period)
+    public XSRecurringDuration(short type,String duration, String period)
         throws IllegalArgumentException
     {
-        super(XSType.RECURRING_DURATION);
+        super(type);
         try {
             _duration = (TimeDuration.parse(duration));
             _period = (TimeDuration.parse(period));
@@ -96,6 +103,124 @@ public class XSRecurringDuration extends XSType {
             throw new IllegalArgumentException();
         }
     }//--XSRecurringDuration(String,String)
+
+    /**
+     * Returns the maximum exclusive value that this XSRecurringDuration can hold.
+     * @return the maximum exclusive value that this XSRecurringDuration can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public RecurringDuration getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSRecurringDuration can hold.
+     * @return the maximum inclusive value that this XSRecurringDuration can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public RecurringDuration getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSRecurringDuration can hold.
+     * @return the minimum exclusive value that this XSRecurringDuration can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public RecurringDuration getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSRecurringDuration can hold.
+     * @return the minimum inclusive value that this can XSRecurringDuration hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public RecurringDuration getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSRecurringDuration can hold.
+     * @param max the maximum exclusive value this XSRecurringDuration can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(RecurringDuration max) {
+        _maxExclusive = max;
+        //if no period and duration, we take the ones from the current
+        //XSRecurringDuration
+        if (_maxExclusive.getDuration() == null)
+            _maxExclusive.setDuration(this.getDuration());
+        if (_maxExclusive.getPeriod() == null)
+            _maxExclusive.setPeriod(this.getPeriod());
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSRecurringDuration can hold.
+     * @param max the maximum inclusive value this XSRecurringDuration can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(RecurringDuration max) {
+        _maxInclusive = max;
+       //if no period and duration, we take the ones from the current
+        //XSRecurringDuration
+        if (_maxExclusive.getDuration() == null)
+            _maxInclusive.setDuration(this.getDuration());
+        if (_maxExclusive.getPeriod() == null)
+            _maxInclusive.setPeriod(this.getPeriod());
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSRecurringDuration can hold.
+     * @param max the minimum exclusive value this XSRecurringDuration can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(RecurringDuration min) {
+        _minExclusive = min;
+       //if no period and duration, we take the ones from the current
+        //XSRecurringDuration
+        if (_minExclusive.getDuration() == null)
+            _minExclusive.setDuration(this.getDuration());
+        if (_minExclusive.getPeriod() == null)
+            _minExclusive.setPeriod(this.getPeriod());
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSInt can hold.
+     * @param max the minimum inclusive value this XSInt can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(RecurringDuration min) {
+        _minInclusive = min;
+        //if no period and duration, we take the ones from the current
+        //XSRecurringDuration
+        if (_minInclusive.getDuration() == null)
+            _minInclusive.setDuration(this.getDuration());
+        if (_minInclusive.getPeriod() == null)
+            _minInclusive.setPeriod(this.getPeriod());
+
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
+    }
+
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
 
    /**
     * returns the duration facet of this recurringDuration
@@ -138,18 +263,38 @@ public class XSRecurringDuration extends XSType {
 
        //-- copy valid facets
         Enumeration enum = getFacets(simpleType);
+        //--duration and period must be treated separately
+        try {
+            Facet dur = simpleType.getFacet("duration");
+            if (dur != null)
+                setDuration(TimeDuration.parse(dur.getValue()));
+            Facet per = simpleType.getFacet("period");
+            if (per != null)
+               setPeriod(TimeDuration.parse(per.getValue()));
+         } catch(ParseException e) {
+                System.out.println("Error in setting the period and duration facets of recurringDuration");
+                e.printStackTrace();
+                return;
+         }
+
         while (enum.hasMoreElements()) {
 
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();
 
             try {
-                //duration
-                if (Facet.DURATION.equals(name))
-                    setDuration(TimeDuration.parse(facet.getValue()));
-                //period
-                else if (Facet.PERIOD.equals(name))
-                    setPeriod(TimeDuration.parse(facet.getValue()));
+                //-- maxExclusive
+                if (Facet.MAX_EXCLUSIVE.equals(name))
+                    this.setMaxExclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                //-- maxInclusive
+                else if (Facet.MAX_INCLUSIVE.equals(name))
+                    this.setMaxInclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                //-- minExclusive
+                else if (Facet.MIN_EXCLUSIVE.equals(name))
+                    this.setMinExclusive(RecurringDuration.parseRecurring(facet.getValue()));
+                //-- minInclusive
+                else if (Facet.MIN_INCLUSIVE.equals(name))
+                    this.setMinInclusive(RecurringDuration.parseRecurring(facet.getValue()));
             } catch(ParseException e) {
                 System.out.println("Error in setting the facets of recurringDuration");
                 e.printStackTrace();

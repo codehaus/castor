@@ -316,7 +316,6 @@ public class TimePeriodDescriptor
 
             //-- update current instance of timePeriod with new timePeriod
             try{
-                System.out.println(value.toString());
                 timePTarget.setFields(value.toString());
             } catch (java.text.ParseException ex) {
                 //-- ignore for now

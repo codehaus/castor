@@ -62,7 +62,7 @@ public final class XSDate extends XSTimePeriod {
         //("java.sql.Date");
 
     public XSDate() {
-        super("P1D");
+        super(XSType.DATE,"P1D");
     } //-- XSDate
 
    /**

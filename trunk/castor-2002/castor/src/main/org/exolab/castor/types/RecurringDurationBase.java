@@ -43,18 +43,21 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 11/07/2000   Aranud Blandin  Added a new constructor and setValues method
  * 11/02/2000   Arnaud Blandin  Changed the constructor
  * 26/10/2000   Arnaud Blandin  Created
  */
 
 package org.exolab.castor.types;
 
+
+import org.exolab.castor.types.TimeDuration;
+import org.exolab.castor.xml.ValidationException;
+
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-
-import org.exolab.castor.types.TimeDuration;
 /**
  * the base class for recurring Duration types
  * This base class contains all the time fields (including the time zone ones)
@@ -72,8 +75,8 @@ public class RecurringDurationBase {
     /**
      * the facets of recurringDuration
      */
-    protected TimeDuration _period = new TimeDuration();
-    protected TimeDuration _duration = new TimeDuration();
+    protected TimeDuration _period = null;
+    protected TimeDuration _duration = null;
 
     //Protected variables
     protected short _hour = 0;
@@ -87,17 +90,17 @@ public class RecurringDurationBase {
     protected boolean _isNegative = false;
 
     /**
-     * the constructor for a Recurring Duration
+     * the constructor for a Recurring DurationBase
      */
     public RecurringDurationBase() {
     }
 
     /**
-     * returns a recurringDuration with the facets
+     * returns a recurringDurationBase with the facets
      * duration and period set up
      * @param duration the TimeDuration representing the duration facet
      * @param period the TimeDuration reprensenting the period facet
-     * @return a recurringDuration with the facets
+     * @return a recurringDurationBase with the facets
      *          duration and period set up
      */
     public RecurringDurationBase(TimeDuration duration, TimeDuration period) {
@@ -106,11 +109,11 @@ public class RecurringDurationBase {
     }
 
     /**
-     * returns a recurringDuration with the facets
+     * returns a recurringDurationBase with the facets
      * duration and period set up
      * @param duration the String representing the duration facet
      * @param period the String reprensenting the period facet
-     * @return a recurringDuration with the facets
+     * @return a recurringDurationBase with the facets
      *          duration and period set up
      */
     public RecurringDurationBase(String duration, String period)
@@ -123,6 +126,27 @@ public class RecurringDurationBase {
             System.out.println("Error in constructor of RecurringDuration: "+e);
             throw new IllegalArgumentException();
         }
+    }
+
+    /**
+     * returns a recurringDurationBase with the facets
+     * duration and period set up but also the fields
+     * @param duration the String representing the duration facet
+     * @param period the String reprensenting the period facet
+     * @param values an array of shorts which contains the values of the fields
+     * @return a recurringDurationBase with the facets
+     *          duration and period set up
+     * @see setValues
+     */
+
+    public RecurringDurationBase(String duration, String period, short[] values)
+        throws IllegalArgumentException
+    {
+        new RecurringDuration(duration, period);
+        if (values.length != 6) {
+            throw new IllegalArgumentException("Wrong numbers of values");
+        }
+        this.setValues(values);
     }
 
     /**
@@ -143,6 +167,18 @@ public class RecurringDurationBase {
         privateSetPeriod(period);
     }
 
+    /**
+     * set the period facet for this recurringDuration
+     * @param period the period to set
+     */
+    public void setPeriod (String period) {
+        try {
+            privateSetPeriod(TimeDuration.parse(period));
+        } catch (ParseException e) {
+            System.out.println(e);
+            e.printStackTrace();
+        }
+    }
 
     /**
      * set the duration facet for this recurringDuration
@@ -151,6 +187,21 @@ public class RecurringDurationBase {
      public void setDuration (TimeDuration duration) {
         _duration = duration;
     }
+
+    /**
+     * set the duration facet for this recurringDuration
+     * @param duration the period to set
+     */
+    public void setDuration(String duration) {
+        try {
+            _duration = (TimeDuration.parse(duration));
+        } catch (ParseException e) {
+            System.out.println(e);
+            e.printStackTrace();
+        }
+    }
+
+
     /**
      * set the hour field for this recurringDuration
      * @param hour the hour to set
@@ -212,6 +263,26 @@ public class RecurringDurationBase {
     }
 
     /**
+     * set all the fields by reading the values in an array
+     * @param values an array of shorts with the values
+     * the array is supposed to be of length 6 and ordered like that:
+     * <ul>
+     *      <li>hour</li>
+     *      <li>minute</li>
+     *      <li>second</li>
+     *      <li>millisecond</li>
+     *      <li>zoneHour</li>
+     *      <li>zoneMinute</li>
+     * </ul>
+     */
+     public void setValues(short[] values) {
+        this.setHour(values[0]);
+        this.setMinute(values[1]);
+        this.setSecond(values[2],values[3]);
+        this.setZone(values[4],values[5]);
+     }
+
+    /**
      * set the negative field to true
      */
     public void setNegative() {
@@ -236,6 +307,14 @@ public class RecurringDurationBase {
     }
 
     //Get methods
+    public TimeDuration getPeriod() {
+        return(_period);
+    }
+
+    public TimeDuration getDuration() {
+        return(_duration);
+    }
+
     public short getHour() {
         return(_hour);
     }
@@ -261,6 +340,24 @@ public class RecurringDurationBase {
     }
 
     /**
+     * returns an array of short with all the fields which describe
+     * a RecurringDurationBase
+     * @return  an array of short with all the fields which describe
+     * a RecurringDurationBase
+     */
+    public short[] getValues() {
+        short[] result = null;
+        result = new short[6];
+        result[0] = this.getHour();
+        result[1] = this.getMinute();
+        result[2] = this.getSeconds();
+        result[3] = this.getMilli();
+        result[4] = this.getZoneHour();
+        result[5] = this.getZoneMinute();
+        return result;
+    } //getValues
+
+    /**
      * return true if this recurring Duration type is UTC
      * i.e if there is no time zone.
      * @returns true if this recurringDuration type is UTC
@@ -279,5 +376,65 @@ public class RecurringDurationBase {
         return _zoneNegative;
     }
 
+    /**
+     * <p> Returns true if the present instance of Recurring Duration Base is equal to
+     * the parameter.
+     * The equals relation is the following :
+     * rd1 equals rd2 iff each field of rd1 is equal to the corresponding field of rd2
+     * @param reccD the recurring duration to compare with the present instance
+     * @return true if the present instance is equal to the parameter false if not
+     */
+     public boolean equals(RecurringDurationBase reccD) throws ValidationException
+     {
+        boolean result = false;
+         if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
+             !(this.getDuration().equals(reccD.getDuration())) )
+        {
+                String err = " Recurring Duration which have different values "
+                            +"for the duration and period can not be compared";
+                throw new ValidationException(err);
+        }
+        result = result && (this.getHour() == reccD.getHour());
+        result = result && (this.getMinute() == reccD.getMinute());
+        result = result && (this.getSeconds() == reccD.getSeconds());
+        result = result && (this.getMilli() == reccD.getMilli());
+        result = result && (this.isNegative() == this.isNegative());
+        if (!reccD.isUTC()) {
+            result = result && (!this.isUTC());
+            result = result && (this.getZoneHour() == reccD.getZoneHour());
+            result = result && (this.getZoneMinute() == reccD.getZoneMinute());
+        }
+        return result;
+    }//equals
+
+    /**
+     * <p>Returns true if the present instance of RecurringDurationBase is greater than
+     * the parameter
+     * <p>Note : the order relation follows the W3C XML Schema draft i.e
+     * rd1 < rd2 iff rd2-rd1>0
+     * @param reccD the recurring duration base to compare with the present instance
+     * @return true if the present instance is the greatest, false if not
+     */
+    public boolean isGreater(RecurringDurationBase reccD) throws ValidationException
+    {
+        boolean result = false;
+        if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
+             !(this.getDuration().equals(reccD.getDuration())) )
+        {
+                String err = " Recurring Duration which have different values "
+                            +"for the duration and period can not be compared";
+                throw new ValidationException(err);
+        }
+        short[] val_this = this.getValues();
+        short[] val_reccD = reccD.getValues();
+        int i = 0;
+        while ( (result != true) || (i< val_this.length) ) {
+            result = val_this[i] > val_reccD[i];
+            if ( val_this[i] < val_reccD[i])
+                return false;
+            i++;
+        }
+        return result;
+    }//isGreater
 
 }

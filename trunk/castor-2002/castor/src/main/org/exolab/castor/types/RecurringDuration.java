@@ -42,6 +42,8 @@
  *
  * $Id$
  * Date         Author          Changes
+ * 11/08/2000   Aranud Blandin  Added new constructor and setValues method
+ * 11/07/2000   Arnaud Blandin  Added isEqual() and isGreater() methods
  * 11/02/2000   Arnaud Blandin  Changed the constructor
  * 26/10/2000   Arnaud Blandin  Created
  */
@@ -54,6 +56,7 @@ import java.util.StringTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 
+import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.types.RecurringDurationBase;
 
@@ -111,6 +114,27 @@ public class RecurringDuration extends RecurringDurationBase{
         throws IllegalArgumentException
     {
         super(duration, period);
+    }
+
+
+    /**
+     * returns a recurringDuration with the facets
+     * duration and period set up but also the fields
+     * @param duration the String representing the duration facet
+     * @param period the String reprensenting the period facet
+     * @param values an array of shorts which contains the values of the fields
+     * @return a recurringDuration with the facets
+     *          duration and period set up
+     * @see setValues
+     */
+     public RecurringDuration(String duration, String period, short[] values)
+        throws IllegalArgumentException
+    {
+        new RecurringDuration(duration, period);
+        if (values.length != 10) {
+            throw new IllegalArgumentException("Wrong numbers of values");
+        }
+        this.setValues(values);
     }
 
     /**
@@ -223,6 +247,41 @@ public class RecurringDuration extends RecurringDurationBase{
         return result;
     }
 
+     /**
+     * set all the fields by reading the values in an array
+     * @param values an array of shorts with the values
+     * the array is supposed to be of length 6 and ordered like that:
+     * century
+     * year
+     * month
+     * day
+     *<ul>
+     *      <li>century</li>
+     *      <li>year</li>
+     *      <li>month</li>
+     *      <li>day</li>
+     *      <li>hour</li>
+     *      <li>minute</li>
+     *      <li>second</li>
+     *      <li>millisecond</li>
+     *      <li>zoneHour</li>
+     *      <li>zoneMinute</li>
+     * </ul>
+     *
+     * @see RecurringDurationBase.setValues
+     */
+     public void setValues(short[] values) {
+        this.setCentury(values[0]);
+        this.setYear(values[1]);
+        this.setMonth(values[2]);
+        this.setDay(values[3]);
+        this.setHour(values[4]);
+        this.setMinute(values[5]);
+        this.setSecond(values[6],values[7]);
+        this.setZone(values[8],values[9]);
+     }
+
+
     //Get methods
     public short getCentury() {
         return(_century);
@@ -239,6 +298,29 @@ public class RecurringDuration extends RecurringDurationBase{
     public short getDay() {
         return(_day);
     }
+
+
+    /**
+     * returns an array of short with all the fields which describe
+     * a RecurringDuration
+     * @return  an array of short with all the fields which describe
+     * a RecurringDuration
+     */
+    public short[] getValues() {
+        short[] result = null;
+        result = new short[10];
+        result[0] = this.getCentury();
+        result[1] = this.getYear();
+        result[2] = this.getMonth();
+        result[3] = this.getDay();
+        result[4] = this.getHour();
+        result[5] = this.getMinute();
+        result[6] = this.getSeconds();
+        result[7] = this.getMilli();
+        result[8] = this.getZoneHour();
+        result[5] = this.getZoneMinute();
+        return result;
+    } //getValues
 
     /**
      * convert this recurringDuration into a local Date
@@ -286,6 +368,8 @@ public class RecurringDuration extends RecurringDurationBase{
         String timeZone = null;
 
         result = String.valueOf(_century);
+        if (result.length()==1)
+            result = "0"+result;
 
         String temp = String.valueOf(_year);
         if (temp.length()==1)
@@ -346,6 +430,10 @@ public class RecurringDuration extends RecurringDurationBase{
 
     }//toString
 
+    public static Object parse(String str) throws ParseException {
+        return parseRecurring(str);
+    }
+
     /**
      * parse a String and convert it into a recurringDuration
      * @param str the string to parse
@@ -354,7 +442,7 @@ public class RecurringDuration extends RecurringDurationBase{
      *                        does not follow the rigth format (see the description
      *                        of this class)
      */
-    public static RecurringDuration parse(String str) throws ParseException {
+    public static RecurringDuration parseRecurring(String str) throws ParseException {
 
         RecurringDuration result = new RecurringDuration();
 
@@ -484,4 +572,70 @@ public class RecurringDuration extends RecurringDurationBase{
         temp = null;
         return result;
     }//parse
+
+    /**
+     * <p> Returns true if the present instance of Recurring Duration is equal to
+     * the parameter.
+     * The equals relation is the following :
+     * rd1 equals rd2 iff each field of rd1 is equal to the corresponding field of rd2
+     * @param reccD the recurring duration to compare with the present instance
+     * @return true if the present instance is equal to the parameter false if not
+     */
+     public boolean equals(RecurringDuration reccD) throws ValidationException
+     {
+        boolean result = false;
+         if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
+             !(this.getDuration().equals(reccD.getDuration())) )
+        {
+                String err = " Recurring Duration which have different values "
+                            +"for the duration and period can not be compared";
+                throw new ValidationException(err);
+        }
+        result = this.getCentury() == reccD.getCentury();
+        result = result && (this.getYear() == reccD.getYear());
+        result = result && (this.getMonth() == reccD.getMonth());
+        result = result && (this.getDay() == reccD.getDay());
+        result = result && (this.getHour() == reccD.getHour());
+        result = result && (this.getMinute() == reccD.getMinute());
+        result = result && (this.getSeconds() == reccD.getSeconds());
+        result = result && (this.getMilli() == reccD.getMilli());
+        result = result && (this.isNegative() == this.isNegative());
+        if (!reccD.isUTC()) {
+            result = result && (!this.isUTC());
+            result = result && (this.getZoneHour() == reccD.getZoneHour());
+            result = result && (this.getZoneMinute() == reccD.getZoneMinute());
+        }
+        return result;
+    }//equals
+
+    /**
+     * <p>Returns true if the present instance of RecurringDuration is greater than
+     * the parameter
+     * <p>Note : the order relation follows the W3C XML Schema draft i.e
+     * rd1 < rd2 iff rd2-rd1>0
+     * @param reccD the recurring duration to compare with the present instance
+     * @return true if the present instance is the greatest, false if not
+     */
+    public boolean isGreater(RecurringDuration reccD) throws ValidationException
+    {
+        boolean result = false;
+        if ( !(this.getPeriod().equals(reccD.getPeriod())) ||
+             !(this.getDuration().equals(reccD.getDuration())) )
+        {
+                String err = " Recurring Duration which have different values "
+                            +"for the duration and period can not be compared";
+                throw new ValidationException(err);
+        }
+        short[] val_this = this.getValues();
+        short[] val_reccD = reccD.getValues();
+        int i = 0;
+        while ( (result != true) && (i< (val_this.length-1)) ) {
+            result = val_this[i] > val_reccD[i];
+            if ( val_this[i] < val_reccD[i])
+                return false;
+            i++;
+        }
+        return result;
+    }//isGreater
+
 } //RecurringDuration

@@ -45,6 +45,7 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.types.Time;
 import org.exolab.javasource.*;
 
 /**
@@ -61,12 +62,9 @@ public final class XSTime extends XSRecurringDuration {
         = new JClass ("org.exolab.castor.types.Time");
         //("java.sql.Time");
 
-    private String value = null;
-
-    public XSTime() {
-        super("P0Y","P1D");
-    } //-- XSTime
-
+   public XSTime() {
+        super(XSType.TIME,"P0Y","P1D");
+   } //-- XSTime
 
     /**
      * Returns the Java code necessary to create a new instance of the
