@@ -77,6 +77,8 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     **/
     private AttributeDecl _attribute = null;
     
+    private Schema _schema = null;
+    
       //----------------/
      //- Constructors -/
     //----------------/
@@ -85,6 +87,8 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         (Schema schema, AttributeList atts, Resolver resolver) 
     {
         super();
+        this._schema = schema;
+        
         setResolver(resolver);
         
         _attribute = new AttributeDecl(schema, atts.getValue("name"));
@@ -106,7 +110,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- type
         attValue = atts.getValue("type");
         if (attValue != null) {
-            _attribute.setSimpletypeRef(attValue);
+            _attribute.setSimpleTypeRef(attValue);
         }
         
     } //-- AttributeUnmarshaller
@@ -159,7 +163,14 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
-        else unmarshaller = new FacetUnmarshaller(name, atts);
+        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            unmarshaller = new SimpleTypeUnmarshaller(_schema, 
+                                                      atts,
+                                                      getResolver());
+        }
+        else {
+            illegalElement(name);
+        }
     
     } //-- startElement
 
@@ -181,26 +192,14 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- call unmarshaller finish to perform any necessary cleanup
         unmarshaller.finish();
         
-        //-- Use JVM internal String
-        name = name.intern();
-        
-        
-        if (name == SchemaNames.ANNOTATION) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = (Annotation) unmarshaller.getObject();
             _attribute.addAnnotation(ann);
         }
-        else if ( (name == SchemaNames.MAX_EXCLUSIVE) ||
-                  (name == SchemaNames.MAX_INCLUSIVE) ||
-                  (name == SchemaNames.MIN_EXCLUSIVE) ||
-                  (name == SchemaNames.MIN_INCLUSIVE) )
-        {
-            
-            Facet tmpFacet = (Facet)unmarshaller.getObject();
-            
-            NumberFacet facet = new NumberFacet(name);
-            facet.setValue(tmpFacet.getValue());
-            
-            _attribute.getSimpleType().addFacet(facet);
+        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            SimpleType simpleType = 
+                ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
+            _attribute.setSimpleType(simpleType);
         }
         
         unmarshaller = null;

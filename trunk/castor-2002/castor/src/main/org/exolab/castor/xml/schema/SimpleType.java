@@ -88,6 +88,12 @@ public class SimpleType extends XMLType
     private Schema schema = null;
     
     /**
+     * The parent structure of this SimpleType
+     * (Schema, AttributeDecl or ElementDecl)
+    **/
+    private Structure parent = null;
+    
+    /**
      * Creates a new SimpleType with the given name and basetype reference.
      * @param name of the SimpleType
      * @param schema the Schema to which this SimpleType belongs
@@ -201,6 +207,15 @@ public class SimpleType extends XMLType
     } //-- getBaseRef
     
     /**
+     * Returns the parent Structure that contains this SimpleType.
+     * This can be either a Schema, AttributeDecl or ElementDecl.
+     * @return the parent of this SimpleType
+    **/
+    public Structure getParent() {
+        return parent;
+    } //-- getParent
+    
+    /**
      * Returns the Id used to Refer to this Object. 
      * @return the Id used to Refer to this Object
      * @see org.exolab.castor.xml.Referable
@@ -263,5 +278,17 @@ public class SimpleType extends XMLType
     {
         //-- do nothing
     } //-- validate
+    
+    
+    //-- protected Methods -/
+    
+    /**
+     * Sets the parent for this SimpleType
+     * @param parent the Structure that contains this SimpleType.
+     * Currently this should only be Schema, ElementDecl or AttributeDecl.
+    **/
+    protected void setParent(Structure parent) {
+        this.parent = parent;
+    } //-- setParent
     
 } //-- DataType
