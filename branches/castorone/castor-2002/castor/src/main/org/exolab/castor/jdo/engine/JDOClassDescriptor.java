@@ -108,6 +108,8 @@ public class JDOClassDescriptor
             throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
         _keyGenDesc = keyGenDesc;
         _cacheType = cacheType;
+        if ( clsDesc instanceof ClassDescriptorImpl )
+            _depends = ((ClassDescriptorImpl)clsDesc).getDepends();
     }
 
 

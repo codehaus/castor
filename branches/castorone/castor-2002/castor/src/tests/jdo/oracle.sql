@@ -1,3 +1,4 @@
+
 drop table   test_table;
 create table test_table (
   id      int           not null,
@@ -36,6 +37,61 @@ create table test_many_person (
 create unique index test_many_person_pk on test_many_person ( pid );
 grant all on test_many_person to test;
 
+
+-- test multiple pk
+drop table test_pks_person;
+create table test_pks_person (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  bday  date 
+);
+create unique index test_pks_person_pk on test_pks_person( fname, lname );
+grant all on test_pks_person to test;
+
+drop table test_pks_employee;
+create table test_pks_employee (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  startDate date 
+);
+create unique index test_pks_person_employee_pk on test_pks_employee( fname, lname );
+grant all on test_pks_employee to test;
+
+drop table test_pks_payroll;
+create table test_pks_payroll (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+);
+create unique index test_pks_payroll_fk on test_pks_payroll( fname, lname );
+create unique index test_pks_payroll_pk on test_pks_payroll( id );
+
+drop table test_pks_address;
+create table test_pks_address (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  stree varchar(30),
+  city  varchar(30),
+  state varchar(2),
+  zip varchar(6)
+);
+create unique index test_pks_address_fk on test_pks_address( fname, lname );
+create unique index test_pks_address_pk on test_pks_address( id );
+grant all on test_pks_address to test;
+
+drop table test_pks_contract;
+create table test_pks_contract (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  policy_no int        not null,
+  contract_no int      not null
+);
+create unique index test_pks_contract_fk on test_pks_contract( fname, lname );
+create unique index test_pks_contract_pk on test_pks_contract( policy_no, contract_no );
+grant all on test_pks_contract to test;
 
 
 -- test_table_ex

@@ -37,7 +37,80 @@
     </field>
     <field name="group" type="jdo.TestManyGroup" collection="collection" 
 	required="false">
-	<sql many-table="test_group_person"/>
+      <sql many-table="test_group_person"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestPKsPerson" identity="firstName lastName">
+    <description>Table used for testing multiple primany key</description>
+    <map-to table="test_pks_person" />
+    <field name="firstName" type="string"  required="true">
+      <sql name="fname" type="varchar" />
+    </field>
+    <field name="lastName" type="string" required="true">
+      <sql name="lname" type="varchar" />
+    </field>
+    <field name="birthDay" type="date"  >
+      <sql name="bday" type="varchar" />
+    </field>
+    <field name="address" type="jdo.TestPKsAddress" collection="collection" />
+  </class>
+
+  <class name="jdo.TestPKsAddress" depends="jdo.TestPKsPerson" identity="id">
+    <description>Table used for testing multiple primany key</description>
+    <map-to table="test_pks_address" />
+    <field name="id" type="integer" >
+      <sql name="id" type="integer" />
+    </field>
+    <field name="street" type="string" >
+      <sql name="street" type="varchar"/>
+    </field>
+    <field name="city" type="string" >
+      <sql name="city" type="varchar" />
+    </field>
+    <field name="state" type="string" >
+      <sql name="state" type="varchar" />
+    </field>
+    <field name="zip" type="string" >
+      <sql name="zip" type="varchar" />
+    </field>
+  </class>
+
+  <class name="jdo.TestPKsEmployee" extends="jdo.TestPKsPerson">
+    <description>Table used for testing multiple primany keys for extends</description>
+    <map-to table="test_pks_employee" />
+    <field name="startDate" type="date" >
+      <sql name="start_date" type="date" />
+    </field>
+    <field name="payRoll" type="jdo.TestPKsPayRoll" />
+    <field name="contract" type="jdo.TestPKsContract" />
+  </class>
+
+  <class name="jdo.TestPKsContract" depends="jdo.TestPKsEmpoyee" identity="policyNo contractNo">
+    <description>Table used for testing multiple primany keys for extends</description>
+    <map-to table="test_pks_contract" />
+    <field name="policyNo" type="integer" >
+      <sql name="policy_no" type="integer"/>
+    </field>
+    <field name="contractNo" type="integer">
+      <sql name="contract_no" type="integer"/>
+    </field>
+    <field name="comment" type="string">
+      <sql name="comment" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestPKsPayRoll" depends="jdo.TestPKsEmployee" identity="id">
+    <description>Table used for testing multiple primany key</description>
+    <map-to table="test_pks_payroll" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer"/>
+    </field>
+    <field name="holiday" type="integer" >
+      <sql name="holiday" type="integer" />
+    </field>
+    <field name="hourlyRate" type="integer" >
+      <sql name="hourly_rate" type="integer" />
     </field>
   </class>
 
