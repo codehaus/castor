@@ -146,7 +146,10 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             int maxOccurs = toInt(attValue);
             _element.setMaxOccurs(maxOccurs);
         }
-        else _element.setMaxOccurs(minOccurs);
+        else if (minOccurs > 0)
+            _element.setMaxOccurs(minOccurs);
+        else
+            _element.setMaxOccurs(1);
         
         //-- @schemaAbbrev
         _element.setSchemaAbbrev(atts.getValue("schemaAbbrev"));
