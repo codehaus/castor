@@ -213,8 +213,8 @@ public class CacheLeakage extends CastorTestCase {
         _cacheType = Database.ReadOnly; 
         runOnce();
 
-        assert( "Element leak not detected!", !_errLeak );
-        assert( "Race condition not happened!", !_errCount );
+        assertTrue( "Element leak not detected!", !_errLeak );
+        assertTrue( "Race condition not happened!", !_errCount );
     }
 
     public void tearDown() 
