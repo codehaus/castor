@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.10</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -69,7 +69,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
             {
                 try {
                     Sql target = (Sql) object;
-                    target.setName( (java.lang.String) value);
+                    target.addName( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -79,13 +79,13 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 return new java.lang.String();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
         
         //-- _type
@@ -102,7 +102,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
             {
                 try {
                     Sql target = (Sql) object;
-                    target.setType( (java.lang.String) value);
+                    target.addType( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -112,13 +112,13 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 return new java.lang.String();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
         
         //-- _manyTable
@@ -168,7 +168,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
             {
                 try {
                     Sql target = (Sql) object;
-                    target.setManyKey( (java.lang.String) value);
+                    target.addManyKey( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -178,13 +178,13 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
                 return new java.lang.String();
             }
         } );
-        desc.setHandler(handler);
+        desc.setHandler( new CollectionFieldHandler(handler));
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
         
         //-- validation code for: _manyKey
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
         
         //-- _dirty
