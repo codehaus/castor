@@ -320,7 +320,7 @@ public class DescriptorSourceFactory {
             //-- check for null primitives
             if (xsType.isPrimitive()) {
 
-                if ((!member.isRequired()) && (!xsType.isEnumerated())) {
+                if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
                     jsc.add("// if null, use delete method for optional primitives ");
                     jsc.add("if (value == null) {");
                     jsc.indent();
@@ -555,7 +555,7 @@ public class DescriptorSourceFactory {
             //-- check for null primitives
             if (xsType.isPrimitive()) {
 
-                if ((!member.isRequired()) && (!xsType.isEnumerated())) {
+                if ((!member.isRequired()) && (!xsType.isEnumerated()) && (!member.isMultivalued())) {
                     jsc.add("// if null, use delete method for optional primitives ");
                     jsc.add("if (value == null) {");
                     jsc.indent();
