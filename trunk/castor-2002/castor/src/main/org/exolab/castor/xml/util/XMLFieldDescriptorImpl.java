@@ -132,6 +132,11 @@ public class XMLFieldDescriptorImpl
     private boolean _immutable = false;
 
     /**
+     * True if the field type is mapped in a Hashtable or Map.
+    **/
+    private boolean _mapped = false;
+    
+    /**
      * The node type (attribute, element, text).
      */
     private NodeType _nodeType = null;
@@ -478,6 +483,18 @@ public class XMLFieldDescriptorImpl
     } //-- isIncremental
 
     /**
+     * Returns true if the field described by this descriptor
+     * is Map or Hashtable. If this method returns true, it
+     * must also return true for any call to #isMultivalued.
+     * 
+     * @return true if the field described by this desciptor is
+     * a Map or Hashtable, otherwise false.
+    **/
+    public boolean isMapped() {
+        return _mapped;
+    } //-- isMapped
+
+    /**
      * Returns true if the Object described by this descriptor can
      * contain more than one value
      * @return true if the Object described by this descriptor can
@@ -602,6 +619,17 @@ public class XMLFieldDescriptorImpl
         this._immutable = immutable;
     } //-- setImmutable
 
+    /**
+     * Sets whether or not this field has been mapped in a Map or
+     * Hashtable.
+     *
+     * @param mapped a boolean that when true indicates this field is
+     * a Hashtable or Map.
+    **/
+    public void setMapped(boolean mapped) {
+        _mapped = mapped;
+    } //-- setMapped
+    
     /**
      * This is a space separated list of xml names that this
      * Field descriptor matches. A '*' is wild.
