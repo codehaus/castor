@@ -71,8 +71,8 @@ import javax.transaction.xa.XAResource;
 import javax.transaction.xa.XAException;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.util.Messages;
@@ -208,16 +208,16 @@ public final class DatabaseImpl
     public synchronized void makePersistent( Object obj )
     {
         TransactionContext tx;
-        ClassDesc         clsDesc;
+        ClassHandler       handler;
         
         if ( _mode == Database.OPEN_READ_ONLY )
             throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
-        clsDesc = _dbEngine.getClassDesc( obj.getClass() );
-        if ( clsDesc == null || clsDesc.getIdentity() == null )
+        handler = _dbEngine.getClassHandler( obj.getClass() );
+        if ( handler == null )
             throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
         try {
-            tx.create( _dbEngine, obj, clsDesc.getIdentity().getValue( obj ) );
+            tx.create( _dbEngine, obj, handler.getIdentity( obj ) );
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
             throw new TransactionNotInProgressException( except.getMessage() );
         } catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {
@@ -255,14 +255,14 @@ public final class DatabaseImpl
         throws ODMGException
     {
         TransactionContext tx;
-        ClassDesc         clsDesc;
+        ClassHandler       handler;
         Object             obj;
         
         tx = getTransaction();
-        clsDesc = _dbEngine.getClassDesc( type );
-        if ( clsDesc == null )
+        handler = _dbEngine.getClassHandler( type );
+        if ( handler == null )
             throw new ClassNotPersistenceCapableException();
-        obj = clsDesc.newInstance();
+        obj = handler.newInstance();
         try {
             switch ( _mode ) {
             case OPEN_READ_ONLY:
@@ -293,14 +293,14 @@ public final class DatabaseImpl
     {
         TransactionContext tx;
         NameBinding        binding;
-        ClassDesc         clsDesc;
+        ClassHandler       handler;
         
         if ( _mode == Database.OPEN_READ_ONLY )
             throw new DatabaseIsReadOnlyException( Messages.message( "jdo.odmg.dbOpenReadOnly" ) );
         tx = getTransaction();
         makePersistent( obj );
-        clsDesc = _dbEngine.getClassDesc( obj.getClass() );
-        binding = new NameBinding( name, obj, (JDOClassDesc) clsDesc );
+        handler = _dbEngine.getClassHandler( obj.getClass() );
+        binding = new NameBinding( name, obj, handler );
         try {
             tx.create( _dbEngine, binding, name );
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
@@ -348,16 +348,16 @@ public final class DatabaseImpl
         TransactionContext tx;
         NameBinding        binding;
         Object             obj;
-        ClassDesc         clsDesc;
+        ClassHandler       handler;
         
         tx = getTransaction();
         try {
             binding = new NameBinding();
             tx.load( _dbEngine, binding, name, AccessMode.ReadOnly );
-            clsDesc = _dbEngine.getClassDesc( binding.getType() );
-            if ( clsDesc == null )
-                throw new ClassNotPersistenceCapableException( clsDesc.getJavaClass().getName() );
-            obj = clsDesc.newInstance();
+            handler = _dbEngine.getClassHandler( binding.getType() );
+            if ( handler == null )
+                throw new ClassNotPersistenceCapableException( handler.getJavaClass().getName() );
+            obj = handler.newInstance();
             tx.load( _dbEngine, obj, binding.objectId, AccessMode.ReadOnly );
             return obj;
         } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {

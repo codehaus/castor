@@ -53,21 +53,22 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.persist.RelationHandler;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
-import org.exolab.castor.persist.RelationContext;
-import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.persist.FetchContext;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.RelationDesc;
-import org.exolab.castor.mapping.ContainerFieldDesc;
 
 
 /**
@@ -87,16 +88,10 @@ class SQLEngine
 {
 
 
-    private JDOClassDesc    _clsDesc;
+    private boolean             _specifyKeyForCreate = true;
 
 
-    private FieldDesc       _identity;
-
-
-    private boolean         _specifyKeyForCreate = true;
-
-
-    private boolean         _useCursorForLock = false;
+    private boolean             _useCursorForLock = false;
 
 
     private String          _stampField; // = "ctid";
@@ -123,54 +118,51 @@ class SQLEngine
     private QueryExpr       _sqlFinder;
 
 
-    private JDOFieldDesc[]   _loadFields;
+    private ClassHandler      _handler;
 
 
-    private RelationDesc[]   _loadRelations;
+    private FieldHandler[]    _loadFields;
 
 
-    private SQLEngine        _extends;
+    private RelationHandler[] _loadRels;
 
 
-    SQLEngine( JDOClassDesc clsDesc, PrintWriter logWriter )
+    private FieldHandler[]    _storeFields;
+
+
+    private RelationHandler[] _storeRels;
+
+
+    private SQLEngine         _extends;
+
+
+    SQLEngine( ClassHandler handler, PrintWriter logWriter )
         throws MappingException
     {
-        if ( clsDesc == null )
-            throw new IllegalArgumentException( "Argument 'clsDesc' is null" );
-        _clsDesc = clsDesc;
-        _identity = _clsDesc.getIdentity();
-        if ( _identity == null )
-            throw new MappingException( "mapping.noIdentity", _clsDesc.getJavaClass().getName() );
+        JDOClassDescriptor clsDesc;
 
-        buildCreateSql();
-        buildRemoveSql();
-        buildStoreSql();
-        buildLoadSql();
-        if ( logWriter != null ) {
-            logWriter.println( "SQL for loading " + _clsDesc.getJavaClass().getName() +
-                               ":  " + _sqlLoad );
-            logWriter.println( "SQL for creating " + _clsDesc.getJavaClass().getName() +
-                               ": " + _sqlCreate );
-            logWriter.println( "SQL for updating " + _clsDesc.getJavaClass().getName() +
-                               ": " + _sqlStore );
-            logWriter.println( "SQL for deleting " + _clsDesc.getJavaClass().getName() +
-                               ": " + _sqlRemove );
-        }
-        if ( _clsDesc.getExtends() != null )
-            _extends = new SQLEngine( (JDOClassDesc) _clsDesc.getExtends(), logWriter );
+        _handler = handler;
+        if ( handler.getExtends() != null )
+            _extends = new SQLEngine( handler.getExtends(), logWriter );
+        clsDesc = (JDOClassDescriptor) _handler.getDescriptor();
+        buildSql( clsDesc, logWriter );
+        buildFinder( clsDesc, logWriter );
     }
-    
-    
-    public JDOClassDesc getClassDesc()
+
+
+    /**
+     * Used by {@link OQLQuery} to retrieve the class descriptor.
+     */
+    JDOClassDescriptor getDescriptor()
     {
-        return _clsDesc;
+        return (JDOClassDescriptor) _handler.getDescriptor();
     }
-
-
-    public PersistenceQuery createQuery( RelationContext rtx, String query, Class[] types )
+    
+    
+    public PersistenceQuery createQuery( FetchContext ctx, String query, Class[] types )
         throws QueryException
     {
-        return new SQLQuery( this, rtx, query, types );
+        return new SQLQuery( this, ctx, query, types );
     }
 
 
@@ -185,7 +177,6 @@ class SQLEngine
     {
         PreparedStatement stmt;
         int               count;
-        JDOFieldDesc[]    descs;
         
         stmt = null;
         try {
@@ -203,58 +194,29 @@ class SQLEngine
             count = 1;
             stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
             if ( _specifyKeyForCreate ) {
-                if ( _identity instanceof ContainerFieldDesc ) {
-
-                    descs = getJDOFields( (ContainerFieldDesc) _identity );
-                    for ( int i = 0 ; i < descs.length ; ++i ) {
-                        descs[ i ].getValue( identity, stmt, count + i );
-                    }
-                    count += descs.length;
-                } else {
-                    stmt.setObject( count, identity );
-                    count += 1;
-                }
+                stmt.setObject( count, identity );
+                count += 1;
             }
             
-            descs = getJDOFields( _clsDesc );
-            for ( int i = 0 ; i < descs.length ; ++i ) {
+            for ( int i = 0 ; i < _storeFields.length ; ++i ) {
                 Object value;
 
-                value = descs[ i ].getValue( obj );
+                value = _storeFields[ i ].getValue( obj );
                 if ( value != null )
                     stmt.setObject( count + i, value );
             }
-            count += descs.length;
+            count += _storeFields.length;
 
-            RelationDesc[] rels;
-
-            rels = _clsDesc.getRelations();
-            for ( int i = 0 ; i < rels.length ; ++i ) {
-                if ( ! rels[ i ].isAttached() ) {
-                    FieldDesc idField;
-
-                    idField = (JDOFieldDesc) rels[ i ].getRelatedClassDesc().getIdentity();
-                    if ( idField instanceof ContainerFieldDesc ) {
-                        Object relObj;
-                        
-                        relObj = rels[ i ].getRelationField().getValue( obj );
-                        descs = getJDOFields( (ContainerFieldDesc) idField );
-                        if ( relObj != null ) {
-                            for ( int j = 0 ; j < descs.length ; ++j ) {
-                                descs[ j ].getValue( relObj, stmt, count + j );
-                            }
-                        }
-                        count += descs.length;
-                    } else {
-                        Object relObj;
-                        
-                        relObj = rels[ i ].getRelationField().getValue( obj );
-                        if ( relObj != null )
-                            ( (JDOFieldDesc) idField ).getValue( relObj, stmt, count );
-                        count += 1;
-                    }
-                }
+            /*
+            for ( int i = 0 ; i < _storeRels.length ; ++i ) {
+                Object relIdentity;
+                
+                relIdentity = _storeRels[ i ].getIdentity( obj );
+                if ( relIdentity != null )
+                    stmt.setObject( count, relIdentity );
+                count += 1;
             }
+            */
             
             stmt.executeUpdate();
             stmt.close();
@@ -274,13 +236,7 @@ class SQLEngine
                     stmt.close();
                 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-                if ( _identity instanceof ContainerFieldDesc ) {
-                    descs = getJDOFields( (ContainerFieldDesc) _identity );
-                    for ( int i = 0 ; i < descs.length ; ++i )
-                        descs[ i ].getValue( identity, stmt, i + 1 );
-                } else {
-                    stmt.setObject( 1, identity );
-                }
+                stmt.setObject( 1, identity );
                 if ( stmt.executeQuery().next() )
                     throw new DuplicateIdentityException( obj.getClass(), identity );
             } catch ( SQLException except2 ) {
@@ -299,120 +255,44 @@ class SQLEngine
         }
     }
 
-    public Object load( Object conn, RelationContext rtx, Object obj, Object identity, AccessMode accessMode )
-        throws ObjectNotFoundException, PersistenceException
-    {
-        PreparedStatement stmt;
-        ResultSet         rs;
-        JDOFieldDesc[]    pkDescs = null;
-        Object            pk;
-        Object            stamp = null;
-        boolean           lock;
-        
-        lock = ( accessMode == AccessMode.Exclusive );
-        try {
-            // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
-            if ( _useCursorForLock )
-                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad,
-                                                               ResultSet.TYPE_FORWARD_ONLY,
-                                                               lock ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY );
-            else
-                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
-            
-            if ( _identity instanceof ContainerFieldDesc ) {
-                pkDescs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-                    pkDescs[ i ].getValue( identity, stmt, i + 1 );
-                }
-            } else {
-                stmt.setObject( 1, identity );
-            }
-            
-            rs = stmt.executeQuery();
-            if ( ! rs.next() )
-                throw new ObjectNotFoundException( obj.getClass(), identity );
-            
-            do {
-                // First iteration for a PK: traverse all the fields
-                for ( int i = 0; i < _loadFields.length ; ++i  ) {
-                    // Usinging typed setValue so float/double, int/long
-                    // can be intermixed with automatic conversion, something
-                    // that throws an exception in the untyped version
-                    _loadFields[ i ].setValue( obj, rs, i + 1 );
-                }
-            } while ( rs.next() );
-            if ( _stampField != null )
-                stamp = rs.getObject( _loadFields.length + 1 );
-            rs.close();
-            stmt.close();
-        } catch ( SQLException except ) {
-            throw new PersistenceException( except );
-        }
-        return stamp;
-    }
-
 
     public Object store( Object conn, Object obj, Object identity,
                          Object original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException
     {
         PreparedStatement stmt;
-        JDOFieldDesc[]    descs;
-        RelationDesc      related;
         int               count;
-        Object            value;
         
         try {
             if ( _extends != null ) 
                 _extends.store( conn, obj, identity, original, stamp );
 
-            stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
-            
-            descs = getJDOFields( _clsDesc );
             count = 1;
-            for ( int i = 0 ; i < descs.length ; ++i ) {
-                value = descs[ i ].getValue( obj );
+            stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
+
+            for ( int i = 0 ; i < _storeFields.length ; ++i ) {
+                Object value;
+
+                value = _storeFields[ i ].getValue( obj );
                 if ( value != null )
-                    stmt.setObject( count + i, value );
+                    stmt.setObject( count , value );
+                ++count;
             }
-            count += descs.length;
+            count += _storeFields.length;
 
-            RelationDesc[] rels;
-
-            rels = _clsDesc.getRelations();
-            for ( int i = 0 ; i < rels.length ; ++i ) {
-                if ( ! rels[ i ].isAttached() ) {
-                    FieldDesc idField;
-
-                    idField = (JDOFieldDesc) rels[ i ].getRelatedClassDesc().getIdentity();
-                    if ( idField instanceof ContainerFieldDesc ) {
-                        Object relObj;
-                        
-                        relObj = rels[ i ].getRelationField().getValue( obj );
-                        descs = getJDOFields( (ContainerFieldDesc) idField );
-                        if ( relObj != null ) {
-                            for ( int j = 0 ; j < descs.length ; ++j )
-                                descs[ j ].getValue( relObj, stmt, count + j );
-                        }
-                        count += descs.length;
-                    } else {
-                        Object relObj;
-                        
-                        relObj = rels[ i ].getRelationField().getValue( obj );
-                        if ( relObj != null )
-                            ( (JDOFieldDesc) idField ).getValue( relObj, stmt, count );
-                        count += 1;
-                    }
-                }
+            /*
+            for ( int i = 0 ; i < _storeRels.length ; ++i ) {
+                Object relIdentity;
+                
+                relIdentity = _storeRels[ i ].getIdentity( obj );
+                if ( relIdentity != null )
+                    stmt.setObject( count, relIdentity );
+                ++count;
             }
+            */
             
-            if ( _identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < descs.length ; ++i )
-                    descs[ i ].getValue( identity, stmt, count + 1 );
-            } else {   
-                stmt.setObject( count, identity );
-            }
+            stmt.setObject( count, identity );
+
             if ( stmt.executeUpdate() == 0 ) {
                 // If no update was performed, the object has been previously
                 // removed from persistent storage. Complain about this.
@@ -427,29 +307,22 @@ class SQLEngine
     }
 
 
-    public void delete( Object conn, Object obj, Object identity )
+    public void delete( Object conn, Object identity )
         throws PersistenceException
     {
         PreparedStatement stmt;
-        JDOFieldDesc[]    descs;
         
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
-            if ( _identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    descs[ i ].getValue( identity, stmt, i + 1 );
-                }
-            } else {
-                stmt.setObject( 1, identity );
-            }
+            stmt.setObject( 1, identity );
+
             // [Oleg] Good practice to execute a statement if it was created
             // in the first place :-)
             stmt.execute();
             stmt.close();
 
             if ( _extends != null ) 
-                _extends.delete( conn, obj, identity );
+                _extends.delete( conn, identity );
         } catch ( SQLException except ) {
             throw new PersistenceException( except );
         }
@@ -460,7 +333,6 @@ class SQLEngine
         throws ObjectDeletedException, PersistenceException
     {
         PreparedStatement stmt;
-        JDOFieldDesc[]    descs;
         
         try {
             if ( _extends != null ) 
@@ -473,21 +345,63 @@ class SQLEngine
                                                                ResultSet.CONCUR_UPDATABLE );
             else
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-            
-            if ( _identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    descs[ i ].getValue( identity, stmt, i + 1 );
-                }
-            } else {
-                stmt.setObject( 1, identity );
-            }
+
+            stmt.setObject( 1, identity );
+
             if ( ! stmt.executeQuery().next() )
                 throw new ObjectDeletedException( obj.getClass(), identity );
             stmt.close();
         } catch ( SQLException except ) {
             throw new PersistenceException( except );
         }
+    }
+
+
+    public Object load( Object conn, FetchContext ctx, Object obj, Object identity, AccessMode accessMode )
+        throws ObjectNotFoundException, PersistenceException
+    {
+        PreparedStatement stmt;
+        ResultSet         rs;
+        Object            pk;
+        Object            stamp = null;
+        boolean           lock;
+        
+        lock = ( accessMode == AccessMode.Exclusive );
+        try {
+            // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
+            if ( _useCursorForLock )
+                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad,
+                                                               ResultSet.TYPE_FORWARD_ONLY,
+                                                               lock ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY );
+            else
+                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
+            
+            stmt.setObject( 1, identity );
+            
+            rs = stmt.executeQuery();
+            if ( ! rs.next() )
+                throw new ObjectNotFoundException( obj.getClass(), identity );
+            
+            do {
+                // First iteration for a PK: traverse all the fields
+                for ( int i = 0; i < _loadFields.length ; ++i  ) {
+                    // Usinging typed setValue so float/double, int/long
+                    // can be intermixed with automatic conversion, something
+                    // that throws an exception in the untyped version
+                    _loadFields[ i ].setValue( obj, rs.getObject( i + 1 ) );
+                }
+            } while ( rs.next() );
+
+            /*
+            if ( _stampField != null )
+                stamp = rs.getObject( _loadFields.length + 1 );
+            */
+            rs.close();
+            stmt.close();
+        } catch ( SQLException except ) {
+            throw new PersistenceException( except );
+        }
+        return stamp;
     }
 
 
@@ -499,75 +413,44 @@ class SQLEngine
     }
 
 
-    protected void buildCreateSql()
+    protected void buildSql( JDOClassDescriptor clsDesc, PrintWriter logWriter )
     {
-        StringBuffer   sql;
-        JDOFieldDesc[] descs;
-        RelationDesc[] rels;
-        int            count;
-        
-        // Create statement to lookup primary key and determine
-        // if object with same primary key already exists
-        if ( _specifyKeyForCreate ) {
-            sql = new StringBuffer( "SELECT 1 FROM " );
-            sql.append( getSQLName( _clsDesc, true ) ).append( " WHERE " );
-            if ( _identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    if ( i > 0 )
-                        sql.append( " AND " );
-                    sql.append( descs[ i ].getSQLName() );
-                    sql.append( "=?" );
-                }
-            } else {
-                sql.append( ( (JDOFieldDesc) _identity ).getSQLName() );
-                sql.append( "=?" );
-            }
-            sql.append( " FOR UPDATE" );
-            _pkLookup = sql.toString();
+        StringBuffer         sql;
+        JDOFieldDescriptor[] jdoFields;
+        FieldDescriptor[]    fields;
+        int                  count;
+        String               wherePk;
+
+        wherePk = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() + "=?";
+        sql = new StringBuffer( "SELECT 1 FROM " );
+        sql.append( clsDesc.getTableName() ).append( " WHERE " );
+        sql.append( wherePk ).append(  " FOR UPDATE" );
+        _pkLookup = sql.toString();
+
+        fields = clsDesc.getFields();
+        jdoFields = new JDOFieldDescriptor[ fields.length ];
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof JDOFieldDescriptor )
+                jdoFields[ i ] = (JDOFieldDescriptor) fields[ i ];
         }
         
         // Create statement to insert a new row into the table
         // using the specified primary key if one is required
         sql = new StringBuffer( "INSERT INTO " );
-        sql.append( getSQLName( _clsDesc, false ) ).append( " (" );
+        sql.append( clsDesc.getTableName() ).append( " (" );
         if ( _specifyKeyForCreate ) {
-            if ( _identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) _identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    if ( i > 0 )
-                        sql.append( ',' );
-                    sql.append( descs[ i ].getSQLName() );
-                }
-                count = descs.length;
-            } else {
-                sql.append( ( (JDOFieldDesc) _identity ).getSQLName() );
-                count = 1;
-            }
-        } else {
+            sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
+            count = 1;
+        } else
             count = 0;
-        }
-        
-        descs = getJDOFields( _clsDesc );
-        for ( int i = 0 ; i < descs.length ; ++i ) {
-            if ( count > 0 )
-                sql.append( ',' );
-            sql.append( descs[ i ].getSQLName() );
-            ++count;
-        }
-
-        rels = _clsDesc.getRelations();
-        if ( rels != null ) {
-            for ( int i = 0 ; i < rels.length ; ++i ) {
-                if ( ! rels[ i ].isAttached() ) {
-                    if ( count > 0 )
-                        sql.append( ',' );
-                    sql.append( ( (JDOFieldDesc) rels[ i ].getRelationField() ).getSQLName() );
-                    ++count;
-                }
+        for ( int i = 0 ; i < jdoFields.length ; ++i ) {
+            if ( jdoFields[ i ] != null ) {
+                if ( count > 0 )
+                    sql.append( ',' );
+                sql.append( jdoFields[ i ].getSQLName() );
+                ++count;
             }
         }
-
         sql.append( ") VALUES (" );
         for ( int i = 0 ; i < count ; ++i ) {
             if ( i > 0 )
@@ -576,91 +459,59 @@ class SQLEngine
         }
         sql.append( ')' );
         _sqlCreate = sql.toString();
-    }
-    
-    
-    protected void buildRemoveSql()
-    {
-        StringBuffer sql;
-        
-        sql = new StringBuffer( "DELETE FROM " );
-        sql.append( getSQLName( _clsDesc, false ) ).append( " WHERE " );
-        sql.append( buildWherePK() );
-        _sqlRemove = sql.toString();
-    }
-    
-    
-    protected void buildStoreSql()
-    {
-        StringBuffer   sql;
-        JDOFieldDesc[] descs;
-        int            count;
-        RelationDesc[] rels;
-        
-        sql = new StringBuffer( "UPDATE " );
-        sql.append( getSQLName( _clsDesc, false ) ).append( " SET " );
-        descs = getJDOFields( _clsDesc );
-        for ( int i = 0 ; i < descs.length ; ++i ) {
-            if ( i > 0 )
-                sql.append( ',' );
-            sql.append( descs[ i ].getSQLName() );
-            sql.append( "=?" );
-        }
-        count = descs.length;
+        if ( logWriter != null )
+            logWriter.println( "SQL for creating " + clsDesc.getJavaClass().getName() +
+                               ": " + _sqlCreate );
 
-        rels = _clsDesc.getRelations();
-        if ( rels != null ) {
-            for ( int i = 0 ; i < rels.length ; ++i ) {
-                if ( ! rels[ i ].isAttached() ) {
-                    if ( count > 0 )
-                        sql.append( ',' );
-                    sql.append( ( (JDOFieldDesc) rels[ i ].getRelationField() ).getSQLName() );
-                    sql.append( "=?" );
-                    ++count;
-                }
-            }
-        }
         
-        sql.append( " WHERE " ).append( buildWherePK() );
-        _sqlStore = sql.toString();
-    }
-    
-    
-    protected StringBuffer buildWherePK()
-    {
-        StringBuffer   sql;
-        JDOFieldDesc[] descs;
-        int            i;
-        FieldDesc      identity;
-        
-        sql = new StringBuffer();
-        if ( _identity instanceof ContainerFieldDesc ) {
-            descs = getJDOFields( (ContainerFieldDesc) _identity );
-            for ( i = 0 ; i < descs.length ; ++i ) {
+        sql = new StringBuffer( "DELETE FROM " ).append( clsDesc.getTableName() );
+        sql.append( " WHERE " ).append( wherePk );
+        _sqlRemove = sql.toString();
+        if ( logWriter != null )
+            logWriter.println( "SQL for deleting " + clsDesc.getJavaClass().getName() +
+                               ": " + _sqlRemove );
+
+
+        sql = new StringBuffer( "UPDATE " );
+        sql.append( clsDesc.getTableName() ).append( " SET " );
+        for ( int i = 0 ; i < jdoFields.length ; ++i ) {
+            if ( jdoFields[ i ] != null ) {
                 if ( i > 0 )
-                    sql.append( " AND " );
-                sql.append( descs[ i ].getSQLName() );
+                    sql.append( ',' );
+                sql.append( jdoFields[ i ].getSQLName() );
                 sql.append( "=?" );
             }
-        } else {
-            sql.append( ( (JDOFieldDesc) _identity ).getSQLName() );
-            sql.append( "=?" );
         }
-        return sql;
+        sql.append( " WHERE " ).append( wherePk );
+        _sqlStore = sql.toString();
+        if ( logWriter != null )
+            logWriter.println( "SQL for updating " + clsDesc.getJavaClass().getName() +
+                               ": " + _sqlStore );
+
+        Vector    storeFields;
+
+        storeFields = new Vector();
+        fields = clsDesc.getFields();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof JDOFieldDescriptor )
+                storeFields.addElement( fields[ i ].getHandler() );
+        }
+        _storeFields = new FieldHandler[ storeFields.size() ];
+        storeFields.copyInto( _storeFields );
     }
-
-
-    protected void buildLoadSql()
+    
+    
+    protected void buildFinder( JDOClassDescriptor clsDesc, PrintWriter logWriter )
         throws MappingException
     {
         Vector    loadFields;
-        Vector    loadRelations;
+        Vector    loadRels;
         QueryExpr expr;
 
         loadFields = new Vector();
-        loadRelations = new Vector();
+        loadRels = new Vector();
         expr = new QueryExpr();
-        addLoadSql( _clsDesc, expr, loadFields, loadRelations, false, true );
+        addLoadSql( clsDesc, expr, loadFields, loadRels, false, true );
         /*
           if ( _stampField != null )
             sqlFields.append( ',' ).append( _stampField );
@@ -668,13 +519,16 @@ class SQLEngine
         
         _sqlLoad = expr.getQuery( false );
         _sqlLoadLock = expr.getQuery( true );
-        _loadFields = new JDOFieldDesc[ loadFields.size() ];
+        _loadFields = new FieldHandler[ loadFields.size() ];
         loadFields.copyInto( _loadFields );
-        _loadRelations = new RelationDesc[ loadRelations.size() ];
-        loadRelations.copyInto( _loadRelations );
-        
+        _loadRels = new RelationHandler[ loadRels.size() ];
+        loadRels.copyInto( _loadRels );
+        if ( logWriter != null )
+            logWriter.println( "SQL for loading " + clsDesc.getJavaClass().getName() +
+                               ":  " + _sqlLoad );
+
         _sqlFinder = new QueryExpr();
-        addLoadSql( _clsDesc, _sqlFinder, loadFields, loadRelations, true, false );
+        addLoadSql( clsDesc, _sqlFinder, loadFields, loadRels, true, false );
         /*
         if ( _stampField != null )
             sqlFields.append( ',' ).append( _stampField );
@@ -682,147 +536,97 @@ class SQLEngine
     }
 
 
-    private void addLoadSql( JDOClassDesc clsDesc, QueryExpr expr, Vector loadFields, Vector loadRelations,
-                             boolean loadPk, boolean queryPk )
+    private void addLoadSql( JDOClassDescriptor clsDesc, QueryExpr expr, Vector loadFields,
+                             Vector loadRels, boolean loadPk, boolean queryPk )
         throws MappingException
     {
-        JDOFieldDesc[] descs;
-        RelationDesc[] rels;
-        JDOClassDesc   extend;
-        FieldDesc      identity;
+        FieldDescriptor[]    fields;
+        JDOClassDescriptor   extend;
+        FieldDescriptor      identity;
         
         identity = clsDesc.getIdentity();
-        extend = (JDOClassDesc) clsDesc.getExtends();
-        rels = clsDesc.getRelations();
+        extend = (JDOClassDescriptor) clsDesc.getExtends();
+        // rels = clsDesc.getRels();
         expr.addTable( clsDesc );
-
+        
         if ( extend != null ) {
-            if ( identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) identity );
-                expr.addJoin( clsDesc, descs, extend, descs );
-            } else {
-                expr.addJoin( clsDesc, (JDOFieldDesc) identity, extend, (JDOFieldDesc) identity );
-            }
-            addLoadSql( extend, expr, loadFields, loadRelations, true, queryPk );
+            expr.addJoin( clsDesc, (JDOFieldDescriptor) identity, extend, (JDOFieldDescriptor) identity );
+            addLoadSql( extend, expr, loadFields, loadRels, true, queryPk );
             loadPk = false;
             queryPk = false;
         }
         
         if ( loadPk  ) {
-            if ( identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    expr.addColumn( clsDesc, descs[ i ] );
-                }
-            } else {
-                expr.addColumn( clsDesc, (JDOFieldDesc) identity );
-            }
+            expr.addColumn( clsDesc, (JDOFieldDescriptor) identity );
             // XXX How do we handle ProductInventory?
         }
         
-        if ( queryPk ) {
-            if ( identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) identity );
-                for ( int i = 0 ; i < descs.length ; ++i )
-                    expr.addParameter( clsDesc, descs[ i ], null );
-            } else {
-                expr.addParameter( clsDesc, (JDOFieldDesc) identity, null );
+        if ( queryPk )
+            expr.addParameter( clsDesc, (JDOFieldDescriptor) identity, null );
+        
+        fields = clsDesc.getFields();
+        for ( int i = 0 ; i < fields.length ; ++i ) {
+            if ( fields[ i ] instanceof JDOFieldDescriptor ) {
+                expr.addColumn( clsDesc, (JDOFieldDescriptor) fields[ i ] );
+                loadFields.addElement( fields[ i ].getHandler() );
             }
         }
         
-        descs = getJDOFields( clsDesc );
-        for ( int i = 0 ; i < descs.length ; ++i ) {
-            expr.addColumn( clsDesc, descs[ i ] );
-            loadFields.addElement( descs[ i ] );
-        }
-
-        rels = clsDesc.getRelations();
-        for ( int i = 0 ; i < rels.length ; ++i ) {
-            if ( rels[ i ].isAttached() ) {
-                if ( rels[ i ].isAttached() )
-                    expr.addJoin( clsDesc, (JDOFieldDesc) clsDesc.getIdentity(),
-                                  (JDOClassDesc) rels[ i ].getRelatedClassDesc(), 
-                                  ( (JDOFieldDesc) ( rels[ i ].getRelatedClassDesc().getIdentity() ) ) );
-                else
-                    expr.addJoin( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField(),
-                                  (JDOClassDesc) rels[ i ].getRelatedClassDesc(), 
-                                  (JDOFieldDesc) rels[ i ].getRelatedClassDesc().getIdentity() );
-            }
-        }
+        /*
+          rels = clsDesc.getRelations();
+          for ( int i = 0 ; i < rels.length ; ++i ) {
+          if ( rels[ i ].isAttached() ) {
+          if ( rels[ i ].isMany() ) {
+          expr.addJoin( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField(),
+          (JDOClassDesc) rels[ i ].getRelatedClass(), 
+          (JDOFieldDesc) rels[ i ].getRelatedClass().getIdentity() );
+          } else {
+          expr.addJoin( clsDesc, (JDOFieldDesc) clsDesc.getIdentity(),
+          (JDOClassDesc) rels[ i ].getRelatedClass(), 
+          ( (JDOFieldDesc) ( rels[ i ].getRelatedClass().getIdentity() ) ) );
+          }
+          }
+          }
+          
+          for ( int i = 0 ; i < rels.length ; ++i ) {
+          if ( ! rels[ i ].isAttached() ) {
+          loadRels.addElement( rels[ i ] );
+          identity = rels[ i ].getRelatedClass().getIdentity();
+          expr.addRelationColumn( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField() );
+          } else {
+          addLoadSql( asContained( (JDOClassDesc) rels[ i ].getRelatedClass(),
+          rels[ i ].getRelationField() ),
+          expr, loadFields, loadRels, false, false );
+          }
+          }
+        */
+    }
         
-        for ( int i = 0 ; i < rels.length ; ++i ) {
-            if ( ! rels[ i ].isAttached() ) {
-                loadRelations.addElement( rels[ i ] );
-                identity = rels[ i ].getRelatedClassDesc().getIdentity();
-                if ( rels[ i ].getRelationField() instanceof ContainerFieldDesc ) {
-                    descs = getJDOFields( (ContainerFieldDesc) rels[ i ].getRelationField() );
-                    for ( i = 0 ; i < descs.length ; ++i )
-                        expr.addRelationColumn( clsDesc, descs[ i ] );
-                } else
-                    expr.addRelationColumn( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField() );
-            } else {
-                addLoadSql( asRelation( (JDOClassDesc) rels[ i ].getRelatedClassDesc(),
-                                        rels[ i ].getRelationField() ),
-                            expr, loadFields, loadRelations, false, false );
-            }
-        }
-    }
+
+        /*
+          private static JDOClassDesc asContained( JDOClassDesc clsDesc, FieldDescriptor refField )
+          throws MappingException
+          {
+          FieldDesc   identity;
+          FieldDesc[] fields;
+          FieldDesc[] cFields;
+          
+          identity = clsDesc.getIdentity();
+          identity = new JDOContainedFieldDesc( (JDOFieldDesc) identity, refField );
+          fields = clsDesc.getFields();
+          cFields = new FieldDesc[ fields.length ];
+          for ( int i = 0 ; i < fields.length ; ++i )
+          cFields[ i ] = new JDOContainedFieldDesc( (JDOFieldDesc) fields[ i ], refField );
+          return new JDOClassDesc( new SimpleClassDesc( clsDesc.getJavaClass(), cFields,
+          clsDesc.getRelations(), identity, clsDesc.getExtends(),
+          clsDesc.getHandler().getAccessMode() ), clsDesc.getTableName() );
+          }
+        */
 
 
-    protected static String getSQLName( JDOClassDesc clsDesc, boolean lock )
+    public String toString()
     {
-        return clsDesc.getTableName();
-    }
-
-
-    protected static String getSQLName( JDOClassDesc clsDesc, JDOFieldDesc field )
-    {
-        return clsDesc.getTableName() + "." + field.getSQLName();
-    }
-
-
-    private static JDOClassDesc asRelation( JDOClassDesc clsDesc, FieldDesc refField )
-        throws MappingException
-    {
-        FieldDesc   identity;
-        FieldDesc[] fields;
-        FieldDesc[] cFields;
-
-        identity = clsDesc.getIdentity();
-        identity = new JDOContainedFieldDesc( (JDOFieldDesc) identity, refField );
-        fields = clsDesc.getFields();
-        cFields = new FieldDesc[ fields.length ];
-        for ( int i = 0 ; i < fields.length ; ++i )
-            cFields[ i ] = new JDOContainedFieldDesc( (JDOFieldDesc) fields[ i ], refField );
-        return new JDOClassDesc( new ClassDesc( clsDesc.getJavaClass(), cFields,
-                                                clsDesc.getRelations(), identity, clsDesc.getExtends(),
-                                                clsDesc.getAccessMode() ), clsDesc.getTableName() );
-    }
-
-
-    private static JDOFieldDesc[] getJDOFields( ClassDesc clsDesc )
-    {
-        JDOFieldDesc[] jdoFields;
-        FieldDesc[]    fields;
-
-        fields = clsDesc.getFields();
-        jdoFields = new JDOFieldDesc[ fields.length ];
-        for ( int i = 0 ; i < fields.length ; ++i )
-            jdoFields[ i ] = (JDOFieldDesc) fields[ i ];
-        return jdoFields;
-    }
-
-
-    private static JDOFieldDesc[] getJDOFields( ContainerFieldDesc fieldDesc )
-    {
-        JDOFieldDesc[] jdoFields;
-        FieldDesc[]    fields;
-
-        fields = fieldDesc.getFields();
-        jdoFields = new JDOFieldDesc[ fields.length ];
-        for ( int i = 0 ; i < fields.length ; ++i )
-            jdoFields[ i ] = (JDOFieldDesc) fields[ i ];
-        return jdoFields;
+        return getDescriptor().toString();
     }
 
 
@@ -849,16 +653,16 @@ class SQLEngine
         private Object    _lastIdentity;
 
 
-        private RelationContext  _rtx;
+        private FetchContext  _ctx;
 
 
-        SQLQuery( SQLEngine engine, RelationContext rtx, String sql, Class[] types )
+        SQLQuery( SQLEngine engine, FetchContext ctx, String sql, Class[] types )
         {
             _engine = engine;
             _types = types;
             _values = new Object[ _types.length ];
             _sql = sql;
-            _rtx = rtx;
+            _ctx = ctx;
         }
         
         
@@ -885,7 +689,7 @@ class SQLEngine
         
         public Class getResultType()
         {
-            return _engine.getClassDesc().getJavaClass();
+            return _engine._handler.getJavaClass();
         }
         
         
@@ -909,20 +713,10 @@ class SQLEngine
         public Object nextIdentity()
             throws PersistenceException
         {
-            JDOFieldDesc[] pkDescs;
-            
             try {
                 if ( ! _rs.next() )
                     return null;
-                if ( _engine._identity instanceof ContainerFieldDesc ) {
-                    _lastIdentity = ( (ContainerFieldDesc) _engine._identity ).newInstance();
-                    pkDescs = getJDOFields( (ContainerFieldDesc) _engine._identity );
-                    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-                        pkDescs[ i ].setValue( _lastIdentity, _rs, 1 + i );
-                    }
-                } else {
-                    _lastIdentity = _rs.getObject( 1 );
-                }
+                _lastIdentity = _rs.getObject( 1 );
             } catch ( SQLException except ) {
                 _lastIdentity = null;
                 throw new PersistenceException( except );
@@ -934,21 +728,11 @@ class SQLEngine
         public Object getIdentity( int index )
             throws PersistenceException
         {
-            JDOFieldDesc[] pkDescs;
-            
             try {
                 _rs.absolute( index );
                 if ( _rs.isLast() )
                     return null;
-                if ( _engine._identity instanceof ContainerFieldDesc ) {
-                    _lastIdentity = ( (ContainerFieldDesc) _engine._identity ).newInstance();
-                    pkDescs = getJDOFields( (ContainerFieldDesc) _engine._identity );
-                    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-                        pkDescs[ i ].setValue( _lastIdentity, _rs, 1 + i );
-                    }
-                } else {
-                    _lastIdentity = _rs.getObject( 1 );
-                }
+                _lastIdentity = _rs.getObject( 1 );
             } catch ( SQLException except ) {
                 _lastIdentity = null;
                 throw new PersistenceException( except );
@@ -983,34 +767,38 @@ class SQLEngine
             if ( _lastIdentity == null )
                 throw new PersistenceException( "persist.fetchWithoutIdentity" );
             try {
-                if ( _engine._identity instanceof ContainerFieldDesc ) {
-                    JDOFieldDesc[] descs;
+                // Set the identity field and skip that many columns in the result set.
+                _engine._handler.setIdentity( obj, _lastIdentity );
+                count = 2;
 
-                    descs = getJDOFields( (ContainerFieldDesc) _engine._identity );
-                    for ( int i = 0 ; i < descs.length ; ++i )
-                        descs[ i ].setValue( obj, descs[ i ].getValue( _lastIdentity ) );
-                    count = descs.length + 1;
-                } else {
-                    _engine._identity.setValue( obj, _lastIdentity );
-                    count = 2;
-                }
-
+                // Load all the fields of the object including one-one relations
                 for ( int i = 0; i < _engine._loadFields.length ; ++i  )
-                    _engine._loadFields[ i ].setValue( obj, _rs, i + count );
+                    _engine._loadFields[ i ].setValue( obj, _rs.getObject( i + count ) );
                 count += _engine._loadFields.length;
-                for ( int i = 0; i < _engine._loadRelations.length ; ++i  ) {
+
+                // Load all the many-one relations of the object
+                for ( int i = 0; i < _engine._loadRels.length ; ++i  ) {
                     Object rel;
                     Object relId;
 
                     relId = _rs.getObject( i + count );
                     if ( relId != null ) {
-                        rel = _rtx.fetch( _engine._loadRelations[ i ].getRelatedClassDesc(), relId  );
-                         _engine._loadRelations[ i ].getRelationField().setValue( obj, rel );
+                        if ( _engine._loadRels[ i ].isMulti() ) {
+                            // XXX Need to deal with multiple relations
+                        } else {
+                            /* Don't use fetch context at this point
+                            rel = _ctx.fetch( _engine._loadRels[ i ].getRelatedClass(), relId );
+                            _engine._loadRels[ i ].setRelated( obj, rel );
+                            */
+                        }
                     }
                 }
-                count += _engine._loadRelations.length;
+                count += _engine._loadRels.length;
+
+                /*
                 if ( _engine._stampField != null )
                     stamp = _rs.getString( _engine._loadFields.length + count );
+                */
             } catch ( SQLException except ) {
                 throw new PersistenceException( except );
             }

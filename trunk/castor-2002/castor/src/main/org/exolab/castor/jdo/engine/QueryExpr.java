@@ -97,7 +97,7 @@ public class QueryExpr
     }
 
     
-    public void addTable( JDOClassDesc clsDesc )
+    public void addTable( JDOClassDescriptor clsDesc )
     {
         addTable( clsDesc.getTableName() );
     }
@@ -109,7 +109,7 @@ public class QueryExpr
     }
 
 
-    public void addColumn( JDOClassDesc clsDesc, JDOFieldDesc field )
+    public void addColumn( JDOClassDescriptor clsDesc, JDOFieldDescriptor field )
     {
         addColumn( clsDesc.getTableName(), field.getSQLName() );
     }
@@ -121,7 +121,7 @@ public class QueryExpr
     }
 
 
-    public void addRelationColumn( JDOClassDesc clsDesc, JDOFieldDesc field )
+    public void addRelationColumn( JDOClassDescriptor clsDesc, JDOFieldDescriptor field )
     {
         addRelationColumn( clsDesc.getTableName(), field.getSQLName() );
     }
@@ -133,7 +133,7 @@ public class QueryExpr
     }
 
 
-    public void addParameter( JDOClassDesc clsDesc, JDOFieldDesc field, String op )
+    public void addParameter( JDOClassDescriptor clsDesc, JDOFieldDescriptor field, String op )
     {
         addCondition( clsDesc.getTableName(), field.getSQLName(), op, Syntax.Parameter );
     }
@@ -149,7 +149,7 @@ public class QueryExpr
     }
 
 
-    public void addCondition( JDOClassDesc clsDesc, JDOFieldDesc field,
+    public void addCondition( JDOClassDescriptor clsDesc, JDOFieldDescriptor field,
                               String op, String value )
     {
         addCondition( clsDesc.getTableName(), field.getSQLName(), op, value );
@@ -163,8 +163,8 @@ public class QueryExpr
     }
 
 
-    public void addJoin( JDOClassDesc leftTable, JDOFieldDesc leftColumn,
-                         JDOClassDesc rightTable, JDOFieldDesc rightColumn )
+    public void addJoin( JDOClassDescriptor leftTable, JDOFieldDescriptor leftColumn,
+                         JDOClassDescriptor rightTable, JDOFieldDescriptor rightColumn )
     {
         _joins.addElement( new Join( leftTable.getTableName(), leftColumn.getSQLName(),
                                      rightTable.getTableName(), rightColumn.getSQLName() ) );
@@ -178,8 +178,8 @@ public class QueryExpr
     }
 
 
-    public void addJoin( JDOClassDesc leftTable, JDOFieldDesc[] leftColumns,
-                         JDOClassDesc rightTable, JDOFieldDesc[] rightColumns )
+    public void addJoin( JDOClassDescriptor leftTable, JDOFieldDescriptor[] leftColumns,
+                         JDOClassDescriptor rightTable, JDOFieldDescriptor[] rightColumns )
     {
         String[] left;
         String[] right;

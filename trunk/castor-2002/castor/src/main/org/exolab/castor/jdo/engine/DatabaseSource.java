@@ -69,8 +69,8 @@ import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.conf.Mapping;
 import org.exolab.castor.jdo.conf.DTDResolver;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.spi.Persistence;
@@ -206,10 +206,10 @@ public class DatabaseSource
         DatabaseSource dbs;
 
         if ( _defaultMapping == null ) {
-            JDOMappingHelper mapping;
+            JDOMappingLoader mapping;
 
             try {
-                mapping = new JDOMappingHelper( null );
+                mapping = new JDOMappingLoader( null );
                 mapping.loadMapping( new InputSource( DatabaseSource.class.getClassLoader().getResourceAsStream( DefaultMapping ) ) );
                 _defaultMapping = mapping;
             } catch ( IOException except ) {
@@ -246,7 +246,7 @@ public class DatabaseSource
         throws MappingException
     {
         Unmarshaller     unm;
-        JDOMappingHelper mapping;
+        JDOMappingLoader mapping;
         Mapping[]        mappings;
         Database         database;
         DatabaseSource   dbs;
@@ -261,7 +261,7 @@ public class DatabaseSource
                 unm.setLogWriter( logWriter );
             database = (Database) unm.unmarshal( source );
 
-            mapping = new JDOMappingHelper( loader );
+            mapping = new JDOMappingLoader( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
             if ( logWriter != null )
@@ -408,11 +408,11 @@ public class DatabaseSource
         implements PersistenceFactory
     {
         
-        public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
+        public Persistence getPersistence( ClassHandler handler, PrintWriter logWriter )
             throws MappingException
         {
             try {
-                return new SQLEngine( (JDOClassDesc) clsDesc, logWriter );
+                return new SQLEngine( handler, logWriter );
             } catch ( MappingException except ) {
                 logWriter.println( except.toString() );
                 return null;
