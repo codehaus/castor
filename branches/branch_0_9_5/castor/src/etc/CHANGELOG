@@ -1,5 +1,11 @@
 
+CVS
+---
 
+XML:   Fixed typo with null check during validation code in
+       XMLClassDescriptorImpl 
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1560
+       (kvisco - 20041214)
 
 Version 0.9.5.4, November 08, 2004
 ----------------------------------
