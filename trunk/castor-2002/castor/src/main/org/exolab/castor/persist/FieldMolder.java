@@ -880,7 +880,13 @@ public class FieldMolder {
             Method resultMethod = null;
             try {
                 Class newCls = loadClass( originalMethod.getDeclaringClass().getName() );
-                resultMethod = newCls.getMethod( originalMethod.getName(), originalMethod.getParameterTypes() );
+                String methodName = originalMethod.getName();
+                Class[] methodParams = originalMethod.getParameterTypes();
+                for(int i = 0; i < methodParams.length; i++) {
+                      if (!methodParams[i].isPrimitive()) {
+                              methodParams[i] = loadClass(methodParams[i].getName());
+                      }
+                }            
             } catch ( NoSuchMethodException e ) {
                 // ssa, FIXME shoudl never happen
                 e.printStackTrace();
@@ -910,6 +916,8 @@ public class FieldMolder {
         {
             if ( null == originalClass ) 
                 return null;
+            if ( originalClass.isPrimitive() )
+                return originalClass;
             
             return loadClass ( originalClass.getName() );
         }
