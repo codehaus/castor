@@ -97,8 +97,7 @@ public class JDOClassDesc
     public JDOClassDesc( ClassDesc clsDesc, String tableName )
         throws MappingException
     {
-        super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getRelations(),
-               clsDesc.getIdentity(), clsDesc.getExtends(), clsDesc.getAccessMode() );
+        super( clsDesc );
 
         if ( tableName == null )
             throw new IllegalArgumentException( "Argument 'tableName' is null" );
@@ -119,18 +118,6 @@ public class JDOClassDesc
                  ( (JDOFieldDesc) fields[ i ] ).isDirtyCheck() )
                 _dirtyCheck = true;
         }
-    }
-
-
-    /**
-     * Constructor used by derived classes.
-     */
-    protected JDOClassDesc( JDOClassDesc clsDesc )
-        throws MappingException
-    {
-        super( clsDesc );
-        _tableName = clsDesc._tableName;
-        _dirtyCheck = clsDesc._dirtyCheck;
     }
 
 
