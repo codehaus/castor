@@ -96,6 +96,11 @@ public class Group extends Particle
      private Vector _wildcard;
 
     /**
+     * The parent for this Group (either another Group or a ComplexType)
+    **/
+    private Structure _parent = null;
+    
+    /**
      * Creates a new Group, with no name
     **/
     public Group() {
@@ -184,13 +189,24 @@ public class Group extends Particle
         return this.order;
     } //-- getOrder
 
-     /**
-      * Returns an enumeration of the different <any> wildcards held
-      * by this group.
-      */
-      public Enumeration getWildcard() {
-          return _wildcard.elements();
-      }
+
+    /**
+     * Returns the parent of this Group, this value may be null if
+     * no parent has been set.
+     *
+     * @return the parent Structure of this Group.
+    **/
+    public Structure getParent() {
+        return _parent;
+    } //-- getParent
+    
+    /**
+     * Returns an enumeration of the different <any> wildcards held
+     * by this group.
+    */
+    public Enumeration getWildcard() {
+        return _wildcard.elements();
+    }
 
     /**
      * Sets if the group is a model group definition
@@ -276,6 +292,10 @@ public class Group extends Particle
         throws SchemaException
     {
         _contentModel.addGroup(group);
+        
+        //-- set reference to parent
+        group.setParent(this);
+        
     } //-- addGroup
 
     /**
@@ -288,6 +308,9 @@ public class Group extends Particle
         throws SchemaException
     {
         _contentModel.addGroup(group);
+        
+        //-- set reference to parent
+        group.setParent(this);
     } //-- addGroup
 
     /**
@@ -370,4 +393,24 @@ public class Group extends Particle
         //-- do nothing
     } //-- validate
 
+    /**
+     * Sets the parent for this Group
+     *
+     * @param parent the parent Structure for this Group
+    **/
+    protected void setParent(Structure parent) {
+        if (parent != null) {
+            switch (parent.getStructureType()) {
+                case Structure.COMPLEX_TYPE:
+                case Structure.GROUP:
+                case Structure.MODELGROUP:
+                    break;
+                default:
+                    String error = "Invalid parent for group";
+                    throw new IllegalArgumentException(error);
+            }
+        }
+        _parent = parent;
+    } //-- setParent
+        
 } //-- Group
