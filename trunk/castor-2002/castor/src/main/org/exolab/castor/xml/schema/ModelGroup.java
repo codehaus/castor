@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999 - 2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -62,12 +62,12 @@ public class ModelGroup extends Group {
     /**
      * the name of the ModelGroup referenced
      */
-     private String groupRef = null;
+     private String _groupRef = null;
 
     /**
      * An ordered list of all ModelGroup definitions
     **/
-    private Vector modelDefs;
+    private Vector _modelDefs;
 
 
     /**
@@ -98,7 +98,7 @@ public class ModelGroup extends Group {
     public ModelGroup(String name, Schema schema) {
         super(name);
         _schema = schema;
-        modelDefs = new Vector();
+        _modelDefs = new Vector();
     } //-- ModelGroup
 
 
@@ -107,8 +107,8 @@ public class ModelGroup extends Group {
      * @param modelGroup the ModelGroup to add to this ModelGroup
     **/
     public void addModelGroup(ModelGroup modelGroup) {
-        if (!modelDefs.contains(modelGroup)) {
-            modelDefs.addElement(modelGroup);
+        if (!_modelDefs.contains(modelGroup)) {
+            _modelDefs.addElement(modelGroup);
         }
     } //-- addModelGroup
 
@@ -128,7 +128,7 @@ public class ModelGroup extends Group {
      * definitions (element, group, modelGroupRef)+
     **/
     public Enumeration getDeclarations() {
-        return modelDefs.elements();
+        return _modelDefs.elements();
     } //-- getDeclarations
 
     /**
@@ -137,7 +137,7 @@ public class ModelGroup extends Group {
      * definition references
     **/
     public void setReference(String reference) {
-        this.groupRef = reference;
+        this._groupRef = reference;
     } //-- setReference
 
     //-------------------------------/
@@ -167,8 +167,8 @@ public class ModelGroup extends Group {
      * @returns the reference if any
      */
      public ModelGroup getReference() {
-        if (groupRef != null)
-            return _schema.getModelGroup(groupRef);
+        if (_groupRef != null)
+            return _schema.getModelGroup(_groupRef);
         return null;
     } //-- getReference
 
@@ -178,8 +178,8 @@ public class ModelGroup extends Group {
       * @returns true if this ModelGroup is referencing another one
       */
      public boolean hasReference() {
-         if (groupRef != null)
-             return (groupRef.length() !=0);
+         if (_groupRef != null)
+             return (_groupRef.length() !=0);
          else return false;
      }
 
@@ -191,7 +191,47 @@ public class ModelGroup extends Group {
     public void validate()
         throws ValidationException
     {
-        //-- do nothing
+        //-- Check for circular references
+        //-- Validation related to section 3.8.6 : Constraints on Model Group Schema Components
+        //-- Schema Component Constraint: Model Group Correct
+        //-- from the W3C XML Schema Recommendation
+        for (int i=0; i<getParticleCount(); i++) {
+            Structure temp = getParticle(i);
+            switch (temp.getStructureType()) {
+                case Structure.MODELGROUP:
+                    ModelGroup tempGroup = (ModelGroup)temp;
+                    String name = null;
+                    if (tempGroup.getReference() != null)
+                        name = tempGroup.getReference().getName();
+
+                    if (name != null && name.equals(this.getName())) {
+                        String err = "in <group> named:"+this.getName();
+                        err +=  "\nCircular groups are disallowed.\n";
+                        err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
+                        throw new ValidationException(err);
+                    }
+                    //check cross-reference
+                    int j = 0;
+                    while (j<tempGroup.getParticleCount()) {
+                        if (tempGroup.getParticle(j).getStructureType() != Structure.MODELGROUP)
+                            j++;
+                        else {
+                            ModelGroup referencedGroup = ((ModelGroup)getParticle(j)).getReference();
+                            if ((referencedGroup != null) && (referencedGroup.equals(this))) {
+                                String err = "Cross reference between <group>:"+this.getName()+" and <group>:"+tempGroup.getName();
+                                err +=  "\nCircular groups are disallowed.\n";
+                                err += "That is, within the {particles} of a group there must not be at any depth a particle whose {term} is the group itself.\n";
+                                throw new ValidationException(err);
+                            }
+
+                        }
+                    }
+                    break;
+                default:
+                    break;
+
+            }
+        }
     } //-- validate
 
     /**
