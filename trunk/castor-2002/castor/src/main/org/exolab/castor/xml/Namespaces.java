@@ -46,6 +46,9 @@
 package org.exolab.castor.xml;
 
 import org.xml.sax.helpers.AttributeListImpl;
+
+import java.util.Enumeration;
+
 /**
  * A class for handling Namespace declaration and scoping
  *
@@ -140,6 +143,15 @@ final class Namespaces {
         return new Namespaces(this);
     } //-- method: createNamespaces
 
+    /**
+     * Returns an Enumeration of local namespace URIs for this Namespaces.
+     *
+     * @return an Enumeration of local namespace URIs.
+    **/
+    public Enumeration getLocalNamespaces() {
+        return new NamespaceEnumerator(_first);
+    } //-- getLocalNamespace
+    
     /**
      * Returns the Namespace URI associated with the given prefix
      *
@@ -298,4 +310,31 @@ final class Namespaces {
         }
     } //-- class: Namespace
 
+    /**
+     * A simple Enumeration for Namespace objects
+    **/
+    class NamespaceEnumerator 
+        implements java.util.Enumeration 
+    {
+        
+        private Namespace _namespace = null;
+        
+        NamespaceEnumerator(Namespace namespace) {
+            _namespace = namespace;
+        }
+        
+        public boolean hasMoreElements() {
+            return (_namespace != null);
+        }
+        
+        public Object nextElement() {
+            String nsURI = null;
+            if (_namespace != null) {
+                nsURI = _namespace.uri;
+                _namespace = _namespace.next;
+            }
+            return nsURI;
+        }
+    } //-- class: NamespaceEnumerator
+    
 } //-- class: Namespaces
