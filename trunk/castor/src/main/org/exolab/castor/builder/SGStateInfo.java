@@ -64,6 +64,9 @@ import java.util.Vector;
 **/
 class SGStateInfo extends ClassInfoResolverImpl {
 
+    public static final int NORMAL_STATUS = 0;
+    public static final int STOP_STATUS = 1;
+    
     /**
      * The package used when creating new classes.
     **/
@@ -91,6 +94,9 @@ class SGStateInfo extends ClassInfoResolverImpl {
     
     private SourceGenerator _sgen = null;
     
+    private int _status = NORMAL_STATUS;
+    
+    
 //    private XMLBindingComponent _bindingComponent = null;
 
     /**
@@ -109,15 +115,40 @@ class SGStateInfo extends ClassInfoResolverImpl {
         _sgen          = sgen;
     } //-- SGStateInfo
 
+    /**
+     * Returns the processed JClass with the given name. If
+     * no such JClass has been marked as processed, 
+     * null is returned.
+     *
+     * @param className the JClass name to check against
+     * @return the JClass with the given name
+     */
+    JClass getProcessed(String className) {
+        for (int i = 0; i < _processed.size(); i++) {
+            JClass jClass = (JClass) _processed.elementAt(i);
+            if (jClass.getName().equals(className))
+                return jClass;
+        }
+        return null;
+    } //-- getProcessed
 
+    /**
+     * Returns the current status
+     *
+     * @return the current status
+     */
+    public int getStatusCode() {
+        return _status;
+    } //-- getStatusCode
+    
     /**
      * Marks the given JClass as having been processed.
      * @param jClass the JClass to mark as having been processed.
     **/
     void markAsProcessed(JClass jClass) {
-        String className = jClass.getName();
-        if (!_processed.contains(className))
-            _processed.addElement(className);
+        //String className = jClass.getName();
+        if (!_processed.contains(jClass))
+            _processed.addElement(jClass);
     } //-- markAsProcessed
 
     /**
@@ -125,8 +156,24 @@ class SGStateInfo extends ClassInfoResolverImpl {
      * @param jClass the JClass to check for being marked as processed
     **/
     boolean processed(JClass jClass) {
-        return _processed.contains(jClass.getName());
+        return _processed.contains(jClass);
     } //-- processed
+    
+    /**
+     * Returns true if a JClass with the given name has been marked as 
+     * processed
+     *
+     * @param className the JClass name to check against
+     */
+    boolean processed(String className) {
+        for (int i = 0; i < _processed.size(); i++) {
+            JClass jClass = (JClass) _processed.elementAt(i);
+            if (jClass.getName().equals(className))
+                return true;
+        }
+        return false;
+    } //-- processed
+    
 
     boolean promptForOverwrite() {
         return _promptForOverwrite;
@@ -189,6 +236,15 @@ class SGStateInfo extends ClassInfoResolverImpl {
    /* XMLBindingComponent getXMLBindingComponent() {
         return _bindingComponent;
     }*/
+    
+    /**
+     * Sets the current status code to the given one
+     *
+     * @param status the new status code
+     */
+    void setStatusCode(int status) {
+        _status = status;
+    } //-- setStatusCode
     
     /**
      * Sets whether or not the source code generator prints
