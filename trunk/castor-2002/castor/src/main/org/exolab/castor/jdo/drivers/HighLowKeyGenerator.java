@@ -254,10 +254,13 @@ public class HighLowKeyGenerator implements KeyGenerator
                             last = new Integer( maxPK + 1 );
                             max = new Integer( maxPK + _grabSizeI );
                         } else {
-                            BigDecimal maxPK = new BigDecimal( 0 );
+                            BigDecimal maxPK = null; 
 
                             if ( rs.next() ) {
                                 maxPK = rs.getBigDecimal(1);
+                            }
+                            if ( maxPK == null ) {
+                                maxPK = new BigDecimal( 0 );
                             }
                             last = maxPK.add( ONE );
                             max = maxPK.add( _grabSizeD );
