@@ -47,52 +47,78 @@
 package jdo;
 
 
-import java.util.Vector;
-import java.util.Enumeration;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.DriverManager;
-import org.exolab.castor.jdo.JDO;
-import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
-import org.exolab.castor.util.Logger;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.jtf.CWTestCase;
-import org.exolab.exceptions.CWClassConstructorException;
-
-
-
-public class JDOCategory
-    extends CWTestCategory
+/**
+ * Test object mapping to test_detaul used to conduct relation tests.
+ * Only for JDK 1.2
+ */
+public class TestSetDetail
 {
 
 
-    private JDO      _jdo;
+    private int        _id;
 
 
-    public JDOCategory( String name, String description, Object jdo )
-        throws CWClassConstructorException
+    private TestSetMaster _master;
+
+
+    static final int       DefaultId = 5;
+
+
+    public TestSetDetail( int id )
     {
-        super( name, description );
-        _jdo = (JDO) jdo;
-        _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
+        this();
+        _id = id;
     }
 
 
-    public Database getDatabase( boolean verbose )
-        throws PersistenceException
+    public TestSetDetail()
     {
-        if ( verbose )
-            _jdo.setLogWriter( Logger.getSystemLogger() );
-        return _jdo.getDatabase();
     }
 
 
-    public Connection getJDBCConnection()
-        throws SQLException
+    public void setId( int id )
     {
-        return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName(), null ).createConnection();
+        _id = id;
+    }
+
+
+    public int getId()
+    {
+        return _id;
+    }
+
+
+    public void setMaster( TestSetMaster master )
+    {
+        _master = master;
+    }
+
+
+    public TestSetMaster getMaster()
+    {
+        return _master;
+    }
+
+
+    public String toString()
+    {
+        return "" + _id;
+    }
+
+
+    public int hashCode() {
+        return _id;
+    }
+    
+    public boolean equals( Object other )
+    {
+        if ( other == this )
+            return true;
+        if ( other != null && other instanceof TestSetDetail ) {
+            if ( ( (TestSetDetail) other )._id == _id )
+                return true;
+        }
+        return false;
     }
 
 

@@ -85,6 +85,31 @@ grant all on test_group to test
 go
 
 
+-- test_smaster
+drop table test_smaster
+go
+create table test_smaster (
+  id       numeric(10,0)    not null
+)
+go
+create unique index test_smaster_pk on test_smaster ( id )
+go
+
+
+-- test_sdetail
+drop table test_sdetail
+go
+create table test_sdetail (
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null
+)
+go
+create unique index test_sdetail_pk on test_sdetail ( detail_id )
+go
+create index test_sdetail_fk on test_sdetail ( master_id )
+go
+
+
 -- test_types
 drop table test_types
 go
@@ -96,6 +121,7 @@ create table test_types (
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
+  dbl_val  numeric(14,2)  not null,
   int_date integer        null,
   str_time char(12)       null,
   num_date numeric(17,0)  null 
@@ -112,6 +138,7 @@ drop table test_keygen
 go
 create table test_keygen (
   id   int          not null,
+  int_val int       not null,
   attr varchar(200) not null
 )
 go

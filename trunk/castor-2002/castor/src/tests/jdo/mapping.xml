@@ -56,8 +56,8 @@
     <field name="group" type="jdo.TestGroup" required="false">
       <sql name="group_id" />
     </field>
-    <field name="details" type="jdo.TestDetail" collection="vector" required="false">
-    </field>
+    <field name="details" type="jdo.TestDetail" collection="vector" 
+           required="false"> </field>
   </class>
 
 
@@ -105,6 +105,32 @@
   </class>
 
 
+  <!-- Classes for testing set collections -->
+  <!-- Only for JDK 1.2
+  <class name="jdo.TestSetMaster" access="shared" identity="id">
+    <description>Test set master table</description>
+    <map-to table="test_smaster" />
+    <field name="id" type="integer">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="details" type="jdo.TestSetDetail" collection="set"
+           required="false"> </field>
+  </class>
+
+
+  <class name="jdo.TestSetDetail" access="shared" identity="id">
+    <description>Test set detail table</description>
+    <map-to table="test_sdetail" />
+    <field name="id" type="integer">
+      <sql name="detail_id" type="numeric" />
+    </field>
+    <field name="master" type="jdo.TestSetMaster" required="true">
+      <sql name="master_id" />
+    </field>
+  </class>
+  -->
+
+
   <!-- Classes for testing type handling -->
   <class name="jdo.TestTypes" access="shared" identity="id">
     <description>Test various type handling and conversions</description>
@@ -130,6 +156,9 @@
     <field name="boolValue" type="boolean" required="true" >
       <sql name="bool_val" type="char[01]" />
     </field>
+    <field name="doubleValue" type="double" required="true" >
+      <sql name="dbl_val" type="numeric" />
+    </field>
     <field name="date2" type="java.util.Date" >
       <sql name="int_date" type="integer[YMD]" />
     </field>
@@ -148,6 +177,9 @@
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
+    </field>
+    <field name="intValue" type="integer" required="true">
+      <sql name="int_val" type="integer"/>
     </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
@@ -175,6 +207,9 @@
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
+    <field name="intValue" type="integer" required="true">
+      <sql name="int_val" type="integer"/>
+    </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
     </field>
@@ -194,6 +229,9 @@
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
+    </field>
+    <field name="intValue" type="integer" required="true">
+      <sql name="int_val" type="integer"/>
     </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>
@@ -238,6 +276,9 @@
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
+    </field>
+    <field name="intValue" type="integer" required="true">
+      <sql name="int_val" type="integer"/>
     </field>
     <field name="attr" type="string" required="true">
       <sql name="attr" type="varchar"/>

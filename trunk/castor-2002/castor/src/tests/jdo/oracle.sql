@@ -79,6 +79,24 @@ create unique index test_group_pk
 grant all on test_group to test;
 
 
+-- test_smaster
+drop table test_smaster;
+create table test_smaster (
+  id       numeric(10,0)    not null
+);
+create unique index test_smaster_pk on test_smaster ( id );
+
+
+-- test_sdetail
+drop table test_sdetail;
+create table test_sdetail (
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null
+);
+create unique index test_sdetail_pk on test_sdetail ( detail_id );
+create index test_sdetail_fk on test_sdetail ( master_id );
+
+
 drop table   test_types;
 create table test_types (
   id       numeric(10,0)  not null,
@@ -88,6 +106,7 @@ create table test_types (
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
+  dbl_val  numeric(14,2)  not null,
   int_date integer        null,
   str_time char(12)       null,
   num_date numeric(17,0)  null
@@ -100,6 +119,7 @@ grant all on test_types to test;
 drop table   test_keygen;
 create table test_keygen (
   id    int           not null,
+  int_val int         not null,
   attr  varchar(200)  not null
 );
 create unique index test_keygen_pk
