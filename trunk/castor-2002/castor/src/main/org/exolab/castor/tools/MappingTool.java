@@ -61,6 +61,7 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Introspector;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
 import org.exolab.castor.mapping.xml.types.NodeType;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
@@ -87,10 +88,33 @@ import org.exolab.castor.builder.util.ConsoleDialog;
 public class MappingTool
 {
 
+    /**
+     * Hashtable of already generated mappings
+    **/
+    private Hashtable _mappings = null;
 
-    private Hashtable _mappings = new Hashtable();
+    /**
+     * ClassDescriptorResolver for loading compiled
+     * descriptors
+    **/
+    private ClassDescriptorResolverImpl _resolver = null;
 
-    private Introspector _intro = new Introspector();
+    /**
+     * Introspector to use if _forceIntrospection is enabled.
+    **/
+    private Introspector _introspector = null;
+    
+    /**
+     * Boolean to indicate that we should always
+     * perform introspection for each class
+     * even if a ClassDescriptor may exist.
+    **/
+    private boolean _forceIntrospection = false;
+    
+    public MappingTool() {
+        _mappings     = new Hashtable();
+        _resolver     = new ClassDescriptorResolverImpl();
+    } //--MappingTool
 
     /**
      * Command line method
@@ -237,7 +261,17 @@ public class MappingTool
 
         if ( _mappings.get( cls ) != null )
             return;
-        if ( ! Types.isConstructable( cls ) )
+            
+        if ( cls.isArray() ) {
+            
+            Class cType = cls.getComponentType();
+            if ( _mappings.get(cType) != null) return;
+            if (Types.isSimpleType(cType)) return;                
+            //-- handle component type
+            addClass( cType );
+        }
+            
+        if ( _forceIntrospection && (!Types.isConstructable( cls )))
             throw new MappingException( "mapping.classNotConstructable", cls.getName() );
 
         XMLClassDescriptor xmlClass;
@@ -246,8 +280,14 @@ public class MappingTool
         FieldMapping       fieldMap;
 
         try {
-            xmlClass = _intro.generateClassDescriptor( cls );
-        } catch ( MarshalException except ) {
+            
+            if (_forceIntrospection)
+                xmlClass = _introspector.generateClassDescriptor( cls );
+            else
+                xmlClass = _resolver.resolve( cls );
+        } 
+        catch ( MarshalException except ) {
+            
             throw new MappingException( except );
         }
         classMap = new ClassMapping();
@@ -275,14 +315,23 @@ public class MappingTool
             
             Class fieldType = fdesc.getFieldType();
             
+            //-- unwrap arrays of objects
+            boolean isArray = fieldType.isArray();
+            while (fieldType.isArray())
+                fieldType = fieldType.getComponentType();
+                
             fieldMap.setType( fieldType.getName() );
             
             //-- To prevent outputing of optional fields...check
             //-- for value first before setting
             if (fdesc.isRequired())  fieldMap.setRequired( true );
             if (fdesc.isTransient()) fieldMap.setTransient( true );
-            if ( fdesc.isMultivalued() )
-                fieldMap.setCollection( CollectionType.ENUMERATE );
+            if ( fdesc.isMultivalued() ) {
+                if (isArray)
+                    fieldMap.setCollection( CollectionType.ARRAY );
+                else
+                    fieldMap.setCollection( CollectionType.ENUMERATE );
+            }
                 
             //-- handle XML Specific information
             fieldMap.setBindXml( new BindXml() );
@@ -292,13 +341,29 @@ public class MappingTool
             
             if (deep) {
                 if ( _mappings.get(fieldType) != null) continue;
-                if (Types.isSimpleType(fieldType)) continue;
+                if (Types.isSimpleType(fieldType)) continue;                
                 //-- recursive add needed classes
                 addClass( fieldType );
             }
         }
     } //-- addClass
 
+    /**
+     * Enables or disables the forcing of introspection when
+     * a ClassDescriptor already exists. This is false by
+     * default.
+     *
+     * @param force when true will cause the MappingTool to
+     * always use introspection regardless of whether or not
+     * a ClassDescriptor exists for a given Class.
+    **/
+    public void setForceIntrospection(boolean force) {
+        _forceIntrospection = force;
+        if (force) {
+            if (_introspector == null)
+                _introspector = new Introspector();
+        }
+    } //-- setForceInstrospection
 
     /**
      * Serializes the mapping to the given writer
