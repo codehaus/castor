@@ -200,7 +200,6 @@ public abstract class TransactionContext
      */
     private Database     _db;
 
-
     /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
@@ -335,12 +334,15 @@ public abstract class TransactionContext
             // object has been created in this transaction, it cannot be
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
-                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), identity ) );
+                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getName(), identity ) );
             if ( entry.deleted ) {
                 return null;
             }
-            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), identity ) );
+            // ssa, multi classloader feature
+            // ssa, FIXME : are the two following statement equivalent ?
+//            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
+            if ( ! molder.isAssignableFrom( entry.object.getClass() ) )
+                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), identity ) );
             if ( entry.created )
                 return entry.object;
             if ( ( accessMode == AccessMode.Exclusive ||
@@ -350,7 +352,7 @@ public abstract class TransactionContext
                 // problem. We cannot return an object that is not
                 // synchronized with the database, but we cannot
                 // synchronize a live object.
-                throw new PersistenceException( Messages.format("persist.lockConflict", molder.getJavaClass(), identity ) );
+                throw new PersistenceException( Messages.format("persist.lockConflict", molder.getName(), identity ) );
             }
             return entry.object;
         }
@@ -394,7 +396,7 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized Object load( LockEngine engine, ClassMolder molder, 
-            Object identity, AccessMode accessMode )
+    Object identity, AccessMode accessMode )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
 
         ObjectEntry entry = null;
@@ -417,16 +419,19 @@ public abstract class TransactionContext
             // object has been created in this transaction, it cannot be
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
-                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getJavaClass(), identity ) );
+                throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getName(), identity ) );
             if ( entry.deleted ) 
-                throw new ObjectNotFoundException( "Object is deleted" + molder.getJavaClass() + identity );
-            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getJavaClass(), identity ) );
+                throw new ObjectNotFoundException( "Object is deleted" + molder.getName() + identity );
+            // ssa, multi classloader feature
+            // ssa, FIXME : Are the two following statements equivalent ?
+//            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
+            if ( ! molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( entry.object.getClass() ) )
+                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), identity ) );
             if ( entry.created )
                 return entry.object;
             if ( ( accessMode == AccessMode.Exclusive ||
                    accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
-                throw new PersistenceException( Messages.format("persist.lockConflict", molder.getJavaClass(), identity ) );
+                throw new PersistenceException( Messages.format("persist.lockConflict", molder.getName(), identity ) );
             }
             return entry.object;
         }
@@ -437,7 +442,10 @@ public abstract class TransactionContext
         // report error with the persistence engine.
         accessMode = molder.getAccessMode( accessMode );
         try {
-            object = molder.newInstance(); 
+            // ssa, multi classloader feature    
+            // ssa, FIXME : No better way to do that ?
+            //object = molder.newInstance(); 
+            object = molder.newInstance( _db.getClassLoader() ); 
             entry = addObjectEntry( oid, object );
             oid = engine.load( this, oid, object, accessMode, _lockTimeout );
             // add entry again using new oid
@@ -544,7 +552,7 @@ public abstract class TransactionContext
             throw new PersistenceException("Object to be created is null!");
 
         // Make sure the object has not beed persisted in this transaction.
-        identity = molder.getIdentity( object );
+        identity = molder.getIdentity( this, object );
         // [oleg] In the case where key generator is used,
         // the value of identity is dummy, set it to null
         if ( molder.isKeyGeneratorUsed() ) {
@@ -654,7 +662,7 @@ public abstract class TransactionContext
         ObjectEntry  entry;
         AccessMode   accessMode = null;
 
-        identity = molder.getIdentity( object );
+        identity = molder.getIdentity( this, object );
 
         // Make sure that nobody is looking at the object
         oid = new OID( engine, molder, depended, identity );
@@ -1364,6 +1372,17 @@ public abstract class TransactionContext
             }
             return OBJECT_STATE_TRANSIENT;
         }
+    }
+    
+    /**
+     * Get the current application ClassLoader.
+     *
+     * @return the current ClassLoader's instance. <code>null</code> if none 
+     * has been provided
+     */
+    public ClassLoader getClassLoader () 
+    {
+        return _db.getClassLoader();
     }
 
     /**
