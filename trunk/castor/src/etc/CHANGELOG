@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:    Fixed issue with mapping multiple elements with the same name but
+        different namespace to separate fields.
+        (kvisco - 20030423)
+
 XML:    Added support for constructor arguments for attribute mapped fields.
         Information will be added to the documentation soon.
         (kvisco - 20030422)
