@@ -113,9 +113,8 @@ public final class MaxKeyGenerator implements KeyGenerator
             // with database-dependent keyword for lock
             query = _factory.getQueryExpression();
             query.addColumn( tableName, primKeyName);
-            pk = tableName + JDBCSyntax.TableColumnSeparator + primKeyName;
             query.addCondition( tableName, primKeyName, QueryExpression.OpEquals,
-                    "(SELECT MAX(" + pk + ") FROM " + tableName + ")");
+                    "(SELECT MAX(t1." + primKeyName + ") FROM " + tableName + " t1)");
 
             // SELECT and put lock on the last record
             sql = query.getStatement( true );
