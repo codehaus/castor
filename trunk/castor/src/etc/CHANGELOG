@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1816 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Fixed problem with double quotes in table names (sequence key generator).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1816
+       (Werner - 20041211)
+
 XML:   Added some additional support for nillable fields. There is still
        some more work needed in this area, but this gets us closer.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1723
