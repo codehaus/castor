@@ -429,19 +429,20 @@ public class SourceFactory  {
 	 * @param createMarshall whether or not to create marshalling framework methods
     **/
     public JClass createSourceCode
-        (Group group, SGStateInfo sgInfo, String packageName)
+        (Group group, ClassInfoResolver resolver, String packageName)
     {
 
         String groupName = group.getName();
         if (groupName == null) {
-            groupName = "Group" + sgInfo.getNextGroupNumber();
+            throw new IllegalArgumentException("Currently unnamed groups are not supported.");
+            //groupName = "Group" + sgInfo.getNextGroupNumber();
         }
 
         String className = JavaNaming.toJavaClassName(groupName);
         className = resolveClassName(className, packageName);
 
         FactoryState state
-            = new FactoryState(className, sgInfo, packageName);
+            = new FactoryState(className, resolver, packageName);
 		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
 
@@ -486,8 +487,8 @@ public class SourceFactory  {
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
 
-        sgInfo.bindReference(jClass, classInfo);
-        sgInfo.bindReference(group, classInfo);
+        resolver.bindReference(jClass, classInfo);
+        resolver.bindReference(group, classInfo);
 
         return jClass;
 
@@ -991,7 +992,16 @@ public class SourceFactory  {
                             state.classInfo.setAsSequence();
                         else
                             state.classInfo.setAsAll();
+                    } 
+                    //-- handle named groups
+                    else if (group.getName() != null) {
+                        JClass groupClass 
+                            = createSourceCode(group, state, state.packageName);
+                        fieldInfo = memberFactory.createFieldInfo(group, state);
+                        handleField(fieldInfo, state);
+                        break;    
                     }
+                    
                     processContentModel(group, state);
                     break;
                 //--In case of a ModelGroup:
