@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.jdo.conf;
@@ -9,19 +11,18 @@ package org.exolab.castor.jdo.conf;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Vector;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
-import org.xml.sax.SAXException;
 
 /**
- * @author <a href="http://castor.exolab.org">Castor-XML</a>
+ * 
  * @version $Revision$ $Date$
 **/
 public class Driver implements java.io.Serializable {
@@ -31,20 +32,11 @@ public class Driver implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private String vUrl;
+    private java.lang.String _className;
 
-    /**
-     * 
-    **/
-    private String vClassName;
+    private java.lang.String _url;
 
-    /**
-     * 
-    **/
-    private Vector vParamList;
+    private java.util.Vector _paramList;
 
 
       //----------------/
@@ -52,8 +44,9 @@ public class Driver implements java.io.Serializable {
     //----------------/
 
     public Driver() {
-        vParamList = new Vector();
-    } //-- Driver()
+        super();
+        _paramList = new Vector();
+    } //-- org.exolab.castor.jdo.conf.Driver()
 
 
       //-----------/
@@ -62,129 +55,165 @@ public class Driver implements java.io.Serializable {
 
     /**
      * 
-     * @param deep 
-    **/
-    protected void validate(boolean deep) 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        if (deep) {
-            for (int i = 0; i < vParamList.size(); i++) {
-                Param vParam = (Param) vParamList.elementAt(i);
-                vParam.validate(true);
-            }
-        }
-    } //-- void validate(boolean) 
-
-    /**
-     * 
-     * @param deep 
-    **/
-    public boolean isValid(boolean deep) {
-        try {
-            validate(deep);
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    } //-- boolean isValid(boolean) 
-
-    /**
-     * 
-    **/
-    public String getUrl() {
-        return this.vUrl;
-    } //-- String getUrl() 
-
-    /**
-     * 
-     * @param vUrl 
-    **/
-    public void setUrl(String vUrl) {
-        this.vUrl = vUrl;
-    } //-- void setUrl(String) 
-
-    /**
-     * 
-    **/
-    public String getClassName() {
-        return this.vClassName;
-    } //-- String getClassName() 
-
-    /**
-     * 
-     * @param vClassName
-    **/
-    public void setClassName(String vClassName) {
-        this.vClassName = vClassName;
-    } //-- void setClassName(String) 
-
-
-    /**
-     * 
-     * @param vParam 
+     * @param vParam
     **/
     public void addParam(Param vParam) 
         throws java.lang.IndexOutOfBoundsException
     {
-        vParamList.addElement(vParam);
+        _paramList.addElement(vParam);
     } //-- void addParam(Param) 
 
     /**
+    **/
+    public java.util.Enumeration enumerateParam() {
+        return _paramList.elements();
+    } //-- java.util.Enumeration enumerateParam() 
+
+    /**
+    **/
+    public java.lang.String getClassName() {
+        return this._className;
+    } //-- java.lang.String getClassName() 
+
+    /**
      * 
-     * @param index 
+     * @param index
     **/
     public Param getParam(int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vParamList.size())) {
+        if ((index < 0) || (index > _paramList.size())) {
             throw new IndexOutOfBoundsException();
         }
         
-        return (Param) vParamList.elementAt(index);
+        return (Param) _paramList.elementAt(index);
     } //-- Param getParam(int) 
 
     /**
-     * 
     **/
-    public Param[] getParams() {
-        int size = vParamList.size();
+    public Param[] getParam() {
+        int size = _paramList.size();
         Param[] mArray = new Param[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (Param) vParamList.elementAt(index);
+            mArray[index] = (Param) _paramList.elementAt(index);
         }
         return mArray;
     } //-- Param[] getParam() 
 
     /**
+    **/
+    public int getParamCount() {
+        return _paramList.size();
+    } //-- int getParamCount() 
+
+    /**
+    **/
+    public java.lang.String getUrl() {
+        return this._url;
+    } //-- java.lang.String getUrl() 
+
+    /**
+    **/
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
+
+    /**
      * 
-     * @param vParam 
-     * @param index 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
+    **/
+    public void removeAllParam() {
+        _paramList.removeAllElements();
+    } //-- void removeAllParam() 
+
+    /**
+     * 
+     * @param index
+    **/
+    public Param removeParam(int index) {
+        Object obj = _paramList.elementAt(index);
+        _paramList.removeElementAt(index);
+        return (Param) obj;
+    } //-- Param removeParam(int) 
+
+    /**
+     * 
+     * @param _className
+    **/
+    public void setClassName(java.lang.String _className) {
+        this._className = _className;
+    } //-- void setClassName(java.lang.String) 
+
+    /**
+     * 
+     * @param vParam
+     * @param index
     **/
     public void setParam(Param vParam, int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vParamList.size())) {
+        if ((index < 0) || (index > _paramList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        vParamList.setElementAt(vParam, index);
+        _paramList.setElementAt(vParam, index);
     } //-- void setParam(Param, int) 
 
     /**
      * 
+     * @param _url
     **/
-    public int getParamCount() {
-        return vParamList.size();
-    } //-- int getParamCount() 
+    public void setUrl(java.lang.String _url) {
+        this._url = _url;
+    } //-- void setUrl(java.lang.String) 
 
     /**
      * 
+     * @param reader
     **/
-    public Enumeration listParams() {
-        return vParamList.elements();
-    } //-- Enumeration enumerateParam() 
+    public static org.exolab.castor.jdo.conf.Driver unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.jdo.conf.Driver) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.Driver.class, reader);
+    } //-- org.exolab.castor.jdo.conf.Driver unmarshal(java.io.Reader) 
 
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

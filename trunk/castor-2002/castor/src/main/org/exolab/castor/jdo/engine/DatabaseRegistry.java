@@ -262,6 +262,7 @@ public class DatabaseRegistry
         PersistenceFactory factory;
 
 
+        /*
         org.exolab.castor.xml.util.ClassDescriptorResolverImpl cdr;
 
         try {
@@ -278,12 +279,12 @@ public class DatabaseRegistry
         } catch ( Exception except ) {
             throw new MappingException( except );
         }
+        */
 
 
         unm = new Unmarshaller( Database.class );
-        //
-        unm.setResolver( cdr );
-        //
+        // unm.setResolver( cdr );
+
         try {
             // Load the JDO database configuration file from the specified
             // input source. If the database was already configured, ignore
@@ -317,7 +318,7 @@ public class DatabaseRegistry
                 mapping.setLogWriter( logWriter );
             if ( source.getSystemId() != null )
                 mapping.setBaseURL( source.getSystemId() );
-            mappings = database.getMappings();
+            mappings = database.getMapping();
             for ( int i = 0 ; i < mappings.length ; ++i ) {
                 mapping.loadMapping( mappings[ i ].getHref() );
             }
@@ -340,7 +341,7 @@ public class DatabaseRegistry
                     throw new MappingException( "jdo.missingDriver", database.getDriver().getUrl() );
 
                 props = new Properties();
-                params = database.getDriver().listParams();
+                params = database.getDriver().enumerateParam();
                 while ( params.hasMoreElements() ) {
                     param = (Param) params.nextElement();
                     props.put( param.getName(), param.getValue() );

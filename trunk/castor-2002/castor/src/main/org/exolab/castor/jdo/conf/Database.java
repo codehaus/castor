@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.jdo.conf;
@@ -9,19 +11,18 @@ package org.exolab.castor.jdo.conf;
  //- Imported classes and packages -/
 //---------------------------------/
 
-import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Enumeration;
 import java.util.Vector;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
-import org.xml.sax.SAXException;
 
 /**
- * @author <a href="http://castor.exolab.org">Castor-XML</a>
+ * 
  * @version $Revision$ $Date$
 **/
 public class Database implements java.io.Serializable {
@@ -31,35 +32,17 @@ public class Database implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private String vName;
+    private java.lang.String _engine = "generic";
 
-    /**
-     * 
-    **/
-    private String vEngine;
+    private java.lang.String _name;
 
-    /**
-     * 
-    **/
-    private Driver vDriver;
+    private Driver _driver;
 
-    /**
-     * 
-    **/
-    private DataSource vDataSource;
+    private DataSource _dataSource;
 
-    /**
-     * 
-    **/
-    private Jndi vJndi;
+    private Jndi _jndi;
 
-    /**
-     * 
-    **/
-    private Vector vMappingList;
+    private java.util.Vector _mappingList;
 
 
       //----------------/
@@ -67,8 +50,9 @@ public class Database implements java.io.Serializable {
     //----------------/
 
     public Database() {
-        vMappingList = new Vector();
-    } //-- Database()
+        super();
+        _mappingList = new Vector();
+    } //-- org.exolab.castor.jdo.conf.Database()
 
 
       //-----------/
@@ -77,173 +61,213 @@ public class Database implements java.io.Serializable {
 
     /**
      * 
-     * @param deep 
-    **/
-    protected void validate(boolean deep) 
-        throws org.exolab.castor.xml.ValidationException
-    {
-    } //-- void validate(boolean) 
-
-    /**
-     * 
-     * @param deep 
-    **/
-    public boolean isValid(boolean deep) {
-        try {
-            validate(deep);
-        }
-        catch (org.exolab.castor.xml.ValidationException vex) {
-            return false;
-        }
-        return true;
-    } //-- boolean isValid(boolean) 
-
-    /**
-     * 
-    **/
-    public String getName() {
-        return this.vName;
-    } //-- String getName() 
-
-    /**
-     * 
-     * @param vName 
-    **/
-    public void setName(String vName) {
-        this.vName = vName;
-    } //-- void setName(String) 
-
-    /**
-     * 
-    **/
-    public String getEngine() {
-        return this.vEngine;
-    } //-- String getEngine() 
-
-    /**
-     * 
-     * @param vEngine 
-    **/
-    public void setEngine(String vEngine) {
-        this.vEngine = vEngine;
-    } //-- void setEngine(String) 
-
-    /**
-     * 
-     * @param vDriver 
-    **/
-    public void setDriver(Driver vDriver) 
-    {
-        this.vDriver = vDriver;
-    } //-- void setDriver(Driver) 
-
-    /**
-     * 
-    **/
-    public Driver getDriver() 
-    {
-        return vDriver;
-    } //-- Driver getDriver() 
-
-
-    /**
-     * 
-     * @param vDataSource 
-    **/
-    public void setDataSource(DataSource vDataSource) 
-    {
-        this.vDataSource = vDataSource;
-    } //-- void setDataSource(DataSource) 
-
-    /**
-     * 
-    **/
-    public DataSource getDataSource() 
-    {
-        return vDataSource;
-    } //-- DataSource getDataSource() 
-
-    /**
-     * 
-     * @param vJndi
-    **/
-    public void setJndi(Jndi vJndi) 
-    {
-        this.vJndi = vJndi;
-    } //-- void setJndi(Jndi) 
-
-    /**
-     * 
-    **/
-    public Jndi getJndi() 
-    {
-        return vJndi;
-    } //-- Jndi getJndi() 
-
-    /**
-     * 
-     * @param vMapping 
+     * @param vMapping
     **/
     public void addMapping(Mapping vMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
-        vMappingList.addElement(vMapping);
+        _mappingList.addElement(vMapping);
     } //-- void addMapping(Mapping) 
 
     /**
+    **/
+    public java.util.Enumeration enumerateMapping() {
+        return _mappingList.elements();
+    } //-- java.util.Enumeration enumerateMapping() 
+
+    /**
+    **/
+    public DataSource getDataSource() {
+        return this._dataSource;
+    } //-- DataSource getDataSource() 
+
+    /**
+    **/
+    public Driver getDriver() {
+        return this._driver;
+    } //-- Driver getDriver() 
+
+    /**
+    **/
+    public java.lang.String getEngine() {
+        return this._engine;
+    } //-- java.lang.String getEngine() 
+
+    /**
+    **/
+    public Jndi getJndi() {
+        return this._jndi;
+    } //-- Jndi getJndi() 
+
+    /**
      * 
-     * @param index 
+     * @param index
     **/
     public Mapping getMapping(int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vMappingList.size())) {
+        if ((index < 0) || (index > _mappingList.size())) {
             throw new IndexOutOfBoundsException();
         }
         
-        return (Mapping) vMappingList.elementAt(index);
+        return (Mapping) _mappingList.elementAt(index);
     } //-- Mapping getMapping(int) 
 
     /**
-     * 
     **/
-    public Mapping[] getMappings() {
-        int size = vMappingList.size();
+    public Mapping[] getMapping() {
+        int size = _mappingList.size();
         Mapping[] mArray = new Mapping[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (Mapping) vMappingList.elementAt(index);
+            mArray[index] = (Mapping) _mappingList.elementAt(index);
         }
         return mArray;
-    } //-- Mapping[] getMappings() 
+    } //-- Mapping[] getMapping() 
+
+    /**
+    **/
+    public int getMappingCount() {
+        return _mappingList.size();
+    } //-- int getMappingCount() 
+
+    /**
+    **/
+    public java.lang.String getReferenceId() {
+        return this._name;
+    } //-- java.lang.String getReferenceId() 
+
+    /**
+    **/
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
+
+    /**
+    **/
+    public boolean isValid() {
+        try {
+            validate();
+        }
+        catch (org.exolab.castor.xml.ValidationException vex) {
+            return false;
+        }
+        return true;
+    } //-- boolean isValid() 
 
     /**
      * 
-     * @param vMapping 
-     * @param index 
+     * @param out
+    **/
+    public void marshal(java.io.Writer out) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
+
+    /**
+     * 
+     * @param handler
+    **/
+    public void marshal(org.xml.sax.DocumentHandler handler) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        //-- we must have a valid element before marshalling
+        //validate(false);
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
+
+    /**
+    **/
+    public void removeAllMapping() {
+        _mappingList.removeAllElements();
+    } //-- void removeAllMapping() 
+
+    /**
+     * 
+     * @param index
+    **/
+    public Mapping removeMapping(int index) {
+        Object obj = _mappingList.elementAt(index);
+        _mappingList.removeElementAt(index);
+        return (Mapping) obj;
+    } //-- Mapping removeMapping(int) 
+
+    /**
+     * 
+     * @param _dataSource
+    **/
+    public void setDataSource(DataSource _dataSource) {
+        this._dataSource = _dataSource;
+    } //-- void setDataSource(DataSource) 
+
+    /**
+     * 
+     * @param _driver
+    **/
+    public void setDriver(Driver _driver) {
+        this._driver = _driver;
+    } //-- void setDriver(Driver) 
+
+    /**
+     * 
+     * @param _engine
+    **/
+    public void setEngine(java.lang.String _engine) {
+        this._engine = _engine;
+    } //-- void setEngine(java.lang.String) 
+
+    /**
+     * 
+     * @param _jndi
+    **/
+    public void setJndi(Jndi _jndi) {
+        this._jndi = _jndi;
+    } //-- void setJndi(Jndi) 
+
+    /**
+     * 
+     * @param vMapping
+     * @param index
     **/
     public void setMapping(Mapping vMapping, int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > vMappingList.size())) {
+        if ((index < 0) || (index > _mappingList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        vMappingList.setElementAt(vMapping, index);
+        _mappingList.setElementAt(vMapping, index);
     } //-- void setMapping(Mapping, int) 
 
     /**
      * 
+     * @param _name
     **/
-    public int getMappingCount() {
-        return vMappingList.size();
-    } //-- int getMappingCount() 
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
 
     /**
      * 
+     * @param reader
     **/
-    public Enumeration listMappings() {
-        return vMappingList.elements();
-    } //-- Enumeration listMappings() 
+    public static org.exolab.castor.jdo.conf.Database unmarshal(java.io.Reader reader) 
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        return (org.exolab.castor.jdo.conf.Database) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.Database.class, reader);
+    } //-- org.exolab.castor.jdo.conf.Database unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }
