@@ -61,7 +61,8 @@ import org.exolab.castor.jdo.desc.Relation;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.persist.Persistence;
-import org.exolab.castor.persist.Query;
+import org.exolab.castor.persist.PersistenceQuery;
+import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.ObjectNotFoundException;
@@ -181,9 +182,10 @@ class SQLEngine
     }
 
 
-    Query createQuery( String sql, Class[] types )
+    public PersistenceQuery createQuery( String query, Class[] types )
+	throws QueryException
     {
-	return new SQLQuery( this, types, sql );
+	return new SQLQuery( this, query, types );
     }
 
 
@@ -810,7 +812,7 @@ class SQLEngine
 
 
     static class SQLQuery
-	implements Query
+	implements PersistenceQuery
     {
 
 
@@ -829,7 +831,7 @@ class SQLEngine
 	private String    _sql;
 
 
-	SQLQuery( SQLEngine engine, Class[] types, String sql )
+	SQLQuery( SQLEngine engine, String sql, Class[] types )
 	{
 	    _engine = engine;
 	    _types = types;
@@ -859,9 +861,9 @@ class SQLEngine
 	}
 
 
-	public ObjectDesc getObjectDesc()
+	public Class getResultType()
 	{
-	    return _engine.getObjectDesc();
+	    return _engine.getObjectDesc().getObjectType();
 	}
 
 
