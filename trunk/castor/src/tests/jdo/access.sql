@@ -26,7 +26,7 @@ drop table test_group;
 create table test_group ( id int not null, "value1" varchar(200)  not null );
 create unique index test_group_pk on test_group ( id );
 drop table test_types;
-create table test_types ( id int not null, tdt date not null, ttm date not null, int_val integer null, long_val numeric(18,0) null, char_val char(1) null, bool_val char(1) null );
+create table test_types ( id int not null, tdt date not null, ttm date not null, int_val integer null, long_val numeric(18,0) null, char_val char(1) null, bool_val char(1) null, bool_is_method char(1) null );
 create unique index test_types_pk on test_types ( id );
 drop table test_keygen;
 create table test_keygen ( id int not null, attr  varchar(200)  not null );

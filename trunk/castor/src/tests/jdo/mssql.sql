@@ -366,6 +366,7 @@ create table test_types (
   long_val numeric(18,0)  null,
   char_val char(1)        null,
   bool_val char(1)        null,
+  bool_is_method char(1)  null,
   int_date integer        null,
   str_time char(23)       null,
   num_date numeric(17,0)  null,

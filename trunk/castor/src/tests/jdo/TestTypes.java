@@ -47,7 +47,6 @@
 package jdo;
 
 
-import java.math.BigDecimal;
 import java.sql.Clob;
 import java.io.InputStream;
 
@@ -75,8 +74,11 @@ public class TestTypes
 
 
     private boolean        _intExists = false;
-
-
+    
+    
+    private boolean        _boolIsMethod;
+    
+    
     private Long           _longValue;
 
 
@@ -99,7 +101,7 @@ public class TestTypes
 
 
     private java.util.Date _time2;
-
+    
 
     private java.util.Date _timestamp2;
 
@@ -377,6 +379,12 @@ public class TestTypes
     {
         return "" + _id;
     }
-
-
+    
+    public void setBoolIsMethod(boolean boolIsMethod){
+        _boolIsMethod = boolIsMethod;
+    }
+    
+    public boolean isBoolIsMethod(){
+        return _boolIsMethod;
+    }
 }
