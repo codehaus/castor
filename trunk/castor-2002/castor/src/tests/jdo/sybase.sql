@@ -138,7 +138,6 @@ drop table test_keygen
 go
 create table test_keygen (
   id   int          not null,
-  int_val int       not null,
   attr varchar(200) not null
 )
 go

@@ -92,7 +92,6 @@ grant all on test_types to test;
 drop table   test_keygen;
 create table test_keygen (
   id    int           not null,
-  int_val int         not null,
   attr  varchar(200)  not null
 );
 create unique index test_keygen_pk
