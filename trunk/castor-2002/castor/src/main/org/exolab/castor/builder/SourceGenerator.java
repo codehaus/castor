@@ -367,10 +367,9 @@ public class SourceGenerator {
     public void generateSource(String filename, String packageName)
         throws java.io.FileNotFoundException
     {
-
-        FileReader reader = new FileReader(new File(filename));
+        FileReader reader = new FileReader(filename);
         InputSource source = new InputSource(reader);
-        source.setSystemId(toURIRepresentation(filename));
+        source.setSystemId(toURIRepresentation((new File(filename)).getAbsolutePath()));
         generateSource(source, packageName);
         try {
             reader.close();
