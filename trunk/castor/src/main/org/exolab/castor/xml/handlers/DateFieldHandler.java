@@ -98,10 +98,24 @@ public class DateFieldHandler extends XMLFieldHandler {
     /**
      * The local timezone offset from UTC
      */
-	private static int TIMEZONE_OFFSET = TimeZone.getDefault().getRawOffset();
+	private static TimeZone TIMEZONE = TimeZone.getDefault();
+	
+    /**
+     * A boolean to indicate that the TimeZone can be suppressed
+     * if the TimeZone is equivalent to the "default" timezone.
+     */
+    private static boolean _allowTimeZoneSuppression = false;
+    
+    /**
+     * Always use UTC time
+     */
+    private static boolean _alwaysUseUTC = false;
 
-    private FieldHandler handler = null;
-
+    /**
+     * The nested FieldHandler
+     */
+    private FieldHandler _handler = null;
+    
     //----------------/
     //- Constructors -/
     //----------------/
@@ -118,7 +132,7 @@ public class DateFieldHandler extends XMLFieldHandler {
                 "the constructor of DateFieldHandler must not be null.";
             throw new IllegalArgumentException(err);
         }
-        this.handler = fieldHandler;
+        _handler = fieldHandler;
     } //-- DateFieldHandler
 
 
@@ -138,7 +152,7 @@ public class DateFieldHandler extends XMLFieldHandler {
         throws java.lang.IllegalStateException
     {
 
-        Object val = handler.getValue(target);
+        Object val = _handler.getValue(target);
 
         if (val == null) return val;
 
@@ -195,14 +209,14 @@ public class DateFieldHandler extends XMLFieldHandler {
         }
         else date = (Date)value;
 
-        handler.setValue(target, date);
+        _handler.setValue(target, date);
 
     } //-- setValue
 
     public void resetValue(Object target)
         throws java.lang.IllegalStateException
     {
-        handler.resetValue(target);
+        _handler.resetValue(target);
     }
 
 
@@ -235,7 +249,7 @@ public class DateFieldHandler extends XMLFieldHandler {
     public Object newInstance( Object parent )
         throws IllegalStateException
     {
-        Object obj = handler.newInstance( parent );
+        Object obj = _handler.newInstance( parent );
         if (obj == null) obj = new Date();
         return obj;
     } //-- newInstance
@@ -252,9 +266,46 @@ public class DateFieldHandler extends XMLFieldHandler {
         if (obj == null) return false;
         if (obj == this) return true;
         if (!(obj instanceof FieldHandler)) return false;
-        return (handler.getClass().isInstance(obj) ||
+        return (_handler.getClass().isInstance(obj) ||
                 getClass().isInstance(obj));
     } //-- equals
+
+
+    /**
+     * Sets whether or not UTC time should always be used when
+     * marshalling out xsd:dateTime values.
+     */
+    public static void setAllowTimeZoneSuppression(boolean allowTimeZoneSuppression) {
+        _allowTimeZoneSuppression = allowTimeZoneSuppression;
+    } //-- setAlwaysUseUTCTime
+
+    /**
+     * Sets whether or not UTC time should always be used when
+     * marshalling out xsd:dateTime values.
+     */
+    public static void setAlwaysUseUTCTime(boolean alwaysUseUTC) {
+        _alwaysUseUTC = alwaysUseUTC;
+    } //-- setAlwaysUseUTCTime
+    
+    /**
+     * Sets the default TimeZone used for comparing dates when marshalling out 
+     * xsd:dateTime values using this handler. This is used when determining
+     * if the timezone can be omitted when marshalling.
+     *
+	 * Default is JVM default returned by TimeZone.getDefault()
+     * @param timeZone TimeZone to use instead of JVM default
+     * @see setAllowTimeZoneSuppression
+     */
+	public static void setDefaultTimeZone(TimeZone timeZone)
+	{
+	    if (timeZone == null) {
+	        //-- reset timezone to the default
+	        TIMEZONE = TimeZone.getDefault();
+		}
+		else {
+		    TIMEZONE = (TimeZone)timeZone.clone();
+		}
+	} //-- setDefaultTimeZone
 
     //-------------------/
     //- Private Methods -/
@@ -477,8 +528,9 @@ public class DateFieldHandler extends XMLFieldHandler {
             cal.setTimeZone(tz);
         }
         else {
-            TimeZone tz = cal.getTimeZone();
-            tz.setRawOffset(TIMEZONE_OFFSET);
+            //TimeZone tz = cal.getTimeZone();
+            cal.setTimeZone((TimeZone)TIMEZONE.clone());
+            //tz.setRawOffset(TIMEZONE_OFFSET);
         }
         
         return cal.getTime();
@@ -496,8 +548,13 @@ public class DateFieldHandler extends XMLFieldHandler {
 
         StringBuffer buffer = null;
         //-- Year: CCYY
-        Calendar cal = new GregorianCalendar();
+        GregorianCalendar cal = new GregorianCalendar();
         cal.setTime(date);
+        
+        if (_alwaysUseUTC) {
+            cal.setTimeZone(TimeZone.getTimeZone(UTC_TIMEZONE));
+        }
+        
         int value   = cal.get(Calendar.YEAR);
         if (value > 9999) {
             buffer = new StringBuffer(DEFAULT_DATE_LENGTH+2);
@@ -563,27 +620,37 @@ public class DateFieldHandler extends XMLFieldHandler {
         if (value == 0) {
             buffer.append('Z'); // UTC
         }
-        else if (value != TIMEZONE_OFFSET) {
-            if (value > 0) 
-                buffer.append('+');
-            else {
-                value = 0-value;
-                buffer.append('-');
+        else {
+            boolean useTimeZoneOffset = true;
+            if (_allowTimeZoneSuppression) {
+                useTimeZoneOffset = (value != TIMEZONE.getRawOffset());
             }
             
-            //-- convert to minutes from milliseconds
-            int minutes = value / 60000;
-            
-            //-- hours: hh
-            value = minutes / 60;
-            if (value < 10) buffer.append('0');
-            buffer.append(value);
-            buffer.append(':');
-            
-            //-- remaining minutes: mm
-            value = minutes % 60;
-            if (value < 10) buffer.append('0');
-            buffer.append(value);
+            if (useTimeZoneOffset) {
+                //-- adjust for Daylight Savings Time
+                value = value + cal.get(Calendar.DST_OFFSET);
+                
+                if (value > 0) 
+                    buffer.append('+');
+                else {
+                    value = 0-value;
+                    buffer.append('-');
+                }
+                
+                //-- convert to minutes from milliseconds
+                int minutes = value / 60000;
+                
+                //-- hours: hh
+                value = minutes / 60;
+                if (value < 10) buffer.append('0');
+                buffer.append(value);
+                buffer.append(':');
+                
+                //-- remaining minutes: mm
+                value = minutes % 60;
+                if (value < 10) buffer.append('0');
+                buffer.append(value);
+            }
         }
         return buffer.toString();
     } //-- format
@@ -605,20 +672,6 @@ public class DateFieldHandler extends XMLFieldHandler {
         return object.toString();
     } //-- format
      
-
-    /**
-     * Sets the TimeZone used when marshalling out xsd:dateTime values using this handler
-	 * Default is JVM default returned by TimeZone.getDefault()
-     * @param timeZone TimeZone to use instead of JVM default
-    **/
-	public static void setDefaultTimeZone(TimeZone timeZone)
-	{
-	    if (timeZone == null) {
-	        timeZone = TimeZone.getDefault();
-		}
-	    TIMEZONE_OFFSET = timeZone.getRawOffset();
-	} //-- setDefaultTimeZone
-
 } //-- DateFieldHandler
 
 
