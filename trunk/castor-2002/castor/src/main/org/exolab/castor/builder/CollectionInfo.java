@@ -133,19 +133,22 @@ public class CollectionInfo extends FieldInfo {
         JSourceCode jsc = null;
 
           //---------------------/
-         //- Create add method -/
+         //- Create add methods -/
         //---------------------/
 
         String cName = JavaNaming.toJavaClassName(getElementName());
+        method = new JMethod(null, "add"+cName);
+        jClass.addMethod(method);
+        method.addException(SGTypes.IndexOutOfBoundsException);
+        method.addParameter(contentParam);
+        createAddMethod(method);
 
         method = new JMethod(null, "add"+cName);
         jClass.addMethod(method);
-
         method.addException(SGTypes.IndexOutOfBoundsException);
+		method.addParameter(new JParameter(JType.Int, "index"));
         method.addParameter(contentParam);
-
-        createAddMethod(method);
-
+        createAddInsertMethod(method);
 
           //---------------------/
          //- Create get method -/
@@ -322,6 +325,39 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(".addElement(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
+
+        //-- bound properties
+        if (isBound())
+            createBoundPropertyCode(jsc);
+
+    } //-- createAddMethod
+
+    /**
+     * Creates implementation of add method with an index.
+     *
+     * @param method the JMethod in which to create the source
+     * code.
+    **/
+    public void createAddInsertMethod(JMethod method) {
+
+        JSourceCode jsc = method.getSourceCode();
+
+        int maxSize = getXSList().getMaximumSize();
+        if (maxSize > 0) {
+            jsc.add("if (!(");
+            jsc.append(getName());
+            jsc.append(".size() < ");
+            jsc.append(Integer.toString(maxSize));
+            jsc.append(")) {");
+            jsc.indent();
+            jsc.add("throw new IndexOutOfBoundsException();");
+            jsc.unindent();
+            jsc.add("}");
+        }
+        jsc.add(getName());
+        jsc.append(".insertElementAt(");
+        jsc.append(getContentType().createToJavaObjectCode(getContentName()));
+		jsc.append(", index);");
 
         //-- bound properties
         if (isBound())
