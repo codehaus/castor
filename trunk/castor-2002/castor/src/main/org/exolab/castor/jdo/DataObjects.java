@@ -80,28 +80,6 @@ public interface DataObjects
 
 
     /**
-     * Returns the log writer for this database source.
-     * <p>
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
-     *
-     * @return The log writer, null if disabled
-     */
-    public PrintWriter getLogWriter();
-
-
-    /**
-     * Sets the log writer for this database source.
-     * <p>
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
-     *
-     * @param logWriter The log writer, null if disabled
-     */
-    public void setLogWriter( PrintWriter logWriter );
-
-
-    /**
      * Sets the description of this database.
      *
      * @param description The description of this database

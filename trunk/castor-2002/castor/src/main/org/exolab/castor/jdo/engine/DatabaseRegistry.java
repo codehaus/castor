@@ -47,7 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.PrintWriter;
 import java.io.IOException;
 import java.util.Properties;
 import java.util.Hashtable;
@@ -73,6 +72,7 @@ import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.DTDResolver;
 
 
@@ -152,19 +152,19 @@ public class DatabaseRegistry
      * @param factory Factory for persistence engines
      * @param jdbcURL The JDBC URL
      * @param jdbcProps The JDBC properties
-     * @param logWriter For tracing messages
+     * @param logInterceptor For tracing messages
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
     DatabaseRegistry( String name, MappingResolver mapResolver, PersistenceFactory factory,
-                      String jdbcUrl, Properties jdbcProps, PrintWriter logWriter )
+                      String jdbcUrl, Properties jdbcProps, LogInterceptor logInterceptor )
         throws MappingException
     {
         _name = name;
         _mapResolver = mapResolver;
         _jdbcUrl = jdbcUrl;
         _jdbcProps = jdbcProps;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logWriter );
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logInterceptor );
         _byEngine.put( _engine, this );
     }
 
@@ -176,18 +176,18 @@ public class DatabaseRegistry
      * @param mapResolver The mapping resolver
      * @param factory Factory for persistence engines
      * @param dataSource The data source
-     * @param logWriter For tracing messages
+     * @param logInterceptor For tracing messages
      * @throws MappingException Error occured when creating
      *  persistence engines for the mapping descriptors
      */
     DatabaseRegistry( String name, MappingResolver mapResolver, PersistenceFactory factory,
-                    DataSource dataSource, PrintWriter logWriter )
+                    DataSource dataSource, LogInterceptor logInterceptor )
         throws MappingException
     {
         _name = name;
         _mapResolver = mapResolver;
         _dataSource = dataSource;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logWriter );
+        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logInterceptor );
         _byEngine.put( _engine, this );
     }
 
@@ -206,7 +206,7 @@ public class DatabaseRegistry
 
 
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
-                                                  PrintWriter logWriter, ClassLoader loader )
+                                                  LogInterceptor logInterceptor, ClassLoader loader )
         throws MappingException
     {
         Unmarshaller       unm;
@@ -225,8 +225,6 @@ public class DatabaseRegistry
                 unm.setEntityResolver( new DTDResolver() );
             else
                 unm.setEntityResolver( new DTDResolver( resolver ) );
-            if ( logWriter != null )
-                unm.setLogWriter( logWriter );
             database = (Database) unm.unmarshal( source );
             if ( _databases.get( database.getName() ) != null )
                 return;
@@ -246,8 +244,6 @@ public class DatabaseRegistry
             mapping = new Mapping( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
-            if ( logWriter != null )
-                mapping.setLogWriter( logWriter );
             if ( source.getSystemId() != null )
                 mapping.setBaseURL( source.getSystemId() );
             mappings = database.enumerateMapping();
@@ -278,7 +274,7 @@ public class DatabaseRegistry
                     props.put( param.getName(), param.getValue() );
                 }
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
-                                            database.getDriver().getUrl(), props, logWriter );
+                                            database.getDriver().getUrl(), props, logInterceptor );
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
                 // DataSource which was configured from the JDO configuration file
@@ -289,7 +285,7 @@ public class DatabaseRegistry
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
-                                            ds, logWriter );
+                                            ds, logInterceptor );
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
                 // locate the DataSource object frome the JNDI namespace and use it.
@@ -306,7 +302,7 @@ public class DatabaseRegistry
                     throw new MappingException( "jdo.jndiNameNotFound", database.getJndi().getName() );
 
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO ), factory,
-                                            (DataSource) ds, logWriter );
+                                            (DataSource) ds, logInterceptor );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }

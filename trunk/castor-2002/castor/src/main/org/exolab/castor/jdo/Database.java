@@ -104,31 +104,63 @@ public interface Database
 
 
     /**
-     * Read only access. Objects can be read but are not made persistent
-     * and changes to objects are not reflected in the database.
+     * Read only access. Used with queries and the {@link #load}
+     * method to load objects as read-only.
+     * <p>
+     * Read-only objects are not persistent and changes to these
+     * objects are not reflected in the database when the transaction
+     * commits.
      */
     public static final short ReadOnly = 0;
 
 
     /**
-     * Shared access. Objects can be read by multiple concurrent
-     * transactions. Equivalent to optimistic locking.
+     * Shared access. Used with queries and the {@link #load}
+     * method to load objects with shared access.
+     * <p>
+     * Shared access allows the same record to be accessed by two
+     * concurrent transactions, each with it's own view (object).
+     * <p>
+     * These objects acquire a read lock which escalated to a write
+     * lock when the transaction commits if the object has been
+     * modified. Dirty checking is enabled for all fields marked
+     * as such, and a cached copy is used to populate the object.
      */
     public static final short Shared = 1;
 
 
     /**
-     * Exclusive access. Objects can be access by a single transaction
-     * at any given time. Equivalent to pessimistic locking.
+     * Exclusive access. Used with queries and the {@link #load}
+     * method to load objects with exclusive access.
+     * <p>
+     * Exclusive access prevents two concurrent transactions from
+     * accessing the same record. In exclusive mode objects acquire
+     * a write lock, and concurrent transactions will block until
+     * the lock is released at commit time.
+     * <p>
+     * Dirty checking is enabled for all fields marked as such.
+     * When an object is first loaded in the transaction, it will
+     * be synchronized with the database and not populated from
+     * the cache.
      */
     public static final short Exclusive = 2;
 
 
     /**
-     * Locked access. Objects can be access by a single transaction
-     * at any given time, and a lock is acquired in the database.
+     * Database lock access. Used with queries and the {@link #load}
+     * method to load objects with a database lock.
+     * <p>
+     * Database lock prevents two concurrent transactions from
+     * accessing the same record either through Castor or direct
+     * database access by acquiring a write lock in the select
+     * statement. Concurrent transactions will block until the lock
+     * is released at commit time.
+     * <p>
+     * When an object is first loaded in the transaction, it will
+     * be synchronized with the database and not populated from
+     * the cache. Dirty checking is not required.
      */
-    public static final short Locked = 3;
+    public static final short DbLocked = 3;
 
 
     /**

@@ -47,7 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.PrintWriter;
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.SystemException;
@@ -71,6 +70,7 @@ import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -108,10 +108,9 @@ public class DatabaseImpl
 
 
     /**
-     * The log writer is a character output stream to which all
-     * logging and tracing messages will be printed.
+     * The log interceptor to which all logging and tracing messages will be sent.
      */
-    private PrintWriter        _logWriter;
+    private LogInterceptor    _logInterceptor;
 
 
     /**
@@ -127,7 +126,7 @@ public class DatabaseImpl
     private Transaction         _transaction;
 
 
-    public DatabaseImpl( String dbName, int lockTimeout, PrintWriter logWriter,
+    public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
                          Transaction transaction )
         throws DatabaseNotFoundException
     {
@@ -141,16 +140,13 @@ public class DatabaseImpl
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );
-        if ( logWriter != null ) {
-            _logWriter = logWriter;
-            _dbEngine.setLogWriter( _logWriter );
-        }
+        _logInterceptor = logInterceptor;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
 
         _transaction = transaction;
         if ( _transaction != null ) {
-            _ctx = new TransactionContextImpl();
+            _ctx = new TransactionContextImpl( true );
             _ctx.setLockTimeout( _lockTimeout );
         }
     }
@@ -226,8 +222,8 @@ public class DatabaseImpl
         case Exclusive:
             mode = AccessMode.Exclusive;
             break;
-        case Locked:
-            mode = AccessMode.Locked;
+        case DbLocked:
+            mode = AccessMode.DbLocked;
             break;
         default:
             throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
@@ -361,7 +357,7 @@ public class DatabaseImpl
 
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
-        _ctx = new TransactionContextImpl();
+        _ctx = new TransactionContextImpl( false );
         _ctx.setLockTimeout( _lockTimeout );
     }
 
@@ -410,21 +406,21 @@ public class DatabaseImpl
             try {
                 _transaction.setRollbackOnly();
             } catch ( SystemException except ) {
-                if ( _logWriter != null )
-                    _logWriter.println( except );
+                if ( _logInterceptor != null )
+                    _logInterceptor.exception( except );
             }
             return;
         }
         try {
             _ctx.prepare();
         } catch ( TransactionAbortedException except ) {
-            if ( _logWriter != null )
-                _logWriter.println( except );
+            if ( _logInterceptor != null )
+                _logInterceptor.exception( except );
             try {
                 _transaction.setRollbackOnly();
             } catch ( SystemException except2 ) {
-                if ( _logWriter != null )
-                    _logWriter.println( except2 );
+                if ( _logInterceptor != null )
+                    _logInterceptor.exception( except2 );
             }
             _ctx.rollback();
         }
@@ -444,8 +440,8 @@ public class DatabaseImpl
             try {
                 _ctx.commit();
             } catch ( TransactionAbortedException except ) {
-                if ( _logWriter != null )
-                    _logWriter.println( except );
+                if ( _logInterceptor != null )
+                    _logInterceptor.exception( except );
             }
             _ctx = null;
             return;
@@ -467,19 +463,6 @@ public class DatabaseImpl
     public void checkpoint()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
-        // If inside XA transation throw IllegalStateException
-        if ( _ctx == null || ! _ctx.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
-        if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
-        try {
-            _ctx.checkpoint();
-        } catch ( TransactionAbortedException except ) {
-            _ctx.rollback();
-            _ctx = null;
-            throw except;
-        }
-
     }
 
 
