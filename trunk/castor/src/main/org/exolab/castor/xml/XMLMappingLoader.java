@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004(C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -218,6 +218,7 @@ public class XMLMappingLoader
         if (clsMap.getAutoComplete()) {
 
             XMLClassDescriptor referenceDesc = null;
+            
             Class type = xmlClassDesc.getJavaClass();
             
             //-- check compiled descriptors 
@@ -229,6 +230,11 @@ public class XMLMappingLoader
                 Introspector introspector = new Introspector();
                 try {
                     referenceDesc = introspector.generateClassDescriptor(type);
+                    if (clsMap.getExtends() != null) {
+                        //-- clear parent from introspected descriptor since
+                        //-- a mapping was provided in the mapping file
+                        ((XMLClassDescriptorImpl)referenceDesc).setExtends(null);
+                    }
                 } catch (MarshalException mx) {
                     String error = "unable to introspect class '" + 
                         type.getName() + "' for auto-complete: ";
@@ -241,6 +247,7 @@ public class XMLMappingLoader
             if (clsMap.getIdentityCount() > 0)
                 identity = clsMap.getIdentity(0);
 
+            
             FieldDescriptor[] fields = xmlClassDesc.getFields();
 
             // Attributes
