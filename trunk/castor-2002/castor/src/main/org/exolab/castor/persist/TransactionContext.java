@@ -712,7 +712,7 @@ public abstract class TransactionContext
         // Make sure that nobody is looking at the object
         oid = new OID( engine, molder, depended, identity );
         entry = getObjectEntry( engine, oid );
-        if ( _autoStore && entry.object == object )
+        if ( _autoStore && entry != null && entry.object == object )
             return entry.oid;
 
         if ( entry != null ) {
