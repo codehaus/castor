@@ -1719,7 +1719,7 @@ public class ClassMolder {
         long lockTimestamp = locker.getTimeStamp();
         long objectTimestamp = _timeStampable? ((TimeStampable)object).jdoGetTimeStamp(): 1;
 
-        if ( objectTimestamp > 0 ) {
+        if ( objectTimestamp > 0 && oid.getIdentity() != null ) {
             // valid range of timestamp
 
             if ( _timeStampable && objectTimestamp != lockTimestamp )
@@ -2529,6 +2529,25 @@ public class ClassMolder {
      */
     public CallbackInterceptor getCallback() {
         return _callback;
+    }
+
+    /**
+     * Test if the specified identity is the default value of the type.
+     */
+    public boolean isDefaultIdentity( Object identity ) {
+
+        if ( _ids.length == 1 )
+            return _ids[0].isDefault( identity );
+
+        if ( identity == null )
+            return true;
+
+        Complex c = (Complex) identity;
+        for ( int i = 0; i < c.size(); i++ ) {
+            if ( !_ids[i].isDefault( c.get(i) ) )
+                return false;
+        }
+        return true;
     }
 
     /**
