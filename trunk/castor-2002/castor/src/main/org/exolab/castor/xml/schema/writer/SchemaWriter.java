@@ -64,124 +64,124 @@ import org.apache.xml.serialize.Serializer;
  * @version $Revision$ $Date$
 **/
 public class SchemaWriter {
-    
+
     private DocumentHandler   _handler = null;
-    
+
     private AttributeListImpl _atts = new AttributeListImpl();
-        
+
     public static boolean enable = false;
-    
+
     /**
      * Creates a new SchemaWriter for the given Writer
      *
-     * @param writer the Writer to serialize to 
+     * @param writer the Writer to serialize to
     **/
-    public SchemaWriter(Writer writer) 
+    public SchemaWriter(Writer writer)
         throws IOException
     {
         if (!enable) unsupported();
-            
+
         Serializer serializer = Configuration.getSerializer();
 
         if (serializer == null)
             throw new IOException("Unable to obtain serailizer");
 
         serializer.setOutputCharStream( writer );
-        
+
         DocumentHandler handler = serializer.asDocumentHandler();
-        
+
         if ( handler == null ) {
             String err = "The following serializer is not SAX capable: ";
             err += serializer.getClass().getName();
             err += "; cannot proceed.";
             throw new IOException( err );
         }
-        
+
         _handler = handler;
-        
+
     } //-- SchemaWriter
-    
+
     /**
      * Creates a new SchemaWriter for the given DocumentHandler
      *
      * @param handler the DocumentHandler to send events to
     **/
     public SchemaWriter(DocumentHandler handler) {
-        
+
         if (!enable) unsupported();
-        
+
         if (handler == null)
             throw new IllegalArgumentException("DocumentHandler must not be null.");
-                    
+
         _handler = handler;
-        
+
     } //-- SchemaWriter
-    
+
     private static final void unsupported() {
         String err = "This class is not yet supported. " +
             " If you really wish to use it, and you promise not to " +
             " complain about unsupported features, then set " +
             " SchemaWriter.enable to true, before you attempt to construct " +
             " this class.";
-            
+
        throw new IllegalStateException ( err );
     }
-    
-    public void write(Schema schema) 
+
+    public void write(Schema schema)
         throws SAXException
     {
         if (schema == null)
             throw new IllegalArgumentException("Schema must not be null.");
-            
-          
+
+
         processSchema(schema);
-        
+
     } //-- write
-    
+
 
     /**
      * Processes the given annotated structure into events
      *
      * @param annotated the annotated structure to process into events
     **/
-    private void processAnnotated(Annotated annotated) 
+    private void processAnnotated(Annotated annotated)
         throws SAXException
     {
         Enumeration enum = annotated.getAnnotations();
         while (enum.hasMoreElements())
             processAnnotation( (Annotation) enum.nextElement() );
-            
+
     } //-- processAnnotated
-    
+
     /**
      * Processes the given annotation into events
      *
      * @param annotation the annotation to process into events
     **/
-    private void processAnnotation(Annotation annotation) 
+    private void processAnnotation(Annotation annotation)
         throws SAXException
     {
-        
+
         _atts.clear();
-        
-        String ELEMENT_NAME = "xsd:annotation";
-        
+
+        String ELEMENT_NAME = "xs:annotation";
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         Enumeration enum = annotation.getDocumentation();
         while (enum.hasMoreElements()) {
             Documentation doc = (Documentation) enum.nextElement();
             String content = doc.getContent();
             if ((content != null) && (content.length() > 0)) {
                 char[] chars = content.toCharArray();
-                _handler.startElement("xsd:documentation", _atts);
+                _handler.startElement("xs:documentation", _atts);
                 _handler.characters(chars, 0, chars.length);
-                _handler.endElement("xsd:documentation");
+                _handler.endElement("xs:documentation");
             }
         }
-            
+
         _handler.endElement(ELEMENT_NAME);
-        
+
     } //-- processAnnotations
 
     /**
@@ -192,15 +192,15 @@ public class SchemaWriter {
     private void processAttribute(AttributeDecl attribute)
         throws SAXException
     {
-        String ELEMENT_NAME = "xsd:attribute";
-        
+        String ELEMENT_NAME = "xs:attribute";
+
         _atts.clear();
-        
+
         //-- name
         String value = attribute.getName();
-        
+
         _atts.addAttribute("name", null, value);
-         
+
         //-- type attribute
         boolean hasAnonymousType = false;
         SimpleType type = attribute.getSimpleType();
@@ -208,7 +208,7 @@ public class SchemaWriter {
             _atts.addAttribute("type", null, type.getName());
         }
         else hasAnonymousType = true;
-        
+
         //-- use flag....kinda nasty
         if (attribute.isRequired()) {
             _atts.addAttribute("use", null, "required");
@@ -217,20 +217,20 @@ public class SchemaWriter {
             _atts.addAttribute("use", null, "fixed");
             _atts.addAttribute("value", null, attribute.getValue());
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(attribute);
-        
+
         //-- process anonymous type if necessary
         if (hasAnonymousType) {
             processSimpleType(type);
         }
-        
+
         _handler.endElement(ELEMENT_NAME);
-        
-        
+
+
     } //-- processAttribute
 
     /**
@@ -241,37 +241,37 @@ public class SchemaWriter {
     private void processComplexType(ComplexType complexType)
         throws SAXException
     {
-        String ELEMENT_NAME = "xsd:complexType";
-        
+        String ELEMENT_NAME = "xs:complexType";
+
         _atts.clear();
-        
+
         if (complexType.isTopLevel()) {
             _atts.addAttribute("name", null, complexType.getName());
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(complexType);
-        
+
         //-- process group
         processContentModelGroup( complexType );
-        
+
         //-- process Attributes, must appear last in a complex type
         Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements())
             processAttribute((AttributeDecl) enum.nextElement());
-            
+
         _handler.endElement(ELEMENT_NAME);
-        
+
     } //-- processComplexType
-    
+
     /**
      * Processes the given ContentModelGroup
      *
      * @param contentModel the content model group to process into events
     **/
-    private void processContentModelGroup(ContentModelGroup contentModel) 
+    private void processContentModelGroup(ContentModelGroup contentModel)
         throws SAXException
     {
         Enumeration enum = contentModel.enumerate();
@@ -289,41 +289,41 @@ public class SchemaWriter {
             }
         }
     } //-- contentModel
-    
+
     /**
      * Processes the given element declaration
-     * 
+     *
      * @param element the element declaration to process into events
     **/
-    private void processElement(ElementDecl element) 
+    private void processElement(ElementDecl element)
         throws SAXException
     {
-        
-        String ELEMENT_NAME = "xsd:element";        
+
+        String ELEMENT_NAME = "xs:element";
         _atts.clear();
-        
-        
+
+
         //-- name or reference
         String value = element.getName();
         if (value != null) {
             if (element.isReference())
-                _atts.addAttribute("ref", null, value);        
+                _atts.addAttribute("ref", null, value);
             else
-                _atts.addAttribute("name", null, value);                
+                _atts.addAttribute("name", null, value);
         }
-        
+
         //-- minOccurs/maxOccurs
         int max = element.getMaxOccurs();
         int min = element.getMinOccurs();
-        
+
         if (min != 1)
             _atts.addAttribute("minOccurs", null, Integer.toString(min));
-            
+
         if (max < 0)
             _atts.addAttribute("maxOccurs", null, "unbounded");
         else if (max > 1)
             _atts.addAttribute("maxOccurs", null, Integer.toString(max));
-            
+
         //-- type attribute
         boolean hasAnonymousType = false;
         if (!element.isReference()) {
@@ -333,7 +333,7 @@ public class SchemaWriter {
             }
             else hasAnonymousType = true;
         }
-        
+
         //-- default
         String defaultValue = element.getDefaultValue();
         if (defaultValue != null) {
@@ -341,21 +341,21 @@ public class SchemaWriter {
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(element);
-        
+
         //-- process anonymous type if necessary
         if (hasAnonymousType) {
             XMLType type = element.getType();
             if (type.isComplexType())
-                processComplexType( (ComplexType) type);            
+                processComplexType( (ComplexType) type);
         }
-        
-        _handler.endElement(ELEMENT_NAME);        
-        
+
+        _handler.endElement(ELEMENT_NAME);
+
     } //-- processElement
-    
+
     /**
      * Processes the given group definition into SAX events
      *
@@ -364,49 +364,49 @@ public class SchemaWriter {
     private void processGroup(Group group)
         throws SAXException
     {
-        String ELEMENT_NAME = "xsd:" + group.getOrder().toString();
-        
+        String ELEMENT_NAME = "xs:" + group.getOrder().toString();
+
         _atts.clear();
-        
+
         String groupName = group.getName();
         if (groupName != null) {
             _atts.addAttribute("name", null, groupName);
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(group);
-        
+
         //-- process content model
         processContentModelGroup( group );
-        
+
         _handler.endElement(ELEMENT_NAME);
-        
+
     } //-- processGroup
-    
-    private void processSchema(Schema schema) 
+
+    private void processSchema(Schema schema)
         throws SAXException
     {
-        
-        String ELEMENT_NAME = "xsd:schema";
-        
+
+        String ELEMENT_NAME = "xs:schema";
+
         _handler.startDocument();
-        
-        
+
+
         //-- namespace declaration for xsd
         _atts.addAttribute("xmlns:xsd", null, schema.getSchemaNamespace());
-        
+
         //-- targetNS
         String value = schema.getTargetNamespace();
         if (value != null)
-            _atts.addAttribute("targetNS", null, value);        
-        
+            _atts.addAttribute("targetNS", null, value);
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- process annotations
         processAnnotated(schema);
-        
+
         Enumeration enum = null;
         //-- process all top level element declarations
         enum = schema.getElementDecls();
@@ -423,13 +423,13 @@ public class SchemaWriter {
         while (enum.hasMoreElements()) {
             processSimpleType((SimpleType) enum.nextElement());
         }
-        
-        _handler.endElement(ELEMENT_NAME);        
-        
+
+        _handler.endElement(ELEMENT_NAME);
+
         _handler.endDocument();
-        
+
     } //-- processSchema
-    
+
     /**
      * Processes the given simple type definition
      *
@@ -438,49 +438,49 @@ public class SchemaWriter {
     private void processSimpleType(SimpleType simpleType)
         throws SAXException
     {
-        
+
         if (simpleType.isBuiltInType()) return;
-        
-        String ELEMENT_NAME = "xsd:simpleType";
-        
+
+        String ELEMENT_NAME = "xs:simpleType";
+
         _atts.clear();
-        
+
         String name = simpleType.getName();
-        
+
         //-- top-level simple type
         if (name != null) {
             _atts.addAttribute("name", null, name);
         }
-        
+
         _handler.startElement(ELEMENT_NAME, _atts);
-        
+
         //-- handle restriction
-        
+
         SimpleType base = (SimpleType)simpleType.getBaseType();
         if (base != null) {
-            
+
             _atts.clear();
             _atts.addAttribute("base", null, base.getName());
-            
-            _handler.startElement("xsd:restriction", _atts);
-            
+
+            _handler.startElement("xs:restriction", _atts);
+
             //-- process facets
             Enumeration enum = simpleType.getFacets();
             while (enum.hasMoreElements()) {
                 Facet facet = (Facet) enum.nextElement();
                 _atts.clear();
                 _atts.addAttribute("value", null, facet.getValue());
-                String facetName = "xsd:" + facet.getName();
+                String facetName = "xs:" + facet.getName();
                 _handler.startElement(facetName, _atts);
                 _handler.endElement(facetName);
             }
-            
-            _handler.endElement("xsd:restriction");
+
+            _handler.endElement("xs:restriction");
         }
-        
+
         _handler.endElement(ELEMENT_NAME);
-        
+
     } //-- processSimpleType
-    
-    
+
+
 } //-- SchemaWriter
