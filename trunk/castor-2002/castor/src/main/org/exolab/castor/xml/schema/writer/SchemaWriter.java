@@ -275,40 +275,71 @@ public class SchemaWriter {
 
         _atts.clear();
 
+        boolean isReference = attribute.isReference();
+        
         //-- name
-        String value = attribute.getName();
-
-        _atts.addAttribute("name", null, value);
+        if (!isReference) {
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+                attribute.getName());
+        }
+        else {
+            _atts.addAttribute(SchemaNames.REF_ATTR, CDATA,
+                attribute.getName(false));
+        }
+        
 
         //-- type attribute
         boolean hasAnonymousType = false;
         SimpleType type = attribute.getSimpleType();
-        if (type.getName() != null) {
-            
-            String typeName = type.getName();
-            
-            //-- add "xsd" prefix if necessary
-            if ((typeName.indexOf(':') < 0) && type.isBuiltInType()) {
-                typeName = schemaPrefix + typeName;
+        if (!isReference) {
+            if (type.getName() != null) {
+                
+                String typeName = type.getName();
+                
+                //-- add "xsd" prefix if necessary
+                if ((typeName.indexOf(':') < 0) && type.isBuiltInType()) {
+                    typeName = schemaPrefix + typeName;
+                }
+                _atts.addAttribute(ATTR_TYPE, CDATA, typeName);
             }
-            _atts.addAttribute(ATTR_TYPE, CDATA, typeName);
+            else hasAnonymousType = true;
         }
-        else hasAnonymousType = true;
 
-        //-- required?
-        if (attribute.isRequired()) {
-            _atts.addAttribute("use", CDATA, "required");
-        }
-        
-        //-- default value
+        // default or fixed values?
+        //-- @default
         if (attribute.isDefault()) {
-            _atts.addAttribute("default", CDATA, attribute.getValue());
+            _atts.addAttribute(SchemaNames.DEFAULT_ATTR, CDATA, 
+                attribute.getValue());
+        }
+        //-- @fixed 
+        else if (attribute.isFixed()) {
+            _atts.addAttribute(SchemaNames.FIXED_ATTR, CDATA, 
+                attribute.getValue());
         }
         
-        //-- fixed value
-        if (attribute.isFixed()) {
-            _atts.addAttribute("fixed", CDATA, attribute.getValue());
+        //-- @form
+        if (attribute.getForm() != null) {
+            _atts.addAttribute(SchemaNames.FORM, CDATA,
+                attribute.getForm().toString());
         }
+        
+        //-- @id (optional)
+        if (attribute.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA,
+                attribute.getId());
+        }
+        
+        //-- use : required
+        if (attribute.isRequired()) {
+            _atts.addAttribute(SchemaNames.USE_ATTR, CDATA,
+                AttributeDecl.USE_REQUIRED);
+        }
+        //-- use : prohibited
+        else if (attribute.isProhibited()) {
+            _atts.addAttribute(SchemaNames.USE_ATTR, CDATA, 
+                AttributeDecl.USE_PROHIBITED);
+        }
+        
 
         _handler.startElement(ELEM_ATTRIBUTE, _atts);
 
@@ -808,7 +839,14 @@ public class SchemaWriter {
         while (enum.hasMoreElements()) {
             processImport((Schema)enum.nextElement(), schemaPrefix);
         }
-
+    
+        //-- process all top level attribute declarations
+        enum = schema.getAttributes();
+        while (enum.hasMoreElements()) {
+            processAttribute((AttributeDecl) enum.nextElement(), 
+                schemaPrefix);
+        }
+        
         //-- process all top level element declarations
         enum = schema.getElementDecls();
         while (enum.hasMoreElements()) {
