@@ -20,6 +20,27 @@ XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' me
 
 XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
 
+JDO:    Fixed some problems when two key generated related (or dependent) object creating in 
+        the same transaction. (Thomas)
+
+JDO:    Relaxed the restriction so that a data object class can now extends one class and
+	depends another. (Suggested by Rimac, Ivica <ivica.rimac@KOM.tu-darmstadt.de>)
+
+JDO:	Fixed NPEs in TransactionContext, and ClassMolder in update(...). (Thomas)
+
+JDO:	Edited the New features document for Castor JDO. (Submited by Rick Horowitz <rickhoro@yahoo.com>)
+
+JDO:	Updated the oqlQuery tools. (Submited by Thorsten Mauch <mauch@imkenberg.de>)
+
+JDO:	Encapsulated and nested runtime exceptions generated while accessing the data object
+	into DataObjectAccessException. (suggested by Christian Sell <christian.sell@netcologne.de>)
+
+JDO:	Fixed a few bugs which some variables are mixed up in ClassMolder.
+	(submitted by Eldad Zamler<eldad314@netvision.net.il>)
+
+JDO:    Fixed NPEs introduced by autoStore. (reported by Steve Vaughan <snmvaughan92@yahoo.com> 
+	and Patric Bechtel <bechtel@ipcon.de>)
+
 	
 Version 0.9 February, 15 2001
 -----------------------------
@@ -123,7 +144,7 @@ JDO:    Added an AutoStore option to JDO. Method of setAutoStore and isAutoStore
 	dependent object, and related objects must be created/update explicitly.
 	(* update is used for long transaction only, all modified object 
 	created/loaded from the short transaction will be store properly
-	at commit time)
+	at commit time) (Thomas Yip <yip@intalio.com>)
 
 JDO:    Added "trigger" mode for SEQUENCE key generator. 
         (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
