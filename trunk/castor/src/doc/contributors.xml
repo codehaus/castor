@@ -494,6 +494,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Paradis" given="Jackie"/>
+    <email>jackie_paradis@yahoo.ca</email>
+    <description>Patch for bug 1474</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Parent" given="Marc-Antoine"/>
     <email>Marc-Antoine_Parent@mitel.com</email>
     <description>Enhancements to the Castor DSML and bug fixing.</description>
