@@ -295,8 +295,19 @@ public abstract class TransactionContext
                 throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
             if ( entry.deleted )
                 throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), identity );
-            if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
+            if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) ) {
+                // if the object in the cache is not a subclass of the class that is needed,
+                // then it may be a subclass.
+                // In this case we forget this object, but don't throw the exception,
+                // the object of the needed class will be reloaded.
+                if ( ! entry.object.getClass().isAssignableFrom( handler.getJavaClass() ) )
+                    throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
+                else {
+                    release( entry.object );
+                    engine.forgetObject( this, oid );
+                    return null;
+                }
+            }
             if ( entry.created )
                 return entry.object;
             if ( ( accessMode == AccessMode.Exclusive && ! entry.engine.hasLock( this, oid, true ) )
@@ -338,10 +349,10 @@ public abstract class TransactionContext
      *
      * @param engine The persistence engine
      * @param handler The class persistence handler
-     * @param object The object to fetch (single instance per transaction)
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
      *  the values in persistent storage
+     * @return The loaded object (single instance per transaction)
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
      * @throws ObjectNotFoundException The object was not found in
@@ -349,44 +360,19 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized void load( PersistenceEngine engine, ClassHandler handler,
-                                   Object object, Object identity, AccessMode accessMode )
+    public synchronized Object load( PersistenceEngine engine, ClassHandler handler,
+                                     Object identity, AccessMode accessMode )
         throws ObjectNotFoundException, LockNotGrantedException, PersistenceException
     {
+        Object      object;
         ObjectEntry entry;
         OID         oid;
 
+        object = fetch( engine, handler, identity, accessMode );
+        if ( object != null )
+            return object;
+        object = handler.newInstance();
         oid = new OID( handler, identity );
-        entry = getObjectEntry( object );
-        if ( entry != null ) {
-            // XXX Need to report object loaded with different identity
-            if ( entry.oid.getIdentity().equals( identity ) )
-                throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
-
-            // If the object has been loaded in this transaction from a
-            // different engine this is an error. If the object has been
-            // deleted in this transaction, it cannot be re-loaded. If the
-            // object has been created in this transaction, it cannot be
-            // re-loaded but no error is reported.
-            if ( entry.engine != engine )
-                throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
-            if ( entry.deleted )
-                throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), identity );
-            if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
-            if ( entry.created )
-                return;
-            if ( ( accessMode == AccessMode.Exclusive ||
-                   accessMode == AccessMode.DbLocked ) && ! entry.oid.isDbLock() ) {
-                // If we are in exclusive mode and object has not been
-                // loaded in exclusive mode before, then we have a
-                // problem. We cannot return an object that is not
-                // synchronized with the database, but we cannot
-                // synchronize a live object.
-                throw new PersistenceExceptionImpl( "persist.lockConflict", handler.getJavaClass(), identity );
-            }
-            return;
-        }
 
         // Load (or reload) the object through the persistence engine with the
         // requested lock. This might report failure (object no longer exists),
@@ -412,23 +398,32 @@ public abstract class TransactionContext
         try {
             engine.copyObject( this, oid, object );
             if ( handler.getCallback() != null ) {
+                Class reloadClass;
+
                 handler.getCallback().using( object, _db );
-                handler.getCallback().loaded( object );
+                reloadClass = handler.getCallback().loaded( object );
+                if ( reloadClass != null && object.getClass() != reloadClass ) {
+                    release( object );
+                    engine.forgetObject( this, oid );
+                    handler = engine.getClassHandler( reloadClass );
+                    if ( handler == null )
+                        throw new ClassNotPersistenceCapableExceptionImpl( reloadClass );
+                    return load( engine, handler, identity, accessMode );
+                }
             }
         } catch ( Exception except ) {
-            removeObjectEntry( object );
+            release( object );
             engine.forgetObject( this, oid );
-            if ( handler.getCallback() != null )
-                handler.getCallback().releasing( object, false );
             if ( except instanceof PersistenceException )
                 throw (PersistenceException) except;
             throw new PersistenceExceptionImpl( except );
         }
 
         if ( accessMode == AccessMode.ReadOnly ) {
-            removeObjectEntry( object );
+            removeObjectEntryWithDependent( object );
             engine.releaseLock( this, oid );
         }
+        return object;
     }
 
 
@@ -541,10 +536,7 @@ public abstract class TransactionContext
             }
             return oid;
         } catch ( Exception except ) {
-
-            if ( handler.getCallback() != null )
-                handler.getCallback().releasing( object, false );
-            removeObjectEntry( object );
+            release( object );
             if ( except instanceof DuplicateIdentityException )
                 throw (DuplicateIdentityException) except;
             if ( except instanceof PersistenceException )
@@ -631,10 +623,7 @@ public abstract class TransactionContext
                 handler.getCallback().updated( object );
             }
         } catch ( Exception except ) {
-            removeObjectEntry( object );
-            engine.forgetObject( this, oid );
-            if ( handler.getCallback() != null )
-                handler.getCallback().releasing( object, false );
+            release( object );
             if ( except instanceof PersistenceException )
                 throw (PersistenceException) except;
             throw new PersistenceExceptionImpl( except );
@@ -709,7 +698,7 @@ public abstract class TransactionContext
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
-            removeObjectEntry( object );
+            removeObjectEntryWithDependent( object );
         }
     }
 
@@ -756,7 +745,7 @@ public abstract class TransactionContext
         } catch ( ObjectDeletedException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
-            removeObjectEntry( object );
+            removeObjectEntryWithDependent( object );
             throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         } catch ( LockNotGrantedException except ) {
             // Can't get lock, but may still keep running
@@ -805,7 +794,7 @@ public abstract class TransactionContext
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // Object has been deleted outside this transaction,
             // forget about it
-            removeObjectEntry( object );
+            removeObjectEntryWithDependent( object );
             throw except;
         } catch ( LockNotGrantedException except ) {
             // Can't get lock, but may still keep running
@@ -835,10 +824,13 @@ public abstract class TransactionContext
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
         if ( entry == null || entry.deleted )
-            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+            return;
+        // [oleg] Don't be so severe
+        //    throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+
         // Release the lock, forget about the object in this transaction
         entry.engine.releaseLock( this, entry.oid );
-        removeObjectEntry( object );
+        removeObjectEntryWithDependent( object );
         handler = entry.engine.getClassHandler( object.getClass() );
         if ( handler.getCallback() != null )
             handler.getCallback().releasing( object, false );
@@ -1195,7 +1187,7 @@ public abstract class TransactionContext
             } catch ( ObjectDeletedException except ) {
                 // Object has been deleted outside this transaction,
                 // forget about it
-                removeObjectEntry( entry.object );
+                removeObjectEntryWithDependent( entry.object );
             }
         }
     }
@@ -1287,6 +1279,50 @@ public abstract class TransactionContext
             if ( entry.object == object ) {
                 _objects.removeElementAt( i );
                 ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
+                return entry;
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * Removes the entry for an object and returns it.
+     * Recursively does the same for all dependent objects.
+     *
+     * @param object The object to remove
+     * @return The removed entry
+     */
+    ObjectEntry removeObjectEntryWithDependent( Object object )
+    {
+        int size;
+        ObjectEntry entry;
+        RelationHandler[] relations;
+        Object related;
+        Enumeration enum;
+
+        size = _objects.size();
+        for ( int i = 0; i < size; i++ ) {
+            entry = (ObjectEntry) _objects.elementAt( i );
+            if ( entry.object == object ) {
+                _objects.removeElementAt( i );
+                ( (Hashtable) _engineOids.get( entry.engine ) ).remove( entry.oid );
+
+                // We have added entries for all dependent objects, now let's remove them
+                relations = entry.engine.getClassHandler(object.getClass()).getRelations();
+                for ( int j = 0 ; j < relations.length ; ++j ) {
+                    if ( relations[ j ] != null && relations[ j ].isAttached() &&
+                            relations[ j ].isMulti() ) {
+                        enum = (Enumeration) relations[ j ].getRelated( object );
+                        if ( enum != null ) {
+                            while ( enum.hasMoreElements() ) {
+                                related = enum.nextElement();
+                                if ( related != null )
+                                    removeObjectEntryWithDependent( related );
+                            }
+                        }
+                    }
+                }
                 return entry;
             }
         }

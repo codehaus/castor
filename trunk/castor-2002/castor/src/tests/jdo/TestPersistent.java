@@ -227,7 +227,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }                        
 
 
-    public void jdoLoad()
+    public Class jdoLoad()
         throws Exception
     {
         Query        qry;
@@ -242,6 +242,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         while ( res.hasMore() )
             _children.addElement( res.next() );
         _origChildren = (Vector) _children.clone();
+        return null;
     }
 
 

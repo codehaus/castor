@@ -68,10 +68,10 @@ public class JDOCallback
     }
 
 
-    public void loaded( Object object )
+    public Class loaded( Object object )
         throws Exception
     {
-        ( (Persistent) object ).jdoLoad();
+        return ( (Persistent) object ).jdoLoad();
     }
 
 

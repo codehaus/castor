@@ -207,18 +207,12 @@ public class DatabaseImpl
     {
         TransactionContext tx;
         ClassHandler       handler;
-        Object             object;
 
         tx = getTransaction();
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = tx.fetch( _dbEngine, handler, identity, null );
-        if ( object == null ) {
-            object = handler.newInstance();
-            tx.load( _dbEngine, handler, object, identity, null );
-        }
-        return object;
+        return tx.load( _dbEngine, handler, identity, null );
     }
 
 
@@ -229,7 +223,6 @@ public class DatabaseImpl
         TransactionContext tx;
         ClassHandler       handler;
         AccessMode         mode;
-        Object             object;
 
         switch ( accessMode ) {
         case ReadOnly:
@@ -251,12 +244,7 @@ public class DatabaseImpl
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = tx.fetch( _dbEngine, handler, identity, mode );
-        if ( object == null ) {
-            object = handler.newInstance();
-            tx.load( _dbEngine, handler, object, identity, mode );
-        }
-        return object;
+        return tx.load( _dbEngine, handler, identity, mode );
     }
 
 

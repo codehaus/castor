@@ -89,9 +89,11 @@ public interface Persistent
      * storage. This method is called immediately after synchronizing an
      * object with the database.
      *
+     * @return null or the extending Class. In the latter case Castor will
+     * reload the object of the given class with the same identity.
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public void jdoLoad()
+    public Class jdoLoad()
         throws Exception;
 
 

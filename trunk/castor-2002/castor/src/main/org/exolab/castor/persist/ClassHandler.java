@@ -444,11 +444,7 @@ public final class ClassHandler
                     for ( int j = 0 ; j < vector.size() ; ++j ) {
                         Object object;
 
-                        object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), vector.elementAt( j ) );
-                        if ( object == null ) {
-                            object = _fields[ i ].handler.newInstance( target);
-                            ctx.load( _fields[ i ].relation.getRelatedHandler(), object, vector.elementAt( j ) );
-                        }
+                        object = ctx.load( _fields[ i ].relation.getRelatedHandler(), vector.elementAt( j ) );
                         if ( object == null )
                             throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
                                                                    vector.elementAt( j ) );
@@ -457,11 +453,7 @@ public final class ClassHandler
                 } else {
                     Object relTarget;
 
-                    relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
-                    if ( relTarget == null ) {
-                        relTarget = _fields[ i ].handler.newInstance( target );
-                        ctx.load( _fields[ i ].relation.getRelatedHandler(), relTarget, fields[ i ] );
-                    }
+                    relTarget = ctx.load( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
                     if ( relTarget == null )
                         throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
                                                                fields[ i ] );
@@ -820,6 +812,30 @@ public final class ClassHandler
     {
         for ( int i = 0 ; i < _fields.length ; ++i )
             _fields[ i ].handler.resetValue( object );
+    }
+
+
+    /**
+     * Forgets all dependent objects in the cache
+     *
+     * @param fields The fields of the object from the cache
+     * @param tx The transaction context
+     * @param cache The cache engine
+     * @throws PersistenceException An error forgetting the dependent objects
+     */
+    void forgetDependent( Object[] fields, TransactionContext tx, CacheEngine cache )
+    {
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ].relation != null && _fields[ i ].multi && fields[ i ] != null ) {
+                Enumeration enum;
+                ClassHandler handler;
+
+                handler = _fields[ i ].relation.getRelatedHandler();
+                for ( enum = ((Vector) fields[ i ]).elements(); enum.hasMoreElements(); ) {
+                    cache.forgetObject( tx, new OID( handler, enum.nextElement() ) );
+                }
+            }
+        }
     }
 
 

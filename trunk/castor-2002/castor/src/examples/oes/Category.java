@@ -103,8 +103,9 @@ public class Category
     }
 
 
-    public void jdoLoad()
+    public Class jdoLoad()
     {
+        return null;
     }
 
 

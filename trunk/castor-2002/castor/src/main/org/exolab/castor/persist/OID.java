@@ -106,9 +106,8 @@ final class OID
         _javaClass = handler.getJavaClass();
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        // [Bill Reynolds] Wrong! This gets confused by subclasses and superclasses.
-        //while ( handler.getExtends() != null )
-        //    handler = (ClassHandler) handler.getExtends();
+        while ( handler.getExtends() != null )
+            handler = (ClassHandler) handler.getExtends();
         _topClass = handler.getJavaClass();
         _hashCode = _topClass.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
