@@ -110,6 +110,13 @@
                </td>
                <td>Optional</td>
              </tr>
+             <tr>
+               <td align="center">nodesc</td><td><br/></td>
+               <td>
+                  Do not generate the class descriptors
+                </td>
+               <td>Optional</td>
+             </tr>
           </table>
 
          <section title="Collection Types">
@@ -219,6 +226,23 @@
              </code>
             </p>
          </section>
+        
+         <section title="Setting a super class">
+            <p>Since version: 0.8.10</p>
+            <p>
+            	The source generator enables the user to set a super class to <b>all</b> the
+            	generated classes (of course class descriptors are not concerned by this option)
+            </p>
+        	<p> To set up the super class, edit the castorbuilder.properties file :
+        	<code>
+        		# This property allows one to specify the super class of *all*
+        		# generated classes
+        		#
+        		#org.exolab.castor.builder.superclass=com.xyz.BaseObject
+			</code>
+			</p>
+		</section>
+        
        </section>
     </section>
 
@@ -278,6 +302,16 @@
                   </td>
                </tr>
                <tr>
+                  <td valign="top">recurringDuration</td>
+                  <td>
+                  	  maxExclusive<br/>
+                  	  minExclusive<br/>
+                  	  maxInclusive<br/>
+                  	  minInclusive<br/>
+                  </td>
+               </tr>
+               
+               <tr>
                   <td valign="top">timeDuration</td>
                   <td>
                   	  maxExclusive<br/>
@@ -304,9 +338,24 @@
                <tr>
                   <td valign="top">NMToken</td><td></td>
                </tr>
-
+			    <tr>
+                  <td valign="top">century</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
+               </tr>
                <tr>
-                  <td valign="top">date</td><td></td>
+                  <td valign="top">date</td>
+                  <td>
+                  	
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
                </tr>
                <tr>
                   <td valign="top">integer</td>
@@ -329,6 +378,15 @@
                   </td>
                </tr>
                <tr>
+                  <td valign="top">month</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                 </td>
+               </tr>
+               <tr>
                   <td valign="top">negativeInteger</td><td></td>
                </tr>
                <tr>
@@ -338,11 +396,42 @@
                   <td valign="top">short</td><td></td>
                </tr>
                <tr>
-                  <td valign="top">time</td><td></td>
+                  <td valign="top">time</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
                </tr>
                <tr>
-                  <td valign="top">timeInstant</td><td></td>
+                  <td valign="top">timeInstant</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
                </tr>
+            	 <tr>
+                  <td valign="top">timePeriod</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
+               </tr>
+               <tr>
+                  <td valign="top">year</td>
+                  <td>
+                  	maxExclusive<br/>
+                  	minExclusive<br/>
+                  	maxInclusive<br/>
+                  	minInclusive<br/>
+                  </td>
+               </tr>
+              
             </table>
          </section>
 
