@@ -472,7 +472,7 @@ public class Converter {
 
        String name = dtd.getName();
 
-       if (name != null && !name.equals("")) schema.setName(name);
+       if (name != null && !name.equals("")) schema.setId(name);
 
 
 
