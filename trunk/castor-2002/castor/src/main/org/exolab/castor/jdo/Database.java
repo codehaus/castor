@@ -492,5 +492,14 @@ public interface Database
         throws TransactionNotInProgressException, TransactionAbortedException;
 
 
+    /**
+     * Get the underlying JDBC Connection.
+     * Only for internal / advanced use !
+     * Never try to close it (is done by castor).
+     */
+    public Object /* java.sql.Connection */ getConnection()
+        throws org.exolab.castor.jdo.PersistenceException;
+
+
 }
 

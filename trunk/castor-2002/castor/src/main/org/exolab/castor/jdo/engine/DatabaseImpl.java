@@ -564,6 +564,20 @@ public class DatabaseImpl
     }
 
 
+
+    /**
+     * Get the underlying JDBC Connection.
+     * Only for internal / advanced use !
+     * Never try to close it (is done by castor).
+     */
+    public Object /* java.sql.Connection */ getConnection()
+            throws org.exolab.castor.jdo.PersistenceException
+    {
+        return _ctx.getConnection( _scope.getLockEngine() );
+    }
+
+
+
     private static class ThreadTracer extends Thread {
         private HashMap _threads = new HashMap();
         private long _interval;
