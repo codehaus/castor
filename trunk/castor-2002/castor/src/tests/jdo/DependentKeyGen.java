@@ -118,7 +118,6 @@ public class DependentKeyGen extends CastorTestCase {
         
         _db = _category.getDatabase( verbose );
 
-        /*
         stream.println( "Delete everything" );
         _db.begin();
         oql = _db.getOQLQuery( "SELECT master FROM jdo.TestMasterKeyGen master" );
@@ -129,7 +128,7 @@ public class DependentKeyGen extends CastorTestCase {
         }
         oql.close();
         stream.println( "Deleting " + cnt + " master objects" );
-
+        
 
         oql = _db.getOQLQuery( "SELECT group FROM jdo.TestGroup group" );
         qres = oql.execute();
@@ -139,7 +138,6 @@ public class DependentKeyGen extends CastorTestCase {
         oql.close();
         stream.println( "Deleting " + cnt + " group objects" );
         _db.commit();
-        */
 
         stream.println( "Attempt to create master with details" );
         _db.begin();
@@ -153,6 +151,7 @@ public class DependentKeyGen extends CastorTestCase {
         detail7 = new TestDetailKeyGen();
         detail7.addDetail2( new TestDetailKeyGen2() );
         detail7.addDetail2( new TestDetailKeyGen2() );
+        detail7.setDetail3( new TestDetailKeyGen3() );
         master.addDetail( detail7 );
         group = new TestGroup();
         _db.create( group );
@@ -189,16 +188,30 @@ public class DependentKeyGen extends CastorTestCase {
                 stream.println( "Error: loaded detail 5 with details2: " + detail );
                 fail("loaded detail 5 with details2: " + detail );
             }
+            if ( detail.getDetail3() != null ) {
+                stream.println( "Error: loaded detail 5 with unexpected details3: " + detail );
+                fail("loaded detail 5 with unexpected details3: " + detail );
+            }
             detail = master.findDetail( detailId6 );
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2 ) {
                 stream.println( "Error: loaded detail 6 without two details: " + detail );
-                fail("loaded detail 6 without two details: " + detail);
+                fail("loaded detail 6 without two details2: " + detail);
             }
+            if ( detail.getDetail3() != null ) {
+                stream.println( "Error: loaded detail 6 with unexpected details3: " + detail );
+                fail("loaded detail 6 with unexpected details3: " + detail );
+            }
+
             detail = master.findDetail( detailId7 );
             if ( detail.getDetails2() == null || detail.getDetails2().size() != 2) {
                 stream.println( "Error: loaded detail 7 without two details: " + detail );
-                fail("loaded detail 7 without two details: " + detail);
+                fail("loaded detail 7 without two details2: " + detail);
             }
+            if ( detail.getDetail3() == null ) {
+                stream.println( "Error: loaded detail 7 without the expected details3: " + detail );
+                fail("loaded detail 7 without the expected details3: " + detail );
+            }
+
         } else {
             stream.println( "Error: failed to create master with details and group" );
             fail("failed to create master with details and group");
