@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004(C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -56,8 +61,6 @@ import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassMapping;
@@ -67,11 +70,10 @@ import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.Property;
 import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
 import org.exolab.castor.mapping.xml.types.CollectionType;
-import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 
 import org.exolab.castor.xml.handlers.ContainerFieldHandler;
-import org.exolab.castor.xml.handlers.EnumFieldHandler;
+import org.exolab.castor.xml.handlers.ToStringFieldHandler;
 import org.exolab.castor.xml.util.ClassDescriptorResolverImpl;
 import org.exolab.castor.xml.util.ContainerElement;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
@@ -83,14 +85,12 @@ import java.io.PrintWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Vector;
-import java.util.Enumeration;
 
 /**
  * An XML implementation of mapping helper. Creates XML class
  * descriptors from the mapping file.
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
@@ -131,13 +131,18 @@ public class XMLMappingLoader
 
 
     /**
+     * A reference to the internal ClassDescriptorResolver
+     */
+    private ClassDescriptorResolverImpl _cdResolver;
+
+    /**
      * naming conventions
-    **/
+     */
     private XMLNaming _naming = null;
 
     /**
-     * Introspector
-    **/
+     * The default NodeType for primitives
+     */
     private NodeType _primitiveNodeType = null;
 
 
@@ -156,7 +161,12 @@ public class XMLMappingLoader
 
     } //-- XMLMappingLoader
 
-
+    private void createResolver() {
+        _cdResolver = new ClassDescriptorResolverImpl();
+        _cdResolver.setIntrospection(false);
+        _cdResolver.setLoadPackageMappings(false);
+    }
+    
     protected void resolveRelations( ClassDescriptor clsDesc )
         throws MappingException
     {
@@ -192,11 +202,26 @@ public class XMLMappingLoader
         ClassDescriptor clsDesc;
         String          xmlName;
 
-        // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getName() );
-        if ( clsDesc != null && clsDesc instanceof XMLClassDescriptor )
-            return clsDesc;
-
+        if (clsMap.getAutoComplete()) {
+            if ((clsMap.getMapTo() == null) &&
+                (clsMap.getFieldMappingCount() == 0) &&
+                (clsMap.getIdentityCount() == 0))
+            {
+                //-- if we make it here we simply try
+                //-- to load a compiled mapping
+                if (_cdResolver == null) {
+                    createResolver();
+                }
+                try {
+                    clsDesc = _cdResolver.resolve(clsMap.getName());
+                    if (clsDesc != null) 
+                        return clsDesc;
+                }
+                catch(ResolverException rx) {};
+                
+            }
+        }
+        
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         clsDesc = super.createDescriptor( clsMap );
@@ -224,10 +249,16 @@ public class XMLMappingLoader
             Class type = xmlClassDesc.getJavaClass();
             
             //-- check compiled descriptors 
-            ClassDescriptorResolverImpl cdr 
-                = new ClassDescriptorResolverImpl();
-            cdr.setIntrospection(false);
-            referenceDesc = cdr.resolve(type);
+            if (_cdResolver == null) {
+                createResolver();
+            }
+            try {
+                referenceDesc = _cdResolver.resolve(type);
+            }
+            catch(ResolverException rx) {
+                throw new MappingException(rx);
+            }
+            
             if (referenceDesc == null) {
                 Introspector introspector = new Introspector();
                 try {
@@ -283,7 +314,7 @@ public class XMLMappingLoader
             // Content
             XMLFieldDescriptor field = referenceDesc.getContentDescriptor();
             if (field!= null)
-                if (isMatchFieldName(fields, field.getFieldName()))
+                if (!isMatchFieldName(fields, field.getFieldName()))
                     // If there is no field with this name, we can add
                     xmlClassDesc.addFieldDescriptor(field);
 
@@ -521,6 +552,7 @@ public class XMLMappingLoader
                 }
             }
         }
+        
         //-- is Type-Safe Enumeration?
         //-- This is not very clean, we should have a way
         //-- to specify something is a type-safe enumeration
@@ -548,8 +580,14 @@ public class XMLMappingLoader
                         if ((returnType != null) && fieldType.isAssignableFrom(returnType)) {
                             if (fieldMap.getHandler() == null) {
                                 //-- Use EnumFieldHandler
-                                FieldHandler handler = xmlDesc.getHandler();
-                                handler = new EnumFieldHandler(fieldType, handler);
+                                //-- mapping loader now supports a basic EnumFieldHandler
+                                //-- for xml we simply need to make sure the toString()
+                                //-- method is called during getValue()
+                                //FieldHandler handler = xmlDesc.getHandler();
+                                //handler = new EnumFieldHandler(fieldType, handler);
+                                
+                                FieldHandler handler = new ToStringFieldHandler(fieldType, xmlDesc.getHandler());
+                                
                                 xmlDesc.setHandler(handler);
                                 xmlDesc.setImmutable(true);
                             }
@@ -581,6 +619,21 @@ public class XMLMappingLoader
         return xmlDesc;
     }
 
+    /**
+     * Sets whether or not to look for and load package specific
+     * mapping files (".castor.xml" files).
+     * 
+     * @param loadPackageMappings a boolean that enables or
+     * disables the loading of package specific mapping files
+     */
+    public void setLoadPackageMappings(boolean loadPackageMappings) 
+    {
+        if (_cdResolver == null) {
+            createResolver();
+        }
+        _cdResolver.setLoadPackageMappings(loadPackageMappings);
+    } //-- setLoadPackageMappings
+    
 
     protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
