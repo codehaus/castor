@@ -186,9 +186,6 @@ public class Test
             product.name = "new product";
             product.price = 55;
             product.group = group;
-            product.inventory = new ProductInventory();
-            product.inventory.quantity = 50;
-            product.inventory.product = product;
             logger.println( "Creating new product: " + product );
             db.makePersistent( product );
         } else {
@@ -208,9 +205,6 @@ public class Test
             computer.name = "new product";
             computer.price = 300;
             computer.group = group;
-            computer.inventory = new ProductInventory();
-            computer.inventory.quantity = 60;
-            computer.inventory.product = computer;
             logger.println( "Creating new computer: " + computer );
             db.makePersistent( computer );
         } else {

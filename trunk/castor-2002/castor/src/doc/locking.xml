@@ -15,8 +15,28 @@
          in optimistic locking mode, when not using the database server as a persistence engine
          (e.g. LDAP, shared object space), and to better report concurrency errors.</p>
 
+      <section title="The Role Of Locking">
+
+        <p>Castor uses locks at two levels. Internal locks are used to assure that all
+           transactions see a consistent view of the database and no conflicts occur during
+           commit. The internal lock mechanism is part of the cache engine and provides its
+           own lock escalation, timeouts and deadlock detection.</p>
+
+        <p>Externally locks are used to assure integrity at the database level when Castor
+           is used along with other applications that get direct access to the database.
+           Castor depends on the semantics of transaction isolation level supported by
+           the particular database, and where supported may use explicit exclusive locks.</p>
+
+        <p>Using optimistic locking and shared access provides better performance through
+           caching and reduces lock contention. Castor relies on dirty checking to assure
+           liveliness of updates. However, where certain tables demand the acquisition of
+           an exclusive lock, these tables can be accessed with an exclusive lock.</p>
+
+      </section>
 
       <section title="Optimistic Locking">
+
+        <p>TO BE REVISED</p>
 
         <p>Optimistic locking mode assumes that concurrent access to objects is rare and
            that objects are frequently accessed but not modified. It does not attempt to
@@ -42,6 +62,8 @@
       </section>
 
       <section title="The ObjectLock">
+
+        <p>TO BE REVISED</p>
 
         <p>Most Java applications rely on the Java <tt>synchronized</tt> mechanism to implement
            locks. Castor takes a different approach to locking, managed through an <tt>ObjectLock</tt>.

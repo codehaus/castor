@@ -11,8 +11,8 @@
               and into XML documents and provides Java object validation</li>
 
           <li>Java to XML mapping uses an XML document to specify the mapping
-              textually (release 0.8), Bean-like descriptors to specify them
-              programatically, and introspection to create default mappings</li>
+              textually, Bean-like descriptors to specify them programatically,
+              and introspection to create default mappings</li>
 
           <li>Code generator can produce Java objects, validation and the proper
               mapping based on an XML schema</li>
@@ -86,20 +86,15 @@
             queries with simple syntax and single object retrieval. A project
             to extend the OQL engine is underway.</li>
 
-        <li>The DAX implementation is not complete. There are plans to replace
-            the ODMG API with a similar, but J2EE-compatible API.</li>
-
-        <li>The EJB CMP implementation will be available for public review
-            prior to release 0.9 and will include a CMP engine, integration
-            with the transaction manager, and finder definition in the XML
-            mapping file.</li>
+        <li>The EJB CMP implementation is now developed in the scope of the
+            OpenEJB project.</li>
 
         <li>This release of Castor JDO supports JTA transactional environments,
             but lacks support for JTA factories. Integration with transaction
             managers and Tomcat/OpenEJB will be introduced in release 0.9.</li>
 
-        <li>Key generation, engines for Oracle/Sybase, store procedure support,
-            BLOBs, XML content, read-only queries.</li>
+        <li>Key generation, engines for Oracle/Sybase, stored procedures,
+            BLOBs, XML content, read-only queries, XML defined finders.</li>
       </ul>
     </section>
 

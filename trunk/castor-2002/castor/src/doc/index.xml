@@ -10,6 +10,11 @@
 
       <p><a href="origins.xml">About the origins of the name</a></p>
 
+      <p>We will host a Castor session during the Java O'Reilly Conference to review
+         the Castor philosophy and future directions. You are welcome to attend and
+         to share your ideas and like-to-see with the rest of us. The session will
+         take place Wedensday, March 29, 8:00 PM Ballroom C.</p>
+
     </header>
 
     <section title="Features">
@@ -17,8 +22,8 @@
       <p>Short feature list (we haven't got all day):
         <ul>
           <li>Castor XML: Java object to XML document</li>
-          <li>Castor JDO: Java object persistence on top of RDBMS</li>
-          <li>Castor DAX: Java object persistence on top of LDAP</li>
+          <li>Castor JDO: Java object persistence to RDBMS</li>
+          <li>Castor DAX: Java object persistence to LDAP</li>
           <li>Castor DSML: LDAP directory exchange through XML</li>
           <li>XML-based mapping file specify the mapping between one model and another</li>
           <li>Support for schema-less Java to XML binding</li>
@@ -32,9 +37,9 @@
     </section>
 
     <section title="News">
-      <p>Version 0.7.12 now <a href="download.xml">available for download</a>.
+      <p>Version 0.8 is now <a href="download.xml">available for download</a>.
       <ul>
-        <li>Mar 15, 2000: Version 0.7.12, dirty checking, pluggable DB engine</li>
+        <li>Mar 17, 2000: Version 0.8, unified mapping model, pluggable DB engine, dirty checking</li>
         <li>Mar 10, 2000: Version 0.7.11, supports one-many relations, XML-Servlet</li>
         <li>Mar 3, 2000: Version 0.7.10, addresses performance of the cache engine</li>
         <li>Feb 25, 2000: Version 0.7.9, new mapping file, one-one relation handling</li>

@@ -41,6 +41,16 @@
          many details per product  -->
     <field name="detail" type="myapp.ProductDetail" required="true"
            collection="vector" />
+
+    <!-- Product has reference to Category with
+         many-many relationship -->
+    <!--
+    <field name="category" type="myapp.Category" required="true"
+           collection="vector">
+      <sql-info name="category_id"
+                many-table="category_prod" many-key="prod_id" />
+    </field>
+    -->
   </class>
 
 
@@ -69,6 +79,30 @@
       <sql-info name="name"/>
     </field>
   </class>
+
+
+  <!--  Mapping for Category  -->
+  <!--
+  <class class-name="myapp.Category">
+    <sql-table table-name="category"/>
+    <description>A product category, any number of products can belong to
+                 the same category, a product can belong to any number of
+                 categories</description>
+    <identity field-ref="id" />
+    <field name="id">
+      <sql-info name="id" />
+    </field>
+    <field name="name">
+      <sql-info name="name" />
+    </field>
+    <field name="product" type="myapp.Product" required="true"
+           collection="vector">
+      <sql-info name="prod_id"
+                many-table="category_prod" many-key="category_id" />
+    </field>
+  </class>
+  -->
+
 
 </mapping>
 

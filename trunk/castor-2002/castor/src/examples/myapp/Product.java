@@ -28,6 +28,9 @@ public class Product
     public Vector           detail;
 
 
+    public Vector           category;
+
+
     public int getId() { return id; }
     public String getName() { return name; }
     public float getPrice() { return price; }
