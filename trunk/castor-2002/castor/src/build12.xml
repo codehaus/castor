@@ -23,7 +23,7 @@
         <property name="deprecation" value="false"/>
         <property name="archive" value="${project}-${version}"/>
         <property name="excludes" value="**/package.html"/>
-        <property name="testexcludes" value="**/package.html"/>
+        <property name="testexcludes" value="**/package.html,**/xml/xml2java/**"/>
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
