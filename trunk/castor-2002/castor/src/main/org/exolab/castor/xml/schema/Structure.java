@@ -55,7 +55,7 @@ import org.exolab.castor.xml.ValidationException;
  * @version $Revision$ $Date$
 **/
 public abstract class Structure {
-    
+
     public static final short ANNOTATION        = 0;
     public static final short APPINFO           = 1;
     public static final short ATTRIBUTE         = 2;
@@ -71,18 +71,19 @@ public abstract class Structure {
     public static final short SCHEMA            = 12;
     public static final short SIMPLE_CONTENT    = 13;
     public static final short SIMPLE_TYPE       = 14;
-    
+    public static final short WILDCARD          = 15;
+
     //-- should be removed eventually
     public static final short UNKNOWN         = -1;
-    
-    
+
+
     /**
      * Creates a new XML Schema Structure
     **/
     protected Structure() {
         super();
     } //-- Structure
-    
+
     /**
      * Calls validate() to determine if this Schema Definition
      * is valid.
@@ -90,26 +91,26 @@ public abstract class Structure {
     **/
     public boolean isValid() {
         try {
-            validate();   
+            validate();
         }
         catch(ValidationException ex) {
             return false;
         }
         return true;
     } //-- isValid
-    
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
     **/
     public abstract short getStructureType();
-    
+
     /**
      * Checks the validity of this Schema defintion.
      * @exception ValidationException when this Schema definition
      * is invalid.
     **/
-    public abstract void validate() 
+    public abstract void validate()
         throws ValidationException;
-        
+
 } //-- Structure

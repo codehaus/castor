@@ -82,6 +82,7 @@ public class ComplexContentRestrictionUnmarshaller extends SaxUnmarshaller {
     private String      _id               = null;
     private boolean     foundAnnotation   = false;
     private boolean     foundAttribute    = false;
+    private boolean     foundAnyAttribute = false;
     private boolean     foundAttributeGroup = false;
 	private boolean     foundModelGroup     = false;
 
@@ -119,7 +120,7 @@ public class ComplexContentRestrictionUnmarshaller extends SaxUnmarshaller {
                 throw new IllegalStateException(err);
             }
 			// We are now sure the base is a complexType
-			// but is it already a restriction? (see CR 5.11->restriction->1.1)
+			// but is it already a restriction? (see PR 5.11->restriction->1.1)
 			else if (((ComplexType)baseType).isRestricted()) {
 			       String err="complexType: "+(_complexType.getName()) != null?
                                             _complexType.getName():"\n";
@@ -220,11 +221,14 @@ public class ComplexContentRestrictionUnmarshaller extends SaxUnmarshaller {
 			 foundAttributeGroup = true;
 			 unmarshaller = new AttributeGroupUnmarshaller(_schema,atts);
 		}
-		else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
-            //-- not yet supported....
-            error("anyAttribute is not yet supported.");
-		}
-		else illegalElement(name);
+		   //-- <anyAttribute>
+        else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           foundAnyAttribute = true;
+            unmarshaller
+                 = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
+        }
+
+        else illegalElement(name);
 
         unmarshaller.setDocumentLocator(getDocumentLocator());
     } //-- startElement
@@ -252,7 +256,16 @@ public class ComplexContentRestrictionUnmarshaller extends SaxUnmarshaller {
             Annotation ann = ((AnnotationUnmarshaller)unmarshaller).getAnnotation();
             _complexType.addAnnotation(ann);
         }
-
+        //-- <anyAttribute>
+        else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+            Wildcard wildcard =
+                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
+            try {
+                _complexType.setAnyAttribute(wildcard);
+            } catch (SchemaException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
 		//-- attribute
 		else if (SchemaNames.ATTRIBUTE.equals(name)) {
             AttributeDecl attrDecl =

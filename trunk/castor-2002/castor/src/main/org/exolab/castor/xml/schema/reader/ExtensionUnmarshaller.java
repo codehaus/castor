@@ -79,6 +79,7 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
     private Schema      _schema      = null;
 
     private boolean foundAnnotation  = false;
+    private boolean foundAnyAttribute = false;
     private boolean foundAttributes  = false;
     private boolean foundModelGroup  = false;
 
@@ -165,9 +166,15 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
+          //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           foundAnyAttribute = true;
+            unmarshaller
+                 = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
+        }
 
         //-- attribute declarations
-        if (SchemaNames.ATTRIBUTE.equals(name)) {
+        else if (SchemaNames.ATTRIBUTE.equals(name)) {
             foundAttributes = true;
             unmarshaller
                 = new AttributeUnmarshaller(_schema, atts, getResolver());
@@ -246,8 +253,19 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
 
+        //-- <anyAttribute>
+        if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+            Wildcard wildcard =
+                 ((WildcardUnmarshaller)unmarshaller).getWildcard();
+            try {
+                _complexType.setAnyAttribute(wildcard);
+            } catch (SchemaException e) {
+                throw new IllegalArgumentException(e.getMessage());
+            }
+        }
+
         //-- attribute declarations
-        if (SchemaNames.ATTRIBUTE.equals(name)) {
+        else if (SchemaNames.ATTRIBUTE.equals(name)) {
             AttributeDecl attrDecl =
                 ((AttributeUnmarshaller)unmarshaller).getAttribute();
 
