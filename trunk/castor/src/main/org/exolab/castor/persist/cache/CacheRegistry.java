@@ -106,10 +106,9 @@ public final class CacheRegistry {
      * @param capacity Cache capacity.
      * @return A {@link Cache} instance, null if no cache type with this name exists.
      * @throws CacheAcquireException A cache of the type specified can not be acquired.
-     * @throws InvalidCacheTypeException An invalid cache type has been specified.
      */
     public static Cache getCache (String cacheType, int capacity, String className) 
-    throws CacheAcquireException, InvalidCacheTypeException
+    	throws CacheAcquireException
     {
         load();
         
