@@ -238,7 +238,8 @@ public interface PersistenceEngine
      * be created in persistent storage. Otherwise the object will be
      * stored and dirty checking might occur in order to determine
      * whether the object is valid. The object's OID might change
-     * during this process.
+     * during this process, and the new OID will be returned. If the
+     * object was not stored (not modified), null is returned.
      *
      * @param tx The transaction context
      * @param obj The object to store
