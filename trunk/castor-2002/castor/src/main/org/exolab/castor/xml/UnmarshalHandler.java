@@ -1178,18 +1178,10 @@ public class UnmarshalHandler implements DocumentHandler {
         //-- we treat strings as primitives
         if (type == String.class) return true;
         
-        if ((type == Boolean.class)   ||
-            (type == Byte.class)      ||
-            (type == Character.class) ||
-            (type == Double.class)    ||
-            (type == Float.class)     ||
-            (type == Integer.class)   ||
-            (type == Long.class)      ||
-            (type == Short.class)) 
+        if ((type == Boolean.class) || (type == Character.class))
             return true;
             
-       return false;
-       
+        return (type.getSuperclass() == Number.class);
     } //-- isPrimitive
     
     /**
