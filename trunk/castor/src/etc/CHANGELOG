@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1676 using contribution from Werner Guttmann [werner DOT guttmann @ gmx DOT net]
+       Added support for lazy-loading 1:1 relations.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1676
+       (Werner - 20041215)
+
 JDO:   Fixed bug 1815 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
        Improved exception handling wrt to global transations.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1815
