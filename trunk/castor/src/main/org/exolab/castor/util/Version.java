@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2002-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -69,7 +69,7 @@ public final class Version {
     /**
      * The version number
      */
-    public static final String VERSION = "0.9.5";
+    public static final String VERSION = "0.9.5.1";
         
     /**
      * The version date.
