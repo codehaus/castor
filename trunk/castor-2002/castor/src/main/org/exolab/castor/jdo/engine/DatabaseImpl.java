@@ -194,10 +194,6 @@ public class DatabaseImpl
                         _ctx.rollback();
                     } catch ( Exception except ) {
                     }
-                    try {
-                        _ctx.close();
-                    } catch ( Exception except ) {
-                    }
                     throw new PersistenceExceptionImpl( "jdo.dbClosedTxRolledback" );
                 }
             } else {
@@ -208,9 +204,9 @@ public class DatabaseImpl
             // the end of transaction, but may be used in jdoStore/jdoRemove
             // which may be called on commit.
             // Therefore, we have to close the Database in afterCompletion
-            if ( _transaction == null )
+            if ( _transaction == null ) 
                 _dbEngine = null;
-            else
+            else 
                 _dbMarkedClosed = true;
         }
     }
@@ -440,10 +436,6 @@ public class DatabaseImpl
             _ctx.rollback();
             throw except;
         } finally {
-            try {
-                _ctx.close();
-            } catch (Exception ex) {
-            }
             _ctx = null;
         }
     }
