@@ -774,9 +774,9 @@ public class DescriptorSourceFactory {
                         min = xsFloat.getMinInclusive();
                         jsc.add("fv.setMinInclusive( new Float(");
                     }
-                    if ( (min.isInfinite()) && (min.compareTo(new Float(0))<0) )
+                    if ( (min.equals(new Float(Float.NEGATIVE_INFINITY))) )
                         jsc.append("Float.NEGATIVE_INFINITY");
-                    else if ( (min.isInfinite()) && (min.compareTo(new Float(0))>0) )
+                    else if ( (min.equals(new Float(Float.POSITIVE_INFINITY))) )
                         jsc.append("Float.POSITIVE_INFINITY");
                     else jsc.append(min.toString());
                     jsc.append("));");
@@ -1046,6 +1046,11 @@ public class DescriptorSourceFactory {
                     jsc.add("sv.setLength(");
                     jsc.append(Integer.toString(xsString.getLength()));
                     jsc.append(");");
+                }
+                if (xsString.hasWhiteSpace()) {
+                    jsc.add("sv.setWhiteSpace(\"");
+                    jsc.append(xsString.getWhiteSpace());
+                    jsc.append("\");");
                 }
                 //-- fixed values
                 if (fixed != null) {
