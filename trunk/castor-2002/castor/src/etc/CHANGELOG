@@ -1,9 +1,29 @@
 
 Version (CVS)
 -------------
-XML:	Added code to remove the xsi-type attribute when a mapping file is used (Arnaud 20020131)
 
-XML:	Fixed a bug that generated classes for "simpleContent" element (Arnaud 20020125)
+ALL:    Upgraded Jakarta Ant to version 1.4 (kvisco) - 20020205)
+
+ALL:    Updated build system to Adaptx, removed XSL:P. Adaptx is the Exolab 
+        version of my old XSL:P processor (kvisco - 20020205)
+
+XML:    Fix bug with Namespaces and QName resolving in the Marshaller, the namespace
+        URI was not being properly declared. (kvisco - 20020202)
+
+XML:    A number of small fixes to the Schema Object Model and SchemaWriter
+        (kvisco - 20020201)
+
+XML:	Added code to remove the xsi-type attribute when a mapping file is used 
+        (Arnaud - 20020131)
+
+XML:    Make sure we marshal namespace prefixes for attributes when necessary
+        (kvisco - 20020130)
+
+XML:    Fix for contructor of Unmarshaller which takes a Mapping object, default 
+        validate value was not getting set properly. (kvisco - 20020130)
+
+XML:	Fixed a bug that generated classes for "simpleContent" element 
+        (Arnaud - 20020125)
 
 XML:    Added Rick Hogge's patch to the source generator that makes 
         java.lang.Object fully qualified to prevent errors when an element name
@@ -19,14 +39,14 @@ XML:    Added support in the Schema Object Model for 'union'. Union is not
         yet integrated with the source generator. (kvisco - 20011217) 
        
 XML:	Refactored the handling of wildcard in the Schema Object Model and
-        Source Generator
+        Source Generator (Arnaud)
 
 XML:	Added support in the Schema Object Model for 'remove' methods (Arnaud)
 
 
 
-Version 0.9.3.9, December 12th
--------------------------------
+Version 0.9.3.9, December 12, 2001
+----------------------------------
 
 XML:    Added support to the Schema Object Model for a number of XML Schema
         attributes / properties such as elementFormDefault, form, 
