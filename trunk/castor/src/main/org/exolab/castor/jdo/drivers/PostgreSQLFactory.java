@@ -82,10 +82,13 @@ public final class PostgreSQLFactory
      */
     public Boolean isDuplicateKeyException( Exception ex )
     {
-        // Sometime gives wrong results
-        //if ( ex.getMessage().toUpperCase().indexOf("DUPLICATE KEY") >= 0 )
-        //    return Boolean.TRUE;
-        return null;
+        Boolean isDuplicateKey = Boolean.FALSE;
+
+        // Fixed 
+        if ( ex.getMessage().indexOf( "duplicate key" ) > 0 )
+            isDuplicateKey = Boolean.TRUE;
+
+        return isDuplicateKey;
     }
 
 
