@@ -62,7 +62,7 @@ public class JMember {
 
     private String name = null;
 
-    private String comment = null;
+    private JDocComment comment = null;
 
     /**
      * The Class in this JMember has been declared
@@ -75,7 +75,7 @@ public class JMember {
         this.name = name;
         this.modifiers = new JModifiers();
         this.modifiers.makePrivate();
-
+        
     } //-- JMember
 
     
@@ -85,7 +85,7 @@ public class JMember {
      * @return the comment describing this member, or
      * null if no comment has been set.
     **/
-    public String getComment() {
+    public JDocComment getComment() {
         return this.comment;
     } //-- getComment
 
@@ -124,13 +124,22 @@ public class JMember {
     } //-- getType
 
     /**
-     * Sets the comment describing this member. The comment 
-     * will be printed when this member is printed with the
-     * Class Printer
-     * @param comment the comment for this member
+     * Sets the comment describing this member. 
+     * @param comment the JDocComment for this member
+    **/
+    public void setComment(JDocComment comment) {
+        this.comment = comment;
+    } //-- setComment
+
+    /**
+     * Sets the comment describing this member. 
+     * @param comment the JDocComment for this member
     **/
     public void setComment(String comment) {
-        this.comment = comment;
+        if (this.comment == null) {
+            this.comment = new JDocComment();
+        }
+        this.comment.setComment(comment);
     } //-- setComment
 
     /**

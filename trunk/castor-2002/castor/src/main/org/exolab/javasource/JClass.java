@@ -60,20 +60,22 @@ import java.util.Vector;
 **/
 public class JClass extends JType {
 
+    /**
+     * The Id for Source control systems
+     * I needed to separate this line to prevent CVS from
+     * expanding it here! ;-)
+    **/
     private static final String DEFAULT_HEADER
-        = "Add code header here";
+        = "$"+"Id";
 
     /**
      * The version for JavaDoc
      * I needed to separate this line to prevent CVS from
-     * expanding it! ;-)
+     * expanding it here! ;-)
     **/
     private static final String version = "$"+"Revision$ $"+"Date$";
 
-    /**
-     * The code header to be displayed at the top of the source file
-    **/
-    private String codeHeader = null;
+    private JComment header = null;
 
     /**
      * List of imported classes and packages
@@ -146,7 +148,6 @@ public class JClass extends JType {
         members       = new JNamedMap();
         methods       = new Vector();
         modifiers     = new JModifiers();
-        
         //-- initialize default Java doc
         jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
         
@@ -409,16 +410,15 @@ public class JClass extends JType {
         jsw.setLineSeparator(lineSeparator);
         
         StringBuffer buffer = new StringBuffer();
+        
+        
         //-- write class header
-        jsw.writeln("/*");
-        if (codeHeader == null)
-            printlnWithPrefix(" * ", DEFAULT_HEADER, jsw);
-        else 
-            printlnWithPrefix(" * ", codeHeader, jsw);
-            
-        //-- separate this line so CVS doesn't expand it
-        jsw.writeln(" * $"+"Id"+"$ ");
-        jsw.writeln(" */");
+        if (header != null) header.print(jsw);
+        else {
+            jsw.writeln("/*");
+            jsw.writeln(" * " + DEFAULT_HEADER);
+            jsw.writeln("*/");
+        }
         jsw.writeln();
         jsw.flush();
         
@@ -517,12 +517,8 @@ public class JClass extends JType {
             JMember jMember = (JMember)members.get(i);
             
             //-- print Java comment
-            jsw.writeln("/**");
-            jsw.write(" * ");
-            String comment = jMember.getComment();
-            if (comment != null) jsw.write(comment);
-            jsw.writeln();
-            jsw.writeln("**/");
+            JDocComment comment = jMember.getComment();
+            if (comment != null) comment.print(jsw);
             
             // -- print member
             jsw.write((JMember)members.get(i));
@@ -564,6 +560,15 @@ public class JClass extends JType {
         jsw.flush();
         jsw.close();
     } //-- printSource
+    
+    /**
+     * Sets the header comment for this JClass
+     * @param comment the comment to display at the top of the source file
+     * when printed
+    **/
+    public void setHeader(JComment comment) {
+        this.header = comment;
+    } //-- setHeader
     
     /**
      * Sets the super Class that this class extends
