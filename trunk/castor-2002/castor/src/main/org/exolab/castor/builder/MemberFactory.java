@@ -278,7 +278,6 @@ public class MemberFactory {
         //-- really exist (this check must be handle by the new version of the SOM)
         if (eDecl.isReference()) {
             ElementDecl eRef = eDecl.getReference();
-
             if (eRef == null) {
                 String err = "unable to resolve element reference: ";
 			    err += element.getName();
@@ -343,8 +342,15 @@ public class MemberFactory {
 			{
 				// Java class name is element name
 				className = JavaNaming.toJavaClassName(eDecl.getName());
-				if (className==null)
+                if (className==null)
 					return null;
+                else {
+                   //make sure we append namespaces information
+                   //if defined in the property file
+                   String packageName = SourceGenerator.getJavaPackage(eDecl.getSchema().getTargetNamespace());
+                   className = (packageName != null)?packageName+"."+className:className;
+                   packageName = null;
+                }
 			}
 			else if (SourceGenerator.mappingSchemaType2Java())
 			{
