@@ -340,30 +340,6 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
      * during marshaling
-    **
-    private void marshal
-        (Object object, 
-         XMLFieldDescriptor descriptor, 
-         DocumentHandler handler, boolean foo) 
-        throws MarshalException, ValidationException
-    {
-    } //-- marshal
-    
-    /**
-     * Marshals the given object, using the given descriptor 
-     * and document handler.
-     *
-     * <BR/>
-     * <B>Note:</B>
-     * <I>
-     *   It is an error if this method is called with an 
-     *   AttributeDescriptor.
-     * </I>
-     * @param descriptor the XMLFieldDescriptor for the given object
-     * @param handler the DocumentHandler to marshal to
-     * @exception org.exolab.castor.xml.MarshalException
-     * @exception org.exolab.castor.xml.ValidationException
-     * during marshaling
     **/
     private void marshal
         (Object object, 
