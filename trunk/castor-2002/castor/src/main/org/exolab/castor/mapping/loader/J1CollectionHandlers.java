@@ -136,7 +136,7 @@ public final class J1CollectionHandlers
             }
             public Object clear( Object collection ) {
                 if ( collection != null )
-                    ( (Vector) collection ).clear();
+                    ( (Vector) collection ).removeAllElements();
                 return null;
             }
             public String toString() {
