@@ -61,13 +61,13 @@ public class IndirectFieldHandler
 {
 
 
-    private FieldHandler   _indirect;
+    private final FieldHandler   _indirect;
 
 
-    private FieldHandler   _handler;
+    private final FieldHandler   _handler;
 
 
-    private boolean        _required;
+    private final boolean        _required;
 
 
     public IndirectFieldHandler( FieldHandler handler, FieldHandler indirect, boolean required )
@@ -93,13 +93,13 @@ public class IndirectFieldHandler
             return null;
         return _handler.getValue( object );
     }
-    
-    
+
+
     public void setValue( Object object, Object value )
     {
         Object ref;
 
-        // XXX If value is null in some cases create the indirect object, in others don't        
+        // XXX If value is null in some cases create the indirect object, in others don't
         ref = _indirect.getValue( object );
         if ( ref == null ) {
             ref = _indirect.newInstance( object );
@@ -119,8 +119,7 @@ public class IndirectFieldHandler
             if ( _required )
                 throw new ValidityException( "mapping.requiredField",
                                              object.getClass().getName(), _indirect.toString() );
-        } else
-            _handler.checkValidity( ref );
+        }
     }
 
 
@@ -135,7 +134,7 @@ public class IndirectFieldHandler
     {
         return _handler + " on " + _indirect;
     }
-    
-    
+
+
 }
 
