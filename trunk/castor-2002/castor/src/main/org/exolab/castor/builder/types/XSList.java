@@ -69,7 +69,7 @@ public class XSList extends XSType {
     private String value = null;
     
     public XSList(XSType contentType) {
-        super(XSType.LIST);
+        super(XSType.COLLECTION);
         this.contentType = contentType;
     } //-- XSList
     

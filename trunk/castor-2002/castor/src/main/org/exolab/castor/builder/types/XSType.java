@@ -142,7 +142,7 @@ public abstract class XSType {
     public static final short ID                 =  5;
     public static final short IDREF              =  6;
     public static final short INTEGER            =  7;
-    public static final short LIST               =  8;
+    public static final short COLLECTION         =  8;
     public static final short LONG               =  9;
     public static final short NCNAME             = 10;
     public static final short NEGATIVE_INTEGER   = 11;
