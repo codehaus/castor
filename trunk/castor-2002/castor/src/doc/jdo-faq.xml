@@ -64,7 +64,7 @@
 	<p>It cannot be used with Castor, because it doesn't allow to keep two open ResultSets at the same time.
 	   Either use JDBC driver of type &gt; 1, or use some other JDBC-ODBC bridge without such restriction
 	   (for example, from <a href="http://www.easysoft.com">Easysoft</a>).</p>
-	
+
 	<p><b>My get-method for the Collection of dependent objects returns <tt>null</tt>. Why?</b></p>
 
 	<p>You should initialize the Collection yourself:
@@ -76,55 +76,60 @@
   }
          </code>
     </p>
-		
+
 	<p><b>What features are supported in Castor's OQL?</b></p>
 
 	<p>Due to some accident, we lost the xml source of the OQL document. Before we recover it, please click
 	<a href="http://www.karpenstein.com/nissim/design-oql-parser.html">here</a> for the document</p>
 
 	<p><b>Should my JDO classes implement some special interface?</b></p>
-	
+
 	<p>In general, no. If you need some behavior that is not directly supported by Castor, you can implement interface org.exolab.castor.jdo.Persistent.
 	In order to use dirty checking for long transaction you should implement interface org.exolab.castor.jdo.TimeStampable.
 	If you need an example of use of these interfaces, see Persistent.java and TestPersistent.java among Castor JDO tests.</p>
-	
+
 	<p><b>Can Castor automatically create/remove related objects?</b></p>
-	
+
 	<p>First of all, let's agree upon terminology. We distinguish dependent and independent objects:
 	   <b>dependent</b> objects are bounded to the parent object's lifecycle,
 	   <b>independent</b> objects have independent lifecycle.
 	   Thus, dependent objects are created/removed automatically, when their parent object is created/removed,
 	   while all operations on independent objects should be performed explicitly.</p>
-	
+
 	<p>However, with Castor 0.8.x you cannot describe explicitly the kind of object.
 	   Instead, the following rule acts: if you have one-to-many relation, and each side of the relation
 	   refers to another (Collection attribute on "one" side, simple attribute on "many" side),
 	   then "many" side is a dependent object. All other objects are independent.
 	   In particular, related objects via one-to-one relation are not created/removed automatically.</p>
-	
+
 	<p>With Castor 0.9 dependent objects should be described via "depends" attribute of "class" element in mapping configuration file.</p>
-	
+
 	<p>If you wish some independent object was created and/or removed automatically on operations on other independent object,
 	   you may use interface Persistent to code the desired behavior.</p>
-	
+
 	<p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
-	
+
 	<p>Probably castor.jar file is in jre/lib/ext directory. In this case you should call
          <code>
   jdo.setClassLoader(getClass().getClassLoader());
          </code>
        before jdo.getDatabase().</p>
-	
+
 	<p><b>I am getting exception "the class ... is not persistence capable...". Why?</b></p>
-	
-	<p>In this case as well as in many others you can get more information with the help of logging. Call
+
+	<p>In this case as well as in many others you can get more information with the help of logging. Call</p>
          <code>
   jdo.setLogWriter(Logger.getSystemLogger());
          </code>
-       and seek in the output for warnings and errors.</p>
-     </section>
+    <p>and seek in the output for warnings and errors.</p>
 
-     <section title="Features requests">
+    <p><b>I call db.remove() on the dependent object and commit, but this doesn't work...</b></p>
+
+    <p>You should not add/remove dependent objects directly. In order to add/remove the dependent object you should just add/remove it from the collection in the master object and call db.commit()</p>
+
+    </section>
+
+    <section title="Features requests">
         <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?</b></p>
 
 	<p>Those features are implemented and available in development branch of the cvs.</p>
