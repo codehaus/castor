@@ -1298,8 +1298,8 @@ public class SourceGenerator {
             processAttributes(complexType, sInfo);
             //--process content type if necessary
             ContentType temp = complexType.getContentType();
-            if (temp.getType() == ContentType.SIMPLETYPE) {
-                processSimpleType(temp.getSimpleType(), sInfo);
+            if (temp.getType() == ContentType.SIMPLE) {
+                processSimpleType(((SimpleContent)temp).getSimpleType(), sInfo);
             }
             
             //-- process ContentModel

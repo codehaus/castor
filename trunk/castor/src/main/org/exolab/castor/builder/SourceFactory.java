@@ -279,7 +279,6 @@ public class SourceFactory  {
                 creatingForAnElement =
                    (component.getAnnotated().getStructureType() == Structure.ELEMENT);
                 ComplexType complexType = (ComplexType)type;
-
                 if (complexType.isTopLevel() && creatingForAnElement) {
                      //--move the view and keep the structure
                      Annotated saved = component.getAnnotated();
@@ -425,8 +424,9 @@ public class SourceFactory  {
                         FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
                         handleField(fieldInfo, state);
                     }
-                    else if (complexType.getContentType().getType() == ContentType.SIMPLETYPE) {
-                        SimpleType temp = complexType.getContentType().getSimpleType();
+                    else if (complexType.getContentType().getType() == ContentType.SIMPLE) {
+                        SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
+                        SimpleType temp = simpleContent.getSimpleType();
                         XSType xsType = TypeConversion.convertType(temp, packageName);
                         FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		                handleField(fieldInfo,state);
@@ -1271,17 +1271,17 @@ public class SourceFactory  {
 				component.setView(complexType);
                 //--only set a super class name if the current complexType
                 //--is not a restriction of a simpleContent (--> no object hierarchy, only content hierarchy)
-                if (!(complexType.isSimpleContent() && complexType.isRestricted()) )
+                if (!(complexType.isSimpleContent() && ((ComplexType)base).isRestricted()) )
                     state.jClass.setSuperClass(baseClassName);
             } //--complexType
 
             //--if the content type is a simpleType create a field info for it.
-            if (complexType.getContentType().getType() == ContentType.SIMPLETYPE) {
-                SimpleType temp = complexType.getContentType().getSimpleType();
+            if (complexType.getContentType().getType() == ContentType.SIMPLE) {
+                SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
+                SimpleType temp = simpleContent.getSimpleType();
                 XSType xsType = TypeConversion.convertType(temp, state.packageName);
                 FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		        handleField(fieldInfo,state);
-		        temp = null;
             }
 		}//--base not null
 		

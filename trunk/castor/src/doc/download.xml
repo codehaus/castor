@@ -3,7 +3,6 @@
   <body>
     <title>Download</title>
     <header>
-      <p>For FTP access use <url>ftp://ftp.exolab.org/pub/</url></p>
       <ul><b>Lastest Released Version: Castor $VERSION$</b>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
             <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$.jar</url>
@@ -24,8 +23,9 @@
             <url>ftp://ftp.exolab.org/pub/castor/castor_$VERSION$/castor-$VERSION$-src.zip</url>
             <br/>&#xA0;</li>
       </ul>
-      <p>Notes:</p>
+      <p><b>Notes:</b></p>
 
+      <p>For FTP access use <url>ftp://ftp.exolab.org/pub/castor/</url></p>
       <p>
          For Latest CVS version use our CVS server
          (<a href="cvs.xml">CVS Information</a>) or

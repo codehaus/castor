@@ -112,6 +112,13 @@ final class TransactionContextImpl
         Connection  conn;
 
         if ( _globalTx ) {
+            enum = _conns.elements();
+            while ( enum.hasMoreElements() ) {
+                try {
+                    ( (Connection) enum.nextElement() ).close();
+                } catch ( SQLException except ) { }
+            }
+
             _conns.clear();
         } else {
             try {

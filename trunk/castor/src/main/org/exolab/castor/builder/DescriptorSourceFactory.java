@@ -393,8 +393,10 @@ public class DescriptorSourceFactory {
 			any = true;
 		boolean isAttribute =
 			(member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
-
-		if (xsType.getType() == XSType.CLASS)
+	    boolean isContent = 
+	        (member.getNodeType() == FieldInfo.TEXT_TYPE);
+	    
+	    if (xsType.getType() == XSType.CLASS)
 			isEnumerated = ((XSClass) xsType).isEnumerated();
 
 		jsc.add("handler = (new org.exolab.castor.xml.XMLFieldHandler() {");
@@ -485,7 +487,7 @@ public class DescriptorSourceFactory {
 			//i.e add specific FieldHandler in org.exolab.castor.xml.handlers
 			//dateTime is not concerned by the following since it is directly
 			//handle by DateFieldHandler
-			if (isAttribute
+			if ( (isAttribute | isContent)
 				&& xsType.isDateTime()
 				&& xsType.getType() != xsType.DATETIME_TYPE) {
 				jsc.append(".parse");

@@ -130,7 +130,7 @@ public abstract class TransactionContext
      * thru this transactionContext as read only object
      */
     public static int OBJECT_STATE_READ_ONLY = 2;
-    
+
     /*
      * An object is consider as Persistent if the object is loaded
      * thru this transactionContext
@@ -155,7 +155,7 @@ public abstract class TransactionContext
      */
     public static int OBJECT_STATE_PERSISTENT_NEW_DELETED = 6;
 
-    
+
     /**
      * Set while transaction is waiting for a lock.
      *
@@ -237,7 +237,7 @@ public abstract class TransactionContext
 
 
     /**
-     * The default callback interceptor for the data object in 
+     * The default callback interceptor for the data object in
      * this transaction.
      */
     private CallbackInterceptor        _callback;
@@ -248,7 +248,7 @@ public abstract class TransactionContext
     private InstanceFactory            _instanceFactory;
 
     /**
-     * Creating 
+     * Creating
      *
      */
     private boolean                   _creating;
@@ -327,9 +327,9 @@ public abstract class TransactionContext
     }
 
     /**
-     * Enable or disable autoStore. 
-     * If enabled, all new objects, which is reachable from other 
-     * object that is quried, loaded, created in the transaction, 
+     * Enable or disable autoStore.
+     * If enabled, all new objects, which is reachable from other
+     * object that is quried, loaded, created in the transaction,
      * will be created when the transaction is committed.
      */
     public void setAutoStore( boolean autoStore ) {
@@ -344,14 +344,14 @@ public abstract class TransactionContext
     }
 
     /**
-     * Overrides the default callback interceptor by a custom 
+     * Overrides the default callback interceptor by a custom
      * interceptor for this database source.
      * <p>
-     * The interceptor is a callback that notifies data objects 
+     * The interceptor is a callback that notifies data objects
      * on persistent state events.
      * <p>
      * If callback interceptor is not overrided, events will be
-     * sent to data object that implements the org.exolab.castor.jdo.Persistent 
+     * sent to data object that implements the org.exolab.castor.jdo.Persistent
      * interface.
      *
      * @param callback The callback interceptor, null if disabled
@@ -361,7 +361,7 @@ public abstract class TransactionContext
     }
 
     /**
-     * Overrides the default instance factory by a custom one for 
+     * Overrides the default instance factory by a custom one for
      * this database source.
      * <p>
      * The factory is used to obatain a new instance of data object
@@ -513,8 +513,8 @@ public abstract class TransactionContext
 
 
     /**
-     * Load an object for use within the transaction. Multiple access 
-     * to the same object within the transaction will return the same 
+     * Load an object for use within the transaction. Multiple access
+     * to the same object within the transaction will return the same
      * object instance (except for read-only access).
      * <p>
      * This method is similar to {@link #fetch} except that it will
@@ -556,8 +556,8 @@ public abstract class TransactionContext
     }
 
     /**
-     * Load an object for use within the transaction. Multiple access 
-     * to the same object within the transaction will return the same 
+     * Load an object for use within the transaction. Multiple access
+     * to the same object within the transaction will return the same
      * object instance (except for read-only access).
      * <p>
      * This method work the same as {@link #load(LockEngine,ClassMolder,Object,Object,AccessMode)},
@@ -592,7 +592,7 @@ public abstract class TransactionContext
 
         oid = new OID( engine, molder, identity );
 
-        if ( objectToBeLoaded != null 
+        if ( objectToBeLoaded != null
             && !molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( objectToBeLoaded.getClass() ) )
             throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), objectToBeLoaded.getClass() ) );
         AccessMode accessMode = molder.getAccessMode( suggestedAccessMode );
@@ -601,8 +601,8 @@ public abstract class TransactionContext
         if ( entry == null )
             entry = getObjectEntry( engine, oid );
         if ( entry != null ) {
-            // If the object has been loaded, but the instance sugguested to 
-            // be loaded into is not the same as the loaded instance, 
+            // If the object has been loaded, but the instance sugguested to
+            // be loaded into is not the same as the loaded instance,
             // error is reported.
             if ( objectToBeLoaded != null && objectToBeLoaded != entry.object )
                 throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getName(), identity ) );
@@ -710,7 +710,7 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized QueryResults query( LockEngine engine, 
+    public synchronized QueryResults query( LockEngine engine,
             PersistenceQuery query, AccessMode accessMode, boolean scrollable )
             throws QueryException, PersistenceException {
         // Need to execute query at this point. This will result in a
@@ -739,7 +739,7 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized void markCreate( LockEngine engine, ClassMolder molder, 
+    public synchronized void markCreate( LockEngine engine, ClassMolder molder,
             Object object, OID depended )
             throws DuplicateIdentityException, PersistenceException {
 
@@ -805,7 +805,7 @@ public abstract class TransactionContext
 
             engine.markCreate( this, oid, object );
         } catch ( LockNotGrantedException lneg ) {
-            // yip: do we need LockNotGrantedException, or should we 
+            // yip: do we need LockNotGrantedException, or should we
             // removed them?
             removeObjectEntry( object );
             throw new DuplicateIdentityException("");
@@ -822,9 +822,9 @@ public abstract class TransactionContext
     /**
      * Creates a new object in persistent storage. The object will
      * be persisted only if the transaction commits. If an identity
-     * is provided then duplicate identity check happens in this 
-     * method, if no identity is provided then duplicate identity 
-     * check occurs when the transaction completes and the object 
+     * is provided then duplicate identity check happens in this
+     * method, if no identity is provided then duplicate identity
+     * check occurs when the transaction completes and the object
      * is not visible in this transaction.
      *
      * @param engine The persistence engine
@@ -839,8 +839,8 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public synchronized void create( LockEngine engine, ClassMolder molder, 
-            Object object, OID depended ) 
+    public synchronized void create( LockEngine engine, ClassMolder molder,
+            Object object, OID depended )
             throws DuplicateIdentityException, PersistenceException {
 
         boolean walk = false;
@@ -865,7 +865,7 @@ public abstract class TransactionContext
 
 
         // After the marking is done, we will actually create the object.
-        // However, because some objects contains foreign key are key 
+        // However, because some objects contains foreign key are key
         // generated, such object should be created after some other.
         // We iterate all object and creating object according the priority.
         int         priority  = 0;
@@ -891,9 +891,9 @@ public abstract class TransactionContext
                             entry.created = true;
                             entry.creating = false;
 
-                            // yip: we got problem here. We would run into 
-                            // problem if user try to create inside the 
-                            // callback. We must think a workaround to 
+                            // yip: we got problem here. We would run into
+                            // problem if user try to create inside the
+                            // callback. We must think a workaround to
                             // fixes this problem for backward compatiblity
                             if ( _callback != null ) {
                                 _callback.using( entry.object, _db );
@@ -912,7 +912,7 @@ public abstract class TransactionContext
                         _callback.releasing( enumEntry.object, false );
                     } else if ( molder.getCallback() != null ) {
                         molder.getCallback().releasing( enumEntry.object, false );
-                    } 
+                    }
                     removeObjectEntry( enumEntry.object );
                     if ( except instanceof DuplicateIdentityException )
                         throw (DuplicateIdentityException) except;
@@ -951,11 +951,11 @@ public abstract class TransactionContext
      * <p>
      * Update will also mark object to be created if the TIMESTAMP
      * equals to NO_TIMESTAMP.
-     * 
+     *
      * @param engine The persistence engine
      * @param molder The object's molder
      * @param object The object to persist
-     * @param depended The master objects of the specified object to be 
+     * @param depended The master objects of the specified object to be
      *        created if exisit
      * @return true if the object is marked to be created
      * @throws DuplicateIdentityException An object with this identity
@@ -965,7 +965,7 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      * @throws ObjectModifiedException Dirty checking mechanism may immediately
-     *  report that the object was modified in the database during the long 
+     *  report that the object was modified in the database during the long
      *  transaction.
      */
     public boolean markUpdate( LockEngine engine, ClassMolder molder, Object object, OID depended )
@@ -991,14 +991,14 @@ public abstract class TransactionContext
         if ( entry != null ) {
             if ( entry.deleted )
                 throw new ObjectDeletedException( Messages.format("persist.objectDeleted", object.getClass(), identity ) );
-            else 
+            else
                 throw new DuplicateIdentityException( "update object which is already in the transaction" );
         }
 
         try {
             entry = addObjectEntry( oid, object );
             entry.creating = entry.engine.update( this, oid, object, null, 0 );
-            // yip: there is one issue here. Because object might be marked 
+            // yip: there is one issue here. Because object might be marked
             // to be created in the update process. However, we have no easy
             // way to fire jdoCreating() events from here.
         } catch ( DuplicateIdentityException lneg ) {
@@ -1020,7 +1020,7 @@ public abstract class TransactionContext
                 } else if ( molder.getCallback() != null ) {
                     molder.getCallback().using( object, _db );
                     molder.getCallback().updated( object );
-                } 
+                }
             } catch ( Exception except ) {
                 release( object );
                 if ( except instanceof PersistenceException )
@@ -1044,11 +1044,11 @@ public abstract class TransactionContext
      * <p>
      * Update will also mark object to be created if the TIMESTAMP
      * equals to NO_TIMESTAMP.
-     * 
+     *
      * @param engine The persistence engine
      * @param molder The object's molder
      * @param object The object to persist
-     * @param depended The master objects of the specified object to be 
+     * @param depended The master objects of the specified object to be
      *        created if exisit
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
@@ -1057,7 +1057,7 @@ public abstract class TransactionContext
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      * @throws ObjectModifiedException Dirty checking mechanism may immediately
-     *  report that the object was modified in the database during the long 
+     *  report that the object was modified in the database during the long
      *  transaction.
      */
     public synchronized void update( LockEngine engine, ClassMolder molder, Object object, OID depended )
@@ -1069,7 +1069,7 @@ public abstract class TransactionContext
             walk = true;
             _creating = true;
         }
-        
+
         try {
             markUpdate( engine, molder, object, depended );
         } catch (DuplicateIdentityException e) {
@@ -1083,7 +1083,7 @@ public abstract class TransactionContext
 
         // markUpdate will actually update object loaded/create from preious
         // transaction, or it might marked some object to be created.
-        // However, because some objects contains foreign key are key 
+        // However, because some objects contains foreign key are key
         // generated, such object should be created after some other.
         // We iterate all object and creating object according the priority.
         int         priority  = 0;
@@ -1100,7 +1100,7 @@ public abstract class TransactionContext
                                 _callback.creating( enumEntry.object, _db );
                             } else if ( enumEntry.molder.getCallback() != null ) {
                                 enumEntry.molder.getCallback().creating( enumEntry.object, _db );
-                            } 
+                            }
                             // Must perform creation after object is recorded in transaction
                             // to prevent circular references.
                             OID oid = enumEntry.engine.create
@@ -1131,7 +1131,7 @@ public abstract class TransactionContext
                         _callback.releasing( enumEntry.object, false );
                     } else if ( molder.getCallback() != null ) {
                         molder.getCallback().releasing( enumEntry.object, false );
-                    } 
+                    }
                     removeObjectEntry( enumEntry.object );
                     if ( except instanceof DuplicateIdentityException )
                         throw (DuplicateIdentityException) except;
@@ -1180,7 +1180,7 @@ public abstract class TransactionContext
             throws ObjectNotPersistentException, LockNotGrantedException, PersistenceException {
         ObjectEntry entry;
 
-        if ( object == null ) 
+        if ( object == null )
             throw new PersistenceException("Object to be deleted is null!");
 
         // Get the entry for this object, if it does not exist
@@ -1197,7 +1197,7 @@ public abstract class TransactionContext
                 _callback.removing( entry.object );
             } else if ( entry.molder.getCallback() != null ) {
                 entry.molder.getCallback().removing( entry.object );
-            } 
+            }
         } catch ( Exception except ) {
             throw new PersistenceException( Messages.format("persist.nested",except) );
         }
@@ -1230,7 +1230,7 @@ public abstract class TransactionContext
                     _callback.removed( entry.object );
                 } else if ( entry.molder.getCallback() != null ) {
                     entry.molder.getCallback().removed( entry.object );
-                } 
+                }
             } catch ( Exception except ) {
                 throw new PersistenceException( Messages.format("persist.nested",except) );
             }
@@ -1271,7 +1271,7 @@ public abstract class TransactionContext
             throws ObjectNotPersistentException, LockNotGrantedException, PersistenceException {
         ObjectEntry entry;
 
-        if ( object == null ) 
+        if ( object == null )
             throw new PersistenceException("Object to acquire lock is null!");
 
         // Get the entry for this object, if it does not exist
@@ -1295,7 +1295,7 @@ public abstract class TransactionContext
     }
 
     public synchronized void markModified( Object object, boolean updatePersist, boolean updateCache ) {
-        
+
         ObjectEntry entry;
 
         entry = getObjectEntry( object );
@@ -1344,7 +1344,7 @@ public abstract class TransactionContext
             throws LockNotGrantedException, ObjectNotPersistentException {
         ObjectEntry entry;
 
-        if ( object == null ) 
+        if ( object == null )
             throw new ObjectNotPersistentException("Object to acquire lock is null!");
 
         // Get the entry for this object, if it does not exist
@@ -1383,7 +1383,7 @@ public abstract class TransactionContext
             throws ObjectNotPersistentException, PersistenceException {
         ObjectEntry  entry;
 
-        if ( object == null ) 
+        if ( object == null )
             throw new PersistenceException("Object to release lock is null!");
 
         // Get the entry for this object, if it does not exist
@@ -1469,10 +1469,10 @@ public abstract class TransactionContext
                 }
             }
 
-            // preStore will actually walk all existing object and it might marked 
+            // preStore will actually walk all existing object and it might marked
             // some object to be created (and to be removed).
-            // Because some objects contains foreign key are key generated, such 
-            // object should be created after some other. We iterate all objects and 
+            // Because some objects contains foreign key are key generated, such
+            // object should be created after some other. We iterate all objects and
             // creating object according the priority.
             int         priority  = 0;
             int         nextPrior = 0;
@@ -1488,7 +1488,7 @@ public abstract class TransactionContext
                                     _callback.creating( enumEntry.object, _db );
                                 } else if ( enumEntry.molder.getCallback() != null ) {
                                     enumEntry.molder.getCallback().creating( enumEntry.object, _db );
-                                } 
+                                }
                                 // Must perform creation after object is recorded in transaction
                                 // to prevent circular references.
                                 OID oid = enumEntry.engine.create
@@ -1519,7 +1519,7 @@ public abstract class TransactionContext
                             _callback.releasing( enumEntry.object, false );
                         } else if ( enumEntry.molder.getCallback() != null ) {
                             enumEntry.molder.getCallback().releasing( enumEntry.object, false );
-                        } 
+                        }
                         removeObjectEntry( enumEntry.object );
                         if ( except instanceof DuplicateIdentityException )
                             throw (DuplicateIdentityException) except;
@@ -1546,7 +1546,7 @@ public abstract class TransactionContext
                     try {
                         _callback.storing( entry.object, entry.updateCacheNeeded );
                     } catch ( Exception except ) {
-                        throw new TransactionAbortedException( 
+                        throw new TransactionAbortedException(
                             Messages.format("persist.nested", except), except );
                     }
                 } else if ( !entry.deleted && entry.molder.getCallback() != null ) {
@@ -1554,14 +1554,14 @@ public abstract class TransactionContext
                         entry.molder.getCallback().storing( entry.object, entry.updateCacheNeeded );
                         // updatePersistNeeded implies updateCacheNeeded
                     } catch ( Exception except ) {
-                        throw new TransactionAbortedException( 
+                        throw new TransactionAbortedException(
                             Messages.format("persist.nested", except), except );
                     }
                 }
             }
 
             _status = Status.STATUS_PREPARING;
-            
+
             // patch for bug 973 Dependent order deletion problem
             // Search maximum priority in _deletedList
             entry = _deletedList;
@@ -1593,8 +1593,6 @@ public abstract class TransactionContext
                 throw (TransactionAbortedException) except;
             // Any error is reported as transaction aborted
             throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
-        } finally {
-          closeConnections();
         }
     }
 
@@ -1650,7 +1648,7 @@ public abstract class TransactionContext
             } else {
                 // Object has been created/accessed inside the
                 // transaction, release its lock.
-                
+
                 if ( entry.updateCacheNeeded ) {
                     entry.engine.updateCache( this, entry.oid, entry.object );
                 }
@@ -1816,11 +1814,11 @@ public abstract class TransactionContext
         depends = entry.oid.getDepends();
         if ( depends == null )
             return false;
-        
+
         return depends.equals( master );
     }
 
-    
+
     /**
      * Returns the object's identity. If the identity was determined when
      * the object was created, or if the object was retrieved, that identity
@@ -1840,7 +1838,7 @@ public abstract class TransactionContext
         if ( entry != null )
             return entry.oid.getIdentity();
         return null;
-    } 
+    }
 
 
     /**
@@ -1902,12 +1900,12 @@ public abstract class TransactionContext
         ObjectEntry entry;
 
         entry = getObjectEntry( object );
-        if ( entry != null ) 
+        if ( entry != null )
             return entry.deleted;
-    
+
         return false;
     }
-    
+
     public boolean isDeletedByOID( OID oid ) {
         ObjectEntry entry;
 
@@ -1949,7 +1947,7 @@ public abstract class TransactionContext
      * @return the current ClassLoader's instance. <code>null</code> if none
      * has been provided
      */
-    public ClassLoader getClassLoader () 
+    public ClassLoader getClassLoader ()
     {
         return _db.getClassLoader();
     }
@@ -1973,7 +1971,7 @@ public abstract class TransactionContext
                     _callback.removing( entry.object );
                 } else if ( entry.molder != null && entry.molder.getCallback() != null ) {
                     entry.molder.getCallback().removing( entry.object );
-                } 
+                }
             } catch ( Exception except ) {
                 throw new PersistenceException( Messages.format("persist.nested", except) );
             }
@@ -2067,7 +2065,7 @@ public abstract class TransactionContext
 
     ObjectEntry rehash( Object object, OID oid ) {
         ObjectEntry entry = getObjectEntry( object );
-        
+
         if ( entry == null )
             throw new IllegalArgumentException("ObjectEntry to be rehash is not found");
 
@@ -2200,7 +2198,7 @@ public abstract class TransactionContext
          * It maybe different from engine.getClassMolder().
          * RelationCollection generally share the same java
          * class, but representing relations of different
-         * pair of object. 
+         * pair of object.
          */
         final ClassMolder        molder;
         /**

@@ -1,6 +1,12 @@
 
 Version (CVS) 
 -------------
+XML:    Fixed Bug 1232: The facet 'MinInclusive' was not handle properly for decimal
+        datatype.
+        (Arnaud - 20030225)
+
+JDO:    Fixed Bug 1165 : Castor closes connections too early with global transactions
+        (Mickael - 20030221)
 
 Version 0.9.4.3, February 12, 2003
 ----------------------------------
