@@ -1419,35 +1419,35 @@ public final class UnmarshalHandler extends MarshalFramework
             //-- the resolver for one
             String instanceClassname = null;
             if (_topClass == null) {
-                classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
 
-                if (classDesc != null) {
-                    _topClass = classDesc.getJavaClass();
-                }
-                else {
-                    //-- check for xsi:type
-                    instanceClassname = getInstanceType(atts, null);
-                    if (instanceClassname != null) {
+                //-- check for xsi:type
+                instanceClassname = getInstanceType(atts, null);
+                if (instanceClassname != null) {
                         
-                        //-- first try loading class directly
-                        try {
-                            _topClass = loadClass(instanceClassname, null);
+                    //-- first try loading class directly
+                    try {
+                        _topClass = loadClass(instanceClassname, null);
+                    }
+                    catch(ClassNotFoundException cnfe) {};
+                        
+                    if (_topClass == null) {
+                        classDesc = getClassDescriptor(instanceClassname);
+                        if (classDesc != null) {
+                            _topClass = classDesc.getJavaClass();
                         }
-                        catch(ClassNotFoundException cnfe) {};
-                        
                         if (_topClass == null) {
-                            classDesc = getClassDescriptor(instanceClassname);
-                            if (classDesc != null) {
-                                _topClass = classDesc.getJavaClass();
-                            }
-                            if (_topClass == null) {
-                                throw new SAXException("Class not found: " +
-                                    instanceClassname);
-                            }
+                            throw new SAXException("Class not found: " +
+                                instanceClassname);
                         }
                     }
-                } //-- else xsi:type check
-                
+                }
+                else {
+                    classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
+                    if (classDesc != null) {
+                        _topClass = classDesc.getJavaClass();
+                    }
+                }
+
                 if (_topClass == null) {
                     String err = "The class for the root element '" +
                         name + "' could not be found.";
