@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.persist;
+package org.exolab.castor.jdo;
 
 
 /**
@@ -57,7 +57,7 @@ package org.exolab.castor.persist;
  * @version $Revision$ $Date$
  */
 public class FatalPersistenceException
-    extends PersistenceExceptionImpl
+    extends PersistenceException
 {
 
 
