@@ -52,6 +52,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
@@ -72,6 +74,12 @@ final class MultiRSCallQuery implements PersistenceQuery
 {
 
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance(MultiRSCallQuery.class);
+    
     private CallableStatement _stmt;
 
 
@@ -211,13 +219,17 @@ final class MultiRSCallQuery implements PersistenceQuery
         if ( _rs != null ) {
             try {
                 _rs.close();
-            } catch ( SQLException except ) { }
+            } catch ( SQLException except ) {
+            	_log.warn (Messages.message("rsClosingFailed"), except);
+            }
             _rs = null;
         }
         if ( _stmt != null ) {
             try {
                 _stmt.close();
-            } catch ( SQLException except ) { }
+            } catch ( SQLException except ) { 
+            	_log.warn (Messages.message("stClosingFailed"), except);
+            }
             _stmt = null;
         }
     }
