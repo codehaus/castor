@@ -80,7 +80,7 @@ public class URIResolverWrapper
 	{
 	    Source source = null;
 	    try {
-	        _resolver.resolve(href, documentBase);
+	        source = _resolver.resolve(href, documentBase);
 	    }
 	    catch(javax.xml.transform.TransformerException tx) {
 	        throw new URIException(tx);
