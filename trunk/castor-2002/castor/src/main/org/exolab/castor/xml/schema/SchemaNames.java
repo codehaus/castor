@@ -76,6 +76,8 @@ public class SchemaNames {
     
     //-- Attr name definitions
     public static final String CONTENT_ATTR     = "content";
+    public static final String DEFAULT_ATTR     = "default";
+    public static final String FIXED_ATTR       = "fixed";
     public static final String MAX_OCCURS_ATTR  = "maxOccurs";
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String NAME_ATTR        = "name";
@@ -83,6 +85,7 @@ public class SchemaNames {
     public static final String SOURCE_ATTR      = "source";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
     public static final String TYPE_ATTR        = "type";
+    public static final String USE_ATTR         = "use";
     public static final String VALUE_ATTR       = "value";
     
     //-- data types
