@@ -55,12 +55,13 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Hashtable;
 import java.util.Properties;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.persist.spi.KeyGenerator;
-import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.PersistenceFactory;
+
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -194,7 +195,6 @@ public class HighLowKeyGenerator implements KeyGenerator
             QueryExpression query;
             String sql;
             String sql2;
-            String pk;
             PreparedStatement stmt = null;
             PreparedStatement stmt2 = null;
             ResultSet rs;

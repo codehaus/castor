@@ -47,26 +47,19 @@
 package org.exolab.castor.jdo.drivers;
 
 
-import java.util.Vector;
-import java.sql.SQLException;
-import java.sql.Connection;
 import java.sql.CallableStatement;
-import java.sql.PreparedStatement;
+import java.sql.Connection;
 import java.sql.ResultSet;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.PersistenceException;
+import java.sql.SQLException;
+
 import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.engine.JDOClassDescriptor;
-import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.jdo.engine.SQLEngine;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.util.Messages;
 
 /**
  * PersistenceQuery implementation for use with CallableStatements that

@@ -113,7 +113,6 @@ public final class InformixQueryExpression
     {
         Vector vector = new Vector();
         Vector outerTables = getOuterTables();
-        String table = null;
 
         for ( Enumeration enum = _tables.keys(); enum.hasMoreElements(); )
         {

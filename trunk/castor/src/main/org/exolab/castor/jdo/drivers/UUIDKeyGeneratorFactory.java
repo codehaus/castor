@@ -69,6 +69,7 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.util.Properties;
+
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;

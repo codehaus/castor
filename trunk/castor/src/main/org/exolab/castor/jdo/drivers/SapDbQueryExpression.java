@@ -49,6 +49,7 @@ package org.exolab.castor.jdo.drivers;
 
 import java.util.Enumeration;
 import java.util.Vector;
+
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
