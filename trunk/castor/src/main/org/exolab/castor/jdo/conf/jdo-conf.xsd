@@ -14,6 +14,12 @@
   xmlns="http://castor.exolab.org/JDO"
   version="$$VERSION$$">
 
+  <xsd:annotation>
+    <xsd:documentation>
+      XML Scheman for the main Castor JDO configuration file 
+    </xsd:documentation>
+  </xsd:annotation>
+
   <xsd:element name="jdo-conf">
     <xsd:complexType>
       <xsd:sequence>
@@ -80,23 +86,11 @@
   </xsd:element>
 
   <xsd:element name="data-source">
-    <xsd:complexType>
+    <xsd:complexType content="elemOnly" order="seq">
       <xsd:sequence>
-        <xsd:element ref="params" minOccurs="0" />
+        <xsd:element ref="param" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
       <xsd:attribute name="class-name" type="xsd:string" use="required" />
-    </xsd:complexType>
-  </xsd:element>
-
-<!--
-  <xsd:element name="params" type="xsd:anyType"/>
-  -->
-  <xsd:element name="params">
-    <xsd:complexType>
-      <xsd:sequence>
-        <xsd:any namespace="http://www.w3.org/2001/XMLSchema" 
-            minOccurs="1" maxOccurs="unbounded" />
-      </xsd:sequence>
     </xsd:complexType>
   </xsd:element>
 
