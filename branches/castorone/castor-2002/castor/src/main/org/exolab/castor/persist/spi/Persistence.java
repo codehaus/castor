@@ -32,7 +32,7 @@
  * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
  * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
@@ -111,7 +111,7 @@ public interface Persistence
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object[] create( Object conn, Object[] fields, Object[] identities )
+    public Object create( Object conn, Object[] fields, Object identity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -133,7 +133,7 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, Object[] fields, Object[] identities,
+    public Object load( Object conn, Object[] fields, Object identity,
                         AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
@@ -168,7 +168,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( Object conn, Object[] fields, Object[] identities,
+    public Object store( Object conn, Object[] fields, Object identity,
                          Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
@@ -184,7 +184,7 @@ public interface Persistence
      * @param identity The object's identity
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Object conn, Object[] identities )
+    public void delete( Object conn, Object identity )
         throws PersistenceException;
     
 
@@ -203,7 +203,7 @@ public interface Persistence
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Object conn, Object[] identities )
+    public void writeLock( Object conn, Object identity )
         throws ObjectDeletedException, PersistenceException;
     
 

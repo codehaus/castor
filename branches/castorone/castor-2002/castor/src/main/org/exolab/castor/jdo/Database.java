@@ -48,6 +48,7 @@ package org.exolab.castor.jdo;
 
 
 import org.exolab.castor.persist.PersistenceInfoGroup;
+import org.exolab.castor.persist.spi.Complex;
 
 /**
  * An open connection to the database. This object represents an open
@@ -201,7 +202,9 @@ public interface Database
      * Once loaded the object is persistent. Calling this method with
      * the same identity in the same transaction will return the same
      * object. This method is equivalent to a query that returns a
-     * single object.
+     * single object. If the identity spans on more than one field, all
+     * of the identity fields can be wrapped in a Complex object.
+     * 
      *
      * @param type The object's type
      * @param identity The object's identity
@@ -214,21 +217,28 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object[] identities )
-        throws ObjectNotFoundException, LockNotGrantedException,
-               TransactionNotInProgressException, PersistenceException;
-
-
     public Object load( Class type, Object identity )
             throws TransactionNotInProgressException, ObjectNotFoundException,
             LockNotGrantedException, PersistenceException;
 
-
-    public Object load( Class type, Object identity, short accessMode )
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException;
-
-
+    /**
+     * Load an object of the specified type and given identity which
+     * spans on more than one fields.
+     *
+     * @param type The object's type
+     * @param identity The object's identity
+     * @throws ObjectNotFoundException No object of the given type and
+     *  identity was found in persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire a lock on the object
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public Object load( Class type, Complex identity )
+        throws ObjectNotFoundException, LockNotGrantedException,
+               TransactionNotInProgressException, PersistenceException;
 
     /**
      * <b>Experimental</b>
@@ -251,9 +261,36 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object[] identities, short accessMode )
-        throws ObjectNotFoundException, LockNotGrantedException,
-               TransactionNotInProgressException, PersistenceException;
+   public Object load( Class type, Object identity, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+    /**
+     * <b>Experimental</b>
+     * <p>
+     * Load an object of the specified type and given identity.
+     * Once loaded the object is persistent. Calling this method with
+     * the same identity in the same transaction will return the same
+     * object. This method is equivalent to a query that returns a
+     * single object. If the identity spans on more than one field, all
+     * of the identity fields can be wrapped in a Complex object.
+     *
+     * @param type The object's type
+     * @param identity The object's identity
+     * @param accessMode The access mode
+     * @throws ObjectNotFoundException No object of the given type and
+     *  identity was found in persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire a lock on the object
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public Object load( Class type, Complex identity, short accessMode )
+            throws ObjectNotFoundException, LockNotGrantedException,
+            TransactionNotInProgressException, PersistenceException;
 
 
     /**
@@ -463,7 +500,7 @@ public interface Database
      * @param object The object
      * @return The object's identity, or null
      */
-    public Object[] getIdentities( Object object );
+    public Object getIdentity( Object object );
 
 
     /**

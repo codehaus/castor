@@ -27,7 +27,7 @@
  *
  * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
- * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+* NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
  * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
@@ -85,6 +85,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.persist.OID;
+import org.exolab.castor.persist.spi.Complex;
 
 /**
  *
@@ -535,31 +536,31 @@ public class OQLQueryImpl
         public boolean hasMore( boolean skipError )
             throws PersistenceException
         {
-            Object[] identities;
+            Object identity;
 
             if ( _lastObject != null )
                 return true;
             if ( _results == null )
                 return false;
             try {
-                identities = _results.nextIdentities();
-                while ( identities != null ) {
+                identity = _results.nextIdentity();
+                while ( identity != null ) {
                     try {
                         _lastObject = _results.fetch();
                         if ( _lastObject != null )
                             break;
                     } catch ( ObjectNotFoundException except ) {
                         // Object not found, deleted, etc. Just skip to next one.
-                        identities = _results.nextIdentities();
+                        identity = _results.nextIdentity();
                     } catch ( PersistenceException except ) {
                         // Error occured. If not throwing exception just skip to
                         // next object.
-                        identities = _results.nextIdentities();
+                        identity = _results.nextIdentity();
                         if ( ! skipError )
                             throw except;
                     }
                 }
-                if ( identities == null ) {
+                if ( identity == null ) {
                     _results.close();
                     _results = null;
                 }
@@ -595,7 +596,7 @@ public class OQLQueryImpl
         private Object next( boolean skipError )
             throws PersistenceException, NoSuchElementException
         {
-            Object[] identities;
+            Object identity;
 
             if ( _lastObject != null ) {
                 Object result;
@@ -610,8 +611,8 @@ public class OQLQueryImpl
             if ( _results == null )
                 throw new NoSuchElementException();
             try {
-                identities = _results.nextIdentities();
-                while ( identities != null ) {
+                identity = _results.nextIdentity();
+                while ( identity != null ) {
                     try {
                         Object result;
                         
@@ -629,9 +630,9 @@ public class OQLQueryImpl
                         if ( ! skipError )
                             throw except;
                     }
-                    identities = _results.nextIdentities();
+                    identity = _results.nextIdentity();
                 }
-                if ( identities == null ) {
+                if ( identity == null ) {
                     _results.close();
                     _results = null;
                 }
