@@ -166,6 +166,18 @@ public abstract class MappingLoader
 
 
     /**
+     * Returns the Java class for the named type. The type name can
+     * be one of the accepted short names (e.g. <tt>integer</tt>) or
+     * the full Java class name (e.g. <tt>java.lang.Integer</tt>).
+     */
+    protected Class resolveType( String typeName )
+        throws ClassNotFoundException
+    {
+        return Types.typeFromName( _loader, typeName );
+    }
+
+
+    /**
      * Sets the log writer. If not null, errors and other messages
      * will be directed to that log writer.
      *
@@ -357,72 +369,6 @@ public abstract class MappingLoader
                 ( (FieldDescriptorImpl) fields[ i ] ).setClassDescriptor( relDesc );
             }
         }
-
-
-        /*
-        FieldDescriptor[] fields;
-        Vector            allRels;
-        Vector            allFields;
-        RelationHandler[] rels;
-
-        allRels = new Vector();
-        allFields = new Vector();
-        fields = clsDesc.getFields();
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( Types.isSimpleType( fields[ i ].getFieldType() ) ) {
-                // Simple type -- this is a field
-                allFields.add( fields[ i ] );
-            } else {
-                ClassDescriptor relClass;
-
-                relClass = getDescriptor( fields[ i ].getFieldType() );
-                if ( relClass == null ) {
-                    // Not simple type but no class desc -- this field must be serializable
-                    if ( Types.isSerializable( fields[ i ].getFieldType() ) )
-                        allFields.add( fields[ i ] );
-                    else
-                        throw new MappingException( "The field " + fields[ i ] +
-                                                    " is not a simple type, a relation or a serialzable object" );
-                } else if ( relClass == NoDescriptor ) {
-                    // NoDescriptor was found for this field, meaning the
-                    // field could not be mapped to this engine.
-                    throw new MappingException( "The field " + fields[ i ] +
-                                                " requires a class descriptor of type " + fields[ i ].getFieldType().getName() +
-                                                " -- no such descriptor could be created for this engine" );
-                } else {
-                    // This is definitely a relation, no go figure out which type.
-                    RelationField relDesc;
-                    boolean      attached;
-
-                    // One-one relation: related object is pointing back to this object.
-                    attached = ( relClass.getIdentity().getFieldType() == clsDesc.getJavaClass() ) ;
-                    relDesc = new RelationHelper( relClass, fields[ i ].getHandler(), attached, false );
-                    allRels.add( relDesc );
-                }
-            }
-        }
-
-        if ( fields.length != allFields.size() ) {
-            // Update the field and relations of the descriptor
-            fields = new FieldDescriptor[ allFields.size() ];
-            allFields.copyInto( fields );
-            rels = clsDesc.getRelations();
-            for ( int i = 0 ; i < rels.length ; ++i )
-            allRels.add( rels[ i ] );
-            rels = new RelationHandler[ allRels.size() ];
-            allRels.copyInto( rels );
-            ( (SimpleClassDescriptor) clsDesc ).setFields( fields );
-            ( (SimpleClassDescriptor) clsDesc ).setRelations( rels );
-        }
-
-        ClassDesc idClsDesc;
-        FieldDesc identity;
-
-
-        idClsDesc = getDescriptor( clsDesc.getIdentity().getFieldType() );
-        if ( idClsDesc != null )
-            clsDesc.setRelatedIdentity( idClsDesc.getIdentity() );
-        */
     }
 
 
@@ -454,7 +400,7 @@ public abstract class MappingLoader
 
         // Obtain the Java class.
         try {
-            javaClass = _loader.loadClass( clsMap.getClassName() );
+            javaClass = resolveType( clsMap.getClassName() );
         } catch ( ClassNotFoundException except ) {
             throw new MappingException( "mapping.classNotFound", clsMap.getClassName() );
         }
@@ -463,7 +409,7 @@ public abstract class MappingLoader
         // class and make sure this class indeed extends it.
         if ( clsMap.getExtends() != null ) {
             try {
-                extend = getDescriptor( _loader.loadClass( clsMap.getExtends() ) );
+                extend = getDescriptor( resolveType( clsMap.getExtends() ) );
                 if ( extend == null )
                     throw new MappingException( "mapping.extendsMissing",
                                                 clsMap.getExtends(), javaClass.getName() );
@@ -606,18 +552,24 @@ public abstract class MappingLoader
         throws MappingException
     {
         TypeInfo     typeInfo;
-        Class        fieldType;
+        Class        fieldType = null;
+        Class        colType = null;
         FieldHandler handler;
-        
-        // If field type supplied in mapping, use it
+
+        // If the field type is supplied, grab it and use it to locate the
+        // field/accessor. If the field is declared as a collection, grab
+        // the collection type as well and use it to locate the field/accessor.
+        // The field type and collector type are respectively used to create
+        // the field TypeInfo.
         if ( fieldMap.getType() != null ) {
             try {
-                fieldType = Types.typeFromName( _loader, fieldMap.getType() );
+                fieldType = resolveType( fieldMap.getType() );
             } catch ( ClassNotFoundException except ) {
                 throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
             }
-        } else
-            fieldType = null;
+        }
+        if ( fieldMap.getCollection() != null )
+            colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
 
         if ( fieldMap.getGetMethod() != null ||
              fieldMap.getSetMethod() != null ) {
@@ -626,35 +578,38 @@ public abstract class MappingLoader
             Method setMethod = null;
             
             if ( fieldMap.getGetMethod() != null ) {
-                getMethod = findAccessor( javaClass, fieldMap.getGetMethod(), fieldType, true );
+                getMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
+                                          ( colType == null ? fieldType : colType ), true );
                 // Use return type for parameter type checking, if known
-                fieldType = getMethod.getReturnType();
+                if ( fieldType == null )
+                    fieldType = getMethod.getReturnType();
             }
             if ( fieldMap.getSetMethod() != null ) {
-                setMethod = findAccessor( javaClass, fieldMap.getGetMethod(), fieldType, true );
+                setMethod = findAccessor( javaClass, fieldMap.getGetMethod(),
+                                          ( colType == null ? fieldType : colType ), true );
                 if ( fieldType == null )
                     fieldType = setMethod.getParameterTypes()[ 0 ];
             }
-            typeInfo = getTypeInfo( fieldType, fieldMap );
+            typeInfo = getTypeInfo( fieldType, colType, fieldMap );
             handler = new FieldHandlerImpl( fieldMap.getName(), getMethod, setMethod, typeInfo );
         } else {
             // No accessor, map field directly.
             Field field;
             
-            field = findField( javaClass, fieldMap.getName(), fieldType );
-            fieldType = field.getType();
-            typeInfo = getTypeInfo( fieldType, fieldMap );
+            field = findField( javaClass, fieldMap.getName(), ( colType == null ? fieldType : colType ) );
+            if ( fieldType == null )
+                fieldType = field.getType();
+            typeInfo = getTypeInfo( fieldType, colType, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
         }
-
         return new FieldDescriptorImpl( fieldMap.getName(), typeInfo, handler, false );
     }
 
 
-    protected TypeInfo getTypeInfo( Class fieldType, FieldMapping fieldMap )
+    protected TypeInfo getTypeInfo( Class fieldType, Class colType, FieldMapping fieldMap )
         throws MappingException
     {
-        return new TypeInfo( fieldType, null, null, fieldMap.getRequired(), null );
+        return new TypeInfo( fieldType, null, null, fieldMap.getRequired(), null, colType );
     }
 
 
@@ -785,7 +740,7 @@ public abstract class MappingLoader
         try {
             Object obj;
 
-            obj = _loader.loadClass( clsName ).newInstance();
+            obj = resolveType( clsName ).newInstance();
             if ( clsDescType.isAssignableFrom( obj.getClass() ) )
                 return (ClassDescriptor) obj;
             return null;

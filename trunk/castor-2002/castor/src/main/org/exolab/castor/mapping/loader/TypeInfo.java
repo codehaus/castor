@@ -98,6 +98,12 @@ public class TypeInfo
 
 
     /**
+     * The collection type of the field.
+     */
+    private Class          _colType;
+
+
+    /**
      * Construct new type information for the field.
      *
      * @param fieldType The field type
@@ -108,9 +114,11 @@ public class TypeInfo
      * @param required True if the field is required
      * @param defaultValue The default value of the field, null to
      *  use the known Java defaults
+     * @param colType The collection type for this field, or null if
+     *  field is singular
      */
     public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
-                     boolean required, Object defaultValue )
+                     boolean required, Object defaultValue, Class colType )
     {
         _fieldType = Types.typeFromPrimitive( fieldType );
         _convertorTo = convertorTo;
@@ -120,6 +128,7 @@ public class TypeInfo
         // Note: must be called with fieldType (might be primitive) and not
         // _fieldType (never primitive) to get the proper default value
         _default = ( defaultValue == null ? Types.getDefault( fieldType ) : defaultValue );
+        _colType = colType;
     }
 
 
@@ -186,6 +195,17 @@ public class TypeInfo
     public Object getDefaultValue()
     {
         return _default;
+    }
+
+
+    /**
+     * Return the collection type of this field.
+     *
+     * @return The collection type of this field
+     */
+    public Class getCollectionType()
+    {
+        return _colType;
     }
 
 

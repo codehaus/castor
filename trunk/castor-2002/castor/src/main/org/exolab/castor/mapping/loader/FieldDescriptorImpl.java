@@ -51,6 +51,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.CollectionHandler;
 
 
 /**
@@ -69,45 +70,51 @@ public class FieldDescriptorImpl
     /**
      * The field handler for get/set field value.
      */
-    private FieldHandler  _handler;
+    private FieldHandler        _handler;
 
 
     /**
      * The name of this field in the object. The field must have a
      * name, even if it set through accessor methods.
      */
-    private String        _fieldName;
+    private final String        _fieldName;
 
 
     /**
      * The field type.
      */
-    private Class         _fieldType;
+    private final Class         _fieldType;
 
 
     /**
      * True if the field is transient and should not be saved/stored.
      */
-    private boolean       _transient;
+    private final boolean       _transient;
 
 
     /**
      * True if the field type is immutable.
      */
-    private boolean       _immutable;
+    private final boolean       _immutable;
 
 
     /**
      * True if the field type is immutable.
      */
-    private boolean       _required;
+    private boolean             _required;
 
 
     /**
      * The type class descriptor, if this field is of a type
      * known by a descriptor.
      */
-    private ClassDescriptor  _clsDesc;
+    private ClassDescriptor      _clsDesc;
+
+
+    /**
+     * The collection handler.
+     */
+    private final CollectionHandler _colHandler;
 
 
     /**
@@ -119,6 +126,7 @@ public class FieldDescriptorImpl
      * @param trans True if the field is transient
      */
     public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, FieldHandler handler, boolean trans )
+        throws MappingException
     {
         if ( fieldName == null )
             throw new IllegalArgumentException( "Argument 'fieldName' is null" );
@@ -126,6 +134,10 @@ public class FieldDescriptorImpl
         _handler = handler;
         _immutable = typeInfo.isImmutable();
         _fieldType = typeInfo.getFieldType();
+        if ( typeInfo.getCollectionType() != null )
+            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
+        else
+            _colHandler = null;
         _required = typeInfo.isRequired();
         _transient = trans;
     }
@@ -134,15 +146,16 @@ public class FieldDescriptorImpl
     /**
      * Constructor used by derived clases.
      */
-    protected FieldDescriptorImpl( FieldDescriptorImpl fieldDesc )
+    protected FieldDescriptorImpl( FieldDescriptor fieldDesc )
     {
-        this._handler = fieldDesc._handler;
-        this._fieldName = fieldDesc._fieldName;
-        this._fieldType = fieldDesc._fieldType;
-        this._transient = fieldDesc._transient;
-        this._immutable = fieldDesc._immutable;
-        this._required = fieldDesc._required;
-        this._clsDesc = fieldDesc._clsDesc;
+        this._handler = fieldDesc.getHandler();
+        this._fieldName = fieldDesc.getFieldName();
+        this._fieldType = fieldDesc.getFieldType();
+        this._transient = fieldDesc.isTransient();
+        this._immutable = fieldDesc.isImmutable();
+        this._required = fieldDesc.isRequired();
+        this._clsDesc = fieldDesc.getClassDescriptor();
+        this._colHandler = fieldDesc.getCollectionHandler();
     }
 
 
@@ -176,15 +189,21 @@ public class FieldDescriptorImpl
     }
 
 
+    public ClassDescriptor getClassDescriptor()
+    {
+        return _clsDesc;
+    }
+
+
     public FieldHandler getHandler()
     {
         return _handler;
     }
 
 
-    public ClassDescriptor getClassDescriptor()
+    public CollectionHandler getCollectionHandler()
     {
-        return _clsDesc;
+        return _colHandler;
     }
 
 
