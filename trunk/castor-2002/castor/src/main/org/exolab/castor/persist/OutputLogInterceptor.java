@@ -98,15 +98,15 @@ public class OutputLogInterceptor
     }
 
 
-    public void deleting( Class objClass, Object identity )
+    public void removing( Class objClass, Object identity )
     {
-        _writer.println( "Castor: Deleting " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Removing " + objClass.getName() + " (" + identity + ")" );
     }
 
 
     public void storing( Class objClass, Object identity )
     {
-        _writer.println( "Castor: Deleting " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Storing " + objClass.getName() + " (" + identity + ")" );
     }
 
 
