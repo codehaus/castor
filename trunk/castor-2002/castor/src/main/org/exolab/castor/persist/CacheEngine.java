@@ -926,8 +926,9 @@ public final class CacheEngine
                             if ( ! tx.isPersistent( related ) )
                                 tx.create( this, related, relIdentity );
                         } else if ( ! original[ i ].equals( relIdentity ) ) {
-                            if ( relations[ i ].isAttached() )
-                                tx.markDelete( this, relations[ i ].getRelatedClass(), original );
+                            // oleg: Wrong! Don't delete master!
+                            // if ( relations[ i ].isAttached() )
+                            //     tx.markDelete( this, relations[ i ].getRelatedClass(), original[ i ] );
                             if ( ! tx.isPersistent( related ) )
                                 tx.create( this, related, relIdentity );
                         }
