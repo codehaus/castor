@@ -35,10 +35,49 @@
 		<p>In the example code I refer to the database file as <tt>database.xml</tt>, but any name can be used.
 		   See <a href="database-conf.xml">Castor JDO Database Configuration</a> for more information.</p>
 
-        <p><api>org.exolab.castor.jdo.JDO2</api> defines the database name and properties and is used
-           to open a database connection. An instance of this class is contructed with a two-step 
-           approach:</p> 
+        <p><api>org.exolab.castor.jdo.JDO</api> defines the database name and properties and is used
+           to open a database connection. The database configuration is loaded on demand by setting
+           the configuration file URL with <tt>setConfiguration</tt>. Creating multiple JDO objects
+           with the same configuration will only load the database configuration once.</p>
  
+        <p>The <api>org.exolab.castor.jdo.Database</api> object represents an open connection to the
+           database. By definition the database object is not thread safe and should not be used from
+           concurrent threads. There is little overhead involved in opening multiple <tt>Database</tt>
+           objects, and a JDBC connection is acquired only per open transaction.</p>
+
+         <p>The following code snippet opens a database, performs a transaction, and closes the database,
+            as it will typically appear in client applications (for brevity, we have ommitted any required 
+            exception handling):</p>
+             
+            <code>
+DataObjects jdo;
+Database db;
+
+<comment>// Instantiate a JDO object</comment>
+jdo = new JDOOld();
+jdo.setDatabaseName( "mydb" );
+jdo.setConfiguration( "database.xml" );
+jdo.setClassLoader( getClass().getClassLoader() );
+
+<comment>// Obtain a new database</comment>
+db = jdo.getDatabase();
+<comment>// Begin a transaction</comment>
+db.begin();
+<comment>// Do something</comment>
+. . .
+<comment>// Commit the transaction, close database</comment>
+db.commit();
+db.close();
+           </code>
+
+        <p>As of release 0.9.6, a new <b>experimental</b> JDO2 class is provided, that will 
+           eventually replace the current JDO class. We have flagged JDO2 as experimental, as its 
+           interface still might undergo minor changes.</p>
+           
+        <p>As with its predecessor, <api>org.exolab.castor.jdo.JDO2</api> defines the database name and 
+           properties and is used to open a database connection. An instance of this class is contructed 
+           with a two-step approach:</p> 
+           
         <ul>
           <li>load the JDO configuration file through one of the static loadConfiguration() 
               methods, e.g. <api class="org.exolab.castor.jdo.JDO2">loadConfiguration(String)</api></li>
@@ -47,14 +86,6 @@
               of the database names defined in the configuration file loaded in step 1).</li>
         </ul>
         
-        <p>Creating multiple JDO2 objects with the same configuration will only load the database 
-           configuration once.</p>
-         
-        <p>The <api>org.exolab.castor.jdo.Database</api> object represents an open connection to the
-           database. By definition the database object is not thread safe and should not be used from
-           concurrent threads. There is little overhead involved in opening multiple <tt>Database</tt>
-           objects, and a JDBC connection is acquired only per open transaction.</p>
-
          <p>The following code snippet opens a database, performs a transaction, and closes the database,
             as it will typically appear in client applications (for brevity, we have ommitted any required 
             exception handling):</p>
@@ -79,30 +110,6 @@ db.begin();
 db.commit();
 db.close();
          </code> 
-
-        <p>The old way of obtaining a JDO instance has been deprecated with release 0.9.6, 
-           but still is supported:</p> 
-             
-            <code>
-DataObjects jdo;
-Database db;
-
-<comment>// Instantiate a JDO object</comment>
-jdo = new JDOOld();
-jdo.setDatabaseName( "mydb" );
-jdo.setConfiguration( "database.xml" );
-jdo.setClassLoader( getClass().getClassLoader() );
-
-<comment>// Obtain a new database</comment>
-db = jdo.getDatabase();
-<comment>// Begin a transaction</comment>
-db.begin();
-<comment>// Do something</comment>
-. . .
-<comment>// Commit the transaction, close database</comment>
-db.commit();
-db.close();
-           </code>
 
 		<p>For an example showing how to set up a database configuration on the fly without
 		the need of a preconfigured XML configuration file) see
