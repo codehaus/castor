@@ -57,44 +57,44 @@ import java.util.Hashtable;
  * @version $Revision$ $Date$
 **/
 public class SchemaUnmarshaller extends SaxUnmarshaller {
-    
-    public static final String XSD_NAMESPACE 
+
+    public static final String XSD_NAMESPACE
         = "http://www.w3.org/1999/XMLSchema";
-        
-        
+
+
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
     private static final String XMLNS        = "xmlns";
     private static final String XMLNS_PREFIX = "xmlns:";
-    
+
     /**
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-        
+
     boolean skipAll = false;
-            
+
     /**
      * The ID Resolver
     **/
     Resolver _resolver = null;
-    
+
     Schema _schema = null;
-    
+
     private boolean foundSchemaDef = false;
-    
-    
+
+
     private String defaultNS = null;
-    
+
     private Hashtable namespaces = null;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -103,24 +103,24 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         this(null, null);
         foundSchemaDef = false;
     } //-- SchemaUnmarshaller
-    
+
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
         super();
         _schema = new Schema();
-        setResolver(resolver);        
+        setResolver(resolver);
         foundSchemaDef = true;
         namespaces = new Hashtable();
         init(atts);
     } //-- SchemaUnmarshaller
-    
+
     public Schema getSchema() {
         return _schema;
     }
-    
+
     public void setSchema(Schema schema) {
         _schema = schema;
     }
-    
+
     /**
      * Returns the Object created by this SaxUnmarshaller
      * @return the Object created by this SaxUnmarshaller
@@ -128,7 +128,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return getSchema();
     } //-- getObject
-    
+
     /**
      * Returns the name of the element that this SaxUnmarshaller
      * handles
@@ -138,46 +138,46 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
     public String elementName() {
         return SchemaNames.SCHEMA;
     } //-- elementName
-        
-    
+
+
     /**
      * initializes the Schema object with the given attribute list
      * @param atts the AttributeList for the schema
     **/
     private void init(AttributeList atts) {
         if (atts == null) return;
-        
+
         String nsURI = atts.getValue(SchemaNames.TARGET_NS_ATTR);
         if ((nsURI != null) && (nsURI.length() > 0))
             _schema.setTargetNamespace(nsURI);
-            
+
     } //-- init
-    
+
     /**
      * Handles namespace attributes
     **/
     private void handleXMLNS(String attName, String attValue) {
-        
+
         if ((attName == null) || (!attName.startsWith(XMLNS))) {
-            throw new IllegalArgumentException(attName + 
+            throw new IllegalArgumentException(attName +
                 " is not a namespace attribute.");
         }
         if ((attValue == null) || (attValue.length() == 0))
-            throw new IllegalArgumentException("error null or empty " + 
+            throw new IllegalArgumentException("error null or empty " +
                 "namespace value");
-        
+
         if (attName.equals(XMLNS)) {
             defaultNS = attValue;
             return;
         }
-        
+
         String prefix = attName.substring(XMLNS_PREFIX.length());
-        
+
         //-- register namespace
         namespaces.put(prefix, attValue);
 
     } //-- handleXMLNS
-    
+
     private void processNamespaces(AttributeList atts) {
         if (atts == null) return;
         //-- loop through atts
@@ -187,26 +187,26 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                 handleXMLNS(attName, atts.getValue(i));
         }
     } //-- processNamespaces
-    
-    
+
+
     public void setResolver(Resolver resolver) {
         if (resolver == null) resolver = new ScopableResolver();
         super.setResolver(resolver);
         _resolver = resolver;
     } //-- setResolver
-    
+
     //-------------------------------------------------/
     //- implementation of org.xml.sax.DocumentHandler -/
     //-------------------------------------------------/
-    
+
     public void startElement(String name, AttributeList atts)
         throws SAXException
     {
-        
+
         if (skipAll) return;
-        
+
         String rawName = name;
-        
+
         //-- handle namespaces
         processNamespaces(atts);
         String namespace = null;
@@ -217,9 +217,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             namespace = (String)namespaces.get(prefix);
         }
         else namespace = defaultNS;
-        
-        
-        //-- backward compatibility, we'll need to 
+
+
+        //-- backward compatibility, we'll need to
         //-- remove this at some point
         if ((!foundSchemaDef) && (idx < 0)) {
             if (defaultNS == null) {
@@ -232,75 +232,80 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             }
         }
         //-- end of backward compatibility
-        
+
         //-- check namespace
         if (!XSD_NAMESPACE.equals(namespace)) {
-            throw new SAXException(rawName + 
+            throw new SAXException(rawName +
                 " has not been declared in the XML Schema namespace");
         }
-        
+
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.startElement(name, atts);
             ++depth;
             return;
         }
-        
-        
-        
+
+
+
         //-- use VM internal String of name
         name = name.intern();
-                
+
         if (name == SchemaNames.SCHEMA) {
-            
+
             if (foundSchemaDef)
                 illegalElement(name);
-                
+
             foundSchemaDef = true;
             init(atts);
             return;
         }
-        
-        //-- <type>
-        if (name == SchemaNames.COMPLEX_TYPE) {
-            unmarshaller 
+
+        //-- <annotation>
+        if (name == SchemaNames.ANNOTATION) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        //-- <complexType>
+        else if (name == SchemaNames.COMPLEX_TYPE) {
+            unmarshaller
                 = new ComplexTypeUnmarshaller(_schema, atts, _resolver);
-        } 
+        }
         //-- <element>
         else if (name == SchemaNames.ELEMENT) {
-            unmarshaller 
+            unmarshaller
                 = new ElementUnmarshaller(_schema, atts, _resolver);
         }
-        //-- <simpletype>
+        //-- <simpleType>
         else if (name == SchemaNames.SIMPLE_TYPE) {
-            unmarshaller 
+            unmarshaller
                 = new SimpleTypeUnmarshaller(_schema, atts, _resolver);
         }
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
-            unmarshaller 
+            unmarshaller
                 = new IncludeUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here
             //-- but since we don't support everything
             //-- yet, simply add an UnknownDef object
+            System.out.print('<');
             System.out.print(name);
-            System.out.print(" elements are either currently unsupported ");
-            System.out.println("or not valid schema elements.");
+            System.out.print("> elements are either currently unsupported ");
+            System.out.println("or non-valid schema elements.");
             unmarshaller = new UnknownUnmarshaller(name);
         }
-        
+
         unmarshaller.setDocumentLocator(getDocumentLocator());
-        
+
     } //-- startElement
 
     public void endElement(String name) throws SAXException {
-                
+
         if (skipAll) return;
-        
+
         String rawName = name;
-        
+
         //-- handle namespaces
         String namespace = null;
         int idx = name.indexOf(':');
@@ -310,21 +315,21 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             namespace = (String)namespaces.get(prefix);
         }
         else namespace = defaultNS;
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
-        
+
+
         //-- use internal JVM String
-        name = name.intern();        
-                
+        name = name.intern();
+
         if (name == SchemaNames.SCHEMA) return;
-        
-        
+
+
         //-- check for name mismatches
         if ((unmarshaller != null)) {
             if (!name.equals(unmarshaller.elementName())) {
@@ -337,11 +342,17 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             String err = "error: missing start element for " + name;
             throw new SAXException(err);
         }
-        
+
         //-- call unmarshaller.finish() to perform any necessary cleanup
         unmarshaller.finish();
-        
-        if (name == SchemaNames.COMPLEX_TYPE) {
+
+
+        //-- <annotation>
+        if (name == SchemaNames.ANNOTATION) {
+            _schema.addAnnotation((Annotation)unmarshaller.getObject());
+        }
+        //-- <complexType>
+        else if (name == SchemaNames.COMPLEX_TYPE) {
             ComplexType complexType = null;
             complexType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
             _schema.addComplexType(complexType);
@@ -352,6 +363,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                 System.out.println("warning: top-level complexType with no name.");
             }
         }
+        //-- <simpleType>
         else if (name == SchemaNames.SIMPLE_TYPE) {
             SimpleType simpleType = null;
             simpleType = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
@@ -365,8 +377,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         unmarshaller = null;
     } //-- endElement
-    
-    public void characters(char[] ch, int start, int length) 
+
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary
@@ -374,6 +386,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             unmarshaller.characters(ch, start, length);
         }
     } //-- characters
-    
+
 } //-- SGDocumentHandler
- 
+
