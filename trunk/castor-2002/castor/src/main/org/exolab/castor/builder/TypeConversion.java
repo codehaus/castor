@@ -132,7 +132,13 @@ public class TypeConversion {
                     return new XSDate();
                 //-- double
                 case SimpleTypesFactory.DOUBLE_TYPE:
-                    return new XSReal();
+                 {
+                    XSReal xsReal = new XSReal();
+                    if (!simpleType.isBuiltInType())
+                        xsReal.setFacets(simpleType);
+                    return xsReal;
+                }
+
                 //-- integer
                 case SimpleTypesFactory.INTEGER_TYPE:
                 {
