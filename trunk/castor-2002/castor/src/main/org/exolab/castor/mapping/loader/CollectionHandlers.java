@@ -48,7 +48,6 @@ package org.exolab.castor.mapping.loader;
 
 
 import java.util.Vector;
-import java.util.Collection;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
@@ -71,6 +70,10 @@ final class CollectionHandlers
 {
 
 
+    // For JDK 1.1 compatilibity
+    private static Class   _collectionClass = null;
+    private static boolean _loadedCollectionClass = false;
+    
     /**
      * Returns the collection's Java class from the collection name.
      * The collection name may be a short name (e.g. <tt>vector</tt>)
@@ -91,7 +94,20 @@ final class CollectionHandlers
                  _info[ i ].javaClass.getName().equals( name ) )
                 return _info[ i ].javaClass;
         //throw new MappingException( "mapping.noCollectionHandler", name );
-        return Collection.class;
+        
+        //-- Fix for JDK 1.1 compatibility
+        // old code: return Collection.class;
+        if (!_loadedCollectionClass) {
+            _loadedCollectionClass = true;
+            try {
+                _collectionClass = Class.forName("java.util.Collection");
+            }
+            catch(ClassNotFoundException cnfe) {
+                // Do nothing we are just here for JDK 1.1
+                // compatibility
+            }
+        }
+        return _collectionClass;
     }
 
 
