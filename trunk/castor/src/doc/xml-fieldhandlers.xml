@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<!-- $Id$ -->
+
+<document url="http://castor.exolab.org/xml-fieldhandlers.html">
+  <body>
+    <title>Castor XML: Writing Custom FieldHandlers</title>
+
+
+    <section title="Introduction">
+
+       <p>
+          Sometimes we need to deal with a data format that Castor doesn't
+          support out-of-the-box, such as an unsupported Date/Time
+          representation, or we want to wrap and unwrap fields in Wrapper
+          objects to get the desired XML output without changing our object
+          model. To handle these cases Castor allows specifying a custom
+          <api class="org.exolab.castor.mapping.FieldHandler">FieldHandler</api>
+          which can do these varying conversions during calls to the fields
+          setter and getter methods.
+       </p>
+
+       <p>
+          The <i>FieldHandler</i> is the basic interface used by the Castor
+          Framework when accessing field values or setting them. By specifying
+          a custom <i>FieldHandler</i> in the mapping file we can basically
+          intercept the calls to retreive or set a field's value and do
+          whatever conversions are necessary.
+        </p>
+
+
+    </section>
+
+    <section title="Writing a simple FieldHandler">
+
+       <p>
+         When a writing a FieldHandler handler we need to provide implementations
+         of the various methods specified in the FieldHandler interface. The main
+         two methods are the <i>getValue</i> and <i>setValue</i> methods which
+         will basically handle all our conversion code. The other methods provide
+         ways to create a new instance of the field's value or reset the field
+         value.
+       </p>
+       <p>
+         <tip>It's actually even easier to write custom field handlers if we use
+              a GeneralizedFieldHandler. See more details in the next section.
+         </tip>
+       </p>
+       <p>
+         Let's take a look at how to convert a date in the format YYYY-MM-DD using
+         a custom FieldHandler. We want to marshal the following XML input file:
+         <code-panel>
+&lt;?xml version="1.0"?&gt;
+&lt;root&gt;2004-05-10&lt;/root&gt;
+         </code-panel>
+
+         The class we'll be marshalling from and unmarshalling to looks as follows:
+
+         <code-panel>
+import java.util.Date;
+
+public class Root {
+
+    private Date _date = null;
+
+    public Root() {
+        super();
+    }
+
+    public Date getDate() {
+        return _date;
+    }
+
+
+    public void setDate(Date date) {
+        _date = date;
+    }
+         </code-panel>
+
+        So we need to write a custom FieldHandler that takes the input String
+        and converts it into the proper java.util.Date instance:
+
+       <code-panel>
+
+import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.ValidityException;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+
+/**
+ * The FieldHandler for the Date class
+ *
+ */
+public class MyDateHandler implements FieldHandler
+{
+
+    private static final String FORMAT = "yyyy-MM-dd";
+
+    /**
+     * Creates a new MyDateHandler instance
+     */
+    public MyDateHandler() {
+        super();
+    }
+
+    /**
+     * Returns the value of the field from the object.
+     *
+     * @param object The object
+     * @return The value of the field
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
+     */
+    public Object getValue( Object object )
+        throws IllegalStateException
+    {
+        Root root = (Root)object;
+        Date value = root.getDate();
+        if (value == null) return null;
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        Date date = (Date)value;
+        return formatter.format(date);
+    }
+
+
+    /**
+     * Sets the value of the field on the object.
+     *
+     * @param object The object
+     * @param value The new value
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
+     * @thorws IllegalArgumentException The value passed is not of
+     *  a supported type
+     */
+    public void setValue( Object object, Object value )
+        throws IllegalStateException, IllegalArgumentException
+    {
+        Root root = (Root)object;
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        Date date = null;
+        try {
+            date = formatter.parse((String)value);
+        }
+        catch(ParseException px) {
+            throw new IllegalArgumentException(px.getMessage());
+        }
+        root.setDate(date);
+
+    }
+
+
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent )
+        throws IllegalStateException
+    {
+        //-- Since it's marked as a string...just return null,
+        //-- it's not needed.
+        return null;
+    }
+
+
+    /**
+     * Sets the value of the field to a default value.
+     *
+     * Reference fields are set to null, primitive fields are set to
+     * their default value, collection fields are emptied of all
+     * elements.
+     *
+     * @param object The object
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
+     */
+    public void resetValue( Object object )
+        throws IllegalStateException, IllegalArgumentException
+    {
+        ((Root)object).setDate(null);
+    }
+
+
+
+    /**
+     * @deprecated No longer supported
+     */
+    public void checkValidity( Object object )
+        throws ValidityException, IllegalStateException
+    {
+        // do nothing
+    }
+
+
+}
+       </code-panel>
+
+       <p>
+         <tip>The <i>newInstance</i> method should return null for immutable types.</tip>
+       </p>
+
+       <body-note>There is also an AbstractFieldHandler that we can extend instead
+         of implementing FieldHandler directly.
+       </body-note>
+
+       In order to tell Castor that we want to use our Custom FieldHandler
+       we must specify it in the mapping file:
+
+        <code-panel>
+
+&lt;?xml version="1.0"?&gt;
+&lt;mapping&gt;
+  &lt;class name="Root"&gt;
+     &lt;field name="date" type="string" handler="MyDateHandler"&gt;
+        &lt;bind-xml node="text"/&gt;
+     &lt;/field&gt;
+  &lt;/class&gt;
+&lt;/mapping&gt;
+
+        </code-panel>
+
+         We can now use a simple Test class to unmarshal our XML document:
+
+         <code-panel>
+import java.io.*;
+import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.*;
+
+public class Test {
+
+    public static void main(String[] args) {
+	    try {
+
+	        //--load mapping
+	        Mapping mapping = new Mapping();
+	        mapping.loadMapping("mapping.xml");
+
+           System.out.println("unmarshalling root instance:");
+           System.out.println();
+
+           Reader reader = new FileReader("test.xml");
+           Unmarshaller unmarshaller = new Unmarshaller(Root.class);
+           unmarshaller.setMapping(mapping);
+           Root root = (Root) unmarshaller.unmarshal(reader);
+           reader.close();
+
+           System.out.println("Root#getDate : " + root.getDate());
+	    }
+	    catch (Exception e) {
+	        e.printStackTrace();
+	    }
+    }
+}
+
+         </code-panel>
+
+         Now simply compile the code and run!
+
+         <code>
+% java Test
+unmarshalling root instance:
+
+Root#getDate : Mon May 10 00:00:00 CDT 2004
+         </code>
+
+         After running our test program we can see that Castor invoked our
+         custom FieldHandler and we got our properly formatted date in our
+         Root.class.
+
+       </p>
+
+    </section>
+
+    <section title="Writing a GeneralizedFieldHandler">
+       <p>
+         A <api class="org.exolab.castor.mapping.GeneralizedFieldHandler">
+         GeneraliedFieldHandler</api> is an extension of FieldHandler interface
+         where we simply write the conversion methods and Castor will automatically
+         handle the underlying get/set operations. This allows us to re-use the
+         same FieldHandler for fields from different classes that require the
+         same conversion.
+       </p>
+      <p>
+        The same FieldHandler we used above can be written as a GeneralizedFieldHandler
+        as such:
+        <code-panel>
+
+import org.exolab.castor.mapping.GeneralizedFieldHandler;
+import org.exolab.castor.mapping.FieldDescriptor;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+
+
+/**
+ * The FieldHandler for the Date class
+ *
+ */
+public class MyDateHandler
+    extends GeneralizedFieldHandler
+{
+
+    private static final String FORMAT = "yyyy-MM-dd";
+
+    /**
+     * Creates a new MyDateHandler instance
+     */
+    public MyDateHandler() {
+        super();
+    }
+
+    /**
+     * This method is used to convert the value when the getValue method
+     * is called. The getValue method will obtain the actual field value
+     * from given 'parent' object. This convert method is then invoked
+     * with the field's value. The value returned from this
+     * method will be the actual value returned by getValue method.
+     *
+     * @param value the object value to convert after performing a get
+     * operation
+     * @return the converted value.
+     */
+    public Object convertUponGet(Object value) {
+        if (value == null) return null;
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        Date date = (Date)value;
+        return formatter.format(date);
+    }
+
+
+    /**
+     * This method is used to convert the value when the setValue method
+     * is called. The setValue method will call this method to obtain
+     * the converted value. The converted value will then be used as
+     * the value to set for the field.
+     *
+     * @param value the object value to convert before performing a set
+     * operation
+     * @return the converted value.
+     */
+    public Object convertUponSet(Object value) {
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        Date date = null;
+        try {
+            date = formatter.parse((String)value);
+        }
+        catch(ParseException px) {
+            throw new IllegalArgumentException(px.getMessage());
+        }
+        return date;
+    }
+
+    /**
+     * Returns the class type for the field that this GeneralizedFieldHandler
+     * converts to and from. This should be the type that is used in the
+     * object model.
+     *
+     * @return the class type of of the field
+     */
+    public Class getFieldType() {
+        return Date.class;
+    }
+
+    /**
+     * Creates a new instance of the object described by this field.
+     *
+     * @param parent The object for which the field is created
+     * @return A new instance of the field's value
+     * @throws IllegalStateException This field is a simple type and
+     *  cannot be instantiated
+     */
+    public Object newInstance( Object parent )
+        throws IllegalStateException
+    {
+        //-- Since it's marked as a string...just return null,
+        //-- it's not needed.
+        return null;
+    }
+
+}
+
+        </code-panel>
+
+        Everything else is the same. So we can re-run our test case using this
+        GeneralizedFieldHandler and we'll get the same result. The main difference
+        is that we implement the <i>convertUponGet</i> and <i>convertUponSet</i>
+        methods.
+
+        <p>
+           Notice that we never reference the <i>Root</i> class in our
+           GeneralizedFieldHandler. This allows us to use the same exact
+           FieldHandler for any field that requires this type of conversion.
+        </p>
+
+      </p>
+    </section>
+
+  </body>
+</document>
