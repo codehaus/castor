@@ -40,6 +40,10 @@
  *
  * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
  *
  * $Id$
  */
@@ -77,15 +81,13 @@ import java.io.Reader;
 import java.io.PrintWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 
 //--Java util imports
 import java.util.Enumeration;
 //import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Properties;
-import java.util.StringTokenizer;
-import java.util.Hashtable;
-import java.net.URL;
 
 /**
  * A Java Source generation tool which uses XML Schema definitions
@@ -141,6 +143,9 @@ public class SourceGenerator
     private static final int    ELEMENT_BINDING = 0;
     private static final int    TYPE_BINDING    = 1;
 
+    private static final String MAPPING_FILE = ".castor.xml";
+    private static final String CDR_FILE = ".castor.cdr";
+    
     //-------------------------/
     //- Command line messages -/
     //------------------------/
@@ -881,6 +886,21 @@ public class SourceGenerator
             if (sInfo.getStatusCode() == SGStateInfo.STOP_STATUS)
                 break;
         }
+        
+        //-- handle cdr files
+        Enumeration cdrFiles = sInfo.getCDRFilenames();
+        while (cdrFiles.hasMoreElements()) {
+            String filename = (String) cdrFiles.nextElement();
+            Properties props = sInfo.getCDRFile(filename);
+            try {
+                FileWriter writer = new FileWriter(filename);
+                props.list(new PrintWriter(writer));
+                writer.flush();
+            }
+            catch(java.io.IOException iox) {
+                // TODO report IO error
+            }
+        }
 
     } //-- createClasses
 
@@ -1299,7 +1319,7 @@ public class SourceGenerator
         if (_createDescriptors && (classInfo != null)) {
 
             JClass desc = _descSourceFactory.createSource(classInfo);
-
+            
             allowPrinting = true;
             if (state.promptForOverwrite()) {
                 String filename = desc.getFilename(_destDir);
@@ -1320,6 +1340,7 @@ public class SourceGenerator
             }
 
             if (allowPrinting) {
+                updateCDRFile(jClass,desc, state);
                 desc.setHeader(_header);
                 desc.print(_destDir,_lineSeparator);
             }
@@ -1356,6 +1377,31 @@ public class SourceGenerator
         return result;
     }
 
+    /**
+     * Updates the CDR (ClassDescriptorResolver) file with the
+     * classname->descriptor mapping.
+     * 
+     * @param jClass
+     * @param jDesc
+     * @param sInfo
+     */
+    private void updateCDRFile(JClass jClass, JClass jDesc, SGStateInfo sInfo) 
+    {
+        String filename = jClass.getFilename(_destDir);
+        File file = new File(filename);
+        file = file.getParentFile();
+        file = new File(file, CDR_FILE);
+        filename = file.getAbsolutePath();
+        
+        Properties props = sInfo.getCDRFile(filename);
+        
+        if (props == null) {
+            props = new Properties();
+            sInfo.setCDRFile(filename, props);
+        }
+        props.setProperty(jClass.getName(), jDesc.getName());
+    } //-- updateCDRFile
+    
 
 } //-- SourceGenerator
 
