@@ -58,7 +58,8 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public final class JMethodSignature {
+public final class JMethodSignature extends JAnnotatedElementHelper
+{
 
     /**
      * The set of modifiers for this JMethod
@@ -111,8 +112,8 @@ public final class JMethodSignature {
         this.name         = name;
         this.modifiers    = new JModifiers();
         this.params       = new JNamedMap(3);
-        this.exceptions   = new Vector(1); 
- 
+        this.exceptions   = new Vector(1);
+        
         //-- add Return type descriptor
         if (returnType != null) {
             jdc.addDescriptor(JDocDescriptor.createReturnDesc(returnType.getLocalName()));
@@ -307,6 +308,12 @@ public final class JMethodSignature {
         
         if (printJavaDoc) jdc.print(jsw);
         
+        //---------------/
+        //- Annotations -/
+		//---------------/
+		
+		printAnnotations(jsw);
+		
         //-----------------/
         //- Method Source -/
         //-----------------/
@@ -323,11 +330,33 @@ public final class JMethodSignature {
         jsw.write(name);
         jsw.write('(');
         
+        //-- any parameter annotations?
+        boolean parameterAnnotations = false;
+		for (int i = 0; i < params.size(); i++) {
+			JParameter jParameter = (JParameter) params.get(i);
+			if(jParameter.hasAnnotations())
+			{
+				parameterAnnotations = true;
+				break;
+			}
+		}
+        
         //-- print parameters
+        if(parameterAnnotations)
+        	jsw.indent();
         for (int i = 0; i < params.size(); i++) {
-            if (i > 0) jsw.write(", ");
-            jsw.write(params.get(i));
+            if (i > 0)
+				jsw.write(", ");
+			if(parameterAnnotations)
+				jsw.writeln();
+            JParameter jParameter = (JParameter) params.get(i);
+			jParameter.printAnnotations(jsw);
+            String typeAndName = jParameter.toString();
+            jsw.write(typeAndName);
         }
+        if(parameterAnnotations)
+        	jsw.unindent();
+        	
         jsw.write(")");
         
         if (exceptions.size() > 0) {
@@ -370,24 +399,24 @@ public final class JMethodSignature {
         return sb.toString();
     } //-- toString
 
-    protected String[] getParameterClassNames() {
+	protected String[] getParameterClassNames() {
         
         
-        Vector names = new Vector(params.size());
+		Vector names = new Vector(params.size());
         
-        for (int i = 0; i < params.size(); i++) {
+		for (int i = 0; i < params.size(); i++) {
             
-            JType  jType  = ((JParameter)params.get(i)).getType();
-            while (jType.isArray()) jType = jType.getComponentType();
-            if (!jType.isPrimitive()) {
-                JClass jclass = (JClass)jType;
-                names.addElement( jclass.getName() );
-            }
-        }
+			JType  jType  = ((JParameter)params.get(i)).getType();
+			while (jType.isArray()) jType = jType.getComponentType();
+			if (!jType.isPrimitive()) {
+				JClass jclass = (JClass)jType;
+				names.addElement( jclass.getName() );
+			}
+		}
         
-        String[] names_array = new String[names.size()];
-        names.copyInto(names_array);
-        return names_array;
-    } //-- getParameterClassNames
-    
+		String[] names_array = new String[names.size()];
+		names.copyInto(names_array);
+		return names_array;
+	} //-- getParameterClassNames
+	    
 } //-- JMethodSignature

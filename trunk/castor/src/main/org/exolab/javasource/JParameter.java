@@ -53,7 +53,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class JParameter {
+public class JParameter extends JAnnotatedElementHelper {
     
     /**
      * The type associated with this JParameter

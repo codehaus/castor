@@ -55,7 +55,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class JField implements JMember {
+public class JField extends JAnnotatedElementHelper implements JMember {
 
     /**
      * The set of modifiers for this JField
