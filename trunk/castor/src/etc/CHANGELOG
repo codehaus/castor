@@ -1,6 +1,11 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1417 using contribution from Stein M. Hugubakken [dulci@start.no].
+	   Added missing entry for resource string "persist.missingEnd" to 
+	   messages.properties. 
+       (Werner - 20040129)
+       
 JDO:   Fixed bug 1500 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
 	   Fixes a problem with dereferencing members of Complex that are set to null. 
        (Werner - 20040122)
