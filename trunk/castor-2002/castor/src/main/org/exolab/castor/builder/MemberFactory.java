@@ -296,6 +296,17 @@ public class MemberFactory {
 
             if (xsType == null)
                 xsType = TypeConversion.convertType(simpleType);
+
+            //-- print warning message if ID, IDREF, IDREFS, NMTOKEN, NTOKENS are
+            //-- used as element type
+             if ( (xsType.getType() == xsType.ID) ||
+                 (xsType.getType() == xsType.IDREF)||
+                 ( (xsType.getType() == xsType.COLLECTION) &&
+                   ( ( (XSList) xsType).getContentType().getType() == xsType.IDREF) ) ||
+                 (xsType.getType() == xsType.NMTOKEN)  )
+                    System.out.println("Warning : For XML Compatibility " +
+                                        xsType.getName()+" should be used only on attributes\n");
+
         }
         //-- ComplexType
         else {
@@ -340,8 +351,15 @@ public class MemberFactory {
 
         }
         else {
-             fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
+             if (xsType.getType() == xsType.COLLECTION)
+                 fieldInfo = infoFactory.createCollection( ((XSList) xsType).getContentType(),
+                                                             fieldName,
+                                                             eDecl.getName()
+                                                              );
+
+             else fieldInfo = infoFactory.createFieldInfo(xsType, fieldName);
         }
+
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName());
 
@@ -357,7 +375,6 @@ public class MemberFactory {
         }
 
         if (comment != null) fieldInfo.setComment(comment);
-
 
         return fieldInfo;
     } //-- createFieldInfo(ElementDecl)
