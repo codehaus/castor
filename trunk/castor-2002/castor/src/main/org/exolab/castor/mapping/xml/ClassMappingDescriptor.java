@@ -189,6 +189,39 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
 
+        //-- _timestamp
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_timestamp", "timestamp", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getTimestamp();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setTimestamp( (java.lang.String) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new java.lang.String();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _timestamp
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        desc.setValidator(fieldValidator);
+        
         //-- _access
         desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.AccessType.class, "_access", "access", NodeType.Attribute);
         handler = (new XMLFieldHandler() {

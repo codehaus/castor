@@ -41,6 +41,8 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.util.Vector _identity;
 
+    private java.lang.String _timestamp;
+
     private org.exolab.castor.mapping.xml.types.AccessType _access = org.exolab.castor.mapping.xml.types.AccessType.valueOf("shared");;
 
     private java.lang.String _keyGenerator;
@@ -304,6 +306,13 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
+    public java.lang.String getTimestamp()
+    {
+        return this._timestamp;
+    } //-- java.lang.String getTimestamp() 
+
+    /**
+    **/
     public boolean hasAutoComplete()
     {
         return this._has_autoComplete;
@@ -563,6 +572,15 @@ public class ClassMapping implements java.io.Serializable {
     {
         this._name = _name;
     } //-- void setName(java.lang.String) 
+
+    /**
+     * 
+     * @param _timestamp
+    **/
+    public void setTimestamp(java.lang.String _timestamp)
+    {
+        this._timestamp = _timestamp;
+    } //-- void setTimestamp(java.lang.String) 
 
     /**
      * 
