@@ -103,7 +103,9 @@ public interface ClassDescriptorResolver {
     public XMLClassDescriptor resolveByXMLName
         (String xmlName, ClassLoader loader);
     
+    /**
+     * Sets the mapping loader for this ClassDescriptorResolver
+    **/
     public void setMappingLoader(XMLMappingLoader xmlMappingLoader);
-    
     
 } //-- ClassDescriptorResolver
