@@ -484,6 +484,7 @@ public final class SQLEngine
         PreparedStatement stmt;
         ResultSet         rs;
         Object            stamp = null;
+        int               count;
 
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
@@ -494,29 +495,39 @@ public final class SQLEngine
                 throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), identity );
 
             // Load all the fields of the object including one-one relations
+            count = 1;
             for ( int i = 0 ; i < _fields.length ; ++i  ) {
                 Object value;
                     
+                fields[ i ] =  null;
+                if ( ! _fields[ i ].load ) 
+                    continue;
                 if ( _fields[ i ].multi ) {
                     fields[ i ] = new Vector();
-                    value = SQLTypes.getObject( rs, i + 1, _fields[ i ].sqlType );
+                    value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
                     if ( value != null )
                         ( (Vector) fields[ i ] ).addElement( value );
                 } else {
-                    value = SQLTypes.getObject( rs, i + 1, _fields[ i ].sqlType );
+                    value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
                     fields[ i ] =  rs.wasNull() ? null : value;
                 }
+                ++count;
             }
 
             while ( rs.next() ) {
-                for ( int i = 0; i < _fields.length ; ++i  )
+                count = 1;
+                for ( int i = 0; i < _fields.length ; ++i  ) {
+                    if ( ! _fields[ i ].load )
+                        continue;
                     if ( _fields[ i ].multi ) {
                         Object value;
                         
-                        value = SQLTypes.getObject( rs, i + 1, _fields[ i ].sqlType );
+                        value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
                         if ( ! rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
                             ( (Vector) fields[ i ] ).addElement( value );
-                        }
+                    }
+                    ++count;
+                }
             }
 
             rs.close();
@@ -713,7 +724,7 @@ public final class SQLEngine
 
                 relDesc = (JDOClassDescriptor) fields[ i ].getClassDescriptor();
                 if ( relDesc == null )
-                    throw new MappingException( "mapping.noRelation", fields[ i ] );
+                    allFields.addElement( new FieldInfo( fields[ i ], false ) );
                 else {
                     FieldDescriptor[] relFields;
                     String            foreKey = null;
@@ -749,6 +760,8 @@ public final class SQLEngine
     static final class FieldInfo
     {
 
+        final boolean load;
+
         final boolean store;
 
         final String  name;
@@ -764,6 +777,7 @@ public final class SQLEngine
             this.name = fieldDesc.getFieldName();
             this.store = store;
             this.multi = fieldDesc.isMultivalued();
+            this.load = this.store || this.multi;
             if ( store && fieldDesc instanceof JDOFieldDescriptor ) {
                 this.dirtyCheck = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
                 this.sqlType = ( (JDOFieldDescriptor) fieldDesc ).getSQLType();
@@ -924,32 +938,41 @@ public final class SQLEngine
             Object stamp = null;
 
             try {
-                count = 2;
 
                 // Load all the fields of the object including one-one relations
+                count = 2;
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                     Object value;
-                    
-                    value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
+                  
+                    fields[ i ] = null;
+                    if ( ! _engine._fields[ i ].load ) 
+                        continue;
+                    value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
                     if ( _engine._fields[ i ].multi ) {
                         fields[ i ] = new Vector();
                         if ( ! _rs.wasNull() )
                             ( (Vector) fields[ i ] ).addElement( value );
                     } else
                         fields[ i ] =  _rs.wasNull() ? null : value;
+                    ++count;
                 }
 
                 if ( _rs.next() ) {
                     _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                     while ( identity.equals( _lastIdentity ) ) {
-                        for ( int i = 0; i < _engine._fields.length ; ++i  )
+                        count = 2;
+                        for ( int i = 0; i < _engine._fields.length ; ++i  ) {
+                            if ( ! _engine._fields[ i ].load )
+                                continue;
                             if ( _engine._fields[ i ].multi ) {
                                 Object value;
 
-                                value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
+                                value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
                                 if ( ! _rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
                                     ( (Vector) fields[ i ] ).addElement( value );
                             }
+                            ++count;
+                        }
                         if ( _rs.next() )
                             _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                         else
@@ -1120,34 +1143,42 @@ public final class SQLEngine
             Object stamp = null;
 
             try {
-                count = 2;
 
                 // Load all the fields of the object including one-one relations
+                count = 2;
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
+                    if ( ! _engine._fields[ i ].load ) 
+                        continue;
                     if ( _engine._fields[ i ].multi ) {
                         Object value;
 
                         fields[ i ] = new Vector();
-                        value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
+                        value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
                         if ( value != null )
                             ( (Vector) fields[ i ] ).addElement( value );
-                    } else
-                        fields[ i ] = _rs.getObject( i + count );
+                    } else 
+                        fields[ i ] = _rs.getObject( count );
+                    ++count;
                 }
 
                 if ( nextRow() ) {
                     _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                     while ( identity.equals( _lastIdentity ) ) {
-                        for ( int i = 0; i < _engine._fields.length ; ++i  )
+                        count = 2;
+                        for ( int i = 0; i < _engine._fields.length ; ++i  ) {
+                            if ( ! _engine._fields[ i ].load )
+                                continue;
                             if ( _engine._fields[ i ].multi ) {
                                 Object value;
 
-                                value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
+                                value = SQLTypes.getObject( _rs, count, _engine._fields[ i ].sqlType );
                                 if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
                                     ( (Vector) fields[ i ] ).addElement( value );
                             }
+                            ++count;
+                        }
                         if ( nextRow() )
-                        _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
+                            _lastIdentity = SQLTypes.getObject( _rs, 1, _identSqlType );
                         else
                             _lastIdentity = null;
                     }
