@@ -78,7 +78,9 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOCallback;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.loader.MappingLoader;
@@ -272,11 +274,20 @@ public class ClassMolder {
                 int[] idType = null;
                 String[] relatedIdSQL = null;
                 int[] relatedIdType = null;
+                TypeConvertor[] idConvertTo = null;
+                TypeConvertor[] idConvertFrom = null;
+                String[] idConvertParam = null;
+                TypeConvertor[] relatedIdConvertTo = null;
+                TypeConvertor[] relatedIdConvertFrom = null;
+                String[] relatedIdConvertParam = null;
 
                 manyTable = fmFields[i].getSql().getManyTable();
 
                 idSQL = new String[fmId.length];
                 idType = new int[fmId.length];
+                idConvertFrom = new TypeConvertor[fmId.length];
+                idConvertTo = new TypeConvertor[fmId.length];
+                idConvertParam = new String[fmId.length];
                 FieldDescriptor[] fd = ((ClassDescriptorImpl)clsDesc).getIdentities();
                 for ( int j=0; j < fmId.length; j++ ) {
                     idSQL[j] = fmId[j].getSql().getName()[0];
@@ -284,6 +295,10 @@ public class ClassMolder {
                     if ( fd[j] instanceof JDOFieldDescriptor ) {
                         int[] type = ((JDOFieldDescriptor)fd[j]).getSQLType();
                         idType[j] = type==null? 0: type[0];
+                        FieldHandlerImpl fh = (FieldHandlerImpl)fd[j].getHandler();
+                        idConvertTo[j] = fh.getConvertTo();
+                        idConvertFrom[j] = fh.getConvertFrom();
+                        idConvertParam[j] = fh.getConvertParam();
                     } else {
                         throw new MappingException("Identity type must contains sql information: "+ _name );
                     }
@@ -296,12 +311,19 @@ public class ClassMolder {
                     FieldDescriptor[] relatedIds = ((JDOClassDescriptor)relDesc).getIdentities();
                     relatedIdSQL = new String[relatedIds.length];
                     relatedIdType = new int[relatedIds.length];
+                    relatedIdConvertTo = new TypeConvertor[relatedIds.length];
+                    relatedIdConvertFrom = new TypeConvertor[relatedIds.length];
+                    relatedIdConvertParam = new String[relatedIds.length];
                     for ( int j=0; j < relatedIdSQL.length; j++ ) {
                         if ( relatedIds[j] instanceof JDOFieldDescriptor ) {
                             String[] tempId = ((JDOFieldDescriptor)relatedIds[j]).getSQLName();
                             relatedIdSQL[j] = tempId==null? null: tempId[0];
                             int[] tempType = ((JDOFieldDescriptor)relatedIds[j]).getSQLType();
                             relatedIdType[j] = tempType==null? 0: tempType[0];
+                            FieldHandlerImpl fh = (FieldHandlerImpl)relatedIds[j].getHandler();
+                            relatedIdConvertTo[j] = fh.getConvertTo();
+                            relatedIdConvertFrom[j] = fh.getConvertFrom();
+                            relatedIdConvertParam[j] = fh.getConvertParam();
                         } else {
                             throw new MappingException("Field type is not persistence-capable: "+ relatedIds[j].getFieldName() );
                         }
@@ -324,7 +346,9 @@ public class ClassMolder {
                     relatedIdSQL = manyName;
                 }
 
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, idSQL, idType, relatedIdSQL, relatedIdType );
+                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable, 
+                        idSQL, idType, idConvertTo, idConvertFrom, idConvertParam, 
+                        relatedIdSQL, relatedIdType, relatedIdConvertTo, relatedIdConvertFrom, relatedIdConvertParam );
             } else {
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i] );
             }
