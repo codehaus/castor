@@ -40,30 +40,158 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
+ * Date         Author              Changes
+ * 11/01/2000   Arnaud Blandin      Created
  */
 package org.exolab.castor.types;
-import java.text.ParseException;
 
 import org.exolab.castor.types.TimePeriod;
+
+import java.text.ParseException;
+import java.util.SimpleTimeZone;
+import java.text.SimpleDateFormat;
+
 /**
- * Describe an XML schema Date
+ * Describe an XML schema Century
+ * The date type is derived from time period by setting up the facet :
+ *      - duration to "P100Y"
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  */
 
 public class Year extends TimePeriod {
 
+      /** Set to true and recompile to include debugging code in class. */
+    private static final boolean DEBUG = false;
+
+    /** The month format used by the toDate() method */
+    private static final String YEAR_FORMAT = "yyyy";
+
     public Year() {
-        super();
-        try{
-            setPeriod(TimeDuration.parse("P1Y"));
-        } catch (ParseException e) {
-            System.out.println("Error in constructor Time");
-            System.out.println(e);
+        super("P1Y");
+        //we need to set the time zone to the computer local time zone
+        //if we want to use the toDate() method.
+        int temp = SimpleTimeZone.getDefault().getRawOffset();
+        if (temp < 0){
+            temp = -temp;
+            _zoneNegative = true ;
         }
+        _zoneHour = (short) (temp / (60*60*1000));
+        temp = temp % (60*60*1000);
+        _zoneMinute = (short)(temp / (60*1000));
     }
 
-    /*TODO disallow access to time and day methods
-           write toDate(), toString()*/
-}
+
+    /*Disallow the access to set month method*/
+    public void setMonth(short month) {
+        throw new UnsupportedOperationException("month must not be changed");
+    }
+    /*Disallow the access to set day method*/
+    public void setDay(short day) {
+        throw new UnsupportedOperationException("day must not be changed");
+    }
+
+    /*Disallow the access to set time methods */
+    public void setHour(short hour) {
+       throw new UnsupportedOperationException("hour must not be changed");
+    }
+
+    public void setMinute(short minute) {
+      throw new UnsupportedOperationException("minute must not be changed");
+    }
+
+    public void setSecond(short second,short millsecond) {
+      throw new UnsupportedOperationException("second must not be changed");
+    }
+
+    public void setZone(short hour, short minute) {
+      throw new UnsupportedOperationException("time zone must not be changed");
+    }
+
+    public void setZoneNegative() {
+        throw new UnsupportedOperationException("time zone must not be changed");
+    }
+
+
+     /**
+     * convert this Year to a string
+     * The format is defined by W3C XML Schema draft and ISO8601
+     * i.e (+|-)CCYY
+     * @return a string representing this Month
+     */
+     public String toString() {
+
+        String result = null;
+
+        result = String.valueOf(this.getCentury());
+        if (result.length() == 1)
+            result = "0"+result;
+        String temp = String.valueOf(this.getYear());
+        if (temp.length()==1)
+            temp = "0"+temp;
+        result =  result  + temp;
+
+        result = isNegative() ? "-"+result : result;
+
+        return result;
+
+    }//toString
+
+    /**
+     * parse a String and convert it into a Year
+     * @param str the string to parse
+     * @return the Year represented by the string
+     * @throws ParseException a parse exception is thrown if the string to parse
+     *                        does not follow the rigth format (see the description
+     *                        of this class)
+     */
+    public static Year parseYear(String str) throws ParseException {
+
+        Year result = new Year();
+
+        if ( str.startsWith("-") ) {
+            result.setNegative();
+            str =str.substring(1);
+        }
+
+        if (DEBUG) {
+            System.out.println("In parsing method of Year");
+            System.out.println("String to parse : "+str);
+            System.out.println("Negative ? "+result.isNegative());
+        }
+
+
+        if (str.length() != 4)
+            throw new ParseException(str+": Bad XML Schema Year type format (CCYY)",0);
+
+        if (DEBUG) {
+            System.out.println("Processing century: "+str.substring(0,2));
+        }
+        result.setCentury(Short.parseShort( str.substring(0,2) ));
+        if (DEBUG) {
+            System.out.println("Processing year: "+str.substring(2,4));
+        }
+        result.setYear(Short.parseShort( str.substring(2,4) ));
+
+        return result;
+    }//parse
+
+     public java.util.Date toDate() throws ParseException {
+        java.util.Date date = null;
+        SimpleDateFormat df = new SimpleDateFormat(YEAR_FORMAT);
+        SimpleTimeZone timeZone = new SimpleTimeZone(0,"UTC");
+
+        // Set the time zone
+        if ( !isUTC() ) {
+            int offset = 0;
+            offset = (int) ( (_zoneMinute + _zoneHour*60)*60*1000);
+            offset = isZoneNegative() ? -offset : offset;
+            timeZone.setRawOffset(offset);
+            timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
+        }
+        df.setTimeZone(timeZone);
+        date = df.parse(this.toString());
+        return date;
+    }//toDate()
+} //--Year

@@ -54,12 +54,12 @@ import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
 /**
- * The Time Descriptor
+ * The Month Descriptor
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  * @see TimeDurationDescriptor
  */
-public class DateDescriptor
+public class MonthDescriptor
     implements XMLClassDescriptor
 {
 
@@ -89,7 +89,7 @@ public class DateDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "date";
+    private static final String _xmlName = "month";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +99,13 @@ public class DateDescriptor
     //- Constructors -/
     //----------------/
 
-    public DateDescriptor() {
+    public MonthDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new DateFieldHandler());
+            _contentDescriptor.setHandler(new MonthFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +113,7 @@ public class DateDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- DateDescriptor
+    } //--MonthDescriptor
 
     //------------------/
     //- Public Methods -/
@@ -191,7 +191,7 @@ public class DateDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Date";
+            "; descriptor for class: Month";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -210,7 +210,7 @@ public class DateDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Date.class;
+        return Month.class;
     } //-- getJavaClass
 
 
@@ -256,11 +256,11 @@ public class DateDescriptor
 
     /**
      * A specialized FieldHandler for the XML Schema
-     * TimeDuration related types
+     * Month related types
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
-     * @version $Revision $ $Date $
+     * @version $Revision$ $Date$
     **/
-    class DateFieldHandler extends XMLFieldHandler {
+    class MonthFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
@@ -269,9 +269,9 @@ public class DateDescriptor
         /**
          * Creates a new TimeFieldHandler
         **/
-        public DateFieldHandler() {
+        public MonthFieldHandler() {
             super();
-        } //-- TimeFieldHandler
+        } //-- MonthFieldHandler
 
         //------------------/
         //- Public Methods -/
@@ -288,10 +288,10 @@ public class DateDescriptor
             throws java.lang.IllegalStateException
         {
 
-            //-- check for TimeDuration class  -- add later
-            Date date = (Date) target;
+            //-- check for Month class  -- add later
+            Month month = (Month) target;
 
-            return date.toString();
+            return month.toString();
         } //-- getValue
 
         /**
@@ -303,24 +303,22 @@ public class DateDescriptor
             throws java.lang.IllegalStateException
         {
 
-
-            if (! (target instanceof Date) ) {
+            if (! (target instanceof Month) ) {
                //-- throw exception
             }
 
-            Date dateTarget = (Date) target;
+            Month monthTarget = (Month) target;
 
             if (value == null) {
                /// do something
             }
 
-            //-- update current instance of time with new time
+            //-- update current instance of time with new month
             try {
-                Date temp = (Date) Date.parseDate(value.toString()) ;
-                dateTarget.setCentury(temp.getCentury());
-                dateTarget.setYear(temp.getYear());
-                dateTarget.setMonth(temp.getMonth());
-                dateTarget.setDay(temp.getDay());
+                Month temp = Month.parseMonth(value.toString()) ;
+                monthTarget.setMonth(temp.getMonth());
+                monthTarget.setYear(temp.getYear());
+                monthTarget.setCentury(temp.getCentury());
             }
             catch (java.text.ParseException ex) {
                 //-- ignore for now
@@ -362,11 +360,12 @@ public class DateDescriptor
         public Object newInstance( Object parent )
             throws IllegalStateException
         {
-            return new Date();
+            return new Month();
         } //-- newInstance
 
 
-    } //-- DateFieldHandler
+    } //-- MonthFieldHandler
 
 
-} //-- DateDescriptor
+} //-- MonthDescriptor
+

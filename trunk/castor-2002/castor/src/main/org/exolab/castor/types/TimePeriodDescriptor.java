@@ -59,7 +59,7 @@ import org.exolab.castor.mapping.ValidityException;
  * @version $Revision$ $Date$
  * @see TimeDurationDescriptor
  */
-public class DateDescriptor
+public class TimePeriodDescriptor
     implements XMLClassDescriptor
 {
 
@@ -89,7 +89,7 @@ public class DateDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "date";
+    private static final String _xmlName = "timePeriod";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
@@ -99,13 +99,13 @@ public class DateDescriptor
     //- Constructors -/
     //----------------/
 
-    public DateDescriptor() {
+    public TimePeriodDescriptor() {
         super();
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
             //-- setHandler
-            _contentDescriptor.setHandler(new DateFieldHandler());
+            _contentDescriptor.setHandler(new TimePeriodFieldHandler());
         }
 
         if (_fields == null) {
@@ -113,7 +113,7 @@ public class DateDescriptor
             _fields[0] = _contentDescriptor;
         }
 
-    } //-- DateDescriptor
+    } //-- TimePeriodDescriptor
 
     //------------------/
     //- Public Methods -/
@@ -191,7 +191,7 @@ public class DateDescriptor
     public String toString() {
 
         String str = super.toString() +
-            "; descriptor for class: Date";
+            "; descriptor for class: TimePeriod";
 
         //-- add xml name
         str += "; xml name: " + _xmlName;
@@ -210,7 +210,7 @@ public class DateDescriptor
      * @return The Java class
      */
     public Class getJavaClass() {
-        return Date.class;
+        return TimePeriod.class;
     } //-- getJavaClass
 
 
@@ -260,7 +260,7 @@ public class DateDescriptor
      * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
      * @version $Revision $ $Date $
     **/
-    class DateFieldHandler extends XMLFieldHandler {
+    class TimePeriodFieldHandler extends XMLFieldHandler {
 
         //----------------/
         //- Constructors -/
@@ -269,7 +269,7 @@ public class DateDescriptor
         /**
          * Creates a new TimeFieldHandler
         **/
-        public DateFieldHandler() {
+        public TimePeriodFieldHandler() {
             super();
         } //-- TimeFieldHandler
 
@@ -288,10 +288,10 @@ public class DateDescriptor
             throws java.lang.IllegalStateException
         {
 
-            //-- check for TimeDuration class  -- add later
-            Date date = (Date) target;
+            //-- check for TimePeriod class  -- add later
+            TimePeriod timeP = (TimePeriod) target;
 
-            return date.toString();
+            return timeP.toString();
         } //-- getValue
 
         /**
@@ -304,25 +304,21 @@ public class DateDescriptor
         {
 
 
-            if (! (target instanceof Date) ) {
+            if (! (target instanceof TimePeriod) ) {
                //-- throw exception
             }
 
-            Date dateTarget = (Date) target;
+            TimePeriod timePTarget = (TimePeriod) target;
 
             if (value == null) {
                /// do something
             }
 
-            //-- update current instance of time with new time
-            try {
-                Date temp = (Date) Date.parseDate(value.toString()) ;
-                dateTarget.setCentury(temp.getCentury());
-                dateTarget.setYear(temp.getYear());
-                dateTarget.setMonth(temp.getMonth());
-                dateTarget.setDay(temp.getDay());
-            }
-            catch (java.text.ParseException ex) {
+            //-- update current instance of timePeriod with new timePeriod
+            try{
+                System.out.println(value.toString());
+                timePTarget.setFields(value.toString());
+            } catch (java.text.ParseException ex) {
                 //-- ignore for now
             }
         } //-- setValue
@@ -366,7 +362,7 @@ public class DateDescriptor
         } //-- newInstance
 
 
-    } //-- DateFieldHandler
+    } //-- TimePeriodFieldHandler
 
 
-} //-- DateDescriptor
+} //-- TimePeriodDescriptor

@@ -40,22 +40,180 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
+ * Date         Author          Changes
+ * 11/02/2000   Arnaud Blandin  Changed the constructor
+ * 26/10/2000   Arnaud Blandin  Created
  */
-package org.exolab.castor.types;
-import java.text.ParseException;
 
+package org.exolab.castor.types;
 import org.exolab.castor.types.RecurringDuration;
 
-public abstract class TimePeriod extends RecurringDuration{
+
+import java.text.ParseException;
+import java.util.StringTokenizer;
+
+/**
+ * Describe an XML schema TimePeriod
+ * The time period type is derived from recurringDuration by setting up the facet:
+ *  - period to "P0Y"
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
+ * @version $Revision$
+ * @see RecurringDuration
+ */
+public class TimePeriod extends RecurringDuration{
+
+    /** Set to true and recompile to include debugging code in class. */
+    private static final boolean DEBUG = false;
 
     public TimePeriod() {
-        super();
-        try{
-            setPeriod(TimeDuration.parse("P0Y"));
-        }catch (ParseException e) {
-            System.out.println("Error in constructor Time Period");
-            System.out.println(e);
-       }
+        super("","P0Y");
     }
-}
+
+    /**
+     * returns a TimePeriod with the duration facet set up
+     * @param duration the String value of the duration facet
+     * @return a TimePeriod the duration facet set up
+     */
+    public TimePeriod(String duration) {
+        super(duration,"P0Y");
+    }
+
+    /**
+     * parse a string to set the fields of a TimePeriod
+     * @param str the string to parse
+     */
+     public void setFields (String str) throws ParseException {
+
+        //remove if necessary the Z at the end
+        if ( str.endsWith("Z"))
+            str = str.substring(0,str.indexOf("Z"));
+
+        //isNegative ? is there a time zone ?
+        if ( str.startsWith("-") )
+            this.setNegative();
+
+        String zoneStr = str.substring(str.length()-6,str.length());
+        boolean timeZone = (  ((zoneStr.lastIndexOf("-") !=-1)  ||
+                               (zoneStr.lastIndexOf("+") !=-1 )) &&
+                               (zoneStr.lastIndexOf(":") !=-1)  );
+
+        if (DEBUG) {
+            System.out.println("In parsing method of TimePeriod");
+            System.out.println("String to parse : "+str);
+            System.out.println("Negative ? "+this.isNegative());
+            String tzone = timeZone?zoneStr:"false";
+            System.out.println("Time zone :" +tzone);
+        }
+
+        if (!timeZone) zoneStr = null;
+        else {
+            int index =  str.lastIndexOf("+") != -1? str.lastIndexOf("+") :
+                                                         str.lastIndexOf("-");
+            str = str.substring(0,index);
+        }
+
+        // the 'T' is required
+        if (str.indexOf('T') == -1) {
+            throw new ParseException("The 'T' element is required",0);
+        }
+        String date = str.substring(0,str.indexOf("T"));
+        String time = str.substring(str.indexOf("T"));
+
+        // proceed date
+        StringTokenizer token = new StringTokenizer(date,"-");
+
+        if (token.countTokens() != 3)
+            throw new ParseException(str+": Bad date format",0);
+
+        //CCYY
+        String temp = token.nextToken();
+        if (temp.length() != 4)
+            throw new ParseException(str+":Bad year format",1);
+        if (DEBUG) {
+            System.out.println("Processing century: "+temp.substring(0,2));
+        }
+        this.setCentury(Short.parseShort( temp.substring(0,2) ));
+        if (DEBUG) {
+            System.out.println("Processing year: "+temp.substring(2,4));
+        }
+        this.setYear(Short.parseShort( temp.substring(2,4) ));
+
+        //MM
+        temp=token.nextToken();
+        if (temp.length() != 2)
+            throw new ParseException(str+": Bad month format",5);
+        if (DEBUG) {
+            System.out.println("Processing month: "+temp);
+        }
+        this.setMonth(Short.parseShort(temp));
+
+        //DD
+        temp=token.nextToken();
+        if (temp.length() != 2)
+            throw new ParseException(str+":Bad day format",8);
+        if (DEBUG) {
+            System.out.println("Processing day: "+temp);
+        }
+        this.setDay(Short.parseShort(temp));
+
+        //proceed Time
+        token = new StringTokenizer(time,":");
+
+        if ((token.countTokens() < 3) && (token.countTokens() > 5) )
+            throw new ParseException(str+": Bad time format",11);
+
+        //hh
+        temp = token.nextToken();
+        temp = temp.substring(temp.indexOf("T")+1);
+        if (temp.length() != 2)
+            throw new ParseException(str+": Bad hour format",11);
+         if (DEBUG) {
+            System.out.println("Processing hour: "+temp);
+        }
+         this.setHour(Short.parseShort( temp ));
+
+        //mm
+        temp=token.nextToken();
+        if (temp.length() != 2)
+            throw new ParseException(str+": Bad minute format",14);
+        if (DEBUG) {
+            System.out.println("Processing minute: "+temp);
+        }
+        this.setMinute( Short.parseShort(temp));
+
+        //ss
+        temp=token.nextToken();
+        String milsecond = "0";
+        if (temp.indexOf(".") != -1) {
+            milsecond = temp.substring(temp.indexOf(".")+1);
+            temp = temp.substring(0,temp.indexOf("."));
+        }
+
+        if (temp.length() != 2)
+            throw new ParseException(str+": Bad second format",17);
+        if (DEBUG) {
+            System.out.println("Processing seconds: "+temp);
+        }
+        this.setSecond(Short.parseShort(temp.substring(0,2)),
+                         Short.parseShort(milsecond));
+
+
+        // proceed TimeZone if any
+        if (timeZone) {
+            if (zoneStr.startsWith("-")) this.setZoneNegative();
+            if (zoneStr.length()!= 6)
+                throw new ParseException(str+": Bad time zone format",20);
+            this.setZone(Short.parseShort(zoneStr.substring(1,3)),
+                           Short.parseShort(zoneStr.substring(4,6)));
+        }
+        else this.isUTC();
+        temp = null;
+    }//setFields
+
+
+     public void setPeriod(TimeDuration period) {
+        throw new UnsupportedOperationException("in a time period type,the period must not be changed");
+    }
+
+} //TimePeriod
