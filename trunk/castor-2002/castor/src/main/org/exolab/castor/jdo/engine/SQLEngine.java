@@ -607,7 +607,7 @@ final class SQLEngine
         {
             this.name = fieldDesc.getFieldName();
             this.store = store;
-            this.multi = fieldDesc.isMulti();
+            this.multi = fieldDesc.isMultivalued();
             if ( store && fieldDesc instanceof JDOFieldDescriptor )
                 this.dirtyCheck = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
             else
