@@ -1,3 +1,14 @@
+Version 0.7.7  February 3, 2000
+-------------------------------
+
+XML:  Changed "archetype" to "type" in accordance with the 19991217
+      XML Schema draft
+
+XML:  Added support for "datatype"
+
+XML:  fixed a bug with the Base64 encoder which caused it to throw an
+      ArrayIndexOutOfBounds exception when it recieved a zero-length array
+
 Version 0.7.6  February 2, 2000
 -------------------------------
 
