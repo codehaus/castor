@@ -52,6 +52,7 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.TypeConvertor;
 
 
 /**
@@ -121,6 +122,17 @@ public class FieldDescriptorImpl
      */
     private ClassDescriptor      _clsDesc;
 
+    /**
+     * The type convertor from Java type to SQL type.
+     */
+    private TypeConvertor        _convertor;
+
+
+    /**
+     * The type convertor parameter.
+     */
+    private String               _convertorParam;
+
 
     /**
      * Constructs a new field descriptor.
@@ -130,8 +142,8 @@ public class FieldDescriptorImpl
      * @param handler The field handler (may be null)
      * @param trans True if the field is transient
      */
-    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, 
-				FieldHandler handler, boolean trans )
+    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo,
+                FieldHandler handler, boolean trans )
         throws MappingException
     {
         if ( fieldName == null )
@@ -143,6 +155,8 @@ public class FieldDescriptorImpl
         _required = typeInfo.isRequired();
         _transient = trans;
         _multi = ( typeInfo.getCollectionHandler() != null );
+        _convertor = typeInfo.getConvertorFrom();
+        _convertorParam = typeInfo.getConvertorParam();
     }
 
 
@@ -160,7 +174,9 @@ public class FieldDescriptorImpl
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
         this._multi = fieldDesc.isMultivalued();
-        }
+        this._convertor = fieldDesc.getConvertor();
+        this._convertorParam = fieldDesc.getConvertorParam();
+    }
 
     public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
     {
@@ -247,11 +263,33 @@ public class FieldDescriptorImpl
     }
 
 
+    /**
+     * Returns the convertor from the field type to an external type.
+     *
+     * @return Convertor from field type
+     */
+    public TypeConvertor getConvertor()
+    {
+        return _convertor;
+    }
+
+
+    /**
+     * Returns the convertor parameter.
+     *
+     * @return Convertor parameter
+     */
+    public String getConvertorParam()
+    {
+        return _convertorParam;
+    }
+
+
     public String toString()
     {
         return _fieldName + "(" + _fieldType.getName() + ")";
     }
-    
+
 
 }
 

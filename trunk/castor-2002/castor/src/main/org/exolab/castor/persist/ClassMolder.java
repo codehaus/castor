@@ -1025,6 +1025,15 @@ public class ClassMolder {
             return false;
         if ( o1.equals( o2 ) )
             return true;
+        // [oleg] is some special cases equals doesn't work properly
+        if ( (o1 instanceof java.math.BigDecimal) && ((java.math.BigDecimal) o1).compareTo(o2) == 0) {
+            return true;
+        }
+        if ( (o1 instanceof java.sql.Timestamp) && (o2 instanceof java.sql.Timestamp)) {
+            java.sql.Timestamp t1 = (java.sql.Timestamp) o1;
+            java.sql.Timestamp t2 = (java.sql.Timestamp) o2;
+            return (t1.getTime() == t2.getTime() && t1.getNanos() / 1000000 == t2.getNanos() / 1000000);
+        }
         return false;
     }
 

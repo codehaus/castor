@@ -157,6 +157,8 @@ public class OQLQueryImpl
             //do type checking and conversion
             Class paramClass = info.getTheClass();
             Class valueClass = value.getClass();
+            Class fieldClass = info.getFieldType();
+            Class sqlClass = info.getSQLType();
 
             if ( value != null ) {
                 if ( paramClass.isAssignableFrom( valueClass ) ) {
@@ -165,8 +167,7 @@ public class OQLQueryImpl
                     if ( molder != null ) {
                         value = molder.getActualIdentity( _dbImpl.getClassLoader(), value );
                     }
-                } else {
-                    if ( info.isUserDefined() ) {
+                } else if ( info.isUserDefined() ) {
                         //If the user specified a type they must pass that exact type.
 
                         throw new IllegalArgumentException( "Query paramter " +
@@ -175,9 +176,12 @@ public class OQLQueryImpl
                                                             paramClass +
                                                             " it is an instance of the class "
                                                             + valueClass );
-                    } else {
+                }
+                if ( sqlClass != null && ! sqlClass.isAssignableFrom( valueClass ) ) {
+                    // First convert the actual value to the field value
+                    if ( fieldClass != valueClass ) {
                         try {
-                            TypeConvertor tc = SQLTypes.getConvertor( valueClass, paramClass );
+                            TypeConvertor tc = SQLTypes.getConvertor( valueClass, fieldClass );
                             value = tc.convert( value, null );
                         } catch ( MappingException e ) {
                             throw new IllegalArgumentException( "Query parameter "
@@ -187,6 +191,10 @@ public class OQLQueryImpl
                                                                 + paramClass
                                                                 + ", because no convertor can be found." );
                         }
+                    }
+                    // Perform conversion from field type to SQL type, if needed
+                    if (info.getConvertor() != null) {
+                        value = info.getConvertor().convert( value, info.getConvertorParam() );
                     }
                 }
             }
@@ -284,16 +292,17 @@ public class OQLQueryImpl
                     max = paramIndex;
             }
         }
-        
+
         //then create the types array and fill it
         _bindTypes = new Class[max];
-        for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); ) 
+        for (Enumeration e = _paramInfo.elements(); e.hasMoreElements(); )
         {
             ParamInfo info = (ParamInfo) e.nextElement();
             for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); )
             {
                 int paramIndex = ( (Integer) f.nextElement() ).intValue();
-                _bindTypes[ paramIndex - 1 ] = f.getClass();
+                _bindTypes[ paramIndex - 1 ] = (info.getSQLType() == null ? info.getTheClass()
+                                                                          : info.getSQLType());
             }
         }
 
@@ -351,7 +360,7 @@ public class OQLQueryImpl
                     }
                     info = (ParamInfo) _paramInfo.get( paramNo );
                     if ( info == null ) {
-                        info = new ParamInfo( "", "java.lang.Object");
+                        info = new ParamInfo( "", "java.lang.Object", null);
                     }
                     info.mapToSQLParam( paramCnt + 1 );
                     _paramInfo.put( paramNo , info );
@@ -368,7 +377,7 @@ public class OQLQueryImpl
         _spCall = sql.toString();
         _projectionType = ParseTreeWalker.PARENT_OBJECT;
         _bindTypes = new Class[ paramCnt ];
-        for ( int i = 0; i < paramCnt; i++ ) 
+        for ( int i = 0; i < paramCnt; i++ )
             _bindTypes[ i ] = Object.class;
 
         objType = oql.substring( as + 4 ).trim();
@@ -383,7 +392,7 @@ public class OQLQueryImpl
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getLockEngine(); 
+        _dbEngine = _dbImpl.getLockEngine();
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
@@ -516,7 +525,7 @@ public class OQLQueryImpl
             _pathInfo = pathInfo;
             _classDescriptor = clsDesc;
         }
-        
+
 
         OQLEnumeration( org.exolab.castor.persist.QueryResults results )
         {
@@ -602,7 +611,7 @@ public class OQLQueryImpl
         {
             return next( false );
         }
-        
+
 
         private Object next( boolean skipError )
             throws PersistenceException, NoSuchElementException
@@ -611,7 +620,7 @@ public class OQLQueryImpl
 
             if ( _lastObject != null ) {
                 Object result;
-                
+
                 result = _lastObject;
                 _lastObject = null;
                 if ( _pathInfo == null )
@@ -626,7 +635,7 @@ public class OQLQueryImpl
                 while ( identity != null ) {
                     try {
                         Object result;
-                        
+
                         result = _results.fetch();
                         if ( result != null )
                             if ( _pathInfo == null )
@@ -680,7 +689,7 @@ public class OQLQueryImpl
             for ( int i = 1; i < _pathInfo.size(); i++ ) {
                 String curFieldName = (String) _pathInfo.elementAt(i);
                 try {
-                    JDOFieldDescriptor curFieldDesc = 
+                    JDOFieldDescriptor curFieldDesc =
                               curClassDesc.getField( curFieldName );
                     FieldHandler handler = curFieldDesc.getHandler();
                     curObject = handler.getValue( curObject );
@@ -693,8 +702,8 @@ public class OQLQueryImpl
 
             return curObject;
         }
-        
+
      }
-    
+
 
 }

@@ -53,7 +53,6 @@ import java.sql.Blob;
 import java.sql.Clob;
 import java.sql.ResultSet;
 import java.sql.Types;
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.PreparedStatement;
@@ -108,9 +107,9 @@ public final class SQLTypes
         int sep;
 
         sep = sqlTypeName.indexOf( LeftParamSeparator );
-        if ( sep >= 0 ) 
+        if ( sep >= 0 )
             sqlTypeName = sqlTypeName.substring( 0, sep );
-        
+
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
                 return _typeInfos[ i ].javaType;
@@ -141,7 +140,7 @@ public final class SQLTypes
         }
         throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
     }
-    
+
 
     /**
      * Extracts parameter for type convertor from the name of the SQL type
@@ -158,7 +157,7 @@ public final class SQLTypes
 
         left = sqlTypeName.indexOf( LeftParamSeparator );
         right = sqlTypeName.indexOf( RightParamSeparator );
-        if ( right < 0 ) 
+        if ( right < 0 )
             right = sqlTypeName.length();
 
         if ( left >= 0 )
@@ -279,7 +278,7 @@ public final class SQLTypes
     {
         StringBuffer java;
         int          i;
-        
+
         java = new StringBuffer( sqlName.length() );
         if ( scope != null )
             java.append( scope ).append( '.' );
@@ -456,26 +455,26 @@ public final class SQLTypes
         // TODO: the closest possible match
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.equals( fromType ) &&
-                 toType.equals( _typeConvertors[ i ].toType ) ) 
+                 toType.equals( _typeConvertors[ i ].toType ) )
                 return _typeConvertors[ i ].convertor;
         }
 
         // else seek for any match
         for ( int i = 0 ; i < _typeConvertors.length ; ++i ) {
             if ( _typeConvertors[ i ].fromType.isAssignableFrom( fromType ) &&
-                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) ) 
+                 toType.isAssignableFrom( _typeConvertors[ i ].toType ) )
                 return _typeConvertors[ i ].convertor;
         }
         throw new MappingException( "mapping.noConvertor", fromType.getName(), toType.getName() );
     }
-    
+
 
     /**
      * Information used to locate a type convertor.
      */
     static class TypeConvertorInfo
     {
-       
+
         /**
          *  The type being converted to.
          */
@@ -488,16 +487,16 @@ public final class SQLTypes
 
         /**
          * The convertor.
-         */        
+         */
         final TypeConvertor convertor;
-        
+
         TypeConvertorInfo( Class fromType, Class toType, TypeConvertor convertor )
         {
             this.fromType  = fromType;
             this.toType    = toType;
             this.convertor = convertor;
         }
-        
+
     }
 
 
@@ -505,14 +504,14 @@ public final class SQLTypes
      * Date format used by the date convertor.
      */
     private static DateFormat _dateFormat = new SimpleDateFormat();
-    
-    
+
+
     /**
-     * Date format used by the date convertor when nonempy parameter 
+     * Date format used by the date convertor when nonempy parameter
      * is specified.
      */
     private static SimpleDateFormat _paramDateFormat = new SimpleDateFormat();
-    
+
     /**
      * Date format used by the double->date convertor.
      */
@@ -543,7 +542,7 @@ public final class SQLTypes
                     case 1: char ch = ( (String) obj ).charAt( 0 );
                         if (param == null || param.length() != 2 )
                             return ( ch == 'T' || ch == 't'  ) ? Boolean.TRUE : Boolean.FALSE;
-                        else 
+                        else
                             return ( ch == param.charAt( 1 ) ) ? Boolean.TRUE : Boolean.FALSE;
                     case 4: return ( (String) obj ).equalsIgnoreCase( "true" ) ? Boolean.TRUE : Boolean.FALSE;
                     case 5: return ( (String) obj ).equalsIgnoreCase( "false" ) ? Boolean.TRUE : Boolean.FALSE;
@@ -604,7 +603,7 @@ public final class SQLTypes
         new TypeConvertorInfo( java.util.Date.class, java.lang.Integer.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 _paramDateFormat.applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new Integer( _paramDateFormat.format( (Date) obj ) );
+                return new Integer( _paramDateFormat.format( (java.util.Date) obj ) );
             }
             public String toString() { return "Date->Integer"; }
         } ),
@@ -711,7 +710,7 @@ public final class SQLTypes
         new TypeConvertorInfo( java.util.Date.class, java.lang.Double.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 _paramDateFormat.applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new Double( _paramDateFormat.format( (Date) obj ) );
+                return new Double( _paramDateFormat.format( (java.util.Date) obj ) );
             }
             public String toString() { return "Date->Double"; }
         } ),
@@ -788,7 +787,7 @@ public final class SQLTypes
         new TypeConvertorInfo( java.util.Date.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 _paramDateFormat.applyPattern( org.exolab.castor.mapping.loader.Types.getFullDatePattern( param ) );
-                return new BigDecimal( _paramDateFormat.format( (Date) obj ) + ".0" );
+                return new BigDecimal( _paramDateFormat.format( (java.util.Date) obj ) + ".0" );
             }
             public String toString() { return "Date->BigDecimal"; }
         } ),
@@ -841,7 +840,7 @@ public final class SQLTypes
                     return obj.toString();
                 else {
                     _paramDateFormat.applyPattern( param );
-                    return _paramDateFormat.format( (Date) obj );
+                    return _paramDateFormat.format( (java.util.Date) obj );
                 }
             }
             public String toString() { return "Date->String"; }
@@ -872,7 +871,7 @@ public final class SQLTypes
             public Object convert( Object obj, String param ) {
                 if ( param == null || param.length() != 2 )
                     return ( (Boolean) obj ).booleanValue() ? "T" : "F";
-                else 
+                else
                     return ( (Boolean) obj ).booleanValue() ? param.substring( 1, 2 ) : param.substring( 0, 1 );
             }
             public String toString() { return "Boolean->String"; }
@@ -989,7 +988,7 @@ public final class SQLTypes
             public Object convert( Object obj, String param ) {
 
                 java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
-                return new Date(timestamp.getTime() + timestamp.getNanos() / 1000000);
+                return new java.util.Date(timestamp.getTime() + timestamp.getNanos() / 1000000);
             }
             public String toString() { return "sql.Timestamp->util.Date"; }
         } ),
@@ -1007,6 +1006,7 @@ public final class SQLTypes
                 }
                 java.sql.Timestamp timestamp = new java.sql.Timestamp(time);
                 timestamp.setNanos((int) ((time % 1000) * 1000000));
+                //timestamp.setNanos(0);  // this can workaround the bug in SAP DB
                 return timestamp;
             }
             public String toString() { return "String->sql.Timestamp"; }
@@ -1019,7 +1019,7 @@ public final class SQLTypes
                 }
                 java.sql.Timestamp timestamp = (java.sql.Timestamp) obj;
                 _paramDateFormat.applyPattern( param );
-                return _paramDateFormat.format( new Date(timestamp.getTime() + timestamp.getNanos() / 1000000) );
+                return _paramDateFormat.format( new java.util.Date(timestamp.getTime() + timestamp.getNanos() / 1000000) );
             }
             public String toString() { return "sql.Timestamp->String"; }
         } ),
