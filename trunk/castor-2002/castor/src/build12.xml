@@ -9,6 +9,7 @@
   		<!-- ================================================================== -->
  		<!--                            Properties                              -->
   		<!-- ================================================================== -->   
+        <property name="name" value="Castor"/>
         <property name="source" value="src"/>
         <property name="main" value="${source}/main"/>
         <property name="etc" value="${source}/etc"/>
@@ -27,11 +28,11 @@
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
-            org.exolab.castor.dax,
             org.exolab.castor.xml,
             org.exolab.castor.dsml,
             org.exolab.castor.mapping"
         />
+        <!--    org.exolab.castor.dax, -->
         <property name="allpackagenames" value="org.*"/>
   
     <!-- ================================================================== -->
@@ -245,13 +246,13 @@
     <target name="javadoc" depends="prepare">
         <mkdir dir="${build}/doc"/>
         <mkdir dir="${build}/doc/javadoc"/>
-        <javadoc sourcepath="${main}" destdir="${build}/doc/javadoc" dir="." doctitle="${name} JavaDoc" windowtitle="${name} JavaDoc" bottom="${copyright}" package="true" author="true" version="true" noindex="true" packagenames="${allpackagenames}"/>
+        <javadoc sourcepath="${main}" destdir="${build}/doc/javadoc" doctitle="${name} JavaDoc" windowtitle="${name} JavaDoc" bottom="${copyright}" package="true" author="true" version="true" noindex="true" packagenames="${allpackagenames}"/>
     </target>
     <!-- Build the API JavaDocs -->
     <target name="api" depends="prepare">
         <mkdir dir="${build}/doc"/>
         <mkdir dir="${build}/doc/api"/>
-        <javadoc sourcepath="${main}" destdir="${build}/doc/api" dir="." doctitle="${Name} API" windowtitle="${Name} API" bottom="${copyright}" public="true" author="true" packagenames="${apipackagenames}"/>
+        <javadoc sourcepath="${main}" destdir="${build}/doc/api" doctitle="${name} API" windowtitle="${name} API" bottom="${copyright}" public="true" author="true" packagenames="${apipackagenames}"/>
     </target>
     <!-- Build the docs, API and full JavaDocs, doc archives -->
     <target name="docs" depends="doc,api,javadoc">
