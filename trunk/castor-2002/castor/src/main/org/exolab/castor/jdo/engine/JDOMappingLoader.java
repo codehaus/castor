@@ -162,7 +162,8 @@ public class JDOMappingLoader
         else
             sqlName = fieldMap.getSqlInfo().getName();
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName,
-                                       DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ) );
+            DirtyCheck.equals( fieldMap.getSqlInfo().getDirty() ),
+            fieldMap.getSqlInfo().getManyTable(), fieldMap.getSqlInfo().getManyKey() );
     }
 
 
