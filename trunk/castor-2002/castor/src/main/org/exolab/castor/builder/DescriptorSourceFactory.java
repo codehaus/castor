@@ -447,18 +447,22 @@ public class DescriptorSourceFactory {
             jsc.append("handler));");
             jsc.add("desc.setImmutable(true);");
         }
-        //-- We need to handle NMTOKENS and IDREFS with the
-        //-- CollectionFieldHandler
+        //-- Handle special Collection Types such as NMTOKENS and IDREFS
         else if (member.getSchemaType().getType() == XSType.COLLECTION) {
-
             switch (xsType.getType()) {
                 case XSType.NMTOKEN_TYPE:
                 case XSType.NMTOKENS_TYPE:
-                case XSType.IDREF_TYPE:
-                case XSType.IDREFS_TYPE:
+                    //-- use CollectionFieldHandler
                     jsc.add("desc.setHandler( new CollectionFieldHandler(");
                     jsc.append("handler));");
                     break;
+                case XSType.IDREF_TYPE:
+                case XSType.IDREFS_TYPE:
+                    //-- uses special code in UnmarshalHandler 
+                    //-- see UnmarshalHandler#processIDREF
+                    jsc.add("desc.setMultivalued(" + member.isMultivalued());
+                    jsc.append(");");
+                    /* do not break here */
                 default:
                     jsc.add("desc.setHandler(handler);");
                     break;
