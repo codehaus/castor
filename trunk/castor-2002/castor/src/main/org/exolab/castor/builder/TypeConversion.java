@@ -154,7 +154,7 @@ public class TypeConversion {
 
         //-- determine base type
         SimpleType base = simpleType;
-        while ((base != null) && ( ! SimpleTypesFactory.isBuiltInType( base.getTypeCode() ) )) {
+        while ((base != null) && (!base.isBuiltInType())) {
             base = (SimpleType)base.getBaseType();
         }
         if (base == null) {
@@ -196,8 +196,25 @@ public class TypeConversion {
                 case SimpleTypesFactory.INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSInteger();
-                    readIntegerFacets(simpleType, xsInteger);
+                    if (!simpleType.isBuiltInType())
+                        readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
+                }
+                //-- int
+				case SimpleTypesFactory.INT_TYPE:
+				{
+					XSInt xsInt = new XSInt();
+					if (!simpleType.isBuiltInType())
+					    readIntFacets(simpleType, xsInt);
+                    return xsInt;
+                }
+                //-- long
+                case SimpleTypesFactory.LONG_TYPE:
+                {
+                    XSLong xsLong = new XSLong();
+                    if (!simpleType.isBuiltInType())
+                        readLongFacets(simpleType,xsLong);
+                    return xsLong;
                 }
                 //-- negative-integer
                 case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
@@ -213,8 +230,6 @@ public class TypeConversion {
                     readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
-                case SimpleTypesFactory.LONG_TYPE:
-                    return new XSLong();
                 //-- string
                 case SimpleTypesFactory.STRING_TYPE:
                     return toXSString(simpleType);
@@ -226,14 +241,11 @@ public class TypeConversion {
                     return new XSDecimal();
                 //-- short
                 case SimpleTypesFactory.SHORT_TYPE:
+                {
 					XSShort xsShort = new XSShort();
 					readShortFacets(simpleType, xsShort);
                     return xsShort;
-                //-- int
-				case SimpleTypesFactory.INT_TYPE:
-					XSInt xsInt = new XSInt();
-					readIntFacets(simpleType, xsInt);
-                    return xsInt;
+                }
                 default:
                     //-- error
                     String className
@@ -264,9 +276,9 @@ public class TypeConversion {
     //-------------------/
 
     /**
-     * Converts the given simpletype to an XSInteger
-     * @param simpletype the Simpletype to convert
-     * @return the XSInteger representation of the given Simpletype
+     * Reads and sets the facets for XSInteger
+     * @param simpletype the SimpleType containing the facets
+     * @param xsInt the XSInteger to set the facets of
     **/
     private static void readIntegerFacets
         (SimpleType simpleType, XSInteger xsInteger)
@@ -286,11 +298,13 @@ public class TypeConversion {
             else if (Facet.MAX_INCLUSIVE.equals(name))
                 xsInteger.setMaxInclusive(facet.toInt());
             //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
                 xsInteger.setMinExclusive(facet.toInt());
             //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_INCLUSIVE.equals(name))
                 xsInteger.setMinInclusive(facet.toInt());
+            else if (Facet.PATTERN.equals(name))
+                xsInteger.setPattern(facet.getValue());
 
         }
 
@@ -298,9 +312,9 @@ public class TypeConversion {
 
 
     /**
-     * Converts the given simpletype to an XSInteger
-     * @param simpletype the Simpletype to convert
-     * @return the XSInteger representation of the given Simpletype
+     * Reads and sets the facets for XSInt
+     * @param simpletype the SimpleType containing the facets
+     * @param xsInt the XSInt to set the facets of
     **/
     private static void readIntFacets
         (SimpleType simpleType, XSInt xsInt)
@@ -320,20 +334,58 @@ public class TypeConversion {
             else if (Facet.MAX_INCLUSIVE.equals(name))
                 xsInt.setMaxInclusive(facet.toInt());
             //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
                 xsInt.setMinExclusive(facet.toInt());
             //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_INCLUSIVE.equals(name))
                 xsInt.setMinInclusive(facet.toInt());
+            else if (Facet.PATTERN.equals(name)) {
+                xsInt.setPattern(facet.getValue());
+            }
 
         }
 
     } //-- toXSInt
 
     /**
-     * Converts the given simpletype to an XSShort
-     * @param simpletype the Simpletype to convert
-     * @param xsShort the XSShort to set the facets in
+     * Reads the facets for an XSLong
+     * @param simpleType the SimpleType containing the facets
+     * @param xsLong the XSLong to set the facets of
+    **/
+    private static void readLongFacets
+        (SimpleType simpleType, XSLong xsLong)
+    {
+
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+            
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                xsLong.setMaxExclusive(facet.toLong());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                xsLong.setMaxInclusive(facet.toLong());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
+                xsLong.setMinExclusive(facet.toLong());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(name))
+                xsLong.setMinInclusive(facet.toLong());
+            //-- pattern
+            else if (Facet.PATTERN.equals(name))
+                xsLong.setPattern(facet.getValue());
+        }
+
+    } //-- readLongFacets
+    
+    /**
+     * Reads and sets the facets for XSShort
+     * @param simpletype the Simpletype containing the facets
+     * @param xsShort the XSShort to set the facets of
     **/
     private static void readShortFacets
         (SimpleType simpleType, XSShort xsShort)
@@ -352,11 +404,14 @@ public class TypeConversion {
             else if (Facet.MAX_INCLUSIVE.equals(name))
                 xsShort.setMaxInclusive(facet.toShort());
             //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
                 xsShort.setMinExclusive(facet.toShort());
             //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(facet.getName()))
+            else if (Facet.MIN_INCLUSIVE.equals(name))
                 xsShort.setMinInclusive(facet.toShort());
+            //-- pattern
+            else if (Facet.PATTERN.equals(name))
+                xsShort.setPattern(facet.getValue());
 
         }
 
