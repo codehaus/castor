@@ -47,7 +47,6 @@
 package org.exolab.castor.persist.spi;
 
 
-import java.io.PrintWriter;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 
