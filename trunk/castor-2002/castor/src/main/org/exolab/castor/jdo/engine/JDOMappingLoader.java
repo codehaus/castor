@@ -61,13 +61,11 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
-import org.exolab.castor.mapping.loader.KeyGeneratorDescriptorImpl;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.mapping.xml.Param;
-import org.exolab.castor.persist.KeyGeneratorRegistry;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -122,7 +120,7 @@ public class JDOMappingLoader
         FieldDescriptor[] fields;
         Vector            jdoFields;
         String            keyGenName;
-        KeyGeneratorDescriptorImpl keyGenDesc;
+        KeyGeneratorDescriptor keyGenDesc;
         
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
@@ -169,9 +167,9 @@ public class JDOMappingLoader
                     params.put( par.getName(), par.getValue() );
                 }
             }
-            keyGenDesc = (KeyGeneratorDescriptorImpl) _keyGenDescs.get(keyGenName);
+            keyGenDesc = (KeyGeneratorDescriptor) _keyGenDescs.get(keyGenName);
             if ( keyGenDesc == null ) {
-                keyGenDesc = new KeyGeneratorDescriptorImpl( keyGenName,
+                keyGenDesc = new KeyGeneratorDescriptor( keyGenName,
                         keyGenFactoryName, params, _keyGenReg );
                 _keyGenDescs.put(keyGenName, keyGenDesc);
             }
