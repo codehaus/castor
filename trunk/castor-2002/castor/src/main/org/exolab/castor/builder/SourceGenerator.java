@@ -459,14 +459,14 @@ public class SourceGenerator {
      * methods (marshall, unmarshall, validate) in the generated classes.
 	 * By default, these methods are generated.
 	 *
-     * @param createMarshall a boolean, when true indicates
+     * @param createMarshalMethods a boolean, when true indicates
      * to generated the marshalling framework methods
      *
      */
-    public void setMarshallCreation(boolean createMarshall) {
+    public void setCreateMarshalMethods(boolean createMarshalMethods) {
         if (sourceFactory != null)
-		   sourceFactory.setMarshallCreation(createMarshall);
-    } //-- setDescriptorCreation
+		   sourceFactory.setCreateMarshalMethods(createMarshalMethods);
+    } //-- setCreateMarshalMethods
 
    /**
      * Sets whether or not to create the XML marshalling framework specific
@@ -624,7 +624,7 @@ public class SourceGenerator {
 		}
 
 		if (options.getProperty("nomarshall") != null) {
-		    sgen.sourceFactory.setMarshallCreation(false);
+		    sgen.setCreateMarshalMethods(false);
 		    System.out.print("-- ");
             System.out.println(DISABLE_MARSHALL_MSG);
 		}
