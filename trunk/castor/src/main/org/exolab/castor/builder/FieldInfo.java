@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the course
+ * of employment at Intalio Inc.
+ * Portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserverd.
+ * 
  * $Id$
  */
 
@@ -54,14 +59,26 @@ import org.exolab.javasource.*;
  * A class for representing field members of a Class. FieldInfo objects
  * hold all the information required about a member in order
  * to be able to produce marshal/unmarshal and validation code.
- * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
+ * 
+ * @author <a href="mailto:keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class FieldInfo extends XMLInfo {
 
+    
+    /**
+     * The method prefixes
+     */
+    private static final String METHOD_PREFIX_ADD    = "add";
+    private static final String METHOD_PREFIX_DELETE = "delete";
+    private static final String METHOD_PREFIX_GET    = "get";
+    private static final String METHOD_PREFIX_HAS    = "has";
+    private static final String METHOD_PREFIX_SET    = "set";
+    
+    
     /**
      * The Java name for Members described by this FieldInfo
-    **/
+     */
     private String name = null;
 
 
@@ -202,120 +219,27 @@ public class FieldInfo extends XMLInfo {
 
 
     /**
-     * Creates the access methods for this FieldInfo
+     * Creates the access methods for field associated with
+     * this FieldInfo. The access methods include getters,
+     * setters, and "has" and "delete" methods if necessary.
+     * 
      * @param jClass the JClass to add the methods to
-    **/
+     * @see #createGetterMethod
+     * @see #createSetterMethod
+     * @see #createHasAndDeleteMethods
+     */
     public void createAccessMethods(JClass jClass) {
 
-        JMethod method    = null;
-        JSourceCode jsc   = null;
+        createGetterMethod(jClass);
+        createSetterMethod(jClass);
 
-        String mname = methodSuffix();
-
-        XSType xsType = getSchemaType();
-        JType jType  = xsType.getJType();
-
-
-        boolean needs_has
-            = ((!xsType.isEnumerated()) && jType.isPrimitive());
-
-        //-- create get method
-        method = new JMethod(jType, "get"+mname);
-        jClass.addMethod(method);
-        createGetterComment(method.getJDocComment());
-        jsc = method.getSourceCode();
-        jsc.add("return this.");
-        jsc.append(this.name);
-        jsc.append(";");
-
-        //-- create set method
-        method = new JMethod(null, "set"+mname);
-        jClass.addMethod(method);
-
-        String paramName = this.name;
-
-        //-- make parameter name pretty,
-        //-- simply for aesthetic beauty
-        if (paramName.indexOf('_') == 0) {
-            String tempName = paramName.substring(1);
-            if (JavaNaming.isValidJavaIdentifier(tempName)) {
-                paramName = tempName;
-            }
-        }
-
-        method.addParameter(new JParameter(jType, paramName));
-        createSetterComment(method.getJDocComment());
-        jsc = method.getSourceCode();
-
-        //-- bound properties
-        if (_bound) {
-            // save old value
-            jsc.add("java.lang.Object old");
-            jsc.append(mname);
-            jsc.append(" = ");
-			//-- 'this.' ensures this refers to the class member not the parameter
-            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
-            jsc.append(";");
-        }
-
-        //-- set new value
-        jsc.add("this.");
-        jsc.append(getName());
-        jsc.append(" = ");
-        jsc.append(paramName);
-        jsc.append(";");
-
-        //-- hasProperty
-        if (needs_has) {
-            jsc.add("this._has");
-            jsc.append(getName());
-            jsc.append(" = true;");
-        }
-        
-        //-- bound properties
-        if (_bound) {
-            //notify listeners
-            jsc.add("notifyPropertyChangeListeners(\"");
-            jsc.append(getName());
-            jsc.append("\", old");
-            jsc.append(mname);
-            jsc.append(", ");
-			//-- 'this.' ensures this refers to the class member not the parameter
-            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
-            jsc.append(");");
-        }
-        
-        if (needs_has) {
-
-            //-- create hasMethod
-            method = new JMethod(JType.Boolean, "has"+mname);
-            jClass.addMethod(method);
-            jsc = method.getSourceCode();
-            jsc.add("return this._has");
-            jsc.append(getName());
-            jsc.append(";");
-
-			//-- create delete method
-            method = new JMethod(null, "delete"+mname);
-            jClass.addMethod(method);
-            jsc = method.getSourceCode();
-            jsc.add("this._has");
-            jsc.append(getName());
-            jsc.append("= false;");
-            //-- bound properties
-            if (_bound) {
-                //notify listeners
-                jsc.add("notifyPropertyChangeListeners(\"");
-                jsc.append(getName());
-                jsc.append("\", ");
-			    //-- 'this.' ensures this refers to the class member not the parameter
-                jsc.append(xsType.createToJavaObjectCode("this."+getName()));
-                jsc.append(", null");
-                jsc.append(");");
-            }
+        if (isHasAndDeleteMethods()) {
+            createHasAndDeleteMethods(jClass);
         }
 
     } //-- createAccessMethods
+    
+    
 
     /**
      * Creates the Javadoc comments for the getter method
@@ -350,6 +274,81 @@ public class FieldInfo extends XMLInfo {
         jDocComment.setComment(mComment);
         jDocComment.addDescriptor(JDocDescriptor.createReturnDesc(at_return));
     } //-- createGetterComment
+    
+    /**
+     * Creates the getter methods for this FieldInfo
+     * 
+     * @param jClass the JClass to add the methods to
+     */
+    public void createGetterMethod(JClass jClass) {
+
+        JMethod method    = null;
+        JSourceCode jsc   = null;
+
+        String mname = methodSuffix();
+
+        XSType xsType = getSchemaType();
+        JType jType  = xsType.getJType();
+
+        //-- create get method
+        method = new JMethod(jType, METHOD_PREFIX_GET+mname);
+        jClass.addMethod(method);
+        createGetterComment(method.getJDocComment());
+        jsc = method.getSourceCode();
+        jsc.add("return this.");
+        jsc.append(this.name);
+        jsc.append(";");
+
+    } //-- createGetterMethod
+    
+    
+    /**
+     * Creates the "has" and "delete" methods for this field
+     * associated with this FieldInfo. These methods are typically 
+     * only needed for primitive types which cannot be assigned 
+     * a null value.
+     * 
+     * @param jClass the JClass to add the methods to
+     */
+    public void createHasAndDeleteMethods(JClass jClass) {
+
+        JMethod method    = null;
+        JSourceCode jsc   = null;
+
+        String mname = methodSuffix();
+
+        XSType xsType = getSchemaType();
+        JType jType  = xsType.getJType();
+
+        //-- create hasMethod
+        method = new JMethod(JType.Boolean, METHOD_PREFIX_HAS+mname);
+        jClass.addMethod(method);
+        jsc = method.getSourceCode();
+        jsc.add("return this._has");
+        jsc.append(getName());
+        jsc.append(";");
+
+        //-- create delete method
+        method = new JMethod(null, METHOD_PREFIX_DELETE+mname);
+        jClass.addMethod(method);
+        jsc = method.getSourceCode();
+        jsc.add("this._has");
+        jsc.append(getName());
+        jsc.append("= false;");
+        //-- bound properties
+        if (_bound) {
+            //notify listeners
+            jsc.add("notifyPropertyChangeListeners(\"");
+            jsc.append(getName());
+            jsc.append("\", ");
+            //-- 'this.' ensures this refers to the class member not the parameter
+            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
+            jsc.append(", null");
+            jsc.append(");");
+        }
+
+    } //-- createHasAndDeleteMethods
+    
 
     /**
      * Creates the Javadoc comments for the setter method
@@ -391,6 +390,82 @@ public class FieldInfo extends XMLInfo {
         }
         paramDesc.setDescription(at_param);
     } //-- createSetterComment
+    
+    /**
+     * Creates the setter (mutator) method(s) for this FieldInfo
+     * 
+     * @param jClass the JClass to add the methods to
+     */
+    public void createSetterMethod(JClass jClass) {
+
+        JMethod method    = null;
+        JSourceCode jsc   = null;
+
+        String mname = methodSuffix();
+
+        XSType xsType = getSchemaType();
+        JType jType  = xsType.getJType();
+
+        //-- create set method
+        method = new JMethod(null, METHOD_PREFIX_SET+mname);
+        jClass.addMethod(method);
+
+        String paramName = this.name;
+
+        //-- make parameter name pretty,
+        //-- simply for aesthetic beauty
+        if (paramName.indexOf('_') == 0) {
+            String tempName = paramName.substring(1);
+            if (JavaNaming.isValidJavaIdentifier(tempName)) {
+                paramName = tempName;
+            }
+        }
+
+        method.addParameter(new JParameter(jType, paramName));
+        createSetterComment(method.getJDocComment());
+        jsc = method.getSourceCode();
+
+        //-- bound properties
+        if (_bound) {
+            // save old value
+            jsc.add("java.lang.Object old");
+            jsc.append(mname);
+            jsc.append(" = ");
+            //-- 'this.' ensures this refers to the class member not the parameter
+            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
+            jsc.append(";");
+        }
+
+        //-- set new value
+        jsc.add("this.");
+        jsc.append(getName());
+        jsc.append(" = ");
+        jsc.append(paramName);
+        jsc.append(";");
+
+        //-- hasProperty
+        if (isHasAndDeleteMethods()) {
+            jsc.add("this._has");
+            jsc.append(getName());
+            jsc.append(" = true;");
+        }
+        
+        //-- bound properties
+        if (_bound) {
+            //notify listeners
+            jsc.add("notifyPropertyChangeListeners(\"");
+            jsc.append(getName());
+            jsc.append("\", old");
+            jsc.append(mname);
+            jsc.append(", ");
+            //-- 'this.' ensures this refers to the class member not the parameter
+            jsc.append(xsType.createToJavaObjectCode("this."+getName()));
+            jsc.append(");");
+        }
+        
+
+    } //-- createSetterMethod
+    
 
     /**
      * Returns the default value for this FieldInfo
@@ -417,7 +492,7 @@ public class FieldInfo extends XMLInfo {
      * @return the name of the delete method for this FieldInfo
     **/
     public String getDeleteMethodName() {
-        return "delete" + methodSuffix();
+        return METHOD_PREFIX_DELETE + methodSuffix();
     } //-- getDeleteMethodName
 
     /**
@@ -425,7 +500,7 @@ public class FieldInfo extends XMLInfo {
      * @return the name of the has method for this FieldInfo
     **/
     public String getHasMethodName() {
-        return "has" + methodSuffix();
+        return METHOD_PREFIX_HAS + methodSuffix();
     } //-- getHasMethodName
 
     /**
@@ -433,7 +508,7 @@ public class FieldInfo extends XMLInfo {
      * @return the name of the read method for this FieldInfo
     **/
     public String getReadMethodName() {
-        return "get" + methodSuffix();
+        return METHOD_PREFIX_GET + methodSuffix();
     } //-- getReadMethodName
 
    /**
@@ -451,9 +526,9 @@ public class FieldInfo extends XMLInfo {
     **/
     public String getWriteMethodName() {
         if (isMultivalued())
-            return "add" + methodSuffix();
+            return METHOD_PREFIX_ADD + methodSuffix();
         else
-            return "set" + methodSuffix();
+            return METHOD_PREFIX_SET + methodSuffix();
     } //-- getWriteMethodName
 
    /**
@@ -485,7 +560,7 @@ public class FieldInfo extends XMLInfo {
                     jsc.add("try {");
                     jsc.indent();
                 }
-                buffer.append("set");
+                buffer.append(METHOD_PREFIX_SET);
                 buffer.append(methodSuffix());
                 buffer.append('(');
                 buffer.append(value);
@@ -541,6 +616,18 @@ public class FieldInfo extends XMLInfo {
         return _isContainer;
     } //-- isContainer
 
+    /**
+     * Returns true if the "has" and "delete" methods are
+     * needed for the field associated with this FieldInfo.
+     * 
+     * @return true if the has and delete methods are needed.
+     */
+    public boolean isHasAndDeleteMethods() {
+        XSType xsType = getSchemaType();
+        JType jType  = xsType.getJType();
+        return ((!xsType.isEnumerated()) && jType.isPrimitive());
+    } //-- isHasMethod
+    
     /**
      * Returns true if this field represents a nillable field.
      * A nillable field is a field that can have null content
