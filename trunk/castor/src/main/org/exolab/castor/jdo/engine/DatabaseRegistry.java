@@ -276,7 +276,9 @@ public class DatabaseRegistry
                 Enumeration params;
                 Param       param;
 
-                if ( database.getDriver().getClassName() != null ) {
+                String driverName = database.getDriver().getClassName();
+
+                if ( driverName != null ) {
                     try {
                         Class.forName( database.getDriver().getClassName() ).newInstance();
                     } catch ( Exception except ) {
@@ -294,6 +296,7 @@ public class DatabaseRegistry
                 }
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
                                             database.getDriver().getUrl(), props );
+                _log.debug( "Using driver: " + driverName );
             } else if ( database.getDataSource() != null ) {
                 // JDO configuration file specifies a DataSource object, use the
                 // DataSource which was configured from the JDO configuration file
@@ -304,6 +307,7 @@ public class DatabaseRegistry
                 if ( ds == null )
                     throw new MappingException( "jdo.missingDataSource", database.getName() );
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory, ds );
+                _log.debug( "Using DataSource: " + database.getDataSource().getClassName() );
             } else if ( database.getJndi() != null ) {
                 // JDO configuration file specifies a DataSource lookup through JNDI,
                 // locate the DataSource object frome the JNDI namespace and use it.
@@ -321,6 +325,7 @@ public class DatabaseRegistry
 
                 dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
                                             (DataSource) ds );
+                _log.debug( "Using DataSource from JNDI ENC: " + database.getJndi().getName() );
             } else {
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }
