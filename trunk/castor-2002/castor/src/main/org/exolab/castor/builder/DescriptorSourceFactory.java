@@ -687,7 +687,7 @@ public class DescriptorSourceFactory {
                         jsc.add("fv.setMaxExclusive( new Float(");
                     else {
                         max = xsFloat.getMaxInclusive();
-                        jsc.add("fv.setMaxInclusive( )");
+                        jsc.add("fv.setMaxInclusive( new Float(");
                     }
                     if ( (max.equals(new Float(Float.NEGATIVE_INFINITY))) )
                         jsc.append("Float.NEGATIVE_INFINITY");
