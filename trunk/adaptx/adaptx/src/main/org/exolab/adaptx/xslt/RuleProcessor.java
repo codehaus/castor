@@ -1146,9 +1146,13 @@ public class RuleProcessor extends ErrorObserverAdapter {
                 if (ns == null) {
                     ns = rpState.getNamespaceURI(prefix);
                 }
+                formatter.startElement(name, ns);
+                //-- Note: The namespace is intentionally declared after
+                //-- the call to startElement because the formatter
+                //-- will otherwise add the namespace declaration to any parent
+                //-- element which may not be finalized yet.
                 if (!formatter.isNamespaceDeclared(ns))
                     formatter.declareNamespace(prefix, ns);
-                formatter.startElement(name, ns);
 		    	processAttributes(xslObject, rpState, true);
 		    	
 		    	ActionTemplate tmpl = xslObject.getActions();
@@ -1202,11 +1206,15 @@ public class RuleProcessor extends ErrorObserverAdapter {
             {
                 String name = node.getLocalName();
                 String ns = node.getNamespaceURI();
+                formatter.startElement(name, ns);
+                //-- Note: The namespace is intentionally declared after
+                //-- the call to startElement because the formatter
+                //-- will otherwise add the namespace declaration to any parent
+                //-- element which may not be finalized yet.
                 if (!formatter.isNamespaceDeclared(ns)) {
                     String prefix = node.getNamespacePrefix(ns);
                     formatter.declareNamespace(prefix, ns);                    
                 }
-                formatter.startElement(name, ns);
                 
                 //-- copy namespace declarations
                 XPathNode nsDecl = node.getFirstNamespace();
@@ -1263,13 +1271,16 @@ public class RuleProcessor extends ErrorObserverAdapter {
             
             String ns = node.getNamespaceURI();
             
+            formatter.startElement(elementName, ns);
+            //-- Note: The namespace is intentionally declared after
+            //-- the call to startElement because the formatter
+            //-- will otherwise add the namespace declaration to any parent
+            //-- element which may not be finalized yet.
             //-- declare prefix/namespace if necessary
             if (!formatter.isNamespaceDeclared(ns)) {
                 String prefix = node.getNamespacePrefix(ns);
                 formatter.declareNamespace(prefix, ns);
             }
-            
-            formatter.startElement(elementName, ns);
             
             //-- Copy Namespace Nodes
             XPathNode nsNode = node.getFirstNamespace();
@@ -1404,9 +1415,17 @@ public class RuleProcessor extends ErrorObserverAdapter {
                 }
                 String ns = xslObject.getAttribute(NAMESPACE_ATTR);
                 if (ns == null) ns = ps.getNamespaceURI(prefix);
+                
+                //-- start element
+                formatter.startElement(name, ns);
+                //-- declare namespace.  
+                //-- Note: The namespace is intentionally declared after
+                //-- the call to startElement because the formatter
+                //-- will otherwise add the namespace declaration to any parent
+                //-- element which may not be finalized yet.
                 if (!formatter.isNamespaceDeclared(ns))
                     formatter.declareNamespace(prefix, ns);                    
-                formatter.startElement(name, ns);
+                    
                 String useAttributeSets 
                     = xslObject.getAttribute(Names.USE_ATTRIBUTE_SETS_ATTR);
                 processAttributeSets(useAttributeSets, ps);
