@@ -93,7 +93,7 @@ public class MappingHelper
 	FieldDesc           fieldDesc;
 	ObjectFieldMapping  objField;
 	PrimaryKeyDesc      primKeyDesc;
-	FieldDesc        primKeyField;
+	FieldDesc           primKeyField;
 	ClassLoader         loader;
 	Enumeration         enum;
 	Hashtable           fields;
@@ -103,8 +103,6 @@ public class MappingHelper
 	loader = null;
 	// Obtain the class loaded from the current thread, this class,
 	// or the system class loader. Success is not guaranteed.
-	if ( loader == null )
-	    loader = Thread.currentThread().getContextClassLoader();
 	if ( loader == null )
 	    loader = ObjectDesc.class.getClassLoader();
 	if ( loader == null )
@@ -239,9 +237,15 @@ public class MappingHelper
 	    }
 	}
 
-	return new JDOObjectDesc( objType, tableName,
-				  (JDOFieldDesc[]) fields.values().toArray( new JDOFieldDesc[ fields.size() ] ),
-				  primKeyDesc, (JDOFieldDesc) primKeyField, extend, related );
+	JDOFieldDesc[] array;
+
+	array = new JDOFieldDesc[ fields.size() ];
+	enum = fields.elements();
+	for ( int i = 0 ; enum.hasMoreElements() ; ++i ) {
+	    array[ i ] = (JDOFieldDesc) enum.nextElement();
+	}
+	return new JDOObjectDesc( objType, tableName, array, primKeyDesc,
+				  (JDOFieldDesc) primKeyField, extend, related );
     }
 
 

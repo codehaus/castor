@@ -144,7 +144,7 @@ class MozillaEntryConsumer
 	} else if ( tagName.equals( XML.Entries.Elements.Entry ) ) {
 	    if ( _attrSet == null || _attr != null )
 		throw new SAXException( Messages.format( "castor.dsml.closingTagNotRecognized", tagName ) );
-	    _entries.add( new LDAPEntry( _entryDN, _attrSet ) );
+	    _entries.addElement( new LDAPEntry( _entryDN, _attrSet ) );
 	    _entryDN = null;
 	    _attrSet = null;
 	} else if ( tagName.equals( XML.Entries.Elements.ObjectClass ) ||

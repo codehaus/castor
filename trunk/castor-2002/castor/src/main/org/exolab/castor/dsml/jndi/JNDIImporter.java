@@ -143,8 +143,11 @@ public class JNDIImporter
 		    }
 		}
 		if ( modifs.size() > 0 ) {
-		    _ctx.modifyAttributes( result.getName(),
-					   (ModificationItem[]) modifs.toArray( new ModificationItem[ modifs.size() ] ) );
+		    ModificationItem[] array;
+
+		    array = new ModificationItem[ modifs.size() ];
+		    modifs.copyInto( array );
+		    _ctx.modifyAttributes( result.getName(), array );
 		    notify( result.getName(), ImportEventListener.Refreshed );
 		} else {
 		    notify( result.getName(), ImportEventListener.Ignored );

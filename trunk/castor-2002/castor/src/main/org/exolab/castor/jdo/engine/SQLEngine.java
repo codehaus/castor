@@ -599,7 +599,8 @@ class SQLEngine
 							related[ i ].getParentField(), logWriter ) );
 		}
 	    }
-	    _related = (SQLRelated[]) engines.toArray( new SQLRelated[ engines.size() ] );
+	    _related = new SQLRelated[ engines.size() ];
+	    engines.copyInto( _related );
 	}
     }
 
@@ -768,7 +769,8 @@ class SQLEngine
 		    sqlJoin, loadFields, 0, false );
 
 	_sqlLoad = sqlFields.append( sqlFrom ).append( sqlJoin ).toString();
-	_loadFields = (JDOFieldDesc[]) loadFields.toArray( new JDOFieldDesc[ loadFields.size() ] );
+	_loadFields = new JDOFieldDesc[ loadFields.size() ];
+	loadFields.copyInto( _loadFields );
 
 	sqlFields = new StringBuffer( "SELECT " );
 	sqlFrom = new StringBuffer( " FROM " );
