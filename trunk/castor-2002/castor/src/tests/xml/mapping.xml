@@ -33,15 +33,9 @@
 
   <class name="xml.Types">
     <map-to xml="types" />
-
     <field name="boolean" >
       <xml name="boolean" node="element" type="boolean" />
     </field>
-<!--
-    <field name="chars" >
-      <xml name="chars" node="element" />
-    </field>
--->
     <field name="bytes" >
       <xml name="bytes" node="element" />
     </field>
@@ -56,6 +50,12 @@
     </field>
     <field name="date" >
       <xml name="date" node="element" />
+    </field>
+    <field name="vector" collection="vector" type="string" >
+      <xml name="vector" node="element" />
+    </field>
+    <field name="hashtable" collection="hashtable" type="string" >
+      <xml name="hashtable" node="element" />
     </field>
   </class>
 

@@ -3,6 +3,7 @@ package xml;
 
 import java.util.Vector;
 import java.util.Hashtable;
+import java.util.Enumeration;
 import java.util.Date;
 
 
@@ -11,9 +12,6 @@ public class Types
 
 
     private boolean  _boolean;
-
-
-    private char[]   _chars;
 
 
     private byte[]   _bytes;
@@ -41,12 +39,19 @@ public class Types
     {
         if ( set ) {
             _boolean = true;
-            _chars = new char[] { 'a', 'b', 'c' };
             _bytes = new byte[] { 5, 6, 7, 8, 9, 10 };
             _integer = 5678;
             _float = 1234.5678F;
             _string = "the quick brown fox";
             _date = new Date();
+            _vector = new Vector();
+            _vector.addElement( "first" );
+            _vector.addElement( "second" );
+            _vector.addElement( "third" );
+            _hashtable = new Hashtable();
+            _hashtable.put( "1", "first" );
+            _hashtable.put( "2", "second" );
+            _hashtable.put( "3", "third" );
         }
     }
 
@@ -65,18 +70,6 @@ public class Types
     public void setBoolean( boolean value )
     {
         _boolean = value;
-    }
-
-
-    public char[] getChars()
-    {
-        return _chars;
-    }
-
-
-    public void setChars( char[] value )
-    {
-        _chars = (char[]) value.clone();
     }
 
 
@@ -164,15 +157,6 @@ public class Types
         x = (Types) other;
         if ( x._boolean != _boolean )
             return false;
-        /*
-        if ( x._chars != _chars ) {
-            if ( x._chars == null || _chars == null || x._chars.length != _chars.length )
-                return false;
-            for ( int i = 0 ; i < x._chars.length ; ++i )
-                if ( x._chars[ i ] != _chars[ i ] )
-                    return false;
-        }
-        */
         if ( x._bytes != _bytes ) {
             if ( x._bytes == null || _bytes == null || x._bytes.length != _bytes.length )
                 return false;
@@ -184,8 +168,27 @@ public class Types
             return false;
         if ( x._string != _string && ( x._string == null || ! x._string.equals( _string) ) )
             return false;
-        if ( x._date != _date && ( x._date == null || ! x._date.equals( _date) ) )
-            return false;
+        if ( x._date != _date ) {
+            if ( x._date == null || ! x._date.equals( _date ) )
+                return false;
+        }
+        if ( x._vector != _vector ) {
+            if ( x._vector == null || _vector == null || x._vector.size() != _vector.size() )
+                return false;
+            for ( int i = 0 ; i < x._vector.size() ; ++i )
+                if ( ! x._vector.elementAt( i ).equals( _vector.elementAt( i ) ) )
+                    return false;
+        }
+        if ( x._hashtable != _hashtable ) {
+            Enumeration enum;
+            
+            if ( x._hashtable == null || _hashtable == null || x._hashtable.size() != _hashtable.size() )
+                return false;
+            enum = x._hashtable.elements();
+            while ( enum.hasMoreElements() )
+                if ( ! _hashtable.contains( enum.nextElement() ) )
+                    return false;
+        }
         return true;
     }
 

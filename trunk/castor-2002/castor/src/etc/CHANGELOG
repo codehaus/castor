@@ -1,7 +1,8 @@
 Version 0.8.7  June 1, 2000
 ---------------------------
 
-JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>)
+JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga
+         <santiago.arriaga@catnet.com.mx>)
 
 JDO:     SEQUENCE key generator now works with Oracle. It has a special 
          RETURNING mode for Oracle8i which is more efficient because 
@@ -16,6 +17,11 @@ JDO:     Added three paramaterized type convertors: Date<->Integer,
          (Oleg Nitz <on@ibis.odessa.ua>)
 
 XML:     Identity field will now use XML name provided in mapping file.
+
+XML:     Marshaller will now accept both primitive and non-primitive types and apply the
+         proper conversion; no dropped in convertor used, so Date/byte conversion should
+         work as expected; added test case for type handling of XML. (Bug reported by
+         Eitan Suez <eitan@uptodata.com>)
 
 Misc:    Fixed security bug when running as an Applet. (Reported by Remus Pereni
          <remus@nolimits.ro>).
