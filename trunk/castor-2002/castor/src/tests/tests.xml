@@ -11,6 +11,7 @@
     <jtf:case class="jdo.Join" />
     <jtf:case class="jdo.KeyGenGeneric" />
     <jtf:case class="jdo.KeyGenIdentity" />
+    <jtf:case class="jdo.StoredProcedure" />
   </jtf:category>
 
   <jtf:category name="postgres" class="jdo.JDOCategory">
