@@ -28,10 +28,23 @@ XML:   Fixed issue with GeneralizedFieldHandler not able to handle collections.
        time is passed into the setter already.
        (kvisco - 20050118)
 
+XML:   Fixed whitespace processing bug, where a ' ' was actually getting 
+       appended to the end of a string value if the parser was calling the
+       #characters method again with only whitespace following a previous 
+       call to #characters method where valid content existed.
+       Reported by: Paul Spencer
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1850
+       (kvisco - 20050114)
+ 
 JDO:   Fixed bug 1839 using contribution from Stein M. Hugubakken [dulci@start.no]
        Added getCacheManager() to Database.java.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1839
        (Werner - 20050110)
+
+XML:   Fixed recent issue where Element#getType() method was always 
+       returning null for element references. Also added automatic resolution of 
+       default and fixed values for references.
+       (kvisco - 20050110)
 
 XML:   Fixed bug 1372: Mapping.loadMapping(String) duplicates directory 
        path. Fixed problem by making the given url a relative URL 
