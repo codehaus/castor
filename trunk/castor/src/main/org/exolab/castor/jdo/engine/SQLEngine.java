@@ -411,10 +411,21 @@ public final class SQLEngine implements Persistence {
         int[] sqlTypes;
         int count;
 
-        if(_log.isDebugEnabled()){
-            _log.debug( Messages.format( "jdo.spCall", spCall ) );
+        // changes for the SQL Direct interface begins here
+        if (spCall.startsWith("SQL")) {
+            sql = spCall.substring(4);
+        	
+            if (_log.isDebugEnabled()){
+                _log.debug (Messages.format ("jdo.directSQL", sql));
+            }
+            
+            return new SQLQuery( this, sql, types );
+		}
+
+        if (_log.isDebugEnabled()) {
+            _log.debug (Messages.format ("jdo.spCall", spCall));
         }
-        
+
         fields = _clsDesc.getFields();
         jdoFields0 = new String[ fields.length + 1 ];
         sqlTypes0 = new int[ fields.length + 1 ];
@@ -435,15 +446,8 @@ public final class SQLEngine implements Persistence {
         sqlTypes = new int[ count ];
         System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
         System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
-        // changes for the SQL Direct interface begins here
-        if(spCall.startsWith("SQL")){
-            sql =spCall.substring(4);
-            return new SQLQuery( this, sql, types );
-        } else {
-            return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
-        }
 
-       
+        return ((BaseFactory) _factory).getCallQuery( spCall, types,_clsDesc.getJavaClass(), jdoFields, sqlTypes );
     }
 
     public QueryExpression getQueryExpression() {
@@ -617,7 +621,9 @@ public final class SQLEngine implements Persistence {
 
                 // First skip all results "for maximum portability"
                 // as proposed in CallableStatement javadocs.
-                while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 );
+                while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 ) {
+                	// do nothing
+                }
 
                 // Identity is returned in the last parameter
                 // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
