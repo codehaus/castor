@@ -340,7 +340,7 @@ public class OQLQueryImpl
                         }
                         info = (ParamInfo) _paramInfo.get( paramNo );
                         if ( info == null ) {
-                            info = new ParamInfo( "", "java.lang.Object", null);
+                            info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
                         }
                         info.mapToSQLParam( paramCnt + 1 );
                         _paramInfo.put( paramNo , info );
@@ -384,7 +384,7 @@ public class OQLQueryImpl
                     }
                     info = (ParamInfo) _paramInfo.get( paramNo );
                     if ( info == null ) {
-                        info = new ParamInfo( "", "java.lang.Object", null);
+                        info = new ParamInfo( "", "java.lang.Object", null, _dbImpl.getClassLoader());
                     }
                     info.mapToSQLParam( paramCnt + 1 );
                     _paramInfo.put( paramNo , info );
@@ -519,6 +519,8 @@ public class OQLQueryImpl
 
     /**
      * Get the generated SQL statement for this OQLQuery
+     * @return A SQL statement.
+     * @throws QueryException If the SQL query cannot be generated.
      */
     public String getSQL() throws org.exolab.castor.jdo.QueryException {
 	  if(_expr != null)
