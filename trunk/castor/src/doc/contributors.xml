@@ -650,6 +650,13 @@
     <description>Reported bug with 1-1 Related Objects and autoStore</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Hoyle" given="Duncan"/>
+    <email>duncanh@granada-learning.com</email>
+    <description>Castor XML feedback</description>
+  </contributor>
+
+
   <!-- Last names begin with I-L -->
 
   <contributor type="Feedback">
