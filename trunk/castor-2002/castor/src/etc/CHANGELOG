@@ -25,16 +25,24 @@ JDO:    Added "trigger" mode for SEQUENCE key generator.
 
 JDO:    Added support for MySQL auto_increment columns in IDENTITY key generator
         (Oleg Nitz, thanks to Alain RAVET <aravet@cirb.irisnet.be> for idea
-	and to George Stewart <georgestewartiv@yahoo.com> for help).
+        and to George Stewart <georgestewartiv@yahoo.com> for help).
 
 JDO:    Improved support for BLOB and CLOB values. Now you can get them as 
         java.io.InputStream and java.sql.Clob, respectively, see "types.html"
-	for details (oleg). 
+        for details (oleg). 
 
 JDO:    Solved problem of NULL dirty checking with Oracle (oleg).         
  
 JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
         by brian rogers <brian@freya.bianca.com>).
+
+DSML:   Add a more detailed policies :
+        * NewAttrOnly, which implies that new attributes are created according 
+        to the DSML, but attributes that already have a value in the ldap are 
+        not updated;
+        * UpdateOnly, which mean that DSML attributes that do not already exist 
+        in the Ldap are not created.
+        Submitted by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
 
 
 Version 0.8.11 December, 15 2000
