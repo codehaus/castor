@@ -59,6 +59,6 @@ import org.exolab.castor.dax.engine.DirectorySourceImpl;
  */
 public class DAX
     extends DirectorySourceImpl
-    implements DirectorySource, XADirectorySource
+    implements DirectorySource
 {
 }
