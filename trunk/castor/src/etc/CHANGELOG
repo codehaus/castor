@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1709 using contribution from Donnie Armstrong. [donnie@attempt4.com]
+       Added new TransactionManagerFactory for IBM WebSphere 5.1.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1709
+       (Werner - 20040806)
+
 XML:   Fixed bug 1706 - No support for XDoclet tags in Source Generator
        (Bruce - 20040804)
 
