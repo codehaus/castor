@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1617 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
+       Fixed an incorrectly coded equality check related to global transaction demarcation.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1617
+       (Werner - 20040516)
+
 JDO:   Fixed bug 1534.
        Added code to allow users to use their own cache implementation with Castor. 
        In general, available cache implementations are now specified in castor.properties.
