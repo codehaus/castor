@@ -501,8 +501,11 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- an element of this type
         if (!descriptor.isMultivalued() && (state.container == null)) {
             if (state.isUsed(descriptor)) {
+
+                FieldHandler handler = descriptor.getHandler();
+
                 String err = "element \"" + name;
-                err += "\" occurs more than once.";
+                err += "\" occurs more than once. (" + descriptor + ")";
                 ValidationException vx =
                     new ValidationException(err);
                 throw new SAXException(vx);
@@ -518,8 +521,10 @@ public final class UnmarshalHandler extends MarshalFramework
             if ((valueType != null) && (valueType.equals(QNAME_NAME)))
                  val = resolveNamespace(val);
 
-            if (state.container == null)
+            if (state.container == null) {
+
                 handler.setValue(state.object, val);
+            }
             else {
                 state.ContainerFieldDesc.getHandler().setValue(state.container, val);
                 state.container = null;
@@ -784,31 +789,14 @@ public final class UnmarshalHandler extends MarshalFramework
         */
         XMLClassDescriptor cdInherited = null;
         if (descriptor == null) {
-            ClassDescriptorEnumeration cde =
-                _cdResolver.resolveAllByXMLName(name, namespace, null);
+             Vector inheritanceList = searchInheritance(name, namespace, classDesc, _cdResolver);
+             if (inheritanceList.size() != 0) {
+                 InheritanceMatch match = (InheritanceMatch)inheritanceList.get(0);
+                 descriptor  = match._parentFieldDesc;
+                 cdInherited = match._inheritedClassDesc;
+             }
+        }
 
-            if (cde.hasNext()) {
-                XMLFieldDescriptor[] descriptors
-                    = classDesc.getElementDescriptors();
-                while (cde.hasNext() && (descriptor == null)) {
-                    cdInherited = cde.getNext();
-                    Class subclass = cdInherited.getJavaClass();
-                    for (int i = 0; i < descriptors.length; i++) {
-                        if (descriptors[i] == null) continue;
-                        //-- check for inheritence
-                        Class superclass = descriptors[i].getFieldType();
-
-                        // It is possible that the superclass is of type object if we use any node.
-                        if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
-                            descriptor = descriptors[i];
-                            break;
-                        }
-                    }
-                }
-                //-- reset inherited class descriptor, if necessary
-                if (descriptor == null) cdInherited = null;
-            }
-        } /* end of additional inheritance logic */
 
         //the field descriptor is still null ->problem
         if (descriptor == null) {
@@ -1576,6 +1564,61 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         return descriptor;
     } //-- searchContainers.
+
+
+    /**
+     * Search there is a field descriptor which can accept one of the class
+     * descriptor which match the given name and namespace. Return a vector of InheritanceMatch
+     */
+    public static Vector searchInheritance(String name, String namespace, XMLClassDescriptor classDesc, ClassDescriptorResolver cdResolver) {
+
+        Vector inheritanceList = new Vector();
+        XMLFieldDescriptor descriptor  = null;
+        ClassDescriptorEnumeration cde = cdResolver.resolveAllByXMLName(name, namespace, null);
+        XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
+        XMLClassDescriptor cdInherited = null;
+
+        if (cde.hasNext()) {
+            while (cde.hasNext() && (descriptor == null)) {
+                cdInherited = cde.getNext();
+                Class subclass = cdInherited.getJavaClass();
+                
+                for (int i = 0; i < descriptors.length; i++) {
+
+                    if (descriptors[i] == null) continue;
+                    //-- check for inheritence
+                    Class superclass = descriptors[i].getFieldType();
+                    
+                    // It is possible that the superclass is of type object if we use any node.
+                    if (superclass.isAssignableFrom(subclass) && (superclass != Object.class)) {
+                        descriptor = descriptors[i];
+                        inheritanceList.add(new InheritanceMatch(descriptor, cdInherited));
+                    }
+                }
+            }
+            //-- reset inherited class descriptor, if necessary
+            if (descriptor == null) cdInherited = null;
+        }
+
+        return inheritanceList;
+    }
+
+    /**
+     * Used to store the information when we find a possible inheritance. It
+     * store the XMLClassDescriptor of the object to instantiate and the
+     * XMLFieldDescriptor of the parent, where the instance of the
+     * XMLClassDescriptor will be put.
+     */
+    public static class InheritanceMatch {
+
+        public XMLFieldDescriptor _parentFieldDesc;
+        public XMLClassDescriptor _inheritedClassDesc;
+
+        public InheritanceMatch(XMLFieldDescriptor parentFieldDesc, XMLClassDescriptor inheritedClassDesc) {
+            _parentFieldDesc    = parentFieldDesc;
+            _inheritedClassDesc = inheritedClassDesc;
+        }
+    }
 
     /**
      * Returns the name of a class, handles array types
