@@ -139,7 +139,8 @@ public class MarshalHelper {
                 MarshalException.BASE_CLASS_OR_VOID_ERR );
         }
         
-        XMLClassDescriptorImpl classDesc = new XMLClassDescriptorImpl(c);
+        XMLClassDescriptorImpl classDesc 
+            = new IntrospectedXMLClassDescriptor(c);
         
         //--------------------------/
         //- handle complex objects -/
@@ -643,7 +644,7 @@ public class MarshalHelper {
             fieldDesc.setNodeType(NodeType.Element);
         }
         //-- primitive types are converted to attributes by default
-        else if ((type.isPrimitive()) || (type == String.class)) {
+        else if (type.isPrimitive()) {
             fieldDesc.setNodeType(NodeType.Attribute);
         }
         else {
@@ -698,18 +699,42 @@ public class MarshalHelper {
 
         if (type.isPrimitive()) return true;
         
-        if ((type == Boolean.class)   ||
-            (type == Byte.class)      ||
-            (type == Character.class) ||
-            (type == Double.class)    ||
-            (type == Float.class)     ||
-            (type == Integer.class)   ||
-            (type == Long.class)      ||
-            (type == Short.class)) 
+        if ((type == Boolean.class) || (type == Character.class))
             return true;
             
-       return false;
+        return (type.getSuperclass() == Number.class);
        
     } //-- isPrimitive
     
 } //-- MarshalHelper
+
+/**
+ * A simple extension of XMLClassDescriptor
+ * so that we can set the "instrospected" flag.
+**/
+class IntrospectedXMLClassDescriptor 
+    extends XMLClassDescriptorImpl 
+{
+    /**
+     * Creates an IntrospectedXMLClassDescriptor
+     * @param type the Class type with which this 
+     * ClassDescriptor describes.
+    **/
+    IntrospectedXMLClassDescriptor(Class type) {
+        super(type);
+        setIntrospected(true);        
+    } //-- XMLClassDescriptorImpl
+
+    /**
+     * Creates an IntrospectedXMLClassDescriptor
+     * @param type the Class type with which this
+     * ClassDescriptor describes.
+    **/
+    public IntrospectedXMLClassDescriptor(Class type, String xmlName)
+    {
+        super(type, xmlName);
+        setIntrospected(true);        
+    } //-- XMLClassDescriptorImpl
+    
+        
+} //-- IntrospectedClassDescriptor
