@@ -183,8 +183,14 @@
     </field>
   </class>
 
+  <key-generator name="SEQUENCE" alias="RETURNING">
+    <param name="returning" value="true"/>
+  </key-generator>
+
   <class name="jdo.TestReturningObject" identity="id" key-generator="RETURNING">
-    <description>Table used for RETURNING key generator testing</description>
+    <description>Table used for SEQUENCE key generator testing in RETURNING
+        mode for Oracle8i
+    </description>
     <map-to table="test_keygen" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -195,7 +201,9 @@
   </class>
 
   <class name="jdo.TestReturningExtends" extends="jdo.TestReturningObject">
-    <description>Table used for RETURNING key generator testing</description>
+    <description>Table used for SEQUENCE key generator testing in RETURNING
+        mode for Oracle8i
+    </description>
     <map-to table="test_keygen_ext" />
     <field name="ext" type="string" required="true">
       <sql name="ext" type="varchar"/>

@@ -3,6 +3,18 @@ Version 0.8.7  June 1, 2000
 
 JDO:     Informix JDBC driver. (Contributed by Santiago Arriaga <santiago.arriaga@catnet.com.mx>)
 
+JDO:     SEQUENCE key generator now works with Oracle. It has a special 
+         RETURNING mode for Oracle8i which is more efficient because 
+         obtains the identity during INSERT, without any additional SQL queries.
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:     Added three paramaterized type convertors: Date<->Integer,
+         Date<->BigDecimal and Date<->String. The latter uses the SimpleDateFormat
+         patterns (e.g. char[MMM d, yyyy]). The others uses similar
+         but shortened patterns (e.g. numeric[YMDhmsS], which is equivalent
+         to "yyyyMMddhhmmssSSS" SimpleDateFormat pattern).
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
 XML:     Identity field will now use XML name provided in mapping file.
 
 

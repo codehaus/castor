@@ -64,7 +64,7 @@ public class KeyGenReturning
     public KeyGenReturning( CWTestCategory category )
         throws CWClassConstructorException
     {
-        super( "TC11", "Key generator: RETURNING", category );
+        super( "TC11", "Key generator: SEQUENCE in RETURNING mode", category );
     }
 
     protected boolean TestAllKeyGens( CWVerboseStream stream, Database db) 
