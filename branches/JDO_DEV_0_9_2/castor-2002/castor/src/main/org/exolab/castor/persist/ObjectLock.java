@@ -90,7 +90,7 @@ import org.exolab.castor.jdo.ObjectDeletedException;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
  * @version $Revision$ $Date$
- * @see TransactionContext
+ * @see Key
  */
 
 final class ObjectLock {
@@ -135,7 +135,7 @@ final class ObjectLock {
      * acquired the write lock. Read and write locks are mutually
      * exclusive.
      */
-    private TransactionContext _writeLock;
+    private Key _writeLock;
 
     /**
      * Read locks on this object. A LinkedTx list of all transactions
@@ -168,7 +168,7 @@ final class ObjectLock {
      *
      *
      */
-    private TransactionContext _confirmWaiting;
+    private Key                _confirmWaiting;
 
 
     private short              _confirmWaitingAction;
@@ -267,17 +267,17 @@ final class ObjectLock {
      * the object. This method is an efficient mean to determine whether
      * a lock is required, or if the object is owned by the transaction.
      *
-     * @param tx The transaction
+     * @param key The transaction
      * @param write True if must have a write lock
      * @return True if the transaction has a lock on this object
      */
-    boolean hasLock( TransactionContext tx, boolean write ) {
+    boolean hasLock( Key key, boolean write ) {
         LinkedTx read;
 
-        if ( _writeLock == tx )
+        if ( _writeLock == key )
             return true;
 
-        if ( _confirmWaiting == tx ) {
+        if ( _confirmWaiting == key ) {
             if ( _confirmWaitingAction == ACTION_WRITE || _confirmWaitingAction == ACTION_CREATE )
                 return true;
             else if ( !write && _confirmWaitingAction == ACTION_READ ) 
@@ -289,7 +289,7 @@ final class ObjectLock {
             return false;
         read = _readLock;
         while ( read != null ) {
-            if ( read.tx == tx )
+            if ( read.key == key )
                 return true;
             read = read.next;
         }
@@ -308,23 +308,23 @@ final class ObjectLock {
                  _confirmWaiting == null && _waitCount == 0 );
     }
 
-    boolean isExclusivelyOwned( TransactionContext tx ) {
+    boolean isExclusivelyOwned( Key key ) {
         LinkedTx read;
 
         if ( _writeLock == null && _readLock == null )
             return false;
 
-        if ( _writeLock == null && _readLock.tx == tx && 
-                        _readLock.next.tx == null )
+        if ( _writeLock == null && _readLock.key == key && 
+                        _readLock.next.key == null )
             return true;
 
-        if ( _writeLock == tx && _readLock == null )
+        if ( _writeLock == key && _readLock == null )
             return true;
 
         return false;
     }
 
-    synchronized void acquireLoadLock( TransactionContext tx, boolean write, int timeout ) 
+    synchronized void acquireLoadLock( Key key, boolean write, int timeout ) 
             throws LockNotGrantedException, ObjectDeletedWaitingForLockException {
         
         long endtime = timeout>0? System.currentTimeMillis() + timeout*1000: Long.MAX_VALUE;
@@ -341,7 +341,7 @@ final class ObjectLock {
                 //      then, we return and wait for confirmation
                 // 7/ we're in some kind of lock, or waiting, exception
                 // 1/ write exist 
-                //      then, put it tx into read/write waiting
+                //      then, put it key into read/write waiting
                 // 2/ read exist
                 //      then, put it read, or write waiting
                 if ( _deleted ) {
@@ -356,60 +356,60 @@ final class ObjectLock {
                     } finally {
                         _waitCount--;
                     }
-                } else if ( _writeLock == tx ) {
-                    //throw new IllegalStateException("Transaction: "+tx+" has already hold the write lock on "+_oid+
+                } else if ( _writeLock == key ) {
+                    //throw new IllegalStateException("Transaction: "+key+" has already hold the write lock on "+_oid+
                     //        " Acquire shouldn't be called twice");
                     return;
                 } else if ( _readLock == null && _writeLock == null && write ) {
                     // no transaction hold any lock,
-                    _confirmWaiting = tx;
+                    _confirmWaiting = key;
                     _confirmWaitingAction = ACTION_WRITE;
                     return;
                 } else if ( _readLock == null && _writeLock == null && !write ) {
                     // no transaction hold any lock, 
                     if ( _object == null ) {
-                        _confirmWaiting = tx;
+                        _confirmWaiting = key;
                         _confirmWaitingAction = ACTION_READ;
                         return;
                     } else {
-                        _readLock = new LinkedTx( tx, null );
+                        _readLock = new LinkedTx( key, null );
                         return;
                     }
                 } else if ( _readLock != null && !write ) {
                     // already a transaction holding read lock, can acquire read lock
                     LinkedTx linked = _readLock;
                     while ( linked != null ) {
-                        if ( linked.tx == tx )
-                            throw new IllegalStateException("Transaction: "+tx+" has already hold the write lock on "+_oid+
+                        if ( linked.key == key )
+                            throw new IllegalStateException("Transaction: "+key+" has already hold the write lock on "+_oid+
                             " Acquire shouldn't be called twice");
                             //return;
                         linked = linked.next;
                     }
                    
                     // if not already in readLock
-                    _readLock = new LinkedTx( tx, _readLock );
+                    _readLock = new LinkedTx( key, _readLock );
                     return;
                 } else {
                     // other transaction holding writeLock, waits for write
                     // or, other transaction holding readLock, waiting for read
                     if ( timeout == 0 ) {
                         if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
+                            System.out.println( "Timeout on " + this.toString() + " by " + key );
                         throw new LockNotGrantedException( (write ? "persist.writeLockTimeout" :
-                                                               "persist.readLockTimeout") + _oid + "/" + _id + " by " + tx );
+                                                               "persist.readLockTimeout") + _oid + "/" + _id + " by " + key );
                     }
                     if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                        System.out.println( "Waiting on " + this.toString() + " by " + key );
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
-                    tx.setWaitOnLock( this );
-                    detectDeadlock( tx, 10 );
+                    key.setWaitOnLock( this );
+                    detectDeadlock( key, 10 );
                     
                     // Must wait for lock and then attempt to reacquire
                     if ( write )
-                        _writeWaiting = new LinkedTx( tx, _writeWaiting );
+                        _writeWaiting = new LinkedTx( key, _writeWaiting );
                     else
-                        _readWaiting = new LinkedTx( tx, _readWaiting );
+                        _readWaiting = new LinkedTx( key, _readWaiting );
                     
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -421,12 +421,12 @@ final class ObjectLock {
                     } catch ( InterruptedException except ) {
                         // If the thread is interrupted, come out with the proper message
                         throw new LockNotGrantedException( write ? "persist.writeLockTimeout" :
-                                                               "persist.readLockTimeout" + _oid + "/" + _id + " by " + tx );
+                                                               "persist.readLockTimeout" + _oid + "/" + _id + " by " + key );
                     }
 
                     if ( _deleted )
                         // If object has been deleted while waiting for lock, report deletion.
-                        throw new ObjectDeletedWaitingForLockException("object deleted" + _oid + "/" + _id + " by " + tx);
+                        throw new ObjectDeletedWaitingForLockException("object deleted" + _oid + "/" + _id + " by " + key);
 
                     // Try to re-acquire lock, this time less timeout,
                     // eventually timeout of zero will either succeed or fail
@@ -434,17 +434,17 @@ final class ObjectLock {
                     if ( System.currentTimeMillis() > endtime )
                         timeout = 0;
 
-                    removeWaiting( tx );
-                    tx.setWaitOnLock( null );
+                    removeWaiting( key );
+                    key.setWaitOnLock( null );
                 }
             } finally {
-                removeWaiting( tx );       
-                tx.setWaitOnLock( null );
+                removeWaiting( key );       
+                key.setWaitOnLock( null );
             }
         }
     }
 
-    synchronized void acquireCreateLock( TransactionContext tx ) 
+    synchronized void acquireCreateLock( Key key ) 
             throws LockNotGrantedException {
 
         while ( true ) {
@@ -469,7 +469,7 @@ final class ObjectLock {
             } else if ( _readLock != null || _writeLock != null ) {
                 throw new LockNotGrantedException("Lock already exist!");
             } else {
-                _confirmWaiting = tx;
+                _confirmWaiting = key;
                 _confirmWaitingAction = ACTION_CREATE;
                 return;
             }
@@ -477,7 +477,7 @@ final class ObjectLock {
     }
 
     // probaraly we just don't need update....
-    synchronized void acquireUpdateLock( TransactionContext tx, int timeout ) 
+    synchronized void acquireUpdateLock( Key key, int timeout ) 
             throws LockNotGrantedException, ObjectDeletedException,
             ObjectDeletedWaitingForLockException {
 
@@ -503,28 +503,28 @@ final class ObjectLock {
                     } finally {
                         _waitCount--;
                     }
-                } else if ( _writeLock == tx ) {
+                } else if ( _writeLock == key ) {
                     return;
                 } else if ( _writeLock == null && _readLock == null ) {
                     // can get the lock now
-                    _confirmWaiting = tx;
+                    _confirmWaiting = key;
                     _confirmWaitingAction = ACTION_UPDATE;
                     return;
                 } else {
                     if ( timeout == 0 ) {
                         if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
+                            System.out.println( "Timeout on " + this.toString() + " by " + key );
                         throw new LockNotGrantedException( "persist.writeLockTimeout" );
                     }
                     if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                        System.out.println( "Waiting on " + this.toString() + " by " + key );
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
-                    tx.setWaitOnLock( this );
-                    detectDeadlock( tx, 10 );
+                    key.setWaitOnLock( this );
+                    detectDeadlock( key, 10 );
                     
                     // Must wait for lock and then attempt to reacquire
-                    _writeWaiting = new LinkedTx( tx, _writeWaiting );
+                    _writeWaiting = new LinkedTx( key, _writeWaiting );
                     
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -536,12 +536,12 @@ final class ObjectLock {
                         wait( waittime<0? 0: waittime );
                     } catch ( InterruptedException except ) {
                         // If the thread is interrupted, come out with the proper message
-                        throw new LockNotGrantedException( "persist.writeLockTimeout" + _oid + "/" + _id + " by " + tx );
+                        throw new LockNotGrantedException( "persist.writeLockTimeout" + _oid + "/" + _id + " by " + key );
                     }
 
                     if ( _deleted )
                         // If object has been deleted while waiting for lock, report deletion.
-                        throw new ObjectDeletedWaitingForLockException("object deleted" + _oid + "/" + _id + " by " + tx);
+                        throw new ObjectDeletedWaitingForLockException("object deleted" + _oid + "/" + _id + " by " + key);
 
                     // Try to re-acquire lock, this time less timeout,
                     // eventually timeout of zero will either succeed or fail
@@ -549,68 +549,68 @@ final class ObjectLock {
                     if ( System.currentTimeMillis() > endtime )
                         timeout = 0;
 
-                    removeWaiting( tx );
-                    tx.setWaitOnLock( null );
+                    removeWaiting( key );
+                    key.setWaitOnLock( null );
                 }
             } finally {
-                removeWaiting( tx );
-                tx.setWaitOnLock( null );                
+                removeWaiting( key );
+                key.setWaitOnLock( null );                
             }
         }
     }
 
-    public synchronized void checkin( TransactionContext tx, Object object ) {
+    public synchronized void checkin( Key key, Object object ) {
 
-        if ( _confirmWaiting != null && _confirmWaiting == tx ) {
+        if ( _confirmWaiting != null && _confirmWaiting == key ) {
             _timeStamp = System.currentTimeMillis();
             _object = object;
             if ( _confirmWaitingAction == ACTION_READ ) {
-                _readLock = new LinkedTx( tx, null );
+                _readLock = new LinkedTx( key, null );
             } else {
-                _writeLock = tx;
+                _writeLock = key;
             }
             _confirmWaiting = null;
             notifyAll();
-        } else if ( _writeLock != null && _writeLock == tx ) {
+        } else if ( _writeLock != null && _writeLock == key ) {
             _timeStamp = System.currentTimeMillis();
             _newobject = object;
         } else
-            throw new IllegalArgumentException("Transaction tx does not own this lock, "+toString()+"!");
+            throw new IllegalArgumentException("Transaction key does not own this lock, "+toString()+"!");
     }
 
-    public synchronized void setObject( TransactionContext tx, Object object ) {
+    public synchronized void setObject( Key key, Object object ) {
 
-        if ( _confirmWaiting != null && _confirmWaiting == tx ) {
+        if ( _confirmWaiting != null && _confirmWaiting == key ) {
             _timeStamp = System.currentTimeMillis();
             _object = object;
             if ( _confirmWaitingAction == ACTION_READ ) {
-                _readLock = new LinkedTx( tx, null );
+                _readLock = new LinkedTx( key, null );
             } else {
-                _writeLock = tx;
+                _writeLock = key;
             }
             _confirmWaiting = null;
             notifyAll();
-        } else if ( _writeLock != null && _writeLock == tx ) {
+        } else if ( _writeLock != null && _writeLock == key ) {
             _timeStamp = System.currentTimeMillis();
             _object = object;
         } else
-            throw new IllegalArgumentException("Transaction tx does not own this lock, "+toString()+"!");
+            throw new IllegalArgumentException("Transaction key does not own this lock, "+toString()+"!");
     }
 
-    public synchronized Object getObject( TransactionContext tx ) {
+    public synchronized Object getObject( Key key ) {
 
-        if ( _confirmWaiting != null && _confirmWaiting == tx )
+        if ( _confirmWaiting != null && _confirmWaiting == key )
             return _object;
-        else if ( _writeLock != null && _writeLock == tx )
+        else if ( _writeLock != null && _writeLock == key )
             return _object;
         else {
             LinkedTx link = _readLock;
             while ( link != null ) {
-                if ( link.tx == tx ) 
+                if ( link.key == key ) 
                     return _object;
                 link = link.next;
             }
-            throw new IllegalArgumentException("Transaction tx does not own this lock!");
+            throw new IllegalArgumentException("Transaction key does not own this lock!");
         }
     }
 
@@ -618,7 +618,7 @@ final class ObjectLock {
         return _timeStamp;
     }
 
-    synchronized void confirm( TransactionContext tx, boolean succeed ) {
+    synchronized void confirm( Key key, boolean succeed ) {
 
         // cases to consider:
         // 1/ not in waitingForConfirmation
@@ -627,13 +627,13 @@ final class ObjectLock {
         // 3/ else
         //         move confirmation and
         //         notify()
-        if ( _confirmWaiting == tx ) {
+        if ( _confirmWaiting == key ) {
             if ( succeed ) {
                 if ( _confirmWaitingAction == ACTION_READ ) {
                     if ( _readLock == null ) 
-                        _readLock = new LinkedTx( tx, null );
+                        _readLock = new LinkedTx( key, null );
                 } else {
-                    _writeLock = tx;
+                    _writeLock = key;
                 }
             }
             _confirmWaiting = null;
@@ -649,12 +649,12 @@ final class ObjectLock {
                     //_writeLock = null;
                     notifyAll();
                 } else if ( _readLock == null ) {
-                } else if ( _readLock.tx == tx )
+                } else if ( _readLock.key == key )
                     _readLock = _readLock.next;
                 else {
                     LinkedTx link = _readLock;
                     while ( link != null ) {
-                        if ( link.next != null && link.next.tx == tx ) {
+                        if ( link.next != null && link.next.key == key ) {
                             link.next = link.next.next;
                             notifyAll();
                             return;
@@ -684,12 +684,12 @@ final class ObjectLock {
      * transaction must only call this method for any given object
      * from a single thread and must mark the lock it is trying to
      * acquire and return it from a call to {@link
-     * TransactionContext#getWaitOnLock} if the call to this method
+     * Key#getWaitOnLock} if the call to this method
      * has not returned yet. If a read lock is available for the
      * transaction and a write lock is requested, the read lock is
      * cancelled whether or not the write is acquired.
      *
-     * @param tx The transaction requesting the lock
+     * @param key The transaction requesting the lock
      * @param write The type of lock requested
      * @param timeout Timeout waiting to acquire lock (in milliseconds),
      *  zero for no waiting
@@ -699,7 +699,7 @@ final class ObjectLock {
      * @throws ObjectDeletedWaitingForLockException The object has
      *  been deleted while waiting for the lock
      */
-    synchronized void upgrade( TransactionContext tx, int timeout )
+    synchronized void upgrade( Key key, int timeout )
             throws LockNotGrantedException, ObjectDeletedWaitingForLockException {
 
         // Note: This method must succeed even if an exception is thrown
@@ -710,7 +710,7 @@ final class ObjectLock {
             IllegalStateException e = new IllegalStateException("Internal error: acquire when confirmWaiting is not null");
             throw e;
         }
-        if ( !hasLock( tx, false ) ) {
+        if ( !hasLock( key, false ) ) {
             IllegalStateException e = new IllegalStateException("Transaction doesn't previously acquire this lock");
             throw e;
         }
@@ -720,36 +720,36 @@ final class ObjectLock {
             // Repeat forever until lock is acquired or timeout
             try {
 
-                if ( _writeLock == tx ) {
+                if ( _writeLock == key ) {
                     // Already have write lock, can acquire object
                     return;
                 } else if ( _writeLock == null && 
-                            _readLock.tx == tx && _readLock.next == null ) {
+                            _readLock.key == key && _readLock.next == null ) {
                     // Upgrading from read to write, no other locks, can upgrade
                     // Order is important in case thread is stopped in the middle
                     //_readLock = null;
                     if ( TRACE )
-                        System.out.println( "Acquired on " + toString() + " by " + tx );
-                    _writeLock = tx;
+                        System.out.println( "Acquired on " + toString() + " by " + key );
+                    _writeLock = key;
                     _readLock = null;
                     return;
                 } else {
                     // Don't wait if timeout is zero
                     if ( timeout == 0 ) {
                         if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
-                        throw new LockNotGrantedException( "persist.writeTimeout" + _oid + "/" + _id + " by " + tx );
+                            System.out.println( "Timeout on " + this.toString() + " by " + key );
+                        throw new LockNotGrantedException( "persist.writeTimeout" + _oid + "/" + _id + " by " + key );
                     }
                     if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                        System.out.println( "Waiting on " + this.toString() + " by " + key );
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
 
-                    tx.setWaitOnLock( this );
-                    detectDeadlock( tx, 10 );
+                    key.setWaitOnLock( this );
+                    detectDeadlock( key, 10 );
                     
                     // Must wait for lock and then attempt to reacquire
-                    _writeWaiting = new LinkedTx( tx, _writeWaiting );
+                    _writeWaiting = new LinkedTx( key, _writeWaiting );
                     
                     // Wait until notified or timeout elapses. Must detect
                     // when notified but object deleted (i.e. locks released)
@@ -766,20 +766,20 @@ final class ObjectLock {
 
                     if ( _deleted )
                         // object should not be deleted, as we got lock on it
-                        throw new IllegalStateException("internal error: object deleted" + _oid + "/" + _id + " by " + tx);
+                        throw new IllegalStateException("internal error: object deleted" + _oid + "/" + _id + " by " + key);
 
                     // Try to re-acquire lock, this time less timeout,
                     // eventually timeout of zero will either succeed or fail
                     // without blocking.
                     if ( System.currentTimeMillis() > endtime )
                         timeout = 0;
-                    removeWaiting( tx );
-                    tx.setWaitOnLock( null );
+                    removeWaiting( key );
+                    key.setWaitOnLock( null );
                 }
             } finally {
                 // Must always remove waiting transaction.
-                removeWaiting( tx );
-                tx.setWaitOnLock( null );
+                removeWaiting( key );
+                key.setWaitOnLock( null );
             }
         } 
     }
@@ -792,16 +792,16 @@ final class ObjectLock {
      * transactions are allowed to acquire a read/write lock on the
      * object.
      *
-     * @param tx The transaction that holds the lock
+     * @param key The transaction that holds the lock
      */
-    synchronized void release( TransactionContext tx ) {
+    synchronized void release( Key key ) {
 
         if ( TRACE )
-            System.out.println( "Release " + this.toString() + " by " + tx );
+            System.out.println( "Release " + this.toString() + " by " + key );
 
         try {
-            tx.setWaitOnLock( null );
-            if ( _writeLock == tx ) {
+            key.setWaitOnLock( null );
+            if ( _writeLock == key ) {
                 _writeLock = null;
                 if ( _invalidated || _deleted ) {
                     _timeStamp = System.currentTimeMillis();
@@ -810,22 +810,22 @@ final class ObjectLock {
                 _deleted = false;
                 _invalidated = false;
             } else if ( _readLock != null ) {
-                if ( _readLock.tx == tx ) {
+                if ( _readLock.key == key ) {
                     _readLock = _readLock.next;
                 } else {
                     LinkedTx read = _readLock;
                     while ( read != null ) {
-                        if ( read.next != null && read.next.tx == tx ) {
+                        if ( read.next != null && read.next.key == key ) {
                             read.next = read.next.next;
                             break;
                         } 
                         read = read.next;
                     }
                     if ( read == null )
-                        throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + tx );
+                        throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + key );
                 }
             } else 
-                throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + tx );
+                throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + key );
 
             // Notify all waiting transactions that they may attempt to
             // acquire lock. First one to succeed wins (or multiple if
@@ -834,7 +834,7 @@ final class ObjectLock {
         } catch ( ThreadDeath death ) {
             // This operation must never fail, not even in the
             // event of a thread death
-            release( tx );
+            release( key );
             throw death;
         }
     }
@@ -845,17 +845,17 @@ final class ObjectLock {
      * released and all transactions waiting for a lock will
      * terminate with an {@link ObjectDeletedException}.
      *
-     * @param tx The transaction that holds the lock
+     * @param key The transaction that holds the lock
      * @throws RuntimeException Attempt to delete object without
      *   acquiring a write lock
      */
-    synchronized void delete( TransactionContext tx ) {
+    synchronized void delete( Key key ) {
 
-        if ( tx != _writeLock )
-            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + tx );
+        if ( key != _writeLock )
+            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + key );
 
         if ( TRACE )
-            System.out.println( "Delete " + this.toString() + " by " + tx );
+            System.out.println( "Delete " + this.toString() + " by " + key );
 
         try {
             // Mark lock as unlocked and deleted, notify all waiting transactions
@@ -866,18 +866,18 @@ final class ObjectLock {
         } catch ( ThreadDeath death ) {
             // Delete operation must never fail, not even in the
             // event of a thread death
-            release( tx );
+            release( key );
             throw death;
         }
     }
 
-    synchronized void invalidate( TransactionContext tx ) {
+    synchronized void invalidate( Key key ) {
         
-        if ( tx != _writeLock ) 
-            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + tx );
+        if ( key != _writeLock ) 
+            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + key );
 
         if ( TRACE )
-            System.out.println( "Delete " + this.toString() + " by " + tx );
+            System.out.println( "Delete " + this.toString() + " by " + key );
 
         _invalidated = true;
     }
@@ -892,7 +892,7 @@ final class ObjectLock {
      *
      * @param waitingTx The transaction waiting to acquire this lock
      */
-    private void detectDeadlock( TransactionContext waitingTx, int numOfRec )
+    private void detectDeadlock( Key waitingTx, int numOfRec )
             throws LockNotGrantedException {
 
         ObjectLock waitOn;
@@ -926,7 +926,7 @@ final class ObjectLock {
                 }
                 read = waitOn._readLock;
                 while ( read != null ) {
-                    if ( read.tx == waitingTx )
+                    if ( read.key == waitingTx )
                         throw new LockNotGrantedException( "persist.deadlock" );
                     read = read.next;
                 }
@@ -942,8 +942,8 @@ final class ObjectLock {
 
                 // lock is the blocking transaction. We are only interested in
                 // a blocked transacrtion.
-                waitOn = lock.tx.getWaitOnLock();
-                if ( waitOn != null && lock.tx != waitingTx ) {
+                waitOn = lock.key.getWaitOnLock();
+                if ( waitOn != null && lock.key != waitingTx ) {
                     LinkedTx read;
 
                     if ( waitOn._writeLock == waitingTx ) {
@@ -951,7 +951,7 @@ final class ObjectLock {
                     }
                     read = waitOn._readLock;
                     while ( read != null ) {
-                        if ( read.tx == waitingTx )
+                        if ( read.key == waitingTx )
                             throw new LockNotGrantedException( "persist.deadlock" );
                         read = read.next;
                     }
@@ -966,18 +966,18 @@ final class ObjectLock {
     /**
      * Remove the transaction from the waiting list (both read and write).
      */
-    private void removeWaiting( TransactionContext tx ) {
+    private void removeWaiting( Key key ) {
 
         try {
             if ( _writeWaiting != null ) {
-                if ( _writeWaiting.tx == tx ) {
+                if ( _writeWaiting.key == key ) {
                     _writeWaiting = _writeWaiting.next;
                 } else {
                     LinkedTx wait;
                     
                     wait = _writeWaiting;
                     while ( wait.next != null ) {
-                        if ( wait.next.tx == tx ) {
+                        if ( wait.next.key == key ) {
                             wait.next = wait.next.next;
                             break;
                         }
@@ -986,14 +986,14 @@ final class ObjectLock {
                 }
             }
             if ( _readWaiting != null ) {
-                if ( _readWaiting.tx == tx ) {
+                if ( _readWaiting.key == key ) {
                     _readWaiting = _readWaiting.next;
                 } else {
                     LinkedTx wait;
                     
                     wait = _readWaiting;
                     while ( wait.next != null ) {
-                        if ( wait.next.tx == tx ) {
+                        if ( wait.next.key == key ) {
                             wait.next = wait.next.next;
                             break;
                         }
@@ -1007,7 +1007,7 @@ final class ObjectLock {
         } catch ( ThreadDeath death ) {
             // This operation must never fail, not even in the
             // event of a thread death
-            removeWaiting( tx );
+            removeWaiting( key );
             throw death;
         }
     }
@@ -1027,13 +1027,13 @@ final class ObjectLock {
     private static class LinkedTx
     {
 
-        TransactionContext tx;
+        Key         key;
 
-        LinkedTx           next;
+        LinkedTx    next;
 
-        LinkedTx( TransactionContext tx, LinkedTx next )
+        LinkedTx( Key key, LinkedTx next )
         {
-            this.tx = tx;
+            this.key = key;
             this.next = next;
         }
 

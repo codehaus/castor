@@ -51,6 +51,7 @@ import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.Relation;
 //import org.exolab.castor.persist.Lockable;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -58,7 +59,7 @@ import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.Key;
 
 import java.util.List;
 
@@ -92,7 +93,7 @@ import java.util.List;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see TransactionContext
+ * @see Key
  * @see PersistenceQuery
  */
 public interface Persistence {
@@ -107,14 +108,14 @@ public interface Persistence {
      * If the identity is null, an identity might be created and returned
      * by this method.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to create
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void create( TransactionContext tx, Object conn, Entity entity )
+    public void create( Key key, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -127,7 +128,7 @@ public interface Persistence {
      * #store}). If <tt>lock</tt> is true the object must be
      * locked in persistence storage to prevent concurrent updates.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to load into
      * @param accessMode The access mode (null equals shared)
@@ -135,7 +136,7 @@ public interface Persistence {
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
+    public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
 
@@ -144,15 +145,13 @@ public interface Persistence {
      * the supplied value. Conceptually, the specified field is a foreign key
      * field; the supplied values is the value the foreign key.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
-     * @param field The field on the "many" side of the relation
-     * @param value The value of the field
-     * @param entityIds The list of loaded identities that should be filled in the method
+     * @param related The relation of the specified entity
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public void loadRelated( TransactionContext tx, Object conn, EntityFieldInfo field, Object value, List entityIds, AccessMode accessMode )
+    public void loadRelated( Key key, Object conn, Relation related, AccessMode accessMode )
         throws PersistenceException;
 
     /**
@@ -173,7 +172,7 @@ public interface Persistence {
      * call to {@link #load}. These arguments are null for objects
      * retrieved with an exclusive lock.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to store
      * @param original The original entity, or null
@@ -183,7 +182,7 @@ public interface Persistence {
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
+    public void store( Key key, Object conn, Entity entity, Entity orginal )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
@@ -194,12 +193,12 @@ public interface Persistence {
      * locks on the object must be retained until the transaction has
      * completed.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to delete
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( TransactionContext tx, Object conn, Entity entity )
+    public void delete( Key key, Object conn, Entity entity )
         throws PersistenceException;
 
 
@@ -212,14 +211,14 @@ public interface Persistence {
      * succeed when the transaction completes, without attempting to
      * reload the object.
      *
-     * @param tx The transaction context
+     * @param key The transaction context
      * @param conn An open connection
      * @param entity The entity to lock
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( TransactionContext tx, Object conn, Entity entity )
+    public void writeLock( Key key, Object conn, Entity entity )
         throws ObjectDeletedException, PersistenceException;
 
 
