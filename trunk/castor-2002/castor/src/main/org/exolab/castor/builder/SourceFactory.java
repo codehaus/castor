@@ -553,7 +553,8 @@ public class SourceFactory  {
         con.getSourceCode().add("super();");
 
         //-- add default import list
-        jClass.addImport("org.exolab.castor.xml.*");
+        if (_createMarshall)
+           jClass.addImport("org.exolab.castor.xml.*");
         jClass.addImport("java.io.Serializable");
 
     } //-- initialize
