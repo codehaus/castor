@@ -101,19 +101,19 @@ public class JDOFieldDesc
      * @throws MappingException Invalid mapping information
      */
     public JDOFieldDesc( FieldDesc fieldDesc, String sqlName, Class sqlType, boolean dirtyCheck )
-	throws MappingException
+        throws MappingException
     {
-	super( fieldDesc );
-	if ( sqlName == null )
-	    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
-	_sqlName = sqlName;
-	if ( sqlType == null )
-	    throw new IllegalArgumentException( "Argument 'sqlType' is null" );
-	if ( getFieldType() != sqlType ) {
-	    _javaToSql = SQLTypes.getConvertor( getFieldType(), sqlType );
-	    _sqlToJava = SQLTypes.getConvertor( sqlType, getFieldType() );
-	}
-	_dirtyCheck = _dirtyCheck;
+        super( fieldDesc );
+        if ( sqlName == null )
+            throw new IllegalArgumentException( "Argument 'sqlName' is null" );
+        _sqlName = sqlName;
+        if ( sqlType == null )
+            throw new IllegalArgumentException( "Argument 'sqlType' is null" );
+        if ( getFieldType() != sqlType ) {
+            _javaToSql = SQLTypes.getConvertor( getFieldType(), sqlType );
+            _sqlToJava = SQLTypes.getConvertor( sqlType, getFieldType() );
+        }
+        _dirtyCheck = _dirtyCheck;
     }
 
 
@@ -122,68 +122,68 @@ public class JDOFieldDesc
      */
     protected JDOFieldDesc( JDOFieldDesc fieldDesc )
     {
-	super( fieldDesc );
-	_sqlName = fieldDesc._sqlName;
-	_dirtyCheck = fieldDesc._dirtyCheck;
-	_javaToSql = fieldDesc._javaToSql;
-	_sqlToJava = fieldDesc._sqlToJava;
+        super( fieldDesc );
+        _sqlName = fieldDesc._sqlName;
+        _dirtyCheck = fieldDesc._dirtyCheck;
+        _javaToSql = fieldDesc._javaToSql;
+        _sqlToJava = fieldDesc._sqlToJava;
     }
 
 
     public String getSQLName()
     {
-	return _sqlName;
+        return _sqlName;
     }
 
 
     public boolean isDirtyCheck()
     {
-	return _dirtyCheck;
+        return _dirtyCheck;
     }
 
 
     public void getValue( Object obj, PreparedStatement stmt, int column )
-	throws SQLException
+        throws SQLException
     {
-	if ( _javaToSql == null )
-	    stmt.setObject( column, super.getValue( obj ) );
-	else
-	    stmt.setObject( column, _javaToSql.convert( super.getValue( obj ) ) );
+        if ( _javaToSql == null )
+            stmt.setObject( column, super.getValue( obj ) );
+        else
+            stmt.setObject( column, _javaToSql.convert( super.getValue( obj ) ) );
     }
     
 
     public void setValue( Object obj, ResultSet rs, int column )
-	throws SQLException
+        throws SQLException
     {
-	if ( _sqlToJava == null )
-	    super.setValue( obj, rs.getObject( column ) );
-	else {
-	    super.setValue( obj, _sqlToJava.convert( rs.getObject( column ) ) );
-	}
+        if ( _sqlToJava == null )
+            super.setValue( obj, rs.getObject( column ) );
+        else {
+            super.setValue( obj, _sqlToJava.convert( rs.getObject( column ) ) );
+        }
     }
-
-
+    
+    
     public Object getValue( Object obj )
     {
-	if ( _javaToSql == null )
-	    return super.getValue( obj );
-	else
-	    return _javaToSql.convert( super.getValue( obj ) );
+        if ( _javaToSql == null )
+            return super.getValue( obj );
+        else
+            return _javaToSql.convert( super.getValue( obj ) );
     }
-
-
+    
+    
     public void setValue( Object obj, Object value )
     {
-	if ( _sqlToJava == null )
-	    super.setValue( obj, value );
-	else
-	    super.setValue( obj, _sqlToJava.convert( value ) );
+        if ( _sqlToJava == null )
+            super.setValue( obj, value );
+        else
+            super.setValue( obj, _sqlToJava.convert( value ) );
     }
-
-
+    
+    
     public String toString()
     {
-	return toString() + " AS " + _sqlName;
+        return super.toString() + " AS " + _sqlName;
     }
 
 

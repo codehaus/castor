@@ -70,42 +70,42 @@ public class DAXClassDesc
 
 
     public DAXClassDesc( ClassDesc clsDesc, FieldDesc attributeSet, String ldapClass )
-	throws MappingException
+        throws MappingException
     {
-	super( clsDesc );
-	if ( attributeSet != null ) {
-	    if ( attributeSet.getFieldType() != Hashtable.class )
-		throw new MappingException( "Not attribute set" );
-	    _attributeSet = attributeSet;
-	}
-	_ldapClass = ldapClass;
+        super( clsDesc );
+        if ( attributeSet != null ) {
+            if ( attributeSet.getFieldType() != Hashtable.class )
+                throw new MappingException( "Not attribute set" );
+            _attributeSet = attributeSet;
+        }
+        _ldapClass = ldapClass;
     }
 
 
     public FieldDesc getAttributeSetField()
     {
-	return _attributeSet;
+        return _attributeSet;
     }
 
 
     public String getLdapClass()
     {
-	return _ldapClass;
+        return _ldapClass;
     }
 
 
     public void copyInto( Object source, Object target )
     {
-	Hashtable attrSet;
-
-	super.copyInto( source, target );
-	if ( _attributeSet != null ) {
-	    attrSet = (Hashtable) _attributeSet.getValue( source );
-	    if ( attrSet == null )
-		_attributeSet.setValue( target, null );
-	    else
-		_attributeSet.setValue( target, attrSet.clone() );
-	}
+        Hashtable attrSet;
+        
+        super.copyInto( source, target );
+        if ( _attributeSet != null ) {
+            attrSet = (Hashtable) _attributeSet.getValue( source );
+            if ( attrSet == null )
+                _attributeSet.setValue( target, null );
+            else
+                _attributeSet.setValue( target, attrSet.clone() );
+        }
     } 
 
 

@@ -67,15 +67,15 @@ final class TransactionContextImpl
 
     public TransactionContextImpl( LDAPConnection conn )
     {
-	super();
-	_conn = conn;
+        super();
+        _conn = conn;
     }
 
 
     public TransactionContextImpl( LDAPConnection conn, Xid xid )
     {
-	super( xid );
-	_conn = conn;
+        super( xid );
+        _conn = conn;
     }
 
 
@@ -91,7 +91,7 @@ final class TransactionContextImpl
 
     public Object getConnection( PersistenceEngine engine )
     {
-	return _conn;
+        return _conn;
     }
 
 

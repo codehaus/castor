@@ -87,188 +87,188 @@ public final class TransactionImpl
 
     public TransactionImpl()
     {
-	// Used by ODMG class which requires that thread be associated
-	// with the new transaction.
-	join();
+        // Used by ODMG class which requires that thread be associated
+        // with the new transaction.
+        join();
     }
 
 
     public static TransactionImpl getCurrent()
     {
-	return (TransactionImpl) _txLocal.get();
+        return (TransactionImpl) _txLocal.get();
     }
 
 
     public static TransactionContext getCurrentContext()
     {
-	TransactionImpl tx;
-
-	tx = (TransactionImpl) _txLocal.get();
-	if ( tx == null )
-	    return null;
-	else
-	    return tx._txContext;
+        TransactionImpl tx;
+        
+        tx = (TransactionImpl) _txLocal.get();
+        if ( tx == null )
+            return null;
+        else
+            return tx._txContext;
     }
 
 
     public void join()
     {
-	TransactionImpl tx;
-
-	tx = (TransactionImpl) _txLocal.get();
-	if ( tx == this )
-	    return;
-	if ( tx != null ) {
-	    -- tx._threadCount;
-	}
-	_txLocal.set( this );
-	++ _threadCount;
+        TransactionImpl tx;
+        
+        tx = (TransactionImpl) _txLocal.get();
+        if ( tx == this )
+            return;
+        if ( tx != null ) {
+            -- tx._threadCount;
+        }
+        _txLocal.set( this );
+        ++ _threadCount;
     }
 
 
     public void leave()
     {
-	TransactionImpl tx;
-
-	tx = (TransactionImpl) _txLocal.get();
-	if ( tx == this ) {
-	    _txLocal.set( null );
-	    -- _threadCount;
-	} else {
-	    // Not inside transaction
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	}
+        TransactionImpl tx;
+        
+        tx = (TransactionImpl) _txLocal.get();
+        if ( tx == this ) {
+            _txLocal.set( null );
+            -- _threadCount;
+        } else {
+            // Not inside transaction
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        }
     }
-
-
+    
+    
     public synchronized void begin()
     {
- 	if ( _txLocal.get() != this )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	if ( _txContext != null && _txContext.isOpen() )
-	    throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.txInProgress" ) );
-	_txContext = new TransactionContextImpl();
+        if ( _txLocal.get() != this )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        if ( _txContext != null && _txContext.isOpen() )
+            throw new TransactionInProgressException( Messages.message( "castor.jdo.odmg.txInProgress" ) );
+        _txContext = new TransactionContextImpl();
     }
 
 
     public boolean isOpen()
     {
-	return ( _txContext != null && _txContext.isOpen() );
+        return ( _txContext != null && _txContext.isOpen() );
     }
 
 
     public void commit()
     {
-	// Thread must be inside transaction, transaction must be owner,
-	// thread must be only thread associated with transaction
- 	if ( _txLocal.get() != this )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-	    throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
-	if ( _txContext == null || ! _txContext.isOpen() )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
-	if ( _threadCount != 1 )
-	    throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
-	try {
-	    _txContext.prepare();
-	    _txContext.commit();
-	} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-	    try {
-		_txContext.rollback();
-	    } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
-		// This should never happen
-	    }
-	    throw new TransactionAbortedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} finally {
-	    _txContext = null;
-	}
+        // Thread must be inside transaction, transaction must be owner,
+        // thread must be only thread associated with transaction
+        if ( _txLocal.get() != this )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
+            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+        if ( _txContext == null || ! _txContext.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+        if ( _threadCount != 1 )
+            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
+        try {
+            _txContext.prepare();
+            _txContext.commit();
+        } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+            try {
+                _txContext.rollback();
+            } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
+                // This should never happen
+            }
+            throw new TransactionAbortedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } finally {
+            _txContext = null;
+        }
     }
 
 
     public void abort()
     {
-	// Thread must be inside transaction, transaction must be owner,
-	// thread must be only thread associated with transaction
- 	if ( _txLocal.get() != this )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	if ( _txContext == null || ! _txContext.isOpen() )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
-	if ( _threadCount != 1 )
-	    throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
-	try {
-	    _txContext.rollback();
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} finally {
-	    _txContext = null;
-	}
+        // Thread must be inside transaction, transaction must be owner,
+        // thread must be only thread associated with transaction
+        if ( _txLocal.get() != this )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        if ( _txContext == null || ! _txContext.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+        if ( _threadCount != 1 )
+            throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
+        try {
+            _txContext.rollback();
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } finally {
+            _txContext = null;
+        }
     }
 
-
+    
     public void checkpoint()
     {
-	// Thread must be inside transaction, transaction must be open
- 	if ( _txLocal.get() != this )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-	    throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
-	if ( _txContext == null || ! _txContext.isOpen() )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
-	try {
-	    _txContext.checkpoint();
-	} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
-	    throw new TransactionAbortedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( TransactionAbortedException except ) {
-	    _txContext = null;
-	    throw except;
-	}
+        // Thread must be inside transaction, transaction must be open
+        if ( _txLocal.get() != this )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
+            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+        if ( _txContext == null || ! _txContext.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+        try {
+            _txContext.checkpoint();
+        } catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+            throw new TransactionAbortedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( TransactionAbortedException except ) {
+            _txContext = null;
+            throw except;
+        }
     }
 
 
     public void lock( Object obj, int lockMode )
-	throws LockNotGrantedException
+        throws LockNotGrantedException
     {
- 	if ( _txLocal.get() != this )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
-	if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-	    throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
-	if ( _txContext == null || ! _txContext.isOpen() )
-	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
-	try {
-	    if ( lockMode == WRITE )
-		_txContext.writeLock( obj, DefaultWaitLockTimeout );
-	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
-	    throw new LockNotGrantedException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
-	    throw new ObjectNotPersistentException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
-	    throw new TransactionNotInProgressException( except.getMessage() );
-	} catch ( org.exolab.castor.persist.PersistenceException except ) {
-	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
-	}
+        if ( _txLocal.get() != this )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.threadNotOwner" ) );
+        if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
+            throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
+        if ( _txContext == null || ! _txContext.isOpen() )
+            throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
+        try {
+            if ( lockMode == WRITE )
+                _txContext.writeLock( obj, DefaultWaitLockTimeout );
+        } catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+            throw new LockNotGrantedException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+            throw new ObjectNotPersistentException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+            throw new TransactionNotInProgressException( except.getMessage() );
+        } catch ( org.exolab.castor.persist.PersistenceException except ) {
+            throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+        }
     }
 
 
     public boolean tryLock( Object obj, int lockMode )
     {
-	try {
-	    lock( obj, lockMode );
-	    return true;
-	} catch ( LockNotGrantedException except ) {
-	    return false;
-	}
+        try {
+            lock( obj, lockMode );
+            return true;
+        } catch ( LockNotGrantedException except ) {
+            return false;
+        }
     }
 
 
     protected void finalize()
-	throws Throwable
+        throws Throwable
     {
-	if ( _txContext != null && _txContext.isOpen() )
-	    _txContext.rollback();
+        if ( _txContext != null && _txContext.isOpen() )
+            _txContext.rollback();
     }
 
 

@@ -60,7 +60,7 @@ public class InvalidSearchException
 
     public InvalidSearchException( String message )
     {
-	super( message );
+        super( message );
     }
 
 

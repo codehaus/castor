@@ -80,75 +80,75 @@ public class JDOContainedFieldDesc
 
 
     public JDOContainedFieldDesc( JDOFieldDesc fieldDesc, FieldDesc parentField,
-				  FieldDesc parentRefField )
-	throws MappingException
+                                  FieldDesc parentRefField )
+        throws MappingException
     {
-	super( fieldDesc );
-	if ( parentField == null )
-	    throw new IllegalArgumentException( "Argument 'parentField' is null" );
-	if ( ! Types.isConstructable( parentField.getFieldType() ) )
-	    throw new MappingException( "The field type " + parentField.getFieldType().getName() +
-					" is not a consturctable class" );
-	_parentField = parentField;
-	_parentRefField = parentRefField;
+        super( fieldDesc );
+        if ( parentField == null )
+            throw new IllegalArgumentException( "Argument 'parentField' is null" );
+        if ( ! Types.isConstructable( parentField.getFieldType() ) )
+            throw new MappingException( "The field type " + parentField.getFieldType().getName() +
+                                        " is not a consturctable class" );
+        _parentField = parentField;
+        _parentRefField = parentRefField;
     }
 
 
     FieldDesc getParentField()
     {
-	return _parentField;
+        return _parentField;
     }
 
 
     public Object getValue( Object obj )
     {
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	obj = _parentField.getValue( obj );
-	if ( obj == null )
-	    return null;
-	return super.getValue( obj );
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        obj = _parentField.getValue( obj );
+        if ( obj == null )
+            return null;
+        return super.getValue( obj );
     }
-
-
+    
+    
     public void getValue( Object obj, PreparedStatement stmt, int column )
-	throws SQLException
+        throws SQLException
     {
-	stmt.setObject( column, getValue( obj ) );
+        stmt.setObject( column, getValue( obj ) );
     }
 
 
     public void setValue( Object obj, Object value )
     {
-	Object self;
-
-	// This is always called with an instance of the parent
-	// object, so we have to obtain the contained object
-	// first before retrieving the field from it.
-	self = _parentField.getValue( obj );
-	if ( self == null ) {
-	    // If the contained object does not exist, it is
-	    // created at this point.
-	    self = Types.newInstance( _parentField.getFieldType() );
-	    if ( _parentRefField != null )
-		_parentRefField.setValue( self, obj );
-	    _parentField.setValue( obj, self );
-	}
-	super.setValue( self, value );
+        Object self;
+        
+        // This is always called with an instance of the parent
+        // object, so we have to obtain the contained object
+        // first before retrieving the field from it.
+        self = _parentField.getValue( obj );
+        if ( self == null ) {
+            // If the contained object does not exist, it is
+            // created at this point.
+            self = Types.newInstance( _parentField.getFieldType() );
+            if ( _parentRefField != null )
+                _parentRefField.setValue( self, obj );
+            _parentField.setValue( obj, self );
+        }
+        super.setValue( self, value );
     }
-
-
+    
+    
     public void setValue( Object obj, ResultSet rs, int column )
-	throws SQLException
+        throws SQLException
     {
-	setValue( obj, rs.getObject( column ) );
+        setValue( obj, rs.getObject( column ) );
     }
-
-
+    
+    
     public String toString()
     {
-	return super.toString() + " on " + _parentField.getFieldName();
+        return super.toString() + " on " + _parentField.getFieldName();
     }
 
 

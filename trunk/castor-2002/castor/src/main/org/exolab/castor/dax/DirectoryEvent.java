@@ -76,7 +76,7 @@ public class DirectoryEvent
      */
     public DirectoryEvent( XADirectory dir )
     {
-	super( dir );
+        super( dir );
     }
 
 
@@ -90,8 +90,8 @@ public class DirectoryEvent
      */
     public DirectoryEvent( XADirectory dir, DirectoryException except )
     {
-	super( dir );
-	_except = except;
+        super( dir );
+        _except = except;
     }
 
 
@@ -103,7 +103,7 @@ public class DirectoryEvent
      */
     public DirectoryException getDirectoryException()
     {
-	return _except;
+        return _except;
     }
 
 

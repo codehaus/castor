@@ -112,375 +112,375 @@ public class DirectoryImpl
 
 
     DirectoryImpl( LDAPConnection conn, LDAPUrl url, 
-		   MappingResolver mapResolver, PrintWriter logWriter )
-	throws DirectoryException
+                   MappingResolver mapResolver, PrintWriter logWriter )
+        throws DirectoryException
     {
-	_conn = conn;
-	_dn = url.getDN();
-	_mapResolver = mapResolver;
-	_clsDesc = (ClassDesc) _mapResolver.listDescriptors().nextElement();
-	try {
-	    _dirEngine = getEngine( url, _clsDesc , logWriter );
-	} catch ( MappingException except ) {
-	    throw new DirectoryException( except );
-	}
-	_logWriter = logWriter;
+        _conn = conn;
+        _dn = url.getDN();
+        _mapResolver = mapResolver;
+        _clsDesc = (ClassDesc) _mapResolver.listDescriptors().nextElement();
+        try {
+            _dirEngine = getEngine( url, _clsDesc , logWriter );
+        } catch ( MappingException except ) {
+            throw new DirectoryException( except );
+        }
+        _logWriter = logWriter;
     }
 
 
     public String getDN()
     {
-	return _dn;
+        return _dn;
     }
 
 
     public Search createSearch( String expr )
-	throws InvalidSearchException, DirectoryException
+        throws InvalidSearchException, DirectoryException
     {
-	Persistence   per;
-	int           next;
-	int           pos;
-	StringBuffer  query;
-	Vector        types;
-	Class[]       array;
-
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-
-	try {
-	    next = expr.indexOf( '$' );
-	    if ( next <= 0 ) {
-		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
-	    } else {
-		pos = 0;
-		query = new StringBuffer();
-		types = new Vector();
-		while ( next > 0 ) {
-		    if ( next == expr.length() - 1 ) {
-			query.append( expr.substring( pos, next + 1 ) );
-			pos = next;
-			break;
-		    }
-		    if ( expr.charAt( next + 1 ) == '$' ) {
-			query.append( expr.substring( pos, next + 1 ) );
-			pos = next + 2;
-			next = expr.indexOf( '$', next );
-		    }
-		    query.append( expr.substring( pos, next + 1 ) );
-		    query.append( "\0" );
-		    pos = next + 1;
-		    next = expr.indexOf( '$', next );
-		    types.addElement( null );
-		}
-		query.append( expr.substring( pos, next ) );
-		array = new Class[ types.size() ];
-		types.copyInto( array );
-		System.out.println( query.toString() );
-		return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( query.toString(), array ) );
-	    }
-	} catch ( QueryException except ) {
-	    throw new InvalidSearchException( except.getMessage() );
-	} catch ( PersistenceException except ) {
-	    throw new DirectoryException( except );
-	}
+        Persistence   per;
+        int           next;
+        int           pos;
+        StringBuffer  query;
+        Vector        types;
+        Class[]       array;
+        
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        
+        try {
+            next = expr.indexOf( '$' );
+            if ( next <= 0 ) {
+                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( expr, new Class[ 0 ] ) );
+            } else {
+                pos = 0;
+                query = new StringBuffer();
+                types = new Vector();
+                while ( next > 0 ) {
+                    if ( next == expr.length() - 1 ) {
+                        query.append( expr.substring( pos, next + 1 ) );
+                        pos = next;
+                        break;
+                    }
+                    if ( expr.charAt( next + 1 ) == '$' ) {
+                        query.append( expr.substring( pos, next + 1 ) );
+                        pos = next + 2;
+                        next = expr.indexOf( '$', next );
+                    }
+                    query.append( expr.substring( pos, next + 1 ) );
+                    query.append( "\0" );
+                    pos = next + 1;
+                    next = expr.indexOf( '$', next );
+                    types.addElement( null );
+                }
+                query.append( expr.substring( pos, next ) );
+                array = new Class[ types.size() ];
+                types.copyInto( array );
+                System.out.println( query.toString() );
+                return new SearchImpl( this, _dirEngine.getPersistence( _clsDesc.getJavaClass() ).createQuery( query.toString(), array ) );
+            }
+        } catch ( QueryException except ) {
+            throw new InvalidSearchException( except.getMessage() );
+        } catch ( PersistenceException except ) {
+            throw new DirectoryException( except );
+        }
     }
 
 
     public synchronized Object read( Object rdn )
-	throws DirectoryException
+        throws DirectoryException
     {
-	ClassDesc         clsDesc;
-	Object             obj;
-
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-
-	clsDesc = _clsDesc;
-	// clsDesc = _dirEngine.getClassDesc();
-	obj = clsDesc.newInstance();
-	try {
-	    if ( _tx != null ) {
-		_tx.load( _dirEngine, obj, rdn, AccessMode.ReadWrite );
-	    } else {
-		TransactionContext tx;
-		
-		tx = new TransactionContextImpl( _conn );
-		tx.load( _dirEngine, obj, rdn, AccessMode.ReadOnly );
-		tx.commit();
-	    }
-	} catch ( ObjectNotFoundException except ) {
-	    return null;
-	} catch ( PersistenceException except ) {
-	    if ( except.getException() != null )
-		throw new DirectoryException( except.getException() );
-	    else
-		throw new DirectoryException( except );
-	}
-	return obj;
+        ClassDesc         clsDesc;
+        Object             obj;
+        
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        
+        clsDesc = _clsDesc;
+        // clsDesc = _dirEngine.getClassDesc();
+        obj = clsDesc.newInstance();
+        try {
+            if ( _tx != null ) {
+                _tx.load( _dirEngine, obj, rdn, AccessMode.ReadWrite );
+            } else {
+                TransactionContext tx;
+                
+                tx = new TransactionContextImpl( _conn );
+                tx.load( _dirEngine, obj, rdn, AccessMode.ReadOnly );
+                tx.commit();
+            }
+        } catch ( ObjectNotFoundException except ) {
+            return null;
+        } catch ( PersistenceException except ) {
+            if ( except.getException() != null )
+                throw new DirectoryException( except.getException() );
+            else
+                throw new DirectoryException( except );
+        }
+        return obj;
     }
-
-
+    
+    
     public synchronized void create( Object obj )
- 	throws DuplicateRDNException, DirectoryException
+        throws DuplicateRDNException, DirectoryException
     {
-	ClassDesc         clsDesc;
-	Object             rdn;
-
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-
-	clsDesc = _clsDesc;
-	// clsDesc = _dirEngine.getClassDesc();
-	while ( clsDesc != null ) {
-	    if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
-		break;
-	    clsDesc = clsDesc.getExtends();
-	}
-	if ( clsDesc == null )
-	    throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
-
-	rdn = clsDesc.getIdentity().getValue( obj );
-	if ( rdn == null )
-	    throw new DirectoryException( "Object has no RDN" );
-	try {
-	    if ( _tx != null ) {
-		_tx.create( _dirEngine, obj, rdn );
-	    } else {
-		TransactionContext tx;
-
-		tx = new TransactionContextImpl( _conn );
-		tx.create( _dirEngine, obj, rdn );
-		tx.commit();
-	    }
-	} catch ( DuplicateIdentityException except ) {
-	    throw new DuplicateRDNException( "Duplicate RDN" );
-	} catch ( PersistenceException except ) {
-	    if ( except.getException() != null )
-		throw new DirectoryException( except.getException() );
-	    else
-		throw new DirectoryException( except );
-	}
+        ClassDesc         clsDesc;
+        Object             rdn;
+        
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        
+        clsDesc = _clsDesc;
+        // clsDesc = _dirEngine.getClassDesc();
+        while ( clsDesc != null ) {
+            if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
+                break;
+            clsDesc = clsDesc.getExtends();
+        }
+        if ( clsDesc == null )
+            throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
+        
+        rdn = clsDesc.getIdentity().getValue( obj );
+        if ( rdn == null )
+            throw new DirectoryException( "Object has no RDN" );
+        try {
+            if ( _tx != null ) {
+                _tx.create( _dirEngine, obj, rdn );
+            } else {
+                TransactionContext tx;
+                
+                tx = new TransactionContextImpl( _conn );
+                tx.create( _dirEngine, obj, rdn );
+                tx.commit();
+            }
+        } catch ( DuplicateIdentityException except ) {
+            throw new DuplicateRDNException( "Duplicate RDN" );
+        } catch ( PersistenceException except ) {
+            if ( except.getException() != null )
+                throw new DirectoryException( except.getException() );
+            else
+                throw new DirectoryException( except );
+        }
     }
-
+    
 
     public synchronized void delete( Object obj )
-	throws DirectoryException
+        throws DirectoryException
     {
-	ClassDesc clsDesc;
-
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-
-	clsDesc = _clsDesc;
-	// clsDesc = _dirEngine.getClassDesc();
-	while ( clsDesc != null ) {
-	    if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
-		break;
-	    clsDesc = clsDesc.getExtends();
-	}
-	if ( clsDesc == null )
-	    throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
-
-	try {
-	    if ( _tx != null ) {
-		_tx.delete( obj );
-	    } else {
-		TransactionContext tx;
-
-		tx = new TransactionContextImpl( _conn );
-		tx.delete( obj );
-		tx.commit();
-	    }
-	} catch ( ObjectNotPersistentException except ) {
-	    throw new DuplicateRDNException( "Object not persistent" );
-	} catch ( PersistenceException except ) {
-	    if ( except.getException() != null )
-		throw new DirectoryException( except.getException() );
-	    else
-		throw new DirectoryException( except );
-	}
+        ClassDesc clsDesc;
+        
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        
+        clsDesc = _clsDesc;
+        // clsDesc = _dirEngine.getClassDesc();
+        while ( clsDesc != null ) {
+            if ( clsDesc.getJavaClass().isAssignableFrom( obj.getClass() ) )
+                break;
+            clsDesc = clsDesc.getExtends();
+        }
+        if ( clsDesc == null )
+            throw new DirectoryException( new ClassNotPersistenceCapableException( obj.getClass() ) );
+        
+        try {
+            if ( _tx != null ) {
+                _tx.delete( obj );
+            } else {
+                TransactionContext tx;
+                
+                tx = new TransactionContextImpl( _conn );
+                tx.delete( obj );
+                tx.commit();
+            }
+        } catch ( ObjectNotPersistentException except ) {
+            throw new DuplicateRDNException( "Object not persistent" );
+        } catch ( PersistenceException except ) {
+            if ( except.getException() != null )
+                throw new DirectoryException( except.getException() );
+            else
+                throw new DirectoryException( except );
+        }
     }
-
+    
 
     public synchronized void begin()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	if ( _tx != null )
-	    throw new DirectoryException( "Already inside a transaction" );
-	_tx = new TransactionContextImpl( _conn );
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        if ( _tx != null )
+            throw new DirectoryException( "Already inside a transaction" );
+        _tx = new TransactionContextImpl( _conn );
     }
-
-
+    
+    
     public synchronized void commit()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	if ( _tx == null )
-	    throw new DirectoryException( "Not inside a transaction" );
-	try {
-	    try {
-		_tx.prepare();
-		_tx.commit();
-	    } catch ( TransactionAbortedException except ) {
-		_tx.rollback();
-	    }
-	} catch ( TransactionNotInProgressException except ) {
-	    throw new DirectoryException( except );
-	} finally {
-	    _tx = null;
-	}
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        if ( _tx == null )
+            throw new DirectoryException( "Not inside a transaction" );
+        try {
+            try {
+                _tx.prepare();
+                _tx.commit();
+            } catch ( TransactionAbortedException except ) {
+                _tx.rollback();
+            }
+        } catch ( TransactionNotInProgressException except ) {
+            throw new DirectoryException( except );
+        } finally {
+            _tx = null;
+        }
     }
 
 
     public synchronized void rollback()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	if ( _tx == null )
-	    throw new DirectoryException( "Not inside a transaction" );
-	try {
-	    _tx.rollback();
-	} catch ( TransactionNotInProgressException except ) {
-	    throw new DirectoryException( except );
-	} finally {
-	    _tx = null;
-	}
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        if ( _tx == null )
+            throw new DirectoryException( "Not inside a transaction" );
+        try {
+            _tx.rollback();
+        } catch ( TransactionNotInProgressException except ) {
+            throw new DirectoryException( except );
+        } finally {
+            _tx = null;
+        }
     }
 
 
     public synchronized boolean isPersistent( Object obj )
     {
-	// If directory is closed or not inside transaction, return null.
-	if ( _dirEngine == null || _tx == null )
-	    return false;
-	return _tx.isPersistent( obj );
+        // If directory is closed or not inside transaction, return null.
+        if ( _dirEngine == null || _tx == null )
+            return false;
+        return _tx.isPersistent( obj );
     }
 
 
     public synchronized void close()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	_dirEngine = null;
-	try {
-	    _conn.disconnect();
-	} catch ( LDAPException except ) {
-	    throw new DirectoryException( except );
-	} finally {
-	    _conn = null;
-	}
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        _dirEngine = null;
+        try {
+            _conn.disconnect();
+        } catch ( LDAPException except ) {
+            throw new DirectoryException( except );
+        } finally {
+            _conn = null;
+        }
     }
 
 
     public void finalizer()
     {
-	try {
-	    if ( _conn != null )
-		_conn.disconnect();
-	} catch ( LDAPException except ) {
-	}
+        try {
+            if ( _conn != null )
+                _conn.disconnect();
+        } catch ( LDAPException except ) {
+        }
     }
-
-
+    
+    
     synchronized TransactionContext getTransactionContext()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	return _tx;
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        return _tx;
     }
 
 
     synchronized TransactionContext newTransactionContext()
-	throws DirectoryException
+        throws DirectoryException
     {
-	if ( _dirEngine == null )
-	    throw new DirectoryException( "Directory closed" );
-	return new TransactionContextImpl( _conn );
+        if ( _dirEngine == null )
+            throw new DirectoryException( "Directory closed" );
+        return new TransactionContextImpl( _conn );
     }
-
+    
 
     PersistenceEngine getPersistenceEngine()
     {
-	return _dirEngine;
+        return _dirEngine;
     }
-
-
+    
+    
     private static Hashtable  _engines = new Hashtable();
-
-
+    
+    
     public static PersistenceEngine getEngine( LDAPUrl url, ClassDesc clsDesc, PrintWriter logWriter )
-	throws MappingException
+        throws MappingException
     {
-	PersistenceEngine engine;
-
-	synchronized ( _engines ) {
-	    engine = (PersistenceEngine) _engines.get( url );
-	    if ( engine == null ) {
-		engine = new PersistenceEngineFactory().createEngine( new SingleMapping( clsDesc ),
-								      new EngineFactory( url.getDN() ), logWriter );
-		_engines.put( url, engine );
-	    }
-	    return engine;
-	}
+        PersistenceEngine engine;
+        
+        synchronized ( _engines ) {
+            engine = (PersistenceEngine) _engines.get( url );
+            if ( engine == null ) {
+                engine = new PersistenceEngineFactory().createEngine( new SingleMapping( clsDesc ),
+                                                                      new EngineFactory( url.getDN() ), logWriter );
+                _engines.put( url, engine );
+            }
+            return engine;
+        }
     }
-
-
+    
+    
     static class SingleMapping
-	implements MappingResolver
+        implements MappingResolver
     {
-
-	private Hashtable _clsDescs;
-
-	SingleMapping( ClassDesc clsDesc )
-	{
-	    _clsDescs = new Hashtable();
-	    _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
-	}
-
-	public ClassDesc getDescriptor( Class type )
-	{
-	    return (ClassDesc) _clsDescs.get( type );
-	}
-
-	public Enumeration listDescriptors()
-	{
-	    return _clsDescs.elements();
-	}
-
-	public Enumeration listObjectTypes()
-	{
-	    return _clsDescs.keys();
-	}
-
+        
+        private Hashtable _clsDescs;
+        
+        SingleMapping( ClassDesc clsDesc )
+        {
+            _clsDescs = new Hashtable();
+            _clsDescs.put( clsDesc.getJavaClass(), clsDesc );
+        }
+        
+        public ClassDesc getDescriptor( Class type )
+        {
+            return (ClassDesc) _clsDescs.get( type );
+        }
+        
+        public Enumeration listDescriptors()
+        {
+            return _clsDescs.elements();
+        }
+        
+        public Enumeration listObjectTypes()
+        {
+            return _clsDescs.keys();
+        }
+        
     }
-
-
+    
+    
     static class EngineFactory
-	implements PersistenceFactory
+        implements PersistenceFactory
     {
-
-	private String _rootDN;
-
-	EngineFactory( String rootDN )
-	{
-	    _rootDN = rootDN;
-	}
-	
-	public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
-	{
-	    try {
-		return new MozillaEngine( (DAXClassDesc) clsDesc, _rootDN );
-	    } catch ( MappingException except ) {
-		return null;
-	    }
-	}
-
+        
+        private String _rootDN;
+        
+        EngineFactory( String rootDN )
+        {
+            _rootDN = rootDN;
+        }
+        
+        public Persistence getPersistence( ClassDesc clsDesc, PrintWriter logWriter )
+        {
+            try {
+                return new MozillaEngine( (DAXClassDesc) clsDesc, _rootDN );
+            } catch ( MappingException except ) {
+                return null;
+            }
+        }
+        
     }
 
 

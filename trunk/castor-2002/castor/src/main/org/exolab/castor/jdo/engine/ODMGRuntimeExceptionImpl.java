@@ -67,32 +67,32 @@ public class ODMGRuntimeExceptionImpl
 
     public ODMGRuntimeExceptionImpl( String message, Exception except )
     {
-	super( message );
-	_except = except;
+        super( message );
+        _except = except;
     }
 
 
     public Exception getException()
     {
-	return _except;
+        return _except;
     }
 
 
     public void printStackTrace()
     {
-	_except.printStackTrace();
+        _except.printStackTrace();
     }
 
 
     public void printStackTrace( PrintStream print )
     {
-	_except.printStackTrace( print );
+        _except.printStackTrace( print );
     }
 
 
     public void printStackTrace( PrintWriter print )
     {
-	_except.printStackTrace( print );
+        _except.printStackTrace( print );
     }
 
 

@@ -70,7 +70,7 @@ public interface XADirectorySource
      * @throws DirectoryException Directory access failed
      */
     public XADirectory getXADirectory()
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
@@ -82,7 +82,7 @@ public interface XADirectorySource
      * @throws DirectoryException Directory access failed
      */
     public XADirectory getXADirectory( String userDN, String password )
-	throws DirectoryException;
+        throws DirectoryException;
 
 
     /**
