@@ -65,6 +65,7 @@ import org.exolab.castor.util.Messages;
 /**
  * MAX key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="leonardo@itera.com.br">Leonardo Souza Mario Bueno</a>
  * @version $Revision$ $Date$
  * @see MaxKeyGeneratorFactory
  */
@@ -114,13 +115,20 @@ public final class MaxKeyGenerator implements KeyGenerator
         Object identity = null;
 
         try {
-            // Create SQL sentence of the form
-            // "SELECT pk FROM table WHERE pk=(SELECT MAX(t1.pk) FROM table t1)"
-            // with database-dependent keyword for lock
             query = _factory.getQueryExpression();
-            query.addColumn( tableName, primKeyName);
-            query.addCondition( tableName, primKeyName, QueryExpression.OpEquals,
-                    "(SELECT MAX(t1." + primKeyName + ") FROM " + tableName + " t1)");
+            if ( _factory.getFactoryName().equals( "mysql" ) ) {
+                // Create SQL sentence of the form
+                // "SELECT MAX(pk) FROM table"
+                query.addSelect("MAX(" + primKeyName + ")");
+                query.addTable(tableName);
+            } else {
+                // Create SQL sentence of the form
+                // "SELECT pk FROM table WHERE pk=(SELECT MAX(t1.pk) FROM table t1)"
+                // with database-dependent keyword for lock
+                query.addColumn( tableName, primKeyName);
+                query.addCondition( tableName, primKeyName, QueryExpression.OpEquals,
+                        "(SELECT MAX(t1." + primKeyName + ") FROM " + tableName + " t1)");
+            }
 
             // SELECT and put lock on the last record
             sql = query.getStatement( true );
