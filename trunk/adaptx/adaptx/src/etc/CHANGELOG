@@ -3,8 +3,13 @@ Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 The following are changes from different versions of Adaptx
 
-Version 0.9.8, October 1, 2003
+Version 0.9.8, October ??, 2003
 ---------------------------------
+
+-- Fixed *static* variable bug in the Lexer, should fix some problems
+   with certain operators being treated as a function name. This was
+   a regression from 0.9.5 (I think).
+   (kvisco - 2003-10-2)
 
 -- Added support for URIResolver in the JAXP implementation
    (kvisco - 2003-10-1)
