@@ -167,7 +167,7 @@ final class SQLEngine
     public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
-        return new SQLQuery( this, query.getStatement( _clsDesc.getAccessMode() == AccessMode.Exclusive), types );
+        return new SQLQuery( this, query.getStatement( _clsDesc.getAccessMode() == AccessMode.Locked), types );
     }
 
 
@@ -361,7 +361,7 @@ final class SQLEngine
         Object            stamp = null;
 
         try {
-            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.Exclusive ) ? _sqlLoadLock : _sqlLoad );
+            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.Locked ) ? _sqlLoadLock : _sqlLoad );
             stmt.setObject( 1, identity );
 
             rs = stmt.executeQuery();
@@ -681,12 +681,7 @@ final class SQLEngine
         public void execute( Object conn, AccessMode accessMode )
             throws QueryException, PersistenceException
         {
-            close();
             _lastIdentity = null;
-            /*
-            if ( _engine._logWriter != null )
-                _engine._logWriter.println( _sql );
-            */
             try {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i ) {
@@ -695,7 +690,11 @@ final class SQLEngine
                 }
                 _rs = _stmt.executeQuery();
             } catch ( SQLException except ) {
-                close();
+                if ( _stmt != null ) {
+                    try {
+                        _stmt.close();
+                    } catch ( SQLException e2 ) { }
+                }
                 throw new PersistenceExceptionImpl( except );
             }
         }
