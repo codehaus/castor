@@ -73,6 +73,7 @@ public class SchemaNames {
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String EXTENSION        = "extension";
+    public static final String FIELD            = "field";
     public static final String GROUP            = "group";
     public static final String INCLUDE          = "include";
     public static final String IMPORT           = "import";
@@ -85,6 +86,7 @@ public class SchemaNames {
     public static final String MIN_INCLUSIVE    = "minInclusive";
     public static final String RESTRICTION      = "restriction";
     public static final String SCHEMA           = "schema";
+    public static final String SELECTOR         = "selector";
     public static final String SEQUENCE         = "sequence";
     public static final String SIMPLETYPE_REF   = "simpletypeRef";
     public static final String SIMPLE_CONTENT   = "simpleContent";
@@ -109,6 +111,7 @@ public class SchemaNames {
     public static final String ORDER_ATTR       = "order";
     public static final String PROCESS_CONTENTS = "processContents";
     public static final String REF_ATTR         = "ref";
+    public static final String REFER_ATTR       = "refer";
     public static final String SCHEMALOCATION_ATTR = "schemaLocation";
     public static final String SOURCE_ATTR      = "source";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
@@ -116,6 +119,7 @@ public class SchemaNames {
     public static final String USE_ATTR         = "use";
     public static final String VALUE_ATTR       = "value";
     public static final String VERSION_ATTR     = "version";
+    public static final String XPATH_ATTR       = "xpath";
 
     //-- data types
     public static final String INTEGER_TYPE     = "integer";
