@@ -92,31 +92,22 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- handle remaining attributes
         String attValue = null;
         
-        //-- default
-        String defaultValue = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        //-- value
+        String defaultValue = atts.getValue(SchemaNames.VALUE_ATTR);
         _attribute.setDefaultValue(defaultValue);
         
-        //-- fixed
-        String fixedValue = atts.getValue(SchemaNames.FIXED_ATTR);
-        
-        if (fixedValue != null) {
-            if (defaultValue != null) {
-                //-- error
-            }
-            _attribute.setFixedValue(fixedValue);
+        //-- use
+        String useValue = atts.getValue(SchemaNames.USE_ATTR);
+        if (useValue == null) {
+            useValue = "default";
         }
+        _attribute.setUseValue(useValue);
         
         //-- type
         attValue = atts.getValue("type");
         if (attValue != null) {
-            _attribute.setDatatypeRef(attValue);
+            _attribute.setSimpletypeRef(attValue);
         }
-        //-- minOccurs
-        attValue = atts.getValue("minOccurs");
-        if (attValue != null) {
-            _attribute.setMinOccurs(toInt(attValue));
-        }
-        
         
     } //-- AttributeUnmarshaller
 
@@ -209,7 +200,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             NumberFacet facet = new NumberFacet(name);
             facet.setValue(facet.getValue());
             
-            _attribute.getDatatype().addFacet(facet);
+            _attribute.getSimpletype().addFacet(facet);
         }
         
         unmarshaller = null;

@@ -52,7 +52,7 @@ import org.exolab.castor.xml.schema.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public abstract class BuiltInType extends Datatype {
+public abstract class BuiltInType extends Simpletype {
 
     /**
      * The name of the binary type
@@ -216,8 +216,8 @@ public abstract class BuiltInType extends Datatype {
     } //-- BuiltInType
     
     /**
-     * Adds the given Facet to this Datatype.
-     * @param facet the Facet to add to this Datatype
+     * Adds the given Facet to this Simpletype.
+     * @param facet the Facet to add to this Simpletype
     **/
     public void addFacet(Facet facet) {
         String err = "Facets cannot be added to built-in types.";
@@ -231,8 +231,8 @@ public abstract class BuiltInType extends Datatype {
     public abstract short getType();
     
     /**
-     * Sets the source type for this datatype
-     * @param source the source type which this datatype inherits from
+     * Sets the source type for this simpletype
+     * @param source the source type which this simpletype inherits from
     **/
     public void setSourceRef(String source) {
         String err = "Primitives types cannot extend other types.";

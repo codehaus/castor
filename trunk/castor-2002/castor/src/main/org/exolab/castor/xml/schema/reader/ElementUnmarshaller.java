@@ -193,12 +193,12 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         if (SchemaNames.ANNOTATION.equals(name)) {
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
-        else if (SchemaNames.ARCHETYPE.equals(name)) {
+        else if (SchemaNames.COMPLEXTYPE.equals(name)) {
             unmarshaller 
-                = new ArchetypeUnmarshaller(_schema, atts, getResolver());
+                = new ComplextypeUnmarshaller(_schema, atts, getResolver());
         }
-        else if (SchemaNames.DATATYPE.equals(name)) {
-            throw new SAXException("<datatype> not yet supported for <element>.");
+        else if (SchemaNames.SIMPLETYPE.equals(name)) {
+            throw new SAXException("<simpletype> not yet supported for <element>.");
         }
         else illegalElement(name);
         
@@ -238,15 +238,15 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             Annotation ann = (Annotation)unmarshaller.getObject();
             _element.addAnnotation(ann);
         }
-        else if (SchemaNames.ARCHETYPE.equals(name)) {
+        else if (SchemaNames.COMPLEXTYPE.equals(name)) {
             
-            Archetype archetype = _element.getArchetype();
+            Complextype complextype = _element.getComplextype();
             
-            if (archetype != null) 
+            if (complextype != null) 
                 redefinedElement(name);
             
-            archetype = ((ArchetypeUnmarshaller)unmarshaller).getArchetype();
-            _element.setArchetype(archetype);
+            complextype = ((ComplextypeUnmarshaller)unmarshaller).getComplextype();
+            _element.setComplextype(complextype);
             
         } 
         

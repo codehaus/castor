@@ -151,20 +151,20 @@ public class MemberFactory {
             
         FieldInfo fieldInfo = null;
                 
-        Datatype datatype = attribute.getDatatype();
+        Simpletype simpletype = attribute.getSimpletype();
         XSType   xsType = null;
         
         boolean enumeration = false;
         
-        if (datatype != null) {
+        if (simpletype != null) {
             
-            if (datatype.hasFacet(Facet.ENUMERATION)) {
+            if (simpletype.hasFacet(Facet.ENUMERATION)) {
                 enumeration = true;
             
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                 ClassInfo cInfo = null;
                 if (resolver != null) {
-                    cInfo = resolver.resolve(datatype);
+                    cInfo = resolver.resolve(simpletype);
                 }
             
                 if (cInfo != null)
@@ -172,7 +172,7 @@ public class MemberFactory {
             }
             
             if (xsType == null)
-                xsType = TypeConversion.convertType(datatype);
+                xsType = TypeConversion.convertType(simpletype);
         }
         else
             xsType = new XSString();
@@ -218,7 +218,7 @@ public class MemberFactory {
             fieldInfo.setFixedValue(attribute.getFixedValue());
         }
         
-        //fieldInfo.setSchemaType(attribute.getDatatypeRef());
+        //fieldInfo.setSchemaType(attribute.getSimpletypeRef());
         
         //-- add annotated comments
         String comment = createComment(attribute);
@@ -257,15 +257,15 @@ public class MemberFactory {
         FieldInfo fieldInfo = null;
         XSType   xsType     = null;
         
-        Datatype datatype = eDecl.getDatatype();
-        if (datatype != null) {
+        Simpletype simpletype = eDecl.getSimpletype();
+        if (simpletype != null) {
             
             //-- handle special case for enumerated types
-            if (datatype.hasFacet(Facet.ENUMERATION)) {
+            if (simpletype.hasFacet(Facet.ENUMERATION)) {
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                 ClassInfo cInfo = null;
                 if (resolver != null) {
-                    cInfo = resolver.resolve(datatype);
+                    cInfo = resolver.resolve(simpletype);
                 }
                 
                 if (cInfo != null)
@@ -273,7 +273,7 @@ public class MemberFactory {
             }
             
             if (xsType == null) 
-                xsType = TypeConversion.convertType(datatype);
+                xsType = TypeConversion.convertType(simpletype);
         }
         else {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());

@@ -98,7 +98,7 @@ public class AppInfoUnmarshaller extends SaxUnmarshaller {
         //-- handle attributes
         String attValue = null;
             
-        _appInfo.setSource(atts.getValue(SchemaNames.SOURCE_ATTR));
+        _appInfo.setSource(atts.getValue(SchemaNames.BASE_ATTR));
         
     } //-- AppInfoUnmarshaller
 

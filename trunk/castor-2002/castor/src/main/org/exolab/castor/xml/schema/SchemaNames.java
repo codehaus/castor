@@ -59,10 +59,10 @@ public class SchemaNames {
     //-- element definitions
     public static final String ANNOTATION       = "annotation";
     public static final String APPINFO          = "appinfo";
-    public static final String ARCHETYPE        = "type";
+    public static final String COMPLEXTYPE      = "complextype";
     public static final String ATTRIBUTE        = "attribute";
-    public static final String DATATYPE_REF     = "datatypeRef";
-    public static final String DATATYPE         = "datatype";
+    public static final String SIMPLETYPE_REF   = "simpletypeRef";
+    public static final String SIMPLETYPE       = "simpletype";
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";
@@ -73,17 +73,16 @@ public class SchemaNames {
     public static final String MIN_EXCLUSIVE    = "minExclusive";
     public static final String MIN_INCLUSIVE    = "minInclusive";
     
-    
     //-- Attr name definitions
     public static final String CONTENT_ATTR     = "content";
-    public static final String DEFAULT_ATTR     = "default";
-    public static final String FIXED_ATTR       = "fixed";
     public static final String MAX_OCCURS_ATTR  = "maxOccurs";
     public static final String MIN_OCCURS_ATTR  = "minOccurs";
     public static final String NAME_ATTR        = "name";
     public static final String ORDER_ATTR       = "order";
-    public static final String SOURCE_ATTR      = "source";
+    public static final String BASE_ATTR        = "base";
     public static final String TARGET_NS_ATTR   = "targetNamespace";
+    public static final String ID_ATTR          = "id";
+    public static final String REF_ATTR         = "ref";
     public static final String TYPE_ATTR        = "type";
     public static final String USE_ATTR         = "use";
     public static final String VALUE_ATTR       = "value";

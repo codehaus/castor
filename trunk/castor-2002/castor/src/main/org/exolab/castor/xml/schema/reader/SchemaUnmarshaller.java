@@ -258,19 +258,19 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         
         //-- <type>
-        if (name == SchemaNames.ARCHETYPE) {
+        if (name == SchemaNames.COMPLEXTYPE) {
             unmarshaller 
-                = new ArchetypeUnmarshaller(_schema, atts, _resolver);
+                = new ComplextypeUnmarshaller(_schema, atts, _resolver);
         } 
         //-- <element>
         else if (name == SchemaNames.ELEMENT) {
             unmarshaller 
                 = new ElementUnmarshaller(_schema, atts, _resolver);
         }
-        //-- <datatype>
-        else if (name == SchemaNames.DATATYPE) {
+        //-- <simpletype>
+        else if (name == SchemaNames.SIMPLETYPE) {
             unmarshaller 
-                = new DatatypeUnmarshaller(_schema, atts, _resolver);
+                = new SimpletypeUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here
@@ -332,22 +332,22 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- call unmarshaller.finish() to perform any necessary cleanup
         unmarshaller.finish();
         
-        if (name == SchemaNames.ARCHETYPE) {
-            Archetype archetype = null;
-            archetype = ((ArchetypeUnmarshaller)unmarshaller).getArchetype();
-            _schema.addArchetype(archetype);
-            if (archetype.getName() != null) {
-                _resolver.addResolvable(archetype.getReferenceId(), archetype);
+        if (name == SchemaNames.COMPLEXTYPE) {
+            Complextype complextype = null;
+            complextype = ((ComplextypeUnmarshaller)unmarshaller).getComplextype();
+            _schema.addComplextype(complextype);
+            if (complextype.getName() != null) {
+                _resolver.addResolvable(complextype.getReferenceId(), complextype);
             }
             else {
-                System.out.println("warning: top-level archetype with no name.");
+                System.out.println("warning: top-level complextype with no name.");
             }
         }
-        else if (name == SchemaNames.DATATYPE) {
-            Datatype datatype = null;
-            datatype = ((DatatypeUnmarshaller)unmarshaller).getDatatype();
-            _schema.addDatatype(datatype);
-            _resolver.addResolvable(datatype.getReferenceId(), datatype);
+        else if (name == SchemaNames.SIMPLETYPE) {
+            Simpletype simpletype = null;
+            simpletype = ((SimpletypeUnmarshaller)unmarshaller).getSimpletype();
+            _schema.addSimpletype(simpletype);
+            _resolver.addResolvable(simpletype.getReferenceId(), simpletype);
         }
         else if (name == SchemaNames.ELEMENT) {
             ElementDecl element = null;
