@@ -581,18 +581,29 @@ public class UnmarshalHandler implements DocumentHandler {
                 //-- Handle support for "Any" type
                 if (_class == Object.class) {
                     
-                    //-- create class name
-                    String cname = MarshalHelper.toJavaName(name,true);
-                    
-                    //-- use parent to get package information
                     Class pClass = parentState.classDesc.getJavaClass();
-                    String pkg = pClass.getName();
-                    int idx = pkg.lastIndexOf('.');
-                    if (idx > 0) {
-                        pkg = pkg.substring(0,idx);
-                        cname = pkg + cname;
+                    ClassLoader loader = pClass.getClassLoader();
+                    
+                    //-- first look for a descriptor based
+                    //-- on the XML name
+                    
+                    classDesc = _cdResolver.resolveByXMLName(name, loader);
+                    
+                    //-- if null, create classname, and try resolving
+                    if (classDesc == null) {
+                        //-- create class name
+                        String cname = MarshalHelper.toJavaName(name,true);
+                        
+                        //-- use parent to get package information
+                        String pkg = pClass.getName();
+                        int idx = pkg.lastIndexOf('.');
+                        if (idx > 0) {
+                            pkg = pkg.substring(0,idx);
+                            cname = pkg + cname;
+                        }
+                        classDesc = getClassDescriptor(cname, loader);
                     }
-                    classDesc = getClassDescriptor(cname, pClass.getClassLoader());
+                    
                     if (classDesc != null) {
                         _class = classDesc.getJavaClass();
                     }
