@@ -14,6 +14,18 @@
     <a href="{.}"><xsl:copy-of select="."/></a>
   </xsl:template>
 
+  <xsl:template match="javadoc">
+    <xsl:choose>
+      <xsl:when test="@type='package'">
+        <a href="javadoc/{translate(.,'.','/')}/package-summary.html"><xsl:copy-of select="."/></a>
+      </xsl:when>
+      <xsl:otherwise>
+        <a href="javadoc/{translate(.,'.','/')}.html"><xsl:copy-of select="."/></a>
+      </xsl:otherwise>
+    </xsl:choose>
+
+  </xsl:template>
+
   <xsl:template match="headline">
     <div>
       <span class="small"><xsl:apply-templates/></span>

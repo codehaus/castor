@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/cvs.xml">
+<document url="http://castor.exolab.org/origins.xml">
   <body>
     <title>About The Origins Of The Name</title>
     <header>
@@ -7,7 +7,7 @@
 
       <p>First, let me say you are not the first to ask this question, and you won't be the last.
          For many, the term "Castor" has a mysterious aura which leaves the user with a craving,
-         a necessity if you must, of wanting an explaination. The need to understand has plagued
+         a necessity if you must, of wanting an explanation. The need to understand has plagued
          people of the human race for some time now.</p>
 
       <p>Some have speculated that Castor comes from the heavens. Either being an astronomer or
@@ -39,7 +39,7 @@
          follows. XML is based on "trees" or "groves". A beaver cuts down trees. Therefore Castor
          removes the notion of trees from processing XML documents. This is an interesting observation
          in that Castor does just that. Castor eliminates the "tree" methodology when dealing with XML.
-         It is an XML databinding framework which allows you to deal directly with your data, instead
+         It is an XML data binding framework which allows you to deal directly with your data, instead
          of thinking in terms of a "tree".</p>
 
       <p>Another equally good speculation is that a beaver is one of the cutest little animals in

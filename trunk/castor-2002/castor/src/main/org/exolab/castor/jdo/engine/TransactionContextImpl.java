@@ -57,6 +57,7 @@ import javax.transaction.xa.XAResource;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.persist.TransactionAbortedException;
 
 
 /**
@@ -152,7 +153,7 @@ final class TransactionContextImpl
     */
 
     protected void commitConnections( boolean keepOpen )
-	throws PersistenceException
+	throws TransactionAbortedException
     {
 	Enumeration enum;
 	Connection  conn;
@@ -169,15 +170,25 @@ final class TransactionContextImpl
 		    conn.commit();
 		    if ( keepOpen )
 			conn.setAutoCommit( false );
-		    else
-			conn.close();
 		}
 	    }
 	} catch ( SQLException except ) {
-	    throw new PersistenceException( except );
+	    // [oleg] Check for rollback exception based on X/Open error code
+	    if ( except.getSQLState() != null &&
+		 except.getSQLState().startsWith( "40" ) )
+		throw new TransactionAbortedException( except );
+
+	    throw new TransactionAbortedException( except );
 	} finally {
-	    if ( ! keepOpen )
+	    if ( ! keepOpen ) {
+		enum = _conns.elements();
+		while ( enum.hasMoreElements() ) {
+		    try {
+			( (Connection) enum.nextElement() ).close();
+		    } catch ( SQLException except ) { }
+		}
 		_conns.clear();
+	    }
 	}
     }
 

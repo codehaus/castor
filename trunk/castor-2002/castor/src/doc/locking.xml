@@ -74,9 +74,9 @@
            A transaction can always upgrade from a read lock to a write lock if no other
            transaction holds a read lock.</p>
 
-        <p>When a transaction requestes a lock which cannot be acquired, the transaction is
+        <p>When a transaction requests a lock which cannot be acquired, the transaction is
            put on the waiting list and is blocked until the lock is released, or the
-           transaction has timedout. A transaction can only wait to acquire one lock at any
+           transaction has timed out. A transaction can only wait to acquire one lock at any
            given time, but multiple transactions may wait to acquire the same lock.</p>
 
       </section>
@@ -117,7 +117,7 @@
            transactions is investigated to determine whether they are blocked (directly or
            indirectly) throw a lock belonging to T2.</p>
 
-        <p>In this example all transations holding a lock on O1 are considerd as blocking T2.
+        <p>In this example all transactions holding a lock on O1 are considered as blocking T2.
            Of these, T1 is a blocked transaction (waiting on T2). T2 is known to be locked
            directly by T2, and so a deadlock is identifier.</p>
 

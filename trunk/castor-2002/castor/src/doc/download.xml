@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/cvs.xml">
+<document url="http://castor.exolab.org/download.xml">
   <body>
     <title>Download</title>
     <header>
       <ul>For FTP access use <url>ftp://ftp.exolab.org/pub</url>.
-        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.5.jar</url><br/>
+        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.6.jar</url><br/>
              The Castor JAR</li>
-        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.5.tar.gz</url><br/>
+        <li><url>http://www.exolab.org/ftp/jars/castor-0.7.6.tar.gz</url><br/>
             The Castor JAR, dependent JARs, XML schemas, command line tools
             and examples</li>
-        <li><url>http://www.exolab.org/ftp/doc/castor-0.7.5-doc.jar</url><br/>
+        <li><url>http://www.exolab.org/ftp/doc/castor-0.7.6-doc.jar</url><br/>
             Documentation and JavaDocs</li>
-        <li><url>http://www.exolab.org/ftp/src/castor-0.7.5-src.tar.gz</url><br/>
+        <li><url>http://www.exolab.org/ftp/src/castor-0.7.6-src.tar.gz</url><br/>
             Full CVS snapshot: all sources, docs, libraries</li>
       </ul>
 

@@ -31,7 +31,7 @@
         </tr>
         <tr>
           <td bgcolor="#565680" align="center">
-            <font color="white">Concurrency</font>
+            <font color="white">Persistence</font>
             <table border="0" cellspacing="8" cellpadding="12">
               <tr>
                 <td bgcolor="#676799" align="center"><font color="white">Transactions</font></td>
@@ -43,7 +43,7 @@
         </tr>
         <tr>
           <td bgcolor="#565680" align="center">
-            <font color="white">Connectors</font>
+            <font color="white">Service Providers</font>
             <table border="0" cellspacing="8" cellpadding="8">
               <tr>
                 <td bgcolor="#676799" align="center"><font color="white">SQL 92</font></td>
@@ -62,55 +62,84 @@
          consist of interfaces as well as semantics that make them suitable for a particular
          type of applications.</p>
 
-      <p>At the medium level are the Castor concurrency engines. These engines expose their
-         own low-level API that is exposed to the application through the top API layer.
-         The concurrency engines take care of object caching, locking and deadlock detection,
-         transactional integrity, and two phase commit.</p>
+      <p>At the medium level is the Castor persistence mechanism. The persistence mechanism exposes
+         itself to the application through the application level APIs. These typically have a
+         one to one mapping with the persistence mechanism API. The persistence mechanism takes
+         care of object caching and rollback, locking and deadlock detection, transactional integrity,
+         and two phase commit.</p>
 
-      <p>At the bottom level are the Castor connectors. These engines provide the persistence
+      <p>At the bottom level are the Castor service providers. SPIs provide the persistence
          and query support into a variety of persistence mechanism. This version of Castor
-         is bundled with an SQL 92 and LDAP persistence engine. Additional engines can be
-         added, for example, alternative engines streamlined for Oracle, Sybase, DB2 and
-         other databases.</p>
+         is bundled with an SQL 92 and LDAP persistence SPIs. Additional SPIs can be added,
+         for example, alternative engines streamlined for Oracle, Sybase, DB2 and other databases.</p>
 
-      <p>This document will decribes the concurrency and connector APIs to allow for those
-         interested in adding new top level APIs and new connectors.</p>
+      <p>This document will describe the persistence mechanism API and SPI to allow for those
+         interested in adding new top level APIs or service providers.</p>
 
     </section>
 
 
-    <section title="Concurrency">
+    <section title="Persistence API">
 
-      <p>The concurrency layer is responsible for object caching, locking, and transaction
-         integrity. All data access goes through the concurrency engine. Transactions are
-         required for database operations through the EJB and ODMG APIs. In Castor transactions
-         have been added to none database operations such as LDAP and shared object spaces.</p>
+      <p>The persistence mechanism is responsible for object caching and rollback, locking and
+         deadlock detection, transaction integrity and two phase commit. All data access goes
+         through the persistence mechanism. All operations are performed in the context of a
+         transaction, even if the underlying SPI does not support transactions (e.g. LDAP).</p>
+
+      <p>The persistence API is defined in the package <javadoc type="package">org.exolab.castor.persist</javadoc>.
+         The persistence mechanism implements the <javadoc>org.exolab.castor.persist.PersistenceEngine</javadoc>
+         interface, which allows objects to be loaded, created, deleted and locked in the
+         context of a transaction. The actual implementation is obtained from
+         <javadoc>org.exolab.castor.persist.PersistenceEngineFactory</javadoc>.</p>
+
+      <p>All operations are performed through the context of a transaction. A transaction is
+         required in order to properly manage locking and caching, and to automatically commit or
+         rollback objects at transaction termination (write-at-commit). Persistence operations are
+         performed through the <javadoc>org.exolab.castor.persist.TransactionContext</javadoc>
+         interface.</p>
+
+       <p>The actual implementation of a transaction context is specific to each application API
+          and set of SPIs. One is created from an <javadoc>org.exolab.castor.persist.XAResourceSource</javadoc>
+          which abstracts the data source for the purpose of connection pooling and XA transaction enlistment.
+          A default implementation of <tt>XAResource</tt> is available from
+          <javadoc>org.exolab.castor.persist.XAResourceImpl</javadoc>.</p>
 
       <section title="Transactions">
 
-        <p>Every operation in the top level APIs is performed within the context of a transaction.
-           This allows changes to occur when the transaction commits and to be cancelled when the
-           transaction rolls back. Using a transactional API relieves the application developer
-           from worrying about the commit/rollback phase. In addition it allows complex
+        <p>Every persistence operation is performed within the context of a transaction.
+           This allows changes to objects to be saved when the transaction commits and to be rolled back
+           when the transaction aborts. Using a transactional API relieves the application developer
+           from worrying about the commit/rollback phase. In addition it allows distributed
            transactions to be managed by a transactional environment, such as an EJB server.</p>
 
         <p>Each time an object is retrieved or created the operation is performed in the context
            of a transaction and the object is recorded with the transaction and locked. When
            the transaction completes, the modified object is persisted automatically. If not all
-           objects can be persisted, the transaction rolls back.</p>
+           objects can be persisted, the transaction rolls back. The transaction context implements
+           full two phase commit.</p>
 
         <p>Each transaction sees it's own view of the objects it retrieves from persistent
            storage. Until the transaction commit, these changes are viewable only within that
-           transaction. If the transaction rollbacks, the objects are automatically reverted
+           transaction. If the transaction rolled back, the objects are automatically reverted
            to their state in persistent storage.</p>
 
-        <p>The transaction context (<tt>org.exolab.castor.persist.TransactionContext</tt>) is
-           the only mechanism by which the top level APIs can interact with the persistence
-           engine. A new transaction must be opened in order to perform any operation and.
-           In a container managed environment (e.g. an EJB server), transactions are started
-           and completed by the container. The container interacts with Castor through the
-           JTA <tt>XAResource</tt> interface (<tt>org.exolab.castor.persist.XAResourceImpl</tt>).</p>
-         
+        <p>The transaction context (<javadoc>org.exolab.castor.persist.TransactionContext</javadoc>)
+           is the only mechanism by which the top level APIs can interact with the persistence
+           engine. A new transaction must be opened in order to perform any operation and.</p>
+
+        <p>A transaction context is not created directly, but through a derived class that implements
+           the proper mechanism for obtaining a new connection, committing and rolling back the
+           connection. Note that commit and rollback operations are only required in a non-JTA
+           environment. When running inside a JTA environment (e.g. an EJB server), the container
+           is responsible to commit/rollback the underlying connection.</p>
+
+        <p>Application level APIs implement data sources that can be enlisted directly with the
+           transaction monitor through the JTA <tt>XAResource</tt> interface. A data source can
+           be implemented using <javadoc>org.exolab.castor.persist.XAResourceSource</javadoc>
+           which serves as a factory for new transaction contexts and
+           <javadoc>org.exolab.castor.persist.XAResourceImpl</javadoc> which provides an <tt>XAResource</tt>
+           implementation.</p>
+
       </section>
 
       <section title="OIDs and Locks">
@@ -118,8 +147,7 @@
         <p>Each object participating in a transaction is associated with an object identifier,
            or <b>OID</b> (<tt>org.exolab.castor.persist.OID</tt>). The OID identifies the object
            through its type and identity value. The identity object must be unique across all
-           OIDs for the same object type in the same persistence space (i.e cache engine,
-           see <a href="#Cache Engine">below</a>).</p>
+           OIDs for the same object type in the same persistence engine.</p>
 
         <p>Each object is also associated with a lock (<tt>org.exolab.castor.persist.ObjectLock</tt>).
            An <b>object lock</b> supports read and write locks with deadlock detection. Any number of
@@ -133,13 +161,14 @@
            transaction, or requires a write lock on an object which is read-locked by another
            transaction, the transaction will block until the lock is released, or the lock
            timeout has elapsed. The lock timeout is a property of the transaction and is
-           specified in seconds. A <tt>LockNotGrantedException</tt> is thrown if the lock
-           could not be acquired within the specified timeout.</p>
+           specified in seconds. A <javadoc>org.exolab.castor.persist.LockNotGrantedException</javadoc>
+           is thrown if the lock could not be acquired within the specified timeout.</p>
 
         <p>This locking mechanism can lead to the possibility of a deadlock. The object lock
-           mechanism provides automatic <b>deadlock</b> detection.</p>
+           mechanism provides automatic deadlock detection by tracking blocked transactions,
+           without depending on a lock wait to timeout.</p>
 
-        <p>Write locks and exclusive locks are always delegated down to the presistence storage.
+        <p>Write locks and exclusive locks are always delegated down to the persistence storage.
            In a distributed environment the database server itself provides the distributed
            locking mechanism. This approach assures proper concurrency control in a distributed
            environments where multiple application servers access the same database server.</p>
@@ -150,7 +179,9 @@
 
         <p>The concurrency engine includes a layer that acts as a cache engine. This layer is
            particularly useful for implementing optimistic locking and reducing synchronization
-           with the database layer. It is also used to perform dirty checks and object rollback.</p>
+           with the database layer. It is also used to perform dirty checks and object rollback.
+           The cache engine is implemented in <tt>org.exolab.castor.persist.CacheEngine</tt> and
+           exposed to the application through the <javadoc>org.exolab.castor.persist.PersistenceEngine</javadoc>.</p>
 
         <p>When an object is retrieved from persistent storage it is placed in the cache engine.
            Subsequent requests to retrieve the same object will return the cached copy (with the
@@ -180,7 +211,7 @@
 
         <p>When an object is retrieved for read/write access, if a copy of the object exists
            in the cache, that copy will be used. A read lock will be acquired in the cache
-           engine, preventing other Castor transactions from deleting or modifyin the object.
+           engine, preventing other Castor transactions from deleting or modifying the object.
            However, no lock is acquired in persistent storage, allowing other applications to
            delete or modify the object while the Castor transaction is in progress.</p>
 
@@ -218,37 +249,45 @@
 
       </section>
 
+      <section title="QueryResults">
+
+         <p>TBD</p>
+
+      </section>
+
     </section>
 
 
-    <section title="Connector">
+    <section title="Service Providers (SPI)">
 
-      <p>Castor supports a connector architecture that allows different presistence storage
-         connectors to be plugged in. The default implementation includes an SQL 92 connector
-         and an LDAP connector. Additional connectors will be available optimized for a
+      <p>Castor supports a service provider architecture that allows different persistence storage
+         providers to be plugged in. The default implementation includes an SQL 92 provider and an
+         and an LDAP provider. Additional providers will be available optimized for a
          particular database server or other storage mechanisms.</p>
 
-      <p>The connector is defined through two interfaces, <tt>org.exolab.castor.persist.Persistence</tt>
-         and <tt>org.exolab.castor.persist.Query</tt>. The first provides creation, deletion, update and
-         lock services. The second is used to retrieve objects as the result of an update.</p>
-
+      <p>The service provider is defined through two interfaces, <javadoc>org.exolab.castor.persist.spi.Persistence</javadoc>
+         and <javadoc>org.exolab.castor.persist.spi.PersistenceQuery</javadoc>. The first provides creation,
+         deletion, update and lock services, the second is used to process queries and result sets.
+         Service providers are obtained through the <javadoc>org.exolab.castor.persist.spi.PersistenceFactory</javadoc>
+         interface.</p>
+         
       <section title="Persistence">
 
-        <p>The interface <tt>org.exolab.castor.persist.Persistence</tt> defines the contract between
-           the concurrency engine and a persistence storage connector. Each persistence space (i.e.
-           database server, directory server) is associated with a single cache engine, which in turn
-           contains a number of persistence connectors, one per object type. Persistence connectors
-           are acquired through a <tt>org.exolab.castor.persist.PersistenceFactory</tt> interface,
-           which is asked by each cache engine to return implementations for all the object types
-           supported by that cache engine.</p>
+        <p>The interface <javadoc>org.exolab.castor.persist.spi.Persistence</javadoc> defines the contract
+           between the persistence mechanism and a persistence service provider. Each persistence storage
+           (i.e. database server, directory server) is associated with a single persistence engine,
+           which in turn contains a number of service providers, one per object type. Service providers
+           are acquired through a <javadoc>org.exolab.castor.persist.spi.PersistenceFactory</javadoc> interface,
+           which is asked by each persistence engine to return implementations for all the object types
+           supported by that persistence engine.</p>
 
         <p>The object's identity is an object that unique identifies the object within persistent
            storage. Typically this would be the primary key on a table, or an RDN for LDAP.
            The identity object may be a simple type (e.g. integer, string) or a complex type.
            For more information refer to the <a href="mapping.xml">mapping specification</a>.</p>
 
-        <p>The persistent connector may support the stamp mechanism for efficiently tracking
-           dirty objects. The stamp mechanism is a unique identifier of the persistent object
+        <p>The service provider may support the stamp mechanism for efficiently tracking dirty
+           objects. The stamp mechanism is a unique identifier of the persistent object
            that changes when the object is modified in persistent storage. For example, a RAWID
            in Oracle or TIMESTAMP in Sybase. If a stamp is return by certain operations it will
            be stored with the object's OID and passed along to the store method.</p>
@@ -288,9 +327,9 @@
 
         <p>The <tt>delete</tt> method is called to delete an object from persistent storage.
            The delete method is called when the transaction commits and expects the object to
-           deleted, if it existed. This method is not called when the transaction rollsback,
+           deleted, if it exists. This method is not called when the transaction rolls back,
            objects created during the transaction with the create method are automatically
-           rolledback by the pesistent storage mechanism.</p>
+           rolled back by the persistent storage mechanism.</p>
 
         <p>The <tt>writeLock</tt> method is called to obtain a write lock on an object for
            which only a read lock was previously obtained. The <tt>changeIdentity</tt> method
@@ -299,17 +338,18 @@
 
       </section>
 
-      <section title="Query">
+      <section title="PersistenceQuery">
 
-        <p>The interface <tt>org.exolab.castor.persist.Query</tt> defines the contract between
-           the concurrency engine and a query mechanism.</p>
-
-      </section>
-
-      <section title="ConnectionFactory">
+        <p>The interface <javadoc>org.exolab.castor.persist.spi.PersistenceQuery</javadoc> defines
+           the contract between the persistence engine and a query mechanism.</p>
 
       </section>
 
+    </section>
+
+    <section title="Enterprise JavaBeans CMP">
+
+      <p>TBD</p>
 
     </section>
 
