@@ -476,7 +476,7 @@ public class ClassMolder {
         Persistence persist;
         ClassDescriptor desc;
 
-        DatingService ds = new DatingService( ClassLoader.getSystemClassLoader() );
+        DatingService ds = new DatingService( loader.getClassLoader() );
 
         enum = loader.listJavaClasses();
         while ( enum.hasMoreElements() ) {
