@@ -232,20 +232,29 @@ public class XMLClassDescriptorImpl extends Validator
     **/
     public void addFieldDescriptor(XMLFieldDescriptor descriptor) {
 
-	    descriptor.setContainingClassDescriptor( this );
-
+        boolean added = false;
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
             case NodeType.ATTRIBUTE:
-                attributeDescriptors.add(descriptor);
+                if (!attributeDescriptors.contains(descriptor)) {
+                    attributeDescriptors.add(descriptor);
+                    added = true;
+                }
                 break;
             case NodeType.TEXT:
                 contentDescriptor = descriptor;
+                added = true;
                 break;
             default:
-                elementDescriptors.add(descriptor);
+                if (!elementDescriptors.contains(descriptor)) {
+                    elementDescriptors.add(descriptor);
+                    added = true;
+                }
                 break;
         }
+        if (added) {
+	        descriptor.setContainingClassDescriptor( this );
+	    }
 
     } //-- addFieldDescriptor
 
