@@ -1,3 +1,15 @@
+
+Version 0.7.1
+----------------------------
+
+- Added binary, and boolean types to the source code generator
+  for Castor XML
+  - binary types will be mapped to byte[] by default, and will
+    be Base64 encoded and decoded automatically
+  - boolean type is an enumeration of "true" or "false"
+
+
+
 Version 0.7  January 7, 2000
 ----------------------------
 
