@@ -87,22 +87,30 @@ final class TransactionContextImpl
 
 
     /**
+     * True if running inside a global transaction and should not
+     * attempt to commit/rollback directly.
+     */
+    private boolean     _globalTx;
+
+
+    /**
      * Create a new transaction context.
      */
-    public TransactionContextImpl()
+    public TransactionContextImpl( boolean globalTx )
     {
         super();
+        _globalTx = globalTx;
     }
 
 
-    protected void commitConnections( boolean keepOpen )
+    protected void commitConnections()
         throws TransactionAbortedException
     {
         Enumeration enum;
         Connection  conn;
         
         try {
-            if ( getXid() == null ) {
+            if ( ! _globalTx ) {
                 // Go through all the connections opened in this transaction,
                 // commit and close them one by one.
                 enum = _conns.elements();
@@ -111,8 +119,6 @@ final class TransactionContextImpl
                     // Checkpoint can only be done if transaction is not running
                     // under transaction monitor
                     conn.commit();
-                    if ( keepOpen )
-                        conn.setAutoCommit( false );
                 }
             }
         } catch ( SQLException except ) {
@@ -123,15 +129,13 @@ final class TransactionContextImpl
             
             throw new TransactionAbortedExceptionImpl( except );
         } finally {
-            if ( ! keepOpen ) {
-                enum = _conns.elements();
-                while ( enum.hasMoreElements() ) {
-                    try {
-                        ( (Connection) enum.nextElement() ).close();
-                    } catch ( SQLException except ) { }
-                }
-                _conns.clear();
+            enum = _conns.elements();
+            while ( enum.hasMoreElements() ) {
+                try {
+                    ( (Connection) enum.nextElement() ).close();
+                } catch ( SQLException except ) { }
             }
+            _conns.clear();
         }
     }
 
@@ -141,7 +145,7 @@ final class TransactionContextImpl
         Connection  conn;
         Enumeration enum;
         
-        if ( getXid() == null ) {
+        if ( ! _globalTx ) {
             // Go through all the connections opened in this transaction,
             // rollback and close them one by one. Ignore errors.
             enum = _conns.elements();
@@ -171,8 +175,9 @@ final class TransactionContextImpl
                 // transaction association in the engine inflates the
                 // code size in other places.
                 conn = DatabaseRegistry.createConnection( engine );
-                if ( getXid() == null )
+                if ( ! _globalTx ) {
                     conn.setAutoCommit( false );
+                }
                 _conns.put( engine, conn );
             } catch ( SQLException except ) {
                 throw new PersistenceExceptionImpl( except );
