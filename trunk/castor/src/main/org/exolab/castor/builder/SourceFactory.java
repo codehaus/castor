@@ -88,11 +88,12 @@ import java.util.Vector;
 /**
  * This class creates the Java Source classes for Schema
  * components
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @author <a href="mailto:kvisco@intalio.com">Arnaud Blandin</a>
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
-**/
-public class SourceFactory  {
+ */
+public class SourceFactory {
     
     
 
@@ -140,28 +141,47 @@ public class SourceFactory  {
     */
     private boolean _sax1 = false;
 
-
+    /**
+     * The BuilderConfiguration instance
+     */
+    private BuilderConfiguration _config = null;
+    
+    /**
+     * The TypeConversion instance to use for mapping
+     * SimpleTypes into XSTypes
+     */
+    private TypeConversion _typeConversion = null;
+    
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
-    **/
-    public SourceFactory() {
-        this(null);
+     *
+     * @param config the BuilderConfiguration instance (must not be null).
+     */
+    public SourceFactory(BuilderConfiguration config) {
+        this(config, null);
     } //-- SourceFactory
 
 
     /**
      * Creates a new SourceFactory with the given FieldInfoFactory
+     *
+     * @param config the BuilderConfiguration instance (must not be null).
      * @param infoFactory the FieldInfoFactory to use
-    */
-    public SourceFactory(FieldInfoFactory infoFactory) {
+     */
+    public SourceFactory(BuilderConfiguration config, FieldInfoFactory infoFactory) {
         super();
+        if (config == null) {
+            String error = "The argument 'config' must not be null.";
+            throw new IllegalArgumentException(error);
+        }
+        _config = config;
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
             this.infoFactory = infoFactory;
-
-        this.memberFactory = new MemberFactory(infoFactory);
-
+        
+        this.memberFactory = new MemberFactory(config, infoFactory);
+        _typeConversion = new TypeConversion(_config);
     } //-- SourceFactory
 
    /**
@@ -177,6 +197,32 @@ public class SourceFactory  {
         _createMarshalMethods = createMarshalMethods;
     } //-- setCreateMarshalMethpds
 
+    /**
+     * Sets whether or not to create extra collection methods
+     * for accessing the actual collection
+     *
+     * @param extraMethods a boolean that when true indicates that
+     * extra collection accessor methods should be created. False
+     * by default.
+     * @see setReferenceMethodSuffix
+     */
+    public void setCreateExtraMethods(boolean extraMethods) {
+        infoFactory.setCreateExtraMethods(extraMethods);
+    } //-- setCreateExtraMethods
+    
+    /**
+     * Sets the method suffix (ending) to use when creating
+     * the extra collection methods.
+     *
+     * @param suffix the method suffix to use when creating
+     * the extra collection methods. If null or emtpty the default
+     * value, as specified in CollectionInfo will be used.
+     * @see setCreateExtraMethods
+     */
+    public void setReferenceMethodSuffix(String suffix) {
+        infoFactory.setReferenceMethodSuffix(suffix);
+    } //-- setReferenceMethodSuffix
+    
     /**
      * Sets whether or not to create the XML marshalling framework specific
      * methods (marshall, unmarshall, validate) in the generated classes.
@@ -305,7 +351,7 @@ public class SourceFactory  {
                      //--move the view and keep the structure
                      Annotated saved = component.getAnnotated();
                      String previousPackage = component.getJavaPackage();
-                     XMLBindingComponent baseComponent = new XMLBindingComponent();
+                     XMLBindingComponent baseComponent = new XMLBindingComponent(_config);
                      baseComponent.setBinding(component.getBinding());
                      baseComponent.setView(complexType);
                      String baseClassName = null;
@@ -449,7 +495,7 @@ public class SourceFactory  {
                     else if (complexType.getContentType().getType() == ContentType.SIMPLE) {
                         SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
                         SimpleType temp = simpleContent.getSimpleType();
-                        XSType xsType = TypeConversion.convertType(temp, packageName);
+                        XSType xsType = _typeConversion.convertType(temp, packageName);
                         FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		                handleField(fieldInfo,state);
 		                temp = null;
@@ -526,7 +572,7 @@ public class SourceFactory  {
                //-- #marshal()
                createMarshalMethods(jClass);
                //-- #unmarshal()
-               createUnmarshalMethods(jClass);
+               createUnmarshalMethods(jClass, sgState);
            }
 		}
 
@@ -619,7 +665,7 @@ public class SourceFactory  {
 
         String className   = JavaNaming.toJavaClassName(typeName);
         
-        XMLBindingComponent comp = new XMLBindingComponent();
+        XMLBindingComponent comp = new XMLBindingComponent(_config);
         if (_binding != null) {
             comp.setBinding(_binding);
         }
@@ -884,15 +930,15 @@ public class SourceFactory  {
 
     } //-- createMarshalMethods
 
-    private void createUnmarshalMethods(JClass parent) {
+    private void createUnmarshalMethods(JClass parent, SGStateInfo sgState) {
 
         //-- mangle method name to avoid compiler errors when this class is extended
 		String methodName = "unmarshal";
-		if (SourceGenerator.mappingSchemaType2Java())
+		if (sgState.getSourceGenerator().mappingSchemaType2Java())
 			methodName+= parent.getName(true);
 
 		//-- create main marshal method
-        JMethod jMethod = new JMethod(parent,methodName);
+        JMethod jMethod = new JMethod(SGTypes.Object ,methodName);
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -1219,7 +1265,7 @@ public class SourceFactory  {
             return;
 
         Enumeration enum = complexType.getAttributeDecls();
-        XMLBindingComponent component = new XMLBindingComponent();
+        XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
@@ -1249,7 +1295,7 @@ public class SourceFactory  {
     private void processComplexType
         (ComplexType complexType, FactoryState state)
     {
-        XMLBindingComponent component = new XMLBindingComponent();
+        XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
         component.setView(complexType);
         
@@ -1306,7 +1352,7 @@ public class SourceFactory  {
             if (complexType.getContentType().getType() == ContentType.SIMPLE) {
                 SimpleContent simpleContent = (SimpleContent)complexType.getContentType();
                 SimpleType temp = simpleContent.getSimpleType();
-                XSType xsType = TypeConversion.convertType(temp, state.packageName);
+                XSType xsType = _typeConversion.convertType(temp, state.packageName);
                 FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(xsType);
 		        handleField(fieldInfo,state);
             }
@@ -1350,7 +1396,7 @@ public class SourceFactory  {
         Enumeration enum = contentModel.enumerate();
 
         FieldInfo fieldInfo = null;
-        XMLBindingComponent component = new XMLBindingComponent();
+        XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
         
         while (enum.hasMoreElements()) {
@@ -1392,6 +1438,14 @@ public class SourceFactory  {
                     if (!( (contentModel instanceof ComplexType)||
                             (contentModel instanceof ModelGroup)) )
                     {
+                        
+                        if (contentModel instanceof ModelGroup) {
+                            ModelGroup mg = (ModelGroup)contentModel;
+                            if (mg.isReference()) {
+                                contentModel = mg.getReference();
+                            }
+                        }
+                        
                         if (contentModel.getParticleCount() > 0) {
 	                        fieldInfo = memberFactory.createFieldInfo(component,
 	                                                                   state.getSGStateInfo());
@@ -1412,6 +1466,9 @@ public class SourceFactory  {
                         //create the field info for the element
                         //that is referring to a model group in order
                         //not to loose the Particle information
+                        if (modelgroup.isReference())
+                            modelgroup = modelgroup.getReference();
+                            
                         if (modelgroup.getParticleCount() > 0) {
 	                        fieldInfo = memberFactory.createFieldInfo(component,
 	                                                  state.getSGStateInfo());
@@ -1701,7 +1758,7 @@ public class SourceFactory  {
         if (base == null)
             baseType = new XSString();
         else
-            baseType = TypeConversion.convertType(base);
+            baseType = _typeConversion.convertType(base);
 
 
         Enumeration enum = simpleType.getFacets("enumeration");
@@ -1982,7 +2039,7 @@ class FactoryState implements ClassInfoResolver {
         this.packageName = packageName;
 
         //-- boundProperties
-        _bound = SourceGenerator.boundPropertiesEnabled();
+        _bound = sgState.getSourceGenerator().boundPropertiesEnabled();
     } //-- FactoryState
 
     //-----------/
