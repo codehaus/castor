@@ -375,6 +375,22 @@
         </td>
       </tr>
     </table>
+    <xsl:if test="@caption">
+	  <i><xsl:value-of select="@caption"/></i>
+    </xsl:if>
+  </xsl:template>
+
+  <xsl:template match="code-block">
+    <table border="0" cellpadding="4">
+      <tr>
+        <td>
+          <xsl:apply-templates/>
+        </td>
+      </tr>
+    </table>
+    <xsl:if test="@caption">
+	  <i><xsl:value-of select="@caption"/></i>
+    </xsl:if>
   </xsl:template>
 
   <xsl:template match="code">
