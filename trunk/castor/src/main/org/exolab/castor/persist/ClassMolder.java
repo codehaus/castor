@@ -271,7 +271,7 @@ public class ClassMolder
             }
             _isKeyGenUsed = ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null );
             
-            if ((_timeStampable) && (_cachetype.equalsIgnoreCase ("none"))) {
+            if ((_timeStampable) && (_cachetype != null) && (_cachetype.equalsIgnoreCase ("none"))) {
                 throw new MappingException (Messages.format("persist.wrongCacheTypeSpecified", _name));
             }
         }
