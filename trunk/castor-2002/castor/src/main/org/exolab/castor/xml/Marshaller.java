@@ -81,24 +81,24 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class Marshaller extends MarshalFramework {
-    
-       
+
+
     //---------------------------/
     //- Private Class variables -/
     //---------------------------/
-    
+
     /**
      * The CDATA type..uses for SAX attributes
     **/
     private static final String CDATA = "CDATA";
-    
+
     /**
-     * Default prefix for use when creating 
+     * Default prefix for use when creating
      * namespace prefixes.
     **/
     private static final String DEFAULT_PREFIX = "ns";
-    
-    
+
+
     /**
      * Message name for a non sax capable serializer error
     **/
@@ -132,11 +132,11 @@ public class Marshaller extends MarshalFramework {
     **/
     private static final StringClassDescriptor _StringClassDescriptor
         = new StringClassDescriptor();
-        
+
     //---------------------------/
     //- Public member variables -/
     //---------------------------/
-    
+
     /**
      * A static flag used to enable debugging when using
      * the static marshal methods.
@@ -146,18 +146,18 @@ public class Marshaller extends MarshalFramework {
     //----------------------------/
     //- Private member variables -/
     //----------------------------/
-    
+
     /**
      * A boolean to indicate whether or not we are
      * marshalling as a complete document or not.
     **/
     private boolean _asDocument = true;
-    
+
     /**
      * The ClassDescriptorResolver used for resolving XMLClassDescriptors
     **/
     private ClassDescriptorResolver _cdResolver = null;
-    
+
     /**
      * A flag indicating whether or not to generate
      * debug information
@@ -168,17 +168,17 @@ public class Marshaller extends MarshalFramework {
      * The depth of the sub tree, 0 denotes document level
     **/
     int depth = 0;
-    
+
     /**
      * The default namespace
     **/
     private String _defaultNamespace = null;
-    
+
     /**
      * The document handler we are marshalling to
     **/
     private DocumentHandler  _handler      = null;
-    
+
     /**
      * The print writer used for logging
     **/
@@ -188,24 +188,24 @@ public class Marshaller extends MarshalFramework {
      * flag to indicate whether or not to use xsi:type
     **/
 	private boolean _marshalExtendedType = true;
-	
+
     /**
      * The namespace stack
     **/
     private Namespaces _namespaces = null;
-     
+
     /**
      * The XMLNaming instance being used.
     **/
     private XMLNaming _naming = null;
-    
+
     /**
      * A handle to the DOM node being marshalled. This
      * will be null a DOM node was not passed in
      * as an argument to a marshal method.
     **/
 	private Node _node = null;
-	
+
 	/**
 	 * Insert NameSpace prefix declarations at the root node
 	 */
@@ -215,18 +215,18 @@ public class Marshaller extends MarshalFramework {
      * The current namespace scoping
     **/
     private List _nsScope = null;
-    
+
     /**
      * current java packages being used during marshalling
     **/
     private List   _packages = null;
-    
+
     /**
      * A stack of parent objects...to prevent circular
      * references from being marshalled.
     **/
     private Stack   _parents  = null;
-    
+
 	/**
 	 * Name of the root element to use
 	 */
@@ -237,7 +237,7 @@ public class Marshaller extends MarshalFramework {
      * This may be null if the user passed in a DocumentHandler.
     **/
     private Serializer       _serializer   = null;
-    
+
     /**
      * The validation flag
     **/
@@ -293,7 +293,7 @@ public class Marshaller extends MarshalFramework {
 
 	/**
 	 * Creates a new Marshaller for the given DOM Node.
-	 * 
+	 *
 	 * @param node the DOM node to marshal into.
 	**/
 	public Marshaller( Node node )
@@ -860,11 +860,11 @@ public class Marshaller extends MarshalFramework {
 
         //-- xsi:type
         if (saveType) {
-            
+
             //-- reassign saveType variable to indicate whether or not
             //-- the xsi namespace was declared
             saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
-            
+
             //-- calculate type name, either use class name or
             //-- schema type name. If XMLClassDescriptor is introspected,
             //-- or is the default XMLClassDescriptorImpl, then
@@ -1257,14 +1257,10 @@ public class Marshaller extends MarshalFramework {
         if (!(fieldDesc instanceof XMLFieldDescriptorImpl))
            return value;
         String result = (String)value;
-        if (result.indexOf('}') <= 0) {
-             String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
-             throw new IllegalArgumentException(err);
-        }
         int idx = result.indexOf('}');
-        if (idx <= 0){
-             String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
-             throw new IllegalArgumentException(err);
+        if (idx <= 0) {
+            String err = "Bad QName value :'"+result+"', it should follow the pattern '{URI}value'";
+            throw new IllegalArgumentException(err);
         }
         String nsURI = result.substring(1, idx);
         String prefix = ((XMLFieldDescriptorImpl)fieldDesc).getQNamePrefix();
