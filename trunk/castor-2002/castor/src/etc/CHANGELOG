@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+XML:    Added fix for collections, reported by Ozgur Balsoy. This bug was introduced
+        on March 8th, in the version 1.45 of DescriptorSourceFactory. (kvisco)
+
 XML:    Added fix for enumerated simpleTypes. When a simpleType restricted another
         simpleType, if both types defined an enumertion facet with the same value
         Castor wouldn't handle this properly. Bug reported by Stephan Goetter.
