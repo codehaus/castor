@@ -55,7 +55,9 @@ import java.io.PrintWriter;
 import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
-import java.util.NoSuchElementException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.CollectionHandler;
@@ -68,8 +70,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.Container;
-import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.util.Messages;
 
 
@@ -86,12 +86,12 @@ public abstract class MappingLoader
     implements MappingResolver
 {
 
-
-    /**
-     * The suffix for the name of a compiled class.
-     */
-    private static final String CompiledSuffix = "Descriptor";
-
+	/**
+	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+	 * Commons Logging</a> instance used for all logging.
+	 */
+	private static Log log = LogFactory.getFactory().getInstance(MappingLoader.class);
+	
     /**
      * The prefix for the "add" method
     **/
@@ -379,12 +379,9 @@ public abstract class MappingLoader
 
         FieldDescriptor[] fields;
         FieldDescriptor[] identities;
-        Enumeration       enum;
         Class             javaClass;
         ClassDescriptor   extend;
         ClassDescriptor   depend;
-        Container         contMaps[];
-        Vector            relations;
         ClassDescriptor   clsDesc;
 
         // See if we have a compiled descriptor.
@@ -920,6 +917,7 @@ public abstract class MappingLoader
                 } catch ( MappingException except ) {
                     throw except;
                 } catch ( Exception except ) {
+                	// log.warn ("Unexpected exception", except);
                 }
                 if ( getMethod == null )
                     throw new MappingException( "mapping.accessorNotFound",
@@ -1030,7 +1028,9 @@ public abstract class MappingLoader
 
                 method = javaClass.getMethod( "create" + capitalize( fieldName ), null );
                 handler.setCreateMethod( method );
-            } catch ( Exception except ) { }
+            } catch ( Exception except ) {
+            	// log.warn ("Unexpected exception", except);
+            }
         }
 
         // If there is an has/delete method, add them to field handler
@@ -1057,7 +1057,9 @@ public abstract class MappingLoader
                 }
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } 
-            catch ( Exception except ) { }
+            catch ( Exception except ) { 
+            	// log.warn("Unexpected exception", except);
+            }
         }
         
         return handler;
@@ -1116,7 +1118,7 @@ public abstract class MappingLoader
      * @param javaClass The class to which the field belongs
      * @param methodName The name of the accessor method
      * @param fieldType The type of the field if known, or null
-     * @param isGetMethod True if get method, false if set method
+     * @param getMethod True if get method, false if set method
      * @return The method, null if not found
      * @throws MappingException The method is not accessible or is not of the
      *  specified type
@@ -1181,6 +1183,7 @@ public abstract class MappingLoader
                         try {
                             method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
                         } catch ( Exception except2 ) {
+                        	// log.warn ("Unexpected exception", except2);
                         }
                     }
                 }
