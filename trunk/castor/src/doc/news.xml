@@ -18,6 +18,32 @@
           <table width="100%" border="0" cellspacing="1" cellpadding="8" bgcolor="#EDEDED"><tr><td>
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
+
+        <news>
+            <title>Castor 0.9.6 Release Candidates</title>
+            <author>Werner Guttmann</author>
+            <date>28 Oct 2004</date>
+            <time>23:55:00</time>
+            <summary>
+                I've placed a copy of the first Castor 0.9.6 release candidate on the
+                <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.6/">FTP Server</a>.<br/><br/>
+
+                This is mainly a bug fix release, but includes a couple of new features as 
+                well. For details about the bugs fixed and features provided, please have 
+                a look at (an interim version of) the 
+                <a href="http://brainopolis.dnsalias.com/castorwiki/Wiki.jsp?page=ReleaseNotes096">release notes</a>.<br/><br/>
+                
+                The release candidate will be replaced by the official version within the 
+                next three or four weeks, so please try this version and report any 
+                regression issues (where applicable). A regression for this release is something 
+                that was working in 0.9.5.4 but no longer is working in this 0.9.6 release 
+                candidate. Only regression issues will be considered for fixing before the final
+                0.9.6 release.<br/><br/>
+                
+                All other bugs will be moved out to 0.9.7, or a 0.9.6.x sub-release if necessary.
+            </summary>
+        </news>
+
         <news>
             <title>Castor 0.9.5.4 Release Candidates</title>
             <author>Keith Visco</author>
@@ -204,13 +230,13 @@
         </news>
 
         <news>
-            <title>Welcome Mickaël Guessant to the Team</title>
+            <title>Welcome Mickaï¿½l Guessant to the Team</title>
             <author>Bruce Snyder</author>
             <date>24 Oct 2002</date>
             <time></time>
             <summary>
             Please welcome our newest addition to the Castor team of committers,
-            Mickaël Guessant! Mickaël is a very welcome addition to the Castor
+            Mickaï¿½l Guessant! Mickaï¿½l is a very welcome addition to the Castor
             JDO team.
             </summary>
         </news>
