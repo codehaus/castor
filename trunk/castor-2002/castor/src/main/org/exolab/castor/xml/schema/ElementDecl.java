@@ -140,7 +140,7 @@ public class ElementDecl extends Particle {
      * @return the name of this element declaration
     **/
     public String getName() {
-		return getName(true);
+		return getName(false);
 	}
     
     /**
