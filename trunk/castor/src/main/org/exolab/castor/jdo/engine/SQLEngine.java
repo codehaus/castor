@@ -1914,7 +1914,7 @@ public final class SQLEngine implements Persistence {
 
         private Object loadSingleField( int i, int count ) throws SQLException, PersistenceException
         {
-            Object[] temp = new Object[10];  // bad practice, assume complex field smaller than 10
+            Object[] temp = new Object[_engine._fields[i].columns.length];
             boolean notNull = false;
             Object   field;
 
@@ -1940,7 +1940,7 @@ public final class SQLEngine implements Persistence {
 
         private Object loadMultiField( int i, int count, Object field ) throws SQLException, PersistenceException
         {
-            Object[]  temp = new Object[10];  // bad practice, assume complex field smaller than 10
+            Object[]  temp = new Object[_engine._fields[i].columns.length];
             boolean notNull = false;
             ArrayList res;
 
