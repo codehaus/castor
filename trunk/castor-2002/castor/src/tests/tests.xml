@@ -3,7 +3,7 @@
           A) 0 - 19  : core - concurrency, locks, transaction mode etc.
 	  B) 20 - 39 : data type - type, relationship, identities
 	  C) 40 - 59 : features - key generators, persistent interface
-	  D) 60 - 79 : misc 
+	  D) 60 - 79 : misc  
 	  E) 80 - 99 : resevered
     -->
   <category name="sybase" class="jdo.JDOCategory">
@@ -28,6 +28,7 @@
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
     <!-- <case class="jdo.NestedFields" /> -->
+    <case class="jdo.Collections" />
     <!-- -->
     <!-- -->
     <!-- -->
@@ -67,6 +68,7 @@
     <case class="jdo.DependentUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
+    <case class="jdo.Collections" />
     <!-- -->
     <!-- -->
     <!-- <case class="jdo.Complex" /> -->
