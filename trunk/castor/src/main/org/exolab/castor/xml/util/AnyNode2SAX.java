@@ -168,8 +168,17 @@ public class AnyNode2SAX implements EventProducer {
             AnyNode tempNode = node.getFirstAttribute();
             String xmlName = null;
             String value = null;
+            String attUri = null;
+            String attPrefix = null;
+            
             while (tempNode != null) {
                 xmlName = tempNode.getLocalName();
+                //--retrieve a prefix?
+                attUri = tempNode.getNamespaceURI();
+                if (attUri != null)
+                    attPrefix = _context.getNamespacePrefix(attUri);
+                if (attPrefix != null && attPrefix.length() > 0)
+                    xmlName = attPrefix + ':' + xmlName;
                 value = tempNode.getStringValue();
                 atts.addAttribute(xmlName, null, value);
                 tempNode = tempNode.getNextSibling();
