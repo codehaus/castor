@@ -411,7 +411,7 @@ drop table test_identity
 go
 create table test_identity (
   id numeric(10,0) identity,
-  attr varchar(200) not null,
+  attr varchar(200) not null
 )
 go
 grant all on test_identity to test
@@ -421,7 +421,7 @@ drop table test_identity_ext
 go
 create table test_identity_ext (
   id numeric(10,0) not null,
-  ext varchar(200) not null,
+  ext varchar(200) not null
 )
 go
 create unique index test_ident_ext_pk on test_identity_ext ( id )
@@ -521,7 +521,7 @@ create table list_types (
   o_binary BINARY(10) null,
   o_varbinary VARBINARY(10) null,
   o_image IMAGE null,
-  o_int   INT null,
+  o_int   INT null
 )
 go
 grant all on list_types to test
