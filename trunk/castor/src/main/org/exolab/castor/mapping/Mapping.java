@@ -516,6 +516,10 @@ public class Mapping
                 _idResolver.setMapping(_mapping);
             }
 
+            //mark the mapping as being processed
+            if (source.getSystemId() != null)
+                _state.markAsProcessed(source.getSystemId(), _mapping);
+                
             // Load the specificed mapping source
             unm = new Unmarshaller( MappingRoot.class );
             unm.setEntityResolver( _resolver );
@@ -527,10 +531,6 @@ public class Mapping
 
             loaded = (MappingRoot) unm.unmarshal( source );
 
-
-            //mark the mapping as being processed
-            if (source.getSystemId() != null)
-                _state.markAsProcessed(source.getSystemId(), _mapping);
                 
             // Load all the included mapping by reference
             //-- note: this is just for processing any
