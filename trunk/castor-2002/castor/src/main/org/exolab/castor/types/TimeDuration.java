@@ -58,7 +58,7 @@ import java.text.ParseException;
  * TODO suuport the corresponding facets
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
-**/
+ **/
 public class TimeDuration  {
 
     /** Set to true and recompile to include debugging code in class. */
@@ -521,4 +521,33 @@ public class TimeDuration  {
 
     } //parse
 
+    /**
+     * Returns true if the instance of TimeDuration has the same fields
+     * of the parameter
+     * @param timeD the time duration to compare
+     * @return true if equal, false if not
+     */
+    public boolean equals(TimeDuration timeD) {
+        boolean result = false;
+        result = (_year == timeD.getYear());
+        result = result && (_month == timeD.getMonth());
+        result = result && (_day == timeD.getDay());
+        result = result && (_hour == timeD.getHour());
+        result = result && (_minute == timeD.getMinute());
+        result = result && (_second == timeD.getSeconds());
+        return result;
+    } //equals
+
+    /**
+     * Returns true if the present instance of TimeDuration is greater than
+     * the parameter
+     * @param timeD the time duration to compare with the present instance
+     * @return true if the present instance is the greatest, false if not
+     */
+     public boolean isGreater(TimeDuration timeD) {
+        boolean result = false;
+        // to be optimized ??
+        result = this.toLong() > timeD.toLong();
+        return result;
+     } //isGreater
 }//TimeDuration
