@@ -1,4 +1,3 @@
-
 /**
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided
@@ -41,77 +40,77 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id
+ * $Id$
  * Date         Author           Changes
- * 11/09/2000   Arnaud Blandin   Created
+ * 05/30/2001   Arnaud Blandin   Created
  */
 
 package org.exolab.castor.xml.validators;
 
-import org.exolab.castor.types.Time;
+import org.exolab.castor.types.DateTimeBase;
 
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.TypeValidator;
 
-public class TimeValidator implements TypeValidator {
+public class DateTimeValidator implements TypeValidator {
 
 
-    private Time _maxInclusive;
-    private Time _maxExclusive;
-    private Time _minInclusive;
-    private Time _minExclusive;
+    private DateTimeBase _maxInclusive;
+    private DateTimeBase _maxExclusive;
+    private DateTimeBase _minInclusive;
+    private DateTimeBase _minExclusive;
 
-    public TimeValidator() {
+    public DateTimeValidator() {
         super();
-    } //-- TimeValidator
+    } //-- DateTimeValidator
 
    /**
-     * Sets the maximum exclusive value that this RecurringDuration can hold.
-     * @param max the maximum exclusive value this RecurringDuration can be
+     * Sets the maximum exclusive value that this Date/Time can hold.
+     * @param max the maximum exclusive value this Date/Time can be
      * @see setMaxInclusive
     **/
-    public void setMaxExclusive(Time max) {
+    public void setMaxExclusive(DateTimeBase max) {
         _maxExclusive = max;
         _maxInclusive = null;
     } //-- setMaxExclusive
 
     /**
-     * Sets the maximum inclusive value that this Recurring Duration can hold.
-     * @param max the maximum inclusive value this RecurringDuration can be
+     * Sets the maximum inclusive value that this Date/Time can hold.
+     * @param max the maximum inclusive value this Date/Time can be
      * @see setMaxExclusive
     **/
-    public void setMaxInclusive(Time max) {
+    public void setMaxInclusive(DateTimeBase max) {
         _maxInclusive = max;
         _maxExclusive = null;
     } //-- setMaxInclusive
 
 
     /**
-     * Sets the minimum exclusive value that this RecurringDuration can hold.
-     * @param max the minimum exclusive value this RecurringDuration can be
+     * Sets the minimum exclusive value that this Date/Time can hold.
+     * @param max the minimum exclusive value this Date/Time can be
      * @see setMinInclusive
     **/
-    public void setMinExclusive(Time min) {
+    public void setMinExclusive(DateTimeBase min) {
         _minExclusive = min;
         _minInclusive = null;
     } //-- setMinExclusive
 
     /**
-     * Sets the minimum inclusive value that this RecurringDuration can hold.
-     * @param max the minimum inclusive value this RecurringDuration can be
+     * Sets the minimum inclusive value that this Date/Time can hold.
+     * @param max the minimum inclusive value this Date/Time can be
      * @see setMinExclusive
     **/
-    public void setMinInclusive(Time min) {
+    public void setMinInclusive(DateTimeBase min) {
         _minInclusive = min;
         _minExclusive = null;
     } //-- setMinInclusive
 
     /**
-     * Validate a Recurring duration instance
-     * @param recurrD the recurring duration to validate
+     * Validates a Date/Time instance
+     * @param dateTime the date/time type to validate
      * @throw ValidationException
      */
-    /*public void validate(Time recurrD) throws ValidationException {
+    public void validate(DateTimeBase dateTime) throws ValidationException {
 
         boolean isThereMinInclusive = (_minInclusive != null);
         boolean isThereMinExclusive = (_minExclusive != null);
@@ -128,47 +127,47 @@ public class TimeValidator implements TypeValidator {
                                           +"are set up");
         }
         if (isThereMinInclusive) {
-            if ( _minInclusive.isGreater(recurrD)) {
-                String err = recurrD + " is less than the minimum allowable ";
+            if ( dateTime.compareTo(_minInclusive) != DateTimeBase.GREATER_THAN) {
+                String err = dateTime + " must be greater than the minimum allowable ";
                 err += "value of " + _minInclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMinExclusive) {
-            if ( (_minExclusive.isGreater(recurrD)) ||
-                  recurrD.equals(_minExclusive) )
+            if ( (dateTime.compareTo(_minExclusive) != DateTimeBase.GREATER_THAN) &&
+                  !dateTime.equals(_minExclusive) )
             {
-                String err = recurrD + " is less than the minimum allowable ";
+                String err = dateTime + " must be greater than (or equal to) the minimum allowable ";
                 err += "value of " + _minExclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMaxInclusive) {
-            if ( recurrD.isGreater(_maxInclusive)) {
-                String err = recurrD + " is greater than the maximum allowable ";
+            if ( dateTime.compareTo(_maxInclusive) != DateTimeBase.LESS_THAN) {
+                String err = dateTime + " must be less than the maximum allowable ";
                 err += "value of " + _maxInclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMaxExclusive) {
-            if ( (recurrD.isGreater(_maxExclusive)) ||
-                  recurrD.equals(_maxExclusive) )
+            if ( (dateTime.compareTo(_maxExclusive) != DateTimeBase.LESS_THAN) &&
+                  !dateTime.equals(_maxExclusive) )
             {
-                String err = recurrD + " is greater than the maximum allowable ";
+                String err = dateTime + " must be less than (or equal to) the maximum allowable ";
                 err += "value of " + _maxExclusive;
                 throw new ValidationException(err);
             }
         }
 
         //use the pattern validator
-        //if (hasPattern()) {
+        /*if (hasPattern()) {
             //something to do...
-        //}
+        }*/
 
-    } //-- validate*/
+    } //-- validate
 
     /**
      * Validates the given Object
@@ -178,16 +177,16 @@ public class TimeValidator implements TypeValidator {
         throws ValidationException
     {
         if (object == null) {
-            String err = "TimeValidator cannot validate a null object.";
+            String err = "DateTimeValidator cannot validate a null object.";
             throw new ValidationException(err);
         }
 
-        Time value = null;
+        DateTimeBase value = null;
 
         try {
-            value = (Time)object;
+            value = (DateTimeBase)object;
         } catch(Exception ex) {
-            String err = ex.toString()+"\nExpecting a Time, received instead: ";
+            String err = ex.toString()+"\nExpecting a RecurringDuration, received instead: ";
             err += object.getClass().getName();
             throw new ValidationException(err);
         }
