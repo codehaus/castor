@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9</a>, using an XML
- * Schema.
+ * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * XML Schema.
  * $Id$
  */
 
@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class RootObjectDescriptor extends org.exolab.castor.tests.framework.testDescriptor.StringTypeDescriptor {
+public class RootObjectDescriptor extends org.exolab.castor.tests.framework.testDescriptor.RootTypeDescriptor {
 
 
       //--------------------------/
@@ -54,84 +54,6 @@ public class RootObjectDescriptor extends org.exolab.castor.tests.framework.test
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
-        
-        //-- _random
-        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_random", "random", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                RootObject target = (RootObject) object;
-                if(!target.hasRandom())
-                    return null;
-                return new Boolean(target.getRandom());
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    RootObject target = (RootObject) object;
-                    // if null, use delete method for optional primitives 
-                    if (value == null) {
-                        target.deleteRandom();
-                        return;
-                    }
-                    target.setRandom( ((Boolean)value).booleanValue());
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _random
-        fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
-        
-        //-- _dump
-        desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_dump", "dump", NodeType.Attribute);
-        handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
-                throws IllegalStateException
-            {
-                RootObject target = (RootObject) object;
-                if(!target.hasDump())
-                    return null;
-                return new Boolean(target.getDump());
-            }
-            public void setValue( Object object, Object value) 
-                throws IllegalStateException, IllegalArgumentException
-            {
-                try {
-                    RootObject target = (RootObject) object;
-                    // if null, use delete method for optional primitives 
-                    if (value == null) {
-                        target.deleteDump();
-                        return;
-                    }
-                    target.setDump( ((Boolean)value).booleanValue());
-                }
-                catch (Exception ex) {
-                    throw new IllegalStateException(ex.toString());
-                }
-            }
-            public Object newInstance( Object parent ) {
-                return null;
-            }
-        } );
-        desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
-        addFieldDescriptor(desc);
-        
-        //-- validation code for: _dump
-        fieldValidator = new FieldValidator();
-        desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
         

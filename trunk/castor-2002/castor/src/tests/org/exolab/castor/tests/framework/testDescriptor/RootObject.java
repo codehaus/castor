@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9</a>, using an XML
- * Schema.
+ * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * XML Schema.
  * $Id$
  */
 
@@ -23,28 +23,9 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class RootObject extends org.exolab.castor.tests.framework.testDescriptor.StringType 
+public class RootObject extends org.exolab.castor.tests.framework.testDescriptor.RootType 
 implements java.io.Serializable
 {
-
-
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
-
-    private boolean _random = false;
-
-    /**
-     * keeps track of state for field: _random
-    **/
-    private boolean _has_random;
-
-    private boolean _dump = false;
-
-    /**
-     * keeps track of state for field: _dump
-    **/
-    private boolean _has_dump;
 
 
       //----------------/
@@ -59,48 +40,6 @@ implements java.io.Serializable
       //-----------/
      //- Methods -/
     //-----------/
-
-    /**
-    **/
-    public void deleteDump()
-    {
-        this._has_dump= false;
-    } //-- void deleteDump() 
-
-    /**
-    **/
-    public void deleteRandom()
-    {
-        this._has_random= false;
-    } //-- void deleteRandom() 
-
-    /**
-    **/
-    public boolean getDump()
-    {
-        return this._dump;
-    } //-- boolean getDump() 
-
-    /**
-    **/
-    public boolean getRandom()
-    {
-        return this._random;
-    } //-- boolean getRandom() 
-
-    /**
-    **/
-    public boolean hasDump()
-    {
-        return this._has_dump;
-    } //-- boolean hasDump() 
-
-    /**
-    **/
-    public boolean hasRandom()
-    {
-        return this._has_random;
-    } //-- boolean hasRandom() 
 
     /**
     **/
@@ -136,26 +75,6 @@ implements java.io.Serializable
         
         Marshaller.marshal(this, handler);
     } //-- void marshal(org.xml.sax.DocumentHandler) 
-
-    /**
-     * 
-     * @param _dump
-    **/
-    public void setDump(boolean _dump)
-    {
-        this._dump = _dump;
-        this._has_dump = true;
-    } //-- void setDump(boolean) 
-
-    /**
-     * 
-     * @param _random
-    **/
-    public void setRandom(boolean _random)
-    {
-        this._random = _random;
-        this._has_random = true;
-    } //-- void setRandom(boolean) 
 
     /**
      * 

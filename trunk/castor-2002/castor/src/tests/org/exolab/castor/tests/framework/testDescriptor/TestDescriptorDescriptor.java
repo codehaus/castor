@@ -232,15 +232,16 @@ public class TestDescriptorDescriptor extends org.exolab.castor.xml.util.XMLClas
         } );
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
+
         //Bug here
         //commented by hand
         //desc.setRequired(true);
+
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
 
         //-- validation code for: _sourceGeneratorTest
         fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
 
         //-- _marshallingTest
@@ -269,14 +270,15 @@ public class TestDescriptorDescriptor extends org.exolab.castor.xml.util.XMLClas
         } );
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/Test");
+
         //Bug here commented by hand
         //desc.setRequired(true);
+
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
 
         //-- validation code for: _marshallingTest
         fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
 
     } //-- org.exolab.castor.tests.framework.testDescriptor.TestDescriptorDescriptor()
