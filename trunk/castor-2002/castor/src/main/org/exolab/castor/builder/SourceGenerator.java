@@ -857,10 +857,10 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
-                    if (cmGroup instanceof ComplexType) {
-                        processContentModel((Group)struct, sInfo);
+                    processContentModel((Group)struct, sInfo);
+                    if (!(cmGroup instanceof ComplexType)) {
+                        createClasses((Group)struct, sInfo);
                     }
-                    else createClasses((Group)struct, sInfo);
                     break;
                 default:
                     break;
