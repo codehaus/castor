@@ -402,6 +402,11 @@
     <description>Proposed "trigger" mode of SEQUENCE key generator for PostgreSQL</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Schneider" given="Georg"/>
+    <email>h8825037@obelix.wu-wien.ac.at</email>
+    <description>Found a AOBException and fixed it.</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Tinker" given="David" />
