@@ -46,9 +46,7 @@
 package org.exolab.castor.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Date;
 import java.text.SimpleDateFormat;
 import java.util.zip.ZipEntry;
@@ -57,7 +55,7 @@ import java.util.zip.ZipFile;
 /**
  * A class which contains the version information
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public final class Version {
@@ -69,7 +67,7 @@ public final class Version {
     /**
      * The version number
      */
-    public static final String VERSION = "0.9.5.3";
+    public static final String VERSION = "0.9.5.4";
         
     /**
      * The version date.
