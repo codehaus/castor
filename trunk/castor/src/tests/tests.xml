@@ -110,7 +110,7 @@
     <case class="jdo.SizeOracle" id="TC66a" />
     <case class="jdo.Absolute" />
     <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
-
+    <case class="jdo.tc166.TestLazy1to1" id="TC166" />
   </category>
 
   <category name="mysql" class="jdo.JDOCategory">
@@ -160,6 +160,7 @@
     <case class="jdo.ExpireManyToMany" />
     <case class="jdo.ExpireLazyEmployee" />
     <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
+    <case class="jdo.tc166.TestLazy1to1" id="TC166" />
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">

@@ -504,9 +504,9 @@ create table test_nton_b (
 
 
 -- those tables should be type INNODB with mysql 4
+drop table if exists depend2;
 drop table if exists master;
 drop table if exists depend1;
-drop table if exists depend2;
 
 create table depend1(
   id int not null primary key
@@ -525,3 +525,45 @@ create table depend2(
   index idx_depend2_master (master_id),
   foreign key (master_id) references master(id)
 );
+
+-- tc166.TestLazy1to1
+drop table if exists lazy_11_chd;
+create table lazy_11_chd (
+  id        int not null,
+  descr     varchar(20) not null
+);
+
+insert into lazy_11_chd (id, descr) values (1, 'child 1');
+insert into lazy_11_chd (id, descr) values (2, 'child 2');
+insert into lazy_11_chd (id, descr) values (3, 'child 3');
+insert into lazy_11_chd (id, descr) values (4, 'child 4');
+
+drop table if exists lazy_11_par;
+create table lazy_11_par (
+  id        int not null,
+  descr     varchar(20) not null,
+  child_id  int
+);
+
+insert into lazy_11_par (id, descr, child_id) values (1, 'parent 1', 1);
+insert into lazy_11_par (id, descr, child_id) values (2, 'parent 2', 2);
+insert into lazy_11_par (id, descr, child_id) values (3, 'parent 3', 1);
+insert into lazy_11_par (id, descr, child_id) values (5, 'parent 5', null);
+
+drop table if exists lazy_11_author;
+create table lazy_11_author (
+  id			bigint not null,
+  first_name	varchar(100) not null,
+  last_name		varchar(100) not null
+);
+
+insert into lazy_11_author (id, first_name, last_name) values (1, 'Joe', 'Writer');
+ 
+drop table if exists lazy_11_book;
+create table lazy_11_book (
+  id			bigint not null,
+  name 			varchar(100) not null,
+  author_id		bigint not null
+);
+
+insert into lazy_11_book (id, name, author_id) select 1, 'test book', lazy_11_author.id from lazy_11_author;
