@@ -5,7 +5,7 @@
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -33,7 +33,7 @@ import java.util.Hashtable;
 /**
  * An implementation of ResultHandler that builds a DOM tree
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class DOMBuilder implements ResultHandler {
@@ -114,6 +114,39 @@ public class DOMBuilder implements ResultHandler {
         nodeStack.push(document);
         buffer = new StringBuffer();
     } //-- DOMBuilder
+    
+    /**
+     * Creates a new DOMBuilder with the given node
+     *
+     * @param node the Node to use when building the DOM fragment
+     */
+    public DOMBuilder(Node node) {
+        
+        if (node == null) {
+            String err = "The DOM node passed to constructor of " +
+                "DOMBuilder must not be null.";
+            throw new IllegalArgumentException(err);
+        }
+        
+        switch (node.getNodeType()) {
+            case Node.ELEMENT_NODE:
+                document = node.getOwnerDocument();
+                break;
+            case Node.DOCUMENT_NODE:
+                document = (Document)node;
+                break;
+            default:
+                String err = "Invalid node type. The DOM node passed to " +
+                    "the constructor of DOMBuilder must be either an " +
+                    "Element node or a Document node.";
+                throw new IllegalArgumentException(err);
+        }
+        
+        nodeStack = new QuickStack();
+        nodeStack.push(node);
+        buffer = new StringBuffer();
+    } //-- DOMBuilder
+    
     
     /**
      * Signals to receive CDATA characters
