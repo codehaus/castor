@@ -143,6 +143,12 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
 
 
         _element = element;
+        
+        //-- set name
+        attValue = atts.getValue(SchemaNames.NAME_ATTR);
+        if (attValue != null) {
+            _group.setName(attValue);
+        }
 
         /*
          * @maxOccurs
