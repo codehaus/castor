@@ -61,7 +61,7 @@ import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.Xml;
+import org.exolab.castor.mapping.xml.BindXml;
 
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLClassDescriptorAdapter;
@@ -158,7 +158,7 @@ public class XMLMappingLoader
         // Create an XML field descriptor
         
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-        Xml xml = fieldMap.getXml();
+        BindXml xml = fieldMap.getBindXml();
         
         if (xml != null) {
             //-- xml name
