@@ -47,6 +47,9 @@
 package org.exolab.castor.persist;
 
 
+import javax.transaction.xa.Xid;
+
+
 /**
  * A data source that wishes to particiate as an XA resource
  * implements this interface. The source then returns an {@link
@@ -77,6 +80,13 @@ public interface XAResourceSource
      * Indicate that the resource has failed and should be discarded.
      */
     public void xaFailed();
+
+
+    /**
+     * Called by {@link XAResourceImpl} to produce a new transaction context
+     * implementation suitable for this data source.
+     */
+    public TransactionContext createTransactionContext( Xid xid );
 
 
 }
