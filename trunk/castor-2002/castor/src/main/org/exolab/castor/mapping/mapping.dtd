@@ -30,7 +30,7 @@
  -->
 <!ELEMENT include EMPTY>
 <!ATTLIST include
-    href CDATA #REQUIRED>
+    href  CDATA  #REQUIRED>
 
 
 <!--
@@ -65,11 +65,11 @@
  -->
 <!ELEMENT class ( description?, map-to?, ( field | container )+ )>
 <!ATTLIST class
-    name            ID #REQUIRED
-    extends         IDREF #IMPLIED
-    identity        CDATA #IMPLIED
-    access          (read-only|shared|exclusive|db-locked) "shared"
-    key-generator   IDREF #IMPLIED>
+    name            ID     #REQUIRED
+    extends         IDREF  #IMPLIED
+    identity        CDATA  #IMPLIED
+    access          ( read-only | shared | exclusive | db-locked )  "shared"
+    key-generator   IDREF  #IMPLIED>
 
 
 <!--
@@ -80,12 +80,12 @@
  -->
 <!ELEMENT map-to EMPTY>
 <!ATTLIST map-to
-    table     NMTOKEN #REQUIRED
-    xml       NMTOKEN #REQUIRED
-    ns-uri    NMTOKEN #REQUIRED
-    ns-prefix NMTOKEN #REQUIRED
-    ldap-dn   NMTOKEN #REQUIRED
-    ldap-oc   NMTOKEN #REQUIRED>
+    table      NMTOKEN  #IMPLIED
+    xml        NMTOKEN  #IMPLIED
+    ns-uri     NMTOKEN  #IMPLIED
+    ns-prefix  NMTOKEN  #IMPLIED
+    ldap-dn    NMTOKEN  #IMPLIED
+    ldap-oc    NMTOKEN  #IMPLIED>
 
 
 <!--
@@ -96,12 +96,17 @@
     The field name is required even if not such field exists in the
     class in order to support field references.
 
+    Unless specified otherwise, the field is accessed through get/set
+    method using the field name (thus, for a field called xyz,
+    <type> getXyz() and void setXyz( <type> )). Collection fields
+    require only a get method with the exception of an array that
+    requires both a get and set method.
+
     If the accessors (get and set methods) are specified the field
     will be accessed only through these methods. The methods must be
-    public and not static. The actual field need not exist, the name
-    is merely used as a unique identifier within the object.
+    public and not static. 
 
-    If the accessors are not specified the field will be accessed
+    If the attribute direct is true, the field will be accessed
     directly. The field must be public, not static and not transient.
 
     The field type is the proper Java class of the field's value or
@@ -115,14 +120,14 @@
  -->
 <!ELEMENT field ( description?, sql?, xml?, ldap? )>
 <!ATTLIST field
-    name NMTOKEN #REQUIRED
-    type NMTOKEN #IMPLIED
-    required (true|false) "false"
-    transient (true|false) "true"
-    get-method NMTOKEN #IMPLIED
-    set-method NMTOKEN #IMPLIED
-    create-method NMTOKEN #IMPLIED
-    collection (array|vector|hashtable|collection|set|map) #IMPLIED>
+    name           NMTOKEN  #REQUIRED
+    type           NMTOKEN  #IMPLIED
+    required       ( true | false )  "false"
+    direct         ( true | false )  "false"
+    get-method     NMTOKEN  #IMPLIED
+    set-method     NMTOKEN  #IMPLIED
+    create-method  NMTOKEN  #IMPLIED
+    collection     ( array | vector | hashtable | collection | set | map )  #IMPLIED>
 
 
 <!--
@@ -136,11 +141,9 @@
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
-    name NMTOKEN #IMPLIED
-    type NMTOKEN #IMPLIED
-    many-table NMTOKEN #IMPLIED
-    many-key NMTOKEN #IMPLIED
-    dirty (check|ignore) "check">
+    name   NMTOKEN  #IMPLIED
+    type   NMTOKEN  #IMPLIED
+    dirty  ( check | ignore )  "check">
 
 
 <!--
@@ -156,9 +159,9 @@
  -->
 <!ELEMENT xml EMPTY>
 <!ATTLIST xml
-    name NMTOKEN #IMPLIED
-    type NMTOKEN #IMPLIED
-    node (attribute|element|text) #IMPLIED>
+    name  NMTOKEN  #IMPLIED
+    type  NMTOKEN  #IMPLIED
+    node  ( attribute | element | text )  #IMPLIED>
 
 
 <!--
@@ -169,7 +172,7 @@
  -->
 <!ELEMENT ldap EMPTY>
 <!ATTLIST ldap
-    name NMTOKEN #IMPLIED>
+    name  NMTOKEN  #IMPLIED>
 
 
 <!--
@@ -180,31 +183,35 @@
   -->
 <!ELEMENT container ( description?, field+ )>
 <!ATTLIST container
-    name NMTOKEN #REQUIRED
-    type NMTOKEN #IMPLIED
-    required (true|false) "false"
-    get-method NMTOKEN #IMPLIED
-    set-method NMTOKEN #IMPLIED
-    create-method NMTOKEN #IMPLIED>
+    name           NMTOKEN  #REQUIRED
+    type           NMTOKEN  #IMPLIED
+    required       ( true | false )  "false"
+    direct         ( true | false )  "false"
+    get-method     NMTOKEN  #IMPLIED
+    set-method     NMTOKEN  #IMPLIED
+    create-method  NMTOKEN  #IMPLIED>
 
 
 <!--
     A textual description.
 
  -->
-<!ELEMENT description (#PCDATA)>
+<!ELEMENT description ( #PCDATA )>
 
 
 <!--
     Specifies parameters for the KeyGenerator (if needed).
     For example, to obtain sequential values from table SEQTAB use
+
     <key-generator name="seqtable">
         <param name="table" value="SEQTAB">
         <param name="global" value="0">
     </key-generator>
     <class ... key-generator="seqtable"> ...
+
     If you have to use several key generators of the same type for the same
     database, use aliases:
+
     <key-generator name="seqtable" alias="seq1">
         <param name="table" value="SEQTAB">
         <param name="global" value="0">
@@ -218,11 +225,11 @@
 
 <!ELEMENT key-generator  ( param* )>
 <!ATTLIST key-generator
-          name CDATA #REQUIRED
-          alias CDATA #IMPLIED>
+          name   CDATA  #REQUIRED
+          alias  CDATA  #IMPLIED>
 
 <!ELEMENT param EMPTY>
 <!ATTLIST param
-          name  CDATA #REQUIRED
-          value CDATA #REQUIRED>
+          name   CDATA  #REQUIRED
+          value  CDATA  #REQUIRED>
 

@@ -57,7 +57,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[8];
+        attributes = new XMLFieldDescriptorImpl[9];
         //-- _collection
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_collection", "collection", NodeType.Attribute);
         desc.setImmutable(true);
@@ -309,6 +309,41 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
         
+        //-- _direct
+        desc = new XMLFieldDescriptorImpl(boolean.class, "_direct", "direct", NodeType.Attribute);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                FieldMapping target = (FieldMapping) object;
+                return new Boolean(target.getDirect());
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    FieldMapping target = (FieldMapping) object;
+                    target.setDirect( ((Boolean)value).booleanValue());
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
+            public Object newInstance( Object parent ) {
+                return null;
+            }
+        } );
+        desc.setHandler(handler);
+        attributes[7] = desc;
+        
+        //-- validation code for: _direct
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
@@ -339,7 +374,7 @@ public class FieldMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         } );
         desc.setHandler(handler);
         desc.setRequired(true);
-        attributes[7] = desc;
+        attributes[8] = desc;
         
         //-- validation code for: _name
         fieldValidator = new FieldValidator();

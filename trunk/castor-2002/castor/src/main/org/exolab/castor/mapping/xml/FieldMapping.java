@@ -44,6 +44,8 @@ public class FieldMapping implements java.io.Serializable {
 
     private boolean _required = false;
 
+    private boolean _direct = false;
+
     private java.lang.String _name;
 
     private java.lang.String _description;
@@ -109,6 +111,12 @@ public class FieldMapping implements java.io.Serializable {
     public boolean getRequired() {
         return this._required;
     } //-- boolean getRequired() 
+
+    /**
+    **/
+    public boolean getDirect() {
+        return this._direct;
+    } //-- boolean getDirect() 
 
     /**
     **/
@@ -233,6 +241,14 @@ public class FieldMapping implements java.io.Serializable {
     public void setRequired(boolean _required) {
         this._required = _required;
     } //-- void setRequired(boolean) 
+
+    /**
+     * 
+     * @param _direct
+    **/
+    public void setDirect(boolean _direct) {
+        this._direct = _direct;
+    } //-- void setDirect(boolean) 
 
     /**
      * 

@@ -74,7 +74,7 @@
       <xsd:attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
-      <xsd:attribute name="transient" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
       <xsd:attribute name="collection" type="string" minOccurs="0">
         <xsd:enumeration value="array"/>
         <xsd:enumeration value="vector"/>
@@ -96,6 +96,7 @@
       <xsd:attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <xsd:attribute name="direct" type="boolean" minOccurs="0" default="false"/>
     </xsd:type>
   </xsd:element>
 
