@@ -822,8 +822,19 @@ public final class UnmarshalHandler extends MarshalFramework
         //--     also check the container's multivalued status?)
         if ( ! descriptor.isMultivalued() ) {
             if (state.isUsed(descriptor)) {
+                
                 String err = "element \"" + name;
-                err += "\" occurs more than once. (" + descriptor + ")";
+                err += "\" occurs more than once. (parent class: " + state.type.getName() + ")";
+                
+                String location = name;
+                while (!_stateInfo.isEmpty()) {
+                    UnmarshalState tmpState = (UnmarshalState)_stateInfo.pop();
+                    if (tmpState.fieldDesc.isContainer()) continue;
+                    location = state.elementName + "/" + location;
+                }
+                
+                err += "\n location: /" + location;
+                
                 ValidationException vx =
                     new ValidationException(err);
                 throw new SAXException(vx);
@@ -843,8 +854,10 @@ public final class UnmarshalHandler extends MarshalFramework
             state.markAsUsed(descriptor);
             //-- special handling for mapped objects
             if (descriptor.isMapped()) {
-                MapItem mapItem = new MapItem(fieldState.key, val);
-                val = mapItem;
+                if (!(val instanceof MapItem)) {
+                    MapItem mapItem = new MapItem(fieldState.key, val);
+                    val = mapItem;
+                }
             }
         }
 
