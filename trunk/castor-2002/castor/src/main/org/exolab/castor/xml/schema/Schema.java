@@ -112,6 +112,12 @@ public class Schema extends Annotated {
     private String version  = null;
 
     /**
+     * The schemaLocation hint provided in the 'import' tag.
+     * By default the schemaLocation is the locator of the SaxUnmarshaller
+     */
+     private String _schemaLocation;
+
+    /**
      * The global AttribteGroups for this Schema
     **/
     private Hashtable attributeGroups = null;
@@ -726,6 +732,14 @@ public class Schema extends Annotated {
     } //-- getSimpleTypes
 
     /**
+     * Returns the schemaLocation hint provided of this schema
+     * @return the schemaLocation hint provided of this schema
+     */
+     public String getSchemaLocation() {
+         return _schemaLocation;
+     }
+
+    /**
      * Returns the ElementDecl of associated with the given name
      * @return the ElementDecl of associated with the given name, or
      *  null if no ElementDecl with the given name was found.
@@ -836,7 +850,15 @@ public class Schema extends Annotated {
     } //-- getId
 
     /**
-     * Returns an imported schema by it's namespace
+     * Returns the imported schemas of this schema
+     * @return the hashtable of the imported schemas
+     */
+     public Enumeration getImportedSchema() {
+         return importedSchemas.elements();
+     }
+
+    /**
+     * Returns an imported schema by its namespace
      * @return The imported schema
      */
     public Schema getImportedSchema(String ns)
@@ -959,6 +981,16 @@ public class Schema extends Annotated {
     public void setName(String name) {
         this.name = name;
     } //-- setName
+
+
+    /**
+     * Set the schemaLocation for this schema. This is useful
+     * when this schema has been imported by another schema
+     * @param schemaLocation the location hint for this Schema
+     */
+     public void setSchemaLocation(String schemaLocation) {
+         _schemaLocation = schemaLocation;
+     }
 
 
     /**
