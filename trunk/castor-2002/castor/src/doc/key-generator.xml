@@ -57,12 +57,13 @@
     <param name="sequence" value="a_seq"/>
   </key-generator>
 
-  <key-generator name="SEQUENCE" alias="B">
+  <key-generator name="SEQUENCE" alias="RETURNING">
     <param name="sequence" value="b_seq"/>
+    <param name="returning" value="true"/>
   </key-generator>
 
   <class name="myapp.ProductGroup"
-         identity="id" key-generator="A">
+         identity="id" key-generator="RETURNING">
     <field name="id">
     </field>
   </class>]]>
