@@ -1288,7 +1288,12 @@ public final class UnmarshalHandler extends MarshalFramework
             String attName = descriptor.getXMLName();
             String attValue = atts.getValue(attName);
 
-            if (attValue != null) processedAtts.add(attName);
+            if (attValue != null) {
+                processedAtts.add(attName);
+            }
+            //-- otherwise...for now just continue, this code needs to 
+            //-- change when we upgrade to new event API
+            else continue;
 
             try {
                 processAttribute(attName, attValue, descriptor, classDesc, object);
@@ -1309,8 +1314,9 @@ public final class UnmarshalHandler extends MarshalFramework
 
                 //-- Begin Namespace Handling :
                 int idx = attName.indexOf(':');
-                if (idx >= 0)
-                    attName = attName.substring(idx+1,attName.length());
+                if (idx >= 0) {
+                    attName = attName.substring(idx+1);
+                }
                //-- End Namespace Handling
 
                if (processedAtts.contains(attName)) continue;
