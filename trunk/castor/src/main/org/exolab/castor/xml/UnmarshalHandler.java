@@ -72,9 +72,9 @@ import java.io.StringWriter;
 
 import java.lang.reflect.*;
 
+import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Stack;
-import java.util.Vector;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
@@ -124,6 +124,10 @@ public final class UnmarshalHandler extends MarshalFramework
      * XML Schema type of the parent element
     **/
     private static final String XSI_TYPE = "type";
+    
+    private static final String XML_SPACE = "space";
+    private static final String XML_SPACE_WITH_PREFIX = "xml:space";
+    private static final String PRESERVE = "preserve";
 
     //----------------------------/
     //- Private Member Variables -/
@@ -280,7 +284,15 @@ public final class UnmarshalHandler extends MarshalFramework
      */
     private AttributeSetImpl _reusableAtts = null;
     
-    private Stack _statePool = null;
+    
+    private ArrayList _statePool = null;
+    
+    
+    /**
+     * The top-level xml:space value
+     */
+    private boolean _wsPreserve = false;
+    
     
     //----------------/
     //- Constructors -/
@@ -309,7 +321,7 @@ public final class UnmarshalHandler extends MarshalFramework
         _topClass           = _class;
         _namespaces         = new Namespaces();
         _nsPackageMappings  = new Hashtable();
-        _statePool          = new Stack();
+        _statePool          = new ArrayList();
     } //-- UnmarshalHandler(Class)
 
     /**
@@ -488,6 +500,20 @@ public final class UnmarshalHandler extends MarshalFramework
     public void setValidation(boolean validate) {
         this._validate = validate;
     } //-- setValidation
+    
+    /**
+     * Sets the top-level whitespace (xml:space) to either
+     * preserving or non preserving. The XML document
+     * can override this value using xml:space on specific
+     * elements. This sets the "default" behavior
+     * when xml:space="default".
+     *
+     * @param preserve a boolean that when true enables
+     * whitespace preserving by default. 
+     */
+    public void setWhitespacePreserve(boolean preserve) {
+        _wsPreserve = preserve;
+    } //-- setWhitespacePreserve
 
     //-----------------------------------/
     //- SAX Methods for DocumentHandler -/
@@ -516,6 +542,43 @@ public final class UnmarshalHandler extends MarshalFramework
            _anyUnmarshaller.characters(ch, start, length);
         else {
              UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+             //-- handle whitespace
+             if (!state.wsPreserve) {
+                //-- trim leading whitespace characters
+                while (length > 0) {
+                    boolean whitespace = false;
+                    switch(ch[start]) {
+                        case ' ':
+                        case '\r':
+                        case '\n':
+                        case '\t':
+                            whitespace = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    if (!whitespace) break;
+                    ++start;
+                    --length;
+                }
+                
+                //-- trim trailing whitespace characters
+                while (length > 0) {
+                    boolean whitespace = false;
+                    switch(ch[start+length-1]) {
+                        case ' ':
+                        case '\r':
+                        case '\n':
+                        case '\t':
+                            whitespace = true;
+                            break;
+                        default:
+                            break;
+                    }
+                    if (!whitespace) break;
+                    --length;
+                }
+             }
              if (state.buffer == null) state.buffer = new StringBuffer();
              state.buffer.append(ch, start, length);
         }
@@ -982,7 +1045,26 @@ public final class UnmarshalHandler extends MarshalFramework
     public void ignorableWhitespace(char[] ch, int start, int length)
         throws org.xml.sax.SAXException
     {
-        //-- ignore
+        
+        //-- If we are skipping elements that have appeared in the XML but for
+        //-- which we have no mapping, skip the text and return
+        if ( _ignoreElementDepth > 0) {
+            return;
+        }
+
+        if (_stateInfo.empty()) {
+            return;
+        }
+        
+        if (_anyUnmarshaller != null)
+           _anyUnmarshaller.ignorableWhitespace(ch, start, length);
+        else {
+             UnmarshalState state = (UnmarshalState)_stateInfo.peek();
+             if (state.wsPreserve) {
+                if (state.buffer == null) state.buffer = new StringBuffer();
+                state.buffer.append(ch, start, length);
+             }
+        }
     } //-- ignorableWhitespace
 
     public void processingInstruction(String target, String data)
@@ -1282,6 +1364,17 @@ public final class UnmarshalHandler extends MarshalFramework
     {
 
         UnmarshalState state = null;
+        String xmlSpace = null;
+
+
+        //-- handle special atts
+        if (atts != null) {
+            //-- xml:space
+            xmlSpace = atts.getValue(XML_SPACE, Namespaces.XML_NAMESPACE);
+            if (xmlSpace == null) {
+                xmlSpace = atts.getValue(XML_SPACE_WITH_PREFIX, "");
+            }
+        }
 
         if (_stateInfo.empty()) {
             //-- Initialize since this is the first element
@@ -1302,10 +1395,10 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
             }
 
-            _topState = getState();
+            _topState = getState();            
             _topState.elementName = name;
-
-
+            _topState.wsPreserve = (xmlSpace != null) ? PRESERVE.equals(xmlSpace) : _wsPreserve;
+            
             XMLClassDescriptor classDesc = null;
             //-- If _topClass is null, then we need to search
             //-- the resolver for one
@@ -1507,6 +1600,11 @@ public final class UnmarshalHandler extends MarshalFramework
         //-- create new state object
         state = getState();
         state.elementName = name;
+        
+        if (xmlSpace != null)        
+            state.wsPreserve = PRESERVE.equals(xmlSpace);
+        else
+            state.wsPreserve = parentState.wsPreserve;
         
         _stateInfo.push(state);
 
@@ -2175,7 +2273,7 @@ public final class UnmarshalHandler extends MarshalFramework
       */
      private void freeState(UnmarshalState state) {
         state.clear();
-        _statePool.push(state);
+        _statePool.add(state);
      } //-- freeState
      
      /**
@@ -2187,7 +2285,7 @@ public final class UnmarshalHandler extends MarshalFramework
         if (_statePool.isEmpty()) 
             return new UnmarshalState();
         else {
-            return (UnmarshalState) _statePool.pop();
+            return (UnmarshalState) _statePool.remove(_statePool.size()-1);
         }
      } //-- freeState
      
@@ -2314,7 +2412,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 return;
             }
         }
-
+        
         //-- First loop through Attribute Descriptors.
         //-- Then, if we have any attributes which
         //-- haven't been processed we can ask
@@ -2372,6 +2470,7 @@ public final class UnmarshalHandler extends MarshalFramework
             String name = atts.getName(i);
 
             if (name.startsWith(XML_PREFIX + ':')) {
+                
                 //-- XML specification specific attribute
                 //-- It should be safe to ignore these...but
                 //-- if you think otherwise...let use know!
@@ -3349,7 +3448,7 @@ public final class UnmarshalHandler extends MarshalFramework
         
         Class _componentType = null;
         
-        Vector _items = null;
+        ArrayList _items = null;
         
         /**
          * Creates a new ArrayHandler 
@@ -3362,7 +3461,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new IllegalArgumentException(err);
             }
             _componentType = componentType;
-            _items = new Vector(5);
+            _items = new ArrayList();
         } //-- ArrayHandler
         
         /**
@@ -3380,14 +3479,14 @@ public final class UnmarshalHandler extends MarshalFramework
                 throw new IllegalArgumentException(err);
             }
             */
-            _items.addElement(obj);
+            _items.add(obj);
         }
         
         public Object getObject() {
             int size = _items.size();
             Object array = Array.newInstance(_componentType, size);
             for (int i = 0; i < size; i++)
-                Array.set(array, i, _items.elementAt(i));
+                Array.set(array, i, _items.get(i));
             return array;
         }
        
