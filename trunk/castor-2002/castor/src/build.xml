@@ -44,6 +44,7 @@
         <include name="**/*.xsl" />
         <include name="**/*.properties" />
         <include name="**/*.dtd" />
+        <include name="**/*.gif" />
         <exclude name="**/MasterTestSuite/**" />
     </patternset>
 
