@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <xsl:stylesheet version="1.0">
 
-  <xsl:output method="html" indent="yes"/>
+  <xsl:output method="html" indent="no"/>
 
   <xsl:include href="topNav.xsl"/>
   <xsl:include href="leftNav.xsl"/>
@@ -48,7 +48,6 @@
         <xsl:attribute name="height">6</xsl:attribute>  
         <xsl:attribute name="border">0</xsl:attribute>  
       </xsl:element></td></tr>
-
       <tr>
         <td width="20" bgcolor="#7270c2" valign="top" align="left"><img
           src="images/dotTrans.gif" border="0" width="1" height="1"/></td>
@@ -58,10 +57,7 @@
         <td width="70" valign="top" align="left"><img 
           src="images/dotTrans.gif" width="1" height="1" border="0"/></td>
         <td width="400" valign="middle" align="left">
-        
-        <xsl:apply-templates select="$project/topNav"/>
-
-        <br/>
+        <xsl:apply-templates select="$project/topNav"/><br/>
         <img src="images/dotTrans.gif" width="1" height="2" border="0"/></td>
         <td width="120" height="20" valign="top" align="left">&#160;</td>
       </tr>
@@ -84,26 +80,20 @@
         <td bgcolor="#7270c2" valign="top" align="left"><img 
           src="images/dotTrans.gif" width="20" height="10" border="0"/></td>
 
-        <td width="95" bgcolor="#7270c2" valign="top" align="left">
-        <img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
-        <xsl:apply-templates select="$project/navSections"/>
-        </td>
+        <td width="95" bgcolor="#7270c2" valign="top" align="left"><img src="images/dotTrans.gif" width="1" height="2" border="0"/><br/>
+<xsl:apply-templates select="$project/navSections"/></td>
 
         <td width="7" bgcolor="#a9a5de" valign="top" align="left">&#160;</td>
         <td width="70" valign="top" align="left">&#160;</td>
         <td rowspan="4" width="400" valign="top">
           <table cols="1" rows="2" border="0" cellpadding="0" cellspacing="0" width="400">
             <tr>
-              <td valign="top" align="left"><br/>
-                <img border="0" height="34" hspace="0"
-                  src="images/castor.gif" vspace="0" width="115"/><br/>
-                <img border="0" height="10" hspace="0"
+              <td valign="top" align="left"><br/><img border="0" height="34" hspace="0"
+                  src="{$project/logo}" vspace="0" width="115"/><br/><img border="0" height="10" hspace="0"
                   src="images/dotTrans.gif"/>
               </td>
             </tr>
-          </table>
-          <p/><p/>
-          <br/>
+          </table><p/><p/><br/>
 
           <xsl:if test="/document/properties/title">
             <span class="header"><xsl:value-of select="/document/properties/title"/></span>
@@ -370,8 +360,7 @@
   </xsl:template>
 
   <xsl:template match="code">
-    <span class="bodyGrey">
-      <pre><span class="bodyBlack"><xsl:apply-templates/></span></pre>
+    <span class="bodyBlack">
       <pre><xsl:apply-templates/></pre>
     </span>
   </xsl:template>

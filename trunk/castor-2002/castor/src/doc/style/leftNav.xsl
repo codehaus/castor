@@ -15,16 +15,12 @@
     <xsl:choose>
       <xsl:when test="position()=$leftBottomNavPos">
         <tr>
-          <td width="95" valign="top" align="left">
-            <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
-          </td>
+          <td width="95" valign="top" align="left"><a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a></td>
         </tr>
       </xsl:when>
       <xsl:otherwise>
         <tr>
-          <td width="95" valign="top" align="left">
-            <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
-          </td>
+          <td width="95" valign="top" align="left"><a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a></td>
         </tr>
       </xsl:otherwise>
     </xsl:choose>
