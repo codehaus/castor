@@ -151,6 +151,13 @@ public class ClassMolder {
         if ( ext != null ) {
             ds.pairExtends( this, ext.getName() );
         }
+
+        if ( clsDesc instanceof JDOClassDescriptor ) {
+            if ( ((JDOClassDescriptor) clsDesc).getCacheType() != null ) {
+                _cachetype = ((JDOClassDescriptor) clsDesc).getCacheType().getType();
+                _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheType().getCapacity();
+            }
+        }
         
         FieldMapping[] fmId = getIdFields( clsMap );
         _ids = new FieldMolder[fmId.length];
