@@ -331,7 +331,7 @@ public class Marshaller {
         //-- calculate Object's name
         String name = descriptor.getXMLName();
         
-        if (name == null) {
+        if (name == null) {			
             name = _class.getName();
             //-- remove package information from name
             int idx = name.lastIndexOf('.');
@@ -345,8 +345,15 @@ public class Marshaller {
         //-- obtain the class descriptor
         XMLClassDescriptor classDesc = null;
         
+		System.out.print("Poop"+_class.getName()+","+descriptor.getFieldType().getName()+","+name);
         if (_class == descriptor.getFieldType())
+		{
+			System.out.print("Match!");
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
+			System.out.println(classDesc);
+		}
+		else
+			System.out.println("NoMatch!");
 
         if (classDesc == null) {
             
@@ -386,7 +393,9 @@ public class Marshaller {
                 }
                 
                 classDesc = getClassDescriptor(_class);
-                name = classDesc.getXMLName();
+				if (descriptor.getXMLName()==null)
+					name = classDesc.getXMLName();
+				System.out.println("class "+name);
             }
             
             if (classDesc == null) {
