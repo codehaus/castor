@@ -437,7 +437,7 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_AND: case KEYWORD_OR: 
       case EQUAL: case NOT_EQUAL: case CONCAT: 
       case GT: case GTE: case LT: case LTE: 
-      case TIMES: case DIVIDE: case KEYWORD_MOD:
+      case TIMES: case DIVIDE: case KEYWORD_MOD: case KEYWORD_LIKE:
         return getSQLExpr( exprTree.getChild(0) ) + " " 
                + exprTree.getToken().getTokenValue() + " "
                + getSQLExpr( exprTree.getChild(1) );
