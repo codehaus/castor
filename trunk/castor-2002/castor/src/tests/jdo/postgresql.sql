@@ -262,6 +262,13 @@ create table test_persistent (
 
 create unique index test_persistent_pk on test_persistent ( id );
 
+create table test_related (
+  id          integer     not null,
+  persist_id  integer     not null
+);
+
+create unique index test_related_pk on test_related ( id );
+
 create table test_identity (
   id SERIAL,
   attr varchar(200) not null

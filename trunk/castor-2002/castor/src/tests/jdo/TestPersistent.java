@@ -98,9 +98,15 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     private TestGroup      _group;
 
 
+    private TestPersistRelated _related;
+
+
+    private TestPersistRelated _origRelated;
+
+
     private transient Database _db;
 
-    
+
     private long           _timeStamp;
 
 
@@ -242,16 +248,31 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
+    public void setRelated( TestPersistRelated related )
+    {
+        _related = related;
+        if (related != null) {
+            related.setPersistent(this);
+        }
+    }
+
+
+    public TestPersistRelated getRelated()
+    {
+        return _related;
+    }
+
+
     public void jdoPersistent( Database db )
     {
         _db = db;
-    }            
+    }
 
 
-    public void jdoTransient() 
+    public void jdoTransient()
     {
         _db = null;
-    }                        
+    }
 
 
     public Class jdoLoad(short accessMode)
@@ -259,16 +280,17 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     {
         Query        qry;
         QueryResults res;
-        
-        if ( _parentId != null ) 
+
+        if ( _parentId != null )
             _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId, accessMode );
-        
+
         qry = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE parentId=$1" );
         qry.bind( _id );
         res = qry.execute();
         while ( res.hasMore() )
             _children.addElement( res.next() );
         _origChildren = (Vector) _children.clone();
+        _origRelated = _related;
         return null;
     }
 
@@ -278,7 +300,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     {
         TestPersistent child;
 
-        if ( modified ) 
+        if ( modified )
             _modificationTime = new Date();
 
         for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) {
@@ -291,25 +313,35 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
             if ( ! vectorContainsChild( _children, child ) )
                 _db.remove( child );
         }
+        if (_origRelated == null && _related != null) {
+            _db.create(_related);
+        }
+        if (_origRelated != null && _related == null) {
+            _db.remove(_origRelated);
+        }
+        _origRelated = _related;
     }
 
-    
+
     public void jdoUpdate()
         throws Exception
     {
         TestPersistent child;
 
-        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) 
+        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); )
             _db.update( enum.nextElement() );
+        if (_origRelated != null) {
+            _db.update(_origRelated);
+        }
     }
 
-    
+
     public static boolean vectorContainsChild(Vector v, TestPersistent child) {
         TestPersistent ch;
-        
+
         for ( Enumeration enum = v.elements(); enum.hasMoreElements(); ) {
             ch = (TestPersistent) enum.nextElement();
-            if ( ch.getId() == child.getId() ) 
+            if ( ch.getId() == child.getId() )
                 return true;
         }
         return false;
@@ -332,7 +364,6 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
             db.create( _group );
         }
         _creationTime = new Date();
-
     }
 
 
@@ -342,6 +373,10 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); )
             _db.create( enum.nextElement() );
         _origChildren = (Vector) _children.clone();
+        if (_related != null) {
+            _db.create(_related);
+        }
+        _origRelated = _related;
     }
 
 
@@ -350,6 +385,9 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     {
         for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); )
             _db.remove( enum.nextElement() );
+        if (_related != null) {
+            _db.remove(_related);
+        }
     }
 
 

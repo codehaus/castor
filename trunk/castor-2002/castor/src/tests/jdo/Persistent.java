@@ -107,7 +107,8 @@ public class Persistent
             long          beforeModTime;
             long          afterModTime;
             long          modTime;
-            
+            TestPersistRelated related;
+
             db = _category.getDatabase( stream.verbose() );
 
             stream.writeVerbose( "Delete everything" );
@@ -118,13 +119,21 @@ public class Persistent
             while ( qres.hasMore() ) {
                 db.remove( qres.next() );
             }
+            oql.close();
             oql = db.getOQLQuery( "SELECT g FROM jdo.TestGroup g" );
             qres = oql.execute();
             while ( qres.hasMore() ) {
                 db.remove( qres.next() );
             }
+            oql.close();
+            oql = db.getOQLQuery( "SELECT r FROM jdo.TestPersistRelated r" );
+            qres = oql.execute();
+            while ( qres.hasMore() ) {
+                db.remove( qres.next() );
+            }
+            oql.close();
             db.commit();
-            
+
             stream.writeVerbose( "Attempt to create parent with children" );
             db.begin();
             parent = new TestPersistent();
@@ -135,14 +144,21 @@ public class Persistent
             child.addChild( new TestPersistent( 731 ) );
             child.addChild( new TestPersistent( 732 ) );
             parent.addChild( child );
+            related = new TestPersistRelated();
+            parent.setRelated( related );
             db.create( parent );
             db.commit();
             db.begin();
             parent = (TestPersistent) db.load( TestPersistent.class, new Integer( TestPersistent.DefaultId ) );
             if ( parent != null ) {
-                if ( parent.getGroup() == null || 
+                if ( parent.getGroup() == null ||
                         parent.getGroup().getId() != TestGroup.DefaultId ) {
                     stream.writeVerbose( "Error: loaded parent without group: " + parent );
+                    result  = false;
+                }
+                if ( parent.getRelated() == null ||
+                        parent.getRelated().getId() != related.getId() ) {
+                    stream.writeVerbose( "Error: loaded parent without related: " + parent );
                     result  = false;
                 }
                 if ( parent.getChildren() == null || parent.getChildren().size() != 3 ||
@@ -153,7 +169,7 @@ public class Persistent
                     result  = false;
                 }
                 child = parent.findChild( 73 );
-                if ( child == null || child.getChildren() == null || 
+                if ( child == null || child.getChildren() == null ||
                      child.getChildren().size() != 2 ||
                      child.findChild( 731 ) == null ||
                      child.findChild( 732 ) == null ) {

@@ -473,6 +473,17 @@ go
 grant all on test_persistent to test
 go
 
+drop table test_related
+go
+create table test_related (
+  id          integer     not null,
+  persist_id  integer     not null
+)
+go
+create unique index test_related_pk on test_related ( id )
+go
+
+
 
 -- test_col
 drop table test_col
