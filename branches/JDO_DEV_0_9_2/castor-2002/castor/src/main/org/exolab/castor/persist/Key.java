@@ -45,10 +45,11 @@
 package org.exolab.castor.persist;
 
 import java.lang.ref.WeakReference;
+import java.lang.ref.ReferenceQueue;
 
 /**
  * A Key is used by a KeyHolder to access locked Entities thru the LockEngine.
- * A key might be shared by different {@ LockEngine} to represent the same
+ * A key might be shared by different {@link LockEngine} to represent the same
  * KeyHolder.
  * <p>
  * Key holds only a WeakReference to KeyHolder, so that it doesn't not prohibit
@@ -61,9 +62,14 @@ import java.lang.ref.WeakReference;
 public final class Key {
 
     /**
-     * Indicate the lock which the current thread is blocked on.
+     * Indicates the lock which the current thread is blocked on.
      */
     private ObjectLock _waitOnLock;
+
+    /**
+     * Stored the next Key which is waiting for the same lock as this
+     */
+    private Key _next;
 
     /**
      * The Key holder of this key that stored in a WeakReference
@@ -81,12 +87,12 @@ public final class Key {
      *
      * @throws NullPointerException if keyholder is null
      */
-    public Key( KeyHolder keyholder ) {
+    public Key( KeyHolder keyholder, ReferenceQueue q ) {
         if ( keyholder == null )
             throw new NullPointerException();
 
         this.hashCode = keyholder.hashCode();
-        this.keyholder = new WeakReference( keyholder );
+        this.keyholder = new WeakReference( keyholder, q );
     }
 
     /**
@@ -114,16 +120,34 @@ public final class Key {
     }
 
     /**
+     * Returns the next Key which is waiting for the same lock as this
+     *
+     * @return The next Key which is waiting for the same lock as this
+     */
+    Key getNext() {
+        return _next;
+    }
+
+    /**
+     * Set the next Key which is waiting for the same lock as this
+     *
+     * @param key the next Key which is waiting fot the same lock as this
+     */
+    void setNext( Key next ) {
+        _next = next;
+    }
+    /**
      * @specified {@link java.lang.Object}
      */
     public int hashCode() {
         return hashCode;
     }
 
-    /**
-     * Two keys are equals if they have the common key holder that is not
-     * garbage collection.
+    /*
+     * Two keys are equals iff they have the common key holder that is not
+     * garbage collected.
      */
+    /*
     public boolean equals( Object object ) {
         if ( object == this )
             return true;
@@ -135,7 +159,7 @@ public final class Key {
                     return true;
         }
         return false;
-    }
+    }*/
 
     /**
      * A Lockable is an object which represented by a Lockage. To avoid
@@ -145,7 +169,7 @@ public final class Key {
 
         public abstract void setKey( Key key );
 
-        public abstract Key getLockage();
+        public abstract Key getKey();
 
     }
 }
