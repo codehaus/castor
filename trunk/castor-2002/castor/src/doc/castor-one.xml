@@ -65,7 +65,7 @@
     &lt;/>
 &lt;/>
            </code>
-          defines time-limited least-recently-used algorithm as the caching algorithm for <code>com.xyz.MyObject</code> class and the cache will be disposed if it is not used within 30 second. (Note that the time-limit ticks after all transaction involved with the objects complete, but not start after it is loaded) </p>
+          defines time-limited least-recently-used algorithm as the caching algorithm for <i>com.xyz.MyObject</i> class and the cache will be disposed if it is not used within 30 second. (Note that the time-limit ticks after all transaction involved with the objects complete, but not start after it is loaded) </p>
     </section>
     <section title="Dependent and related relationships">
           <p>
@@ -75,13 +75,13 @@
 	     Related objects’ life cycle is independent to each other. Meaning that they have to be created, removed and updated (for long transaction) independently. </p>
 
           <p>
-	     In dependent relation, one data object class must de declared as depends on one other data object class in the mapping file, and such object is called a dependent data object class. A data object class without <code>depends</code> declared in the mapping is called master object. A master object can be depended by zero or more dependent data object class. </p>
+	     In dependent relation, one data object class must de declared as depends on one other data object class in the mapping file, and such object is called a dependent data object class. A data object class without <i>depends</i> declared in the mapping is called master object. A master object can be depended by zero or more dependent data object class. </p>
 
 	  <p>
 	     As of Castor 0.9, dependent object can be related to other master data object classes including extended classes. </p>
 
 	  <p>
-	     If an object class declared as <code>depends</code> on other class, it may not be created, removed or updated separately. Attempting to create, remove or update an independent object will be result in ObjectNotPersistcapableException. A note is that Castor doesn’t allow an independent object to change its master object change its master data object instance during a transaction, and each dependent object can has only one master object. Both dependent and master object must have identities, and may or may not associate with key-generators. </p>
+	     If an object class declared as <i>depends</i> on other class, it may not be created, removed or updated separately. Attempting to create, remove or update an independent object will be result in ObjectNotPersistcapableException. A note is that Castor doesn’t allow an independent object to change its master object change its master data object instance during a transaction, and each dependent object can has only one master object. Both dependent and master object must have identities, and may or may not associate with key-generators. </p>
 
 	  <p>
 	     Here is the DTD for declaring dependent object:
@@ -103,7 +103,7 @@
     &lt;/>
 &lt;/>
                   </code>
-             declares the data object classes of <code>com.xyz.MyDependentObject</code> as a dependent class of <code>com.xyz.MyObject</code>.</p>
+             declares the data object classes of <i>com.xyz.MyDependentObject</i> as a dependent class of <i>com.xyz.MyObject</i>.</p>
     </section>
     <section title="Different cardinalities of relationship">
          <p>
@@ -205,7 +205,7 @@
            Lazy loading of collection is also a new to castor 0.9. (As of writing, only java.util.Collection is supported. But, java.util.Set, java.util.HashMap etc will be added soon.) The elements in the collection is only loaded when the application ask for the object from the collection, for example using iterator.next(). (The iterator in castor’s lazy collection is optimized and it will return loaded object first.) Lazy loading can be applied to both one-to-many and many-to-many relationship. </p>
 
 	<p>
-	   In mapping file, lazy loading is specified in the element of the collection’s <code>&lt;field></code>, for example,
+	   In mapping file, lazy loading is specified in the element of the collection’s <i>&lt;field></i>, for example,
 	       <code>
 &lt;mapping>
     &lt;class name=”com.xzy.Department”>
