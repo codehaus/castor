@@ -64,6 +64,7 @@ import javax.naming.Context;
 import javax.naming.Name;
 import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
+import javax.naming.NoInitialContextException;
 import javax.naming.spi.ObjectFactory;
 import javax.transaction.TransactionManager;
 import javax.transaction.Transaction;
@@ -399,6 +400,8 @@ public class JDO
                     tx.registerSynchronization( dbImpl );
                     return dbImpl;
                 }
+             } catch ( NoInitialContextException except ) {
+                // No initial context. Just ignore.
              } catch ( NameNotFoundException except ) {
                 // No TransactionManager object. Just ignore.
             } catch ( Exception except ) {
