@@ -86,10 +86,19 @@ public class StringValidator extends PatternValidator
      * Sets the fixed value in which all valid Strings must match.
      * @param fixedValue the fixed value that all Strings must match
     **/
-    public void setFixedValue(String fixedValue) {
+    public void setFixed(String fixedValue) {
         this.fixed = fixedValue;
     } //-- setFixedValue
 
+    /**
+     * Only used for backward compatibility for object model generated with an old
+     * version of Castor
+     * @deprecated since 0.9.4_beta
+     *
+     */
+     public void setFixedValue(String fixedValue) {
+          setFixed(fixedValue);
+     }
     /**
      * Sets the maximum length of that a valid String must be.
      * To remove the max length facet, use a negative value.
