@@ -16,6 +16,7 @@
         <property name="excludes" value="**/package.html"/>
         <property name="testexcludes" value="**/package.html"/>
         <property name="apipackagenames" value="
+            org.exolab.castor.types,
             org.exolab.castor.jdo,
             org.exolab.castor.dax,
             org.exolab.castor.xml,
