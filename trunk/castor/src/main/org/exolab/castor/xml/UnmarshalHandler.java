@@ -101,6 +101,12 @@ public final class UnmarshalHandler extends MarshalFramework
     private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
     private static final String   EMPTY_STRING      = "";
 
+    /**
+     * The error message when no class descriptor has been found
+     * TODO: move to resource bundle
+     */
+    private static final String ERROR_DID_NOT_FIND_CLASSDESCRIPTOR =
+        "unable to find or create a ClassDescriptor for class: ";
 
     /**
      * The built-in XML prefix used for xml:space, xml:lang
@@ -324,6 +330,7 @@ public final class UnmarshalHandler extends MarshalFramework
         _topClass           = _class;
         _namespaces         = new Namespaces();
         _statePool          = new ArrayList();
+        _namespaceToPackage = new HashMap();
     } //-- UnmarshalHandler(Class)
     
     /**
@@ -333,11 +340,8 @@ public final class UnmarshalHandler extends MarshalFramework
      * @param nsURI the namespace URI to map from
      * @param packageName the package name to map to
      */
-    public void addNamespaceToPackageMapping(String nsURI, String packageName) {
-        
-        if (_namespaceToPackage == null) {
-        	_namespaceToPackage = new HashMap();
-        }
+    public void addNamespaceToPackageMapping(String nsURI, String packageName) 
+    {
         if (nsURI == null) nsURI = "";
         if (packageName == null) packageName = "";
     	_namespaceToPackage.put(nsURI, packageName);
@@ -1490,7 +1494,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     }
                 }
                 else {
-                    classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
+                    classDesc = resolveByXMLName(name, namespace, null);
                     if (classDesc == null) {
                         classDesc = getClassDescriptor(name, _loader);
                         if (classDesc == null) {
@@ -1633,6 +1637,12 @@ public final class UnmarshalHandler extends MarshalFramework
                     _unmarshalListener.attributesProcessed(_topState.object);
                 processNamespaces(classDesc);
             }
+            
+            String pkg = getJavaPackage(_topClass);
+            if (getMappedPackage(namespace) == null) 
+            {
+                addNamespaceToPackageMapping(namespace, pkg);
+            }
             return;
         } //--rootElement
 
@@ -1760,13 +1770,21 @@ public final class UnmarshalHandler extends MarshalFramework
                not be completely necessary, and perhaps we should remove it.
             */
             if ((descriptor == null) && (count == 0) && (!targetState.wrapper)) {
-                MarshalFramework.InheritanceMatch[] matches = searchInheritance(name, namespace, classDesc, _cdResolver);
+                MarshalFramework.InheritanceMatch[] matches = null;
+                try {
+                    matches = searchInheritance(name, namespace, classDesc, _cdResolver);
+                }
+                catch(MarshalException rx) {
+                    //-- TODO: 
+                }
                 if (matches.length != 0) {
                     InheritanceMatch match = matches[0];
                     descriptor  = match.parentFieldDesc;
                     cdInherited = match.inheritedClassDesc;
                     break; //-- found
                 }
+                /* */
+                
                 isWrapper = (isWrapper || hasFieldsAtLocation(name, classDesc));
             }
             else if (descriptor != null) {
@@ -1966,7 +1984,7 @@ public final class UnmarshalHandler extends MarshalFramework
         classDesc = null;
         if (cdInherited != null) classDesc = cdInherited;
         else if (!name.equals(descriptor.getXMLName()))
-            classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
+            classDesc = resolveByXMLName(name, namespace, null);
 
         if (classDesc == null)
             classDesc = (XMLClassDescriptor)descriptor.getClassDescriptor();
@@ -2004,6 +2022,7 @@ public final class UnmarshalHandler extends MarshalFramework
             String currentPackage = getJavaPackage(parentState.type);
             String instanceType = getInstanceType(atts, currentPackage);
             if (instanceType != null) {
+                
                 Class instanceClass = null;
                 try {
 
@@ -2067,7 +2086,7 @@ public final class UnmarshalHandler extends MarshalFramework
                 ClassLoader loader = pClass.getClassLoader();
                 //-- first look for a descriptor based
                 //-- on the XML name
-                classDesc = _cdResolver.resolveByXMLName(name, namespace, loader);
+                classDesc = resolveByXMLName(name, namespace, loader);
                 //-- if null, create classname, and try resolving
                 String cname = null;
                 if (classDesc == null) {
@@ -2196,6 +2215,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     catch(java.lang.Exception ex) {
                         String err = "unable to instantiate a new type of: ";
                         err += className(_class);
+                        err += "; " + ex.getMessage();
                         throw new SAXException(err);
                     }
                 }
@@ -2453,7 +2473,9 @@ public final class UnmarshalHandler extends MarshalFramework
      * the instance type attribute, or null if no instance type
      * attribute exists in the given AttributeList.
      */
-    private String getInstanceType(AttributeSet atts, String currentPackage) {
+    private String getInstanceType(AttributeSet atts, String currentPackage) 
+        throws SAXException
+    {
 
         if (atts == null) return null;
 
@@ -2478,52 +2500,65 @@ public final class UnmarshalHandler extends MarshalFramework
 
             //-- Retrieve the type corresponding to the schema name and
             //-- return it.
-            XMLClassDescriptor classDesc =
-                _cdResolver.resolveByXMLName(type, typeNamespaceURI, _loader);            
-
-            if (classDesc != null)
-                return classDesc.getJavaClass().getName();
-
-
-            //-- if class descriptor is not found here, then no descriptors
-            //-- existed in memory...try to load one based on name of
-            //-- Schema type
-            final String className = JavaNaming.toJavaClassName(type);
+            XMLClassDescriptor classDesc = null;
             
-            String adjClassName = className;
-            String mappedPackage = null;
-            if (_namespaceToPackage != null) {
-                String lookUpKey = (typeNamespaceURI != null) ? typeNamespaceURI : "";
-                mappedPackage = (String)_namespaceToPackage.get(lookUpKey);
-            }
-            
-            if ((mappedPackage != null) && (mappedPackage.length() > 0)) {
-                adjClassName = mappedPackage + "." + className;
-            }
-        	classDesc = _cdResolver.resolve(adjClassName, _loader);
-            if (classDesc != null)
-                return classDesc.getJavaClass().getName();
+            try {
+                classDesc = _cdResolver.resolveByXMLName(type, typeNamespaceURI, _loader);            
 
-            //-- try to use "current Package"
-            if ((currentPackage != null) && currentPackage.length() > 0) {
-            	adjClassName = currentPackage + '.' + className;
-            }
-            classDesc = _cdResolver.resolve(adjClassName, _loader);
-            if (classDesc != null)
-                return classDesc.getJavaClass().getName();
+                if (classDesc != null)
+                    return classDesc.getJavaClass().getName();
+
+
+                //-- if class descriptor is not found here, then no descriptors
+                //-- existed in memory...try to load one based on name of
+                //-- Schema type
+                final String className = JavaNaming.toJavaClassName(type);
+            
+                String adjClassName = className;
+                String mappedPackage = getMappedPackage(typeNamespaceURI);
+                if ((mappedPackage != null) && (mappedPackage.length() > 0)) {
+                    adjClassName = mappedPackage + "." + className;
+                }
+            	classDesc = _cdResolver.resolve(adjClassName, _loader);
+                if (classDesc != null)
+                    return classDesc.getJavaClass().getName();
+
+                //-- try to use "current Package"
+                if ((currentPackage != null) && currentPackage.length() > 0) {
+                	adjClassName = currentPackage + '.' + className;
+                }
                 
-            //-- Still can't find type, this may be due to an
-            //-- attempt to unmarshal an older XML instance
-            //-- that was marshalled with a previous Castor. A
-            //-- bug fix in the XMLMappingLoader prevents old
-            //-- xsi:type that are missing the "java:"
-            classDesc = _cdResolver.resolve(type, _loader);
-            if (classDesc != null)
-                return classDesc.getJavaClass().getName();
-
+                classDesc = _cdResolver.resolve(adjClassName, _loader);
+                if (classDesc != null)
+                    return classDesc.getJavaClass().getName();
+                
+                //-- Still can't find type, this may be due to an
+                //-- attempt to unmarshal an older XML instance
+                //-- that was marshalled with a previous Castor. A
+                //-- bug fix in the XMLMappingLoader prevents old
+                //-- xsi:type that are missing the "java:"
+                classDesc = _cdResolver.resolve(type, _loader);
+                if (classDesc != null)
+                    return classDesc.getJavaClass().getName();
+            }
+            catch(ResolverException rx) {
+                throw new SAXException(rx);
+            }
         }
         return null;
     } //-- getInstanceType
+    
+    /**
+     * Looks up the package name from the given namespace URI
+     * 
+     * @param namespace the namespace URI to lookup
+     * @return the package name or null.
+     */
+    private String getMappedPackage(String namespace) {
+        String lookUpKey = (namespace != null) ? namespace : "";
+        return (String)_namespaceToPackage.get(lookUpKey);
+    } //-- getMappedPackage
+    
 
     /**
      * Processes the given attribute list, and attempts to add each
@@ -3216,25 +3251,23 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLClassDescriptor classDesc = null;
 
 
-        classDesc = _cdResolver.resolve(_class);
+        try {
+            classDesc = _cdResolver.resolve(_class);
+        }
+        catch(ResolverException rx) {
+            // TODO
+        }
 
         if (classDesc != null) {
             return new InternalXMLClassDescriptor(classDesc);
         }
 
-        //-- we couldn't create a ClassDescriptor, check for
-        //-- error message
-        if (_cdResolver.error()) {
-            message(_cdResolver.getErrorMessage());
+        if (debug) {
+            message(ERROR_DID_NOT_FIND_CLASSDESCRIPTOR + _class.getName());
         }
-        else {
-            buf.setLength(0);
-            buf.append("unable to find or create a ClassDescriptor for class: ");
-            buf.append(_class.getName());
-            message(buf.toString());
-        }
+        
         return classDesc;
-    } //-- getMarshalInfo
+    } //-- getClassDescriptor
 
 
     /**
@@ -3245,29 +3278,48 @@ public final class UnmarshalHandler extends MarshalFramework
     **/
     private XMLClassDescriptor getClassDescriptor
         (String className, ClassLoader loader)
+        throws SAXException
     {
         if (_cdResolver == null)
             _cdResolver = new ClassDescriptorResolverImpl();
 
-        XMLClassDescriptor classDesc = _cdResolver.resolve(className, loader);
+        
+        XMLClassDescriptor classDesc = null;
+        try {
+            classDesc = _cdResolver.resolve(className, loader);
+        }
+        catch(ResolverException rx) {
+            throw new SAXException(rx);
+        }
+        
 
         if (classDesc != null) {
             return new InternalXMLClassDescriptor(classDesc);
         }
 
-        //-- we couldn't create a ClassDescriptor, check for
-        //-- error message
-        if (_cdResolver.error()) {
-            message(_cdResolver.getErrorMessage());
+        if (debug) {
+            message(ERROR_DID_NOT_FIND_CLASSDESCRIPTOR + className);
         }
-        else {
-            buf.setLength(0);
-            buf.append("unable to find or create a ClassDescriptor for class: ");
-            buf.append(className);
-            message(buf.toString());
-        }
+        
         return classDesc;
     } //-- getClassDescriptor
+    
+    /**
+     * Returns the XMLClassLoader
+     */
+    private XMLClassDescriptor resolveByXMLName
+        (String name, String namespace, ClassLoader loader) 
+        throws SAXException
+    {
+        
+        try {
+            return _cdResolver.resolveByXMLName(name, namespace, loader);
+        }
+        catch(ResolverException rx) {
+            throw new SAXException(rx);
+        }
+        
+    }
 
     /**
      * Returns the package for the given Class

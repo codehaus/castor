@@ -320,33 +320,52 @@ abstract class MarshalFramework {
      * @returns an array of InheritanceMatch.
      */
     public static InheritanceMatch[] searchInheritance
-        (String name, String namespace, XMLClassDescriptor classDesc, ClassDescriptorResolver cdResolver) 
+        (String name, 
+         String namespace, 
+         XMLClassDescriptor classDesc, 
+         ClassDescriptorResolver cdResolver) 
+        throws MarshalException
     {
 
-
-        //-- A little required logic for finding Not-Yet-Loaded
-        //-- descriptors
-        String className =JavaNaming.toJavaClassName(name);
-        //-- should use namespace-to-prefix mappings, but
-        //-- just create package for now.
-        Class clazz = classDesc.getJavaClass();
-        String pkg = null;
-        if (clazz != null) {
-            while (clazz.getDeclaringClass() != null)
-                clazz = clazz.getDeclaringClass();
-            pkg = clazz.getName();
-            int idx = pkg.lastIndexOf('.');
-            if (idx >= 0) {
-                pkg = pkg.substring(0, idx+1);
-                className = pkg + className;
+        ClassDescriptorEnumeration cde = null;
+        
+        try {
+            //-- A little required logic for finding Not-Yet-Loaded
+            //-- descriptors
+            String className =JavaNaming.toJavaClassName(name);
+            //-- should use namespace-to-prefix mappings, but
+            //-- just create package for now.
+            Class clazz = classDesc.getJavaClass();
+            String pkg = null;
+            if (clazz != null) {
+                while (clazz.getDeclaringClass() != null)
+                    clazz = clazz.getDeclaringClass();
+                pkg = clazz.getName();
+                int idx = pkg.lastIndexOf('.');
+                if (idx >= 0) {
+                    pkg = pkg.substring(0, idx+1);
+                    className = pkg + className;
+                }
             }
+            cdResolver.resolve(className, classDesc.getClass().getClassLoader());
+            //-- end Not-Yet-Loaded descriptor logic
+            
+            //-- resolve all by XML name + namespace URI
+            cde = cdResolver.resolveAllByXMLName(name, namespace, null);
         }
-        cdResolver.resolve(className, classDesc.getClass().getClassLoader());
-        //-- end Not-Yet-Loaded descriptor logic
+        catch(ResolverException rx) {
+            Throwable actual = rx.getCause();
+            if (actual instanceof MarshalException) {
+                throw (MarshalException)actual;
+            }
+            if (actual != null) {
+                throw new MarshalException(actual);
+            }
+            throw new MarshalException(rx);
+        }
 
         Vector inheritanceList = null;
         XMLFieldDescriptor descriptor  = null;
-        ClassDescriptorEnumeration cde = cdResolver.resolveAllByXMLName(name, namespace, null);
         XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
         XMLClassDescriptor cdInherited = null;
 
