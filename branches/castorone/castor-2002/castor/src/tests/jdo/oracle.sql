@@ -107,6 +107,65 @@ create table test_pks_category (
 );
 create unique index test_pks_category_pk on test_pks_category( id );
 
+-- base class
+drop table test_rel_person;
+
+create table test_rel_person (
+  pid    int             not null,
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  bday  date 
+);
+
+
+create unique index test_rel_person_pk on test_rel_person( pid );
+
+
+-- extend base class (person)
+drop table test_rel_employee;
+
+create table test_rel_employee (
+  pid    int             not null,
+  start_date date null
+);
+
+create unique index test_rel_employee_pk on test_rel_employee( pid );
+
+
+-- depends class of person
+drop table test_rel_address;
+
+create table test_rel_address (
+  pid    int             not null,
+  id  int               not null,
+  street varchar(30) null,
+  city  varchar(30) null,
+  state varchar(30) null,
+  zip varchar(30) null
+);
+
+create index test_rel_address_fk on test_rel_address( pid );
+
+create unique index test_rel_address_pk on test_rel_address( id );
+
+
+-- depend class of employee
+drop table test_rel_payroll;
+
+create table test_rel_payroll (
+  pid    int             not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+);
+
+create index test_rel_payroll_fk on test_rel_payroll( pid );
+
+create unique index test_rel_payroll_pk on test_rel_payroll( id );
+
+-- end for test_relations
+
+
 -- test_table_ex
 drop table test_table_ex;
 
