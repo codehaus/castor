@@ -54,7 +54,7 @@ import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.util.Configuration;
 
 import org.xml.sax.*;
-      
+
 import java.io.Reader;
 import java.io.PrintWriter;
 import java.io.File;
@@ -71,17 +71,17 @@ import java.util.Properties;
  * @version $Revision$ $Date$
 **/
 public class SourceGenerator {
-    
+
     /**
      * The application name
     **/
     static final String appName = "Castor";
-    
+
     /**
      * The application description
     **/
     static final String appDesc = "XML data binder for Java";
-    
+
     /**
      * The application version
     **/
@@ -98,75 +98,75 @@ public class SourceGenerator {
      * does not expand it here.
     **/
     private static final String DEFAULT_HEADER =
-        "This class was automatically generated with \n"+"<a href=\"" + 
-        appURI + "\">" + appName + " " + version + 
+        "This class was automatically generated with \n"+"<a href=\"" +
+        appURI + "\">" + appName + " " + version +
         "</a>, using an XML Schema.\n$" + "Id";
-        
+
     private String lineSeparator = null;
     private JComment header = null;
-    
+
     private boolean warnOnOverwrite = true;
 
-    private String  destDir;
+    private String  destDir = null;
 
-    /** 
+    /**
      * The field info factory.
      */
     private FieldInfoFactory infoFactory = null;
-    
+
     /** The source factory.
     */
     private SourceFactory sourceFactory = null;
-    
-    /** 
+
+    /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
     public SourceGenerator() {
         this(null); //-- use default factory
     } //-- SourceGenerator
-    
-    /** 
+
+    /**
      * Creates a SourceGenerator using the specific field info Factory.
      * @param infoFactory the FieldInfoFactory to use.
     */
     public SourceGenerator(FieldInfoFactory infoFactory) {
-        super();    
-        
+        super();
+
         if (infoFactory == null)
             this.infoFactory = new FieldInfoFactory();
         else
             this.infoFactory = infoFactory;
-        
+
         this.sourceFactory = new SourceFactory(infoFactory);
-        
+
         header = new JComment(JComment.HEADER_STYLE);
         header.appendComment(DEFAULT_HEADER);
-        
+
     } //-- SourceGenerator
-    
+
 
     /**
-     * Creates Java Source code (Object model) for the given XML Schema 
+     * Creates Java Source code (Object model) for the given XML Schema
      * @param schema the XML schema to generate the Java sources for
      * @param packageName the package for the generated source files
     **/
     public void generateSource(Schema schema, String packageName) {
         SGStateInfo sInfo = new SGStateInfo();
         sInfo.packageName = packageName;
-        
+
         sInfo.setPromptForOverwrite(warnOnOverwrite);
-        
+
         createClasses(schema, sInfo);
     } //-- generateSource
 
     /**
-     * Creates Java Source code (Object model) for the given XML Schema 
-     * @param reader the Reader with which to read the XML Schema definition. 
+     * Creates Java Source code (Object model) for the given XML Schema
+     * @param reader the Reader with which to read the XML Schema definition.
      * The caller should close the reader, since thie method will not do so.
      * @param packageName the package for the generated source files
     **/
     public void generateSource(Reader reader, String packageName) {
-        
+
         //-- get default parser from Configuration
         Parser parser = null;
         try {
@@ -177,11 +177,11 @@ public class SourceGenerator {
             System.out.println("fatal error: unable to create SAX parser.");
             return;
         }
-        
+
         SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
         parser.setDocumentHandler(schemaUnmarshaller);
         parser.setErrorHandler(schemaUnmarshaller);
-        
+
         try {
             parser.parse(new InputSource(reader));
         }
@@ -190,10 +190,10 @@ public class SourceGenerator {
             return;
         }
         catch(org.xml.sax.SAXException sx) {
-            
+
             Exception except = sx.getException();
             if (except == null) except = sx;
-            
+
             if (except instanceof SAXParseException) {
                 SAXParseException spe = (SAXParseException)except;
                 System.out.println("SAXParseException: " + spe);
@@ -205,32 +205,32 @@ public class SourceGenerator {
             else except.printStackTrace();
             return;
         }
-        
+
         Schema schema = schemaUnmarshaller.getSchema();
         generateSource(schema, packageName);
-        
+
     } //-- generateSource
-    
+
     /**
      * Creates Java Source code (Object model) for the given XML Schema
      * @param filename the full path to the XML Schema definition
      * @param packageName the package for the generated source files
     **/
-    public void generateSource(String filename, String packageName) 
+    public void generateSource(String filename, String packageName)
         throws java.io.FileNotFoundException
     {
-        
+
         FileReader reader = new FileReader(new File(filename));
         generateSource(reader, packageName);
         try {
             reader.close();
         }
         catch(java.io.IOException iox) {};
-            
-        
+
+
     } //-- generateSource
-    
-    
+
+
     /**
      * Returns the version number of this SourceGenerator
      * @return the version number of this SourceGenerator
@@ -238,52 +238,56 @@ public class SourceGenerator {
     public static String getVersion() {
         return version;
     } //-- getVersion
-    
+
     public void setSuppressNonFatalWarnings(boolean suppress) {
-        warnOnOverwrite = (!suppress);   
+        warnOnOverwrite = (!suppress);
     } //-- setSuppressNonFatalWarnings
-    
+
     /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
     **/
     public static void main(String[] args) {
-        
-        
+
+
         CommandLineOptions allOptions = new CommandLineOptions();
-        
+
         //-- filename flag
         allOptions.addFlag("i", "filename", "Sets the input filename");
-        
+
         //-- package name flag
         allOptions.addFlag("package", "package-name", "Sets the package name");
         allOptions.setOptional("package", true);
-        
+
+        //-- destination directory
+        allOptions.addFlag("dest", "dest-dir", "Sets the destination output directory");
+        allOptions.setOptional("dest", true);
+
         //-- line break flag
         String desc = "Sets the line separator style for the desired platform";
         allOptions.addFlag("line-separator", "( unix | mac | win)", desc);
         allOptions.setOptional("line-separator", true);
-        
+
         //-- Force flag
         desc = "Suppress non fatal warnings, such as overwriting files.";
         allOptions.addFlag("f", "", desc);
         allOptions.setOptional("f", true);
-        
+
         //-- Help flag
         desc = "Displays this help screen.";
         allOptions.addFlag("h", "", desc);
         allOptions.setOptional("h", true);
-        
+
         //-- source generator types name flag
         allOptions.addFlag("types", "types", "Sets the source generator types name (SGTypeFactory)");
         allOptions.setOptional("types", true);
         //-- XXX maintained temporarily
         allOptions.addFlag("type-factory", "");
         allOptions.setOptional("type-factory", true);
-        
+
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
-        
+
         //-- check for help option
         if (options.getProperty("h") != null) {
             PrintWriter pw = new PrintWriter(System.out, true);
@@ -291,7 +295,7 @@ public class SourceGenerator {
             pw.flush();
             return;
         }
-        
+
         String  schemaFilename = options.getProperty("i");
         String  packageName    = options.getProperty("package");
         String  lineSepStyle   = options.getProperty("line-separator");
@@ -301,7 +305,7 @@ public class SourceGenerator {
         // -- XXX maintained temporarily
         if (typeFactory == null)
             typeFactory = options.getProperty("type-factory");
-        
+
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
             if ("win".equals(lineSepStyle)) {
@@ -340,17 +344,18 @@ public class SourceGenerator {
         else {
             sgen = new SourceGenerator(); // default
         }
-      
+
+        sgen.setDestDir(options.getProperty("dest"));
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
         if (force) System.out.println("-- Suppressing non fatal warnings.");
-        
+
         if (schemaFilename == null) {
             System.out.println(appName);
             allOptions.printUsage(new PrintWriter(System.out));
             return;
         }
-        
+
         try {
             sgen.generateSource(schemaFilename, packageName);
         }
@@ -358,13 +363,13 @@ public class SourceGenerator {
             System.out.println("unable to open XML schema file");
             return;
         }
-        
+
     } //-- main
 
     public void setDestDir(String destDir) {
         this.destDir = destDir;
     }
-    
+
     /**
      * Sets the line separator to use when printing the source code
      * @param lineSeparator the line separator to use when printing
@@ -383,44 +388,44 @@ public class SourceGenerator {
     public void setLineSeparator(String lineSeparator) {
         this.lineSeparator = lineSeparator;
     } //-- setLineSeparator
-    
+
     //-------------------/
     //- Private Methods -/
     //-------------------/
-    
+
     private void createClasses(Schema schema, SGStateInfo sInfo) {
-        
+
         Enumeration structures = schema.getElementDecls();
-        
+
         //-- handle all top-level element declarations
         while (structures.hasMoreElements())
             createClasses((ElementDecl)structures.nextElement(), sInfo);
-            
+
         //-- handle all top-level archetypes
         structures = schema.getArchetypes();
         while (structures.hasMoreElements())
             processArchetype((Archetype)structures.nextElement(), sInfo);
-        
+
         //-- handle all top-level datatypes
         structures = schema.getDatatypes();
         while (structures.hasMoreElements())
             processDatatype((Datatype)structures.nextElement(), sInfo);
-        
-        
+
+
     } //-- createClasses
-    
+
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
-        
-        
+
+
         //-- create classes for sub-elements if necessary
         Archetype archetype = elementDecl.getArchetype();
-            
+
         if (archetype != null) {
             JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
             processArchetype(archetype, sInfo);
-            
+
             processJClass(jClass, sInfo);
         }
         else {
@@ -433,44 +438,44 @@ public class SourceGenerator {
                 return;
             }
             processDatatype(datatype, sInfo);
-        } 
-        
+        }
+
     }  //-- createClasses
-    
+
     /**
      * Processes the given Archetype and creates all necessary class
      * to support it
      * @param archetype the Archetype to process
     **/
     private void processArchetype(Archetype archetype, SGStateInfo sInfo) {
-        
+
         if (archetype == null) return;
-        
-        
+
+
         ClassInfo classInfo = sInfo.resolve(archetype);
-        
+
         if (classInfo == null) {
-            
+
             //-- handle top-leve archetypes
             if (archetype.isTopLevel()) {
-                
-                JClass jClass 
-                    = sourceFactory.createSourceCode(archetype, 
-                                                     sInfo, 
+
+                JClass jClass
+                    = sourceFactory.createSourceCode(archetype,
+                                                     sInfo,
                                                      sInfo.packageName);
-                processJClass(jClass, sInfo);                                                    
-                
+                processJClass(jClass, sInfo);
+
             }
-            
+
             //-- process source archetype if necessary
             String source = archetype.getSource();
             if (source != null) {
                 Schema schema = archetype.getSchema();
                 processArchetype(schema.getArchetype(source), sInfo);
             }
-            
+
             process(archetype, sInfo);
-            
+
         }
         else {
             JClass jClass = classInfo.getJClass();
@@ -480,30 +485,30 @@ public class SourceGenerator {
             }
         }
     } //-- processArchetype
-    
-    
+
+
     private void processDatatype(Datatype datatype, SGStateInfo sInfo) {
-        
+
         if (datatype == null) return;
-        
+
         String packageName = sInfo.packageName;
         //-- modify package name so we don't have
         //-- name collisions, since XML Schema uses
         //-- separate namespaces for elements and datatypes
         if (packageName == null) packageName = "types";
         else packageName += ".types";
-            
+
         if (! (datatype instanceof BuiltInType) ) {
-                                
+
             ClassInfo classInfo = sInfo.resolve(datatype);
-            
+
             if (classInfo == null) {
-                
-                JClass jClass 
-                    = sourceFactory.createSourceCode(datatype, 
-                                                     sInfo, 
+
+                JClass jClass
+                    = sourceFactory.createSourceCode(datatype,
+                                                     sInfo,
                                                      packageName);
-                                                     
+
                 processJClass(jClass, sInfo);
             }
             else {
@@ -514,17 +519,17 @@ public class SourceGenerator {
             }
         }
     } //-- processDatatype
-    
+
     private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
-        
-        
+
+
         Enumeration enum = cmGroup.enumerate();
-        
+
         while (enum.hasMoreElements()) {
-                
+
             Structure struct = (Structure)enum.nextElement();
-                
-            switch(struct.getStructureType()) {                    
+
+            switch(struct.getStructureType()) {
                 case Structure.ELEMENT:
                     ElementDecl eDecl = (ElementDecl)struct;
                     if (eDecl.isReference()) continue;
@@ -538,17 +543,17 @@ public class SourceGenerator {
             }
         }
     } //-- process
-    
+
     /**
-     * Processes the given JClass by creating the 
+     * Processes the given JClass by creating the
      * corresponding MarshalInfo and print the Java classes
      * @param classInfo the classInfo to process
     **/
     private void processJClass(JClass jClass, SGStateInfo state) {
-        
-        
+
+
         boolean allowPrinting = true;
-        
+
         if (state.promptForOverwrite()) {
             String filename = jClass.getFilename(destDir);
             File file = new File(filename);
@@ -557,22 +562,22 @@ public class SourceGenerator {
                 allowPrinting = confirm(message);
             }
         }
-        
+
         //-- print class
         if (allowPrinting) {
             jClass.setHeader(header);
             jClass.print(destDir,lineSeparator);
         }
-        
+
         //-- create MarshalInfo and print
-        
+
         ClassInfo classInfo = state.resolve(jClass);
         if (classInfo != null) {
-            
-            
-            JClass desc 
+
+
+            JClass desc
                 = DescriptorSourceFactory.createSource(classInfo);
-                
+
             allowPrinting = true;
             if (state.promptForOverwrite()) {
                 String filename = desc.getFilename(destDir);
@@ -582,27 +587,27 @@ public class SourceGenerator {
                     allowPrinting = confirm(message);
                 }
             }
-            
+
             if (allowPrinting) {
                 desc.setHeader(header);
                 desc.print(destDir,lineSeparator);
             }
         }
-        
+
         state.markAsProcessed(jClass);
     } //-- processClassInfo
-    
-    
+
+
     private boolean confirm(String message) {
-        
+
         try {
             while (true) {
                 System.out.println();
                 System.out.print(message);
                 System.out.print( "(y|n|?) : ");
-                
+
                 int ch = System.in.read();
-                
+
                 //-- read eoln, or extra characters
                 while (System.in.available() > 0) {
                     switch (System.in.read()) {
@@ -613,9 +618,9 @@ public class SourceGenerator {
                             ch = '\0';
                     }
                 }
-                
+
                 System.out.println();
-                
+
                 //-- check ch
                 switch (ch) {
                     case 'y':
