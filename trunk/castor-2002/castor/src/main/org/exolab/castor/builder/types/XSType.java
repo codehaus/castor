@@ -157,6 +157,11 @@ public abstract class XSType {
     **/
     public static final String NMTOKEN_NAME        = "NMTOKEN";
 
+   /**
+    * The of the NMTOKENS type
+    */
+    public static String NMTOKENS_NAME  = "NMTOKENS";
+
     /**
      * The name of the positive-integer type
     **/
@@ -241,6 +246,7 @@ public abstract class XSType {
     public static final short NCNAME             = 16;
     public static final short NEGATIVE_INTEGER   = 17;
     public static final short NMTOKEN            = 18;
+    public static final short NMTOKENS           = 33;
     public static final short NON_NEGATIVE_INTEGER = 31;
     public static final short NON_POSITIVE_INTEGER = 32;
     public static final short POSITIVE_INTEGER   = 19;
@@ -415,6 +421,8 @@ public abstract class XSType {
                 return NEGATIVE_INTEGER_NAME;
             case NMTOKEN:
                 return NMTOKEN_NAME;
+            case NMTOKENS:
+                return NMTOKENS_NAME;
             case NON_NEGATIVE_INTEGER:
                 return NON_NEGATIVE_INTEGER_NAME;
             case NON_POSITIVE_INTEGER:
