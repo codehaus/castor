@@ -138,6 +138,12 @@ public final class LockEngine /*implements TransactionContextListener*/ {
      */
     private HashMap _xaTx = new HashMap();
 
+
+    /**
+     * All the connection keyed by TransactionContext
+     */
+    private HashMap _conn = new HashMap();
+
     
     /**
      * Used by the constructor when creating handlers to temporarily
@@ -304,6 +310,17 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         return null;
     }*/
 
+    public void commitConnection( TransactionContext tx ) 
+            throws PersistenceException {
+    }
+
+    public void rollbackConnection( TransactionContext tx ) {
+    }
+
+    public void closeConnection( TransactionContext tx ) 
+            throws PersistenceException {
+    }
+
     /**
      * This method is used by the bridge layer to insert an prefetched
      * entity into the LockEngine. Each inserted entity is read-locked. 
@@ -373,10 +390,10 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         boolean    succeed;
         short      action;
 
-        typeInfo = (TypeInfo) _typeInfo.get( entity.entityClasses );
+        typeInfo = (TypeInfo) _typeInfo.get( entity.info );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( 
-                Messages.format("persist.classNotPersistenceCapable", entity.entityClass ) );
+                Messages.format("persist.classNotPersistenceCapable", entity.info ) );
 
         //AccessMode accessMode = typeInfo.molder.getAccessMode( suggestedAccessMode );
 
@@ -410,11 +427,11 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             //    oid = lockedOid;
 
             if ( _logInterceptor != null )
-                _logInterceptor.loading( entity.entityClass, entity.identity );
+                _logInterceptor.loading( entity.info, entity.identity );
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist
             throw new ObjectNotFoundException( 
-            Messages.format("persist.objectNotFound", entity.entityClass, entity.identity ));
+            Messages.format("persist.objectNotFound", entity.info, entity.identity ));
         } finally {
             if ( lock != null ) lock.confirm( tx, succeed );
         }
@@ -453,10 +470,10 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         OID newoid;
         boolean succeed;
 
-        typeInfo = (TypeInfo) _typeInfo.get( entity.entityClass );
+        typeInfo = (TypeInfo) _typeInfo.get( entity.info );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( 
-            Messages.format( "persist.classNotPersistenceCapable", entity.entityClass) );
+            Messages.format( "persist.classNotPersistenceCapable", entity.info) );
             
         boolean write = true;   // just for readability
 
@@ -473,7 +490,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
                 lock = typeInfo.acquire( entity.identity, tx, ObjectLock.ACTION_CREATE, 0 );
 
                 if ( _logInterceptor != null )
-                    _logInterceptor.creating( entity.entityClass, entity.identity );
+                    _logInterceptor.creating( entity.info, entity.identity );
 
                 //oid = lock.getOID();
 
@@ -488,7 +505,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             } catch ( LockNotGrantedException except ) {
                 // Someone else is using the object, definite duplicate key
                 throw new DuplicateIdentityException( Messages.format( 
-                    "persist.duplicateIdentity", entity.entityClasses, 
+                    "persist.duplicateIdentity", entity.info, 
                     entity.identity ) );
             } catch ( DuplicateIdentityException except ) {
                 // we got a write lock and the persistence storage already
@@ -505,7 +522,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
 
             try {
                 if ( _logInterceptor != null )
-                    _logInterceptor.creating( entity.entityClass, entity.identity );
+                    _logInterceptor.creating( entity.info, entity.identity );
 
                 //oid = lock.getOID();
 
@@ -559,13 +576,13 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         TypeInfo   typeInfo;
         Object[]   fields;
 
-        typeInfo = (TypeInfo) _typeInfo.get( entity.entityClass );
+        typeInfo = (TypeInfo) _typeInfo.get( entity.info );
 
         try {
             lock = typeInfo.assure( entity.identity, tx, true );
 
             if ( _logInterceptor != null )
-                _logInterceptor.removing( entity.entityClass, entity.identity );
+                _logInterceptor.removing( entity.info, entity.identity );
 
             typeInfo.persist.delete( tx, _conns.get( tx ), entity );
 
@@ -637,7 +654,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         typeInfo = (TypeInfo) _typeInfo.get( entity.identity );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( 
-            Messages.format("persist.classNotPersistenceCapable", entity.entityClass ) );
+            Messages.format("persist.classNotPersistenceCapable", entity.info ) );
 
         //accessMode = typeInfo.molder.getAccessMode( suggestedAccessMode );
         //write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
@@ -688,7 +705,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             throw e;
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
-            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", entity.entityClass, entity.identity) );
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", entity.info, entity.identity) );
         } finally {
             if ( lock != null )
                 lock.confirm( tx, succeed );
@@ -733,7 +750,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         ObjectLock  lock = null;
         boolean     modified;
 
-        typeInfo = (TypeInfo) _typeInfo.get( entity.entityClass );
+        typeInfo = (TypeInfo) _typeInfo.get( entity.info );
 
         // Acquire a read lock first. Only if the object has been modified
         // do we need a write lock.
@@ -777,7 +794,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
         ObjectLock lock = null;
         TypeInfo   typeInfo;
 
-        typeInfo = (TypeInfo) _typeInfo.get( entity.entityClass );
+        typeInfo = (TypeInfo) _typeInfo.get( entity.info );
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
 
@@ -785,7 +802,7 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             lock = typeInfo.assure( entity.identity, tx, true );
 
             if ( _logInterceptor != null )
-                _logInterceptor.storing( entity.entityClass, entity.identity );
+                _logInterceptor.storing( entity.info, entity.identity );
 
             typeInfo.persist.store( tx, _conns.get( tx ), entity, (Entity) lock.getObject( tx ) );
 
