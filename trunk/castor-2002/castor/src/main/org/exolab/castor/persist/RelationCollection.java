@@ -122,6 +122,8 @@ public class RelationCollection implements Collection, Lazy {
         _molder = molder;
         _engine = engine;
         _accessMode = amode;
+        if ( ids == null )
+            ids = new ArrayList();
         _ids = ids;
         _size = _ids.size();
         _deleted = new ArrayList();
@@ -240,8 +242,9 @@ public class RelationCollection implements Collection, Lazy {
                 return lazyLoad( id );
             } else {
                 // skip to the first "not deleted" id
-                id = _ids.get(cursor++ - _added.size() );
-                while ( _deleted.contains(id) ) {
+                id = _ids.get(cursor++ - _added.size());
+
+                while ( isSkipped( id ) ) {
                     id = _ids.get(cursor++ - _added.size());
                 }
                 o = _loaded.get( id );
@@ -249,6 +252,15 @@ public class RelationCollection implements Collection, Lazy {
                     return o;
                 return lazyLoad( id );
             }
+        }
+        private boolean isSkipped( Object id ) {
+            if ( _deleted.contains(id) ) {
+                return true;
+            }
+            // make sure the object is not deleted in
+            // the current transaction outside this class
+            OID oid = new OID(parent._engine, parent._molder, id);
+            return parent._tx.isDeletedByOID( oid );
         }
         private Object lazyLoad( Object ids ) {
             Object o;
