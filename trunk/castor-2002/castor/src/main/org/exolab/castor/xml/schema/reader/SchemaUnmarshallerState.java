@@ -46,7 +46,7 @@ package org.exolab.castor.xml.schema.reader;
 
 import org.exolab.castor.xml.schema.Schema;
 
-import java.util.Vector;
+import java.util.Hashtable;
 
 /**
  * A class used to save State information for the SchemaUnmarshaller
@@ -58,21 +58,23 @@ import java.util.Vector;
 class SchemaUnmarshallerState {
 
 
-    private Vector _processed = null;
+    private Hashtable _processed = null;
 
     /**
      * Creates a new SchemaUnmarshallerState
      */
     protected SchemaUnmarshallerState() {
-        _processed   = new Vector(1);
+        _processed   = new Hashtable(1);
     } //-- SchemaUnmarshallerState
     /**
      * Marks the given schema as having been processed.
+     * @param schemaLocation the key identifying the physical location
+     * of the schema to mark.
      * @param schema the Schema to mark as having
      * been processed.
      */
-    void markAsProcessed(Schema schema) {
-        _processed.addElement(schema);
+    void markAsProcessed(String schemaLocation, Schema schema) {
+        _processed.put(schemaLocation,schema);
     } //-- markAsProcessed
 
     /**
@@ -80,24 +82,22 @@ class SchemaUnmarshallerState {
      * @param schema the Schema to check for being marked as processed
      */
     boolean processed(Schema schema) {
-        return _processed.contains(schema);
+        return _processed.containsValue(schema);
     } //-- processed
-
-    /**
-     * Marks the given schema location (a URI pointing to the
-     * schema) as having been processed.
-     * @param schemaLocation the schema location to mark as having
-     * been processed.
-     */
-    void markAsProcessed(String schemaLocation) {
-        _processed.addElement(schemaLocation);
-    } //-- markAsProcessed
 
     /**
      * Returns true if the given schema location has been marked as processed
      * @param schema location the schema location to check for being marked as processed
-    **/
+     */
     boolean processed(String schemaLocation) {
-       return _processed.contains(schemaLocation);
+       return _processed.containsKey(schemaLocation);
     } //-- processed
+
+    /**
+     * Returns the schema corresponding to the given schemaLocation
+     * @param schemaLocation the schema location of the schema
+     */
+     Schema getSchema(String schemaLocation) {
+         return (Schema)_processed.get(schemaLocation);
+     }
 }
