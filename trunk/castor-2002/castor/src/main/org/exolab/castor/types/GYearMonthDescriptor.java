@@ -339,13 +339,15 @@ public class GYearMonthDescriptor implements XMLClassDescriptor {
                 GYearMonthTarget.setCentury(temp.getCentury());
                 GYearMonthTarget.setYear(temp.getYear());
                 GYearMonthTarget.setMonth(temp.getMonth());
-                if (temp.isUTC())
+                if (temp.isUTC()) {
                     GYearMonthTarget.setUTC();
-                GYearMonthTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                    GYearMonthTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                }
                 temp = null;
             }
-            catch (Exception ex) {
-                //-- ignore for now
+            catch (java.text.ParseException ex) {
+                String err = "GYearMonthDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 

@@ -326,13 +326,16 @@ public class DateDescriptor
 
 
             if (! (target instanceof Date) ) {
-               //-- throw exception
+               String err = "DateDescriptor#setValue: expected Date, received instead:"
+                            + target.getClass();
+               throw new IllegalStateException(err);
             }
 
             Date dateTarget = (Date) target;
 
             if (value == null) {
-               /// do something
+               String err = "DateDescriptor#setValue: null value.";
+               throw new IllegalStateException(err);
             }
 
             //-- update current instance of time with new time
@@ -342,9 +345,14 @@ public class DateDescriptor
                 dateTarget.setYear(temp.getYear());
                 dateTarget.setMonth(temp.getMonth());
                 dateTarget.setDay(temp.getDay());
+                 if (temp.isUTC()) {
+                    dateTarget.setUTC();
+                    dateTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
+                }
             }
-            catch (Exception ex) {
-                //-- ignore for now
+            catch (java.text.ParseException ex) {
+                String err = "DateDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 

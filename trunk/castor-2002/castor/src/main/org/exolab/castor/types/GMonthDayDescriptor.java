@@ -55,7 +55,7 @@ import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ValidityException;
 
 /**
- * The gMonthDay Descriptor
+ * The gMonthDay Descriptor.
  * @author <a href="blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
@@ -338,13 +338,15 @@ public class GMonthDayDescriptor implements XMLClassDescriptor {
                 GMonthDay temp = GMonthDay.parseGMonthDay(value.toString()) ;
                 gMonthDayTarget.setMonth(temp.getMonth());
                 gMonthDayTarget.setDay(temp.getDay());
-                if (temp.isUTC())
+                if (temp.isUTC()) {
                     gMonthDayTarget.setUTC();
-                gMonthDayTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                    gMonthDayTarget.setZone(temp.getZoneHour(), temp.getZoneMinute());
+                }
                 temp = null;
             }
-            catch (Exception ex) {
-                //-- ignore for now
+            catch (java.text.ParseException ex) {
+                String err = "GMonthDayDescriptor#setValue: wrong value\n"+ex.getMessage();
+                throw new IllegalStateException(err);
             }
         } //-- setValue
 
