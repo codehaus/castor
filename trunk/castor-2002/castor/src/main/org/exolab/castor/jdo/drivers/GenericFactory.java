@@ -81,16 +81,13 @@ public class GenericFactory
 
 
     /**
-     * Only for jdo PersistenceFactories:
-     * determine if the given SQLException is DuplicateKeyException
+     * Determine if the given SQLException is DuplicateKeyException
      * @return Boolean.TRUE means "yes",
      *         Boolean.FALSE means "no",
      *         null means "cannot determine"
      */
     public Boolean isDuplicateKeyException( Exception ex )
     {
-        if ( ex.getMessage().toUpperCase().indexOf("DUPLICATE KEY") >= 0 )
-            return Boolean.TRUE;
         return null;
     }
 
