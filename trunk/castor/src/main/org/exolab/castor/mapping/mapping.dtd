@@ -244,7 +244,7 @@
 
 <!ELEMENT key-generator  ( param* )>
 <!ATTLIST key-generator
-          name   ID  #REQUIRED
+          name   NMTOKEN  #REQUIRED
           alias  NMTOKEN  #IMPLIED>
 
 <!ELEMENT param EMPTY>
