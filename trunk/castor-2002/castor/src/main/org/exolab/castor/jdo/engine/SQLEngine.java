@@ -356,16 +356,13 @@ public final class SQLEngine implements Persistence {
         conn = (Connection) _separateConnections.get( dr );
         if ( conn == null ) {
             try {
-                //System.out.println("creating new Connection for keygenerator...");
                 conn = dr.createConnection();
                 conn.setAutoCommit( false );
                 _separateConnections.put( dr, conn );
             } catch ( SQLException except ) {
-                //except.printStackTrace();
                 throw new PersistenceException( Messages.message("persist.cannotCreateSeparateConn"), except );
             }
         } //else
-        //  System.out.println("reusing already established connection for keygenerator...");
         return conn;
     }
 
@@ -500,10 +497,8 @@ public final class SQLEngine implements Persistence {
         Properties prop = null;
 
         if ( _keyGen.isInSameConnection() ) {
-            //System.out.println("using same connection as transaction. Dangerous!");
             connection = (Connection) conn;
         } else {
-            //System.out.println("using separate connection for key generation.");
             connection = getSeparateConnection();
         }
 
@@ -1087,7 +1082,6 @@ public final class SQLEngine implements Persistence {
             stmt.close();
 
         } catch ( SQLException except ) {
-            except.printStackTrace();
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
         return stamp;
@@ -1718,7 +1712,6 @@ public final class SQLEngine implements Persistence {
                 else
                     field = null;
             }
-            //System.out.println( "loadSingleField( " + i + ", " + count + " ) -> '" + field + "'" );
             return field;
         }
 
@@ -1752,7 +1745,6 @@ public final class SQLEngine implements Persistence {
                         res.add( com );
                 }
             }
-            //System.out.println( "loadMultiField( " + i + ", " + count + " ) -> '" + res + "'" );
             return res;
         }
 
@@ -1774,7 +1766,6 @@ public final class SQLEngine implements Persistence {
                     fields[i] = loadSingleField( i, count );
                 }
                 count += _engine._fields[i].columns.length;
-                //System.out.println( "loadRow: fields[" + i + "] = '" + fields[i] + "' (count = '" + count + "')" );
             }
             return count;
         }
@@ -1796,8 +1787,6 @@ public final class SQLEngine implements Persistence {
         {
             // Check if the given identities differ.
             for ( int i = 0; i < wantedIdentity.length; i++ ) {
-                //System.out.println( "identitiesEqual() wanted'"+wantedIdentity[i]+"' <-> current'"+currentIdentity[i]+"'" );
-
                 if( wantedIdentity[i] == null || currentIdentity[i] == null ) {
                     if( wantedIdentity[i] != currentIdentity[i] )
                         return false;
@@ -1843,8 +1832,6 @@ public final class SQLEngine implements Persistence {
                 else
                     wantedIdentity = loadSQLIdentity();
 
-                //System.out.println( "*** FETCHING OBJ WITH ID " + wantedIdentity[0] );
-
                 // Load first (and perhaps only) row of object data from _rs into <_fields> array.
                 // As we assume that we have called fetch() immediatly after nextIdentity(),
                 // we can be sure that it belongs to the object we want. This is probably not the
@@ -1867,8 +1854,6 @@ public final class SQLEngine implements Persistence {
                         // We are done with all the rows for our obj. and still have rows left.
                         _lastIdentity = currentIdentity;
 
-                        //System.out.println( "*** DONE (GOOD) OBJ WITH ID " + wantedIdentity[0] );
-
                         // As stamp is never set, this function always returns null ... ???
                         // (Don't ask me, it was like that before I modified the code! :-)
                         return stamp;
@@ -1882,8 +1867,6 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except ) {
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
-
-            //System.out.println( "*** DONE (BAD) OBJ WITH ID " + wantedIdentity[0] );
 
             return null;
         }
