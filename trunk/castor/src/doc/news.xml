@@ -19,6 +19,24 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
         <news>
+            <title>Castor Message Board</title>
+            <author>Keith Visco</author>
+            <date>04 Jul 2004</date>
+            <time>05:00:00</time>
+            <summary>
+               The Castor site now has a new
+               <a href="http://castor.exolab.org/phpBB2">message board</a>.
+               <br/>
+               <br/>
+               Message boards are typically more user-friendly than mailing lists
+               as they keeps the information in a much more organized fashion and don't
+               add to our ever increasing inboxes.
+               <br/>
+               The mailing lists will continue to remain open and you can choose which
+               ever communication method you prefer.
+            </summary>
+        </news>
+        <news>
             <title>CastorLive Book in the Works</title>
             <author>Bruce Snyder</author>
             <date>20 Jun 2004</date>
@@ -27,13 +45,13 @@
             Bruce Snyder is now authoring <a href="http://www.sourcebeat.com/TitleAction.do?id=8">Castor
             Live</a> for <a href="http://www.sourcebeat.com/">SourceBeat
             Publishing</a>. The first cut of the book will be out by the end
-            of the July containing the first few chapters. 
+            of the July containing the first few chapters.
             <br />
             <br />
-            The SourceBeat model is very different from traditional publishing because books 
-            are published online and <i>updated every month</i> by the author! Subscribers to 
-            a book receive a one year subscription and receive all updates to the title for that 
-            year. Also check out the <a href="http://jroller.org/page/CastorLive">Castor Live blog</a> 
+            The SourceBeat model is very different from traditional publishing because books
+            are published online and <i>updated every month</i> by the author! Subscribers to
+            a book receive a one year subscription and receive all updates to the title for that
+            year. Also check out the <a href="http://jroller.org/page/CastorLive">Castor Live blog</a>
             for additional information.
             </summary>
         </news>
@@ -80,7 +98,7 @@
             <date>10 Mar 2004</date>
             <time>04:19:15</time>
             <summary>
-            An interim release (0.9.5.4) may be released sooner for any 
+            An interim release (0.9.5.4) may be released sooner for any
             regression issues still present in 0.9.5.3.
             </summary>
         </news>
@@ -91,9 +109,9 @@
             <date>01 May 2004</date>
             <time>13:06:24</time>
             <summary>
-            Please welcome Stein Hugubakken as the latest addition to team 
-            Castor! Stein has been active with Castor since early this year 
-            and we're very happy to have him on board. 
+            Please welcome Stein Hugubakken as the latest addition to team
+            Castor! Stein has been active with Castor since early this year
+            and we're very happy to have him on board.
             </summary>
         </news>
 
@@ -103,9 +121,9 @@
             <date>15 Jan 2004</date>
             <time>22:58:39</time>
             <summary>
-            Please welcome Patrick van Kaan as the latest addition to team 
-            Castor! Patrick has been using Castor JDO for a while now and 
-            is the developer behind the <a href="http://castor-taglib.sourceforge.net/">Castor-Taglib</a> 
+            Please welcome Patrick van Kaan as the latest addition to team
+            Castor! Patrick has been using Castor JDO for a while now and
+            is the developer behind the <a href="http://castor-taglib.sourceforge.net/">Castor-Taglib</a>
             project.
             </summary>
         </news>
@@ -116,8 +134,8 @@
             <date>11 Nov 2003</date>
             <time>18:38:10</time>
             <summary>
-            Please welcome Werner Guttman as the newest committer to the Castor 
-            team! Werner's contributions moving forward with the Castor JDO 
+            Please welcome Werner Guttman as the newest committer to the Castor
+            team! Werner's contributions moving forward with the Castor JDO
             refactoring are key, as is his experience with J2EE and IBM WebSphere.
             </summary>
         </news>
@@ -128,10 +146,10 @@
             <date>19 Jun 2003</date>
             <time>16:39:17</time>
             <summary>
-            Can't find it here? Check out the 
-            <a href="http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main">CastorWiki</a>. 
-            An effort put together by a number of Castor users to document the 
-            undocumented! Hosted off site by Lance Lavandowska, and championed 
+            Can't find it here? Check out the
+            <a href="http://www.brainopolis.com/castorwiki/Wiki.jsp?page=Main">CastorWiki</a>.
+            An effort put together by a number of Castor users to document the
+            undocumented! Hosted off site by Lance Lavandowska, and championed
             by Tek1 (whose real name is a mystery to us all!).
             </summary>
         </news>
@@ -142,10 +160,10 @@
             <date>12 Mar 2003</date>
             <time></time>
             <summary>
-            We're pleased to announce that the folks at 
-            <a href="http://www.refactorit.com/index.html?id=649">RefactorIt</a> 
-            have included Castor as part of their Open Source Community License. 
-            This means anyone who works on the Castor code base can download a 
+            We're pleased to announce that the folks at
+            <a href="http://www.refactorit.com/index.html?id=649">RefactorIt</a>
+            have included Castor as part of their Open Source Community License.
+            This means anyone who works on the Castor code base can download a
             copy of RefactorIt and use it when working on the Castor code.
             </summary>
         </news>
@@ -156,8 +174,8 @@
             <date>14 Nov 2002</date>
             <time></time>
             <summary>
-            <b>Congratulations</b> to Bruce Snyder and his family on the birth 
-            of their second daughter, the youngest member of the Castor team, 
+            <b>Congratulations</b> to Bruce Snyder and his family on the birth
+            of their second daughter, the youngest member of the Castor team,
             we can't wait until she's old enough to start programming!
             </summary>
         </news>
@@ -168,8 +186,8 @@
             <date>24 Oct 2002</date>
             <time></time>
             <summary>
-            Please welcome our newest addition to the Castor team of committers, 
-            Mickaël Guessant! Mickaël is a very welcome addition to the Castor 
+            Please welcome our newest addition to the Castor team of committers,
+            Mickaël Guessant! Mickaël is a very welcome addition to the Castor
             JDO team.
             </summary>
         </news>
@@ -180,13 +198,13 @@
             <date>10 July 2002</date>
             <time></time>
             <summary>
-            Bruce Snyder has taken over for Thomas Yip as the Castor JDO Project 
-            Lead. Bruce's name should be very familar to most Castor users as he 
-            has been an active contributor and committer to Castor JDO for more 
+            Bruce Snyder has taken over for Thomas Yip as the Castor JDO Project
+            Lead. Bruce's name should be very familar to most Castor users as he
+            has been an active contributor and committer to Castor JDO for more
             than a year.
             <br />
             <br />
-            A very special Thanks to Thomas Yip for the great job he did and all 
+            A very special Thanks to Thomas Yip for the great job he did and all
             the contributions he made to the project.
             </summary>
         </news>
