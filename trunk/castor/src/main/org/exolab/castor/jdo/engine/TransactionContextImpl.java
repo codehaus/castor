@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
@@ -78,6 +79,9 @@ final class TransactionContextImpl
     extends TransactionContext
 {
 
+	/** 
+	 * Log instance used for outputting debug statements
+	 */
     private static Log _log = LogFactory.getFactory().getInstance( TransactionContextImpl.class );
 
     /**
@@ -94,6 +98,10 @@ final class TransactionContextImpl
      */
     private boolean     _globalTx;
 
+	/** 
+	 * Meta-data related to the RDBMS used.
+	 */
+    private DbMetaInfo _dbInfo;
 
     /**
      * Create a new transaction context.
@@ -103,7 +111,6 @@ final class TransactionContextImpl
         super( db );
         _globalTx = globalTx;
     }
-
 
     protected void commitConnections()
         throws TransactionAbortedException
@@ -223,5 +230,16 @@ final class TransactionContextImpl
         return conn;
     }
 
+    /**
+     * @return DbMetaInfo object with database connection information
+     */
+    public DbMetaInfo getConnectionInfo(LockEngine engine) throws PersistenceException
+    {
+        Connection conn = (Connection)getConnection(engine);
 
+        if (_dbInfo == null)
+            _dbInfo = new DbMetaInfo(conn);
+
+        return _dbInfo;
+    }
 }
