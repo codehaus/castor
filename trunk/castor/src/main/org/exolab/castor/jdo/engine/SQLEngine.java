@@ -1672,9 +1672,11 @@ public final class SQLEngine implements Persistence {
                     _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;
                 }
+                
                 if(_log.isDebugEnabled()){
-                    _log.debug( Messages.format( "jdo.executing", _sql ) );
+                    _log.debug (Messages.format ("jdo.executingSql", _sql));
                 }
+                
                 _rs = _stmt.executeQuery();
                 _resultSetDone = false;
             } catch ( SQLException except ) {
