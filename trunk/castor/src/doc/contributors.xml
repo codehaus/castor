@@ -316,6 +316,14 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Giordano" given="Chris"/>
+    <email>giordano@more.net</email>
+    <description>
+       Patch for bug 1658
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Green" given="Nathan"/>
     <email>nsgreen@thazar.com</email>
     <description>
@@ -672,6 +680,14 @@
   </contributor>
 
   <!-- Last names begin with T-Z -->
+
+  <contributor type="Contributor">
+    <name surname="Thal" given="David"/>
+    <email>dthal@combimatrix.com</email>
+    <description>
+       Patch for bug 1666
+    </description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
