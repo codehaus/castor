@@ -57,9 +57,7 @@ public class XSBoolean extends XSType {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
-        = new JClass("boolean");
-        
+    private static final JType jType = JType.Boolean;        
     
     public XSBoolean() {
         super(XSType.BOOLEAN);

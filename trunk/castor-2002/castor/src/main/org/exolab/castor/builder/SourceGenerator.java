@@ -47,6 +47,7 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.xml.schema.reader.*;
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.types.BuiltInType;
 
 import org.exolab.javasource.*;
 import org.exolab.castor.util.CommandLineOptions;
@@ -296,11 +297,22 @@ public class SourceGenerator {
     
     private void createClasses(Schema schema, SGStateInfo sInfo) {
         
-        Enumeration elems = schema.getElementDecls();
-        while (elems.hasMoreElements()) {
-            ElementDecl eDecl = (ElementDecl) elems.nextElement();
-            createClasses(eDecl, sInfo);
-        }
+        Enumeration structures = schema.getElementDecls();
+        
+        //-- handle all top-level element declarations
+        while (structures.hasMoreElements())
+            createClasses((ElementDecl)structures.nextElement(), sInfo);
+            
+        //-- handle all top-level archetypes
+        structures = schema.getArchetypes();
+        while (structures.hasMoreElements())
+            processArchetype((Archetype)structures.nextElement(), sInfo);
+        
+        //-- handle all top-level datatypes
+        structures = schema.getDatatypes();
+        while (structures.hasMoreElements())
+            processDatatype((Datatype)structures.nextElement(), sInfo);
+        
         
     } //-- createClasses
     
@@ -310,35 +322,25 @@ public class SourceGenerator {
         //-- create classes for sub-elements if necessary
         Archetype archetype = elementDecl.getArchetype();
             
-        ClassInfo classInfo 
-            = new ClassInfo(elementDecl, sInfo.resolver, sInfo.packageName);
-            
-        JClass jClass = null;
-        
         if (archetype != null) {
+            JClass jClass = SourceFactory.createSourceCode(elementDecl,
+                                                        sInfo,
+                                                        sInfo.packageName);
             processArchetype(archetype, sInfo);
-            jClass = SourceFactory.createClassSource(classInfo);
-            jClass.setHeader(header);
-            jClass.print(lineSeparator);
-            jClass = MarshalInfoSourceFactory.createSource(classInfo);
-            jClass.setHeader(header);
-            jClass.print(lineSeparator);
+            
+            processJClass(jClass, sInfo);
         }
         else {
             Datatype datatype = elementDecl.getDatatype();
-            if (datatype != null) {
-                jClass = MarshalInfoSourceFactory.createSource(classInfo);
-                jClass.setHeader(header);
-                jClass.print(lineSeparator);
-            }
-            else {
+            if (datatype == null) {
                 String typeRef = elementDecl.getTypeRef();
                 System.out.print("'type' or 'datatype' with name '" + typeRef);
                 System.out.print("' not found for element: ");
                 System.out.println(elementDecl.getName());
+                return;
             }
-        }
-        
+            processDatatype(datatype, sInfo);
+        } 
         
     }  //-- createClasses
     
@@ -351,48 +353,89 @@ public class SourceGenerator {
         
         if (archetype == null) return;
         
-        boolean alreadyGenerated = sInfo.sourceGenerated.contains(archetype);
-        if (!alreadyGenerated) {
+        
+        ClassInfo classInfo = sInfo.resolve(archetype);
+        
+        if (classInfo == null) {
+            
+            //-- handle top-leve archetypes
             if (archetype.isTopLevel()) {
-                ClassInfo classInfo = new ClassInfo(archetype, 
-                                                    sInfo.resolver, 
-                                                    sInfo.packageName);
-                                                    
-                JClass jClass = SourceFactory.createClassSource(classInfo);
-                jClass.setHeader(header);
-                jClass.print(lineSeparator);
-                jClass = MarshalInfoSourceFactory.createSource(classInfo);
-                jClass.setHeader(header);
-                jClass.print(lineSeparator);
+                
+                JClass jClass 
+                    = SourceFactory.createSourceCode(archetype, 
+                                                     sInfo, 
+                                                     sInfo.packageName);
+                processJClass(jClass, sInfo);                                                    
+                
             }
-            String source = null;
-            if ((source = archetype.getSource()) != null) {
+            
+            //-- process source archetype if necessary
+            String source = archetype.getSource();
+            if (source != null) {
                 Schema schema = archetype.getSchema();
                 processArchetype(schema.getArchetype(source), sInfo);
             }
+            
             process(archetype, sInfo);
-            sInfo.sourceGenerated.addElement(archetype);
+            
+        }
+        else {
+            JClass jClass = classInfo.getJClass();
+            if (!sInfo.processed(jClass)) {
+                process(archetype, sInfo);
+                processJClass(jClass, sInfo);
+            }
         }
     } //-- processArchetype
     
-    private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
-        Enumeration enum = cmGroup.enumerate();
+    
+    private void processDatatype(Datatype datatype, SGStateInfo sInfo) {
         
-        boolean alreadyGenerated = sInfo.sourceGenerated.contains(cmGroup);
+        if (datatype == null) return;
+        
+        String packageName = sInfo.packageName;
+        //-- modify package name so we don't have
+        //-- name collisions, since XML Schema uses
+        //-- separate namespaces for elements and datatypes
+        if (packageName == null) packageName = "types";
+        else packageName += ".types";
+            
+        if (! (datatype instanceof BuiltInType) ) {
+                                
+            ClassInfo classInfo = sInfo.resolve(datatype);
+            
+            if (classInfo == null) {
+                
+                JClass jClass 
+                    = SourceFactory.createSourceCode(datatype, 
+                                                     sInfo, 
+                                                     packageName);
+                                                     
+                processJClass(jClass, sInfo);
+            }
+            else {
+                JClass jClass = classInfo.getJClass();
+                if (!sInfo.processed(jClass)) {
+                    processJClass(jClass, sInfo);
+                }
+            }
+        }
+    } //-- processDatatype
+    
+    private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
+        
+        
+        Enumeration enum = cmGroup.enumerate();
         
         while (enum.hasMoreElements()) {
                 
             Structure struct = (Structure)enum.nextElement();
                 
-            switch(struct.getStructureType()) {
-                    
+            switch(struct.getStructureType()) {                    
                 case Structure.ELEMENT:
                     ElementDecl eDecl = (ElementDecl)struct;
                     if (eDecl.isReference()) continue;
-                        
-                    if (!alreadyGenerated) {
-                        createClasses(eDecl, sInfo);
-                    }
+                    createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
                     process((Group)struct, sInfo);
@@ -401,6 +444,31 @@ public class SourceGenerator {
                     break;
             }
         }
-    }
+    } //-- process
+    
+    /**
+     * Processes the given JClass by creating the 
+     * corresponding MarshalInfo and print the Java classes
+     * @param classInfo the classInfo to process
+    **/
+    private void processJClass(JClass jClass, SGStateInfo state) {
+        
+        //-- print class
+        jClass.setHeader(header);
+        jClass.print(lineSeparator);
+        
+        //-- create MarshalInfo and print
+        
+        ClassInfo classInfo = state.resolve(jClass);
+        if (classInfo != null) {
+            JClass mInfo 
+                = MarshalInfoSourceFactory.createSource(classInfo);
+            mInfo.setHeader(header);
+            mInfo.print(lineSeparator);
+        }
+        
+        state.markAsProcessed(jClass);
+    } //-- processClassInfo
+    
 } //-- SourceGenerator
 

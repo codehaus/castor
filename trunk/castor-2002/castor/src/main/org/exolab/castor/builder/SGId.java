@@ -55,12 +55,12 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SGId extends SGMember {
+public class SGId extends FieldInfo {
  
     
     public SGId(String name) {
         super(new XSId(), name);
-        setXMLNodeType(SGMember.ATTRIBUTE);
+        setNodeType(FieldInfo.ATTRIBUTE_TYPE);
     } //-- SGId
     
     public JMethod[] createAccessMethods() {
@@ -68,7 +68,7 @@ public class SGId extends SGMember {
         JMethod[] methods = new JMethod[3];
         
         String mname = getName().substring(1);
-        JType jType  = getXSType().getJType();
+        JType jType  = getSchemaType().getJType();
         
         //-- create get method
         methods[0] = new JMethod(jType, "get"+mname);

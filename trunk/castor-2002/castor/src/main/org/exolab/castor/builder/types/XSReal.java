@@ -63,8 +63,7 @@ public class XSReal extends XSType {
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
-        = new JClass("double");
+    private static final JType jType = JType.Double;
         
     
     public XSReal() {

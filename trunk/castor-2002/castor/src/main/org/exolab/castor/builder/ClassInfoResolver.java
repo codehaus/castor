@@ -46,44 +46,26 @@
 package org.exolab.castor.builder;
 
 
-import java.util.Hashtable;
-
 /**
  * A class for "caching" ClassInfo's which later need to be
- * resolved (or "fetched") by another ClassInfo
+ * resolved (retrieved) by another ClassInfo
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ClassInfoResolver {
-    
-    Hashtable _cache = null;
-    
-    public ClassInfoResolver() {
-        _cache = new Hashtable();
-    } //-- ClassInfoResolver
-    
+public interface ClassInfoResolver {
     
     /**
      * Adds the given Reference to this ClassInfo resolver
      * @param key the key to bind a reference to
      * @param classInfo the ClassInfo which is being referenced
     **/
-    public void bindReference(Object key, ClassInfo classInfo) {
-        if (key == null) {
-            String err = "null passed as argument to ";
-            err += "ClassInfoResolver#bindReference";
-            throw new NullPointerException(err);
-        }
-        _cache.put(key, classInfo);
-    } //-- bindReference
+    public void bindReference(Object key, ClassInfo classInfo);
     
     /**
      * Returns the ClassInfo which has been bound to the given key
      * @param key the object to which the ClassInfo has been bound
      * @return the ClassInfo which has been bound to the given key
     **/
-    public ClassInfo resolve(Object key) {
-        return (ClassInfo) _cache.get(key);    
-    } //-- resolve
+    public ClassInfo resolve(Object key);
     
 } //-- ClassInfoResolver

@@ -54,12 +54,30 @@ import org.exolab.javasource.*;
 **/
 public class XSClass extends XSType {
     
-
-    private JClass jClass = null;
+    private JClass  jClass     = null;
+    private String  name       = null;
+    private boolean enumerated = false;
     
+    /**
+     * Creates a new XSClass with the given JClass reference
+     * @param jClass the JClass type of this XSClass
+    **/
     public XSClass(JClass jClass) {
+        this(jClass, null);
+    } //-- XSClass
+
+    /**
+     * Creates a new XSClass with the given JClass reference
+     * @param jClass the JClass associated with this XSType
+     * @param schemaTypeName The XML Schema type name
+    **/
+    public XSClass(JClass jClass, String schemaTypeName) {
         super(XSType.CLASS);
         this.jClass = jClass;
+        if (schemaTypeName != null) {
+            this.name = schemaTypeName;
+        }
+        else this.name = jClass.getName();
     } //-- XSClass
     
     
@@ -69,6 +87,29 @@ public class XSClass extends XSType {
     **/
     public JType getJType() {
         return this.jClass;
-    }
+    } //-- getJType
+    
+    /**
+     * Return true if this XSClass represents an enumerated type,
+     * otherwise false
+     * @return true if this XSClass represents an enumerated type,
+     * otherwise false.
+    **/
+    public boolean isEnumerated() {
+        return enumerated;
+    } //-- isEnumerated
+    
+    public String getName() {
+        return this.name;
+    } //-- getName
+    
+    /**
+     * Sets the enumerated flag for this XSClass
+     * @param enumerated a boolean indicating whether or not this XSClass 
+     * represents an enumerated type
+    **/
+    public void setAsEnumertated(boolean enumerated) {
+        this.enumerated = enumerated;
+    } //-- setAsEnumerated
     
 } //-- XSClass
