@@ -20,6 +20,22 @@
               <span class="newsSummary"-->
 
         <news>
+            <title>Castor JDO - New committers</title>
+            <author>Werner Guttmann</author>
+            <date>14 Feb 2005</date>
+            <time>21:21:21</time>
+            <summary>
+                Please join me to welcome Gregory, Martin, Ralf and Stein as new committers
+				for Castor JDO. I am more than happy to have them on board, as all of them 
+				have shown their dedication to the project through numerous occasions (incl.
+				patches and willingness to spend time with me and Bruce ...).
+				
+				Details about the current and past committers (as well as contributors) 
+				can be found at <a href="http://castor.codehaus.org/contributors.html">here</a>.
+            </summary>
+        </news>
+
+        <news>
             <title>Castor 0.9.6 - Final release</title>
             <author>Werner Guttmann</author>
             <date>09 Feb 2005</date>
