@@ -66,7 +66,7 @@ import org.exolab.castor.util.Configuration;
  * @version $Revision$ $Date$
  * @see CollectionHandler
  */
-final class CollectionHandlers
+public final class CollectionHandlers
 {
 
 
