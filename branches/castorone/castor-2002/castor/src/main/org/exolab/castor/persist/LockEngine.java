@@ -326,9 +326,10 @@ public final class LockEngine {
         // Non-exclusive mode, we do not attempt to touch the database
         // at this point, simply return the object's oid.
 
+        /*
         if ( accessMode == AccessMode.ReadOnly ) {
             typeInfo.release( oid, tx );
-        }
+        }*/
         return oid;
     }
 
@@ -484,7 +485,7 @@ public final class LockEngine {
             } catch ( DuplicateIdentityException except ) {
                 // we got a write lock and the persistence storage already
                 // recorded. Should destory the lock
-                typeInfo.delete( oid, tx );
+                //typeInfo.delete( oid, tx );
                 throw except;
             } finally {
                 if ( lock != null ) 
@@ -500,16 +501,23 @@ public final class LockEngine {
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
+                oid = lock.getOID();
+
                 Object[] newids = typeInfo.molder.create( tx, oid, lock, object );
+
+                succeed = true;
+
+                oid.setDbLock( true );
 
                 newoid = new OID( oid.getLockEngine(), oid.getMolder(), oid.getDepends(), newids );
 
+                //lock.setOID( newoid );
+                
                 typeInfo.rename( oid, newoid, tx );
-
-                newoid.setDbLock( true );
 
                 return newoid;
             } catch ( LockNotGrantedException e ) {
+                e.printStackTrace();
                 throw new PersistenceException( Messages.format("persist.nested","Key Generator Failure. Duplicated Identity is generated!") );
             } finally {
                 if ( lock != null )
@@ -1058,6 +1066,7 @@ public final class LockEngine {
                         // we ensure here that the entry which should be move 
                         // to "cache" from "locks" is actually moved.
                         if ( entry.isDisposable() ) {
+                            System.out.println("----- lock removed: "+entry+" tx: "+tx);
                             locks.remove( oid );
                             cache.put( oid, entry );
                         }
@@ -1141,12 +1150,14 @@ public final class LockEngine {
                 throw new LockNotGrantedException("Lock doesn't exsit!");
             if ( !entry.isExclusivelyOwned( tx ) ) 
                 throw new LockNotGrantedException("Lock to be renamed is not own exclusively by transaction!");
-            if ( !entry.isDisposable() ) 
+            if ( entry.isEntered() ) 
                 throw new LockNotGrantedException("Lock to be renamed is being acquired by another transaction!");
             if ( newentry != null ) 
                 throw new LockNotGrantedException("Lock is already existed for the new oid.");
 
+            entry = (ObjectLock) locks.remove( orgoid );
             entry.setOID( newoid );
+            locks.put( newoid, entry );
 
             // copy oid status
             newoid.setDbLock( orgoid.isDbLock() );
@@ -1182,6 +1193,8 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
+                        (new Exception("Stack trace when lock deleted")).printStackTrace();
+                        System.out.println("----- lock deleted: "+entry+" tx: "+tx);
                         locks.remove( oid );
                     }
                 }
@@ -1214,6 +1227,7 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( !failed && entry.isDisposable() ) {
+                        System.out.println("----- lock removed: "+entry+" tx: "+tx);
                         cache.put( oid, entry );
                         locks.remove( oid );
                     }
