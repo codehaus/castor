@@ -160,10 +160,10 @@ final class CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlerInfo[] _colHandlers = new CollectionHandlerInfo[] {
-        // For enumerate ([])
+        // For enumerate (any)
         new CollectionHandlerInfo( "enumerate", Enumeration.class, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
-                return object;
+                return null;
             }
             public Enumeration elements( Object collection ) {
                 return (Enumeration) collection;
@@ -172,7 +172,7 @@ final class CollectionHandlers
                 return "Enumerate CollectionHandler";
             }
         } ),
-        // For array ([])
+        // For array (any)
         new CollectionHandlerInfo( "array", Object[].class, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 Object[] array;
@@ -204,10 +204,12 @@ final class CollectionHandlers
                 if ( collection == null ) {
                     collection = new Vector();
                     ( (Vector) collection ).addElement( object );
-                } else
+                    return collection;
+                } else {
                     if ( ! ( (Vector) collection ).contains( object ) )
                         ( (Vector) collection ).addElement( object );
-                return collection;
+                    return null;
+                }
             }
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
@@ -224,10 +226,12 @@ final class CollectionHandlers
                 if ( collection == null ) {
                     collection = new Hashtable();
                     ( (Hashtable) collection ).put( object, object );
-                } else
+                    return collection;
+                } else {
                     if ( ! ( (Hashtable) collection ).contains( object ) )
                         ( (Hashtable) collection ).put( object, object );
-                return collection;
+                    return null;
+                }
             }
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
