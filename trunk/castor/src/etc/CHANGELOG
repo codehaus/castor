@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+ALL:   Fixed bug 1563 using a patch from Keith
+       (Bruce - 20040323)
+
 ALL:   Fixed bug 1566 using contribution from jpinto@inescporto.pt [João Luis Pinto].
        Updates Eclipse related project files.
        (Werner - 20040319)

@@ -53,6 +53,7 @@ import java.io.IOException;
 import org.xml.sax.SAXException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+import org.exolab.castor.net.util.URIUtils;
 
 
 /**
@@ -245,13 +246,23 @@ public class DTDResolver
             URL url;
 
             try {
-                url = new URL( systemId );
+                url = new URL( _baseUrl, systemId );
                 source = new InputSource( url.openStream() );
                 source.setSystemId(systemId);
                 return source;
             } catch ( MalformedURLException except ) {
                 try {
-                    url = new URL( _baseUrl, systemId );
+                    String absURL = URIUtils.resolveAsString(systemId, _baseUrl.toString());
+                    url = new URL( absURL );
+                    source = new InputSource( url.openStream() );
+                    source.setSystemId(systemId);
+                    return source;
+                 } catch ( MalformedURLException ex2 ) { }
+            }
+            catch ( java.io.FileNotFoundException fnfe) {
+                try {
+                    String absURL = URIUtils.resolveAsString(systemId, _baseUrl.toString());
+                    url = new URL( absURL );
                     source = new InputSource( url.openStream() );
                     source.setSystemId(systemId);
                     return source;
