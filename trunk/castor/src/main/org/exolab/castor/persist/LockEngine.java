@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
+import org.exolab.castor.persist.cache.*;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
@@ -184,8 +185,14 @@ public final class LockEngine {
 
                     if ( extend == null ) {
                         // create new LRU for the base type
-                        LRU lru = LRU.create( molder.getCacheType(), molder.getCacheParam() );
-                        TypeInfo info = new TypeInfo( molder, new HashMap(), lru ); 
+                        Cache cache = null;
+                        try {
+                        	cache = CacheFactory.create( molder.getCacheType(), molder.getCacheParam());
+                        } catch (InvalidCacheTypeException e) {
+                        	_log.error ("Problem creating performance cache instance", e);
+                        	throw new MappingException ("Problem creating performance cache instance", e);
+                        }
+                        TypeInfo info = new TypeInfo( molder, new HashMap(), cache ); 
                         _typeInfo.put( molder.getName(), info );
                         itor.remove();
                         processedClasses.add( molder );
@@ -868,9 +875,11 @@ public final class LockEngine {
         try {
             lock = typeInfo.assure( oid, tx, true );
             typeInfo.molder.updateCache( tx, oid, lock, object );
-        } catch ( LockNotGrantedException e ) {
+        } 
+        catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
-        } catch ( PersistenceException except ) {
+        } 
+        catch ( PersistenceException except ) {
             typeInfo.delete( oid, tx );
         }
     }
@@ -1025,7 +1034,7 @@ public final class LockEngine {
          * put into cache maybe disposed by LRU mechanisum.
          * All extends classes share the same map as the base class.
          */
-        private final LRU cache;
+        private final Cache cache;
 
         /**
          * Constructor for creating base class info
@@ -1037,7 +1046,7 @@ public final class LockEngine {
          *         store and dispose freed ObjectLock
          *
          */
-        private TypeInfo( ClassMolder molder, HashMap locks, LRU cache ) {
+        private TypeInfo( ClassMolder molder, HashMap locks, Cache cache ) {
             this.name = molder.getName();
             this.molder = molder;
             this.locks = locks;
@@ -1330,7 +1339,7 @@ public final class LockEngine {
                 entry = (ObjectLock) locks.get( oid );
 
                 if ( entry == null )
-                    throw new IllegalStateException("No lock to destory!");
+                    throw new IllegalStateException("No lock to destroy!");
                 entry.enter();
             }
 
@@ -1373,7 +1382,7 @@ public final class LockEngine {
                 synchronized( locks ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        cache.put( oid, entry );
+                        // cache.put( oid, entry );
                         if ( entry.isExpired() ) {
                             cache.expire(oid);
                             entry.expired();
