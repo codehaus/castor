@@ -48,6 +48,9 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Hashtable;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 /**
  * Generates a parse tree for a stream of tokens representing an OQL query. 
  *
@@ -56,10 +59,15 @@ import java.util.Hashtable;
  */
 public class Parser implements TokenTypes {
 
-  Lexer _lexer;
-  Token _curToken = null;;
-  Token _nextToken = null;
-  ParseTreeNode _treeRoot;
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (Parser.class);
+    Lexer _lexer;
+    Token _curToken = null;
+    Token _nextToken = null;
+    ParseTreeNode _treeRoot;
   
   private static Hashtable tokenTypes = new Hashtable();
 
@@ -121,6 +129,7 @@ public class Parser implements TokenTypes {
       tokenTypes.put( new Integer( KEYWORD_MAX ), "KEYWORD_MAX" );
       tokenTypes.put( new Integer( KEYWORD_AVG ), "KEYWORD_AVG" );
       tokenTypes.put( new Integer( KEYWORD_LIMIT ), "KEYWORD_LIMIT" );
+      tokenTypes.put( new Integer( KEYWORD_OFFSET ), "KEYWORD_OFFSET" );
   }
 
   /**
@@ -164,9 +173,14 @@ public class Parser implements TokenTypes {
     }
 
     if ( _curToken.getTokenType() == KEYWORD_LIMIT ) {
-      _treeRoot.addChild(limitClause());
+    	_treeRoot.addChild(limitClause());
+
+        if ( _curToken.getTokenType() == KEYWORD_OFFSET ) {
+        	_treeRoot.addChild(offsetClause());
+        }
+
     }
-    
+
     match(END_OF_QUERY);
 
     return _treeRoot;
@@ -174,7 +188,7 @@ public class Parser implements TokenTypes {
 
   /**
    * Primes the _curToken and _nextToken private members by calling 
-   * {@link Lexer.getToken()}.
+   * {@link Lexer#nextToken()}.
    *
    * @throws InvalidCharException thrown by the Lexer.
    * @throws OQLSyntaxException if the query contains less than 2 tokens.
@@ -221,7 +235,9 @@ public class Parser implements TokenTypes {
     try {
       _nextToken = _lexer.nextToken();
     }
-    catch (NoMoreTokensException e) {}
+    catch (NoMoreTokensException e) {
+    	// _log.warn (e.getClass().getName(), e);
+	}
 
     return retNode;
   }
@@ -265,8 +281,8 @@ public class Parser implements TokenTypes {
 
     if (retNode == null)
       return queryTarget;
-    else
-      return retNode;
+
+    return retNode;
   }
   
   /**
@@ -363,8 +379,8 @@ public class Parser implements TokenTypes {
 
     if (retNode == null)
       return tableIdentifier;
-    else
-      return retNode;
+    
+    return retNode;
   }
   
   /**
@@ -475,8 +491,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return leftSide;
-    else
-      return retNode;
+
+    return retNode;
   }
   
   /**
@@ -513,8 +529,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return leftSide;
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -544,8 +560,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return leftSide;
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -575,8 +591,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return leftSide;
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -602,8 +618,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return leftSide;
-    else
-      return retNode;
+
+    return retNode;
   }
   
 
@@ -632,8 +648,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return postfixExpr();
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -676,8 +692,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return primaryExpr();
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -744,8 +760,8 @@ public class Parser implements TokenTypes {
     
     if (retNode == null)
       return primaryExpr();
-    else
-      return retNode;
+
+    return retNode;
   }
 
   /**
@@ -998,11 +1014,33 @@ public class Parser implements TokenTypes {
     ParseTreeNode retNode = match(KEYWORD_LIMIT);
 
     retNode.addChild(queryParam());
-      if ( _curToken.getTokenType() == COMMA )
-    {
-      retNode.addChild( match( COMMA ) );
-      retNode.addChild( queryParam() );
-    }
+//    if ( _curToken.getTokenType() == COMMA ) {
+//      retNode.addChild( match( COMMA ) );
+//      retNode.addChild( queryParam() );
+//    }
+
+    return retNode;
+  }
+
+  /**
+   * Consumes tokens of limitClause.
+   *
+   * @return a Parse tree containing LIMIT as the root, with children
+   *    as limit parameters.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match(), or if an
+   *    unknown token is encountered here.
+   */
+  private ParseTreeNode offsetClause()
+            throws InvalidCharException, OQLSyntaxException {
+
+    ParseTreeNode retNode = match(KEYWORD_OFFSET);
+
+    retNode.addChild(queryParam());
+//    if ( _curToken.getTokenType() == COMMA ) {
+//      retNode.addChild( match( COMMA ) );
+//      retNode.addChild( queryParam() );
+//    }
 
     return retNode;
   }
