@@ -962,7 +962,28 @@ public class Types
                 return result;
             }
             public String toString() { return "castor.types.Date->util.Date"; }
+        } ),
+
+        new TypeConvertorInfo( java.sql.Date.class, org.exolab.castor.types.Date.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                return new org.exolab.castor.types.Date((java.util.Date) obj);
+            }
+            public String toString() { return "sql.Date->castor.types.Date"; }
+        } ),
+
+        new TypeConvertorInfo( org.exolab.castor.types.Date.class, java.sql.Date.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                Object result = null;
+                try {
+                    result = new java.sql.Date( ((org.exolab.castor.types.Date)obj).toDate().getTime() );
+                } catch (java.text.ParseException e) {
+                    //we can never reach that point
+                }
+                return result;
+            }
+            public String toString() { return "castor.types.Date->sql.Date"; }
         } )
+
     };
 
 
