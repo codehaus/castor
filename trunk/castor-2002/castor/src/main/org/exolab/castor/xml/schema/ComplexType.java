@@ -110,11 +110,6 @@ public class ComplexType extends XMLType
     private FinalList _final = null;
 
     /**
-     * The unique id for this ComplexType (optional)
-    **/
-    private String _id = null;
-
-    /**
      * The parent structure for this ComplexType
      * (either an ElementDecl or a Schema)
     **/
@@ -129,8 +124,6 @@ public class ComplexType extends XMLType
 	 * a flag set to true if this complexType is a simpleContent
 	 */
 	private boolean _simpleContent = false;
-
-
 
 
 
@@ -282,15 +275,6 @@ public class ComplexType extends XMLType
     public FinalList getFinal() {
         return _final;
     } //-- getFinal
-
-    /**
-     * Returns the Id for this ComplexType, or null if no Id has been set.
-     *
-     * @return the Id for this ComplexType, or null if no Id has been set.
-    **/
-    public String getId() {
-        return _id;
-    } //-- getId
 
     /**
      * Returns the parent of this ComplexType, this value may be null if
@@ -495,16 +479,6 @@ public class ComplexType extends XMLType
 	    else
 	        _final = new FinalList(finalValue);
 	} //-- setFinal
-
-    /**
-     * Sets the Id for this ComplexType. The Id must be globally unique
-     * within the Schema. Use a null value to remove the Id.
-     *
-     * @param id the unique Id for this ComplexType
-    **/
-    public void setId(String id) {
-        _id = id;
-    } //-- setId
 
 	/**
 	 * Sets whether or not this complexType is a 'simpleContent'
