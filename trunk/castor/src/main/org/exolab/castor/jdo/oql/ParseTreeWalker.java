@@ -749,15 +749,25 @@ public class ParseTreeWalker implements TokenTypes
   private String getParamTypeForComparison(ParseTreeNode comparisonTree)
       throws QueryException
   {
-
     for (Enumeration e = comparisonTree.children(); e.hasMoreElements(); ) {
-
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
       int tokenType = curChild.getToken().getTokenType();
 
-      if ((tokenType == DOT) || (tokenType == IDENTIFIER)) {
-        JDOFieldDescriptor field = checkField(curChild);
-        return field.getFieldType().getName();
+      switch(tokenType) {
+        case STRING_LITERAL:	return "java.lang.String";
+        case DOUBLE_LITERAL:	return "java.lang.Double";
+        case LONG_LITERAL:		return "java.lang.Long";
+        case BOOLEAN_LITERAL:	return "java.lang.Boolean";
+        case CHAR_LITERAL:		return "java.lang.Character";
+        case DATE_LITERAL:		return "java.util.Date";
+        case TIME_LITERAL:
+        case TIMESTAMP_LITERAL:	return "java.util.Time";
+
+        case DOT:
+        case IDENTIFIER: {
+			JDOFieldDescriptor field = checkField(curChild);
+			return field.getFieldType().getName();
+        }
       }
     }
 
@@ -1440,6 +1450,5 @@ public class ParseTreeWalker implements TokenTypes
 
     return sb.toString();
   }
-
 
 }
