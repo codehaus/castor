@@ -85,28 +85,24 @@ public class OutputLogInterceptor
         _writer = new PrintWriter( writer );
     }
 
-
-    public void loading( Class objClass, Object identity )
+    public void loading(Object objClass, Object identity)
     {
-        _writer.println( "Castor: Loading " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Loading " + objClass + " (" + identity + ")" );
     }
 
-
-    public void creating( Class objClass, Object identity )
+    public void creating( Object objClass, Object identity )
     {
-        _writer.println( "Castor: Creating " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Creating " + objClass + " (" + identity + ")" );
     }
 
-
-    public void removing( Class objClass, Object identity )
+    public void removing( Object objClass, Object identity )
     {
-        _writer.println( "Castor: Removing " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Removing " + objClass + " (" + identity + ")" );
     }
 
-
-    public void storing( Class objClass, Object identity )
+    public void storing( Object objClass, Object identity )
     {
-        _writer.println( "Castor: Storing " + objClass.getName() + " (" + identity + ")" );
+        _writer.println( "Castor: Storing " + objClass + " (" + identity + ")" );
     }
 
 
