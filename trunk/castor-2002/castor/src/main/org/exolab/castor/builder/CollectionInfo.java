@@ -38,8 +38,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999,2000 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
+ * Contribution(s):
+ *
+ * - Frank Thelen, frank.thelen@poet.de
+ *     - Moved creation of access methods into an appropriate
+ *       set of separate methods, for extensibility
+ * 
  * $Id$
  */
 
@@ -132,7 +138,7 @@ public class CollectionInfo extends FieldInfo {
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(contentParam);
         
-        createAddMethod_Impl(method);
+        createAddMethod(method);
                     
 
           //---------------------/
@@ -146,7 +152,7 @@ public class CollectionInfo extends FieldInfo {
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(new JParameter(JType.Int, "index"));
                     
-        createGetMethod_Impl(method);
+        createGetByIndexMethod(method);
                     
         
           //-----------------------/
@@ -157,7 +163,7 @@ public class CollectionInfo extends FieldInfo {
         method = new JMethod(jType, "get"+cName);
         methods.addElement(method);
         
-        createGetByIndexMethod_Impl(method);
+        createGetMethod(method);
 
         
           //---------------------/
@@ -170,7 +176,7 @@ public class CollectionInfo extends FieldInfo {
         method.addParameter(contentParam);
         method.addParameter(new JParameter(JType.Int, "index"));
         
-        createSetMethod_Impl(method);
+        createSetMethod(method);
         
         
           //--------------------------/
@@ -180,7 +186,7 @@ public class CollectionInfo extends FieldInfo {
         method = new JMethod(JType.Int, "get"+cName+"Count");
         methods.addElement(method);
         
-        createGetCountMethod_Impl(method);
+        createGetCountMethod(method);
         
         
           //---------------------------/
@@ -190,7 +196,7 @@ public class CollectionInfo extends FieldInfo {
         method = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
         methods.addElement(method);
         
-        createEnumerateMethod_Impl(method);
+        createEnumerateMethod(method);
         
         
           //--------------------------------/
@@ -214,7 +220,7 @@ public class CollectionInfo extends FieldInfo {
         methods.addElement(method);
         method.addParameter(new JParameter(JType.Int, "index"));
         
-        createRemoveByIndexMethod_Impl(method);
+        createRemoveByIndexMethod(method);
         
         
           //-----------------------------/
@@ -224,7 +230,7 @@ public class CollectionInfo extends FieldInfo {
         method = new JMethod(null, "removeAll"+cName);
         methods.addElement(method);
         
-        createRemoveAllMethod_Impl(method);
+        createRemoveAllMethod(method);
         
         
         /* Return JMethod[] */
@@ -284,9 +290,10 @@ public class CollectionInfo extends FieldInfo {
         return true;
     }
 
-    /** Creates implementation of add method.
-    */
-    public void createAddMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of add method.
+    **/
+    public void createAddMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         
@@ -306,11 +313,57 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(".addElement(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
-    }
+        
+    } //-- createAddMethod
+    
                     
-    /** Creates implementation of get method.
-    */
-    public void createGetMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of object[] get() method.
+    **/
+    public void createGetMethod(JMethod method) {
+
+        JSourceCode jsc = method.getSourceCode();
+        JType jType = method.getReturnType();
+                    
+        jsc.add("int size = ");
+        jsc.append(getName());
+        jsc.append(".size();");
+        
+        String variableName = getName()+".elementAt(index)";
+        
+        JType compType = jType.getComponentType();
+        
+        jsc.add(compType.toString());
+        jsc.append("[] mArray = new ");
+        jsc.append(compType.getLocalName());
+        jsc.append("[size]");
+        //-- if component is an array, we must add [] after setting
+        //-- size
+        if (compType.isArray()) jsc.append("[]");
+        jsc.append(";");
+        
+        jsc.add("for (int index = 0; index < size; index++) {");
+        jsc.indent();
+        jsc.add("mArray[index] = ");
+        if (getContentType().getType() == XSType.CLASS) {
+            jsc.append("(");
+            jsc.append(jType.getLocalName());
+            jsc.append(") ");
+            jsc.append(variableName);
+        }
+        else {
+            jsc.append(getContentType().createFromJavaObjectCode(variableName));
+        }
+        jsc.append(";");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("return mArray;");
+    } //-- createGetMethod
+    
+    /** 
+     * Creates implementation of the get(index) method.
+    **/
+    public void createGetByIndexMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
@@ -331,7 +384,7 @@ public class CollectionInfo extends FieldInfo {
         
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
-            jsc.append(jType.getName());
+            jsc.append(jType.toString());
             jsc.append(") ");
             jsc.append(variableName);
         }
@@ -339,46 +392,13 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(getContentType().createFromJavaObjectCode(variableName));
         }
         jsc.append(";");
-    }
+    } //-- createGetByIndex
 
-    /** Creates implementation of get[] method.
-    */
-    public void createGetByIndexMethod_Impl (JMethod method) {
 
-        JSourceCode jsc = method.getSourceCode();
-        JType jType = method.getReturnType();
-                    
-        jsc.add("int size = ");
-        jsc.append(getName());
-        jsc.append(".size();");
-        
-        String variableName = getName()+".elementAt(index)";
-        
-        jsc.add(jType.getLocalName());
-        jsc.append("[] mArray = new ");
-        jsc.append(jType.getLocalName());
-        jsc.append("[size];");
-        jsc.add("for (int index = 0; index < size; index++) {");
-        jsc.indent();
-        jsc.add("mArray[index] = ");
-        if (getContentType().getType() == XSType.CLASS) {
-            jsc.append("(");
-            jsc.append(jType.getLocalName());
-            jsc.append(") ");
-            jsc.append(variableName);
-        }
-        else {
-            jsc.append(getContentType().createFromJavaObjectCode(variableName));
-        }
-        jsc.append(";");
-        jsc.unindent();
-        jsc.add("}");
-        jsc.add("return mArray;");
-    }
-
-    /** Creates implementation of set method.
-    */
-    public void createSetMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of set method.
+    **/
+    public void createSetMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
         
@@ -407,33 +427,39 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(".setElementAt(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(", index);");
-    }
+        
+    } //-- createSetMethod
+    
 
-    /** Creates implementation of getCount method.
-    */
-    public void createGetCountMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of getCount method.
+    **/
+    public void createGetCountMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         
         jsc.add("return ");
         jsc.append(getName());
         jsc.append(".size();");
-    }
+    } //-- createGetCoundMethod
 
-    /** Creates implementation of Enumerate method.
-    */
-    public void createEnumerateMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of Enumerate method.
+    **/
+    public void createEnumerateMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         
         jsc.add("return ");
         jsc.append(getName());
         jsc.append(".elements();");
-    }
+        
+    } //-- createEnumerateMethod
 
-    /** Creates implementation of remove(Object) method.
-    */
-    public void createRemoveByObjectMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of remove(Object) method.
+    **/
+    public void createRemoveByObjectMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         
@@ -442,11 +468,13 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(".removeElement(");
         jsc.append(getContentName());
         jsc.append(");");
-    }
+        
+    } //-- createRemoveByObjectMethod
 
-    /** Creates implementation of remove(int i) method.
-    */
-    public void createRemoveByIndexMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of remove(int i) method.
+    **/
+    public void createRemoveByIndexMethod(JMethod method) {
         
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
@@ -466,17 +494,19 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(getContentType().createFromJavaObjectCode("obj"));
             jsc.append(";");
         }
-    }
+        
+    } //-- createRemoveByIndexMethod
 
-    /** Creates implementation of removeAll() method.
-    */
-    public void createRemoveAllMethod_Impl (JMethod method) {
+    /** 
+     * Creates implementation of removeAll() method.
+    **/
+    public void createRemoveAllMethod (JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
-        
         jsc.add(getName());
         jsc.append(".removeAllElements();");
-    }
+        
+    } //-- createRemoveAllMethod
     
 
 } //-- CollectionInfo

@@ -196,7 +196,7 @@ public abstract class XSType {
         JType jType = getJType();
         if (jType != null) {
             sb.append('(');
-            sb.append(jType.getName());
+            sb.append(jType.toString());
             sb.append(") ");
         }
         sb.append(variableName);
