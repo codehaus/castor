@@ -2159,13 +2159,33 @@ public abstract class TransactionContext
      */
     ObjectEntry getObjectEntry( Object object )
     {
-        ObjectEntry entry;
+	    ObjectEntry entry;
 
-        for ( Enumeration enumeration = _objects.elements(); enumeration.hasMoreElements(); ) {
-            entry = (ObjectEntry) enumeration.nextElement();
-            if ( entry.object == object )
-                return entry;
-        }
+		if(object instanceof LazyCGLIB) {
+			// TODO [WG] We still might have an option for some serious optimization here if the instance has not been materialized yet.
+		    Class clazz = ((LazyCGLIB)object).interceptedClass();
+		    Object identity = ((LazyCGLIB)object).interceptedIdentity();
+
+	        for ( Enumeration enumeration = _objects.elements(); enumeration.hasMoreElements(); ) {
+	            entry = (ObjectEntry) enumeration.nextElement();
+	            if ( clazz == entry.object.getClass() ) {
+	        	    if( identity == null ) {
+	        	        if( entry.oid.getIdentity() == null)
+		                    return entry;
+	        	    } else {
+	        	        if( identity.equals(entry.oid.getIdentity()) )
+		                    return entry;
+	        	    }
+	            }
+	        }
+		} else {
+	        for ( Enumeration enumeration = _objects.elements(); enumeration.hasMoreElements(); ) {
+	            entry = (ObjectEntry) enumeration.nextElement();
+	            if ( object == entry.object )
+	                return entry;
+	        }
+		}
+		
         return null;
     }
 
