@@ -88,6 +88,11 @@ public class TestCaseAggregator extends TestCase {
     private final static String FILE_SEPARATOR = System.getProperty("file.separator");
 
     /**
+     * CVS name...to filter--> best solution for next version use a FileFilter
+     */
+     private final static String CVS = "CVS";
+
+    /**
      * Name of the system property to set up the verbose mode.
      */
     public static final String VERBOSE_PROPERTY = "org.exolab.castor.tests.Verbose";
@@ -157,8 +162,7 @@ public class TestCaseAggregator extends TestCase {
         CastorTestCase tc = null;
         for (int i=0; i<list.length; ++i) {
             String name = list[i].getName();
-
-            if (list[i].isDirectory()) {
+            if (list[i].isDirectory() && !name.endsWith(CVS)) {
                 //look for jars or testDescriptor files inside the directory
                 TestCaseAggregator recurse = new TestCaseAggregator(list[i], outputRoot);
                 suite.addTest(recurse.suite());
@@ -170,6 +174,7 @@ public class TestCaseAggregator extends TestCase {
             }
             if (tc != null && tc.suite() != null)
                 suite.addTest(tc.suite());
+            tc = null;
         }//for
 
         return suite;
