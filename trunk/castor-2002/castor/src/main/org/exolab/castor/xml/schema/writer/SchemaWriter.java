@@ -288,7 +288,8 @@ public class SchemaWriter {
         //-- type attribute
         boolean hasAnonymousType = false;
         SimpleType type = attribute.getSimpleType();
-        if (!isReference) {
+        if ((!isReference) && (type != null)) {
+            
             if (type.getName() != null) {
 
                 String typeName = type.getName();
