@@ -53,6 +53,7 @@ import org.odmg.TransactionNotInProgressException;
 import org.odmg.TransactionAbortedException;
 import org.odmg.LockNotGrantedException;
 import org.odmg.ODMGRuntimeException;
+import org.odmg.ObjectNotPersistentException;
 import javax.transaction.Status;
 import org.exolab.castor.util.FastThreadLocal;
 import org.exolab.castor.util.Messages;
@@ -170,6 +171,15 @@ public final class TransactionImpl
 	try {
 	    _txContext.prepare();
 	    _txContext.commit();
+	} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+	    try {
+		_txContext.rollback();
+	    } catch ( org.exolab.castor.persist.TransactionNotInProgressException except2 ) {
+		// This should never happen
+	    }
+	    throw new TransactionAbortedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
 	} finally {
 	    _txContext = null;
 	}
@@ -188,6 +198,8 @@ public final class TransactionImpl
 	    throw new ODMGRuntimeException( Messages.message( "castor.jdo.odmg.threadNotSingleOwner" ) );
 	try {
 	    _txContext.rollback();
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
 	} finally {
 	    _txContext = null;
 	}
@@ -205,6 +217,10 @@ public final class TransactionImpl
 	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
 	try {
 	    _txContext.checkpoint();
+	} catch ( org.exolab.castor.persist.TransactionAbortedException except ) {
+	    throw new TransactionAbortedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
 	} catch ( TransactionAbortedException except ) {
 	    _txContext = null;
 	    throw except;
@@ -221,7 +237,18 @@ public final class TransactionImpl
 	    throw new TransactionAbortedException( Messages.message( "castor.jdo.odmg.txAborted" ) );
 	if ( _txContext == null || ! _txContext.isOpen() )
 	    throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.txNotInProgress" ) );
-	_txContext.lock( obj, ( lockMode == WRITE ), DefaultWaitLockTimeout );
+	try {
+	    if ( lockMode == WRITE )
+		_txContext.writeLock( obj, DefaultWaitLockTimeout );
+	} catch ( org.exolab.castor.persist.LockNotGrantedException except ) {
+	    throw new LockNotGrantedException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.ObjectNotPersistentException except ) {
+	    throw new ObjectNotPersistentException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.PersistenceException except ) {
+	    throw new ODMGRuntimeExceptionImpl( except.getMessage(), except.getException() );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	}
     }
 
 

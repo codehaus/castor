@@ -61,9 +61,12 @@ import org.odmg.QueryInvalidException;
 import org.odmg.QueryException;
 import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.jdo.ODMGSQLException;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
+import org.exolab.castor.persist.TransactionContext.QueryResults;
+import org.exolab.castor.persist.TransactionContext.AccessMode;
+import org.exolab.castor.persist.Query;
+import org.exolab.castor.persist.PersistenceException;
 
 
 /**
@@ -80,34 +83,26 @@ public class OQLQueryImpl
     private int                _fieldNum;
 
 
-    private SQLEngine          _engine;
-
-
     private DatabaseEngine     _dbEngine;
 
 
-    private Vector             _fields;
-
-
-    private Object[]           _values;
-
-
-    private String             _sql;
-
-
     private Class              _objClass;
+
+
+    private Query              _query;
 
 
     public void bind( Object obj )
 	throws QueryParameterCountInvalidException,
 	       QueryParameterTypeInvalidException
     {
-	if ( _sql == null ) {
+	if ( _query == null ) {
 	    throw new ODMGRuntimeException( "Must create query before using it" );
 	}
-	if ( _fieldNum == _values.length )
-	    throw new QueryParameterCountInvalidException( "Only " + _fieldNum + " fields in this query" );
-	_values[ _fieldNum ] = obj;
+	if ( _fieldNum == _query.getParameterCount() )
+	    throw new QueryParameterCountInvalidException( "Only " + _query.getParameterCount() +
+							   " fields in this query" );
+	_query.setParameter( _fieldNum, obj );
 	++_fieldNum;
     }
 
@@ -120,10 +115,12 @@ public class OQLQueryImpl
 	String          objName;
 	StringBuffer    sql;
 	JDOObjectDesc   objDesc;
+	SQLEngine       engine;
+	Vector          types;
+	Class[]         array;
 
-	_sql = null;
 	_fieldNum = 0;
-	_fields = new Vector();
+	types = new Vector();
 	sql = new StringBuffer();
 	token = new StringTokenizer( oql );
 	if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "SELECT" ) )
@@ -140,8 +137,6 @@ public class OQLQueryImpl
 	    throw new QueryInvalidException( "Missing object name" );
 	if ( ! objName.equals( token.nextToken() ) )
 	    throw new QueryInvalidException( "Object name not same in SELECT and FROM" );
-	if ( ! token.hasMoreTokens() || ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
-	    throw new QueryInvalidException( "Missing WHERE clause" );
 
 	try {
 	    _objClass = Class.forName( objType );
@@ -151,22 +146,31 @@ public class OQLQueryImpl
 	_dbEngine = DatabaseEngine.getDatabaseEngine( _objClass ); 
 	if ( _dbEngine == null )
 	    throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
-	_engine = _dbEngine.getSQLEngine( _objClass );
-	objDesc = _engine.getObjectDesc();
+	engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
+	objDesc = engine.getObjectDesc();
 
-	parseField( objDesc, token, sql );
-	while ( token.hasMoreTokens() ) {
-	    if ( ! token.nextToken().equals( "AND" ) )
-		throw new QueryInvalidException( "Only AND supported in WHERE clause" );
-	    parseField( objDesc, token, sql );
+	if ( token.hasMoreTokens() ) {
+	    if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
+		throw new QueryInvalidException( "Missing WHERE clause" );
+	    parseField( objDesc, token, sql, types );
+	    while ( token.hasMoreTokens() ) {
+		if ( ! token.nextToken().equals( "AND" ) )
+		    throw new QueryInvalidException( "Only AND supported in WHERE clause" );
+		parseField( objDesc, token, sql, types );
+	    }
+	} else {
+	    sql.append( "1 = 1" );
 	}
 
-	_sql = sql.insert( 0, _engine._sqlFinder ).append( _engine._sqlFinderJoin ).toString();
-	_values = new Object[ _fields.size() ];
+	sql.insert( 0, engine._sqlFinder ).append( engine._sqlFinderJoin );
+	array = new Class[ types.size() ];
+	types.copyInto( array );
+	_query = engine.createQuery( sql.toString(), array );
     }
 
 
-    private void parseField( JDOObjectDesc objDesc, StringTokenizer token, StringBuffer sqlWhere )
+    private void parseField( JDOObjectDesc objDesc, StringTokenizer token,
+			     StringBuffer sqlWhere, Vector types )
 	throws QueryInvalidException
     {
 	String         name;
@@ -218,10 +222,10 @@ public class OQLQueryImpl
 	sqlWhere.append( op );
 	if ( value.startsWith( "$" ) ) {
 	    sqlWhere.append( "?" );
+	    types.addElement( field.getFieldType() );
 	} else {
 	    sqlWhere.append( value );
 	}
-	_fields.addElement( field.getFieldType() );
     }
 
 
@@ -229,18 +233,35 @@ public class OQLQueryImpl
 	throws QueryException
     {
 	TransactionContext tx;
+	QueryResults       results;
 	Object             obj;
+	Vector             set;
 
 	try {
 	    tx = TransactionImpl.getCurrentContext();
 	    if ( tx == null || ! tx.isOpen() )
 		throw new TransactionNotInProgressException( Messages.message( "castor.jdo.odmg.dbTxNotInProgress" ) );
-	    obj = tx.query( _dbEngine, _objClass, _sql, _values, Database.OPEN_READ_WRITE, 0 );
+	    results = tx.query( _dbEngine, _query, AccessMode.ReadWrite );
 	    _fieldNum = 0;
-	    return obj;
-	} catch ( ODMGException except ) {
-	    throw new QueryException( except.toString() );
-	} catch ( ODMGSQLException except ) {
+
+	    obj = results.nextResult();
+	    if ( obj == null )
+		return null;
+	    set = new Vector();
+	    set.addElement( obj );
+	    obj = results.nextResult();
+	    if ( obj == null )
+		return set.firstElement();
+	    while ( obj != null ) {
+		set.addElement( obj );
+		obj = results.nextResult();
+	    }
+	    return set.elements();
+	} catch ( org.exolab.castor.persist.QueryException except ) {
+	    throw new QueryException( except.getMessage() );
+	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
+	    throw new TransactionNotInProgressException( except.getMessage() );
+	} catch ( PersistenceException except ) {
 	    throw new QueryException( except.toString() );
 	}
     }
