@@ -64,7 +64,10 @@ import org.apache.commons.logging.LogFactory;
  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
  */
 public class JDOConfLoader {
-
+    private static final String NOTE_096 =
+          "NOTE: JDO configuration syntax has changed with castor 0.9.6, "
+        + "please see http://castor.codehaus.org/release-notes.html for details";
+    
     private static Log _log = LogFactory.getFactory().getInstance( JDOConfLoader.class );
 
     private static boolean _loaded = false;
@@ -95,6 +98,7 @@ public class JDOConfLoader {
                 _jdoConf = (JdoConf) unmarshaller.unmarshal (source);
             }
             catch (MarshalException e) {
+                _log.info(NOTE_096);
                 throw new MappingException (e); 
             }
             catch (ValidationException e) {
