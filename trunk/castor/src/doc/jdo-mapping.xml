@@ -29,10 +29,10 @@
 
       <code>
       &lt;mapping>
-          &lt;class>
-              &lt;map-to />
-              &lt;field>
-                  &lt;sql />
+          &lt;class ... >
+              &lt;map-to ... />
+              &lt;field ... >
+                  &lt;sql ... />
               &lt;/field>
               ...
           &lt;/class>
@@ -64,6 +64,44 @@
     </section>
 
     <section title="The Mapping File">
+
+      <section title="The &lt;mapping> element">
+
+        <code>
+          &lt;!ELEMENT mapping ( description?, include*, class*, key-generator* )>
+        </code>
+
+        <p>The &lt;mapping> element is the root element of a mapping file. It contains:</p>
+
+        <ul>
+          <li>an optional description</li>
+          <li>zero or more &lt;include> which facilitates reusing mapping files</li>
+          <li>zero or more &lt;class> descriptions: one for each class we intend to give
+            mapping information</li>
+          <li>zero or more &lt;key-generator>: not used for XML mapping</li>
+        </ul>
+
+        <p>A mapping file look like this:</p>
+
+        <code>
+        &lt;?xml version="1.0"?>
+        &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
+                                 "http://castor.exolab.org/mapping.dtd">
+
+        &lt;mapping>
+                &lt;description>Description of the mapping&lt;/description>
+                &lt;include href="other_mapping_file.xml"/>
+
+                &lt;class name="A">
+                        ...
+                &lt;/class>
+
+                &lt;class name="B">
+                        ...
+                &lt;/class>
+        &lt;/mapping>
+        </code>
+      </section>
 
       <section title="The &lt;class> element">
 
@@ -273,7 +311,7 @@
         <code>
         public &lt;type> &lt;get-method>();
         </code>
-        or
+        <p>or</p>
         <code>
         public void &lt;set-method>(&lt;type> value);
         </code>
@@ -284,10 +322,14 @@
 		<code>	public void is&lt;capitalized-name>()/public &lt;type> get&lt;capitalized-name>();</code>
 		
 		<p>the former for boolean types, the latter for all other types (or if the 
-		   'is&lt;capitalized-name>()' method is not defined for a boolean type), and 
-		   a standard set method of</p>
+		'is&lt;capitalized-name>()' method is not defined for a boolean type), and 
+		a standard set method of</p>
         
         <code>	public void set&lt;capitalized-name>(&lt;type> value);</code>        
+	
+	    <p>If there are more than one set&lt;capitalized-name> method it first tries to find the one
+        that exactly matches &lt;type>. If no such method is available and &lt;type> is a java
+        primitive type it tries to find a method with the corresponing java object type.</p>
 	
         <p>&lt;capitalized-name> means that Castor uses the &lt;name> attribute by changing its first
         letter to uppercase without modifying the other letters.</p>

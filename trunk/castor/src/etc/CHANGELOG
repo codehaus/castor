@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug 1214 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem in field molder when dealing with 'set'
+	   methods with more than one signature.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1214
+       (Ralf - 20050402)
+
 All:   Fixed bug 1903 using contribution from Stein M. Hugubakken [dulci@start.no]
        Enclose debug-statements with isDebugEnabled when string-concatenation is used in the debug-call.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1903

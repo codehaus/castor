@@ -31,7 +31,28 @@
               Short description says all ...
             </summary>
 			<bugs>
-			<bug id="1903">
+				<bug id="1214">
+					<description>
+						Fixed problem in field molder when dealing with 'set'
+						methods with more than one signature.
+					</description>
+					<contributor>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Howard Pelling</name>
+						<email>howardpelling@earthlink.net</email>
+					</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050402</date>
+				</bug>
+			    <bug id="1903">
 					<description>
 						Surrounded logging-statements with isDebugEnabled() if the
 						logging-string is assembled.
