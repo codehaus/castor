@@ -27,12 +27,11 @@ package org.exolab.castor.jdo;
  * Write locks are implicitly obtained as objects are modified.
  * <code>Transaction</code> objects are transient, they cannot be stored in the database.
  *
- * @author David Jordan (as Java Editor of the Object Data Management Group)
+ * @author David Jordan (OMG)
  * @version ODMG 3.0
- * @see TransactionNotInProgressException
+ * @version $Revision$ $Date$
  */
 public interface Transaction
-    extends org.odmg.Transaction
 {
 
 
@@ -89,7 +88,8 @@ public interface Transaction
      * Committing a transaction does not remove from memory transient objects created
      * during the transaction
      */
-    public void commit();
+    public void commit()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException;
 
 
     /**
@@ -98,7 +98,8 @@ public interface Transaction
      * associated locks.
      * Aborting a transaction does not restore the state of modified transient objects
      */
-    public void abort();
+    public void abort()
+        throws TransactionNotInProgressException, PersistenceException;
 
 
     /**
@@ -108,7 +109,8 @@ public interface Transaction
      * The transaction retains all locks it held on those objects at the time the
      * checkpoint was invoked.
      */
-    public void checkpoint();
+    public void checkpoint()
+        throws TransactionNotInProgressException, TransactionAbortedException, PersistenceException;
 
 
     /**
@@ -138,7 +140,7 @@ public interface Transaction
      * @throws LockNotGrantedException Is thrown if the given lock mode could not be acquired.
      */
     public void lock( Object obj, int lockMode )
-        throws LockNotGrantedException;
+        throws LockNotGrantedException, PersistenceException;
 
 
     /**
@@ -151,7 +153,8 @@ public interface Transaction
      * <code>UPGRADE</code>, and <code>WRITE</code>.
      * @return True if the lock has been acquired, otherwise false.
      */
-    public boolean tryLock( Object obj, int lockMode );
+    public boolean tryLock( Object obj, int lockMode )
+        throws PersistenceException;
 
 
 }

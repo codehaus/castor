@@ -53,12 +53,17 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.DuplicateIdentityException;
-import org.exolab.castor.persist.PersistenceException;
-import org.exolab.castor.persist.ObjectNotFoundException;
-import org.exolab.castor.persist.ObjectModifiedException;
-import org.exolab.castor.persist.ObjectDeletedException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.persist.DuplicateIdentityExceptionImpl;
+import org.exolab.castor.persist.PersistenceExceptionImpl;
+import org.exolab.castor.persist.ObjectNotFoundExceptionImpl;
+import org.exolab.castor.persist.ObjectDeletedExceptionImpl;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -68,6 +73,7 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -140,8 +146,12 @@ final class SQLEngine
         if ( _clsDesc.getExtends() != null )
             _extends = new SQLEngine( (JDOClassDescriptor) _clsDesc.getExtends(), null,
 				      _factory, _stampField );
-        buildSql( _clsDesc, _logWriter );
-        buildFinder( _clsDesc, _logWriter );
+        try {
+            buildSql( _clsDesc, _logWriter );
+            buildFinder( _clsDesc, _logWriter );
+        } catch ( QueryException except ) {
+            throw new MappingException( except );
+        }
     }
 
 
@@ -196,7 +206,7 @@ final class SQLEngine
             // [oleg] Check for duplicate key based on X/Open error code
             if ( except.getSQLState() != null &&
                  except.getSQLState().startsWith( "23" ) )
-                throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
+                throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
 
             // [oleg] Check for duplicate key the old fashioned way,
             //        after the INSERT failed to prevent race conditions
@@ -210,7 +220,7 @@ final class SQLEngine
                 stmt.setObject( 1, identity );
                 if ( stmt.executeQuery().next() ) {
 		    stmt.close();
-                    throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
+                    throw new DuplicateIdentityExceptionImpl( _clsDesc.getJavaClass(), identity );
 		}
             } catch ( SQLException except2 ) {
                 // Error at the stage indicates it wasn't a duplicate
@@ -223,7 +233,7 @@ final class SQLEngine
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -269,12 +279,12 @@ final class SQLEngine
 		    stmt.setObject( 1, identity );
 		    if ( stmt.executeQuery().next() ) {
 			stmt.close();
-			throw new ObjectModifiedException( _clsDesc.getJavaClass(), identity );
+			throw new ObjectModifiedException( Messages.format( "persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
 		    }
 		    stmt.close();
 		}
 
-                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
             }
             stmt.close();
             return null;
@@ -284,7 +294,7 @@ final class SQLEngine
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -310,7 +320,7 @@ final class SQLEngine
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -330,7 +340,7 @@ final class SQLEngine
             // If no query was performed, the object has been previously
             // removed from persistent storage. Complain about this.
             if ( ! stmt.executeQuery().next() )
-                throw new ObjectDeletedException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), identity );
             stmt.close();
         } catch ( SQLException except ) {
             try {
@@ -338,7 +348,7 @@ final class SQLEngine
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
     }
 
@@ -356,7 +366,7 @@ final class SQLEngine
 
             rs = stmt.executeQuery();
             if ( ! rs.next() )
-                throw new ObjectNotFoundException( _clsDesc.getJavaClass(), identity );
+                throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), identity );
 
             // Load all the fields of the object including one-one relations
             for ( int i = 0 ; i < _fields.length ; ++i  ) {
@@ -386,13 +396,14 @@ final class SQLEngine
             stmt.close();
 
         } catch ( SQLException except ) {
-            throw new PersistenceException( except );
+            throw new PersistenceExceptionImpl( except );
         }
         return stamp;
     }
 
 
     private void buildSql( JDOClassDescriptor clsDesc, PrintWriter logWriter )
+            throws QueryException
     {
         StringBuffer         sql;
         JDOFieldDescriptor[] jdoFields;
@@ -477,7 +488,7 @@ final class SQLEngine
 
 
     private void buildFinder( JDOClassDescriptor clsDesc, PrintWriter logWriter )
-        throws MappingException
+        throws MappingException, QueryException
     {
         Vector          fields;
         QueryExpression expr;
@@ -683,7 +694,7 @@ final class SQLEngine
                 _rs = _stmt.executeQuery();
             } catch ( SQLException except ) {
                 close();
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
         }
 
@@ -709,7 +720,7 @@ final class SQLEngine
                 return _lastIdentity;
             } catch ( SQLException except ) {
                 _lastIdentity = null;
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
         }
 
@@ -772,7 +783,7 @@ final class SQLEngine
                 } else
                     _lastIdentity = null;
             } catch ( SQLException except ) {
-                throw new PersistenceException( except );
+                throw new PersistenceExceptionImpl( except );
             }
             return stamp;
         }

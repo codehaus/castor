@@ -47,6 +47,10 @@
 package org.exolab.castor.persist;
 
 
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.util.Messages;
+
+
 /**
  * Thrown to indicate that a lock attempt has failed due to object
  * being deleted by a concurrent transaction.
@@ -61,7 +65,7 @@ public class ObjectDeletedWaitingForLockException
 
     ObjectDeletedWaitingForLockException()
     {
-        super( "persist.deletedWaitingForLock" );
+        super( Messages.message( "persist.deletedWaitingForLock" ) );
     }
 
 

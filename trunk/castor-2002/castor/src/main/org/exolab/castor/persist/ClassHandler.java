@@ -54,6 +54,8 @@ import java.io.ObjectInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -389,8 +391,8 @@ public final class ClassHandler
 
                         object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), vector.elementAt( j ) );
                         if ( object == null )
-                            throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedClass(),
-                                                               vector.elementAt( j ) );
+                            throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
+                                                                   vector.elementAt( j ) );
                         collection = _fields[ i ].colHandler.addValue( collection, object, vector.elementAt( j ) );
                     }
                     _fields[ i ].relation.setRelated( target, collection );
@@ -399,8 +401,8 @@ public final class ClassHandler
 
                     relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
                     if ( relTarget == null )
-                        throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedClass(),
-                                                           fields[ i ] );
+                        throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
+                                                               fields[ i ] );
                     _fields[ i ].relation.setRelated( target, relTarget );
                 }
             }

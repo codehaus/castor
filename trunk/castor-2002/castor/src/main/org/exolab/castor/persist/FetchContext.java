@@ -47,6 +47,7 @@
 package org.exolab.castor.persist;
 
 
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 
 
