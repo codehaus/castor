@@ -417,8 +417,8 @@ grant all on test_keygen_seq to test;
 drop table test_identity;
 
 create table test_identity (
-  id numeric(10,0) identity,
-  attr varchar(200) not null,
+  id numeric(10,0) not null,
+  attr varchar(200) not null
 );
 
 grant all on test_identity to test;
@@ -428,7 +428,7 @@ drop table test_identity_ext;
 
 create table test_identity_ext (
   id numeric(10,0) not null,
-  ext varchar(200) not null,
+  ext varchar(200) not null
 );
 
 create unique index test_ident_ext_pk on test_identity_ext ( id );
@@ -488,7 +488,7 @@ create table test_persistent (
 
 create unique index test_persistent_pk on test_persistent ( id );
 
-grant all on test_persistent on test;
+grant all on test_persistent to test;
 
 
 drop table test_related;
