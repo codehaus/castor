@@ -95,15 +95,6 @@ public class TestManyGroup {
     }
 
     public void setPeople( Collection people ) {
-        System.out.println("TestmanyGroup.setPeople() "+people);
-        if ( people != null ) {
-            Iterator i = people.iterator();
-            while ( i.hasNext() ) {
-                System.out.println( "People to be added"+i.next() );
-            }
-        } else {
-            System.out.println("People is null");
-        }
         _people = people;
     }
 

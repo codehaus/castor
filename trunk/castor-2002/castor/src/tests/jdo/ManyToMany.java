@@ -138,7 +138,7 @@ public class ManyToMany extends CWTestCase {
                 _db.remove( group );
                 stream.writeVerbose( "Deleted object: " + group );
             } else {
-                System.out.println("Group 1 not found, creating new one");
+                stream.writeVerbose("Group 1 not found, creating new one");
             }
 
             oqlp = _db.getOQLQuery( "SELECT object FROM jdo.TestManyPerson object WHERE id = $1" );
@@ -150,7 +150,7 @@ public class ManyToMany extends CWTestCase {
                 _db.remove( person1 );
                 stream.writeVerbose( "Deleted object: " + person1 );
             } else {
-                System.out.println("Person 100 not found, creating new one");
+                stream.writeVerbose("Person 100 not found, creating new one");
             }
 
             oqlp.bind( 200 );
@@ -161,14 +161,14 @@ public class ManyToMany extends CWTestCase {
                 _db.remove( person1 );
                 stream.writeVerbose( "Deleted object: " + person1 );
             } else {
-                System.out.println("Person 200 not found, creating new one");
+                stream.writeVerbose("Person 200 not found, creating new one");
             }
             _db.commit();
 
 
             // create new group with two people
             _db.begin();
-            System.out.println("--------------Creating new group with people!--------------");
+            stream.writeVerbose("Creating new group with people!");
             person1 = new TestManyPerson();
             person1.setValue1("I am person 1");
             ArrayList gPerson1 = new ArrayList();
@@ -201,18 +201,12 @@ public class ManyToMany extends CWTestCase {
             _db.create( person1 );
             _db.create( person2 );
 
-            System.out.println("object created: " + group);
+            stream.writeVerbose("object created: " + group);
             Collection ppl = group.getPeople();
-            if ( ppl != null ) {
-                Iterator i = ppl.iterator();
-                while ( i.hasNext() ) {
-                    System.out.println( i.next() );
-                }
-            }
             _db.commit();
                 
             // load the object and modify it
-            System.out.println("--------------Load the objects and modify it--------------");
+            stream.writeVerbose("Load the objects and modify it");
             _db.begin();
             oql.bind( 1 );
             group = null;
@@ -276,7 +270,7 @@ public class ManyToMany extends CWTestCase {
             _db.commit();
 
             // load again to see if the changes done are effective
-            System.out.println("--------------Load the objects again to see if changes done are effective--------------");
+            stream.writeVerbose("Load the objects again to see if changes done are effective");
             _db.begin();
             oql.bind( 1 );
             group = null;
