@@ -285,8 +285,12 @@ public class UnmarshalHandler implements DocumentHandler {
                 state.buffer.setLength(0);
             }
             
-            if (type == String.class)
-                state.object = str;
+            if (type == String.class) {
+                if (str != null)
+                    state.object = str;
+                else
+                    state.object = "";
+            }
             //-- special handling for byte[]
             else if (byteArray) {
                 if (str == null)
