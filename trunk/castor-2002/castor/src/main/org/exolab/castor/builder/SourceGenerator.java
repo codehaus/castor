@@ -1199,23 +1199,30 @@ public class SourceGenerator {
             String componentName = null;
 
             if (name.indexOf("_has") == -1) {
+               //Collection needs a specific handling
                if ( (type.getName().equals("java.util.Vector")) ||
                     (type.getName().equals("java.util.ArrayList")) ) {
                      //if we are dealing with a Vector or an ArrayList
                     //we retrieve the type included in this Collection
-                    String methodName = JavaNaming.toJavaClassName(name.substring(0,name.indexOf("List")));
+                    int listLocat = name.lastIndexOf("List");
+                    String tempName = name;
+                    if (listLocat != -1)
+                       tempName = tempName.substring(0,listLocat);
+                    String methodName = JavaNaming.toJavaClassName(tempName);
                     methodName = "get"+methodName;
                     JMethod method = jclass.getMethod(methodName,0);
                     componentName = method.getReturnType().getName();
                     method = null;
                     methodName = null;
+                    tempName = null;
+                    jsc.add(name+" = RandomHelper.getRandom("+name+", "+componentName+".class);");
                }
-
-               if (type.isPrimitive())
+               else if (type.isPrimitive())
                   jsc.add(setName+"(RandomHelper.getRandom("+name+"));");
                else
-                 jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class));");
-                 jsc.add("");
+                 jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+type.getName()+".class));");
+                 //jsc.add(setName+"(("+type.getName()+")RandomHelper.getRandom("+name+", "+((componentName != null)?componentName:type.getName())+".class));");
+                jsc.add("");
             }
         }
 
