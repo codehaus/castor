@@ -55,7 +55,7 @@ import org.exolab.castor.persist.sql.KeyGeneratorDescriptor;
 public final class EntityInfo {
 
     /**
-     * The base entity class which this object represent.
+     * The entity class which this object represent.
      */
     public final String entityClass;
 
@@ -70,7 +70,7 @@ public final class EntityInfo {
     public final EntityFieldInfo[] idInfo;
 
     /**
-     * All entities which extends the base entities
+     * All entities which directly extends this entities
      */
     public final EntityInfo[] subEntities;
 
