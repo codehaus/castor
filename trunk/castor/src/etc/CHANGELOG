@@ -3,6 +3,12 @@ Version (CVS)
 -------------
 
 
+JDO:   Fixed bug 1785 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Adds configuration of JDO using an inline JDBC DataSource by providing 
+       configuration parameters using a Properties collection
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1785
+       (Werner - 20041129)
+
 JDO:   Fixed bug 1791 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added support for using constants in comparison expressions with bind values.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1791
