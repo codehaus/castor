@@ -49,6 +49,8 @@ package jdo;
 
 import java.util.Enumeration;
 import java.util.Vector;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 
 /**
@@ -67,7 +69,7 @@ public class TestDetail
     private TestMaster _master;
 
 
-    private Vector     _details2;
+    private ArrayList     _details2;
 
 
     static final int       DefaultId = 5;
@@ -86,7 +88,7 @@ public class TestDetail
     public TestDetail()
     {
         _value = DefaultValue;
-        _details2 = new Vector();
+        _details2 = new ArrayList();
     }
 
 
@@ -128,16 +130,20 @@ public class TestDetail
 
     public void addDetail2( TestDetail2 detail2 )
     {
-        _details2.addElement( detail2 );
+        _details2.add( detail2 );
         detail2.setDetail( this );
     }
 
 
-    public Vector getDetails2()
+    public ArrayList getDetails2()
     {
         return _details2;
     }
 
+
+    public void setDetails2( ArrayList list ) {
+        _details2 = list;
+    }
 
     public TestDetail2 createDetail2()
     {
@@ -147,16 +153,16 @@ public class TestDetail
 
     public TestDetail2 findDetail2( int id )
     {
-        Enumeration enum;
+        Iterator enum;
         TestDetail2 detail2;
 
         if ( _details2 == null ) {
             return null;
         }
 
-        enum = _details2.elements();
-        while ( enum.hasMoreElements() ) {
-            detail2 = (TestDetail2) enum.nextElement();
+        enum = _details2.iterator();
+        while ( enum.hasNext() ) {
+            detail2 = (TestDetail2) enum.next();
             if ( detail2.getId() == id ) {
                 return detail2;
             }
@@ -173,7 +179,7 @@ public class TestDetail
             for ( int i = 0 ; i < _details2.size() ; ++i ) {
                 if ( i > 0 )
                     details2 = details2 + ", ";
-                details2 = details2 + _details2.elementAt( i ).toString();
+                details2 = details2 + _details2.get( i ).toString();
             }
         }
         return _id + " / " + _value + " / " + _master.getId() + " / { " + details2 + " }";

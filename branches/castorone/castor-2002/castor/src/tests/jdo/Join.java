@@ -52,6 +52,7 @@ import java.util.Enumeration;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
@@ -103,7 +104,7 @@ public class Join
             TestMaster    master;
             TestGroup     group;
             TestDetail    detail;
-            Enumeration   enum;
+            QueryResults   enum;
             TestMaster    master2;
             LongTransactionSupport lts;
             
@@ -112,8 +113,8 @@ public class Join
             oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE id = $1" );
             oql.bind( TestMaster.DefaultId );
             enum = oql.execute();
-            while ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
+            while ( enum.hasMore() ) {
+                master = (TestMaster) enum.next();
                 group = master.getGroup();
                 if ( group != null ) {
                     master.setGroup( null );
@@ -125,8 +126,8 @@ public class Join
             groupOql = db.getOQLQuery( "SELECT group FROM jdo.TestGroup group WHERE id = $1" );
             groupOql.bind( TestGroup.DefaultId );
             enum = groupOql.execute();
-            if ( enum.hasMoreElements() ) {
-                group = (TestGroup) enum.nextElement();
+            if ( enum.hasMore() ) {
+                group = (TestGroup) enum.next();
                 stream.writeVerbose( "Using existing group: " + group );
             } else {
                 group = new TestGroup();
@@ -144,8 +145,8 @@ public class Join
             db.begin();
             oql.bind( TestMaster.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
+            if ( enum.hasMore() ) {
+                master = (TestMaster) enum.next();
                 db.remove( master );
                 stream.writeVerbose( "Created master with no group: " + master );
             } else {
@@ -168,8 +169,8 @@ public class Join
             db.begin();
             oql.bind( TestMaster.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
+            if ( enum.hasMore() ) {
+                master = (TestMaster) enum.next();
                 if ( master.getGroup() == null || master.getGroup().getId() != TestGroup.DefaultId ) {
                     stream.writeVerbose( "Error: loaded master without any group: " + master );
                     result  = false;
@@ -199,8 +200,8 @@ public class Join
             db.begin();
             oql.bind( TestMaster.DefaultId );
             enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                master = (TestMaster) enum.nextElement();
+            if ( enum.hasMore() ) {
+                master = (TestMaster) enum.next();
                 if ( master.getDetails().size() == 0 ||
                      ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId ) ) ||
                      ! master.getDetails().contains( new TestDetail( TestDetail.DefaultId + 1 ) ) ||

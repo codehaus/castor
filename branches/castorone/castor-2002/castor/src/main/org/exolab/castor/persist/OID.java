@@ -48,6 +48,7 @@ package org.exolab.castor.persist;
 
 import java.util.Vector;
 import java.util.Enumeration;
+import java.util.Iterator;
 
 /**
  * Object identifier. An object identifier is unique within a cache
@@ -153,6 +154,9 @@ public final class OID
                 System.out.println("array of array");
                 if ( !isEquals( (Object[]) object1[i], (Object[]) object2[i] ) )
                     return false;
+            } else if ( (object1[i] instanceof Vector) && (object2[i] instanceof Vector) ) {      
+                if ( !isEquals( (Vector) object1[i], (Vector) object2[i] ) )
+                    return false;                
             } else {      
                 if ( !object1[i].equals( object2[i] ) ) {
                     return false;
@@ -179,15 +183,17 @@ public final class OID
         if ( object1 == null || object2 == null )
             return false;
 
-        System.out.println("Object1:");
+        System.out.println("Vector Object1:");
         for ( int i=0; i<object1.size(); i++ ) {
-            System.out.print(object1.elementAt(i));
+            if ( i > 0 ) System.out.print(", ");
+            System.out.print((object1.elementAt(i) instanceof Object[])?((Object[])object1.elementAt(i))[0]:object1.elementAt(i));
         }
         System.out.println();
 
-        System.out.println("Object2:");
+        System.out.println("Vector Object2:");
         for ( int i=0; i<object2.size(); i++ ) {
-            System.out.print(object2.elementAt(i));
+            if ( i > 0 ) System.out.print(", ");
+            System.out.print((object2.elementAt(i) instanceof Object[])?((Object[])object2.elementAt(i))[0]:object2.elementAt(i));
         }
         System.out.println();
         if ( object1.size() != object2.size() )
@@ -196,6 +202,37 @@ public final class OID
         Enumeration enum = object1.elements();
         while ( enum.hasMoreElements() ) {
             if ( !object2.contains( enum.nextElement() ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean isEquals( ArrayVector object1, ArrayVector object2 ) {
+        if ( object1 == object2 ) 
+            return true;
+        if ( object1 == null || object2 == null )
+            return false;
+
+        System.out.println("Vector Object1:");
+        for ( int i=0; i<object1.size(); i++ ) {
+            if ( i > 0 ) System.out.print(", ");
+            System.out.print((object1.get(i) instanceof Object[])?((Object[])object1.get(i))[0]:object1.get(i));
+        }
+        System.out.println();
+
+        System.out.println("Vector Object2:");
+        for ( int i=0; i<object2.size(); i++ ) {
+            if ( i > 0 ) System.out.print(", ");
+            System.out.print((object2.get(i) instanceof Object[])?((Object[])object2.get(i))[0]:object2.get(i));
+        }
+        System.out.println();
+        if ( object1.size() != object2.size() )
+            return false;
+
+        Iterator enum = object1.iterator();
+        while ( enum.hasNext() ) {
+            if ( !object2.contains( enum.next() ) ) {
                 return false;
             }
         }

@@ -76,6 +76,7 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
 import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.ArrayVector;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -1047,7 +1048,7 @@ public final class SQLEngine implements Persistence {
                     }
                     fields[i] = temp;
                 } else {
-                    Vector res = new Vector();
+                    ArrayVector res = new ArrayVector();
                     Object[] temp = new Object[_fields[i].columns.length];
                     notNull = false;
                     for ( int j=0; j<_fields[i].columns.length; j++ ) {
@@ -1058,7 +1059,7 @@ public final class SQLEngine implements Persistence {
                         }
                         count++;
                     }
-                    if ( notNull ) res.addElement(temp);
+                    if ( notNull ) res.add(temp);
                     fields[i] = res;
                 }
             }
@@ -1071,7 +1072,7 @@ public final class SQLEngine implements Persistence {
                         continue;
 
                     if ( _fields[i].multi ) {
-                        Vector res = (Vector)fields[i];
+                        ArrayVector res = (ArrayVector)fields[i];
                         Object[] temp = new Object[_fields[i].columns.length];
                         notNull = false;
                         for ( int j=0; j<_fields[i].columns.length; j++ ) {
@@ -1082,7 +1083,7 @@ public final class SQLEngine implements Persistence {
                             }
                             count++;
                         }
-                        if ( notNull || !res.contains( temp ) ) res.addElement(temp);
+                        if ( notNull || !res.contains( temp ) ) res.add(temp);
                     } else {
                         count += _fields[i].columns.length;
                     }
@@ -1788,7 +1789,7 @@ public final class SQLEngine implements Persistence {
                 count = _engine._ids.length;
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                     if ( _engine._fields[i].multi ) {
-                        Vector res = new Vector();
+                        ArrayVector res = new ArrayVector();
                         Object[] temp = new Object[_engine._fields[i].columns.length];
                         for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
                             Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
@@ -1820,7 +1821,7 @@ public final class SQLEngine implements Persistence {
                     while ( OID.isEquals( sqlIdentities, _lastIdentities ) ) {
                         for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                             if ( _engine._fields[i].multi ) {
-                                Vector res = (Vector) fields[i];
+                                ArrayVector res = (ArrayVector) fields[i];
                                 Object[] temp = new Object[_engine._fields[i].columns.length];
                                 for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
                                     Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
@@ -2023,7 +2024,7 @@ public final class SQLEngine implements Persistence {
                 count = _engine._ids.length;
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                     if ( _engine._fields[i].multi ) {
-                        Vector res = new Vector();
+                        ArrayVector res = new ArrayVector();
                         Object[] temp = new Object[_engine._fields[i].columns.length];
                         for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
                             Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
@@ -2056,7 +2057,7 @@ public final class SQLEngine implements Persistence {
                         count = 1;
                         for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
                             if ( _engine._fields[i].multi ) {
-                                Vector res = (Vector) fields[i];
+                                ArrayVector res = (ArrayVector) fields[i];
                                 Object[] temp = new Object[_engine._fields[i].columns.length];
                                 for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
                                     Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
