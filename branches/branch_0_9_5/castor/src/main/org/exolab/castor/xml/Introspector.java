@@ -586,7 +586,9 @@ public final class Introspector {
                         customHandler = true;
                         //-- swap type with the type specified by the
                         //-- custom field handler
-                        type = gfh.getFieldType();
+                        if (gfh.getFieldType() != null) {
+                            type = gfh.getFieldType();
+                        }
                     }
                 } 
                 
@@ -764,7 +766,9 @@ public final class Introspector {
                             customHandler = true;
                             //-- swap type with the type specified by the
                             //-- custom field handler
-                            type = gfh.getFieldType();
+                            if (gfh.getFieldType() != null) {
+                                type = gfh.getFieldType();
+                            }
                         }
                     } 
                 }
