@@ -370,7 +370,7 @@ public class myclass {
       <section title="3.4 The &lt;field> element">
 
         <code>
-        &lt;!ELEMENT field ( description?, sql?, xml?, ldap? )>
+        &lt;!ELEMENT field ( description?, sql?, bind-xml?, ldap? )>
         &lt;!ATTLIST field
                   name           NMTOKEN  #REQUIRED
                   type           NMTOKEN  #IMPLIED
@@ -447,8 +447,20 @@ public class myclass {
               implementation' is the type used if the object holding the collection is found
               to be null and need to be instantiated.</p>
 
-            <p>For hashtable and map, Castor will add an object with put(object, object): the object
-              is both the key and the value. This will be improved in the future.</p></li>
+            <p>For hashtable and maps (since 0.9.5.3), Castor will save both key and values.
+               When marshalling output &lt;key&gt; and &lt;value&gt;
+               elements. These names can be controlled by using a top-level or nested class mapping for
+               the org.exolab.castor.mapping.MapItem class.
+            </p>
+
+            <p>Note: for backward compatibility with prior versions of Castor, the <i>saveMapKeys</i>
+              property can be set to false in the castor.properties file.</p>
+
+            <p>For versions prior to 0.9.5.3, hashtable and maps, Castor will save only the value
+               during marshalling and during unmarshalling will add a map entry using the object as
+               both the key and value, e.g. map.put(object, object).
+            </p>
+          </li>
         </ul>
 
         <p>It is necessary to use a collection when the content model of the
@@ -571,7 +583,7 @@ public class myclass {
       <section title="3.5 The &lt;bind-xml> element">
 
         <code>
-        &lt;!ELEMENT bind-xml EMPTY>
+        &lt;!ELEMENT bind-xml (class?, property*)>
         &lt;!ATTLIST bind-xml
                   name     NMTOKEN     #IMPLIED
                   type     NMTOKEN     #IMPLIED
@@ -591,7 +603,12 @@ public class myclass {
 
         <p>Description of the attributes:</p>
         <ul>
-          <li><b>name:</b> the name of the element or attribute</li>
+          <li><b>name:</b> the name of the element or attribute. <br/>
+              Note: The name is a QName, and a namespace prefix may be used to indicate the
+              element or attribute belongs to a certain namespace. Note the prefix is not
+              preserved or used during marshalling, it's simply used for
+              qualification of which namespace the element or attribute belongs.
+          </li>
 
           <li><b>auto-naming:</b> if no name is specified this attribute controls
             how castor will automatically create a name for the field. Normally
@@ -610,13 +627,17 @@ public class myclass {
               class mapping. For more information see the <a href="#6.-Location-attribute">Location attribute</a> below.
           </li>
 
-          <li><b>QName-prefix:</b> When using a QName value, you can provide a default prefix that
+          <li><b>QName-prefix:</b> When the field represents a QName value, a prefix can be provided that
               is used when marshalling value of type QName. More information on the use of 'QName-prefix'
               can be found in the <a href="./SourceGeneratorUser.pdf">SourceGenerator Documentation</a></li>
 
           <li><b>reference:</b> Indicates if this field has to be treated as a reference by the unmarshaller.
           In order to work properly, you must specify the node type to 'attribute'
-          for both the 'id' and the 'reference'.</li>
+          for both the 'id' and the 'reference'. In newer versions of Castor, 'element' node for
+          reference is allowed. Remember to make sure that an <i>identity</i> field is specified
+          on the &lt;class&gt; mapping for the object type being referenced so that Castor knows what
+          the object's identity is.
+          </li>
 
           <li><b>matches:</b> Allows overriding the matches rules for
           the name of the element. It is a standard regular
@@ -633,6 +654,21 @@ public class myclass {
               value is inherited from the &lt;field&gt; element.
           </li>
 
+          <li><b>Nested class mapping</b> (since 0.9.5.3) the bind-xml element supports a nested class
+              mapping, which is often useful when needing to specify more than one mapping for a
+              particular class. A good example of this is when mapping Hashtable/HashMap/Map.
+              <br/>Example:
+              <code>
+                &lt;bind-xml ...&gt;
+                   &lt;class name="org.exolab.castor.mapping.MapItem"&gt;
+                      &lt;field name="key" type="java.lang.String"&gt;
+                        &lt;bind-xml name="id"/&gt;
+                      &lt;/field&gt;
+                      &lt;field name="value" type="com.acme.Foo"/&gt;
+                   &lt;/class&gt;
+                &lt;/bind-xml&gt;
+              </code>
+          </li>
         </ul>
 
       </section>
@@ -1172,6 +1208,28 @@ public class main {
           above.
        </p>
        </section>
+       <section title="7.4 Preventing Castor from checking for a default constructor">
+       Since: 0.9.5
+       <p>
+          Sometimes it's useful to prevent Castor from checking for a default constructor,
+          such as when trying to write a mapping for an interface or type-safe enum. You can use the
+          "undocumented" verify-constructable="false" attribute on the &lt;class&gt; element to
+          prevent Castor from looking for the default constructor.
+       </p>
+       </section>
+
+       <section title="7.5 Type safe enumeration mapping">
+       Since: 0.9.5
+       <p>
+          While you can always use your own custom FieldHandler for handling type-safe enumeration
+          classes, Castor does have a built-in approach to dealing with these types of classes.
+          If the type-safe enum class has a <b>public static &lt;type&gt; valueOf(String)</b> method
+          Castor will call that method so that the proper instance of the enumeration is returned.
+          Note: You'll also need to disable the default constructor check in the mapping file
+          (see section 7.4 above to see more on this).
+       </p>
+       </section>
+
 
     </section>
   </body>
