@@ -358,7 +358,7 @@ create unique index test_col_pk on test_col( id );
 drop table test_item;
 create table test_item (
   iid       integer         not null,
-  id      integer         not null
+  id      integer           null
 );
 create unique index test_item_pk on test_item( iid );
 
