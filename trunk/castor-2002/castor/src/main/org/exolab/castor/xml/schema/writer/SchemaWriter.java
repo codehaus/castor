@@ -1032,6 +1032,17 @@ public class SchemaWriter {
             _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, name);
         }
 
+        //-- @final
+        if (simpleType.getFinal() != null) {
+            _atts.addAttribute(SchemaNames.FINAL_ATTR, CDATA,
+                simpleType.getFinal());
+        }
+        
+        //-- @id
+        if (simpleType.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, simpleType.getId());
+        }
+        
         _handler.startElement(ELEMENT_NAME, _atts);
 
         //-- process annotations
