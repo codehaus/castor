@@ -186,20 +186,8 @@ public class FieldValidator extends Validator {
         //-- be validated elsewhere, validating them
         //-- here could cause endless loops
         if (_descriptor.isReference()) return;
-        
         //-- don't validate "transient" fields...
         if (_descriptor.isTransient()) return;
-               
-        //-- prevent endless loop!
-        //-- have we seen this object yet?
-        if (context != null) {
-            if (context.isValidated(object))
-                return;
-            //-- mark object as processed
-            context.addValidated(object);
-        }
-        
-        
         
             
         FieldHandler handler = _descriptor.getHandler();
@@ -211,6 +199,7 @@ public class FieldValidator extends Validator {
         
         if (value == null) {
             if (!_descriptor.isRequired()) return;
+            
             String err = "The field '" + _descriptor.getFieldName() + "' ";
             if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
                 err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
@@ -219,6 +208,14 @@ public class FieldValidator extends Validator {
             throw new ValidationException(err);
         }
         
+        //-- prevent endless loop!
+        //-- have we seen this object yet?
+        if (context != null) {
+            if (context.isValidated(object))
+                return;
+            //-- mark object as processed
+            context.addValidated(object);
+        }
         
 
         Class type = value.getClass();
