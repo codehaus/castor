@@ -40,10 +40,15 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
+ * Date         Author              Changes
+ * 10/27/2000   Arnaud Blandin      Added the support for min/max facets
+ * 10/9/2000    Arnaud Blandin      Created
  */
 
 package org.exolab.castor.builder.types;
+
+import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
@@ -53,6 +58,11 @@ public class XSTimeDuration extends XSType {
     private static final JType JTYPE =
                     new JClass("org.exolab.castor.types.TimeDuration");
 
+    private TimeDuration _maxInclusive;
+    private TimeDuration _maxExclusive;
+    private TimeDuration _minInclusive;
+    private TimeDuration _minExclusive;
+
     public XSTimeDuration() {
         super(XSType.TIME_DURATION);
     }
@@ -61,4 +71,95 @@ public class XSTimeDuration extends XSType {
     public JType getJType() {
         return this.JTYPE;
     }
-}
+     /**
+     * Returns the maximum exclusive value that this XSTimeDuration can hold.
+     * @return the maximum exclusive value that this XSTimeDuration can hold. If
+     * no maximum exclusive value has been set, Null will be returned
+     * @see getMaxInclusive
+    **/
+    public TimeDuration getMaxExclusive() {
+        return _maxExclusive;
+    } //-- getMaxExclusive
+
+    /**
+     * Returns the maximum inclusive value that this XSTimeDuration can hold.
+     * @return the maximum inclusive value that this XSTimeDuration can hold. If
+     * no maximum inclusive value has been set, Null will be returned
+     * @see getMaxExclusive
+    **/
+    public TimeDuration getMaxInclusive() {
+        return _maxInclusive;
+    } //-- getMaxInclusive
+
+
+    /**
+     * Returns the minimum exclusive value that this XSTimeDuration can hold.
+     * @return the minimum exclusive value that this XSTimeDuration can hold. If
+     * no minimum exclusive value has been set, Null will be returned
+     * @see getMinInclusive
+     * @see setMaxInclusive
+    **/
+    public TimeDuration getMinExclusive() {
+        return _minExclusive;
+    } //-- getMinExclusive
+
+    /**
+     * Returns the minimum inclusive value that this XSTimeDuration can hold.
+     * @return the minimum inclusive value that this can XSTimeDuration hold. If
+     * no minimum inclusive value has been set, Null will be returned
+     * @see getMinExclusive
+    **/
+    public TimeDuration getMinInclusive() {
+        return _minInclusive;
+    } //-- getMinInclusive
+
+    /**
+     * Sets the maximum exclusive value that this XSTimeDuration can hold.
+     * @param max the maximum exclusive value this XSTimeDuration can be
+     * @see setMaxInclusive
+    **/
+    public void setMaxExclusive(TimeDuration max) {
+        _maxExclusive = max;
+        _maxInclusive = null;
+    } //-- setMaxExclusive
+
+    /**
+     * Sets the maximum inclusive value that this XSTimeDuration can hold.
+     * @param max the maximum inclusive value this XSTimeDuration can be
+     * @see setMaxExclusive
+    **/
+    public void setMaxInclusive(TimeDuration max) {
+        _maxInclusive = max;
+        _maxExclusive = null;
+    } //-- setMaxInclusive
+
+
+    /**
+     * Sets the minimum exclusive value that this XSTimeDuration can hold.
+     * @param max the minimum exclusive value this XSTimeDuration can be
+     * @see setMinInclusive
+    **/
+    public void setMinExclusive(TimeDuration min) {
+        _minExclusive = min;
+        _minInclusive = null;
+    } //-- setMinExclusive
+
+    /**
+     * Sets the minimum inclusive value that this XSInt can hold.
+     * @param max the minimum inclusive value this XSInt can be
+     * @see setMinExclusive
+    **/
+    public void setMinInclusive(TimeDuration min) {
+        _minInclusive = min;
+        _minExclusive = null;
+    } //-- setMinInclusive
+
+    public boolean hasMinimum() {
+        return ( (_minInclusive != null) || (_minExclusive != null) );
+    }
+
+    public boolean hasMaximum() {
+       return ( (_maxInclusive != null) || (_maxExclusive != null) );
+    }
+
+} //XSTimeDuration
