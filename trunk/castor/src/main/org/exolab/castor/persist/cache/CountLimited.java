@@ -274,9 +274,8 @@ implements Cache
 			cur++;
 			if ( cur >= size ) cur = 0;
 			return LRU_NEW;
-		} else {
-			return LRU_OLD;
 		}
+		return LRU_OLD;
 	}
 	
 	private class ValuesEnumeration implements Enumeration {
