@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:	Supports the <any> element in the Source Generator.(Arnaud)
+
+XML:	Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
+	(Arnaud)
+
 XML:    Added object container support. Handle element and attributes, as well
         as container in container. Object container are object that exist in the
         object model, but will not appear directly in the XML document. There
