@@ -1759,7 +1759,7 @@ public class ClassMolder {
                             // load the cached dependent object from the data store.
                             // The loaded will be compared with the new one
                             if ( fields[i] != null )
-                                tx.load( fieldEngine, fieldClassMolder, fields[i], oid, suggestedAccessMode );
+                                tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
                         } else if ( tx.isAutoStore() ) {
                             if ( o != null && !tx.isRecorded(o) )
                                 tx.markUpdate( fieldEngine, fieldClassMolder, o, null );
