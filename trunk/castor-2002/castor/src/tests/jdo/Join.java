@@ -244,7 +244,6 @@ public class Join
             detail = (TestDetail) master.getDetails().elementAt( 0 );
             master.getDetails().removeElementAt( 0 );
             db.remove( detail );
-            detail = new TestDetail( TestDetail.DefaultId + 2 );
             master.addDetail( detail );
             db.create( detail );
             db.commit();
