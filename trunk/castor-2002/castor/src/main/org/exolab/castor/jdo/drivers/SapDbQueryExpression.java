@@ -92,7 +92,7 @@ public final class SapDbQueryExpression
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
         // They should go in the special order: the table from the left side of outer join
-        // gould go before the table from the right side.
+        // should go before the table from the right side.
         // first add elements that participate in outer joins
         enum = _joins.elements();
         while ( enum.hasMoreElements() ) {
@@ -100,6 +100,9 @@ public final class SapDbQueryExpression
             int right;
 
             join = (Join) enum.nextElement();
+            if ( ! join.outer ) {
+                continue;
+            }
             left = sorted.indexOf(join.leftTable);
             right = sorted.indexOf(join.rightTable);
             if (left >= 0 && right >= 0) {
@@ -159,10 +162,10 @@ public final class SapDbQueryExpression
             }
         }
         first = addWhereClause( sql, first );
-        
+
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
- 
+
         // Use WITH LOCK to lock selected tables.
         if ( lock && _select == null ) {
             sql.append( " WITH LOCK" );
