@@ -197,7 +197,7 @@ public class SourceFactory  {
 
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
-
+        state.setCreateGroupItem(createGroupItem);
         initialize(jClass);
 
         //-- set super class if necessary
@@ -248,6 +248,12 @@ public class SourceFactory  {
 		           classInfo = state.classInfo;
                    jClass    = state.jClass;
 		           initialize(jClass);
+
+                   //process attributes and content type
+                   //since it has not be performed before
+                   processAttributes(complexType, state);
+                   processContentType(complexType.getContentType(), state);
+
                    classInfo.addFieldInfo(fInfo);
                    fInfo.createJavaField(jClass);
                    fInfo.createAccessMethods(jClass);
@@ -369,6 +375,7 @@ public class SourceFactory  {
         FactoryState state  = new FactoryState(className, sgState);
 		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
+        state.setCreateGroupItem(createGroupItem);
 
 		state.markAsProcessed(type);
 
@@ -416,6 +423,10 @@ public class SourceFactory  {
 		    classInfo = state.classInfo;
             jClass    = state.jClass;
 		    initialize(jClass);
+            //process attributes and content type
+            //since it has not be performed before
+            processAttributes(type, state);
+            processContentType(type.getContentType(), state);
 
             classInfo.addFieldInfo(fInfo);
             fInfo.createJavaField(jClass);
@@ -466,7 +477,7 @@ public class SourceFactory  {
 			    createUnmarshalMethods(jClass);
 			}
 		}
-		
+
         //create equals() method?
         if (SourceGenerator.equalsMethod())
             createEqualsMethod(jClass);
@@ -628,7 +639,7 @@ public class SourceFactory  {
         FactoryState state  = new FactoryState(className, sgState);
 		ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
-
+        state.setCreateGroupItem(createGroupItem);
 		state.markAsProcessed(group);
 
 		initialize(jClass);
@@ -971,7 +982,7 @@ public class SourceFactory  {
 			jsc.indent();
 			jsc.add("return false;");
 			jsc.unindent();
-		}		
+		}
         jsc.add("");
         jsc.add("if (obj instanceof ");
         jsc.append(jclass.getName(true));
@@ -1252,8 +1263,28 @@ public class SourceFactory  {
      	//---------------------/
         //- handle attributes -/
         //---------------------/
-        //-- loop throug each attribute
+        if (!state.isCreateGroupItem())
+            processAttributes(complexType, state);
+
+        //------------------------/
+        //- handle content model -/
+        //------------------------/
+        if (!state.isCreateGroupItem())
+            processContentType(complexType.getContentType(), state);
+
+        processContentModel(complexType, state);
+    } //-- processComplextype
+
+    /**
+     * Process the attributes contained in this complexType.
+     * @param complexType the given complex type.
+     * @param state the given FactoryState
+     */
+    private void processAttributes(ComplexType complexType, FactoryState state) {
+        if (complexType == null)
+            return;
         Enumeration enum = complexType.getAttributeDecls();
+
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
 
@@ -1263,17 +1294,21 @@ public class SourceFactory  {
                 if ( ! (SimpleTypesFactory.isBuiltInType(sType.getTypeCode())) )
                 createSourceCode(sType, state.getSGStateInfo());
             }
-
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
             handleField(fieldInfo, state);
         }
+        return;
+    }
 
-        //------------------------/
-        //- handle content model -/
-        //------------------------/
-        //-- check contentType
-        ContentType contentType = complexType.getContentType();
-
+    /**
+     * Process the given content type and create a field info for it.
+     * @param contentType the given content type.
+     * @param state the given FactoryState
+     */
+    private void processContentType(ContentType contentType, FactoryState state)
+    {
+        if (contentType == null)
+            return;
         //-- create text member
         if ((contentType == ContentType.mixed) ||
             (contentType == ContentType.any))
@@ -1281,9 +1316,7 @@ public class SourceFactory  {
             FieldInfo fieldInfo = memberFactory.createFieldInfoForContent(new XSString());
             handleField(fieldInfo, state);
         }
-        processContentModel(complexType, state);
-    } //-- processComplextype
-
+    }
 
     private void handleField(FieldInfo fieldInfo, FactoryState state) {
 
@@ -1888,7 +1921,7 @@ class FactoryState implements ClassInfoResolver {
     private ClassInfoResolver _resolver  = null;
     private Vector            _processed = null;
     private SGStateInfo       _sgState   = null;
-
+    private boolean           _createGroupItem = false;
     /**
      * Keeps track of whether or not the BoundProperties
      * methods have been created
@@ -2029,4 +2062,23 @@ class FactoryState implements ClassInfoResolver {
         return _resolver.resolve(key);
     } //-- resolve
 
+    /**
+     * Returns true if we are currently in the state of
+     * creating a group item class.
+     * @return true if we are currently in the state of
+     * creating a group item class.
+     */
+    boolean isCreateGroupItem() {
+        return _createGroupItem;
+    }
+
+    /**
+     * Sets to true if we are currently generating a class
+     * to represent items in a group.
+     * @param createGroupItem true if we are currently generating a class
+     * to represent items in a group.
+     */
+     void setCreateGroupItem(boolean createGroupItem) {
+         _createGroupItem = createGroupItem;
+     }
 } //-- FactoryState
