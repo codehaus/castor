@@ -3,6 +3,11 @@ Version (CVS)
 -------------
 
 
+JDO:   Fixed bug 1789 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Fixed various problems with the HTML docs (typos, structure, content, etc.).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1789
+       (Werner - 20041205)
+
 JDO:   Fixed bug 1814 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Fixed a problem parsing OQL WHERE clauses containing string or character constants 
        including a question mark character.
