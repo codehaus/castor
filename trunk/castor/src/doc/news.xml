@@ -20,6 +20,26 @@
               <span class="newsSummary"-->
 
         <news>
+            <title>Castor 0.9.6 - Final release</title>
+            <author>Werner Guttmann</author>
+            <date>09 Feb 2005</date>
+            <time>22:22:22</time>
+            <summary>
+                I've placed a copy of Castor 0.9.6 (final) on the
+                <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.6/">FTP Server</a>.<br/><br/>
+
+                This is mainly a bug fix release, but includes a couple of new features as
+                well. For details about the bugs fixed and features provided, please have
+                a look at the
+                <a href="release-notes.html">release notes</a>.<br/><br/>
+				
+				Please report any issues through the project's 
+				<a href="http://bugzilla.exolab.org">bug tracking site</a> and/or the 
+				mailing lists.
+            </summary>
+        </news>
+
+        <news>
             <title>Castor 0.9.6 - 3rd release candidates</title>
             <author>Werner Guttmann</author>
             <date>11 Jan 2005</date>
