@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="Castor" repository="castor">
+
+  <title>The Castor Project</title>
+
+  <links>
+    <link name="Home" href="index.html" image="images/links/home.gif" height="19" width="39"/>
+    <link name="FAQ" href="faq.html" image="images/links/faq.gif" height="19" width="30"/>
+    <link name="License" href="license.html" image="images/links/license.gif" height="19" width="47"/>
+    <link name="CVS" href="http://castor.exolab.org/cvs.xml" image="images/links/cvs.gif" height="19" width="30"/>
+      <link name="Download" href="http://castor.exolab.org/download.xml" image="images/links/download.gif" height="19" width="64"/>
+    <link name="Tools" href="http://castor.exolab.org/tools.xml" image="images/links/tools.gif" height="19" width="38"/>
+    <link name="Lists" href="http://castor.exolab.org/lists.xml" image="images/links/lists.gif" height="19" width="35"/>
+    <link name="Library" href="library.html" image="images/links/library.gif" height="19" width="47"/>
+    <link name="Contact" href="contacts.html" image="images/links/contacts.gif" height="19" width="57"/>
+    <link name="Exolab" href="http://www.exolab.org" image="images/links/exolab.gif" height="19" width="47"/>
+  </links>
+
+  <menu name="misc">
+    <item name="types" href="types.html"/>
+  </menu>
+
+  <notice>
+    Java, Sun, Sun Microsystems are trademarks or registered trademarks of Sun Microsystems, Inc. in the United States and in other countries.
+  </notice>
+  <notice>
+    <a href="http://www.exoffice.com">Exoffice Technologies, Inc.</a> (C) 2000. All rights reserved
+  </notice>
+
+</project>
