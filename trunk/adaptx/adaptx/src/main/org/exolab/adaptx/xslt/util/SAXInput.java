@@ -99,6 +99,14 @@ public class SAXInput
     } //-- SAXInput
     
     /**
+     * Creates a new SAXInput
+    **/
+    public SAXInput(boolean saveLocation) {
+        this();
+        _xpnBuilder.setSaveLocation(saveLocation);
+    } //-- SAXInput
+    
+    /**
      * Sets the XSLTProcessor to use for the XSL Transformations
      * @param processor the XSLTProcessor to invoke
     **/
@@ -117,6 +125,15 @@ public class SAXInput
     public void setStylesheet(XSLTStylesheet stylesheet) {
         this._stylesheet = stylesheet;
     } //-- setStylesheet
+    
+    /**
+     * Returns the root XPathNode
+     *
+     * @return the root XPathNode
+     */
+    public XPathNode getRoot() {
+        return _xpnBuilder.getRoot();
+    }
     
     //-------------------------------------/
     //- Implementation of DocumentHandler -/
