@@ -47,54 +47,21 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.io.PrintWriter;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.QueryExpression;
-
-
 /**
- * {@link PersistenceFactory} for PostgreSQL 6.5 and 7.
+ * {@link PersistenceFactory} for generic JDBC driver.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
 public final class PostgreSQLFactory
-    implements PersistenceFactory
+    extends GenericFactory
 {
 
-
-    /**
-     * The name underwhich this factory is registered. (<tt>postgresql</tt>).
-     */
-    public static final String FactoryName = "postgresql";
 
 
     public String getFactoryName()
     {
-        return FactoryName;
-    }
-
-
-    public QueryExpression getQueryExpression()
-    {
-        return new JDBCQueryExpression();
-    }
-
-
-    public Persistence getPersistence( ClassDescriptor clsDesc, PrintWriter logWriter )
-        throws MappingException
-    {
-	if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
-	    return null;
-        try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, logWriter, this, null );
-        } catch ( MappingException except ) {
-            logWriter.println( except.toString() );
-            return null;
-        }
+        return "postgresql";
     }
 
 
