@@ -1070,9 +1070,10 @@ public class DescriptorSourceFactory {
                 }
                 //-- fixed values
                 if (fixed != null) {
-                    jsc.add("sv.setFixedValue(\"");
+                    jsc.add("sv.setFixedValue(");
+                    //fixed should be "the value"
                     jsc.append(fixed);
-                    jsc.append("\");");
+                    jsc.append(");");
                 }
                 //-- pattern facet
                 pattern = xsString.getPattern();
