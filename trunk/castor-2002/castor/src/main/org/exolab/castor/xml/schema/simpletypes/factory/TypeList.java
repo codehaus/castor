@@ -79,7 +79,7 @@ public class TypeList
 
         for( int index= 0; index < types.size(); index++)
         {
-            ((Type)(types.get(index))).Print(output);
+            ((Type)(types.elementAt(index))).Print(output);
         }
         output.println();
         output.flush();

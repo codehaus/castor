@@ -144,7 +144,7 @@ public class Type
 
         for( int index= 0; index < facet.size(); index++)
         {
-            ((TypeProperty)(facet.get(index))).Print(output);
+            ((TypeProperty)(facet.elementAt(index))).Print(output);
         }
         output.println();
     }
