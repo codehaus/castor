@@ -239,6 +239,20 @@ public final class XMLInstance2SchemaHandler
         else {
             ComplexType cType = (ComplexType)sInfo.element.getType();
             
+            if ((cType == null) && (sInfo.attributes.size() > 0)) {
+                cType = new ComplexType(_schema);
+                sInfo.element.setType(cType);
+                Group group = new Group();
+                group.setOrder(_defaultGroupOrder);
+                //-- add attributes
+                try {
+                    cType.addGroup(group);
+                }
+                catch(SchemaException sx) {
+                    throw new SAXException(sx);
+                }
+            }
+            
             if (cType != null) {
                 //-- add attributes
                 try {
@@ -259,10 +273,12 @@ public final class XMLInstance2SchemaHandler
             StateInfo parentInfo = (StateInfo)_siStack.peek();
             ComplexType type = (ComplexType) parentInfo.element.getType();
             Group group = null;
-            if (type == null) {
-                parentInfo.complex = true;
-                type = new ComplexType(_schema);
-                parentInfo.element.setType(type);
+            if ((type == null) || (type.getParticleCount() == 0)) {
+                if (type == null) {
+                    parentInfo.complex = true;
+                    type = new ComplexType(_schema);
+                    parentInfo.element.setType(type);
+                }
                 group = new Group();
                 group.setOrder(_defaultGroupOrder);
                 try {
