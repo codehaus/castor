@@ -42,14 +42,14 @@ public class Test
 	    dir.commit();
 
             dir.begin();
-	    user = (User) dir.read( "kvisco" );
+      user = (User) dir.read( "arkin" );
 	    if ( user == null || user != null ) {
 		user = new User();
-		user.setUid( "kvisco" );
-		user.setFirst( "Keith" );
-		user.setLast( "Visco" );
-		user.setFull( "Keith Visco" );
-		user.setEmail( new String[] { "kvisco@exoffice.com" } );
+    user.setUid( "arkin" );
+    user.setFirst( "Assaf" );
+    user.setLast( "Arkin" );
+    user.setFull( "Assaf Arkin" );
+    user.setEmail( new String[] { "arkin@intalio.com" } );
 		System.out.println( "Creating: " + user );
 		dir.create( user );
 	    } else {
@@ -66,7 +66,7 @@ public class Test
 	    dirs.setURL( "ldap://localhost/dc=exoffice,dc=com" );
 	    dir = dirs.getDirectory( "dc=exoffice,dc=com", "secret" );
 	    dir.begin();
-	    rec = (Record) dir.read( new RDN( "people", "kvisco" ) );
+      rec = (Record) dir.read( new RDN( "people", "arkin" ) );
 	    System.out.println( rec );
 	    dir.commit();
 	    */
