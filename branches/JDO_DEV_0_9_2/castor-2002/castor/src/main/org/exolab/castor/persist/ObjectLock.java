@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2001 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -96,13 +96,19 @@ import org.exolab.castor.jdo.ObjectDeletedException;
 final class ObjectLock {
 
 
-    final static short ACTION_READ = 1;
+    final static short ACTION_READ      = 1;
 
-    final static short ACTION_WRITE = 2;
+    final static short ACTION_WRITE     = 2;
 
-    final static short ACTION_CREATE = 3;
+    final static short ACTION_CREATE    = 3;
 
-    final static short ACTION_UPDATE = 4;
+    final static short ACTION_UPDATE    = 4;
+
+    final static short LOCK_TO_LOCK     = 1;
+
+    final static short LOCK_TO_CACHE    = 2;
+
+    final static short LOCK_TO_DESTROY  = 3;
 
     /* for debug only */
     private static int idcount = 0;
@@ -143,7 +149,7 @@ final class ObjectLock {
      * If the commit is sucessful this object will become the locked 
      * object. If it fails, this value will set null.
      */
-    private Object              _newobject;
+    private Object              _newObject;
 
     /**
      * The Key that being used to load the the current value, 
@@ -218,12 +224,21 @@ final class ObjectLock {
     private int                 _waitCount;
 
     /**
-     *
+     * The Key that is in the vital point of this object lock.
+     * Vital point happens when the object lock is waiting for a
+     * thread that holding a key to set the inital value into the
+     * object lock. In the perido that a thread've gotten the lock
+     * and set the value (or fail and release the lock), the state 
+     * of the object lock is unknown. As a result, every object
+     * that is waiting for a lock in vital point state will be 
+     * blocked.
      */
-    private Key                 _confirmWaiting;
+    private Key                 _vital;
 
-
-    private short               _confirmWaitingAction;
+    /**
+     * The pending action of a key in vital point
+     */
+    private short               _vitalAction;
 
     /**
      * Create a new lock for the specified object. Must not create two
@@ -243,7 +258,6 @@ final class ObjectLock {
             }
         }
     }
-
 
     /**
      * Return the object's OID.
@@ -268,36 +282,61 @@ final class ObjectLock {
      * to avoid race condition. enter and leave should be called 
      * exactly the same number of time.
      */
-    void enter() {
+    synchronized void enter( Key key ) {
         _gateCount++;
     }
 
     /**
      * Indicate that a transaction is not interested to change the 
      * state of this lock anymore. (ie, will not call either acquire
-     * update, release or delete.) 
-     * It method should be synchronized externally.
+     * update, release or delete.)
+     *
+     * @return the action that typeInfo to take
      */
-    void leave() {
+    synchronized short leave( Key key ) {
         _gateCount--;
+        if ( _object == null && _masterKey == key )
+            release( key );
+
+        if ( _gateCount != 0 ) {
+            return LOCK_TO_LOCK;
+        } else {
+            if ( !isFree() )
+                return LOCK_TO_LOCK;
+            else if ( _deleted || _invalidated )
+                return LOCK_TO_DESTROY;
+            else
+                return LOCK_TO_CACHE;
+        }
+    }
+
+    /**
+     * Determines if the specified key is the key being used to load 
+     * the the current value, or being used to modified and committed 
+     * sucessfully.
+     */
+    synchronized boolean isMaster( Key key ) {
+        return _masterKey == key;
     }
 
     /**
      * Return true if there is any transaction called {@ink enter}, 
      * but not yet called {@link leave}.
-     */ 
+     */
+     /*
     boolean isEntered() {
         return _gateCount != 0;
-    }
+    }*/
 
     /**
      * Return true if this object can be safely disposed. An ObjectLock
      * can be safely disposed if and only if the no transaction is 
      * holding any lock, nor any transaction isEntered.
      */
+     /*
     boolean isDisposable() {
         return _gateCount == 0 && isFree() && _waitCount == 0;
-    }
+    }*/
 
     /**
      * Returns true if the transaction holds a read or write lock on
@@ -308,43 +347,35 @@ final class ObjectLock {
      * @param write True if must have a write lock
      * @return True if the transaction has a lock on this object
      */
-    boolean hasLock( Key key, boolean write ) {
-        LinkedTx read;
+    public synchronized boolean hasLock( Key key, boolean write ) {
 
         if ( _writeLock == key )
             return true;
 
-        if ( _confirmWaiting == key ) {
-            if ( _confirmWaitingAction == ACTION_WRITE || _confirmWaitingAction == ACTION_CREATE )
-                return true;
-            else if ( !write && _confirmWaitingAction == ACTION_READ ) 
-                return true;
-            return false;
-        }
-
         if ( write )
             return false;
-        read = _readLock;
+
+        LinkedTx read = _readLock;
         while ( read != null ) {
             if ( read.key == key )
                 return true;
             read = read.next;
         }
-
         return false;
     }
 
     /**
-     * Return true if and only if this lock can be safely disposed
+     * Return true if and no key is current waiting or holding
+     * any the current locks
      *
      * @return True if no lock and no waiting
      */
-    boolean isFree() {
+    private boolean isFree() {
         return ( _writeLock == null && _readLock == null && 
-                 _writeWaiting == null && _readWaiting == null && 
-                 _confirmWaiting == null && _waitCount == 0 );
+                 _writeWaiting == null && _readWaiting == null );
     }
 
+    /*
     boolean isExclusivelyOwned( Key key ) {
         LinkedTx read;
 
@@ -359,6 +390,12 @@ final class ObjectLock {
             return true;
 
         return false;
+    }*/
+    synchronized void downgrade( Key key ) {
+        if ( _writeLock == key ) {
+            _writeLock = null;
+            _readLock  = new LinkedTx( key, _readLock );
+        } 
     }
 
     synchronized void acquire( Key key, boolean write, int timeout ) 
@@ -435,6 +472,7 @@ final class ObjectLock {
         }
     }
 
+    /*
     synchronized void acquireCreateLock( Key key ) 
             throws LockNotGrantedException {
 
@@ -465,8 +503,9 @@ final class ObjectLock {
                 return;
             }
         }
-    }
+    }*/
 
+    /*
     // probaraly we just don't need update....
     synchronized void acquireUpdateLock( Key key, int timeout ) 
             throws LockNotGrantedException, ObjectDeletedException,
@@ -485,10 +524,8 @@ final class ObjectLock {
                     try {
                         _waitCount++;
                         wait();
-                        /*
-                        if ( _deleted ) {
-                            throw new ObjectDeletedWaitingForLockException("Object deleted!");
-                        }*/
+                        //if ( _deleted ) {
+                        //    throw new ObjectDeletedWaitingForLockException("Object deleted!");
                     } catch ( InterruptedException e ) {
                         throw new LockNotGrantedException("Thread interrupted acquiring lock!");
                     } finally {
@@ -549,8 +586,9 @@ final class ObjectLock {
                 key.setWaitOnLock( null );                
             }
         }
-    }
+    }*/
 
+    /*
     public synchronized void checkin( Key key, Object object ) {
 
         if ( _confirmWaiting != null && _confirmWaiting == key ) {
@@ -568,10 +606,10 @@ final class ObjectLock {
             _newobject = object;
         } else
             throw new IllegalArgumentException("Transaction key does not own this lock, "+toString()+"!");
-    }
+    }*/
 
     public synchronized void setObject( Key key, Object object ) {
-
+        /*
         if ( _confirmWaiting != null && _confirmWaiting == key ) {
             _timestamp = System.currentTimeMillis();
             _object = object;
@@ -582,7 +620,9 @@ final class ObjectLock {
             }
             _confirmWaiting = null;
             notifyAll();
-        } else if ( _writeLock != null && _writeLock == key ) {
+        } else */
+            
+        if ( _writeLock != null && _writeLock == key ) {
             _timestamp = System.currentTimeMillis();
             _object = object;
         } else
@@ -590,10 +630,11 @@ final class ObjectLock {
     }
 
     public synchronized Object getObject( Key key ) {
-
+        /*
         if ( _confirmWaiting != null && _confirmWaiting == key )
             return _object;
-        else if ( _writeLock != null && _writeLock == key )
+        else*/
+        if ( _writeLock != null && _writeLock == key )
             return _object;
         else {
             LinkedTx link = _readLock;
@@ -606,10 +647,17 @@ final class ObjectLock {
         }
     }
 
+    public synchronized void pendObject( Key key, Object object ) {
+
+        if ( _writeLock == key )
+            _newObject = object;
+    }
+
     public synchronized long getTimeStamp() {
         return _timestamp;
     }
 
+    /*
     synchronized void confirm( Key key, boolean succeed ) {
 
         // cases to consider:
@@ -659,7 +707,7 @@ final class ObjectLock {
             notifyAll();
         } else 
             throw new IllegalStateException("Confirm transaction does not match the locked transaction");        
-    }
+    }*/
 
     /**
      * Acquires a lock on the object on behalf of the specified
@@ -697,11 +745,11 @@ final class ObjectLock {
         // Note: This method must succeed even if an exception is thrown
         // in the middle. An exception may be thrown by a Thread.stop().
         // Must make sure not to lose consistency.
-
+        /*
         if ( _confirmWaiting != null ) {
             IllegalStateException e = new IllegalStateException("Internal error: acquire when confirmWaiting is not null");
             throw e;
-        }
+        }*/
         if ( !hasLock( key, false ) ) {
             IllegalStateException e = new IllegalStateException("Transaction doesn't previously acquire this lock");
             throw e;
@@ -1192,7 +1240,7 @@ final class ObjectLock {
                     }
                 }
             }
-            if ( _deleted && _readWaiting == null && _writeWaiting == null && _confirmWaiting == null ) {
+            if ( _deleted && _readWaiting == null && _writeWaiting == null /*&& _confirmWaiting == null*/ ) {
                 _deleted = false;
             }
         } catch ( ThreadDeath death ) {
