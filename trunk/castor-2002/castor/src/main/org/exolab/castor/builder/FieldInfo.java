@@ -200,10 +200,11 @@ public class FieldInfo extends XMLInfo {
 
         boolean needs_has
             = ((!xsType.isEnumerated()) && jType.isPrimitive());
-
+        
         //-- create get method
         method = new JMethod(jType, "get"+mname);
         jClass.addMethod(method);
+        createGetterComment(method.getJDocComment());
         jsc = method.getSourceCode();
         jsc.add("return this.");
         jsc.append(this.name);
@@ -225,6 +226,7 @@ public class FieldInfo extends XMLInfo {
         }
 
         method.addParameter(new JParameter(jType, paramName));
+        createSetterComment(method.getJDocComment());
         jsc = method.getSourceCode();
 
         //-- bound properties
@@ -287,6 +289,65 @@ public class FieldInfo extends XMLInfo {
 
     } //-- createAccessMethods
 
+    /**
+     * Creates the Javadoc comments for the getter method
+     * associated with this FieldInfo.
+     *
+     * @param jDocComment the JDocComment to add the Javadoc
+     * comments to.
+    **/
+    public void createGetterComment(JDocComment jDocComment) {
+        
+        String fieldName = this.name;
+        //-- remove '_' if necessary
+        if (fieldName.indexOf('_') == 0) {
+            fieldName = fieldName.substring(1);
+        }
+        
+        String at_return = "the value of field '" + fieldName + "'.";
+        
+        String mComment = "Returns " + at_return;
+        if ((_comment != null) && (_comment.length() > 0)) {
+            mComment += " The field '" + fieldName + 
+                "' has the following description: ";
+            mComment += _comment;
+        }
+        jDocComment.appendComment(mComment);
+        jDocComment.addDescriptor(JDocDescriptor.createReturnDesc(at_return));
+    } //-- createGetterComment
+
+    /**
+     * Creates the Javadoc comments for the setter method
+     * associated with this FieldInfo.
+     *
+     * @param jDocComment the JDocComment to add the Javadoc
+     * comments to.
+    **/
+    public void createSetterComment(JDocComment jDocComment) {
+        
+        String fieldName = this.name;
+        //-- remove '_' if necessary
+        if (fieldName.indexOf('_') == 0) {
+            fieldName = fieldName.substring(1);
+        }
+        
+        String at_param = "the value of field '" + fieldName + "'.";
+        
+        String mComment = "Sets " + at_param;
+        if ((_comment != null) && (_comment.length() > 0)) {
+            mComment += " The field '" + fieldName + 
+                "' has the following description: ";
+            mComment += _comment;
+        }
+        jDocComment.appendComment(mComment);
+        
+        JDocDescriptor paramDesc = jDocComment.getParamDescriptor(fieldName);
+        if (paramDesc == null) {
+            paramDesc = JDocDescriptor.createParamDesc(fieldName, null);
+            jDocComment.addDescriptor(paramDesc);
+        }
+        paramDesc.setDescription(at_param);
+    } //-- createSetterComment
 
     /**
      * Returns the default value for this FieldInfo
