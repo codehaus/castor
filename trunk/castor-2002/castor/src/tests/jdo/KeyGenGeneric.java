@@ -161,9 +161,9 @@ public class KeyGenGeneric
         // Find the first object and remove it 
         //object = (TestKeyGenObject) db.load( objClass, object.getId() );
         oql = (OQLQueryImpl) db.getOQLQuery();
-        oql.newCreate( "SELECT object FROM " + objClass.getName() +
+        oql.create( "SELECT object FROM " + objClass.getName() +
                        " object WHERE id = $1" );
-        oql.newBind( object.getId() );
+        oql.bind( object.getId() );
         enum = oql.execute();
         stream.writeVerbose( "Removing first object: " + object );
         if ( enum.hasMoreElements() ) {
@@ -177,9 +177,9 @@ public class KeyGenGeneric
         // Find the second object and remove it
         //ext = (TestKeyGenObject) db.load( extClass, ext.getId() );
         oql = (OQLQueryImpl) db.getOQLQuery();
-        oql.newCreate( "SELECT ext FROM " + extClass.getName() +
+        oql.create( "SELECT ext FROM " + extClass.getName() +
                        " ext WHERE id = $1" );
-        oql.newBind( ext.getId() );
+        oql.bind( ext.getId() );
         enum = oql.execute();
         stream.writeVerbose( "Removing second object: " + ext );
         if ( enum.hasMoreElements() ) {
