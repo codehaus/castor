@@ -49,19 +49,14 @@ package org.exolab.castor.mapping.loader;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
-import java.util.Date;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import org.exolab.castor.mapping.MappingException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.types.Duration;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.MimeBase64Encoder;
-import org.exolab.castor.util.MimeBase64Decoder;
-//import org.exolab.castor.util.ClobImpl;
 
 
 /**
@@ -76,7 +71,12 @@ import org.exolab.castor.util.MimeBase64Decoder;
 public class Types
 {
 
-
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance (Types.class);
+    
     /**
      * Returns the class name based on the supplied type name. The type name
      * can be a short name (e.g. int, byte) or any other Java class (e.g.
@@ -97,9 +97,11 @@ public class Types
                 return ( _typeInfos[ i ].primitive != null ? _typeInfos[ i ].primitive :
                          _typeInfos[ i ].javaType );
         }
-        if ( loader != null )
-            return loader.loadClass( typeName );
-        else
+        if ( loader != null ) {
+            Class aClass = loader.loadClass (typeName);
+            // _log.debug ("Loaded class " + aClass);
+            return aClass;
+        } else
             return Class.forName( typeName );
     }
 
@@ -574,6 +576,9 @@ public class Types
           new TypeInfo( XML,        "xml",         org.w3c.dom.Document.class, org.w3c.dom.Element.class ),
           new TypeInfo( Serialized, "ser",         java.io.Serializable.class, null )
         */
+        new TypeInfo( "duration",   null,
+                      org.exolab.castor.types.Duration.class,     false,     new Duration (0) ),
+                              
     };
 
     /**
