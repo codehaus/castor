@@ -130,11 +130,11 @@ public class CastorTestCase extends TestCase {
     }
     public void run( TestResult result ) {
         System.out.println();
-        System.out.print( "test: "+getName() );
+        System.out.print( "Test: "+getName()+" "+getDescription()+" " );
         super.run( result );
     }
     public void run( TestResult result, String branch ) {
-        System.out.println( "test: "+getName()+" branch: "+branch );
+        System.out.println( "Test: "+getName()+" Branch: "+branch );
         if ( branch == null || branch.equals("") )
             run( result );
     }
