@@ -320,7 +320,7 @@ public class Types
             case 'y': case 'Y': sb.append( "yyyy" ); break;
             case 'M':           sb.append( "MM" ); break;
             case 'd': case 'D': sb.append( "dd" ); break;
-            case 'h':           sb.append( "hh" ); break;
+            case 'h': case 'H': sb.append( "HH" ); break;
             case 'm':           sb.append( "mm" ); break;
             case 's':           sb.append( "ss" ); break;
             case 'S':           sb.append( "SSS" ); break;
