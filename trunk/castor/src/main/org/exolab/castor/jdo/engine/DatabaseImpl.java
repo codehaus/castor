@@ -466,6 +466,8 @@ public class DatabaseImpl
     public void begin()
         throws PersistenceException
     {
+        _log.debug( "Beginning tx" );
+
         if ( _transaction != null )
             throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
 
@@ -483,6 +485,7 @@ public class DatabaseImpl
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
+        _log.debug( "Committing tx" );
 
         if ( _transaction != null )
             throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
@@ -510,6 +513,8 @@ public class DatabaseImpl
     public void rollback()
         throws TransactionNotInProgressException
     {
+        _log.debug( "Rolling back tx" );
+
         if ( _transaction != null )
             throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
 
