@@ -153,7 +153,6 @@ public class FieldMolder {
     }
 
     public boolean isDependent() {
-		System.out.println("###### isDependent() is called in: "+_eMold+"."+_fMold+" result: "+(_fMold != null && (_fMold.getDepends() == _eMold)));
         return _fMold != null && (_fMold.getDepends() == _eMold);
     }
 
@@ -342,11 +341,12 @@ public class FieldMolder {
 
 
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap, 
-            String manyTable, String idSQL, String relatedIdSQL ) throws MappingException {
+            String manyTable, String[] idSQL, int[] idType, String[] relatedIdSQL,
+			int[] relatedIdType ) throws MappingException {
 
         this( ds, eMold, fieldMap );
 
-        _manyToManyLoader = new SQLRelationLoader( manyTable, idSQL, relatedIdSQL );
+        _manyToManyLoader = new SQLRelationLoader( manyTable, idSQL, idType, relatedIdSQL, relatedIdType );
     }
 
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap ) 
