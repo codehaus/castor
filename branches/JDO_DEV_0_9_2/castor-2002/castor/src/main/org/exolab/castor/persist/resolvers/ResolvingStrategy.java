@@ -40,7 +40,7 @@
  *
  * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
  */
 package org.exolab.castor.persist.resolvers;
 
@@ -59,9 +59,6 @@ import org.exolab.castor.persist.AccessMode;
  * multiple ClassLoader enviorment, we need a set of accessors 
  * for each ClassLoader. RelationResolver is responsible for 
  * giving the right accessor the each strategy.
- *
- *
- *
  */
 public abstract class ResolvingStrategy {
     // should strategy contains the field number?
