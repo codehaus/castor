@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+XML:   Fix for bug 1632. StringValidator.normalize wasn't handling empty
+       strings properly. Patch from Ulli Hafner.
+       (kvisco - 20040511)
+
 XML:   Performance change to org.exolab.castor.util.List to demand create internal Object[]
        From various performance improvements contributed by Ian Richards (also CODA)
        (afawcett - 20040510)
