@@ -108,7 +108,7 @@ public class TypeHandling
             // If it exists, set the name to some predefined value
             // that this test will later override.
             db.begin();
-            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
+            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $(integer)1" );
             // This one tests that bind performs type conversion
             oql.bind( TestTypes.DefaultId );
             enum = oql.execute();
@@ -125,9 +125,9 @@ public class TypeHandling
 
             stream.writeVerbose( "Testing date/time conversion" );
             db.begin();
-            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
+            oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $(double)1" );
             // This one tests that bind performs type conversion
-            oql.bind( TestTypes.DefaultId );
+            oql.bind( (double) TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
                 types = (TestTypes) enum.nextElement();
