@@ -1456,6 +1456,12 @@ public final class UnmarshalHandler extends MarshalFramework
                 }
                 else {
                     classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
+                    if (classDesc == null) {
+                        classDesc = getClassDescriptor(name, _loader);
+                        if (classDesc == null) {
+                            classDesc = getClassDescriptor(JavaNaming.toJavaClassName(name));
+                        }
+                    }
                     if (classDesc != null) {
                         _topClass = classDesc.getJavaClass();
                     }
