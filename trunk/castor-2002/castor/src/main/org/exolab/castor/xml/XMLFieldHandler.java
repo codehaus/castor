@@ -133,8 +133,14 @@ public class XMLFieldHandler
     public void checkValidity( Object object )
         throws ValidityException, IllegalStateException
     {
-        //-- Do nothing, this method is overloaded by the
-        //-- source code generator
+        if (validator != null) {
+            try {
+                validator.validate(getValue(object));
+            }
+            catch(ValidationException vx) {
+                throw new ValidityException(vx);
+            }
+        }
         
     } //-- checkValidity
 
