@@ -318,8 +318,8 @@ public final class LockEngine {
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
      */
-    public OID load( TransactionContext tx, OID oid, Object object, AccessMode accessMode, int timeout )
-            throws ObjectNotFoundException, LockNotGrantedException, PersistenceException, 
+    public OID load( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
+            throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
             ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
 
         OID        lockedOid;
@@ -329,12 +329,13 @@ public final class LockEngine {
         boolean    write;
         boolean    succeed;
         short      action;
-    
+
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", oid.getName() ) );
 
         ClassMolder molder = oid.getMolder();
+        AccessMode accessMode = molder.getAccessMode( suggestedAccessMode );
 
         succeed = false;
 
@@ -342,7 +343,7 @@ public final class LockEngine {
 
         try {
 
-            if ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked ) 
+            if ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked )
                 action = ObjectLock.ACTION_WRITE;
             else
                 action = ObjectLock.ACTION_READ;
@@ -351,7 +352,7 @@ public final class LockEngine {
 
             lockedOid = lock.getOID();
 
-            Object stamp = typeInfo.molder.load( tx, lockedOid, lock, object, accessMode );
+            Object stamp = typeInfo.molder.load( tx, lockedOid, lock, object, suggestedAccessMode );
             // proposal change: lockedOid parameter is not really neccesary.
             // we can added getOID() method in DepositBox. It make code a little
             // bit clear?
@@ -422,7 +423,7 @@ public final class LockEngine {
             succeed = false;
 
             try {
-                
+
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
                 if ( _logInterceptor != null )
@@ -569,7 +570,7 @@ public final class LockEngine {
      *  report that the object was modified in the database during the long
      *  transaction.
      */
-    public OID update( TransactionContext tx, OID oid, Object object, AccessMode accessMode, int timeout )
+    public OID update( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
             throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
                    PersistenceException, ClassNotPersistenceCapableException,
                    ObjectDeletedWaitingForLockException {
@@ -577,8 +578,10 @@ public final class LockEngine {
         TypeInfo   typeInfo;
         Object   identity;
         ObjectLock lock;
-        boolean    write;
         boolean    succeed;
+        // [oleg] these variables are not used
+        //boolean    write;
+        //AccessMode accessMode;
 
         // If the object is new, don't try to load it from the cache
 
@@ -586,7 +589,8 @@ public final class LockEngine {
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", oid.getName() ) );
 
-        write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
+        //accessMode = typeInfo.molder.getAccessMode( suggestedAccessMode );
+        //write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
         succeed = false;
         lock = null;
         try {
@@ -609,7 +613,7 @@ public final class LockEngine {
             }*/
             oid = lock.getOID();
 
-            typeInfo.molder.update( tx, oid, lock, object, accessMode );
+            typeInfo.molder.update( tx, oid, lock, object, suggestedAccessMode );
 
             succeed = true;
 
@@ -618,7 +622,7 @@ public final class LockEngine {
                 oid.setDbLock( true );
              */
             /*
-            if ( accessMode == AccessMode.ReadOnly ) 
+            if ( accessMode == AccessMode.ReadOnly )
                 typeInfo.release( oid, tx );
             */
             return oid;
@@ -628,7 +632,7 @@ public final class LockEngine {
             // This is equivalent to object not existing
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getName(), oid.getIdentity()) );
         } finally {
-            if ( lock != null ) 
+            if ( lock != null )
                 lock.confirm( tx, succeed );
         }
     }
