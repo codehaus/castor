@@ -60,6 +60,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.List;
@@ -128,6 +129,12 @@ public final class Introspector {
      * Name of the java.util.List collection
      */
     private static final String LIST = "java.util.List";
+    
+    /**
+     * Name of the java.util.Map collection
+     */
+    private static final String MAP = "java.util.Map";
+    
 
     /**
      * Used as a prefix for the name of a container field
@@ -200,6 +207,13 @@ public final class Introspector {
     private Hashtable _handlerFactoryMap =  null;
     
     /**
+     * A flag indicating that MapKeys should be saved. To remain
+     * backward compatible this may be disable via the 
+     * castor.properties.
+     */
+    private boolean _saveMapKeys = true;
+     
+    /**
      * Creates a new instance of the Introspector
      */
     public Introspector() {
@@ -223,7 +237,16 @@ public final class Introspector {
             _wrapCollectionsInContainer = Boolean.valueOf(wrap).booleanValue();
         }
         
-    }
+        //-- Save Hashtable / Map keys ?
+        String saveKeys = config.getProperty(Configuration.Property.SaveMapKeys, null);
+        if (saveKeys != null) {
+            if ("false".equals(saveKeys) || "off".equals(saveKeys)) {
+                _saveMapKeys = false;
+            }
+        }
+        
+    } //-- init
+    
     
     /**
      * Registers the given "generalized" FieldHandlerFactory with this
@@ -443,7 +466,7 @@ public final class Introspector {
                 type = methodSet.add.getParameterTypes()[0];
                 isCollection = true;
             }
-            
+                        
             //-- if there was no add method, use get/set methods
             //-- to calculate type.
             if (type == null) {
@@ -515,6 +538,11 @@ public final class Introspector {
                                                 
                 if (methodSet.create != null) 
                     ((FieldHandlerImpl)handler).setCreateMethod(methodSet.create);
+                 
+                //-- handle Hashtable/Map 
+                if (isCollection && _saveMapKeys && isMapCollection(type)) {
+                    ((FieldHandlerImpl)handler).setConvertFrom(new IdentityConvertor());
+                }
                     
                 //-- look for GeneralizedFieldHandler
                 FieldHandlerFactory factory = getHandlerFactory(type);
@@ -645,9 +673,25 @@ public final class Introspector {
                 typeInfo = new TypeInfo(type, null, null, false, null, colHandler);
                 
                 FieldHandler handler = null;
-
+                boolean customHandler = false;
                 try {
                     handler = new FieldHandlerImpl(field, typeInfo);
+                    
+                    //-- handle Hashtable/Map 
+                    if (isCollection && _saveMapKeys && isMapCollection(type)) {
+                        ((FieldHandlerImpl)handler).setConvertFrom(new IdentityConvertor());
+                    }
+                        
+                    //-- look for GeneralizedFieldHandler
+                    FieldHandlerFactory factory = getHandlerFactory(type);
+                    if (factory != null) {
+                        GeneralizedFieldHandler gfh = factory.createFieldHandler(type);
+                        if (gfh != null) {
+                            gfh.setFieldHandler(handler);
+                            handler = gfh;
+                            customHandler = true;
+                        }
+                    } 
                 }
                 catch (MappingException mx) {
                     throw new MarshalException(mx);
@@ -656,8 +700,11 @@ public final class Introspector {
                 fieldDesc.setHandler(handler);
                    
                 //-- check for instances of java.util.Date
-                if (java.util.Date.class.isAssignableFrom(type))
-                    dateDescriptors.add(fieldDesc);
+                if (java.util.Date.class.isAssignableFrom(type)) {
+                    if (!customHandler) {
+                        dateDescriptors.add(fieldDesc);
+                    }
+                }
                 
             }            
         } //-- end of direct field access
@@ -810,6 +857,20 @@ public final class Introspector {
     } //-- setPrimitiveNodeType
     
     /**
+     * Sets whether or not keys from Hastable / Map instances
+     * should be saved in the XML. 
+     * 
+     * <p>Note: This is true by default since Castor 0.9.5.3</p>
+     *
+     * @param saveMapKeys a boolean that when true indicates keys
+     * from Hashtable or Map instances should be saved. Otherwise
+     * only the value object is saved.
+     */
+    public void setSaveMapKeys(boolean saveMapKeys) {
+        _saveMapKeys = saveMapKeys;
+    } //-- setSaveMapKeys
+    
+    /**
      * Converts the given xml name to a Java name.
      * @param name the name to convert to a Java Name
      * @param upperFirst a flag to indicate whether or not the
@@ -940,6 +1001,37 @@ public final class Introspector {
     
     
     /**
+     * Returns true if the given Class is an instance of a
+     * collection class.
+     * 
+     * @see loadCollections
+    **/
+    public static boolean isMapCollection(Class clazz) {
+        
+        if (clazz.isArray()) return false;
+        
+        for (int i = 0; i < _collections.length; i++) {
+            //-- check to see if clazz is either the
+            //-- same as or a subclass of one of the
+            //-- available collections. For performance
+            //-- reasons we first check if class is 
+            //-- directly equal to one of the collections
+            //-- instead of just calling isAssignableFrom.
+            if ((clazz == _collections[i]) ||
+                (_collections[i].isAssignableFrom(clazz)))
+            {
+                if (_collections[i] == java.util.Hashtable.class)
+                    return true;
+                //-- For JDK 1.1 compatibility use string name "java.util.Map"
+                if (_collections[i].getName().equals(MAP))
+                    return true;
+            }
+        }
+        return false;
+    } //-- isMapCollection
+    
+    
+    /**
      * Returns true if we are allowed to create a descriptor
      * for a given class type
      * @param type the Class type to test
@@ -999,14 +1091,16 @@ public final class Introspector {
      * @return a list of available collections
     **/
     private static Class[] loadCollections() {
-        Vector collections = new Vector();
+        Vector collections = new Vector(5);
         
         //-- JDK 1.1
         collections.addElement(Vector.class);
         collections.addElement(Enumeration.class);
+        collections.addElement(Hashtable.class);
         
         //-- JDK 1.2+
         ClassLoader loader = Vector.class.getClassLoader();
+        
         
         Class clazz = null;
         try {
@@ -1020,7 +1114,25 @@ public final class Introspector {
             //-- or some nasty ClassLoader 
             //-- issue has occurred.
         } 
-        if (clazz != null) collections.addElement(clazz);
+        if (clazz != null) {
+            //-- java.util.List found, add to collections, 
+            //-- also add java.util.Map
+            collections.addElement(clazz);
+        
+            clazz = null;
+            try {
+                if (loader != null) {
+                    clazz = loader.loadClass(MAP);
+                }
+                else clazz = Class.forName(MAP);
+            }
+            catch(ClassNotFoundException cnfx) {
+                //-- just ignore...for now
+                //-- some nasty ClassLoader issue has occurred.
+            } 
+            if (clazz != null) collections.addElement(clazz);
+        }
+        
         
         Class[] classes = new Class[collections.size()];
         collections.copyInto(classes);
@@ -1028,6 +1140,19 @@ public final class Introspector {
         return classes;
     } //-- loadCollections
     
+    
+    /**
+     * A special TypeConvertor that simply returns the object
+     * given. This is used for preventing the FieldHandlerImpl
+     * from using a CollectionHandler when getValue is called.
+     */
+    class IdentityConvertor implements TypeConvertor {
+        public Object convert( Object object, String param )
+            throws ClassCastException
+        {
+            return object;
+        }
+    } //-- class: IdentityConvertor
     
     /**
      * A simple struct for holding a set of accessor methods
@@ -1065,6 +1190,9 @@ public final class Introspector {
             this.fieldName = fieldName;
         }
     } //-- inner class: MethodSet
+    
+    
+    
     
 } //-- Introspector
 
