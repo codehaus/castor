@@ -151,11 +151,20 @@ public abstract class XSType {
     public static final short STRING             = 14;
     public static final short TIME_INSTANT       = 15;
     
-    private short type = NULL;
     
+    private short   type       = NULL;
+    
+    /**
+     * Flag signaling an enumerated type
+    **/
+    private boolean enumerated = false;
+    
+    /**
+     * Creates a new XSType of the given type
+    **/
     protected XSType(short type) {
         this.type = type;
-    }
+    } //-- XSType
     
     /**
      * Returns the JType that this XSType represents
@@ -202,6 +211,14 @@ public abstract class XSType {
         sb.append(variableName);
         return sb.toString();
     } //-- fromJavaObject
+    
+    /**
+     * Returns true if this XSType represents an enumerated type
+     * @return true if this XSType represents an enumerated type
+    **/
+    public boolean isEnumerated() {
+        return enumerated;
+    } //-- isEnumerated
     
     public boolean isPrimitive() {
         switch (type) {
@@ -255,5 +272,14 @@ public abstract class XSType {
                 return null;
         }
     } //-- getName
+    
+    /**
+     * Sets the enumerated flag for this XSClass
+     * @param enumerated a boolean indicating whether or not this XSClass 
+     * represents an enumerated type
+    **/
+    public void setAsEnumertated(boolean enumerated) {
+        this.enumerated = enumerated;
+    } //-- setAsEnumerated
     
 } //-- XSType
