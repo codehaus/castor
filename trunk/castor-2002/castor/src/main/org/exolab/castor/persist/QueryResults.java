@@ -104,6 +104,18 @@ public final class QueryResults
 	_query = query;
 	_accessMode = accessMode;
     }
+
+
+    /**
+     * Returns the transaction context in which this query was opened.
+     * The transaction may be closed.
+     *
+     * @return The query's transaction context
+     */
+    public TransactionContext getTransaction()
+    {
+	return _tx;
+    }
     
     
     /**
@@ -169,7 +181,7 @@ public final class QueryResults
 
 
     /**
-     * Returns the location of the last identity retrieved. The
+     * Returns the position of the last identity retrieved. The
      * index is one based.
      *
      * @return The index of the last identity retruned (one based) 
@@ -178,13 +190,13 @@ public final class QueryResults
      * @throws TransactionNotInProgressException The transaction
      *  has been closed
      */
-    public int getLocation()
+    public int getPosition()
 	throws TransactionNotInProgressException, PersistenceException
     {
 	// Make sure transaction is still open.
 	if ( _tx.getStatus() != Status.STATUS_ACTIVE )
 	    throw new TransactionNotInProgressException();
-	return _query.getLocation();
+	return _query.getPosition();
     }
 
 
