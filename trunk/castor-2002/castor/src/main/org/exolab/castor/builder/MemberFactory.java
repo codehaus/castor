@@ -227,8 +227,13 @@ public class MemberFactory {
         Datatype datatype = eDecl.getDatatype();
         if (datatype != null) {
             xsType = TypeConversion.convertType(datatype);
+            
+            JType jType = xsType.getJType();
+            
+            //-- This is NOT clean...we need a different approach
+            //-- here...
             //-- modify package name if necessary
-            if (!(datatype instanceof BuiltInType) ) {
+            if (datatype.hasFacet(Facet.ENUMERATION)) {
                 JClass jClass = (JClass) xsType.getJType();
                 String packageName = jClass.getPackageName();
                 if ((packageName != null) && (packageName.length() > 0))
