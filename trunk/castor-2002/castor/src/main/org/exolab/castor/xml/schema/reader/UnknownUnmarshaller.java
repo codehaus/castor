@@ -108,6 +108,14 @@ public class UnknownUnmarshaller extends SaxUnmarshaller {
     public void elementName(String name) {
         this.name = name;
     } //-- elementName
+
+    /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return null;
+    } //-- getObject
     
     /**
      * @param name 

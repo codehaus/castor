@@ -64,11 +64,11 @@ public abstract class SaxUnmarshaller
       //--------------------/
      //- Member Variables -/
     //--------------------/
-
+    
     /**
      * The document locator
     **/
-    Locator _locator = null;
+    private Locator _locator = null;
     
     /**
      * The resolver to be used for resolving id references
@@ -94,6 +94,12 @@ public abstract class SaxUnmarshaller
      * handles
     **/
     public abstract String elementName();
+    
+    /**
+     * Returns the Object created by this Unmarshaller
+     * @return the Object created by this Unmarshaller
+    **/
+    public abstract Object getObject();
     
     /**
      * Called to signal an end of unmarshalling. This method should
@@ -145,10 +151,66 @@ public abstract class SaxUnmarshaller
     } //-- isWhiteSpace
    
     /**
+     * This method is called when an illegal Attribute is encountered.
+     * @param attName the name of the illegal attribute.
+     * @exception org.xml.sax.SAXException always thrown.
+    **/
+    public void illegalAttribute(String attName) 
+        throws org.xml.sax.SAXException
+    {
+        String err = "Illegal attribute '" + attName + 
+            "' found on element <" + elementName() + ">.";
+            
+        if (_locator != null) {
+            err += "\n   line: " + _locator.getLineNumber();
+        }
+        
+        throw new SAXException(err);
+    } //-- illegalAttribute
+    
+    /**
+     * This method is called when an illegal Element is encountered.
+     * @param name the name of the illegal element
+     * @exception org.xml.sax.SAXException always thrown.
+    **/
+    public void illegalElement(String name) 
+        throws org.xml.sax.SAXException
+    {
+        String err = "Illegal element '" + name + 
+            "' found as child of <" + elementName() + ">.";
+            
+        if (_locator != null) {
+            err += "\n   line: " + _locator.getLineNumber();
+        }
+        
+        throw new SAXException(err);
+    } //-- illegalElement
+   
+    /**
+     * This method is called when an element which may only
+     * be defined once, is redefined.
+     * @param name the name of the element
+     * @exception org.xml.sax.SAXException always thrown.
+    **/
+    public void redefinedElement(String name) 
+        throws org.xml.sax.SAXException
+    {
+        String err = "redefintion of element '" + name + 
+            "' within element <" + elementName() + ">.";
+            
+        if (_locator != null) {
+            err += "\n   line: " + _locator.getLineNumber();
+        }
+        
+        throw new SAXException(err);
+    } //-- redefinedElement
+    
+    /**
      * This method is called when an out of order element is encountered
+     * @exception org.xml.sax.SAXException always thrown.
     **/
     public void outOfOrder(String name) 
-        throws SAXException 
+        throws org.xml.sax.SAXException 
     {
         StringBuffer err = new StringBuffer("out of order element <");
         err.append(name);

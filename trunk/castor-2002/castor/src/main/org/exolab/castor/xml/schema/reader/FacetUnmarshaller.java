@@ -65,7 +65,7 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     /**
      * The current SaxUnmarshaller
     **/
-    private SaxUnmarshaller unmarshaller;
+    private SaxUnmarshaller unmarshaller = null;
     
     /**
      * The current branch depth
@@ -77,8 +77,9 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     **/
     private Facet _facet = null;
     
-    private CharacterUnmarshaller charUnmarshaller = null;
-    
+    /**
+     * The element name of the Facet currently being unmarshalled
+    **/
     private String _elementName = null;
     
       //----------------/
@@ -108,8 +109,6 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
         _facet = new BasicFacet(name);
         _facet.setValue(atts.getValue(SchemaNames.VALUE_ATTR));
         
-        //-- we don't support any facets that have character data
-        //charUnmarshaller = new CharacterUnmarshaller();
     } //-- ArchetypeUnmarshaller
 
       //-----------/
@@ -134,6 +133,14 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     } //-- getArchetype
 
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getFacet();
+    } //-- getObject
+    
+    /**
      * @param name 
      * @param atts 
      * @see org.xml.sax.DocumentHandler
@@ -141,8 +148,18 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     public void startElement(String name, AttributeList atts) 
         throws org.xml.sax.SAXException
     {
-        String err = "A facet cannot contain daughter elements.";
-        throw new SAXException(err);
+        //-- Do delagation if necessary
+        if (unmarshaller != null) {
+            unmarshaller.startElement(name, atts);
+            ++depth;
+            return;
+        }
+        
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        else illegalElement(name);
+        
     } //-- startElement
 
     /**
@@ -152,7 +169,20 @@ public class FacetUnmarshaller extends SaxUnmarshaller {
     public void endElement(String name) 
         throws org.xml.sax.SAXException
     {
-        throw new SAXException("missing start element: " + name);
+        //-- Do delagation if necessary
+        if ((unmarshaller != null) && (depth > 0)) {
+            unmarshaller.endElement(name);
+            --depth;
+            return;
+        }
+        
+        if (unmarshaller == null)
+            throw new SAXException("missing start element: " + name);
+        else if (SchemaNames.ANNOTATION.equals(name)) {
+            Annotation annotation = (Annotation)unmarshaller.getObject();
+            _facet.addAnnotation(annotation);
+        }
+        
     } //-- endElement
 
     public void characters(char[] ch, int start, int length) 

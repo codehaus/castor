@@ -87,6 +87,14 @@ public class CharacterUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
     
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getString();
+    } //-- getObject
+    
+    /**
      * Returns the set of characters recieved by this CharacterUnmarshaller
      * as a String
      * @return the set of characters recieved by this CharacterUnmarshaller

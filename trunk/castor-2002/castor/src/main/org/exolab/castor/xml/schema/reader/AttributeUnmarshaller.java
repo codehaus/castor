@@ -65,7 +65,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     /**
      * The current SaxUnmarshaller
     **/
-    private FacetUnmarshaller unmarshaller;
+    private SaxUnmarshaller unmarshaller;
     
     /**
      * The current branch depth
@@ -95,7 +95,7 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         //-- type
         attValue = atts.getValue("type");
         if (attValue != null) {
-            _attribute.setDataTypeRef(attValue);
+            _attribute.setDatatypeRef(attValue);
         }
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
@@ -128,6 +128,14 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
     } //-- getAttribute
 
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getAttribute();
+    } //-- getObject
+    
+    /**
      * 
      * @param name 
      * @param atts 
@@ -142,7 +150,10 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        unmarshaller = new FacetUnmarshaller(name, atts);
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        else unmarshaller = new FacetUnmarshaller(name, atts);
     
     } //-- startElement
 
@@ -168,13 +179,17 @@ public class AttributeUnmarshaller extends SaxUnmarshaller {
         name = name.intern();
         
         
-        if ( (name == SchemaNames.MAX_EXCLUSIVE) ||
+        if (name == SchemaNames.ANNOTATION) {
+            Annotation ann = (Annotation) unmarshaller.getObject();
+            _attribute.addAnnotation(ann);
+        }
+        else if ( (name == SchemaNames.MAX_EXCLUSIVE) ||
                   (name == SchemaNames.MAX_INCLUSIVE) ||
                   (name == SchemaNames.MIN_EXCLUSIVE) ||
                   (name == SchemaNames.MIN_INCLUSIVE) )
         {
             
-            Facet tmpFacet = unmarshaller.getFacet();
+            Facet tmpFacet = (Facet)unmarshaller.getObject();
             
             NumberFacet facet = new NumberFacet(name);
             facet.setValue(facet.getValue());

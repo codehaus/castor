@@ -77,9 +77,9 @@ public class DatatypeUnmarshaller extends SaxUnmarshaller {
     **/
     private Datatype _datatype = null;
     
-    
-    private boolean allowRefines = true;
-    
+    /**
+     * A reference to the Schema definition
+    **/
     private Schema _schema = null;
     
       //----------------/
@@ -114,7 +114,7 @@ public class DatatypeUnmarshaller extends SaxUnmarshaller {
         //-- source
         String source = atts.getValue(SchemaNames.SOURCE_ATTR);
         if ((source != null) && (source.length() > 0)) {
-            _datatype.setBaseTypeRef(source);
+            _datatype.setSourceRef(source);
         }
     } //-- DatatypeUnmarshaller
 
@@ -140,6 +140,14 @@ public class DatatypeUnmarshaller extends SaxUnmarshaller {
     } //-- getDatatype
 
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getDatatype();
+    } //-- getObject
+
+    /**
      * @param name 
      * @param atts 
      * @see org.xml.sax.DocumentHandler
@@ -154,7 +162,10 @@ public class DatatypeUnmarshaller extends SaxUnmarshaller {
             return;
         }
         
-        unmarshaller = new FacetUnmarshaller(name, atts);
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        else unmarshaller = new FacetUnmarshaller(name, atts);
     
     } //-- startElement
 
@@ -176,12 +187,14 @@ public class DatatypeUnmarshaller extends SaxUnmarshaller {
         //-- have unmarshaller perform any necessary clean up
         unmarshaller.finish();
         
-        FacetUnmarshaller facetUnmarshaller 
-            = (FacetUnmarshaller) unmarshaller;
-            
-        Facet facet = facetUnmarshaller.getFacet();
-        
-        if (facet != null) _datatype.addFacet(facet);
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            Annotation annotation = (Annotation)unmarshaller.getObject();
+            _datatype.addAnnotation(annotation);
+        }
+        else {
+            Facet facet = (Facet)unmarshaller.getObject();
+            if (facet != null) _datatype.addFacet(facet);
+        }
     
         unmarshaller = null;
     } //-- endElement

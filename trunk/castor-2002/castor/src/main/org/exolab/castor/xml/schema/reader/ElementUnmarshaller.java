@@ -100,15 +100,14 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         
         this._schema = schema;
         
-        _element = new ElementDecl();
-        _element.useResolver(resolver);
+        _element = new ElementDecl(schema);
         
         String attValue = null;
         
         //-- @ref
         attValue = atts.getValue("ref");
         if (attValue != null) {
-            _element.setReference(attValue,resolver);
+            _element.setReference(attValue);
         }
             
             
@@ -137,10 +136,6 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         //-- @schemaName
         _element.setSchemaName(atts.getValue("schemaName"));
         
-        
-        if (!_element.isReference())
-            resolver.addResolvable(_element.getReferenceId(), _element);
-        
         charUnmarshaller = new CharacterUnmarshaller();
     } //-- ElementUnmarshaller
 
@@ -166,6 +161,14 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     } //-- getElement
 
     /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return _element;
+    } //-- getObject
+    
+    /**
      * @param name 
      * @param atts 
      * @see org.xml.sax.DocumentHandler
@@ -183,19 +186,18 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         
         //-- Use JVM internal String
         name = name.intern();
-        if (name == SchemaNames.ARCHETYPE) {
+        
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+        else if (SchemaNames.ARCHETYPE.equals(name)) {
             unmarshaller 
                 = new ArchetypeUnmarshaller(_schema, atts, getResolver());
         }
-        else if (name == SchemaNames.DATATYPE) {
+        else if (SchemaNames.DATATYPE.equals(name)) {
             throw new SAXException("<datatype> not yet supported for <element>.");
         }
-        else {
-            StringBuffer err = new StringBuffer("illegal element <");
-            err.append(name);
-            err.append("> found in <element>.");
-            throw new SAXException(err.toString());
-        }
+        else illegalElement(name);
         
         unmarshaller.setResolver(getResolver());
         
@@ -225,22 +227,19 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             }
         }
         
-        //-- Use JVM internal String
-        name = name.intern();
-       
         //-- call finish for any necessary cleanup
         unmarshaller.finish();
         
-        if (name == SchemaNames.ARCHETYPE) {
+        if (SchemaNames.ANNOTATION.equals(name)) {
+            Annotation ann = (Annotation)unmarshaller.getObject();
+            _element.addAnnotation(ann);
+        }
+        else if (SchemaNames.ARCHETYPE.equals(name)) {
             
             Archetype archetype = _element.getArchetype();
             
-            if (archetype != null) {
-                StringBuffer err = new StringBuffer("archetype defined more than ");
-                err.append("once for element definition: ");
-                err.append(_element.getName());
-                throw new SAXException(err.toString());
-            }
+            if (archetype != null) 
+                redefinedElement(name);
             
             archetype = ((ArchetypeUnmarshaller)unmarshaller).getArchetype();
             _element.setArchetype(archetype);

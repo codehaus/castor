@@ -150,6 +150,13 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
     public Group getGroup() {
         return _group;
     } //-- getGroup
+    /**
+     * Returns the Object created by this SaxUnmarshaller
+     * @return the Object created by this SaxUnmarshaller
+    **/
+    public Object getObject() {
+        return getGroup();
+    } //-- getObject
 
     /**
      * @param name 
