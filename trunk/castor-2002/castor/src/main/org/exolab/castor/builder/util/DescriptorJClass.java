@@ -83,9 +83,6 @@ public class DescriptorJClass extends JClass {
     
 
     //-- methods defined by org.exolab.castor.xml.XMLClassDescriptor
-    private JMethod _getAttributeDescriptors = null;
-    private JMethod _getContentDescriptor    = null;
-    private JMethod _getElementDescriptors   = null;
     private JMethod _getNameSpacePrefix      = null;
     private JMethod _getNameSpaceURI         = null;
     private JMethod _getValidator            = null;
@@ -95,7 +92,6 @@ public class DescriptorJClass extends JClass {
     private JMethod _getAccessMode = null;
     private JMethod _getIdentity   = null;
     private JMethod _getExtends    = null;
-    private JMethod _getFields     = null;
     private JMethod _getJavaClass  = null;
     
     private JClass _type = null;
@@ -114,8 +110,11 @@ public class DescriptorJClass extends JClass {
         
         JMethod     method = null;
         JSourceCode jsc    = null;
-        
-        addInterface("org.exolab.castor.xml.XMLClassDescriptor");
+
+		if (_type.getSuperClass()==null)
+			setSuperClass("org.exolab.castor.xml.util.XMLClassDescriptorImpl");
+		else
+			setSuperClass(_type.getSuperClass()+"Descriptor");
         
         addImport("org.exolab.castor.xml.*");
         addImport("org.exolab.castor.xml.handlers.*");
@@ -123,9 +122,6 @@ public class DescriptorJClass extends JClass {
         addImport("org.exolab.castor.xml.validators.*");
         addImport("org.exolab.castor.xml.FieldValidator");
         
-        addMember(new JMember(xfdArrayClass,   "elements") );
-        addMember(new JMember(xfdArrayClass,   "attributes") );
-        addMember(new JMember(_XMLFieldDescriptorImplClass, "contentDesc"));
         addMember(new JMember(SGTypes.String,  "nsPrefix"));
         addMember(new JMember(SGTypes.String,  "nsURI"));
         addMember(new JMember(SGTypes.String,  "xmlName"));
@@ -141,27 +137,6 @@ public class DescriptorJClass extends JClass {
         //-----------------------------------------/
         //- Methods Defined by XMLClassDescriptor -/
         //-----------------------------------------/
-        
-        //-- create getAttributeDescriptors method
-        method = new JMethod(xfdArrayClass, "getAttributeDescriptors");
-        jsc = method.getSourceCode();
-        jsc.add("return attributes;");
-        addMethod(method);
-        _getAttributeDescriptors = method;
-        
-        //-- create getContentDescriptor method
-        method = new JMethod(_XMLFieldDescriptorClass, "getContentDescriptor");
-        jsc = method.getSourceCode();
-        jsc.add("return contentDesc;");
-        addMethod(method);
-        _getContentDescriptor = method;
-        
-        //-- create getElementDescriptors method
-        method = new JMethod(xfdArrayClass, "getElementDescriptors");
-        jsc = method.getSourceCode();
-        jsc.add("return elements;");
-        addMethod(method);
-        _getElementDescriptors = method;
         
         //-- create getNameSpacePrefix method
         method = new JMethod(SGTypes.String, "getNameSpacePrefix");
@@ -211,31 +186,6 @@ public class DescriptorJClass extends JClass {
         addMethod(method);
         _getExtends = method;
         
-        //-- create getExtends method
-        JType fdArrayClass = _FieldDescriptorClass.createArray();
-        method = new JMethod(fdArrayClass, "getFields");
-        jsc = method.getSourceCode();
-        jsc.add("int size = attributes.length + elements.length;");
-        jsc.add("if (contentDesc != null) ++size;");
-        jsc.add("");
-        jsc.add("FieldDescriptor[] fields = new FieldDescriptor[size];");
-        jsc.add("int c = 0;");
-        jsc.add("for (int i = 0; i < attributes.length; i++)");
-        jsc.indent();
-        jsc.add("fields[c++] = attributes[i];");
-        jsc.unindent();
-        jsc.add("");    
-        jsc.add("for (int i = 0; i < elements.length; i++)");
-        jsc.indent();
-        jsc.add("fields[c++] = elements[i];");
-        jsc.unindent();
-        jsc.add("");    
-        jsc.add("if (contentDesc != null) fields[c] = contentDesc;");
-        jsc.add("");    
-        jsc.add("return fields;");    
-        addMethod(method);
-        _getFields= method;
-        
         //-- create getIdentity method
         method = new JMethod(_FieldDescriptorClass, "getIdentity");
         jsc = method.getSourceCode();
@@ -253,18 +203,6 @@ public class DescriptorJClass extends JClass {
         _getJavaClass = method;
         
     } //-- createSource
-    
-    public JMethod getAttributeDescriptorsMethod() {
-        return _getAttributeDescriptors;
-    } //-- getAttributeDescriptorsMethod
-    
-    public JMethod getContentDescriptorMethod() {
-        return _getContentDescriptor;
-    } //-- getContentDescriptorMethod
-    
-    public JMethod getElementDescriptorsMethod() {
-        return _getElementDescriptors;
-    } //-- getElementDescriptorsMethod
     
     public JMethod getNameSpacePrefixMethod() {
         return _getNameSpacePrefix;
@@ -284,10 +222,6 @@ public class DescriptorJClass extends JClass {
     
     public JMethod getExtendsMethod() {
         return _getExtends;
-    } //-- getExtendsMethod
-    
-    public JMethod getFieldsMethod() {
-        return _getFields;
     } //-- getExtendsMethod
     
     public JMethod getIdentityMethod() {
