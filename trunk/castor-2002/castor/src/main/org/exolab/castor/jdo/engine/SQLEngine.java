@@ -975,8 +975,8 @@ public final class SQLEngine implements Persistence {
     public Object load( Object conn, Object[] fields, Object identity, AccessMode accessMode )
             throws ObjectNotFoundException, PersistenceException {
 
-        PreparedStatement stmt;
-        ResultSet         rs;
+        PreparedStatement stmt  = null;
+        ResultSet         rs    = null;
         Object            stamp = null;
         boolean           notNull;
 
@@ -1077,11 +1077,17 @@ public final class SQLEngine implements Persistence {
                     }
                 }
             }
-            rs.close();
-            stmt.close();
-
         } catch ( SQLException except ) {
             throw new PersistenceException( Messages.format("persist.nested", except), except );
+        } finally {
+            try {
+                if ( rs != null ) rs.close();
+            } catch ( SQLException sqle ) {
+            }
+            try {
+                if ( stmt != null ) stmt.close();
+            } catch ( SQLException sqle ) {
+            }
         }
         return stamp;
     }
