@@ -693,6 +693,7 @@ public abstract class MappingLoader
 
                 try {
                     
+                    //-- handle nested fields
                     while ( true ) {
                         
                         Class last;
@@ -702,24 +703,13 @@ public abstract class MappingLoader
                             break;
                         last = javaClass;
                         
-                        fieldName = fieldName.substring( point + 1 );
                         
-                        // * getter *
-                        
-                        //-- reassign getPrefix for each time through 
-                        //-- the loop.
-                        getPrefix = GET_METHOD_PREFIX;
-                        methodName = getPrefix + capitalize( fieldName );
+                        // * getter for parent field *
+                        String parentField = fieldName.substring(0, point);
+                        methodName = GET_METHOD_PREFIX + capitalize( parentField );
                         method = javaClass.getMethod( methodName, null );                        
-                        if (method == null) {
-                            if ((fieldType == Boolean.class) ||
-                                (fieldType == Boolean.TYPE)) 
-                            {
-                                getPrefix = IS_METHOD_PREFIX;
-                                methodName = getPrefix + capitalize( fieldName );
-                                method = javaClass.getMethod( methodName, null);
-                            }
-                        }
+                        
+                        fieldName = fieldName.substring( point + 1 );
                         
                         // Make sure method is not abstract/static
                         // (note: Class.getMethod() returns only public methods).
@@ -740,7 +730,9 @@ public abstract class MappingLoader
                             method = null;
                         }
                         setSeq.addElement( method );
-                    }
+                    } //-- end of nested fields
+                    
+                    //-- save method-call sequence for nested fields
                     if ( getSeq.size() > 0 ) {
                         getSequence = new Method[ getSeq.size() ];
                         getSeq.copyInto( getSequence );
@@ -749,18 +741,21 @@ public abstract class MappingLoader
                     }
                     
                     
-                    getMethod = findAccessor( javaClass, getPrefix + capitalize( fieldName ),
-                                            ( colType == null ? fieldType : colType ), true );
+                    //-- find get-method for actual field
+                    methodName = getPrefix + capitalize( fieldName );
+                    Class returnType = (colType == null) ? fieldType : colType;
+                    getMethod = findAccessor( javaClass, methodName, returnType, true);
                                           
-                    //-- check for boolean type
+                    //-- If getMethod is null, check for boolean type 
+                    //-- method prefix might be "is".
                     if (getMethod == null) {
                         if ((fieldType == Boolean.class) || 
                             (fieldType == Boolean.TYPE)) 
                         {
                             getPrefix = IS_METHOD_PREFIX;
-                            getMethod = findAccessor(javaClass, 
-                                getPrefix + capitalize( fieldName ),
-                                ( colType == null ? fieldType : colType ), true );
+                            methodName = getPrefix + capitalize( fieldName );
+                            getMethod = findAccessor(javaClass, methodName,
+                                    returnType, true);
                         }
                     }
                 } catch ( MappingException except ) {
