@@ -154,7 +154,7 @@ public class DatabaseSource
 	} catch ( MappingException except ) {
 	    throw except;
 	} catch ( Exception except ) {
-	    throw new MappingException( "Nested error: " + except.getMessage() );
+	    throw new MappingException( except );
 	}
     }
 
@@ -206,7 +206,7 @@ public class DatabaseSource
 		    try {
 			Class.forName( db.getDriver().getClassName() );
 		    } catch ( ClassNotFoundException except ) {
-			throw new MappingException( except.toString() );
+			throw new MappingException( except );
 		    }
 		}
 		props = new Properties();
@@ -233,7 +233,7 @@ public class DatabaseSource
 		    throw new MappingException( "The JNDI name " + db.getDbName() +
 						" does not map to a DataSource" );
 		} catch ( NamingException except ) {
-		    throw new MappingException( "Nested exception: " + except.toString() );
+		    throw new MappingException( except );
 		}
 		if ( ! ( ds instanceof DataSource ) )
 		    throw new MappingException( "The JNDI name " + db.getDbName() +
@@ -375,7 +375,7 @@ public class DatabaseSource
 	    } catch ( NameNotFoundException except ) {
 		throw new MappingException( "The JNDI name " + dbName + " does not map to a DataSource" );
 	    } catch ( NamingException except ) {
-		throw new MappingException( except.toString() );
+		throw new MappingException( except );
 	    }
 	    if ( obj instanceof DataSource ) {
 		return registerDataSource( dbName, (DataSource) obj, null );

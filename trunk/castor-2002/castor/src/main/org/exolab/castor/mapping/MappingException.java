@@ -47,6 +47,8 @@
 package org.exolab.castor.mapping;
 
 
+import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.sql.SQLException;
 
 
@@ -62,10 +64,53 @@ public class MappingException
 {
 
 
+    private Exception  _except;
+
+
     public MappingException( String message )
     {
 	super( message );
     }
 
+    public MappingException( Exception except )
+    {
+	super( "Nested exception: " + except.toString() );
+	_except = except;
+    }
+
+
+    public Exception getException()
+    {
+	return _except;
+    }
+
+
+    public void printStackTrace()
+    {
+	if ( _except == null )
+	    super.printStackTrace();
+	else
+	    _except.printStackTrace();
+    }
+
+
+    public void printStackTrace( PrintStream print )
+    {
+	if ( _except == null )
+	    super.printStackTrace( print );
+	else
+	    _except.printStackTrace( print );
+    }
+
+
+    public void printStackTrace( PrintWriter print )
+    {
+	if ( _except == null ) 
+	    super.printStackTrace( print );
+	else
+	    _except.printStackTrace( print );
+    }
+
 
 }
+
