@@ -48,7 +48,9 @@ package org.exolab.castor.xml;
 //-- xml related imports
 import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
+import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.MimeBase64Encoder;
@@ -106,6 +108,9 @@ public class Marshaller {
      * The ClassDescriptorResolver used for resolving XMLClassDescriptors
     **/
     private ClassDescriptorResolver _cdResolver = null;
+
+    private DocumentHandler  _handler;
+
     
     /**
      * The depth of the sub tree, 0 denotes document level
@@ -119,7 +124,10 @@ public class Marshaller {
     /**
      * Creates a new Marshaller
     **/
-    private Marshaller() {
+    public Marshaller( DocumentHandler handler ) {
+        if ( handler == null )
+            throw new IllegalArgumentException( "Argument 'handler' is null" );
+        _handler         = handler;
         _nsPrefixKeyHash = new Hashtable(3);
         _nsURIKeyHash    = new Hashtable(3);
         _nsScope         = new List(3);
@@ -127,54 +135,35 @@ public class Marshaller {
         _cdResolver       = new ClassDescriptorResolverImpl();
         _parents         = new Stack();
     } //-- Marshaller
-    
-    
+
+
+    public Marshaller( Writer out )
+        throws IOException
+    {
+        this( Configuration.getSerializer( out ) );
+    }
+
+
+    public void setMapping( Mapping mapping )
+        throws MappingException
+    {
+        _cdResolver = new ClassDescriptorResolverImpl();
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getXMLMapping() );
+    }
+
+
     /**
-     * Marshals the given Object as XML using the given Writer.
+     * Marshals the given object as XML using the given Writer.
      * @param obj the Object to marshal
      * @param out the Writer to marshal to
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
-    public static void marshal(Object obj, Writer out) 
+    public void marshal(Object obj, Writer out) 
         throws MarshalException, ValidationException
     {
-        marshal(obj, out, null);
-    } //-- void marshal(Writer) 
-
-    /**
-     * Marshals the given Object as XML using the given Writer.
-     * @param obj the Object to marshal
-     * @param out the Writer to marshal to
-     * @param logger the PrintWriter to write log information to
-     * @exception org.exolab.castor.xml.MarshalException
-     * @exception org.exolab.castor.xml.ValidationException
-    **/
-    public static void marshal(Object obj, Writer out, PrintWriter logger) 
-        throws MarshalException, ValidationException
-    {
-        marshal(obj, out, logger, Configuration.debug());
-    } //-- void marshal(Writer) 
-
-    /**
-     * Marshals the given Object as XML using the given Writer.
-     * @param obj the Object to marshal
-     * @param out the Writer to marshal to
-     * @param logger the PrintWriter to write log information to
-     * @exception org.exolab.castor.xml.MarshalException
-     * @exception org.exolab.castor.xml.ValidationException
-    **/
-    public static void marshal
-        (Object obj, Writer out, PrintWriter logger, boolean debug) 
-        throws MarshalException, ValidationException
-    {
-        try {
-       	    marshal(obj, Configuration.getSerializer( out ), logger, debug);
-       	}
-       	catch (java.io.IOException ioe) {
-       	    throw new MarshalException(ioe);
-       	}
-
+        validate(obj);
+        marshal(obj, null, _handler );
         try {
             out.flush();
         }
@@ -191,38 +180,11 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.MarshalException
      * @exception org.exolab.castor.xml.ValidationException
     **/
-    public static void marshal(Object object, DocumentHandler handler) 
+    public void marshal(Object object) 
         throws MarshalException, ValidationException
     {
-        Marshaller marshaller = new Marshaller();
-        marshaller.validate(object);
-        marshaller.marshal(object, null, handler);
-    } //-- marshal
-    
-    /**
-     * Marshals the given Object as XML using the given DocumentHandler.
-     * @param obj the Object to marshal
-     * @param handler the DocumentHandler to marshal to
-     * @param logger the PrintWriter to write log messages to
-     * @param debug a flag indicating whether or not to generate debug 
-     * information
-     * @exception org.exolab.castor.xml.MarshalException
-     * @exception org.exolab.castor.xml.ValidationException
-    **/
-    public static void marshal 
-    (
-        Object object, 
-        DocumentHandler handler, 
-        PrintWriter logger, 
-        boolean debug 
-    ) 
-        throws MarshalException, ValidationException
-    {
-        Marshaller marshaller = new Marshaller();
-        marshaller.validate(object);
-        marshaller.setLogWriter(logger);
-        marshaller.setDebug(debug);
-        marshaller.marshal(object, null, handler);
+        validate(object);
+        marshal(object, null, _handler);
     } //-- marshal
     
     /**
@@ -232,11 +194,10 @@ public class Marshaller {
      * @exception org.exolab.castor.xml.ValidationException
      * during marshaling
     **/
-    public void marshal
+    private void marshal
         (Object object, XMLFieldDescriptor descriptor, DocumentHandler handler) 
         throws MarshalException, ValidationException
     {
-        
         if (object == null) {
             String err = "Marshaller#marshal: null parameter: 'object'"; 
             throw new IllegalArgumentException(err);
@@ -273,7 +234,7 @@ public class Marshaller {
             
         XMLClassDescriptor classDesc 
             = (XMLClassDescriptor)descriptor.getClassDescriptor();
-            
+
         if (classDesc == null) {
             
             //-- check for primitive or String, we need to use
@@ -312,6 +273,7 @@ public class Marshaller {
                 }
                 
                 classDesc = getClassDescriptor(_class);
+                name = classDesc.getXMLName();
             }
             
             if (classDesc == null) {
@@ -324,6 +286,7 @@ public class Marshaller {
                     throw new MarshalException
                         (MarshalException.BASE_CLASS_OR_VOID_ERR);
                 }
+                /*
                 else if ((!_class.isPrimitive()) && 
 		            (!Serializable.class.isAssignableFrom( _class ))) {
 		                
@@ -332,6 +295,7 @@ public class Marshaller {
                             (MarshalException.NON_SERIALIZABLE_ERR);
                     }
                 }
+                */
                 _parents.pop();
                 return;
             }
