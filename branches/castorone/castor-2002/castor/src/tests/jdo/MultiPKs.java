@@ -54,9 +54,12 @@ import java.util.Collection;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.lang.Math;
 import java.util.Vector;
 import java.util.Random;
+import java.util.Date;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -111,15 +114,183 @@ public class MultiPKs extends CWTestCase {
     public boolean run( CWVerboseStream stream ) {
         boolean result = true;
         try {
+            _db = _category.getDatabase( stream.verbose() );
+            _conn = _category.getJDBCConnection();
+
+			// delete everything directly
+            stream.writeVerbose( "Delete everything" );
+			Statement stmt = _conn.createStatement();
+			stmt.executeUpdate("DELETE FROM test_pks_person");
+			stmt.executeUpdate("DELETE FROM test_pks_employee");
+			stmt.executeUpdate("DELETE FROM test_pks_payroll");
+			stmt.executeUpdate("DELETE FROM test_pks_address");
+			stmt.executeUpdate("DELETE FROM test_pks_contract");
+			stmt.executeUpdate("DELETE FROM test_pks_category");
+			_conn.commit();
+
+            _db.begin();
+			// create person 1
+			TestPKsEmployee person = new TestPKsEmployee();
+			person.setFirstName( "First" );
+			person.setLastName( "Person" );
+			person.setBirthday( new Date(1922, 2, 2) );
+
+			TestPKsAddress address1 = new TestPKsAddress();
+			address1.setId(1);
+			address1.setStreet("#1 Address Street");
+			address1.setCity("First City");
+			address1.setState("AB");
+            address1.setZip("10000");
+			address1.setPerson( person );
+
+			TestPKsAddress address2 = new TestPKsAddress();
+			address2.setId(2);
+			address2.setStreet("2nd Ave");
+			address2.setCity("Second City");
+			address2.setState("BC");
+            address2.setZip("22222");
+			address2.setPerson( person );
+
+			TestPKsAddress address3 = new TestPKsAddress();
+			address3.setId(3);
+			address3.setStreet("3rd Court");
+			address3.setCity("Third Ave");
+			address3.setState("AB");
+            address3.setZip("30003");
+			address3.setPerson( person );
+
+			ArrayList addresslist = new ArrayList();
+			addresslist.add( address1 );
+			addresslist.add( address2 );
+			addresslist.add( address3 );
+
+			person.setAddress( addresslist );
+
+			TestPKsPayRoll pr1 = new TestPKsPayRoll();
+			pr1.setId( 1 );
+			pr1.setHoliday( 15 );
+			pr1.setHourlyRate( 25 );
+			pr1.setEmployee( person );
+			person.setPayRoll( pr1 );
+
+			TestPKsContractCategory cc = new TestPKsContractCategory();
+			cc.setId( 101 );
+			cc.setName("Full-time slave");
+			_db.create( cc );
+
+			TestPKsContractCategory cc2 = new TestPKsContractCategory();
+			cc2.setId( 102 );
+			cc2.setName("Full-time employee");
+			_db.create( cc2 );
+			ArrayList category = new ArrayList();
+			category.add( cc );
+			category.add( cc2 );
+
+			TestPKsContract con = new TestPKsContract();
+			con.setPolicyNo(1001);
+			con.setComment("80 hours a week, no pay hoilday, no sick leave, arrive office at 7:30am everyday");
+			con.setContractNo(78);
+			con.setEmployee( person );
+			con.setCategory( category );
+			person.setContract( con );
+			_db.create( person );
+			_db.commit();			
+
+
+
+
+			_db.begin();
+			Object[] fullname = { "First", "Person" };
+
+			TestPKsEmployee loadPerson = (TestPKsEmployee) _db.load( TestPKsEmployee.class, fullname );
 			
+			if ( loadPerson.getBirthday().equals(new Date(1922, 2, 2)) &&
+					loadPerson.getFirstName().equals("First") && loadPerson.getLastName().equals("Person") ) {
+				System.out.println("OK: Employee is valid");
+
+				ArrayList address = loadPerson.getAddress();
+				Iterator itor = address.iterator();
+				TestPKsAddress[] addresses = { null, null, null };
+				TestPKsAddress addr;
+				while ( itor.hasNext() ) {
+				    addr = (TestPKsAddress)itor.next();
+					if ( addr.getId() < 1 || addr.getId() > 3 ) {
+						_db.rollback();
+						System.out.println("Error: Address id is wrong");
+						return false;
+					}
+					addresses[addr.getId()-1] = addr;
+				}
+
+				if ( addresses[0] == null || !addresses[0].getStreet().equals("#1 Address Street") 
+						|| !addresses[0].getCity().equals("First City") || !addresses[0].getState().equals("AB") 
+						|| !addresses[0].getZip().equals("10000") || addresses[0].getPerson() != loadPerson ) {
+					System.out.println("Error: Address 1 is wrong");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Address 1 are valid");
+
+				if ( addresses[1] == null || !addresses[1].getStreet().equals("2nd Ave") 
+						|| !addresses[1].getCity().equals("Second City") || !addresses[1].getState().equals("BC") 
+						|| !addresses[1].getZip().equals("22222") || addresses[1].getPerson() != loadPerson ) {
+					System.out.println("Error: Address 2 is wrong");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Address 2 are valid");
+
+				TestPKsPayRoll payroll = loadPerson.getPayRoll();
+				if ( payroll == null || payroll.getId() != 1 || payroll.getHoliday() != 15 
+						|| payroll.getEmployee() != loadPerson || payroll.getHourlyRate() != 25 ) {
+					System.out.println("Error: PayRoll loaded wrong");
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: PayRoll is valid");
+
+				TestPKsContract cont = loadPerson.getContract();
+				if ( cont == null || cont.getPolicyNo() != 1001 || cont.getEmployee() != loadPerson 
+						|| cont.getContractNo() != 78 ) {
+					System.out.println("Error: Contract are not what expected!");
+					System.out.println("employe==null? "+cont.getEmployee()+"/"+cont.getEmployee().getFirstName()+"/"+cont.getEmployee().getLastName());
+					System.out.println("loadPerson? "+loadPerson+"/"+loadPerson.getFirstName()+"/"+loadPerson.getLastName());					
+					System.out.println("person? "+person+"/"+person.getFirstName()+"/"+person.getLastName());					
+					_db.rollback();
+					return false;
+				}
+				System.out.println("OK: Contract is valid");
+
+				ArrayList catelist = cont.getCategory();
+				itor = catelist.iterator();
+				TestPKsContractCategory cate;
+				while ( itor.hasNext() ) {
+				    cate = (TestPKsContractCategory) itor.next();
+					if ( cate.getId() == 101 && cate.getName().equals("Full-time slave") ) {
+					} else if ( cate.getId() == 102 && cate.getName().equals("Full-time employee") ) {
+					} else {
+						System.out.println("Error: Category is wrong");
+						_db.rollback();
+						return false;
+					}							
+				}
+				System.out.println("OK: Categories are valid");
+			} else {
+				_db.rollback();
+				System.out.println("Error: FirstName, LastName or Birthday is wrong!");
+				return false;
+			}
+				
+			_db.commit();
 
         } catch ( Exception e ) {
             result = false;
             e.printStackTrace();
         }
-		// if it is not test, assume it's broken. So return false.
-        return false;
+        return result;
     }
 }
+
+
 
 

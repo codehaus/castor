@@ -54,6 +54,102 @@ go
 grant all on test_many_person to test
 go
 
+-- test multiple pk
+drop table test_pks_person
+go
+create table test_pks_person (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  bday  datetime 
+)
+go
+
+create unique index test_pks_person_pk on test_pks_person( fname, lname )
+go
+grant all on test_pks_person to test
+go
+
+drop table test_pks_employee
+go
+create table test_pks_employee (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  start_date datetime null
+)
+go
+create unique index test_pks_person_employee_pk on test_pks_employee( fname, lname )
+go
+grant all on test_pks_employee to test
+go
+
+drop table test_pks_payroll
+go
+create table test_pks_payroll (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  holiday int,
+  hourly_rate int
+)
+go
+create unique index test_pks_payroll_fk on test_pks_payroll( fname, lname )
+go
+create unique index test_pks_payroll_pk on test_pks_payroll( id )
+go
+
+drop table test_pks_address
+go
+create table test_pks_address (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  id int               not null,
+  street varchar(30) null,
+  city  varchar(30) null,
+  state varchar(2) null,
+  zip varchar(6) null
+)
+go
+create unique index test_pks_address_pk on test_pks_address( id )
+go
+grant all on test_pks_address to test
+go
+
+drop table test_pks_contract
+go
+create table test_pks_contract (
+  fname varchar(15)    not null,
+  lname varchar(15)    not null,
+  policy_no int        not null,
+  contract_no int      not null,
+  c_comment varchar(30)  null
+)
+go
+create unique index test_pks_contract_fk on test_pks_contract( fname, lname )
+go
+create unique index test_pks_contract_pk on test_pks_contract( policy_no, contract_no )
+go
+grant all on test_pks_contract to test
+go
+
+drop table test_pks_category_contract
+go
+create table test_pks_category_contract (
+  policy_no int        not null,
+  contract_no int      not null,
+  cate_id int          not null
+)
+go
+
+drop table test_pks_category
+go
+create table test_pks_category (
+  id  int              not null,
+  name varchar(20)     not null
+)
+go
+create unique index test_pks_category_pk on test_pks_category( id )
+go
+
 
 -- test_table_ex
 drop table test_table_ex
@@ -190,6 +286,24 @@ go
 create unique index test_keygen_ext_pk on test_keygen_ext ( id )
 go
 grant all on test_keygen_ext to test
+go
+
+-- list_types
+drop table list_types
+go
+create table list_types (
+  o_char  CHAR         null,
+  o_nchar NCHAR        null,
+  o_varchar VARCHAR(10) null,
+  o_nvarchar VARCHAR(10) null,
+  o_text TEXT null,
+  o_datetime datetime null,
+  o_smalldatetime SMALLDATETIME null,
+  o_binary(10) BINARY null,
+  o_varbinary(10) VARBINARY null,
+  o_image IMAGE null,
+  o_int   INT null,
+)
 go
 
 

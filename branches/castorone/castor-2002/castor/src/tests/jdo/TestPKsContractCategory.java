@@ -10,6 +10,7 @@ import java.util.Date;
 
 public class TestPKsContractCategory {
     private int _id;
+	private String _name;
 	private ArrayList _contract;
 
     public void setId( int id ) {
@@ -18,6 +19,12 @@ public class TestPKsContractCategory {
     public int getId() {
         return _id;
     }
+	public void setName( String name ) {
+		_name = name;
+	}
+	public String getName() {
+		return _name;
+	}
 	public void setContract( ArrayList contract ) {
 		_contract = contract;
 	}

@@ -26,8 +26,11 @@ public class TestPKsPerson {
     public void setLastName( String lname ) {
         _lname = lname;
     }
-    public Date getBirthDay() {
+    public Date getBirthday() {
         return _bday;
+    }
+    public void setBirthday( Date date ) {
+        _bday = date;
     }
     public ArrayList getAddress() {
         return _address;
