@@ -227,8 +227,8 @@ public final class QueryResults
                     throw new ObjectNotFoundExceptionImpl( handler.getJavaClass(), _lastIdentity );
                 else {
                     if ( ( _accessMode == AccessMode.Exclusive ||
-                           _accessMode == AccessMode.Locked ) &&
-                         ! oid.isExclusive() ) {
+                           _accessMode == AccessMode.DbLocked ) &&
+                         ! oid.isDbLock() ) {
                         // If we are in exclusive mode and object has not been
                         // loaded in exclusive mode before, then we have a
                         // problem. We cannot return an object that is not
