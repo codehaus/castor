@@ -67,7 +67,7 @@ public class SGId extends FieldInfo {
         
         JMethod[] methods = new JMethod[3];
         
-        String mname = getName().substring(1);
+        String mname = methodSuffix();
         JType jType  = getSchemaType().getJType();
         
         //-- create get method
