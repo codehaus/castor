@@ -163,7 +163,10 @@ public class RandomHelper {
      * @returns a random Castor timeDuration
      */
     public static TimeDuration getRandom(TimeDuration date, Class c) {
-        return new TimeDuration(_rand.nextLong());
+        long randLong = (long)_rand.nextInt();
+        randLong = (randLong > 0)?randLong : -randLong;
+        System.out.println(randLong);
+        return new TimeDuration(randLong);
     }
 
     /**
@@ -171,8 +174,46 @@ public class RandomHelper {
      * @returns a random Castor recurringDuration
      */
     public static RecurringDuration getRandom(RecurringDuration recurring, Class c) {
-        return new RecurringDuration(new TimeDuration(_rand.nextLong()),
-                                     new TimeDuration(_rand.nextLong()));
+        short randShort;
+        long randLong = _rand.nextLong();
+        TimeDuration randDuration = new TimeDuration(randLong);
+        RecurringDuration result = new RecurringDuration(randDuration, randDuration);
+        short[] values = new short[10];
+        //only positive values are allowed
+        //century
+        randShort = (short) _rand.nextInt(99);
+        values[0] = (randShort > 0)? randShort:(short)-randShort;
+        //year
+        randShort = (short)_rand.nextInt(99);
+        values[1] = (randShort > 0)? randShort:(short)-randShort;
+        //month
+        randShort = (short)_rand.nextInt(12);
+        values[2] = (randShort > 0)? randShort:(short)-randShort;
+        //day
+        randShort = (short)_rand.nextInt(30);
+        values[3] = (randShort > 0)? randShort:(short)-randShort;
+        //hour
+        randShort = (short)_rand.nextInt(24);
+        values[4] = (randShort > 0)? randShort:(short)-randShort;
+        //minute
+        randShort = (short)_rand.nextInt(60);
+        values[5] = (randShort > 0)? randShort:(short)-randShort;
+        //second
+        randShort = (short)_rand.nextInt(60);
+        values[6] = (randShort > 0)? randShort:(short)-randShort;
+        //millisecond
+        randShort = (short)_rand.nextInt(99);
+        values[7] = (randShort > 0)? randShort:(short)-randShort;
+        //time zone hour
+        randShort = (short)_rand.nextInt(12);
+        values[8] = randShort;
+        //time zone minute
+        randShort = (short)_rand.nextInt(60);
+        values[9] = (randShort > 0)? randShort:(short)-randShort;
+        result.setValues(values);
+        values = null;
+        randDuration = null;
+        return result;
     }
 
 
@@ -187,7 +228,7 @@ public class RandomHelper {
         }
         return obj;
     }
-    
+
     /**
      * Returns a random Castor recurringDuration
      * @returns a random Castor recurringDuration
