@@ -612,13 +612,14 @@ public class ElementDecl extends Particle
     } //-- getStructureType
 
     /**
-     * Checks the validity of this element definition
-     * @exception ValidationException when this element definition
-     * is invalid
+     * Checks the validity of this element definition.
+     *
+     * @throws ValidationException when this element definition
+     * is invalid.
     **/
     public void validate() throws ValidationException {
 
-        //-- if this merely references another element definition
+        //-- If this merely references another element definition
         //-- just check that we can resolve the reference
         if (_elementRef != null) {
             if (_schema.getElementDecl(_elementRef) == null) {
@@ -626,12 +627,35 @@ public class ElementDecl extends Particle
                     "is not resolvable.";
                 throw new ValidationException(err);
             }
+            return;
         }
-        else if (_name == null)  {
+        
+        if (_name == null)  {
             String err = "<element> is missing required 'name' or " +
                 "'ref' attribute.";
             throw new ValidationException(err);
         }
+        
+        //-- If type is anonymous, make sure the type is valid.
+        //-- To prevent excess validation, we ONLY validate
+        //-- if the type is anonymous, because otherwise
+        //-- the Schema itself will validate the type.
+        XMLType type = getType();
+        if (type != null) {
+            if (type.isComplexType()) {
+                ComplexType complexType = (ComplexType)type;
+                if (!complexType.isTopLevel()) {
+                    complexType.validate();
+                }
+            }
+            else {
+                SimpleType simpleType = (SimpleType)type;
+                if (simpleType.getParent() != simpleType.getSchema()) {
+                    simpleType.validate();
+                }
+            }
+        }
+        
     } //-- validate
 
 

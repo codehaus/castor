@@ -45,6 +45,7 @@
 
 package org.exolab.castor.xml.schema;
 
+import org.exolab.castor.xml.ValidationException;
 
 /**
  * Package private class to handles type references.
@@ -98,6 +99,20 @@ class TypeReference extends XMLType
     public short getStructureType() {
         return Structure.UNKNOWN;
     } //-- getStructureType
+    
+    /**
+     * Checks the validity of this type defintion.
+     *
+     * @throws ValidationException when this type definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- Do nothing
+        
+    } //-- validate
+    
 }
 
 

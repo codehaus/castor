@@ -703,6 +703,26 @@ public class ComplexType extends XMLType
         return Structure.COMPLEX_TYPE;
     } //-- getStructureType
 
+    /**
+     * Checks the validity of this ComplexType defintion.
+     *
+     * @throws ValidationException when this ComplexType definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- check attributes
+        _attributes.validate();
+        
+        //-- check content model
+        Enumeration enum = _contentModel.enumerate();
+        while (enum.hasMoreElements()) {
+            ((Structure)enum.nextElement()).validate();
+        }
+        
+    } //-- validate
+
     //---------------------/
     //- Protected Methods -/
     //---------------------/

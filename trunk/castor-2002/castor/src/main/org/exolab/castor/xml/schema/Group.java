@@ -440,14 +440,18 @@ public class Group extends Particle
     }
 
     /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
+     * Checks the validity of this Group defintion.
+     *
+     * @throws ValidationException when this Group definition
      * is invalid.
     **/
     public void validate()
         throws ValidationException
     {
-        //-- do nothing
+        Enumeration enum = _contentModel.enumerate();
+        while (enum.hasMoreElements()) {
+            ((Structure)enum.nextElement()).validate();
+        }
     } //-- validate
 
     /**

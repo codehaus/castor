@@ -237,15 +237,4 @@ public abstract class XMLType extends Annotated
     XMLType getType() { return this; }
 
 
-    /**
-     * Checks the validity of this Schema defintion.
-     * @exception ValidationException when this Schema definition
-     * is invalid.
-    **/
-    public void validate()
-        throws ValidationException
-    {
-        //-- do nothing
-    } //-- validate
-
 } //-- XMLType
