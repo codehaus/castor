@@ -16,6 +16,10 @@
 
     <section title="1 Introduction">
 
+      <p>Castor XML mapping is a way to simplify the binding of java classes to
+      XML document. It allows to transform the data contained in a java object
+      model into/from an XML document.</p>
+
       <p>Although it is possible to rely on Castor's default behavior to marshal and
         unmarshal Java objects into an XML document, it might be necessary to have more
         control over this behavior. For example, if a Java object model already exists,
@@ -71,7 +75,7 @@
           <li>by default, create a name using the name of the class</li>
         </ul>
 
-        <p>It will then use the field information from the mapping file to determine if a
+        <p>It will then use the fields information from the mapping file to determine how a
           given property of the object has to be translated into one and only one of the
           following:</p>
 
@@ -103,7 +107,7 @@
 
         <p>When Castor finds an element while unmarshalling a document, it will try to use
           the mapping information to determine which object to instantiate. If no mapping
-          information is present, Castor will use the name of the element to try to find
+          information is present, Castor will use the name of the element to try to guess
           the name of a class to instantiate (for example, for an element named
           'test-element', Castor will try to instantiate a class named 'TestElement' if no
           information is given in the mapping file). Castor will then use the field
@@ -192,6 +196,7 @@
                   name            ID       #REQUIRED
                   extends         IDREF    #IMPLIED
                   depends         IDREF    #IMPLIED
+                  auto-complete   ( true |false ) "false"
                   identity        CDATA    #IMPLIED
                   access          ( read-only | shared | exclusive | db-locked )  "shared"
                   key-generator   IDREF    #IMPLIED >
@@ -212,24 +217,34 @@
             for which mapping information is provided. It should _not_ be used
             if the extended class is not used in the mapping file.</li>
 
-          <li><b>depends:</b> for more information on this fields, see JDO
+          <li><b>depends:</b> for more information on this fields see JDO
             documentation.</li>
 
-          <li><b>identity:</b> for more information on this fields, see JDO
+          <li><b>auto-complete:</b> if true, the class will be introspected to
+          determine its field and the fields specified in the mapping file will
+          be used to overide the field found during the introspection.</li>
+
+          <li><b>identity:</b> for more information on this fields see JDO
             documentation</li>
 
-          <li><b>access:</b> for more information on this fields, see JDO documentation</li>
+          <li><b>access:</b> for more information on this fields see JDO documentation</li>
           
-          <li><b>key-generator</b>: for more information on this fields, see JDO
+          <li><b>key-generator</b>: for more information on this fields see JDO
             documentation</li>
         </ul>
+
+        <p>The auto-complete attributes is interesting as it allow a fine degree
+        of control of the introspector: it is possible to specifiy only the
+        fields whose Castor default behavior does not suite our needs. These
+        feature should simplify the handling of complexe class containing many
+        fields.</p>
 
         <p>Description of the content:</p>
 
         <ul>
              <li><b>description</b>: an optional &lt;description></li>
 
-             <li><b>cache-type:</b> for more information on this field, see JDO
+             <li><b>cache-type:</b> for more information on this field see JDO
              documentation</li>
 
              <li><b>an optional &lt;map-to></b>. Used if the name of the element is not the
@@ -361,6 +376,7 @@ public class myclass {
                   required       ( true | false )  "false"
                   direct         ( true | false )  "false"
                   lazy           ( true | false )  "false"
+                  transient      ( true | false )  "false"
                   get-method     NMTOKEN  #IMPLIED
                   set-method     NMTOKEN  #IMPLIED
                   create-method  NMTOKEN  #IMPLIED
@@ -495,6 +511,10 @@ public class myclass {
             above for more details.</li>
 
           <li><b>required:</b> the field can the optional or required</li>
+
+          <li><b>transient:</b> if true, this field will be ignored during the
+          marshalling. This is usefull in when used with the auto-complete
+          option.</li>
 
           <li><b>direct:</b> if true, Castor will expect a public variable in the object
             and will modify it directly</li>
@@ -719,6 +739,7 @@ public class Item {
     public String _reference;
     public int    _quantity;
     public float  _unitPrice;
+    public String _description;
 }
             </code>
           </td>
@@ -796,6 +817,12 @@ public class Item {
                        type="float"
                        direct="true">
                         &lt;bind-xml name="UnitPrice" node="element"/>
+                &lt;/field>
+
+                &lt;field name="_description"
+                       type="string"
+                       direct="true">
+                        &lt;bind-xml name="Description" node="element"/>
                 &lt;/field>
         &lt;/class>
 
