@@ -65,7 +65,7 @@ import org.exolab.castor.dax.XADirectorySource;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.xml.Mapping;
-import org.exolab.castor.persist.PersistenceException;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.xml.Unmarshaller;
 
 

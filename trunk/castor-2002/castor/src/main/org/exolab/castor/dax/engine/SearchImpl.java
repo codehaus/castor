@@ -53,14 +53,14 @@ import org.exolab.castor.dax.Search;
 import org.exolab.castor.dax.InvalidSearchException;
 import org.exolab.castor.dax.DirectoryException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
+import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.PersistenceException;
-import org.exolab.castor.persist.QueryException;
-import org.exolab.castor.persist.ObjectNotFoundException;
-import org.exolab.castor.persist.LockNotGrantedException;
-import org.exolab.castor.persist.TransactionNotInProgressException;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
