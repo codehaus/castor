@@ -140,7 +140,15 @@ public class Lexer implements TokenTypes {
     //consume white space
     while (isWhiteSpace(curChar)) {
       _pos++;
-      curChar = _queryString.charAt(_pos);
+      try {
+        curChar = _queryString.charAt(_pos);
+      }
+      catch (IndexOutOfBoundsException e) {
+        if (!endOfQueryPassed) {
+          endOfQueryPassed = true;
+          return (new Token(END_OF_QUERY, ""));
+        }
+      }
     }
   
     if ( isDigit(curChar) ) 
