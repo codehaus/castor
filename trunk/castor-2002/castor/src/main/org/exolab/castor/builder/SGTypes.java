@@ -45,7 +45,6 @@
 
 package org.exolab.castor.builder;
 
-import org.exolab.castor.xml.JavaXMLNaming;
 import org.exolab.javasource.*;
 
 

@@ -52,7 +52,7 @@
 package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.types.*;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
 import java.util.Vector;
@@ -84,7 +84,7 @@ public class CollectionInfo extends FieldInfo {
         super(new XSList(contentType), name);
         xsList = (XSList) getSchemaType();
         this.contentType = contentType;
-        this.contentName = "v" + JavaXMLNaming.toJavaClassName(elementName);
+        this.contentName = "v" + JavaNaming.toJavaClassName(elementName);
         this.elementName = elementName;
         content = new FieldInfo(contentType, contentName);
     } //-- CollectionInfo
@@ -100,14 +100,14 @@ public class CollectionInfo extends FieldInfo {
         
     public String getReadMethodName() {
         StringBuffer sb = new StringBuffer("get");
-        sb.append(JavaXMLNaming.toJavaClassName(getElementName()));
+        sb.append(JavaNaming.toJavaClassName(getElementName()));
         return sb.toString();
     } //-- getReadMethodName
     
     public String getWriteMethodName() {
         StringBuffer sb = new StringBuffer();
         sb.append("add");
-        sb.append(JavaXMLNaming.toJavaClassName(getElementName()));
+        sb.append(JavaNaming.toJavaClassName(getElementName()));
         return sb.toString();
     } //-- getWriteMethodName
     
@@ -135,7 +135,7 @@ public class CollectionInfo extends FieldInfo {
          //- Create add method -/
         //---------------------/
         
-        String cName = JavaXMLNaming.toJavaClassName(getElementName());
+        String cName = JavaNaming.toJavaClassName(getElementName());
         
         method = new JMethod(null, "add"+cName);
         jClass.addMethod(method);
@@ -185,7 +185,7 @@ public class CollectionInfo extends FieldInfo {
         
         //-- array setter
         JType arrayType = contentParam.getType().createArray();
-        String pName = JavaXMLNaming.toJavaMemberName(cName);
+        String pName = JavaNaming.toJavaMemberName(cName);
         JParameter arrayParam = new JParameter(arrayType, pName+"Array");
         method = new JMethod(null, "set"+cName);
         method.addParameter(arrayParam);

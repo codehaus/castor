@@ -50,7 +50,7 @@ import org.exolab.javasource.*;
 import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.castor.xml.schema.Facet;
-import org.exolab.castor.xml.JavaXMLNaming;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
 
@@ -77,7 +77,7 @@ public class TypeConversion {
 
         //-- enumerated types
         if (simpleType.hasFacet("enumeration")) {
-            String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
+            String className = JavaNaming.toJavaClassName(simpleType.getName());
 			className = SourceGenerator.getQualifiedClassName(
 							simpleType.getSchema().getTargetNamespace(),
 							"types."+className);
@@ -94,7 +94,7 @@ public class TypeConversion {
         }
         if (base == null) {
             String className
-                = JavaXMLNaming.toJavaClassName(simpleType.getName());
+                = JavaNaming.toJavaClassName(simpleType.getName());
             xsType = new XSClass(new JClass(className));
         }
         else {
@@ -295,7 +295,7 @@ public class TypeConversion {
                     warning += " is not currently supported by Castor Source Generator.";
                     System.out.println(warning);
                     String className
-                        = JavaXMLNaming.toJavaClassName(simpleType.getName());
+                        = JavaNaming.toJavaClassName(simpleType.getName());
                     xsType = new XSClass(new JClass(className));
                     break;
 
