@@ -47,6 +47,7 @@
 package org.exolab.castor.mapping.loader;
 
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -499,13 +500,24 @@ public final class FieldHandlerImpl
                         // The return type of the get method should be the type of the collection.
                         Class type = _getMethod.getReturnType();
                         
-                        // The other cases are handled in the
-                        // J1CollectionHandler during the add(collect,value) call
-                        if (type.isArray() && type.getComponentType().isPrimitive()) {
-                            try {
-                                collect = java.lang.reflect.Array.newInstance(type.getComponentType(), 0);
-                            } catch (Exception e) {
-                                throw new IllegalStateException("Unable to instantiate an array of '" + type.getComponentType() + "' : " + e);
+                        //-- Handle Arrays, we need to declare the array with
+                        //-- the correct type. The other cases are handled in  
+                        //-- the J1CollectionHandler during the 
+                        //-- add(collect,value) call
+                        if (type.isArray()) {
+                            Class componentType = type.getComponentType();
+                            Class valueType = value.getClass();
+                            if (componentType.isPrimitive() || 
+                               ((!valueType.isArray()) && (valueType != componentType))) 
+                            {
+                                try {
+                                    collect = Array.newInstance(componentType, 0);
+                                } 
+                                catch (Exception e) {
+                                    String err = "Unable to instantiate an array of '" + 
+                                        componentType + "' : " + e;
+                                    throw new IllegalStateException(err);
+                                }
                             }
                         }
                         setCollection = true;
