@@ -837,7 +837,7 @@ public class Marshaller extends MarshalFramework {
                     //-- automatically create namespace prefix?
                     prefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
                 }
-                declareNamespace(prefix, namespace, atts);
+                declareNamespace(prefix, namespace);
                 xmlName = prefix + ':' + xmlName;
             }
 
@@ -874,7 +874,7 @@ public class Marshaller extends MarshalFramework {
             //be resolved ({URI}value -> ns:value).
             String valueType = attDescriptor.getSchemaType();
             if ((valueType != null) && (valueType.equals(QNAME_NAME)))
-                 value = resolveQName(value, attDescriptor, atts);
+                 value = resolveQName(value, attDescriptor);
 
             atts.addAttribute(xmlName, CDATA, value.toString());
         }
@@ -890,9 +890,8 @@ public class Marshaller extends MarshalFramework {
         //-- xsi:type
         if (saveType) {
 
-            //-- reassign saveType variable to indicate whether or not
-            //-- the xsi namespace was declared
-            saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
+            //-- declare XSI namespace, if necessary
+            declareNamespace(XSI_PREFIX, XSI_NAMESPACE);
 
             //-- calculate type name, either use class name or
             //-- schema type name. If XMLClassDescriptor is introspected,
@@ -931,13 +930,12 @@ public class Marshaller extends MarshalFramework {
             nsPrefix = (String) _namespaces.getNamespacePrefix(nsURI);
         }
 
-        boolean declaredNS = false;
 		//-- declare namespace at this element scope?
 		if (nsURI != null) {
 		    if (nsPrefix == null) {
 		        nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
 		    }
-			declaredNS = declareNamespace(nsPrefix, nsURI, atts);
+			declareNamespace(nsPrefix, nsURI);
 		}
 
 		//-- declare all necesssary namespaces
@@ -961,7 +959,7 @@ public class Marshaller extends MarshalFramework {
        //be resolved ({URI}value -> ns:value)
        String valueType = descriptor.getSchemaType();
        if ((valueType != null) && (valueType.equals(QNAME_NAME)))
-           object = resolveQName(object, descriptor, atts);
+           object = resolveQName(object, descriptor);
 
         try {
             if (!containerField)
@@ -1130,36 +1128,16 @@ public class Marshaller extends MarshalFramework {
      *
      * @param nsPrefix the namespace prefix
      * @param nsURI the namespace URI to declare
-     * @param atts the AttributeListImpl to create the namespace
-     * declaration
      * @return true if the namespace was not in scope and was
      *  sucessfully declared, other false
     **/
-    private boolean declareNamespace
-        (String nsPrefix, String nsURI, AttributeListImpl atts)
+    private boolean declareNamespace(String nsPrefix, String nsURI)
     {
-
         boolean declared = false;
-
         if ( (nsURI != null) && (nsURI.length() != 0)) {
-
             String tmpPrefix = _namespaces.getNamespacePrefix(nsURI);
             if ((tmpPrefix == null) || (!tmpPrefix.equals(nsPrefix))) {
-                String attName = XMLNS;
-
-                if (nsPrefix != null) {
-                    int len = nsPrefix.length();
-                    if (len > 0) {
-                        StringBuffer buf = new StringBuffer(6+len);
-                        buf.append(XMLNS);
-                        buf.append(':');
-                        buf.append(nsPrefix);
-                        attName = buf.toString();
-                    }
-                }
-
                 _namespaces.addNamespace(nsPrefix, nsURI);
-                atts.addAttribute(attName, CDATA, nsURI);
                 declared = true;
             }
         }
@@ -1276,7 +1254,7 @@ public class Marshaller extends MarshalFramework {
      * Resolve a QName value ({URI}value) by declaring a namespace after
      * having retrieved the prefix.
      */
-    private Object resolveQName(Object value, XMLFieldDescriptor fieldDesc, AttributeListImpl atts) {
+    private Object resolveQName(Object value, XMLFieldDescriptor fieldDesc) {
         if ( (value == null) || !(value instanceof String))
             return value;
         if (!(fieldDesc instanceof XMLFieldDescriptorImpl))
@@ -1296,7 +1274,7 @@ public class Marshaller extends MarshalFramework {
         if (prefix == null)
             prefix = DEFAULT_PREFIX+(++NAMESPACE_COUNTER);
         result = (prefix.length() != 0)?prefix+":"+result.substring(idx+1):result.substring(idx+1);
-        declareNamespace(prefix, nsURI, atts);
+        declareNamespace(prefix, nsURI);
         return result;
     }
 
