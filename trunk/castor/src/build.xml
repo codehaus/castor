@@ -118,7 +118,7 @@
             gen.jdo.conf     Use the Source Generator to create the Java classes for jdo-conf.xsd
             gen.mapping      Use the Source Generator to create the Java classes for mapping.xsd
             gen.pvd          Use the Source Generator to create the Java classes for the pvd.xsd
-            
+
             prepare-eclipse  Put Eclipse project files into place (src/main only).
             prepare-eclipse-complete  Put Eclipse project files into place.
         -----------------------------------------------------------
@@ -172,7 +172,7 @@
 
     <target name="compile.xml" depends="prepare"
             description="Compile the Castor XML packages">
-        <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" 
+        <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}"
                debug="on" deprecation="${deprecation}"
                includes="${castor.xml.files}">
             <classpath refid="build.classpath"/>
@@ -184,9 +184,9 @@
         </copy>
     </target>
 
-    <target name="compile.jdo" depends="prepare,compile.xml" 
+    <target name="compile.jdo" depends="prepare,compile.xml"
             description="Compile the Castor JDO packages">
-        <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}" 
+        <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}"
                debug="on" deprecation="${deprecation}"
                includes="${castor.jdo.files}">
             <classpath refid="build.classpath"/>
@@ -263,7 +263,7 @@
 
     </target>
 
-    <target name="tests" depends="prepare" description="Build the tests packages">
+    <target name="tests" depends="prepare,compile" description="Build the tests packages">
         <mkdir dir="${build}/tests"/>
         <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" debug="on" deprecation="${deprecation}">
         <classpath refid="build.classpath"/>
@@ -551,17 +551,17 @@
             <arg value="j2"/>
         </java>
     </target>
-    
+
     <target name="prepare-eclipse-base" description="Copy base Eclipse project files to the root directory">
         <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
     </target>
-    
-    <target name="prepare-eclipse" depends="prepare-eclipse-base" 
+
+    <target name="prepare-eclipse" depends="prepare-eclipse-base"
                   description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
     </target>
-    
-    <target name="prepare-eclipse-complete" depends="prepare-eclipse-base" 
+
+    <target name="prepare-eclipse-complete" depends="prepare-eclipse-base"
             description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template.complete" tofile="${basedir}/.classpath" overwrite="true"/>
     </target>
