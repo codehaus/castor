@@ -121,8 +121,8 @@ public final class MaxKeyGenerator implements KeyGenerator
                 // "SELECT MAX(pk) FROM table"
                 query.addSelect("MAX(" + primKeyName + ")");
                 query.addTable(tableName);
-                
-                // SELECT without lock 
+
+                // SELECT without lock
                 sql = query.getStatement( false );
             } else {
                 // Create SQL sentence of the form
@@ -131,7 +131,7 @@ public final class MaxKeyGenerator implements KeyGenerator
                 query.addColumn( tableName, primKeyName);
                 query.addCondition( tableName, primKeyName, QueryExpression.OpEquals,
                         "(SELECT MAX(t1." + primKeyName + ") FROM " + tableName + " t1)");
-                
+
                 // SELECT and put lock on the last record
                 sql = query.getStatement( true );
             }
@@ -144,8 +144,14 @@ public final class MaxKeyGenerator implements KeyGenerator
                     identity = new Integer( rs.getInt( 1 ) + 1 );
                 else if ( _sqlType == Types.BIGINT )
                     identity = new Long( rs.getLong( 1 ) + 1 );
-                else
-                    identity = rs.getBigDecimal( 1 ).add( ONE );
+                else {
+                    BigDecimal max = rs.getBigDecimal( 1 );
+                    if (max == null) {
+                        identity = ONE;
+                    } else {
+                        identity = max.add( ONE );
+                    }
+                }
             } else {
                 if ( _sqlType == Types.INTEGER )
                     identity = new Integer( 1 );
@@ -174,7 +180,7 @@ public final class MaxKeyGenerator implements KeyGenerator
 
 
     /**
-     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ?
      */
     public final byte getStyle() {
         return BEFORE_INSERT;
