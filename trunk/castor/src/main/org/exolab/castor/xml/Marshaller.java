@@ -330,17 +330,13 @@ public class Marshaller extends MarshalFramework {
 
         //-- wrap content handler to be compatable with
         //-- document handler
-        if (handler instanceof DocumentHandler)
-            _handler = (DocumentHandler)handler;
-        else {
-            try {
-                ParserAdapter adapter = new ParserAdapter();
-                adapter.setContentHandler(handler);
-                _handler = adapter;
-            }
-            catch(SAXException sx) {
-                throw new NestedIOException(sx);
-            }
+        try {
+            ParserAdapter adapter = new ParserAdapter();
+            adapter.setContentHandler(handler);
+            _handler = adapter;
+        }
+        catch(SAXException sx) {
+            throw new NestedIOException(sx);
         }
 
         // call internal initializer
