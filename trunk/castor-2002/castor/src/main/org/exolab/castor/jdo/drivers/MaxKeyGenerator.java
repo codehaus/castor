@@ -65,13 +65,8 @@ import org.exolab.castor.util.Messages;
 /**
  * MAX key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
-<<<<<<< MaxKeyGenerator.java
  * @author <a href="leonardo@itera.com.br">Leonardo Souza Mario Bueno</a>
  * @version $Revision$ $Date$
-=======
- * @author <a href="leonardo@itera.com.br">Leonardo Souza Mario Bueno</a>
- * @version $Revision$ $Date$
->>>>>>> 1.9
  * @see MaxKeyGeneratorFactory
  */
 public final class MaxKeyGenerator implements KeyGenerator
