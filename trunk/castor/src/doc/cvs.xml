@@ -110,6 +110,11 @@ againsts the up-to-date cvs version, or
          not be broken by another patch later. It becomes even more important
          if your project depends on a feature that you're contributing.</p>
 
+      <p>The last requirement for contributing code is to create a 
+      <a href="http://bugzilla.exolab.org/">Bugzilla</a> report to provide a
+      full description of the issue or enhancement. This allows the issue to 
+      be fully traceable. The last thing to do is attach the diff to this report.</p>
+
     </section>
 
     <section title="Guidelines For Committers">
