@@ -1,5 +1,18 @@
 <harness name="castor">
 
+  <category name="leak" class="jdo.JDOCategory">
+    <description>JDO test for cache leakage</description>
+    <jdo database-name="sybase" configuration="sybase.xml" />
+    <case class="jdo.CacheLeakage"/>
+  </category>
+
+  <category name="race" class="jdo.JDOCategory">
+    <description>JDO test for race condition</description>
+    <jdo database-name="sybase" configuration="sybase.xml" />
+    <case class="jdo.Race"/>
+  </category>
+
+
   <category name="sybase" class="jdo.JDOCategory">
     <description>JDO tests for Sybase 11</description>
     <jdo database-name="sybase" configuration="sybase.xml" />

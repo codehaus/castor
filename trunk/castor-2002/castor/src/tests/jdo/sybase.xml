@@ -7,4 +7,11 @@
   </data-source>
   <mapping href="mapping.xml" />
 </database>
-
+<!--
+<database name="sybase" engine="sybase" >
+  <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource"> 
+    <params user="test" password="secret" port-number="5000" server-name="yip" />
+  </data-source>
+  <mapping href="mapping.xml" />
+</database>
+-->
