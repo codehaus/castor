@@ -22,22 +22,35 @@
     <section title="Technical questions">
         <p><b>I am using Oracle, I got ObjectModifiedException during commit. But, Castor is the only program access the database. Why?</b></p>
 
-	<p>The problem happens when some fields of a class contains null value. It dues to a bugs in Oracle's JDBC driver's setNull method. We're developing workaround to modify the SQLStatement to work around the problem. However, in the mean time, please set the potential null field to dirty="ignore" in the mapping file.</p>
-	
+	<p>The problem happens when some fields of a class contains null value. It dues to a bugs in Oracle's JDBC driver's setNull method. We're developing workaround to modify the SQLStatement to work around the problem. However, in the mean time, please set the potential null field to dirty="ignore" in the mapping file:
+         <code><![CDATA[
+<field name="...." type="....">
+   <sql name="...." dirty="ignore"/>
+</field>]]>
+         </code>
+    </p>
+
 	<p><b>How do I declare dependent object in Castor 0.8.x?</b></p>
 
 	<p></p>
 
-	<p>What features are supported in Castor's OQL?</p>
+	<p><b>Why get-method for the Collection of dependent objects returns <tt>null</tt>?</b></p>
+
+	<p>You should initialize the Collection yourself:
+         <code>
+  private Collection _children = new ArrayList();
+
+  public Collection getChildren() {
+      return _children;
+  }
+         </code>
+    </p>
+		
+	<p><b>What features are supported in Castor's OQL?</b></p>
 
 	<p>Due to some accident, we lost the xml source of the OQL document. Before we recover it, please click 
 	<a href="http://www.karpenstein.com/nissim/design-oql-parser.html">here</a> for the document</p>
 
-        <p>
-<field name="...." type="....">
-   <sql name="...." dirty="ignore"/>
-</field>
-	</p>
      </section>
      <section title="Features requests">
         <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?</b></p>
@@ -56,11 +69,15 @@
     <section title="Working with open source databases">
 	<p><b>Does Castor support PosgreSQL?</b></p>
                
-	<p>Outter join.........[Oleg, could you answer this one]</p>
+	<p>Partially, because PostgreSQL doesn't support outer joins
+	   (actually, "partially" means "no" :-).
+	   Once they add the support for outer joins,
+	   we shall change Castor PostrgeSQL driver for full PostrgeSQL support.</p>
 
-	<p><b>Does Castor support MySQL</b></p>
+	<p><b>Does Castor support MySQL?</b></p>
 	
-	<p>mySQL beta 4........[Oleg, could you answer this one, too]</p>
+	<p>Yes, starting from MySQL version 3.23, where transaction support has been added.
+	   Note: if you use mm.MySQL JDBC driver, then you need version 2.0.3 or higher.</p>
     </section>
 
   </body>
