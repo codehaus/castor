@@ -241,6 +241,13 @@ public abstract class TransactionContext
     private CallbackInterceptor        _callback;
 
     /**
+     * Creating 
+     *
+     */
+    private boolean                   _creating;
+
+
+    /**
      * Create a new transaction context. This method is used by the
      * explicit transaction model.
      */
@@ -756,6 +763,11 @@ public abstract class TransactionContext
             Object object, OID depended ) 
             throws DuplicateIdentityException, PersistenceException {
 
+        boolean walk = false;
+        if ( !_creating ) {
+            walk = true;
+            _creating = true;
+        }
         // markCreate will walk the object tree starting from the specified
         // object and mark all the object to be created.
         markCreate( engine, molder, object, depended );
@@ -769,7 +781,7 @@ public abstract class TransactionContext
         // We iterate all object and creating object according the priority.
         int         priority  = 0;
         int         nextPrior = 0;
-        for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
+        for ( boolean nextCreate=walk; nextCreate; priority=nextPrior ) {
             Enumeration enum = _objects.elements();
             nextCreate = false;
             while ( enum.hasMoreElements() ) {
@@ -823,18 +835,20 @@ public abstract class TransactionContext
             }
         }
 
-        // after we create the objects, some cache may invalid because the
-        // relation are cached on both side. So, we updateCache if it is
-        // marked to be update from the markCreate state
-        Enumeration enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
-            ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
-            if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
-                enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
-                enumEntry.updateCacheNeeded = false;
+        if ( walk ) {
+            // after we create the objects, some cache may invalid because the
+            // relation are cached on both side. So, we updateCache if it is
+            // marked to be update from the markCreate state
+            Enumeration enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
+                    enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
+                    enumEntry.updateCacheNeeded = false;
+                }
             }
+            _creating = false;
         }
-
     }
 
     /**
@@ -956,6 +970,11 @@ public abstract class TransactionContext
         throws DuplicateIdentityException, ObjectModifiedException,
                ClassNotPersistenceCapableException, PersistenceException {
 
+        boolean walk = false;
+        if ( !_creating ) {
+            walk = true;
+            _creating = true;
+        }
         markUpdate( engine, molder, object, depended );
 
         // markUpdate will actually update object loaded/create from preious
@@ -965,7 +984,7 @@ public abstract class TransactionContext
         // We iterate all object and creating object according the priority.
         int         priority  = 0;
         int         nextPrior = 0;
-        for ( boolean nextCreate=true; nextCreate; priority=nextPrior ) {
+        for ( boolean nextCreate=walk; nextCreate; priority=nextPrior ) {
             Enumeration enum = _objects.elements();
             nextCreate = false;
             while ( enum.hasMoreElements() ) {
@@ -1020,16 +1039,19 @@ public abstract class TransactionContext
             }
         }
 
-        // after we create the objects, some cache may invalid because the
-        // relation are cached on both side. So, we updateCache if it is
-        // marked to be update from the markCreate state
-        Enumeration enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
-            ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
-            if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
-                enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
-                enumEntry.updateCacheNeeded = false;
+        if ( walk ) {
+            // after we create the objects, some cache may invalid because the
+            // relation are cached on both side. So, we updateCache if it is
+            // marked to be update from the markCreate state
+            Enumeration enum = _objects.elements();
+            while ( enum.hasMoreElements() ) {
+                ObjectEntry enumEntry = (ObjectEntry) enum.nextElement();
+                if ( enumEntry.created && enumEntry.updateCacheNeeded ) {
+                    enumEntry.engine.updateCache( this, enumEntry.oid, enumEntry.object );
+                    enumEntry.updateCacheNeeded = false;
+                }
             }
+            _creating = false;
         }
     }
 
