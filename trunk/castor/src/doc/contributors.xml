@@ -193,6 +193,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Bates" given="Simon" />
+    <email>simon.bates@utoronto.ca</email>
+    <description>Proposed patch for bug 1200</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Beauregard" given="Michael" />
     <email>michael_beauregard@transcanada.com</email>
     <description>Patch for Ant build descriptor to construct the CLASSPATH.</description>
