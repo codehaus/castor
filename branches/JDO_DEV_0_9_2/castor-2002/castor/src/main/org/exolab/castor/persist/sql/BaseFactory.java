@@ -52,24 +52,25 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Properties;
 import java.util.Enumeration;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.naming.NameNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.conf.*;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.persist.LogInterceptor;
+import org.exolab.castor.persist.Entity;
+import org.exolab.castor.persist.EntityInfo;
+import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.Connector;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.LogInterceptor;
-import org.exolab.castor.persist.Entity;
-import org.exolab.castor.persist.EntityInfo;
-import org.exolab.castor.persist.EntityFieldInfo;
-import org.exolab.castor.jdo.conf.*;
-import org.exolab.castor.jdo.PersistenceException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.naming.NameNotFoundException;
+import org.exolab.castor.util.Messages;
 
 /**
  * {@link PersistenceFactory} for generic JDBC driver.
@@ -85,10 +86,10 @@ public abstract class BaseFactory
     public Persistence getPersistence( EntityInfo entity, LogInterceptor log )
         throws MappingException
     {
-        
+
         // 092: if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
         //    return null;
-        
+
         try {
             return new SQLEngine( entity, log, this, null );
         } catch ( MappingException except ) {
@@ -98,7 +99,8 @@ public abstract class BaseFactory
         }
     }
 
-    public Connector getConnector( Database database ) {
+    public Connector getConnector( Database database )
+            throws MappingException, PersistenceException {
 
         try {
             if ( database.getDriver() != null ) {
@@ -212,11 +214,15 @@ public abstract class BaseFactory
             _ds    = ds;
         }
 
-        public Object createConnection() {
-            if ( _ds != null )
-                return _ds.getConnection();
-            else
-                return DriverManager.getConnection( _url, _pros );
+        public Object createConnection() throws PersistenceException {
+            try {
+                if ( _ds != null )
+                    return _ds.getConnection();
+                else
+                    return DriverManager.getConnection( _url, _pros );
+            } catch (SQLException except) {
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
+            }
         }
     }
 }
