@@ -202,8 +202,6 @@ public abstract class MappingLoader
             ClassDescriptor clsDesc;
 
             clsMap = (ClassMapping) enum.nextElement();
-            System.out.println("Creating ClassDescriptor for: " + 
-                clsMap.getName());
             clsDesc = createDescriptor( clsMap );
             addDescriptor( clsDesc );
             // If the return value is NoDescriptor then the derived
@@ -396,9 +394,8 @@ public abstract class MappingLoader
         if ( fieldMaps == null || fieldMaps.length == 0 )
             return new FieldDescriptor[ 0 ];
         fields = new FieldDescriptor[ fieldMaps.length ];
-        for ( int i = 0 ; i < fieldMaps.length ; ++i ) {
+        for ( int i = 0 ; i < fieldMaps.length ; ++i )
             fields[ i ] = createFieldDesc( javaClass, fieldMaps[ i ] );
-        }
         return fields;
     }
 
@@ -495,7 +492,6 @@ public abstract class MappingLoader
         } else {
 
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
-                
                 int    point;
                 Vector getSeq = new Vector();
                 Vector setSeq = new Vector();
@@ -517,7 +513,6 @@ public abstract class MappingLoader
                         methodName = "get" + capitalize( fieldName.substring( 0, point ) );
                         method = javaClass.getMethod( methodName, null );
                         fieldName = fieldName.substring( point + 1 );
-                        
                         // Make sure method is not abstract/static
                         // (note: Class.getMethod() returns only public methods).
                         if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
