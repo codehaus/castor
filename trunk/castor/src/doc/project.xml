@@ -235,7 +235,7 @@
         <display>Status, Todo</display>
       </navLink>
       <navLink>
-        <url>changelog.xml</url>
+        <url>release-notes.xml</url>
         <display>Changelog</display>
       </navLink>
       <navLink>
