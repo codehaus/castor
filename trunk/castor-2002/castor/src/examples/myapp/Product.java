@@ -165,7 +165,7 @@ public class Product implements Persistent
     }
 
 
-    public void jdoBeforeCreate()
+    public void jdoBeforeCreate( Database db )
     {
     }
 

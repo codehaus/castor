@@ -184,7 +184,7 @@ public class Product
     }
 
 
-    public void jdoBeforeCreate()
+    public void jdoBeforeCreate( Database db )
     {
     }
 

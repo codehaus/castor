@@ -130,7 +130,7 @@ public class Category
     }
 
 
-    public void jdoBeforeCreate()
+    public void jdoBeforeCreate( Database db )
     {
     }
 }
