@@ -212,6 +212,8 @@ public final class FieldHandlerImpl
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
         _colHandler = typeInfo.getCollectionHandler();
+        System.out.println("Creating FieldHandler: " + _fieldName);
+        if (_colHandler == null) System.out.println("   -- not a collection");
     }
 
 
@@ -248,6 +250,8 @@ public final class FieldHandlerImpl
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
         _colHandler = typeInfo.getCollectionHandler();
+        System.out.println("Creating FieldHandler: " + _fieldName);
+        if (_colHandler == null) System.out.println("   -- not a collection");
     }
 
 
@@ -302,6 +306,10 @@ public final class FieldHandlerImpl
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
         _colHandler = typeInfo.getCollectionHandler();
+        
+        System.out.println("Creating FieldHandler: " + _fieldName);
+        if (_colHandler == null) System.out.println("   -- not a collection");
+        
     }
 
 
