@@ -281,6 +281,18 @@
 
 
     <!-- Build the JAR file using main-opt -->
+    <target name="jar.jdotests" depends="tests">
+        <delete file="${dist}/${archive}-tests.jar"/>
+
+        <copy todir="${build}/tests">
+            <fileset dir="${source}/etc" includes="MANIFEST.MF" />
+        </copy>
+
+        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" 
+        includes="LICENSE,README,jdo/**,harness/**,*" excludes="xml" />
+
+    </target> 
+
     <target name="jar" depends="main-opt">
         <delete file="${dist}/${archive}.jar"/>
         <delete file="${classes}/MANIFEST.MF"/>
