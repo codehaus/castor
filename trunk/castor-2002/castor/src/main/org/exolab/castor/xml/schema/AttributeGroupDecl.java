@@ -67,11 +67,6 @@ public final class AttributeGroupDecl extends AttributeGroup {
 
 
     /**
-     * The id of this AttributeGroup
-    **/
-    private String _id = null;
-
-    /**
      * The name of this AttributeGroup
     **/
     private String _name = null;
@@ -191,15 +186,6 @@ public final class AttributeGroupDecl extends AttributeGroup {
         return new AttributeGroupEnumeration(_attributes, _references);
     } //-- getAttributes
 
-    /**
-     * Returns the id of this AttributeGroup
-     * @return the id of this AttributeGroup, or null, if
-     * no id was defined.
-    **/
-    public String getId() {
-        return _id;
-    } //-- getId
-
 
     /**
      * Returns the name of this AttributeGroup
@@ -267,14 +253,6 @@ public final class AttributeGroupDecl extends AttributeGroup {
          }
          else return false;
     } //-- removeReference
-
-    /**
-     * Sets the id of this AttributeGroup
-     * @param id the id of this AttributeGroup
-    **/
-    public void setId(String id) {
-        this._id = id;
-    } //-- setId
 
     /**
      * Sets the name of this AttributeGroup
