@@ -92,7 +92,7 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-final class SQLEngine
+public final class SQLEngine
     implements Persistence
 {
 
@@ -175,7 +175,7 @@ final class SQLEngine
     /**
      * Used by {@link OQLQuery} to retrieve the class descriptor.
      */
-    JDOClassDescriptor getDescriptor()
+    public JDOClassDescriptor getDescriptor()
     {
         return _clsDesc;
     }
@@ -192,7 +192,13 @@ final class SQLEngine
         return new SQLQuery( this, sql, types );
     }
 
+/*
+Will be adding this later.
 
+    public QueryExpression getQueryExpression() {
+        return _factory.getQueryExpression();
+    }
+*/
     public QueryExpression getFinder()
     {
         return (QueryExpression) _sqlFinder.clone();

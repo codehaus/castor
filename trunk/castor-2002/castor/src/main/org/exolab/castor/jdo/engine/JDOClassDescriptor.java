@@ -112,6 +112,35 @@ public class JDOClassDescriptor
         return _tableName;
     }
 
+    /**
+     * Returns a JDOFieldDescriptor for the field with the name passed.  Null
+     * if named field does not exist.
+     *
+     * @param name The name of the field to return
+     * @return The field if it exists, otherwise null.
+     */
+    public JDOFieldDescriptor getField(String name) 
+    {
+        JDOFieldDescriptor field = null;
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ] instanceof JDOFieldDescriptor &&
+                 _fields[ i ].getFieldName().equals( name ) ) {
+                field = (JDOFieldDescriptor) _fields[ i ];
+                break;
+            }
+        }
+        
+        if ( field == null ) {
+            if ( this.getIdentity() instanceof JDOFieldDescriptor &&
+                 this.getIdentity().getFieldName().equals( name ) ) {
+                field = (JDOFieldDescriptor) this.getIdentity();
+            }
+        }
+
+        return field;
+                
+    }
+
 
     /**
      * Returns the key generator specified for this class.

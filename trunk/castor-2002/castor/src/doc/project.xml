@@ -33,7 +33,7 @@
     <item name="Using JDO" href="jdo.xml"/>
     <item name="Tips &amp; Tricks" href="tips-tricks.xml"/>
     <item name="JDO Config" href="database-conf.xml"/>
-    <item name="Types" href="types.xml"/>
+    <!--<item name="Types" href="types.xml"/>-->
     <item name="Source generator" href="sourcegen.xml"/>
     <item name="Running The Examples" href="examples.xml"/>
   </menu>
@@ -41,6 +41,7 @@
     <item name="Configuration, Libs, Building" href="conf-lib.xml"/>
     <item name="Transactions &amp; Locks" href="locking.xml"/>
     <item name="Design: Persistence" href="design-persist.xml"/>
+    <item name="Design: OQL Parser" href="design-oql-parser.xml"/>
   </menu>
   <menu name="Misc">
     <item name="JavaDoc" href="javadoc/overview-summary.html"/>

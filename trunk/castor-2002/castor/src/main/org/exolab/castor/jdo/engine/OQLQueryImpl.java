@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.util.Vector;
+import java.util.Hashtable;
 import java.util.StringTokenizer;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
@@ -61,6 +62,13 @@ import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.oql.Lexer;
+import org.exolab.castor.jdo.oql.Parser;
+import org.exolab.castor.jdo.oql.Token;
+import org.exolab.castor.jdo.oql.TokenTypes;
+import org.exolab.castor.jdo.oql.ParseTreeNode;
+import org.exolab.castor.jdo.oql.ParseTreeWalker;
+import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.PersistenceEngine;
@@ -102,6 +110,8 @@ public class OQLQueryImpl
 
     private Object[]           _bindValues;
 
+    private Hashtable          _newBindTypes;
+
 
     private int                _fieldNum;
 
@@ -132,6 +142,33 @@ public class OQLQueryImpl
         ++_fieldNum;
     }
 
+    public void newBind( Object value )
+    {
+        if ( _expr == null )
+            throw new IllegalStateException( "Must create query before using it" );
+        if ( _fieldNum == _newBindTypes.size() )
+            throw new IllegalArgumentException( "Only " + _newBindTypes.size() +
+                                                " fields in this query" );
+        try {
+            ParamInfo info = (ParamInfo) _newBindTypes.get(new Integer( _fieldNum ));
+            
+            if ( value != null && ! info.getClass().isAssignableFrom( value.getClass() ) )
+                throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
+                                                    _bindTypes[ _fieldNum ].getName() );
+            if ( _bindValues == null )
+                _bindValues = new Object[ _bindTypes.length ];
+
+            for (Enumeration e = info.getParamMap().elements(); e.hasMoreElements(); )
+            {
+                int fieldNum = ( (Integer) e.nextElement() ).intValue();
+                _bindValues[ fieldNum ] = value;
+            }
+            
+        } catch ( IllegalArgumentException except ) {
+            throw except;
+        }
+        ++_fieldNum;
+    }
 
     public void bind( boolean value )
     {
@@ -174,6 +211,55 @@ public class OQLQueryImpl
         bind( new Double( value ) );
     }
 
+    public void newCreate( String oql )
+        throws QueryException    
+    {
+
+        _fieldNum = 0;
+        _expr = null;
+        
+        Lexer lexer = new Lexer(oql);
+        Parser parser = new Parser(lexer);
+        ParseTreeNode parseTree = parser.getParseTree();
+
+        _dbEngine = _dbImpl.getPersistenceEngine(); 
+        if ( _dbEngine == null )
+            throw new QueryException( "Could not get a persistence engine" );
+
+        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree);
+
+        _objClass = walker.getObjClass();
+        _expr = walker.getQueryExpression();
+        _newBindTypes = walker.getBindTypes();
+
+
+        //port new bind types back to the format of old bind types.
+        //first get the maximum SQL param.
+        int max = 0;
+        for (Enumeration e = _newBindTypes.elements(); e.hasMoreElements(); ) {
+            ParamInfo info = (ParamInfo) e.nextElement();
+            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
+            {
+                int paramIndex = ( (Integer) f.nextElement() ).intValue();
+                if (  paramIndex > max )
+                    max = paramIndex;
+            }
+        }
+        
+        //then create the types array and fill it
+        _bindTypes = new Class[max - 1];
+        for (Enumeration e = _newBindTypes.elements(); e.hasMoreElements(); ) 
+        {
+            ParamInfo info = (ParamInfo) e.nextElement();
+            for (Enumeration f = info.getParamMap().elements(); f.hasMoreElements(); ) 
+            {
+                int paramIndex = ( (Integer) f.nextElement() ).intValue();
+                _bindTypes[ paramIndex - 1 ] = f.getClass();
+            }        
+        }
+         
+    }
+    
 
     public void create( String oql )
         throws QueryException
