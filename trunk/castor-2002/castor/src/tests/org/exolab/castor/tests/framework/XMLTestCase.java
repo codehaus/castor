@@ -136,6 +136,17 @@ public abstract class XMLTestCase extends TestCase {
     protected Class  _rootClass;
 
     /**
+     * Name of the schema in the jar
+     */
+    protected String _schemaName;
+
+    /**
+     * File for the schema in the temp directory
+     */
+    protected File _schemaFile = null;
+
+
+    /**
      * If true, the dumpFields() function has been implemented in the rootClass
      */
     protected boolean _hasDump;
@@ -227,12 +238,17 @@ public abstract class XMLTestCase extends TestCase {
         verbose("Marshal the object into '" + outputName + ".xml" +"'");
         File marshal_output = testMarshal(randomizedObject, outputName + ".xml");
 
-        // 4. Unmarshal
+        // 4. Validate against a schema if any
+        if (_schemaFile != null) {
+            // TODO: Put validation code here
+        }
+
+        // 5. Unmarshal
         verbose("Unmarshal the file");
         Object  unmrashalledRandomizedObject= testUnmarshal(marshal_output);
         assertNotNull("Unmarshalled object from file '" + marshal_output.getName() + "' is null", unmrashalledRandomizedObject);
 
-        // 5. Dump the unmarshalled object in a file if possible
+        // 6. Dump the unmarshalled object in a file if possible
         if (_hasDump) {
             verbose("Dump the object into '" + outputName + "-unmar.dump" +"'");
             FileWriter writer = new FileWriter(new File(_outputRootFile, outputName + "-unmar.dump"));
