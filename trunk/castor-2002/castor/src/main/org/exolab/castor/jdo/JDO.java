@@ -561,7 +561,7 @@ public class JDO
         if ( _dbConf != null )
             ref.add( new StringRefAddr( "configuration", _dbConf ) );
         if ( _tmName != null )
-            ref.add( new StringRefAddr( "transactionManager", _dbConf ) );
+            ref.add( new StringRefAddr( "transactionManager", _tmName ) );
         ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
     return ref;
     }
