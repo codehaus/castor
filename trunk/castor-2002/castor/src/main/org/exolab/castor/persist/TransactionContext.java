@@ -351,17 +351,19 @@ public abstract class TransactionContext
     protected abstract void rollbackConnections();
 
 
-    public synchronized Object fetch( LockEngine engine, ClassMolder molder, 
-            Object identity, AccessMode accessMode ) 
+    public synchronized Object fetch( LockEngine engine, ClassMolder molder,
+            Object identity, AccessMode suggestedAccessMode )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
 
         ObjectEntry entry = null;
         OID         oid;
+        AccessMode  accessMode;
 
-        if ( identity == null ) 
+        if ( identity == null )
             throw new PersistenceException("Identities can't be null!");
 
         oid = new OID( engine, molder, identity );
+        accessMode = molder.getAccessMode( suggestedAccessMode );
         if ( accessMode == AccessMode.ReadOnly )
             entry = getReadOnlyObjectEntry( oid );
         if ( entry == null )
@@ -434,19 +436,20 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized Object load( LockEngine engine, ClassMolder molder, 
-    Object identity, AccessMode accessMode )
+    public synchronized Object load( LockEngine engine, ClassMolder molder,
+    Object identity, AccessMode suggestedAccessMode )
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
 
         ObjectEntry entry = null;
         Object      object = null;
         OID         oid;
 
-        if ( identity == null ) 
+        if ( identity == null )
             throw new PersistenceException("Identities can't be null!");
 
         oid = new OID( engine, molder, identity );
 
+        AccessMode accessMode = molder.getAccessMode( suggestedAccessMode );
         if ( accessMode == AccessMode.ReadOnly )
             entry = getReadOnlyObjectEntry( oid );
         if ( entry == null )
@@ -459,7 +462,7 @@ public abstract class TransactionContext
             // re-loaded but no error is reported.
             if ( entry.engine != engine )
                 throw new PersistenceException( Messages.format("persist.multipleLoad", molder.getName(), identity ) );
-            if ( entry.deleted ) 
+            if ( entry.deleted )
                 throw new ObjectNotFoundException( "Object is deleted" + molder.getName() + identity );
             // ssa, multi classloader feature
             // ssa, FIXME : Are the two following statements equivalent ?
@@ -479,14 +482,13 @@ public abstract class TransactionContext
         // requested lock. This might report failure (object no longer exists),
         // hold until a suitable lock is granted (or fail to grant), or
         // report error with the persistence engine.
-        accessMode = molder.getAccessMode( accessMode );
         try {
-            // ssa, multi classloader feature    
+            // ssa, multi classloader feature
             // ssa, FIXME : No better way to do that ?
-            //object = molder.newInstance(); 
-            object = molder.newInstance( _db.getClassLoader() ); 
+            //object = molder.newInstance();
+            object = molder.newInstance( _db.getClassLoader() );
             entry = addObjectEntry( oid, object );
-            oid = engine.load( this, oid, object, accessMode, _lockTimeout );
+            oid = engine.load( this, oid, object, suggestedAccessMode, _lockTimeout );
             // add entry again using new oid
             entry = removeObjectEntry( object );
             if ( entry == null )
@@ -701,7 +703,6 @@ public abstract class TransactionContext
         Object     identity;
         OID          oid;
         ObjectEntry  entry;
-        AccessMode   accessMode = null;
 
         if ( object == null )
             throw new NullPointerException();
@@ -735,14 +736,11 @@ public abstract class TransactionContext
             //throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
         }
 
-        // to prevent circular references
-        accessMode = molder.getAccessMode( accessMode );
-
         // If the object isn't found in the cache, then attempt to create it.
         try {
             addObjectEntry( oid, object );
 
-            oid = engine.update( this, oid, object, accessMode, _lockTimeout );
+            oid = engine.update( this, oid, object, null, _lockTimeout );
 
             //if ( oid == null ) {
             //    oid = create( engine, molder, object, depended );

@@ -610,7 +610,7 @@ public class ClassMolder {
      * @return the object stamp for the object in the persistent storage
      */
     public Object load( TransactionContext tx, OID oid, DepositBox locker,
-            Object object, AccessMode accessMode )
+            Object object, AccessMode suggestedAccessMode )
             throws ObjectNotFoundException, PersistenceException {
 
         Connection conn;
@@ -621,6 +621,7 @@ public class ClassMolder {
         Object stamp = null;
         Object temp;
         int fieldType;
+        AccessMode accessMode = getAccessMode( suggestedAccessMode );
 
         if ( oid.getIdentity() == null )
             throw new PersistenceException("The identities of the object to be loaded is null");
@@ -696,7 +697,7 @@ public class ClassMolder {
                 if ( fields[i] != null ) {
                     // use the corresponding Persistent fields as the identity,
                     // and we ask transactionContext in action to load it.
-                    temp = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
+                    temp = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
                     _fhs[i].setValue( object, temp, tx.getClassLoader() );
                 } else {
                     _fhs[i].setValue( object, null, tx.getClassLoader() );
@@ -719,7 +720,7 @@ public class ClassMolder {
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
                         for ( int j=0,l=v.size(); j<l; j++ ) {
-                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null ) );
+                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode ) );
                         }
                         cp.close();
                         //_fhs[i].setValue( object, cp.getCollection() );
@@ -731,7 +732,7 @@ public class ClassMolder {
                     // A lazy collection with all the identity of the related object
                     // will constructed and set as the data object's field.
                     ArrayList list = (ArrayList) fields[i];
-                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, list );
+                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, list );
                     _fhs[i].setValue( object, relcol, tx.getClassLoader() );
                 }
                 break;
@@ -1636,7 +1637,7 @@ public class ClassMolder {
      * @param locker the dirty check cache of the object
      * @param object the object to be stored
      */
-    public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode accessMode )
+    public void update( TransactionContext tx, OID oid, DepositBox locker, Object object, AccessMode suggestedAccessMode )
             throws PersistenceException, ObjectModifiedException {
 
         ClassMolder fieldClassMolder;
@@ -1650,6 +1651,7 @@ public class ClassMolder {
         int fieldType;
         long timestamp;
         Object o;
+        AccessMode accessMode = getAccessMode( suggestedAccessMode );
 
         fields = (Object[]) locker.getObject( tx );
 
@@ -1702,7 +1704,7 @@ public class ClassMolder {
                         // load the cached dependent object from the data store.
                         // The loaded will be compared with the new one
                         if ( fields[i] != null ) {
-                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
+                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], suggestedAccessMode );
                             if ( o != null )
                                 tx.update( fieldEngine, fieldClassMolder, o, oid );
                         }
@@ -1738,14 +1740,14 @@ public class ClassMolder {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     // load all the dependent object in cache for modification
                                     // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode );
                                 }
                             }
                         } else {
                             ArrayList avlist = (ArrayList) fields[i];
                             fieldClassMolder = _fhs[i].getFieldClassMolder();
                             fieldEngine = _fhs[i].getFieldLockEngine();
-                            RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, null, avlist );
+                            RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, avlist );
                         }
                     } else if ( tx.isAutoStore() ) {
                         Iterator itor = getIterator( _fhs[i].getValue( object, tx.getClassLoader() ) );
@@ -1763,7 +1765,7 @@ public class ClassMolder {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     // load all the dependent object in cache for modification
                                     // check at commit time.
-                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null );
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), suggestedAccessMode );
                                 }
                             }
                         }
