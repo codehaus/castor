@@ -55,19 +55,21 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
- * A specialized FieldHandler for the XML Schema 
+ * A specialized FieldHandler for the XML Schema
  * Date/Time related types
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class DateFieldHandler extends XMLFieldHandler {
-        
-    
+
+
     public static final String DATE_FORMAT =
         "yyyy-MM-dd'T'HH:mm:ss.SSS";
-        
+    public static final String DATE_FORMAT_2 =
+        "yyyy-MM-dd'T'HH:mm:ss";
+
     private FieldHandler handler = null;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -78,7 +80,7 @@ public class DateFieldHandler extends XMLFieldHandler {
      * @param
     **/
     public DateFieldHandler(FieldHandler fieldHandler) {
-        
+
         if (fieldHandler == null) {
             String err = "The FieldHandler argument passed to " +
                 "the constructor of DateFieldHandler must not be null.";
@@ -86,13 +88,13 @@ public class DateFieldHandler extends XMLFieldHandler {
         }
         this.handler = fieldHandler;
     } //-- DateFieldHandler
-    
-    
+
+
     //------------------/
     //- Public Methods -/
     //------------------/
-    
-    
+
+
     /**
      * Returns the value of the field associated with this
      * descriptor from the given target object.
@@ -100,22 +102,27 @@ public class DateFieldHandler extends XMLFieldHandler {
      * @return the value of the field associated with this
      * descriptor from the given target object.
     **/
-    public Object getValue(Object target) 
+    public Object getValue(Object target)
         throws java.lang.IllegalStateException
     {
-        
+
         Object val = handler.getValue(target);
-        
+
         if (val == null) return val;
-        
+
         Object formatted = null;
-        
+
         DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+
+        if ( (val.toString().indexOf(".")) != -1) {
+             df = new SimpleDateFormat(DATE_FORMAT_2);
+        }
+
         if (val.getClass().isArray()) {
-            
+
             int size = Array.getLength(val);
             String[] values = new String[ size ];
-            
+
             for (int i = 0; i < size; i++) {
                 Object obj = Array.get(val, i);
                 if (obj instanceof java.util.Date)
@@ -123,13 +130,13 @@ public class DateFieldHandler extends XMLFieldHandler {
                 else
                     values[i] = obj.toString();
             }
-            
+
             formatted = values;
         }
         else {
             if (val instanceof java.util.Date)
                 formatted = df.format( (Date) val);
-            else 
+            else
                 formatted = val.toString();
         }
         return formatted;
@@ -138,17 +145,17 @@ public class DateFieldHandler extends XMLFieldHandler {
     /**
      * Sets the value of the field associated with this descriptor.
      * @param target the object in which to set the value
-     * @param value the value of the field 
+     * @param value the value of the field
     **/
     public void setValue(Object target, Object value)
         throws java.lang.IllegalStateException
     {
         Date date = null;
-        
+
         if (! (value instanceof Date) ) {
-            
+
             DateFormat df = new SimpleDateFormat(DATE_FORMAT);
-            
+
             try {
                 date = df.parse(value.toString());
             }
@@ -158,11 +165,11 @@ public class DateFieldHandler extends XMLFieldHandler {
             }
         }
         else date = (Date)value;
-        
+
         handler.setValue(target, date);
-        
+
     } //-- setValue
-    
+
     public void resetValue(Object target)
         throws java.lang.IllegalStateException
     {
@@ -182,7 +189,7 @@ public class DateFieldHandler extends XMLFieldHandler {
      *  is not compatiable with the Java object
      */
     public void checkValidity( Object object )
-        throws ValidityException, IllegalStateException 
+        throws ValidityException, IllegalStateException
     {
         //-- do nothing for now
     } //-- checkValidity
@@ -201,8 +208,8 @@ public class DateFieldHandler extends XMLFieldHandler {
     {
         return new Date();
     } //-- newInstance
-    
-    
+
+
 } //-- DateFieldHandler
 
 
