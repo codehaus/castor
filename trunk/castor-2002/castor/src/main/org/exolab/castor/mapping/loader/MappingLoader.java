@@ -87,6 +87,11 @@ public abstract class MappingLoader
      * The suffix for the name of a compiled class.
      */
     private static final String CompiledSuffix = "Descriptor";
+    
+    /**
+     * The prefix for the "add" method
+    **/
+    private static final String ADD_METHOD_PREFIX = "add";
 
 
     /**
@@ -577,11 +582,19 @@ public abstract class MappingLoader
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
+                    
+                    String methodName = fieldMap.getSetMethod();
+                    Class type = fieldType;
+                    if (colType != null) {
+                        if (!methodName.startsWith(ADD_METHOD_PREFIX))
+                            type = colType;
+                    }
+                    
                     setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
-                                              ( colType == null ? fieldType : colType ), false );
+                                              type , false );
                     if ( setMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                                    fieldMap.getSetMethod(), ( colType == null ? fieldType : colType ),
+                                                    fieldMap.getSetMethod(), type,
                                                     javaClass.getName() );
                     if ( fieldType == null )
                         fieldType = setMethod.getParameterTypes()[ 0 ];
