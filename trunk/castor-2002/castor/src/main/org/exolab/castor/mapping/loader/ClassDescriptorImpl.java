@@ -69,32 +69,32 @@ public class ClassDescriptorImpl
     /**
      * The Java class for this descriptor.
      */
-    private Class                _javaClass;
+    private final Class                _javaClass;
 
 
     /**    
      * The fields described for this class.
      */
-    protected FieldDescriptor[]  _fields;
+    protected final FieldDescriptor[]  _fields;
 
 
     /**
      * The descriptor of the class which this class extends,
      * or null if this is a top-level class.
      */
-    private ClassDescriptor     _extends;
+    private final ClassDescriptor     _extends;
 
 
     /**
      * The field of the identity for this class.
      */
-    private FieldDescriptor    _identity;
+    private final FieldDescriptor    _identity;
 
 
     /**
      * The access mode specified for this class.
      */
-    private AccessMode         _accessMode;
+    private final AccessMode         _accessMode;
 
 
     /**
@@ -130,8 +130,10 @@ public class ClassDescriptorImpl
                                             _javaClass.getName(), extend.getJavaClass().getName() );
             _extends = extend;
             _identity = ( identity == null ? _extends.getIdentity() : identity );
-        } else
+        } else {
+            _extends = null;
             _identity = identity;
+        }
         _accessMode = accessMode;
     }
     
@@ -142,6 +144,10 @@ public class ClassDescriptorImpl
     protected ClassDescriptorImpl( Class javaClass )
     {
         _javaClass = javaClass;
+        _extends = null;
+        _fields = null;
+        _identity = null;
+        _accessMode = null;
     }
 
 

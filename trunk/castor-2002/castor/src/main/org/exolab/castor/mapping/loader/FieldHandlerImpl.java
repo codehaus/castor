@@ -61,6 +61,11 @@ import org.exolab.castor.util.Messages;
 /**
  * A field handler that knows how to get/set the values of a field
  * directly or through the get/set methods. Uses reflection.
+ * <p>
+ * Note: the field Java type is obtained from {@link TypeInfo#getFieldType()},
+ * but if the field is a collection, the actual field/accessor type is
+ * obtained from {@link TypeInfo#getCollectionType} and the object to create
+ * (with {@link #newInstance}) is the former field type.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -73,70 +78,70 @@ public final class FieldHandlerImpl
     /**
      * The Java field described and accessed through this descriptor.
      */
-    private Field   _field;
+    private final Field   _field;
 
 
     /**
      * The method used to obtain the value of this field. May be null.
      */
-    private Method  _getMethod;
+    private final Method  _getMethod;
 
 
     /**
      * The method used to set the value of this field. May be null.
      */
-    private Method  _setMethod;
+    private final Method  _setMethod;
 
 
     /**
      * The method used to create a new instance of the field.
      */
-    private Method  _createMethod;
+    private Method         _createMethod;
 
 
     /**
      * The Java field name.
      */
-    private String  _fieldName;
+    private final String  _fieldName;
 
 
     /**
      * The Java field type.
      */
-    private Class  _fieldType;
+    private final Class  _fieldType;
 
 
     /**
      * True if this field is an immutable type.
      */
-    private boolean  _immutable;
+    private final boolean  _immutable;
 
 
     /**
      * The default value for primitive fields. Will be set if the field is null.
      */
-    private Object   _default;
+    private final Object   _default;
 
 
     /**
      * Returns true if the field is required. Required fields cannot
      * be null on output.
      */
-    private boolean  _required;
+    private boolean        _required;
 
 
     /**
      * Convertor to apply when setting the value of the field. Converts from
      * the value to the field type. Null if no convertor is required.
      */
-    private TypeConvertor  _convertTo;
+    private final TypeConvertor  _convertTo;
 
 
     /**
      * Convertor to apply when reading the value of the field. Converts from
      * the field type to the return value. Null if no convertor is required.
      */
-    private TypeConvertor  _convertFrom;
+    private final TypeConvertor  _convertFrom;
 
 
     /**
@@ -164,6 +169,8 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
+        _getMethod = null;
+        _setMethod = null;
     }
 
 
@@ -195,21 +202,17 @@ public final class FieldHandlerImpl
         if ( getMethod == null && setMethod == null )
             throw new IllegalArgumentException( "Both arguments 'getMethod' and 'setMethod' are null" );
         
-        if ( setMethod != null ) {
-            if ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                 ( setMethod.getModifiers() & Modifier.STATIC ) != 0 )
-                throw new MappingException( "mapping.accessorNotAccessible",
-                                            setMethod, setMethod.getDeclaringClass().getName() );
-            _setMethod = setMethod;
-        }
+        if ( setMethod != null && ( ( setMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                                    ( setMethod.getModifiers() & Modifier.STATIC ) != 0 ) )
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        setMethod, setMethod.getDeclaringClass().getName() );
+        _setMethod = setMethod;
 
-        if ( getMethod != null ) {
-            if ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                 ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) 
-                throw new MappingException( "mapping.accessorNotAccessible",
-                                            getMethod, getMethod.getDeclaringClass().getName() );
-            _getMethod = getMethod;
-        }
+        if ( getMethod != null && ( ( getMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
+                                    ( getMethod.getModifiers() & Modifier.STATIC ) != 0 ) )
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        getMethod, getMethod.getDeclaringClass().getName() );
+        _getMethod = getMethod;
 
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _immutable = typeInfo.isImmutable();
@@ -217,6 +220,7 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
+        _field = null;
     }
 
 
