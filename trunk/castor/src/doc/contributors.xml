@@ -402,6 +402,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Oines" given="Leif"/>
+    <email>leif.oines@calebtech.com</email>
+    <description>Some bug fixes for DateFieldHandler</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Olausson" given="Thomas"/>
     <email>thomas.olausson@home.se</email>
     <description>Contributed a patch for DB2 and identity columns</description>
@@ -423,6 +429,12 @@
     <name surname="Parent" given="Marc-Antoine"/>
     <email>Marc-Antoine_Parent@mitel.com</email>
     <description>Enhancements to the Castor DSML and bug fixing.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+    <name surname="Pinel" given="Phil"/>
+    <email>geek@quack.org.uk</email>
+    <description>TimeZone bug fix for DateFieldHandler</description>
   </contributor>
 
   <contributor type="Contributor">
