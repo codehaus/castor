@@ -1,8 +1,9 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
             targetNamespace="http://testspace"
+            elementFormDefault="qualified"
             version="1.0">
 
-   
+
    <xs:complexType name="Root">
      <xs:sequence>
        <xs:element name="node" type="AbstractNode" minOccurs="1" maxOccurs="unbounded"/>
@@ -22,7 +23,7 @@
      </xs:complexContent>
      </xs:complexType>
     </xs:element>
-    
+
    <xs:element name="NodeB">
      <xs:complexType>
      <xs:complexContent>
