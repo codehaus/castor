@@ -164,8 +164,13 @@ public class SearchDescriptor
     {
 	if ( _returnAttrs == null )
 	    return null;
-	else
-	    return (String[]) _returnAttrs.toArray( new String[ _returnAttrs.size() ] );
+	else {
+	    String[] array;
+
+	    array = new String[ _returnAttrs.size() ];
+	    _returnAttrs.copyInto( array );
+	    return array;
+	}
     }
 
 
