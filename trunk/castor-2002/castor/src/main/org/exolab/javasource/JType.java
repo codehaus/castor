@@ -150,7 +150,7 @@ public class JType {
     **/
     public String toString() {
         
-        if (_isArray) return this.name+"[]";
+        if (_isArray) return _componentType.toString()+"[]";
         else return this.name;
         
     } //-- toString
