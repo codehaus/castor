@@ -428,6 +428,54 @@
     </field>
   </class>
 
+  <class name="jdo.TestMasterKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Test master table</description>
+    <map-to table="test_master" />
+    <field name="id" type="integer">
+      <sql name="id" type="numeric" />
+    </field>
+    <field name="value1" type="string"  required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="group" type="jdo.TestGroup" required="false">
+      <sql name="group_id"/>
+    </field>
+    <field name="details" type="jdo.TestDetailKeyGen" collection="arraylist" required="false">
+      <sql many-key="master_id"/>
+    </field>
+  </class>
+
+
+  <class name="jdo.TestDetailKeyGen" depends="jdo.TestMasterKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Test detail table</description>
+    <map-to table="test_detail" />
+    <field name="id" type="integer">
+      <sql name="detail_id" type="numeric" />
+    </field>
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="master" type="jdo.TestMasterKeyGen" required="true">
+      <sql name="master_id" />
+    </field>
+    <field name="details2" type="jdo.TestDetailKeyGen2" collection="arraylist" required="false">
+      <sql many-key="detail_id"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestDetailKeyGen2" depends="jdo.TestDetailKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Test detail2 table</description>
+    <map-to table="test_detail2" />
+    <field name="id" type="integer">
+      <sql name="detail2_id" type="numeric" />
+    </field>
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="detail" type="jdo.TestDetailKeyGen" required="true">
+      <sql name="detail_id" />
+    </field>
+  </class>
 
   <class name="jdo.TestGroup" access="shared" identity="id">
     <description>Test groups table</description>
