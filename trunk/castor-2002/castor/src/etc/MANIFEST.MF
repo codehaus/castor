@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Specification-Title: Castor Exchange/Persistence Framework
+Specification-Title: Castor XML, JDO, DAX, DSML
 Specification-Vendor: Exoffice Technologies Inc.
 Specification-Version: 0.8
 Implementation-Title: Castor

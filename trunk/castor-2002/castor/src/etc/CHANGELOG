@@ -1,37 +1,46 @@
+Version 0.7.2  January 12, 2000
+-------------------------------
+
+JDO: Implemented object caching. Each transaction gets a single view
+     of the object and may change that object without affecting the
+     other transaction. Upon commit the shared view is updated. If the
+     transaction is aborted, the object is returned to its original
+     state.
+
+JDO: Implemented two phase commit through the XAResource interface,
+     allow Castor to perform a prepare stage followed by a separate
+     commit stage. Improved the design of the checkpoint method.
+
+JDO: Now implements the XAResource interface and can be used as
+     an XA resource in a JTA/JTS transaction server.
+
+Misc: Changed location of properties file to fix class name mismatch
+      bug. Added example sources to the tar ball distribution.
+      Rechecked the libraries to prevent build issues.
+
+
 Version 0.7.1  January 11, 2000
 -------------------------------
 
-[DAX module]
+DAX: First release of some DAX code
 
-- First release of some DAX code
+JDO: Temporary fix to rollback of objects in lieu of missing
+     CacheEngine (JDO)
 
-[JDO module]
+JDO: Perliminary code for XAResource support in Castor JDO
 
-- Temporary fix to rollback of objects in lieu of missing
-  CacheEngine (JDO)
-
-- Perliminary code for XAResource support in Castor JDO
-
-
-[XML module]
-
-   [Schema support]
-
-   - Added some support for derived archetypes (types) 
+XML: Added some support for derived archetypes (types) 
      - only extension derivation is possible at this time,
       so deriveBy must be "extension". 
 
-   - Added binary, and boolean types to the source code generator
+XML: Added binary, and boolean types to the source code generator
      for Castor XML
-   - binary types will be mapped to byte[] by default, and will
-     be Base64 encoded and decoded automatically
-   - boolean type is an enumeration of "true" or "false"
+     - binary types will be mapped to byte[] by default, and will
+       be Base64 encoded and decoded automatically
+     - boolean type is an enumeration of "true" or "false"
 
-   [Marshalling Framework]
+XML: Added support for byte[] -> encoding and decoding from Base64
 
-   - added support for byte[] -> encoding and decoding from Base64
-
-=======
 
 Version 0.7  January 7, 2000
 ----------------------------
@@ -50,6 +59,7 @@ Version 0.7  January 7, 2000
 - Added timeInstant, NMToken and NCName types
 
 =======
+
 
 Version 0.6  December 20, 1999
 ------------------------------
