@@ -1467,13 +1467,19 @@ public class ClassMolder {
         long timestamp;
         Object o;
 
-        if ( isDependent() )
-            return;
-
         fields = (Object[]) locker.getObject( tx );
 
-        if ( fields == null ) 
-            throw new ObjectModifiedException("Object is cleared from cache.");
+        if ( fields == null ) {
+            if ( !isDependent() ) {
+                throw new ObjectModifiedException("Object is cleared from cache.");
+            } else {
+                fields = new Object[_fhs.length];
+                Connection conn = (Connection)tx.getConnection(oid.getLockEngine());
+                stamp = _persistence.load( conn, fields, oid.getIdentities(), accessMode );
+                oid.setDbLock( accessMode == AccessMode.DbLocked );
+                locker.setObject( tx, fields );
+            }
+        }
 
         timestamp = locker.getTimeStamp();
 
@@ -1487,6 +1493,8 @@ public class ClassMolder {
                 throw new ObjectModifiedException( "Time stamp mismatched!" );
                     /*Messages.format( "persist.objectModified", object.getClass(), OID.flatten( ids ) ) ); */
             } 
+        } else if ( !isDependent() ) {
+            throw new IllegalArgumentException("A long transaction object must implement the TimeStampable interface!");
         }
 
         // load the original field into the transaction. so, store will
@@ -1504,8 +1512,12 @@ public class ClassMolder {
                         // depedent class won't have persistenceInfo in LockEngine
                         // must look at fieldMolder for it
 
-                        // load all the cached dependent object 
+                        // load the cached dependent object from the data store. 
+                        // The loaded will be compared with the new one
                         value = tx.load( fieldEngine, fieldClassMolder, (Object[])fields[i], null );
+                        o = _fhs[i].getValue( object );
+                        if ( o != null )
+                            tx.update( fieldEngine, fieldClassMolder, o, oid );
                     } else {
                         o = _fhs[i].getValue( object );
                         if ( !tx.isPersistent( o ) ) {
@@ -1521,11 +1533,26 @@ public class ClassMolder {
                     fieldEngine = _fhs[i].getFieldLockEngine();
                     if ( _fhs[i].isDependent() ) {
                         if ( !_fhs[i].isLazy() ) {
-                            ArrayList col = new ArrayList();
+                            Collection al = (Collection) _fhs[i].getValue( object );
                             ArrayVector v = (ArrayVector)fields[i];
+                            if ( al != null ) {
+                                if ( v != null ) {
+                                    Iterator it = al.iterator();
+                                    while ( it.hasNext() ) {
+                                        Object element = it.next();
+                                        if ( v.contains( fieldClassMolder.getIdentities( element ) ) ) {
+                                            tx.update( fieldEngine, fieldClassMolder, element, oid );
+                                        } else {
+                                            tx.create( fieldEngine, fieldClassMolder, element, oid );
+                                        }
+                                    }
+                                }
+                            }
+                            ArrayList col = new ArrayList();
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
-                                    col.add( tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null ) );
+                                    // load all the object
+                                    tx.load( oid.getLockEngine(), fieldClassMolder, (Object[])v.get(j), null );
                                 }
                             } 
                         } else {
@@ -2262,13 +2289,16 @@ public class ClassMolder {
         return v;
     }
 
+    public String toString() {
+        return "ClassMolder "+ _base.getName();
+    }
+
     /**
      * Return true if a key generator is used for the base type of this ClassMolder
      */
     public boolean isKeyGeneratorUsed() {
         return _isKeyGenUsed;
     }
-
 }
 
 
