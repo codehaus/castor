@@ -368,6 +368,10 @@ public class MarshalInfoSourceFactory {
             if (member.getRequired()) {
                 jsc.add("desc.setRequired(true);");
             }
+            //-- mark as multi or single valued
+            jsc.add("desc.setMultivalued("+member.isMultivalued());
+            jsc.append(");");
+            
             jsc.add("elements[");
             jsc.append(Integer.toString(i));
             jsc.append("] = desc;");
