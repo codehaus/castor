@@ -115,7 +115,7 @@ public class DatabaseRegistry
      */
     private MappingResolver   _mapResolver;
 
-
+                            
     /**
      * The database name of this database source.
      */
@@ -160,12 +160,9 @@ public class DatabaseRegistry
                       String jdbcUrl, Properties jdbcProps, LogInterceptor logInterceptor )
         throws MappingException
     {
-        _name = name;
-        _mapResolver = mapResolver;
+        this( name, mapResolver, factory, logInterceptor);
         _jdbcUrl = jdbcUrl;
         _jdbcProps = jdbcProps;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logInterceptor );
-        _byEngine.put( _engine, this );
     }
 
 
@@ -184,10 +181,27 @@ public class DatabaseRegistry
                     DataSource dataSource, LogInterceptor logInterceptor )
         throws MappingException
     {
+        this( name, mapResolver, factory, logInterceptor);
+        _dataSource = dataSource;
+    }
+    
+    /**
+     * Base constructor for a new database registry.
+     *
+     * @param name The database name
+     * @param mapResolver The mapping resolver
+     * @param factory Factory for persistence engines
+     * @param logInterceptor For tracing messages
+     * @throws MappingException Error occured when creating
+     *  persistence engines for the mapping descriptors
+     */
+    DatabaseRegistry( String name, MappingResolver mapResolver, PersistenceFactory factory,
+                    LogInterceptor logInterceptor )
+        throws MappingException
+    {
         _name = name;
         _mapResolver = mapResolver;
-        _dataSource = dataSource;
-        _engine = new PersistenceEngineFactory().createEngine( _mapResolver, factory, logInterceptor );
+        _engine = new PersistenceEngineFactory().createEngine( mapResolver, factory, logInterceptor );
         _byEngine.put( _engine, this );
     }
 
@@ -203,8 +217,7 @@ public class DatabaseRegistry
     {
         return _name;
     }
-
-
+    
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
                                                   LogInterceptor logInterceptor, ClassLoader loader )
         throws MappingException
@@ -215,7 +228,6 @@ public class DatabaseRegistry
         Database           database;
         DatabaseRegistry   dbs;
         PersistenceFactory factory;
-        Key                key;  
 
         unm = new Unmarshaller( Database.class );
         try {
@@ -227,8 +239,7 @@ public class DatabaseRegistry
             else
                 unm.setEntityResolver( new DTDResolver( resolver ) );
             database = (Database) unm.unmarshal( source );
-            key = new Key( database.getName(), loader );
-            if ( _databases.get( key ) != null )
+            if ( _databases.get( database.getName() ) != null )
                 return;
 
             // Complain if no database engine was specified, otherwise get
@@ -310,7 +321,7 @@ public class DatabaseRegistry
             }
 
             // Register the new registry object for the given database name.
-            _databases.put( key, dbs );
+            _databases.put( database.getName(), dbs );
 
         } catch ( MappingException except ) {
             throw except;
@@ -365,12 +376,10 @@ public class DatabaseRegistry
         return null;
     }
 
-
-    public static synchronized DatabaseRegistry getDatabaseRegistry( String name, ClassLoader loader )
+    public static synchronized DatabaseRegistry getDatabaseRegistry( String name )
     {
         DatabaseRegistry dbs;
-
-        dbs = (DatabaseRegistry) _databases.get( new Key( name, loader ) );
+        dbs = (DatabaseRegistry) _databases.get( name);
         return dbs;
     }
 
@@ -387,45 +396,5 @@ public class DatabaseRegistry
             return DriverManager.getConnection( dbs._jdbcUrl, dbs._jdbcProps );
     }
 
-
-
-    /**
-     * Keys for Hashtable  _databases
-     */
-    private static class Key {
-        
-        /**
-         * The database name. Not null.
-         */
-        private String _name;
-
-        /**
-         * The application class loader. May be null.
-         */
-        private ClassLoader _classLoader;
-        
-        Key( String name, ClassLoader classLoader ) {
-            _name = name;
-            _classLoader = classLoader; 
-        }
-
-        public boolean equals( Object obj ) {
-            Key other;
-            
-            if ( obj == null || ! (obj instanceof Key) ) {
-                return false;
-            }
-            other = (Key) obj;
-            return (_name.equals(other._name) && _classLoader == other._classLoader );
-        }
-
-        public int hashCode() {
-            return _name.hashCode() + ( _classLoader == null ? 0 : _classLoader.hashCode() );
-        }
-
-        public String toString() {
-            return _name + "/" + _classLoader;
-        }
-    }
 
 }
