@@ -411,18 +411,16 @@
     <field name="id" type="long">
       <sql name="id" type="numeric" />
     </field>
-    <field name="date" type="java.util.Date">
+    <field name="date" type="date">
       <sql name="tdt" type="timestamp" />
     </field>
-    <field name="time" type="java.util.Date">
+    <field name="time" type="date">
       <sql name="ttm" type="timestamp" dirty="ignore" />
     </field>
     <field name="intValue" type="integer" required="false" >
-      <!--sql name="int_val" type="integer" dirty="ignore" /-->
       <sql name="int_val" type="integer" />
     </field>
     <field name="longValue" type="long" required="false" >
-      <!--sql name="long_val" type="numeric" dirty="ignore" /-->
       <sql name="long_val" type="numeric" />
     </field>
     <field name="charValue" type="char" required="false" >
@@ -431,13 +429,13 @@
     <field name="boolValue" type="boolean" required="true" >
       <sql name="bool_val" type="char[01]" />
     </field>
-    <field name="date2" type="java.util.Date" >
+    <field name="date2" type="date" >
       <sql name="int_date" type="integer[YMD]" />
     </field>
-    <field name="time2" type="java.util.Date" >
+    <field name="time2" type="date" >
       <sql name="str_time" type="char[HH:mm:ss.SSS]" />
     </field>
-    <field name="timestamp2" type="java.util.Date" >
+    <field name="timestamp2" type="date" >
       <sql name="num_date" type="numeric[YMDhmsS]" />
     </field>
     <field name="blob" type="bytes" >

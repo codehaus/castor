@@ -117,6 +117,7 @@ public class TestTypes
         _id = DefaultId;
         _date = date;
         _time = date;
+	_charValue='A';
         _timestamp = date;
         _date2 = date;
         _time2 = date;
