@@ -245,6 +245,17 @@
         SELECT o FROM Order o,
             WHERE o.lineItem.price>100
         </code></p>
+
+        <p><b>Can I write a pass-thru OQL?</b></p>
+        <p>Yes. Just put "CALL SQL" in front of your SQL statement.</p>
+        <p>For example,
+        <code>
+    OQLQuery oql = castorDb.getOQLQuery(
+        "CALL SQL SELECT id, name, date "+
+        "FROM user WHERE upper(name) like $1");
+        </code></p>
+        <p>Be remember that the order of the fields listed must match what is defined in the mapping file.</p>
+
     </section>
 
     <section title="Features requests">
