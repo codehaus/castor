@@ -458,7 +458,7 @@ public class JDO
 
         if ( _dbName == null )
             throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
-        if ( DatabaseRegistry.getDatabaseRegistry( _dbName, _classLoader ) == null ) {
+        if ( DatabaseRegistry.getDatabaseRegistry( _dbName ) == null ) {
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
