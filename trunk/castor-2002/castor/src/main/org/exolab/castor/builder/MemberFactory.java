@@ -204,11 +204,17 @@ public class MemberFactory {
         fieldInfo.setRequired(attribute.isRequired());
 
         //-- handle namespace URI / prefix
+        Form form = attribute.getForm();
         Schema schema = attribute.getSchema();
         if (schema != null) {
-            String nsURI = schema.getTargetNamespace();
-            if ((nsURI != null) && (nsURI.length() > 0)) {
-                fieldInfo.setNamespaceURI(nsURI);
+            if (form == null) {
+                form = schema.getAttributeFormDefault();
+            }
+            if ((form != null) && form.isQualified()) {
+                String nsURI = schema.getTargetNamespace();
+                if ((nsURI != null) && (nsURI.length() > 0)) {
+                    fieldInfo.setNamespaceURI(nsURI);
+                }
             }
         }
 
