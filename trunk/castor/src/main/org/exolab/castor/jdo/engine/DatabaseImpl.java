@@ -47,10 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.SystemException;
@@ -73,7 +69,6 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.TransactionContext;
@@ -423,8 +418,6 @@ public class DatabaseImpl
 
     public boolean isPersistent( Object object )
     {
-        TransactionContext tx;
-        
         if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
@@ -434,8 +427,6 @@ public class DatabaseImpl
 
     public Object getIdentity(Object object)
     {
-        TransactionContext tx;
-        
         if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
@@ -477,19 +468,31 @@ public class DatabaseImpl
     }
 
 
-    protected void finalize()
-        throws Throwable
-    {
-        if ( _scope != null )
-            close();
-    }
+	/* Overrides Object.finalize().
+	 * 
+	 * Outputs a warning message to teh logs if the current DatabaseImpl 
+	 * instance still has valid scope. In this condition - a condition that 
+	 * ideally should not occur at all - we close the instance as well to 
+	 * free up resources.
+	 * 
+	 * @see java.lang.Object#finalize()
+	 */
+	protected void finalize() throws Throwable {
+		if (_scope != null) {
+			
+			// retrieve SQL bound to this Database instance
+			OQLQuery oqlQuery = getOQLQuery(); 
+			String sql = ((OQLQueryImpl) oqlQuery).getSQL(); 
+			
+			_log.warn(Messages.format("jdo.finalize_close", this.toString(), _dbName, sql));
+			close();
+		}
+	}
 
 
     protected TransactionContext getTransaction()
         throws TransactionNotInProgressException
     {
-        TransactionContext tx;
-        
         if ( _scope == null )
             throw new TransactionNotInProgressException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
@@ -677,8 +680,6 @@ public class DatabaseImpl
     public void expireCache( Class[] type, Object[] identity )
         throws PersistenceException 
     {
-        PersistenceInfo    info;
-        
         for ( int i = 0; i < type.length; i++ ) {
 
             LockEngine engine = getLockEngine();
