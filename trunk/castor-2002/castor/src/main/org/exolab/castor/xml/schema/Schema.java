@@ -267,6 +267,20 @@ public class Schema extends Structure {
         return (Archetype)archetypes.get(name);
     } //-- getArchetype
     
+    /**
+     * Returns an Enumeration of all top-level Archetype declarations
+     * @return an Enumeration of all top-level Archetype declarations
+    **/
+    public Enumeration getArchetypes() {
+        return archetypes.elements();
+    } //-- getArchetypes
+    
+    /**
+     * Returns the Datatype associated with the given name,
+     * or null if no such Datatype exists.
+     * @return the Datatype associated with the given name,
+     * or null if no such Datatype exists.
+    **/
     public Datatype getDatatype(String name) {
         if (name == null)  {
             String err = NULL_ARGUMENT + "getDatatype: ";
@@ -275,6 +289,14 @@ public class Schema extends Structure {
         }
         return (Datatype)datatypes.get(name);
     } //-- getDatatype
+    
+    /**
+     * Returns an Enumeration of all Datatype declarations
+     * @return an Enumeration of all Datatype declarations
+    **/
+    public Enumeration getDatatypes() {
+        return datatypes.elements();
+    } //-- getDatatypes
     
     /**
      * Returns the ElementDecl of associated with the given name
@@ -286,10 +308,8 @@ public class Schema extends Structure {
     } //-- getElementDecl
 
     /**
-     * Returns an Enumeration of all the ElementDecl objects
-     * declared at the top level of this SchemaDef
-     * @return an Enumeration of all the ElementDecl objects
-     * declared at the top level of this SchemaDef
+     * Returns an Enumeration of all top-level element declarations
+     * @return an Enumeration of all top-level element declarations
     **/
     public Enumeration getElementDecls() {
         return elements.elements();

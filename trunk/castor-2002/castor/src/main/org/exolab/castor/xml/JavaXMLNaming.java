@@ -46,6 +46,7 @@
 package org.exolab.castor.xml;
 
 import java.io.File;
+import java.util.Hashtable;
 
 /**
  * This class converts XML Names to proper Java names.
@@ -56,12 +57,31 @@ import java.io.File;
 **/
 public class JavaXMLNaming {
     
+    
+    private static final Hashtable subst = keywordMap();
+    
+    private static final String[] keywords = { 
+        "class", "static"
+    };
+        
     /**
      * private constructor
     **/
     private JavaXMLNaming() {
         super();
     } //-- JavaXMLNaming
+    
+    /**
+     * Returns true if the given String is a Java keyword which
+     * will cause a problem when used as a variable name
+    **/
+    public static boolean isKeyword(String name) {
+        if (name == null) return false;
+        for (int i = 0; i < keywords.length; i++) {
+            if (keywords[i].equals(name)) return true;
+        }
+        return false;
+    } //-- isKeyword
     
     public static String toJavaClassName(String name) {
                 
@@ -74,7 +94,16 @@ public class JavaXMLNaming {
     } //-- toJavaClassName
 
     public static String toJavaMemberName(String name) {
-        return toJavaName(name, false);
+        
+        if (name == null) return null;
+        
+        String memberName = toJavaName(name, false);
+        if (isKeyword(memberName)) {
+            String mappedName = (String) subst.get(memberName);
+            if (mappedName != null) memberName = mappedName;
+            else memberName = "_"+memberName;
+        }
+        return memberName;
     } //-- toJavaMemberName
     
     /**
@@ -85,6 +114,12 @@ public class JavaXMLNaming {
         if (packageName == null) return packageName;
         return packageName.replace('.',File.separatorChar);
     } //-- packageToPath
+    
+    private static Hashtable keywordMap() {
+        Hashtable ht = new Hashtable();
+        ht.put("class", "type");
+        return ht;
+    } //-- keywordMap
     
     /**
      * Converts the given xml name to a Java name.
