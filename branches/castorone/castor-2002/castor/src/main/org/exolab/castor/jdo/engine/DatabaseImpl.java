@@ -73,8 +73,9 @@ import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
-
-
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
 
 
 
@@ -135,6 +136,12 @@ public class DatabaseImpl
      * The class loader for application classes (may be null).
      */
     private ClassLoader _classLoader;
+
+
+    /**
+     * All the thread which has called begin, but not yet commit.
+     */
+    private static ThreadTracer _threadTracer = new ThreadTracer( 5000 );
 
 
     public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
@@ -232,7 +239,7 @@ public class DatabaseImpl
             LockNotGrantedException, PersistenceException {
 
         Object[] identities = { identity };
-        return load( type, identities );
+        return load( type, identities, accessMode );
     }
 
     public Object load( Class type, Object[] identities, short accessMode )
@@ -422,6 +429,7 @@ public class DatabaseImpl
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
         _ctx = new TransactionContextImpl( this, false );
         _ctx.setLockTimeout( _lockTimeout );
+        _threadTracer.add( Thread.currentThread(), this );
     }
 
 
@@ -437,6 +445,7 @@ public class DatabaseImpl
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         try {
+            _threadTracer.remove( Thread.currentThread() );
             _ctx.prepare();
             _ctx.commit();
         } catch ( TransactionAbortedException except ) {
@@ -457,6 +466,7 @@ public class DatabaseImpl
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        _threadTracer.remove( Thread.currentThread() );
         _ctx.rollback();
         _ctx = null;
     }
@@ -543,4 +553,50 @@ public class DatabaseImpl
     }
 
 
+    private static class ThreadTracer extends Thread {
+        private HashMap _threads = new HashMap();
+        private long _interval;
+        private ThreadTracer( long interval ) {
+            super("Dead Transaction Tracer");
+            _interval = interval;
+            setDaemon( true );
+            start();
+        }
+        private synchronized void add( Thread thread, Database database ) {
+            _threads.put( thread, database );
+        }
+        private synchronized void remove( Thread thread ) {
+            _threads.remove( thread );
+        }
+        public void run() {
+            while ( true ) {
+                try {
+                    sleep(_interval);
+
+                    //synchronized ( this ) {
+                        Iterator threads = _threads.keySet().iterator();
+                        while ( threads.hasNext() ) {
+                            Thread t = (Thread) threads.next();
+                            if ( !t.isAlive() ) {
+                                System.out.println("Thread dead: "+t);
+                                Database db = (Database) _threads.get( t );
+                                if ( db.isActive() ) {
+                                    System.out.println("roll back cus thread dead");
+                                    try {
+                                        db.rollback();
+                                    } catch ( TransactionNotInProgressException e ) {
+                                        threads.remove();
+                                    }
+                                }
+                                threads.remove();
+                            }
+                        }
+                    //}
+                } catch ( InterruptedException e ) {
+                    e.printStackTrace();
+                    return;
+                }
+            }
+        }
+    }
 }
