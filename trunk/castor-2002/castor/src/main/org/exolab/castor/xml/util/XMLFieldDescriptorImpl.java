@@ -288,6 +288,7 @@ public class XMLFieldDescriptorImpl
         if (_required) {
             _validator = new FieldValidator();
             _validator.setMinOccurs(1);
+            _validator.setDescriptor(this);
         }
     } //-- XMLFieldDescriptorImpl
 
@@ -407,11 +408,11 @@ public class XMLFieldDescriptorImpl
      * @return the namespace URI.
     **/
     public String getNameSpaceURI() {
-        
+
         //-- use containing class's namespace if
         //-- necessary
         if ((nsURI == null) && (this._contClsDescriptor != null)) {
-            if (isPrimitive(_fieldType) && (_nodeType == NodeType.Element)) 
+            if (isPrimitive(_fieldType) && (_nodeType == NodeType.Element))
             {
                 if (_contClsDescriptor instanceof XMLClassDescriptor) {
                     return ((XMLClassDescriptor)_contClsDescriptor).getNameSpaceURI();
