@@ -48,6 +48,7 @@ package org.exolab.castor.mapping;
 
 
 import java.util.Properties;
+import org.exolab.castor.persist.KeyGeneratorRegistry;
 
 
 /**
@@ -59,6 +60,14 @@ import java.util.Properties;
  */
 public interface KeyGeneratorDescriptor
 {
+
+    /**
+     * Returns the name of the key generator, i.e. the name of the key
+     * generator factory or the alias if it is used.
+     *
+     * @return Key generator name.
+     */
+    public String getName();
 
 
     /**
@@ -75,6 +84,14 @@ public interface KeyGeneratorDescriptor
      * @return key generator parameters.
      */
     public Properties getParams();
+
+
+    /**
+     * Returns the key generator registry object.
+     *
+     * @return key generator registry object.
+     */
+    public KeyGeneratorRegistry getKeyGeneratorRegistry();
 
 
 }

@@ -52,12 +52,16 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.KeyGeneratorDescriptor;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
 
 
 /**
- * Registry for {@link KeyGenerator} instances (flyweight pattern).
+ * Registry for {@link KeyGenerator} instances.
+ * Is used to create no more than one instance of the give type with 
+ * the given parameters.
  * 
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
@@ -66,10 +70,11 @@ public final class KeyGeneratorRegistry
 {
 
     /**
-     * Association between pairs (KeyGeneratorDescriptor, PersistenceFactory)
-     * and key generator instances.
+     * Association between key generator names (aliases) and instances.
+     * To avoid cyclic references keyGenDesc->registry, registry->keyGenDesc
+     * WeakHashMap should be used here with JDK >= 1.2
      */
-    private static Hashtable  _keyGens = new Hashtable();
+    private Hashtable  _keyGens = new Hashtable();
 
 
     /**
@@ -80,65 +85,41 @@ public final class KeyGeneratorRegistry
      * @param desc The key generator description
      * @return The {@link KeyGenerator}
      */
-    public static KeyGenerator getKeyGenerator( PersistenceFactory factory,
-                                                KeyGeneratorDescriptor desc )
+    public KeyGenerator getKeyGenerator( PersistenceFactory factory,
+                                         KeyGeneratorDescriptor desc,
+                                         LogInterceptor logInterceptor )
             throws MappingException
     {
+        String keyGenName;
         KeyGeneratorFactory keyGenFactory;
         KeyGenerator keyGen;
-        KeyGenInfo info;
 
-        info = new KeyGenInfo( factory.getFactoryName(), desc );
-        keyGen = (KeyGenerator) _keyGens.get( info );
+        keyGenName = desc.getName();
+        keyGen = (KeyGenerator) _keyGens.get( keyGenName );
         if ( keyGen == null ) {
             keyGenFactory = KeyGeneratorFactoryRegistry.getKeyGeneratorFactory(
                     desc.getKeyGeneratorFactoryName() );
 
             if (keyGenFactory != null) {
                 keyGen = keyGenFactory.getKeyGenerator( factory, desc.getParams() );
+                if ( keyGen != null && logInterceptor != null ) {
+                    logInterceptor.message( "Key generator " +
+                            desc.getKeyGeneratorFactoryName() +
+                            " have been instantiated, parameters: " +
+                            desc.getParams() );
+                }
             }
             if ( keyGen == null ) {
-                throw new MappingException( Messages.format( "mapping.noKeyGen",
-                                            desc.getKeyGeneratorFactoryName() ) );
+                /*
+                 * Don't throw exception here, just notify and continue without
+                 * key generator
+                 */
+                Logger.getSystemLogger().println( Messages.format(
+                        "mapping.noKeyGen", desc.getKeyGeneratorFactoryName() ) );
+                return null;
             }
-            _keyGens.put( info, keyGen );
+            _keyGens.put( keyGenName, keyGen );
         }    
         return keyGen;
-    }
-
-    private static class KeyGenInfo {
-        private final String factoryName;
-        private final KeyGeneratorDescriptor desc;
-
-        KeyGenInfo( String factoryName, KeyGeneratorDescriptor desc) {
-            this.factoryName = factoryName;
-            this.desc = desc;
-        }
-
-        public boolean equals( Object obj ) {
-            KeyGenInfo k;
-
-            if ( obj == null || !(obj instanceof KeyGenInfo) ) {
-                return false;
-            }
-
-            k = (KeyGenInfo) obj;
-
-            if ( factoryName == null && k.factoryName != null ) {
-                return false;
-            }
-            if ( !factoryName.equals( k.factoryName ) ) {
-                return false;
-            }
-
-            if ( desc == null && k.desc != null ) {
-                return false;
-            }
-            if ( !desc.equals( k.desc ) ) {
-                return false;
-            }
-
-            return true;
-        }
     }
 }

@@ -67,6 +67,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.KeyGeneratorDef;
 import org.exolab.castor.mapping.xml.Param;
+import org.exolab.castor.persist.KeyGeneratorRegistry;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -96,6 +97,16 @@ public class JDOMappingLoader
      * See {@link #loadMapping}.
      */
     private Hashtable _keyGenDescs = new Hashtable();
+
+
+    /**
+     * Used by the constructor for creating key generators.
+     * Each database must have a proprietary KeyGeneratorRegistry instance
+     * Otherwise it is impossible to implement correctly stateful
+     * key generator algorithms like HIGH/LOW.
+     * See {@link #loadMapping}.
+     */
+    private KeyGeneratorRegistry _keyGenReg = new KeyGeneratorRegistry();
 
 
     public JDOMappingLoader( ClassLoader loader, PrintWriter logWriter )
@@ -140,32 +151,29 @@ public class JDOMappingLoader
         keyGenName = clsMap.getKeyGenerator();
         keyGenDesc = null;
         if ( keyGenName != null ) {
+            String keyGenFactoryName;
             KeyGeneratorDef keyGenDef;
             Enumeration enum;
             Properties params;
-            KeyGeneratorDescriptorImpl oldKeyGenDesc;
 
             // first search among declared key generators
             // and resolve alias
             keyGenDef = (KeyGeneratorDef) _keyGenDefs.get( keyGenName );
             params = new Properties();
+            keyGenFactoryName = keyGenName;
             if ( keyGenDef != null ) {
-                keyGenName = keyGenDef.getName();
+                keyGenFactoryName = keyGenDef.getName();
                 enum = keyGenDef.enumerateParam();
                 while ( enum.hasMoreElements() ) {
                     Param par = (Param) enum.nextElement();
                     params.put( par.getName(), par.getValue() );
                 }
             }
-            keyGenDesc = new KeyGeneratorDescriptorImpl( keyGenName, params );
-            
-            // If the equal object was already instantiated, we use the old 
-            // object and leave this unreferenced so that it will be garbage collected
-            oldKeyGenDesc = (KeyGeneratorDescriptorImpl) _keyGenDescs.get(keyGenDesc);
-            if (oldKeyGenDesc == null) {
-                _keyGenDescs.put(keyGenDesc, keyGenDesc);
-            } else {
-                keyGenDesc = oldKeyGenDesc;
+            keyGenDesc = (KeyGeneratorDescriptorImpl) _keyGenDescs.get(keyGenName);
+            if ( keyGenDesc == null ) {
+                keyGenDesc = new KeyGeneratorDescriptorImpl( keyGenName,
+                        keyGenFactoryName, params, _keyGenReg );
+                _keyGenDescs.put(keyGenName, keyGenDesc);
             }
         }
 
@@ -245,6 +253,7 @@ public class JDOMappingLoader
 
         _keyGenDefs = null;
         _keyGenDescs = null;
+        _keyGenReg = null;
     }
 
 }
