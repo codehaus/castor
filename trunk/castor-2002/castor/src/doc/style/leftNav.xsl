@@ -3,9 +3,9 @@
 
   <xsl:template match="$project/navSections">
     <xsl:for-each select="section">
-      <table width="95" border="0" cellpadding="0" cellspacing="0">
+      <table width="115" border="0" cellpadding="0" cellspacing="0">
         <tr>
-          <td width="95" valign="top" align="left">
+          <td width="115" valign="top" align="left">
             <xsl:choose>
               <xsl:when test="@url">
                 <xsl:variable name="url">
@@ -28,7 +28,7 @@
               </xsl:call-template>
             </xsl:variable>
             <tr>
-              <td width="95" valign="top" align="left">
+              <td width="115" valign="top" align="left">
 		&#160;&#160;
                 <a href="{$url}"><span class="subMenuOff"><xsl:value-of select="display"/></span></a>
               </td>
