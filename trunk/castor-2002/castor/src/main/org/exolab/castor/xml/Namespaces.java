@@ -212,7 +212,7 @@ final class Namespaces {
      * Declare the namespaces of this stack in as attributes.
      * @param atts the Attribute List to fill in.
      */
-    public void declareAsAttributes(AttributeListImpl atts) {
+    public void declareAsAttributes(AttributeListImpl atts, boolean localOnly) {
 
         Namespace ns = _first;
         String attName = null;
@@ -232,8 +232,8 @@ final class Namespaces {
             ns = ns.next;
         }
 
-        if (_parent != null) {
-            _parent.declareAsAttributes(atts);
+        if ((!localOnly) && (_parent != null)) {
+            _parent.declareAsAttributes(atts, false);
         }
     } //method:declareAsAttributes
 
