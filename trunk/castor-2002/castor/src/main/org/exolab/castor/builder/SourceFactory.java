@@ -56,6 +56,8 @@ import org.exolab.javasource.*;
 
 
 import java.util.Enumeration;
+import java.util.Vector;
+
 
 /**
  * This class creates the Java Source classes for Schema
@@ -125,6 +127,12 @@ public class SourceFactory  {
         className = resolveClassName(className, packageName);
         
         state = new FactoryState(className, resolver, packageName);
+        
+        //-- mark this element as being processed in this current
+        //-- state to prevent the possibility of endless recursion
+        ElementDecl tmpDecl = element;
+        while (tmpDecl.isReference()) tmpDecl = tmpDecl.getReference();        
+        state.markAsProcessed(tmpDecl);
         
         ClassInfo classInfo = state.classInfo;
         JClass    jClass    = state.jClass;
@@ -526,7 +534,7 @@ public class SourceFactory  {
     private void processComplexType
         (ComplexType complexType, FactoryState state) 
     {
-        
+                
         String typeName = complexType.getName();
         
         ClassInfo classInfo = state.classInfo;
@@ -666,9 +674,18 @@ public class SourceFactory  {
                 
                     ElementDecl eDecl = (ElementDecl)struct;
                     
+                    
+                    //-- make sure we haven't processed this element yet
+                    //-- to prevent endless recursion.
+                    ElementDecl tmpDecl = eDecl;
+                    while (tmpDecl.isReference()) 
+                        tmpDecl = tmpDecl.getReference();
+                        
+                    boolean processed = state.processed(tmpDecl);
+                    
                     //-- make sure we process the element first
                     //-- so that it's available to the MemberFactory
-                    if (state.resolve(struct) == null) 
+                    if ((state.resolve(struct) == null) && (!processed))
                         createSourceCode((ElementDecl)struct,
                                           state,
                                           state.packageName);
@@ -860,22 +877,40 @@ public class SourceFactory  {
 **/
 class FactoryState implements ClassInfoResolver {
     
+    //--------------------/
+    //- Member Variables -/
+    //--------------------/
+    
     JClass    jClass           = null;
     ClassInfo classInfo        = null;
     
     String packageName         = null;
     
     private ClassInfoResolver _resolver = null;
+    private Vector            _processed = null;
     
+    //----------------/
+    //- Constructors -/
+    //----------------/
+    
+    /**
+     * Creates a new FactoryState 
+    **/
     protected FactoryState(String className, ClassInfoResolver resolver) {
         this(className, resolver, null);
     } //-- FactoryState
 
+    /**
+     * Creates a new FactoryState 
+    **/
     protected FactoryState
         (String className, ClassInfoResolver resolver, String packageName) 
     {
-        jClass    = new JClass(className);
-        classInfo = new ClassInfo(jClass);
+        _processed   = new Vector();
+        
+        jClass       = new JClass(className);
+        classInfo    = new ClassInfo(jClass);
+        
         if (resolver == null)
             _resolver = new ClassInfoResolverImpl();
         else
@@ -883,6 +918,10 @@ class FactoryState implements ClassInfoResolver {
             
         this.packageName = packageName;
     } //-- FactoryState
+    
+    //-----------/
+    //- Methods -/
+    //-----------/
     
     /**
      * Adds the given Reference to this ClassInfo resolver
@@ -892,6 +931,23 @@ class FactoryState implements ClassInfoResolver {
     public void bindReference(Object key, ClassInfo classInfo) {
         _resolver.bindReference(key, classInfo);
     } //-- bindReference
+    
+    /**
+     * Marks the given complexType as having been processed.
+     * @param complexType the ComplexType to mark as having
+     * been processed.
+    **/
+    void markAsProcessed(ElementDecl element) {
+        _processed.addElement(element);
+    } //-- markAsProcessed
+    
+    /**
+     * Returns true if the given ComplexType has been marked as processed
+     * @param complexType the ComplexType to check for being marked as processed
+    **/
+    boolean processed(ElementDecl element) {
+        return _processed.contains(element);
+    } //-- processed
     
     /**
      * Returns the ClassInfo which has been bound to the given key
