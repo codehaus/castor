@@ -89,13 +89,13 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         _schema = new Schema();
         _resolver = new ScopableResolver();
     }
+    
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
         super();
         setResolver(resolver);        
         _schema = new Schema();
         foundSchemaDef = true;
-        //_schema.useResolver(resolver);        
-          
+        init(atts);
     } //-- SchemaUnmarshaller
     
     public Schema getSchema() {
@@ -120,7 +120,21 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         return SchemaNames.SCHEMA;
     } //-- elementName
         
-    /* SAX DocumentHandler methods */
+    
+    /**
+     * initializes the Schema object with the given attribute list
+     * @param atts the AttributeList for the schema
+    **/
+    private void init(AttributeList atts) {
+        if (atts == null) return;
+        String nsURI = atts.getValue("targetNamespace");
+        if ((nsURI != null) && (nsURI.length() > 0))
+            _schema.setTargetNamespace(nsURI);
+    } //-- init
+    
+    //-------------------------------------------------/
+    //- implementation of org.xml.sax.DocumentHandler -/
+    //-------------------------------------------------/
     
     public void startElement(String name, AttributeList atts)
         throws SAXException
@@ -141,7 +155,12 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                 
         
         if (name == SchemaNames.SCHEMA) {
+            
+            if (foundSchemaDef)
+                illegalElement(name);
+                
             foundSchemaDef = true;
+            init(atts);
             return;
         }
         
