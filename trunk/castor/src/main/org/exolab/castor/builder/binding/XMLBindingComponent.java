@@ -66,6 +66,8 @@ import org.exolab.castor.xml.schema.Structure;
 import org.exolab.castor.xml.schema.XMLType;
 import org.exolab.javasource.JClass;
 
+import java.util.Enumeration;
+
 /**
  * <p>This class is the implementation of BindingComponent from an XML Schema
  * point of view. This specific implementation wraps an XML Schema annotated structure.
@@ -916,26 +918,7 @@ public class XMLBindingComponent implements BindingComponent {
 	 * from this BindingComponent. 0 is returned by default.
 	 */
     public int getLowerBound() {
-        switch (_annotated.getStructureType()) {
-
-            case Structure.ELEMENT:
-                return ((ElementDecl)_annotated).getMinOccurs();
-
-            case Structure.COMPLEX_TYPE:
-                return ((ComplexType)_annotated).getMinOccurs();
-
-            case Structure.GROUP:
-            case Structure.MODELGROUP:
-                return ((Group)_annotated).getMinOccurs();
-
-            case Structure.ATTRIBUTE:
-                if (((AttributeDecl)_annotated).isRequired())
-                    return 1;
-                break;
-            default:
-               break;
-        }
-        return 0;
+        return getLowerBound(_annotated);        
     }
 
     ////////METHODS RELATED TO A CLASS BINDING
@@ -1198,5 +1181,63 @@ public class XMLBindingComponent implements BindingComponent {
 	public short getType() {
 	    return _type;
 	}
+	
+	
+   /**
+	 * Returns the lower bound of the collection that is generated from
+	 * this BindingComponent. The lower bound is a positive integer.
+	 * In the case of an XML Schema component, it corresponds to the
+	 * XML Schema minOccurs attribute, if any.
+	 *
+	 * @return an int representing the lower bound of the collection generated
+	 * from this BindingComponent. 0 is returned by default.
+	 */
+    private static int getLowerBound(Annotated annotated) {
+        
+        switch (annotated.getStructureType()) {
 
-}
+            case Structure.ELEMENT:
+                return ((ElementDecl)annotated).getMinOccurs();
+
+            case Structure.COMPLEX_TYPE:
+                return ((ComplexType)annotated).getMinOccurs();
+
+            case Structure.MODELGROUP:
+            case Structure.GROUP:
+                Group group = (Group)annotated;
+                //-- if the group is top-level, then
+                //-- we always return 0
+                Structure parent = group.getParent();
+                if (parent != null) {
+                    if (parent.getStructureType() == Structure.SCHEMA)
+                        return 0;
+                }                
+                int minOccurs = group.getMinOccurs();                
+                //-- if minOccurs == 1, then check to see
+                //-- if all elements inside group are 
+                //-- optional, if so, we return 0, not 1.
+                if (minOccurs == 1) {
+                    Enumeration enum = group.enumerate();                    
+                    while (enum.hasMoreElements()) {
+                        if (getLowerBound((Annotated)enum.nextElement()) != 0)
+                            return 1;
+                    }
+                    //-- if we make it here, all items in group have a
+                    //-- lowerbound of 0, so the group can be considered
+                    //-- optional
+                    return 0;
+                }
+                return minOccurs;
+                
+            case Structure.ATTRIBUTE:
+                if (((AttributeDecl)annotated).isRequired())
+                    return 1;
+                break;
+            default:
+               break;
+        }
+        return 0;
+        
+    } //-- getLowerBound
+	
+} //-- class: XMLBindingComponent
