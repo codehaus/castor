@@ -22,7 +22,7 @@
   </contributor>
 
   <contributor type="Committer">
-    <name surname="Nissim" given="Oleg"/>
+    <name surname="Nitz" given="Oleg"/>
     <email>on@ibis.odessa.ua</email>
     <company id="ibis"/>
     <description>Key generators, stored procedures, Sybase 11/12 support and
