@@ -1,11 +1,11 @@
 /*
- * (C) Copyright Keith Visco 1998, 1999  All rights reserved.
+ * (C) Copyright Keith Visco 1999-2003  All rights reserved.
  *
  * The contents of this file are released under an Open Source 
  * Definition (OSD) compliant license; you may not use this file 
  * execpt in compliance with the license. Please see license.txt, 
  * distributed with this file. You may also obtain a copy of the
- * license at http://www.clc-marketing.com/xslp/license.txt
+ * license at http://www.kvisco.com/xslp/license.txt
  *
  * The program is provided "as is" without any warranty express or
  * implied, including the warranty of non-infringement and the implied
@@ -29,12 +29,13 @@ import org.exolab.adaptx.net.URIException;
 import org.exolab.adaptx.util.ErrorObserverAdapter;
 import org.exolab.adaptx.util.ErrorObserver;
 import org.exolab.adaptx.util.QuickStack;
-import org.exolab.adaptx.xml.AttributeListWrapper;
+import org.exolab.adaptx.xml.AttributeListImpl;
 import org.exolab.adaptx.xml.Whitespace;
 import org.exolab.adaptx.xml.XMLUtil;
 import org.exolab.adaptx.xslt.*;
 
 import org.xml.sax.*;
+import org.xml.sax.helpers.AttributesImpl;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -42,23 +43,40 @@ import java.util.Hashtable;
 
 
 /**
- * A class which implements DocumentHandler and is used by the
- * XSLReader when reading an XSLT stylsheet.
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * A class which implements a SAX DocumentHandler and 
+ * ContentHandler and is used by the XSLTReader when 
+ * reading an XSLT stylesheet.
+ *
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class StylesheetHandler extends ErrorObserverAdapter
-    implements DocumentHandler
+    implements ContentHandler, DocumentHandler
 {
-
+    
+    /**
+     * The namespace declaration prefix
+     */
+    private static final String NS_DECL_PREFIX = "xmlns:";
+    
+    /**
+     * The default namespace declaration name
+     */
+    private static final String NS_DECL_DEFAULT = "xmlns";
+    
+    
     /**
      * I use this so that I don't have to check for a Null
      * attribute list everywhere
     **/
-    private static AttributeListWrapper _defaultAtts 
-        = new AttributeListWrapper(null);
+    private static final AttributeListImpl _defaultAtts = new AttributeListImpl();
 
-
+    
+    /**
+     * Signals that a new namespace scope is needed
+     */
+    private boolean _createNewNamespace = true;
+    
     /**
      * Keeps track of the tree depth
     **/
@@ -86,26 +104,27 @@ public class StylesheetHandler extends ErrorObserverAdapter
     private XSLTStylesheet _stylesheet  = null;
     
     /**
-     * The XSLT namespace prefix
-    **/
-    private String        _xsltPrefix = null;
-    
-    /**
      * A flag indicating a literal stylesheet, NOT
      * a literal element
-    **/
+     */
     private boolean       _literal    = false;
     
-    private boolean       _ignore      = false;
-    private int           _ignoreDepth = 0;
-    
+    /**
+     * Set to true when any events are recieved
+     */
     private boolean       _dirty       = false;
+    
+    /**
+     * The set of namespaces currently in scope
+     */
+    private Namespaces _namespaces = null;
     
     /**
      * The XSLTReader to use for xsl:include and xsl:import
     **/
     private XSLTReader     _xsltReader  = null;
     private URIResolver   _resolver   = null;
+    
     
     /**
      * Creates a new StylesheetHandler
@@ -142,12 +161,10 @@ public class StylesheetHandler extends ErrorObserverAdapter
     **/
     private void init() {
         _depth        = 0;
-        _ignore       = false;
-        _ignoreDepth  = 0;
         _literal      = false;
         _objects      = new QuickStack();
+        _namespaces   = new Namespaces();
         _stylesheet   = new XSLTStylesheet();
-        _xsltPrefix   = null;
         _dirty        = false;
         //-- add stylesheet to stack
         _objects.push(_stylesheet);
@@ -198,7 +215,6 @@ public class StylesheetHandler extends ErrorObserverAdapter
     {   
         _dirty = true;
         
-        
         if (_objects.empty()) return;
         
         XSLObject xslObject = (XSLObject)_objects.peek();
@@ -242,35 +258,80 @@ public class StylesheetHandler extends ErrorObserverAdapter
     } //-- endDocument
     
     /**
-     * Signals the start of element
+     * Signals the end of an element 
+     *
+     * <p>DocumentHandler#endElement</p>
+     *
      * @param name the name of the element
-     * @param atts the AttributeList containing the associated
-     * attributes for the element
-    **/
+     */
     public void endElement(String name) 
         throws org.xml.sax.SAXException
     {
+        endElement(null, null, name);
+    } //-- endElement
+    
+    /**
+     * Signals the end of an element 
+     *
+     * <p>ContentHandler#endElement</p>
+     *
+     * @param namespaceURI the namespace URI of the element
+     * @param localName the unqualified name of the element
+     * @param qName the qualified name of the element
+     */
+    public void endElement(String namespaceURI, String localName, String qName)
+        throws SAXException        
+    {
+        
+        //-- DEBUG
+        /*
+        if ((qName != null) && (qName.length() > 0))
+            System.out.println("endElement: " + qName);
+        else
+            System.out.println("endElement: " + localName);        
+        /* */
+        //-- /DEBUG
+        
         _dirty = true;
-        
-        //System.out.println("#endElement: " + name);
-        
-        //-- check to see if we are in "ignore" mode
-        //-- if, so decrement the depth and reset "ignore".
-        if (_ignore) {
-            --_ignoreDepth;
-            _ignore = (_ignoreDepth != 0);
-            return;
-        }
         
         --_depth;
         
+        String prefix = "";
         
+        if ((localName == null) || (localName.length() == 0)) {
+            if ((qName == null) || (qName.length() == 0)) {
+                String error = "missing 'localName' and 'qName', at least one must be present.";
+                throw new SAXException(error);
+            }
+            int idx = qName.indexOf(':');
+            if (idx >= 0) {
+                prefix = qName.substring(0, idx);
+                localName = qName.substring(idx+1);
+            }
+            else {
+                localName = qName;
+            }
+        }
+        else {
+            if (qName != null) {
+                int idx = qName.indexOf(':');
+                if (idx >= 0) {
+                    prefix = qName.substring(0, idx);
+                }
+            }
+        }
+        
+        if ((namespaceURI == null) || (namespaceURI.length() == 0))
+            namespaceURI = _namespaces.getNamespaceURI(prefix);
+
+            
         XSLObject xslObject = (XSLObject)_objects.pop();
         
         //-- handle root
         if (_depth == 0) {
             //-- do nothing for now
         }
+        
         //-- handle top-level processing 
         else if ((_depth == 1) && (!_literal)) {
             
@@ -346,7 +407,23 @@ public class StylesheetHandler extends ErrorObserverAdapter
             parent.appendAction(xslObject);
         }
         
+        //-- remove current namespace scoping
+        _namespaces = _namespaces.getParent();
+        
     } //-- endElement
+    
+    
+    /**
+     * Ends the namespace prefix mapping
+     *
+     * @param prefix the namespace prefix
+     */
+    public void endPrefixMapping(String prefix)
+        throws SAXException
+    {
+        _namespaces.removeNamespace(prefix);
+        
+    } //-- startPrefixMapping
     
     /**
      * Signals the start of ignorable whitespace characters
@@ -396,10 +473,24 @@ public class StylesheetHandler extends ErrorObserverAdapter
     } //-- setDocumentLocator
     
     
+    /**
+     * <p>ContentHandler#skippedEntity</p>
+     *
+     * Recieves notification of a skipped entity
+     *
+     * @param name the name of the skipped entity
+     */
+    public void skippedEntity(String name)
+        throws SAXException
+    {
+        //-- do nothing
+        
+    } //-- skippedEntity
+
     
     /**
      * Signals the start of a document
-    **/
+     */
     public void startDocument() 
         throws org.xml.sax.SAXException
     {
@@ -408,33 +499,122 @@ public class StylesheetHandler extends ErrorObserverAdapter
     
     /**
      * Signals the start of element
+     *
+     * <p>DocumentHandler#startElement</p>
+     *
      * @param name the name of the element
      * @param atts the AttributeList containing the associated
      * attributes for the element
-    **/
+     */
     public void startElement(String name, AttributeList atts) 
         throws org.xml.sax.SAXException 
     {
+        startElement("", "", name, new AttributeList2Attributes(atts));
+        
+    } //-- startElement
+    
+        
+    /**
+     * Signals the start of element
+     *
+     * <p>ContentHandler#startElement</p>
+     *
+     * @param name the name of the element
+     * @param atts the Attributes containing the associated
+     * attributes for the element
+     */
+    public void startElement
+        (String namespaceURI, String localName, String qName, Attributes attributes)
+        throws SAXException
+    {
+        
+        //-- DEBUG
+        /*
+        if ((qName != null) && (qName.length() > 0))
+            System.out.println("startElement: " + qName);
+        else
+            System.out.println("startElement: " + localName);        
+        /* */
+        //-- /DEBUG
         
         _dirty = true;
         
-        //System.out.println("startElement: " + name);
+        //-- Create new namespace scope, if necessary, and
+        //-- reset flag to true for any child-processing
+        if (_createNewNamespace)
+            _namespaces = _namespaces.createNamespaces();
+        else
+            _createNewNamespace = true;
         
-        //-- check to see if we are ignoring elements
-        if (_ignore) {
-            //System.out.println(" -- ignore mode");
-            ++_ignoreDepth;
-            return;
+        
+        //-- Process any possible namespaces from the set
+        //-- of Attributes and then convert Attributes to 
+        //-- a good old fashioned AttributeList, to prevent 
+        //-- the need from dealing with the plethora of ways 
+        //-- in which names and namespaces can come across.
+        AttributeList atts = null;
+        if (attributes == null) atts = _defaultAtts;
+        if (attributes instanceof AttributeList2Attributes) {
+            atts = ((AttributeList2Attributes)attributes).getAttributeList();
+            processNamespaces(atts);
+        }
+        else {
+            processNamespaces(attributes);
+            AttributeListImpl attsImpl = new AttributeListImpl();
+            for (int i = 0; i < attributes.getLength(); i++) {
+                String attName = attributes.getQName(i);
+                if ((attName == null) || (attName.length() == 0)) {
+                    attName = attributes.getLocalName(i);
+                    String nsURI = attributes.getURI(i);
+                    if ((nsURI != null) && (nsURI.length() > 0)) {
+                        String tmpPrefix = _namespaces.getNonDefaultNamespacePrefix(nsURI);
+                        if (tmpPrefix != null) {
+                            attName = tmpPrefix + ":" + attName;
+                        }
+                    }
+                }
+                attsImpl.addAttribute(attName, attributes.getValue(i));
+            }
+            atts = attsImpl;
         }
         
-        String     tagName   = name;
-        String     nsPrefix  = XMLUtil.getNameSpacePrefix(tagName);
+        
+        String prefix = "";
+        
+        if ((localName == null) || (localName.length() == 0)) {
+            if ((qName == null) || (qName.length() == 0)) {
+                String error = "missing 'localName' and 'qName', at least one must be present.";
+                throw new SAXException(error);
+            }
+            int idx = qName.indexOf(':');
+            if (idx >= 0) {
+                prefix = qName.substring(0, idx);
+                localName = qName.substring(idx+1);
+            }
+            else {
+                localName = qName;
+            }
+        }
+        else {
+            if (qName != null) {
+                int idx = qName.indexOf(':');
+                if (idx >= 0) {
+                    prefix = qName.substring(0, idx);
+                }
+            }
+        }
+        
+        if ((namespaceURI == null) || (namespaceURI.length() == 0))
+            namespaceURI = _namespaces.getNamespaceURI(prefix);
+        
+        
+        
+        
+        
+        String     tagName   = localName;
         short      xslType   = XSLObject.LITERAL;
             
 
-        if (atts == null) atts = _defaultAtts;
-        
-        
         if (_depth == 0) {
             //-- copy attributes to handle namespace declarations
             try {
@@ -448,21 +628,12 @@ public class StylesheetHandler extends ErrorObserverAdapter
             }
         }
         
-        //-- handle XSLT namespace prefix
-        if (_xsltPrefix == null) 
-            _xsltPrefix = _stylesheet.getXSLNSPrefix();
-            
         //-- remove xslt prefix from element name, if necessary
         boolean xsltElement = false;
-        if ((_xsltPrefix != null) && (_xsltPrefix.equals(nsPrefix))) {
-            xsltElement = true;
-            //-- remove prefix
-            if (nsPrefix.length() > 0)
-                tagName = tagName.substring(nsPrefix.length()+1);
-        }
-        else if ((_xsltPrefix == null) && (nsPrefix.length() == 0)) {
+        if (XSLTStylesheet.XSLT_NAMESPACE.equals(namespaceURI)) {
             xsltElement = true;
         }
+        
         //-- get XSLT action type
         if (xsltElement) {
             xslType = XSLObject.getTypeFromName(tagName);
@@ -502,11 +673,11 @@ public class StylesheetHandler extends ErrorObserverAdapter
                         String attName = atts.getName(i);
                         String attValue = atts.getValue(i);
                         //-- suppress XSLT namespaces
-                        if (attName.startsWith("xmlns")) {
+                        if (attName.equals(NS_DECL_DEFAULT) || 
+                            attName.startsWith(NS_DECL_PREFIX)) 
+                        {
                             if (attValue.equals(XSLTStylesheet.XSLT_NAMESPACE))
-                            {
                                 continue;
-                            }
                         }
                         xslObject.setAttribute(attName,attValue);
                     }
@@ -522,8 +693,9 @@ public class StylesheetHandler extends ErrorObserverAdapter
             xslObject = _stylesheet;
             String version = atts.getValue(Names.VERSION_ATTR);
             if ((version == null) || (version.length() == 0)) {
-                if (_xsltPrefix != null) {
-                    String attName = _xsltPrefix + ':' + Names.VERSION_ATTR;
+                String xsltPrefix = _namespaces.getNonDefaultNamespacePrefix(XSLTStylesheet.XSLT_NAMESPACE);
+                if ((xsltPrefix != null) && (xsltPrefix.length() > 0)) {
+                    String attName = xsltPrefix + ':' + Names.VERSION_ATTR;
                     version =  atts.getValue(attName);
                 }
             }
@@ -537,8 +709,8 @@ public class StylesheetHandler extends ErrorObserverAdapter
                         
                 String err = "error in XSLT file: " + filename;
                     
-                err += ";\n -- " + name;
-                err += " element must have a 'version' " +
+                err += ";\n -- The '" + localName;
+                err += "' element must have a 'version' " +
                     " attribute. Please update your stylesheets " + 
                     " accordingly, as this will be changed to a fatal " +
                     " error soon. - Assuming XSLT 1.0";
@@ -639,7 +811,7 @@ public class StylesheetHandler extends ErrorObserverAdapter
                     xslObject = new XSLObject(XSLObject.LITERAL);
                     processChildren = false;
                     copyAtts = false;
-                    invalidTopLevelError(name);
+                    invalidTopLevelError(localName);
                     break;
                    
             } //-- switch
@@ -660,7 +832,7 @@ public class StylesheetHandler extends ErrorObserverAdapter
                 case XSLObject.OUTPUT:
                 case XSLObject.PRESERVE_SPACE:
                 case XSLObject.STRIP_SPACE:
-                    topLevelOnlyError(name);
+                    topLevelOnlyError(localName);
                     break;
                 case XSLObject.APPLY_TEMPLATES:
                 case XSLObject.APPLY_IMPORTS:
@@ -810,6 +982,23 @@ public class StylesheetHandler extends ErrorObserverAdapter
         ++_depth;
     } //-- startElement
     
+    /**
+     * Starts the namespace prefix mapping
+     *
+     * @param prefix the namespace prefix
+     * @param uri the namespace URI
+     */
+    public void startPrefixMapping(String prefix, String uri)
+        throws SAXException
+    {
+        
+        if (_createNewNamespace) {
+            _namespaces = _namespaces.createNamespaces();
+            _createNewNamespace = false;
+        }
+        _namespaces.addNamespace(prefix, uri);
+    } //-- startPrefixMapping
+
     
     //-------------------/
     //- Private Methods -/
@@ -954,6 +1143,54 @@ public class StylesheetHandler extends ErrorObserverAdapter
         receiveError("'"+name+err);
     } //-- invalidTopLevelError
     
+    /**
+     * Processes the given Attributes looking for Namespace
+     * declarations.
+     *
+     * @param atts the Attributes to process
+     */
+    private void processNamespaces(Attributes atts) {
+        if (atts == null) return;
+        
+        for (int i = 0; i < atts.getLength(); i++) {
+            String name = atts.getQName(i);
+            if ((name != null) && (name.length() > 0)) {
+                if (name.equals(NS_DECL_DEFAULT)) {
+                    _namespaces.addNamespace("", atts.getValue(i));
+                }
+                else if (name.startsWith(NS_DECL_PREFIX)) {
+                    _namespaces.addNamespace(name.substring(NS_DECL_PREFIX.length()),
+                        atts.getValue(i));
+                }
+            }
+        }
+        
+    } //-- processNamespaces
+    
+    
+    /**
+     * Processes the given Attributes looking for Namespace
+     * declarations.
+     *
+     * @param atts the Attributes to process
+     */
+    private void processNamespaces(AttributeList atts) {
+        if (atts == null) return;
+        
+        for (int i = 0; i < atts.getLength(); i++) {
+            String name = atts.getName(i);
+            if ((name != null) && (name.length() > 0)) {
+                if (name.equals(NS_DECL_DEFAULT)) {
+                    _namespaces.addNamespace("", atts.getValue(i));
+                }
+                else if (name.startsWith(NS_DECL_PREFIX)) {
+                    _namespaces.addNamespace(name.substring(NS_DECL_PREFIX.length()),
+                        atts.getValue(i));
+                }
+            }
+        }
+        
+    } //-- processNamespaces
     
     /**
      * Signals an error when a top-level xsl element appears in
