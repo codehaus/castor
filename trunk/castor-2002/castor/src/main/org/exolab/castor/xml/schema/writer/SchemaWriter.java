@@ -123,6 +123,10 @@ public class SchemaWriter {
     private static final String ATTR_TYPE   = "type";
     private static final String ATTR_VALUE  = "value";
     
+    private static final String VALUE_FALSE = "false";
+    private static final String VALUE_TRUE  = "true";
+    
+    
     /** 
      * For use with SAX AttributeList
      */
@@ -394,6 +398,7 @@ public class SchemaWriter {
     {
 
         String ELEMENT_NAME = schemaPrefix + ELEMENT;
+        
         _atts.clear();
 
 
@@ -401,22 +406,28 @@ public class SchemaWriter {
         String value = element.getName();
         if (value != null) {
             if (element.isReference())
-                _atts.addAttribute("ref", null, value);
+                _atts.addAttribute(SchemaNames.REF_ATTR, CDATA, value);
             else
-                _atts.addAttribute(ATTR_NAME, null, value);
+                _atts.addAttribute(ATTR_NAME, CDATA, value);
         }
 
         //-- minOccurs/maxOccurs
         int max = element.getMaxOccurs();
         int min = element.getMinOccurs();
 
-        if (min != 1)
-            _atts.addAttribute("minOccurs", null, Integer.toString(min));
+        if (min != 1) {
+            _atts.addAttribute(SchemaNames.MIN_OCCURS_ATTR, CDATA, 
+                Integer.toString(min));
+        }
 
-        if (max < 0)
-            _atts.addAttribute("maxOccurs", null, "unbounded");
-        else if (max > 1)
-            _atts.addAttribute("maxOccurs", null, Integer.toString(max));
+        if (max < 0) {
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA, 
+                "unbounded");
+        }
+        else if (max > 1) {
+            _atts.addAttribute(SchemaNames.MAX_OCCURS_ATTR, CDATA, 
+                Integer.toString(max));
+        }
 
         //-- type attribute
         boolean hasAnonymousType = false;
@@ -454,10 +465,33 @@ public class SchemaWriter {
             }
         }
 
-        //-- default
-        String defaultValue = element.getDefaultValue();
-        if (defaultValue != null) {
-            _atts.addAttribute("default", CDATA, defaultValue);
+        //-- @abstract
+        if (element.isAbstract()) {
+            _atts.addAttribute(SchemaNames.ABSTRACT, CDATA, VALUE_TRUE);
+        }
+        
+        //-- @block
+        if (element.getBlock() != null) {
+            _atts.addAttribute(SchemaNames.BLOCK_ATTR, CDATA,
+                element.getBlock().toString());
+        }
+        
+        //-- @default
+        if (element.getDefaultValue() != null) {
+            _atts.addAttribute(SchemaNames.DEFAULT_ATTR, CDATA,
+                element.getDefaultValue());
+        }
+        
+        //-- @fixed
+        if (element.getFixedValue() != null) {
+            _atts.addAttribute(SchemaNames.FIXED_ATTR, CDATA,
+                element.getFixedValue());
+        }
+        
+        //-- @final
+        if (element.getFinal() != null) {
+            _atts.addAttribute(SchemaNames.FINAL_ATTR, CDATA,
+                element.getFinal().toString());
         }
         
         //-- @form
@@ -466,6 +500,24 @@ public class SchemaWriter {
             _atts.addAttribute(SchemaNames.FORM, CDATA, form.toString());
         }
 
+        //-- @id
+        if (element.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, 
+                element.getId());
+        }
+        
+        //-- @nillable
+        if (element.isNillable()) {
+            _atts.addAttribute(SchemaNames.NILLABLE_ATTR, CDATA,
+                VALUE_TRUE);
+        }
+        
+        //-- @substitutionGroup
+        if (element.getSubstitutionGroup() != null) {
+            _atts.addAttribute(SchemaNames.SUBSTITUTION_GROUP_ATTR, CDATA,
+                element.getSubstitutionGroup());
+        }
+        
         _handler.startElement(ELEMENT_NAME, _atts);
 
         //-- process annotations
@@ -687,6 +739,20 @@ public class SchemaWriter {
         if (form != null) {
             _atts.addAttribute(SchemaNames.ELEM_FORM_DEFAULT_ATTR, CDATA,
                 form.toString());
+        }
+
+        //-- blockDefault
+        BlockList blockList = schema.getBlockDefault();
+        if (blockList != null) {
+            _atts.addAttribute(SchemaNames.BLOCK_DEFAULT_ATTR, CDATA,
+                blockList.toString());
+        }
+
+        //-- finalDefault
+        FinalList finalList = schema.getFinalDefault();
+        if (finalList != null) {
+            _atts.addAttribute(SchemaNames.FINAL_DEFAULT_ATTR, CDATA,
+                finalList.toString());
         }
 
 
