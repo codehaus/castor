@@ -1479,8 +1479,7 @@ public final class UnmarshalHandler extends MarshalFramework
         (String name, XMLClassDescriptor classDesc)
         throws SAXException
     {
-
-        XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
+         XMLFieldDescriptor[] descriptors = classDesc.getElementDescriptors();
 
         XMLFieldDescriptor descriptor = null;
 
@@ -1489,28 +1488,33 @@ public final class UnmarshalHandler extends MarshalFramework
 
             XMLFieldDescriptor xfd = descriptors[i];
             if (xfd.isContainer()) {
+                XMLClassDescriptor xcd = (XMLClassDescriptor)xfd.getClassDescriptor();
+
                 //-- set class descriptor if necessary
-                if (xfd.getClassDescriptor() == null) {
-                    XMLClassDescriptor xcd
-                        = getClassDescriptor(xfd.getFieldType());
+                if (xcd  == null) {
+                    xcd = getClassDescriptor(xfd.getFieldType());
                     if (xcd != null) {
-                        //-- set class descriptor if necessary
+                         //-- set class descriptor if necessary
                         if (xfd instanceof XMLFieldDescriptorImpl) {
                             ((XMLFieldDescriptorImpl)xfd).setClassDescriptor(xcd);
                         }
-                        if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
-                            descriptor = xfd;
-                            break;
-                        }
-                        else if (searchContainers(name, xcd) != null) {
-                            descriptor = xfd;
-                            break;
-                        }
                     }
-                }
-                else if (xfd.matches(name)) {
+                } // xcd == null
+
+                //have we found the descriptor?
+                if (xfd.matches(name)) {
                     descriptor = xfd;
                     break;
+                }
+                //is it in this class descriptor?
+                else if (xcd.getFieldDescriptor(name, NodeType.Element) != null) {
+                    descriptor = xfd;
+                    break;
+                }
+                //or is it contained in a fieldDescriptor?
+                else if (searchContainers(name, xcd) != null) {
+                     descriptor = xfd;
+                     break;
                 }
             }
         }
