@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1641 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Upgraded JUnit to version 3.8.1.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1641
+       (Werner - 20040607)
+       
 XML:   Fixed bug 1633 XML Date Timezone Not unmarshalled correctly.
        Patch from axia@sonusnet.com.
        (kvisco - 20040527)
