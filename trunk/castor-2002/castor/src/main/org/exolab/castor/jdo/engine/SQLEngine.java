@@ -53,10 +53,6 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.persist.ClassHandler;
-import org.exolab.castor.persist.RelationHandler;
 import org.exolab.castor.persist.QueryException;
 import org.exolab.castor.persist.DuplicateIdentityException;
 import org.exolab.castor.persist.PersistenceException;
@@ -68,7 +64,10 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.loader.IndirectFieldHandler;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
@@ -88,60 +87,61 @@ final class SQLEngine
 {
 
 
-    private boolean           _specifyKeyForCreate = true;
+    private String              _pkLookup;
 
 
-    private boolean           _useCursorForLock = false;
+    private String              _sqlCreate;
 
 
-    private String            _stampField; // = "ctid";
+    private String              _sqlRemove;
 
 
-    private String            _pkLookup;
+    private String              _sqlStore;
 
 
-    private String            _sqlCreate;
+    private String              _sqlStoreDirty;
 
 
-    private String            _sqlRemove;
+    private String              _sqlLoad;
 
 
-    private String            _sqlStore;
+    private String              _sqlLoadLock;
 
 
-    private String            _sqlLoad;
+    private FieldInfo[]         _fields;
 
 
-    private String            _sqlLoadLock;
+    private SQLEngine           _extends;
 
 
-    private QueryExpr         _sqlFinder;
+    private QueryExpression     _sqlFinder;
 
 
-    private ClassHandler      _handler;
+    private PersistenceFactory  _factory;
 
 
-    private FieldInfo[]       _fields;
+    private String              _stampField;
 
 
-    private SQLEngine         _extends;
+    private PrintWriter         _logWriter;
 
 
-    private PrintWriter       _logWriter;
+    private JDOClassDescriptor   _clsDesc;
 
 
-    SQLEngine( ClassHandler handler, PrintWriter logWriter )
+    SQLEngine( JDOClassDescriptor clsDesc, PrintWriter logWriter,
+               PersistenceFactory factory, String stampField )
         throws MappingException
     {
-        JDOClassDescriptor clsDesc;
-
-        _handler = handler;
-        if ( handler.getExtends() != null )
-            _extends = new SQLEngine( handler.getExtends(), logWriter );
-        clsDesc = (JDOClassDescriptor) _handler.getDescriptor();
-        buildSql( clsDesc, logWriter );
-        buildFinder( handler, logWriter );
+        _clsDesc = clsDesc;
+        _stampField = stampField;
+        _factory = factory;
         _logWriter = logWriter;
+        if ( _clsDesc.getExtends() != null )
+            _extends = new SQLEngine( (JDOClassDescriptor) _clsDesc.getExtends(), null,
+				      _factory, _stampField );
+        buildSql( _clsDesc, _logWriter );
+        buildFinder( _clsDesc, _logWriter );
     }
 
 
@@ -150,20 +150,20 @@ final class SQLEngine
      */
     JDOClassDescriptor getDescriptor()
     {
-        return (JDOClassDescriptor) _handler.getDescriptor();
+	return _clsDesc;
     }
 
 
-    public PersistenceQuery createQuery( String query, Class[] types )
+    public PersistenceQuery createQuery( QueryExpression query, Class[] types )
         throws QueryException
     {
-        return new SQLQuery( this, query, types );
+        return new SQLQuery( this, query.getStatement( _clsDesc.getAccessMode() == AccessMode.Exclusive), types );
     }
 
 
-    public QueryExpr getFinder()
+    public QueryExpression getFinder()
     {
-        return (QueryExpr) _sqlFinder.clone();
+        return (QueryExpression) _sqlFinder.clone();
     }
 
 
@@ -175,31 +175,20 @@ final class SQLEngine
 
         stmt = null;
         try {
+            // Must create record in parent table first.
+            // All other relations have been created before hand.
             if ( _extends != null )
                 _extends.create( conn, fields, identity );
 
-            // If creation requires a primary key to be supplied, must check
-            // that no such primary key exists in the table. This call will
-            // also lock the table against creation of an object with such
-            // a primary key.
-            if ( _specifyKeyForCreate && identity == null )
-                throw new PersistenceException( "persist.createWithoutIdentity" );
-
             // Must remember that SQL column index is base one
-            count = 1;
             stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-            if ( _specifyKeyForCreate ) {
-                stmt.setObject( count, identity );
-                count += 1;
-            }
-
-            for ( int i = 0 ; i < _fields.length ; ++i ) {
+            stmt.setObject( 1, identity );
+            count = 2;
+            for ( int i = 0 ; i < _fields.length ; ++i )
                 if ( _fields[ i ].store ) {
                     stmt.setObject( count, fields[ i ] );
                     ++count;
                 }
-            }
-
             stmt.executeUpdate();
             stmt.close();
             return null;
@@ -219,8 +208,10 @@ final class SQLEngine
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
                 stmt.setObject( 1, identity );
-                if ( stmt.executeQuery().next() )
+                if ( stmt.executeQuery().next() ) {
+		    stmt.close();
                     throw new DuplicateIdentityException( getDescriptor().getJavaClass(), identity );
+		}
             } catch ( SQLException except2 ) {
                 // Error at the stage indicates it wasn't a duplicate
                 // primary key problem. But best if the INSERT error is
@@ -232,7 +223,6 @@ final class SQLEngine
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-
             throw new PersistenceException( except );
         }
     }
@@ -242,34 +232,60 @@ final class SQLEngine
                          Object[] original, Object stamp )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException
     {
-        PreparedStatement stmt;
+        PreparedStatement stmt = null;
         int               count;
 
         try {
+            // Must store record in parent table first.
+            // All other relations have been created before hand.
             if ( _extends != null )
                 _extends.store( conn, fields, identity, original, stamp );
 
+            stmt = ( (Connection) conn ).prepareStatement( original == null ? _sqlStore : _sqlStoreDirty );
             count = 1;
-            stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
-
-            for ( int i = 0 ; i < _fields.length ; ++i ) {
+            for ( int i = 0 ; i < _fields.length ; ++i )
                 if ( _fields[ i ].store ) {
                     stmt.setObject( count, fields[ i ] );
                     ++count;
                 }
-            }
-
             stmt.setObject( count, identity );
+            ++count;
+
+	    if ( original != null ) {
+		for ( int i = 0 ; i < _fields.length ; ++i )
+		    if ( _fields[ i ].dirtyCheck ) {
+			stmt.setObject( count, original[ i ] );
+			++count;
+		    }
+	    }
 
             if ( stmt.executeUpdate() == 0 ) {
                 // If no update was performed, the object has been previously
-                // removed from persistent storage. Complain about this.
+                // removed from persistent storage or has been modified if
+		// dirty checking. Determine which is which.
                 stmt.close();
-                throw new ObjectDeletedException( getDescriptor().getJavaClass(), identity );
+		if ( original != null ) {
+		    stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
+		    stmt.setObject( 1, identity );
+		    if ( stmt.executeQuery().next() ) {
+			stmt.close();
+			throw new ObjectModifiedException( getDescriptor().getJavaClass(),
+							   identity );
+		    }
+		    stmt.close();
+		}
+
+                throw new ObjectDeletedException( getDescriptor().getJavaClass(),
+						  identity );
             }
             stmt.close();
             return null;
         } catch ( SQLException except ) {
+            try {
+                // Close the insert/select statement
+                if ( stmt != null )
+                    stmt.close();
+            } catch ( SQLException except2 ) { }
             throw new PersistenceException( except );
         }
     }
@@ -278,20 +294,24 @@ final class SQLEngine
     public void delete( Object conn, Object identity )
         throws PersistenceException
     {
-        PreparedStatement stmt;
+        PreparedStatement stmt = null;
 
         try {
-            stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
-            stmt.setObject( 1, identity );
-
-            // [Oleg] Good practice to execute a statement if it was created
-            // in the first place :-)
-            stmt.execute();
-            stmt.close();
-
+            // Must delete record in parent table first.
+            // All other relations will be deleted after wards.
             if ( _extends != null )
                 _extends.delete( conn, identity );
+
+            stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
+            stmt.setObject( 1, identity );
+            stmt.execute();
+            stmt.close();
         } catch ( SQLException except ) {
+            try {
+                // Close the insert/select statement
+                if ( stmt != null )
+                    stmt.close();
+            } catch ( SQLException except2 ) { }
             throw new PersistenceException( except );
         }
     }
@@ -300,26 +320,26 @@ final class SQLEngine
     public void writeLock( Object conn, Object identity )
         throws ObjectDeletedException, PersistenceException
     {
-        PreparedStatement stmt;
+        PreparedStatement stmt = null;
 
         try {
+            // Must obtain lock on record in parent table first.
             if ( _extends != null )
                 _extends.writeLock( conn, identity );
 
-            // Only write locks are implemented by locking the row.
-            // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
-            if ( _useCursorForLock )
-                stmt = ( (Connection) conn ).prepareStatement( _pkLookup, ResultSet.TYPE_FORWARD_ONLY,
-                                                               ResultSet.CONCUR_UPDATABLE );
-            else
-                stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-
+            stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
             stmt.setObject( 1, identity );
-
+            // If no query was performed, the object has been previously
+            // removed from persistent storage. Complain about this.
             if ( ! stmt.executeQuery().next() )
                 throw new ObjectDeletedException( getDescriptor().getJavaClass(), identity );
             stmt.close();
         } catch ( SQLException except ) {
+            try {
+                // Close the insert/select statement
+                if ( stmt != null )
+                    stmt.close();
+            } catch ( SQLException except2 ) { }
             throw new PersistenceException( except );
         }
     }
@@ -335,14 +355,7 @@ final class SQLEngine
 
         lock = ( accessMode == AccessMode.Exclusive );
         try {
-            // [Oleg Nitz] SELECT FOR UPDATE requires cursor in some databases
-            if ( _useCursorForLock )
-                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad,
-                                                               ResultSet.TYPE_FORWARD_ONLY,
-                                                               lock ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY );
-            else
-                stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
-
+            stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
             stmt.setObject( 1, identity );
 
             rs = stmt.executeQuery();
@@ -363,27 +376,21 @@ final class SQLEngine
     }
 
 
-    public void changeIdentity( Object conn, Object oldIdentity, Object newIdentity )
-        throws DuplicateIdentityException, PersistenceException
-    {
-        if ( _extends != null )
-            _extends.changeIdentity( conn, oldIdentity, newIdentity );
-    }
-
-
-    protected void buildSql( JDOClassDescriptor clsDesc, PrintWriter logWriter )
+    private void buildSql( JDOClassDescriptor clsDesc, PrintWriter logWriter )
     {
         StringBuffer         sql;
         JDOFieldDescriptor[] jdoFields;
         FieldDescriptor[]    fields;
         int                  count;
-        String               wherePk;
+        QueryExpression      query;
+        String               wherePK;
 
-        wherePk = ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() + "=?";
-        sql = new StringBuffer( "SELECT 1 FROM " );
-        sql.append( clsDesc.getTableName() ).append( " WHERE " );
-        sql.append( wherePk ).append(  " FOR UPDATE" );
-        _pkLookup = sql.toString();
+        query = _factory.getQueryExpression();
+        query.addParameter( clsDesc.getTableName(), ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName(),
+                            QueryExpression.OpEquals );
+        _pkLookup = query.getStatement( true );
+        wherePK = JDBCSyntax.Where + ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() +
+            QueryExpression.OpEquals + JDBCSyntax.Parameter;
 
         fields = clsDesc.getFields();
         jdoFields = new JDOFieldDescriptor[ fields.length ];
@@ -396,15 +403,11 @@ final class SQLEngine
         // using the specified primary key if one is required
         sql = new StringBuffer( "INSERT INTO " );
         sql.append( clsDesc.getTableName() ).append( " (" );
-        if ( _specifyKeyForCreate ) {
-            sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
-            count = 1;
-        } else
-            count = 0;
+        sql.append( ( (JDOFieldDescriptor) clsDesc.getIdentity() ).getSQLName() );
+        count = 1;
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
-                if ( count > 0 )
-                    sql.append( ',' );
+                sql.append( ',' );
                 sql.append( jdoFields[ i ].getSQLName() );
                 ++count;
             }
@@ -423,7 +426,7 @@ final class SQLEngine
 
 
         sql = new StringBuffer( "DELETE FROM " ).append( clsDesc.getTableName() );
-        sql.append( " WHERE " ).append( wherePk );
+        sql.append( wherePK );
         _sqlRemove = sql.toString();
         if ( logWriter != null )
             logWriter.println( "SQL for deleting " + clsDesc.getJavaClass().getName() +
@@ -437,75 +440,84 @@ final class SQLEngine
             if ( jdoFields[ i ] != null ) {
                 if ( count > 0 )
                     sql.append( ',' );
-                sql.append( jdoFields[ i ].getSQLName() );
-                sql.append( "=?" );
+                sql.append( jdoFields[ i ].getSQLName() ).append( "=?" );
                 ++count;
             }
         }
-        sql.append( " WHERE " ).append( wherePk );
+        sql.append( wherePK );
         _sqlStore = sql.toString();
+
+        for ( int i = 0 ; i < jdoFields.length ; ++i ) {
+            if ( jdoFields[ i ] != null ) {
+                if ( jdoFields[ i ].isDirtyCheck() )
+                    sql.append( " AND " ).append( jdoFields[ i ].getSQLName() ).append( "=?" );
+            }
+        }
+        _sqlStoreDirty = sql.toString();
         if ( logWriter != null )
             logWriter.println( "SQL for updating " + clsDesc.getJavaClass().getName() +
-                               ": " + _sqlStore );
+                               ": " + _sqlStoreDirty );
     }
 
 
-    protected void buildFinder( ClassHandler handler, PrintWriter logWriter )
+    private void buildFinder( JDOClassDescriptor clsDesc, PrintWriter logWriter )
         throws MappingException
     {
-        Vector    fields;
-        QueryExpr expr;
+        Vector          fields;
+        QueryExpression expr;
 
         fields = new Vector();
-        expr = new QueryExpr();
-        addLoadSql( handler, expr, fields, false, true, true );
+        expr = _factory.getQueryExpression();
+        addLoadSql( clsDesc, expr, fields, false, true, true );
 
-        _sqlLoad = expr.getQuery( false );
-        _sqlLoadLock = expr.getQuery( true );
+        _sqlLoad = expr.getStatement( false );
+        _sqlLoadLock = expr.getStatement( true );
         _fields = new FieldInfo[ fields.size() ];
         fields.copyInto( _fields );
         if ( logWriter != null )
-            logWriter.println( "SQL for loading " + handler.getJavaClass().getName() +
+            logWriter.println( "SQL for loading " + clsDesc.getJavaClass().getName() +
                                ":  " + _sqlLoad );
 
-        _sqlFinder = new QueryExpr();
-        addLoadSql( handler, _sqlFinder, fields, true, false, true );
+        _sqlFinder = _factory.getQueryExpression();
+        addLoadSql( clsDesc, _sqlFinder, fields, true, false, true );
     }
 
 
-    private void addLoadSql( ClassHandler handler, QueryExpr expr, Vector allFields,
+    private void addLoadSql( JDOClassDescriptor clsDesc, QueryExpression expr, Vector allFields,
                              boolean loadPk, boolean queryPk, boolean store )
         throws MappingException
     {
-        JDOClassDescriptor   clsDesc;
+        // JDOClassDescriptor   clsDesc;
         FieldDescriptor[]    fields;
         JDOClassDescriptor   extend;
         FieldDescriptor      identity;
+        String               identitySQL;
 
-        clsDesc = (JDOClassDescriptor) handler.getDescriptor();
+        // clsDesc = (JDOClassDescriptor) handler.getDescriptor();
         identity = clsDesc.getIdentity();
-        expr.addTable( clsDesc );
+        identitySQL = ( (JDOFieldDescriptor) identity ).getSQLName();
 
         // If this class extends another class, create a join with the parent table and
         // add the load fields of the parent class (but not the store fields)
-        if ( handler.getExtends() != null ) {
-            expr.addJoin( clsDesc, (JDOFieldDescriptor) identity,
-                          (JDOClassDescriptor) clsDesc.getExtends(), (JDOFieldDescriptor) identity );
-            addLoadSql( handler.getExtends(), expr, allFields, true, queryPk, false );
+        if ( clsDesc.getExtends() != null ) {
+            expr.addInnerJoin( clsDesc.getTableName(), identitySQL,
+                               ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(), identitySQL );
+            addLoadSql( (JDOClassDescriptor) clsDesc.getExtends(), expr, allFields,
+			true, queryPk, false );
             loadPk = false;
             queryPk = false;
         }
 
         if ( loadPk  )
-            expr.addColumn( clsDesc, (JDOFieldDescriptor) identity );
-
+            expr.addColumn( clsDesc.getTableName(), identitySQL );
         if ( queryPk )
-            expr.addParameter( clsDesc, (JDOFieldDescriptor) identity, null );
+            expr.addParameter( clsDesc.getTableName(), identitySQL, QueryExpression.OpEquals );
 
         fields = clsDesc.getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ] instanceof JDOFieldDescriptor ) {
-                expr.addColumn( clsDesc, (JDOFieldDescriptor) fields[ i ] );
+                expr.addColumn( clsDesc.getTableName(),
+                                ( (JDOFieldDescriptor) fields[ i ] ).getSQLName() );
                 allFields.addElement( new FieldInfo( fields[ i ], store ) );
             } else {
                 JDOClassDescriptor relDesc;
@@ -526,10 +538,9 @@ final class SQLEngine
                              }
                     }
                     if ( foreKey != null ) {
-                        expr.addTable( relDesc );
-                        expr.addColumn( relDesc, (JDOFieldDescriptor) relDesc.getIdentity() );
-                        expr.addJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
-                                      relDesc.getTableName(), foreKey );
+                        expr.addColumn( relDesc.getTableName(), ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLName() );
+                        expr.addOuterJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
+                                           relDesc.getTableName(), foreKey );
                         allFields.addElement( new FieldInfo( fields[ i ], false ) );
                     }
                 }
@@ -553,17 +564,23 @@ final class SQLEngine
 
         final boolean multi;
 
+        final boolean dirtyCheck;
+
         FieldInfo( FieldDescriptor fieldDesc, boolean store )
         {
             this.name = fieldDesc.getFieldName();
             this.store = store;
             this.multi = ( fieldDesc.getCollectionHandler() != null );
+            if ( store && fieldDesc instanceof JDOFieldDescriptor )
+                this.dirtyCheck = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
+            else
+                this.dirtyCheck = false;
         }
 
     }
 
 
-    final static class SQLQuery
+    static final class SQLQuery
         implements PersistenceQuery
     {
 
@@ -617,7 +634,7 @@ final class SQLEngine
 
         public Class getResultType()
         {
-            return _engine._handler.getJavaClass();
+            return _engine._clsDesc.getJavaClass();
         }
 
 
