@@ -122,6 +122,7 @@ public class Marshaller {
     **/
     private ClassDescriptorResolver _cdResolver = null;
 
+	private Hashtable		 _cdCache      = null;	
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
     
@@ -185,6 +186,7 @@ public class Marshaller {
         _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
+		_cdCache         = new Hashtable(3);		
         _parents         = new Stack();
     } //-- initialize();
     
@@ -356,23 +358,7 @@ public class Marshaller {
             //-- classes
             if (isPrimitive(_class) || (_class == String.class) || byteArray) 
             {
-                
-                //-- look for marshalInfo based on element name
-                String cname = MarshalHelper.toJavaName(name,true);
-                
-                for (int i = 0; i < _packages.size(); i++) {
-                    String pkgName = (String)_packages.get(i);
-                    String className = pkgName+cname;
-                    
-                    
-                    ClassLoader loader = _class.getClassLoader();
-                    classDesc = getClassDescriptor(className, loader);
-                    
-                    if (classDesc != null) break;
-                }
-                if (classDesc == null) {
-                    classDesc = new StringClassDescriptor();
-                }
+                classDesc = getPrimitiveClassDescriptor(_class, name);
             }
             else {
                 //-- save package information for use when searching
@@ -629,8 +615,41 @@ public class Marshaller {
         if (addedNamespace) _nsScope.remove(nsURI);
         
     } //-- void marshal(DocumentHandler) 
-    
-    
+      
+    /**
+     * Gets a class descriptor for a primitive type. Will search for a
+     * specialized descriptor, but will return a plain string descriptor if
+     * one can't be found. As the search for a specialized descriptor can be
+     * slow, we cache the results.
+     * @param _class Class of object we want a ClassDescriptor for
+     * @param name XML element name of object
+     **/
+    private XMLClassDescriptor getPrimitiveClassDescriptor(Class _class, String name)
+        throws MarshalException
+    {
+        XMLClassDescriptor classDesc = (XMLClassDescriptor) _cdCache.get(name);
+        if (classDesc != null)
+            return classDesc;
+        
+        //-- look for marshalInfo based on element name
+        String cname = MarshalHelper.toJavaName(name,true);
+        
+        for (int i = 0; i < _packages.size(); i++) {
+            String pkgName = (String)_packages.get(i);
+            String className = pkgName+cname;
+            
+            ClassLoader loader = _class.getClassLoader();
+            classDesc = getClassDescriptor(className, loader);
+            
+            if (classDesc != null)
+                break;
+        }
+        if (classDesc == null)
+            classDesc = new StringClassDescriptor();
+        _cdCache.put(name, classDesc);
+        return classDesc;
+    }
+	
     /**
      * Sets the flag to turn on and off debugging
      * @param debug the flag indicating whether or not debug information
