@@ -435,6 +435,8 @@ public class BuilderConfiguration {
             }
         }
         _localProps = new Properties(defaults);
+        processNamespacePackageMappings(_localProps.getProperty( Property.NamespacePackagesOld, ""));
+        processNamespacePackageMappings(_localProps.getProperty( Property.NamespacePackages, ""));
     } //-- setDefaultProperties
   	
 	
@@ -445,7 +447,7 @@ public class BuilderConfiguration {
 	 * @param packageName the package name 
 	 */
     public void setNamespacePackageMapping(String ns, String packageName) {
-        _nspackages.put(ns, packageName);
+    	_nspackages.put(ns, packageName);
     } //-- setNamespcaePackageMapping
     
 	/**
