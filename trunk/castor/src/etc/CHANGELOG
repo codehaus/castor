@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1524: Stack Overflow when container elements occur in 
+       instance document. The problem was primarily due to the 
+       MarshalFramework#searchInheritence method which was allowing
+       the ClassDescriptors for schema groups to be searched.
+       (kvisco - 20040608)
+
 JDO:   Fixed bug 1402 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added code to handle extend relationships where no additional fields are added. For such cases,
        no STORE SQL statement will be generated (and used).
