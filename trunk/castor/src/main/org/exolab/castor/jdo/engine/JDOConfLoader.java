@@ -56,13 +56,17 @@ import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Helper class to load the Castor JDO configuration from its configuration file.
  * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
  */
 public class JDOConfLoader {
-    
+
+    private static Log _log = LogFactory.getFactory().getInstance( JDOConfLoader.class );
+
     private static boolean _loaded = false;
     private static JdoConf _jdoConf = null;
     
@@ -91,7 +95,8 @@ public class JDOConfLoader {
                 throw new MappingException (e);
             }
             
-            _loaded = true; 
+            _loaded = true;
+            _log.debug( "Loaded jdo conf successfully" ); 
         }
     }
     
