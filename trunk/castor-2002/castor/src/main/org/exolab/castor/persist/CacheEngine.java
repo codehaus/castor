@@ -766,6 +766,7 @@ public final class CacheEngine
         Object     oldIdentity;
         TypeInfo   typeInfo;
         OID        oid;
+        short      modified;
 
         typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
         oid = new OID( typeInfo.handler, identity );
@@ -875,7 +876,8 @@ public final class CacheEngine
                                                     typeInfo.javaClass.getName(), identity );
 
             // Check if object has been modified, and whether it can be stored.
-            if ( ! typeInfo.handler.isModified( object, original ) )
+            modified = typeInfo.handler.isModified( object, original );
+            if ( modified == ClassHandler.Unmodified )
                 return null;
             try {
                 typeInfo.handler.checkValidity( object );
@@ -886,7 +888,7 @@ public final class CacheEngine
             // Object has been modified, must write it. Acquire a write lock and
             // block is some other transaction has a read lock on the object.
             // First one to call this method gets to commit.
-            original = (Object[]) lock.acquire( tx, true, timeout );
+            original = (Object[]) lock.acquire( tx, modified == ClassHandler.LockRequired, timeout );
 
             // The object has an old identity, it existed before, one need
             // to store the new contents.
@@ -1075,7 +1077,7 @@ public final class CacheEngine
         // called after a successful return from store(), so we don't
         // need to wait for the lock
         try {
-            fields = (Object[]) lock.acquire( tx, true, 0 );
+            fields = (Object[]) lock.acquire( tx, false, 0 );
             typeInfo.handler.copyInto( object, fields );
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,

@@ -56,6 +56,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -82,6 +83,11 @@ import org.exolab.castor.util.Messages;
  */
 public final class ClassHandler
 {
+
+
+    public static final short Unmodified = 0;
+    public static final short Modified = 1;
+    public static final short LockRequired = 2;
 
 
     /**
@@ -490,20 +496,21 @@ public final class ClassHandler
 
     /**
      * Determines if the object has been modified from its original
-     * value. Returns true if the object has been modified. This
-     * method does not check whether the identity has been modified.
+     * value. Returns the modification status as {@link #Unmodified},
+     * {@link #Modified} or {@link #LockRequired}. This method does
+     * not check whether the identity has been modified.
      *
      * @param object The object
      * @param cached The cached copy
-     * @return True if the object has been modified
+     * @return The modified status
      */
-    boolean isModified( Object object, Object[] original )
+    short isModified( Object object, Object[] original )
     {
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( isModified( _fields[ i ], object, original[ i ] ) )
-                return true;
+                return ( _fields[ i ].dirty ? LockRequired : Modified );
         }
-        return false;
+        return Unmodified;
     }
 
 
@@ -611,6 +618,11 @@ public final class ClassHandler
          */
         final boolean           multi;
 
+        /**
+         * True if the field requires dirty checking.
+         */
+        final boolean           dirty;
+
         FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
             this.fieldType = fieldDesc.getFieldType();
@@ -618,6 +630,10 @@ public final class ClassHandler
             this.immutable = fieldDesc.isImmutable();
             this.relation = relation;
             this.multi = fieldDesc.isMultivalued();
+            if ( fieldDesc instanceof JDOFieldDescriptor )
+                this.dirty = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
+            else
+                this.dirty = true;
         }
 
     }
