@@ -101,7 +101,7 @@ public class CollectionInfo extends FieldInfo {
     public String getReadMethodName() {
         StringBuffer sb = new StringBuffer("get");
         sb.append(JavaNaming.toJavaClassName(getElementName()));
-        sb.append("List");
+        // fix for avoiding compilation conflict sb.append("List");
         return sb.toString();
     } //-- getReadMethodName
 
@@ -166,7 +166,7 @@ public class CollectionInfo extends FieldInfo {
         //-----------------------/
 
         jType = jType.createArray();
-        method = new JMethod(jType, "get"+cName+"List");
+        method = new JMethod(jType, "get"+cName);// fix for avoiding compilation conflict +"List");
         jClass.addMethod(method);
 
         createGetMethod(method);
