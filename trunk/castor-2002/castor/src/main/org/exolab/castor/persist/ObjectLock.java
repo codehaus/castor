@@ -315,7 +315,7 @@ final class ObjectLock
 			read = read.next;
 		    }
 		    if ( read == null )
-			Messages.message( "persist.notOwnerLock" )
+			throw new IllegalStateException( Messages.message( "persist.notOwnerLock" ) );
 		}
 	    }
 	    // Notify all waiting transactions that they may attempt to
