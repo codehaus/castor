@@ -1385,11 +1385,17 @@ public final class SQLEngine implements Persistence {
         if (entity == null) {
             return null;
         }
+        /*
         for (int i = 0; i < entity.entityClasses.length; i++) {
             if (entity.entityClasses[i].equals(_entityInfo)) {
                 return entity.fields[i];
             }
-        }
+        }*/
+        // yip: the inheritance model changed from 0.9.2.
+        // this is only a quick hack.
+        if ( entity.info.equals( _entityInfo ) )
+            if ( entity.values != null && entity.values.length == 0 ) 
+                return entity.values[0].values;
         throw new PersistenceException( "Entity of a wrong class passed" );
     }
 
