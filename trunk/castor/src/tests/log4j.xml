@@ -16,14 +16,28 @@
         </layout>
     </appender>
     
-    <category name="org.exolab.castor.jdo">
-      <priority value="warn" />
+    <category name="org.exolab.castor">
+      <priority value="error" />
     </category>
 
-    <category name="org.exolab.castor.persist">
-      <priority value="warn" />
+    <!-- to set the level to DEBUG for Castor, please replace above with -->
+    <!--
+    <category name="org.exolab.castor">
+      <priority value="debug" />
     </category>
-    
+    -->
+
+    <!-- to set the level to DEBUG for e.g. Castor JDO only, please replace above with -->
+    <!--
+    <category name="org.exolab.castor">
+      <priority value="error" />
+    </category>
+
+    <category name="org.exolab.castor.jdo">
+      <priority value="debug" />
+    </category>
+    -->
+
     <root>
         <priority value="debug" />
         <appender-ref ref="console"/>
