@@ -65,7 +65,7 @@ public final class XSMonth extends XSTimePeriod {
     private String value = null;
 
     public XSMonth() {
-        super("P1M");
+        super(XSType.MONTH,"P1M");
     } //-- XSNMonth
 
     /**

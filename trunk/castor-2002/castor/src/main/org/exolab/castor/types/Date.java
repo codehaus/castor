@@ -131,8 +131,20 @@ public class Date extends TimePeriod {
         result = isNegative() ? "-"+result : result;
 
         return result;
-
     }//toString
+
+    /**
+     * parse a String and convert it into an java.lang.Object
+     * @param str the string to parse
+     * @return an Object represented by the string
+     * @throws ParseException a parse exception is thrown if the string to parse
+     *                        does not follow the rigth format (see the description
+     *                        of this class)
+     */
+
+    public static Object parse(String str) throws ParseException {
+        return parseDate(str);
+    }
 
     /**
      * parse a String and convert it into a Date

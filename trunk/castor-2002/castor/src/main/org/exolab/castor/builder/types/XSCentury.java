@@ -65,7 +65,7 @@ public final class XSCentury extends XSTimePeriod {
     private String value = null;
 
     public XSCentury() {
-        super("P100Y");
+        super(XSType.CENTURY,"P100Y");
     } //-- XSCentury
 
     /**

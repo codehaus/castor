@@ -139,6 +139,18 @@ public class Year extends TimePeriod {
     }//toString
 
     /**
+    * parse a String and convert it into a java.lang.Object
+    * @param str the string to parse
+    * @return the java.lang.Object represented by the string
+    * @throws ParseException a parse exception is thrown if the string to parse
+    *                        does not follow the rigth format (see the description
+    *                        of this class)
+    */
+    public static Object parse(String str) throws ParseException {
+        return parseYear(str);
+    }
+
+    /**
      * parse a String and convert it into a Year
      * @param str the string to parse
      * @return the Year represented by the string
@@ -194,4 +206,6 @@ public class Year extends TimePeriod {
         date = df.parse(this.toString());
         return date;
     }//toDate()
+
+
 } //--Year

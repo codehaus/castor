@@ -40,7 +40,7 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $Id
  * Date         Author              Changes
  * 11/01/2000   Arnaud Blandin      Created
  */
@@ -138,6 +138,18 @@ public class Century extends TimePeriod {
         return result;
 
     }//toString
+
+   /**
+    * parse a String and convert it into a java.lang.Object
+    * @param str the string to parse
+    * @return the java.lang.Object represented by the string
+    * @throws ParseException a parse exception is thrown if the string to parse
+    *                        does not follow the rigth format (see the description
+    *                        of this class)
+    */
+    public static Object parse(String str) throws ParseException {
+        return parseCentury(str);
+    }
 
     /**
      * parse a String and convert it into a Century

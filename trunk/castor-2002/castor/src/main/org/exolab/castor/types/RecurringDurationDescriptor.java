@@ -314,7 +314,7 @@ public class RecurringDurationDescriptor
 
             //-- update current instance of time with new time
             try {
-                RecurringDuration temp = RecurringDuration.parse(value.toString()) ;
+                RecurringDuration temp = RecurringDuration.parseRecurring(value.toString()) ;
                 recurTarget.setCentury(temp.getCentury());
                 recurTarget.setYear(temp.getYear());
                 recurTarget.setMonth(temp.getMonth());

@@ -537,6 +537,7 @@ public class TimeDuration  {
         result = result && (_hour == timeD.getHour());
         result = result && (_minute == timeD.getMinute());
         result = result && (_second == timeD.getSeconds());
+        result = result && (this.isNegative() == timeD.isNegative());
         return result;
     } //equals
 

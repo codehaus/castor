@@ -66,7 +66,7 @@ public final class XSYear extends XSTimePeriod {
     private String value = null;
 
     public XSYear() {
-        super("P1Y");
+        super(XSType.YEAR,"P1Y");
     } //-- XSYear
 
     /**

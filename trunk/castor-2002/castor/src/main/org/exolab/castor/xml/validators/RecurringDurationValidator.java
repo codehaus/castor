@@ -40,76 +40,77 @@
  *
  * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
+ * $Id
  * Date         Author           Changes
- * 10/26/2000   Arnaud Blandin   Created
+ * 11/07/2000   Arnaud Blandin   Created
  */
 
 package org.exolab.castor.xml.validators;
 
+import org.exolab.castor.types.RecurringDuration;
+
 import org.exolab.castor.xml.ValidationException;
 import org.exolab.castor.xml.TypeValidator;
-import org.exolab.castor.types.TimeDuration;
 
-public class TimeDurationValidator implements TypeValidator {
+public class RecurringDurationValidator implements TypeValidator {
 
 
-    private TimeDuration _maxInclusive;
-    private TimeDuration _maxExclusive;
-    private TimeDuration _minInclusive;
-    private TimeDuration _minExclusive;
+    private RecurringDuration _maxInclusive;
+    private RecurringDuration _maxExclusive;
+    private RecurringDuration _minInclusive;
+    private RecurringDuration _minExclusive;
 
-    public TimeDurationValidator() {
+    public RecurringDurationValidator() {
         super();
-    } //-- TimeDurationValidator
+    } //-- RecurringDurationValidator
 
    /**
-     * Sets the maximum exclusive value that this TimeDuration can hold.
-     * @param max the maximum exclusive value this TimeDuration can be
+     * Sets the maximum exclusive value that this RecurringDuration can hold.
+     * @param max the maximum exclusive value this RecurringDuration can be
      * @see setMaxInclusive
     **/
-    public void setMaxExclusive(TimeDuration max) {
+    public void setMaxExclusive(RecurringDuration max) {
         _maxExclusive = max;
         _maxInclusive = null;
     } //-- setMaxExclusive
 
     /**
-     * Sets the maximum inclusive value that this TimeDuration can hold.
-     * @param max the maximum inclusive value this TimeDuration can be
+     * Sets the maximum inclusive value that this Recurring Duration can hold.
+     * @param max the maximum inclusive value this RecurringDuration can be
      * @see setMaxExclusive
     **/
-    public void setMaxInclusive(TimeDuration max) {
+    public void setMaxInclusive(RecurringDuration max) {
         _maxInclusive = max;
         _maxExclusive = null;
     } //-- setMaxInclusive
 
 
     /**
-     * Sets the minimum exclusive value that this TimeDuration can hold.
-     * @param max the minimum exclusive value this TimeDuration can be
+     * Sets the minimum exclusive value that this RecurringDuration can hold.
+     * @param max the minimum exclusive value this RecurringDuration can be
      * @see setMinInclusive
     **/
-    public void setMinExclusive(TimeDuration min) {
+    public void setMinExclusive(RecurringDuration min) {
         _minExclusive = min;
         _minInclusive = null;
     } //-- setMinExclusive
 
     /**
-     * Sets the minimum inclusive value that this TimeDuration can hold.
-     * @param max the minimum inclusive value this TimeDuration can be
+     * Sets the minimum inclusive value that this RecurringDuration can hold.
+     * @param max the minimum inclusive value this RecurringDuration can be
      * @see setMinExclusive
     **/
-    public void setMinInclusive(TimeDuration min) {
+    public void setMinInclusive(RecurringDuration min) {
         _minInclusive = min;
         _minExclusive = null;
     } //-- setMinInclusive
 
     /**
-     * Validate a time duration instance
-     * @param timeD the time duration to validate
+     * Validate a Recurring duration instance
+     * @param recurrD the recurring duration to validate
      * @throw ValidationException
      */
-    public void validate(TimeDuration timeD) throws ValidationException {
+    public void validate(RecurringDuration recurrD) throws ValidationException {
 
         boolean isThereMinInclusive = (_minInclusive != null);
         boolean isThereMinExclusive = (_minExclusive != null);
@@ -125,38 +126,37 @@ public class TimeDurationValidator implements TypeValidator {
             throw new ValidationException("both maxInclusive and maxExclusive"
                                           +"are set up");
         }
-
         if (isThereMinInclusive) {
-            if ( _minInclusive.isGreater(timeD)) {
-                String err = timeD + " is less than the minimum allowable ";
+            if ( _minInclusive.isGreater(recurrD)) {
+                String err = recurrD + " is less than the minimum allowable ";
                 err += "value of " + _minInclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMinExclusive) {
-            if ( (_minExclusive.isGreater(timeD)) ||
-                  timeD.equals(_minExclusive) )
+            if ( (_minExclusive.isGreater(recurrD)) ||
+                  recurrD.equals(_minExclusive) )
             {
-                String err = timeD + " is less than the minimum allowable ";
+                String err = recurrD + " is less than the minimum allowable ";
                 err += "value of " + _minExclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMaxInclusive) {
-            if ( timeD.isGreater(_maxInclusive)) {
-                String err = timeD + " is greater than the maximum allowable ";
+            if ( recurrD.isGreater(_maxInclusive)) {
+                String err = recurrD + " is greater than the maximum allowable ";
                 err += "value of " + _maxInclusive;
                 throw new ValidationException(err);
             }
         }
 
          if (isThereMaxExclusive) {
-            if ( (timeD.isGreater(_maxExclusive)) ||
-                  timeD.equals(_maxExclusive) )
+            if ( (recurrD.isGreater(_maxExclusive)) ||
+                  recurrD.equals(_maxExclusive) )
             {
-                String err = timeD + " is greater than the maximum allowable ";
+                String err = recurrD + " is greater than the maximum allowable ";
                 err += "value of " + _maxExclusive;
                 throw new ValidationException(err);
             }
@@ -177,19 +177,19 @@ public class TimeDurationValidator implements TypeValidator {
         throws ValidationException
     {
         if (object == null) {
-            String err = "TimeDurationValidator cannot validate a null object.";
+            String err = "RecurringDurationValidator cannot validate a null object.";
             throw new ValidationException(err);
         }
 
-        TimeDuration value = null;
+        RecurringDuration value = null;
+
         try {
-            value = TimeDuration.parse(object.toString());
-        }
-        catch(Exception ex) {
-            String err = "Expecting a TimeDuration, received instead: ";
+            value = (RecurringDuration)object;
+        } catch(Exception ex) {
+            String err = ex.toString()+"\nExpecting a RecurringDuration, received instead: ";
             err += object.getClass().getName();
             throw new ValidationException(err);
         }
         validate(value);
     } //-- validate
-}
+}//-- RecurringDurationValidator

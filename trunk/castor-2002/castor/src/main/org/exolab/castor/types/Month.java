@@ -139,6 +139,10 @@ public class Month extends TimePeriod {
 
     }//toString
 
+    public static Object parse(String str) throws ParseException {
+        return parseMonth(str);
+    }
+
     /**
      * parse a String and convert it into a Month
      * @param str the string to parse
