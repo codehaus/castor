@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.util.Messages;
 
@@ -591,9 +592,9 @@ public final class ClassHandler
     void checkValidity( Object object )
         throws ValidityException, IllegalStateException
     {
-        // Object cannot be saved if one of the required fields is null
-        for ( int i = 0 ; i < _fields.length ; ++i )
-            _fields[ i ].handler.checkValidity( object );
+        // XXX Temporary hack until we find proper home for validity checks
+        if ( _clsDesc instanceof ClassDescriptorImpl )
+            ( (ClassDescriptorImpl) _clsDesc ).checkValidity( object );
     }
 
 

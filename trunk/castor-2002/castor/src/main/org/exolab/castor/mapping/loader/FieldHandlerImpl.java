@@ -415,23 +415,6 @@ public final class FieldHandlerImpl
     public void checkValidity( Object object )
         throws ValidityException
     {
-        /*
-        try {
-            if ( _required ) {
-                if ( ( _field != null && _field.get( object ) == null ) ||
-                     ( _field == null && _getMethod.invoke( object, null ) == null ) )
-                throw new ValidityException( "mapping.requiredField",
-                                             object.getClass().getName(), _fieldName );
-            }
-        } catch ( IllegalAccessException except ) {
-            // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
-        } catch ( InvocationTargetException except ) {
-            // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                              toString(), except.getMessage() ) );
-        }
-        */
     }
 
 
