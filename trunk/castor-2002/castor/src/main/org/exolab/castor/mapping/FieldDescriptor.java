@@ -109,5 +109,16 @@ public interface FieldDescriptor
     public FieldHandler getHandler();
 
 
+    /**
+     * Returns the class descriptor related to the field type. If the
+     * field type is a class for which a descriptor exists, this
+     * descriptor is returned. If the field type is a class for which
+     * no mapping is provided, null is returned.
+     *
+     * @return The class descriptor of the field type, or null
+     */
+    public ClassDescriptor getTypeDescriptor();
+
+
 }
 
