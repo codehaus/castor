@@ -35,7 +35,7 @@ public class ClassMapping implements java.io.Serializable {
 
     private java.lang.String _name;
 
-    private java.lang.String _extends;
+    private java.lang.Object _extends;
 
     private java.lang.Object _depends;
 
@@ -208,10 +208,10 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public java.lang.String getExtends()
+    public java.lang.Object getExtends()
     {
         return this._extends;
-    } //-- java.lang.String getExtends()
+    } //-- java.lang.Object getExtends()
 
     /**
      *
@@ -476,10 +476,10 @@ public class ClassMapping implements java.io.Serializable {
      *
      * @param _extends
     **/
-    public void setExtends(java.lang.String _extends)
+    public void setExtends(java.lang.Object _extends)
     {
         this._extends = _extends;
-    } //-- void setExtends(java.lang.String)
+    } //-- void setExtends(java.lang.Object)
 
     /**
      *
