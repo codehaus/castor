@@ -96,9 +96,9 @@ public class Test
 
             // Load the mapping from the specified filed, and Open up the
             // database for read/write access
-            JDO.loadDatabase( getClass().getResource( DatabaseFile ).toString(), null );
             jdo = new JDO();
             jdo.setDatabaseName( "test" );
+            jdo.setConfiguration( getClass().getResource( DatabaseFile ).toString() );
             db = jdo.getDatabase();
 
             // All ODMG database access requires a transaction
