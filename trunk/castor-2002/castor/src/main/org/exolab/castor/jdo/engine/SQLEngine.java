@@ -1212,8 +1212,8 @@ public final class SQLEngine implements Persistence {
         JDOClassDescriptor base = clsDesc;
         while ( base.getExtends() != null ) {
             base = (JDOClassDescriptor)base.getExtends();
-            expr.addInnerJoin( _mapTo, idnames, base.getTableName(), idnames );
-            find.addInnerJoin( _mapTo, idnames, base.getTableName(), idnames );
+            expr.addInnerJoin( base.getTableName(), idnames, base.getTableName(), idnames );
+            find.addInnerJoin( base.getTableName(), idnames, base.getTableName(), idnames );
         }
         for ( int i=0; i<_ids.length; i++ ) {
             find.addColumn( _mapTo, idnames[i] );
@@ -1347,7 +1347,7 @@ public final class SQLEngine implements Persistence {
                 // initalize the class
                 switch (type) {
                 case FIELD_TYPE:
-                    this.tableName = ((JDOClassDescriptor)clsDesc).getTableName();;
+                    this.tableName = classTable;//((JDOClassDescriptor)clsDesc).getTableName();;
                     this.jdoName = fieldDesc.getFieldName();
                     this.load = true;
                     this.store = !ext;
