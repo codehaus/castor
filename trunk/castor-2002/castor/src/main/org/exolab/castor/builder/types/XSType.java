@@ -126,7 +126,16 @@ public abstract class XSType {
      * The name of the timeInstant type
     **/
     public static final String TIME_INSTANT_NAME   = "timeInstant";
-    
+	
+	/**
+	 * The name of the short type
+	 */
+	public static final String SHORT_NAME			= "short";
+    	
+	/**
+	 * The name of the int type
+	 */
+	public static final String INT_NAME				= "int";    
     
     
     public static final short NULL               = -1;
@@ -150,7 +159,8 @@ public abstract class XSType {
     public static final short POSITIVE_INTEGER   = 13;
     public static final short STRING             = 14;
     public static final short TIME_INSTANT       = 15;
-    
+	public static final short SHORT				 = 16;
+	public static final short INT				 = 17;    
     
     private short   type       = NULL;
     
@@ -236,6 +246,8 @@ public abstract class XSType {
             case LONG:
             case NEGATIVE_INTEGER:
             case POSITIVE_INTEGER:
+			case SHORT:
+			case INT:
                 return true;
             default:
                 return false;
@@ -276,6 +288,10 @@ public abstract class XSType {
                 return STRING_NAME;
             case TIME_INSTANT:
                 return TIME_INSTANT_NAME;
+			case SHORT:
+				return SHORT_NAME;
+			case INT:
+				return INT_NAME;
             default:
                 return null;
         }

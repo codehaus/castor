@@ -706,6 +706,48 @@ public class DescriptorSourceFactory {
                 jsc.unindent();
                 jsc.add("}");
                 break;
+			case XSType.INT:
+                jsc.add("{ //-- local scope");
+                jsc.indent();
+                jsc.add("IntValidator iv = new IntValidator();");
+                XSInt xsInt = (XSInt)xsType;
+                if (xsInt.hasMinimum()) {
+                    Integer min = xsInt.getMinExclusive();
+                    if (min != null)
+                        jsc.add("iv.setMinExclusive(");
+                    else {
+                        min = xsInt.getMinInclusive();
+                        jsc.add("iv.setMinInclusive(");
+                    }
+                    jsc.append(min.toString());
+                    jsc.append(");");
+                }
+                if (xsInt.hasMaximum()) {
+                    Integer max = xsInt.getMaxExclusive();
+                    if (max != null)
+                        jsc.add("iv.setMaxExclusive(");
+                    else {
+                        max = xsInt.getMaxInclusive();
+                        jsc.add("iv.setMaxInclusive(");
+                    }
+                    jsc.append(max.toString());
+                    jsc.append(");");
+                }
+                
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Integer.parseInt(fixed);
+                    
+                    jsc.add("iv.setFixedValue(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                
+                jsc.add("fieldValidator.setValidator(iv);");
+                jsc.unindent();
+                jsc.add("}");
+                break;
             case XSType.STRING:
                 jsc.add("{ //-- local scope");
                 jsc.indent();
