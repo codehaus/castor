@@ -69,32 +69,35 @@ public abstract class AbstractCacheFactory
     
     /**
      * Instantiates an instance of the given class.
+     * @param classLoader A ClassLoader instance.
      * @return A Cache instance.
      * @throws CacheAcquireException Problem instantiating a cache instance.
      */
-    public Cache getCache() 
+    public Cache getCache(ClassLoader classLoader)
         throws CacheAcquireException
     {
+		if (classLoader == null) {
+			classLoader = Thread.currentThread().getContextClassLoader();
+		}
         Cache cache = null;
 
         try {
-            ClassLoader classLoader = Thread.currentThread().getContextClassLoader(); 
             cache = (Cache) Class.forName (getCacheClassName(), true, classLoader).newInstance();
         }
         catch (ClassNotFoundException cnfe) {
             _log.error ("Cannot find class " + getCacheClassName(), cnfe);
             throw new CacheAcquireException ( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", cnfe.getMessage()), cnfe);
+                    "jdo.engine.classNotInstantiable", cnfe.getMessage()), cnfe);
         }
         catch (IllegalAccessException iae) {
             _log.error ("Illegal access with class " + getCacheClassName(), iae);
             throw new CacheAcquireException( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", iae.getMessage()), iae);
+                    "jdo.engine.classNotInstantiable", iae.getMessage()), iae);
         } 
         catch (InstantiationException e) {
             _log.error ("Problem instantiating class " + getCacheClassName(), e);
             throw new CacheAcquireException( Messages.format( 
-                    "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e );
+                    "jdo.engine.classNotInstantiable", e.getMessage()), e );
         }
         
         return cache;

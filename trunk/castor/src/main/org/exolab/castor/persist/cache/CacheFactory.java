@@ -63,10 +63,11 @@ public interface CacheFactory
 
     /**
      * Instantiates an instance of the given class.
+	 * @param classLoader A ClassLoader instance.
      * @return A Cache instance.
      * @throws CacheAcquireException Problem instantiating a cache instance.
      */
-    Cache getCache () 
+    Cache getCache (ClassLoader classLoader) 
     	throws CacheAcquireException;
 
     /**
