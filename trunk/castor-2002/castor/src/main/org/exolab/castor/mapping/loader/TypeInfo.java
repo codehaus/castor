@@ -82,13 +82,13 @@ public class TypeInfo
     /**
      * True if the field type is immutable.
      */
-    private boolean       _immutable;
+    private boolean       _immutable = false;
 
 
     /**
      * True if the field is required.
      */
-    private boolean        _required;
+    private boolean        _required = false;
 
 
     /**
@@ -103,6 +103,16 @@ public class TypeInfo
     private Class          _colType;
 
 
+    /**
+     * Construct new type information for a field. This field
+     * requires no type conversion, and has no default value.
+     *
+     * @param fieldType The field type
+    **/
+    public TypeInfo(Class fieldType) {
+        _fieldType = Types.typeFromPrimitive( fieldType );
+    } //-- TypeInfo
+    
     /**
      * Construct new type information for the field.
      *
@@ -208,7 +218,15 @@ public class TypeInfo
         return _colType;
     }
 
-
+    /**
+     * Sets a flag indictating if the field is required.
+     *
+     * @param required the value of the flag. Should be true if the 
+     * field is required, false otherwise.
+     */
+    public void setRequired(boolean required) {
+        this._required = required;
+    } //-- setRequired
 }
 
 
