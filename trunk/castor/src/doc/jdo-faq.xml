@@ -568,9 +568,21 @@ SELECT p FROM Product p WHERE p.id IN LIST ( 123, 456, 789 )
             If identifiers other than numbers are used, those identifiers must be 
             quoted:
             <code><![CDATA[
-SELECT p FROM Product p WHERE p.id IN LIST ( "abc", "jkl", "xyz" )
+SELECT p FROM Product p WHERE p.name IN LIST ( "abc", "jkl", "xyz" )
             ]]></code>
             </p>
+			<p>
+            To include NULL values in the 'IN' list, use the 'nil' keyword:
+            <code><![CDATA[
+SELECT p FROM Product p WHERE p.name IN LIST( "ABC", nil )
+            ]]></code>
+            </p>
+			<p>
+            It is even possible to include bind values in the 'IN' lists using the following syntax:
+            <code><![CDATA[
+SELECT p FROM Product p WHERE p.id IN LIST( $(int)1, $2, $3 )
+            ]]></code>
+			</p>
         </section>
 
     </section>
