@@ -182,6 +182,9 @@ public class FieldValidator extends Validator {
         //-- here could cause endless loops
         if (_descriptor.isReference()) return;
         
+        //-- don't validate "transient" fields...
+        if (_descriptor.isTransient()) return;
+        
         FieldHandler handler = _descriptor.getHandler();
         
         if (handler == null) return;
