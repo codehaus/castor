@@ -99,7 +99,7 @@ public interface MapHandler
      * @throws ClassCastException The MapHandler does not
      *  support collections of this type
      */
-    public Enumeration elements( Object Map )
+    public Enumeration elements( Object map )
         throws ClassCastException;
 
     /**
@@ -111,7 +111,7 @@ public interface MapHandler
      * @throws ClassCastException The MapHandler does not
      *  support collections of this type
      */
-    public Enumeration keys( Object Map )
+    public Enumeration keys( Object map )
         throws ClassCastException;
 
 
