@@ -1780,7 +1780,6 @@ public class ClassMolder {
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     if ( !newSetOfIds.contains( v.get(j) ) ) {
-                                        System.out.println( "load object with id of: "+v.get(j) );
                                         // load all the dependent object in cache for modification
                                         // check at commit time.
                                         tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
@@ -1810,7 +1809,6 @@ public class ClassMolder {
                             if ( v != null ) {
                                 for ( int j=0,l=v.size(); j<l; j++ ) {
                                     if ( !newSetOfIds.contains( v.get(j) ) ) {
-                                        System.out.println( "load object with id of: "+v.get(j) );
                                         // load all the dependent object in cache for modification
                                         // check at commit time.
                                         tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
