@@ -114,8 +114,6 @@ public class Duration
      */
     public Duration(long l) {
 
-        if (l == 0)
-           throw new IllegalArgumentException("At least one designator (Y,M,D,H,M,S) must be present.");
         long refSecond = 1000;
         long refMinute = 60 * refSecond;
         long refHour = 60 * refMinute;
@@ -284,8 +282,6 @@ public class Duration
      *@return a string representing the duration
      */
      public String toString() {
-        if (isZero())
-           throw new IllegalArgumentException("At least one designator (Y,M,D,H,M,S) must be present.");
         StringBuffer result = new StringBuffer();
         result.append("P");
         if (_year != 0) {
@@ -374,7 +370,8 @@ public class Duration
         }
         ++idx;
 
-
+        if (idx == chars.length)
+            throw new ParseException("Bad format for a duration:"+str, idx);
         int number = 0;
         boolean hasNumber = false;
 
@@ -605,19 +602,4 @@ public class Duration
         return result;
      } //isGreater
 
-     /**
-      * Returns true is all the fields of this duration are
-      * set to zero.
-      * @return true is all the fields of this duration are
-      * set to zero.
-      */
-      private boolean isZero() {
-          boolean result = (_year == 0);
-          result = result && (_month == 0);
-          result = result && (_day == 0);
-          result = result && (_hour == 0);
-          result = result && (_minute == 0);
-          result = result && (_second == 0);
-          return result;
-      }
-}//TimeDuration
+}//Duration
