@@ -921,6 +921,49 @@ class SQLEngine
 	}
 	
 	
+	public Object getIdentity( int index )
+	    throws PersistenceException
+	{
+	    Object         identity;
+	    JDOFieldDesc[] pkDescs;
+	    
+	    try {
+		_rs.absolute( index );
+		if ( _rs.isLast() )
+		    return null;
+		if ( _engine._primKey.isPrimitive() ) {
+		    identity = _rs.getObject( 1 );
+		} else {
+		    identity = _engine._primKey.createNew();
+		    pkDescs = _engine._primKey.getJDOFields();
+		    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
+			pkDescs[ i ].setValue( identity, _rs, 1 + i );
+		    }
+		}
+	    } catch ( SQLException except ) {
+		throw new PersistenceException( except );
+	    }
+	    return identity;
+	}
+
+
+	public int getLocation()
+	    throws PersistenceException
+	{
+	    try {
+		return _rs.getRow();
+	    } catch ( SQLException except ) {
+		throw new PersistenceException( except );
+	    }
+	}
+
+
+	public boolean isForwardOnly()
+	{
+	    return true;
+	}
+
+
 	public Object fetch( Object obj )
 	    throws ObjectNotFoundException, PersistenceException
 	{

@@ -295,7 +295,8 @@ public abstract class TransactionContext
      * @param obj The object to load
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
-     * @return True if the object contents has been modified
+     * @return True if the object contents has been modified to reflect
+     *  the values in persistent storage
      * @throws TransactionNotInProgressException Method called while
      *   transaction is not in progress
      * @throws LockNotGrantedException Timeout or deadlock occured
