@@ -95,9 +95,13 @@ abstract class MarshalFramework {
      */    
     public static final String XML_SPACE_ATTR = "xml:space";
     
+    
+
     //-----------------------------/
     //- Protected class variables -/
     //-----------------------------/
+
+    static final String INTERNAL_XML_NAME = "-error-if-this-is-used-";
 
     /**
      * The default prefix used for specifying the
@@ -320,6 +324,11 @@ abstract class MarshalFramework {
                 for (int i = 0; i < descriptors.length; i++) {
 
                     if (descriptors[i] == null) continue;
+                    
+                    //-- skip descriptors with special internal name
+                    if (INTERNAL_XML_NAME.equals(descriptors[i].getXMLName())) 
+                        continue;
+                    
                     //-- check for inheritence
                     Class superclass = descriptors[i].getFieldType();
 
