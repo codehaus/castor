@@ -702,6 +702,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Ulrich" given="Lutz"/>
+    <email>ulrich@optimal-systems.de</email>
+    <description>Patch for Castor XML bug 1416</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="van Kann" given="Patrick" />
     <email>patrick.vankann@fortune-cookie.com</email>
     <description>Ported SQL for Castor JDO tests to SQL Server; updates for docs; helping others on the mailing list</description>
