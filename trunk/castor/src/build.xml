@@ -1,7 +1,6 @@
-<!-- =================== Build for Castor using Ant 1.4 =================== -->
+<!-- =================== Build for Castor using Ant 1.5 =================== -->
 <!--
-    This build descriptor works with Ant 1.5, but the Castor Project
-    currently only distributes Ant 1.4.
+    This build descriptor works with Ant 1.5.
 -->
 <!-- $Id$ -->
 
@@ -484,8 +483,7 @@
         </java>
     </target>
     
-	<target name="prepare-eclipse" depends="prepare"
-            description="Copy Eclipse project files to the root directory">
+	<target name="prepare-eclipse" description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template" tofile="${basedir}/.classpath" overwrite="true"/>
         <copy file="${project.eclipse}/project.template" tofile="${basedir}/.project" overwrite="true"/>
     </target>
