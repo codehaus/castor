@@ -49,6 +49,8 @@ import java.util.Enumeration;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.FileInputStream;
+import java.net.URL;
 
 // jUnit framework classes
 import junit.framework.TestSuite;
@@ -67,6 +69,8 @@ import org.exolab.castor.mapping.Mapping;
 
 
 public class Main extends TestHarness {
+
+    private final static String DEFAULT_FILE = "tests.xml";
 
     /**
      * Arguments
@@ -90,13 +94,31 @@ public class Main extends TestHarness {
     private boolean gui;
 
     /**
+     * The test file
+     */
+    private String testFile;
+
+    /**
+     * The test url
+     */
+    private String testUrl;
+
+    /**
+     * The test resource
+     */
+    private String testRes;
+
+    /**
      * Constructor
      */
-    private Main( boolean verbose, boolean printInfo, boolean gui, String tests ) {
+    private Main( boolean verbose, boolean printInfo, boolean gui, String testRes, String testFile, String testUrl, String tests ) {
         super(null,"Castor","Root");
-        this.verbose = verbose;
-        this.printInfo = printInfo;
+        this.verbose     = verbose;
+        this.printInfo   = printInfo;
         this.testBranchs = tests;
+        this.testFile    = testFile;
+        this.testUrl     = testUrl;
+        this.testRes     = testRes;
         if ( verbose ) {
             TestHarness.setVerboseStream( System.out );
             TestHarness.setVerbose( true );
@@ -126,7 +148,15 @@ public class Main extends TestHarness {
             mapping = new Mapping();
             mapping.loadMapping( Main.class.getResource( "harness/mapping.xml" ) );
             unm.setMapping( mapping );
-            harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( "tests.xml" ) ) );
+            if ( testRes != null ) {
+                harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( testRes ) ) );
+            } else if ( testFile != null ) {
+                harness = (Harness) unm.unmarshal( new InputStreamReader( new FileInputStream( testFile ) ) );
+            } else if ( testUrl != null ) {
+                harness = (Harness) unm.unmarshal( new InputStreamReader( (new URL(testUrl)).openStream() ) );
+            } else {
+                harness = (Harness) unm.unmarshal( new InputStreamReader( Main.class.getResourceAsStream( DEFAULT_FILE ) ) );
+            }
             testApp = harness.createTestHarness( testBranchs );
             if ( printInfo )
                 testApp.printInfo( System.out, testBranchs );
@@ -139,13 +169,16 @@ public class Main extends TestHarness {
 
     /**
      * The main method. 
-     * Usage: test [-verbose] [-info] [-gui] testcases
+     * Usage: test [-verbose] [-info] [-gui] [-res test.xml | -file test.xml | -url urlOfTest] testcases
      */
     public static void main( String args[] ) {
         int     cur       = 0;
         boolean infoOnly  = false;
         boolean verbose   = false;
         boolean gui       = false;
+        String  file      = null;
+        String  url       = null;
+        String  res       = null;
 
         if ( args.length == 0 ) {
             usage();
@@ -159,6 +192,30 @@ public class Main extends TestHarness {
                 infoOnly = true;
             } else if ( args[cur].equals("-gui") ) {
                 gui = true;
+            } else if ( args[cur].equals("-file") ) {
+                cur++;
+                if ( cur < args.length && args[cur] != null && !args[cur].trim().equals("") )
+                    file = args[cur].trim();
+                else {
+                    usage();
+                    return;
+                }
+            } else if ( args[cur].equals("-url") ) {
+                cur++;
+                if ( cur < args.length && args[cur] != null && !args[cur].trim().equals("") )
+                    url = args[cur].trim();
+                else {
+                    usage();
+                    return;
+                }
+            } else if ( args[cur].equals("-res") ) {
+                cur++;
+                if ( cur < args.length && args[cur] != null && !args[cur].trim().equals("") )
+                    res = args[cur].trim();
+                else {
+                    usage();
+                    return;
+                }
             }
             cur++;
         }
@@ -167,7 +224,7 @@ public class Main extends TestHarness {
                 usage();
                 return;
             } else {
-                junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, null ) );
+                junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, res, file, url, null ) );
                 return;
 
             }
@@ -178,14 +235,14 @@ public class Main extends TestHarness {
                 System.out.println( args[i] + "\t" );
             }
         }
-        junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, args[cur] ) );
+        junit.textui.TestRunner.run( new Main( verbose, infoOnly, gui, res, file, url, args[cur] ) );
     }
 
     /**
      * Print the usage
      */
     private static void usage() {
-        System.out.println( "Usage: test [-verbose] [-info] testcases" );
+        System.out.println( "Usage: test [-verbose] [-info] [-gui] [-res test.xml | -file test.xml | -url urlOfTest] testcases" );
     }
 
     /**
