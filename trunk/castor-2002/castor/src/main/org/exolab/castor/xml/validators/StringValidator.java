@@ -59,6 +59,10 @@ public class StringValidator extends PatternValidator
 {
 
 
+    private final static String PRESERVE = "preserve";
+    private final static String REPLACE = "replace";
+    private final static String COLLAPSE = "collapse";
+
     private String  fixed      = null;
 
     private boolean required   = false;
@@ -67,7 +71,7 @@ public class StringValidator extends PatternValidator
     private int     minLength  = 0;
 
     private int     maxLength  = -1;
-    private String _whiteSpace = "preserved";
+    private String _whiteSpace = PRESERVE;
 
 
     /**
@@ -133,11 +137,11 @@ public class StringValidator extends PatternValidator
      * @param whiteSpace the whiteSpace value
      */
      public void setWhiteSpace(String value) {
-        if (value.equals("preserved"))
+        if (value.equals(PRESERVE))
             this._whiteSpace = value;
-        else if (value.equals("replace"))
+        else if (value.equals(REPLACE))
             this._whiteSpace = value;
-        else if (value.equals("collapse"))
+        else if (value.equals(COLLAPSE))
             this._whiteSpace = value;
         else {
             System.out.println("Warning : "+value+" is a bad entry for the whiteSpace value");
@@ -169,7 +173,7 @@ public class StringValidator extends PatternValidator
             }
         }
 
-        if (_whiteSpace.equals("collapse")) {
+        if (_whiteSpace.equals(COLLAPSE)) {
             //-- heavy method to keep compatibility
             //-- with JDK 1.1 (can't use Vector.toArray)
             char[] temp = new char[chars.length];
@@ -237,7 +241,7 @@ public class StringValidator extends PatternValidator
             }
             if (hasPattern()) super.validate(value);
 
-            if ( !this._whiteSpace.equals("preserved") )
+            if ( !this._whiteSpace.equals(PRESERVE) )
                 normalize(value);
         }
     } //-- validate

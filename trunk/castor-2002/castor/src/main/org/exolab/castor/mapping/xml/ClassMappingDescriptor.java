@@ -192,13 +192,13 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         //-- _timestamp
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_timestamp", "timestamp", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 ClassMapping target = (ClassMapping) object;
                 return target.getTimestamp();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -216,12 +216,12 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _timestamp
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- _access
         desc = new XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.AccessType.class, "_access", "access", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
@@ -288,7 +288,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
@@ -368,7 +368,7 @@ public class ClassMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
