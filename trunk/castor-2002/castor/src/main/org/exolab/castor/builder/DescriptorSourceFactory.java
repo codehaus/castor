@@ -239,9 +239,9 @@ public class DescriptorSourceFactory {
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
                 xsType = ((CollectionInfo)member).getContent().getSchemaType();
-			
+
 			//-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
-            String nodeName = member.getNodeName();	   
+            String nodeName = member.getNodeName();
 			String nodeNameParam = null;
 			if ((nodeName!=null) && (!isText))
 			{
@@ -255,14 +255,14 @@ public class DescriptorSourceFactory {
 					JModifiers publicStaticFinal = new JModifiers();
 					publicStaticFinal.makePublic();
 					publicStaticFinal.setStatic(true);
-					publicStaticFinal.setFinal(true);		
+					publicStaticFinal.setFinal(true);
 					JField jField = new JField(SGTypes.String, nodeNameParam);
 					jField.setModifiers(publicStaticFinal);
 					jField.setInitString("\""+nodeName+"\"");
 					classDesc.addMember(jField);
 				}
 			}
-			
+
 			//-- Generate code to new XMLFieldDescriptorImpl instance
             jsc.add("desc = new XMLFieldDescriptorImpl(");
             jsc.append(classType(xsType.getJType()));
@@ -643,6 +643,13 @@ public class DescriptorSourceFactory {
                    jsc.append(");");
                 }
 
+                //-- fixed values
+                if (fixed != null) {
+
+                    jsc.add("dv.setFixed(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
                 jsc.add("fieldValidator.setValidator(dv);");
                 jsc.unindent();
                 jsc.add("}");
