@@ -31,18 +31,58 @@
          Lets walk through a very simple example. Assume we have a simple person
         class as follows:
 <code>
+<comment>
+/**
+ * An simple person class
+ */
 public class Person implements java.io.Serializable {
 
-   <comment>//The name of the person</comment>
+   <comment>
+    /**
+     * The name of the person
+     */
+   </comment>
    private String name = null;
 
+   <comment>
+    /**
+     * Creates a Person with no name
+     */
+   </comment>
    public Person() {
       super();
    }
 
-   public Person(String name)
+   <comment>
+    /**
+     * Creates a Person with the given name
+     */
+   </comment>
 
+   public Person(String name) {
+      this.name  = name;
+   }
+
+   <comment>
+    /**
+     * @return name of the person
+     */
+   </comment>
+   public String getName() {
+      return name;
+   }
+
+   <comment>
+    /**
+     * Sets the name of the person
+     * @param name the name of the person
+     */
+   </comment>
+   public void setName(String name) {
+      this.name = name;
+   }
 }
+
 </code>
 
          To marshal an instance of the person class you simply call the Marshaller
@@ -60,14 +100,28 @@ writer = new FileWriter("test.xml");
 Marshaller.marshal(person, writer);
 
          </code>
+
+         To unmarshal an instance of the person class you simply call the Unmarshaller
+         as follows:
+
+         <code>
+
+<comment>// Create a Reader to the file to unmarshal from</comment>
+reader = new FileReader("test.xml");
+
+<comment>// Marshal the person object</comment>
+Person person = Unmarshaller.unmarshal(Person.class, reader);
+
+         </code>
       </p>
 
+    <p>Marshalling and Unmarshalling is basically that simple.</p>
 
     </section>
 
     <section title="Using Existing Classes/Objects">
       <p>
-        Castor can marshal almost any arbitrary Object to and from XML. When descriptors
+        Castor can marshal "almost" any arbitrary Object to and from XML. When descriptors
         are not available for a specfic Class, the marshalling framework uses reflection
         to gain information about the object.
         <note>
@@ -76,16 +130,47 @@ Marshaller.marshal(person, writer);
            so that they may be modified and compiled with little effort.
         </note>
       </p>
+      <p>If a set of descriptors exist for the classes, then Castor will use those
+         to gain information about how to handle the marshalling.
+         See <a href="#Class Descriptors">Class Descriptors</a> for more information.
+      </p>
       <p>
-         As long as the Object has getter and setter methods,
-         the only restriction is that it implements "java.io.Serializable". The
+         There are two main restrictions to marshalling objects. The first is
+         that all Classes must implement "java.io.Serializable". The
          reason we force this restriction is that we needed a way to prevent
          marshalling of certain objects.
          <note>We are contemplating changing this restriction, as long as we provide a way to
          prevent objects from being marshalled.
          </note>
-     </p>
-    </section>
+         There second, which applies only to classes that do NOT have associated descriptors.
+         These classes must have have a public default constructor
+         (ie. a constructor with no arguments) and adequete "getter" and "setter"
+         methods to be properly be marshalled and unmarshalled.
+      </p>
+      <p>
+         The example illustrated in the previous section
+          <a href="#The Marshalling Framework">The Marshalling Framework</a>
+         demonstrates how to use the framework with existing classes.
+      </p>
+   </section>
+
+    <section title="Class Descriptors">
+      <p>
+         Class descriptors provide the "Castor Framework" with necessary information
+         so that the Class can be marshalled properly.
+         The class descriptors can be shared between the JDO and XML frameworks.
+      </p>
+      <p>
+        Class descriptors contain a set of
+        <a href="#Field Descriptors">Field Descriptors</a>
+      </p>
+      <p>
+        XML Class descriptors provide the marshalling framework with the information it
+        needs about a class in order to be marshalled to and from XML.
+        The XMLClassDescriptor <api>org.exolab.castor.xml.XMLClassDescriptor</api>.
+      </p>
+   </section>
+
 
   </body>
 </document>
