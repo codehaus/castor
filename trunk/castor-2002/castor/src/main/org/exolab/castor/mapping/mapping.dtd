@@ -193,7 +193,8 @@
     matches  NMTOKEN  #IMPLIED
     QName-prefix NMTOKEN #IMPLIED
     reference (true|false) "false"
-    node  ( attribute | element | text )  #IMPLIED>
+    node  ( attribute | element | text )  #IMPLIED
+    auto-naming ( deriveByClass | deriveByField ) #IMPLIED>
 
 
 <!--
