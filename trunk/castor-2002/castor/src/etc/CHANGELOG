@@ -35,6 +35,8 @@ JDO:    Improved support for BLOB and CLOB values. Now you can get them as
         for details (oleg). 
 
 JDO:    Solved problem of NULL dirty checking with Oracle (oleg).         
+
+JDO:    Added support for BIGINT sql type in key generators (oleg).
  
 JDO:    Bug fix in the handling of classloader in the mapping loader (reported 
         by brian rogers <brian@freya.bianca.com>).
