@@ -69,7 +69,9 @@ import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
-
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
 
 
 /**
@@ -271,12 +273,46 @@ public final class LocalConfiguration extends Configuration {
     {
         String prop;
         Parser parser;
+        
+        //-- validation?
+        prop = getProperties().getProperty( Property.ParserValidation, "false" );
+        boolean validation = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+                               
+        //-- namespaces?
+        prop = getProperties().getProperty( Property.Namespaces, "false" );
+        boolean namespaces = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+        
 
-        prop = _props.getProperty( Property.Parser );
-        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
-            // If no parser class was specified, we default to Xerces.
+        //-- which parser?
+        prop = getProperties().getProperty( Property.Parser );
+        if (( prop == null ) || (prop.length() == 0)) {
+            // If no parser class was specified, check for JAXP
+            // otherwise we default to Xerces.
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(namespaces);
+            factory.setValidating(validation);
+            try {
+                SAXParser saxParser = factory.newSAXParser();
+                return saxParser.getParser();
+            }
+            catch(ParserConfigurationException pcx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+            }
+            catch(org.xml.sax.SAXException sx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+            }
+            
+        }
+        
+        if ((prop == null) || 
+            (prop.length() == 0) || 
+            (prop.equalsIgnoreCase("xerces"))) 
+        {
             prop = "org.apache.xerces.parsers.SAXParser";
         }
+        
 
         // If a parser class was specified, we try to create it and
         // complain about creation error.
@@ -292,36 +328,25 @@ public final class LocalConfiguration extends Configuration {
 
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
-            boolean         flag;
-
-            prop = _props.getProperty( Property.ParserValidation, "false" );
-            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+            boolean         flag;            
+            XMLReader xmlReader = (XMLReader)parser;
             try {
-                ( (XMLReader) parser ).setFeature( Features.Validation, flag );
-            } catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
-            }
-            prop = _props.getProperty( Property.Namespaces, "false" );
-            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-            try {
-                ( (XMLReader) parser ).setFeature( Features.Namespaces, flag );
-            } catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
-            }
-
-            features = _props.getProperty( Property.ParserFeatures, features );
-            if ( features != null ) {
-                token = new StringTokenizer( features, ", " );
-                while ( token.hasMoreTokens() ) {
-                    try {
-                        ( (XMLReader) parser ).setFeature( token.nextToken(), true );
-                    } catch ( SAXException except ) {
-                        Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+                xmlReader.setFeature( Features.Validation, validation );
+                xmlReader.setFeature( Features.Namespaces, namespaces );
+                features = getDefault().getProperty( Property.ParserFeatures, features );
+                if ( features != null ) {
+                    token = new StringTokenizer( features, ", " );
+                    while ( token.hasMoreTokens() ) {
+                        xmlReader.setFeature( token.nextToken(), true );
                     }
                 }
+            } 
+            catch ( SAXException except ) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
         }
         return parser;
+        
     }
 
     /**

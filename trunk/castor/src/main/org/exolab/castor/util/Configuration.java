@@ -69,7 +69,9 @@ import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLNaming;
 import org.exolab.castor.xml.util.DefaultNaming;
-
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
@@ -499,12 +501,47 @@ public abstract class Configuration
     {
         String prop;
         Parser parser;
+        
+        //-- validation?
+        prop = getDefault().getProperty( Property.ParserValidation, "false" );
+        boolean validation = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+                               
+        //-- namespaces?
+        prop = getDefault().getProperty( Property.Namespaces, "false" );
+        boolean namespaces = ( prop.equalsIgnoreCase( "true" ) || 
+                               prop.equalsIgnoreCase( "on" ) );
+        
 
+        //-- which parser?
         prop = getDefault().getProperty( Property.Parser );
-        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
-            // If no parser class was specified, we default to Xerces.
+        if (( prop == null ) || (prop.length() == 0))  {
+            // If no parser class was specified, check for JAXP
+            // otherwise we default to Xerces.
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            factory.setNamespaceAware(namespaces);
+            factory.setValidating(validation);
+            try {
+                SAXParser saxParser = factory.newSAXParser();
+                return saxParser.getParser();
+            }
+            catch(ParserConfigurationException pcx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+            }
+            catch(org.xml.sax.SAXException sx) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+            }
+            
+        }
+        
+        
+        if ((prop == null) ||
+            (prop.length() == 0) ||
+            (prop.equalsIgnoreCase("xerces"))) 
+        {
             prop = "org.apache.xerces.parsers.SAXParser";
         }
+        
 
         // If a parser class was specified, we try to create it and
         // complain about creation error.
@@ -520,33 +557,21 @@ public abstract class Configuration
 
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
-            boolean         flag;
-
-            prop = getDefault().getProperty( Property.ParserValidation, "false" );
-            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+            boolean         flag;            
+            XMLReader xmlReader = (XMLReader)parser;
             try {
-                ( (XMLReader) parser ).setFeature( Features.Validation, flag );
-            } catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
-            }
-            prop = getDefault().getProperty( Property.Namespaces, "false" );
-            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-            try {
-                ( (XMLReader) parser ).setFeature( Features.Namespaces, flag );
-            } catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
-            }
-
-            features = getDefault().getProperty( Property.ParserFeatures, features );
-            if ( features != null ) {
-                token = new StringTokenizer( features, ", " );
-                while ( token.hasMoreTokens() ) {
-                    try {
-                        ( (XMLReader) parser ).setFeature( token.nextToken(), true );
-                    } catch ( SAXException except ) {
-                        Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+                xmlReader.setFeature( Features.Validation, validation );
+                xmlReader.setFeature( Features.Namespaces, namespaces );
+                features = getDefault().getProperty( Property.ParserFeatures, features );
+                if ( features != null ) {
+                    token = new StringTokenizer( features, ", " );
+                    while ( token.hasMoreTokens() ) {
+                        xmlReader.setFeature( token.nextToken(), true );
                     }
                 }
+            } 
+            catch ( SAXException except ) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
         }
         return parser;
@@ -822,12 +847,6 @@ public abstract class Configuration
         else
             _defaultValues.strictElements = true;
 
-        //-- backward compatibility with 0.9.3.9
-        prop = _defaultProps.getProperty(JavaNaming.UPPER_CASE_AFTER_UNDERSCORE_PROPERTY, null);
-        if (prop != null) {
-            JavaNaming.upperCaseAfterUnderscore = Boolean.valueOf(prop).booleanValue();
-        }
-
         prop = null;
     }
 
@@ -850,6 +869,12 @@ public abstract class Configuration
         // Complain if not found.
         try {
             properties.load( Configuration.class.getResourceAsStream( resourceName ) );
+            
+            //-- debug information:
+            //URL url = Configuration.class.getResource( resourceName );
+            //System.out.println("loading configuration: " + url.toExternalForm());
+            //-- end debug information
+            
             found = true;
         } 
         catch ( Exception except ) {
