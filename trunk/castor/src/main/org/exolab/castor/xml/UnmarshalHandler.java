@@ -916,6 +916,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     qName = prefix + ":" + localName;
             }
         }
+       
         endElement(qName); 
     } //-- endElement
     
@@ -928,8 +929,12 @@ public final class UnmarshalHandler extends MarshalFramework
     public void endPrefixMapping(String prefix)
         throws SAXException
     { 
-        //-- do nothing, already taken care of in 
-        //-- endElement
+        //-- nothing to do , already taken care of in 
+        //-- endElement except if we are unmarshalling an 
+        //-- AnyNode
+        if (_anyUnmarshaller != null) {
+            _anyUnmarshaller.endPrefixMapping(prefix);
+        }
         
     } //-- endPrefixMapping
 
@@ -2011,6 +2016,7 @@ public final class UnmarshalHandler extends MarshalFramework
     public void startPrefixMapping(String prefix, String uri)
         throws SAXException
     { 
+        
         //-- Patch for Xerces 2.x bug
         //-- prevent attempting to declare "XML" namespace
         if (Namespaces.XML_NAMESPACE_PREFIX.equals(prefix) && 
@@ -2020,11 +2026,15 @@ public final class UnmarshalHandler extends MarshalFramework
         }
         //-- end Xerces 2.x bug
         
-        if (_createNamespaceScope) {
+        //-- Forward the call to SAX2ANY 
+        //-- or create a namespace node
+        if (_anyUnmarshaller != null) {
+            _anyUnmarshaller.startPrefixMapping(prefix, uri);
+        }
+        else if (_createNamespaceScope) {
             _namespaces = _namespaces.createNamespaces();
             _createNamespaceScope = false;
         }
-        
         
         _namespaces.addNamespace(prefix, uri);
         
