@@ -163,7 +163,12 @@ public class Product
     }
 
 
-    public void jdoStore()
+    public void jdoCreate()
+    {
+    }
+
+
+    public void jdoStore(boolean modified)
     {
     }
 
