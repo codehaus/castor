@@ -927,7 +927,7 @@ public class Marshaller extends MarshalFramework {
 				        ClassDescriptor tmpCDesc = 
 				            _cdResolver.resolveByXMLName(tmpName, nsURI, null);
 				        if (tmpCDesc != null) {
-				            saveType = (tmpCDesc.getClass() != classDesc.getClass());
+				            saveType = (tmpCDesc.getJavaClass() != classDesc.getJavaClass());
 				        }
 				        else {
 				            saveType = true;
