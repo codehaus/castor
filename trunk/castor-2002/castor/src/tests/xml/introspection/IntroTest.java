@@ -6,7 +6,7 @@
  * and conditions stipulated in the agreement/contract under which the
  * program(s) have been supplied.
  *
- * $Id: IntroTest.java
+ * $Id$
  */
 
 
@@ -20,6 +20,8 @@
  */
 
 import java.io.*;
+import java.util.Iterator;
+import java.util.Set;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.*;
 import junit.framework.*;
@@ -33,8 +35,9 @@ import com.intalio.XMLDiff.*;
  * Objects representing a collection are unmarshalled, marshalled.
  * All the types supported by Castor are used:
  * Array, Vector, Hashtable, ArrayList and HashSet  
- *
- * 
+ *  <br>
+ * @author <a href="mailto:victoor@intalio.com">Alexandre Victoor</a>
+ * @version $Revision$ $Date$ 
  */
 
 
@@ -52,13 +55,15 @@ import com.intalio.XMLDiff.*;
     rootHashSet _roothashset = new rootHashSet();
     
     /**
-     *  This method uses the class XMLGen to build
+     *  This method uses the class {@link XMLItemListGenerator} to build
      *  input.xml . The name of the rootname is
      *  given in argument of the method. The boolean
      *  xsi is used to tell if xsi attribut should be 
      *  used or not in the input files. The generated
      *  file input.xml is then compared to output.xml,
      *  result from marshalling process, using XMLDiff.
+     *  @param rootname the name of the root element in the xml file
+     *  @param xsi boolean, true if xsi attributes are present in the file
      */
      
     public void compareResults ( String rootname, boolean xsi )
@@ -83,6 +88,8 @@ import com.intalio.XMLDiff.*;
      *  are only 2 possibilities, 2 comparisons to do.
      *  If the first comparison is not succesfull, a second
      *  comparison is made using the method comparerResult
+     *  @param rootname the name of the root element in the xml file
+     *  @param xsi boolean, true if xsi attributes are present in the file
      */
     public void compareResultsInv ( String rootname, boolean xsi )
     {
@@ -110,8 +117,11 @@ import com.intalio.XMLDiff.*;
                 Item[] items = new Item[2];
                 Item it1 = new Item("hello", 34);
                 Item it2 = new Item("test", 366);
+                Item it3 = new Item("test", 12);
                 items[0] = it1;
                 items[1] = it2;
+                
+                System.out.println("----------Initialisation----------");
                 
                 _rootarray.setItem(items);
                 _rootarrayd.item=items;
@@ -136,7 +146,25 @@ import com.intalio.XMLDiff.*;
                 java.util.HashSet _hashsetitems = new java.util.HashSet();
                 _hashsetitems.add(it1);
                 _hashsetitems.add(it2);
+                _hashsetitems.add(it3);
                 _roothashset.setItem(_hashsetitems);
+                
+                Set set = _hashsetitems;
+                
+                System.out.println("Array: "+_hashsetitems.getClass().isArray());
+                System.out.println("Enumeration?: "+(_hashsetitems instanceof java.util.Enumeration));
+                System.out.println("Array: "+set.getClass().isArray());
+                System.out.println("Enumeration?: "+(set instanceof java.util.Enumeration));
+                Iterator it = _hashsetitems.iterator();
+        
+        if (it!=null)
+        {
+            while(it.hasNext())
+            {
+                System.out.println("Object: "+it.next());
+            }
+        }
+        
         
         }
         
@@ -148,7 +176,7 @@ import com.intalio.XMLDiff.*;
      *  The root object used has get/set methods
      */
     
-    public void testIntroTC01ArrayXSIUnmarshal() {
+    public void __testIntroTC01ArrayXSIUnmarshal() {
         
         try {
 
@@ -177,7 +205,7 @@ import com.intalio.XMLDiff.*;
      *  The root object used has get/set methods
      */
     
-    public void testIntroTC02ArrayNoXSIUnmarshal() {
+    public void __testIntroTC02ArrayNoXSIUnmarshal() {
         
         try {
 
@@ -206,7 +234,7 @@ import com.intalio.XMLDiff.*;
      *
      */
     
-    public void testIntroTC03ArrayMarshal() {
+    public void __testIntroTC03ArrayMarshal() {
         try {
              
              FileWriter writer = new FileWriter("output.xml");
@@ -260,7 +288,7 @@ import com.intalio.XMLDiff.*;
      *
      */  
     
-    public void testIntroTC05ArrayDMarshal() {
+    public void __testIntroTC05ArrayDMarshal() {
         try {
              
              FileWriter writer = new FileWriter("output.xml");
@@ -283,7 +311,7 @@ import com.intalio.XMLDiff.*;
      */
 
     
-        public void testIntroTC06VectorUnmarshal() {
+        public void __testIntroTC06VectorUnmarshal() {
         
         try {
             
@@ -311,7 +339,7 @@ import com.intalio.XMLDiff.*;
      *
      */  
     
-    public void testIntroTC07VectorMarshal() {
+    public void __testIntroTC07VectorMarshal() {
         try {
              
              FileWriter writer = new FileWriter("output.xml");
@@ -335,7 +363,7 @@ import com.intalio.XMLDiff.*;
      *  and Castor will access directly to the vector
      */
    
-    public void testIntroTC08VectorDUnmarshal() {
+    public void __testIntroTC08VectorDUnmarshal() {
         
         try {
                 Unmarshaller unmar;
@@ -362,7 +390,7 @@ import com.intalio.XMLDiff.*;
      *
      */  
 
-    public void testIntroTC09VectorDMarshal() {
+    public void __testIntroTC09VectorDMarshal() {
         try {
              
              FileWriter writer = new FileWriter("output.xml");
@@ -416,7 +444,7 @@ import com.intalio.XMLDiff.*;
      *  comparison.
      */  
     
-    public void testIntroTC11HashtableMarshal() {
+    public void __testIntroTC11HashtableMarshal() {
         try {
              
              FileWriter writer = new FileWriter("output.xml");
@@ -471,7 +499,7 @@ import com.intalio.XMLDiff.*;
      */  
 
 
-    public void testIntroTC13ArrayListMarshal() {
+    public void __testIntroTC13ArrayListMarshal() {
         try {
              
              
@@ -533,19 +561,27 @@ import com.intalio.XMLDiff.*;
             
              FileWriter writer = new FileWriter("output.xml");
              Marshaller marshaller = new Marshaller(writer);
+             Set set = _roothashset.getItem();
+             System.out.println("Array: "+set.getClass().isArray());
+             System.out.println("Enumeration?: "+(set instanceof java.util.Enumeration));
+             System.out.println("Vector?: "+(set instanceof java.util.Vector));
              marshaller.marshal(_roothashset);
-             
+            _roothashset.print();
              
              compareResultsInv("root-hash-set",true);
-             
-            
+                        
         } catch  (Exception e) {
             fail("An error has occured: "+e);
         }
     }
 
 
-        
+
+    public static void main(String[] arg) {
+        IntroTest o = new IntroTest("test");
+        o.setUp();
+        o.testIntroTC15HashSetMarshal();
+    }
         
  }
  
