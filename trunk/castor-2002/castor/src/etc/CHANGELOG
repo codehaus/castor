@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+JDO:    Added "trigger" mode for SEQUENCE key generator. 
+        (Vitaly Shishakov <vitaly.shishakov@novalumen.com>)
+
 
 Version 0.8.11 December, 15 2000
 --------------------------------
@@ -30,9 +33,9 @@ Version 0.8.10
 
 XML:    Made the collection name in the mapping file NOT case sensitive. (Seb)
 
-XML:	Added new validation flag for the marshalling framework in castor.properties
-	Changed the parser validation property to og.exolab.castor.parser.validation
-	(Arnaud)
+XML:    Added new validation flag for the marshalling framework in castor.properties
+    Changed the parser validation property to og.exolab.castor.parser.validation
+    (Arnaud)
 
 XML:    Added fix to Marshaller#isPrimitive to support BigDecimal, submitted
         by Don Kleppinger. (kvisco)
