@@ -78,6 +78,7 @@ import java.util.ArrayList;
  * Concurrent access test. Tests a JDO modification and concurrent
  * JDBC modification to determine if JDO can detect the modification
  * with dirty checking.
+ *
  */
 public class Collections extends CWTestCase {
 
