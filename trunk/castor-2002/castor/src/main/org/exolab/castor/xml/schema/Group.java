@@ -132,6 +132,16 @@ public class Group extends Particle
         _wildcard.addElement(wildcard);
      }
 
+    /**
+     * Removes the given Wildcard from this Group.
+     * @param wilcard the Wildcard to remove.
+     * @return true if the wildcard has been successfully removed, false otherwise.
+     */
+     public boolean removeWildCard(Wildcard wildcard) {
+         if (wildcard == null)
+            return false;
+         return _wildcard.remove(wildcard);
+     }
 
     /**
      * Returns the ContentModelGroup for this group
@@ -273,6 +283,16 @@ public class Group extends Particle
     } //-- addElementDecl
 
     /**
+     * Removes the given ElementDecl from this ContentModelGroup.
+     * @param elementDecl the ElementDecl to remove.
+     * @return true if the element has been successfully removed, false otherwise.
+     */
+     public boolean removeElementDecl(ElementDecl element) {
+         return _contentModel.removeElementDecl(element);
+     }
+
+
+    /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
@@ -289,7 +309,18 @@ public class Group extends Particle
     } //-- addGroup
 
     /**
-     * Adds the given ModelGroup Definition to this ContentModelGroup
+     * Removes the given Group from this Group.
+     * @param group the Group to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(Group group){
+        boolean result = _contentModel.removeGroup(group);
+        group.setParent(null);
+        return result;
+     }
+
+    /**
+     * Adds the given ModelGroup Definition to this Group
      * @param group the ModelGroup to add
      * @exception SchemaException when a group with the same name as the
      * specified group already exists in the current scope
@@ -302,6 +333,17 @@ public class Group extends Particle
         //-- set reference to parent
         group.setParent(this);
     } //-- addGroup
+
+    /**
+     * Removes the given ModelGroup Definition from this Group.
+     * @param group the ModelGroup Definition to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(ModelGroup group) {
+         boolean result = _contentModel.removeGroup(group);
+         group.setParent(null);
+         return result;
+     }
 
     /**
      * Returns an enumeration of all the Particles of this
@@ -334,7 +376,7 @@ public class Group extends Particle
     public ElementDecl getElementDecl(String name) {
         return _contentModel.getElementDecl(name);
     } //-- getElementDecl
-    
+
     /**
      * Returns the Particle at the specified index
      * @param index the index of the particle to return

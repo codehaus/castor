@@ -99,6 +99,19 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
     } //-- addElementDecl
 
     /**
+     * Removes the given ElementDecl from this ContentModelGroup.
+     * @param elementDecl the ElementDecl to remove.
+     * @return true if the element has been successfully removed, false otherwise.
+     */
+     public boolean removeElementDecl(ElementDecl elementDecl) {
+        if (elementDecl == null)
+            return false;
+        //remove the resolvable reference???
+        return _contentModel.remove(elementDecl);
+     }
+
+
+    /**
      * Adds the given Group to this ContentModelGroup
      * @param group the Group to add
      * @exception SchemaException when a group with the same name as the
@@ -125,6 +138,19 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
         //-- add to content model
         _contentModel.addElement(group);
     } //-- addGroup
+
+    /**
+     * Removes the given Group from this ContentModelGroup.
+     * @param group the Group to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(Group group) {
+       if (group == null)
+            return false;
+        //remove the resolvable reference???
+        return _contentModel.remove(group);
+     }
+
 
     /**
      * Adds the given ModelGroup Definition to this ContentModelGroup
@@ -156,6 +182,18 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
 
 
     /**
+     * Removes the given ModelGroup Definition from this ContentModelGroup.
+     * @param group the ModelGroup Definition to remove.
+     * @return true if the group has been successfully removed, false otherwise.
+     */
+     public boolean removeGroup(ModelGroup group){
+       if (group == null)
+            return false;
+        //remove the resolvable reference???
+        return _contentModel.remove(group);
+     }
+
+    /**
      * Returns an enumeration of all the Particles contained
      * within this ContentModelGroup
      *
@@ -176,7 +214,7 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
     **/
     public ElementDecl getElementDecl(String name) {
         if (name == null) return null;
-        
+
         if (_resolver != null) {
             String key = "element:"+name;
             return (ElementDecl) _resolver.resolve(key);

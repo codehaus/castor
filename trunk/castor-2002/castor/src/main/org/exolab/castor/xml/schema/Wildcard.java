@@ -135,6 +135,16 @@ public class Wildcard extends Particle {
          _namespaces.addElement(Namespace);
      }
 
+   /**
+    * Removes the given namespace from the namespace collection
+    * @param namespace the namespace to remove.
+    */
+    public boolean removeNamespace(String namespace) {
+       if (namespace == null)
+           return false;
+       return _namespaces.remove(namespace);
+    }
+
     /**
      * Returns the complexType that contains this wildcard, can return null.
      * @return the complexType that contains this wildcard (can be null).
