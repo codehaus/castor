@@ -61,8 +61,57 @@ public class JavaXMLNaming {
     private static final Hashtable subst = keywordMap();
     
     private static final String[] keywords = { 
-        "class", "static"
-    };
+        "abstract", 
+        "boolean",  
+        "break",
+        "byte",
+        "case",     
+        "catch",   
+        "char",   
+        "class", 
+        "const", 
+        "continue",
+        "default",  
+        "do",      
+        "double",
+        "else",     
+        "extends",
+        "false",    
+        "final",   
+        "finally", 
+        "float",
+        "for",
+        "goto",
+        "if",
+        "implements",
+        "import",
+        "instanceof",
+        "int",
+        "interface",
+        "long",
+        "native",
+        "new",
+        "null",
+        "package",
+        "private",
+        "protected",
+        "public",
+        "return",
+        "short",
+        "static",
+        "super",
+        "switch",
+        "synchronized",
+        "this",
+        "throw",
+        "throws",
+        "transient",
+        "true",
+        "try",
+        "void",
+        "volatile",
+        "while"
+    }; //-- keywords
         
     /**
      * private constructor
@@ -82,6 +131,39 @@ public class JavaXMLNaming {
         }
         return false;
     } //-- isKeyword
+    
+    /**
+     * Returns true if the given String matches the
+     * production of a valid Java identifier
+     *
+     * @param string, the String to check the production of
+     * @return true if the given String matches the
+     * production of a valid Java name, otherwise false
+    **/
+    public static boolean isValidJavaIdentifier(String string) {
+        
+        if ((string == null) || (string.length() == 0)) 
+            return false;
+            
+        for (int i = 0; i < string.length(); i++) {
+            char ch = string.charAt(i);
+            
+            //-- digit
+            if (ch == '_') continue;
+            if (ch == '$') continue;
+            
+            if ((ch >= 'A') && (ch <= 'Z')) continue;
+            if ((ch >= 'a') && (ch <= 'z')) continue;
+            if ((ch >= '0') && (ch <= '9')) {
+                if (i == 0) return false;
+                continue;
+            }
+            
+            return false;
+        }
+        if (isKeyword(string)) return false;
+        return true;
+    } //-- isValidJavaIdentifier
     
     public static String toJavaClassName(String name) {
                 
