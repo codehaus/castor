@@ -426,4 +426,11 @@ public class DatabaseDescriptor implements org.exolab.castor.xml.XMLClassDescrip
         return xmlName;
     } //-- java.lang.String getXMLName()
 
+    /**
+     * false
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
+
 }

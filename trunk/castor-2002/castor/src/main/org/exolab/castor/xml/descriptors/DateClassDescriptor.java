@@ -101,23 +101,23 @@ public class DateClassDescriptor
         if (_contentDescriptor == null) {
             _contentDescriptor = new XMLFieldDescriptorImpl(String.class,
                 "content", "content", NodeType.Text);
-                
+
             _contentDescriptor.setImmutable(true);
             //-- setHandler
             _contentDescriptor.setHandler(new DateFieldHandler(
                 new XMLFieldHandler() {
-                
-                    public Object getValue( Object object ) 
+
+                    public Object getValue( Object object )
                         throws IllegalStateException
                     {
                         return object;
                     }
-                
-                    public void setValue( Object object, Object value) 
+
+                    public void setValue( Object object, Object value)
                         throws IllegalStateException, IllegalArgumentException
                     {
                         if (object.getClass() == java.util.Date.class) {
-                            
+
                             Date target = (Date)object;
                             if (value.getClass() == java.util.Date.class) {
                                 target.setTime(((Date)value).getTime());
@@ -129,7 +129,7 @@ public class DateClassDescriptor
                     }
                 }
             ));
-           
+
         }
 
         if (_fields == null) {
@@ -297,5 +297,23 @@ public class DateClassDescriptor
     public AccessMode getAccessMode() {
         return null;
     } //-- getAccessMode
+
+
+     /**
+     * <p>Returns true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
+     * the given name and if the given object can hold this field (i.e a value is not already set for
+     * this field).
+     * <p>This is mainly used for container object (that can contains other object), in this particular case
+     * the implementation will return null.
+     * @param fieldName the name of the field to check
+     * @param object the object represented by this XMLCLassDescriptor
+     * @return true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
 
 } //-- class: DateClassDescriptor

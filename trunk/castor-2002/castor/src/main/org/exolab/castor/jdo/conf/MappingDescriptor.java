@@ -235,4 +235,11 @@ public class MappingDescriptor implements org.exolab.castor.xml.XMLClassDescript
         return xmlName;
     } //-- java.lang.String getXMLName()
 
+    /**
+     * false
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
+
 }
