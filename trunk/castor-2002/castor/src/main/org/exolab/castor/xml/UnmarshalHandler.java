@@ -123,11 +123,15 @@ public class UnmarshalHandler implements DocumentHandler {
     private ClassDescriptorResolver _cdResolver = null;
     
     /**
+     * The IDResolver for resolving IDReferences
+    **/
+    private IDResolverImpl _idResolver = null;
+    
+    /**
      * A flag indicating whether or not to perform validation
     **/
     private boolean          _validate     = true;
     
-    private Hashtable _idReferences = null;
     
     private Hashtable _resolveTable = null;
     
@@ -153,7 +157,7 @@ public class UnmarshalHandler implements DocumentHandler {
     protected UnmarshalHandler(Class _class) {
         super();
         _stateInfo    = new Stack();
-        _idReferences = new Hashtable();
+        _idResolver   = new IDResolverImpl();
         _resolveTable = new Hashtable();
         buf           = new StringBuffer();
         _topClass     = _class;
@@ -203,6 +207,18 @@ public class UnmarshalHandler implements DocumentHandler {
             killWriter = false;
         }
     } //-- setDebug
+    
+    /**
+     * Sets the IDResolver to use when resolving IDREFs for
+     * which no associated element may exist in XML document.
+     *
+     * @param idResolver the IDResolver to use when resolving
+     * IDREFs for which no associated element may exist in the
+     * XML document.
+    **/
+    public void setIDResolver(IDResolver idResolver) {
+        _idResolver.setResolver(idResolver);
+    } //-- idResolver
     
     /**
      * Sets the PrintWriter used for printing log messages
@@ -1048,12 +1064,12 @@ public class UnmarshalHandler implements DocumentHandler {
         
         //-- if this is the identity then save id
         if (classDesc.getIdentity() == descriptor) {
-            _idReferences.put(attValue, parent);
+            _idResolver.bind(attValue, parent);
             //-- resolve waiting references
             resolveReferences(attValue, parent);
         }
         else if (descriptor.isReference()) {
-            value = _idReferences.get(attValue);
+            value = _idResolver.resolve(attValue);
             if (value == null) {
                 //-- save state to resolve later 
                 ReferenceInfo refInfo 
@@ -1339,6 +1355,52 @@ public class UnmarshalHandler implements DocumentHandler {
         
         return primitive;
     } //-- toPrimitiveObject
+    
+    /**
+     * Local IDResolver
+    **/
+    class IDResolverImpl implements IDResolver {
+        
+        private Hashtable  _idReferences = null;
+        private IDResolver _idResolver   = null;
+        
+        IDResolverImpl() {
+        } //-- IDResolverImpl
+        
+        void bind(String id, Object obj) {
+            
+            if (_idReferences == null)
+                _idReferences = new Hashtable();
+                
+                
+            _idReferences.put(id, obj);
+            
+        } //-- bind
+        
+        /**
+         * Returns the Object whose id matches the given IDREF,
+         * or null if no Object was found.
+         * @param idref the IDREF to resolve.
+         * @return the Object whose id matches the given IDREF.
+        **/
+        public Object resolve(String idref) {
+            
+            if (_idReferences != null) {
+                Object obj = _idReferences.get(idref);
+                if (obj != null) return obj;
+            }
+            
+            if (_idResolver != null) {
+                return _idResolver.resolve(idref);
+            }
+            return null;
+        } //-- resolve
+        
+        void setResolver(IDResolver idResolver) {
+            _idResolver = idResolver;
+        }
+        
+    } //-- IDResolverImpl
     
     /**
      * Internal class used to save state for reference resolving
