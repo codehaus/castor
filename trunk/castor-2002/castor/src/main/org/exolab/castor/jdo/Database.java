@@ -72,7 +72,7 @@ package org.exolab.castor.jdo;
  * For example:
  * <pre>
  * Database    db;
- * OQLQuery    oql;
+ * Query       oql;
  * Product     prod;
  * Enumeration enum;
  *
@@ -83,9 +83,9 @@ package org.exolab.castor.jdo;
  * oql = db.getOQLQuery( "SELECT p FROM Product p WHERE group=$");
  * oql.bind( groupId );
  * enum = oql.execute();
- * while ( enum.hasMoreElements() ) {
+ * while ( enum.hasMore() ) {
  *   <font color="red">// A 25% mark down for each product and mark as sale</font>
- *   prod = (Product) enum.nextElement();
+ *   prod = (Product) enum.next();
  *   prod.markDown( 0.25 );
  *   prod.setOnSale( true );
  * }
@@ -96,8 +96,8 @@ package org.exolab.castor.jdo;
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see DataObjects#getDatabase
- * @see OQLQuery
+ * @see JDO#getDatabase
+ * @see Query
  */
 public interface Database
 {
@@ -181,6 +181,15 @@ public interface Database
      */
     public OQLQuery getOQLQuery( String oql )
         throws QueryException;
+
+
+    /**
+     * Creates an empty query. The query must be created before
+     * it can be executed.
+     *
+     * @return A query
+     */
+    public Query getQuery();
 
 
     /**

@@ -52,6 +52,7 @@ import javax.transaction.Transaction;
 import javax.transaction.SystemException;
 import javax.transaction.Synchronization;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
@@ -356,6 +357,12 @@ public class DatabaseImpl
     }
     
     
+    public Query getQuery()
+    {
+        return new OQLQueryImpl( this );
+    }
+
+
     protected void finalize()
         throws Throwable
     {
