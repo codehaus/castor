@@ -172,7 +172,7 @@ public class Types
     public static Class typeFromPrimitive( Class type )
     {
         /// Fix for arrays
-        if ((type != null) & (type.isArray())) {
+        if ((type != null) && (type.isArray()) && (type != byte[].class)) {
             return typeFromPrimitive( type.getComponentType() );
         }
         /// end fix
