@@ -71,13 +71,21 @@ public final class InterbaseQueryExpression
             }
             done.addElement( join.leftTable );
         }
-        enum = tables.elements();
+        enum = tables.keys();
         while ( enum.hasMoreElements() ) {
-            if ( first )
+            if ( first ) {
                 first = false;
-            else
+            } else {
                 sql.append( JDBCSyntax.TableSeparator );
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
+            }
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) tables.get( tableAlias );
+            if( tableAlias.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
         }
 
         first = addWhereClause( sql, true );
@@ -94,7 +102,15 @@ public final class InterbaseQueryExpression
       if(join.outer) sql.append( JDBCSyntax.LeftJoin );
       else sql.append( JDBCSyntax.InnerJoin );
 
-      sql.append(  _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
+      String tableAlias = join.rightTable;
+      String tableName = (String) _tables.get( tableAlias );
+      if( tableAlias.equals( tableName ) ) {
+          sql.append( _factory.quoteName( tableName ) );
+      } else {
+          sql.append( _factory.quoteName( tableName ) + " " +
+                      _factory.quoteName( tableAlias ) );
+      }
+      sql.append( JDBCSyntax.On );
       for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
           if ( j > 0 ) sql.append( JDBCSyntax.And );
           sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +

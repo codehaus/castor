@@ -116,6 +116,10 @@ public class JDBCQueryExpression
         _tables.put( tableName, tableName );
     }
 
+    public void addTable( String tableName, String tableAlias )
+    {
+        _tables.put( tableAlias, tableName );
+    }
 
     public void addParameter( String tableName, String columnName, String condOp )
     {
@@ -158,6 +162,25 @@ public class JDBCQueryExpression
     }
 
 
+    public void addInnerJoin( String leftTable, String leftColumn,
+                              String rightTable, String rightColumn, String rightTableAlias )
+    {
+        int index;
+        Join join;
+
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTableAlias, rightTable );
+        join = new Join( leftTable, leftColumn, rightTableAlias, rightColumn, false );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        } else {
+            // inner join overrides outer joins
+            _joins.set(index, join);
+        }
+    }
+
+
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn )
     {
@@ -167,6 +190,25 @@ public class JDBCQueryExpression
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
         join = new Join( leftTable, leftColumn, rightTable, rightColumn, false );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        } else {
+            // inner join overrides outer joins
+            _joins.set(index, join);
+        }
+    }
+
+
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn, String rightTableAlias )
+    {
+        int index;
+        Join join;
+
+        _tables.put( leftTable, leftTable );
+        _tables.put( rightTableAlias, rightTable );
+        join = new Join( leftTable, leftColumn, rightTableAlias, rightColumn, false );
         index = _joins.indexOf(join);
         if (index < 0) {
             _joins.add(join);
@@ -337,7 +379,14 @@ public class JDBCQueryExpression
                 sql.append( "{oj " );
             sql.append(  _factory.quoteName( join.leftTable ) );
             sql.append( JDBCSyntax.LeftJoin );
-            sql.append(  _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
+            String tableName = (String) tables.get( join.rightTable );
+            if( join.rightTable.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( join.rightTable ) );
+            }
+            sql.append( JDBCSyntax.On );
             for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
                 if ( j > 0 )
                     sql.append( JDBCSyntax.And );
@@ -356,7 +405,13 @@ public class JDBCQueryExpression
                 if ( ! join.leftTable.equals( join2.leftTable ) )
                     continue;
                 sql.append( JDBCSyntax.LeftJoin );
-                sql.append(  _factory.quoteName( join2.rightTable ) ).append( JDBCSyntax.On );
+                if( join2.rightTable.equals( tableName ) ) {
+                    sql.append( _factory.quoteName( tableName ) );
+                } else {
+                    sql.append( _factory.quoteName( tableName ) + " " +
+                                _factory.quoteName( join2.rightTable ) );
+                }
+                sql.append( JDBCSyntax.On );
                 for ( int j = 0 ; j < join2.leftColumns.length ; ++j ) {
                     if ( j > 0 )
                         sql.append( JDBCSyntax.And );
@@ -371,13 +426,20 @@ public class JDBCQueryExpression
                 sql.append( "}" );
             done.addElement( join.leftTable );
         }
-        enum = tables.elements();
+        enum = tables.keys();
         while ( enum.hasMoreElements() ) {
             if ( first )
                 first = false;
             else
                 sql.append( JDBCSyntax.TableSeparator );
-            sql.append( _factory.quoteName( (String) enum.nextElement() ) );
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) tables.get( tableAlias );
+            if( tableAlias.equals( tableName ) ) {
+                sql.append( _factory.quoteName( tableName ) );
+            } else {
+                sql.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
         }
 
         // Use standard join syntax for all inner joins

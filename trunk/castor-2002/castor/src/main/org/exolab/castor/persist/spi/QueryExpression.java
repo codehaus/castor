@@ -161,6 +161,16 @@ public interface QueryExpression
      */
     public void addTable( String tableName );
 
+
+    /**
+     * Add a table with an alias to the from clause.
+     *
+     * @param tableName The name of the table to add to the select clause
+     * @param tableAlias The name of the alias under which the where clauses will access it
+     */
+    public void addTable( String tableName, String tableAlias );
+
+
     /**
      * Add a query paramater.
      *
@@ -230,6 +240,19 @@ public interface QueryExpression
 
 
     /**
+     * Add an inner join with an alias for the right table
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column name on the left side
+     * @param rightTable The table name on the right side
+     * @param rightColumn The column name on the right side
+     * @param rightTableAlias The alias name to use for the table on the right side
+     */
+    public void addInnerJoin( String leftTable, String leftColumn,
+                              String rightTable, String rightColumn, String rightTableAlias );
+
+
+    /**
      * Add an outer join. May use an inner join if outer
      * joins are not supported.
      *
@@ -245,6 +268,19 @@ public interface QueryExpression
 
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn );
+
+
+    /**
+     * Add an inner join with an alias for the right table
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column names on the left side
+     * @param rightTable The table names on the right side
+     * @param rightColumn The column name on the right side
+     * @param rightTableAlias The alias name to use for the table on the right side
+     */
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn, String rightTableAlias );
 
 
     public void addOuterJoin( String leftTable, String[] leftColumn,

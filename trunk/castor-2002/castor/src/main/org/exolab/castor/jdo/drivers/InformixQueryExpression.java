@@ -118,15 +118,24 @@ public final class InformixQueryExpression
         Vector outerTables = getOuterTables();
         String table = null;
 
-        for(Enumeration enum = _tables.elements(); enum.hasMoreElements();)
+        for ( Enumeration enum = _tables.keys(); enum.hasMoreElements(); )
         {
-            table = (String)enum.nextElement();
-            if (outerTables.contains(table))
-                vector.addElement("OUTER " + _factory.quoteName(table));
-            else
-                vector.addElement(_factory.quoteName(table));
+            String tableAlias = (String) enum.nextElement();
+            String tableName = (String) _tables.get( tableAlias );
+            StringBuffer tmp;
+            if ( outerTables.contains( tableAlias ) ) {
+                tmp = new StringBuffer( "OUTER " );
+            } else {
+                tmp = new StringBuffer();
+            }
+            if( tableAlias.equals( tableName ) ) {
+                tmp.append( _factory.quoteName( tableName ) );
+            } else {
+                tmp.append( _factory.quoteName( tableName ) + " " +
+                            _factory.quoteName( tableAlias ) );
+            }
+            vector.addElement( _factory.quoteName( tmp.toString() ) );
         }
-
         return vector.elements();
     }
 

@@ -808,6 +808,30 @@ public class ParseTreeWalker implements TokenTypes
 
 
   /**
+   * Builds the alias name for a table from the path info.
+   *
+   * @param tableName The name of the table to add to the select clause
+   * @param tableAlias The path info vector to build the alias with
+   */
+  public String buildTableAlias( String tableName, Vector path )
+  {
+      // FIXME This will cause problems if a (different) table with
+      // the same name as our alias already exists (or will be added at a later time)
+      // in the query. Catching this might become a bit tricky ...
+      StringBuffer tableAlias = new StringBuffer( tableName );
+      // We don't just alias all tables here, but only those where some attribute is queried (not those
+      // where we query a whole object). The reasons for this are impossible for me to explain right now,
+      // as I am rather tired; I'll write some better explanation later - I promise! :-)
+      if( path != null && path.size() > 2 ) {
+          tableAlias.append( "_for_" );
+          for ( int i = 1; i < path.size(); i++ ) {
+              tableAlias.append( (String) path.elementAt(i) + "_" ); }
+          tableAlias.deleteCharAt( tableAlias.length() - 1 );
+      }
+      return tableAlias.toString();
+  }
+
+  /**
    * Adds joins to the queryExpr for path expressions in the OQL.
    *
    */
@@ -822,7 +846,7 @@ public class ParseTreeWalker implements TokenTypes
     for ( int i = 1; i < path.size() - 1; i++ ) {
         JDOFieldDescriptor fieldDesc = null;
 
-        // Find the sorceclass and the fielsddescriptor
+        // Find the sourceclass and the fielsddescriptor
         // in the class hierachie
         while(fieldDesc == null){
             fieldDesc = sourceClass.getField( (String) path.elementAt(i) );
@@ -840,7 +864,8 @@ public class ParseTreeWalker implements TokenTypes
                 _queryExpr.addInnerJoin( sourceClass.getTableName(),
                                          fieldDesc.getSQLName(),
                                          clsDesc.getTableName(),
-                                         foreignKey.getSQLName() );
+                                         foreignKey.getSQLName(),
+                                         buildTableAlias( clsDesc.getTableName(), path ) );
             } else {
                 //a one -> many relationship
                 JDOFieldDescriptor identity = (JDOFieldDescriptor) sourceClass.getIdentity();
@@ -849,7 +874,8 @@ public class ParseTreeWalker implements TokenTypes
                 _queryExpr.addInnerJoin( sourceClass.getTableName(),
                                          identityColumn,
                                          clsDesc.getTableName(),
-                                         fieldDesc.getManyKey()[0] );
+                                         fieldDesc.getManyKey()[0],
+                                         buildTableAlias( clsDesc.getTableName(), path ) );
             }
             sourceClass = clsDesc;
         }
@@ -1004,63 +1030,54 @@ public class ParseTreeWalker implements TokenTypes
 
       //fields or SQL functions
       case IDENTIFIER: case DOT:
-        if ( exprTree.getChildCount() > 0 &&
-             exprTree.getChild(1).getToken().getTokenType() == LPAREN ) {
-          //An SQL function
-          sb = new StringBuffer(exprTree.getToken().getTokenValue())
-                      .append("(");
-          int paramCount = 0;
-          for (Enumeration e = exprTree.children(); e.hasMoreElements(); ) {
-            sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) )
-              .append(" , ");
-            paramCount++;
-          }
-
-          if ( paramCount > 0 )
-            //replace final comma space with close paren.
-            sb.replace(sb.length() - 2, sb.length() - 1, " )").append(" ");
-          else
-            //there were no parameters, so no commas.
-            sb.append(") ");
-
-          return sb.toString();
-        }
-        else {
-
-        //a field
-        if ( tokenType == DOT ) {
-        Vector path = (Vector) _pathInfo.get(exprTree);
-        if ( path == null ) {
-            System.err.println( "exprTree="+exprTree.toStringEx()+
-                    "\npathInfo = {" );
-            Enumeration enum = _pathInfo.keys();
-            ParseTreeNode n;
-            while ( enum.hasMoreElements() ) {
-            n = (ParseTreeNode)enum.nextElement();
-            System.err.println( "\t"+n.toStringEx() );
+        if ( exprTree.getChildCount() > 0 && exprTree.getChild(1).getToken().getTokenType() == LPAREN ) {
+            //An SQL function
+            sb = new StringBuffer(exprTree.getToken().getTokenValue()).append("(");
+            int paramCount = 0;
+            for (Enumeration e = exprTree.children(); e.hasMoreElements(); ) {
+                sb.append( getSQLExpr( (ParseTreeNode) e.nextElement() ) ).append(" , ");
+                paramCount++;
             }
-            // Exception follows in addJoinsForPathExpression()
-        }
-        addJoinsForPathExpression( path );
-        }
 
-          JDOFieldDescriptor field =
-                  (JDOFieldDescriptor) _fieldInfo.get(exprTree);
-      if ( field == null ) {
-          throw new IllegalStateException( "fieldInfo for "+exprTree.toStringEx()+
-                           " not found" );
-      }
-          JDOClassDescriptor clsDesc =
-          // (JDOClassDescriptor) field.getClassDescriptor();
-          (JDOClassDescriptor) field.getContainingClassDescriptor();
+            if ( paramCount > 0 ) {
+                //replace final comma space with close paren.
+                sb.replace(sb.length() - 2, sb.length() - 1, " )").append(" ");
+            } else {
+                //there were no parameters, so no commas.
+                sb.append(") ");
+            }
 
-          if ( clsDesc == null ) {
-          throw new IllegalStateException( "ContainingClass of "+
-                           field.toString()+" is null !" );
-      }
+            return sb.toString();
+        } else {
 
-          return _queryExpr.encodeColumn( clsDesc.getTableName(),
-                      field.getSQLName()[0] );
+            //a field
+            if ( tokenType == DOT ) {
+                Vector path = (Vector) _pathInfo.get(exprTree);
+                if ( path == null ) {
+                    System.err.println( "exprTree=" + exprTree.toStringEx() + "\npathInfo = {" );
+                    Enumeration enum = _pathInfo.keys();
+                    ParseTreeNode n;
+                    while ( enum.hasMoreElements() ) {
+                        n = (ParseTreeNode)enum.nextElement();
+                        System.err.println( "\t" + n.toStringEx() );
+                    }
+                    // Exception follows in addJoinsForPathExpression()
+                }
+                addJoinsForPathExpression( path );
+            }
+
+            JDOFieldDescriptor field = (JDOFieldDescriptor) _fieldInfo.get(exprTree);
+            if ( field == null ) {
+                throw new IllegalStateException( "fieldInfo for " + exprTree.toStringEx() + " not found" );
+            }
+            JDOClassDescriptor clsDesc = (JDOClassDescriptor) field.getContainingClassDescriptor();
+
+            if ( clsDesc == null ) {
+                throw new IllegalStateException( "ContainingClass of "+ field.toString()+" is null !" );
+            }
+            String tableAlias = buildTableAlias( clsDesc.getTableName(), (Vector) _pathInfo.get(exprTree) );
+            _queryExpr.addTable( clsDesc.getTableName(), tableAlias );
+            return _queryExpr.encodeColumn( tableAlias, field.getSQLName()[0] );
         }
 
       //parameters
