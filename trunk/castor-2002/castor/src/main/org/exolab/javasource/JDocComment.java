@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -164,6 +164,11 @@ public class JDocComment {
         JComment jComment = new JComment(JComment.JAVADOC_STYLE);
         
         jComment.setComment(_comment.toString());
+        
+        //-- force a separating "*" for readability
+        if (_descriptors.size() > 0) {
+            jComment.appendComment("\n");
+        }
         
         for (int i = 0; i < _descriptors.size(); i++) {
             jComment.appendComment("\n");
