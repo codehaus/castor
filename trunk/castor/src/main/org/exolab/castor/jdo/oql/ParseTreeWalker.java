@@ -50,6 +50,7 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Vector;
 
+import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
@@ -82,6 +83,7 @@ public class ParseTreeWalker implements TokenTypes
   private ClassLoader _classLoader;
   private Class _objClass;
   private QueryExpression _queryExpr;
+  private DbMetaInfo _dbInfo;
 
   private int _SQLParamIndex; //Alex
   private Hashtable _paramInfo;
@@ -112,12 +114,13 @@ public class ParseTreeWalker implements TokenTypes
    * @param classLoader A ClassLoader instance to load classes.
    * @throws QueryException Thrown by checkErrors.
    */
-  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader )
+  public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader, DbMetaInfo dbInfo)
       throws QueryException
   {
     _dbEngine = dbEngine;
     _parseTree = parseTree;
     _classLoader = classLoader;
+    _dbInfo = dbInfo;
 
     _SQLParamIndex = 1; //Alex
     _paramInfo = new Hashtable();
@@ -885,6 +888,8 @@ public class ParseTreeWalker implements TokenTypes
         _queryExpr = _engine.getQueryExpression();
         addSelectFromJoins();
     }
+
+    _queryExpr.setDbMetaInfo(_dbInfo);
 
     //check for DISTINCT
     if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
