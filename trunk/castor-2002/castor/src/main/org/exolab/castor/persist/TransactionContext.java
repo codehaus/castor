@@ -287,12 +287,10 @@ public abstract class TransactionContext
      *
      * @param engine The persistence engine
      * @param handler The class persistence handler
+     * @param object The object to fetch (single instance per transaction)
      * @param identity The object's identity
      * @param accessMode The access mode (see {@link AccessMode})
-     * @return The object (single instance per transaction)
      *  the values in persistent storage
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
      * @throws ObjectNotFoundException The object was not found in
@@ -300,18 +298,20 @@ public abstract class TransactionContext
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public synchronized Object fetch( PersistenceEngine engine, ClassHandler handler,
-                                      Object identity, AccessMode accessMode )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
+    public synchronized OID fetch( PersistenceEngine engine, ClassHandler handler,
+                                   Object object, Object identity, AccessMode accessMode )
+        throws ObjectNotFoundException, LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
         OID         oid;
-        Object      object;
 
         oid = new OID( handler, identity );
-        entry = getObjectEntry( engine, oid );
+        entry = getObjectEntry( object );
         if ( entry != null ) {
+            // XXX Need to report object loaded with different identity
+            if ( entry.oid.getIdentity().equals( identity ) )
+                throw new PersistenceExceptionImpl( "persist.multipleLoad", handler.getJavaClass(), identity );
+
             // If the object has been loaded in this transaction from a
             // different engine this is an error. If the object has been
             // deleted in this transaction, it cannot be re-loaded. If the
@@ -324,7 +324,7 @@ public abstract class TransactionContext
             if ( ! handler.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
                 throw new PersistenceExceptionImpl( "persist.typeMismatch", handler.getJavaClass(), entry.object.getClass() );
             if ( entry.created )
-                return entry.object;
+                return oid;
             if ( ( accessMode == AccessMode.Exclusive ||
                    accessMode == AccessMode.Locked ) && ! entry.oid.isExclusive() ) {
                 // If we are in exclusive mode and object has not been
@@ -334,7 +334,7 @@ public abstract class TransactionContext
                 // synchronize a live object.
                 throw new PersistenceExceptionImpl( "persist.lockConflict", handler.getJavaClass(), identity );
             }
-            return entry.object;
+            return oid;
         }
 
         // Load (or reload) the object through the persistence engine with the
@@ -357,7 +357,6 @@ public abstract class TransactionContext
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
         // the object in this transaction.
-        object = handler.newInstance();
         entry = addObjectEntry( object, oid, engine );
         try {
             engine.copyObject( this, oid, object );
@@ -370,7 +369,7 @@ public abstract class TransactionContext
             removeObjectEntry( object );
             engine.releaseLock( this, oid );
         }
-        return object;
+        return oid;
     }
 
 
@@ -385,16 +384,13 @@ public abstract class TransactionContext
      * @param query A query against the persistence engine
      * @param accessMode The access mode
      * @return A query result iterator
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws QueryException An invalid query
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
     public synchronized QueryResults query( PersistenceEngine engine, PersistenceQuery query,
                                             AccessMode accessMode )
-        throws TransactionNotInProgressException, QueryException,
-               PersistenceException
+        throws QueryException, PersistenceException
     {
         // Need to execute query at this point. This will result in a
         // new result set from the query, or an exception.
@@ -416,8 +412,6 @@ public abstract class TransactionContext
      * @param object The object to persist
      * @param identity The object's identity (may be null)
      * @return The object's OID
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws DuplicateIdentityException An object with this identity
      *  already exists in persistent storage
      * @throws PersistenceException An error reported by the
@@ -426,8 +420,7 @@ public abstract class TransactionContext
      *  persistent capable
      */
     public synchronized OID create( PersistenceEngine engine, Object object, Object identity )
-        throws TransactionNotInProgressException, DuplicateIdentityException,
-               ClassNotPersistenceCapableException, PersistenceException
+        throws DuplicateIdentityException, ClassNotPersistenceCapableException, PersistenceException
     {
         OID          oid;
         ObjectEntry  entry;
@@ -479,8 +472,6 @@ public abstract class TransactionContext
      * assure the object can be deleted.
      *
      * @param object The object to delete from persistent storage
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws ObjectNotPersistentException The object has not been
      *  queried or created in this transaction
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -489,8 +480,7 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized void delete( Object object )
-        throws TransactionNotInProgressException, ObjectNotPersistentException,
-               LockNotGrantedException, PersistenceException
+        throws ObjectNotPersistentException, LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
 
@@ -546,8 +536,6 @@ public abstract class TransactionContext
      * @param timeout Timeout waiting to acquire lock, specified in
      *  seconds, zero for no waiting, negative to use the default
      *  timeout for this transaction
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws ObjectNotPersistentException The object has not been
      *  queried or created in this transaction
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -556,8 +544,7 @@ public abstract class TransactionContext
      *  persistence engine
      */
     public synchronized void writeLock( Object object, int timeout )
-        throws TransactionNotInProgressException, ObjectNotPersistentException,
-               LockNotGrantedException, PersistenceException
+        throws ObjectNotPersistentException, LockNotGrantedException, PersistenceException
     {
         ObjectEntry entry;
 
@@ -583,21 +570,67 @@ public abstract class TransactionContext
 
 
     /**
+     * Acquire a write lock on the object. Read locks are implicitly
+     * available when the object is queried. A write lock is only
+     * granted for objects that are created or deleted or for objects
+     * loaded in exclusive mode - this method can obtain such a lock
+     * explicitly. If the object already has a write lock in this
+     * transaction or a read lock in this transaction but no read lock
+     * in any other transaction, a write lock is obtained. If this
+     * object has a read lock in any other transaction this method
+     * will block until the other transaction will release its lock.
+     * If the specified timeout has elapsed or a deadlock has been
+     * detected, an exception will be thrown but the current lock will
+     * be retained.
+     *
+     * @param object The object to lock
+     * @param timeout Timeout waiting to acquire lock, specified in
+     *  seconds, zero for no waiting, negative to use the default
+     *  timeout for this transaction
+     * @throws ObjectNotPersistentException The object has not been
+     *  queried or created in this transaction
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     */
+    public synchronized void softLock( Object object, int timeout )
+        throws LockNotGrantedException, ObjectNotPersistentException
+    {
+        ObjectEntry entry;
+
+        // Get the entry for this object, if it does not exist
+        // the object has never been persisted in this transaction
+        entry = getObjectEntry( object );
+        if ( entry == null )
+            throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+        if ( entry.deleted )
+            throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
+        try {
+            entry.engine.softLock( this, entry.oid, timeout );
+        } catch ( ObjectDeletedException except ) {
+            // Object has been deleted outside this transaction,
+            // forget about it
+            removeObjectEntry( object );
+            throw except;
+        } catch ( LockNotGrantedException except ) {
+            // Can't get lock, but may still keep running
+            throw except;
+        }
+    }
+
+
+    /**
      * Releases the lock granted on the object. The object is removed
      * from this transaction and will not participate in transaction
      * commit/abort. Any changes done to the object are lost.
      *
      * @param object The object to release the lock
-     * @throws  TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws ObjectNotPersistentException The object was not queried
      *   or created in this transaction
      * @throws PersistenceException An error occured talking to the
      *   persistence engine
      */
     public synchronized void release( Object object )
-        throws TransactionNotInProgressException, ObjectNotPersistentException,
-               PersistenceException
+        throws ObjectNotPersistentException, PersistenceException
     {
         ObjectEntry entry;
 
@@ -623,14 +656,14 @@ public abstract class TransactionContext
      *
      * @return True if the transaction can commit, false if the
      *   transaction is read only
-     * @throws  TransactionNotInProgressException Method called while
-     *   transaction is not in progress
+     * @throws  IllegalStateException Method called if transaction is
+     *  not in the proper state to perform this operation
      * @throws TransactionAbortedException The transaction has been
      *   aborted due to inconsistency, duplicate object identity, error
      *   with the persistence engine or any other reason
      */
     public synchronized boolean prepare()
-        throws TransactionNotInProgressException, TransactionAbortedException
+        throws TransactionAbortedException
     {
         Enumeration enum;
         ObjectEntry entry;
@@ -640,7 +673,7 @@ public abstract class TransactionContext
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedExceptionImpl( "persist.markedRollback" );
         if ( _status != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
+            throw new IllegalStateException( Messages.message( "persist.noTransaction" ) );
 
         // No objects in this transaction -- this is a read only transaction
         if ( _objects.size() == 0 ) {
@@ -708,20 +741,20 @@ public abstract class TransactionContext
      * objects deleted during the transaction. May be called any number
      * of times prior to committing/aborting the transaction.
      *
-     * @throws  TransactionNotInProgressException Method called while
-     *   transaction is not in progress
      * @throws TransactionAbortedException The transaction has been
      *   aborted due to inconsistency, duplicate object identity, error
      *   with the persistence engine or any other reason
+     * @throws  IllegalStateException Method called if transaction is
+     *  not in the proper state to perform this operation
      */
     public void checkpoint()
-        throws TransactionNotInProgressException, TransactionAbortedException
+        throws TransactionAbortedException
     {
         Enumeration enum;
         ObjectEntry entry;
 
         if ( _xid != null )
-            throw new TransactionNotInProgressException( Messages.message( "persist.checkpointNotSupported" ) );
+            throw new IllegalStateException( Messages.message( "persist.checkpointNotSupported" ) );
         // Never commit transaction that has been marked for rollback
         if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
             rollback();
@@ -790,7 +823,7 @@ public abstract class TransactionContext
      *   without calling {@link #prepare} first
      */
     public synchronized void commit()
-        throws TransactionNotInProgressException, TransactionAbortedException
+        throws TransactionAbortedException
     {
         Enumeration enum;
         ObjectEntry entry;
@@ -849,18 +882,17 @@ public abstract class TransactionContext
      * queried in this transaction. This method may be called at any point
      * during the transaction.
      *
-     * @throws  TransactionNotInProgressException Method called while
-     *   transaction is not in progress
+     * @throws  IllegalStateException Method called if transaction is
+     *  not in the proper state to perform this operation
      */
     public synchronized void rollback()
-        throws TransactionNotInProgressException
     {
         Enumeration enum;
         ObjectEntry entry;
 
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_PREPARED &&
              _status != Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
+            throw new IllegalStateException( Messages.message( "persist.noTransaction" ) );
 
         // Go through all the connections opened in this transaction,
         // rollback and close them one by one.
