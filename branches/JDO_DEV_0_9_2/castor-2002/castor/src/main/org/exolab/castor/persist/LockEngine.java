@@ -993,7 +993,7 @@ public final class LockEngine {
         /**
          * The base entity this TypeInfo belongs to
          */
-        private final Entity        base;
+        private final EntityInfo    base;
 
         /**
          * The molder for this class.
