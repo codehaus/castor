@@ -52,11 +52,21 @@ import java.util.Enumeration;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Constructor;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.jdo.engine.SQLEngine;
+
 import junit.framework.TestSuite;
 import junit.framework.TestCase;
 
 public class Category
 {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( Category.class );
 
 
     private String  _name;
@@ -135,7 +145,8 @@ public class Category
 
 
     public TestSuite createTestCategory( TestHarness harness, String branch )
-            throws Exception {
+            throws Exception 
+	{
 
         Class          catClass;
         Constructor    cnst;
