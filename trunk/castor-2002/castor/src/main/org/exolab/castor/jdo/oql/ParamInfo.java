@@ -77,6 +77,8 @@ public class ParamInfo {
   {
     _userDefinedType = userDefinedType;
     _systemType = systemType;
+
+    _sqlQueryParamMap = new Vector();
     
     Class userClass = null;
     Class systemClass = null;
