@@ -142,7 +142,7 @@ public class Mapping
      * {@link #getResolver}.
      */
     public static final EngineMapping DAX =
-        new EngineMapping( "jdo", "org.exolab.castor.dax.engine.DAXMappingLoader" );
+        new EngineMapping( "dax", "org.exolab.castor.dax.engine.DAXMappingLoader" );
 
 
     /**
@@ -150,7 +150,7 @@ public class Mapping
      * {@link #getResolver}.
      */
     public static final EngineMapping XML =
-        new EngineMapping( "jdo", "org.exolab.castor.xml.XMLMappingLoader" );
+        new EngineMapping( "xml", "org.exolab.castor.xml.XMLMappingLoader" );
 
 
     /**
