@@ -193,14 +193,6 @@ create unique index test_types_pk
   on test_types ( id );
 
 
-create table test_keygen (
-  id    int           not null,
-  attr  varchar(200)  not null
-);
-
-create unique index test_keygen_pk
-  on test_keygen ( id );
-
 
 create table list_types (
   o_char  CHAR(100)         null,
@@ -218,12 +210,35 @@ create table list_types (
 );
 
 
+create table test_keygen (
+  id    int           not null,
+  attr  varchar(200)  not null
+);
+
+create unique index test_keygen_pk
+  on test_keygen ( id );
+
 create table test_keygen_ext (
   id   int          not null,
   ext  varchar(200) not null
 );
 
 create unique index test_keygen_ext_pk on test_keygen_ext ( id );
+
+create table test_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+);
+
+create unique index test_uuid_pk
+  on test_uuid ( id );
+
+create table test_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+);
+
+create unique index test_uuid_ext_pk on test_uuid_ext ( id );
 
 
 create table test_seqtable (

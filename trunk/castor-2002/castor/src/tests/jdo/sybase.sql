@@ -372,6 +372,28 @@ go
 grant all on test_keygen_ext to test
 go
 
+
+drop table test_uuid
+go
+create table test_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+)
+go
+create unique index test_uuid_pk on test_uuid ( id )
+go
+
+drop table test_uuid_ext
+go
+create table test_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+)
+go
+create unique index test_uuid_ext_pk on test_uuid_ext ( id )
+go
+
+
 -- test_seqtable
 drop table test_seqtable
 go

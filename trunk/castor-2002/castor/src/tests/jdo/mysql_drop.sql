@@ -39,6 +39,10 @@ drop table   test_types;
 
 drop table   test_keygen;
 
+drop table test_uuid;
+
+drop table test_uuid_ext;
+
 drop table list_types;
 
 drop table test_keygen_ext;
@@ -50,8 +54,6 @@ drop table test_persistent;
 drop table test_identity;
 
 drop table test_identity_ext;
-
-drop table test_col;
 
 drop table test_col;
 

@@ -47,30 +47,56 @@
 package jdo;
 
 
-import org.exolab.castor.jdo.Database;
-import org.exolab.jtf.CWVerboseStream;
-import org.exolab.jtf.CWTestCategory;
-import org.exolab.exceptions.CWClassConstructorException;
-
-
 /**
- * Test for RETURNING key generator.
+ * Test object for UUID key generator.
  */
-public class KeyGenReturning
-    extends KeyGenGeneric
+public class TestUuidObject
 {
 
 
-    public KeyGenReturning( CWTestCategory category )
-        throws CWClassConstructorException
+    private String _id;
+
+
+    private String _attr;
+
+
+    static final String    DefaultAttr = "attr";
+
+
+    public TestUuidObject()
     {
-        super( "TC43", "Key generator: SEQUENCE in RETURNING mode", category );
+        _attr = DefaultAttr;
     }
 
-    protected boolean testAllKeyGens( CWVerboseStream stream, Database db)
-            throws Exception
+
+    public void setId( String id )
     {
-        return testOneKeyGen( stream, db, TestReturningObject.class, TestReturningExtends.class );
+        _id = id;
     }
+
+
+    public String getId()
+    {
+        return _id;
+    }
+
+
+    public void setAttr( String attr )
+    {
+        _attr = attr;
+    }
+
+
+    public String getAttr()
+    {
+        return _attr;
+    }
+
+
+    public String toString()
+    {
+        return ( _id == null ? "null" : _id.toString() ) + " / " + _attr;
+    }
+
 
 }

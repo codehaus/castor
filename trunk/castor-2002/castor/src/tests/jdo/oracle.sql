@@ -294,6 +294,21 @@ create unique index test_keygen_ext_pk on test_keygen_ext ( id );
 grant all on test_keygen_ext to test;
 
 
+drop table test_uuid;
+create table test_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+);
+create unique index test_uuid_pk on test_uuid ( id );
+
+drop table test_uuid_ext;
+create table test_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+);
+create unique index test_uuid_ext_pk on test_uuid_ext ( id );
+
+
 drop table   test_seqtable;
 create table test_seqtable (
   table_name  varchar(200)  not null,
