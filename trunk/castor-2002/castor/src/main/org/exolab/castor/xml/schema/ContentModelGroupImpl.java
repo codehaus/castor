@@ -269,20 +269,35 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
     **/
     public ElementDecl getElementDecl(String name) {
         if (name == null) return null;
-
+        ElementDecl result = null;
         if (_resolver != null) {
             String key = "element:"+name;
-            return (ElementDecl) _resolver.resolve(key);
+            result =  (ElementDecl) _resolver.resolve(key);
+            //resolver is always not null (initialized in the constructor)
+            //but it may not contain the element (in case of a complexType)
+            if (result != null)
+                return result;
         }
         for (int i = 0; i < _contentModel.size(); i++) {
             Particle p = (Particle) _contentModel.elementAt(i);
-            if (p.getStructureType() == Structure.ELEMENT) {
-                ElementDecl e = (ElementDecl)p;
-                if (name.equals(e.getName()))
-                    return e;
+            switch (p.getStructureType()) {
+                case Structure.ELEMENT:
+                    ElementDecl e = (ElementDecl)p;
+                    if (name.equals(e.getName())) {
+                        result = e;
+                        break;
+                    }
+                    break;
+
+                case Structure.GROUP:
+                case Structure.MODELGROUP:
+                    result = ((ContentModelGroup)p).getElementDecl(name);
+                    break;
+                default:
+                    break;
             }
         }
-        return null;
+        return result;
     } //-- getElementDecl
 
     /**
