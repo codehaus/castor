@@ -143,7 +143,8 @@ table, values:
                    <td>Optional, default="false"</td></tr>
          </table></p>
       <p>If the parameter "global" is set to "true", the sequence table contains only one row with
-         <![CDATA["&lt;GLOBAL&gt;"]]> instead of the table name. This row serves for all tables.</p>
+         <![CDATA["<GLOBAL>"]]> instead of the table name. This row serves for all tables.</p>
+      <p>Don't forget to set same-connection="true" if you are working in EJB environment!</p>
       <p>Note, that the class HighLowKeyGenerator is not final, so you can
          extend it in order to implement other variants of HIGH/LOW
          algorithm (for example, HIGH/MID/LOW or char key values).</p>
