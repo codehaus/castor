@@ -122,6 +122,14 @@
         <url>key-generator.xml</url>
         <display>Key Generators</display>
       </navLink>
+      <navLink>
+        <url>long-transact.xml</url>
+        <display>Long Transactions</display>
+      </navLink>
+      <navLink>
+        <url>nested-attr.xml</url>
+        <display>Nested Attributes</display>
+      </navLink>
     </section>
 
     <section name="misc">
