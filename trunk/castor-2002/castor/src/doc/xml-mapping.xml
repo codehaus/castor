@@ -774,7 +774,7 @@ public class Item {
             <code>
 &lt;?xml version="1.0"?>
 &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
-                         "http://Castor.exolab.org/mapping.dtd">
+                         "http://castor.exolab.org/mapping.dtd">
 
 &lt;mapping>
         &lt;class name="MyOrder">
