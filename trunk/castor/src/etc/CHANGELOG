@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1815 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
+       Improved exception handling wrt to global transations.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1815
+       (Werner - 20041215)
+
 XML:   Fixed typo with null check during validation code in
        XMLClassDescriptorImpl 
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1560
