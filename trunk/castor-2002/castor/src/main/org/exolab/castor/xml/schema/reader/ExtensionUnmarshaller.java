@@ -292,8 +292,15 @@ public class ExtensionUnmarshaller extends SaxUnmarshaller {
                 (AttributeGroupReference) unmarshaller.getObject();
             _complexType.addAttributeGroupReference(attrGroupRef);
         }
-        //-- groups
-        else if (SchemaNames.isGroupName(name)) {
+        //--group
+        else if (name.equals(SchemaNames.GROUP)) {
+            ModelGroup group = ((ModelGroupUnmarshaller)unmarshaller).getGroup();
+            _complexType.addGroup(group);
+        }
+
+        //-- group declarations (all, choice, sequence)
+        else if ( (SchemaNames.isGroupName(name)) && (name != SchemaNames.GROUP) )
+        {
             Group group = ((GroupUnmarshaller)unmarshaller).getGroup();
             _complexType.addGroup(group);
         }
