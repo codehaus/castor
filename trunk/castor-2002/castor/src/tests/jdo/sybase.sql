@@ -304,6 +304,21 @@ go
 grant all on test_detail2 to test
 go
 
+-- test_detail3
+drop table test_detail3
+go
+create table test_detail3
+(
+  detail3_id  numeric(10,0)  not null,
+  detail_id  numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+)
+go
+create unique index test_detail3_pk on test_detail3 ( detail3_id )
+go
+grant all on test_detail3 to test
+go
+
 -- test_group
 drop table test_group
 go
@@ -459,12 +474,12 @@ go
 drop table test_persistent
 go
 create table test_persistent (
-  id       integer         not null,
-  ctime    datetime        not null,
-  mtime    datetime        null,
+  id       integer          not null,
+  ctime    datetime         not null,
+  mtime    datetime         null,
   value1    varchar(200)    not null,
-  parent_id integer        null,
-  group_id numeric(10,0)   not null
+  parent_id integer         null,
+  group_id numeric(10,0)    not null
 )
 go
 create unique index test_persistent_pk on test_persistent ( id )
