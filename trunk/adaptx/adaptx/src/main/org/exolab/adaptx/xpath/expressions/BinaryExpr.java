@@ -38,6 +38,13 @@ public interface BinaryExpr extends XPathExpression {
 
 
     /**
+     * Returns the operator for this binary expression
+     *
+     * @return the operator for this binary expression
+     */
+    public Operator getOperator();
+    
+    /**
      * Returns the Expr that should be evaluated as the left hand side
      * of this BinaryExpr
      *

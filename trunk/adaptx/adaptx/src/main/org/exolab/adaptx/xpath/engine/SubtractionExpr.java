@@ -30,6 +30,7 @@ import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.NumberResult;
 import org.exolab.adaptx.xpath.XPathException;
 
+import org.exolab.adaptx.xpath.expressions.Operator;
 
 /**
  * Represents an Subtraction Expr. 
@@ -37,7 +38,9 @@ import org.exolab.adaptx.xpath.XPathException;
 **/
 class SubtractionExpr extends BinaryExprImpl {
 
+    private static final String OP_STRING = " - ";
     
+    private static final Operator _operator = new SubtractOperator();
     
       //---------------/
      //- Constructor -/
@@ -77,43 +80,82 @@ class SubtractionExpr extends BinaryExprImpl {
     public XPathResult evaluate(XPathContext context) 
         throws XPathException
     {
-        double value = 0;
+        return _operator.execute(getLeftSide(), getRightSide(), context);
         
-        XPathExpression leftExpr = getLeftSide();
-        XPathExpression rightExpr = getRightSide();
-        
-        if ((leftExpr == null) || (rightExpr == null))
-            return NumberResult.NaN;
-
-        XPathResult rResult = rightExpr.evaluate( context );
-        XPathResult lResult = leftExpr.evaluate( context );
-        return new NumberResult(lResult.numberValue()-rResult.numberValue());
     } //-- evaluate
     
     /**
-     * Returns the String representation of this Expr
-     * @return the String representation of this Expr
-    **/
-    public String toString() {
-        
-        
-        StringBuffer sb = new StringBuffer();
-        XPathExpression expr = getLeftSide();
-        
-        if (expr != null)
-            sb.append(expr.toString());
-        else
-            sb.append("null");
-        sb.append(" - ");
-        
-        expr = getRightSide();
-        
-        if (expr != null)
-            sb.append(expr.toString());
-        else 
-            sb.append("null");
-        
-        return sb.toString();
-    } //-- toString
+     * Returns the operator for this binary expression
+     *
+     * @return the operator for this binary expression
+     */
+    public Operator getOperator() {
+        return _operator;
+    } //-- getOperator
     
-} //-- SubtractionExpr
+    /**
+     * The implementation of the "-" (subtraction) Operator.
+     */
+    static class SubtractOperator implements Operator {
+        
+        /**
+         * Returns the type for this Operator. The operator
+         * type may be one of the pre-defined types, or
+         * a user-defined type.
+         *
+         * @return the operator type
+         */
+        public int getOperatorType() {
+            return Operator.SUBTRACT_OPERATOR;
+        } //-- getOperator
+        
+        /**
+         * Executes this operator on the given expressions
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @param context the XPathContext for expression evaluation
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathExpression left, XPathExpression right, XPathContext context)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return NumberResult.NaN;
+
+            XPathResult rResult = right.evaluate( context );
+            XPathResult lResult = left.evaluate( context );
+            return new NumberResult(lResult.numberValue()-rResult.numberValue());
+            
+        } //-- execute
+        
+        /**
+         * Executes this operator on the given XPath values
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathResult left, XPathResult right)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return NumberResult.NaN;
+
+            return new NumberResult(left.numberValue()-right.numberValue());
+            
+        } //-- execute
+            
+        /**
+         * Returns the string representation of this operator
+         */
+        public String toString() {
+            return OP_STRING;
+        }
+    } //-- class: SubtractOperator
+    
+} //-- class: SubtractionExpr

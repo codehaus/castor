@@ -28,6 +28,7 @@ import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathException;
 
 import org.exolab.adaptx.xpath.expressions.BinaryExpr;
+import org.exolab.adaptx.xpath.expressions.Operator;
 
 /**
  * Represents a simple binary expression. A binary expression is
@@ -38,8 +39,10 @@ import org.exolab.adaptx.xpath.expressions.BinaryExpr;
  */
 abstract class BinaryExprImpl implements BinaryExpr {
 
-    protected XPathExpression leftExpr = null;
-    protected XPathExpression rightExpr = null;
+    final static String NULL = "null";
+    
+    protected XPathExpression leftExpr   = null;
+    protected XPathExpression rightExpr  = null;
 
       //---------------/
      //- Constructor -/
@@ -70,6 +73,13 @@ abstract class BinaryExprImpl implements BinaryExpr {
       //------------------/
      //- Public Methods -/
     //------------------/
+    
+    /**
+     * Returns the operator for this binary expression
+     *
+     * @return the operator for this binary expression
+     */
+    public abstract Operator getOperator();
     
 
     /**
@@ -124,5 +134,32 @@ abstract class BinaryExprImpl implements BinaryExpr {
 
     } //-- setLeftSide
 
-} //-- BinaryExpr
+    /**
+     * Returns the String representation of this BinaryExprImpl
+     *
+     * @return the String representation of this BinaryExprImpl
+     */
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        
+        XPathExpression tmp = getLeftSide();
+        if (tmp != null) 
+            sb.append(tmp.toString());
+        else 
+            sb.append(NULL);
+        
+        Operator op = getOperator();
+        if (op != null)
+            sb.append(op.toString());
+            
+        tmp = getRightSide();
+        if (tmp != null) 
+            sb.append(sb.toString());
+        else 
+            sb.append(NULL);
+            
+        return sb.toString();
+    } //-- toString
+
+} //-- class: BinaryExprImpl
 

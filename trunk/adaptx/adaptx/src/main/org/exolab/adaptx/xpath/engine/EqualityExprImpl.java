@@ -34,6 +34,7 @@ import org.exolab.adaptx.xpath.BooleanResult;
 import org.exolab.adaptx.xpath.XPathException;
 
 import org.exolab.adaptx.xpath.expressions.EqualityExpr;
+import org.exolab.adaptx.xpath.expressions.Operator;
 
 /**
  * The implementation of EqualityExpr
@@ -42,7 +43,7 @@ import org.exolab.adaptx.xpath.expressions.EqualityExpr;
  * @version $Revision$
  */
 class EqualityExprImpl extends BinaryExprImpl
-    implements EqualityExpr
+    implements EqualityExpr, Operator
 {
 
 
@@ -97,24 +98,6 @@ class EqualityExprImpl extends BinaryExprImpl
      //- Public Methods -/
     //------------------/
     
-    /**
-     * Returns the equality comparison type. 
-     * 
-     * @return the equality comparison type
-     */
-    public int getComparisonType() {
-        return _op;
-    } //-- getComparisonType
-    
-    /**
-     * Returns the type of Expr this Expr represents
-     *
-     * @return the type of Expr this Expr represents
-     */
-    public short getExprType()
-    {
-        return XPathExpression.BOOLEAN;
-    } //-- getExprType
     
 
     /**
@@ -128,12 +111,47 @@ class EqualityExprImpl extends BinaryExprImpl
     public XPathResult evaluate( XPathContext context )
         throws XPathException
     {
-        if ( leftExpr == null || rightExpr == null )
+        return execute(getLeftSide(), getRightSide(), context);
+
+    } //-- evaluate
+    
+    /**
+     * Executes this operator on the given expressions
+     *
+     * @param left the left-side expression
+     * @param right the right-side expression
+     * @param context the XPathContext 
+     * @return the XPathResult
+     * @throws XPathException when an error occurs during execution
+     */
+    public XPathResult execute
+        (XPathExpression left, XPathExpression right, XPathContext context)
+        throws XPathException
+    {
+        if ( left == null || right == null )
             return BooleanResult.FALSE;
+        
+        XPathResult lResult = left.evaluate( context );
+        XPathResult rResult = right.evaluate( context );
+        return execute(lResult, rResult);
+    } //-- execute
 
-        XPathResult lResult = leftExpr.evaluate( context );
-        XPathResult rResult = rightExpr.evaluate( context );
-
+    /**
+     * Executes this operator on the given XPath values
+     *
+     * @param left the left-side expression
+     * @param right the right-side expression
+     * @return the XPathResult
+     * @throws XPathException when an error occurs during execution
+     */
+    public XPathResult execute
+        (XPathResult lResult, XPathResult rResult)
+        throws XPathException
+    {
+            
+        if ( lResult == null || rResult == null )
+            return BooleanResult.FALSE;
+        
         int lType = lResult.getResultType();
         int rType = rResult.getResultType();
 
@@ -177,8 +195,47 @@ class EqualityExprImpl extends BinaryExprImpl
             return BooleanResult.FALSE;
         }
         return BooleanResult.from(compare(lResult,rResult));
-    } //-- evaluate
+
+    } //-- execute
+  
+    /**
+     * Returns the equality comparison type. 
+     * 
+     * @return the equality comparison type
+     */
+    public int getComparisonType() {
+        return _op;
+    } //-- getComparisonType
     
+    /**
+     * Returns the type of Expr this Expr represents
+     *
+     * @return the type of Expr this Expr represents
+     */
+    public short getExprType()
+    {
+        return XPathExpression.BOOLEAN;
+    } //-- getExprType
+    
+    /**
+     * Returns the operator for this binary expression
+     *
+     * @return the operator for this binary expression
+     */
+    public Operator getOperator() {
+        return this;
+    } //-- getOperator
+
+    /**
+     * Returns the type for this Operator. The operator
+     * type may be one of the pre-defined types, or
+     * a user-defined type.
+     *
+     * @return the operator type
+     */
+    public int getOperatorType() {
+        return Operator.EQUALITY_OPERATOR;
+    }
 
     public static boolean isRelationalOperator( String operator )
     {

@@ -30,6 +30,8 @@ import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.NumberResult;
 import org.exolab.adaptx.xpath.XPathException;
 
+import org.exolab.adaptx.xpath.expressions.Operator;
+
 
 /**
  * Represents an Addition Expr. 
@@ -38,6 +40,9 @@ import org.exolab.adaptx.xpath.XPathException;
 **/
 class AdditionExpr extends BinaryExprImpl {
 
+    static final String OP_STRING = " + ";
+    
+    private static final Operator _operator = new AddOperator();
     
       //---------------/
      //- Constructor -/
@@ -77,43 +82,84 @@ class AdditionExpr extends BinaryExprImpl {
     public XPathResult evaluate(XPathContext context) 
         throws XPathException
     {
-        XPathExpression leftExpr = getLeftSide();
-        XPathExpression rightExpr = getRightSide();
+        return _operator.execute(getLeftSide(), getRightSide(), context);
         
-        if ((leftExpr == null) || (rightExpr == null))
-            return NumberResult.NaN;
-
-        XPathResult rResult = rightExpr.evaluate(context);
-        XPathResult lResult = leftExpr.evaluate(context);
-        return new NumberResult(lResult.numberValue()+rResult.numberValue());
-
     } //-- evaluate
     
-
     /**
-     * Returns the String representation of this Expr
-     * @return the String representation of this Expr
-    **/
-    public String toString() {
+     * Returns the operator for this binary expression
+     *
+     * @return the operator for this binary expression
+     */
+    public Operator getOperator() {
+        return _operator;
+    } //-- getOperator
+    
+    /**
+     * The implementation of the "+" (addition) Operator.
+     */
+    static class AddOperator implements Operator {
         
-        StringBuffer sb = new StringBuffer();
-        XPathExpression expr = getLeftSide();
+        /**
+         * Returns the type for this Operator. The operator
+         * type may be one of the pre-defined types, or
+         * a user-defined type.
+         *
+         * @return the operator type
+         */
+        public int getOperatorType() {
+            return Operator.ADD_OPERATOR;
+        } //-- getOperator
         
-        if (expr != null)
-            sb.append(expr.toString());
-        else
-            sb.append("null");
-        sb.append(" + ");
+        /**
+         * Executes this operator on the given expressions
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @param context the XPathContext for expression evaluation
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathExpression left, XPathExpression right, XPathContext context)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return NumberResult.NaN;
+
+            XPathResult rResult = right.evaluate(context);
+            XPathResult lResult = left.evaluate(context);
+            
+            return new NumberResult(lResult.numberValue()+rResult.numberValue());
+            
+        } //-- execute
         
-        expr = getRightSide();
-        
-        if (expr != null)
-            sb.append(expr.toString());
-        else 
-            sb.append("null");
-        
-        return sb.toString();
-    } //-- toString
+        /**
+         * Executes this operator on the given XPath values
+         *
+         * @param left the left-side expression
+         * @param right the right-side expression
+         * @return the XPathResult
+         * @throws XPathException when an error occurs during execution
+         */
+        public XPathResult execute
+            (XPathResult left, XPathResult right)
+            throws XPathException
+        {
+            if ((left == null) || (right == null))
+                return NumberResult.NaN;
+
+            return new NumberResult(left.numberValue()+right.numberValue());
+            
+        } //-- execute
+            
+        /**
+         * Returns the string representation of this operator
+         */
+        public String toString() {
+            return OP_STRING;
+        }
+    } //-- AddOperator
     
 } //-- AdditionExpr
 
