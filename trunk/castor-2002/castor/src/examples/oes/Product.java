@@ -183,6 +183,12 @@ public class Product
     {
     }
 
+
+    public void jdoBeforeCreate()
+    {
+    }
+
+
 }
 
 

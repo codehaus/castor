@@ -165,6 +165,11 @@ public class Product implements Persistent
     }
 
 
+    public void jdoBeforeCreate()
+    {
+    }
+
+
     public String toString()
     {
         return _id + " " + _name;
