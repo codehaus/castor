@@ -290,7 +290,12 @@ public class XMLMappingLoader
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
 
         //-- matches
-        if (match != null) xmlDesc.setMatches(match);
+        if (match != null) {
+            xmlDesc.setMatches(match);
+            //-- special fix for xml-name since XMLFieldDescriptorImpl
+            //-- will create a default name based off the field name
+            if (xmlName == null) xmlDesc.setXMLName(null);
+        }
 
         //-- reference
         xmlDesc.setReference(isReference);
