@@ -47,7 +47,8 @@ package org.exolab.castor.tests.framework;
 import java.util.Random;
 import java.util.Vector;
 import java.util.ArrayList;
-
+import java.util.Date;
+import org.exolab.castor.types.*;
 /**
  * An helper class to assist in the generation of random instance of a given
  * object model.
@@ -65,7 +66,7 @@ public class RandomHelper {
     /**
      * The pseudo random number generator.
      */
-    private static Random _rand; 
+    private static Random _rand;
 
     static {
         _seed = System.currentTimeMillis();
@@ -82,7 +83,7 @@ public class RandomHelper {
      */
     private final static int MAX_COLLECTION_LENGTH = 50;
 
-    /** 
+    /**
      * List of the charactere that can be used to compose a string
      */
     private final static String PRINTABLE_CHAR = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890-_:.,=+~!@#$%^&*()[]{}\\|?";
@@ -96,7 +97,7 @@ public class RandomHelper {
      * @param vect the vector to populate
      * @param c the type of object to put in the vector
      */
-    public static Vector getRandom(Vector vect, Class c) 
+    public static Vector getRandom(Vector vect, Class c)
         throws InstantiationException, IllegalAccessException {
 
         int size = _rand.nextInt(MAX_COLLECTION_LENGTH);
@@ -129,7 +130,8 @@ public class RandomHelper {
 
 
     /**
-     * Return a random string.
+     * Returns a random string.
+     * @returns a random string
      */
     public static String getRandom(String s, Class c) {
 
@@ -142,16 +144,45 @@ public class RandomHelper {
 
         return new String(data);
     }
-    
+
     /**
-     * Return a random int.
+     * Returns a random java.util.date.
+     * @returns a random java.util.Date
+     */
+    public static java.util.Date getRandom(java.util.Date date, Class c) {
+
+        long milli  = _rand.nextLong();
+        return new java.util.Date(milli);
+    }
+
+    /**
+     * Returns a random Castor timeDuration
+     * @returns a random Castor timeDuration
+     */
+    public static TimeDuration getRandom(TimeDuration date, Class c) {
+        return new TimeDuration(_rand.nextLong());
+    }
+
+    /**
+     * Returns a random Castor recurringDuration
+     * @returns a random Castor recurringDuration
+     */
+    public static RecurringDuration getRandom(RecurringDuration recurring, Class c) {
+        return new RecurringDuration(new TimeDuration(_rand.nextLong()),
+                                     new TimeDuration(_rand.nextLong()));
+    }
+
+    /**
+     * Returns a random int.
+     * @returns a random int
      */
     public static int getRandom(int i) {
         return _rand.nextInt();
     }
 
     /**
-     * Return a random float.
+     * Returns a random float.
+     * @returns a random float
      */
     public static float getRandom(float f) {
         return _rand.nextFloat();
@@ -159,35 +190,41 @@ public class RandomHelper {
 
 
     /**
-     * Return a random boolean.
+     * Returns a random boolean.
+     * @returns a random boolean
      */
     public static boolean getRandom(boolean b) {
         return _rand.nextBoolean();
     }
 
     /**
-     * Return a random long.
+     * Returns a random long.
+     * @returns a random long
      */
     public static long getRandom(long l) {
         return _rand.nextLong();
     }
 
     /**
-     * Return a random double.
+     * Returns a random double.
+     * @returns a random double
      */
     public static double getRandom(double d) {
         return _rand.nextDouble();
     }
 
     /**
-     * Return a random printable character from the PRINTABLE_CHAR string
+     * Returns a random printable character from the PRINTABLE_CHAR string
+     * @returns a random printable character from the PRINTABLE_CHAR string
      */
     public static char rndPrintableChar() {
         return PRINTABLE_CHAR.charAt(_rand.nextInt(PRINTABLE_CHAR.length()));
     }
 
     /**
-     * Return the seed which was used to initialize the pseudo-random number
+     * Returns the seed which was used to initialize the pseudo-random number
+     * generator
+     * @returns the seed which was used to initialize the pseudo-random number
      * generator
      */
     public static long getSeed() {
