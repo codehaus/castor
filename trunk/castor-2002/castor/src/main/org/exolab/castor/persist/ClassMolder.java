@@ -357,7 +357,7 @@ public class ClassMolder {
         }
 
         // ssa, FIXME : Are the two statements equivalents ?
-//        if ( Persistent.class.isAssignableFrom( _base ) )
+		//        if ( Persistent.class.isAssignableFrom( _base ) )
         if ( Persistent.class.isAssignableFrom( ds.resolve(_name) ) )
             _callback = new JDOCallback();
     }
@@ -1443,14 +1443,6 @@ public class ClassMolder {
 
         if ( updateCache || updatePersist )
             tx.writeLock( object, timeout );
-
-        if ( getCallback() != null ) {
-            try {
-                getCallback().storing( object, updateCache );
-            } catch ( Exception except ) {
-                throw new PersistenceException( except.getMessage(), except );
-            }
-        }
 
         return updateCache;
     }
