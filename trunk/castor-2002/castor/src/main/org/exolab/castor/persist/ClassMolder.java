@@ -71,7 +71,6 @@ import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.mapping.loader.RelationDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.AccessMode;

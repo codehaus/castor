@@ -81,21 +81,11 @@ import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.mapping.loader.RelationDescriptor;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.persist.spi.Complex;
 import java.util.ArrayList;
 import java.util.HashSet;
-
-
-// ToDo (written on Aug 6, 2000)
-// -- JDODescription / MappingLoader for getIdenties
-// -- so better id, id.length
-// -- verify wherePK under addLoadSql etc...
-// -- query, store, delete ALL need new PK
-// -- QueryResult (blindly changed getIdentity to getIdentities)
-// -- create dependent object, tx need an special method for that
 
 
 /**
