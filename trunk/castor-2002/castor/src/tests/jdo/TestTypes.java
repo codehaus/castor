@@ -100,6 +100,7 @@ public class TestTypes
         _time = new java.util.Date();
         _timestamp = new java.util.Date();
         _date2 = new java.util.Date();
+        _time2 = new java.util.Date();
         _timestamp2 = new java.util.Date();
     }
 
