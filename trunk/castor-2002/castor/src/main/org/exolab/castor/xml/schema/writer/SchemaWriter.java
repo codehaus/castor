@@ -471,6 +471,13 @@ public class SchemaWriter {
             if (type.isComplexType())
                 processComplexType((ComplexType) type, schemaPrefix);
         }
+        
+        //-- process any identity-constraints
+        Enumeration enum = element.getIdentityConstraints();
+        while(enum.hasMoreElements()) {
+            processIdentityConstraint((IdentityConstraint)enum.nextElement(),
+                schemaPrefix);
+        }
 
         _handler.endElement(ELEMENT_NAME);
 
@@ -527,6 +534,97 @@ public class SchemaWriter {
 
     } //-- processGroup
 
+    /**
+     * Processes the given IdentityConstraint
+     *
+     * @param constraint the IdentityConstraint to process
+    **/
+    private void processIdentityConstraint
+        (IdentityConstraint constraint, String schemaPrefix) 
+        throws SAXException
+    {
+        
+        if (constraint == null) return;
+        
+        String ELEMENT_NAME = schemaPrefix;
+        
+        String name  = null;
+        String id    = null;
+        String refer = null;
+        
+        switch (constraint.getStructureType()) {
+            case Structure.KEYREF:
+                ELEMENT_NAME += SchemaNames.KEYREF;
+                refer = ((KeyRef)constraint).getRefer();
+                break;
+            case Structure.UNIQUE:
+                ELEMENT_NAME += SchemaNames.UNIQUE;
+                break;
+            default:
+                ELEMENT_NAME += SchemaNames.KEY;
+                break;
+        }
+        
+        name = constraint.getName();
+        id   = constraint.getId();
+        
+        _atts.clear();
+        
+        //-- name
+        _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, 
+            constraint.getName());
+            
+        //-- id
+        if (id != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, id);
+        }
+        
+        //-- refer
+        if (refer != null) {
+            _atts.addAttribute(SchemaNames.REFER_ATTR, CDATA, refer);
+        }
+        
+        _handler.startElement(ELEMENT_NAME, _atts);
+        
+        //-- process annotations
+        processAnnotated(constraint, schemaPrefix);
+        
+        //-- process selector
+        String ELEM_SELECTOR = schemaPrefix + SchemaNames.SELECTOR;
+        String xpath = null;
+        
+        IdentitySelector selector = constraint.getSelector();
+        xpath = selector.getXPath();
+        id = selector.getId();
+        _atts.clear();
+        _atts.addAttribute(SchemaNames.XPATH_ATTR, CDATA, xpath);
+        if (id != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, id);
+        }
+        _handler.startElement(ELEM_SELECTOR, _atts);
+        processAnnotated(selector, schemaPrefix);
+        _handler.endElement(ELEM_SELECTOR);
+        
+        //-- process field(s)
+        String ELEM_FIELD = schemaPrefix + SchemaNames.FIELD;
+        Enumeration enum = constraint.getFields();
+        while(enum.hasMoreElements()) {
+            IdentityField field = (IdentityField) enum.nextElement();
+            _atts.clear();
+            id    = field.getId();
+            xpath = field.getXPath();
+            _atts.addAttribute(SchemaNames.XPATH_ATTR, CDATA, xpath);
+            if (id != null) {
+                _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, id);
+            }
+            _handler.startElement(ELEM_FIELD, _atts);
+            processAnnotated(field, schemaPrefix);
+            _handler.endElement(ELEM_FIELD);
+        }
+        _handler.endElement(ELEMENT_NAME);
+        
+    } //-- processIdentityConstraint
+    
     private void processSchema(Schema schema)
         throws SAXException
     {
@@ -570,7 +668,7 @@ public class SchemaWriter {
         //-- targetNS
         String value = schema.getTargetNamespace();
         if (value != null)
-            _atts.addAttribute("targetNS", CDATA, value);
+            _atts.addAttribute(SchemaNames.TARGET_NS_ATTR, CDATA, value);
 
         //-- modify schemaPrefix to include ':'
         if (schemaPrefix.length() > 0) {
@@ -635,7 +733,7 @@ public class SchemaWriter {
     private void processImport(Schema schema, String schemaPrefix)
         throws SAXException
     {
-        String ELEMENT_NAME = schemaPrefix + "import";
+        String ELEMENT_NAME = schemaPrefix + SchemaNames.IMPORT;
         _atts.clear();
 
         String namespace = schema.getTargetNamespace();
@@ -668,7 +766,7 @@ public class SchemaWriter {
 
         //-- top-level simple type
         if (name != null) {
-            _atts.addAttribute("name", null, name);
+            _atts.addAttribute(SchemaNames.NAME_ATTR, null, name);
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
