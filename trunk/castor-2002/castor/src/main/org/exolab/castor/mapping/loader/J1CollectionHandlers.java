@@ -82,9 +82,13 @@ public final class J1CollectionHandlers
             public Object add( Object collection, Object object ) {
                 Object[] array;
                 if ( collection == null ) {
-                    array = new Object[ 1 ];
-                    array[ 0 ] = object;
-                    return array;
+
+                    // If the collection is of primitive type, the instantiation
+                    // (if it was null) is handled in the FieldHandlerImpl. We
+                    // can rely here that we deal only with array of object.
+                    Object newArray = Array.newInstance(object.getClass(), 1);
+                    Array.set(newArray, 0,  object);
+                    return newArray;
                 }
                 
                 Class type = collection.getClass();
@@ -115,7 +119,7 @@ public final class J1CollectionHandlers
             public int size( Object collection ) {
                 if ( collection == null )
                     return 0;
-                return ( (Object[]) collection ).length;
+                return Array.getLength(collection);
             }
             public Object clear( Object collection ) {
                 return null;

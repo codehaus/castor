@@ -556,15 +556,21 @@ public abstract class MappingLoader
                                                 javaClass.getName() );
                 if ( fieldType == null && colType == null )
                     fieldType = getMethod.getReturnType();
-                if ( colType == null || getSetCollection ) {
-                    setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
-                                              ( colType == null ? fieldType : colType ), false );
-                    if ( setMethod == null )
-                        throw new MappingException( "mapping.accessorNotFound",
-                                                    "set" + capitalize( fieldName ),
-                                                    ( colType == null ? fieldType : colType ),
-                                                    javaClass.getName() );
-                }
+
+
+                // We try to locate a set method anyway and we complain only if we really need one.
+                setMethod = findAccessor( javaClass, "set" + capitalize( fieldName ),
+                                          ( colType == null ? fieldType : colType ), false );
+
+                // If we have a collection that need both set and get and that
+                // we don't have a set method, we fail
+                if ( setMethod == null && colType != null && getSetCollection )
+                    throw new MappingException( "mapping.accessorNotFound",
+                                                "set" + capitalize( fieldName ),
+                                                ( colType == null ? fieldType : colType ),
+                                                javaClass.getName() );
+
+
             } else {
                 // First look up the get accessors
                 if ( fieldMap.getGetMethod() != null ) {
