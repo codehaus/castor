@@ -48,17 +48,11 @@ package dsml;
 
 
 import java.io.PrintWriter;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import netscape.ldap.LDAPConnection;
 import netscape.ldap.LDAPv2;
 import javax.naming.Context;
 import javax.naming.directory.InitialDirContext;
-import org.apache.xml.serialize.*;
-import org.xml.sax.DocumentHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.Parser;
-import org.apache.xerces.parsers.SAXParser;
 import org.exolab.castor.dsml.Importer;
 import org.exolab.castor.dsml.Exporter;
 import org.exolab.castor.dsml.ImportExportException;
