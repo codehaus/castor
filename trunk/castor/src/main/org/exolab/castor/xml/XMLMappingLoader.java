@@ -500,6 +500,7 @@ public class XMLMappingLoader
                         xmlDesc.setMapped(true);
                     }
                 }
+                else xmlDesc.setMapped(true);
             }
 
             
