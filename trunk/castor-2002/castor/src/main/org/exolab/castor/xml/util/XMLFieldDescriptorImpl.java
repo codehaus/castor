@@ -49,6 +49,8 @@ package org.exolab.castor.xml.util;
 
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.util.List;
+import java.util.StringTokenizer;
 
 /**
  * XML field descriptor. Wraps {@link FieldDescriptor} and adds
@@ -62,6 +64,8 @@ public class XMLFieldDescriptorImpl
 {
 
 
+    private static final String WILD_CARD = "*";
+    
     private static final String NULL_CLASS_ERR
         = "The 'type' argument passed to the constructor of "
          + "XMLFieldDescriptorImpl may not be null.";
@@ -145,18 +149,34 @@ public class XMLFieldDescriptorImpl
      */
     private String _xmlName    = null;
 
-
+    private List _matches = null;
+    
+    private boolean isWild = false;
     
     private FieldValidator _validator = null;
+    
+    /**
+     * The DescriptorResolver...only used for
+     * default matching
+    **/
+    private MappingResolver _resolver = null;
     
     //----------------/
     //- Constructors -/
     //----------------/
     
+    /**
+     * This a private constructor to handle common code among
+     * constructors     
+    **/
+    private XMLFieldDescriptorImpl() {
+        _matches = new List();
+    } //-- XMLFieldDescriptorImpl
     
     public XMLFieldDescriptorImpl
         (Class fieldType, String fieldName, String xmlName, NodeType nodeType) 
     {
+        this();
         
         if (fieldType == null) 
             throw new IllegalArgumentException(NULL_CLASS_ERR);
@@ -169,6 +189,7 @@ public class XMLFieldDescriptorImpl
         this._xmlName    = xmlName;
         this._nodeType   = nodeType;
         this._nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
+        
     } //-- XMLFieldDescriptorImpl
     
     
@@ -186,6 +207,8 @@ public class XMLFieldDescriptorImpl
         ( FieldDescriptor fieldDesc, String xmlName, NodeType nodeType )
         throws MappingException
     {
+        
+        this();
 
         this._handler         = fieldDesc.getHandler();
         this._fieldName       = fieldDesc.getFieldName();
@@ -211,11 +234,11 @@ public class XMLFieldDescriptorImpl
         }
         
         //-- handle xml name
-        if ( xmlName == null )
-            xmlName = getFieldName();
+        if ( xmlName == null ) xmlName = getFieldName();        
         _xmlName = xmlName;
         
         _nodeType = ( nodeType == null ? NodeType.Attribute : nodeType );
+        
     } //-- XMLFieldDescriptorImpl
 
     //------------------/
@@ -388,9 +411,20 @@ public class XMLFieldDescriptorImpl
      * or attributes with the given XML name.
     **/
     public boolean matches(String xmlName) {
+        
         if (xmlName != null) {
-            return xmlName.equals(this._xmlName);
+            
+            if (isWild) return true;
+            else if (_matches.size() > 0) {
+                for (int i = 0; i < _matches.size(); i++) {
+                    if (xmlName.equals( _matches.get(i) ) ) 
+                        return true;
+                }
+            }
+            else return xmlName.equals(this._xmlName);
+            
         }
+        
         return false;
     } //-- matches
 
@@ -438,6 +472,28 @@ public class XMLFieldDescriptorImpl
     public void setImmutable(boolean immutable) {
         this._immutable = immutable;
     } //-- setImmutable
+    
+    /**
+     * This is a space separated list of xml names that this
+     * Field descriptor matches. A '*' is wild.
+     * @param matchExpr the space separated list of xml names, matched
+     * by this descriptor
+    **/
+    public void setMatches(String matchExpr) {
+        isWild = false;
+        if ((matchExpr == null) || (matchExpr.length() == 0)) return;
+        
+        StringTokenizer st = new StringTokenizer(matchExpr);
+        while (st.hasMoreTokens()) {
+            String token = st.nextToken();
+            if (WILD_CARD.equals(token)) {
+                isWild = true;
+                break;
+            }
+            _matches.add(token);
+        }
+
+    } //-- setMatches
     
     public void setMultivalued(boolean multivalued) {
         this.multivalued = multivalued;
@@ -516,9 +572,35 @@ public class XMLFieldDescriptorImpl
     
     public String toString()
     {
-        return _fieldName + " AS " + _xmlName;
+        return "XMLFieldDesciptor: " + _fieldName + " AS " + _xmlName;
     }
 
-
+    //---------------------/
+    //- Protected Methods -/
+    //---------------------/
+    
+    /**
+     * Returns true if a call to #setMatches has been made with a non-null,
+     * or non-zero-length value.
+     * This method is used by the XML Mapping Loader
+     *
+     * @return true if a call to #setMatches has been made with a legal value.
+     *
+    **/
+    protected boolean hasNonDefaultMatching() {
+        return (isWild || (_matches.size() > 0));
+    } //-- hasNonDefaultMatching
+    
+    /**
+     * Sets the DescriptorResolver for following relationships
+     * among descriptors and types. This is used by the default
+     * matching scheme
+     *
+     * @param resolver the DescriptorResolver to use 
+    **/
+    protected void setDescriptorResolver(MappingResolver resolver) {
+        _resolver = resolver;
+    } //-- setDescriptorResolver
+    
 } //-- XMLFieldDescriptor
 
