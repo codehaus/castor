@@ -16,6 +16,9 @@ JDO:     Added three paramaterized type convertors: Date<->Integer,
          to "yyyyMMddhhmmssSSS" SimpleDateFormat pattern).
          (Oleg Nitz <on@ibis.odessa.ua>)
 
+JDO:     Fixes to handling of dependent objects create/delete/modify during
+         transaction commit. (Oleg Nitz <on@ibis.odessa.ua>)
+
 XML:     Identity field will now use XML name provided in mapping file.
 
 XML:     Marshaller will now accept both primitive and non-primitive types and apply the
