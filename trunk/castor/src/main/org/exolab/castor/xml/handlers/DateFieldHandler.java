@@ -546,6 +546,7 @@ public class DateFieldHandler extends XMLFieldHandler {
             }
             if (delimiter) {
                 if (flags != START_FLAG) {
+                    if (flags == YEAR_FLAG) value = value * sign;
                     values[flags] = value;
                 }
                 ++flags;
@@ -680,16 +681,29 @@ public class DateFieldHandler extends XMLFieldHandler {
         
         cal.setTimeZone(TIMEZONE);
         
+        
         int value   = cal.get(Calendar.YEAR);
-        if (value > 9999) {
+        //-- adjust year for ERA (BC or AD)
+        if (cal.get(Calendar.ERA) == GregorianCalendar.BC) {
+            value = 1-value;
+        }
+        
+        if (value < 0) { //-- adjust for sign (BC)
+            buffer = new StringBuffer(DEFAULT_DATE_LENGTH+1);
+            buffer.append('-');
+            value = -1*value;
+        }
+        else if (value > 9999) {
             buffer = new StringBuffer(DEFAULT_DATE_LENGTH+2);
         }
         else {
             buffer = new StringBuffer(DEFAULT_DATE_LENGTH);
-            //-- pad year to 4 digits if necessary
-            for (int tmp = 1000; value < tmp; tmp = tmp / 10)
-                buffer.append('0');
         }
+        
+        //-- pad year to 4 digits if necessary
+        for (int tmp = 1000; value < tmp; tmp = tmp / 10)
+            buffer.append('0');
+        
         buffer.append(value);
         
         //-- Year/Month Separator
@@ -783,13 +797,14 @@ public class DateFieldHandler extends XMLFieldHandler {
     } //-- format
     
     
-    /* For Testing
+    /* For Testing 
     public static void main(String[] args) {
         
         String[] dates = new String[] {                
             "2004-01-01T00:00:00.1", 
             "2004-01-01T00:00:00.01", 
-            "2004-01-01T00:00:00.001"
+            "2004-01-01T00:00:00.001",
+            "-0004-01-01T00:00:00.001"
         };
         
         for (int i = 0; i < dates.length; i++) {
