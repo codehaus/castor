@@ -76,39 +76,29 @@ public class XMLFieldDescriptorImpl
          + "XMLFieldDescriptorImpl may not be null.";
 
     /**
-     *
+     * The index of this field within the constructor arguments
+     * Note: This field is only applicable if the field is
+     * an attribute field and it's supposed to be set via the
+     * constructor. A value less than zero indicates that this
+     * field is not part of the constructor arguments.
      */
-    private ClassDescriptor _contClsDescriptor;
-
-    /**
-     * Flag to indicate that objects should be added
-     * to their as soon as they are created, but before they
-     * are finished being populated.
-    **/
-    private boolean incremental = false;
-
-    /**
-     * A flag to indicate that the Object described by this
-     * descriptor is multivalued
-    **/
-    private boolean multivalued = false;
-
-    /**
-     * The namespace prefix that is to be used when marshalling
-    **/
-    private String nsPrefix = null;
-
-    /**
-     * The namespace URI used for both marshalling and unmarshalling
-    **/
-    private String nsURI = null;
+     private int _argIndex = -1;
 
     /**
      * The type class descriptor, if this field is of a type
      * known by a descriptor.
      */
     private XMLClassDescriptor  _classDescriptor;
-
+    
+    /**
+     * True if the field is a container field
+     */
+    private boolean _container = false;
+    
+    /**
+     * A reference to the containing ClassDescriptor
+     */
+    private ClassDescriptor _contClsDescriptor;
 
     /**
      * The Java (programmatic) name of the field being described
@@ -129,21 +119,49 @@ public class XMLFieldDescriptorImpl
      * True if the field type is immutable.
      */
     private boolean _immutable = false;
-
-    /**
-     * True if the field type is mapped in a Hashtable or Map.
-    **/
-    private boolean _mapped = false;
     
     /**
-     * The node type (attribute, element, text).
+     * Flag to indicate that objects should be added
+     * to their as soon as they are created, but before they
+     * are finished being populated.
      */
-    private NodeType _nodeType = null;
+    private boolean _incremental = false;
 
     /**
      * True if the field is a reference to another Object in the hierarchy.
     **/
     public boolean _isReference = false;
+    
+    private boolean _isWild = false;
+    
+    /**
+     * True if the field type is mapped in a Hashtable or Map.
+    **/
+    private boolean _mapped = false;
+    
+    private String[] _matches = null;
+    
+    /**
+     * A flag to indicate that the Object described by this
+     * descriptor is multivalued
+     */
+    private boolean _multivalued = false;
+
+    /**
+     * The node type (attribute, element, text).
+     */
+    private NodeType _nodeType = null;
+    
+    /**
+     * The namespace prefix that is to be used when marshalling
+     */
+    private String _nsPrefix = null;
+
+    /**
+     * The namespace URI used for both marshalling and unmarshalling
+     */
+    private String _nsURI = null;
+
 
     /**
      * indicates a required field when true
@@ -151,26 +169,23 @@ public class XMLFieldDescriptorImpl
     public boolean _required = false;
 
     /**
+     * The XML Schema type of this field value
+     */
+    private String _schemaType = null;
+    
+    /**
      * True if the field is transient and should not be saved/stored.
      */
     private boolean _transient = false;
 
     /**
-     * True if the field is a container field
-     */
-    private boolean _container = false;
-    
-    /**
-     * The XML Schema type of this field value
-     */
-     private String _schemaType = null;
-
-    /**
      * The prefix used in case the
      * value of the field described is of type QName.
      */
-     private String _qNamePrefix = null;
+    private String _qNamePrefix = null;
 
+    private FieldValidator _validator = null;
+    
     /**
      * The XML name of the field, this is only the local
      * name.
@@ -187,12 +202,6 @@ public class XMLFieldDescriptorImpl
      */
     private String _xmlPath    = null;
 
-
-    private String[] _matches = null;
-
-    private boolean isWild = false;
-
-    private FieldValidator _validator = null;
 
 
     //----------------/
@@ -297,7 +306,7 @@ public class XMLFieldDescriptorImpl
         this._transient       = fieldDesc.isTransient();
         this._immutable       = fieldDesc.isImmutable();
         this._required        = fieldDesc.isRequired();
-        this.multivalued      = fieldDesc.isMultivalued();
+        this._multivalued     = fieldDesc.isMultivalued();
 
         ClassDescriptor cd    = fieldDesc.getClassDescriptor();
         if (cd != null) {
@@ -320,7 +329,7 @@ public class XMLFieldDescriptorImpl
         setXMLName(xmlName);
 
         if (nodeType == null) {
-            if (this.multivalued)
+            if (_multivalued)
                 _nodeType = NodeType.Element;
             else
                 _nodeType = NodeType.Attribute;
@@ -409,6 +418,21 @@ public class XMLFieldDescriptorImpl
     } //-- getCollectionHandler
 
     /**
+     * Returns the index within the constructor argument array where the 
+     * value of this field should be. A value less than zero indicates
+     * that the value of this field is set via a normal setter method
+     * and not via the constructor.
+     *
+     * Note: This only applies to attribute mapped fields at this time.
+     *
+     * @return the index within the constructor argument array for 
+     * this field.
+     */
+    public int getConstructorArgumentIndex() {
+        return _argIndex;
+    } //-- getConstructorArgumentIndex
+
+    /**
      * Returns the name of the field.
      *
      * @return Field name
@@ -453,7 +477,7 @@ public class XMLFieldDescriptorImpl
      * @return the "suggested" namespace prefix.
     **/
     public String getNameSpacePrefix() {
-        return nsPrefix;
+        return _nsPrefix;
     } //-- getNameSpacePrefix
 
     /**
@@ -479,7 +503,7 @@ public class XMLFieldDescriptorImpl
             }
         }
         */
-        return nsURI;
+        return _nsURI;
     } //-- getNameSpaceURI
 
 
@@ -565,6 +589,19 @@ public class XMLFieldDescriptorImpl
      }
 
     /**
+     * Returns true if the value of the field represented by this 
+     * descriptor should be set via the constructor of the containing
+     * class. This is only valid for attribute mapped fields.
+     *
+     * @return true if the value of the field represented by this 
+     * descriptor should be set via the constructor of the containing
+     * class.
+     */
+    public boolean isConstructorArgument() {
+        return (_argIndex >= 0);
+    }
+    
+    /**
      * Returns true if the field described by this descriptor is a container
      * field. A container is a field that should is not a first-class object,
      * and should therefore have no XML representation. 
@@ -592,7 +629,7 @@ public class XMLFieldDescriptorImpl
      * is finished unmarshalling the Object.
     **/
     public boolean isIncremental() {
-        return incremental;
+        return _incremental;
     } //-- isIncremental
 
     /**
@@ -614,7 +651,7 @@ public class XMLFieldDescriptorImpl
      * contain more than one value
     **/
     public boolean isMultivalued() {
-        return multivalued;
+        return _multivalued;
     } //-- isMultivalued
 
     /**
@@ -669,7 +706,7 @@ public class XMLFieldDescriptorImpl
     public boolean matches(String xmlName) {
 
         if (xmlName != null) {
-            if (isWild) return true;
+            if (_isWild) return true;
             else if (_matches.length > 0) {
                 for (int i = 0; i < _matches.length; i++) {
                     if (xmlName.equals( _matches[i] ) )
@@ -693,6 +730,27 @@ public class XMLFieldDescriptorImpl
     } //-- setClassDescriptor
 
     /**
+     * Sets whether or not the value of the field represented by this
+     * FieldDescriptor should be set via the constructor of the containing
+     * ClassDescriptor. The index value greater than 0 specifies the index
+     * within the argument array that the value of this field should be.
+     *
+     * Note: This only applies to attribute mapped fields at this time.
+     *
+     * @param index the index within the argument array. A value less
+     * than zero indicates that this field should not be part of the
+     * constructor arguments.
+     */
+    public void setConstructorArgumentIndex(int index) {
+        if (_nodeType != NodeType.Attribute) {
+            String err = "constructor arguments are only valid for " +
+                "attribute mapped fields.";
+            throw new IllegalStateException(err);
+        }
+        _argIndex = index;
+    } //-- setConstructorArgumentIndex
+
+    /**
      * Sets the FieldHandler for the field being described
      * by this FieldDescriptor
      *
@@ -711,7 +769,7 @@ public class XMLFieldDescriptorImpl
      * unmarshalling it.
     **/
     public void setIncremental(boolean incremental) {
-        this.incremental = incremental;
+        this._incremental = incremental;
     } //-- setIncremental
 
     /**
@@ -792,7 +850,7 @@ public class XMLFieldDescriptorImpl
      * by this descriptor
     **/
     public void setMatches(String matchExpr) {
-        isWild = false;
+        _isWild = false;
         if ((matchExpr == null) || (matchExpr.length() == 0)) return;
 
         StringTokenizer st = new StringTokenizer(matchExpr);
@@ -800,7 +858,7 @@ public class XMLFieldDescriptorImpl
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (WILD_CARD.equals(token)) {
-                isWild = true;
+                _isWild = true;
                 break;
             }
             names.add(token);
@@ -811,7 +869,7 @@ public class XMLFieldDescriptorImpl
     } //-- setMatches
 
     public void setMultivalued(boolean multivalued) {
-        this.multivalued = multivalued;
+        this._multivalued = multivalued;
     } //-- setMultivalued
 
     /**
@@ -849,7 +907,7 @@ public class XMLFieldDescriptorImpl
      * the "described" object
     **/
     public void setNameSpacePrefix(String nsPrefix) {
-        this.nsPrefix = nsPrefix;
+        this._nsPrefix = nsPrefix;
     } //-- setNameSpacePrefix
 
     /**
@@ -858,7 +916,7 @@ public class XMLFieldDescriptorImpl
      * unmarshalling the "described" Object.
     **/
     public void setNameSpaceURI(String nsURI) {
-        this.nsURI = nsURI;
+        this._nsURI = nsURI;
     } //-- setNameSpaceURI
 
 
@@ -932,7 +990,7 @@ public class XMLFieldDescriptorImpl
      *
     **/
     protected boolean hasNonDefaultMatching() {
-        return (isWild || (_matches.length > 0));
+        return (_isWild || (_matches.length > 0));
     } //-- hasNonDefaultMatching
 
 
