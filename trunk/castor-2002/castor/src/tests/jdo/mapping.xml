@@ -14,7 +14,7 @@
     <field name="value1" type="string"  required="true">
       <sql name="value1" type="varchar" />
     </field>
-    <field name="people" type="jdo.TestManyPerson" collection="collection"
+    <field name="people" type="jdo.TestManyPerson" collection="arraylist"
     required="false" >
     <sql many-table="test_group_person"/>
     </field>
@@ -35,7 +35,7 @@
     <field name="sthelse" type="string"  >
       <sql name="sthelse" type="varchar" />
     </field>
-    <field name="group" type="jdo.TestManyGroup" collection="collection"
+    <field name="group" type="jdo.TestManyGroup" collection="arraylist"
     required="false">
       <sql many-table="test_group_person"/>
     </field>
@@ -54,7 +54,7 @@
     <field name="birthday" type="date"  >
       <sql name="bday" type="date" />
     </field>
-    <field name="address" type="jdo.TestLazyAddress" collection="collection" lazy="true"/>
+    <field name="address" type="jdo.TestLazyAddress" collection="arraylist" lazy="true"/>
   </class>
 
   <class name="jdo.TestLazyAddress" depends="jdo.TestLazyPerson" identity="id">
@@ -102,7 +102,7 @@
     <field name="comment" type="string">
       <sql name="c_comment" type="varchar"/>
     </field>
-    <field name="category" type="jdo.TestLazyContractCategory" collection="collection" >
+    <field name="category" type="jdo.TestLazyContractCategory" collection="arraylist" >
       <sql many-table="test_pks_category_contract" many-key="policy_no contract_no" name="cate_id" />
     </field>
     <field name="employee" type="jdo.TestLazyEmployee" >
@@ -118,7 +118,7 @@
     <field name="name" type="string">
       <sql name="name" type="varchar" />
     </field>
-    <field name="contract" type="jdo.TestLazyContract" collection="collection" >
+    <field name="contract" type="jdo.TestLazyContract" collection="arraylist" >
       <sql many-table="test_pks_category_contract" many-key="cate_id" name="policy_no contract_no" />
     </field>
   </class>
@@ -154,7 +154,7 @@
     <field name="birthday" type="date"  >
       <sql name="bday" type="date" />
     </field>
-    <field name="address" type="jdo.TestPKsAddress" collection="collection" />
+    <field name="address" type="jdo.TestPKsAddress" collection="arraylist" />
   </class>
 
   <class name="jdo.TestPKsAddress" depends="jdo.TestPKsPerson" identity="id">
@@ -202,7 +202,7 @@
     <field name="comment" type="string">
       <sql name="c_comment" type="varchar"/>
     </field>
-    <field name="category" type="jdo.TestPKsContractCategory" collection="collection" >
+    <field name="category" type="jdo.TestPKsContractCategory" collection="arraylist" >
       <sql many-table="test_pks_category_contract" many-key="policy_no contract_no" name="cate_id" />
     </field>
     <field name="employee" type="jdo.TestPKsEmployee" >
@@ -218,7 +218,7 @@
     <field name="name" type="string">
       <sql name="name" type="varchar" />
     </field>
-    <field name="contract" type="jdo.TestPKsContract" collection="collection" >
+    <field name="contract" type="jdo.TestPKsContract" collection="arraylist" >
       <sql many-table="test_pks_category_contract" many-key="cate_id" name="policy_no contract_no" />
     </field>
   </class>
@@ -607,7 +607,7 @@
     <field name="group" type="jdo.TestGroup" required="true">
       <sql name="group_id" />
     </field>
-  </class> 
+  </class>
 
   <class name="jdo.TestNestedFields" access="shared" identity="id">
     <description>Table used for nested fields testing</description>
@@ -621,7 +621,7 @@
     <field name="nested2.nested3.value2" type="string">
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
-  </class> 
+  </class>
 
   <class name="jdo.TestCol" identity="id">
     <description>Table used for testing different collection types support</description>
@@ -650,7 +650,7 @@
 
   <class name="jdo.TestColArrayList" extends="jdo.TestCol">
     <description>Table used for testing different collection types support</description>
-    <!-- this is a dirty hack, don't follows. It only work if load always 
+    <!-- this is a dirty hack, don't follows. It only work if load always
          done by db.load( MyClass.class, id ). -->
     <map-to table="test_col" />
     <field name="item" type="jdo.TestItem" collection="arraylist">
@@ -659,10 +659,10 @@
 
   <class name="jdo.TestColCollection" extends="jdo.TestCol">
     <description>Table used for testing different collection types support</description>
-    <!-- this is a dirty hack, don't follows. It only work if load always 
+    <!-- this is a dirty hack, don't follows. It only work if load always
          done by db.load( MyClass.class, id ). -->
     <map-to table="test_col" />
-    <field name="item" type="jdo.TestItem" collection="collection">
+    <field name="item" type="jdo.TestItem" collection="arraylist">
     </field>
   </class>
 
@@ -717,7 +717,7 @@
     <field name="item" type="jdo.TestItem" collection="vector">
     </field>
   </class>
-
+<!--
   <class name="jdo.TestSerial" identity="id">
     <description>Table used for testing serializable field</description>
     <map-to table="test_serial" />
@@ -728,4 +728,5 @@
       <sql name="dep" type="blob" dirty="ignore"/>
     </field>
   </class>
+-->  
 </mapping>
