@@ -265,6 +265,7 @@ public class Unmarshaller {
         handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);
         handler.setDebug(debug);
+        handler.setValidation(validate);
         eventProducer.setDocumentHandler(handler);
         try {
             eventProducer.start();
@@ -312,6 +313,7 @@ public class Unmarshaller {
         handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);
         handler.setDebug(debug);
+        handler.setValidation(validate);
         parser.setDocumentHandler(handler);
 
         //parser.setErrorHandler(unmarshaller);
