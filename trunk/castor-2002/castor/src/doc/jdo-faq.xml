@@ -138,16 +138,16 @@
 
      </section>
 
-     <section title="Desing issue">
-        <p><b>How does Castor work</b></p>
+     <section title="Design issues">
+        <p><b>How does Castor JDO work anyway?</b></p>
 
-	<p>Castor JDO work that way, (let use object loading as an example)</p>
+	<p>Let's use object loading as an example.</p>
 
-	<p>When an object is loaded, transactionContext (tx) creates a new instance of the object of the interested type, if the object not yet in the tx.(otherwise, the existed object will be returned.) Tx ask LockEngine to load the object. </p>
+	<p>When an object is loaded and if the object is in the transactionContext( tx), tx returns the perviously loaded object with the requested identities. Otherwise, tx creates a new instance of the object of the interested type and it asks LockEngine to load the object. </p>
 
-	<p>LockEngine acquires lock for the object, and it makes sure ClassMolder have a thread-safe enviroment for loading. In ClassMolder, SQLEngine will be called to load a set of field for that object, if the fields is not yet exist. Then ClassMolder binds the loaded or cached fields into the new instance, and asks tx to load the related and dependent objects. Eventually, object is returned after all relationship are resolved.</p>
+	<p>LockEngine acquires lock for the object, and it makes sure ClassMolder have a thread-safe enviroment for loading. In ClassMolder, SQLEngine will be called to load a set of field for that object, if the fields is not in cache yet. Then, ClassMolder binds the loaded or cached fields into the new instance, and asks tx to load the related and dependent objects. Eventually, object is returned after all relationship is resolved.</p>
 
-	<p>At the commit time, each object in the tx will be checked for modification one by one, including dependent and related objects. Commit has different states. In the preStore state, modification is checked. Object is marked dirty if modified. Also, if any modification is made which should cause related or dependent to be dirty, then method markModification will be made to tx for the each affected related or dependent object. After all preStore state, all object mark modified should be updated will be properly stored.</p>
+	<p>When commit is called, several states will be gone thur before it returns. In preStore state, each object in the tx will be checked for modification one by one, including dependent and related objects. Also, reachable object will be put into tx, if it's not yet in the tx. Object is marked dirty if modified. Also, if any modification is made which should cause related or dependent to be dirty, then method markModification will be made to tx for each of the affected related or dependent object. After all preStore state, all object mark modified should be updated will be properly stored. And, the connection is commited. Then, if the connection commit successfully, object cache in LockEngine is update and all lock is released.</p>
      </section>
 
      <section title="Working with open source databases">
