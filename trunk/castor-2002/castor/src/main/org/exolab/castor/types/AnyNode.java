@@ -135,21 +135,21 @@ public final class AnyNode {
      */
     private String _localName;
 
+   /**
+    * the Namespace URI of the current node
+    */
+    private String _uri;
+
+   /**
+    * The prefix of the Namespace
+    */
+    private String _prefix;
+
     /**
-     * the Namespace URI of the current node
-     */
-     private String _uri;
-
-     /**
-      * The prefix of the Namespace
-      */
-     private String _prefix;
-
-     /**
-      * A stack used for avoiding endless loop
-      * in toString()
-      */
-      private Stack _elements;
+    * A stack used for avoiding endless loop
+    * in toString()
+    */
+    private static Stack _elements;
 
      /**
       * The value of this node defined as follow:
@@ -516,8 +516,14 @@ public final class AnyNode {
       * to the representation of this node.
       */
      public String toString() {
+         _elements = null;
+         return privateToString();
+     }
+
+     private String privateToString() {
 
          StringBuffer sb = new StringBuffer(4096);
+
          if (_elements == null)
             _elements = new Stack();
 
@@ -563,7 +569,7 @@ public final class AnyNode {
                   if (tempNode != null) {
                       sb.append(">");
                       while (tempNode != null) {
-                          sb.append(tempNode.toString());
+                          sb.append(tempNode.privateToString());
                           tempNode = tempNode.getFirstChild();
                       }
                       //close the tag
@@ -571,14 +577,14 @@ public final class AnyNode {
                   } else sb.append("/>");
                   //process any sibling ELEMENT node
                   if (siblingNode != null)
-                      sb.append(siblingNode.toString());
+                      sb.append(siblingNode.privateToString());
 
              }//ELEMENT
              else {
                 sb.append(this.getStringValue());
                 AnyNode tempNode = this.getNextSibling();
                 while (tempNode != null) {
-                     sb.append(tempNode.toString());
+                     sb.append(tempNode.privateToString());
                      tempNode = tempNode.getNextSibling();
                 }
                 tempNode = null;
