@@ -204,7 +204,7 @@ public final class ClassHandler
      * and the parent class into one set.
      */
     private void addFields( CacheEngine cache, ClassDescriptor clsDesc,
-			    Vector fields, Vector rels )
+                Vector fields, Vector rels )
         throws MappingException
     {
         FieldDescriptor[] descs;
@@ -361,7 +361,7 @@ public final class ClassHandler
      */
     Object[] newFieldSet()
     {
-	return new Object[ _fields.length ];
+    return new Object[ _fields.length ];
     }
 
 
@@ -514,6 +514,174 @@ public final class ClassHandler
 
 
     /**
+     * Copies the contents of the object into another object. 
+     * Used by LongTransactionSupport.
+     *
+     * @param source The source object
+     * @param target The target object
+     */
+    public void copyObject(Object source, Object target) 
+        throws PersistenceException
+    {
+        if ( source == target ) 
+            return;
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            if ( _fields[ i ].relation == null )
+                _fields[ i ].handler.setValue( target, _fields[ i ].handler.getValue( source ) );
+            else if ( _fields[ i ].multi ) {
+                Vector       vector;
+                Enumeration  enum;
+                ClassHandler relHandler;
+                Object[]     idents;
+                Object       related;
+                Object       origRelated;
+                Object       relIdentity;
+                int          foundIndex;
+
+                vector = new Vector();
+                enum = (Enumeration) _fields[ i ].relation.getRelated( target );
+                if ( enum != null ) 
+                    while ( enum.hasMoreElements() ) 
+                        vector.add( enum.nextElement() );
+                _fields[ i ].handler.resetValue( target );
+                enum = (Enumeration) _fields[ i ].relation.getRelated( source );
+                if ( enum == null ) 
+                    continue;        
+                relHandler = _fields[ i ].relation.getRelatedHandler();
+                idents = new Object[ vector.size() ];
+                for ( int j = 0; j < idents.length; j++ ) {
+                    idents[ j ] = relHandler.getIdentity( vector.elementAt( j ) );
+                }
+                while ( enum.hasMoreElements() ) {
+                    related = enum.nextElement();
+                    if ( related == null ) 
+                        continue;        
+
+                    // search for backward references equal to the source 
+                    // and set it to target 
+                    for ( int j = 0; j < relHandler._relations.length; j++ ) {
+                        if ( relHandler._relations[ j ] == null ) 
+                            continue;
+                        if ( source == relHandler._relations[ j ].getRelated( related ) )
+                            relHandler._relations[ j ].setRelated( related, target );
+                    }
+
+                    relIdentity = relHandler.getIdentity( related );
+                    if ( relIdentity == null ) 
+                        continue;        
+                    foundIndex = -1;
+                    for ( int j = 0; j < idents.length; j++ ) {
+                        if ( relIdentity.equals( idents[ j ] ) ) {
+                            foundIndex = j;
+                            break;
+                        }
+                    }
+                    if ( foundIndex < 0 ) 
+                        _fields[ i ].relation.setRelated( target, related );
+                    else {
+                        origRelated = vector.elementAt( foundIndex );
+                        if ( origRelated != related ) 
+                            relHandler.copyObject( related, origRelated );
+                        _fields[ i ].relation.setRelated( target, origRelated );
+                    }
+                }
+            } else if ( !_fields[ i ].relation.isAttached() ) {
+                ClassHandler relHandler;
+                Object       related;
+                Object       origRelated;
+                Object       relIdentity;
+
+                relHandler = _fields[ i ].relation.getRelatedHandler();
+                related = _fields[ i ].relation.getRelated( source );
+                relIdentity = null;
+                if ( related != null )
+                    relIdentity = relHandler.getIdentity( related );
+                if ( relIdentity == null )
+                    _fields[ i ].relation.setRelated( target, null );
+                else {
+                    origRelated = _fields[ i ].relation.getRelated( target );
+                    if ( origRelated == null) 
+                        _fields[ i ].relation.setRelated( target, related );
+                    else if ( origRelated != related ) 
+                        relHandler.copyObject( related, origRelated );
+                }
+            }
+        }
+    }
+
+    /**
+     * Searches for the object with the same identity as the passed copy has
+     * among objects participating in the given transaction and fills it 
+     * by values from the copy
+     * Used by LongTransactionSupport.
+     *
+     * @param Object source The copy
+     * @param TransactionContext tx The transaction
+     * @param PersistenceEngine engine The persistence engine
+     * @return The filled object participating in the transaction or the same 
+     *         object if not found.
+     */
+    public Object fillFromCopy( Object source, TransactionContext tx, 
+                                PersistenceEngine engine )
+        throws PersistenceException
+    {
+        TransactionContext.ObjectEntry entry;
+        Object target;
+
+        entry = tx.getObjectEntry( engine, new OID( this, getIdentity( source ) ) );
+        if ( entry == null )
+            target = source;  // The record will be created
+        else {
+            target = entry.object;
+            if ( target == source ) // Already processed
+                return source;
+        }
+        for ( int i = 0 ; i < _fields.length ; i++ ) {
+            if ( _fields[ i ].relation == null ) 
+                _fields[ i ].handler.setValue( target, _fields[ i ].handler.getValue( source ) );
+            else if ( _fields[ i ].multi ) {
+                Vector       vector;
+                Enumeration  enum;
+                ClassHandler relHandler;
+                Object       related;
+
+                vector = new Vector();
+                enum = (Enumeration) _fields[ i ].relation.getRelated( source );
+                if ( enum != null ) 
+                    while ( enum.hasMoreElements() ) 
+                        vector.add( enum.nextElement() );
+                relHandler = _fields[ i ].relation.getRelatedHandler();
+                _fields[ i ].handler.resetValue( target );
+                enum = vector.elements();
+                while ( enum.hasMoreElements() ) {
+                    related = enum.nextElement();
+                    if ( related != null ) 
+                        _fields[ i ].relation.setRelated( target, 
+                                relHandler.fillFromCopy( related, tx, engine ) );
+                }
+            } else {
+                ClassHandler relHandler;
+                Object       related;
+
+                relHandler = _fields[ i ].relation.getRelatedHandler();
+                related = _fields[ i ].relation.getRelated( source );
+                if ( related == null )
+                    _fields[ i ].relation.setRelated( target, null );
+                else {
+                    entry = tx.getObjectEntry( engine, 
+                            new OID( relHandler, relHandler.getIdentity( related ) ) );
+                    if ( entry != null ) {
+                        related = entry.object;
+                    }
+                    _fields[ i ].relation.setRelated( target, related );
+                }
+            }
+        }
+        return target;
+    }            
+
+    
+    /**
      * Used by {@link #copyField(Object,Object)} to copy a single field.
      */
     private Object copyValue( FieldInfo field, Object source )
@@ -580,14 +748,14 @@ public final class ClassHandler
         if ( ! field.multi ) {
             Object value;
 
-	    // Modified if field has value but original is null,
-	    // original has value but field is null, or the value
-	    // of boths does not pass equality test.
-	    value = field.handler.getValue( object );
-	    if ( value == null )
-		return ( original != null );
-	    if ( field.relation != null )
-		value = field.relation.getIdentity( value );
+        // Modified if field has value but original is null,
+        // original has value but field is null, or the value
+        // of boths does not pass equality test.
+        value = field.handler.getValue( object );
+        if ( value == null )
+        return ( original != null );
+        if ( field.relation != null )
+        value = field.relation.getIdentity( value );
             if ( value == null )
                 return ( original != null );
             else
@@ -603,16 +771,16 @@ public final class ClassHandler
             // elements.
             Enumeration enum;
             int         count;
-	    Object      relIdentity;
+        Object      relIdentity;
 
             enum = (Enumeration) field.handler.getValue( object );
             if ( enum.hasMoreElements() && original == null )
                 return true;
             for ( count = 0 ;  enum.hasMoreElements() ; ++count ) {
- 		relIdentity = field.relation.getIdentity( enum.nextElement() );
+        relIdentity = field.relation.getIdentity( enum.nextElement() );
                 if ( ! ( (Vector) original ).contains( relIdentity ) )
                     return true;
-	    }
+        }
             return ( count != ( (Vector) original ).size() );
         }
     }
@@ -664,24 +832,24 @@ public final class ClassHandler
     final static class FieldInfo
     {
 
-	/**
-	 * The field handler.
-	 */
+    /**
+     * The field handler.
+     */
         final FieldHandler      handler;
 
-	/**
-	 * The field type.
-	 */
+    /**
+     * The field type.
+     */
         final Class             fieldType;
 
-	/**
-	 * True if the field is an immutable type.
-	 */
+    /**
+     * True if the field is an immutable type.
+     */
         final boolean           immutable;
 
-	/**
-	 * The relation handler if the field is a relation.
-	 */
+    /**
+     * The relation handler if the field is a relation.
+     */
         final RelationHandler   relation;
 
         /**
@@ -697,7 +865,7 @@ public final class ClassHandler
         FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
             this.fieldType = fieldDesc.getFieldType();
-	    this.handler = fieldDesc.getHandler();
+        this.handler = fieldDesc.getHandler();
             this.immutable = fieldDesc.isImmutable();
             this.relation = relation;
             this.multi = fieldDesc.isMultivalued();
