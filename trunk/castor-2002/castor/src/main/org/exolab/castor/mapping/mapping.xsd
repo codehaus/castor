@@ -36,7 +36,7 @@
      <xsd:complexType>
         <xsd:sequence>
            <xsd:element name="description" type="xsd:string" minOccurs="0" maxOccurs="1" />
-           <xsd:element ref="cache-type-mapping"   minOccurs="0" maxOccurs="1" />
+           <xsd:element ref="cache-type"   minOccurs="0" maxOccurs="1" />
            <xsd:element ref="map-to" minOccurs="0" maxOccurs="1" />
            <xsd:choice minOccurs="1">
               <xsd:element ref="field" minOccurs="0" maxOccurs="unbounded"/>
@@ -235,7 +235,7 @@
     </xsd:complexType>
   </xsd:element>
 
-  <xsd:element name="cache-type-mapping">
+  <xsd:element name="cache-type">
      <xsd:complexType>
         <xsd:attribute name="type" use="optional" value="count-limited">
            <xsd:simpleType>

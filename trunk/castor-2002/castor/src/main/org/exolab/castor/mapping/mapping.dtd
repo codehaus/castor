@@ -63,7 +63,7 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, cache-type-mapping?, map-to?, field+ )>
+<!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
@@ -77,8 +77,8 @@
 <!--
     Specifies the cache type and capacity used for this class
  -->
-<!ELEMENT cache-type-mapping EMPTY>
-<!ATTLIST cache-type-mapping
+<!ELEMENT cache-type EMPTY>
+<!ATTLIST cache-type
     type           ( none | count-limited | time-limited | unlimited ) "count-limited"
     capacity       NMTOKEN  #IMPLIED>
 
