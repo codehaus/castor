@@ -45,9 +45,10 @@
 
 package org.exolab.castor.xml;
 
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+
+import org.exolab.castor.core.exceptions.CastorException;
 
 /**
  * An exception that is used to signal an error that
@@ -58,7 +59,7 @@ import java.io.PrintStream;
 **/
 public class XMLException extends CastorException {
     
-          
+
     /**
      * A nested exception
     **/
@@ -68,6 +69,11 @@ public class XMLException extends CastorException {
      * The location for this Exception
     **/
     private Location  _location   = null;
+
+    /**
+     * The error code for this Exception
+     */
+    private int errorCode = -1;
     
     /**
      * Creates a new XMLException with no message
@@ -108,7 +114,8 @@ public class XMLException extends CastorException {
      * @param errorCode the errorCode for this Exception
     **/
     public XMLException(String message, int errorCode) {
-        super(message, errorCode);
+        super(message);
+        this.errorCode = errorCode;
     } //-- XMLException(String)
 
     /**
@@ -134,7 +141,7 @@ public class XMLException extends CastorException {
     public XMLException
         (String message, Exception exception, int errorCode) 
     {
-        super(message, errorCode);
+        this(message, errorCode);
         this._exception = exception;
     } //-- XMLException(String, Exception, int)
     
@@ -208,6 +215,24 @@ public class XMLException extends CastorException {
             }
             _exception.printStackTrace( printer );
         }
+    }
+
+    /**
+     * Returns the error code for this Exception, or -1 if no error code exists.
+     * 
+     * @return the error code for this Exception, or -1 if no error code exists
+     */
+    public int getErrorCode() {
+        return errorCode;
+    }
+
+    /**
+     * Sets the error code for this Exception
+     * 
+     * @param errorCode the error code
+     */
+    public void setErrorCode(int errorCode) {
+        this.errorCode = errorCode;
     }
     
 } //-- XMLException
