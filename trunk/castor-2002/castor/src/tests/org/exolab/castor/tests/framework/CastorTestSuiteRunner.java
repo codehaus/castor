@@ -110,9 +110,20 @@ public class CastorTestSuiteRunner extends TestCase {
 
         TEST_ROOT = System.getProperty(TEST_ROOT_PROPERTY);
         
+        //-- cleanup for relative directories "." and ".."
+        if (TEST_ROOT.equals(".") || TEST_ROOT.equals("..")) {
+            File tmp = new File(TEST_ROOT);
+            try {
+                TEST_ROOT = tmp.getCanonicalPath();
+            }
+            catch(java.io.IOException iox) {
+                iox.printStackTrace();
+                System.exit(1);
+            }
+        }
         //-- some clean up needed because URLClassLoader can't handle a
         //-- file URL that starts with "./"
-        if (TEST_ROOT.startsWith("./")) {
+        else if (TEST_ROOT.startsWith("./")) {
             TEST_ROOT = TEST_ROOT.substring(2);
         }
         
