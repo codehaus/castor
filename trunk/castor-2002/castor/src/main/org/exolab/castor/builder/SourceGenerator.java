@@ -85,7 +85,7 @@ public class SourceGenerator {
     /**
      * The application version
     **/
-    static final String version = "0.8 (20000324)";
+    static final String version = "0.8 (2000418)";
 
     /**
      * The application URI
@@ -106,9 +106,36 @@ public class SourceGenerator {
     private JComment header = null;
     
     private boolean warnOnOverwrite = true;
+
+    /** 
+     * The field info factory.
+     */
+    private FieldInfoFactory infoFactory = null;
     
+    /** The source factory.
+    */
+    private SourceFactory sourceFactory = null;
+    
+    /** 
+     * Creates a SourceGenerator using the default FieldInfo factory
+     */
     public SourceGenerator() {
+        this(null); //-- use default factory
+    } //-- SourceGenerator
+    
+    /** 
+     * Creates a SourceGenerator using the specific field info Factory.
+     * @param infoFactory the FieldInfoFactory to use.
+    */
+    public SourceGenerator(FieldInfoFactory infoFactory) {
         super();    
+        
+        if (infoFactory == null)
+            this.infoFactory = new FieldInfoFactory();
+        else
+            this.infoFactory = infoFactory;
+        
+        this.sourceFactory = new SourceFactory(infoFactory);
         
         header = new JComment(JComment.HEADER_STYLE);
         header.appendComment(DEFAULT_HEADER);
@@ -216,8 +243,6 @@ public class SourceGenerator {
     **/
     public static void main(String[] args) {
         
-        SourceGenerator sgen = new SourceGenerator();
-        
         
         CommandLineOptions allOptions = new CommandLineOptions();
         
@@ -236,6 +261,10 @@ public class SourceGenerator {
         desc = "Suppress non fatal warnings, such as overwritting files.";
         allOptions.addFlag("f", "", desc);
         
+        //-- source generator type-factory name flag
+        allOptions.addFlag("type-factory", "type-factory-name", "Sets the source generator type-factory name (SGTypeFactory)");
+        allOptions.setOptional("type-factory", true);
+        
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
         
@@ -243,6 +272,7 @@ public class SourceGenerator {
         String packageName    = options.getProperty("package");
         String lineSepStyle   = options.getProperty("line-separator");
         boolean force         = (options.getProperty("f") != null);
+        String typeFactory    = options.getProperty("type-factory");
         
         String lineSep = System.getProperty("line.separator");
         if (lineSepStyle != null) {
@@ -264,6 +294,24 @@ public class SourceGenerator {
                 System.out.println("-- using default line separator for this platform");
             }
         }
+
+        SourceGenerator sgen = null;
+        if (typeFactory != null) {
+            try {
+                sgen = new SourceGenerator((FieldInfoFactory)Class.forName(typeFactory).newInstance());
+            }
+            catch(Exception x) {
+                System.out.print("- invalid option for type-factory: ");
+                System.out.println(typeFactory);
+                System.out.println(x);
+                System.out.println("-- using default source generator type-factory");
+                sgen = new SourceGenerator(); // default
+            }
+        }
+        else {
+            sgen = new SourceGenerator(); // default
+        }
+      
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
         if (force) System.out.println("Suppressing non fatal warnings.");
@@ -335,7 +383,7 @@ public class SourceGenerator {
         Archetype archetype = elementDecl.getArchetype();
             
         if (archetype != null) {
-            JClass jClass = SourceFactory.createSourceCode(elementDecl,
+            JClass jClass = sourceFactory.createSourceCode(elementDecl,
                                                         sInfo,
                                                         sInfo.packageName);
             processArchetype(archetype, sInfo);
@@ -374,7 +422,7 @@ public class SourceGenerator {
             if (archetype.isTopLevel()) {
                 
                 JClass jClass 
-                    = SourceFactory.createSourceCode(archetype, 
+                    = sourceFactory.createSourceCode(archetype, 
                                                      sInfo, 
                                                      sInfo.packageName);
                 processJClass(jClass, sInfo);                                                    
@@ -419,7 +467,7 @@ public class SourceGenerator {
             if (classInfo == null) {
                 
                 JClass jClass 
-                    = SourceFactory.createSourceCode(datatype, 
+                    = sourceFactory.createSourceCode(datatype, 
                                                      sInfo, 
                                                      packageName);
                                                      
