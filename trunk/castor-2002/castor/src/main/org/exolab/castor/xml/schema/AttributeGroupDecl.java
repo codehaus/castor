@@ -70,7 +70,7 @@ public final class AttributeGroupDecl extends AttributeGroup {
      * The id of this AttributeGroup
     **/
     private String _id = null;
-    
+
     /**
      * The name of this AttributeGroup
     **/
@@ -81,12 +81,12 @@ public final class AttributeGroupDecl extends AttributeGroup {
     **/
     private Schema _schema = null;
 
-    
+
     /**
      * The collection of attributes for this AttributeGroup
     **/
     private Vector _attributes = null;
-    
+
     /**
      * The collection of AttributesGroupReferences for this
      * AttributeGroup
@@ -111,60 +111,74 @@ public final class AttributeGroupDecl extends AttributeGroup {
     /**
      * Adds the given attribute definition to this AttributeGroup
      *
-     * @param attrDecl the AttributeDecl to add 
+     * @param attrDecl the AttributeDecl to add
     **/
     public void addAttribute(AttributeDecl attrDecl) {
-        
+
         if (attrDecl == null) return;
-        
+
         //-- add validation code
-        
+
         //-- add to internal collection
         _attributes.addElement(attrDecl);
-        
+
     } //-- addAttribute
 
     /**
      * Adds the given AttributeGroupReference to this AttributeGroup
      *
-     * @param attrGroup the AttributeGroupReference to add 
+     * @param attrGroup the AttributeGroupReference to add
     **/
     public void addReference(AttributeGroupReference attrGroup) {
-        
+
         if (attrGroup == null) return;
-        
+
         //-- add validation code
-        
+
         //-- add to internal collection
         _references.addElement(attrGroup);
-        
+
     } //-- addReference
-    
+
+
+    /**
+     * Returns the attributes of THIS attribute group.
+     * (not those of the nested groups)
+     */
+    public Enumeration getMyAttributes() { return _attributes.elements(); }
+
+    /**
+     * Returns the AttributeGroupReference of THIS attribute group.
+     * (not those of the nested groups)
+     */
+    public Enumeration getMyAttributeGroupReferences() { return _references.elements(); }
+
+
     /**
      * Returns the AttributeDecl associated with the given name
      * @return the AttributeDecl associated with the given name, or
      *  null if no AttributeDecl with the given name was found.
     **/
     public AttributeDecl getAttribute(String name) {
-        
+
         if (name == null) return null;
-        
+
         for (int i = 0; i < _attributes.size(); i++) {
             AttributeDecl attr = (AttributeDecl) _attributes.elementAt(i);
             if (name.equals(attr.getName())) return attr;
         }
-        
+
         for (int i = 0; i < _references.size(); i++) {
-            AttributeGroupReference ref = 
+            AttributeGroupReference ref =
                 (AttributeGroupReference) _references.elementAt(i);
-            
+
             AttributeDecl attr = ref.getAttribute(name);
             if (attr != null) return attr;
         }
-        
+
         return null;
     } //-- getAttribute
-    
+
     /**
      * Returns an Enumeration of all the attributes of this
      * attribute group. The enumeration includes attributes from
@@ -176,7 +190,7 @@ public final class AttributeGroupDecl extends AttributeGroup {
     public Enumeration getAttributes() {
         return new AttributeGroupEnumeration(_attributes, _references);
     } //-- getAttributes
-    
+
     /**
      * Returns the id of this AttributeGroup
      * @return the id of this AttributeGroup, or null, if
@@ -186,7 +200,7 @@ public final class AttributeGroupDecl extends AttributeGroup {
         return _id;
     } //-- getId
 
-    
+
     /**
      * Returns the name of this AttributeGroup
      * @return the name of this AttributeGroup, or null, if
@@ -204,7 +218,7 @@ public final class AttributeGroupDecl extends AttributeGroup {
     public Schema getSchema() {
         return _schema;
     } //-- getSchema
-    
+
     /**
      * Returns true if this AttributeGroup does not contain any
      * AttributeDecls or any non-empty AttributeGroups
@@ -213,22 +227,22 @@ public final class AttributeGroupDecl extends AttributeGroup {
      * AttributeDecls or any non-empty AttributeGroups
     **/
     public boolean isEmpty() {
-        
+
         if (_attributes.size() > 0) return false;
-        
+
         if (_references.size() == 0) return true;
-        
+
         for (int i = 0; i < _references.size(); i++) {
             if (!((AttributeGroup)_references.elementAt(i)).isEmpty())
                 return false;
         }
         return true;
-        
+
     } //-- isEmpty
-    
+
     /**
      * Removes the given AttributeDecl from this AttributeGroup.
-     * @param attr the attribute to remove. 
+     * @param attr the attribute to remove.
     **/
     public void removeAttribute(AttributeDecl attr) {
         _attributes.removeElement(attr);
@@ -236,12 +250,12 @@ public final class AttributeGroupDecl extends AttributeGroup {
 
     /**
      * Removes the given AttributeGroupReference from this AttributeGroup.
-     * @param attrGroup the AttributeGroupReference to remove. 
+     * @param attrGroup the AttributeGroupReference to remove.
     **/
     public void removeReference(AttributeGroupReference attrGroupReference) {
         _references.removeElement(attrGroupReference);
     } //-- removeReference
-    
+
     /**
      * Sets the id of this AttributeGroup
      * @param id the id of this AttributeGroup
@@ -255,17 +269,17 @@ public final class AttributeGroupDecl extends AttributeGroup {
      * @param name the name of this AttributeGroup
     **/
     public void setName(String name) {
-        
-        if (name == null) 
+
+        if (name == null)
             throw new IllegalArgumentException("name must not be null");
-            
+
         //-- strip namespace prefix if necessary
         int idx = name.indexOf(':');
-        if (idx >= 0) 
+        if (idx >= 0)
             this._name = name.substring(idx+1);
-        else 
+        else
             this._name = name;
-            
+
     } //-- setName
 
     //-------------------------------/
@@ -292,54 +306,54 @@ public final class AttributeGroupDecl extends AttributeGroup {
 
     } //-- validate
 
-    
+
 } //-- AttributeGroup
 
 /**
  * A simple enumerator for the AttributeGroup class
 **/
 class AttributeGroupEnumeration implements Enumeration {
-    
+
     private Vector references = null;
     int index = 0;
-    
+
     private Enumeration enum = null;
-    
-    
+
+
     AttributeGroupEnumeration(Vector definitions, Vector references) {
         enum = definitions.elements();
         if (!enum.hasMoreElements()) enum = null;
         this.references = references;
     } //-- AttributeGroupEnumeration
-    
+
     public boolean hasMoreElements() {
         if (enum != null) return true;
-        
+
         int i = index;
         while (i < references.size()) {
-            AttributeGroupReference ref = 
+            AttributeGroupReference ref =
                 (AttributeGroupReference)references.elementAt(i);
             ++i;
             if (!ref.isEmpty()) return true;
         }
         return false;
-        
+
     } //-- hasMoreElements
-    
+
     public Object nextElement() {
-        
+
         if (enum != null) {
             Object obj = enum.nextElement();
             if (!enum.hasMoreElements()) enum = null;
             return obj;
         }
-        
+
         while (index < references.size()) {
-            AttributeGroupReference ref = 
+            AttributeGroupReference ref =
                 (AttributeGroupReference)references.elementAt(index);
-            
+
             ++index;
-            
+
             enum = ref.getAttributes();
             if (enum.hasMoreElements()) {
                 Object obj = enum.nextElement();
@@ -347,7 +361,7 @@ class AttributeGroupEnumeration implements Enumeration {
                 return obj;
             }
         }
-        
+
         return null;
     }
 } //-- AttributeGroupEnumeration
