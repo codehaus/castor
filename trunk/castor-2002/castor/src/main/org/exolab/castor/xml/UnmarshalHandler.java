@@ -610,12 +610,11 @@ public class UnmarshalHandler implements DocumentHandler {
                 //-- Get Class type...first use ClassDescriptor,
                 //-- since it could be more specific than 
                 //-- the FieldDescriptor
-                boolean useHandler = true;
                 if (classDesc != null) {
                     _class = classDesc.getJavaClass();
                     //-- XXXX this is a hack I know...but we
                     //-- XXXX can't use the handler in this case
-                    useHandler = false;
+                    state.derived = true;
                 }
                 else
                     _class = descriptor.getFieldType();
@@ -666,7 +665,7 @@ public class UnmarshalHandler implements DocumentHandler {
                 else {
                     //-- XXXX should remove this test once we can
                     //-- XXXX come up with a better solution
-                    if (useHandler) 
+                    if (!state.derived) 
                         state.object = handler.newInstance(parentState.object);
                     //-- reassign class in case there is a conflict
                     //-- between descriptor#getFieldType and
@@ -784,7 +783,6 @@ public class UnmarshalHandler implements DocumentHandler {
         throws org.xml.sax.SAXException
     {
         
-        //System.out.println("#processAttributes");
         if (atts == null) {
             
             if ((classDesc != null) 
@@ -793,7 +791,7 @@ public class UnmarshalHandler implements DocumentHandler {
             {
                 UnmarshalState state = (UnmarshalState)_stateInfo.peek();
                 buf.setLength(0);
-                buf.append("AttributeList for '");
+                buf.append("warning: the AttributeList for '");
                 buf.append(state.elementName);
                 buf.append("' is null, but attribute descriptors exist.");
                 message(buf.toString());
@@ -885,13 +883,16 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
             }
             else {
-                //-- check for proper type
+                //-- check for proper type and do type
+                //-- conversion
                 Class type = descriptor.getFieldType();
-                if (type.isPrimitive())
+                if (isPrimitive(type))
                     value = MarshalHelper.toPrimitiveObject(type, attValue);
             }
                 
             try {
+                
+                
                 FieldHandler handler = descriptor.getHandler();
                 
                 if (handler != null)
