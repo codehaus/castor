@@ -205,16 +205,15 @@ public class MemberFactory {
         fieldInfo.setRequired(attribute.isRequired());
 
         String value = attribute.getValue();
-
         if (value != null) {
 
+           if (value.length() == 0)
+              value="\"\"";
             //-- XXX Need to change this...and we
             //-- XXX need to validate the value.
 
             //-- clean up value
-            //--the value can't be an empty string
-            if ( (xsType.getType() == XSType.STRING) &&
-                 (value.length() != 0) )
+            if  (xsType.getType() == XSType.STRING)
             {
                 char ch = value.charAt(0);
                 switch (ch) {
