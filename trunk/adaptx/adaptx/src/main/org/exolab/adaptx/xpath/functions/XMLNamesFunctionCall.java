@@ -100,7 +100,10 @@ public class XMLNamesFunctionCall
             case LOCAL_PART:
                 return new StringResult( node.getLocalName() );
             case NAMESPACE:
-                return new StringResult( node.getNamespaceURI() );
+                if (node.getNamespaceURI() != null) {
+                    return new StringResult( node.getNamespaceURI() );
+                }
+                break;
             default:
                 return new StringResult( node.getLocalName() );
             }
