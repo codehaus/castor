@@ -53,7 +53,7 @@
 	<p>Due to some accident, we lost the xml source of the OQL document. Before we recover it, please click
 	<a href="http://www.karpenstein.com/nissim/design-oql-parser.html">here</a> for the document</p>
 
-	<p><b>Should my Java Objects implement some special interface?</b></p>
+	<p><b>Should my JDO classes implement some special interface?</b></p>
 	
 	<p>In general, no. If you need some behavior that is not directly supported by Castor, you can implement interface org.exolab.castor.jdo.Persistent.
 	In order to use dirty checking for long transaction you should implement interface org.exolab.castor.jdo.TimeStampable.
@@ -77,7 +77,22 @@
 	
 	<p>If you wish some independent object was created and/or removed automatically on operations on other independent object,
 	   you may use interface Persistent to code the desired behavior.</p>
-
+	
+	<p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
+	
+	<p>Probably castor.jar file is in jre/lib/ext directory. In this case you should call
+         <code>
+  jdo.setClassLoader(getClass().getClassLoader());
+         </code>
+       before jdo.getDatabase().</p>
+	
+	<p><b>I am getting exception "the class ... is not persistence capable...". Why?</b></p>
+	
+	<p>In this case as well as in many others you can get more information with the help of logging. Call
+         <code>
+  jdo.setLogWriter(Logger.getSystemLogger());
+         </code>
+       and seek in the output for warnings and errors.</p>
      </section>
      <section title="Features requests">
         <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?</b></p>
