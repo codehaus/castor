@@ -47,11 +47,9 @@
 package org.exolab.castor.persist;
 
 
-import java.io.PrintWriter;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**

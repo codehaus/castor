@@ -46,10 +46,7 @@
 
 package org.exolab.castor.persist;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.Iterator;
 
 /**
  * Object identifier. An object identifier is unique within a cache
