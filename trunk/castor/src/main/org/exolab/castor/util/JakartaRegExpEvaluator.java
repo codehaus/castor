@@ -61,8 +61,8 @@
     implements RegExpEvaluator
 {
     
-    private static final String BOL = "^";
-    private static final String EOL = "$";
+    private static final String BOL = "^(";
+    private static final String EOL = ")$";
     
     /**
      * The Regular expression
