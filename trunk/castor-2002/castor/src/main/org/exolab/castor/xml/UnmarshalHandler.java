@@ -818,6 +818,7 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         catch (java.lang.IllegalStateException ise) {
             message(ise.toString());
+            throw new SAXException(ise);
         }
             
             
