@@ -130,6 +130,20 @@
         </p>
         </section>
 
+        <section title="Refactor for Correct Use of JDBC Tx Isolation Levels">
+        <p>
+        <b>Description:</b><br />
+        Currently Castor JDO does not make any use of JDBC tx isolation levels
+        and this needs to be corrected. 
+        </p>
+        <p>
+        <b>Volunteer:</b> <br />
+        <b>Status:</b> <br />
+        <b>Date Started:</b><br />
+        <b>Notes:</b><br />
+        This impacts Connection duration and needs to be investigated further.
+        </section>
+
         <section title="Query Engine Refactoring">
         <p>
         <b>Description:</b><br />
