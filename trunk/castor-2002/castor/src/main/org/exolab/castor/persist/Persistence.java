@@ -78,6 +78,7 @@ package org.exolab.castor.persist;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  * @see TransactionContext
+ * @see PersistenceQuery
  */
 public interface Persistence
 {
@@ -215,11 +216,30 @@ public interface Persistence
      * @param newIdentity The object's new identity
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
+     * @throws ObjectDeletedException Indicates the object has been
+     *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
     public void changeIdentity( Object conn, Object obj,
 				Object oldIdentity, Object newIdentity )
-	throws DuplicateIdentityException, PersistenceException;
+	throws ObjectDeletedException, DuplicateIdentityException, PersistenceException;
+
+
+    /**
+     * Creates and returns a new query object. The query object is
+     * used to execute a query against persistent storage and fetch
+     * the results of the query. The query parameter types are
+     * specified prehand. If a particular parameter type is unknown,
+     * null may be used and type checking will defer to query
+     * execution.
+     *
+     * @param query The query statement
+     * @param type List of all parameter types, or null
+     * @return A new query object that can be executed
+     * @throws QueryException The query is invalid
+     */
+    public PersistenceQuery createQuery( String query, Class[] types )
+	throws QueryException;
 
 
 }
