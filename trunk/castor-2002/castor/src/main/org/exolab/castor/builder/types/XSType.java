@@ -125,7 +125,7 @@ public abstract class XSType {
     /**
      * The name of the gDay type.
      */
-    public static final String GDAY_NAME = "gName";
+    public static final String GDAY_NAME = "gDay";
 
     /**
      * The name of the gMonth type.
@@ -468,6 +468,10 @@ public abstract class XSType {
                 return DATE_NAME;
             case GYEARMONTH_TYPE:
                 return GYEARMONTH_NAME;
+            case GYEAR_TYPE:
+                return GYEAR_NAME;
+            case GMONTHDAY_TYPE:
+                return GMONTHDAY_NAME;
             case GDAY_TYPE:
                 return GDAY_NAME;
             case GMONTH_TYPE:
