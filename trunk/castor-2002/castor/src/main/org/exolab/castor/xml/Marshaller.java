@@ -132,7 +132,7 @@ public class Marshaller {
         _nsURIKeyHash    = new Hashtable(3);
         _nsScope         = new List(3);
         _packages        = new List(3);
-        _cdResolver       = new ClassDescriptorResolverImpl();
+        _cdResolver      = new ClassDescriptorResolverImpl();
         _parents         = new Stack();
     } //-- Marshaller
 
@@ -152,26 +152,27 @@ public class Marshaller {
     }
 
 
-    /**
-     * Marshals the given object as XML using the given Writer.
-     * @param obj the Object to marshal
-     * @param out the Writer to marshal to
-     * @exception org.exolab.castor.xml.MarshalException
-     * @exception org.exolab.castor.xml.ValidationException
-    **/
-    public void marshal(Object obj, Writer out) 
+    public static void marshal(Object object, Writer out) 
         throws MarshalException, ValidationException
     {
-        validate(obj);
-        marshal(obj, null, _handler );
-        try {
-            out.flush();
-        }
-        catch(java.io.IOException ex) {
-            throw new MarshalException(ex);
-        }
-    } //-- void marshal(Writer) 
+        Marshaller mar;
 
+        try {
+            mar = new Marshaller(out);
+            mar.marshal(object);
+        } catch ( IOException except ) {
+            throw new MarshalException( except );
+        }
+    } //-- marshal
+
+    public static void marshal(Object object, DocumentHandler docHandler) 
+        throws MarshalException, ValidationException
+    {
+        Marshaller mar;
+
+        mar = new Marshaller(docHandler);
+        mar.marshal(object);
+    } //-- marshal
 
     /**
      * Marshals the given Object as XML using the given DocumentHandler.
@@ -286,16 +287,6 @@ public class Marshaller {
                     throw new MarshalException
                         (MarshalException.BASE_CLASS_OR_VOID_ERR);
                 }
-                /*
-                else if ((!_class.isPrimitive()) && 
-		            (!Serializable.class.isAssignableFrom( _class ))) {
-		                
-		            if (depth == 0) {
-                        throw new MarshalException
-                            (MarshalException.NON_SERIALIZABLE_ERR);
-                    }
-                }
-                */
                 _parents.pop();
                 return;
             }
@@ -595,7 +586,7 @@ public class Marshaller {
      * type
     **/
     private boolean isPrimitive(Class type) {
-        
+
         if (type.isPrimitive()) return true;
         
         if ((type == Boolean.class)   ||
@@ -613,4 +604,5 @@ public class Marshaller {
     } //-- isPrimitive
     
 } //-- Marshaller
+
 
