@@ -71,7 +71,6 @@
         <echo message="  source   Builds the source tarball in the dist directory"/>
         <echo message="  tarball  Builds the binary distribution in the dist directory"/>
         <echo message="  cvs      Update the sources from the CVS"/>
-        <echo message="  runtests Launch the basic test for the source generator"/>
         <echo message=""/>
     </target>
     <!-- Prepare target directories -->
@@ -183,101 +182,7 @@
 
     </target>
 
-    <target name="runtests" depends="prepare, main">
-        <!--Test for include of include-->
-        <!--to be removed when integrated-->
-        <!--to the Castor Testing Framework-->
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/includeA.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
 
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<!-- <arg value="-i testtype1.xsd -f -dest ../../../../build -package xml.xml2java" /> do not work because ant add " -->
-        	<arg value="-i${source}/tests/xml/xml2java/testtype1.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/timeInstantTestxsd.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs2.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minmaxOccurs.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs2.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs3.xsd" />
-        	<arg value="-f" />
-        	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" />
-        </java>
-
-        <javac srcdir="${build}/tests" destdir="${build}/tests" classpath="${classpath}" debug="on" deprecation="${deprecation}" />
-
-        <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
-
-        <copy todir="${build}/tests">
-            <fileset dir="${source}/tests">
-                <patternset refid="support.files" />
-            </fileset>
-        </copy>
-
-        <junit printsummary="yes" fork="no" haltonfailure="no">
-    		<formatter type="plain" />
-    		<!-- <classpath  refid="project.class.path" /> -->
-    		<classpath>
-    			<pathelement path="${classpath}" />
-				<pathelement location="${build}/tests" />
-			</classpath>
-    		<batchtest fork="no">
-    			<fileset dir="${source}/tests">
-    				<include name="**/*Test.java" />
-    				<exclude name="**/tests/framework/**" />
-    			</fileset>
-    		</batchtest>
-    	</junit>
-
-
-    </target>
 
     <target name="jar.all" depends="release,jar.jdotests" />
 
@@ -336,23 +241,18 @@
         <mkdir dir="${build}/doc"/>
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl" includes="**.xml" excludes="style/**,project.xml"/>
         <copy todir="${build}/doc">
-			<fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
-		</copy>
+		<fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
+	</copy>
         <copy todir="${build}/doc/images">
-			<fileset dir="${doc}/images" />
-		</copy>
+		<fileset dir="${doc}/images" />
+	</copy>
         <copy todir="${build}/doc/images">
-			<fileset dir="${doc}/style/images" includes="*.gif"/>
-		</copy>
+		<fileset dir="${doc}/style/images" includes="*.gif"/>
+	</copy>
         <copy todir="${build}/doc/">
-			<fileset dir="${doc}/style" includes="*.css"/>
-		</copy>
-        <copy todir="${build}/doc">
-			<fileset dir="${schema}" includes="*.dtd,*.xsd"/>
-		</copy>
-
-
-
+		<fileset dir="${doc}/style" includes="*.css"/>
+	</copy>
+        
         <replace file="${build}/doc/index.html" token="$$VERSION$$" value="${version}"/>
         <replace file="${build}/doc/index.html" token="$$RELEASE_DATE$$" value="${release_date}"/>
         <replace file="${build}/doc/download.html" token="$$VERSION$$" value="${version}"/>
@@ -391,17 +291,17 @@
         <mkdir dir="${build}/${archive}/src"/>
         <!-- <copydir src="${source}" dest="${build}/${archive}/src" defaultexcludes="true"/> -->
         <copy todir="${build}/${archive}/src">
-			<fileset dir="${source}" />
-		</copy>
+		<fileset dir="${source}" />
+	</copy>
         <mkdir dir="${build}/${archive}/lib"/>
 
         <copy todir="${build}/${archive}/lib">
-			<fileset dir="${lib}" excludes="jconn2.jar"/>
-		</copy>
+		<fileset dir="${lib}" excludes="jconn2.jar"/>
+	</copy>
 
         <copy todir="${build}/${archive}">
-			<fileset dir="." includes="*.sh,*.bat"/>
-		</copy>
+		<fileset dir="." includes="*.sh,*.bat"/>
+	</copy>
 
         <tar includes="${archive}/**" basedir="${build}" tarfile="${dist}/${archive}-src.tar"/>
         <gzip src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
