@@ -129,6 +129,7 @@ public class OQLQueryImpl
         SQLEngine       engine;
         Vector          types;
         Class[]         array;
+        QueryExpr       expr;
         
         _fieldNum = 0;
         types = new Vector();
@@ -159,26 +160,24 @@ public class OQLQueryImpl
             throw new QueryInvalidException( "Cold not find an engine supporting class " + objType );
         engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
         clsDesc = engine.getClassDesc();
-        
+
+        expr = engine.getFinder();
         if ( token.hasMoreTokens() ) {
             if ( ! token.nextToken().equalsIgnoreCase( "WHERE" ) )
                 throw new QueryInvalidException( "Missing WHERE clause" );
-            parseField( clsDesc, token, sql, types );
+            parseField( clsDesc, token, expr, types );
             while ( token.hasMoreTokens() ) {
                 if ( ! token.nextToken().equals( "AND" ) )
                     throw new QueryInvalidException( "Only AND supported in WHERE clause" );
-                parseField( clsDesc, token, sql, types );
+                parseField( clsDesc, token, expr, types );
             }
-        } else {
-            sql.append( "1 = 1" );
         }
         
-        sql.insert( 0, engine._sqlFinder ).append( engine._sqlFinderJoin );
         array = new Class[ types.size() ];
         types.copyInto( array );
         try {
             _query = engine.createQuery( new RelationContext( TransactionImpl.getCurrentContext(), _dbEngine ),
-                                         sql.toString(), array );
+                                         expr.getQuery( false ), array );
         } catch ( QueryException except ) {
             throw new QueryInvalidException( except.getMessage() );
         }
@@ -186,7 +185,7 @@ public class OQLQueryImpl
     
     
     private void parseField( JDOClassDesc clsDesc, StringTokenizer token,
-                             StringBuffer sqlWhere, Vector types )
+                             QueryExpr expr, Vector types )
         throws QueryInvalidException
     {
         String         name;
@@ -211,7 +210,6 @@ public class OQLQueryImpl
         field = null;
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ].getFieldName().equals( name ) ) {
-                sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
                 field = fields[ i ];
                 break;
             }
@@ -222,25 +220,22 @@ public class OQLQueryImpl
                 fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
                 for ( int i = 0 ; i < fields.length ; ++i ) {
                     if ( fields[ i ].getFieldName().equals( name ) ) {
-                        sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
                         field = fields[ i ];
                         break;
                     }
                 }
             } else if ( clsDesc.getIdentity().getFieldName().equals( name ) ) {
-                sqlWhere.append( clsDesc.getTableName() + "." + ( (JDOFieldDesc) clsDesc.getIdentity() ).getSQLName() );
                 field = (JDOFieldDesc) clsDesc.getIdentity();
             }
         }
         
         if ( field == null )
             throw new QueryInvalidException( "The field " + name + " was not found" );
-        sqlWhere.append( op );
         if ( value.startsWith( "$" ) ) {
-            sqlWhere.append( "?" );
+            expr.addParameter( clsDesc, field, op );
             types.addElement( field.getFieldType() );
         } else {
-            sqlWhere.append( value );
+            expr.addCondition( clsDesc, field, op, value );
         }
     }
     
@@ -265,11 +260,9 @@ public class OQLQueryImpl
             identity = results.nextIdentity();
             while ( identity != null ) {
                 try {
-                    obj = _dbEngine.getClassDesc( results.getResultType() ).newInstance();
-                    results.fetch( obj );
+                    obj = results.fetch();
                     set.addElement( obj );
-                } catch ( ObjectNotFoundException except ) {
-                }
+                } catch ( ObjectNotFoundException except ) { }
                 identity = results.nextIdentity();
             }
             if ( set.size() == 0 )

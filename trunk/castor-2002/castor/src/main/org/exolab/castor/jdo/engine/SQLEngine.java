@@ -121,8 +121,7 @@ class SQLEngine
     private String          _sqlLoadLock;
 
 
-    String          _sqlFinder;
-    String          _sqlFinderJoin;
+    private QueryExpr       _sqlFinder;
 
 
     private JDOFieldDesc[]   _loadFields;
@@ -177,6 +176,12 @@ class SQLEngine
         throws QueryException
     {
         return new SQLQuery( this, rtx, query, types );
+    }
+
+
+    public QueryExpr getFinder()
+    {
+        return (QueryExpr) _sqlFinder.clone();
     }
 
 
@@ -676,45 +681,37 @@ class SQLEngine
     protected void buildLoadSql()
         throws MappingException
     {
-        Vector         loadFields;
-        Vector         loadRelations;
-        StringBuffer   sqlFields;
-        StringBuffer   sqlFrom;
-        StringBuffer   sqlJoin;
-        
+        Vector    loadFields;
+        Vector    loadRelations;
+        QueryExpr expr;
+
         loadFields = new Vector();
         loadRelations = new Vector();
-        sqlFields = new StringBuffer( "SELECT " );
-        sqlFrom = new StringBuffer( " FROM " );
-        sqlJoin = new StringBuffer( " WHERE " );
-        addLoadSql( _clsDesc, sqlFields, sqlFrom,
-                    sqlJoin, loadFields, loadRelations, 0, false, true );
-        if ( _stampField != null )
+        expr = new QueryExpr();
+        addLoadSql( _clsDesc, expr, loadFields, loadRelations, false, true );
+        /*
+          if ( _stampField != null )
             sqlFields.append( ',' ).append( _stampField );
+        */
         
-        _sqlLoad = sqlFields.append( sqlFrom ).append( sqlJoin ).toString();
-        _sqlLoadLock = _sqlLoad + " FOR UPDATE";
+        _sqlLoad = expr.getQuery( false );
+        _sqlLoadLock = expr.getQuery( true );
         _loadFields = new JDOFieldDesc[ loadFields.size() ];
         loadFields.copyInto( _loadFields );
         _loadRelations = new RelationDesc[ loadRelations.size() ];
         loadRelations.copyInto( _loadRelations );
         
-        sqlFields = new StringBuffer( "SELECT " );
-        sqlFrom = new StringBuffer( " FROM " );
-        sqlJoin = new StringBuffer( "" );
-        addLoadSql( _clsDesc, sqlFields, sqlFrom,
-                    sqlJoin, loadFields, loadRelations, 0, true, true );
+        _sqlFinder = new QueryExpr();
+        addLoadSql( _clsDesc, _sqlFinder, loadFields, loadRelations, true, false );
+        /*
         if ( _stampField != null )
             sqlFields.append( ',' ).append( _stampField );
-        _sqlFinder = sqlFields.append( sqlFrom ).append( " WHERE " ).toString();
-        _sqlFinderJoin = sqlJoin.toString();
+        */
     }
 
 
-    private int addLoadSql( JDOClassDesc clsDesc, StringBuffer sqlFields,
-                            StringBuffer sqlFrom, StringBuffer sqlJoin,
-                            Vector loadFields, Vector loadRelations, int count,
-                            boolean loadPk, boolean firstTable )
+    private void addLoadSql( JDOClassDesc clsDesc, QueryExpr expr, Vector loadFields, Vector loadRelations,
+                             boolean loadPk, boolean queryPk )
         throws MappingException
     {
         JDOFieldDesc[] descs;
@@ -725,117 +722,80 @@ class SQLEngine
         identity = clsDesc.getIdentity();
         extend = (JDOClassDesc) clsDesc.getExtends();
         rels = clsDesc.getRelations();
-        
-        if ( ! firstTable )
-            sqlFrom.append( ',' );
-        sqlFrom.append( getSQLName( clsDesc, false ) );
-        
-        if ( ! loadPk ) {
-            if ( identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    if ( i > 0 )
-                        sqlJoin.append( " AND " );
-                    sqlJoin.append( getSQLName( clsDesc, descs[ i ] ) );
-                    sqlJoin.append( "=?" );
-                }
-            } else {
-                sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
-                sqlJoin.append( "=?" );
-            }
-        }
-        
-        if ( extend != null ) {
-            if ( identity instanceof ContainerFieldDesc ) {
-                descs = getJDOFields( (ContainerFieldDesc) identity );
-                for ( int i = 0 ; i < descs.length ; ++i ) {
-                    sqlJoin.append( " AND " );
-                    sqlJoin.append( getSQLName( clsDesc, descs[ i ] ) );
-                    sqlJoin.append( "=" );
-                    sqlJoin.append( getSQLName( extend, descs[ i ] ) );
-                }
-            } else {
-                sqlJoin.append( " AND " );
-                sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
-                sqlJoin.append( "=" );
-                sqlJoin.append( getSQLName( extend, (JDOFieldDesc) identity ) );
-            }
-        }
-        
-        if ( extend != null ) {
-            count = addLoadSql( extend, sqlFields, sqlFrom,
-                                sqlJoin, loadFields, loadRelations, count, true, false );
-            loadPk = false;
-        }
+        expr.addTable( clsDesc );
 
+        if ( extend != null ) {
+            if ( identity instanceof ContainerFieldDesc ) {
+                descs = getJDOFields( (ContainerFieldDesc) identity );
+                expr.addJoin( clsDesc, descs, extend, descs );
+            } else {
+                expr.addJoin( clsDesc, (JDOFieldDesc) identity, extend, (JDOFieldDesc) identity );
+            }
+            addLoadSql( extend, expr, loadFields, loadRelations, true, queryPk );
+            loadPk = false;
+            queryPk = false;
+        }
+        
         if ( loadPk  ) {
             if ( identity instanceof ContainerFieldDesc ) {
                 descs = getJDOFields( (ContainerFieldDesc) identity );
                 for ( int i = 0 ; i < descs.length ; ++i ) {
-                    if ( count > 0 )
-                        sqlFields.append( ',' );
-                    sqlFields.append( getSQLName( clsDesc, descs[ i ] ) );
-                    loadFields.addElement( new JDOContainedFieldDesc( descs[ i ], (ContainerFieldDesc) identity, null ) );
-                    ++count;
+                    expr.addColumn( clsDesc, descs[ i ] );
+                    //                    loadFields.addElement( new JDOContainedFieldDesc( descs[ i ], (ContainerFieldDesc) identity, null ) );
                 }
             } else {
-                if ( count > 0 )
-                    sqlFields.append( ',' );
-                sqlFields.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
-                loadFields.addElement( identity );
-                ++count;
+                expr.addColumn( clsDesc, (JDOFieldDesc) identity );
+                //                loadFields.addElement( identity );
+            }
+            // XXX How do we handle ProductInventory?
+        }
+        
+        if ( queryPk ) {
+            if ( identity instanceof ContainerFieldDesc ) {
+                descs = getJDOFields( (ContainerFieldDesc) identity );
+                for ( int i = 0 ; i < descs.length ; ++i )
+                    expr.addParameter( clsDesc, descs[ i ], null );
+            } else {
+                expr.addParameter( clsDesc, (JDOFieldDesc) identity, null );
             }
         }
         
         descs = getJDOFields( clsDesc );
         for ( int i = 0 ; i < descs.length ; ++i ) {
-            if ( count > 0 )
-                sqlFields.append( ',' );
-            sqlFields.append( getSQLName( clsDesc, descs[ i ] ) );
+            expr.addColumn( clsDesc, descs[ i ] );
             loadFields.addElement( descs[ i ] );
-            ++count;
         }
 
         rels = clsDesc.getRelations();
         for ( int i = 0 ; i < rels.length ; ++i ) {
-            sqlJoin.append( " AND " );
-            if ( rels[ i ].isAttached() )
-                sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) clsDesc.getIdentity() ) );
-            else
-                sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField() ) );
-            sqlJoin.append( '=' );
-            if ( rels[ i ].isAttached() )
-                sqlJoin.append( getSQLName( (JDOClassDesc) rels[ i ].getRelatedClassDesc(),
-                                            ( (JDOFieldDesc) ( rels[ i ].getRelatedClassDesc().getIdentity() ) ) ) );
-            else
-                sqlJoin.append( getSQLName( (JDOClassDesc) rels[ i ].getRelatedClassDesc(),
-                                            (JDOFieldDesc) rels[ i ].getRelatedClassDesc().getIdentity() ) );
+            if ( rels[ i ].isAttached() ) {
+                if ( rels[ i ].isAttached() )
+                    expr.addJoin( clsDesc, (JDOFieldDesc) clsDesc.getIdentity(),
+                                  (JDOClassDesc) rels[ i ].getRelatedClassDesc(), 
+                                  ( (JDOFieldDesc) ( rels[ i ].getRelatedClassDesc().getIdentity() ) ) );
+                else
+                    expr.addJoin( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField(),
+                                  (JDOClassDesc) rels[ i ].getRelatedClassDesc(), 
+                                  (JDOFieldDesc) rels[ i ].getRelatedClassDesc().getIdentity() );
+            }
         }
         
         for ( int i = 0 ; i < rels.length ; ++i ) {
             if ( ! rels[ i ].isAttached() ) {
-                loadRelations.add( rels[ i ] );
+                loadRelations.addElement( rels[ i ] );
                 identity = rels[ i ].getRelatedClassDesc().getIdentity();
-                if ( identity instanceof ContainerFieldDesc ) {
-                    descs = getJDOFields( (ContainerFieldDesc) identity );
-                    for ( i = 0 ; i < descs.length ; ++i ) {
-                        if ( count > 0 )
-                            sqlFields.append( ',' );
-                        sqlFields.append( getSQLName( (JDOClassDesc) rels[ i ].getRelatedClassDesc(), descs[ i ] ) );
-                        ++count;
-                    }
-                } else {
-                    if ( count > 0 )
-                        sqlFields.append( ',' );
-                    sqlFields.append( getSQLName( (JDOClassDesc) rels[ i ].getRelatedClassDesc(), (JDOFieldDesc) identity ) );
-                    ++count;
-                }
+                if ( rels[ i ].getRelationField() instanceof ContainerFieldDesc ) {
+                    descs = getJDOFields( (ContainerFieldDesc) rels[ i ].getRelationField() );
+                    for ( i = 0 ; i < descs.length ; ++i )
+                        expr.addRelationColumn( clsDesc, descs[ i ] );
+                } else
+                    expr.addRelationColumn( clsDesc, (JDOFieldDesc) rels[ i ].getRelationField() );
             } else {
-                count = addLoadSql( (JDOClassDesc) rels[ i ].getRelatedClassDesc(), sqlFields, sqlFrom,
-                                    sqlJoin, loadFields, loadRelations, count, true, false );
+                addLoadSql( asRelation( (JDOClassDesc) rels[ i ].getRelatedClassDesc(),
+                                        rels[ i ].getRelationField() ),
+                            expr, loadFields, loadRelations, false, false );
             }
         }
-        return count;
     }
 
 
@@ -848,6 +808,25 @@ class SQLEngine
     protected static String getSQLName( JDOClassDesc clsDesc, JDOFieldDesc field )
     {
         return clsDesc.getTableName() + "." + field.getSQLName();
+    }
+
+
+    private static JDOClassDesc asRelation( JDOClassDesc clsDesc, FieldDesc refField )
+        throws MappingException
+    {
+        FieldDesc   identity;
+        FieldDesc[] fields;
+        FieldDesc[] cFields;
+
+        identity = clsDesc.getIdentity();
+        identity = new JDOContainedFieldDesc( (JDOFieldDesc) identity, refField, null );
+        fields = clsDesc.getFields();
+        cFields = new FieldDesc[ fields.length ];
+        for ( int i = 0 ; i < fields.length ; ++i )
+            cFields[ i ] = new JDOContainedFieldDesc( (JDOFieldDesc) fields[ i ], refField, null );
+        return new JDOClassDesc( new ClassDesc( clsDesc.getJavaClass(), cFields,
+                                                clsDesc.getRelations(), identity, clsDesc.getExtends(),
+                                                clsDesc.getAccessMode() ), clsDesc.getTableName() );
     }
 
 
@@ -945,8 +924,6 @@ class SQLEngine
         {
             PreparedStatement stmt;
 
-// XXX
-System.out.println( _sql );
             _lastIdentity = null;
             try {
                 stmt = ( (Connection) conn ).prepareStatement( _sql );
@@ -1036,7 +1013,6 @@ System.out.println( _sql );
             if ( _lastIdentity == null )
                 throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
             try {
-
                 if ( _engine._identity instanceof ContainerFieldDesc ) {
                     JDOFieldDesc[] descs;
 
