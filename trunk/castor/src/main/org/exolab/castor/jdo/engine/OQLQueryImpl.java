@@ -526,10 +526,11 @@ public class OQLQueryImpl
      * @throws QueryException If the SQL query cannot be generated.
      */
     public String getSQL() throws org.exolab.castor.jdo.QueryException {
-	  if(_expr != null)
+	  if(_expr != null) {
           return _expr.getStatement(true);
-        else
-         return _spCall;
+	  }
+
+	  return _spCall;
     }
 
     public void close()
@@ -726,7 +727,7 @@ public class OQLQueryImpl
         }
 
         private Object followPath(Object parent) {
-            //System.out.println("Following the path.");
+            // _log.debug ("Following the path.");
             //follow the path
             JDOClassDescriptor curClassDesc = _classDescriptor;
             Object curObject = parent;
