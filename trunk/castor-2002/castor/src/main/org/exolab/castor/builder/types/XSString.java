@@ -82,7 +82,7 @@ public final class XSString extends XSPatternBase {
     /**
      * the whiteSpace facet
      */
-     private String _whiteSpace = "preserved";
+     private String _whiteSpace = "preserve";
     /**
      * Creates a new XSString
      */
@@ -219,7 +219,7 @@ public final class XSString extends XSPatternBase {
      * @param whiteSpace the whiteSpace value
      */
      public void setWhiteSpace(String value) {
-        if (value.equals("preserved"))
+        if (value.equals("preserve"))
             this._whiteSpace = value;
         else if (value.equals("replace"))
             this._whiteSpace = value;

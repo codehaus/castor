@@ -487,7 +487,7 @@ public class FieldMappingDescriptor extends org.exolab.castor.xml.util.XMLClassD
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);

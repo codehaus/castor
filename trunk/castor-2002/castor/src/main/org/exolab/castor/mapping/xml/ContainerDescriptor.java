@@ -1,5 +1,5 @@
 /*
- * This class was automatically generated with 
+ * This class was automatically generated with
  * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
  * XML Schema.
  * $Id$
@@ -23,7 +23,7 @@ import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.xml.validators.*;
 
 /**
- * 
+ *
  * @version $Revision$ $Date$
 **/
 public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptorImpl {
@@ -54,17 +54,17 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
-        
+
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getName();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -83,23 +83,23 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setRequired(true);
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _name
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- _type
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getType();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -117,16 +117,16 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- _required
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_required", "required", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
@@ -134,12 +134,12 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
                     return null;
                 return new Boolean(target.getRequired());
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     Container target = (Container) object;
-                    // if null, use delete method for optional primitives 
+                    // if null, use delete method for optional primitives
                     if (value == null) {
                         target.deleteRequired();
                         return;
@@ -157,15 +157,15 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _required
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
-        
+
         //-- _direct
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_direct", "direct", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
@@ -173,12 +173,12 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
                     return null;
                 return new Boolean(target.getDirect());
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
                     Container target = (Container) object;
-                    // if null, use delete method for optional primitives 
+                    // if null, use delete method for optional primitives
                     if (value == null) {
                         target.deleteDirect();
                         return;
@@ -196,21 +196,21 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _direct
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
-        
+
         //-- _getMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_getMethod", "get-method", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getGetMethod();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -228,22 +228,22 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _getMethod
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- _setMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_setMethod", "set-method", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getSetMethod();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -261,22 +261,22 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _setMethod
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- _createMethod
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_createMethod", "create-method", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getCreateMethod();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -294,25 +294,25 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setHandler(handler);
         desc.setNameSpaceURI("http://castor.exolab.org/");
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _createMethod
         fieldValidator = new FieldValidator();
         fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
         desc.setValidator(fieldValidator);
-        
+
         //-- initialize element descriptors
-        
+
         //-- _description
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getDescription();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -331,26 +331,26 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _description
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
-            sv.setWhiteSpace("preserved");
+            sv.setWhiteSpace("preserve");
             fieldValidator.setValidator(sv);
         }
         desc.setValidator(fieldValidator);
-        
+
         //-- _fieldMapping
         desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMapping", "field", NodeType.Element);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public Object getValue( Object object )
                 throws IllegalStateException
             {
                 Container target = (Container) object;
                 return target.getFieldMapping();
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( Object object, Object value)
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -370,12 +370,12 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
         desc.setRequired(true);
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
-        
+
         //-- validation code for: _fieldMapping
         fieldValidator = new FieldValidator();
         fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
-        
+
     } //-- org.exolab.castor.mapping.xml.ContainerDescriptor()
 
 
@@ -388,55 +388,55 @@ public class ContainerDescriptor extends org.exolab.castor.xml.util.XMLClassDesc
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
         return null;
-    } //-- org.exolab.castor.mapping.AccessMode getAccessMode() 
+    } //-- org.exolab.castor.mapping.AccessMode getAccessMode()
 
     /**
     **/
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
         return null;
-    } //-- org.exolab.castor.mapping.ClassDescriptor getExtends() 
+    } //-- org.exolab.castor.mapping.ClassDescriptor getExtends()
 
     /**
     **/
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
         return identity;
-    } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity() 
+    } //-- org.exolab.castor.mapping.FieldDescriptor getIdentity()
 
     /**
     **/
     public java.lang.Class getJavaClass()
     {
         return org.exolab.castor.mapping.xml.Container.class;
-    } //-- java.lang.Class getJavaClass() 
+    } //-- java.lang.Class getJavaClass()
 
     /**
     **/
     public java.lang.String getNameSpacePrefix()
     {
         return nsPrefix;
-    } //-- java.lang.String getNameSpacePrefix() 
+    } //-- java.lang.String getNameSpacePrefix()
 
     /**
     **/
     public java.lang.String getNameSpaceURI()
     {
         return nsURI;
-    } //-- java.lang.String getNameSpaceURI() 
+    } //-- java.lang.String getNameSpaceURI()
 
     /**
     **/
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
         return null;
-    } //-- org.exolab.castor.xml.TypeValidator getValidator() 
+    } //-- org.exolab.castor.xml.TypeValidator getValidator()
 
     /**
     **/
     public java.lang.String getXMLName()
     {
         return xmlName;
-    } //-- java.lang.String getXMLName() 
+    } //-- java.lang.String getXMLName()
 
 }
