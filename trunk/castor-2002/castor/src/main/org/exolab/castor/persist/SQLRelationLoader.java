@@ -38,9 +38,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 2000 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2000-2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id: SQLRelationLoader.java,
+ * $Id$
  */
 
 
@@ -300,9 +300,10 @@ public class SQLRelationLoader {
     public void deleteRelation( Connection conn, Object leftValue )
             throws PersistenceException {
 
+        PreparedStatement stmt = null;
         try {
             int count = 1;
-            PreparedStatement stmt = conn.prepareStatement( deleteAll );
+            stmt = conn.prepareStatement( deleteAll );
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
@@ -316,15 +317,21 @@ public class SQLRelationLoader {
         } catch ( SQLException e ) {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
+        } finally {
+            try {
+                if ( stmt != null )
+                    stmt.close();
+            } catch ( SQLException sqle ) { }
         }
     }
 
     public void deleteRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
 
+        PreparedStatement stmt = null;
         try {
             int count = 1;
-            PreparedStatement stmt = conn.prepareStatement( delete );
+            stmt = conn.prepareStatement( delete );
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
@@ -348,6 +355,12 @@ public class SQLRelationLoader {
         } catch ( SQLException e ) {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
+        } finally {
+            try {
+                if ( stmt != null )
+                    stmt.close();
+            } catch ( SQLException sqle ) { }
+
         }
     }
 
