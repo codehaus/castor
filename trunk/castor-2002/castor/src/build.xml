@@ -243,18 +243,22 @@
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
             includes="**.xml" excludes="style/**,project.xml"
             processor="org.exolab.adaptx.util.JakartaAntAdapter"/>
-        <copy todir="${build}/doc">
-		<fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
-	</copy>
-        <copy todir="${build}/doc/images">
-		<fileset dir="${doc}/images" />
-	</copy>
-        <copy todir="${build}/doc/images">
-		<fileset dir="${doc}/style/images" includes="*.gif"/>
-	</copy>
+         <copy todir="${build}/doc">
+            <fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
+         </copy>
+         <copy todir="${build}/doc">
+            <fileset dir="${main}/org/exolab/castor/mapping"
+                     includes="mapping.dtd,mapping.xsd"/>
+         </copy>
+         <copy todir="${build}/doc/images">
+            <fileset dir="${doc}/images" />
+         </copy>
+         <copy todir="${build}/doc/images">
+            <fileset dir="${doc}/style/images" includes="*.gif"/>
+         </copy>
         <copy todir="${build}/doc/">
-		<fileset dir="${doc}/style" includes="*.css"/>
-	</copy>
+            <fileset dir="${doc}/style" includes="*.css"/>
+         </copy>
 
         <replace file="${build}/doc/index.html" token="$$VERSION$$" value="${version}"/>
         <replace file="${build}/doc/index.html" token="$$RELEASE_DATE$$" value="${release_date}"/>
