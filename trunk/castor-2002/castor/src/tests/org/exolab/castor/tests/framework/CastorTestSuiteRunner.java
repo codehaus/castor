@@ -109,7 +109,7 @@ public class CastorTestSuiteRunner extends TestCase {
     public static Test suite() {
 
         TEST_ROOT = System.getProperty(TEST_ROOT_PROPERTY);
-        
+
         //-- cleanup for relative directories "." and ".."
         if (TEST_ROOT.equals(".") || TEST_ROOT.equals("..")) {
             File tmp = new File(TEST_ROOT);
@@ -123,12 +123,12 @@ public class CastorTestSuiteRunner extends TestCase {
         }
         //-- some clean up needed because URLClassLoader can't handle a
         //-- file URL that starts with "./"
-        else if (TEST_ROOT.startsWith("./")) {
+        else if ( (TEST_ROOT.startsWith("./")) || (TEST_ROOT.startsWith(".\\")) ) {
             TEST_ROOT = TEST_ROOT.substring(2);
         }
-        
+
         File testRoot = new File(TEST_ROOT);
-        
+
         if (!testRoot.exists()) {
             System.out.println("Unable to locate the root directory for the test cases");
             System.exit(1);
@@ -145,7 +145,6 @@ public class CastorTestSuiteRunner extends TestCase {
 
         if (args.length == 0)
             error();
-
         boolean text = false; // GUI by default
 
         for (int i=0; i<args.length; ++i) {
