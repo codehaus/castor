@@ -302,52 +302,51 @@
          the use of a default XML-based database configuration file:</p>
          
       <code>
-JDO jdo;
-org.exolab.castor.jdo.conf.Database jdoDbConf;
+  JDO jdo;
+  org.exolab.castor.jdo.conf.Database jdoDbConf;
 
-String db_url = "jdbc:oracle:thin:localhost:1521:SID";
-String username = "scott"
-String password = "tiger";
+  String db_url = "jdbc:oracle:thin:localhost:1521:SID";
+  String username = "scott";
+  String password = "tiger";
 
-<comment>// Use the mapping file located in the current Java package</comment>
-URL map_url = class.getResource("mapping.xml");
+  <comment>// Use the mapping file located in the current Java package</comment>
+  URL map_url = getClass().getResource("mapping.xml");
 
-<comment>// Create the JDO object</comment>
-jdo = new JDO();
-jdo.setDatabaseName("mydb");
+  <comment>// Create the JDO object</comment>
+  jdo = new JDO();
+  jdo.setDatabaseName("mydb");
 
-<comment>// Set up JDO the configuration with the specified database driver and connection information</comment>
-jdoDbConf = JdoConfFactory.createJdoDbConf("mydb", "oracle", 
-	JdoConfFactory.createJdoDriverConf("oracle.jdbc.driver.OracleDriver",
-					   db_url, username, password));
+  <comment>// Set up the JDO configuration with the specified database driver and connection information</comment>
+  jdoDbConf = JdoConfFactory.createJdoDbConf("mydb", "oracle", 
+	  JdoConfFactory.createJdoDriverConf("oracle.jdbc.driver.OracleDriver",
+						db_url, username, password));
 
-<comment>// Store mapping file location in the configuration</comment>
-jdoDbConf.addMapping(JdoConfFactory.createJdoMappingConf(map_url.toString()));
+  <comment>// Store the mapping file location in the configuration</comment>
+  jdoDbConf.addMapping(JdoConfFactory.createJdoMappingConf(map_url.toString()));
 
-<comment>// Activate the JDO configuration</comment>
-jdo.setConfiguration(JdoConfFactory.createJdoConf(jdoDbConf));
+  <comment>// Activate the JDO configuration</comment>
+  jdo.setConfiguration(JdoConfFactory.createJdoConf(jdoDbConf));
        </code>
 
        <p>As an alternative to using a org.exolab.castor.jdo.conf.Driver,
-          you can also use a JDBC 2.0 DataSource:</p>
+          you can also configure Castor to use a JDBC 2.0 DataSource:</p>
 
        <code>
-<comment>// Create a JDBC data source, in this case an Oracle data source instance</comment>
-OracleDataSource ds = new OracleDataSource();
+  <comment>// Configure the JDBC data source, in this case an Oracle data source</comment>
+  org.exolab.castor.jdo.conf.DataSource dsConf = JdoConfFactory.createJdoDSConf(s_jdo_driver_name_pooling);
 
-ds.setURL(db_url);
-ds.setUser(username);
-ds.setPassword(password);
+  dsConf.addParam(JdoConfFactory.createJdoConfParam("URL", db_url));
+  dsConf.addParam(JdoConfFactory.createJdoConfParam("user", username));
+  dsConf.addParam(JdoConfFactory.createJdoConfParam("password", password));
 
-<comment>// Set up JDO the configuration with the specified data source</comment>
-jdoDbConf = JdoConfFactory.createJdoDbConf("mydb", "oracle",
-				JdoConfFactory.createJdoDSConf(ds));
+  <comment>// Set up JDO the configuration with the specified data source configuration</comment>
+  jdoDbConf = JdoConfFactory.createJdoDbConf("mydb", "oracle", dsConf);
 
-<comment>// Store mapping file location in the configuration</comment>
-jdoDbConf.addMapping(JdoConfFactory.createJdoMappingConf(map_url.toString()));
+  <comment>// Store the mapping file location in the configuration</comment>
+  jdoDbConf.addMapping(JdoConfFactory.createJdoMappingConf(map_url.toString()));
 
-<comment>// Activate the JDO configuration</comment>
-jdo.setConfiguration(JdoConfFactory.createJdoConf(jdoDbConf));
+  <comment>// Activate the JDO configuration</comment>
+  jdo.setConfiguration(JdoConfFactory.createJdoConf(jdoDbConf));
        </code>
 
     </section>
