@@ -45,6 +45,7 @@
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.xml.util.XMLClassDescriptorImpl;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
@@ -52,7 +53,6 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.List;
-
 
 import java.io.IOException;
 import java.io.PrintWriter;

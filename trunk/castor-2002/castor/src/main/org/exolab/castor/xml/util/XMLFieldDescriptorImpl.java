@@ -47,6 +47,7 @@
 package org.exolab.castor.xml.util;
 
 
+import org.exolab.castor.xml.handlers.DateFieldHandler;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.xml.*;
 import org.exolab.castor.util.List;

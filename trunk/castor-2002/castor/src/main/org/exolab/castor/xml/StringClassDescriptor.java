@@ -49,6 +49,7 @@ package org.exolab.castor.xml;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.xml.validators.*;
 
 /**
  * The default String class descriptor
