@@ -148,28 +148,28 @@ public class DatatypeHandler {
             Integer.parseInt(value);
             return INTEGER_TYPE;
         }
-        catch(NumberFormatException nfe) {};
+        catch(NumberFormatException nfe) {}
 
         //-- check for long
         try {
             Long.parseLong(value);
             return LONG_TYPE;
         }
-        catch(NumberFormatException nfe) {};
+        catch(NumberFormatException nfe) {}
 
         //-- check for float, must be done before check for double
         try {
             Float.valueOf(value);
             return FLOAT_TYPE;
         }
-        catch(NumberFormatException nfe) {};
+        catch(NumberFormatException nfe) {}
 
         //-- check for double
         try {
             Double.valueOf(value);
             return DOUBLE_TYPE;
         }
-        catch(NumberFormatException nfe) {};
+        catch(NumberFormatException nfe) {}
 
         //-- check for boolean
         if (value.equals(TRUE) || value.equals(FALSE)) {
@@ -181,14 +181,14 @@ public class DatatypeHandler {
             Date.parseDate(value);
             return DATE_TYPE;
         }
-        catch(ParseException px) {};
+        catch(ParseException px) {}
 
         //-- check for time
         try {
             Time.parseTime(value);
             return TIME_TYPE;
         }
-        catch(ParseException px) {};
+        catch(ParseException px) {}
 
         //-- check for dateTime
         DateFormat df = null;

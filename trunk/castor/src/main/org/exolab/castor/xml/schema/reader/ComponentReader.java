@@ -114,7 +114,7 @@ public abstract class ComponentReader {
      * Called to signal an end of unmarshalling. This method should
      * be overridden to perform any necessary clean up by an unmarshaller
     **/
-    public void finish() throws XMLException {};
+    public void finish() throws XMLException {}
 
     public Locator getDocumentLocator() {
         return _locator;

@@ -21,12 +21,12 @@ public class DTDParser implements DTDParserConstants {
     if (jj_2_1(3)) {
       jj_consume_token(S);
     } else {
-      ;
+      // ;
     }
     label_1:
     while (true) {
       if (jj_2_2(3)) {
-        ;
+        // ;
       } else {
         break label_1;
       }
@@ -35,28 +35,28 @@ public class DTDParser implements DTDParserConstants {
         if (jj_2_3(3)) {
           jj_consume_token(S);
         } else {
-          ;
+          // ;
         }
       } else if (jj_2_9(3)) {
         AttlistDecl(document);
         if (jj_2_4(3)) {
           jj_consume_token(S);
         } else {
-          ;
+          // ;
         }
       } else if (jj_2_10(3)) {
         GEntityDecl(document);
         if (jj_2_5(3)) {
           jj_consume_token(S);
         } else {
-          ;
+          // ;
         }
       } else if (jj_2_11(3)) {
         NotationDecl(document);
         if (jj_2_6(3)) {
           jj_consume_token(S);
         } else {
-          ;
+          // ;
         }
       } else if (jj_2_12(3)) {
         Comment();
