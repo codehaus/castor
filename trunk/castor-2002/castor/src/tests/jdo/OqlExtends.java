@@ -86,7 +86,7 @@ public class OqlExtends extends CastorTestCase {
     }
 
     public void runTest()
-            throws PersistenceException {
+            throws PersistenceException, Exception {
 
         Date date;
         OQLQuery         oqlAll;
@@ -132,16 +132,17 @@ public class OqlExtends extends CastorTestCase {
         stream.println( "Creating new object: " + t );
         _db.create( t );
         date = new Date();
+        Thread.currentThread().sleep(2000);
         t = new TestOqlExtends();
         t.setId(TestOqlExtends.DefaultId + 11);
         t.setGroup(group2);
         stream.println( "Creating new object: " + t );
         _db.create( t );
+        oql.close();
         _db.commit();
 
         // query on extends object
         _db.begin();
-        oql.close();
         oql = _db.getOQLQuery( "SELECT t FROM jdo.TestOqlExtends t WHERE t.group.id=$1" );
         oql.bind( group1.getId() );
         res = oql.execute();
@@ -160,8 +161,7 @@ public class OqlExtends extends CastorTestCase {
             stream.println( "Error: retrieved " + cnt + " objects");
             fail("result size mismatch");
         }
-
-        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t WHERE t.creationTime<$1" );
+        oql = _db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t WHERE t.creationTime<=$1" );
         oql.bind( date );
         res = oql.execute();
         for ( cnt = 0; res.hasMore(); cnt++ ) {
