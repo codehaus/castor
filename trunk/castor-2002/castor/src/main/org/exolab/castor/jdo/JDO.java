@@ -122,7 +122,7 @@ import org.exolab.castor.util.Messages;
  */
 public class JDO
     implements DataObjects, Referenceable,
-	       ObjectFactory, Serializable
+           ObjectFactory, Serializable
 {
 
 
@@ -145,6 +145,12 @@ public class JDO
      * will be sent.
      */
     private LogInterceptor  _logInterceptor;
+
+
+    /**
+     * The class loader.
+     */
+    private ClassLoader     _classLoader;
 
 
     /**
@@ -245,9 +251,9 @@ public class JDO
      */
     public void setDescription( String description )
     {
-	if ( description == null )
-	    throw new NullPointerException( "DataSource: Argument 'description' is null" );
-	_description = description;
+    if ( description == null )
+        throw new NullPointerException( "DataSource: Argument 'description' is null" );
+    _description = description;
     }
 
 
@@ -260,7 +266,7 @@ public class JDO
      */
     public String getDescription()
     {
-	return _description;
+    return _description;
     }
 
 
@@ -376,6 +382,28 @@ public class JDO
 
 
     /**
+     * Sets the application class loader.
+     *
+     * @param classLoader The application class loader
+     */
+    public void setClassLoader( ClassLoader classLoader )
+    {
+        _classLoader = classLoader;
+    }
+
+
+    /**
+     * Returns the application class loader.
+     *
+     * @returns The application class loader
+     */
+    public ClassLoader getClassLoader()
+    {
+        return _classLoader;
+    }
+
+
+    /**
      * Opens and returns a connection to the database. Throws an
      * {@link DatabaseNotFoundException} if the database named was not
      * set in the constructor or with a call to {@link #setDatabaseName},
@@ -397,7 +425,7 @@ public class JDO
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, null );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), null, _logInterceptor, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
@@ -490,10 +518,10 @@ public class JDO
 
     public synchronized Reference getReference()
     {
-	Reference ref;
+    Reference ref;
 
-	// We use same object as factory.
-	ref = new Reference( getClass().getName(), getClass().getName(), null );
+    // We use same object as factory.
+    ref = new Reference( getClass().getName(), getClass().getName(), null );
 
         if ( _description != null )
             ref.add( new StringRefAddr( "description", _description ) );
@@ -504,52 +532,52 @@ public class JDO
         if ( _tmName != null )
             ref.add( new StringRefAddr( "transactionManager", _dbConf ) );
         ref.add( new StringRefAddr( "lockTimeout", Integer.toString( _lockTimeout ) ) );
- 	return ref;
+    return ref;
     }
 
 
     public Object getObjectInstance( Object refObj, Name name, Context nameCtx, Hashtable env )
         throws NamingException
     {
-	Reference ref;
+    Reference ref;
 
-	// Can only reconstruct from a reference.
-	if ( refObj instanceof Reference ) {
-	    ref = (Reference) refObj;
-	    // Make sure reference is of datasource class.
-	    if ( ref.getClassName().equals( getClass().getName() ) ) {
+    // Can only reconstruct from a reference.
+    if ( refObj instanceof Reference ) {
+        ref = (Reference) refObj;
+        // Make sure reference is of datasource class.
+        if ( ref.getClassName().equals( getClass().getName() ) ) {
 
-		JDO     ds;
-		RefAddr addr;
+        JDO     ds;
+        RefAddr addr;
 
-		try {
-		    ds = (JDO) Class.forName( ref.getClassName() ).newInstance();
-		} catch ( Exception except ) {
-		    throw new NamingException( except.toString() );
-		}
-		addr = ref.get( "description" );
-		if ( addr != null )
-		    ds._description = (String) addr.getContent();
-		addr = ref.get( "databaseName" );
-		if ( addr != null )
-		    ds._dbName = (String) addr.getContent();
-		addr = ref.get( "configuration" );
-		if ( addr != null )
-		    ds._dbConf = (String) addr.getContent();
-		addr = ref.get( "lockTimeout" );
-		if ( addr != null )
+        try {
+            ds = (JDO) Class.forName( ref.getClassName() ).newInstance();
+        } catch ( Exception except ) {
+            throw new NamingException( except.toString() );
+        }
+        addr = ref.get( "description" );
+        if ( addr != null )
+            ds._description = (String) addr.getContent();
+        addr = ref.get( "databaseName" );
+        if ( addr != null )
+            ds._dbName = (String) addr.getContent();
+        addr = ref.get( "configuration" );
+        if ( addr != null )
+            ds._dbConf = (String) addr.getContent();
+        addr = ref.get( "lockTimeout" );
+        if ( addr != null )
                     ds._lockTimeout = Integer.parseInt( (String) addr.getContent() );
-		addr = ref.get( "transactionManager" );
-		if ( addr != null )
+        addr = ref.get( "transactionManager" );
+        if ( addr != null )
                     ds._tmName = (String) addr.getContent();
-		return ds;
+        return ds;
 
-	    } else
-		throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
-	} else if ( refObj instanceof Remote )
-	    return refObj;
-	else
-	    return null;
+        } else
+        throw new NamingException( "JDO: Reference not constructed from class " + getClass().getName() );
+    } else if ( refObj instanceof Remote )
+        return refObj;
+    else
+        return null;
     }
 
 }
