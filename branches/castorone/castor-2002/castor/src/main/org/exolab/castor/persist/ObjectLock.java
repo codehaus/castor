@@ -639,6 +639,7 @@ final class ObjectLock implements DepositBox {
                     // same as delete the lock
                     _deleted = true;
                     _object = null;
+                    _timeStamp =  System.currentTimeMillis();
                     //_writeLock = null;
                     notifyAll();
                 } else if ( _readLock == null ) {
@@ -798,9 +799,12 @@ final class ObjectLock implements DepositBox {
             tx.setWaitOnLock( null );
             if ( _writeLock == tx ) {
                 _writeLock = null;
-                _deleted = false;
-                if ( _invalidated )
+                if ( _invalidated || _deleted ) {
+                    _timeStamp = System.currentTimeMillis();
                     _object = null;
+                }
+                _deleted = false;
+                _invalidated = false;
             } else if ( _readLock != null ) {
                 if ( _readLock.tx == tx ) {
                     _readLock = _readLock.next;
