@@ -133,7 +133,7 @@ public class JDBCQueryExpression
 
     public String encodeColumn( String tableName, String columnName )
     {
-        return _factory.quoteName( tableName + 
+        return _factory.quoteName( tableName +
                    JDBCSyntax.TableColumnSeparator +
                    columnName );
     }
@@ -142,35 +142,69 @@ public class JDBCQueryExpression
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
     {
+        int index;
+        Join join;
+
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
-        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, false ) );
+        join = new Join( leftTable, leftColumn, rightTable, rightColumn, false );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        } else {
+            // inner join overrides outer joins
+            _joins.set(index, join);
+        }
     }
 
 
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn )
     {
+        int index;
+        Join join;
+
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
-        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, false ) );
+        join = new Join( leftTable, leftColumn, rightTable, rightColumn, false );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        } else {
+            // inner join overrides outer joins
+            _joins.set(index, join);
+        }
     }
 
 
     public void addOuterJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )
     {
+        int index;
+        Join join;
+
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
-        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, true ) );
+        join = new Join( leftTable, leftColumn, rightTable, rightColumn, true );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        }
     }
 
     public void addOuterJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn )
     {
+        int index;
+        Join join;
+
         _tables.put( leftTable, leftTable );
         _tables.put( rightTable, rightTable );
-        _joins.addElement( new Join( leftTable, leftColumn, rightTable, rightColumn, true ) );
+        join = new Join( leftTable, leftColumn, rightTable, rightColumn, true );
+        index = _joins.indexOf(join);
+        if (index < 0) {
+            _joins.add(join);
+        }
     }
 
 
@@ -260,7 +294,7 @@ public class JDBCQueryExpression
         sql.append( JDBCSyntax.Select );
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
-        
+
         if ( _select == null )
           sql.append( getColumnList() );
         else
@@ -309,7 +343,7 @@ public class JDBCQueryExpression
         first = true;
         for ( int i = 0 ; i < _joins.size() ; ++i ) {
             Join join;
-            
+
             join = (Join) _joins.elementAt( i );
             if ( ! join.outer ) {
                 if ( first ) {
@@ -326,7 +360,7 @@ public class JDBCQueryExpression
                                                     join.rightColumns[ j ] ) );
                 }
             }
-        } 
+        }
         first = addWhereClause( sql, first );
 
         if ( _order != null )
@@ -396,6 +430,38 @@ public class JDBCQueryExpression
             this.outer = outer;
         }
 
+        public int hashCode() {
+            return leftTable.hashCode() ^ rightTable.hashCode();
+        }
+
+        public boolean equals(Object obj) {
+            Join join = (Join) obj;
+
+            if (!leftTable.equals(join.leftTable) || !rightTable.equals(join.rightTable) ||
+                    leftColumns.length != join.leftColumns.length ||
+                    rightColumns.length != join.rightColumns.length) {
+                return false;
+            }
+            for (int i = 0; i < leftColumns.length; i++) {
+                if (!leftColumns[i].equals(join.leftColumns[i])) {
+                    return false;
+                }
+            }
+            for (int i = 0; i < rightColumns.length; i++) {
+                if (!rightColumns[i].equals(join.rightColumns[i])) {
+                    return false;
+                }
+            }
+            // [oleg] Important: Don't compare "outer" field!
+            // We need this to make sure that inner join overrides outer joins,
+            // we use Vector.indexOf to solve this problem.
+            return true;
+        }
+
+        public String toString() {
+            return leftTable + "." + leftColumns[0] + (outer ? "*=" : "=") + rightTable + "." + rightColumns[0];
+
+        }
     }
 
 
