@@ -61,33 +61,52 @@ package org.exolab.castor.mapping;
  *
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
+ * @author <a href="kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class AccessMode
 {
 
-
+    /**
+     * Represents the read only type
+    **/
+    public static final short READ_ONLY = 0;
+    
+    
+    /**
+     * Represents the shared type
+    **/
+    public static final short SHARED    = 1;
+    
+    
+    /**
+     * Represents the exlusive type
+    **/
+    public static final short EXCLUSIVE = 2;
+    
     /**
      * Read only access. Objects can be read but are not made
      * persistent and changes to objects are not reflected in
      * persistent storage.
      */
-    public static final AccessMode ReadOnly = new AccessMode( "read-only" );
+    public static final AccessMode ReadOnly 
+        = new AccessMode( AccessMode.READ_ONLY, "read-only" );
 
 
     /**
      * Shared access. Objects can be read by multiple concurrent
      * transactions. Equivalent to optimistic locking.
      */
-    public static final AccessMode Shared = new AccessMode( "shared" );
+    public static final AccessMode Shared 
+        = new AccessMode( AccessMode.SHARED, "shared" );
 
 
     /**
      * Exclusive access. Objects can be access by a single transaction
      * at any given time. Equivalent to pessimistic locking.
      */
-    public static final AccessMode Exclusive = new AccessMode( "exclusive" );
-
+    public static final AccessMode Exclusive 
+        = new AccessMode( AccessMode.EXCLUSIVE, "exclusive" );
 
     /**
      * Returns the access mode from the name. If <tt>accessMode</tt>
@@ -117,17 +136,30 @@ public class AccessMode
      */
     private String _name;
 
+    /**
+     * The type of this AccessMode
+    **/
+    private short _type = READ_ONLY;
 
-    private AccessMode( String name )
+    private AccessMode( short type, String name )
     {
+        _type = type;
         _name = name;
     }
 
 
+    /**
+     * Returns the type of this AccessMode.
+     * @return the type of this AccessMode.
+    **/
+    public short getType() {
+        return _type;
+    } //-- getType
+    
     public String toString()
     {
         return _name;
     }
 
 
-}
+} //-- AccessMode
