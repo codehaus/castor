@@ -299,7 +299,7 @@ public class DatabaseImpl
         info = _scope.getPersistenceInfo( object.getClass() );
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", object.getClass().getName()) );
-        tx.update( info.engine, info.molder, object);
+        tx.update( info.engine, info.molder, object, null );
     }
 
 
