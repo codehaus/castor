@@ -922,7 +922,7 @@ public class SchemaWriter {
 
         //-- top-level simple type
         if (name != null) {
-            _atts.addAttribute(SchemaNames.NAME_ATTR, null, name);
+            _atts.addAttribute(SchemaNames.NAME_ATTR, CDATA, name);
         }
 
         _handler.startElement(ELEMENT_NAME, _atts);
@@ -935,7 +935,13 @@ public class SchemaWriter {
             String ELEM_RESTRICTION = schemaPrefix + RESTRICTION;
             
             _atts.clear();
-            _atts.addAttribute("base", null, base.getName());
+            
+            String typeName = base.getName();
+            //-- add "xsd" prefix if necessary
+            if ((typeName.indexOf(':') < 0) && base.isBuiltInType()) {
+                typeName = schemaPrefix + typeName;
+            }
+            _atts.addAttribute(SchemaNames.BASE_ATTR, CDATA, typeName);
 
             _handler.startElement(ELEM_RESTRICTION, _atts);
 
@@ -944,7 +950,8 @@ public class SchemaWriter {
             while (enum.hasMoreElements()) {
                 Facet facet = (Facet) enum.nextElement();
                 _atts.clear();
-                _atts.addAttribute("value", null, facet.getValue());
+                _atts.addAttribute(SchemaNames.VALUE_ATTR, CDATA, 
+                    facet.getValue());
                 String facetName = schemaPrefix + facet.getName();
                 _handler.startElement(facetName, _atts);
                 _handler.endElement(facetName);
@@ -952,11 +959,73 @@ public class SchemaWriter {
 
             _handler.endElement(ELEM_RESTRICTION);
         }
+        else if (simpleType instanceof Union) {
+            processUnion((Union)simpleType, schemaPrefix);
+        }
 
         _handler.endElement(ELEMENT_NAME);
 
     } //-- processSimpleType
 
+    /**
+     * Processes the given simpleType Union definition
+     *
+     * @param union the simpleType Union definition to process into events
+     * @param schemaPrefix the namespace prefix to use for schema elements
+    **/
+    private void processUnion
+        (Union union, String schemaPrefix)
+        throws SAXException
+    {
+
+        String ELEMENT_NAME = schemaPrefix + SchemaNames.UNION;
+
+        _atts.clear();
+
+        if (union.getId() != null) {
+            _atts.addAttribute(SchemaNames.ID_ATTR, CDATA, 
+                union.getId());
+        }
+
+        //-- process local simpleType references
+        StringBuffer memberTypes = new StringBuffer();
+        Enumeration enum = union.getMemberTypes();        
+        while (enum.hasMoreElements()) {
+            SimpleType simpleType = (SimpleType)enum.nextElement();
+            //-- ignore local simpleTypes;
+            if (simpleType.getParent() != union.getSchema()) {
+                continue;
+            }
+            //-- process top-level references
+            if (memberTypes.length() > 0) memberTypes.append(' ');
+            memberTypes.append(simpleType.getName());
+        }
+        if (memberTypes.length() > 0) {
+            _atts.addAttribute(SchemaNames.MEMBER_TYPES_ATTR, CDATA,
+                memberTypes.toString());
+        }
+
+        _handler.startElement(ELEMENT_NAME, _atts);
+        
+        //-- process local annotation
+        Annotation annotation = union.getLocalAnnotation();
+        if (annotation != null) {
+            processAnnotation(annotation, schemaPrefix);
+        }
+        
+        //-- process local simpleType definitions
+        enum = union.getMemberTypes();        
+        while (enum.hasMoreElements()) {
+            SimpleType simpleType = (SimpleType)enum.nextElement();            
+            //-- ignore top-level simpleTypes;
+            if (simpleType.getParent() == union.getSchema()) 
+                continue;
+            processSimpleType(simpleType, schemaPrefix);
+        }
+        _handler.endElement(ELEMENT_NAME);
+
+    } //-- processUnion
+    
     /**
      * Determines if a given XMLType is imported by the
      * schema containing the element that refers to it.
