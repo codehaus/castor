@@ -1,20 +1,37 @@
 Version 0.7.1  January 11, 2000
 -------------------------------
 
+[DAX module]
+
+- First release of some DAX code
+
+[JDO module]
+
 - Temporary fix to rollback of objects in lieu of missing
   CacheEngine (JDO)
 
 - Perliminary code for XAResource support in Castor JDO
 
-- First release of some DAX code
 
-- Added binary, and boolean types to the source code generator
-  for Castor XML
-  - binary types will be mapped to byte[] by default, and will
-    be Base64 encoded and decoded automatically
-  - boolean type is an enumeration of "true" or "false"
+[XML module]
 
+   [Schema support]
 
+   - Added some support for derived archetypes (types) 
+     - only extension derivation is possible at this time,
+      so deriveBy must be "extension". 
+
+   - Added binary, and boolean types to the source code generator
+     for Castor XML
+   - binary types will be mapped to byte[] by default, and will
+     be Base64 encoded and decoded automatically
+   - boolean type is an enumeration of "true" or "false"
+
+   [Marshalling Framework]
+
+   - added support for byte[] -> encoding and decoding from Base64
+
+=======
 
 Version 0.7  January 7, 2000
 ----------------------------
