@@ -66,6 +66,9 @@ public class JDOConfigLoaderTest extends TestCase {
 	private EntityResolver resolver = null;
 	private ClassLoader classLoader = null;
 	
+	private static final String JDO_CONF_FILE = "src/examples/jdo/jdo-conf.xml";
+	private static final String DATABASE_NAME = "minimal";
+	
 	private PrintWriter writer = null;
 
 	/**
@@ -82,8 +85,7 @@ public class JDOConfigLoaderTest extends TestCase {
 	protected void setUp() throws Exception {
 		super.setUp();
 		
-		source = new InputSource ("src/examples/jdo/jdo-conf.xml");
-		
+		source = new InputSource (JDO_CONF_FILE);
 		writer = new PrintWriter (new FileWriter ("output.log"));
 	}
 
@@ -101,7 +103,7 @@ public class JDOConfigLoaderTest extends TestCase {
 		throws Exception 
 	{
 		
-		Database database = JDOConfLoader.getDatabase (source, resolver);
+		Database database = JDOConfLoader.getDatabase (DATABASE_NAME, source, resolver);
 		writer.println (database);
 	}
 
