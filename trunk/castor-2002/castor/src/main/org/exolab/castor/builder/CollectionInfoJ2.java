@@ -157,13 +157,12 @@ public class CollectionInfoJ2 extends CollectionInfo {
         createSetArrayMethod(method);
 
          //---------------------------/
-        //- Create Enumerate Method -/
+        //- Create Iterate Method -/
        //---------------------------/
 
-        method = new JMethod(SGTypes.Enumeration, "enumerate"+cName);
+        method = new JMethod(SGTypes.Iterator, "iterate"+cName);
         jClass.addMethod(method);
-
-        createEnumerateMethod(method);
+        createIterateMethod(method);
 
 
           //-------------------/
@@ -260,21 +259,18 @@ public class CollectionInfoJ2 extends CollectionInfo {
     } //-- createAddMethod
 
     /**
-     * Creates implementation of Enumerate method.
+     * Creates implementation of Iterate method.
      *
      * @param method the JMethod in which to create the source
      * code.
-    **/
-    public void createEnumerateMethod(JMethod method) {
+     */
+      public void createIterateMethod(JMethod method) {
 
-        JSourceCode jsc = method.getSourceCode();
-
-        jsc.add("return new org.exolab.castor.util.IteratorEnumeration(");
-        jsc.append(getName());
-        jsc.append(".iterator());");
-
-    } //-- createEnumerateMethod
-
+          JSourceCode jsc = method.getSourceCode();
+          jsc.add("return ");
+          jsc.append(getName());
+          jsc.append(".iterator();");
+      } //-- createIterateMethod
     /**
      * Creates implementation of object[] get() method.
      *
