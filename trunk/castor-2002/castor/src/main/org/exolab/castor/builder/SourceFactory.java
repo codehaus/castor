@@ -67,6 +67,8 @@ import java.util.Vector;
 **/
 public class SourceFactory  {
 
+    private static final short BASE_TYPE_ENUMERATION   = 0;
+    private static final short OBJECT_TYPE_ENUMERATION = 1;
 
     /**
      * The type factory.
@@ -80,6 +82,8 @@ public class SourceFactory  {
     private MemberFactory memberFactory = null;
 
 
+    private short enumerationType = OBJECT_TYPE_ENUMERATION;
+    
     /**
      * Creates a new SourceFactory using the default FieldInfo factory.
     **/
@@ -887,22 +891,60 @@ public class SourceFactory  {
 
     /**
      * Creates all the necessary enumeration code from the given
-     * simpletype
+     * SimpleType. Enumerations are handled a couple ways.
+     * @see processEnumerationAsBaseType
     **/
     private void processEnumeration
         (SimpleType simpleType, FactoryState state)
     {
-
+        
+        
+        switch (enumerationType) {
+            case BASE_TYPE_ENUMERATION:
+                processEnumerationAsBaseType(simpleType, state);
+                break;
+            default:
+                processEnumerationAsNewObject(simpleType, state);
+                break;
+        }
+        
+    } //-- processEnumeration
+    
+    /**
+     * Creates all the necessary enumeration code from the given
+     * SimpleType. Enumerations are handled a couple ways.
+     * @see processEnumerationAsBaseType
+    **/
+    private void processEnumerationAsNewObject
+        (SimpleType simpleType, FactoryState state)
+    {
+        
         Enumeration enum = simpleType.getFacets("enumeration");
 
-
+        
+        //-- select naming for types and instances
+        boolean useValuesAsName = true;
+        while (enum.hasMoreElements()) {
+            Facet facet = (Facet)enum.nextElement();
+            String value = facet.getValue().toUpperCase();
+            if (!JavaXMLNaming.isValidJavaIdentifier(value)) {
+                useValuesAsName = false;
+                break;
+            }
+        }
+        
+        enum = simpleType.getFacets("enumeration");
 
         JClass jClass = state.jClass;
         String className = jClass.getLocalName();
 
-        JMember     member = null;
-        JDocComment jdc    = null;
-        JSourceCode jsc    = null;
+        JMember  member = null;
+        JMember  fHash  = new JMember(SGTypes.Hashtable, "_memberTable");
+        fHash.setInitString("init()");
+        fHash.getModifiers().setStatic(true);
+        
+        JDocComment jdc = null;
+        JSourceCode jsc = null;
 
         //-- modify constructor
         JConstructor constructor = jClass.getConstructor(0);
@@ -924,7 +966,21 @@ public class SourceFactory  {
         jdc.appendComment("Returns a new " + className);
         jdc.appendComment(" based on the given String value.");
 
-        JSourceCode srcValueOf = mValueOf.getSourceCode();
+        jsc = mValueOf.getSourceCode();
+        jsc.add("Object obj = null;");
+        jsc.add("if (string != null) ");
+        jsc.append("obj = _memberTable.get(string);");
+        jsc.add("if (obj == null) {");
+        jsc.indent();
+        jsc.add("String err = \"'\" + string + \"' is not a valid ");
+        jsc.append(className);
+        jsc.append("\";");
+        jsc.add("throw new IllegalArgumentException(err);");
+        jsc.unindent();
+        jsc.add("}");
+        jsc.add("return (");
+        jsc.append(className);
+        jsc.append(") obj;");
 
         //-- #toString method
         JMethod mToString = new JMethod(SGTypes.String, "toString");
@@ -934,6 +990,14 @@ public class SourceFactory  {
         jdc.appendComment(className);
         mToString.getSourceCode().add("return this.stringValue;");
 
+        //-- #init method
+        JMethod mInit = new JMethod(SGTypes.Hashtable, "init");
+        jClass.addMethod(mInit);        
+        mInit.getModifiers().makePrivate();
+        mInit.getModifiers().setStatic(true);
+        mInit.getSourceCode().add("Hashtable members = new Hashtable();");
+        
+
         //-- Loop through "enumeration" facets
         int count = 0;
 
@@ -942,10 +1006,16 @@ public class SourceFactory  {
             Facet facet = (Facet) enum.nextElement();
 
             String value = facet.getValue();
-            String typeName = value.toUpperCase() + "_TYPE";
-            String objName = JavaXMLNaming.toJavaMemberName(value, false);
-            objName = objName.toUpperCase();
-
+            
+            String typeName = null;
+            String objName = null;
+            
+            if (useValuesAsName) objName = value.toUpperCase();
+            else objName = "VALUE_" + count;
+            
+            //-- create typeName
+            //-- Note: this could cause name conflicts
+            typeName = objName + "_TYPE";
 
             //-- handle int type
             member = new JMember(JType.Int, typeName);
@@ -979,22 +1049,29 @@ public class SourceFactory  {
             member.setInitString(init.toString());
             jClass.addMember(member);
 
-            //-- add #valueOf code
-
-            if (count != 0) srcValueOf.add("else if (\"");
-            else srcValueOf.add("if (\"");
-
-            srcValueOf.append(value);
-            srcValueOf.append("\".equals(string))");
-            srcValueOf.indent();
-            srcValueOf.add("return ");
-            srcValueOf.append(objName);
-            srcValueOf.append(";");
-            srcValueOf.unindent();
-
+            
+            //-- initializer method
+            jsc = mInit.getSourceCode();
+            jsc.add("members.put(\"");
+            jsc.append(escapeValue(value));
+            jsc.append("\", ");                
+            jsc.append(objName);
+            jsc.append(");");
+            
             ++count;
         }
 
+        //-- finish init method        
+        mInit.getSourceCode().add("return members;");
+        
+        //-- add memberTable to the class, we can only
+        //-- add this after all the types, or we'll
+        //-- create source code that will generate
+        //-- null pointer exceptions, because calling
+        //-- init() will try to add null values to
+        //-- the hashtable.
+        jClass.addMember(fHash);
+        
         //-- add internal type
         member = new JMember(JType.Int, "type");
         member.setInitString("-1");
@@ -1004,13 +1081,6 @@ public class SourceFactory  {
         member = new JMember(SGTypes.String, "stringValue");
         member.setInitString("null");
         jClass.addMember(member);
-
-
-        //-- finish #valueOf
-        srcValueOf.add("String err = \"'\" + string + \"' is not a valid ");
-        srcValueOf.append(className);
-        srcValueOf.append("\";");
-        srcValueOf.add("throw new IllegalArgumentException(err);");
 
         //-- add #getType method
 
@@ -1024,6 +1094,154 @@ public class SourceFactory  {
 
     } //-- processEnumeration
 
+    /**
+     * Creates all the necessary enumeration code from the given
+     * SimpleType.
+     * Enumerations are handled by creating an Object like the
+     * following:
+     * <BR />
+     * <CODE>
+     *    public class {name} {
+     *        // list of values
+     *        {type}[] values = {
+     *            ...
+     *        };
+     *
+     *        // Returns true if the given value is part
+     *        // of this enumeration
+     *        public boolean contains({type} value);
+     *         
+     *        // Returns the {type} value whose String value
+     *        // is equal to the given String
+     *        public {type} valueOf(String strValue);
+     *    }
+     *
+     * </CODE>
+     * /// NOT YET FINISHED, so it's not enabled
+    **/
+    private void processEnumerationAsBaseType
+        (SimpleType simpleType, FactoryState state)
+    {
+
+
+        SimpleType base = (SimpleType)simpleType.getBaseType();        
+        XSType baseType = null;        
+        
+        if (base == null)
+            baseType = new XSString();
+        else
+            baseType = TypeConversion.convertType(base);
+            
+            
+        Enumeration enum = simpleType.getFacets("enumeration");
+            
+        JClass jClass = state.jClass;
+        String className = jClass.getLocalName();
+
+
+        JMember     fValues = null;
+        JDocComment jdc     = null;
+        JSourceCode jsc     = null;
+
+        //-- modify constructor
+        JConstructor constructor = jClass.getConstructor(0);
+        constructor.getModifiers().makePrivate();
+        
+        fValues = new JMember(baseType.getJType().createArray(), "values");
+        
+        //-- Loop through "enumeration" facets
+        //-- and create the default values for the type.
+        int count = 0;
+        
+        StringBuffer values = new StringBuffer("{\n");
+
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet) enum.nextElement();
+
+            String value = facet.getValue();
+            
+            //-- Should we make sure the value is valid
+            //-- before proceeding??
+            
+            
+            //-- we need to move this code to XSType
+            //-- so that we don't have to do special
+            //-- code here for each type
+            
+            if (count > 0) values.append(",\n");
+            
+            //-- indent for fun
+            values.append("    ");
+            
+            if (baseType.getType() == XSType.STRING) {
+                values.append('\"');
+                //-- escape value
+                values.append(escapeValue(value));
+                values.append('\"');
+                
+            }
+            else values.append(value);
+            
+            ++count;
+        }
+        
+        values.append("\n}");
+            
+        fValues.setInitString(values.toString());
+        jClass.addMember(fValues);
+
+        //-- #valueOf method
+        JMethod method = new JMethod(jClass, "valueOf");
+        method.addParameter(new JParameter(SGTypes.String, "string"));
+        method.getModifiers().setStatic(true);
+        jClass.addMethod(method);
+        jdc = method.getJDocComment();
+        jdc.appendComment("Returns the " + baseType.getJType());
+        jdc.appendComment(" based on the given String value.");
+        jsc = method.getSourceCode();
+        
+        jsc.add("for (int i = 0; i < values.length; i++) {");
+        jsc.add("}");
+        jsc.add("throw new IllegalArgumentException(\"");
+        jsc.append("Invalid value for ");
+        jsc.append(className);
+        jsc.append(": \" + string + \".\");");
+        
+    } //-- processEnumerationAsBaseType
+
+    /**
+     * Escapes special characters in the given String so that it can
+     * be printed correctly.
+     *
+     * @param str the String to escape
+     * @return the escaped String, or null if the given String was null.
+    **/
+    private static String escapeValue(String str) {
+        if (str == null) return str;
+
+        StringBuffer sb = new StringBuffer();
+        char[] chars = str.toCharArray();
+
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            switch (ch) {
+                case '\\':
+                case '\"':
+                case '\'':
+                    sb.append('\\');
+                    break;
+                default:
+                    break;
+            }
+            sb.append(ch);
+        }
+        return sb.toString();
+
+    } //-- escapeValue
+
+    
+    
 } //-- SourceFactory
 
 
