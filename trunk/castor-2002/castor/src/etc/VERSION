@@ -1,6 +1,6 @@
 name=Castor
 project=castor
-version=0.8.8
+version=0.8.9
 build.compiler=classic
 copyright=Intalio Inc. (C) 2000. All rights reserved  http://www.intalio.com
 
