@@ -55,7 +55,7 @@ import java.sql.DriverManager;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.persist.DatabaseRegistry;
 import org.exolab.castor.util.Logger;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
@@ -92,7 +92,9 @@ public class JDOCategory
     public Connection getJDBCConnection()
         throws SQLException
     {
-        return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName() ).createConnection();
+        //return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName() ).createConnection();
+	// oleg: how to create Connection???
+	return null;
     }
 
 
