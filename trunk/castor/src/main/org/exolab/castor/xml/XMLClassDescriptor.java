@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -48,7 +48,6 @@ package org.exolab.castor.xml;
 
 
 import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.ValidityException;
 
 /**
  * A class descriptor for describing relationships between a Class
@@ -57,20 +56,12 @@ import org.exolab.castor.mapping.ValidityException;
  * extra methods for handling XML.
  * All fields are of type {@link XMLFieldDescriptor}.
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public interface XMLClassDescriptor extends ClassDescriptor {
 
 
-    /**
-     * Returns true if the given XMLFieldDescriptor is contained
-     * within this XMLClassDescriptor.
-     *
-     * @return true if the XMLFieldDescriptor is part of this
-     * XMLClassDescriptor, otherwise false.
-    **/
-    //public boolean contains(XMLFieldDescriptor descriptor);
     
     /**
      * Returns the set of XMLFieldDescriptors for all members
@@ -79,21 +70,30 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      *
      * @return an array of XMLFieldDescriptors for all members
      * that should be marshalled as XML attributes.
-    **/
-    public XMLFieldDescriptor[]  getAttributeDescriptors();
+     */
+    public XMLFieldDescriptor[] getAttributeDescriptors();
 
+    
     /**
      * Returns the XMLFieldDescriptor for the member
      * that should be marshalled as text content.
      * @return the XMLFieldDescriptor for the member
      * that should be marshalled as text content.
-    **/
+     */
     public XMLFieldDescriptor getContentDescriptor();
 
 
     /**
+     * Returns the set of XMLFieldDescriptors for all members
+     * that should be marshalled as XML elements.
+     * @return an array of XMLFieldDescriptors for all members
+     * that should be marshalled as XML elements.
+     */
+    public XMLFieldDescriptor[] getElementDescriptors();
+    
+    /**
      * Returns the XML field descriptor matching the given
-     * xml name and nodeType. If NodeType is null, then
+     * xml name, namespace, and nodeType. If NodeType is null, then
      * either an AttributeDescriptor, or ElementDescriptor
      * may be returned. Null is returned if no matching
      * descriptor is available.
@@ -104,26 +104,22 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      * @return the matching descriptor, or null if no matching
      * descriptor is available.
      *
-    **/
+     */
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType);
+        (String name, String namespace, NodeType nodeType);
 
     /**
-     * Returns the set of XMLFieldDescriptors for all members
-     * that should be marshalled as XML elements.
-     * @return an array of XMLFieldDescriptors for all members
-     * that should be marshalled as XML elements.
-    **/
-    public XMLFieldDescriptor[]  getElementDescriptors();
-
-    /**
+     * Returns the namespace prefix to use when marshalling as XML.
+     *
      * @return the namespace prefix to use when marshalling as XML.
-    **/
+     */
     public String getNameSpacePrefix();
 
     /**
+     * Returns the namespace URI used when marshalling and unmarshalling as XML.
+     *
      * @return the namespace URI used when marshalling and unmarshalling as XML.
-    **/
+     */
     public String getNameSpaceURI();
 
     /**
@@ -133,29 +129,33 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      *
      * @return the type validator for the class described by this
      * ClassDescriptor.
-    **/
+     */
     public TypeValidator getValidator();
 
     /**
      * Returns the XML Name for the Class being described.
+     *
      * @return the XML name.
-    **/
+     */
     public String getXMLName();
 
     /**
-     * <p>Returns true if the given object represented by this XMLClassDescriptor
-     * can accept a member whose name is given.
-     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
-     * the given name and if the given object can hold this field (i.e a value is not already set for
-     * this field).
-     * Different reasons can change the acceptance criteria, this is the reason why each implementation
-     * of XMLClassDescriptor must define these reasons.
-     * @param fieldName the name of the field to check
-     * @param object the object represented by this XMLCLassDescriptor
+     * <p>Returns true if the given object, represented by this 
+     * XMLClassDescriptor, can accept a value for the member 
+     * associated with the given xml name and namespace.</p>
+     * 
+     * <p>An XMLClassDescriptor can accept a value for a field if it 
+     * contains a descriptor that matches the given xml name and 
+     * namespace and if the given object can hold this field 
+     * (i.e a value is not already set for this field).</p>
+     * 
+     * @param name the xml name of the field to check
+     * @param namespace the namespace uri
+     * @param object the object instance represented by this XMLCLassDescriptor
      * @return true if the given object represented by this XMLClassDescriptor
      * can accept a member whose name is given.
      */
-    public boolean canAccept(String fieldName, Object object);
+    public boolean canAccept(String name, String namespace, Object object);
 
 } //-- XMLClassDescriptor
 
