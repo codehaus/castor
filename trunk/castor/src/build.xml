@@ -294,7 +294,13 @@
         <mkdir dir="${build}/doc"/>
         <style basedir="${doc}" destdir="${build}/doc" style="style/exolab.xsl"
             includes="**.xml" excludes="style/**,project.xml"
-            processor="org.exolab.adaptx.util.JakartaAntAdapter"/>
+            processor="org.exolab.adaptx.util.JakartaAntAdapter">
+            <classpath>
+               <fileset dir="${lib}">
+                  <include name="adaptx*.jar"/>
+               </fileset>
+            </classpath>
+         </style>
          <copy todir="${build}/doc">
             <fileset dir="${doc}" includes="license.txt,document.dtd,*.pdf"/>
          </copy>
@@ -439,7 +445,7 @@
       </java>
    </target>
 
-    <target name="generate.jdo.conf" 
+    <target name="generate.jdo.conf"
             description="Use the Source Generator to create the classes for the jdo-conf.xsd">
         <delete dir="${gen.src}"/>
         <mkdir dir="${gen.src}"/>
@@ -461,7 +467,7 @@
         </javac>
     </target>
 
-    <target name="gen.pvd" 
+    <target name="gen.pvd"
             description="Use the Source Generator to create the classes for the pvd.xsd">
         <java classname="org.exolab.castor.builder.SourceGenerator">
             <arg value="-i"/>
