@@ -1420,14 +1420,14 @@ public class SourceFactory  {
             = state.jClass.getConstructor(0).getSourceCode();
 
         ClassInfo base = state.classInfo.getBaseClass();
-
         boolean present = false;
         if (base != null) {
+
             switch (fieldInfo.getNodeType()) {
-                case NodeType.ATTRIBUTE:
+                case XMLInfo.ATTRIBUTE_TYPE:
                     present = (base.getAttributeField(fieldInfo.getNodeName()) != null);
                     break;
-                case NodeType.ELEMENT:
+                case XMLInfo.ELEMENT_TYPE:
                     present = (base.getElementField(fieldInfo.getNodeName()) != null);
                     break;
                 default:
@@ -1435,9 +1435,9 @@ public class SourceFactory  {
             }
         }
         state.classInfo.addFieldInfo(fieldInfo);
-
+        present = present && !fieldInfo.isMultivalued();
         //create the relevant Java fields only if the field
-        //info is not yet in the base classInfo
+        //info is not yet in the base classInfo or if it is not a collection
         if (!present) {
             fieldInfo.createJavaField(state.jClass);
             //-- do not create access methods for transient fields
