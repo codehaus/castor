@@ -26,7 +26,7 @@
             <time>22:22:22</time>
             <summary>
                 I've placed a copy of Castor 0.9.6 (final) on the
-                <a href="ftp://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
+                <a href="http://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
 
                 This is mainly a bug fix release, but includes a couple of new features as
                 well. For details about the bugs fixed and features provided, please have
@@ -46,7 +46,7 @@
             <time>23:25:00</time>
             <summary>
                 I've placed a copy of the <b>3rd</b> and <b>final</b> Castor 0.9.6 release candidate on the
-                <a href="ftp://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
+                <a href="http://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
 
                 This is a bug fix release only. For details about the bugs fixed sinc the last 
                 release candidate, please have a look at (an interim version of) the
@@ -64,7 +64,7 @@
             <time>17:45:00</time>
             <summary>
                 I've placed a copy of Castor 0.9.5.4 final on the
-                <a href="ftp://dist.codehaus.org/castor/0.9.5.4/">FTP Server</a>.
+                <a href="http://dist.codehaus.org/castor/0.9.5.4/">FTP Server</a>.
 
                 This is a bug fix release, so please do not expect new features
                 slated for 0.9.6 to appear in this release.
@@ -81,7 +81,7 @@
             <time>23:55:00</time>
             <summary>
                 I've placed a copy of the first Castor 0.9.6 release candidate on the
-                <a href="ftp://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
+                <a href="http://dist.codehaus.org/castor/0.9.6/">FTP Server</a>.<br/><br/>
 
                 This is mainly a bug fix release, but includes a couple of new features as
                 well. For details about the bugs fixed and features provided, please have
@@ -107,7 +107,7 @@
             <summary>
 
                 I've placed a copy of the latest Castor 0.9.5.4 release candidate on the
-                <a href="ftp://dist.codehaus.org/castor/0.9.5.4/">FTP Server</a>.
+                <a href="http://dist.codehaus.org/castor/0.9.5.4/">FTP Server</a>.
 
                 This is a bug fix release, so please do not expect new features
                 slated for 0.9.6 to appear in this release. The release candidate
