@@ -72,11 +72,17 @@ final class FetchContext
     }
 
 
-    Object fetch( ClassHandler handler, Object object, Object identity )
+    Object fetch( ClassHandler handler, Object identity )
         throws PersistenceException
     {
-        return _tx.fetch( _engine, handler, object, identity, null );
+        return _tx.fetch( _engine, handler, identity, null );
     }
 
+
+    void load( ClassHandler handler, Object object, Object identity )
+        throws PersistenceException
+    {
+        _tx.load( _engine, handler, object, identity, null );
+    }
 
 }
