@@ -174,6 +174,10 @@ public abstract class Configuration
     }
     
     
+    // Some static string definitions
+    private static final String TRUE_VALUE  = "true";
+    private static final String ON_VALUE    = "on";
+    
     /**
      * The default properties loaded from the configuration file.
      */
@@ -184,7 +188,6 @@ public abstract class Configuration
      * True if the default configuration specified debugging.
      */
     private static boolean    _debug;
-
 
     /**
      * Returns true if the default configuration specified debugging.
@@ -335,12 +338,26 @@ public abstract class Configuration
                                                              prop, except ) );
             }
         }
-        prop = getDefault().getProperty( Property.Indent, "" );
-        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
-            serializer.setOutputFormat( new OutputFormat( Method.XML, null, true ) );
+        serializer.setOutputFormat( getOutputFormat() );
         return serializer;
     }
     
+    /** 
+     * Returns the default OutputFormat for use with a Serializer.
+     *
+     * @return the default OutputFormat
+    **/
+    public static OutputFormat getOutputFormat() {
+        
+        boolean indent = false;
+        String prop = getDefault().getProperty( Property.Indent, "" );
+        
+        //-- get default indentation
+        indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
+                   prop.equalsIgnoreCase( ON_VALUE ) );
+            
+        return new OutputFormat( Method.XML, null, indent );
+    } //-- getOutputFormat
     
     /**
      * Returns a default serializer for producing an XML document to
