@@ -331,6 +331,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Hafner" given="Ulli"/>
+    <email>hafner@sdm.de</email>
+    <description>Patch for bug 1632</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Hall" given="John"/>
     <email>jhall@solant.com</email>
     <company id="avolent"/>
