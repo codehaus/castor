@@ -57,10 +57,10 @@ import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.TransactionContext;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
-import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
@@ -227,7 +227,7 @@ public class OQLQueryImpl
     }
 
     public void create( String oql )
-        throws QueryException
+    throws PersistenceException
     {
 
         _fieldNum = 0;
@@ -248,12 +248,15 @@ public class OQLQueryImpl
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
-        ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader());
+	    TransactionContext trans = _dbImpl.getTransaction();
+	    DbMetaInfo dbInfo = trans.getConnectionInfo(_dbEngine);
+
+	    ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree, _dbImpl.getClassLoader(), dbInfo);
 
         _objClass = walker.getObjClass();
         _clsDesc = walker.getClassDescriptor();
         _expr = walker.getQueryExpression();
-        _paramInfo = (Hashtable) _expr.postProcessParamInfo((Map) walker.getParamInfo());
+        _paramInfo = (Hashtable) _expr.postProcessParamInfo(walker.getParamInfo());
         _projectionType = walker.getProjectionType();
         _pathInfo = walker.getPathInfo();
 
