@@ -174,6 +174,13 @@ public class Marshaller extends MarshalFramework {
     **/
     private String _defaultNamespace = null;
 
+    /** 
+     * The output format to use with the serializer.
+     * This will be null if the user passed in their
+     * own DocumentHandler.
+    **/
+    private OutputFormat _format = null;
+    
     /**
      * The document handler we are marshalling to
     **/
@@ -358,10 +365,15 @@ public class Marshaller extends MarshalFramework {
         _asDocument = asDocument;
 
         if (_serializer != null) {
-            OutputFormat format = Configuration.getOutputFormat();
-            format.setOmitXMLDeclaration( ! asDocument );
-            _serializer.setOutputFormat( format );
-
+            
+            if (_format == null) {
+                _format = Configuration.getOutputFormat();
+            }
+            _format.setOmitXMLDeclaration( ! asDocument );
+            
+            //-- reset output format, this needs to be done
+            //-- any time a change occurs to the format.
+            _serializer.setOutputFormat( _format );
             try {
                 _handler = _serializer.asDocumentHandler();
             }
@@ -1201,16 +1213,37 @@ public class Marshaller extends MarshalFramework {
     } //-- setLogWriter
 
     /**
-     * Sets the encoding for the serializer
+     * Sets the encoding for the serializer. Note that this method
+     * cannot be called if you've passed in your own DocumentHandler.
+     *
      * @param encoding the encoding to set
-     */
+    **/
     public void setEncoding(String encoding) {
-        OutputFormat format = Configuration.getOutputFormat();
-        format.setEncoding(encoding);
-        //the serializer can't be null at this point
-        _serializer.setOutputFormat(format);
-
-    }
+        
+        if (_serializer != null) {
+            if (_format == null) {
+                _format = Configuration.getOutputFormat();
+            }
+            _format.setEncoding(encoding);
+            //-- reset output format, this needs to be done
+            //-- any time a change occurs to the format.
+            _serializer.setOutputFormat( _format );
+            try {
+                _handler = _serializer.asDocumentHandler();
+            }
+            catch (java.io.IOException iox) {
+                //-- we can ignore this exception since it shouldn't
+                //-- happen. If _serializer is not null, it means
+                //-- we've already called this method sucessfully
+                //-- in the Marshaller() constructor
+            }
+        }
+        else {
+            String error = "encoding cannot be set if you've passed in "+
+            "your own DocumentHandler";
+            throw new IllegalStateException(error);
+        }
+    } //-- setEncoding
 
     /**
      * Finds and returns an XMLClassDescriptor for the given class. If
