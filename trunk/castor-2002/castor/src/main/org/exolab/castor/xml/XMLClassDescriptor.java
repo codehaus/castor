@@ -52,7 +52,7 @@ import org.exolab.castor.mapping.ValidityException;
 
 /**
  * A class descriptor for describing relationships between a Class
- * and an XML element. Implements {@link ClassDescriptor} 
+ * and an XML element. Implements {@link ClassDescriptor}
  * All fields are of type {@link XMLFieldDescriptor}.
  * This interface used to be "MarshalInfo".
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
@@ -68,7 +68,7 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      * that should be marshalled as XML attributes.
     **/
     public XMLFieldDescriptor[]  getAttributeDescriptors();
-    
+
     /**
      * Returns the XMLFieldDescriptor for the member
      * that should be marshalled as text content.
@@ -76,8 +76,8 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      * that should be marshalled as text content.
     **/
     public XMLFieldDescriptor getContentDescriptor();
-    
-    
+
+
     /**
      * Returns the XML field descriptor matching the given
      * xml name and nodeType. If NodeType is null, then
@@ -94,7 +94,7 @@ public interface XMLClassDescriptor extends ClassDescriptor {
     **/
     public XMLFieldDescriptor getFieldDescriptor
         (String name, NodeType nodeType);
-    
+
     /**
      * Returns the set of XMLFieldDescriptors for all members
      * that should be marshalled as XML elements.
@@ -102,24 +102,24 @@ public interface XMLClassDescriptor extends ClassDescriptor {
      * that should be marshalled as XML elements.
     **/
     public XMLFieldDescriptor[]  getElementDescriptors();
-    
+
     /**
      * @return the namespace prefix to use when marshalling as XML.
     **/
     public String getNameSpacePrefix();
-    
+
     /**
      * @return the namespace URI used when marshalling and unmarshalling as XML.
     **/
     public String getNameSpaceURI();
-    
+
     /**
      * Returns a specific validator for the class described by
      * this ClassDescriptor. A null value may be returned
-     * if no specific validator exists. 
+     * if no specific validator exists.
      *
      * @return the type validator for the class described by this
-     * ClassDescriptor. 
+     * ClassDescriptor.
     **/
     public TypeValidator getValidator();
 
@@ -129,7 +129,21 @@ public interface XMLClassDescriptor extends ClassDescriptor {
     **/
     public String getXMLName();
 
-    
+    /**
+     * <p>Returns true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
+     * the given name and if the given object can hold this field (i.e a value is not already set for
+     * this field).
+     * Different reasons can change the acceptance criteria, this is the reason why each implementation
+     * of XMLClassDescriptor must define these reasons.
+     * @param fieldName the name of the field to check
+     * @param object the object represented by this XMLCLassDescriptor
+     * @return true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     */
+    public boolean canAccept(String fieldName, Object object);
+
 } //-- XMLClassDescriptor
 
 
