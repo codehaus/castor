@@ -101,10 +101,10 @@ public class XMLMappingLoader
                         fields[ i ] instanceof XMLFieldDescriptorImpl ) {
 		( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
                 ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
-                if ( clsDesc instanceof XMLClassDescriptorImpl )
-                    ( (XMLClassDescriptorImpl) clsDesc ).sortDescriptors();
             }
         }
+        if ( clsDesc instanceof XMLClassDescriptorImpl )
+            ( (XMLClassDescriptorImpl) clsDesc ).sortDescriptors();
     }
 
 

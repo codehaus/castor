@@ -111,6 +111,11 @@ public class XMLClassDescriptorAdapter
             setXMLName(xmlName);
         }
         
+        if ( classDesc.getIdentity() != null ) {
+            String xmlFieldName = MarshalHelper.toXMLName(classDesc.getIdentity().getFieldName());
+            addFieldDescriptor(new XMLFieldDescriptorImpl(classDesc.getIdentity(),xmlFieldName,NodeType.Attribute));
+        }
+
         setJavaClass(classDesc.getJavaClass());
 
     } //-- XMLClassDescriptorAdapter
