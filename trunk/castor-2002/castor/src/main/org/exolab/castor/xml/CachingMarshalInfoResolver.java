@@ -118,8 +118,8 @@ public class CachingMarshalInfoResolver
         try {
             mInfo = MarshalHelper.getMarshalInfo(type);
         }
-        catch(java.io.IOException ex) {
-            String err = ex.getMessage();
+        catch(MarshalException mx) {
+            String err = mx.toString();
             if (err == null) setError(IO_ERR);
             else setError(err);
         }

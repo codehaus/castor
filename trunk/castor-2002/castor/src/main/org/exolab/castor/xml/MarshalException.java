@@ -52,7 +52,7 @@ import java.io.IOException;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class MarshalException extends IOException {
+public class MarshalException extends CastorException {
     
     //------------------/
     //- error messages -/
@@ -66,24 +66,111 @@ public class MarshalException extends IOException {
         = "The marshaller cannot unmarshal non primitive types that " +
           "do not implement java.io.Serializable";
           
-    String message = null;
+    /**
+     * A nested exception
+    **/
+    private Exception _exception  = null;
     
+    /**
+     * The location for this Exception
+    **/
+    private Location  _location   = null;
+    
+    /**
+     * Creates a new MarshalException with no message,
+     * or nested Exception
+    **/
     public MarshalException() {
         super();
-    }
+    } //-- MarshalException
     
+    /**
+     * Creates a new MarshalException with the given message.
+     * @param message the message for this Exception
+    **/
     public MarshalException(String message) {
         super(message);
-        this.message = message;
-    }
+    } //-- MarshalException(String)
+
+    /**
+     * Creates a new MarshalException with the given message.
+     * @param message the message for this Exception
+     * @param errorCode the errorCode for this Exception
+    **/
+    public MarshalException(String message, int errorCode) {
+        super(message, errorCode);
+    } //-- MarshalException(String)
     
+    /**
+     * Creates a new MarshalException with the given nested
+     * exception.
+     * @param exception the nested exception
+    **/
     public MarshalException(Exception exception) {
-        super(exception.getMessage());
-        this.message = exception.getMessage();
-    }
+        super();
+        if (exception != null) {
+            super.setMessage(exception.getMessage());
+            this._exception = exception;
+        }
+    } //-- MarshalException(Exception)
+
+    /**
+     * Creates a new MarshalException with the given message
+     * and nested exception.
+     * @param message the detail message for this exception
+     * @param exception the nested exception
+    **/
+    public MarshalException(String message, Exception exception) {
+        super(message);
+        this._exception = exception;
+    } //-- MarshalException(String, Exception)
+
+    /**
+     * Creates a new MarshalException with the given message,
+     * nested exception, and errorCode.
+     * @param message the detail message for this exception
+     * @param exception the nested exception
+     * @param errorCode the errorCode for this Exception
+    **/
+    public MarshalException
+        (String message, Exception exception, int errorCode) 
+    {
+        super(message, errorCode);
+        this._exception = exception;
+    } //-- MarshalException(String, Exception, int)
     
-    public String getMessage() {
-        return this.message;
-    }
+    /**
+     * Returns the exception, which in turn caused this Exception to
+     * be thrown, or null if nested exception exists.
+     * @return the exception, which in turn caused this Exception to
+     * be thrown, or null if nested exception exists.
+    **/
+    public Exception getException() {
+        return _exception;
+    } //-- getException
+    
+    /**
+     * Sets the location information for this Exception
+     * @param location, the location information for this validation
+     * exception
+    **/
+    public void setLocation(Location location) {
+        this._location = location;
+    } //-- setLocation
+    
+    /**
+     * Returns the String representation of this Exception
+     * @return the String representation of this Exception
+    **/
+    public String toString() {
+        StringBuffer sb = new StringBuffer("MarshalException: ");
+        String message = getMessage();
+        if (message != null) sb.append(message);
+        if (_location != null) {
+            sb.append(";\n   ");
+            sb.append(_location.toString());
+        }
+        return sb.toString();
+    } //-- toString
     
 } //-- MarshalException

@@ -50,26 +50,113 @@ package org.exolab.castor.xml;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ValidationException extends Exception {
+public class ValidationException extends CastorException {
     
-    String message = null;
+    /**
+     * A nested exception
+    **/
+    private Exception _exception  = null;
     
+    /**
+     * The location for this Exception
+    **/
+    private Location  _location   = null;
+    
+    /**
+     * Creates a new ValidationException with no message,
+     * or nested Exception
+    **/
     public ValidationException() {
         super();
-    }
+    } //-- ValidationException
     
+    /**
+     * Creates a new ValidationException with the given message.
+     * @param message the message for this Exception
+    **/
     public ValidationException(String message) {
         super(message);
-        this.message = message;
-    }
+    } //-- ValidationException(String)
+
+    /**
+     * Creates a new ValidationException with the given message.
+     * @param message the message for this Exception
+     * @param errorCode the errorCode for this Exception
+    **/
+    public ValidationException(String message, int errorCode) {
+        super(message, errorCode);
+    } //-- ValidationException(String)
     
+    /**
+     * Creates a new ValidationException with the given nested
+     * exception.
+     * @param exception the nested exception
+    **/
     public ValidationException(Exception exception) {
-        super(exception.getMessage());
-        this.message = exception.getMessage();
-    }
+        super();
+        if (exception != null) {
+            super.setMessage(exception.getMessage());
+            this._exception = exception;
+        }
+    } //-- ValidationException(Exception)
+
+    /**
+     * Creates a new ValidationException with the given message
+     * and nested exception.
+     * @param message the detail message for this exception
+     * @param exception the nested exception
+    **/
+    public ValidationException(String message, Exception exception) {
+        super(message);
+        this._exception = exception;
+    } //-- ValidationException(String, Exception)
+
+    /**
+     * Creates a new ValidationException with the given message,
+     * nested exception, and errorCode.
+     * @param message the detail message for this exception
+     * @param exception the nested exception
+     * @param errorCode the errorCode for this Exception
+    **/
+    public ValidationException
+        (String message, Exception exception, int errorCode) 
+    {
+        super(message, errorCode);
+        this._exception = exception;
+    } //-- ValidationException(String, Exception, int)
     
-    public String getMessage() {
-        return this.message;
-    }
+    /**
+     * Returns the exception, which in turn caused this Exception to
+     * be thrown, or null if nested exception exists.
+     * @return the exception, which in turn caused this Exception to
+     * be thrown, or null if nested exception exists.
+    **/
+    public Exception getException() {
+        return _exception;
+    } //-- getException
+    
+    /**
+     * Sets the location information for this ValidationException
+     * @param location, the location information for this validation
+     * exception
+    **/
+    public void setLocation(Location location) {
+        this._location = location;
+    } //-- setLocation
+    
+    /**
+     * Returns the String representation of this Exception
+     * @return the String representation of this Exception
+    **/
+    public String toString() {
+        StringBuffer sb = new StringBuffer("ValidationException: ");
+        String message = getMessage();
+        if (message != null) sb.append(message);
+        if (_location != null) {
+            sb.append(";\n   ");
+            sb.append(_location.toString());
+        }
+        return sb.toString();
+    } //-- toString
     
 } //-- ValidationException

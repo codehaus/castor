@@ -115,9 +115,11 @@ public class MarshalHelper {
      * @param c the Class to return the MarshalInfo for
      * @return the MarshalInfo for the given class, or one is created by
      * using reflection
+     * @exception MarshalException when an error occurs during the 
+     * retrieval or creation of a MarshalInfo
     **/
     public static MarshalInfo getMarshalInfo(Class c) 
-        throws java.io.IOException
+        throws MarshalException
     {
         return getMarshalInfo(c, null);
     } //-- getMarshalInfo
@@ -130,9 +132,11 @@ public class MarshalHelper {
      * @param errorWriter a PrintWriter to report errors to
      * @return the MarshalInfo for the given class, or one is created by
      * using reflection
+     * @exception MarshalException when an error occurs while trying to
+     * retrieve or create a new MarshalInfo for the given class
     **/
     public static MarshalInfo getMarshalInfo(Class c, PrintWriter errorWriter) 
-        throws java.io.IOException
+        throws MarshalException
     {
         if (c == null) return null;
         MarshalInfo mInfo = getMarshalInfo(c.getName(),c.getClassLoader());
@@ -145,11 +149,11 @@ public class MarshalHelper {
      * Creates a MarshalInfo for the given class by using Reflection.
      * @param c the Class to create the MarshalInfo for
      * @return the new MarshalInfo created for the given class
-     * @exception IOException when an error occurs during the creation
+     * @exception MarshalException when an error occurs during the creation
      * of the MarshalInfo class
     **/
     public static MarshalInfo generateMarshalInfo(Class c) 
-        throws java.io.IOException 
+        throws MarshalException
     {
         return generateMarshalInfo(c, null);
     } //-- generateMarshalInfo(Class)
@@ -159,12 +163,12 @@ public class MarshalHelper {
      * @param c the Class to create the MarshalInfo for
      * @param errorWriter a PrintWriter to print error information to
      * @return the new MarshalInfo created for the given class
-     * @exception IOException when an error occurs during the creation
+     * @exception MarshalException when an error occurs during the creation
      * of the MarshalInfo class
     **/
     public static MarshalInfo generateMarshalInfo
         (Class c, PrintWriter errorWriter) 
-        throws java.io.IOException 
+        throws MarshalException
     {
         
         if (c == null) return null;

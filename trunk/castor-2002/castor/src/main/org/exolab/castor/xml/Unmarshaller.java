@@ -154,9 +154,12 @@ public class Unmarshaller {
      * (setters/getters) in order for instances of the Class
      * to be properly unmarshalled.
      * @param reader the Reader to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
     **/
     public Object unmarshal(Reader reader) 
-        throws java.io.IOException
+        throws MarshalException, ValidationException
     {
         return unmarshal(new InputSource(reader));
     } //-- unmarshal(Reader reader)
@@ -167,14 +170,17 @@ public class Unmarshaller {
      * (setters/getters) in order for instances of the Class
      * to be properly unmarshalled.
      * @param source the InputSource to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
     **/
     public Object unmarshal(InputSource source) 
-        throws java.io.IOException
+        throws MarshalException, ValidationException
     {
         Parser parser = Configuration.getParser();
         
         if (parser == null)
-            throw new IOException("unable to create parser");
+            throw new MarshalException("unable to create parser");
             
         if (entityResolver != null)
             parser.setEntityResolver(entityResolver);
@@ -188,17 +194,35 @@ public class Unmarshaller {
         try {
             parser.parse(source);
         }
+        catch(java.io.IOException ioe) {
+            throw new MarshalException(ioe);
+        }
         catch(org.xml.sax.SAXException sx) {
             
-            String message = sx.getMessage();
-            if (message == null) {
-                Exception ex = sx.getException();
-                if (ex != null) message = ex.getMessage();
+            MarshalException marshalEx = new MarshalException();
+           
+            String message = null;
+            FileLocation fileLocation = null;
+            
+            Exception ex = sx.getException();
+            if (ex != null) {
+                message = ex.getMessage();
+                if (ex instanceof org.xml.sax.SAXParseException) {
+                    SAXParseException sxpe = (SAXParseException)sx;
+                    fileLocation = new FileLocation();
+                    fileLocation.setFilename(sxpe.getSystemId());
+                    fileLocation.setLineNumber(sxpe.getLineNumber());
+                    fileLocation.setColumnNumber(sxpe.getColumnNumber());
+                    marshalEx.setLocation(fileLocation);
+                }
             }
+            else message = sx.getMessage();
+            
             if (message == null) 
                 message = sx.toString();
             
-            throw new java.io.IOException(message);
+            marshalEx.setMessage(message);
+            throw marshalEx;
         }
         
         return handler.getObject();
@@ -210,9 +234,12 @@ public class Unmarshaller {
      * of the Class to be properly unmarshalled.
      * @param c the Class to create a new instance of
      * @param reader the Reader to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
     **/
     public static Object unmarshal(Class c, Reader reader) 
-        throws java.io.IOException
+        throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
         return unmarshaller.unmarshal(reader);;
@@ -224,9 +251,12 @@ public class Unmarshaller {
      * of the Class to be properly unmarshalled.
      * @param c the Class to create a new instance of
      * @param source the InputSource to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
     **/
     public static Object unmarshal(Class c, InputSource source) 
-        throws java.io.IOException
+        throws MarshalException, ValidationException
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
         return unmarshaller.unmarshal(source);;
