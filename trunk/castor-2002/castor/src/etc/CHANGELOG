@@ -18,7 +18,7 @@ JDO:    Fixed problem with Float/BigDecimal and Double/BigDecimal
         type conversions. (Oleg Nitz <on@ibis.odessa.ua>)
 
 JDO:    Implemented algorithm of "bounded" dirty checking for long
-        transactions, it uses local timestamps and is work only
+        transactions, it uses local timestamps and is works only
         if the object is still in the cache at the end of the transaction.
         See interface TimeStampable and Database.update().
         (Oleg Nitz <on@ibis.odessa.ua>)
