@@ -120,10 +120,11 @@ public class Dependent
             db.begin();
             oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master" );
             qres = oql.execute();
-            
+
             for ( cnt = 0; qres.hasMore(); cnt++ ) {
                 db.remove( qres.next() );
             }
+            oql.close();
             stream.writeVerbose( "Deleting " + cnt + " master objects" );
 			/*
             oql = db.getOQLQuery( "SELECT detail FROM jdo.TestDetail detail" );
@@ -144,9 +145,10 @@ public class Dependent
             for ( cnt = 0; qres.hasMore(); cnt++ ) {
                 db.remove( qres.nextElement() );
             }
+            oql.close();
             stream.writeVerbose( "Deleting " + cnt + " group objects" );
             db.commit();
-            
+
             stream.writeVerbose( "Attempt to create master with details" );
             db.begin();
             master = new TestMaster();
@@ -256,6 +258,46 @@ public class Dependent
                 stream.writeVerbose( "Error: master not found" );
                 result = false;
             }
+            db.commit();
+
+            stream.writeVerbose( "Test OQL query" );
+            db.begin();
+            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.value1=$1" );
+            oql.bind(TestDetail.DefaultValue);
+            qres = oql.execute();
+            if ( qres.hasMore() ) {
+                stream.writeVerbose( "OK: correct result of query 1 " );
+            } else {
+                stream.writeVerbose( "Error: incorrect result of query 1 " );
+                result = false;
+            }
+            oql.bind(TestDetail.DefaultValue + "*");
+            qres = oql.execute();
+            if ( qres.hasMore() ) {
+                stream.writeVerbose( "Error: incorrect result of query 2 " );
+                result = false;
+            } else {
+                stream.writeVerbose( "OK: correct result of query 2 " );
+            }
+            oql.close();
+            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.details.details2.value1=$1" );
+            oql.bind(TestDetail2.DefaultValue);
+            qres = oql.execute();
+            if ( qres.hasMore() ) {
+                stream.writeVerbose( "OK: correct result of query 3 " );
+            } else {
+                stream.writeVerbose( "Error: incorrect result of query 3 " );
+                result = false;
+            }
+            oql.bind(TestDetail2.DefaultValue + "*");
+            qres = oql.execute();
+            if ( qres.hasMore() ) {
+                stream.writeVerbose( "Error: incorrect result of query 4 " );
+                result = false;
+            } else {
+                stream.writeVerbose( "OK: correct result of query 4 " );
+            }
+            oql.close();
             db.commit();
 
             if ( ! result )
