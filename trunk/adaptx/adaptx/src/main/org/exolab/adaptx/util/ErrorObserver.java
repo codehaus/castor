@@ -56,10 +56,10 @@
 package org.exolab.adaptx.util;
 
 /**
- * A simple interface that allows xsl:message actions to be
- * observed.
+ * A simple interface that allows warnings and errors to
+ * be reported.
  *
- * @author <a href="mailto:kvisco@ziplink.net">Keith Visco</a>
+ * @author <a href="mailto:keith@kvisco.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public interface ErrorObserver {
