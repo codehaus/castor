@@ -49,6 +49,9 @@ package org.exolab.castor.jdo.engine;
 
 import java.io.PrintWriter;
 import javax.transaction.Status;
+import javax.transaction.Transaction;
+import javax.transaction.SystemException;
+import javax.transaction.Synchronization;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.DatabaseNotFoundException;
@@ -79,7 +82,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public class DatabaseImpl
-    implements Database
+    implements Database, Synchronization
 {
 
 
@@ -117,7 +120,15 @@ public class DatabaseImpl
     private String             _dbName;
 
 
-    public DatabaseImpl( String dbName, int lockTimeout, PrintWriter logWriter )
+    /**
+     * True if the transaction is listed as synchronized and
+     * subordinate to this transaction.
+     */
+    private Transaction         _transaction;
+
+
+    public DatabaseImpl( String dbName, int lockTimeout, PrintWriter logWriter,
+                         Transaction transaction )
         throws DatabaseNotFoundException
     {
         // Locate a suitable datasource and database engine
@@ -136,6 +147,12 @@ public class DatabaseImpl
         }
         _dbName = dbName;
         _lockTimeout = lockTimeout;
+
+        _transaction = transaction;
+        if ( _transaction != null ) {
+            _ctx = new TransactionContextImpl();
+            _ctx.setLockTimeout( _lockTimeout );
+        }
     }
 
 
@@ -175,12 +192,15 @@ public class DatabaseImpl
     {
         TransactionContext tx;
         ClassHandler       handler;
+        Object             object;
 
         tx = getTransaction();
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        return tx.fetch( _dbEngine, handler, identity, null );
+        object = handler.newInstance();
+        tx.fetch( _dbEngine, handler, object, identity, null );
+        return object;
     }
 
 
@@ -191,6 +211,7 @@ public class DatabaseImpl
         TransactionContext tx;
         ClassHandler       handler;
         AccessMode         mode;
+        Object             object;
 
         switch ( accessMode ) {
         case ReadOnly:
@@ -212,7 +233,9 @@ public class DatabaseImpl
         handler = _dbEngine.getClassHandler( type );
         if ( handler == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        return tx.fetch( _dbEngine, handler, identity, mode );
+        object = handler.newInstance();
+        tx.fetch( _dbEngine, handler, object, identity, mode );
+        return object;
     }
 
 
@@ -286,80 +309,6 @@ public class DatabaseImpl
     }
 
 
-    public synchronized Object lookup( Class type, Object primKey )
-        throws TransactionNotInProgressException, LockNotGrantedException,
-               PersistenceException
-    {
-        TransactionContext tx;
-        ClassHandler       handler;
-        
-        tx = getTransaction();
-        handler = _dbEngine.getClassHandler( type );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
-        try {
-            return tx.fetch( _dbEngine, handler, primKey, AccessMode.ReadOnly );
-        } catch ( ObjectNotFoundException except ) {
-            return null;
-        }
-    }
-    
-
-    public synchronized void bind( Object obj, String name )
-        throws DuplicateIdentityException, ClassNotPersistenceCapableException,
-               PersistenceException
-    {
-        TransactionContext tx;
-        NameBinding        binding;
-        ClassHandler       handler;
-        
-        tx = getTransaction();
-        makePersistent( obj );
-        handler = _dbEngine.getClassHandler( obj.getClass() );
-        binding = new NameBinding( name, obj, handler );
-        tx.create( _dbEngine, binding, name );
-    }
-
-
-    public synchronized void unbind( String name )
-        throws ObjectNotFoundException, PersistenceException
-    {
-        TransactionContext tx;
-        ClassHandler       handler;
-        
-        tx = getTransaction();
-        try {
-            handler = _dbEngine.getClassHandler( NameBinding.class );
-            tx.fetch( _dbEngine, handler, name, AccessMode.Exclusive );
-        } catch ( ObjectNotPersistentException except ) {
-            throw new PersistenceExceptionImpl( except );
-        } catch ( LockNotGrantedException except ) {
-            throw new PersistenceExceptionImpl( except );
-        }
-    }
-
-
-    public synchronized Object lookup( String name )
-        throws ObjectNotFoundException, PersistenceException
-    {
-        TransactionContext tx;
-        NameBinding        binding;
-        ClassHandler       handler;
-        
-        tx = getTransaction();
-        try {
-            handler = _dbEngine.getClassHandler( NameBinding.class );
-            binding = (NameBinding) tx.fetch( _dbEngine, handler, name, AccessMode.ReadOnly );
-            handler = _dbEngine.getClassHandler( binding.getType() );
-            if ( handler == null )
-                throw new ClassNotPersistenceCapableExceptionImpl( handler.getJavaClass() );
-            return tx.fetch( _dbEngine, handler, binding.objectId, AccessMode.ReadOnly );
-        } catch ( LockNotGrantedException except ) {
-            throw new PersistenceExceptionImpl( except );
-        }
-    }
-
-
     public OQLQuery getOQLQuery()
     {
         return new OQLQueryImpl( this );
@@ -401,10 +350,12 @@ public class DatabaseImpl
     public void begin()
         throws PersistenceException
     {
-        // If inside XA transation throw IllegalStateException
+        if ( _transaction != null )
+            throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
+
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
-        _ctx = new TransactionContextImpl( null );
+        _ctx = new TransactionContextImpl();
         _ctx.setLockTimeout( _lockTimeout );
     }
 
@@ -412,7 +363,9 @@ public class DatabaseImpl
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
-        // If inside XA transation throw IllegalStateException
+        if ( _transaction != null )
+            throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
+
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
@@ -421,11 +374,7 @@ public class DatabaseImpl
             _ctx.prepare();
             _ctx.commit();
         } catch ( TransactionAbortedException except ) {
-            try {
-                _ctx.rollback();
-            } catch ( TransactionNotInProgressException except2 ) {
-                // This should never happen
-            }
+            _ctx.rollback();
             throw except;
         } finally {
             _ctx = null;
@@ -436,13 +385,72 @@ public class DatabaseImpl
     public void rollback()
         throws TransactionNotInProgressException
     {
+        if ( _transaction != null )
+            throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
+
         // If inside XA transation throw IllegalStateException
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
+        _ctx.rollback();
+        _ctx = null;
+    }
+
+
+    public void beforeCompletion()
+    {
+        if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
+            throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
+        if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK ) {
+            try {
+                _transaction.setRollbackOnly();
+            } catch ( SystemException except ) {
+                if ( _logWriter != null )
+                    _logWriter.println( except );
+            }
+            return;
+        }
         try {
+            _ctx.prepare();
+        } catch ( TransactionAbortedException except ) {
+            if ( _logWriter != null )
+                _logWriter.println( except );
+            try {
+                _transaction.setRollbackOnly();
+            } catch ( SystemException except2 ) {
+                if ( _logWriter != null )
+                    _logWriter.println( except2 );
+            }
             _ctx.rollback();
-        } finally {
+        }
+    }
+
+
+    public void afterCompletion( int status )
+    {
+        if ( _transaction == null || _ctx == null || ! _ctx.isOpen() )
+            throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
+        if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
+            return;
+        if ( _ctx.getStatus() != Status.STATUS_PREPARED )
+            throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
+        switch ( status ) {
+        case Status.STATUS_COMMITTED:
+            try {
+                _ctx.commit();
+            } catch ( TransactionAbortedException except ) {
+                if ( _logWriter != null )
+                    _logWriter.println( except );
+            }
             _ctx = null;
+            return;
+        case Status.STATUS_ROLLEDBACK:
+            _ctx.rollback();
+            _ctx = null;
+            return;
+        default:
+            _ctx.rollback();
+            _ctx = null;
+            throw new IllegalStateException( "Unexpected state: afterCompletion called with status " + status );
         }
     }
 
@@ -461,11 +469,7 @@ public class DatabaseImpl
         try {
             _ctx.checkpoint();
         } catch ( TransactionAbortedException except ) {
-            try {
-                _ctx.rollback();
-            } catch ( TransactionNotInProgressException except2 ) {
-                // This should never happen
-            }
+            _ctx.rollback();
             _ctx = null;
             throw except;
         }
