@@ -48,15 +48,18 @@
 package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimePeriod;
+import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.text.ParseException;
 import java.util.StringTokenizer;
 import java.text.SimpleDateFormat;
 import java.util.SimpleTimeZone;
 /**
- * Describe an XML schema Month
- * The date type is derived from time period by setting up the facet :
- *      - duration to "P1M"
+ * <p>Describe an XML schema Month.
+ * <p>The date type is derived from time period by setting up the facet :
+ *  <ul>
+ *      <li>duration to "P1M"</li>
+ *  </ul>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  */
@@ -76,38 +79,67 @@ public class Month extends TimePeriod {
         int temp = SimpleTimeZone.getDefault().getRawOffset();
         if (temp < 0){
             temp = -temp;
-            _zoneNegative = true ;
+            try {
+                this.setZoneNegative();
+            } catch (NotSupportedOperationException e) {
+            }
         }
-        _zoneHour = (short) (temp / (60*60*1000));
+        short zhour = (short) (temp / (60*60*1000));
         temp = temp % (60*60*1000);
-        _zoneMinute = (short)(temp / (60*1000));
+        short zmin = (short)(temp / (60*1000));
+        try {
+            this.setZone(zhour,zmin);
+        } catch (NotSupportedOperationException e) {
+        }
     }
 
     /*Disallow the access to set day method*/
-    public void setDay(short day) {
-        throw new UnsupportedOperationException("day must not be changed");
+    public void setDay(short day)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the day field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
     /*Disallow the access to set time methods */
-    public void setHour(short hour) {
-       throw new UnsupportedOperationException("hour must not be changed");
+    public void setHour(short hour)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the hour field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setMinute(short minute) {
-      throw new UnsupportedOperationException("minute must not be changed");
+    public void setMinute(short minute)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the minute field must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setSecond(short second,short millsecond) {
-      throw new UnsupportedOperationException("second must not be changed");
+
+    public void setSecond(short second,short millsecond)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the second fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setZone(short hour, short minute) {
-      throw new UnsupportedOperationException("time zone must not be changed");
+
+    public void setZone(short hour, short minute)
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the time zone fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
 
-    public void setZoneNegative() {
-        throw new UnsupportedOperationException("time zone must not be changed");
+
+    public void setZoneNegative()
+        throws NotSupportedOperationException
+    {
+        String err = "In a Month : the tinme zone fields must not be changed";
+        throw new NotSupportedOperationException(err);
     }
+
 
 
      /**
@@ -180,16 +212,20 @@ public class Month extends TimePeriod {
         if (DEBUG) {
             System.out.println("Processing year: "+temp.substring(2,4));
         }
-        result.setYear(Short.parseShort( temp.substring(2,4) ));
-
+        try {
+            result.setYear(Short.parseShort( temp.substring(2,4) ));
+        } catch(NotSupportedOperationException e){
+        }
         temp=token.nextToken();
         if (temp.length() != 2)
             throw new ParseException(str+": Bad month format",5);
         if (DEBUG) {
             System.out.println("Processing month: "+temp);
         }
-        result.setMonth(Short.parseShort(temp));
-
+        try {
+            result.setMonth(Short.parseShort(temp));
+        } catch(NotSupportedOperationException e) {
+        }
         temp = null;
         return result;
     }//parse
@@ -202,7 +238,7 @@ public class Month extends TimePeriod {
         // Set the time zone
         if ( !isUTC() ) {
             int offset = 0;
-            offset = (int) ( (_zoneMinute + _zoneHour*60)*60*1000);
+            offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
             timeZone.setID(timeZone.getAvailableIDs(offset)[0]);

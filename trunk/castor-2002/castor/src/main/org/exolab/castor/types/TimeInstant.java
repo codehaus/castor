@@ -48,10 +48,12 @@
  */
 package org.exolab.castor.types;
 /**
- * Describe an XML schema TimeInstant
+ * <p>Describe an XML schema TimeInstant.
  * The time type is derived from recurringDuration by setting up the facet:
- *  - duration to "P0Y"
- *  - period to "P0Y"
+ *      <ul>
+ *           <li>duration to "P0Y"</li>
+ *           <li>period to "P0Y"</li>
+ *      </ul>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  * @see RecurringDuration

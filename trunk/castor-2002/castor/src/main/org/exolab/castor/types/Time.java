@@ -54,12 +54,14 @@ import java.util.Date;
 import org.exolab.castor.types.TimeDuration;
 
 /**
- * Describe an XML schema Time
- * The time type is derived from recurringDuration by setting up the facet:
- *  - duration to "P0Y"
- *  - period to "P1D"
- * The format is defined by W3C XML Schema draft and ISO8601
- * i.e (+|-)hh:mm:ss.sss(Z|(+|-)hh:mm)
+ * <p>Describe an XML schema Time.
+ * <p>The time type is derived from recurringDuration by setting up the facet:
+ *      <ul>
+ *          <li>duration to "P0Y"</li>
+ *          <li>period to "P1D"</li>
+ *      </ul>
+ * <p>The format is defined by W3C XML Schema draft and ISO8601
+ * i.e <tt>(+|-)hh:mm:ss.sss(Z|(+|-)hh:mm)</tt>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$
  * @see RecurringDuration
@@ -90,7 +92,7 @@ public class Time extends RecurringDurationBase {
         // Set the time zone
         if ( !isUTC() ) {
             int offset = 0;
-            offset = (int) ( (_zoneMinute + _zoneHour*60)*60*1000);
+            offset = (int) ( (this.getZoneMinute() + this.getZoneHour()*60)*60*1000);
             offset = isZoneNegative() ? -offset : offset;
             timeZone.setRawOffset(offset);
             timeZone.setID(timeZone.getAvailableIDs(offset)[0]);
@@ -113,32 +115,32 @@ public class Time extends RecurringDurationBase {
         String result = null;
         String timeZone = null;
         String temp = null;
-        temp = String.valueOf(_hour);
+        temp = String.valueOf(this.getHour());
         if (temp.length()==1)
             temp = "0"+temp;
         result = temp;
 
-        temp = String.valueOf(_minute);
+        temp = String.valueOf(this.getMinute());
         if (temp.length()==1)
             temp = "0"+temp;
         result = result + ":" + temp;
 
-        temp = String.valueOf(_second);
+        temp = String.valueOf(this.getSeconds());
         if (temp.length()==1)
             temp = "0"+temp;
-        result = result + ":" + temp +"."+String.valueOf(_millsecond);
+        result = result + ":" + temp +"."+String.valueOf(this.getMilli());
 
 
         result = isNegative() ? "-"+result : result;
 
         // by default we choose to not concat the Z
         if (!isUTC()) {
-            temp = String.valueOf(_zoneHour);
+            temp = String.valueOf(this.getZoneHour());
             if (temp.length()==1)
                 temp = "0"+temp;
             timeZone = temp;
 
-            temp = String.valueOf(_zoneMinute);
+            temp = String.valueOf(this.getZoneMinute());
             if (temp.length()==1)
                 temp = "0"+temp;
             timeZone = timeZone + ":" + temp;
@@ -161,6 +163,7 @@ public class Time extends RecurringDurationBase {
      */
 
     public static Time parse(String str) throws ParseException {
+
 
         Time result = new Time();
         //remove if necessary the Z at the end
@@ -204,15 +207,24 @@ public class Time extends RecurringDurationBase {
          if (DEBUG) {
             System.out.println("Processing hour: "+temp);
         }
-         result.setHour(Short.parseShort( temp ));
-
+        try {
+            result.setHour(Short.parseShort( temp ));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a time type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
         temp=token.nextToken();
         if (temp.length() != 2)
             throw new ParseException("Bad minute format",14);
         if (DEBUG) {
             System.out.println("Processing minute: "+temp);
         }
-        result.setMinute( Short.parseShort(temp));
+        try {
+            result.setMinute( Short.parseShort(temp));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a time type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
         temp=token.nextToken();
         String milsecond = "0";
@@ -226,20 +238,35 @@ public class Time extends RecurringDurationBase {
         if (DEBUG) {
             System.out.println("Processing seconds: "+temp);
         }
-        result.setSecond(Short.parseShort(temp.substring(0,2)),
+        try {
+            result.setSecond(Short.parseShort(temp.substring(0,2)),
                          Short.parseShort(milsecond));
+        } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a time type
+            //(if not a ParseException is thrown) so we can never reach that point
+        }
 
 
         // proceed TimeZone if any
         if (timeZone) {
-            if (zoneStr.startsWith("-")) result.setZoneNegative();
+            try {
+                if (zoneStr.startsWith("-")) result.setZoneNegative();
+            } catch(org.exolab.castor.xml.NotSupportedOperationException e) {
+                //-- can never happen (a parse exception is thrown if the
+                //-- object is not valide)
+            }
             if (zoneStr.length()!= 6)
                 throw new ParseException("Bad time zone format",20);
             if (DEBUG) {
                 System.out.println("Processing timeZone: "+zoneStr);
             }
-            result.setZone(Short.parseShort(zoneStr.substring(1,3)),
-                           Short.parseShort(zoneStr.substring(4,6)));
+            try {
+                result.setZone(Short.parseShort(zoneStr.substring(1,3)),
+                                Short.parseShort(zoneStr.substring(4,6)));
+            } catch (org.exolab.castor.xml.NotSupportedOperationException e) {
+            //we are sure that this method is used with a time type
+            //(if not a ParseException is thrown) so we can never reach that point
+            }
         }
         else result.setUTC();
         temp = null;

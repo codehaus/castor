@@ -164,10 +164,10 @@ public class TimeDescriptor
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType) 
+        (String name, NodeType nodeType)
     {
         return null;
-        
+
     } //-- getFieldDescriptor
 
     /**
@@ -343,7 +343,7 @@ public class TimeDescriptor
                 timeTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
                 timeTarget.isUTC();
             }
-            catch (java.text.ParseException ex) {
+            catch (Exception ex) {
                 //-- ignore for now
             }
         } //-- setValue

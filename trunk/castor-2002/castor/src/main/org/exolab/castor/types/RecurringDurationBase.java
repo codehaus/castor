@@ -43,7 +43,8 @@
  *
  * $Id$
  * Date         Author          Changes
- * 11/07/2000   Aranud Blandin  Added a new constructor and setValues method
+ * 12/05/2000   Arnaud Blandin  Added the support for NotSupportedOperationException
+ * 11/07/2000   Arnaud Blandin  Added a new constructor and setValues method
  * 11/02/2000   Arnaud Blandin  Changed the constructor
  * 26/10/2000   Arnaud Blandin  Created
  */
@@ -53,45 +54,66 @@ package org.exolab.castor.types;
 
 import org.exolab.castor.types.TimeDuration;
 import org.exolab.castor.xml.ValidationException;
+import org.exolab.castor.xml.NotSupportedOperationException;
 
 import java.util.Date;
 import java.util.StringTokenizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 /**
- * the base class for recurring Duration types
- * This base class contains all the time fields (including the time zone ones)
+ * <p>The base class for recurring Duration types.
+ * <p>This base class contains all the time fields (including the time zone ones)
  * and also the facets period and duration
- * The validation of the time fields is done in the set methods and follows
- * <a href="http://www.iso.ch/markete/8601.pdf>the ISO8601 Date and Time Format</a>
+ * <p>The validation of the time fields is done in the set methods and follows
+ * <a href="http://www.iso.ch/markete/8601.pdf">the ISO8601 Date and Time Format</a>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @see RecurringDuration
  * @see Time
  * @see TimeInstant
  * @see TimePeriod
  */
-public class RecurringDurationBase {
+abstract class RecurringDurationBase {
 
     /**
-     * the facets of recurringDuration
+     * the period facet of this recurringDuration
      */
-    protected TimeDuration _period = null;
-    protected TimeDuration _duration = null;
-
-    //Protected variables
-    protected short _hour = 0;
-    protected short _minute = 0;
-    protected short _second = 0;
-    protected short _millsecond = 0;
-    protected short _zoneHour = 0;
-    protected short _zoneMinute = 0;
-    protected boolean _UTC = false;
-    protected boolean _zoneNegative = false;
-    protected boolean _isNegative = false;
+    private TimeDuration _period = null;
+    /**
+     * the duration facet of this recurringDuration
+     */
+    private TimeDuration _duration = null;
 
     /**
-     * the constructor for a Recurring DurationBase
+     * the hour field of this recurringDuration
      */
+    private short _hour = 0;
+    /**
+     * the minute field of this recurringDuration
+     */
+    private short _minute = 0;
+    /**
+     * the second field of this recurringDuration
+     */
+    private short _second = 0;
+    /**
+     * the millsecond field of this recurringDuration
+     */
+    private short _millsecond = 0;
+    /**
+     * the time zone hour field of this recurringDuration
+     */
+    private short _zoneHour = 0;
+    /**
+     * the time zone minute field of this recurringDuration
+     */
+    private short _zoneMinute = 0;
+    /**
+     * true if this recurringDuration is UTC related
+     */
+    private boolean _UTC = false;
+    private boolean _zoneNegative = false;
+    private boolean _isNegative = false;
+
     public RecurringDurationBase() {
     }
 
@@ -101,11 +123,17 @@ public class RecurringDurationBase {
      * @param duration the TimeDuration representing the duration facet
      * @param period the TimeDuration reprensenting the period facet
      * @return a recurringDurationBase with the facets
-     *          duration and period set up
+     *           duration and period set up
      */
-    public RecurringDurationBase(TimeDuration duration, TimeDuration period) {
-        this.setDuration(duration);
-        this.privateSetPeriod(period);
+    public RecurringDurationBase(TimeDuration duration, TimeDuration period)
+    {
+        try {
+            this.setDuration(duration);
+            this.setPeriodInternal(period);
+        } catch (NotSupportedOperationException e) {
+            String err = "Recurring Duration :"+e;
+            throw new IllegalArgumentException(err);
+        }
     }
 
     /**
@@ -115,16 +143,18 @@ public class RecurringDurationBase {
      * @param period the String reprensenting the period facet
      * @return a recurringDurationBase with the facets
      *          duration and period set up
+     * @throws IllegalArgumentException this exception is thrown when the parameter strings
+     *                                  are not corresponding to valid TimeDuration
      */
     public RecurringDurationBase(String duration, String period)
         throws IllegalArgumentException
     {
         try {
             this.setDuration(TimeDuration.parse(duration));
-            this.privateSetPeriod(TimeDuration.parse(period));
-        } catch (java.text.ParseException e) {
-            System.out.println("Error in constructor of RecurringDuration: "+e);
-            throw new IllegalArgumentException();
+            this.setPeriodInternal(TimeDuration.parse(period));
+        } catch (Exception e) {
+            String err = "In RecurringDurationBase : "+e;
+            throw new IllegalArgumentException(err);
         }
     }
 
@@ -136,11 +166,13 @@ public class RecurringDurationBase {
      * @param values an array of shorts which contains the values of the fields
      * @return a recurringDurationBase with the facets
      *          duration and period set up
+     * @throws IllegalArgumentException this exception is thrown when the values array
+     *                                  is not of length 6.
      * @see setValues
      */
 
     public RecurringDurationBase(String duration, String period, short[] values)
-        throws IllegalArgumentException
+        throws NotSupportedOperationException
     {
         new RecurringDuration(duration, period);
         if (values.length != 6) {
@@ -155,49 +187,65 @@ public class RecurringDurationBase {
      * of subclasses
      * @param period the period to set
      */
-    private void privateSetPeriod (TimeDuration period) {
+    private void setPeriodInternal (TimeDuration period) {
         _period = period;
     }
 
     /**
      * set the period facet for this recurringDuration
      * @param period the period to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the period facet is not allowed
      */
-    public void setPeriod (TimeDuration period) {
-        privateSetPeriod(period);
+    public void setPeriod (TimeDuration period)
+        throws NotSupportedOperationException
+    {
+        setPeriodInternal(period);
     }
 
     /**
      * set the period facet for this recurringDuration
      * @param period the period to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the period facet is not allowed
      */
-    public void setPeriod (String period) {
+    public void setPeriod (String period)
+        throws NotSupportedOperationException
+    {
         try {
-            privateSetPeriod(TimeDuration.parse(period));
+            setPeriodInternal(TimeDuration.parse(period));
         } catch (ParseException e) {
-            System.out.println(e);
-            e.printStackTrace();
+            String err = "RecurringDuration, setPeriod:"+e;
+            throw new IllegalArgumentException(err);
         }
     }
 
     /**
      * set the duration facet for this recurringDuration
      * @param duration the period to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the duration facet is not allowed
      */
-     public void setDuration (TimeDuration duration) {
+     public void setDuration (TimeDuration duration)
+        throws NotSupportedOperationException
+    {
         _duration = duration;
     }
 
     /**
      * set the duration facet for this recurringDuration
      * @param duration the period to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the duration facet is not allowed
      */
-    public void setDuration(String duration) {
+    public void setDuration(String duration)
+        throws NotSupportedOperationException
+    {
         try {
             _duration = (TimeDuration.parse(duration));
         } catch (ParseException e) {
-            System.out.println(e);
-            e.printStackTrace();
+            String err = "RecurringDuration, setDuration:"+e;
+            throw new IllegalArgumentException(err);
         }
     }
 
@@ -205,8 +253,12 @@ public class RecurringDurationBase {
     /**
      * set the hour field for this recurringDuration
      * @param hour the hour to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the hour field is not allowed
      */
-    public void setHour(short hour) {
+    public void setHour(short hour)
+        throws NotSupportedOperationException
+    {
         String err = "";
         if (hour > 23) {
             err = "the hour field ("+hour+")must be strictly lower than 24";
@@ -218,8 +270,12 @@ public class RecurringDurationBase {
     /**
      * set the minute field for this recurringDuration
      * @param minute the minute to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the minute field is not allowed
      */
-    public void setMinute(short minute) {
+    public void setMinute(short minute)
+        throws NotSupportedOperationException
+    {
          String err = "";
          if (minute > 59) {
             err = "the minute field ("+minute+")must be lower than 59";
@@ -232,8 +288,12 @@ public class RecurringDurationBase {
      * set the second field for this recurringDuration
      * @param second the second to set
      * @param millsecond the millisecond to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the second field is not allowed
      */
-    public void setSecond(short second,short millsecond) {
+    public void setSecond(short second,short millsecond)
+        throws NotSupportedOperationException
+     {
          String err = "";
          if (second > 60) {
             err = "the second field ("+second+")must be lower than 60";
@@ -247,8 +307,12 @@ public class RecurringDurationBase {
      * set the time zone fields for this recurringDuration
      * @param hour the time zone hour to set
      * @param minute the time zone minute to set
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the value of the time zone fields is not allowed
      */
-    public void setZone(short hour, short minute) {
+    public void setZone(short hour, short minute)
+        throws NotSupportedOperationException
+    {
          String err = "";
          if (hour > 23) {
             err = "the zone hour field ("+hour+")must be strictly lower than 24";
@@ -274,8 +338,12 @@ public class RecurringDurationBase {
      *      <li>zoneHour</li>
      *      <li>zoneMinute</li>
      * </ul>
+     * @throws NotSupportedOperationException this exception is thrown when changing
+     *         the value of a time related field is not allowed
      */
-     public void setValues(short[] values) {
+     public void setValues(short[] values)
+        throws NotSupportedOperationException
+    {
         this.setHour(values[0]);
         this.setMinute(values[1]);
         this.setSecond(values[2],values[3]);
@@ -292,9 +360,13 @@ public class RecurringDurationBase {
 
     /**
      * set the time zone negative field to true
+     * @throws NotSupportedOperationException this exception is thrown when
+     *         changing the time zone fields is not allowed
      */
 
-    public void setZoneNegative() {
+    public void setZoneNegative()
+        throws NotSupportedOperationException
+    {
         _zoneNegative = true;
     }
 
@@ -394,8 +466,8 @@ public class RecurringDurationBase {
     /**
      * <p> Returns true if the present instance of Recurring Duration Base is equal to
      * the parameter.
-     * The equals relation is the following :
-     * rd1 equals rd2 iff each field of rd1 is equal to the corresponding field of rd2
+     * <p> The equals relation is the following :
+     * <tt>rd1 equals rd2 iff each field of rd1 is equal to the corresponding field of rd2 </tt>
      * @param reccD the recurring duration to compare with the present instance
      * @return true if the present instance is equal to the parameter false if not
      */
@@ -426,7 +498,7 @@ public class RecurringDurationBase {
      * <p>Returns true if the present instance of RecurringDurationBase is greater than
      * the parameter
      * <p>Note : the order relation follows the W3C XML Schema draft i.e
-     * rd1 < rd2 iff rd2-rd1>0
+     * <tt>rd1 < rd2 iff rd2-rd1>0</tt>
      * @param reccD the recurring duration base to compare with the present instance
      * @return true if the present instance is the greatest, false if not
      */
@@ -452,4 +524,4 @@ public class RecurringDurationBase {
         return result;
     }//isGreater
 
-}
+}//-- RecurringDurationBase

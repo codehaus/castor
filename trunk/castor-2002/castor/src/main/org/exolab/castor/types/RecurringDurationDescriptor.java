@@ -346,7 +346,7 @@ public class RecurringDurationDescriptor
                 recurTarget.setZone(temp.getZoneHour(),temp.getZoneMinute());
                 recurTarget.isUTC();
             }
-            catch (java.text.ParseException ex) {
+            catch (Exception ex) {
                 //-- ignore for now
             }
         } //-- setValue
