@@ -44,9 +44,6 @@
 
   <xsl:template match="a">
     <a>
-      <xsl:for-each select="@*[name(.)!='href']">
-        <xsl:copy select="."/>
-      </xsl:for-each>
       <xsl:if test="@href">
         <xsl:variable name="href">
           <xsl:call-template name="link-convertor">
@@ -57,6 +54,9 @@
           <xsl:value-of select="$href"/>
         </xsl:attribute>
       </xsl:if>
+      <xsl:for-each select="@*[name(.)!='href']">
+        <xsl:copy select="."/>
+      </xsl:for-each>
       <xsl:apply-templates/>
     </a>
   </xsl:template>
