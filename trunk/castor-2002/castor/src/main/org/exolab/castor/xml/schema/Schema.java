@@ -670,7 +670,7 @@ public class Schema extends Annotated {
             //-- first try built-in types
             result= simpleTypesFactory.getBuiltInType(name);
             //if we have a built-in type not declared in the good namespace -> Exception
-             if ( (result != null) && (namespaces.containsValue(DEFAULT_SCHEMA_NS))) {
+             if ( (result != null) && (namespaces.contains(DEFAULT_SCHEMA_NS))) {
                 String err = "getSimpleType: the simple type '"+name+
                              "' has not been declared in XML Schema namespace.";
                 throw new IllegalArgumentException(err);
