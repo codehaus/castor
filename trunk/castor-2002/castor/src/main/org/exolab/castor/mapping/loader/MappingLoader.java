@@ -412,7 +412,7 @@ public abstract class MappingLoader
 
         // Create the class descriptor.
         clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
-                                           AccessMode.getAccessMode( clsMap.getAccess() ) );
+                                           AccessMode.getAccessMode( clsMap.getAccess().toString() ) );
 
         ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
         return clsDesc;
@@ -535,7 +535,7 @@ public abstract class MappingLoader
         // If the field is declared as a collection, grab the collection type as
         // well and use it to locate the field/accessor.
         if ( fieldMap.getCollection() != null ) {
-            colType = CollectionHandlers.getCollectionType( fieldMap.getCollection() );
+            colType = CollectionHandlers.getCollectionType( fieldMap.getCollection().toString() );
             colHandler = CollectionHandlers.getHandler( colType );
             getSetCollection = CollectionHandlers.isGetSetCollection( colType );
             if ( colType == Object[].class ) {

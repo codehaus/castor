@@ -40,7 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id: ClassMolder.java,
+ * $Id$
  */
 
 
@@ -213,7 +213,7 @@ public class ClassMolder {
 
         _base = clsDesc.getJavaClass();
 
-        _accessMode = AccessMode.getAccessMode( clsMap.getAccess() );
+        _accessMode = AccessMode.getAccessMode( clsMap.getAccess().toString() );
 
         ds.register( _name, this );
 

@@ -58,6 +58,7 @@ import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Introspector;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptor;
+import org.exolab.castor.mapping.xml.types.NodeType;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -65,6 +66,7 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MapTo;
+import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.mapping.xml.Xml;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.util.Messages;
@@ -146,10 +148,10 @@ public class MappingTool
             fieldMap.setRequired( fields[ i ].isRequired() );
             fieldMap.setTransient( fields[ i ].isTransient() );
             if ( fields[ i ].isMultivalued() )
-                fieldMap.setCollection( "enumerate" );
+                fieldMap.setCollection( CollectionType.ENUMERATE );
             fieldMap.setXml( new Xml() );
             fieldMap.getXml().setName( ( (XMLFieldDescriptor) fields[ i ] ).getXMLName() );
-            fieldMap.getXml().setNode( ( (XMLFieldDescriptor) fields[ i ] ).getNodeType().toString() );
+            fieldMap.getXml().setNode( NodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
             classMap.addFieldMapping( fieldMap );
 
             if ( ! Types.isSimpleType( fields[ i ].getFieldType() ) )

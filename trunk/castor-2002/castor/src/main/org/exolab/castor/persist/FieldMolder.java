@@ -68,8 +68,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.TypeMapping;
-import org.exolab.castor.mapping.xml.ManyToMany;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -418,7 +416,7 @@ public class FieldMolder {
 
             // Set collection type
             if ( fieldMap.getCollection() != null ) {
-                _colClass = getCollectionType( fieldMap.getCollection(), _lazy );
+                _colClass = getCollectionType( fieldMap.getCollection().toString(), _lazy );
                 _store = false;
             }
             // Set field name, if it is null, we try to discover it with

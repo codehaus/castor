@@ -667,7 +667,7 @@ public class DTXQuery {
 				Xml relFieldXml = relFields[n].getXml();
 				String node = "element";
 				if (relFieldXml != null) {
-				    node = relFieldXml.getNode();
+				    node = relFieldXml.getNode().toString();
 				} 
 
 				if (!relFieldName.equals(foreKey)) {
@@ -703,7 +703,7 @@ public class DTXQuery {
 		Xml fieldXml = field.getXml();
 		String node = "element";
 		if (fieldXml != null) {
-		     node = fieldXml.getNode();
+		     node = fieldXml.getNode().toString();
 		} 
 
 		if (node.equalsIgnoreCase("attribute")) {
