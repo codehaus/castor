@@ -215,21 +215,6 @@ create unique index test_rel_payroll_pk on test_rel_payroll( id )
 go
 -- end for test_relations
 
-
--- test_table_ex
-drop table test_table_ex
-go
-create table test_table_ex (
-  id      int          not null,
-  value1  varchar(200) not null,
-  value2  varchar(200) null
-)
-go
-create unique index test_table_ex_pk on test_table_ex ( id )
-go
-grant all on test_table_ex to test
-go
-
 -- test_table_extends
 drop table test_table_extends
 go
@@ -244,6 +229,20 @@ go
 grant all on test_table_extends to test
 go
 
+
+-- test_table_ex
+drop table test_table_ex
+go
+create table test_table_ex (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+)
+go
+create unique index test_table_ex_pk on test_table_ex ( id )
+go
+grant all on test_table_ex to test
+go
 
 -- test_race
 drop table test_race
@@ -287,6 +286,22 @@ go
 create unique index test_detail_pk on test_detail ( detail_id )
 go
 grant all on test_detail to test
+go
+
+
+-- test_detail2
+drop table test_detail2
+go
+create table test_detail2
+(
+  detail2_id  numeric(10,0)  not null,
+  detail_id  numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+)
+go
+create unique index test_detail2_pk on test_detail2 ( detail2_id )
+go
+grant all on test_detail2 to test
 go
 
 
@@ -355,25 +370,6 @@ go
 grant all on test_keygen_ext to test
 go
 
--- list_types
-drop table list_types
-go
-create table list_types (
-  o_char  CHAR         null,
-  o_nchar NCHAR        null,
-  o_varchar VARCHAR(10) null,
-  o_nvarchar VARCHAR(10) null,
-  o_text TEXT null,
-  o_datetime datetime null,
-  o_smalldatetime SMALLDATETIME null,
-  o_binary BINARY(10) null,
-  o_varbinary VARBINARY(10) null,
-  o_image IMAGE null,
-  o_int   INT null,
-)
-go
-
-
 -- test_seqtable
 drop table test_seqtable
 go
@@ -423,23 +419,6 @@ sp_procxmode proc_check_permissions, "anymode"
 go
 
 
--- test_detail2
-drop table test_detail2
-go
-create table test_detail2
-(
-  detail2_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
-)
-go
-create unique index test_detail2_pk on test_detail2 ( detail2_id )
-go
-grant all on test_detail2 to test
-go
-
-
-
 -- test_persistent
 drop table test_persistent
 go
@@ -456,3 +435,22 @@ create unique index test_persistent_pk on test_persistent ( id )
 go
 grant all on test_persistent to test
 go
+
+-- list_types
+drop table list_types
+go
+create table list_types (
+  o_char  CHAR         null,
+  o_nchar NCHAR        null,
+  o_varchar VARCHAR(10) null,
+  o_nvarchar VARCHAR(10) null,
+  o_text TEXT null,
+  o_datetime datetime null,
+  o_smalldatetime SMALLDATETIME null,
+  o_binary BINARY(10) null,
+  o_varbinary VARBINARY(10) null,
+  o_image IMAGE null,
+  o_int   INT null,
+)
+go
+
