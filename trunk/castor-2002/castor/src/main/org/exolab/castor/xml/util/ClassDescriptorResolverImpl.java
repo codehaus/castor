@@ -129,6 +129,16 @@ public class ClassDescriptorResolverImpl
         return _errMessage;
     } //-- getErrorMessage
     
+    /**
+     * Returns the Introspector being used by this ClassDescriptorResolver.
+     * This allows for configuration of the Introspector.
+     *
+     * @return the Introspector being used by this ClassDescriptorResolver
+    **/
+    public Introspector getIntrospector() {
+        return _introspector;
+    } //-- getIntrospector
+    
     public XMLMappingLoader getMappingLoader() {
         return mappingLoader;
     } //-- getXMLMappingLoader
