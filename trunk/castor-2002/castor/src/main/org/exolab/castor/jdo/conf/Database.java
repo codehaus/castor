@@ -34,7 +34,7 @@ public class Database implements java.io.Serializable {
     /**
      * 
     **/
-    private String vDbName;
+    private String vName;
 
     /**
      * 
@@ -49,7 +49,12 @@ public class Database implements java.io.Serializable {
     /**
      * 
     **/
-    private DataSourceRef vDataSourceRef;
+    private Jndi vJndi;
+
+    /**
+     * 
+    **/
+    private Engine vEngine;
 
     /**
      * 
@@ -96,17 +101,17 @@ public class Database implements java.io.Serializable {
     /**
      * 
     **/
-    public String getDbName() {
-        return this.vDbName;
-    } //-- String getDbName() 
+    public String getName() {
+        return this.vName;
+    } //-- String getName() 
 
     /**
      * 
-     * @param vDbName 
+     * @param vName 
     **/
-    public void setDbName(String vDbName) {
-        this.vDbName = vDbName;
-    } //-- void setDbName(String) 
+    public void setName(String vName) {
+        this.vName = vName;
+    } //-- void setName(String) 
 
     /**
      * 
@@ -145,20 +150,37 @@ public class Database implements java.io.Serializable {
 
     /**
      * 
-     * @param vDataSourceRef
+     * @param vJndi
     **/
-    public void setDataSourceRef(DataSourceRef vDataSourceRef) 
+    public void setJndi(Jndi vJndi) 
     {
-        this.vDataSourceRef = vDataSourceRef;
-    } //-- void setDataSourceRef(DataSourceRef) 
+        this.vJndi = vJndi;
+    } //-- void setJndi(Jndi) 
 
     /**
      * 
     **/
-    public DataSourceRef getDataSourceRef() 
+    public Jndi getJndi() 
     {
-        return vDataSourceRef;
-    } //-- DataSourceRef getDataSourceRef() 
+        return vJndi;
+    } //-- Jndi getJndi() 
+
+    /**
+     * 
+     * @param vEngine
+    **/
+    public void setEngine(Engine vEngine) 
+    {
+        this.vEngine = vEngine;
+    } //-- void setEngine(Engine) 
+
+    /**
+     * 
+    **/
+    public Engine getEngine() 
+    {
+        return vEngine;
+    } //-- Engine getEngine() 
 
     /**
      * 

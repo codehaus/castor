@@ -52,13 +52,13 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         //-- initialize attributes
         
         attributes = new MarshalDescriptor[1];
-        //-- vDbName
-        desc = new SimpleMarshalDescriptor(String.class, "vDbName", "db-name");
+        //-- vName
+        desc = new SimpleMarshalDescriptor(String.class, "vName", "name");
         desc.setDescriptorType(DescriptorType.attribute);
         try {
-            desc.setReadMethod(Database.class.getMethod("getDbName", emptyClassArgs));
+            desc.setReadMethod(Database.class.getMethod("getName", emptyClassArgs));
             classArgs[0] = String.class;
-            desc.setWriteMethod(Database.class.getMethod("setDbName", classArgs));
+            desc.setWriteMethod(Database.class.getMethod("setName", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
@@ -66,7 +66,7 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         
         //-- initialize elements
         
-        elements = new MarshalDescriptor[4];
+        elements = new MarshalDescriptor[5];
         //-- vDriver
         desc = new SimpleMarshalDescriptor(Driver.class, "vDriver", "driver");
         desc.setDescriptorType(DescriptorType.element);
@@ -91,17 +91,29 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         
         elements[1] = desc;
         
-        //-- vDataSourceRef
-        desc = new SimpleMarshalDescriptor(DataSourceRef.class, "vDataSourceRef", "data-source-ref");
+        //-- vJndi
+        desc = new SimpleMarshalDescriptor(Jndi.class, "vJndi", "jndi");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(Database.class.getMethod("getDataSourceRef", emptyClassArgs));
-            classArgs[0] = DataSourceRef.class;
-            desc.setWriteMethod(Database.class.getMethod("setDataSourceRef", classArgs));
+            desc.setReadMethod(Database.class.getMethod("getJndi", emptyClassArgs));
+            classArgs[0] = Jndi.class;
+            desc.setWriteMethod(Database.class.getMethod("setJndi", classArgs));
         }
         catch(java.lang.NoSuchMethodException nsme) {};
         
         elements[2] = desc;
+
+        //-- vEngine
+        desc = new SimpleMarshalDescriptor(Engine.class, "vEngine", "engine");
+        desc.setDescriptorType(DescriptorType.element);
+        try {
+            desc.setReadMethod(Database.class.getMethod("getEngine", emptyClassArgs));
+            classArgs[0] = Engine.class;
+            desc.setWriteMethod(Database.class.getMethod("setEngine", classArgs));
+        }
+        catch(java.lang.NoSuchMethodException nsme) {};
+        
+        elements[3] = desc;
 
         //-- vMappingList
         desc = new SimpleMarshalDescriptor(Mapping.class, "vMappingList", "mapping");
@@ -114,7 +126,7 @@ public class DatabaseMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         }
         catch(java.lang.NoSuchMethodException nsme) { };
         
-        elements[3] = desc;
+        elements[4] = desc;
         
     } //-- DatabaseMarshalInfo()
 
