@@ -287,7 +287,7 @@
 
        <p>
           The input file to the source code generator is an XML Schema<sup>2</sup>.
-          The current supported version is the <b>W3C XML Schema Candidate Recommendation</b><sup>1</sup>. 
+          The current supported version is the <b>W3C XML Schema Recommendation</b><sup>1</sup>. 
           For more information about XML Schema Support, check the <a href="xmlschema.xml">XML Schema page</a>
        </p>
 
@@ -295,7 +295,7 @@
   </section>
 
    <section>
-      <body-note><sup>1</sup>Castor 0.9.0 uses XML Schema Candidate Recommendation 20001024</body-note>
+      <body-note><sup>1</sup>Castor 0.9.3 uses XML Schema Recommendation 20010502</body-note>
       <body-note>
          <sup>2</sup>XML Schema is a <a href="http://www.w3.org">W3C</a> Working Draft
       </body-note>
