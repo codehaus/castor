@@ -55,7 +55,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class AttributeDecl extends SchemaBase {
+public class AttributeDecl extends Annotated {
 
     
     /**
@@ -75,7 +75,7 @@ public class AttributeDecl extends SchemaBase {
     **/
     private int minOccurs = 0;
     
-    Datatype datatype = null;
+    String typeRef = null;
     
     /**
      * The Schema to which this AttributeDecl belongs
@@ -109,22 +109,12 @@ public class AttributeDecl extends SchemaBase {
                 "; 'name' must not be null or zero-length.";
             throw new IllegalArgumentException(err);
         }
-        this.name = name;
-        this.schema = schema;
+        this.name    = name;
+        this.schema  = schema;
+        this.typeRef = SchemaNames.STRING_TYPE;
         setMinOccurs(minOccurs);
-        datatype = new Datatype(schema, "string");
     } //-- AttrDecl
     
-    
-    /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
-    **/
-    public short getDefType() {
-        return SchemaBase.ATTRIBUTE;
-    } //-- getDefType
-
     /**
      * Returns the name of attributes defined by this AttributeDecl
      * @return the name of attributes defined by this AttributeDecl
@@ -138,12 +128,12 @@ public class AttributeDecl extends SchemaBase {
      * @return the data type associated with this AttributeDecl
     **/
     public Datatype getDatatype() {
-        return datatype;
+        return schema.getDatatype(typeRef);
     } //-- getDataType
 
-    public String getDataTypeRef() {
-        return datatype.getBaseTypeRef();
-    } //-- getDataTypeRef
+    public String getDatatypeRef() {
+        return typeRef;
+    } //-- getDatatypeRef
     
     /**
      * Returns the maximum occurance that attributes defined by this
@@ -178,8 +168,8 @@ public class AttributeDecl extends SchemaBase {
         return (minOccurs == 1);
     } //-- getRequired
     
-    public void setDataTypeRef(String name) {
-        datatype.setBaseTypeRef(name);
+    public void setDatatypeRef(String name) {
+        this.typeRef = name;
     } //-- setDataTypeRef
     
     
@@ -203,6 +193,18 @@ public class AttributeDecl extends SchemaBase {
     public void setName(String name) {
         this.name = name;
     } //-- setName
+
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
+    /**
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
+    **/
+    public short getStructureType() {
+        return Structure.ATTRIBUTE;
+    } //-- getStructureType
     
     /**
      * Checks the validity of this Attribute declaration
@@ -216,7 +218,6 @@ public class AttributeDecl extends SchemaBase {
             String err = "<attribute> is missing required 'name' attribute.";
             throw new ValidationException(err);
         }
-        datatype.validate();
         
     } //-- validate
     

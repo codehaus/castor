@@ -45,9 +45,51 @@
 
 package org.exolab.castor.xml.schema;
 
+import org.exolab.castor.xml.ValidationException;
+
+import java.util.Enumeration;
+import java.util.Vector;
+
 /**
- * An XML Schema content model type
+ * A class representing the XML Schema Annotation
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
- * @version $Revision$ $Date$
+ * @version $Revision$ $Date$ 
 **/
-public abstract class ContentModelType extends Annotated {};
+public abstract class Annotated extends Structure {
+    
+    /**
+     * The Annotations of this Annotated structure
+    **/
+    private Vector _annotations = null;
+    
+    public Annotated() {
+        _annotations = new Vector(1);
+    } //-- Annotated
+    
+    /**
+     * Adds the given Annotation to this Annotated Structure
+     * @param annotation the Annotation to add
+    **/
+    public void addAnnotation(Annotation annotation) {
+        _annotations.addElement(annotation);
+    } //-- addAnnotation
+    
+    /**
+     * Returns an Enumeration of the Annotations contained within
+     * this Annotated type
+     * @return an Enumeration of the Annotation contained within 
+     * this Annotated type
+    **/
+    public Enumeration getAnnotations() {
+        return _annotations.elements();
+    } //-- getAnnotations
+    
+    /**
+     * Removes the given Annotation from this Annotated Structure
+     * @param annotation the Annotation to remove
+    **/
+    public void removeAnnotation(Annotation annotation) {
+        _annotations.removeElement(annotation);
+    } //-- removeAnnotation
+    
+} //-- Annotated

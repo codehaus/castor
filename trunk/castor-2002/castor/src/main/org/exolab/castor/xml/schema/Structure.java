@@ -45,9 +45,68 @@
 
 package org.exolab.castor.xml.schema;
 
+import org.exolab.castor.xml.*;
+
+import java.util.Vector;
+import java.util.Hashtable;
+import java.util.Enumeration;
+
 /**
- * An XML Schema content model type
+ * The base class for all XML Schema stuctures
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public abstract class ContentModelType extends Annotated {};
+public abstract class Structure {
+    
+    public static final short ANNOTATION      = 0;
+    public static final short APPINFO         = 1;
+    public static final short ARCHETYPE       = 2;
+    public static final short ATTRIBUTE       = 3;
+    public static final short DATATYPE        = 4;
+    public static final short ELEMENT         = 5;
+    public static final short FACET           = 6;
+    public static final short GROUP           = 7;
+    public static final short INFO            = 8;
+    public static final short MODELGROUP      = 9;
+    public static final short MODELGROUP_REF  = 10;
+    public static final short SCHEMA          = 11;
+    public static final short UNKNOWN         = 12;
+    
+    
+    /**
+     * Creates a new XML Schema Structure
+    **/
+    protected Structure() {
+        super();
+    } //-- Structure
+    
+    /**
+     * Calls validate() to determine if this Schema Definition
+     * is valid.
+     * @return true if this Schema definition is valid, otherwise false.
+    **/
+    public boolean isValid() {
+        try {
+            validate();   
+        }
+        catch(ValidationException ex) {
+            return false;
+        }
+        return true;
+    } //-- isValid
+    
+    /**
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
+    **/
+    public abstract short getStructureType();
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public abstract void validate() 
+        throws ValidationException;
+        
+} //-- Structure

@@ -90,5 +90,8 @@ public class BasicFacet extends Facet {
         return _name;
     } //-- getName
     
+    public boolean isMultivalued() {
+        return _name.equals(SchemaNames.ENUMERATION);
+    }
 } //-- BasicFacet
 

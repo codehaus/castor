@@ -91,7 +91,7 @@ public abstract class ContentModelGroup extends ContentModelType {
             throw new SchemaException(err);
         }
         
-        _resolver.addResolvable(key, elementDecl);
+        //_resolver.addResolvable(key, elementDecl);
         
         //-- add to content model
         _contentModel.addElement(elementDecl);

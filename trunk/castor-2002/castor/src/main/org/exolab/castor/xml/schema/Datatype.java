@@ -47,14 +47,14 @@ package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
 
-import java.util.Hashtable;
+import java.util.Enumeration;
 
 /**
  * An XML Schema Datatype
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$ 
 **/
-public class Datatype extends SchemaBase 
+public class Datatype extends Annotated 
     implements org.exolab.castor.xml.Referable
 {
 
@@ -67,10 +67,20 @@ public class Datatype extends SchemaBase
           
           
        
-    private String baseType = null;    
+    /**
+     * The source datatype reference
+    **/
+    private String source = null;    
+    
+    /**
+     * The datatype name
+    **/
     private String name = null;
     
-    private Hashtable facets = null;
+    /**
+     * The constraining facets of this type
+    **/
+    private FacetList facets     = null;
 
     /**
      * The owning Schema to which this Datatype belongs
@@ -88,10 +98,12 @@ public class Datatype extends SchemaBase
     
     /**
      * Creates a new Datatype with the given name and basetype reference.
-     * @param name of the DataType
+     * @param name of the Datatype
      * @param schema the Schema to which this Datatype belongs
+     * @param source the base datatype which this datatype inherits from.
+     * If the datatype does not "extend" any other, source may be null.
     **/
-    public Datatype(Schema schema, String name, String baseTypeRef) {
+    public Datatype(Schema schema, String name, String source) {
         super();
         if (schema == null) {
             String err = NULL_ARGUMENT + "; 'schema' must not be null.";
@@ -103,42 +115,57 @@ public class Datatype extends SchemaBase
             throw new IllegalArgumentException(err);
         }
         
-        this.schema = schema;
-        this.name = name;
-        this.baseType = baseTypeRef;
-        facets = new Hashtable();
+        this.schema  = schema;
+        this.name    = name;
+        this.source  = source;
+        this.facets  = new FacetList();
     } //-- DataType
     
     /**
-     * Adds the given Facet to this DataType.
+     * Adds the given Facet to this Datatype.
+     * @param facet the Facet to add to this Datatype
     **/
     public void addFacet(Facet facet) {
-        if (facet != null) {
-            String name = facet.getName();
-            if (name != null) facets.put(name, facet);
-        }
+        
+        if (facet == null) return;
+        
+        String name = facet.getName();
+        
+        if (name == null) return;
+        
+        facets.add(facet);
+        
     } //-- addFacet
     
     /**
-     * Returns the type of this SchemaBase
-     * @return the type of this SchemaBase
-     * @see org.exolab.xml.schema.SchemaBase
+     * Returns the facets associated with the given name
+     * @return the facets associated with the given name
     **/
-    public short getDefType() {
-        return SchemaBase.DATATYPE;
-    } //-- getDefType
+    public Enumeration getFacets(String name) {
+        FacetListEnumerator fle = null;
+        Datatype datatype = getSource();
+        if (datatype != null) {
+            fle = (FacetListEnumerator)datatype.getFacets(name);
+        }
+        fle = new FacetListEnumerator(facets, fle);
+        fle.setMask(name);
+        return fle;
+    } //-- getFacets 
     
     /**
-     * Returns the facet associated with the given name
-     * @return the facet associated with the given name, or
-     * null if no facet was found
+     * Returns an Enumeration of all the Facets (including inherited)
+     * facets for this type.
+     * @return an Enumeration of all the Facets for this type
     **/
-    public Facet getFacet(String name) {
-        
-        if (name == null) return null;
-        return (Facet) facets.get(name);
-        
-    } //-- getFacet 
+    public Enumeration getFacets() {
+        FacetListEnumerator fle = null;
+        Datatype datatype = getSource();
+        if (datatype != null) {
+            fle = (FacetListEnumerator)datatype.getFacets();
+        }
+        fle = new FacetListEnumerator(facets, fle);
+        return fle;
+    } //-- getFacets
     
     /**
      * Returns the name of this DataType
@@ -149,9 +176,26 @@ public class Datatype extends SchemaBase
     } //-- getName
     
     
-    public String getBaseTypeRef() {
-        return baseType;
-    } //-- getBaseTypeRef
+    /**
+     * Returns the source Datatype that this Datatype inherits from.
+     * If this Datatype does not inherit from any other, or if
+     * reference cannot be resolved this will be null.
+     * @return the source Datatype that this Datatype inherits from.
+    **/
+    public Datatype getSource() {
+        if (source == null) return null;
+        return this.schema.getDatatype(source);
+    } //-- getSource
+    
+    /**
+     * Returns the name of the source type for this datatype.
+     * If this datatype does not inherit from any other, this
+     * will be null.
+     * @return the name of the source type for this datatype.
+    **/
+    public String getSourceRef() {
+        return source;
+    } //-- getSourceRef
     
     /**
      * Returns the Id used to Refer to this Object. 
@@ -170,20 +214,51 @@ public class Datatype extends SchemaBase
         return schema;
     } //-- getSchema
     
-    public void setBaseTypeRef(String baseTypeRef) {
-        this.baseType = baseTypeRef;
-    } //-- setBaseTypeRef
+    /**
+     * Returns true if this Datatype has a specified Facet
+     * with the given name.
+     * @param name the name of the Facet to look for
+     * @return true if this Datatype has a specified Facet
+     * with the given name
+    **/
+    public boolean hasFacet(String name) {
+        if (name == null) return false;
+        for (int i = 0; i < facets.size(); i++) {
+            Facet facet = (Facet) facets.get(i);
+            if (name.equals(facet.getName())) return true;
+        }
+        return false;
+    } //-- hasFacet
     
     /**
-     * Checks the validity of this Attribute declaration
-     * @exception ValidationException when this Attribute declaration
-     * is invalid
+     * Sets the source type for this datatype
+     * @param source the source type which this datatype inherits from
     **/
-    public void validate() throws ValidationException {
-        //if (name == null)  {
-        //    String err = "<attribute> is missing required 'name' attribute.";
-        //    throw new ValidationException(err);
-        //}
+    public void setSourceRef(String source) {
+        this.source = source;
+    } //-- setBaseTypeRef
+    
+    //-------------------------------/
+    //- Implementation of Structure -/
+    //-------------------------------/
+    
+    /**
+     * Returns the type of this Schema Structure
+     * @return the type of this Schema Structure
+    **/
+    public short getStructureType() {
+        return Structure.DATATYPE;
+    } //-- getStructureType
+    
+    /**
+     * Checks the validity of this Schema defintion.
+     * @exception ValidationException when this Schema definition
+     * is invalid.
+    **/
+    public void validate()
+        throws ValidationException
+    {
+        //-- do nothing
     } //-- validate
     
 } //-- DataType

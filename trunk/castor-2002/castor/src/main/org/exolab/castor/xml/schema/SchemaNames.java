@@ -57,6 +57,8 @@ public class SchemaNames {
         "org.exolab.castor.xml.schema";
         
     //-- element definitions
+    public static final String ANNOTATION       = "annotation";
+    public static final String APPINFO          = "appinfo";
     public static final String ARCHETYPE        = "type";
     public static final String ATTRIBUTE        = "attribute";
     public static final String DATATYPE_REF     = "datatypeRef";
@@ -64,6 +66,7 @@ public class SchemaNames {
     public static final String ELEMENT          = "element";
     public static final String ENUMERATION      = "enumeration";
     public static final String GROUP            = "group";
+    public static final String INFO             = "info";
     public static final String SCHEMA           = "schema";
     public static final String MAX_EXCLUSIVE    = "maxExclusive";
     public static final String MAX_INCLUSIVE    = "maxInclusive";
