@@ -46,7 +46,7 @@
 
 package org.exolab.castor.persist;
 
-
+import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.ClassMapping;
@@ -200,33 +200,55 @@ public class SQLRelationLoader {
 		deleteAll = sb.toString();
 
     }
-    public void createRelation( Connection conn, Object[] leftValue, Object[] rightValue ) 
+    public void createRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
         
 		try {
 			int count = 1;
 			ResultSet rset;
             PreparedStatement stmt = conn.prepareStatement( select );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
 				count++;
 			}
-			for ( int i=0; i < rightValue.length; i++ ) {
-				stmt.setObject( count, rightValue[i], rightType[i] );
+            if ( rightType.length > 1 ) {
+                Complex right = (Complex) rightValue;
+                for ( int i=0; i < right.size(); i++ ) {
+                    stmt.setObject( count, right.get(i), rightType[i] );
 				count++;
 			}
+            } else {
+                stmt.setObject( count, rightValue, rightType[0] );
+            }
 			count = 1;
             rset = stmt.executeQuery();
             if ( ! rset.next() ) {
 				stmt = conn.prepareStatement( insert );
-				for ( int i=0; i < leftValue.length; i++ ) {				
-					stmt.setObject( count, leftValue[i], leftType[i] );
+                if ( leftType.length > 1 ) {
+                    Complex left = (Complex) leftValue;
+                    for ( int i=0; i < left.size(); i++ ) {
+                        stmt.setObject( count, left.get(i), leftType[i] );
+                        count++;
+                    }
+                } else {
+                    stmt.setObject( count, leftValue, leftType[0] );
 					count++;
 				}
-				for ( int i=0; i < rightValue.length; i++ ) {
-					stmt.setObject( count, rightValue[i], rightType[i] );
+                if ( rightType.length > 1 ) {
+                    Complex right = (Complex) rightValue;
+                    for ( int i=0; i < right.size(); i++ ) {
+                        stmt.setObject( count, right.get(i), rightType[i] );
 					count++;
 				}
+                } else {
+                    stmt.setObject( count, rightValue, rightType[0] );
+                }
 				int r = stmt.executeUpdate();
             } 
         } catch ( SQLException e ) {
@@ -234,16 +256,21 @@ public class SQLRelationLoader {
             throw new PersistenceException( e.toString() );
         }
     }
-    public void deleteRelation( Connection conn, Object[] leftValue ) 
+    public void deleteRelation( Connection conn, Object leftValue )
             throws PersistenceException {
 
         try {
 			int count = 1;
             PreparedStatement stmt = conn.prepareStatement( deleteAll );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
 				count++;
 			}
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
+            }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
 			e.printStackTrace();
@@ -251,20 +278,31 @@ public class SQLRelationLoader {
         }
     }
 
-    public void deleteRelation( Connection conn, Object[] leftValue, Object[] rightValue ) 
+    public void deleteRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
 
         try {
 			int count = 1;
             PreparedStatement stmt = conn.prepareStatement( delete );
-			for ( int i=0; i < leftValue.length; i++ ) {				
-				stmt.setObject( count, leftValue[i], leftType[i] );
+            if ( leftType.length > 1 ) {
+                Complex left = (Complex) leftValue;
+                for ( int i=0; i < left.size(); i++ ) {
+                    stmt.setObject( count, left.get(i), leftType[i] );
 				count++;
 			}
-			for ( int i=0; i < rightValue.length; i++ ) {
-				stmt.setObject( count, rightValue[i], rightType[i] );
+            } else {
+                stmt.setObject( count, leftValue, leftType[0] );
 				count++;
 			}
+            if ( rightType.length > 1 ) {
+                Complex right = (Complex) rightValue;
+                for ( int i=0; i < right.size(); i++ ) {
+                    stmt.setObject( count, right.get(i), rightType[i] );
+                    count++;
+                }
+            } else {
+                stmt.setObject( count, rightValue, rightType[0] );
+            }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
 			e.printStackTrace();

@@ -73,6 +73,7 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Messages;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -217,17 +218,14 @@ public class DatabaseImpl
         return ( _scope == null );
     }
 
-    public Object load( Class type, Object identity ) 
+    public Object load( Class type, Complex identity ) 
             throws TransactionNotInProgressException, ObjectNotFoundException,
             LockNotGrantedException, PersistenceException {
     
-        Object[] identities = { identity };
-        return load( type, identities );
+        return load( type, (Object)identity );
     }
 
-    public Object load( Class type, Object[] identities )
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException {
+    public Object load( Class type, Object identity) throws ObjectNotFoundException, LockNotGrantedException, TransactionNotInProgressException, PersistenceException {
         TransactionContext tx;
         PersistenceInfo    info;
 
@@ -236,20 +234,17 @@ public class DatabaseImpl
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", type.getName() ) );
 
-        return tx.load( info.engine, info.molder, identities, null );
+        return tx.load( info.engine, info.molder, identity, null );
     }
 
-    public Object load( Class type, Object identity, short accessMode )
+    public Object load( Class type, Complex identity, short accessMode )
             throws TransactionNotInProgressException, ObjectNotFoundException,
             LockNotGrantedException, PersistenceException {
 
-        Object[] identities = { identity };
-        return load( type, identities, accessMode );
+        return load( type, (Object)identity, accessMode );
     }
 
-    public Object load( Class type, Object[] identities, short accessMode )
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException {
+    public Object load( Class type, Object identity, short accessMode) throws ObjectNotFoundException, LockNotGrantedException, TransactionNotInProgressException, PersistenceException {
         TransactionContext tx;
         PersistenceInfo    info;
         AccessMode         mode;
@@ -276,7 +271,7 @@ public class DatabaseImpl
         if ( info == null )
             throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
         
-        return tx.load( info.engine, info.molder, identities, mode );
+        return tx.load( info.engine, info.molder, identity, mode );
     }
 
     public void create( Object object )
@@ -346,27 +341,25 @@ public class DatabaseImpl
         remove( object );
     }
 
-    /*
     public boolean isPersistent( Object object )
-    {
-        TransactionContext tx;
-        
-        if ( _dbEngine == null )
-            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
-        if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.isPersistent( object );
-        return false;
-    }
-    */
-
-    public Object[] getIdentities( Object object )
     {
         TransactionContext tx;
         
         if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.getIdentities( object );
+            return _ctx.isPersistent( object );
+        return false;
+    }
+
+    public Object getIdentity(Object object)
+    {
+        TransactionContext tx;
+        
+        if ( _scope == null )
+            throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
+        if ( _ctx != null && _ctx.isOpen()  )
+            return _ctx.getIdentity( object );
         return null;
     }
 

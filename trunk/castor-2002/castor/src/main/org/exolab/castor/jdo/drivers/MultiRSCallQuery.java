@@ -66,6 +66,7 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.persist.spi.Complex;
 
 /**
  * PersistenceQuery implementation for CallableStatements
@@ -171,25 +172,24 @@ final class MultiRSCallQuery implements PersistenceQuery
     }
 
 
-    public Object[] nextIdentities( Object[] identities )
-        throws PersistenceException
-    {
+    public Object nextIdentity(Object identity) throws PersistenceException {
+                
         try {
             if ( _lastIdentity == null ) {
                 if ( !nextRow() )
                     return null;
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
-                return new Object[] { _lastIdentity };
+                return new Complex( _lastIdentity );
             }
 
-            while ( _lastIdentity.equals( identities[0] ) ) {
+            while ( _lastIdentity.equals( identity ) ) {
                 if ( ! nextRow() ) {
                     _lastIdentity = null;
                     return null;
                 }
                 _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
             }
-            return new Object[] { _lastIdentity };
+            return new Complex( _lastIdentity );
         } catch ( SQLException except ) {
             _lastIdentity = null;
             throw new PersistenceException( Messages.format( "persist.nested", except ) );
@@ -214,8 +214,7 @@ final class MultiRSCallQuery implements PersistenceQuery
     }
 
 
-    public Object fetch( Object[] fields, Object[] identities )
-        throws ObjectNotFoundException, PersistenceException
+    public Object fetch(Object[] fields,Object identity) throws ObjectNotFoundException, PersistenceException
     {
         Object stamp = null;
 

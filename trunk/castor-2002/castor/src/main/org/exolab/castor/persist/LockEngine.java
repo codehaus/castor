@@ -330,10 +330,10 @@ public final class LockEngine {
                 oid = lockedOid;
 
             if ( _logInterceptor != null )
-                _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
+                _logInterceptor.loading( typeInfo.javaClass, oid.getIdentity() );
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist
-            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, oid.getIdentity()));
         } finally {
             if ( lock != null ) lock.confirm( tx, succeed );
         }
@@ -381,7 +381,7 @@ public final class LockEngine {
 
         lock = null;
 
-        if ( ! OID.isIdsNull( oid.getIdentities() ) ) {
+        if ( oid.getIdentity() != null ) {
 
             lock = null;
 
@@ -392,7 +392,7 @@ public final class LockEngine {
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
                 if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.javaClass, oid.getIdentities() );
+                    _logInterceptor.creating( typeInfo.javaClass, oid.getIdentity() );
 
                 oid = lock.getOID();
 
@@ -408,7 +408,7 @@ public final class LockEngine {
                 // Someone else is using the object, definite duplicate key
                 throw new DuplicateIdentityException( Messages.format( 
                     "persist.duplicateIdentity", object.getClass().getName(), 
-                    OID.flatten(oid.getIdentities())) );
+                    oid.getIdentity() ) );
             } catch ( DuplicateIdentityException except ) {
                 // we got a write lock and the persistence storage already
                 // recorded. Should destory the lock
@@ -424,13 +424,13 @@ public final class LockEngine {
 
             try {
                 if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.javaClass, oid.getIdentities() );
+                    _logInterceptor.creating( typeInfo.javaClass, oid.getIdentity() );
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
                 oid = lock.getOID();
 
-                Object[] newids = typeInfo.molder.create( tx, oid, lock, object );
+                Object newids = typeInfo.molder.create( tx, oid, lock, object );
 
                 succeed = true;
 
@@ -483,7 +483,7 @@ public final class LockEngine {
             lock = typeInfo.assure( oid, tx, true );
 
             if ( _logInterceptor != null )
-                _logInterceptor.removing( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
+                _logInterceptor.removing( typeInfo.javaClass, oid.getIdentity() );
 
             typeInfo.molder.delete( tx, oid );
 
@@ -540,7 +540,7 @@ public final class LockEngine {
                    ObjectDeletedWaitingForLockException {
 
         TypeInfo   typeInfo;
-        Object[]   identities;
+        Object   identity;
         ObjectLock lock;
         boolean    write;
         boolean    succeed;
@@ -591,7 +591,7 @@ public final class LockEngine {
             throw e;
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
-            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getJavaClass().getName(), OID.flatten(oid.getIdentities())) );
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getJavaClass().getName(), oid.getIdentity()) );
         } finally {
             if ( lock != null ) 
                 lock.confirm( tx, succeed );
@@ -641,7 +641,7 @@ public final class LockEngine {
         // Acquire a read lock first. Only if the object has been modified
         // do we need a write lock.
 
-        oid = new OID( this, typeInfo.molder, oid.getIdentities() );
+        oid = new OID( this, typeInfo.molder, oid.getIdentity() );
 
         // acquire read lock
         // getLockedField();
@@ -839,8 +839,6 @@ public final class LockEngine {
     public void releaseLock( TransactionContext tx, OID oid ) {
         ObjectLock lock;
         TypeInfo   typeInfo;
-
-        //(new Exception("stack trace for release lock")).printStackTrace();
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = typeInfo.release( oid, tx );
         lock.getOID().setDbLock( false );
