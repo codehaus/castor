@@ -48,6 +48,7 @@ package org.exolab.castor.persist;
 
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
@@ -81,6 +82,18 @@ public class SQLRelationLoader {
 
 	private int[] leftType;
 
+    private TypeConvertor[] leftTo;
+
+    private TypeConvertor[] leftFrom;
+
+    private String[] leftParam;
+
+    private TypeConvertor[] rightTo;
+
+    private TypeConvertor[] rightFrom;
+
+    private String[] rightParam;
+
 	private int[] rightType;
 
     private String[] left;
@@ -107,7 +120,18 @@ public class SQLRelationLoader {
      */
 	private String deleteAll;
 
-    public SQLRelationLoader( String table, String[] key, int[] keyType, String[] otherKey, int[] otherKeyType ) {
+    public SQLRelationLoader( String table, String[] key, int[] keyType, 
+            TypeConvertor[] idTo, TypeConvertor[] idFrom, String[] idParam, 
+            String[] otherKey, int[] otherKeyType,
+            TypeConvertor[] ridTo, TypeConvertor[] ridFrom, String[] ridParam ) {
+
+        leftTo = idTo;
+        leftFrom = idFrom;
+        leftParam = idParam;
+        rightTo = ridTo;
+        rightFrom = ridFrom;
+        rightParam = ridParam;
+
         tableName = table;
         left = key;
         right = otherKey;
@@ -199,6 +223,23 @@ public class SQLRelationLoader {
 		deleteAll = sb.toString();
 
     }
+
+    private Object idToSQL( int index, Object object )
+			throws PersistenceException {
+
+		if ( object == null || leftFrom[index] == null )
+			return object;
+		return leftFrom[index].convert( object, leftParam[index] );
+	}
+
+    private Object ridToSQL( int index, Object object )
+			throws PersistenceException {
+
+		if ( object == null || rightFrom[index] == null )
+			return object;
+		return rightFrom[index].convert( object, rightParam[index] );
+	}
+
     public void createRelation( Connection conn, Object leftValue, Object rightValue )
             throws PersistenceException {
         
@@ -209,21 +250,21 @@ public class SQLRelationLoader {
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
-                    stmt.setObject( count, left.get(i), leftType[i] );
+                    stmt.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
                     count++;
                 }
             } else {
-                stmt.setObject( count, leftValue, leftType[0] );
+                stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
 				count++;
 			}
             if ( rightType.length > 1 ) {
                 Complex right = (Complex) rightValue;
                 for ( int i=0; i < right.size(); i++ ) {
-                    stmt.setObject( count, right.get(i), rightType[i] );
+                    stmt.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
 				count++;
 			}
             } else {
-                stmt.setObject( count, rightValue, rightType[0] );
+                stmt.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
             }
 			count = 1;
             rset = stmt.executeQuery();
@@ -232,21 +273,21 @@ public class SQLRelationLoader {
                 if ( leftType.length > 1 ) {
                     Complex left = (Complex) leftValue;
                     for ( int i=0; i < left.size(); i++ ) {
-                        stmt.setObject( count, left.get(i), leftType[i] );
+                        stmt.setObject( count, idToSQL( i, left.get(i)), leftType[i] );
                         count++;
                     }
                 } else {
-                    stmt.setObject( count, leftValue, leftType[0] );
+                    stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
 					count++;
 				}
                 if ( rightType.length > 1 ) {
                     Complex right = (Complex) rightValue;
                     for ( int i=0; i < right.size(); i++ ) {
-                        stmt.setObject( count, right.get(i), rightType[i] );
+                        stmt.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
 					count++;
 				}
                 } else {
-                    stmt.setObject( count, rightValue, rightType[0] );
+                    stmt.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
                 }
 				int r = stmt.executeUpdate();
             } 
@@ -264,11 +305,11 @@ public class SQLRelationLoader {
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
-                    stmt.setObject( count, left.get(i), leftType[i] );
+                    stmt.setObject( count, idToSQL( i, left.get(i) ), leftType[i] );
 				count++;
 			}
             } else {
-                stmt.setObject( count, leftValue, leftType[0] );
+                stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
             }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {
@@ -286,21 +327,21 @@ public class SQLRelationLoader {
             if ( leftType.length > 1 ) {
                 Complex left = (Complex) leftValue;
                 for ( int i=0; i < left.size(); i++ ) {
-                    stmt.setObject( count, left.get(i), leftType[i] );
+                    stmt.setObject( count, idToSQL( i, left.get(i) ), leftType[i] );
 				count++;
 			}
             } else {
-                stmt.setObject( count, leftValue, leftType[0] );
+                stmt.setObject( count, idToSQL( 0, leftValue ), leftType[0] );
 				count++;
 			}
             if ( rightType.length > 1 ) {
                 Complex right = (Complex) rightValue;
                 for ( int i=0; i < right.size(); i++ ) {
-                    stmt.setObject( count, right.get(i), rightType[i] );
+                    stmt.setObject( count, ridToSQL( i, right.get(i) ), rightType[i] );
                     count++;
                 }
             } else {
-                stmt.setObject( count, rightValue, rightType[0] );
+                stmt.setObject( count, ridToSQL( 0, rightValue ), rightType[0] );
             }
             int i = stmt.executeUpdate();
         } catch ( SQLException e ) {

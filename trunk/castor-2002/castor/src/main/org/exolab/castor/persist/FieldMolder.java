@@ -66,6 +66,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.loader.MappingLoader;
@@ -387,13 +388,16 @@ public class FieldMolder {
      * @throws MappingException The field or its accessor methods are not
      *  found, not accessible, not of the specified type, etc
      */
-    public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap, 
-            String manyTable, String[] idSQL, int[] idType, String[] relatedIdSQL,
-			int[] relatedIdType ) throws MappingException {
+    public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap, String manyTable, 
+            String[] idSQL, int[] idType, TypeConvertor[] idTo, TypeConvertor[] idFrom, String[] idParam,
+            String[] relatedIdSQL, int[] relatedIdType, TypeConvertor[] ridTo, TypeConvertor[] ridFrom, String[] ridParam ) 
+            throws MappingException {
 
         this( ds, eMold, fieldMap );
 
-        _manyToManyLoader = new SQLRelationLoader( manyTable, idSQL, idType, relatedIdSQL, relatedIdType );
+        _manyToManyLoader = new SQLRelationLoader( manyTable, 
+                idSQL, idType, idTo, idFrom, idParam,
+                relatedIdSQL, relatedIdType, ridTo, ridFrom, ridParam );
     }
 
     public FieldMolder( DatingService ds, ClassMolder eMold, FieldMapping fieldMap ) 
