@@ -49,10 +49,12 @@ package org.exolab.castor.persist.sql;
 import java.util.Set;
 import java.util.HashMap;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.NoSuchElementException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.CallableStatement;
 import java.sql.SQLException;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.DuplicateIdentityException;
@@ -63,7 +65,6 @@ import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.Entity;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
@@ -109,9 +110,10 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     private final byte _kind;
 
     /**
-     * Does the query checks for dirtiness (only UPDATE or DELETE)?
+     * Not null if the query checks for dirtiness (only UPDATE or DELETE).
+     * In this case specifies which fields to skip ("IS NULL" goes on this position in the query).
      */
-    private final boolean _checkDirty;
+    private final BitSet _dirtyCheckNulls;
 
     /**
      * The HashMap maps Key to batch PreparedStatements, which are executed at the end
@@ -154,7 +156,12 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     /**
      * The log interceptor
      */
-    private final LogInterceptor _logInterceptor;
+    private final LogInterceptor _log;
+
+    /**
+     * Lookup by an identity value
+     */
+    private SQLQueryExecutor _pkLookup;
 
     /**
      * @param factory The persistence factory.
@@ -167,16 +174,15 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
      * @param keyGen The key generator, is used for INSERT statements only.
      */
     SQLQueryExecutor(BaseFactory factory, SQLConnector connector, LogInterceptor log,
-                     SQLEntityInfo info, String sql, byte kind, boolean checkDirty,
-                     KeyGenerator keyGen)
-            throws MappingException {
+                     SQLEntityInfo info, String sql, byte kind, BitSet dirtyCheckNulls,
+                     KeyGenerator keyGen) {
         _factory = factory;
         _connector = connector;
-        _logInterceptor = log;
+        _log = log;
         _sql = sql;
         _info = info;
         _kind = kind;
-        _checkDirty = checkDirty;
+        _dirtyCheckNulls = dirtyCheckNulls;
         _canUseBatch = (_kind == UPDATE || _kind == DELETE);
         _keyGen = keyGen;
     }
@@ -188,7 +194,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
      * @param entity The main Entity (input or output).
      */
     public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity)
-            throws PersistenceException, MappingException {
+            throws PersistenceException {
         executeEntity(key, lockEngine, conn, entity, null);
     }
 
@@ -199,7 +205,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
      * @param entity2 An additional input Entity, it is used for UPDATE and DELETE with dirty checking.
      */
     public void executeEntity(Key key, LockEngine lockEngine, Connection conn, Entity entity, Entity entity2)
-            throws PersistenceException, MappingException {
+            throws PersistenceException {
         boolean useBatch;
         PreparedStatement stmt = null;
         ResultSet rs = null;
@@ -225,7 +231,11 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                     stmt = (PreparedStatement) _batchStmt.get(key);
                 }
                 if (stmt == null) {
-                    stmt = conn.prepareStatement(_sql);
+                    if (_kind == INSERT && _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT) {
+                        stmt = conn.prepareCall(_sql);
+                    } else {
+                        stmt = conn.prepareStatement(_sql);
+                    }
                     _batchStmt.put(key, stmt);
                     _connector.addListener(key, this);
                 }
@@ -243,6 +253,7 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
             // bind parameters
             count = 1;
+
             if (_kind == UPDATE || _kind == INSERT) {
                 for (int sub = 0; sub < entity.entityClasses.length; sub++) {
                     if (!entity.entityClasses[sub].equals(_info.info.entityClass)) {
@@ -256,21 +267,25 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                     break;
                 }
             }
-            if (entity.identity != null) {
-                bindIdentity(entity.identity, stmt, count, _info.idInfo);
-            } else {
-                if (_keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT) {
-                    throw new PersistenceException( Messages.format("persist.noIdentity", _info.info.entityClass));
-                }
+
+            if (_kind == INSERT && _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT) {
+                entity.identity = generateKey(conn); // Generate key before INSERT
             }
+
+
+            if (entity.identity != null) {
+                count = bindIdentity(entity.identity, stmt, count, _info.idInfo);
+            }
+
             // Dirty checking
-            if ((_kind == UPDATE || _kind == DELETE) && _checkDirty) {
+            if ((_kind == UPDATE || _kind == DELETE) && _dirtyCheckNulls != null) {
                 for (int sub = 0; sub < entity2.entityClasses.length; sub++) {
                     if (!entity2.entityClasses[sub].equals(_info.info.entityClass)) {
                         continue;
                     }
                     for (int i = 0; i < _info.fieldInfo.length; i++) {
-                        if (_info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck) {
+                        if (_info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck
+                                && !_dirtyCheckNulls.get(i)) {
                             count = bindField(entity2.values[sub][i], stmt, count, _info.fieldInfo[i]);
                         }
                     }
@@ -289,8 +304,13 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
                     stmt.addBatch();
                 } else {
                     try {
-                        if (stmt.executeUpdate() <= 0) {
+                        if (_kind == INSERT && _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT) {
+                            entity.identity = insertAndGenerateKey(stmt, count); // Generate key during INSERT
+                        } else if (stmt.executeUpdate() <= 0) {
                             throwUpdateException(key, lockEngine, conn, entity, null);
+                        }
+                        if (_kind == INSERT && _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT) {
+                            entity.identity = generateKey(conn); // Generate key after INSERT
                         }
                     } catch (SQLException except) {
                         throwUpdateException(key, lockEngine, conn, entity, except);
@@ -364,6 +384,60 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
     }
 
     /**
+     * Use the specified keygenerator to generate a key for this
+     * row of object.
+     *
+     * Result key will be in java type.
+     */
+    private Object generateKey(Connection conn) throws PersistenceException {
+        Object identity;
+
+        identity = _keyGen.generateKey(conn, _info.info.entityClass, _info.idInfo[0].info.fieldNames[0], null);
+
+        if ( identity == null )
+            throw new PersistenceException(Messages.format("persist.noIdentity", _info.info.entityClass));
+
+        if (_info.idInfo[0].sqlToJava[0] != null) {
+            identity = _info.idInfo[0].sqlToJava[0].convert(identity, _info.idInfo[0].info.typeParam[0]);
+        }
+        return identity;
+    }
+
+
+    /**
+     * Execute INSERT statement with key generation during it. In this case the PreparedStatetement
+     * is actually a CallableStatement. Currently there is only one such key generator: SEQUENCE key
+     * generator in RETURNING mode for Oracle.
+     */
+    private Object insertAndGenerateKey(PreparedStatement stmt, int count) throws SQLException {
+        CallableStatement cstmt = (CallableStatement) stmt;
+        int sqlType;
+        Object identity;
+
+        sqlType = _info.idInfo[0].sqlType[0];
+        cstmt.registerOutParameter(count, sqlType);
+        cstmt.execute();
+
+        // First skip all results "for maximum portability"
+        // as proposed in CallableStatement javadocs.
+        while (cstmt.getMoreResults() || cstmt.getUpdateCount() != -1) {
+        }
+
+        // Identity is returned in the last parameter
+        // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
+        if (sqlType == java.sql.Types.INTEGER) {
+            identity = new Integer(cstmt.getInt(count));
+        } else {
+            identity = cstmt.getObject(count);
+        }
+        if (_info.idInfo[0].sqlToJava[0] != null) {
+            identity = _info.idInfo[0].sqlToJava[0].convert(identity, _info.idInfo[0].info.typeParam[0]);
+        }
+        return identity;
+    }
+
+
+    /**
      * Recursive method that loads sub-entities in depth-first order.
      * @return The number of the first null level.
      */
@@ -397,13 +471,12 @@ public class SQLQueryExecutor implements SQLConnector.ConnectorListener, SQLQuer
 
     private void throwUpdateException(Key key, LockEngine lockEngine, Connection conn, Entity entity,
                                       SQLException except)
-            throws PersistenceException, MappingException {
-        SQLQueryExecutor lookup;
-
-        lookup = SQLQueryBuilder.getExecutor(_factory, _connector, _logInterceptor,
-                                             _info.info, LOOKUP, false, false);
+            throws PersistenceException {
+        if (_pkLookup == null) {
+            _pkLookup = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, false);
+        }
         try {
-            lookup.executeEntity(key, lockEngine, conn, entity);
+            _pkLookup.executeEntity(key, lockEngine, conn, entity);
 
             // The entity exists in the database
             if (_kind == INSERT) {

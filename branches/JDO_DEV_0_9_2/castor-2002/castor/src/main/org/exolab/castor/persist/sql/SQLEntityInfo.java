@@ -50,7 +50,7 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.persist.EntityInfo;
 import org.exolab.castor.persist.EntityFieldInfo;
@@ -104,7 +104,7 @@ public final class SQLEntityInfo
      */
     public final SQLEntityInfo[] superEntities;
 
-    private SQLEntityInfo(EntityInfo info) throws MappingException {
+    private SQLEntityInfo(EntityInfo info) throws PersistenceException {
         ArrayList idNamesList = new ArrayList();
         String[] fieldNames;
         boolean isId;
@@ -181,7 +181,7 @@ public final class SQLEntityInfo
         }
     }
 
-    public static SQLEntityInfo getInstance(EntityInfo info) throws MappingException {
+    public static SQLEntityInfo getInstance(EntityInfo info) throws PersistenceException {
         SQLEntityInfo res;
 
         // Due to this synchronization other threads will not access the instance until it's

@@ -52,6 +52,8 @@ import java.util.Stack;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.HashMap;
+import java.util.BitSet;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.CallableStatement;
@@ -66,7 +68,6 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
@@ -110,7 +111,7 @@ import org.exolab.castor.util.Messages;
  *
  * @version $Revision$ $Date$
  */
-public final class SQLEngine implements Persistence {
+public final class SQLEngine implements Persistence, SQLQueryKinds {
 
     private final static boolean ID_TYPE = true;
 
@@ -118,37 +119,37 @@ public final class SQLEngine implements Persistence {
     private final static boolean FIELD_TYPE = false;
 
 
-    private String              _pkLookup;
+    private SQLQueryExecutor    _sqlLock;
 
 
-    private String              _sqlCreate;
+    private SQLQueryExecutor    _sqlCreate;
 
 
-    private String              _sqlRemove;
+    private SQLQueryExecutor    _sqlRemove;
 
 
-    private String              _sqlStore;
+    /**
+     * Maps BitSets of "null" positions in the array of fields to SQLQueryExecutors
+     */
+    private HashMap             _sqlRemoveDirtyCheckMap;
 
 
-    private String              _sqlStoreDirty;
+    private SQLQueryExecutor    _sqlStore;
 
 
-    private String              _sqlLoad;
+    /**
+     * Maps BitSets of "null" positions in the array of fields to SQLQueryExecutors
+     */
+    private HashMap             _sqlStoreDirtyCheckMap;
 
 
-    private String              _sqlLoadLock;
+    private SQLQueryExecutor    _sqlLoad;
 
 
-    private EntityInfo          _entityInfo;
+    private SQLQueryExecutor    _sqlLoadLock;
 
 
-    private FieldInfo[]         _fields;
-
-
-    private ColumnInfo[]         _ids;
-
-
-    private SQLEngine           _extends;
+    private SQLEntityInfo       _info;
 
 
     private QueryExpression     _sqlFinder;
@@ -160,22 +161,7 @@ public final class SQLEngine implements Persistence {
     private String              _stampField;
 
 
-    private String              _type;
-
-
-    private String              _mapTo;
-
-
-    private String              _extTable;
-
-
-    private LogInterceptor       _logInterceptor;
-
-
-    private JDOClassDescriptor   _clsDesc;
-
-
-    private KeyGenerator         _keyGen;
+    private LogInterceptor       _log;
 
 
     //private ClassMolder          _mold;
@@ -187,183 +173,34 @@ public final class SQLEngine implements Persistence {
     private SQLConnector         _connector;
 
 
-    SQLEngine( EntityInfo entityInfo, LockEngine lockEngine, LogInterceptor log, 
+    SQLEngine( EntityInfo info, LockEngine lockEngine, LogInterceptor log,
             BaseFactory factory, SQLConnector connector, String stampField )
-            throws MappingException {
+            throws PersistenceException {
 
-        _clsDesc = null; //clsDesc;
-        _entityInfo = entityInfo;
+        _info = SQLEntityInfo.getInstance(info);
         _lockEngine = lockEngine;
         _connector = connector;
         _stampField = stampField;
         _factory = factory;
-        _logInterceptor = log;
-        _keyGen = null;
-        _type = _clsDesc.getJavaClass().getName();
-        _mapTo = _clsDesc.getTableName();
+        _log = log;
 
-        if ( _clsDesc.getExtends() == null ) {
-            KeyGeneratorDescriptor keyGenDesc = _clsDesc.getKeyGeneratorDescriptor();
-            if ( keyGenDesc != null ) {
-                int[] tempType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
-                _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
-                        _factory, keyGenDesc, tempType==null? 0: tempType[0],
-                        _logInterceptor );
-            }
-        }
-
-        // construct field and id info
-        Vector idsInfo = new Vector();
-        Vector fieldsInfo = new Vector();
-
-        /*
-         * Implementation Note:
-         * Extends and Depends has some special mutual exclusive
-         * properties, which implementator should aware of.
-         *
-         * A Depended class may depends on another depended class
-         * A class should either extends or depends on other class
-         * A class should not depend on extending class.
-         *  because, it is the same as depends on the base class
-         * A class may be depended by zero or more classes
-         * A class may be extended by zero or more classes
-         * A class may extends only zero or one class
-         * A class may depends only zero or one class
-         * A class may depend on extended class
-         * A class may extend a dependent class.
-         * A class may extend a depended class.
-         * No loop or circle should exist
-         *
-         * In other word,
-         *
-         */
-        // then, we put depended class ids in the back
-        JDOClassDescriptor base = _clsDesc;
-
-        // make sure there is no forbidded cases
-		/*
-        while ( base.getDepends() != null ) {
-            if ( base.getExtends() != null )
-                throw new MappingException("Class should not both depends on and extended other classes");
-
-            base = (JDOClassDescriptor)base.getDepends();
-            if ( base.getExtends() != null )
-                throw new MappingException("Class should not depends on an extended class");
-            // do we need to add loop detection?
-        }*/
-
-        // walk until the base class which this class extends
-        base = _clsDesc;
-        Stack stack = new Stack();
-        stack.push( base );
-        while ( base.getExtends() != null ) {
-            //if ( base.getDepends() != null )
-            //    throw new MappingException("Class should not both depends on and extended other classes");
-            base = (JDOClassDescriptor) base.getExtends();
-            stack.push( base );
-            // do we need to add loop detection?
-        }
-        if ( base != _clsDesc ) {
-            _extTable = base.getTableName();
-        }
-
-        // now base is either the base of extended class, or
-        // clsDesc
-        // we always put the original id info in front
-        // [oleg] except for SQL name, it may differ.
-        JDOClassDescriptor jdoBase = (JDOClassDescriptor) base;
-        FieldDescriptor[] baseIdDescriptors = base.getIdentities();
-        FieldDescriptor[] idDescriptors = _clsDesc.getIdentities();
-
-        for ( int i=0; i < baseIdDescriptors.length; i++ ) {
-            if ( baseIdDescriptors[i] instanceof JDOFieldDescriptor ) {
-                String name = baseIdDescriptors[i].getFieldName();
-                String[] sqlName = ((JDOFieldDescriptor) baseIdDescriptors[i]).getSQLName();
-                int[] sqlType = ((JDOFieldDescriptor) baseIdDescriptors[i]).getSQLType();
-                FieldHandlerImpl fh = (FieldHandlerImpl) baseIdDescriptors[i].getHandler();
-
-                // The extending class may have other SQL names for identity fields
-                for (int j = 0; j < idDescriptors.length; j++) {
-                    if (name.equals(idDescriptors[j].getFieldName()) &&
-                            (idDescriptors[j] instanceof JDOFieldDescriptor)) {
-                        sqlName = ((JDOFieldDescriptor) idDescriptors[j]).getSQLName();
-                        break;
-                    }
-                }
-                idsInfo.add( new ColumnInfo( sqlName[0], sqlType[0], fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
-            } else
-                throw new MappingException("Except JDOFieldDescriptor");
-        }
-
-
-        // if class or base class depend on other class,
-        // depended class ids will be part of this ids and
-        // will be added in the back. We don't need to take
-        // care depended class which is depends on other class.
-        // ClassMolder will take care of it.
-        /*
-        idDescriptors = null;
-        if ( clsDesc.getDepends()!= null ) {
-            idDescriptors = ((ClassDescriptorImpl)jdoBase.getDepends()).getIdentities();
-            for ( int i=0; i<idDescriptors.length; i++ ) {
-                if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
-                    String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
-                    int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
-                    FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
-                    idsInfo.add( new ColumnInfo( name, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
-                } else
-                    throw new MappingException("Except JDOFieldDescriptor");
-            }
-        } */
-
-        // then do the fields
-        boolean extendField = true;
-        while ( !stack.empty() ) {
-            base = (JDOClassDescriptor)stack.pop();
-            FieldDescriptor[] fieldDescriptors = base.getFields();
-            for ( int i=0; i<fieldDescriptors.length; i++ ) {
-                if ( stack.empty() ) {
-                    fieldsInfo.add( new FieldInfo( _clsDesc, fieldDescriptors[i], _clsDesc.getTableName(), !extendField ) );
-                } else {
-                    fieldsInfo.add( new FieldInfo( _clsDesc, fieldDescriptors[i], base.getTableName(), extendField ) );
-                }
-            }
-        }
-
-        _ids = new ColumnInfo[idsInfo.size()];
-        idsInfo.copyInto( _ids );
-
-        _fields = new FieldInfo[fieldsInfo.size()];
-        fieldsInfo.copyInto( _fields );
-
+        /* TODO
         try {
-            buildSql();
-            buildFinder( _clsDesc );
+            buildFinder();
         } catch ( QueryException except ) {
             except.printStackTrace();
             throw new MappingException( except );
         }
-    }
-
-    /*
-	public Persistence.FieldInfo[] getInfo() {
-		return _fields;
-	}*/
-
-    /**
-     * Mutator method for setting extends SQLEngine
-     * @param engine
-     */
-    public void setExtends( SQLEngine engine ) {
-        _extends = engine;
+        */
     }
 
     /**
      * Used by {@link OQLQuery} to retrieve the class descriptor.
+     * TODO: get rid of this method.
      */
     public JDOClassDescriptor getDescriptor()
     {
-        return _clsDesc;
+        return null;
     }
 
 
@@ -384,9 +221,10 @@ public final class SQLEngine implements Persistence {
         //if ( accessMode == null )
         //    accessMode = _clsDesc.getAccessMode();
         sql = query.getStatement( accessMode == AccessMode.DbLocked);
-        if ( _logInterceptor != null )
-            _logInterceptor.queryStatement( sql );
-        return new SQLQuery( this, sql, types );
+        if ( _log != null )
+            _log.queryStatement( sql );
+        /* return new SQLQuery( this, sql, types ); TODO: SQLQuery implementation */
+        return null;
     }
 
 
@@ -399,9 +237,10 @@ public final class SQLEngine implements Persistence {
         int[] sqlTypes;
         int count;
 
-        if ( _logInterceptor != null )
-            _logInterceptor.queryStatement( spCall );
+        if ( _log != null )
+            _log.queryStatement( spCall );
 
+/* TODO
         fields = _clsDesc.getFields();
         jdoFields0 = new String[ fields.length + 1 ];
         sqlTypes0 = new int[ fields.length + 1 ];
@@ -422,7 +261,8 @@ public final class SQLEngine implements Persistence {
         sqlTypes = new int[ count ];
         System.arraycopy( jdoFields0, 0, jdoFields, 0, count );
         System.arraycopy( sqlTypes0, 0, sqlTypes, 0, count );
-        return ((BaseFactory) _factory).getCallQuery( spCall, types, _clsDesc.getJavaClass(), jdoFields, sqlTypes );
+        return _factory.getCallQuery( spCall, types, _clsDesc.getJavaClass(), jdoFields, sqlTypes );
+*/      return null;
     }
 
     public QueryExpression getQueryExpression() {
@@ -432,58 +272,6 @@ public final class SQLEngine implements Persistence {
     public QueryExpression getFinder()
     {
         return (QueryExpression) _sqlFinder.clone();
-    }
-
-	private Object idToSQL( int index, Object object )
-			throws PersistenceException {
-
-        if ( object == null || _ids[index].convertFrom == null )
-			return object;
-		return _ids[index].convertFrom.convert( object, _ids[index].convertParam );
-	}
-
-    private Object toSQL( int field, int column, Object object )
-            throws PersistenceException {
-
-        ColumnInfo col = _fields[field].columns[column];
-        if ( object == null || col.convertFrom == null )
-            return object;
-        return col.convertFrom.convert( object, col.convertParam );
-    }
-
-	private Object idToJava( int index, Object object )
-			throws PersistenceException {
-
-		if ( object == null || _ids[index].convertTo == null )
-			return object;
-		return _ids[index].convertTo.convert( object, _ids[index].convertParam );
-	}
-
-    private Object toJava( int field, int column, Object object )
-            throws PersistenceException {
-
-        ColumnInfo col = _fields[field].columns[column];
-        if ( object == null || col.convertTo == null )
-            return object;
-        return col.convertTo.convert( object, col.convertParam );
-    }
-
-    /**
-     * Use the specified keygenerator to gengerate a key for this
-     * row of object.
-     *
-     * Result key will be in java type.
-     */
-    private Object generateKey( Object conn ) throws PersistenceException {
-        Object identity;
-
-        identity = _keyGen.generateKey( (Connection) conn, _clsDesc.getTableName(),
-                _ids[0].name, null );
-
-        if ( identity == null )
-            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
-
-        return idToJava( 0, identity );
     }
 
 
@@ -504,221 +292,35 @@ public final class SQLEngine implements Persistence {
      * @throws PersistenceException A persistence error occured
      */
     public void create( Key key, Object conn, Entity entity )
-        throws DuplicateIdentityException, PersistenceException {
+        throws PersistenceException {
 
-        PreparedStatement stmt = null;
-        int               count;
-        Object            sqlId;
-        Object[]          fields = null;
-
-        if ( _extends == null && _keyGen == null && entity.identity == null )
-            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
-
-        fields = extractFields(entity);
-        try {
-            // Must create record in the parent table first.
-            // All other dependents are created afterwards.
-            if ( _extends != null ) {
-                // | quick and very dirty hack to try to make multiple class on the same table work
-                if ( !_extends._mapTo.equals( _mapTo ) ) {
-                    _extends.create( key, conn, entity );
-                }
-            }
-
-            // Generate key before INSERT
-            else if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )
-                entity.identity = generateKey( conn );   // genKey return identity in JDO type
-
-
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
-                stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
-            else
-                stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-
-            // Must remember that SQL column index is base one
-            count = 1;
-            if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                if ( _ids.length > 1 && !(entity.identity instanceof Complex) )
-                    throw new PersistenceException( "Multiple identities expected!" );
-
-                if ( entity.identity instanceof Complex ) {
-                    Complex id = (Complex) entity.identity;
-                    if ( id.size() != _ids.length || _ids.length <= 1 )
-                        throw new PersistenceException( "Size of complex field mismatched!");
-
-                    for ( int i=0; i<_ids.length; i++ )
-                        stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-                } else {
-                    if ( _ids.length != 1 )
-                        throw new PersistenceException( "Complex field expected!" );
-
-                    stmt.setObject( count++, idToSQL( 0, entity.identity ) );
-                }
-            }
-
-            for ( int i = 0 ; i < _fields.length ; ++i ) {
-                if ( _fields[ i ].store ) {
-                    if ( fields[i] == null ) {
-                        for ( int j=0; j < _fields[i].columns.length; j++ )
-                            stmt.setNull( count++, _fields[i].columns[j].sqlType );
-
-                    } else if ( fields[i] instanceof Complex ) {
-                        Complex complex = (Complex)fields[i];
-                        if ( complex.size() != _fields[i].columns.length )
-                            throw new PersistenceException( "Size of complex field mismatch!" );
-
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = ( complex == null ? null : complex.get(j) );
-                            SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
-                        }
-                    } else {
-                        if ( _fields[i].columns.length != 1 )
-                            throw new PersistenceException( "Complex field expected! ");
-
-                        SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
-                    }
-                }
-            }
-
-            // Generate key during INSERT
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
-                CallableStatement cstmt = (CallableStatement) stmt;
-                int sqlType;
-
-                sqlType = _ids[0].sqlType;
-                cstmt.registerOutParameter( count, sqlType );
-                cstmt.execute();
-
-                // First skip all results "for maximum portability"
-                // as proposed in CallableStatement javadocs.
-                while ( cstmt.getMoreResults() || cstmt.getUpdateCount() != -1 );
-
-                // Identity is returned in the last parameter
-                // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
-                if ( sqlType == java.sql.Types.INTEGER )
-                    entity.identity = new Integer( cstmt.getInt( count ) );
-                else
-                    entity.identity = cstmt.getObject( count );
-                entity.identity = idToJava( 0, entity.identity );
-            } else
-                stmt.executeUpdate();
-
-            stmt.close();
-
-            // Generate key after INSERT
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT ) {
-                entity.identity = generateKey( conn );
-            }
-        } catch ( SQLException except ) {
-            // [oleg] Check for duplicate key after the INSERT failed 
-	    // to prevent race conditions and optimize INSERT times
-            try {
-                // Close the insert statement
-                if ( stmt != null )
-                    stmt.close();
-
-                stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-
-                // bind the identity to the preparedStatement
-                count = 1;
-                if ( entity.identity instanceof Complex ) {
-                    Complex id = (Complex) entity.identity;
-                    if ( id.size() != _ids.length || _ids.length <= 1 )
-                        throw new PersistenceException( "Size of complex field mismatched!");
-
-                    for ( int i=0; i<_ids.length; i++ )
-                        stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-                } else {
-                    if ( _ids.length != 1 )
-                        throw new PersistenceException( "Complex field expected!" );
-
-                    stmt.setObject( count++, idToSQL( 0, entity.identity ) );
-                }
-
-                if ( stmt.executeQuery().next() ) {
-                    stmt.close();
-                    throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), entity.identity ) );
-                }
-            } catch ( SQLException except2 ) {
-                // Error at the stage indicates it wasn't a duplicate
-                // primary key problem. But best if the INSERT error is
-                // reported, not the SELECT error.
-            }
-
-            try {
-                // Close the insert/select statement
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+        if (_sqlCreate == null) {
+            _sqlCreate = SQLQueryBuilder.getCreateExecutor(_factory, _connector, _log, _info);
         }
+        _sqlCreate.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
     }
 
+    private BitSet getDirtyCheckNulls(Entity original) {
+        BitSet dirtyCheckNulls = new BitSet();
 
-    /**
-     * if isNull, replace next "=?" with " IS NULL",
-     * otherwise skip next "=?",
-     * move "pos" to the left.
-     */
-    private int nextParameter(boolean isNull, StringBuffer sb, int pos) {
-        for ( ; pos > 0; pos--) {
-            if (sb.charAt(pos - 1) == '=' && sb.charAt(pos) == '?') {
-                break;
+        if (_factory.supportsSetNullInWhere()) {
+            return dirtyCheckNulls;
+        }
+        for (int sub = 0; sub < original.entityClasses.length; sub++) {
+            if (!original.entityClasses[sub].equals(_info.info.entityClass)) {
+                continue;
             }
-        }
-        if (pos > 0) {
-            pos--;
-            if (isNull) {
-                sb.delete(pos, pos + 2);
-                sb.insert(pos, " IS NULL");
-            }
-        }
-        return pos;
-    }
-
-    /**
-     * If the RDBMS doesn't support setNull for "WHERE fld=?" and requires "WHERE fld IS NULL",
-     * we need to modify the statement.
-     */
-    private String getStoreStatement( Object[] origFields ) throws PersistenceException {
-        StringBuffer sb = null;
-        int pos = 0;
-
-        if (origFields == null) {
-            return _sqlStore;
-        }
-        if (((BaseFactory) _factory).supportsSetNullInWhere()) {
-            return _sqlStoreDirty;
-        }
-        pos = _sqlStoreDirty.length() - 1;
-        sb = new StringBuffer(pos * 4);
-        sb.append(_sqlStoreDirty);
-        for (int i = _fields.length - 1; i >= 0; i--) {
-            if (_fields[i].store && _fields[i].dirtyCheck) {
-                if (origFields[i] == null) {
-                    for (int j = _fields[i].columns.length - 1; j >= 0; j--) {
-                        pos = nextParameter(true, sb, pos);
-                    }
-                } else if ( origFields[i] instanceof Complex ) {
-                    Complex complex = (Complex) origFields[i];
-                    if ( complex.size() != _fields[i].columns.length )
-                        throw new PersistenceException( "Size of complex field mismatch!" );
-
-                    for (int j = _fields[i].columns.length - 1; j >= 0; j--) {
-                        pos = nextParameter((complex.get(j) == null), sb, pos);
-                    }
-                } else {
-                    if (_fields[i].columns.length != 1)
-                        throw new PersistenceException( "Complex field expected! ");
-
-                    pos = nextParameter(false, sb, pos);
+            for (int i = 0; i < original.values[sub].length; i++) {
+                if (original.values[sub][i] == null &&
+                        _info.fieldInfo[i] != null && _info.fieldInfo[i].info.dirtyCheck) {
+                    dirtyCheckNulls.set(i);
                 }
             }
+            break;
         }
-        return sb.toString();
+        return dirtyCheckNulls;
     }
+
 
     /**
      * Stores the object in persistent storage, given the object fields
@@ -749,136 +351,29 @@ public final class SQLEngine implements Persistence {
      * @throws PersistenceException A persistence error occured
      */
     public void store( Key key, Object conn, Entity entity, Entity original )
-        throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
+        throws PersistenceException {
 
-        PreparedStatement stmt = null;
-        int               count;
-        Object[]          fields;
-        Object[]          origFields;
+        BitSet dirtyCheckNulls;
+        SQLQueryExecutor executor;
 
-        fields = extractFields(entity);
-        origFields = extractFields(original);
-        try {
-            // Must store record in parent table first.
-            // All other dependents are stored independently.
-            if ( _extends != null ) {
-                // | quick and very dirty hack to try to make multiple class on the same table work
-                if ( !_extends._mapTo.equals( _mapTo ) ) {
-                    _extends.store( key, conn, entity, original );
-                }
+        if (original == null) {
+            if (_sqlStore == null) {
+                _sqlStore = SQLQueryBuilder.getStoreExecutor(_factory, _connector, _log,
+                                                             _info, null);
             }
-            stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( origFields ) );
-
-            count = 1;
-
-            // bind fields of the row to be stored into the preparedStatement
-            for ( int i = 0 ; i < _fields.length ; ++i ) {
-                if ( _fields[ i ].store ) {
-                    if ( fields[i] == null ) {
-                        for ( int j=0; j < _fields[i].columns.length; j++ )
-                            stmt.setNull( count++, _fields[i].columns[j].sqlType );
-
-                    } else if ( fields[i] instanceof Complex ) {
-                        Complex complex = (Complex) fields[i];
-                        if ( complex.size() != _fields[i].columns.length )
-                            throw new PersistenceException( "Size of complex field mismatch!" );
-
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
-                        }
-                    } else {
-                        if ( _fields[i].columns.length != 1 )
-                            throw new PersistenceException( "Complex field expected! ");
-
-                        SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
-                    }
-                }
+            _sqlStore.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+        } else {
+            dirtyCheckNulls = getDirtyCheckNulls(original);
+            if (_sqlStoreDirtyCheckMap == null) {
+                _sqlStoreDirtyCheckMap = new HashMap();
             }
-
-            // bind the identity of the row to be stored into the preparedStatement
-            if ( entity.identity instanceof Complex ) {
-                Complex id = (Complex) entity.identity;
-                if ( id.size() != _ids.length || _ids.length <= 1 )
-                    throw new PersistenceException( "Size of complex field mismatched!");
-
-                for ( int i=0; i<_ids.length; i++ )
-                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-            } else {
-                if ( _ids.length != 1 )
-                    throw new PersistenceException( "Complex field expected!" );
-
-                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
+            executor = (SQLQueryExecutor) _sqlStoreDirtyCheckMap.get(dirtyCheckNulls);
+            if (executor == null) {
+                executor = SQLQueryBuilder.getStoreExecutor(_factory, _connector, _log,
+                                                            _info, dirtyCheckNulls);
+                _sqlStoreDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
-
-            // bind the old fields of the row to be stored into the preparedStatement
-            if ( original != null ) {
-                boolean supportsSetNull = ((BaseFactory) _factory).supportsSetNullInWhere();
-
-                for ( int i = 0 ; i < _fields.length ; ++i ) {
-                    if ( _fields[ i ].store && _fields[i].dirtyCheck ) {
-                        if ( origFields[i] == null ) {
-                            if (supportsSetNull) {
-                                for ( int j=0; j < _fields[i].columns.length; j++ )
-                                    stmt.setNull( count++, _fields[i].columns[j].sqlType );
-                            }
-                        } else if ( origFields[i] instanceof Complex ) {
-                            Complex complex = (Complex) origFields[i];
-                            if ( complex.size() != _fields[i].columns.length )
-                                throw new PersistenceException( "Size of complex field mismatch!" );
-
-                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                                SQLTypes.setObject( stmt, count++, toSQL( i, j, complex.get(j)), _fields[i].columns[j].sqlType );
-                            }
-                        } else {
-                            if ( _fields[i].columns.length != 1 )
-                                throw new PersistenceException( "Complex field expected! ");
-
-                            SQLTypes.setObject( stmt, count++, toSQL( i, 0, origFields[i]), _fields[i].columns[0].sqlType );
-                        }
-                    }
-                }
-            }
-
-            if ( stmt.executeUpdate() <= 0 ) { // SAP DB returns -1 here
-                // If no update was performed, the object has been previously
-                // removed from persistent storage or has been modified if
-                // dirty checking. Determine which is which.
-                stmt.close();
-                if ( original != null ) {
-                    stmt = ( (Connection) conn ).prepareStatement( _sqlLoad ); //_pkLookup
-
-                    // bind the identity to the prepareStatement
-                    count = 1;
-                    if ( entity.identity instanceof Complex ) {
-                        Complex id = (Complex) entity.identity;
-                        for ( int i=0; i<_ids.length; i++ )
-                            stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-                    } else {
-                        stmt.setObject( count++, idToSQL( 0, entity.identity ) );
-                    }
-
-                    ResultSet res = stmt.executeQuery();
-                    int c = res.getMetaData().getColumnCount();
-                    if ( res.next() ) {
-
-                        stmt.close();
-                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), entity.identity ) );
-                    }
-                    stmt.close();
-                }
-
-                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), entity.identity) );
-            }
-            stmt.close();
-        } catch ( SQLException except ) {
-            try {
-                // Close the insert/select statement
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+            executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
         }
     }
 
@@ -895,46 +390,31 @@ public final class SQLEngine implements Persistence {
      * @param entity The entity to delete
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Key key, Object conn, Entity entity )
+    public void delete( Key key, Object conn, Entity entity /*, Entity original */)
         throws PersistenceException {
 
-        PreparedStatement stmt = null;
+        Entity original = null; /* TOTO: should be a parameter */
+        BitSet dirtyCheckNulls;
+        SQLQueryExecutor executor;
 
-        try {
-            stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
-            int count = 1;
-            // bind the identity of the preparedStatement
-            if ( entity.identity instanceof Complex ) {
-                Complex id = (Complex) entity.identity;
-                if ( id.size() != _ids.length || _ids.length <= 1 )
-                    throw new PersistenceException( "Size of complex field mismatched!");
-
-                for ( int i=0; i<_ids.length; i++ )
-                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-            } else {
-                if ( _ids.length != 1 )
-                    throw new PersistenceException( "Complex field expected!" );
-                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
+        if (original == null) {
+            if (_sqlRemove == null) {
+                _sqlRemove = SQLQueryBuilder.getDeleteExecutor(_factory, _connector, _log,
+                                                               _info, null);
             }
-
-            int result = stmt.executeUpdate();
-            if ( result < 1 )
-                throw new PersistenceException("Object to be deleted does not exist! "+ entity.identity );
-
-            stmt.close();
-
-            // Must delete record in parent table last.
-            // All other dependents have been deleted before.
-            if ( _extends != null )
-                _extends.delete( key, conn, entity );
-        } catch ( SQLException except ) {
-            try {
-                // Close the insert/select statement
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+            _sqlRemove.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+        } else {
+            dirtyCheckNulls = getDirtyCheckNulls(original);
+            if (_sqlRemoveDirtyCheckMap == null) {
+                _sqlRemoveDirtyCheckMap = new HashMap();
+            }
+            executor = (SQLQueryExecutor) _sqlRemoveDirtyCheckMap.get(dirtyCheckNulls);
+            if (executor == null) {
+                executor = SQLQueryBuilder.getDeleteExecutor(_factory, _connector, _log,
+                                                             _info, dirtyCheckNulls);
+                _sqlRemoveDirtyCheckMap.put(dirtyCheckNulls, executor);
+            }
+            executor.executeEntity(key, _lockEngine, (Connection) conn, entity, original);
         }
     }
 
@@ -956,46 +436,12 @@ public final class SQLEngine implements Persistence {
      * @throws PersistenceException A persistence error occured
      */
     public void writeLock( Key key, Object conn, Entity entity )
-        throws ObjectDeletedException, PersistenceException {
+        throws PersistenceException {
 
-        PreparedStatement stmt = null;
-        try {
-            // Must obtain lock on record in parent table first.
-            if ( _extends != null )
-                _extends.writeLock( key, conn, entity );
-
-            stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-
-            int count = 1;
-            // bind the identity of the preparedStatement
-            if ( entity.identity instanceof Complex ) {
-                Complex id = (Complex) entity.identity;
-                if ( id.size() != _ids.length || _ids.length <= 1 )
-                    throw new PersistenceException( "Size of complex field mismatched!");
-
-                for ( int i=0; i<_ids.length; i++ )
-                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-            } else {
-                if ( _ids.length != 1 )
-                    throw new PersistenceException( "Complex field expected!" );
-
-                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
-            }
-
-            // If no query was performed, the object has been previously
-            // removed from persistent storage. Complain about this.
-            if ( ! stmt.executeQuery().next() )
-                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), entity.identity ) );
-            stmt.close();
-        } catch ( SQLException except ) {
-            try {
-                // Close the insert/select statement
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+        if (_sqlLock == null) {
+            _sqlLock = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, true);
         }
+        _sqlLock.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
     }
 
 
@@ -1018,133 +464,19 @@ public final class SQLEngine implements Persistence {
      * @throws PersistenceException A persistence error occured
      */
     public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
-        throws ObjectNotFoundException, PersistenceException {
+        throws PersistenceException {
 
-        PreparedStatement stmt;
-        ResultSet         rs;
-        Object            stamp = null;
-        boolean           notNull;
-        Object[]          fields;
-
-        fields = extractFields(entity);
-        try {
-            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
-            int count = 1;
-            // bind the identity of the preparedStatement
-            if ( entity.identity instanceof Complex ) {
-                Complex id = (Complex) entity.identity;
-                if ( id.size() != _ids.length || _ids.length <= 1 )
-                    throw new PersistenceException( "Size of complex field mismatched! expected: "+_ids.length+" found: "+id.size() );
-
-                for ( int i=0; i<_ids.length; i++ )
-                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
-            } else {
-                if ( _ids.length != 1 )
-                    throw new PersistenceException( "Complex field expected!" );
-                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
+        if (accessMode == AccessMode.DbLocked) {
+            if (_sqlLoadLock == null) {
+                _sqlLoadLock = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true);
             }
-
-            // query the object
-            rs = stmt.executeQuery();
-            if ( ! rs.next() )
-                throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _clsDesc.getJavaClass().getName(), entity.identity) );
-
-            // Load all the fields of the object including one-one relations
-            count = 1;
-            Object[] temp = new Object[10]; // assume complex field max at 10
-            for ( int i = 0 ; i < _fields.length ; ++i  ) {
-                if ( !_fields[i].load )
-                    continue;
-
-                if ( !_fields[i].multi ) {
-                    notNull = false;
-                    if ( _fields[i].columns.length == 1 ) {
-                        Object value = toJava( i, 0, SQLTypes.getObject( rs, count++, _fields[i].columns[0].sqlType ) );
-                        if ( !rs.wasNull() )
-                            fields[i] = value;
-                        else
-                            fields[i] = null;
-                    } else {
-                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = toJava( i, j, SQLTypes.getObject( rs, count++, _fields[i].columns[j].sqlType ) );
-                        if ( !rs.wasNull() ) {
-                            temp[j] = value;
-                            notNull = true;
-                            } else {
-                                temp[j] = null;
-                            }
-                        }
-                        if ( notNull )
-                            fields[i] = new Complex( _fields[i].columns.length, temp );
-                        else
-                            fields[i] = null;
-                    }
-                } else {
-                    ArrayList res = new ArrayList();
-                    notNull = false;
-                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                        Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
-                        if ( !rs.wasNull() ) {
-                            temp[j] = value;
-                            notNull = true;
-                        } else {
-                                temp[j] = null;
-                        }
-                        count++;
-                    }
-                    if ( notNull ) {
-                        if ( _fields[i].columns.length == 1 )
-                            res.add( temp[0] );
-                        else
-                            res.add( new Complex( _fields[i].columns.length, temp ) );
-                    }
-                    fields[i] = res;
-                }
+            _sqlLoadLock.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
+        } else {
+            if (_sqlLoad == null) {
+                _sqlLoad = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, false);
             }
-
-            while ( rs.next() ) {
-                count = 1;
-                for ( int i = 0; i < _fields.length ; ++i  ) {
-                    if ( !_fields[i].load )
-                        continue;
-
-                    if ( _fields[i].multi ) {
-                        ArrayList res = (ArrayList)fields[i];
-                        notNull = false;
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
-                            if ( !rs.wasNull() ) {
-                                temp[j] = value;
-                                notNull = true;
-                            } else {
-                                temp[j] = null;
-                            }
-                            count++;
-                        }
-                        if ( notNull ) {
-                            if ( _fields[i].columns.length == 1 ) {
-                                if ( !res.contains( temp[0] ) )
-                                    res.add( temp[0] );
-                            } else {
-                                Complex com = new Complex( _fields[i].columns.length, temp );
-                                if ( !res.contains( com ) )
-                                    res.add( new Complex( _fields[i].columns.length, temp ) );
-                            }
-                        }
-                    } else {
-                        count += _fields[i].columns.length;
-                    }
-                }
-            }
-            rs.close();
-            stmt.close();
-
-        } catch ( SQLException except ) {
-            except.printStackTrace();
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+            _sqlLoad.executeEntity(key, _lockEngine, (Connection) conn, entity, null);
         }
-        entity.objectStamp = stamp;
     }
 
     /**
@@ -1164,153 +496,17 @@ public final class SQLEngine implements Persistence {
             throws PersistenceException {
     }
 
-    private void buildSql() throws QueryException {
-
-        StringBuffer         sql;
-        JDOFieldDescriptor[] jdoFields;
-        FieldDescriptor[]    fields;
-        int                  count;
-        QueryExpression      query;
-        String               wherePK;
-        String               primKeyName;
-        String               tableName;
-        boolean              keyGened = false;
-
-
-        tableName = _mapTo;
-        query = _factory.getQueryExpression();
-
-        // initalize lookup query
-        for ( int i=0; i<_ids.length; i++ ) {
-            query.addParameter( tableName, _ids[i].name, QueryExpression.OpEquals );
-        }
-        _pkLookup = query.getStatement( true );
-
-        // create sql statements
-        StringBuffer sb = new StringBuffer();
-        sb.append( JDBCSyntax.Where );
-        for ( int i=0; i<_ids.length; i++ ) {
-            if ( i > 0 ) sb.append( JDBCSyntax.And );
-            sb.append( _factory.quoteName( _ids[i].name ) );
-            sb.append( QueryExpression.OpEquals );
-            sb.append( JDBCSyntax.Parameter );
-        }
-        wherePK = sb.toString();
-
-        // Create statement to insert a new row into the table
-        // using the specified primary key if one is required
-        sql = new StringBuffer( JDBCSyntax.Insert );
-        sql.append( _factory.quoteName( tableName ) ).append( " (" );
-        count = 0;
-        for ( int i=0; i<_ids.length; i++ ) {
-            if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                if ( count > 0 ) sql.append( ',' );
-                keyGened = true;
-                sql.append( _factory.quoteName( _ids[i].name ) );
-                ++count;
-            }
-        }
-        for ( int i = 0 ; i < _fields.length; ++i ) {
-            if ( _fields[i].store ) {
-                for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                    if ( count > 0 )
-                        sql.append( ',' );
-                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
-                    ++count;
-                }
-            }
-        }
-        // it is possible to have no fields in INSERT statement:
-        // only the primary key field in the table,
-        // with KeyGenerator DURING_INSERT or BEFORE_INSERT
-        if ( count == 0 )
-            sql.setLength( sql.length() - 2 ); // cut " ("
-        else
-            sql.append( ")" );
-        sql.append( " VALUES (" );
-        for ( int i = 0 ; i < count; ++i ) {
-            if ( i > 0 )
-                sql.append( ',' );
-            sql.append( '?' );
-        }
-        sql.append( ')' );
-        _sqlCreate = sql.toString();
-
-        if ( ! keyGened ) {
-            try {
-                _sqlCreate = _keyGen.patchSQL( _sqlCreate, _ids[0].name /*primKeyName*/ );
-            } catch ( MappingException except )  {
-                _logInterceptor.exception( except );
-                // proceed without this stupid key generator
-                _keyGen = null;
-                buildSql();
-                return;
-            }
-            if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
-                _sqlCreate = JDBCSyntax.Call + _sqlCreate + JDBCSyntax.EndCall;
-        }
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for creating " + _type + ": " + _sqlCreate );
-
-
-        sql = new StringBuffer( JDBCSyntax.Delete ).append( _factory.quoteName( tableName ) );
-        sql.append( wherePK );
-        _sqlRemove = sql.toString();
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for deleting " + _type + ": " + _sqlRemove );
-
-        sql = new StringBuffer( JDBCSyntax.Update );
-        sql.append( _factory.quoteName( _mapTo ) );
-        sql.append( JDBCSyntax.Set );
-        count = 0;
-        for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( _fields[ i ].store ) {
-                for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                    if ( count > 0 )
-                        sql.append( ',' );
-                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
-                    sql.append( "=?" );
-                    ++count;
-                }
-            }
-        }
-        sql.append( wherePK );
-        _sqlStore = sql.toString();
-
-        for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( _fields[i].store && _fields[i].dirtyCheck ) {
-                for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                    sql.append( " AND " );
-                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
-                    sql.append( "=?" );
-                }
-            }
-        }
-        _sqlStoreDirty = sql.toString();
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for updating " + _type + ": " + _sqlStoreDirty );
-    }
-
-
-    private void buildFinder( JDOClassDescriptor clsDesc ) throws MappingException, QueryException {
+/* TODO: redesign
+    private void buildFinder( JDOClassDescriptor clsDesc ) throws QueryException {
         Vector          fields;
-        QueryExpression expr;
         QueryExpression find;
 
         fields = new Vector();
-        expr = _factory.getQueryExpression();
         find = _factory.getQueryExpression();
         //addLoadSql( expr, fields, false, true, true );
 
         //_fields = new FieldInfo[ fields.size() ];
         //fields.copyInto( _fields );
-
-        // get id columns' names
-        String[] idnames = new String[_ids.length];
-        for ( int i=0; i<_ids.length; i++ ) {
-            idnames[i] = _ids[i].name;
-            expr.addParameter( _mapTo, _ids[i].name, QueryExpression.OpEquals );
-        }
 
         // join all the extended table
         JDOClassDescriptor curDesc = clsDesc;
@@ -1323,7 +519,6 @@ public final class SQLEngine implements Persistence {
             for ( int i=0; i<_ids.length; i++ ) {
                 baseIds[i] = ((JDOFieldDescriptor) (baseDesc.getIdentities()[i])).getSQLName()[0];
             }
-            expr.addInnerJoin( curDesc.getTableName(), curIds, baseDesc.getTableName(), baseIds );
             find.addInnerJoin( curDesc.getTableName(), curIds, baseDesc.getTableName(), baseIds );
             curDesc = baseDesc;
             curIds = baseIds;
@@ -1336,254 +531,33 @@ public final class SQLEngine implements Persistence {
         Vector joinTables = new Vector();
         for ( int i=0; i<_fields.length; i++ ) {
             if ( _fields[i].load ) {
-                if ( _fields[i].joined /*&& !joinTables.contains( _fields[i].tableName )*/ ) {
+                if ( _fields[i].joined ) {
                     int offset = 0;
                     String[] rightCol = _fields[i].joinFields;
                     String[] leftCol = new String[_ids.length-offset];
                     for ( int j=0; j<leftCol.length; j++ ) {
                         leftCol[j] = _ids[j+offset].name;
                     }
-                    expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
                     find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
                     joinTables.add( _fields[i].tableName );
                 }
 
                 for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                    expr.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
                     find.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
                 }
             }
         }
-        _sqlLoad = expr.getStatement( false );
-        _sqlLoadLock = expr.getStatement( true );
-
         _sqlFinder = find;
 
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for loading " + _type + ":  " + _sqlLoad );
-
     }
-
-
-    private void addLoadSql( QueryExpression expr, Vector allFields,
-            boolean loadPk, boolean queryPk, boolean store )
-            throws MappingException {
-    }
-
-
-    private Object[] extractFields(Entity entity) throws PersistenceException {
-        if (entity == null) {
-            return null;
-        }
-        /*
-        for (int i = 0; i < entity.entityClasses.length; i++) {
-            if (entity.entityClasses[i].equals(_entityInfo)) {
-                return entity.fields[i];
-            }
-        }*/
-        // yip: the inheritance model changed from 0.9.2.
-        // this is only a quick hack.
-        if ( entity.info.equals( _entityInfo ) )
-            if ( entity.values != null && entity.values.length == 0 ) 
-                return entity.values[0];
-        throw new PersistenceException( "Entity of a wrong class passed" );
-    }
+*/
 
     public String toString() {
-        return _clsDesc.toString();
+        return _info.toString();
     }
 
-    static final class FieldInfo /*implements Persistence.FieldInfo*/ {
 
-        final String  tableName;
-
-        final String  jdoName;
-
-        final boolean load;
-
-        final boolean store;
-
-        final boolean multi;
-
-        final boolean joined;
-
-        final boolean dirtyCheck;
-
-        final String[] joinFields;
-        //!TY fix this. joinFields should be in FieldInfo, not ColumnInfo
-
-        //final boolean foreign;
-
-        ColumnInfo[] columns;
-
-        FieldInfo( JDOClassDescriptor clsDesc, FieldDescriptor fieldDesc, String classTable, boolean ext )
-                throws MappingException{
-
-            // for readability
-            final int FIELD_TYPE = 0;
-
-            final int REF_TYPE = 1;
-
-            final int REL_TABLE_TYPE = 2;
-
-            int type;
-
-            FieldDescriptor[] classids = clsDesc.getIdentities();
-            ClassDescriptor related = fieldDesc.getClassDescriptor();
-            if ( related != null && !( related instanceof JDOClassDescriptor ) )
-                    throw new MappingException("Related class is not JDOClassDescriptor");
-
-            if ( fieldDesc.getClassDescriptor() != null ) {
-                // !(fieldDesc instanceof JDOFieldDescriptor) ) {
-                // no <sql> tag, treated as foreign key field of
-                // PersistenceCapable
-
-                // determine the type of field
-                if ( !( fieldDesc instanceof JDOFieldDescriptor ) )
-                    type = REF_TYPE;
-                else if ( ((JDOFieldDescriptor)fieldDesc).getManyTable() != null )
-                    type = REL_TABLE_TYPE;
-                else if ( ((JDOFieldDescriptor)fieldDesc).getSQLName() != null )
-                    type = FIELD_TYPE;
-                else
-                    type = REF_TYPE;
-
-                // initalize the column names
-                FieldDescriptor[] relids = ((JDOClassDescriptor)related).getIdentities();
-                String[] names = null;
-                if ( fieldDesc instanceof JDOFieldDescriptor )
-                    names = ((JDOFieldDescriptor)fieldDesc).getSQLName();
-                String[] relnames = new String[relids.length];
-                for ( int i=0; i<relids.length; i++ ) {
-                    relnames[i] = ((JDOFieldDescriptor)relids[i]).getSQLName()[0];
-                    if ( relnames[i] == null )
-                        throw new MappingException("Related class identities field does not contains sql information!");
-                }
-                String[] joins = null;
-                if ( fieldDesc instanceof JDOFieldDescriptor )
-                    joins = ((JDOFieldDescriptor)fieldDesc).getManyKey();
-                String[] classnames = new String[classids.length];
-                for ( int i=0; i<classids.length; i++ ) {
-                    classnames[i] = ((JDOFieldDescriptor)classids[i]).getSQLName()[0];
-                    if ( classnames[i] == null )
-                        throw new MappingException("Related class identities field does not contains sql information!");
-                }
-
-                // basic check of column names
-                if ( names != null && names.length != relids.length )
-                    throw new MappingException("The number of column of foreign keys doesn't not match with what specified in manyKey");
-                if ( joins != null && joins.length != classids.length )
-                    throw new MappingException("The number of column of foreign keys doesn't not match with what specified in manyKey");
-
-                // initalize the class
-                switch (type) {
-                case FIELD_TYPE:
-                    this.tableName = classTable;//((JDOClassDescriptor)clsDesc).getTableName();;
-                    this.jdoName = fieldDesc.getFieldName();
-                    this.load = true;
-                    this.store = !ext;
-                    this.multi = false;
-                    this.joined = false;
-                    this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
-                    names = (names!=null?names:relnames);
-                    this.joinFields = classnames;
-                    break;
-                case REF_TYPE:
-                    this.tableName = ((JDOClassDescriptor)related).getTableName();
-                    this.jdoName = fieldDesc.getFieldName();
-                    this.load = true;
-                    this.store = false;
-                    this.multi = fieldDesc.isMultivalued();
-                    this.joined = true;
-                    this.dirtyCheck = (fieldDesc instanceof JDOFieldDescriptor)?((JDOFieldDescriptor)fieldDesc).isDirtyCheck():true;
-                    names = (names!=null?names:relnames);
-                    this.joinFields = (joins!=null?joins:classnames);
-                    break;
-                case REL_TABLE_TYPE:
-                    this.tableName = ((JDOFieldDescriptor)fieldDesc).getManyTable();
-                    this.jdoName = fieldDesc.getFieldName();
-                    this.load = true;
-                    this.store = false;
-                    this.multi = fieldDesc.isMultivalued();
-                    this.joined = true;
-                    this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
-                    names = (names!=null?names:relnames);
-                    this.joinFields = (joins!=null?joins:classnames);
-                    break;
-                default:
-                    throw new MappingException("Never happen! But, it won't compile without the exception");
-                }
-
-                this.columns = new ColumnInfo[relids.length];
-                for ( int i=0; i<relids.length; i++ ) {
-                    if ( !(relids[i] instanceof JDOFieldDescriptor) )
-                        throw new MappingException("Related class identities field does not contains sql information!");
-
-                    JDOFieldDescriptor relId = (JDOFieldDescriptor)relids[i];
-                    FieldHandlerImpl fh = (FieldHandlerImpl) relId.getHandler();
-                    columns[i] = new ColumnInfo( names[i], relId.getSQLType()[0],
-                            fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() );
-                }
-            } else {
-                // primitive field
-                this.tableName = classTable;
-                this.jdoName = fieldDesc.getFieldName();
-                this.load = true;
-                this.store = !ext;
-                this.multi = false;
-                this.joined = false;
-                this.joinFields = null;
-                this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
-
-                FieldHandlerImpl fh = (FieldHandlerImpl) fieldDesc.getHandler();
-                this.columns = new ColumnInfo[1];
-                String[] sqlNameArray = ((JDOFieldDescriptor)fieldDesc).getSQLName();
-                String sqlName;
-                if ( sqlNameArray == null ) {
-                    sqlName = fieldDesc.getFieldName();
-                } else {
-                    sqlName = sqlNameArray[0];
-                }
-                this.columns[0] = new ColumnInfo( sqlName,
-                        ((JDOFieldDescriptor)fieldDesc).getSQLType()[0], fh.getConvertTo(),
-                        fh.getConvertFrom(), fh.getConvertParam() );
-            }
-        }
-		public boolean isComplex() {
-			return true;
-		}
-		public boolean isPersisted() {
-			return store;
-		}
-		public String getFieldName() {
-			return jdoName;
-		}
-        public String toString() {
-            return tableName + "." + jdoName;
-        }
-    }
-
-    static final class ColumnInfo {
-
-        final String  name;
-
-        final int sqlType;
-
-        final TypeConvertor convertTo;
-
-        final TypeConvertor convertFrom;
-
-        final String convertParam;
-
-        ColumnInfo( String name, int type, TypeConvertor convertTo,
-                TypeConvertor convertFrom, String convertParam ) {
-            this.name = name;
-            this.sqlType = type;
-            this.convertTo = convertTo;
-            this.convertFrom = convertFrom;
-            this.convertParam = convertParam;
-        }
-    }
+/*
     static final class SQLQuery implements PersistenceQuery {
 
 
@@ -1620,7 +594,7 @@ public final class SQLEngine implements Persistence {
             _types = types;
             _values = new Object[ _types.length ];
             _sql = sql;
-            _identSqlType = new int[_engine._clsDesc.getIdentities().length];
+            _identSqlType = new int[_engine._info.getIdentities().length];
             for (int i = 0; i < _identSqlType.length; i++) {
                 _identSqlType[i] = ((JDOFieldDescriptor) _engine._clsDesc.getIdentities()[i]).getSQLType()[0];
             }
@@ -1713,8 +687,6 @@ public final class SQLEngine implements Persistence {
                         switch (_engine._ids.length) {
                         case 1:
                             return returnId[0];
-                        case 2:
-                            return new Complex( returnId[0], returnId[1] );
                         default:
                             return new Complex( returnId );
                         }
@@ -1943,4 +915,5 @@ public final class SQLEngine implements Persistence {
             return stamp;
         }
     }
+*/
 }

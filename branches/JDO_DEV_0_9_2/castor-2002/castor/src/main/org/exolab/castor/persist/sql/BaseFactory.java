@@ -63,7 +63,6 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.conf.*;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.LogInterceptor;
 import org.exolab.castor.persist.Key;
 import org.exolab.castor.persist.Entity;
@@ -97,7 +96,7 @@ public abstract class BaseFactory
         try {
             SQLConnector connector = (SQLConnector) _connectors.get( lockEngine );
             return new SQLEngine( entity, lockEngine, log, this, connector, null );
-        } catch ( MappingException except ) {
+        } catch (Exception except ) {
             if ( log != null )
                 log.exception( except );
             return null;
@@ -106,7 +105,7 @@ public abstract class BaseFactory
 
     public Connector getConnector( LockEngine lockEngine, Database database )
             throws MappingException, PersistenceException {
-    
+
         if ( _connectors.containsKey( lockEngine ) )
             return (Connector) _connectors.get( lockEngine );
 

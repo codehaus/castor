@@ -47,10 +47,11 @@
 package org.exolab.castor.persist.sql;
 
 import java.sql.Types;
-import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.persist.EntityFieldInfo;
 import org.exolab.castor.persist.types.SQLTypes;
+import org.exolab.castor.util.Messages;
 
 /**
  * This class hold SQL-specific information and is used internally by the bridge layer.
@@ -72,7 +73,7 @@ public final class SQLFieldInfo
 
     public final TypeConvertor[] sqlToJava;
 
-    public SQLFieldInfo(EntityFieldInfo info) throws MappingException {
+    public SQLFieldInfo(EntityFieldInfo info) throws PersistenceException {
         int len = info.fieldNames.length;
 
         this.info = info;
@@ -82,8 +83,12 @@ public final class SQLFieldInfo
         for (int i = 0; i < len; i++) {
             sqlType[i] = SQLTypes.getSQLType(info.declaredType[i]);
             if (info.expectedType[i] != info.declaredType[i]) {
-                javaToSql[i] = SQLTypes.getConvertor(info.expectedType[i], info.declaredType[i]);
-                sqlToJava[i] = SQLTypes.getConvertor(info.declaredType[i], info.expectedType[i]);
+                try {
+                    javaToSql[i] = SQLTypes.getConvertor(info.expectedType[i], info.declaredType[i]);
+                    sqlToJava[i] = SQLTypes.getConvertor(info.declaredType[i], info.expectedType[i]);
+                } catch (Exception except) {
+                    throw new PersistenceException(Messages.format("persist.nested", except), except);
+                }
             }
         }
     }
