@@ -886,14 +886,19 @@ public class DescriptorSourceFactory {
                 jsc.indent();
                 jsc.add("StringValidator sv = new StringValidator();");
                 XSString xsString = (XSString)xsType;
-                if (xsString.hasMinLength()) {
+                if ( (xsString.hasMinLength()) && (!xsString.hasLength()) ){
                     jsc.add("sv.setMinLength(");
                     jsc.append(Integer.toString(xsString.getMinLength()));
                     jsc.append(");");
                 }
-                if (xsString.hasMaxLength()) {
+                if ( (xsString.hasMaxLength()) && (!xsString.hasLength()) ) {
                     jsc.add("sv.setMaxLength(");
                     jsc.append(Integer.toString(xsString.getMaxLength()));
+                    jsc.append(");");
+                }
+                if ( xsString.hasLength()) {
+                    jsc.add("sv.setLength(");
+                    jsc.append(Integer.toString(xsString.getLength()));
                     jsc.append(");");
                 }
                 //-- fixed values
