@@ -41,12 +41,12 @@ public class Test
             JDO  jdo;
             
             logger.println( "Reading Java-SQL mapping from " + DatabaseFile );
-            JDO.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null );
+            // JDO.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null, Logger.getSystemLogger() );
             jdo = new JDO();
             jdo.setLogWriter( Logger.getSystemLogger() );
-            // Run the ODMG API test, see odmgTest()
+            jdo.setConfiguration( Test.class.getResource( DatabaseFile ).toString() );
             jdo.setDatabaseName( "test" );
-            odmgTest( jdo, logger );
+            test( jdo, logger );
         } catch ( Exception except ) {
             logger.println( except );
             except.printStackTrace( logger );
@@ -54,7 +54,7 @@ public class Test
     }
     
     
-    public static void odmgTest( JDO jdo, PrintWriter logger )
+    public static void test( JDO jdo, PrintWriter logger )
         throws Exception
     {
         Database      db;
@@ -69,8 +69,6 @@ public class Test
 
         db = jdo.getDatabase();
 
-        // Must be associated with an open transaction in order to
-        // use the ODMG database
         db.begin();
         logger.println( "Begin transaction" );
         

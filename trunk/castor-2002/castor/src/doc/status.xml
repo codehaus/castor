@@ -40,9 +40,6 @@
               object graph to single row mapping, and multiple column primary
               keys and automatic type conversion</li>
 
-          <li>Provides an ODMG compliant API for OODMBS-like persistence,
-              XML-based data source definition, name binding</li>
-
           <li>Optimistic and pessimistic locking modes, in-memory concurrency
               engine, and dead-lock detection</li>
 

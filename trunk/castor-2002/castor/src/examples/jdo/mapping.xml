@@ -44,13 +44,11 @@
 
     <!-- Product has reference to Category with
          many-many relationship -->
-    <!--
     <field name="category" type="myapp.Category" required="true"
            collection="vector">
       <sql-info name="category_id"
                 many-table="category_prod" many-key="prod_id" />
     </field>
-    -->
   </class>
 
 
@@ -82,7 +80,6 @@
 
 
   <!--  Mapping for Category  -->
-  <!--
   <class class-name="myapp.Category">
     <sql-table table-name="category"/>
     <description>A product category, any number of products can belong to
@@ -101,7 +98,6 @@
                 many-table="category_prod" many-key="category_id" />
     </field>
   </class>
-  -->
 
 
 </mapping>

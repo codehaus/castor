@@ -112,6 +112,12 @@
     <field-mapping set-method="setDirty" type="string">
       <xml-info name="dirty"/>
     </field-mapping>
+    <field-mapping set-method="setManyTable" type="string">
+      <xml-info name="many-table"/>
+    </field-mapping>
+    <field-mapping set-method="setManyKey" type="string">
+      <xml-info name="many-key"/>
+    </field-mapping>
   </class-mapping>
 
 </mapping-mapping>

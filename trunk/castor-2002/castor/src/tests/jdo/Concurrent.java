@@ -6,6 +6,7 @@ import org.exolab.castor.jdo.JDOSource;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.ObjectModifiedException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -57,7 +58,7 @@ public class Concurrent
 	    _jdbcUri = "jdbc:postgresql:test?user=test&password=test";
 	else
 	    _jdbcUri = jdbcUri;
-	_logger.println( "Using JDBC URI " + jdbcUri );
+	_logger.println( "Using JDBC URI " + _jdbcUri );
     }
 
 
@@ -74,7 +75,7 @@ public class Concurrent
         // Determine if test object exists, if not create it.
         // If it exists, set the name to some predefined value
         // that this test will later override.
-        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( new Integer( TestObject.DefaultId ) );
         object = (TestObject) oql.execute();
         if ( object == null ) {
@@ -98,14 +99,21 @@ public class Concurrent
         
         // Perform direct JDBC access and override the value of that table
         conn = DriverManager.getConnection( _jdbcUri );
-        conn.createStatement().execute( "UPDATE test_object SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
+        conn.createStatement().execute( "UPDATE test_table SET name='" + JDBCName + "' WHERE id=" + TestObject.DefaultId );
         _logger.println( "Updated test object from JDBC" );
         conn.close();
         
         // Commit JDO transaction, this should report object modified
         // exception
         _logger.println( "Committing JDO update" );
-        _db.commit();
+        try {
+            _db.commit();
+            _logger.println( "Error: ObjectModifiedException not thrown" );
+        } catch ( ObjectModifiedException except ) {
+            _logger.println( "OK: ObjectModifiedException thrown" );
+        } catch ( Exception except ) {
+            _logger.println( "Error: " + except );
+        }
         _db.close();
     }
 

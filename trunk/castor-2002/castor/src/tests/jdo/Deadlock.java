@@ -6,6 +6,8 @@ import org.exolab.castor.jdo.JDOSource;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.TransactionAbortedException;
 
 
 /**
@@ -46,7 +48,7 @@ public class Deadlock
         _db.begin();
         
         // Create two objects in the database -- need something to lock
-        oql = _db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+        oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
         oql.bind( new Integer( TestObject.DefaultId ) );
         object = (TestObject) oql.execute();
         if ( object == null ) {
@@ -109,7 +111,7 @@ public class Deadlock
             try {
                 db = _jdo.getDatabase();
                 db.begin();
-                oql = db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+                oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
                 // Load first object and change something about it (otherwise will not write)
                 _logger.println( "First: Loading object " + TestObject.DefaultId );
@@ -122,13 +124,16 @@ public class Deadlock
                 // Give the other thread a 2 second opportunity.
                 sleep( 2000 );
                 
-                _logger.println( "First: Loading object " + TestObject.DefaultId  + 1 );
+                _logger.println( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 oql.bind( new Integer( TestObject.DefaultId + 1 ) );
                 object = (TestObject) oql.execute();
                 _logger.println( "First: Loaded " + object );
                 object.name = object.name + ":1";
                 // db.lock( group );
                 
+                // Give the other thread a 2 second opportunity.
+                sleep( 2000 );
+
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
                 _logger.println( "First: Committing" );
@@ -167,13 +172,13 @@ public class Deadlock
             try {
                 db = _jdo.getDatabase();
                 db.begin();
-                oql = db.getOQLQuery( "SELECT object FROM test.TestObject object WHERE id = $1" );
+                oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
                 // Give the other thread a 2 second opportunity.
                 sleep( 2000 );
                 
                 // Load first object and change something about it (otherwise will not write)
-                _logger.println( "Second: Loading object " + TestObject.DefaultId + 1 );
+                _logger.println( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
                 oql.bind( new Integer( TestObject.DefaultId + 1 ) );
                 object = (TestObject) oql.execute();
                 _logger.println( "Second: Loaded " + object );
@@ -197,10 +202,18 @@ public class Deadlock
                 // lock blocking until the first transaction completes.
                 _logger.println( "Second: Committing" );
                 db.commit();
+                _logger.println( "Error: deadlock not detected" );
                 _logger.println( "Second: Committed" );
                 db.close();
+            } catch ( TransactionAbortedException except ) {
+                if ( except.getException() instanceof LockNotGrantedException )
+                    _logger.println( "OK: Deadlock detected" );
+                else
+                    _logger.println( "Error: " + except );
+                _logger.println( "Second: aborting" );
             } catch ( Exception except ) {
-                _logger.println( "Second: " + except );
+                _logger.println( "Error: " + except );
+            } finally {
                 try {
                     if ( db != null )
                         db.close();
