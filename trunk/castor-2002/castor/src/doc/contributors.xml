@@ -65,6 +65,11 @@
     <description>Testing for Oracle and type conversion for Oracle JDBC driver.</description>
   </contributor>
 
+  <contributor type="Feedback">
+    <name surname="Eitan" given="Suez"/>
+    <email>eitan@uptodata.com</email>
+    <description>Responsible for uncovering bugs that no one else noticed.</description>
+  </contributor>
 
   <!--
       Company Information, so we don't have to duplicate it for
