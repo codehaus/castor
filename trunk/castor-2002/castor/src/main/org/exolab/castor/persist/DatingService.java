@@ -46,39 +46,12 @@
 
 package org.exolab.castor.persist;
 
-
+import java.util.Vector;
 import java.util.Hashtable;
 import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Collection;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectDeletedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.SQLEngine;
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.mapping.xml.ClassMapping;
-import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
-import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.ClassDescriptor;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.spi.CallbackInterceptor;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
-import org.exolab.castor.jdo.engine.JDOClassDescriptor;
-import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import java.sql.Connection;
-import java.util.Vector;
-import java.util.ArrayList;
-
+import org.exolab.castor.mapping.MappingException;
 
 /**
  * DataService is a helper class for constructing <tt>ClassMolder</tt>s and
