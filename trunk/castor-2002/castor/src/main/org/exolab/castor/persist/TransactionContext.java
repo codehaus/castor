@@ -529,6 +529,14 @@ public abstract class TransactionContext
         if ( object == null )
             throw new PersistenceException("Object to be created is null!");
 
+        try {
+            if ( molder.getCallback() != null ) {
+                molder.getCallback().creating( object, _db );
+            }
+        } catch ( Exception except ) {
+            throw new PersistenceException( Messages.format("persist.nested",except) );
+        }
+
         // Make sure the object has not beed persisted in this transaction.
         identities = molder.getIdentities( object );
         // [oleg] In the case where key generator is used,
@@ -580,9 +588,6 @@ public abstract class TransactionContext
         }
 
         try {
-            if ( molder.getCallback() != null ) {
-                molder.getCallback().creating( object, _db );
-            }
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
             if ( entry == null)
