@@ -949,7 +949,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 String location = name;
                 while (!_stateInfo.isEmpty()) {
                     UnmarshalState tmpState = (UnmarshalState)_stateInfo.pop();
-                    if (tmpState.fieldDesc.isContainer()) continue;
+                    if (!tmpState.wrapper) {
+                        if (tmpState.fieldDesc.isContainer()) continue;
+                    }
                     location = state.elementName + "/" + location;
                 }
                 
@@ -1741,7 +1743,19 @@ public final class UnmarshalHandler extends MarshalFramework
         XMLClassDescriptor oldClassDesc = classDesc;
         while (descriptor == null) {
             
-            descriptor = classDesc.getFieldDescriptor(name, namespace, NodeType.Element);
+            //-- NOTE (kv 20050228): 
+            //-- we need to clean this code up, I made this
+            //-- fix to make sure the correct descriptor which
+            //-- matches the location path is used
+            if (path.length() > 0) {
+                String tmpName = path + "/" + name;
+                descriptor = classDesc.getFieldDescriptor(tmpName, namespace, NodeType.Element);
+            }
+            //-- End Patch
+            
+            if (descriptor == null) { 
+                descriptor = classDesc.getFieldDescriptor(name, namespace, NodeType.Element);
+            }
             
             //-- Namespace patch, should be moved to XMLClassDescriptor, but
             //-- this is the least intrusive patch at the moment. kv - 20030423

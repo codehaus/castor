@@ -40,6 +40,11 @@
  *
  * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
+ * This file was originally developed by Keith Visco during the
+ * course of employment at Intalio Inc.
+ * All portions of this file developed by Keith Visco after Jan 19 2005 are
+ * Copyright (C) 2005 Keith Visco. All Rights Reserved.
+ *
  * $Id$
  */
 
@@ -63,7 +68,7 @@ import org.exolab.castor.xml.*;
  * class is used by both generated source code as well
  * as the XMLMappingLoader.
  *
- * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
+ * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class XMLClassDescriptorImpl extends Validator
@@ -336,6 +341,16 @@ public class XMLClassDescriptorImpl extends Validator
         XMLFieldDescriptor[] attributes = _attArray;
         XMLFieldDescriptor[] elements   = _elemArray;
         
+        // TODO: clean up location patch
+        String location = null;
+        if (name != null) {
+            int idx = name.lastIndexOf('/');
+            if (idx >= 0) {
+                location = name.substring(0, idx);
+                name = name.substring(idx+1);
+            }
+        }
+        
         if (wild || (nodeType == NodeType.Element)) {
             
             if (elements == null) elements = getElementArray();
@@ -343,6 +358,11 @@ public class XMLClassDescriptorImpl extends Validator
             for (int i = 0; i < elements.length; i++) {
                 XMLFieldDescriptor desc = elements[i];
                 if (desc == null) continue;
+                
+                if (location != null) {
+                    if (!location.equals(desc.getLocationPath())) 
+                        continue;
+                }
 
                 if (desc.matches(name)) {
                       if (!desc.matches(WILDCARD)) return desc;
