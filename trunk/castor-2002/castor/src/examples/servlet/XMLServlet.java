@@ -69,7 +69,8 @@ import org.apache.xml.serialize.SerializerFactory;
 import org.apache.xml.serialize.OutputFormat;
 import org.apache.xml.serialize.Method;
 import org.exolab.adaptx.xslt.*;
-import org.exolab.adaptx.xslt.util.*;
+import org.exolab.adaptx.xslt.handlers.ResultHandlerAdapter;
+import org.exolab.adaptx.xslt.util.SAXInput;
 import org.exolab.adaptx.net.impl.URILocationImpl;
 
 /**
@@ -182,7 +183,7 @@ public abstract class XMLServlet
             if ( _docHandler != null )
                 return _docHandler;
                 
-            Formatter _formatter = null;
+            ResultHandler _resultHandler = null;
             
             if ( _format == null ) {
                 
@@ -190,25 +191,25 @@ public abstract class XMLServlet
                 _format = new OutputFormat( Method.XML, _response.getCharacterEncoding(), false );
                 ser = new XMLSerializer( _format );
                 ser.setOutputCharStream( getWriter() );
-                _formatter = new FormatterAdapter(ser.asDocumentHandler());
+                _resultHandler = new ResultHandlerAdapter(ser.asDocumentHandler());
             } else {
                 Serializer ser;
                 
                 _format.setEncoding( _response.getCharacterEncoding() );
                 ser = SerializerFactory.getSerializerFactory( _format.getMethod() ).makeSerializer( _format );
                 ser.setOutputCharStream( getWriter() );
-                _formatter = new FormatterAdapter(ser.asDocumentHandler());
+                _resultHandler = new ResultHandlerAdapter(ser.asDocumentHandler());
             }
             _response.setContentType( "text/" + _format.getMethod() );
 
             if ( _stylesheet != null ) {
                 SAXInput saxInput = new SAXInput();
                 saxInput.setProcessor(_xslp);
-                saxInput.setOutputHandler(_formatter);
+                saxInput.setOutputHandler(_resultHandler);
                 saxInput.setStylesheet(_stylesheet);
                 _docHandler = saxInput;
             }
-            else _docHandler = _formatter;
+            else _docHandler = _resultHandler;
             
             return _docHandler;
         }
