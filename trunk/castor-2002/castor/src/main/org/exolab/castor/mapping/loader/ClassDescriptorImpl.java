@@ -47,10 +47,12 @@
 package org.exolab.castor.mapping.loader;
 
 
+import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -197,21 +199,12 @@ public class ClassDescriptorImpl
     {
         // Object cannot be saved if one of the required fields is null
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-            try {
-                if ( _fields[ i ].isRequired() && _fields[ i ].getHandler().getValue( object ) == null )
-                    throw new ValidityException( "mapping.requiredField",
-                                                 object.getClass().getName(), _fields[ i ].getFieldName() );
-            } catch ( IllegalAccessException except ) {
-                // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
-            } catch ( InvocationTargetException except ) {
-                // This should never happen
-                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                                  toString(), except.getMessage() ) );
-            }
+            if ( _fields[ i ].isRequired() && _fields[ i ].getHandler().getValue( object ) == null )
+                throw new ValidityException( "mapping.requiredField",
+                                             object.getClass().getName(), _fields[ i ].getFieldName() );
         }
     }
-
+    
 
     public String toString()
     {
