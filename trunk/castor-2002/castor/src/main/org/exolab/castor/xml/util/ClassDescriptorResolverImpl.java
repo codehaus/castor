@@ -78,7 +78,7 @@ public class ClassDescriptorResolverImpl
      * Creates a new ClassDescriptorResolverImpl
     **/
     public ClassDescriptorResolverImpl() {
-        _cache = new Hashtable();
+        _cache        = new Hashtable();
     } //-- ClassDescriptorResolverImpl
 
     /**
@@ -173,7 +173,9 @@ public class ClassDescriptorResolverImpl
         if (classDesc == null) {
             try {
                 classDesc = MarshalHelper.generateClassDescriptor(type);
-                if (classDesc != null) _cache.put(type, classDesc);
+                if (classDesc != null) {
+                    _cache.put(type, classDesc);
+                }
             }
             catch (MarshalException mx) {
                 String err = mx.toString();
@@ -293,7 +295,6 @@ public class ClassDescriptorResolverImpl
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         this.mappingLoader = mappingLoader;
     } //-- setMappingLoader
-
     
     //-------------------/
     //- Private Methods -/
