@@ -410,7 +410,7 @@ public abstract class MappingLoader
             // convert idList into array
             if (extend == null) {
                 identities = new FieldDescriptor[idList.size()];
-                idList.toArray(identities);
+                idList.copyInto(identities);
             } else {
                 // we allows identity fields to be re-defined in the extends 
                 // class mapping to override some properties of the field, 
@@ -431,15 +431,15 @@ public abstract class MappingLoader
                 } else {
                     // we leave things in the old way for the XML side
                     if ( idList.size() == 0 )
-                        idList.add( extend.getIdentity() );
+                        idList.addElement( extend.getIdentity() );
                     identities = new FieldDescriptor[idList.size()];
-                    idList.toArray(identities);
+                    idList.copyInto(identities);
                 }
             }
             
             // convert fieldList into array
             fields = new FieldDescriptor[fieldList.size()];
-            fieldList.toArray(fields);
+            fieldList.copyInto(fields);
             
             // the following check only needed by JDO side, move it to JDOMappingLoader
             /*
@@ -485,7 +485,7 @@ public abstract class MappingLoader
             if ( strings.charAt( count ) == delimit ) {
                 if ( start < (count - 1) ) {
                     //System.out.println( "("+strings.substring( start, count )+")" );
-                    v.add( strings.substring( start, count ) );
+                    v.addElement( strings.substring( start, count ) );
                     count++;
                     start = count;
                     continue;
@@ -495,7 +495,7 @@ public abstract class MappingLoader
         }
         if ( start < (count - 1) ) {
             //System.out.println( "("+strings.substring( start, count )+")" );
-            v.add( strings.substring( start, count ) );
+            v.addElement( strings.substring( start, count ) );
         }
 
         String[] result = new String[v.size()];
