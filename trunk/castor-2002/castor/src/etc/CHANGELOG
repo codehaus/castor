@@ -20,6 +20,9 @@ Mapping: Fixed mapping loader to complain if get/set methods are not found. Both
          required to be present, unless a collection field is used which only requires
          a get method. (Reported by Lincoln Spiteri <Lincoln.Spiteri@mobisle.com>)
 
+Mapping: Added convertor between String and character. (Reported by Donald Ball
+         <balld@webslingerz.com>)
+
 
 Version 0.8.5  May 12, 2000
 ---------------------------

@@ -189,56 +189,38 @@ public class TypeHandling
             db.commit();
             if ( ! result )
                 return false;
+            else
+                stream.writeVerbose( "OK: null in integer field passed" );
 
 
-            /*
-            stream.writeVerbose( "Creating new object: " + object );
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                object.setValue1( null );
-            }
-            try {
-                db.commit();
-                stream.writeVerbose( "OK: Failed to detect validity exception" );
-                result = false;
-            } catch ( TransactionAbortedException except ) {
-                stream.writeVerbose( "OK: Detected validity exception: " + except.getMessage() );
-            }
 
-            stream.writeVerbose( "Testing null in required field" );
+            stream.writeVerbose( "Testing value in char field" );
             db.begin();
-            stream.writeVerbose( "Creating new object: " + object );
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
+            oql.bind( (double) TestTypes.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                object.setValue1( null );
-            }
-            try {
-                db.commit();
-                stream.writeVerbose( "OK: Failed to detect validity exception" );
-                result = false;
-            } catch ( TransactionAbortedException except ) {
-                stream.writeVerbose( "OK: Detected validity exception: " + except.getMessage() );
-            }
-            
-            stream.writeVerbose( "Testing null in non-required field" );
-            db.begin();
-            stream.writeVerbose( "Creating new object: " + object );
-            oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
-            oql.bind( TestObject.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                object = (TestObject) enum.nextElement();
-                object.setValue2( null );
+                types = (TestTypes) enum.nextElement();
+                types.setCharValue( 'A' );
             }
             db.commit();
-            stream.writeVerbose( "OK: Stored null in non-required field" );
-            */
+            db.begin();
+            oql.bind( (double) TestTypes.DefaultId );
+            enum = oql.execute();
+            if ( enum.hasMoreElements() ) {
+                types = (TestTypes) enum.nextElement();
+                if ( types.getCharValue() != 'A' ) {
+                    stream.writeVerbose( "Error: char value was not set" );
+                    result = false;
+                }
+            } else {
+                stream.writeVerbose( "Error: failed to load object" );
+                result = false;
+            }
+            db.commit();
+            if ( ! result )
+                return false;
+            else
+                stream.writeVerbose( "OK: value in character field passed" );
 
             db.close();
         } catch ( Exception except ) {

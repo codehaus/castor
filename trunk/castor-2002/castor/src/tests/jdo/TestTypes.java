@@ -75,6 +75,9 @@ public class TestTypes
     private boolean        _intExists = false;
 
 
+    private char           _charValue;
+
+
     static final int       DefaultId = 3;
 
 
@@ -157,6 +160,18 @@ public class TestTypes
     public void deleteIntValue()
     {
         _intExists = false;
+    }
+
+
+    public char getCharValue()
+    {
+        return _charValue;
+    }
+
+
+    public void setCharValue( char value )
+    {
+        _charValue = value;
     }
 
 
