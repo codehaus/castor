@@ -414,10 +414,14 @@ public class TypeConversion {
                     //-- since we don't actually support this type, yet,
                     //-- we'll simply treat it as a string, but warn the
                     //-- user.
-                    String warning = "Warning: Currently, the W3C datatype '"+simpleType.getName();
-                    warning += "' is supported only as a String by Castor Source Generator.";
+                    String warning = "Warning: Currently, the W3C datatype 'token'";
+                    warning += " is supported only as a String by Castor Source Generator.";
                     System.out.println(warning);
-                    return new XSString();
+                    XSString xsString = new XSString();
+                    if (!simpleType.isBuiltInType()) {
+                        xsString.setFacets(simpleType);
+                    }
+                    return xsString;
                 }
                 default:
                     //-- error
