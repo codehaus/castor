@@ -158,13 +158,14 @@
     java.math.BigDecimal or numeric).
     However, SQL type may contain the parameter for the SQL<->Java type
     convertors in square brackets (e.g., char[01] for false->0, true->1
-    conversion from Boolean Java type to char SQL type)
-
+    conversion from Boolean Java type to char SQL type).
+    For the conversion to accept parameters with whitespaces, the type
+    attribute have to be CDATA not NMTOKENS.
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
     name        NMTOKENS  #IMPLIED
-    type        NMTOKENS    #IMPLIED
+    type        CDATA     #IMPLIED
     many-key    NMTOKENS  #IMPLIED
     many-table  NMTOKEN  #IMPLIED
     read-only   ( true | false )  "false"

@@ -70,6 +70,7 @@ import org.exolab.castor.mapping.xml.CacheTypeMapping;
 import org.exolab.castor.mapping.xml.Param;
 import org.exolab.castor.mapping.xml.types.DirtyType;
 import org.exolab.castor.util.Messages;
+import java.util.ArrayList;
 
 /**
  * A JDO implementation of mapping helper. Creates JDO class descriptors
@@ -196,6 +197,44 @@ public class JDOMappingLoader
         return jd;
     }
 
+    /**
+     * Parse the sql type attribute to build an
+     * array of types, needed to support whitespace inside
+     * parameterized types (see Bug 1045)
+     */
+    protected String[] getSqlTypes( FieldMapping fieldMap ) {
+      if (fieldMap.getSql() == null) { return new String[0]; }
+      String sqlType = fieldMap.getSql().getType();
+      if (sqlType == null) { return new String[0]; }
+
+      ArrayList types = new ArrayList();
+      int current = 0;
+      int begin = 0;
+      int state = 0;
+      while (current < sqlType.length()) {
+        switch (state) {
+          case 0:
+            if (sqlType.charAt(current) == ' ') {
+              types.add(sqlType.substring(begin, current));
+              begin = current + 1;
+            }
+            else if (sqlType.charAt(current) == '[') {
+              state = 1;
+            }
+            break;
+          case 1:
+            if (sqlType.charAt(current) == ']') {
+              state = 0;
+            }
+
+        }
+        current++;
+      }
+      types.add(sqlType.substring(begin, current));
+      String[] result = new String[types.size()];
+      return (String[])types.toArray(result);
+    }
+
 
     protected TypeInfo getTypeInfo( Class fieldType, CollectionHandler colHandler, FieldMapping fieldMap )
         throws MappingException
@@ -207,10 +246,11 @@ public class JDOMappingLoader
         Class         sqlType = null;
 
         fieldType = Types.typeFromPrimitive( fieldType );
+        String[] sqlTypes = getSqlTypes(fieldMap);
 
-        if ( fieldMap.getSql() != null && fieldMap.getSql().getType().length > 0 ) {
+        if ( fieldMap.getSql() != null && sqlTypes.length > 0 ) {
             //--TO Check
-            typeName = fieldMap.getSql().getType()[0];
+            typeName = sqlTypes[0];
             sqlType = SQLTypes.typeFromName( typeName );
         } else {
             sqlType = fieldType;
@@ -247,11 +287,13 @@ public class JDOMappingLoader
 
         sqlName = fieldMap.getSql().getName();
 
-        int len = fieldMap.getSql().getType().length;
+        String[] sqlTypes = getSqlTypes(fieldMap);
+
+        int len = sqlTypes.length;
         if ( len > 0 ) {
             sType = new int[len];
             for ( int i=0; i < len; i++ ) {
-                sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType()[i] );
+                sqlType = SQLTypes.typeFromName( sqlTypes[i] );
                 if ( _factory != null )
                     sqlType = _factory.adjustSqlType( sqlType );
                 sType[i] = SQLTypes.getSQLType( sqlType );

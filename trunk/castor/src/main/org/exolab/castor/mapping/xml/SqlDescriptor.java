@@ -94,6 +94,7 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
         fieldValidator.setMinOccurs(0);
         //-- _type
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", org.exolab.castor.xml.NodeType.Attribute);
+        desc.setImmutable(true);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
@@ -106,22 +107,27 @@ public class SqlDescriptor extends org.exolab.castor.xml.util.XMLClassDescriptor
             {
                 try {
                     Sql target = (Sql) object;
-                    target.addType( (java.lang.String) value);
+                    target.setType( (java.lang.String) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new java.lang.String();
+                return null;
             }
         } );
-        desc.setHandler( new org.exolab.castor.xml.handlers.CollectionFieldHandler(handler, new org.exolab.castor.xml.validators.NameValidator(org.exolab.castor.xml.validators.NameValidator.NMTOKEN)));
+        desc.setHandler(handler);
         addFieldDescriptor(desc);
         
         //-- validation code for: _type
         fieldValidator = new org.exolab.castor.xml.FieldValidator();
-        fieldValidator.setMinOccurs(0);
+        { //-- local scope
+            StringValidator typeValidator = new StringValidator();
+            typeValidator.setWhiteSpace("preserve");
+            fieldValidator.setValidator(typeValidator);
+        }
+        desc.setValidator(fieldValidator);
         //-- _manyTable
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_manyTable", "many-table", org.exolab.castor.xml.NodeType.Attribute);
         handler = (new org.exolab.castor.xml.XMLFieldHandler() {

@@ -44,7 +44,7 @@ public class Sql implements java.io.Serializable {
     /**
      * Field _type
      */
-    private java.util.Vector _type;
+    private java.lang.String _type;
 
     /**
      * Field _manyTable
@@ -89,7 +89,6 @@ public class Sql implements java.io.Serializable {
     public Sql() {
         super();
         _name = new Vector();
-        _type = new Vector();
         _manyKey = new Vector();
         setDirty(org.exolab.castor.mapping.xml.types.DirtyType.valueOf("check"));
     } //-- org.exolab.castor.mapping.xml.Sql()
@@ -146,29 +145,6 @@ public class Sql implements java.io.Serializable {
     } //-- void addName(int, java.lang.String) 
 
     /**
-     * Method addType
-     * 
-     * @param vType
-     */
-    public void addType(java.lang.String vType)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        _type.addElement(vType);
-    } //-- void addType(java.lang.String) 
-
-    /**
-     * Method addType
-     * 
-     * @param index
-     * @param vType
-     */
-    public void addType(int index, java.lang.String vType)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        _type.insertElementAt(vType, index);
-    } //-- void addType(int, java.lang.String) 
-
-    /**
      * Method deleteReadonly
      */
     public void deleteReadonly()
@@ -199,14 +175,6 @@ public class Sql implements java.io.Serializable {
     {
         return _name.elements();
     } //-- java.util.Enumeration enumerateName() 
-
-    /**
-     * Method enumerateType
-     */
-    public java.util.Enumeration enumerateType()
-    {
-        return _type.elements();
-    } //-- java.util.Enumeration enumerateType() 
 
     /**
      * Returns the value of field 'dirty'.
@@ -323,41 +291,14 @@ public class Sql implements java.io.Serializable {
     } //-- boolean getTransient() 
 
     /**
-     * Method getType
+     * Returns the value of field 'type'.
      * 
-     * @param index
+     * @return the value of field 'type'.
      */
-    public java.lang.String getType(int index)
-        throws java.lang.IndexOutOfBoundsException
+    public java.lang.String getType()
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _type.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (String)_type.elementAt(index);
-    } //-- java.lang.String getType(int) 
-
-    /**
-     * Method getType
-     */
-    public java.lang.String[] getType()
-    {
-        int size = _type.size();
-        java.lang.String[] mArray = new java.lang.String[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (String)_type.elementAt(index);
-        }
-        return mArray;
-    } //-- java.lang.String[] getType() 
-
-    /**
-     * Method getTypeCount
-     */
-    public int getTypeCount()
-    {
-        return _type.size();
-    } //-- int getTypeCount() 
+        return this._type;
+    } //-- java.lang.String getType() 
 
     /**
      * Method hasReadonly
@@ -430,14 +371,6 @@ public class Sql implements java.io.Serializable {
     } //-- void removeAllName() 
 
     /**
-     * Method removeAllType
-     */
-    public void removeAllType()
-    {
-        _type.removeAllElements();
-    } //-- void removeAllType() 
-
-    /**
      * Method removeManyKey
      * 
      * @param index
@@ -460,18 +393,6 @@ public class Sql implements java.io.Serializable {
         _name.removeElementAt(index);
         return (String)obj;
     } //-- java.lang.String removeName(int) 
-
-    /**
-     * Method removeType
-     * 
-     * @param index
-     */
-    public java.lang.String removeType(int index)
-    {
-        java.lang.Object obj = _type.elementAt(index);
-        _type.removeElementAt(index);
-        return (String)obj;
-    } //-- java.lang.String removeType(int) 
 
     /**
      * Sets the value of field 'dirty'.
@@ -577,33 +498,13 @@ public class Sql implements java.io.Serializable {
     } //-- void setTransient(boolean) 
 
     /**
-     * Method setType
+     * Sets the value of field 'type'.
      * 
-     * @param index
-     * @param vType
+     * @param type the value of field 'type'.
      */
-    public void setType(int index, java.lang.String vType)
-        throws java.lang.IndexOutOfBoundsException
+    public void setType(java.lang.String type)
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _type.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        _type.setElementAt(vType, index);
-    } //-- void setType(int, java.lang.String) 
-
-    /**
-     * Method setType
-     * 
-     * @param typeArray
-     */
-    public void setType(java.lang.String[] typeArray)
-    {
-        //-- copy array
-        _type.removeAllElements();
-        for (int i = 0; i < typeArray.length; i++) {
-            _type.addElement(typeArray[i]);
-        }
+        this._type = type;
     } //-- void setType(java.lang.String) 
 
     /**

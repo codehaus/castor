@@ -58,6 +58,8 @@ import java.util.Enumeration;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
@@ -100,13 +102,17 @@ public class TypeHandling extends CastorTestCase {
 
 
     public void setUp() 
-            throws PersistenceException {
+        throws PersistenceException, SQLException {
 
         TestTypes     types;
         Enumeration   enum;
 
         // Open transaction in order to perform JDO operations
         _db = _category.getDatabase( verbose );
+
+        // Delete all records to avoid problems with changed mapping
+        Connection conn = _category.getJDBCConnection();
+        conn.createStatement().execute( "DELETE FROM test_types" );
 
         // Determine if test object exists, if not create it.
         // If it exists, set the name to some predefined value
@@ -343,8 +349,8 @@ public class TypeHandling extends CastorTestCase {
         df = new SimpleDateFormat();
         df.applyPattern("yyyy/MM/dd");
         date = df.parse("2000/05/27");
-        df.applyPattern("HH:mm:ss.SSS");
-        time = df.parse("02:16:01.234");
+        df.applyPattern("yyyy/MM/dd HH:mm:ss.SSS");
+        time = df.parse("2000/05/27 02:16:01.234");
         df.applyPattern("yyyy/MM/dd HH:mm:ss.SSS");
         timestamp = df.parse("2000/05/27 02:16:01.234");
         _db.begin();

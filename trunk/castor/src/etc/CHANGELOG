@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+JDO:    Fixed Bug 1045 : date->char[yyyy-MM-dd hh:mm:ss] parameterized type not supported
+        (Mickael - 20030325)
+
 XML:    Added initial support for wrapper elements, which are now supported 
         via the bind-xml "location" attribute. More information will be
         available in the docs, hopefully soon. 
