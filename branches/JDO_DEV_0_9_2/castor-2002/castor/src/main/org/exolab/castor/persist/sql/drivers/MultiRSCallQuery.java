@@ -61,12 +61,12 @@ import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.SQLTypes;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.types.Complex;
 
 /**
  * PersistenceQuery implementation for CallableStatements
