@@ -47,6 +47,9 @@
 package org.exolab.castor.persist;
 
 
+import org.exolab.castor.util.Messages;
+
+
 /**
  * Read/write locks and lock synchronization on an object. Each object
  * is required to have one <tt>ObjectLock</tt> which at any given time
@@ -311,6 +314,8 @@ final class ObjectLock
 			}
 			read = read.next;
 		    }
+		    if ( read == null )
+			Messages.message( "persist.notOwnerLock" )
 		}
 	    }
 	    // Notify all waiting transactions that they may attempt to
@@ -338,7 +343,7 @@ final class ObjectLock
     synchronized void delete( TransactionContext tx )
     {
 	if ( tx != _writeLock )
-	    throw new RuntimeException( "persist.deleteWithoutLock" );
+	    throw new RuntimeException( Messages.message( "persist.notOwnerLock" ) );
 	try {
 	    // Mark lock as unlocked and deleted, notify all waiting transactions
 	    _object = null;
@@ -370,7 +375,7 @@ final class ObjectLock
 
 	// For each lock look at all the waiting transactions( waitOn) and
 	// determine whether they are currently waiting for a lock. A transaction
-	// is waiting for a lock if it has called acquireLock() and has not
+	// is waiting for a lock if it has called acquire() and has not
 	// returned from the call.
 
 	// If one of these locks is locked (read or write) by this transaction,
