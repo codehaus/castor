@@ -182,14 +182,14 @@ public class Product implements Persistent, TimeStampable
 
     public void jdoSetTimeStamp( long timeStamp )
     {
-        System.out.println( "CHANGING TIMESTAMP FROM: " + _timeStamp + " TO: " + timeStamp );
+        // System.out.println( "CHANGING TIMESTAMP FROM: " + _timeStamp + " TO: " + timeStamp );
         _timeStamp = timeStamp;
     }
 
 
     public long jdoGetTimeStamp()
     {
-        System.out.println( "GRABBING TIMESTAMP " + _timeStamp );
+        // System.out.println( "GRABBING TIMESTAMP " + _timeStamp );
         return _timeStamp;
     }
 
