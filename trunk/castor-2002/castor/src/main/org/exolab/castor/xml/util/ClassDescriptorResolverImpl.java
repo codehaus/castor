@@ -59,6 +59,8 @@ import java.util.Enumeration;
 public class ClassDescriptorResolverImpl
     implements ClassDescriptorResolver 
 {
+ 
+    private static final String DESCRIPTOR_PREFIX = "Descriptor";
     
     /**
      * internal cache for class descriptors
@@ -135,7 +137,19 @@ public class ClassDescriptorResolverImpl
         XMLClassDescriptor classDesc = (XMLClassDescriptor) _cache.get(type);
         
         if (classDesc != null) return classDesc;
-        String className = type.getName() + "Descriptor";
+        
+        //-- check mapping loader first 
+        //-- [proposed by George Stewart]
+        if (mappingLoader != null) {            
+            classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
+            if (classDesc != null) {
+               _cache.put(type, classDesc);
+               return classDesc;
+            }
+        }
+       
+         
+        String className = type.getName() + DESCRIPTOR_PREFIX;
         try {
             ClassLoader loader = type.getClassLoader();
             Class dClass = loadClass(className, loader);            
@@ -145,8 +159,7 @@ public class ClassDescriptorResolverImpl
         catch(ClassNotFoundException cnfe) { 
             /* 
              This is ok, since we are just checking if the
-             Class exists...if not we check them MappingLoader,
-             or we create one
+             Class exists...if not we create one.
             */ 
         }
         catch(Exception ex) {
@@ -156,9 +169,6 @@ public class ClassDescriptorResolverImpl
             return null;
         }
         
-        if ((classDesc == null) && (mappingLoader != null))
-            classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
-            
         //-- create classDesc automatically if necessary
         if (classDesc == null) {
             try {
