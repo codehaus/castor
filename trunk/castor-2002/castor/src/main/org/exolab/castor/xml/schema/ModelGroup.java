@@ -212,11 +212,10 @@ public class ModelGroup extends Group {
                     }
                     //check cross-reference
                     int j = 0;
-                    while (j<tempGroup.getParticleCount()) {
-                        if (tempGroup.getParticle(j).getStructureType() != Structure.MODELGROUP)
-                            j++;
-                        else {
-                            ModelGroup referencedGroup = ((ModelGroup)getParticle(j)).getReference();
+                    tempGroup = tempGroup.getReference();
+                    while (j < tempGroup.getParticleCount()) {
+                        if (tempGroup.getParticle(j).getStructureType() == Structure.MODELGROUP) {
+                            ModelGroup referencedGroup = ((ModelGroup)tempGroup.getParticle(j)).getReference();
                             if ((referencedGroup != null) && (referencedGroup.equals(this))) {
                                 String err = "Cross reference between <group>:"+this.getName()+" and <group>:"+tempGroup.getName();
                                 err +=  "\nCircular groups are disallowed.\n";
@@ -225,6 +224,8 @@ public class ModelGroup extends Group {
                             }
 
                         }
+                        j++;
+
                     }
                     break;
                 default:
