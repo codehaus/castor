@@ -44,34 +44,37 @@
  */
 
 package org.exolab.castor.builder.types;
-
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
+
+import java.util.Enumeration;
 
 /**
  * The XML Schema Short type
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSShort extends XSPatternBase {
-    
+public final class XSShort extends XSPatternBase {
+
     //- Constraints for Short type
     Short maxInclusive = null;
     Short maxExclusive = null;
     Short minInclusive = null;
     Short minExclusive = null;
-    
+
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType = JType.Short;
-        
+
     //private Short value = null;
-    
+
     public XSShort() {
         super(XSType.SHORT);
     } //-- XSShort
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -79,7 +82,7 @@ public class XSShort extends XSPatternBase {
     public JType getJType() {
         return this.jType;
     }
-    
+
     /**
      * Returns the maximum exclusive value that this XSShort can hold.
      * @return the maximum exclusive value that this XSShort can hold. If
@@ -89,7 +92,7 @@ public class XSShort extends XSPatternBase {
     public Short getMaxExclusive() {
         return maxExclusive;
     } //-- getMaxExclusive
-    
+
     /**
      * Returns the maximum inclusive value that this XSShort can hold.
      * @return the maximum inclusive value that this XSShort can hold. If
@@ -99,8 +102,8 @@ public class XSShort extends XSPatternBase {
     public Short getMaxInclusive() {
         return maxInclusive;
     } //-- getMaxInclusive
-    
-    
+
+
     /**
      * Returns the minimum exclusive value that this XSShort can hold.
      * @return the minimum exclusive value that this XSShort can hold. If
@@ -111,7 +114,7 @@ public class XSShort extends XSPatternBase {
     public Short getMinExclusive() {
         return minExclusive;
     } //-- getMinExclusive
-    
+
     /**
      * Returns the minimum inclusive value that this XSShort can hold.
      * @return the minimum inclusive value that this XSShort can hold. If
@@ -121,7 +124,7 @@ public class XSShort extends XSPatternBase {
     public Short getMinInclusive() {
         return minInclusive;
     } //-- getMinInclusive
-    
+
     public boolean hasMaximum() {
         return ((maxInclusive != null) || (maxExclusive != null));
     } //-- hasMaximum
@@ -129,13 +132,13 @@ public class XSShort extends XSPatternBase {
     public boolean hasMinimum() {
         return ((minInclusive != null) || (minExclusive != null));
     } //-- hasMinimum
-    
-    
+
+
     //public String toString() {
     //    return value.toString();
     //}
-    
-    
+
+
     /**
      * Sets the maximum exclusive value that this XSShort can hold.
      * @param max the maximum exclusive value this XSShort can be
@@ -155,7 +158,7 @@ public class XSShort extends XSPatternBase {
         maxExclusive = max;
         maxInclusive = null;
     } //-- setMaxExclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSShort can hold.
      * @param max the maximum inclusive value this XSShort can be
@@ -163,9 +166,9 @@ public class XSShort extends XSPatternBase {
     **/
     public void setMaxInclusive(short max) {
         maxInclusive = new Short(max);
-        maxExclusive = null; 
+        maxExclusive = null;
     } //-- setMaxInclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSShort can hold.
      * @param max the maximum inclusive value this XSShort can be
@@ -175,8 +178,8 @@ public class XSShort extends XSPatternBase {
         maxInclusive = max;
         maxExclusive = null;
     } //-- setMaxInclusive
-    
-    
+
+
     /**
      * Sets the minimum exclusive value that this XSShort can hold.
      * @param max the minimum exclusive value this XSShort can be
@@ -196,7 +199,7 @@ public class XSShort extends XSPatternBase {
         minExclusive = min;
         minInclusive = null;
     } //-- setMinExclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSShort can hold.
      * @param max the minimum inclusive value this XSShort can be
@@ -206,7 +209,7 @@ public class XSShort extends XSPatternBase {
         minInclusive = new Short(min);
         minExclusive = null;
     } //-- setMinInclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSShort can hold.
      * @param max the minimum inclusive value this XSShort can be
@@ -216,7 +219,39 @@ public class XSShort extends XSPatternBase {
         minInclusive = min;
         minExclusive = null;
     } //-- setMinInclusive
-    
+
+    /**
+     * Reads and sets the facets for XSShort
+     * @param simpletype the Simpletype containing the facets
+     **/
+    public void setFacets(SimpleType simpleType)
+    {
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                setMaxExclusive(facet.toShort());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                setMaxInclusive(facet.toShort());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
+                setMinExclusive(facet.toShort());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(name))
+                setMinInclusive(facet.toShort());
+            //-- pattern
+            else if (Facet.PATTERN.equals(name))
+                setPattern(facet.getValue());
+
+        }
+
+    } //-- toXSShort
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -233,10 +268,10 @@ public class XSShort extends XSPatternBase {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
@@ -245,5 +280,5 @@ public class XSShort extends XSPatternBase {
         sb.append(").shortValue()");
         return sb.toString();
     } //-- fromJavaObject
-    
+
 } //-- XSShort

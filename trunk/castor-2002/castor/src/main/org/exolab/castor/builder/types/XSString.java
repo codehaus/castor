@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -52,45 +53,45 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSString extends XSPatternBase {
-    
+public final class XSString extends XSPatternBase {
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
+    private static final JType jType
         = new JClass("java.lang.String");
-        
+
     private String value = null;
-    
+
     /**
      * The max length facet
     **/
     private int maxLength = -1;
-    
+
     /**
      * The min length facet
     **/
     private int minLength =  0;
-    
+
     /**
      * Creates a new XSString
     **/
     public XSString() {
         super(XSType.STRING);
     } //-- XSString
-    
+
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
         return "(String)"+variableName;
     } //-- fromJavaObject
-    
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -98,16 +99,16 @@ public class XSString extends XSPatternBase {
     public JType getJType() {
         return this.jType;
     } //-- getJType
-    
+
     /**
      * Returns the maximum length occurances of this type can be.
-     * A negative value denotes no maximum length     
+     * A negative value denotes no maximum length
      * @return the maximum length facet
     **/
     public int getMaxLength() {
         return maxLength;
     } //-- getMaxLength
-    
+
     /**
      * Returns the minimum length occurances of this type can be.
      * @return the minimum length facet
@@ -115,7 +116,7 @@ public class XSString extends XSPatternBase {
     public int getMinLength() {
         return minLength;
     } //-- getMinLength
-    
+
     /**
      * Returns true if a maximum length has been set
      * @return true if a maximum length has been set
@@ -123,7 +124,7 @@ public class XSString extends XSPatternBase {
     public boolean hasMaxLength() {
         return (maxLength >= 0);
     } //-- hasMaxLength
-    
+
     /**
      * Returns true if a minimum length has been set
      * @return true if a minimum length has been set
@@ -131,7 +132,7 @@ public class XSString extends XSPatternBase {
     public boolean hasMinLength() {
         return (minLength > 0);
     } //-- hasMinLength
-    
+
     /**
      * Sets the maximum length of this XSString. To remove the max length
      * facet, use a negative value.
@@ -140,15 +141,16 @@ public class XSString extends XSPatternBase {
     public void setMaxLength(int maxLength) {
         this.maxLength = maxLength;
     } //-- setMaxLength
-    
+
     /**
-     * Sets the minimum length of this XSString. 
+     * Sets the minimum length of this XSString.
      * @param minLength the minimum length for occurances of this type
     **/
     public void setMinLength(int minLength) {
         this.minLength = minLength;
     } //-- setMinLength
-    
+
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the String value of this XSString
      * @return thr String value of this XSString
@@ -156,5 +158,5 @@ public class XSString extends XSPatternBase {
     public String toString() {
         return value;
     }
-    
+
 } //-- XSString

@@ -45,31 +45,34 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
+import java.util.Enumeration;
 /**
  * The XML Schema long type
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSLong extends XSPatternBase {
-    
+public final class XSLong extends XSPatternBase {
+
     //- Constraints for long type
     Long maxInclusive = null;
     Long maxExclusive = null;
     Long minInclusive = null;
     Long minExclusive = null;
-    
+
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType = JType.Long;
-        
+
     public XSLong() {
         super(XSType.LONG);
     } //-- XSLong
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -77,7 +80,7 @@ public class XSLong extends XSPatternBase {
     public JType getJType() {
         return this.jType;
     }
-    
+
     /**
      * Returns the maximum exclusive value that this XSLong can hold.
      * @return the maximum exclusive value that this XSLong can hold. If
@@ -87,7 +90,7 @@ public class XSLong extends XSPatternBase {
     public Long getMaxExclusive() {
         return maxExclusive;
     } //-- getMaxExclusive
-    
+
     /**
      * Returns the maximum inclusive value that this XSLong can hold.
      * @return the maximum inclusive value that this XSLong can hold. If
@@ -97,8 +100,8 @@ public class XSLong extends XSPatternBase {
     public Long getMaxInclusive() {
         return maxInclusive;
     } //-- getMaxInclusive
-    
-    
+
+
     /**
      * Returns the minimum exclusive value that this XSLong can hold.
      * @return the minimum exclusive value that this XSLong can hold. If
@@ -109,7 +112,7 @@ public class XSLong extends XSPatternBase {
     public Long getMinExclusive() {
         return minExclusive;
     } //-- getMinExclusive
-    
+
     /**
      * Returns the minimum inclusive value that this XSLong can hold.
      * @return the minimum inclusive value that this XSLong can hold. If
@@ -119,7 +122,7 @@ public class XSLong extends XSPatternBase {
     public Long getMinInclusive() {
         return minInclusive;
     } //-- getMinInclusive
-    
+
     public boolean hasMaximum() {
         return ((maxInclusive != null) || (maxExclusive != null));
     } //-- hasMaximum
@@ -127,13 +130,13 @@ public class XSLong extends XSPatternBase {
     public boolean hasMinimum() {
         return ((minInclusive != null) || (minExclusive != null));
     } //-- hasMinimum
-    
-    
+
+
     //public String toString() {
     //    return value.toString();
     //}
-    
-    
+
+
     /**
      * Sets the maximum exclusive value that this XSLong can hold.
      * @param max the maximum exclusive value this XSLong can be
@@ -153,7 +156,7 @@ public class XSLong extends XSPatternBase {
         maxExclusive = max;
         maxInclusive = null;
     } //-- setMaxExclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSLong can hold.
      * @param max the maximum inclusive value this XSLong can be
@@ -161,9 +164,9 @@ public class XSLong extends XSPatternBase {
     **/
     public void setMaxInclusive(long max) {
         maxInclusive = new Long(max);
-        maxExclusive = null; 
+        maxExclusive = null;
     } //-- setMaxInclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSLong can hold.
      * @param max the maximum inclusive value this XSLong can be
@@ -173,8 +176,8 @@ public class XSLong extends XSPatternBase {
         maxInclusive = max;
         maxExclusive = null;
     } //-- setMaxInclusive
-    
-    
+
+
     /**
      * Sets the minimum exclusive value that this XSLong can hold.
      * @param max the minimum exclusive value this XSLong can be
@@ -194,7 +197,7 @@ public class XSLong extends XSPatternBase {
         minExclusive = min;
         minInclusive = null;
     } //-- setMinExclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSLong can hold.
      * @param max the minimum inclusive value this XSLong can be
@@ -204,7 +207,7 @@ public class XSLong extends XSPatternBase {
         minInclusive = new Long(min);
         minExclusive = null;
     } //-- setMinInclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSLong can hold.
      * @param max the minimum inclusive value this XSLong can be
@@ -214,7 +217,42 @@ public class XSLong extends XSPatternBase {
         minInclusive = min;
         minExclusive = null;
     } //-- setMinInclusive
-    
+
+
+    /**
+     * Reads and sets the facets for XSTimeDuration
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+    public void setFacets(SimpleType simpleType) {
+
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                setMaxExclusive(facet.toLong());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                setMaxInclusive(facet.toLong());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
+                setMinExclusive(facet.toLong());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(name))
+                setMinInclusive(facet.toLong());
+            //-- pattern
+            else if (Facet.PATTERN.equals(name))
+                setPattern(facet.getValue());
+        } //setFacets
+
+    } //-- readLongFacets
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -231,10 +269,10 @@ public class XSLong extends XSPatternBase {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
@@ -243,5 +281,5 @@ public class XSLong extends XSPatternBase {
         sb.append(").longValue()");
         return sb.toString();
     } //-- fromJavaObject
-    
+
 } //-- XSLong

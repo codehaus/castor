@@ -40,10 +40,11 @@
  *
  * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
  *
- * $Id $
+ * $Id$
  */
 
 package org.exolab.castor.builder.types;
+import org.exolab.castor.xml.schema.SimpleType;
 
 import org.exolab.javasource.JType;
 import org.exolab.javasource.JClass;
@@ -53,7 +54,7 @@ import org.exolab.javasource.JClass;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public class XSUriReference extends XSType {
+public final class XSUriReference extends XSType {
 
     /**
      * The JType represented by this XSType
@@ -84,6 +85,7 @@ public class XSUriReference extends XSType {
         return "(String)"+variableName;
     } //-- fromJavaObject
 
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents

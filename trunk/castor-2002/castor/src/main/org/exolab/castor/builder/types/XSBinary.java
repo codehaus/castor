@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -52,20 +53,20 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSBinary extends XSType {
-    
+public final class XSBinary extends XSType {
+
     /**
      * The JType represented by this XSType
     **/
-    private static final JType jType 
+    private static final JType jType
         = (new JClass("byte")).createArray();
-        
-    
+
+
     public XSBinary() {
         super(XSType.BINARY);
     } //-- XSBinary
-    
-    
+
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -73,5 +74,5 @@ public class XSBinary extends XSType {
     public JType getJType() {
         return this.jType;
     } //-- getJType
-    
+
 } //-- XSBinary

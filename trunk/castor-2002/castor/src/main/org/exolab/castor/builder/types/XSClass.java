@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -53,10 +54,10 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public class XSClass extends XSType {
-    
+
     private JClass  jClass     = null;
     private String  name       = null;
-    
+
     /**
      * Creates a new XSClass with the given JClass reference
      * @param jClass the JClass type of this XSClass
@@ -78,8 +79,8 @@ public class XSClass extends XSType {
         }
         else this.name = jClass.getName();
     } //-- XSClass
-    
-    
+
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -87,9 +88,9 @@ public class XSClass extends XSType {
     public JType getJType() {
         return this.jClass;
     } //-- getJType
-    
+
     public String getName() {
         return this.name;
     } //-- getName
-    
+
 } //-- XSClass

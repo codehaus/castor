@@ -48,6 +48,7 @@ package org.exolab.castor.builder;
 import org.exolab.castor.builder.types.*;
 import org.exolab.javasource.*;
 import org.exolab.castor.util.OrderedMap;
+import org.exolab.castor.types.TimeDuration;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaXMLNaming;
@@ -56,6 +57,7 @@ import org.exolab.castor.xml.schema.SimpleTypesFactory;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.text.ParseException;
 
 
 /**
@@ -137,7 +139,6 @@ public class TypeConversion {
 
         XSType xsType = null;
 
-
         //-- enumerated types
         if (simpleType.hasFacet("enumeration")) {
             String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
@@ -198,7 +199,7 @@ public class TypeConversion {
                 {
                     XSInteger xsInteger = new XSInteger();
                     if (!simpleType.isBuiltInType())
-                        readIntegerFacets(simpleType, xsInteger);
+                        xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
                 //-- int
@@ -206,7 +207,7 @@ public class TypeConversion {
 				{
 					XSInt xsInt = new XSInt();
 					if (!simpleType.isBuiltInType())
-					    readIntFacets(simpleType, xsInt);
+					    xsInt.setFacets(simpleType);
                     return xsInt;
                 }
                 //-- long
@@ -214,21 +215,21 @@ public class TypeConversion {
                 {
                     XSLong xsLong = new XSLong();
                     if (!simpleType.isBuiltInType())
-                        readLongFacets(simpleType,xsLong);
+                        xsLong.setFacets(simpleType);
                     return xsLong;
                 }
                 //-- negative-integer
                 case SimpleTypesFactory.NEGATIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSNegativeInteger();
-                    readIntegerFacets(simpleType, xsInteger);
+                    xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
                 //-- positive-integer
                 case SimpleTypesFactory.POSITIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSPositiveInteger();
-                    readIntegerFacets(simpleType, xsInteger);
+                    xsInteger.setFacets(simpleType);
                     return xsInteger;
                 }
                 //-- string
@@ -242,16 +243,26 @@ public class TypeConversion {
                     return new XSTimeInstant();
                 //-- Time duration
                 case SimpleTypesFactory.TIME_DURATION_TYPE:
-                    return new XSTimeDuration();
+                {
+					XSTimeDuration xsTimeD = new XSTimeDuration();
+					if (!simpleType.isBuiltInType())
+					   xsTimeD.setFacets(simpleType);
+                    return xsTimeD;
+                }
                     //return new XSLong();
                 //-- decimal
                 case SimpleTypesFactory.DECIMAL_TYPE:
-                    return new XSDecimal();
+                {
+                    XSDecimal xsDecimal = new XSDecimal();
+                    if (!simpleType.isBuiltInType())
+					   xsDecimal.setFacets(simpleType);
+                    return xsDecimal;
+                }
                 //-- short
                 case SimpleTypesFactory.SHORT_TYPE:
                 {
 					XSShort xsShort = new XSShort();
-					readShortFacets(simpleType, xsShort);
+					xsShort.setFacets(simpleType);
                     return xsShort;
                 }
                 default:
@@ -283,166 +294,6 @@ public class TypeConversion {
      //- Private Methods -/
     //-------------------/
 
-    /**
-     * Reads and sets the facets for XSInteger
-     * @param simpletype the SimpleType containing the facets
-     * @param xsInt the XSInteger to set the facets of
-    **/
-    private static void readIntegerFacets
-        (SimpleType simpleType, XSInteger xsInteger)
-    {
-
-        //-- copy valid facets
-        Enumeration enum = getFacets(simpleType);
-        while (enum.hasMoreElements()) {
-
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-
-            //-- maxExclusive
-            if (Facet.MAX_EXCLUSIVE.equals(name))
-                xsInteger.setMaxExclusive(facet.toInt());
-            //-- maxInclusive
-            else if (Facet.MAX_INCLUSIVE.equals(name))
-                xsInteger.setMaxInclusive(facet.toInt());
-            //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(name))
-                xsInteger.setMinExclusive(facet.toInt());
-            //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(name))
-                xsInteger.setMinInclusive(facet.toInt());
-            else if (Facet.PATTERN.equals(name))
-                xsInteger.setPattern(facet.getValue());
-
-        }
-
-    } //-- toXSInteger
-
-
-    /**
-     * Reads and sets the facets for XSInt
-     * @param simpletype the SimpleType containing the facets
-     * @param xsInt the XSInt to set the facets of
-    **/
-    private static void readIntFacets
-        (SimpleType simpleType, XSInt xsInt)
-    {
-
-        //-- copy valid facets
-        Enumeration enum = getFacets(simpleType);
-        while (enum.hasMoreElements()) {
-
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-
-            //-- maxExclusive
-            if (Facet.MAX_EXCLUSIVE.equals(name))
-                xsInt.setMaxExclusive(facet.toInt());
-            //-- maxInclusive
-            else if (Facet.MAX_INCLUSIVE.equals(name))
-                xsInt.setMaxInclusive(facet.toInt());
-            //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(name))
-                xsInt.setMinExclusive(facet.toInt());
-            //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(name))
-                xsInt.setMinInclusive(facet.toInt());
-            else if (Facet.PATTERN.equals(name)) {
-                xsInt.setPattern(facet.getValue());
-            }
-
-        }
-
-    } //-- toXSInt
-
-    /**
-     * Reads the facets for an XSLong
-     * @param simpleType the SimpleType containing the facets
-     * @param xsLong the XSLong to set the facets of
-    **/
-    private static void readLongFacets
-        (SimpleType simpleType, XSLong xsLong)
-    {
-
-        //-- copy valid facets
-        Enumeration enum = getFacets(simpleType);
-        while (enum.hasMoreElements()) {
-
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-
-            //-- maxExclusive
-            if (Facet.MAX_EXCLUSIVE.equals(name))
-                xsLong.setMaxExclusive(facet.toLong());
-            //-- maxInclusive
-            else if (Facet.MAX_INCLUSIVE.equals(name))
-                xsLong.setMaxInclusive(facet.toLong());
-            //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(name))
-                xsLong.setMinExclusive(facet.toLong());
-            //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(name))
-                xsLong.setMinInclusive(facet.toLong());
-            //-- pattern
-            else if (Facet.PATTERN.equals(name))
-                xsLong.setPattern(facet.getValue());
-        }
-
-    } //-- readLongFacets
-
-    /**
-     * Reads and sets the facets for XSShort
-     * @param simpletype the Simpletype containing the facets
-     * @param xsShort the XSShort to set the facets of
-    **/
-    private static void readShortFacets
-        (SimpleType simpleType, XSShort xsShort)
-    {
-        //-- copy valid facets
-        Enumeration enum = getFacets(simpleType);
-        while (enum.hasMoreElements()) {
-
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-
-            //-- maxExclusive
-            if (Facet.MAX_EXCLUSIVE.equals(name))
-                xsShort.setMaxExclusive(facet.toShort());
-            //-- maxInclusive
-            else if (Facet.MAX_INCLUSIVE.equals(name))
-                xsShort.setMaxInclusive(facet.toShort());
-            //-- minExclusive
-            else if (Facet.MIN_EXCLUSIVE.equals(name))
-                xsShort.setMinExclusive(facet.toShort());
-            //-- minInclusive
-            else if (Facet.MIN_INCLUSIVE.equals(name))
-                xsShort.setMinInclusive(facet.toShort());
-            //-- pattern
-            else if (Facet.PATTERN.equals(name))
-                xsShort.setPattern(facet.getValue());
-
-        }
-
-    } //-- toXSShort
-
-	/**
-	 * Returns a list of Facets from the simpleType
-	 *	(duplicate facets due to extension are filtered out)
-     * @param simpletype the Simpletype we want the facets for
-     * @return Unique list of facets from the simple type
-	 */
-	private static Enumeration getFacets(SimpleType simpleType)
-	{
-		Hashtable hashTable = new Hashtable();
-        Enumeration enum = simpleType.getFacets();
-		while (enum.hasMoreElements()) {
-
-            Facet facet = (Facet)enum.nextElement();
-            String name = facet.getName();
-			hashTable.put(name, facet);
-		}
-		return hashTable.elements();
-	}
 
     /**
      * Converts the given simpletype to an XSString
@@ -501,7 +352,7 @@ public class TypeConversion {
         nameMap.put("timeDuration",        "org.exolab.castor.types.TimeDuration");
        // nameMap.put("timeDuration",        "long");
         nameMap.put("timeInstant",         "java.util.Date");
-        nameMap.put("decimal",             "java.util.BigDecimal");
+        nameMap.put("decimal",             "java.math.BigDecimal");
         nameMap.put("short",               "short");
         nameMap.put("int",		           "int");
 

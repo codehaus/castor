@@ -44,6 +44,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -76,6 +77,7 @@ public class XSTime extends XSType {
         return "new "+getJType().getName()+"(0);";
     } //-- newInstanceCode*/
 
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents

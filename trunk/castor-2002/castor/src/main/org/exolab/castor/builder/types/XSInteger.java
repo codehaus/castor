@@ -44,8 +44,11 @@
  */
 
 package org.exolab.castor.builder.types;
-
+import org.exolab.castor.xml.schema.Facet;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
+
+import java.util.Enumeration;
 
 /**
  * The XML Schema Integer type
@@ -53,25 +56,25 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public class XSInteger extends XSPatternBase {
-    
+
     //- Constraints for integer type
     Integer maxInclusive = null;
     Integer maxExclusive = null;
     Integer minInclusive = null;
     Integer minExclusive = null;
-    
+
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType = JType.Int;
-        
+
     //private Integer value = null;
-    
+
     public XSInteger() {
         super(XSType.INTEGER);
     } //-- XSInteger
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -79,7 +82,7 @@ public class XSInteger extends XSPatternBase {
     public JType getJType() {
         return this.jType;
     }
-    
+
     /**
      * Returns the maximum exclusive value that this XSInteger can hold.
      * @return the maximum exclusive value that this XSInteger can hold. If
@@ -89,7 +92,7 @@ public class XSInteger extends XSPatternBase {
     public Integer getMaxExclusive() {
         return maxExclusive;
     } //-- getMaxExclusive
-    
+
     /**
      * Returns the maximum inclusive value that this XSInteger can hold.
      * @return the maximum inclusive value that this XSInteger can hold. If
@@ -99,8 +102,8 @@ public class XSInteger extends XSPatternBase {
     public Integer getMaxInclusive() {
         return maxInclusive;
     } //-- getMaxInclusive
-    
-    
+
+
     /**
      * Returns the minimum exclusive value that this XSInteger can hold.
      * @return the minimum exclusive value that this XSInteger can hold. If
@@ -111,7 +114,7 @@ public class XSInteger extends XSPatternBase {
     public Integer getMinExclusive() {
         return minExclusive;
     } //-- getMinExclusive
-    
+
     /**
      * Returns the minimum inclusive value that this XSInteger can hold.
      * @return the minimum inclusive value that this XSInteger can hold. If
@@ -121,7 +124,7 @@ public class XSInteger extends XSPatternBase {
     public Integer getMinInclusive() {
         return minInclusive;
     } //-- getMinInclusive
-    
+
     public boolean hasMaximum() {
         return ((maxInclusive != null) || (maxExclusive != null));
     } //-- hasMaximum
@@ -129,13 +132,13 @@ public class XSInteger extends XSPatternBase {
     public boolean hasMinimum() {
         return ((minInclusive != null) || (minExclusive != null));
     } //-- hasMinimum
-    
-    
+
+
     //public String toString() {
     //    return value.toString();
     //}
-    
-    
+
+
     /**
      * Sets the maximum exclusive value that this XSInteger can hold.
      * @param max the maximum exclusive value this XSInteger can be
@@ -155,7 +158,7 @@ public class XSInteger extends XSPatternBase {
         maxExclusive = max;
         maxInclusive = null;
     } //-- setMaxExclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSInteger can hold.
      * @param max the maximum inclusive value this XSInteger can be
@@ -163,9 +166,9 @@ public class XSInteger extends XSPatternBase {
     **/
     public void setMaxInclusive(int max) {
         maxInclusive = new Integer(max);
-        maxExclusive = null; 
+        maxExclusive = null;
     } //-- setMaxInclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSInteger can hold.
      * @param max the maximum inclusive value this XSInteger can be
@@ -175,8 +178,8 @@ public class XSInteger extends XSPatternBase {
         maxInclusive = max;
         maxExclusive = null;
     } //-- setMaxInclusive
-    
-    
+
+
     /**
      * Sets the minimum exclusive value that this XSInteger can hold.
      * @param max the minimum exclusive value this XSInteger can be
@@ -196,7 +199,7 @@ public class XSInteger extends XSPatternBase {
         minExclusive = min;
         minInclusive = null;
     } //-- setMinExclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSInteger can hold.
      * @param max the minimum inclusive value this XSInteger can be
@@ -206,7 +209,7 @@ public class XSInteger extends XSPatternBase {
         minInclusive = new Integer(min);
         minExclusive = null;
     } //-- setMinInclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSInteger can hold.
      * @param max the minimum inclusive value this XSInteger can be
@@ -216,7 +219,43 @@ public class XSInteger extends XSPatternBase {
         minInclusive = min;
         minExclusive = null;
     } //-- setMinInclusive
-    
+
+     /**
+     * Reads and sets the facets for XSTimeDuration
+     * override the readFacet method of XSType
+     * @param simpletype the Simpletype containing the facets
+     * @param xsType the XSType to set the facets of
+     * @see org.exolab.castor.builder.xstype#readFacets
+     */
+
+    public void setFacets(SimpleType simpleType) {
+
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                setMaxExclusive(facet.toInt());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                setMaxInclusive(facet.toInt());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
+                setMinExclusive(facet.toInt());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(name))
+                setMinInclusive(facet.toInt());
+            else if (Facet.PATTERN.equals(name))
+                setPattern(facet.getValue());
+
+        }
+
+    } //-- setFacets
+
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -233,10 +272,10 @@ public class XSInteger extends XSPatternBase {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
@@ -245,5 +284,5 @@ public class XSInteger extends XSPatternBase {
         sb.append(").intValue()");
         return sb.toString();
     } //-- fromJavaObject
-    
+
 } //-- XSInteger

@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -52,25 +53,25 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class XSReal extends XSType {
-    
+public final class XSReal extends XSType {
+
     //- Constraints for integer type
     Double maxInclusive = null;
     Double maxExclusive = null;
     Double minInclusive = null;
     Double minExclusive = null;
-    
+
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType = JType.Double;
-        
-    
+
+
     public XSReal() {
         super(XSType.DOUBLE);
     } //-- XSReal
-    
-    
+
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
@@ -78,7 +79,7 @@ public class XSReal extends XSType {
     public JType getJType() {
         return this.jType;
     }
-    
+
     /**
      * Returns the maximum exclusive value that this XSReal can hold.
      * @return the maximum exclusive value that this XSReal can hold. If
@@ -88,7 +89,7 @@ public class XSReal extends XSType {
     public Double getMaxExclusive() {
         return maxExclusive;
     } //-- getMaxExclusive
-    
+
     /**
      * Returns the maximum inclusive value that this XSReal can hold.
      * @return the maximum inclusive value that this XSReal can hold. If
@@ -98,8 +99,8 @@ public class XSReal extends XSType {
     public Double getMaxInclusive() {
         return maxInclusive;
     } //-- getMaxInclusive
-    
-    
+
+
     /**
      * Returns the minimum exclusive value that this XSReal can hold.
      * @return the minimum exclusive value that this XSReal can hold. If
@@ -110,7 +111,7 @@ public class XSReal extends XSType {
     public Double getMinExclusive() {
         return minExclusive;
     } //-- getMinExclusive
-    
+
     /**
      * Returns the minimum inclusive value that this XSReal can hold.
      * @return the minimum inclusive value that this XSReal can hold. If
@@ -120,7 +121,7 @@ public class XSReal extends XSType {
     public Double getMinInclusive() {
         return minInclusive;
     } //-- getMinInclusive
-    
+
     public boolean hasMaximum() {
         return ((maxInclusive != null) || (maxExclusive != null));
     } //-- hasMaximum
@@ -128,13 +129,13 @@ public class XSReal extends XSType {
     public boolean hasMinimum() {
         return ((minInclusive != null) || (minExclusive != null));
     } //-- hasMinimum
-    
-    
+
+
     //public String toString() {
     //    return value.toString();
     //}
-    
-    
+
+
     /**
      * Sets the maximum exclusive value that this XSReal can hold.
      * @param max the maximum exclusive value this XSReal can be
@@ -152,7 +153,7 @@ public class XSReal extends XSType {
     public void setMaxExclusive(Double max) {
         maxExclusive = max;
     } //-- setMaxExclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSReal can hold.
      * @param max the maximum inclusive value this XSReal can be
@@ -161,7 +162,7 @@ public class XSReal extends XSType {
     public void setMaxInclusive(double max) {
         maxInclusive = new Double(max);
     } //-- setMaxInclusive
-    
+
     /**
      * Sets the maximum inclusive value that this XSReal can hold.
      * @param max the maximum inclusive value this XSReal can be
@@ -170,8 +171,8 @@ public class XSReal extends XSType {
     public void setMaxInclusive(Double max) {
         maxInclusive = max;
     } //-- setMaxInclusive
-    
-    
+
+
     /**
      * Sets the minimum exclusive value that this XSReal can hold.
      * @param max the minimum exclusive value this XSReal can be
@@ -189,7 +190,7 @@ public class XSReal extends XSType {
     public void setMinExclusive(Double min) {
         minExclusive = min;
     } //-- setMinExclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSReal can hold.
      * @param max the minimum inclusive value this XSReal can be
@@ -198,7 +199,7 @@ public class XSReal extends XSType {
     public void setMinInclusive(double min) {
         minInclusive = new Double(min);
     } //-- setMinInclusive
-    
+
     /**
      * Sets the minimum inclusive value that this XSReal can hold.
      * @param max the minimum inclusive value this XSReal can be
@@ -207,7 +208,7 @@ public class XSReal extends XSType {
     public void setMinInclusive(Double min) {
         minInclusive = min;
     } //-- setMinInclusive
-    
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -224,10 +225,10 @@ public class XSReal extends XSType {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
@@ -236,5 +237,5 @@ public class XSReal extends XSType {
         sb.append(").doubleValue()");
         return sb.toString();
     } //-- fromJavaObject
-    
+
 } //-- XSReal
