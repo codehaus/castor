@@ -259,7 +259,7 @@ public class ElementDecl extends Particle
      * Returns true if this element has children (i.e if it
      * holds attributes or elements).
      */
-    public boolean isComplexContent() {
+    public boolean hasChildren() {
         XMLType type = getType();
         if (type instanceof SimpleType)
            return false;
