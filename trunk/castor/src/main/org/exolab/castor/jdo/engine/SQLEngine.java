@@ -47,49 +47,51 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Stack;
-import java.util.Properties;
-import java.sql.SQLException;
-import java.sql.Connection;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.ObjectDeletedException;
-import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import java.sql.SQLException;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.Vector;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.FieldHandler;
-import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
+import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.persist.ClassMolder;
+import org.exolab.castor.persist.OID;
+import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
-import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.OID;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.persist.spi.Complex;
-import java.util.ArrayList;
-import java.util.HashSet;
 
 
 /**
@@ -102,10 +104,18 @@ import java.util.HashSet;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  *
  * @version $Revision$ $Date$
  */
 public final class SQLEngine implements Persistence {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( SQLEngine.class );
+
 
     private final static boolean ID_TYPE = true;
 
@@ -164,9 +174,6 @@ public final class SQLEngine implements Persistence {
     private String              _extTable;
 
 
-    private LogInterceptor       _logInterceptor;
-
-
     private JDOClassDescriptor   _clsDesc;
 
 
@@ -175,17 +182,13 @@ public final class SQLEngine implements Persistence {
 
     private ClassMolder          _mold;
 
-    // Uncomment to activate SQL statements trace
-    private static Logger        _logger ;//= new Logger( System.out ).setPrefix( "SQL" );
 
-    SQLEngine( JDOClassDescriptor clsDesc,
-               LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
+    SQLEngine( JDOClassDescriptor clsDesc, PersistenceFactory factory, String stampField )
         throws MappingException {
 
         _clsDesc = clsDesc;
         _stampField = stampField;
         _factory = factory;
-        _logInterceptor = logInterceptor;
         _keyGen = null;
         _type = clsDesc.getJavaClass().getName();
         _mapTo = clsDesc.getTableName();
@@ -195,8 +198,7 @@ public final class SQLEngine implements Persistence {
             if ( keyGenDesc != null ) {
                 int[] tempType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
-                        _factory, keyGenDesc, tempType==null? 0: tempType[0],
-                        _logInterceptor );
+                        _factory, keyGenDesc, tempType==null? 0: tempType[0] );
             }
         }
 
@@ -397,8 +399,9 @@ public final class SQLEngine implements Persistence {
         if ( accessMode == null )
             accessMode = _clsDesc.getAccessMode();
         sql = query.getStatement( accessMode == AccessMode.DbLocked);
-        if ( _logInterceptor != null )
-            _logInterceptor.queryStatement( sql );
+
+        _log.debug( Messages.format( "jdo.createSql", sql ) );
+
         return new SQLQuery( this, sql, types );
     }
 
@@ -413,8 +416,7 @@ public final class SQLEngine implements Persistence {
         int[] sqlTypes;
         int count;
 
-        if ( _logInterceptor != null )
-            _logInterceptor.queryStatement( spCall );
+        _log.debug( Messages.format( "jdo.spCall", spCall ) );
 
         fields = _clsDesc.getFields();
         jdoFields0 = new String[ fields.length + 1 ];
@@ -552,7 +554,7 @@ public final class SQLEngine implements Persistence {
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
                 
-            if (_logger != null) _logger.println(_sqlCreate);
+            _log.debug( Messages.format( "jdo.create", _sqlCreate ) );
             
             // Must remember that SQL column index is base one
             count = 1;
@@ -633,8 +635,8 @@ public final class SQLEngine implements Persistence {
             return identity;
 
         } catch ( SQLException except ) {
-            if ( _logInterceptor != null )
-                _logInterceptor.storeStatement( "Error creating " + _type + ", SQL : " + _sqlCreate );
+            _log.fatal( Messages.format( "jdo.storeFatal",  _type,  _sqlCreate ) );
+
             // [oleg] Check for duplicate key based on X/Open error code
             // Bad way: all validation exceptions are reported as DuplicateKey
             //if ( except.getSQLState() != null &&
@@ -661,7 +663,8 @@ public final class SQLEngine implements Persistence {
                     stmt.close();
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-                if (_logger != null) _logger.println(_pkLookup);
+
+                _log.debug( Messages.format( "jdo.duplicateKeyCheck", _pkLookup ) );
 
                 // bind the identity to the preparedStatement
                 count = 1;
@@ -781,7 +784,7 @@ public final class SQLEngine implements Persistence {
 
             storeStatement = getStoreStatement( original );
             stmt = ( (Connection) conn ).prepareStatement( storeStatement );
-            if (_logger != null) _logger.println(storeStatement);
+            _log.debug( Messages.format( "jdo.store", storeStatement ) );
 
             count = 1;
 
@@ -861,7 +864,7 @@ public final class SQLEngine implements Persistence {
                 stmt.close();
                 if ( original != null ) {
                     stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
-                    if (_logger != null) _logger.println(_sqlLoad);
+                    _log.debug( Messages.format( "jdo.store", _sqlLoad ) );
 
                     // bind the identity to the prepareStatement
                     count = 1;
@@ -889,8 +892,8 @@ public final class SQLEngine implements Persistence {
             stmt.close();
             return null;
         } catch ( SQLException except ) {
-            if ( _logInterceptor != null )
-                _logInterceptor.storeStatement( "Error updating " + _type + ", SQL : " + storeStatement );
+            _log.fatal( Messages.format( "jdo.storeFatal", _type,  storeStatement ) );
+
             try {
                 // Close the insert/select statement
                 if ( stmt != null )
@@ -909,7 +912,7 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             
-            if (_logger != null) _logger.println(_sqlRemove);
+            _log.debug( Messages.format( "jdo.removing", _sqlRemove ) );
             
             int count = 1;
             // bind the identity of the preparedStatement
@@ -936,8 +939,8 @@ public final class SQLEngine implements Persistence {
             if ( _extends != null )
                 _extends.delete( conn, identity );
         } catch ( SQLException except ) {
-            if ( _logInterceptor != null )
-                _logInterceptor.storeStatement( "Error deleting " + _type + ", SQL : " + _sqlRemove );
+            _log.fatal( Messages.format( "jdo.deleteFatal", _type, _sqlRemove ) );
+
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         } finally {
             try {
@@ -959,7 +962,7 @@ public final class SQLEngine implements Persistence {
                 _extends.writeLock( conn, identity );
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-            if (_logger != null) _logger.println(_pkLookup);
+            _log.debug( Messages.format( "jdo.acquireWriteLock", _pkLookup ) );
 
             int count = 1;
             // bind the identity of the preparedStatement
@@ -1005,7 +1008,7 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             
-            if (_logger != null) _logger.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
+            _log.debug( Messages.format( "jdo.load", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
             
             int count = 1;
             // bind the identity of the preparedStatement
@@ -1103,8 +1106,8 @@ public final class SQLEngine implements Persistence {
                 }
             }
         } catch ( SQLException except ) {
-            if ( _logInterceptor != null )
-                _logInterceptor.storeStatement( "Error loading " + _type + ", SQL : " + (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad) );
+            _log.fatal( Messages.format( "jdo.loadFatal", _type, (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) ) );
+
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         } finally {
             try {
@@ -1195,7 +1198,7 @@ public final class SQLEngine implements Persistence {
             try {
                 _sqlCreate = _keyGen.patchSQL( _sqlCreate, _ids[0].name /*primKeyName*/ );
             } catch ( MappingException except )  {
-                _logInterceptor.exception( except );
+                _log.fatal( except );
                 // proceed without this stupid key generator
                 _keyGen = null;
                 buildSql();
@@ -1204,15 +1207,13 @@ public final class SQLEngine implements Persistence {
             if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
                 _sqlCreate = "{call " + _sqlCreate + "}";
         }
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for creating " + _type + ": " + _sqlCreate );
 
+        _log.debug( Messages.format( "jdo.creating", _type, _sqlCreate ) );
 
         sql = new StringBuffer( "DELETE FROM " ).append( _factory.quoteName( tableName ) );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for deleting " + _type + ": " + _sqlRemove );
+        _log.debug( Messages.format( "jdo.removing", _type, _sqlRemove ) );
 
         sql = new StringBuffer( "UPDATE " );
         sql.append( _factory.quoteName( _mapTo ) );
@@ -1242,8 +1243,7 @@ public final class SQLEngine implements Persistence {
             }
         }
         _sqlStoreDirty = sql.toString();
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for updating " + _type + ": " + _sqlStoreDirty );
+        _log.debug( Messages.format( "jdo.updating", _type, _sqlStoreDirty ) );
     }
 
 
@@ -1317,8 +1317,7 @@ public final class SQLEngine implements Persistence {
 
         _sqlFinder = find;
 
-        if ( _logInterceptor != null )
-            _logInterceptor.storeStatement( "SQL for loading " + _type + ":  " + _sqlLoad );
+        _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
 
     }
 
@@ -1681,12 +1680,11 @@ public final class SQLEngine implements Persistence {
                 _stmt = ( (Connection) conn ).prepareStatement( _sql );
                 }
 
-                if (_logger != null) _logger.println(_sql);
-
                 for ( int i = 0 ; i < _values.length ; ++i ) {
                     _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;
                 }
+                _log.debug( Messages.format( "jdo.executing", _sql ) );
                 _rs = _stmt.executeQuery();
                 _resultSetDone = false;
             } catch ( SQLException except ) {

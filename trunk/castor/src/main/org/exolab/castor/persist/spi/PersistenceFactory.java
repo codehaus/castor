@@ -62,6 +62,7 @@ import org.exolab.castor.mapping.MappingException;
  * database and is configured through Bean-like accessor methods.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see Persistence
  */
@@ -85,13 +86,12 @@ public interface PersistenceFactory
      * the specified object type.
      *
      * @param clsDesc The class descriptor
-     * @param logInterceptor Interceptor to write log messages to
      *  (may be null)
      * @return A suiteable persistence implementation, or null
      * @throws MappingException Indicates that the object type is not
      *  supported by the persistence engine due to improper mapping
      */
-    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
+    public Persistence getPersistence( ClassDescriptor clsDesc )
         throws MappingException;
 
 

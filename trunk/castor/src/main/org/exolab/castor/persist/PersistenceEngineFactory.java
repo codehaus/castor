@@ -61,6 +61,7 @@ import org.exolab.castor.persist.spi.LogInterceptor;
  * interface.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public class PersistenceEngineFactory
@@ -72,15 +73,13 @@ public class PersistenceEngineFactory
      *
      * @param mapResolver All the descriptors supported by this engine
      * @param factory Persistence SPI factory
-     * @param logInterceptor Optional log/trace interceptor
      * @throws MappingException The SPI factory could not support one of
      *  object types due to a mapping errot
      */
-    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
-                                           LogInterceptor logInterceptor )
+    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory )
         throws MappingException
     {
-        return new LockEngine( mapResolver, factory, logInterceptor );
+        return new LockEngine( mapResolver, factory );
     }
 
 

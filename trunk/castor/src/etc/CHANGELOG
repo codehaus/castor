@@ -1,6 +1,10 @@
 
 Version (CVS) 
 -------------
+JDO:   Switched the logging mechanism in Castor over to use Jakarta Commons
+       Logging with Log4J as the default logging package. 
+       (Bruce - 20031110) 
+
 JDO:   Fixed bug 1391 using contribution from xgard@gmx.de.
        (Bruce - 20031110)
 

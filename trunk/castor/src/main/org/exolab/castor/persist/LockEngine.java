@@ -51,6 +51,10 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Enumeration;
 import java.util.Iterator;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
@@ -70,7 +74,6 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
 
 
@@ -99,9 +102,16 @@ import org.exolab.castor.util.Messages;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public final class LockEngine {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( LockEngine.class );
 
 
     /**
@@ -142,12 +152,6 @@ public final class LockEngine {
 
 
     /**
-     * The log interceptor used to trace persistence operations. May be null.
-     */
-    private LogInterceptor     _logInterceptor;
-
-
-    /**
      * Construct a new cache engine with the specified mapping table, 
      * persistence engine and the log interceptor.
      *
@@ -155,17 +159,14 @@ public final class LockEngine {
      *  supported by this cache
      * @param factory Factory for creating persistence engines for each
      *  object described in the map
-     * @param logInterceptor Log interceptor to use for cache and all its
-     *  persistence engines
      * @throws MappingException Indicate that one of the mappings is
      *  invalid
      */
-    LockEngine( MappingResolver mapResolver, PersistenceFactory factory, 
-            LogInterceptor logInterceptor )
+    LockEngine( MappingResolver mapResolver, PersistenceFactory factory )
             throws MappingException {
 
         try {
-            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory, logInterceptor );
+            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory );
     
             _typeInfo = new HashMap();
             Enumeration enum = v.elements();
@@ -214,8 +215,7 @@ public final class LockEngine {
                 Iterator itor = freshClasses.iterator();
                 while ( itor.hasNext() ) {
                     ClassMolder molder = (ClassMolder)itor.next();
-                    _logInterceptor.message("The base class, "
-                        + (molder.getExtends().getName())
+                    _log.error("The base class, " + (molder.getExtends().getName())
                         + ", of the extends class ," + molder.getName() 
                         + " can not be resolved! ");
                 }
@@ -263,8 +263,6 @@ public final class LockEngine {
                 }
             } */
 
-            _logInterceptor = logInterceptor;
-    
             _factory = factory;
         } catch ( ClassNotFoundException e ) {
             throw new MappingException("Declared Class not found!" );
@@ -369,8 +367,7 @@ public final class LockEngine {
             if ( lockedOid != null )
                 oid = lockedOid;
 
-            if ( _logInterceptor != null )
-                _logInterceptor.loading( typeInfo.molder.getName(), oid.getIdentity() );
+            _log.debug( Messages.format( "jdo.loading", typeInfo.molder.getName(), oid.getIdentity() ) );
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getName(), oid.getIdentity()));
@@ -450,8 +447,7 @@ public final class LockEngine {
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
-                if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.molder.getName(), oid.getIdentity() );
+                _log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
 
                 oid = lock.getOID();
 
@@ -482,8 +478,7 @@ public final class LockEngine {
             succeed = false;
 
             try {
-                if ( _logInterceptor != null )
-                    _logInterceptor.creating( typeInfo.molder.getName(), oid.getIdentity() );
+                _log.debug( Messages.format( "jdo.creating", typeInfo.molder.getName(), oid.getIdentity() ) );
 
                 lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_CREATE, 0 );
 
@@ -539,8 +534,7 @@ public final class LockEngine {
         try {
             lock = typeInfo.assure( oid, tx, true );
 
-            if ( _logInterceptor != null )
-                _logInterceptor.removing( typeInfo.molder.getName(), oid.getIdentity() );
+            _log.debug( Messages.format( "jdo.removing", typeInfo.molder.getName(), oid.getIdentity() ) );
 
             typeInfo.molder.delete( tx, oid );
 
@@ -630,8 +624,7 @@ public final class LockEngine {
             if ( write && ! oid.isDbLock() ) {
                 // Db-lock mode we always synchronize the object with
                 // the database and obtain a lock on the object.
-                if ( _logInterceptor != null )
-                    _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
+                _log.debug( Messages.format( "jdo.loading", typeInfo.javaClass, OID.flatten( oid.getIdentities() ) ) );
             }*/
             oid = lock.getOID();
 
@@ -752,8 +745,7 @@ public final class LockEngine {
         try {
             lock = typeInfo.assure( oid, tx, false );
 
-            if ( _logInterceptor != null )
-                _logInterceptor.storing( typeInfo.molder.getName(), oid.getIdentity() );
+            _log.debug( Messages.format( "jdo.storing", typeInfo.molder.getName(), oid.getIdentity() ) );
 
             typeInfo.molder.store( tx, oid, lock, object );
         } catch ( ObjectModifiedException e ) {
@@ -937,8 +929,7 @@ public final class LockEngine {
         } catch ( LockNotGrantedException except ) {
             // If this transaction has no write lock on the object,
             // something went foul.
-            if ( _logInterceptor != null )
-                _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
+            _log.fatal( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
             throw new IllegalStateException( except.toString() );
         }
     }

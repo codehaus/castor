@@ -48,11 +48,14 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.util.Hashtable;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.KeyGeneratorFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;
@@ -64,10 +67,16 @@ import org.exolab.castor.util.Messages;
  * the given parameters.
  * 
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 final class KeyGeneratorRegistry
 {
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( KeyGeneratorRegistry.class );
 
     /**
      * Association between key generator names (aliases) and instances.
@@ -85,8 +94,7 @@ final class KeyGeneratorRegistry
      */
     public KeyGenerator getKeyGenerator( PersistenceFactory factory,
                                          KeyGeneratorDescriptor desc,
-                                         int sqlType,
-                                         LogInterceptor logInterceptor )
+                                         int sqlType )
             throws MappingException
     {
         String keyGenName;
@@ -101,11 +109,10 @@ final class KeyGeneratorRegistry
 
             if (keyGenFactory != null) {
                 keyGen = keyGenFactory.getKeyGenerator( factory, desc.getParams(), sqlType );
-                if ( keyGen != null && logInterceptor != null ) {
-                    logInterceptor.message( "Key generator " +
-                            desc.getKeyGeneratorFactoryName() +
-                            " has been instantiated, parameters: " +
-                            desc.getParams() );
+                if ( keyGen != null ) 
+                {
+                    _log.debug( "Key generator " + desc.getKeyGeneratorFactoryName() +
+                            " has been instantiated, parameters: " + desc.getParams() );
                 }
             }
             if ( keyGen == null ) {

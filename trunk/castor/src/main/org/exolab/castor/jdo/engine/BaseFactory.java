@@ -48,6 +48,10 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.sql.SQLException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.mapping.MappingException;
@@ -56,30 +60,36 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
+import org.exolab.castor.util.Messages;
 
 
 /**
  * {@link org.exolab.castor.persist.spi.PersistenceFactory} for generic JDBC driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public abstract class BaseFactory
     implements PersistenceFactory
 {
 
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( BaseFactory.class );
 
-    public Persistence getPersistence( ClassDescriptor clsDesc, LogInterceptor logInterceptor )
+
+    public Persistence getPersistence( ClassDescriptor clsDesc )
         throws MappingException
     {
         if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
             return null;
         try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, logInterceptor, this, null);
+            return new SQLEngine( (JDOClassDescriptor) clsDesc, this, null);
         } catch ( MappingException except ) {
-            if ( logInterceptor != null )
-                logInterceptor.exception( except );
+            _log.fatal( Messages.format( "jdo.fatalException", except ) );
             return null;
         }
     }

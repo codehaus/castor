@@ -43,42 +43,46 @@
  * $Id$
  */
 
-
 package org.exolab.castor.jdo;
 
- 
-import java.io.PrintWriter;
 import java.io.InputStream;
+import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.Serializable;
-import java.util.Hashtable;
-import org.xml.sax.InputSource;
-import org.xml.sax.EntityResolver;
 import java.rmi.Remote;
-import javax.naming.InitialContext;
-import javax.naming.Referenceable;
-import javax.naming.Reference;
-import javax.naming.StringRefAddr;
-import javax.naming.RefAddr;
+import java.util.Hashtable;
+
 import javax.naming.Context;
+import javax.naming.InitialContext;
 import javax.naming.Name;
-import javax.naming.NamingException;
 import javax.naming.NameNotFoundException;
+import javax.naming.NamingException;
 import javax.naming.NoInitialContextException;
+import javax.naming.RefAddr;
+import javax.naming.Reference;
+import javax.naming.Referenceable;
 import javax.naming.spi.ObjectFactory;
-import javax.transaction.TransactionManager;
-import javax.transaction.Transaction;
+import javax.naming.StringRefAddr;
 import javax.transaction.Status;
-import org.exolab.castor.mapping.MappingException;
+import javax.transaction.Transaction;
+import javax.transaction.TransactionManager;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.jdo.engine.OQLQueryImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
-import org.exolab.castor.persist.spi.LogInterceptor;
-import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
+import org.exolab.castor.persist.spi.InstanceFactory;
+import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
+
+import org.xml.sax.EntityResolver;
+import org.xml.sax.InputSource;
 
 
 /**
@@ -121,12 +125,19 @@ import org.exolab.castor.util.Messages;
  * </pre>
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public class JDO
     implements DataObjects, Referenceable,
            ObjectFactory, Serializable
 {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( JDO.class );
 
 
     /**
@@ -146,6 +157,9 @@ public class JDO
     /**
      * The log intercpetor to which all logging and tracing messages
      * will be sent.
+     * @deprected There is no need for this member due to the implementation
+     * of Log4J which is controlled via the log4j.properties file.
+     * @see #_log
      */
     private LogInterceptor  _logInterceptor;
 
@@ -245,6 +259,8 @@ public class JDO
      * logging and tracing messages will be printed.
      *
      * @return The log writer, null if disabled
+     * @deprected There is no need for this method due to the implementation
+     * of Log4J which is controlled via the log4j.properties file.
      */
     public void setLogWriter( PrintWriter logWriter )
     {
@@ -262,6 +278,8 @@ public class JDO
      * logging and tracing messages are sent.
      *
      * @param logInterceptor The log interceptor, null if disabled
+     * @deprected There is no need for this method due to the implementation
+     * of Log4J which is controlled via the log4j.properties file.
      */
     public void setLogInterceptor( LogInterceptor logInterceptor )
     {
@@ -309,6 +327,8 @@ public class JDO
      * Returns the log interceptor for this database source.
      *
      * @return The log interceptor, null if disabled
+     * @deprected There is no need for this method due to the implementation
+     * of Log4J which is controlled via the log4j.properties file.
      */
     public LogInterceptor getLogInterceptor()
     {
@@ -580,7 +600,7 @@ public class JDO
             if ( _dbConf == null )
                 throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", _dbName ) );
             try {
-                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), _entityResolver, _logInterceptor, _classLoader );
+                DatabaseRegistry.loadDatabase( new InputSource( _dbConf ), _entityResolver, _classLoader );
             } catch ( MappingException except ) {
                 throw new DatabaseNotFoundException( except );
             }
@@ -601,8 +621,8 @@ public class JDO
                     return _txDbPool.get( tx );
 
                 if ( tx != null && tx.getStatus() == Status.STATUS_ACTIVE ) {
-                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
-                            _callback, _instanceFactory, tx, _classLoader, _autoStore );
+                    dbImpl = new DatabaseImpl( _dbName, _lockTimeout, _callback, 
+                            _instanceFactory, tx, _classLoader, _autoStore );
 
                     if ( _txDbPool != null )
                         _txDbPool.put( tx, dbImpl );
@@ -616,12 +636,11 @@ public class JDO
                 // No TransactionManager object. Just ignore.
             } catch ( Exception except ) {
                 // NamingException, SystemException, RollbackException
-                if ( _logInterceptor != null )
-                    _logInterceptor.exception( except );
+                    _log.warn( Messages.format( "jdo.warnException", except ) );
             }
         }
-        return new DatabaseImpl( _dbName, _lockTimeout, _logInterceptor,
-                _callback, _instanceFactory, null, _classLoader, _autoStore );
+        return new DatabaseImpl( _dbName, _lockTimeout, _callback, 
+                _instanceFactory, null, _classLoader, _autoStore );
     }
 
 
@@ -637,7 +656,7 @@ public class JDO
     public static void loadConfiguration( String url )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, null );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null );
     }
 
 
@@ -655,7 +674,7 @@ public class JDO
     public static void loadConfiguration( String url, ClassLoader loader )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, loader );
     }
     
     
@@ -677,7 +696,7 @@ public class JDO
                                           ClassLoader loader )
         throws MappingException
     {
-        DatabaseRegistry.loadDatabase( source, resolver, null, loader );
+        DatabaseRegistry.loadDatabase( source, resolver, loader );
     }
 
 

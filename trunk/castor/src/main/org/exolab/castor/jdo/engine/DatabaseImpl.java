@@ -47,10 +47,18 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.SystemException;
 import javax.transaction.Synchronization;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.OQLQuery;
@@ -72,16 +80,10 @@ import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceInfo;
 import org.exolab.castor.persist.PersistenceInfoGroup;
-import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.util.Messages;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
-
-
 
 
 /**
@@ -89,11 +91,18 @@ import java.util.Set;
  * demaracation.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public class DatabaseImpl
     implements Database, Synchronization
 {
+
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static Log _log = LogFactory.getFactory().getInstance( SQLEngine.class );
 
 
     /**
@@ -116,12 +125,6 @@ public class DatabaseImpl
      * specified in seconds.
      */
     private int                        _lockTimeout;
-
-
-    /**
-     * The log interceptor to which all logging and tracing messages will be sent.
-     */
-    private LogInterceptor             _logInterceptor;
 
 
     /**
@@ -166,11 +169,11 @@ public class DatabaseImpl
     private TxDatabaseMap              _txMap;
 
 
-    public DatabaseImpl( String dbName, int lockTimeout,
-            LogInterceptor logInterceptor, CallbackInterceptor callback,
-            InstanceFactory instanceFactory, Transaction transaction, 
-            ClassLoader classLoader, boolean autoStore )
-            throws DatabaseNotFoundException {
+    public DatabaseImpl( String dbName, int lockTimeout, CallbackInterceptor callback,
+                         InstanceFactory instanceFactory, Transaction transaction, 
+                         ClassLoader classLoader, boolean autoStore )
+        throws DatabaseNotFoundException 
+    {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
@@ -183,7 +186,6 @@ public class DatabaseImpl
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
         _scope = new PersistenceInfoGroup( pe );
-        _logInterceptor = logInterceptor;
         _callback = callback;
         _instanceFactory = instanceFactory;
         _dbName = dbName;
@@ -562,21 +564,18 @@ public class DatabaseImpl
             try {
                 _transaction.setRollbackOnly();
             } catch ( SystemException except ) {
-                if ( _logInterceptor != null )
-                    _logInterceptor.exception( except );
+                _log.warn( Messages.format( "jdo.warnException", except ) );
             }
             return;
         }
         try {
             _ctx.prepare();
         } catch ( TransactionAbortedException except ) {
-            if ( _logInterceptor != null )
-                _logInterceptor.exception( except );
+            _log.fatal( Messages.format( "jdo.fatalException", except ) );
             try {
                 _transaction.setRollbackOnly();
             } catch ( SystemException except2 ) {
-                if ( _logInterceptor != null )
-                    _logInterceptor.exception( except2 );
+                _log.fatal( Messages.format( "jdo.fatalException", except2 ) );
             }
             _ctx.rollback();
         }
@@ -597,8 +596,7 @@ public class DatabaseImpl
                 try {
                     _ctx.commit();
                 } catch ( TransactionAbortedException except ) {
-                    if ( _logInterceptor != null )
-                        _logInterceptor.exception( except );
+                    _log.fatal( Messages.format( "jdo.fatalException", except ) );
                     _ctx.rollback();
                 }
                 _ctx = null;
