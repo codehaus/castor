@@ -94,7 +94,7 @@ public class ClassDescriptorImpl
     /**
      * The field of the identity for this class.
      */
-    private final FieldDescriptor[]    _identities;
+    protected final FieldDescriptor[]    _identities;
 
 
     /**

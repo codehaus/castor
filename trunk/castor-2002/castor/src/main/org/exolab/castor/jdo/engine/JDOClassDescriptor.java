@@ -174,9 +174,11 @@ public class JDOClassDescriptor
         }
         
         if ( field == null ) {
-            if ( this.getIdentity() instanceof JDOFieldDescriptor &&
-                 this.getIdentity().getFieldName().equals( name ) ) {
-                field = (JDOFieldDescriptor) this.getIdentity();
+          for ( int i = 0 ; i < _identities.length ; ++i ) {
+            if ( _identities[ i ] instanceof JDOFieldDescriptor &&
+                 _identities[ i ].getFieldName().equals( name ) ) {
+                field = (JDOFieldDescriptor) _identities[ i ];
+            }
             }
         }
 
