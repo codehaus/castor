@@ -125,7 +125,12 @@ public class MappingHelper
 	}
 
 	if ( objMap.getExtends() != null ) {
-	    extend = mapTable.getDescriptor( objMap.getExtends() );
+	    try {
+		extend = (JDOObjectDesc) mapTable.getDescriptor( loader.loadClass( objMap.getExtends() ) );
+	    } catch ( ClassNotFoundException excpet ) {
+		throw new MappingException( "Could not find definition of super mapping " +
+					    objMap.getExtends() + " -- forward references not supported" );
+	    }
 	    if ( extend == null )
 		throw new MappingException( "Could not find definition of super mapping " +
 					    objMap.getExtends() + " -- forward references not supported" );
@@ -195,7 +200,12 @@ public class MappingHelper
 		objTypeName = relMap.getObject().getType();
 	    } else {
 		objTypeName = relMap.getObjectRef().getType();
-		relDesc = mapTable.getDescriptor( objTypeName );
+		try {
+		    relDesc = (JDOObjectDesc) mapTable.getDescriptor( loader.loadClass( objTypeName ) );
+		} catch ( ClassNotFoundException except ) {
+		    throw new MappingException( "Could not find mapping for object " +
+						objTypeName );
+		}
 		if ( relDesc == null )
 		    throw new MappingException( "Could not find mapping for object " +
 						objTypeName );

@@ -50,6 +50,8 @@ package org.exolab.castor.jdo;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.ObjectMapping;
@@ -62,6 +64,7 @@ import org.exolab.castor.jdo.mapping.ObjectMapping;
  * @version $Revision$ $Date$
  */
 public class MappingTable
+    implements MappingResolver
 {
 
 
@@ -77,16 +80,7 @@ public class MappingTable
     }
 
 
-    public JDOObjectDesc getDescriptor( Class type )
-    {
-	JDOObjectDesc desc;
-
-	desc = (JDOObjectDesc) _mapping.get( type.getName() );
-	return desc;
-    }
-
-
-    public JDOObjectDesc getDescriptor( String type )
+    public ObjectDesc getDescriptor( Class type )
     {
 	JDOObjectDesc desc;
 
@@ -95,9 +89,9 @@ public class MappingTable
     }
 
 
-    public void addDescriptor( JDOObjectDesc desc )
+    public void addDescriptor( ObjectDesc desc )
     {
-	_mapping.put( desc.getObjectType().getName(), desc );
+	_mapping.put( desc.getObjectType(), desc );
     }
 
 
@@ -107,7 +101,7 @@ public class MappingTable
     }
 
 
-    public Enumeration listObjectClasses()
+    public Enumeration listObjectTypes()
     {
 	return _mapping.keys();
     }

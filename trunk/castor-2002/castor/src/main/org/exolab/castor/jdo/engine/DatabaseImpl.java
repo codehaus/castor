@@ -73,6 +73,7 @@ import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ObjectDesc;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
+import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.Messages;
 
 
