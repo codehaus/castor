@@ -522,6 +522,11 @@ public abstract class TransactionContext
 
         // Make sure the object has not beed persisted in this transaction.
         identities = molder.getIdentities( object );
+        // [oleg] In the case where key generator is used,
+        // the value of identity is dummy, set it to null
+        if ( molder.isKeyGeneratorUsed() ) {
+            OID.setIdsNull( identities );
+        }
         entry = getObjectEntry( object );
         if ( entry != null && ! entry.deleted ) {
             throw new PersistenceException( Messages.format("persist.objectAlreadyPersistent", object.getClass().getName(), OID.flatten(entry.oid.getIdentities())) );
@@ -540,25 +545,25 @@ public abstract class TransactionContext
         oid = new OID( engine, molder, depended, identities );
         entry = getObjectEntry( engine, oid );
         if ( !OID.isIdsNull( identities ) && entry != null ) {
-            if ( ! entry.deleted || entry.object != object ) 
+            if ( ! entry.deleted || entry.object != object )
                 throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), identities[0] ) );
 
             else {
-                // If the object was already deleted in this transaction, 
+                // If the object was already deleted in this transaction,
                 // just undelete it.
                 // Remove the entry from a FIFO linked list of deleted entries.
                 if ( _deletedList != null ) {
                     ObjectEntry deleted;
-                    
-                    if ( _deletedList == entry ) 
+
+                    if ( _deletedList == entry )
                         _deletedList = entry.nextDeleted;
                     else {
                         deleted = _deletedList;
-                        while ( deleted.nextDeleted != null && deleted.nextDeleted != entry ) 
+                        while ( deleted.nextDeleted != null && deleted.nextDeleted != entry )
                             deleted = deleted.nextDeleted;
-                        if ( deleted.nextDeleted == entry ) 
+                        if ( deleted.nextDeleted == entry )
                             deleted.nextDeleted = entry.nextDeleted;
-                        else 
+                        else
                             throw new PersistenceException( Messages.format("persist.deletedNotFound", OID.flatten(identities)) );
                     }
                 }
@@ -571,7 +576,7 @@ public abstract class TransactionContext
             }
             // Must perform creation after object is recorded in transaction
             // to prevent circular references.
-            if ( entry == null) 
+            if ( entry == null)
                 entry = addObjectEntry( oid, object );
             oid = engine.create( this, oid, object );
 

@@ -286,9 +286,9 @@ public final class OID {
     public static boolean isIdsNull( Object[] objects ) {
         if ( objects == null )
             return true;
-        if ( objects.length == 0 ) 
+        if ( objects.length == 0 )
             return true;
-        
+
         for ( int i=0; i<objects.length; i++ ) {
             if ( objects[i] == null )
                 return true;
@@ -302,14 +302,25 @@ public final class OID {
     public boolean isIdsNull() {
         if ( _identities == null )
             return true;
-        if ( _identities.length == 0 ) 
+        if ( _identities.length == 0 )
             return true;
-        
+
         for ( int i=0; i<_identities.length; i++ ) {
             if ( _identities[i] == null )
                 return true;
         }
         return false;
+    }
+
+    /**
+     * Utility method to set the identity to null.
+     */
+    public static void setIdsNull(Object[] objects) {
+        if (objects != null) {
+            for (int i = 0; i < objects.length; i++) {
+                objects[i] = null;
+            }
+        }
     }
 
     /**
