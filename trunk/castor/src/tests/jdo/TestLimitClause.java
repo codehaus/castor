@@ -98,9 +98,8 @@ public class TestLimitClause extends CastorTestCase
         Connection connection = (Connection) ((DatabaseImpl) _db).getConnection();
         
         Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("DELETE FROM test_table");
+        int retValue = statement.executeUpdate ("DELETE FROM test_table");
         
-        resultSet.close();
         statement.close();
         
         _db.commit();
