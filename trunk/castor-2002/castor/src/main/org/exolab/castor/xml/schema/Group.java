@@ -324,6 +324,18 @@ public class Group extends Particle
     } //-- enumerate
 
     /**
+     * Returns the element declaration with the given name, or null if no
+     * element declaration with that name exists in this ContentModelGroup.
+     *
+     * @param name the name of the element.
+     * @return the ElementDecl with the given name, or null if no
+     * ElementDecl exists in this ContentModelGroup.
+    **/
+    public ElementDecl getElementDecl(String name) {
+        return _contentModel.getElementDecl(name);
+    } //-- getElementDecl
+    
+    /**
      * Returns the Particle at the specified index
      * @param index the index of the particle to return
      * @returns the CMParticle at the specified index
