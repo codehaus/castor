@@ -1,4 +1,3 @@
-
 /**
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided
@@ -54,68 +53,139 @@ import java.util.NoSuchElementException;
 
 
 /**
+ * Holds an arbitrary set of LDAP attributes. LDAP attributes that do
+ * not map to a particular object field can still be accessed through
+ * this collection of attributes. Each attribute has a name and one or
+ * more values.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
+ * @see Attribute
  */
 public class AttributeSet
 {
 
 
-    private Hashtable  _attrSet = new Hashtable();
+    /**
+     * A collection of attributes ({@link Attribute}) accessible by name.
+     */
+    private Hashtable  _attrs = new Hashtable();
 
 
+    /**
+     * Return an attribute with the specified name, null if no such
+     * attribute exists in this set.
+     *
+     * @param name The attribute's name
+     * @return The attribute
+     */
     public Attribute getAttribute( String name )
     {
-	return (Attribute) _attrSet.get( name );
+	return (Attribute) _attrs.get( name );
     }
 
 
+    /**
+     * Removes an attribute with the specified name, returning the
+     * removed attribute or null if there was no such attribute in
+     * this set.
+     *
+     * @param name The attribute's name
+     * @return The old attribute, or null
+     */
     public Attribute removeAttribute( String name )
     {
-	return (Attribute) _attrSet.remove( name );
+	return (Attribute) _attrs.remove( name );
     }
 
 
-    public Attribute setAttribute( String name, Attribute attr )
+    /**
+     * Adds an attribute to this set. If an attribute with the same
+     * name already exists in that set, the old attribute is removed
+     * and returned.
+     *
+     * @param attr The attribute
+     * @return The old attribute, or null
+     */
+    public Attribute setAttribute( Attribute attr )
     {
-	return (Attribute) _attrSet.put( name, attr );
+	return (Attribute) _attrs.put( attr.getName(), attr );
     }
 
 
+    /**
+     * Adds an attribute to this set. If an attribute with the same
+     * name already exists in that set, the old attribute is removed
+     * and returned. The attribute's values is an array of zero or
+     * more string values.
+     *
+     * @param name The attribute's name
+     * @param value The attribute's string values
+     * @return The old attribute, or null
+     */
     public Attribute setAttribute( String name, String[] values )
     {
 	Attribute attr;
 
 	attr = new Attribute( name );
 	attr.setValues( values );
-	return (Attribute) _attrSet.put( name, attr );
+	return (Attribute) _attrs.put( name, attr );
     }
 
 
+    /**
+     * Returns an enumeration of all the attributes in this set.
+     *
+     * @return Enumeration of {@link Attribute}
+     */
     public Enumeration listAttributes()
     {
-	return _attrSet.elements();
+	return _attrs.elements();
     }
 
 
+    /**
+     * Returns an enumeration of the names of all attributes in this set.
+     *
+     * @return Enumeration of attribute names
+     */
     public Enumeration listAttributeNames()
     {
-	return _attrSet.keys();
+	return _attrs.keys();
     }
 
 
+    /**
+     * Returns a textual presentation of the attribute set.
+     */
     public String toString()
     {
 	StringBuffer str;
 	Enumeration  enum;
 
 	str = new StringBuffer();
-	enum = _attrSet.elements();
+	enum = _attrs.elements();
 	while ( enum.hasMoreElements() ) {
 	    str.append( enum.nextElement().toString() );
 	}
 	return str.toString();
+    }
+
+
+    public Object clone()
+    {
+	AttributeSet copy;
+	Attribute    attr;
+	Enumeration  enum;
+
+	copy = new AttributeSet();
+	enum = _attrs.elements();
+	while ( enum.hasMoreElements() ) {
+	    attr = (Attribute) enum.nextElement();
+	    attr = (Attribute) attr.clone();
+	    copy._attrs.put( attr.getName(), attr );
+	}
+	return copy;
     }
 
 
