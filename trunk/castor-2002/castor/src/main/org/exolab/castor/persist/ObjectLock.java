@@ -96,7 +96,7 @@ final class ObjectLock
     /**
      * The object being locked, null if the object has been deleted.
      */
-    private Object             _object;
+    private Object              _object;
 
 
     /**
@@ -139,9 +139,9 @@ final class ObjectLock
      *
      * @param obj The object to create a lock for
      */
-    ObjectLock( Object obj )
+    ObjectLock( Object object )
     {
-        _object = obj;
+        _object = object;
     }
 
 
@@ -157,7 +157,7 @@ final class ObjectLock
     boolean hasLock( TransactionContext tx, boolean write )
     {
         LinkedTx read;
-        
+
         if ( _writeLock == tx )
             return true;
         if ( write )
@@ -191,7 +191,7 @@ final class ObjectLock
      * has not returned yet. If a read lock is available for the
      * transaction and a write lock is requested, the read lock is
      * cancelled whether or not the write is acquired.
-     * 
+     *
      * @param tx The transaction requesting the lock
      * @param write The type of lock requested
      * @param timeout Timeout waiting to acquire lock (in milliseconds),
@@ -208,7 +208,7 @@ final class ObjectLock
         // Note: This method must succeed even if an exception is thrown
         // in the middle. An exception may be thrown by a Thread.stop().
         // Must make sure not to lose consistency.
-        
+
         if ( _writeLock == tx ) {
             // Already have write lock, can continue
         } else if ( _readLock == null && _writeLock == null ) {
@@ -226,7 +226,7 @@ final class ObjectLock
             // Looking for read lock and no write locks, can acquire
             // Make sure we do not wait twice for the same lock
             LinkedTx read;
-            
+
             read = _readLock;
             while ( read != null ) {
                 if ( read.tx == tx )
@@ -239,19 +239,19 @@ final class ObjectLock
             if ( timeout == 0 )
                 throw new LockNotGrantedException( write ? "persist.writeLockTimeout" :
                                                    "persist.readLockTimeout" );
-            
+
             try {
                 // Detect possibility of dead-lock. Must remain in wait-on-lock
                 // position until lock is granted or exception thrown.
                 tx.setWaitOnLock( this );
                 detectDeadlock( tx );
-                
+
                 // Must wait for lock and then attempt to reacquire
                 if ( write )
                     _writeWaiting = new LinkedTx( tx, _writeWaiting );
                 else
                     _readWaiting = new LinkedTx( tx, _readWaiting );
-                
+
                 // Wait until notified or timeout elapses. Must detect
                 // when notified but object deleted (i.e. locks released)
                 // All waiting transactions are notified at once, but once
@@ -275,10 +275,12 @@ final class ObjectLock
                 if ( timeout < 0 )
                     timeout = 0;
                 removeWaiting( tx );
+                tx.setWaitOnLock( null );
                 return acquire( tx, write, timeout );
             } finally {
                 // Must always remove waiting transaction.
                 removeWaiting( tx );
+                tx.setWaitOnLock( null );
             }
         }
         return _object;
@@ -305,7 +307,7 @@ final class ObjectLock
                     _readLock = _readLock.next;
                 } else {
                     LinkedTx read;
-                    
+
                     read = _readLock;
                     while ( read.next != null ) {
                         if ( read.next.tx == tx ) {
@@ -370,27 +372,27 @@ final class ObjectLock
         throws LockNotGrantedException
     {
         ObjectLock waitOn;
-        
+
         // Inspect write lock and all read locks (the two are mutually exclusive).
-        
+
         // For each lock look at all the waiting transactions( waitOn) and
         // determine whether they are currently waiting for a lock. A transaction
         // is waiting for a lock if it has called acquire() and has not
         // returned from the call.
-        
+
         // If one of these locks is locked (read or write) by this transaction,
         // a dead lock has been detected. Recursion is necessary to prevent
         // indirect dead locks (A locked by B, B locked by C, C acquires lock on A)
-        
+
         // Only the last lock attempt in a dead-lock situation will cancel.
-        
+
         if ( _writeLock != null ) {
             // _writeLock is the blocking transaction. We are only interested in
             // a blocked transacrtion.
             waitOn = _writeLock.getWaitOnLock();
             if ( waitOn != null ) {
                 LinkedTx read;
-                
+
                 // Is the blocked transaction blocked by the transaction locking
                 // this object? This is a deadlock.
                 if ( waitOn._writeLock == waitingTx ) {
@@ -406,19 +408,19 @@ final class ObjectLock
             }
         } else {
             LinkedTx lock;
-            
+
             lock = _readLock;
             while ( lock != null ) {
-                
+
                 // T1 trying to acquire lock on O1, which is locked by T2
                 // T2 trying to acauire lock on O1, T1 is waiting on O1
-                
+
                 // lock is the blocking transaction. We are only interested in
                 // a blocked transacrtion.
                 waitOn = lock.tx.getWaitOnLock();
                 if ( waitOn != null && lock.tx != waitingTx ) {
                     LinkedTx read;
-                    
+
                     if ( waitOn._writeLock == waitingTx ) {
                         throw new LockNotGrantedException( "persist.deadlock" );
                     }
@@ -434,8 +436,8 @@ final class ObjectLock
             }
         }
     }
-    
-    
+
+
     /**
      * Remove the transaction from the waiting list (both read and write).
      */
@@ -447,7 +449,7 @@ final class ObjectLock
                     _writeWaiting = _writeWaiting.next;
                 } else {
                     LinkedTx wait;
-                    
+
                     wait = _writeWaiting;
                     while ( wait.next != null ) {
                         if ( wait.next.tx == tx ) {
@@ -463,7 +465,7 @@ final class ObjectLock
                     _readWaiting = _readWaiting.next;
                 } else {
                     LinkedTx wait;
-                    
+
                     wait = _readWaiting;
                     while ( wait.next != null ) {
                         if ( wait.next.tx == tx ) {
@@ -480,27 +482,27 @@ final class ObjectLock
             removeWaiting( tx );
         }
     }
-    
-    
+
+
     /**
      * Object uses to hold a linked list of transactions holding
      * write locks or waiting for a read/write lock.
      */
     static class LinkedTx
     {
-        
+
         TransactionContext tx;
-        
+
         LinkedTx           next;
-        
+
         LinkedTx( TransactionContext tx, LinkedTx next )
         {
             this.tx = tx;
             this.next = next;
         }
-        
+
     }
-    
+
 
 }
 

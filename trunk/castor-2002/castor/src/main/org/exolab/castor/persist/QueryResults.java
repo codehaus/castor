@@ -68,25 +68,25 @@ public final class QueryResults
     /**
      * The transaction context in which this query was executed.
      */
-    private TransactionContext _tx;
+    private final TransactionContext _tx;
     
     
     /**
      * The persistence engine against which this query was executed.
      */
-    private PersistenceEngine   _engine;
+    private final PersistenceEngine   _engine;
     
     
     /**
      * The executed query.
      */
-    private PersistenceQuery     _query;
+    private final PersistenceQuery     _query;
     
     
     /**
      * The mode in which this query is running.
      */
-    private AccessMode             _accessMode;
+    private final AccessMode             _accessMode;
     
     
     /**

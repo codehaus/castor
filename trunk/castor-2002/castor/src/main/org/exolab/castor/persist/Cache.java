@@ -66,14 +66,14 @@ final class Cache
      * Mapping of OIDs to objects. The object is used as the key, and
      * {@link OID} is the value.
      */
-    private Hashtable  _oids = new Hashtable();
+    private final Hashtable  _oids = new Hashtable();
 
 
     /**
      * Mapping of object locks to OIDs. The {@link OID} is used as the
      * key, and {@link ObjectLock} is the value. There is one lock per OID.
      */
-    private Hashtable _locks = new Hashtable();
+    private final Hashtable _locks = new Hashtable();
 
 
     ObjectLock getLock( OID oid )

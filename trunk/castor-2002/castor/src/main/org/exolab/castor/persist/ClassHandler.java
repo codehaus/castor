@@ -47,6 +47,7 @@
 package org.exolab.castor.persist;
 
 
+import java.util.Enumeration;
 import java.util.Vector;
 import java.io.ObjectOutputStream;
 import java.io.ObjectInputStream;
@@ -58,6 +59,7 @@ import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
@@ -71,11 +73,11 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see ClassDescriptor
  */
-public class ClassHandler
+public final class ClassHandler
 {
 
 
-    private ClassDescriptor   _clsDesc;
+    private final ClassDescriptor   _clsDesc;
 
 
     private ClassHandler      _extends;
@@ -139,14 +141,17 @@ public class ClassHandler
                 fields.addElement( new FieldInfo( descs[ i ], null ) );
                 rels.addElement( null );
             } else {
-                FieldHandler    handler;
-                RelationHandler relHandler;
+                FieldDescriptor[] relFields;
+                RelationHandler   relHandler;
+                boolean           attached = false;
 
-                if ( descs[ i ].getHandler() instanceof IndirectFieldHandler )
-                    handler = ( (IndirectFieldHandler) descs[ i ].getHandler() ).getHandler();
-                else
-                    handler = descs[ i ].getHandler();
-                relHandler = new RelationHandler( descs[ i ].getFieldName(), handler, clsHandler );
+                relFields = clsHandler._clsDesc.getFields();
+                for ( int j = 0 ; j < relFields.length ; ++j )
+                    if ( relFields[ j ].getFieldType() == clsDesc.getJavaClass() ) {
+                        attached = true;
+                        break;
+                    }
+                relHandler = new RelationHandler( descs[ i ], clsHandler, attached );
                 fields.addElement( new FieldInfo( descs[ i ], relHandler ) );
                 rels.addElement( relHandler );
             }
@@ -159,7 +164,7 @@ public class ClassHandler
         return _fields.length;
     }
 
-                      
+
     /**
      * Returns the access mode for this class.
      *
@@ -256,7 +261,7 @@ public class ClassHandler
         return Types.newInstance( _clsDesc.getJavaClass() );
     }
 
-    
+
     public Object getIdentity( Object object )
     {
         if ( _relIdentity == null )
@@ -300,13 +305,28 @@ public class ClassHandler
                 _fields[ i ].handler.setValue( target, copyValue( _fields[ i ], fields[ i ] ) );
             else {
                 Object relSource;
-                Object relTarget;
-            
+
                 if ( fields[ i ] == null )
                     _fields[ i ].relation.setRelated( target, null );
-                else {
-                    relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(),
-                                           fields[ i ] );
+                else if ( _fields[ i ].colHandler != null ) {
+                    Object collection = null;
+                    Vector array;
+
+                    array = (Vector) fields[ i ];
+                    for ( int j = 0 ; j < array.size() ; ++j ) {
+                        Object object;
+
+                        object = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), array.elementAt( j ) );
+                        if ( object == null )
+                            throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
+                                                               array.elementAt( j ) );
+                        collection = _fields[ i ].colHandler.addValue( collection, object, array.elementAt( j ) );
+                    }
+                    _fields[ i ].relation.setRelated( target, collection );
+                } else {
+                    Object relTarget;
+
+                    relTarget = ctx.fetch( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
                     if ( relTarget == null )
                         throw new ObjectNotFoundException( _fields[ i ].relation.getRelatedHandler().getJavaClass(),
                                                            fields[ i ] );
@@ -323,9 +343,20 @@ public class ClassHandler
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].relation == null )
                 fields[ i ] = copyValue( _fields[ i ], _fields[ i ].handler.getValue( source ) );
-            else {
-                fields[ i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity, 
-                                                       _fields[ i ].relation.getIdentity( _fields[ i ].relation.getRelated( source ) ) );
+            else if ( _fields[ i ].colHandler != null ) {
+                Vector     vector;
+                Enumeration enum;
+
+                vector = new Vector();
+                enum = _fields[ i ].colHandler.getValues( _fields[ i ].relation.getRelated( source ) );
+                while ( enum.hasMoreElements() ) {
+                    vector.addElement( copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
+                                                  _fields[ i ].relation.getIdentity( enum.nextElement() ) ) );
+                }
+                fields[ i ] = vector;
+            } else {
+                fields[ i ] = copyValue( _fields[ i ].relation.getRelatedHandler()._identity,
+                    _fields[ i ].relation.getIdentity( _fields[ i ].relation.getRelated( source ) ) );
             }
         }
     }
@@ -346,7 +377,7 @@ public class ClassHandler
                 ByteArrayOutputStream ba;
                 ObjectOutputStream    os;
                 ObjectInputStream     is;
-                
+
                 ba = new ByteArrayOutputStream();
                 os = new ObjectOutputStream( ba );
                 os.writeObject( source );
@@ -416,17 +447,19 @@ public class ClassHandler
     final static class FieldInfo
     {
 
-        final FieldHandler  handler;
+        final FieldHandler      handler;
 
-        final Class         fieldType;
+        final Class             fieldType;
 
-        final String        fieldName;
+        final String            fieldName;
 
-        final boolean       immutable;
+        final boolean           immutable;
 
-        final boolean       required;
+        final boolean           required;
 
-        final RelationHandler relation;
+        final RelationHandler   relation;
+
+        final CollectionHandler colHandler;
 
         FieldInfo( FieldDescriptor fieldDesc, RelationHandler relation )
         {
@@ -436,6 +469,7 @@ public class ClassHandler
             this.immutable = fieldDesc.isImmutable();
             this.required = fieldDesc.isRequired();
             this.relation = relation;
+            this.colHandler = fieldDesc.getCollectionHandler();
         }
 
     }
