@@ -88,6 +88,22 @@ public interface FieldHandler
 
 
     /**
+     * Sets the value of the field to a default value.
+     * <p>
+     * Reference fields are set to null, primitive fields are set to
+     * their default value, collection fields are emptied of all
+     * elements.
+     *
+     * @param object The object
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler is not
+     *  compatiable with the Java object
+     */
+    public void resetValue( Object object )
+        throws IllegalStateException, IllegalArgumentException;
+
+
+    /**
      * @deprecated No longer supported
      */
     public void checkValidity( Object object )

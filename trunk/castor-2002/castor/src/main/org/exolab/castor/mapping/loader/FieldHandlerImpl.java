@@ -406,6 +406,68 @@ public final class FieldHandlerImpl
     }
 
 
+    public void resetValue( Object object )
+    {
+        if ( _colHandler == null ) {
+
+            try {
+                if ( _handler != null )
+                    _handler.resetValue( object );
+                else if ( _field != null )
+                    _field.set( object, _default );
+                else if ( _setMethod != null ) {
+                    if ( _deleteMethod != null )
+                        _deleteMethod.invoke( object, null );
+                    else
+                        _setMethod.invoke( object, new Object[] { _default } );
+                }
+                // If the field has no set method, ignore it.
+                // If this is a problem, identity it someplace else.
+            } catch ( IllegalArgumentException except ) {
+                // Graceful way of dealing with unwrapping exception
+                throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+
+        } else {
+            Object collect;
+
+            try {
+                // Get the field value (the collection), add the value to it,
+                // possibly yielding a new collection (in the case of an array),
+                // and set that collection back into the field.
+                if ( _handler != null ) {
+                    _handler.resetValue( object );
+                } else if ( _field != null ) {
+                    collect = _field.get( object );
+                    collect = _colHandler.clear( collect );
+                    if ( collect != null )
+                        _field.set( object, collect );
+                } else if ( _getMethod != null ) {
+                    collect = _getMethod.invoke( object, null );
+                    collect = _colHandler.clear( collect );
+                    if ( collect != null && _setMethod != null)
+                        _setMethod.invoke( object, new Object[] { collect } );
+                }                
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+
+        }
+    }
+
+
     /**
      * @deprecated
      */
