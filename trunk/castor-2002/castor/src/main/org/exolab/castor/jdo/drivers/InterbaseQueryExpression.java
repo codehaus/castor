@@ -15,7 +15,7 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 public final class InterbaseQueryExpression
     extends JDBCQueryExpression
 {
-
+    private StringBuffer sql;
 
     public InterbaseQueryExpression( PersistenceFactory factory )
     {
@@ -24,10 +24,10 @@ public final class InterbaseQueryExpression
 
     public String getStatement( boolean lock )
     {
-        StringBuffer sql;
         Enumeration  enum;
         boolean      first;
         Hashtable    tables;
+        Vector       done = new Vector();
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
@@ -37,38 +37,39 @@ public final class InterbaseQueryExpression
         if ( _select == null )
           sql.append( getColumnList() );
         else
-          sql.append( _select ).append(" ");
+          sql.append( _select).append(" ");
 
         sql.append( JDBCSyntax.From );
 
         tables = (Hashtable) _tables.clone();
-        // Use outer join syntax for all outer joins. Inner joins come later.
         first = true;
+        // gather all joins with the same left part use SQL92 syntax
         for ( int i = 0 ; i < _joins.size() ; ++i ) {
-            Join join;
 
-            join = (Join) _joins.elementAt( i );
-            if ( join.outer ) {
-                //else sql.append( JDBCSyntax.TableSeparator );
+            Join join = (Join) _joins.elementAt( i );
 
-                //sql.append( "{oj " );
-                if(first) sql.append( _factory.quoteName( join.leftTable ) );
-                sql.append( JDBCSyntax.LeftJoin );
-                sql.append( _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
-                for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
-                    if ( j > 0 )
-                        sql.append( JDBCSyntax.And );
-                    sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
-                                                    join.leftColumns[ j ] ) ).append( OpEquals );
-                    sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
-                                                    join.rightColumns[ j ] ) );
-                }
-                //sql.append( "}" );
-                tables.remove( join.leftTable );
-                tables.remove( join.rightTable );
+            if (done.contains( join.leftTable ) ) continue;
 
-                if ( first ) first = false;
+            if ( first ) {
+                first = false;
+                sql.append(  _factory.quoteName( join.leftTable ) );
             }
+
+            appendJoin(join);
+
+            tables.remove( join.leftTable );
+            tables.remove( join.rightTable );
+
+            for ( int k = i + 1 ; k < _joins.size() ; ++k ) {
+
+                Join join2 = (Join) _joins.elementAt( k );
+
+                if (join.leftTable.equals( join2.leftTable ) ){
+                  appendJoin(join2);
+                  tables.remove( join2.rightTable );
+                }
+            }
+            done.addElement( join.leftTable );
         }
         enum = tables.elements();
         while ( enum.hasMoreElements() ) {
@@ -79,35 +80,28 @@ public final class InterbaseQueryExpression
             sql.append( _factory.quoteName( (String) enum.nextElement() ) );
         }
 
-        // Use standard join syntax for all inner joins.
-        first = true;
-        for ( int i = 0 ; i < _joins.size() ; ++i ) {
-            Join join;
-
-            join = (Join) _joins.elementAt( i );
-            if ( ! join.outer ) {
-                if ( first ) {
-                    sql.append( JDBCSyntax.Where );
-                    first = false;
-                } else
-                    sql.append( JDBCSyntax.And );
-                for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
-                    if ( j > 0 )
-                        sql.append( JDBCSyntax.And );
-                    sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
-                                                    join.leftColumns[ j ] ) ).append( OpEquals );
-                    sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
-                                                    join.rightColumns[ j ] ) );
-                }
-            }
-        }
-        first = addWhereClause( sql, first );
+        first = addWhereClause( sql, true );
 
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
 
-        // There is no standard way to lock selected tables.
+        // Do not use FOR UPDATE to lock query.
         return sql.toString();
+    }
+
+    void appendJoin(Join join){
+
+      if(join.outer) sql.append( JDBCSyntax.LeftJoin );
+      else sql.append( JDBCSyntax.InnerJoin );
+
+      sql.append(  _factory.quoteName( join.rightTable ) ).append( JDBCSyntax.On );
+      for ( int j = 0 ; j < join.leftColumns.length ; ++j ) {
+          if ( j > 0 ) sql.append( JDBCSyntax.And );
+          sql.append( _factory.quoteName( join.leftTable + JDBCSyntax.TableColumnSeparator +
+                                          join.leftColumns[ j ] ) ).append( OpEquals );
+          sql.append( _factory.quoteName( join.rightTable + JDBCSyntax.TableColumnSeparator +
+                                          join.rightColumns[ j ] ) );
+      }
     }
 
 }
