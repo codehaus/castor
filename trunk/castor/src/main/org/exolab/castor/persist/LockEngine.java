@@ -187,10 +187,15 @@ public final class LockEngine {
                         // create new LRU for the base type
                         Cache cache = null;
                         try {
-                        	cache = CacheFactory.create( molder.getCacheType(), molder.getCacheParam());
-                        } catch (InvalidCacheTypeException e) {
+                        	cache = CacheRegistry.getCache (molder.getCacheType(), molder.getCacheParam());
+                        } 
+                        catch (InvalidCacheTypeException e) {
                         	_log.error ("Problem creating performance cache instance", e);
                         	throw new MappingException ("Problem creating performance cache instance", e);
+                        } 
+                        catch (CacheAcquireException e) {
+                            _log.error ("Problem creating performance cache instance." + e.getMessage(), e);
+                            throw new MappingException ("Problem creating performance cache instance", e);
                         }
                         TypeInfo info = new TypeInfo( molder, new HashMap(), cache ); 
                         _typeInfo.put( molder.getName(), info );
