@@ -396,9 +396,9 @@ Will be adding this later.
             if ( original != null ) {
                 for ( int i = 0 ; i < _fields.length ; ++i ) {
                     if ( _fields[ i ].dirtyCheck ) {
-                        if ( original[ i ] == null ) {
+                        if ( original[ i ] == null )
                             stmt.setNull( count, _fields[ i ].sqlType );
-                        } else
+                        else
                             stmt.setObject( count, original[ i ] );
                         ++count;
                     }
@@ -506,15 +506,17 @@ Will be adding this later.
 
             // Load all the fields of the object including one-one relations
             for ( int i = 0 ; i < _fields.length ; ++i  ) {
-                if ( _fields[ i ].multi ) {
-                    Object value;
+                Object value;
                     
+                if ( _fields[ i ].multi ) {
                     fields[ i ] = new Vector();
                     value = rs.getObject( i + 1 );
                     if ( value != null )
                         ( (Vector) fields[ i ] ).addElement( value );
-                } else
-                    fields[ i ] = rs.getObject( i + 1 );
+                } else {
+                    value = rs.getObject( i + 1 );
+                    fields[ i ] =  rs.wasNull() ? null : value;
+                }
             }
 
             while ( rs.next() ) {
@@ -523,7 +525,7 @@ Will be adding this later.
                         Object value;
                         
                         value = rs.getObject( i + 1 );
-                        if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
+                        if ( ! rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
                             ( (Vector) fields[ i ] ).addElement( value );
                         }
             }
@@ -929,15 +931,17 @@ Will be adding this later.
 
                 // Load all the fields of the object including one-one relations
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
-                    if ( _engine._fields[ i ].multi ) {
-                        Object value;
+                    Object value;
 
+                    if ( _engine._fields[ i ].multi ) {
                         fields[ i ] = new Vector();
                         value = _rs.getObject( i + count );
-                        if ( value != null )
+                        if ( ! _rs.wasNull() )
                             ( (Vector) fields[ i ] ).addElement( value );
-                    } else
-                        fields[ i ] = _rs.getObject( i + count );
+                    } else {
+                        value = _rs.getObject( i + count );
+                        fields[ i ] =  _rs.wasNull() ? null : value;
+                    }
                 }
 
                 if ( _rs.next() ) {
@@ -948,7 +952,7 @@ Will be adding this later.
                                 Object value;
 
                                 value = _rs.getObject( i + count );
-                                if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
+                                if ( ! _rs.wasNull() && ! ( (Vector) fields[ i ] ).contains( value ) )
                                     ( (Vector) fields[ i ] ).addElement( value );
                             }
                         if ( _rs.next() )
