@@ -226,6 +226,17 @@ public class TypeConversion {
 					    xsInt.setFacets(simpleType);
                     return xsInt;
                 }
+                case SimpleTypesFactory.LANGUAGE_TYPE:
+                {
+                    //-- since we don't actually support this type, yet,
+                    //-- we'll simply treat it as a string, but warn the
+                    //-- user.
+                    String warning = "Warning: The W3C datatype '"+simpleType.getName();
+                    warning += "' is not currently supported by Castor Source Generator.";
+                    warning += " It will be treated as a java.lang.String.";
+                    System.out.println(warning);
+                    return new XSString();
+                }
                 //-- long
                 case SimpleTypesFactory.LONG_TYPE:
                 {
@@ -308,8 +319,8 @@ public class TypeConversion {
                 }
                 default:
                     //-- error
-                    String warning = "Warning: The W3C datatype "+simpleType.getName();
-                    warning += " is not currently supported by Castor Source Generator.";
+                    String warning = "Warning: The W3C datatype '"+simpleType.getName();
+                    warning += "' is not currently supported by Castor Source Generator.";
                     System.out.println(warning);
                     String className
                         = JavaNaming.toJavaClassName(simpleType.getName());
