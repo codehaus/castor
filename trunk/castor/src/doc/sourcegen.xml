@@ -365,7 +365,7 @@
                <code>
 &lt;binding
     defaultBindingType = (element|type)>
-    (include*,package*,namingXML?,elementBinding*, attributeBinding, complexTypeBinding, groupBinding
+    (include*,package*,namingXML?,elementBinding*, attributeBinding, complexTypeBinding, groupBinding)
 &lt;/binding>
                </code>
              </tr> 
