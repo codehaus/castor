@@ -127,6 +127,11 @@ public class Marshaller {
     **/
     private String _defaultNamespace = null;
     
+    /**
+     * The validation flag
+    **/
+    private boolean _validate = true;
+    
     
     /**
      * The current namespace scoping
@@ -280,6 +285,23 @@ public class Marshaller {
         
     } //-- setNamespacePrefix
 
+    /**
+     * Sets whether or not to validate the object model
+     * before marshalling. By default validation is enabled.
+     * This method is really for debugging.
+     * I do not recommend turning off validation, since
+     * you could marshal a document, which you can then
+     * not unmarshal. If you know the object model
+     * is guaranteed to be valid, disabling validation will
+     * improve performace.
+     *
+     * @param validate the boolean indicating whether or not to
+     * validate the object model before marshalling.
+    **/
+    public void setValidation(boolean validate) {
+        _validate = validate;
+    } //-- setValidation
+    
     /**
      * Marshals the given Object as XML using the given writer
      * @param obj the Object to marshal
@@ -776,8 +798,10 @@ public class Marshaller {
     private void validate(Object object) 
         throws ValidationException
     {
-        //-- we must have a valid element before marshalling
-        Validator.validate(object, _cdResolver);
+        if (_validate) {
+            //-- we must have a valid element before marshalling
+            Validator.validate(object, _cdResolver);
+        }
     }
     
     /**
