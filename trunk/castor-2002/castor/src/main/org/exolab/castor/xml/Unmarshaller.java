@@ -426,7 +426,7 @@ public class Unmarshaller {
      * Creates and initalizes an UnmarshalHandler
      * @return the new UnmarshalHandler
     **/
-    private UnmarshalHandler createHandler() {
+    public UnmarshalHandler createHandler() {
         UnmarshalHandler handler = new UnmarshalHandler(_class);
         handler.setResolver(_cdResolver);
         handler.setLogWriter(pw);

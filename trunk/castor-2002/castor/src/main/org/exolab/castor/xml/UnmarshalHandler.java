@@ -78,7 +78,7 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class UnmarshalHandler extends MarshalFramework
+public final class UnmarshalHandler extends MarshalFramework
     implements DocumentHandler
 {
 
@@ -186,7 +186,7 @@ public class UnmarshalHandler extends MarshalFramework
         _topClass     = _class;
     } //-- UnmarshalHandler(Class)
 
-    protected Object getObject() {
+    public Object getObject() {
         if (_topState != null) return _topState.object;
         return null;
     } //-- getObject
