@@ -898,15 +898,8 @@ public final class CacheEngine
                     Object related;
                     Enumeration enum;
                     Object[] origIdentity;
+                    Object relIdentity;
 
-                    enum = (Enumeration) relations[ i ].getRelated( object );
-                    if ( enum != null ) {
-                        while ( enum.hasMoreElements() ) {
-                            related = enum.nextElement();
-                            if ( related != null )
-                                tx.update( this, related, relations[ i ].getIdentity( related ) );
-                        }
-                    }
                     // make sure that all dependent objects are included in the transaction,
                     // otherwise objects that should be deleted won't be deleted
                     if ( fields[ i ] == null )
@@ -916,24 +909,40 @@ public final class CacheEngine
                         ( (Vector) fields[ i ] ).copyInto( origIdentity );
                     }
 
+                    enum = (Enumeration) relations[ i ].getRelated( object );
+                    if ( enum != null ) {
+                        while ( enum.hasMoreElements() ) {
+                            related = enum.nextElement();
+                            if ( related == null )
+                                continue;
+                            relIdentity = relations[ i ].getIdentity( related );
+                            if ( relIdentity == null )
+                                continue;
+                            tx.update( this, related, relIdentity );
+                            for( int j = 0; j < origIdentity.length; j++ ) {
+                                if ( origIdentity[ j ] != null && origIdentity[ j ].equals( relIdentity ) ) {
+                                    origIdentity[ j ] = null;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+
                     if ( relations[ i ].isAttached() ) {
                         for ( int j = 0 ; j < origIdentity.length ; ++j ) {
                             if ( origIdentity[ j ] != null ) {
                                 ClassHandler relHandler;
 
                                 relHandler = relations[ i ].getRelatedHandler();
-                                if ( tx.fetch( this, relHandler, origIdentity[ j ], accessMode ) == null) {
-                                    // The loading will also load the related objects.
-                                    // We don't need this for future deletion of this object.
-                                    // Moreover, this may yield errors if
-                                    // the related object will be updated later
-                                    // Therefore, we must clean all references to
-                                    // the related objects before loading
-                                    cleanRelatedForDependent( tx,
-                                            relHandler.getJavaClass(), origIdentity[ j ] );
-                                    tx.load( this, relHandler, relHandler.newInstance(),
-                                             origIdentity[ j ], accessMode );
-                                }
+                                // The loading will also load the related objects.
+                                // We don't need this for future deletion of this object.
+                                // Moreover, this may yield errors if
+                                // the related object will be updated later
+                                // Therefore, we must clean all references to
+                                // the related objects before loading
+                                clearRelatedForDependent( tx,
+                                        relHandler.getJavaClass(), origIdentity[ j ] );
+                                tx.load( this, relHandler, origIdentity[ j ], accessMode );
                             }
                         }
                     }
@@ -986,10 +995,10 @@ public final class CacheEngine
 
 
     /**
-     * Clean all references to all related objects in the cache 
+     * Clear all references to all related objects in the cache
      * for the given identity. Used during update of the dependent objects.
      */
-    void cleanRelatedForDependent( TransactionContext tx, Class type, Object identity )
+    void clearRelatedForDependent( TransactionContext tx, Class type, Object identity )
         throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
                PersistenceException, ClassNotPersistenceCapableException
     {
@@ -1557,7 +1566,8 @@ public final class CacheEngine
         oid.setDbLock( false );
         //System.out.println("CacheEngine.realeaseLock!");
         lock = typeInfo.cache.getLockForAquire( oid );
-        lock.release( tx );
+        if ( lock != null && lock.hasLock( tx, false ) )
+            lock.release( tx );
         typeInfo.cache.finishLockForAquire( oid );
     }
 
@@ -1577,25 +1587,33 @@ public final class CacheEngine
         ObjectLock lock;
         Object[]   fields;
         TypeInfo   typeInfo;
+        RelationHandler[] relations;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         lock = typeInfo.cache.getLockForAquire( oid );
-        try {
-            fields = (Object[]) lock.acquire( tx, true, 0 );
-            typeInfo.cache.removeLock( oid );
-            lock.delete( tx );
-        } catch ( LockNotGrantedException except ) {
-            // If this transaction has no write lock on the object,
-            // something went foul.
-            if ( _logInterceptor != null )
-                _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
-            throw new IllegalStateException( except.toString() );
-        } finally {
-            // signal cache that it's now safe to release the object
-            // from transcation state to cache state.
-            typeInfo.cache.finishLockForAquire( oid );
+        if ( lock != null ) {
+            try {
+                fields = (Object[]) lock.acquire( tx, true, 0 );
+        
+                // Forget all the dependent objects
+                typeInfo.handler.forgetDependent( fields, tx, this );
+        
+                typeInfo.cache.removeLock( oid );
+                lock.delete( tx );
+            } catch ( LockNotGrantedException except ) {
+                // If this transaction has no write lock on the object,
+                // something went foul.
+                if ( _logInterceptor != null )
+                    _logInterceptor.message( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
+                throw new IllegalStateException( except.toString() );
+            } finally {
+                // signal cache that it's now safe to release the object
+                // from transcation state to cache state.
+                typeInfo.cache.finishLockForAquire( oid );
+            }
         }
     }
+
 
 
     /**

@@ -158,8 +158,9 @@ public class Product
     }
 
 
-    public void jdoLoad()
+    public Class jdoLoad()
     {
+        return null;
     }
 
 

@@ -196,21 +196,13 @@ public class DirectoryImpl
         handler = _handler;
         // clsDesc = _dirEngine.getClassDesc();
         try {
-            if ( _tx != null ) {
-                object = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
-                if ( object == null ) {
-                    object = handler.newInstance();
-                    _tx.load( _dirEngine, handler, object, rdn, AccessMode.Shared );
-                }
-            } else {
+            if ( _tx != null ) 
+                object = _tx.load( _dirEngine, handler, rdn, AccessMode.Shared );
+            else {
                 TransactionContext tx;
                 
                 tx = new TransactionContextImpl( _conn );
-                object = _tx.fetch( _dirEngine, handler, rdn, AccessMode.Shared );
-                if ( object == null ) {
-                    object = handler.newInstance();
-                    _tx.load( _dirEngine, handler, object, rdn, AccessMode.Shared );
-                }
+                object = _tx.load( _dirEngine, handler, rdn, AccessMode.Shared );
                 tx.commit();
             }
         } catch ( ObjectNotFoundException except ) {

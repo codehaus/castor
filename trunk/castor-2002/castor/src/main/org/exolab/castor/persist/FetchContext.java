@@ -80,10 +80,10 @@ final class FetchContext
     }
 
 
-    void load( ClassHandler handler, Object object, Object identity )
+    Object load( ClassHandler handler, Object identity )
         throws PersistenceException
     {
-        _tx.load( _engine, handler, object, identity, null );
+        return _tx.load( _engine, handler, identity, null );
     }
 
 }

@@ -258,19 +258,29 @@ public final class QueryResults
                 // or exclusive mode.
                 oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
                 handler = _engine.getClassHandler( oid.getJavaClass() );
+                if ( handler == null )
+                    throw new ClassNotPersistenceCapableExceptionImpl( oid.getJavaClass() );
                 object = handler.newInstance();
                 entry = _tx.addObjectEntry( object, oid, _engine );
                 try {
                     _engine.copyObject( _tx, oid, object );
                     if ( handler.getCallback() != null ) {
+                        Class reloadClass;
+
                         handler.getCallback().using( object, _db );
-                        handler.getCallback().loaded( object );
+                        reloadClass = handler.getCallback().loaded( object );
+                        if ( reloadClass != null && object.getClass() != reloadClass ) {
+                            _tx.release( object );
+                            _engine.forgetObject( _tx, oid );
+                            handler = _engine.getClassHandler( reloadClass );
+                            if ( handler == null )
+                                throw new ClassNotPersistenceCapableExceptionImpl( reloadClass );
+                            object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
+                        }
                     }
                 } catch ( Exception except ) {
-                    _tx.removeObjectEntry( object );
+                    _tx.release( object );
                     _engine.forgetObject( _tx, oid );
-                    if ( handler.getCallback() != null )
-                        handler.getCallback().releasing( object, false );
                     if ( except instanceof PersistenceException )
                         throw (PersistenceException) except;
                     throw new PersistenceExceptionImpl( except );

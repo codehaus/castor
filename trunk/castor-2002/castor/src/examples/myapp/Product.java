@@ -3,9 +3,11 @@ package myapp;
 
 import java.util.Vector;
 import java.util.Enumeration;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Persistent;
 
 
-public class Product
+public class Product implements Persistent
 {
 
 
@@ -20,6 +22,8 @@ public class Product
 
     private ProductGroup _group;
 
+
+    private Database     _db;
 
     /** Java 1.2
     private java.util.ArrayList  _details = new java.util.ArrayList();
@@ -120,10 +124,50 @@ public class Product
     }
 
 
+    public void jdoPersistent( Database db )
+    {
+        _db = db;
+    }
+
+
+    public void jdoTransient()
+    {
+        _db = null;
+    }
+
+
+    public Class jdoLoad()
+    {
+        if ( _name.indexOf("PC") >= 0 ) {
+            return Computer.class;
+        }
+        return null;
+    }
+
+
+    public void jdoCreate()
+    {
+    }
+
+
+    public void jdoStore(boolean modified)
+    {
+    }
+
+
+    public void jdoRemove()
+    {
+    }
+
+
+    public void jdoUpdate()
+    {
+    }
+
+
     public String toString()
     {
         return _id + " " + _name;
     }
-
 
 }

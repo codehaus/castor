@@ -67,10 +67,12 @@ public interface CallbackInterceptor
      * Called to indicate that the object has been loaded from persistent
      * storage.
      *
+     * @return null or the extending Class. In the latter case Castor will
+     * reload the object of the given class with the same identity.
      * @param object The object
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public void loaded( Object object )
+    public Class loaded( Object object )
         throws Exception;
 
 

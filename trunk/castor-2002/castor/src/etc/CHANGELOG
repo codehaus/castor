@@ -1,6 +1,13 @@
 Version 0.8.9
 -------------
 
+JDO:    Replacing of extended object in the cache on load of extending object
+        implemented. jdoLoad signature changed. Now in jdoLoad you can request
+        reloading the object instance as an instance of an extending class.
+        You need some "type" field in the extended class, which determines 
+        the correct extending class, see example in
+        src\examples\myapp\Product.java. (Oleg Nitz)
+
 JDO:    Now IdentityKeyGenerator works with Hypersonic SQL identities
         (idea by Mark Delanoy <mdelanoy@niku.com>)
 
@@ -57,10 +64,10 @@ XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
 XML:    Added support for top-level annotations (kvisco)
 
 XML:    Made some changes in Unmarshalling code to handle "null" primitives. 
-	Based on suggestions from Fabrice Gomez. (kvisco)
+    Based on suggestions from Fabrice Gomez. (kvisco)
 
 XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers 
-	using dynamic-introspection. (kvisco)
+    using dynamic-introspection. (kvisco)
 
 XML:    Changed some case-sensitive issues with the below mentioned Schema
         syntax upgrade (kvisco)
@@ -90,16 +97,16 @@ XML:    <include> element support (Andrew Fawcett)
 
 XML:    decimal type support (Andrew Fawcett)
 
-XML:	Support xsi:type from XML Schema for Instances 
-	(Remy Maucherat <remm@apache.org>)
+XML:    Support xsi:type from XML Schema for Instances 
+    (Remy Maucherat <remm@apache.org>)
 
 
 Version 0.8.8  June 20, 2000
 ----------------------------
 
 XML:     Added support for the Unmarshaller to automatically determine the 
-	 Class of the root element, based on a given Mapping, or 
-	 ClassDescriptorResolver
+     Class of the root element, based on a given Mapping, or 
+     ClassDescriptorResolver
 
 XML:     Added support for the "has" method for primitives in the generated source
 
