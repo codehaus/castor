@@ -78,28 +78,46 @@ public class ClassDescriptorResolverImpl
     private Hashtable _cacheViaName = null;
     
     /**
+     * Keeps a list of ClassNotFoundExceptions
+     * for faster lookups than using loadClass().
+     * hopefully this won't eat up too much
+     * memory.
+     */
+    private Hashtable _classNotFoundList = null;
+    
+    /**
      * A flag indicating an error has occured
     **/
     private boolean   _error      = false;
+    
     
     /**
      * Error message
     **/
     private String    _errMessage = null;
     
-    private XMLMappingLoader mappingLoader = null;
-    
-    private ClassLoader _loader  = null;
-   
     /**
      * The introspector to use, if necessary, to 
      * create dynamic ClassDescriptors
-    **/
+     */
     private Introspector _introspector = null;
+    
+    /**
+     * The classloader to use
+     */
+    private ClassLoader _loader  = null;
+    
+    /**
+     * MappingLoader instance for finding user-defined
+     * mappings from a mapping-file
+     */
+    private XMLMappingLoader _mappingLoader = null;
+    
+   
     
     /** 
      * A flag to indicate the use of introspection
-    **/
+     */
     private boolean _useIntrospection = true;
     
     /**
@@ -108,7 +126,6 @@ public class ClassDescriptorResolverImpl
     public ClassDescriptorResolverImpl() {
         _cacheViaClass = new Hashtable();
         _cacheViaName  = new Hashtable();
-        _introspector  = new Introspector();
     } //-- ClassDescriptorResolverImpl
 
 
@@ -173,11 +190,13 @@ public class ClassDescriptorResolverImpl
      * @return the Introspector being used by this ClassDescriptorResolver
     **/
     public Introspector getIntrospector() {
+        if (_introspector == null)
+            _introspector = new Introspector();
         return _introspector;
     } //-- getIntrospector
     
     public XMLMappingLoader getMappingLoader() {
-        return mappingLoader;
+        return _mappingLoader;
     } //-- getXMLMappingLoader
     
     /**
@@ -207,8 +226,8 @@ public class ClassDescriptorResolverImpl
 
         //-- check mapping loader first 
         //-- [proposed by George Stewart]
-        if (mappingLoader != null) {            
-            classDesc = (XMLClassDescriptor)mappingLoader.getDescriptor(type);
+        if (_mappingLoader != null) {            
+            classDesc = (XMLClassDescriptor)_mappingLoader.getDescriptor(type);
             if (classDesc != null) {
                _cacheViaClass.put(type, classDesc);
                return classDesc;
@@ -239,7 +258,7 @@ public class ClassDescriptorResolverImpl
         //-- create classDesc automatically if necessary
         if ((classDesc == null) && _useIntrospection) {
             try {
-                classDesc = _introspector.generateClassDescriptor(type);
+                classDesc = getIntrospector().generateClassDescriptor(type);
                 if (classDesc != null) {
                     _cacheViaClass.put(type, classDesc);
                 }
@@ -278,15 +297,24 @@ public class ClassDescriptorResolverImpl
             return null;
         }
             
-
-
+        //-- first check mapping loader
+        if (_mappingLoader != null) {
+            classDesc = (XMLClassDescriptor)_mappingLoader.getDescriptor(className);
+            if (classDesc != null)
+                return classDesc;
+        }
+        
         //-- try and load class to check cache,
         Class _class = null;
         try {
             _class = loadClass(className, loader);
         }
         catch(ClassNotFoundException cnfe) { 
-            //-- do nothing for now
+            //-- save exception, for future calls with
+            //-- the same classname
+            if (_classNotFoundList == null)
+                _classNotFoundList = new Hashtable();
+            _classNotFoundList.put(className, cnfe);
         }
         
         if (_class != null) {
@@ -297,14 +325,27 @@ public class ClassDescriptorResolverImpl
         //-- try to load ClassDescriptor with no class being
         //-- present...does this make sense?
         if ((classDesc == null) && (_class == null)) {
-            String dClassName = className+"Descriptor";
+            String dClassName = className+DESCRIPTOR_PREFIX;
             try {
 	            Class dClass = loadClass(dClassName, loader);
                 classDesc = (XMLClassDescriptor) dClass.newInstance();
+                if (classDesc.getJavaClass() != null) {
+                    associate(classDesc.getJavaClass(), classDesc);
+                }
             }
-            catch(InstantiationException ie)   { /* :-) */ }
-            catch(ClassNotFoundException cnfe) { /* ;-) */ }
-            catch(IllegalAccessException iae)  { /* :-Þ */ }
+            catch(InstantiationException ie) {  
+                //-- do nothing for now
+            }
+            catch(IllegalAccessException iae)  {
+                //-- do nothing for now
+            }
+            catch(ClassNotFoundException cnfe) { 
+                //-- save exception, for future calls with
+                //-- the same classname
+                if (_classNotFoundList == null)
+                    _classNotFoundList = new Hashtable();
+                _classNotFoundList.put(className, cnfe);
+            }
         }
         return classDesc;
     } //-- resolve(String, ClassLoader)
@@ -327,6 +368,7 @@ public class ClassDescriptorResolverImpl
             return null;
         }
         
+        
         XMLClassDescriptor classDesc = null;
         Enumeration enum             = null;
         
@@ -341,8 +383,8 @@ public class ClassDescriptorResolverImpl
 
         //-- next check mapping loader...
         XMLClassDescriptor possibleMatch = null;
-        if (mappingLoader != null) {
-            enum = mappingLoader.listDescriptors();
+        if (_mappingLoader != null) {
+            enum = _mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
@@ -404,8 +446,8 @@ public class ClassDescriptorResolverImpl
         Enumeration enum             = null;
         
         //-- check mapping loader first
-        if (mappingLoader != null) {
-            enum = mappingLoader.listDescriptors();
+        if (_mappingLoader != null) {
+            enum = _mappingLoader.listDescriptors();
             while (enum.hasMoreElements()) {
                 classDesc = (XMLClassDescriptor)enum.nextElement();
                 if (xmlName.equals(classDesc.getXMLName())) {
@@ -447,7 +489,7 @@ public class ClassDescriptorResolverImpl
     } //-- setIntrospection
     
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
-        this.mappingLoader = mappingLoader;
+        _mappingLoader = mappingLoader;
     } //-- setMappingLoader
     
     //-------------------/
@@ -463,6 +505,17 @@ public class ClassDescriptorResolverImpl
     private Class loadClass(String className, ClassLoader loader) 
         throws ClassNotFoundException
     {
+        //-- for performance, check the classNotFound list
+        //-- first to prevent searching through all the 
+        //-- possible classpaths etc for something we
+        //-- already know doesn't exist.
+        //-- check classNotFoundList 
+        if (_classNotFoundList != null) {
+            Object exception = _classNotFoundList.get(className);
+            if (exception != null)
+                throw (ClassNotFoundException)exception;
+        }
+        
         //-- use passed in loader
 	    if ( loader != null )
 		    return loader.loadClass(className);
@@ -507,73 +560,71 @@ public class ClassDescriptorResolverImpl
         
         return ns1.equals(ns2);
     } //-- namespaceEquals
+
+    /**
+     * A locally used implementation of ClassDescriptorEnumeration
+     */
+    class XCDEnumerator implements ClassDescriptorEnumeration {
+        
+        private Entry _current = null;
+        
+        private Entry _last = null;
+        
+        /**
+        * Creates an XCDEnumerator
+        **/
+        XCDEnumerator() {
+            super();
+        } //-- XCDEnumerator
+        
+        /**
+        * Adds the given XMLClassDescriptor to this XCDEnumerator
+        **/
+        protected void add(XMLClassDescriptor classDesc) {
+            Entry entry = new Entry();
+            entry.classDesc = classDesc;
+            if (_current == null) {
+                _current = entry;
+                _last    = entry;
+            }
+            else {
+                _last.next = entry;
+                _last = entry;
+            }
+        } //-- add
+        
+        /** 
+        * Returns true if there are more XMLClassDescriptors
+        * available.
+        *
+        * @return true if more XMLClassDescriptors exist within this
+        * enumeration.
+        **/
+        public boolean hasNext() {
+            return (_current != null);
+        } //-- hasNext
+        
+        /**
+        * Returns the next XMLClassDescriptor in this enumeration.
+        *
+        * @return the next XMLClassDescriptor in this enumeration.
+        **/
+        public XMLClassDescriptor getNext() {
+            if (_current == null) return null;
+            Entry entry = _current;
+            _current = _current.next;
+            return entry.classDesc;
+        } //-- getNext
+            
+        class Entry {
+            XMLClassDescriptor classDesc = null;
+            Entry next = null;
+        }
+        
+    } //-- ClassDescriptorEnumeration
     
 } //-- ClassDescriptorResolverImpl
 
 
 
-/**
- * A locally used implementation of ClassDescriptorEnumeration
- *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$
-**/
-class XCDEnumerator implements ClassDescriptorEnumeration {
-    
-    private Entry _current = null;
-    
-    private Entry _last = null;
-    
-    /**
-     * Creates an XCDEnumerator
-    **/
-    XCDEnumerator() {
-        super();
-    } //-- XCDEnumerator
-    
-    /**
-     * Adds the given XMLClassDescriptor to this XCDEnumerator
-    **/
-    protected void add(XMLClassDescriptor classDesc) {
-        Entry entry = new Entry();
-        entry.classDesc = classDesc;
-        if (_current == null) {
-            _current = entry;
-            _last    = entry;
-        }
-        else {
-            _last.next = entry;
-            _last = entry;
-        }
-    } //-- add
-    
-    /** 
-     * Returns true if there are more XMLClassDescriptors
-     * available.
-     *
-     * @return true if more XMLClassDescriptors exist within this
-     * enumeration.
-    **/
-    public boolean hasNext() {
-        return (_current != null);
-    } //-- hasNext
-    
-    /**
-     * Returns the next XMLClassDescriptor in this enumeration.
-     *
-     * @return the next XMLClassDescriptor in this enumeration.
-    **/
-    public XMLClassDescriptor getNext() {
-        if (_current == null) return null;
-        Entry entry = _current;
-        _current = _current.next;
-        return entry.classDesc;
-    } //-- getNext
-        
-    class Entry {
-        XMLClassDescriptor classDesc = null;
-        Entry next = null;
-    }
-    
-} //-- ClassDescriptorEnumeration
 
