@@ -2,67 +2,67 @@
 Version (CVS)
 -------------
 
-XML: Fixed bug that prevented elements that reference each other to generate classes. It removes
-     the StackOverFlow Exception. (Arnaud)
+XML:    Fixed bug that prevented elements that reference each other to generate classes. It removes
+        the StackOverFlow Exception. (Arnaud)
 
-XML: Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
+XML:    Added code from Matt Small [msmall@clickability.com] that improves the SchemaWriter support (Arnaud)
 
-XML: Fixed bug in the generated descriptors to correctly generate validation code when collections are used.
-     (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
-   
-XML: Added QName support in the marshalling framework (when used via the mapping or via
-     the Source Code Generator) (Arnaud)
+XML:    Fixed bug in the generated descriptors to correctly generate validation code when collections are used.
+        (Reported by Dr. Louis Coetzee [lcoetzee@subversion.icomtek.csir.co.za]) (Arnaud)
+
+XML:    Added QName support in the marshalling framework (when used via the mapping or via
+        the Source Code Generator) (Arnaud)
 
 
-XML: Added special code to prevent creating a default XML name when using the "matches" 
-     attribute for bind-xml element in the mapping file. (kvisco) 20010815
+XML:    Added special code to prevent creating a default XML name when using the "matches"
+        attribute for bind-xml element in the mapping file. (kvisco) 20010815
 
-XML: Fixed bug with introspector...first character of field name was not being 
-     decapitalized. This caused a bug in the "auto-complete" feature. 
-     (kvisco) 20010815
+XML:    Fixed bug with introspector...first character of field name was not being
+        decapitalized. This caused a bug in the "auto-complete" feature.
+        (kvisco) 20010815
 
-XML: Fixed bug with "auto-complete" when specifying an identity field, the field
-     descriptor was not being set. (kvisco) 20010814
+XML:    Fixed bug with "auto-complete" when specifying an identity field, the field
+        descriptor was not being set. (kvisco) 20010814
 
-XML: Added support for specifying that a field is a reference using the mapping file.
-     (kvisco) 20010814
-     
-XML: Fixed bug in the generated classes: the attributes of complexTypes which contained
-     nested groups were wrongly located.
-     (Reported by Joseph Campolongo [jvc@cascadeworks.com]) (Arnaud)
+XML:    Added support for specifying that a field is a reference using the mapping file.
+        (kvisco) 20010814
 
-XML: Fixed bug that prevented string-to-primitive conversion code from being
-     executed for identity fields (kvisco) 20010808
-      - Bug reported by Patric Bechtel
+XML:    Fixed bug in the generated classes: the attributes of complexTypes which contained
+        nested groups were wrongly located.
+        (Reported by Joseph Campolongo [jvc@cascadeworks.com]) (Arnaud)
 
-XML: Fixed bug which prevented IDREFS from working properly (kvisco) 20010807
-      - Applied patches sent in from Steve Vaughan
+XML:    Fixed bug that prevented string-to-primitive conversion code from being
+        executed for identity fields (kvisco) 20010808
+         - Bug reported by Patric Bechtel
 
-XML: Added code to Source Code Generator to create 'add(index, object)' method for list fields.
-	(andrew.fawcett@coda.com, Andrew Fawcett)
+XML:    Fixed bug which prevented IDREFS from working properly (kvisco) 20010807
+         - Applied patches sent in from Steve Vaughan
 
-XML: Fixed bug with 'equals' implementation not being generated for classes representing <xsd:complexType>'s
-	(andrew.fawcett@coda.com, Andrew Fawcett)
+XML:    Added code to Source Code Generator to create 'add(index, object)' method for list fields.
+        (andrew.fawcett@coda.com, Andrew Fawcett)
 
-XML: Fixed bug in 'equals' implementation, not calling super.equals(...) when approprite
-	(andrew.fawcett@coda.com, Andrew Fawcett)
+XML:    Fixed bug with 'equals' implementation not being generated for classes representing <xsd:complexType>'s
+        (andrew.fawcett@coda.com, Andrew Fawcett)
 
-XML: Fixed problem in Schema unmarshalling (when using both xsd:include and xsd:import), 
-            allowing a given schema to be  parsed a second time, resulting in duplicate type errors.
-	(andrew.fawcett@coda.com, Andrew Fawcett)
+XML:    Fixed bug in 'equals' implementation, not calling super.equals(...) when approprite
+        (andrew.fawcett@coda.com, Andrew Fawcett)
 
-XML: Added an option (default is off) to expose the names of each attribute and element described in the class descriptor.
-            Use org.exolab.castor.builder.classdescfieldnames=true in castorbuilder.properties to enable
-	(andrew.fawcett@coda.com, Andrew Fawcett)
+XML:    Fixed problem in Schema unmarshalling (when using both xsd:include and xsd:import),
+        allowing a given schema to be  parsed a second time, resulting in duplicate type errors.
+        (andrew.fawcett@coda.com, Andrew Fawcett)
 
-XML:  Fix a bug in SimpleTypeFactory.
-      (Reported by Risheng Lin <rlin@eng.utoledo.edu>) (Arnaud)
+XML:    Added an option (default is off) to expose the names of each attribute and element described in the class descriptor.
+        Use org.exolab.castor.builder.classdescfieldnames=true in castorbuilder.properties to enable
+        (andrew.fawcett@coda.com, Andrew Fawcett)
 
-XML:  Add an option in the Source Generator that allows to use wrapper objects instead of primitives
-      (Eg java.lang.Double instead of double) (Arnaud)
+XML:    Fix a bug in SimpleTypeFactory.
+        (Reported by Risheng Lin <rlin@eng.utoledo.edu>) (Arnaud)
 
-XML:  Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and 
-      patch submitted by Marcin Chalotowski <Marcin.Chalotowski@3dart.com>) (Arnaud)
+XML:    Add an option in the Source Generator that allows to use wrapper objects instead of primitives
+        (Eg java.lang.Double instead of double) (Arnaud)
+
+XML:    Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and
+        patch submitted by Marcin Chalotowski <Marcin.Chalotowski@3dart.com>) (Arnaud)
 
 JDO:    Fixed a old values appears in new result problem.
         (reported by Jim Branecki [Jim_Branecki@sparta.com]
@@ -79,7 +79,7 @@ JDO:    Fixed IllegalStateException when TransactionManager calls
         (reported by Richard Monson-Haefel [Richard@intalio.com]
          and Matthew Jensen [mmj@ceg.net])
 
-JDO:    Made the BatchUpdateSQL utility to take small letter "go" as end 
+JDO:    Made the BatchUpdateSQL utility to take small letter "go" as end
         tokens of a statements. (yip)
 
 JDO:    Added special care for Double/Float type to workaround a oracle's problem. (yip)
@@ -102,21 +102,21 @@ JDO:    Splitted create() phase into two phases: markCreate() and create().
 
 JDO:    Fixed a bug in the FieldMolder.isStored() method. (yip)
 
-JDO:    Fixed the problem with two 1:N relations between the same two tables (reported 
-        by CORMONT Cedric <cedric.cormont@softeam.fr>). The solution is to use aliases 
+JDO:    Fixed the problem with two 1:N relations between the same two tables (reported
+        by CORMONT Cedric <cedric.cormont@softeam.fr>). The solution is to use aliases
         (when needed) in outer joins generated by SQLEngine. (oleg)
 
-JDO:    Restricted JDO to eat only ObjectNotFoundException now to workaround 
+JDO:    Restricted JDO to eat only ObjectNotFoundException now to workaround
         inconsistent reference in database. (yip)
 
-JDO:    Fixed a NPE in TransactionContext.load(). 
+JDO:    Fixed a NPE in TransactionContext.load().
         (reported by Naveen Sharma [sharmn@sdd.comsat.com])
 
-JDO:    Fixed bug in JDBCQueryExpression.getSelect() that previously 
+JDO:    Fixed bug in JDBCQueryExpression.getSelect() that previously
         was hidden in ancestors. (oleg)
 
 JDO:    Fixed a bug that caused PersistenceException("persis.typeMismatch")
-        to be thrown in ClassMolder. 
+        to be thrown in ClassMolder.
         (Bug reported by (Naveen Sharma [sharmn@sdd.comsat.com]))
 
 JDO:    Added type convertor of BigDecimal<-->Short and BigDecimal<-->Byte. (yip)
@@ -147,7 +147,7 @@ JDO:    (test) Added a 2 second sleep in between the creation of the first
         Because, some database stored time in less precision, and it causes
         the test to fail. (yip)
 
-JDO:    (test) Used a new SQL connection in the inner class of the test to 
+JDO:    (test) Used a new SQL connection in the inner class of the test to
         workaround a problem in Solaris. (yip)
 
 JDO:    (test) Added test cases for dependent relationship where each of the data object
@@ -177,20 +177,20 @@ XML:    Added nested Exception support for FieldHandlerImpl (kvisco)
 
 XML:    Fixed CollectionInfoODMG30,  applied patch by Bernd Deichmann (kvisco)
 
-XML:    Added the auto-complete feature and transient field support to 
+XML:    Added the auto-complete feature and transient field support to
         the mapping file. (Sebastien Gignoux <gignoux@intalio.com>)
 
-XML:    Fix a bug that creates infinite loop when cross-importing 
+XML:    Fix a bug that creates infinite loop when cross-importing
         (or including) schemas(Arnaud).
 
-XML:    Added the support for the facets min/max Ex/Inclusive for the date/time 
-        types and added complete implementation of date/time W3C XML Schema 
+XML:    Added the support for the facets min/max Ex/Inclusive for the date/time
+        types and added complete implementation of date/time W3C XML Schema
         datatypes (Arnaud).
 
-XML:    Added new supports for XML Schema Recommendation datatypes and remove 
+XML:    Added new supports for XML Schema Recommendation datatypes and remove
         old references to the Candidate Recommendation document (Arnaud).
 
-XML:    Added push behavior for the unmarshaller with SAX producer. Made some 
+XML:    Added push behavior for the unmarshaller with SAX producer. Made some
         functions public and UnmarshalHandler final.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
@@ -198,23 +198,23 @@ XML:    Remove the xsi:type when using the generated descriptors.(Arnaud)
 
 XML:    Support for the <any> element in the Marshalling Framework.(Arnaud)
 
-XML:    Added setRootElement method to Marshaller.java to override default root 
-        element name for document. Usefull when using classes generated via 
+XML:    Added setRootElement method to Marshaller.java to override default root
+        element name for document. Usefull when using classes generated via
         'type' mapping, as the root element name is not known.
         (Andrew Fawcett, andrew.fawcett@coda.com)
 
-XML:    Fix the Marshaller to handle correctly Vector by keeping the 
-        xsi:type information (Bug reported by Eric Kaplan 
+XML:    Fix the Marshaller to handle correctly Vector by keeping the
+        xsi:type information (Bug reported by Eric Kaplan
         (eric.kaplan@armanta.com) (Arnaud)
 
-XML:    Fix the SourceGenerator to handle correctly the 'types' package 
+XML:    Fix the SourceGenerator to handle correctly the 'types' package
         when a Date/Time type is used as an attribute.(thanks to
         Maria Gray <maria.gray@datalex.ie>,
         Christopher P. van Buskirk <Chris.vanBuskirk@vanderbilt.edu> and
         Dean Thompson <dthompson@medebiz.net> for their proposed solutions) (Arnaud)
 
-XML:    Removed a dependency to xerces jar in Configuration.java 
-        (Patch submitted by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM> 
+XML:    Removed a dependency to xerces jar in Configuration.java
+        (Patch submitted by Marc-Antoine Parent <Marc-Antoine_Parent@Mitel.COM>
         and committed by Sebastien Gignoux <gignoux@intalio.com>)
 
 XML:    Fix a bug in the validation framework. (Arnaud)
@@ -227,10 +227,10 @@ XML:    Support the wildcards <any> and <anyAttribute> in the Schema Object Mode
 XML:    Improved grouping support....now handles maxOccurs > 1. Nested groups
         are no longer simply flattened. (kvisco)
 
-XML:    Added object container support. Handle element and attributes, as 
-        well as container in container. Object container are object that 
-        exist in the object model, but will not appear directly in the XML 
-        document. There will be no element associated to this object, but 
+XML:    Added object container support. Handle element and attributes, as
+        well as container in container. Object container are object that
+        exist in the object model, but will not appear directly in the XML
+        document. There will be no element associated to this object, but
         its child will appear in its parent element.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
@@ -245,7 +245,7 @@ JDO:    Fixed an ObjectNotPersistentException in ClassMolder.preStore().
         (Kesha Sibilev <ksibilev@powernetinc.com>)
 
 JDO:    Fixed when deleting an object which participates in the many-to-many
-        relationship the corresponding record in the relation table is not 
+        relationship the corresponding record in the relation table is not
         being deleted problem. (Kesha Sibilev <ksibilev@powernetinc.com>)
 
 JDO:    Fixed the addMethod is not cloned for mutliple class loader enviorment
@@ -339,7 +339,7 @@ JDO:    Added database to transaction association pooling.
 JDO:    (misc) Added a BatchUpdateSQL utility to helps executing a batch
         of sql create statements in the jdo test directory. (yip)
 
-JDO:    (misc) Ported test cases and test harness framework from JTF to 
+JDO:    (misc) Ported test cases and test harness framework from JTF to
         JUnit (yip)
 
 JDO:    (misc) Javadoc to test cases (yip)
