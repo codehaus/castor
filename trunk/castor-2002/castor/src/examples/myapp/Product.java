@@ -9,13 +9,13 @@ public class Product
 {
 
 
-    private int      _id;
+    private int          _id;
 
 
-    private String   _name;
+    private String       _name;
 
 
-    private float    _price;
+    private float        _price;
 
 
     private ProductGroup _group;
@@ -81,30 +81,16 @@ public class Product
     }
 
 
-    public Enumeration getDetail()
+    public Vector getDetails()
     {
-        return _details.elements();
+        return _details;
     }
 
 
     public void addDetail( ProductDetail detail )
     {
-        detail.setProduct( this );
         _details.addElement( detail );
-    }
-
-
-    public Enumeration getCategory()
-    {
-        return _categories.elements();
-    }
-
-
-    public void addCategory( Category category )
-    {
-        if ( ! _categories.contains( category ) )
-            _categories.addElement( category );
-        category.addProduct( this );
+        detail.setProduct( this );
     }
 
 

@@ -8,7 +8,7 @@
     <description>Product group</description>
     <map-to table="prod_group" xml="group" />
     <field name="id">
-      <sql/>
+      <sql type="numeric" />
       <xml node="attribute"/>
     </field>
     <field name="name">
@@ -39,22 +39,22 @@
     <!--  Product has reference to ProductGroup,
           many products may reference same group  -->
     <field name="group" type="myapp.ProductGroup">
-      <sql name="group_id" />
+      <sql name="group_id" type="char" />
       <xml name="group" node="element" />
     </field>
 
     <!-- Product has reference to ProductDetail
          many details per product  -->
-    <field name="detail" type="myapp.ProductDetail" required="true"
-           collection="enumerate">
+    <field name="details" type="myapp.ProductDetail" required="true"
+           collection="vector">
       <xml name="detail" node="element" />
     </field>
 
     <!-- Product has reference to Category with
          many-many relationship -->
 <!--
-    <field name="category" type="myapp.Category" required="true"
-           collection="enumerate">
+    <field name="categories" type="myapp.Category" required="true"
+           collection="vector">
       <sql name="category_id"
            many-table="category_prod" many-key="prod_id" />
       <xml name="category" node="element" />
@@ -109,8 +109,8 @@
       <xml node="element" />
     </field>
 <!--
-    <field name="product" type="myapp.Product" required="true"
-           collection="enumerate">
+    <field name="products" type="myapp.Product" required="true"
+           collection="vector">
       <sql name="prod_id"
            many-table="category_prod" many-key="category_id" />
       <xml name="product" node="element" />

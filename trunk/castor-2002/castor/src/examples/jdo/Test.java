@@ -116,7 +116,7 @@ public class Test
             writer.println( "Deleting existing computer: " + computer );
             db.remove( computer );
         }
-        
+
         // Look up the group and if found in the database,
         // delete this object from the database
         groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );

@@ -98,11 +98,19 @@
 
     <section title="TODO">
       <ul>
-        <li>Many-many relations and possible bug fixes for inheritence</li>
+        <li>Add type convertors to bind parameters and load() method</li>
+
+        <li>New architecture separating the responsibility of the CacheEngine from
+            that of the persistent object, in order to better support relations
+            (especially many-many) and better handle dependency object commits.</li>
+
+        <li>Multi column primary keys and contained objects.</li>
+
+        <li>DataStore API replacing existing persist SPI. Consolidation of JDO and DAX.</li>
+
+        <li>New mapping DTD</li>
 
         <li>Remove excessive methods in source code generator</li>
-
-        <li>Add type convertors to bind parameters and load() method</li>
 
         <li>Support for read-only fields</li>
 
