@@ -1,6 +1,8 @@
 
 Version (CVS)
 -------------
+XML: 	Fix bug# 886 (Arnaud - 20020219)
+
 XML:	Fix namespaces issue in the marhalling process (Arnaud - 20020211)
 
 ALL:    Upgraded Jakarta Ant to version 1.4 (kvisco) - 20020205)
