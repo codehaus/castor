@@ -47,6 +47,7 @@
 package org.exolab.castor.xml.util;
 
 import java.lang.reflect.Array;
+import java.util.Collection;
 
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
@@ -890,15 +891,14 @@ public class XMLClassDescriptorImpl extends Validator
             FieldValidator validator = fieldDesc.getValidator();
             if (validator != null) {
                 if (validator.getMaxOccurs() < 0) {
-                   return true;
+                   result = true;
                 }
                  else {
                     // count current objects and add 1
                     tempObject = fieldDesc.getHandler().getValue(object);
                     int current = Array.getLength(tempObject);
                     int newTotal = current + 1;
-                    boolean min = validator.getMinOccurs() <= newTotal ;
-                    result = ( min && (newTotal <= validator.getMaxOccurs()) );
+                    result = (newTotal <= validator.getMaxOccurs());
                  }
             }
             else {
@@ -907,7 +907,7 @@ public class XMLClassDescriptorImpl extends Validator
             }
         }
         //3-- the fieldDescriptor is a container
-        if (fieldDesc.isContainer()) {
+        else if (fieldDesc.isContainer()) {
             tempObject = fieldDesc.getHandler().getValue(object);
             //if the object is not yet instantiated, we return true
             if (tempObject == null)
@@ -915,9 +915,6 @@ public class XMLClassDescriptorImpl extends Validator
             else
                 result = ((XMLClassDescriptor)fieldDesc.getClassDescriptor()).canAccept(fieldName, tempObject);
         }
-
-
-
         //4-- Check if the value is set or not
         else {
             FieldHandler handler = fieldDesc.getHandler();
@@ -934,9 +931,19 @@ public class XMLClassDescriptorImpl extends Validator
             while (result && i<fields.length) {
                 XMLFieldDescriptor desc = fields[i];
                 if (desc != fieldDesc && (object!=null) ) {
-                    hasValue = desc.getHandler().getValue(object) != null;
-                    if (hasValue)
+                    Object tempObj = desc.getHandler().getValue(object);
+                    hasValue = (tempObj != null);
+                    if (hasValue) {
                         result = false;
+                        //special case for array
+                        if (tempObj.getClass().isArray()) {
+                            result =  Array.getLength(tempObj) == 0;
+                        }
+                        //special case for collection
+                        if (tempObj instanceof Collection) {
+                           result = ((Collection)tempObj).isEmpty();
+                        }
+                    }
                 }
                 i++;
             }//while
