@@ -74,7 +74,7 @@ package org.exolab.castor.persist;
  * stamp. A sequence counter that increment itself after each modification to the 
  * entity can also be used as a stamp.
  */
-public final class Entity {
+public final class Entity implements Cloneable {
 
     /**
      * The type of the entity.
@@ -107,6 +107,21 @@ public final class Entity {
     public String[] entityClasses;
 
     /**
+     * Represent the actual values in the data store. The first dimension
+     * of the array corresponds to entityClasses. The second dimension
+     * corresponds to the field order in as declared in EntityInfo.fieldInfo
+     * of the entityClasses.
+     */
+    public Object[][] values;
+
+    /**
+     * Constructor
+     */ 
+    public Entity() {
+        super();
+    }
+
+    /**
      * Constructor
      */ 
     public Entity( EntityInfo info, Object identity ) {
@@ -115,18 +130,12 @@ public final class Entity {
         this.identity = identity;
     }
 
-    public Entity() {
-        super();
-    }
-
     /**
-     * Represent the actual values in the data store. The first dimension
-     * of the array corresponds to entityClasses. The second dimension
-     * corresponds to the field order in as declared in EntityInfo.fieldInfo
-     * of the entityClasses.
+     * Test if this object belongs to the same entity type and has the 
+     * same identity. (warning! it behavior subject to change)
+     *
+     * @specify by java.lang.Object.equals(Object)
      */
-    public Object[][] values;
-
     public boolean equals(Object obj) {
         Entity ent;
 
@@ -137,12 +146,61 @@ public final class Entity {
         return (info.equals(ent.info) && identity.equals(ent.identity));
     }
 
+    /**
+     * Return the hashCode of this entity
+     *
+     * @specify by java.lang.Object.hashCode()
+     */
     public int hashCode() {
         return info.hashCode() + (identity == null ? 0 : identity.hashCode());
     }
 
+    /**
+     * Get a string representing this entity
+     * 
+     * @return a string representing this entity
+     */
     public String toString() {
         return info + "[" + identity + "]";
+    }
+
+    /**
+     * Get a clone of this object
+     *
+     * @return an new instance of the same object that has the same values
+     */
+    public Object clone() throws CloneNotSupportedException {
+        Entity cloned = (Entity) super.clone();
+        copyInto( cloned );
+        return cloned;
+    }
+
+    /**
+     * Copy all the fields of this entity into the target entity
+     *
+     * @param target The entity that the fields to be copied into
+     */
+    public void copyInto( Entity target ) {
+        if ( entityClasses != null ) {
+            target.entityClasses = new String[target.entityClasses.length];
+            System.arraycopy( entityClasses, 0, 
+                target.entityClasses, 0, entityClasses.length );
+        } else {
+            target.entityClasses = null;
+        }
+        if ( values != null ) {
+            target.values = new Object[values.length][];
+            for ( int i = 0; i <= values.length; i++ ) {
+                if ( values[i] != null ) {
+                    target.values[i] = new Object[values[i].length];
+                    System.arraycopy( values[i], 0, target.values[i], 0, values[i].length );
+                } else {
+                    target.values[i] = null;
+                }
+            }
+        } else {
+            target.values = null;
+        }
     }
 
 }
