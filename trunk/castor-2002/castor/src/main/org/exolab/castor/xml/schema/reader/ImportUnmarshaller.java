@@ -95,7 +95,8 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		//-- Is this namespace one the schema knows about?
 		if (!schema.isKnownNamespace(namespace))
 			throw new SAXException("namespace '"+namespace+"' not declared in schema");
-
+        if (namespace.equals(schema.getTargetNamespace()) )
+            throw new SAXException("the 'namespace' attribute in the <import> element cannot be the same of the targetNamespace of the global schema");
 		//-- Schema object to hold import schema
 		boolean addSchema = false;
 		Schema importedSchema = schema.getImportedSchema(namespace);
@@ -126,7 +127,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			schemaUnmarshaller.setSchema(importedSchema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
-		}
+        }
 
 		try {
 		    parser.parse(new InputSource(schemalocation));
