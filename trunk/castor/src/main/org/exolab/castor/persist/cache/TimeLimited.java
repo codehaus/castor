@@ -110,8 +110,6 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
      */
     public TimeLimited () {
     	super();
-        
-        _log.debug ("Successfully initialized instance of " + getClass().getName());
     }
     
     /**

@@ -110,11 +110,6 @@ implements Cache
         mapKeyPos = new Hashtable(size);
 
         this.size = size;
-        
-        if (_log.isDebugEnabled()) {
-            _log.trace ("Successfully initialzed count-limited cache instance" );
-        }
-        
     }
     
     

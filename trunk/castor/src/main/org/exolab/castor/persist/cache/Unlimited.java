@@ -75,12 +75,9 @@ extends AbstractBaseCache
 	
 	/**
 	 * Constructor
-	 *
 	 */
 	public Unlimited() {
-		if (_log.isDebugEnabled()) {
-			_log.trace ("Successfully created unlimited cache instance" );
-		}
+	    super();
 	}
 	
 	/**
