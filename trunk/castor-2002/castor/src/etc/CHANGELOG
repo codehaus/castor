@@ -49,6 +49,10 @@ JDO:    Temporary fix to ClassLoader problem in EJB environment: application
 
 Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
+XML:    Fixed Marshaller#setMarshalAsDocument so that XML fragment marshalling
+        works again. This used to work, but changes to the serializers had 
+        prevented this from working properly. Reported by Phil Grida. (kvisco)
+
 XML:    Fixed endless recursion bug when processing recursive element 
         declarations, reported by Chris Schaefer (kvisco).
 
