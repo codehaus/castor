@@ -204,17 +204,23 @@
 
       <!-- Signal that this field should be marshalled as a reference -->
       <xsd:attribute name="reference" type="xsd:boolean" use="optional"/>
+
+     <!-- NodeType for the XML node -->
       <xsd:attribute name="node" use="optional">
          <xsd:simpleType>
             <xsd:restriction base="xsd:string">
                <xsd:enumeration value="attribute"/>
                <xsd:enumeration value="element"/>
+               <xsd:enumeration value="namespace"/>
                <xsd:enumeration value="text"/>
             </xsd:restriction>
          </xsd:simpleType>
       </xsd:attribute>
 
       <xsd:attribute name="QName-prefix" type="xsd:NMTOKEN" use="optional"/>
+
+      <!-- Signal that this field is transient for XML (ie should be ignored) -->
+      <xsd:attribute name="transient" type="xsd:boolean" use="optional"/>
 
     </xsd:complexType>
   </xsd:element>
