@@ -108,24 +108,24 @@
 
     <section title="TODO List">
 <pre>
-  JDO: ObjectDesc/PrimaryKeyDesc are cloning return arrays to assure it
-       is immutable and prevent the caller from changing their contents.
+  JDO: ClassDesc/ContainerFieldDesc return arrays that are not cloned.
        This practice must be deprecated and checks made to assure these
        arrays are not altered, or use an immutable return collection.
 
-  JDO: Check that required fields are not null prior to storing object.
+  JDO: Locking mode must be specific to table, not database.
 
-  JDO: Required, read/write attributes are currently ignored.
+  JDO: Add SQL capabilities mechanism to address different databases.
 
   JDO: Inheritance is not fully working. Need to rethink over ODI model.
 
   JDO: Need to think up a better alternative to the ODMG API.
 
-  JDO: identityChange, dirty checking, define SPI for key generation,
-       support Sybase HOLDLOCK
+  JDO: Implement dirty checking, define SPI for key generation, support
+       Sybase HOLDLOCK
 
-  DAX: Type convertors to/from String, support for Vectors, might want
-       to replace AttributeSet with a hashtable
+  DAX: Type convertors to/from String, support for Vectors.
+
+  DAX: Better query parser with support for parameters.
 </pre>
     </section>
 

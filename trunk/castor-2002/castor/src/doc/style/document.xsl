@@ -122,6 +122,9 @@
     <blockquote><hr size="1" noshadow=""/><xsl:apply-templates/><hr size="1" noshadow=""/></blockquote>
   </xsl:template>
 
+  <xsl:template match="nbsp">
+    &#xA0;
+  </xsl:template>
 
   <!-- Everything else in the document is considered HTML and
        produced as such with the proper processing.
