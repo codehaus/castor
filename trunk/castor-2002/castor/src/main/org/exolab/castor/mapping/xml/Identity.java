@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class Identity implements java.io.Serializable {
@@ -27,10 +30,7 @@ public class Identity implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-    /**
-     * 
-    **/
-    private java.lang.String vFieldRef;
+    private java.lang.String _fieldRef;
 
 
       //----------------/
@@ -39,7 +39,7 @@ public class Identity implements java.io.Serializable {
 
     public Identity() {
         super();
-    } //-- Identity()
+    } //-- org.exolab.castor.mapping.xml.Identity()
 
 
       //-----------/
@@ -49,23 +49,8 @@ public class Identity implements java.io.Serializable {
     /**
     **/
     public java.lang.String getFieldRef() {
-        return this.vFieldRef;
+        return this._fieldRef;
     } //-- java.lang.String getFieldRef() 
-
-    /**
-     * @param vFieldRef
-    **/
-    public void setFieldRef(java.lang.String vFieldRef) {
-        this.vFieldRef = vFieldRef;
-    } //-- void setFieldRef(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -80,6 +65,7 @@ public class Identity implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -92,6 +78,7 @@ public class Identity implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -104,12 +91,29 @@ public class Identity implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _fieldRef
+    **/
+    public void setFieldRef(java.lang.String _fieldRef) {
+        this._fieldRef = _fieldRef;
+    } //-- void setFieldRef(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static Identity unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Identity unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (Identity) Unmarshaller.unmarshal(Identity.class, reader);
-    } //-- Identity unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Identity) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Identity.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Identity unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

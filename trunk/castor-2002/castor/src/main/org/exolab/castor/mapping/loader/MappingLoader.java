@@ -64,7 +64,7 @@ import org.xml.sax.SAXException;
 import org.exolab.castor.mapping.xml.Mapping;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.ContainerMapping;
+import org.exolab.castor.mapping.xml.Container;
 import org.exolab.castor.mapping.xml.Include;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.MarshalException;
@@ -252,8 +252,6 @@ public abstract class MappingLoader
     }
 
 
-private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
-
     /**
      * Loads the mapping from the specified input source. This method
      * loads the mapping objects from the specified input source.
@@ -267,31 +265,9 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         throws IOException, MappingException
     {
         Unmarshaller unm;
-        
-        if ( _cdr == null ) {
-            try {
-                org.exolab.castor.xml.XMLMappingLoader xml;
-                
-                unm = new Unmarshaller( org.exolab.castor.mapping.xml.Mapping.class );
-                unm.setEntityResolver( _resolver );
-                _cdr = new org.exolab.castor.xml.util.ClassDescriptorResolverImpl();
-                xml = new org.exolab.castor.xml.XMLMappingLoader( _loader );
-                xml.loadMapping( (org.exolab.castor.mapping.xml.Mapping) unm.unmarshal( new InputSource( getClass().getResourceAsStream( "/org/exolab/castor/mapping/xml/mapping.xml" ) ) ) );
-                _cdr.setMappingLoader( xml );
-            } catch ( MappingException except ) {
-                throw except;
-            } catch ( Exception except ) {
-                throw new MappingException( except );
-            }
-        }
-
-        //
-        unm = new Unmarshaller( Mapping.class );
-        //
-
-        unm.setResolver( _cdr );
-
+       
         try {
+            unm = new Unmarshaller( Mapping.class );
             unm.setEntityResolver( _resolver );
             if ( _logWriter != null )
                 unm.setLogWriter( _logWriter );
@@ -321,7 +297,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         Enumeration   enum;
 
         // Load all the included mapping files first.
-        enum = mapping.enumerateIncludes();
+        enum = mapping.enumerateInclude();
         while ( enum.hasMoreElements() ) {
             Include       include;
 
@@ -413,7 +389,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         Enumeration       enum;
         Class             javaClass;
         ClassDescriptor   extend;
-        ContainerMapping  contMaps[];
+        Container         contMaps[];
         Vector            relations;
         ClassDescriptor   clsDesc;
 
@@ -451,7 +427,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
         // in there.
         fields = createFieldDescs( javaClass, clsMap.getFieldMapping() );
         /*
-        contMaps = clsMap.getContainerMapping();
+        contMaps = clsMap.getContainer();
         if ( contMaps != null && contMaps.length > 0 ) {
             FieldDesc[] allFields;
 
@@ -505,7 +481,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
 
         // Create the class descriptor.
         clsDesc = new ClassDescriptorImpl( javaClass, fields, identity, extend,
-                                           AccessMode.getAccessMode( clsMap.getAccessMode() ) );
+                                           AccessMode.getAccessMode( clsMap.getAccess() ) );
         return clsDesc;
     }
 
@@ -548,7 +524,7 @@ private static org.exolab.castor.xml.ClassDescriptorResolver _cdr;
      *  the class cannot be created
      */
     /*
-    protected ContainerFieldDesc createContainerFieldDesc( Class javaClass, ContainerMapping fieldMap )
+    protected ContainerFieldDesc createContainerFieldDesc( Class javaClass, Container fieldMap )
         throws MappingException
     {
         // Container type must be constructable.

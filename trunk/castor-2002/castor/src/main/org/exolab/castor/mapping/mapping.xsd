@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE schema PUBLIC "-//W3C/DTD XML Schema Version 1.0//EN"
-                        "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.dtd">
+<!--DOCTYPE schema PUBLIC "-//W3C/DTD XML Schema Version 1.0//EN"
+                        "http://www.w3.org/TR/2000/WD-xmlschema-1-20000225/structures.dtd"-->
 <!--
     Castor Object Mapping XML Schema
 
@@ -39,7 +39,7 @@
         <element ref="container"/>
       </group>
       <attribute name="class-name" type="ID" minOccurs="1"/>
-      <attribute name="extends" type="IDREF" minOccurs="0"/>
+      <attribute name="extends" type="string" minOccurs="0"/>
       <attribute name="access" type="string" minOccurs="0" default="shared">
         <enumeration value="read-only"/>
         <enumeration value="shared"/>
@@ -100,7 +100,8 @@
     <type content="empty">
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
       <attribute name="type" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="for-key" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="many-key" type="NMTOKEN" minOccurs="0"/>
       <attribute name="dirty" type="string" minOccurs="0" default="check">
         <enumeration value="check"/>
         <enumeration value="ignore"/>

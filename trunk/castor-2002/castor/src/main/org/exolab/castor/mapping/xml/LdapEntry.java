@@ -1,6 +1,8 @@
 /*
- * Add code header here
- * $Id$ 
+ * This class was automatically generated with 
+ * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * using an XML Schema.
+ * $Id
  */
 
 package org.exolab.castor.mapping.xml;
@@ -18,6 +20,7 @@ import org.exolab.castor.xml.ValidationException;
 import org.xml.sax.DocumentHandler;
 
 /**
+ * 
  * @version $Revision$ $Date$
 **/
 public class LdapEntry implements java.io.Serializable {
@@ -27,11 +30,7 @@ public class LdapEntry implements java.io.Serializable {
      //- Member Variables -/
     //--------------------/
 
-
-    /**
-     * 
-    **/
-    private java.lang.String vObjectClass;
+    private java.lang.String _objectClass;
 
 
       //----------------/
@@ -40,7 +39,7 @@ public class LdapEntry implements java.io.Serializable {
 
     public LdapEntry() {
         super();
-    } //-- LdapEntry()
+    } //-- org.exolab.castor.mapping.xml.LdapEntry()
 
 
       //-----------/
@@ -50,23 +49,8 @@ public class LdapEntry implements java.io.Serializable {
     /**
     **/
     public java.lang.String getObjectClass() {
-        return this.vObjectClass;
+        return this._objectClass;
     } //-- java.lang.String getObjectClass() 
-
-    /**
-     * @param vObjectClass
-    **/
-    public void setObjectClass(java.lang.String vObjectClass) {
-        this.vObjectClass = vObjectClass;
-    } //-- void setObjectClass(java.lang.String) 
-
-    /**
-    **/
-    public void validate() 
-        throws org.exolab.castor.xml.ValidationException
-    {
-        org.exolab.castor.xml.Validator.validate(this, null);
-    } //-- void validate() 
 
     /**
     **/
@@ -81,6 +65,7 @@ public class LdapEntry implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * 
      * @param out
     **/
     public void marshal(java.io.Writer out) 
@@ -93,6 +78,7 @@ public class LdapEntry implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * 
      * @param handler
     **/
     public void marshal(org.xml.sax.DocumentHandler handler) 
@@ -105,12 +91,29 @@ public class LdapEntry implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
+     * 
+     * @param _objectClass
+    **/
+    public void setObjectClass(java.lang.String _objectClass) {
+        this._objectClass = _objectClass;
+    } //-- void setObjectClass(java.lang.String) 
+
+    /**
+     * 
      * @param reader
     **/
-    public static LdapEntry unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.LdapEntry unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (LdapEntry) Unmarshaller.unmarshal(LdapEntry.class, reader);
-    } //-- LdapEntry unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.LdapEntry) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.LdapEntry.class, reader);
+    } //-- org.exolab.castor.mapping.xml.LdapEntry unmarshal(java.io.Reader) 
+
+    /**
+    **/
+    public void validate() 
+        throws org.exolab.castor.xml.ValidationException
+    {
+        org.exolab.castor.xml.Validator.validate(this, null);
+    } //-- void validate() 
 
 }

@@ -25,58 +25,41 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class ClassMapping implements java.io.Serializable {
+public class Container implements java.io.Serializable {
 
 
       //--------------------/
      //- Member Variables -/
     //--------------------/
 
-    private java.lang.String _className;
+    private java.lang.String _setMethod;
 
-    private java.lang.String _access = "shared";
+    private java.lang.String _getMethod;
 
-    private java.lang.String _extends;
+    private java.lang.String _type;
+
+    private boolean _required = false;
+
+    private java.lang.String _name;
 
     private Description _description;
 
-    private SqlTable _sqlTable;
-
-    private XmlSchema _xmlSchema;
-
-    private LdapEntry _ldapEntry;
-
-    private Identity _identity;
-
     private java.util.Vector _fieldMappingList;
-
-    private java.util.Vector _containerList;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public ClassMapping() {
+    public Container() {
         super();
         _fieldMappingList = new Vector();
-        _containerList = new Vector();
-    } //-- org.exolab.castor.mapping.xml.ClassMapping()
+    } //-- org.exolab.castor.mapping.xml.Container()
 
 
       //-----------/
      //- Methods -/
     //-----------/
-
-    /**
-     * 
-     * @param vContainer
-    **/
-    public void addContainer(Container vContainer) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        _containerList.addElement(vContainer);
-    } //-- void addContainer(Container) 
 
     /**
      * 
@@ -90,71 +73,15 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public java.util.Enumeration enumerateContainer() {
-        return _containerList.elements();
-    } //-- java.util.Enumeration enumerateContainer() 
-
-    /**
-    **/
     public java.util.Enumeration enumerateFieldMapping() {
         return _fieldMappingList.elements();
     } //-- java.util.Enumeration enumerateFieldMapping() 
 
     /**
     **/
-    public java.lang.String getAccess() {
-        return this._access;
-    } //-- java.lang.String getAccess() 
-
-    /**
-    **/
-    public java.lang.String getClassName() {
-        return this._className;
-    } //-- java.lang.String getClassName() 
-
-    /**
-     * 
-     * @param index
-    **/
-    public Container getContainer(int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > _containerList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (Container) _containerList.elementAt(index);
-    } //-- Container getContainer(int) 
-
-    /**
-    **/
-    public Container[] getContainer() {
-        int size = _containerList.size();
-        Container[] mArray = new Container[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (Container) _containerList.elementAt(index);
-        }
-        return mArray;
-    } //-- Container[] getContainer() 
-
-    /**
-    **/
-    public int getContainerCount() {
-        return _containerList.size();
-    } //-- int getContainerCount() 
-
-    /**
-    **/
     public Description getDescription() {
         return this._description;
     } //-- Description getDescription() 
-
-    /**
-    **/
-    public java.lang.String getExtends() {
-        return this._extends;
-    } //-- java.lang.String getExtends() 
 
     /**
      * 
@@ -190,33 +117,33 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public Identity getIdentity() {
-        return this._identity;
-    } //-- Identity getIdentity() 
+    public java.lang.String getGetMethod() {
+        return this._getMethod;
+    } //-- java.lang.String getGetMethod() 
 
     /**
     **/
-    public LdapEntry getLdapEntry() {
-        return this._ldapEntry;
-    } //-- LdapEntry getLdapEntry() 
+    public java.lang.String getName() {
+        return this._name;
+    } //-- java.lang.String getName() 
 
     /**
     **/
-    public java.lang.String getReferenceId() {
-        return this._className;
-    } //-- java.lang.String getReferenceId() 
+    public boolean getRequired() {
+        return this._required;
+    } //-- boolean getRequired() 
 
     /**
     **/
-    public SqlTable getSqlTable() {
-        return this._sqlTable;
-    } //-- SqlTable getSqlTable() 
+    public java.lang.String getSetMethod() {
+        return this._setMethod;
+    } //-- java.lang.String getSetMethod() 
 
     /**
     **/
-    public XmlSchema getXmlSchema() {
-        return this._xmlSchema;
-    } //-- XmlSchema getXmlSchema() 
+    public java.lang.String getType() {
+        return this._type;
+    } //-- java.lang.String getType() 
 
     /**
     **/
@@ -258,25 +185,9 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
     **/
-    public void removeAllContainer() {
-        _containerList.removeAllElements();
-    } //-- void removeAllContainer() 
-
-    /**
-    **/
     public void removeAllFieldMapping() {
         _fieldMappingList.removeAllElements();
     } //-- void removeAllFieldMapping() 
-
-    /**
-     * 
-     * @param index
-    **/
-    public Container removeContainer(int index) {
-        Object obj = _containerList.elementAt(index);
-        _containerList.removeElementAt(index);
-        return (Container) obj;
-    } //-- Container removeContainer(int) 
 
     /**
      * 
@@ -290,50 +201,11 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _access
-    **/
-    public void setAccess(java.lang.String _access) {
-        this._access = _access;
-    } //-- void setAccess(java.lang.String) 
-
-    /**
-     * 
-     * @param _className
-    **/
-    public void setClassName(java.lang.String _className) {
-        this._className = _className;
-    } //-- void setClassName(java.lang.String) 
-
-    /**
-     * 
-     * @param vContainer
-     * @param index
-    **/
-    public void setContainer(Container vContainer, int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > _containerList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        _containerList.setElementAt(vContainer, index);
-    } //-- void setContainer(Container, int) 
-
-    /**
-     * 
      * @param _description
     **/
     public void setDescription(Description _description) {
         this._description = _description;
     } //-- void setDescription(Description) 
-
-    /**
-     * 
-     * @param _extends
-    **/
-    public void setExtends(java.lang.String _extends) {
-        this._extends = _extends;
-    } //-- void setExtends(java.lang.String) 
 
     /**
      * 
@@ -352,45 +224,53 @@ public class ClassMapping implements java.io.Serializable {
 
     /**
      * 
-     * @param _identity
+     * @param _getMethod
     **/
-    public void setIdentity(Identity _identity) {
-        this._identity = _identity;
-    } //-- void setIdentity(Identity) 
+    public void setGetMethod(java.lang.String _getMethod) {
+        this._getMethod = _getMethod;
+    } //-- void setGetMethod(java.lang.String) 
 
     /**
      * 
-     * @param _ldapEntry
+     * @param _name
     **/
-    public void setLdapEntry(LdapEntry _ldapEntry) {
-        this._ldapEntry = _ldapEntry;
-    } //-- void setLdapEntry(LdapEntry) 
+    public void setName(java.lang.String _name) {
+        this._name = _name;
+    } //-- void setName(java.lang.String) 
 
     /**
      * 
-     * @param _sqlTable
+     * @param _required
     **/
-    public void setSqlTable(SqlTable _sqlTable) {
-        this._sqlTable = _sqlTable;
-    } //-- void setSqlTable(SqlTable) 
+    public void setRequired(boolean _required) {
+        this._required = _required;
+    } //-- void setRequired(boolean) 
 
     /**
      * 
-     * @param _xmlSchema
+     * @param _setMethod
     **/
-    public void setXmlSchema(XmlSchema _xmlSchema) {
-        this._xmlSchema = _xmlSchema;
-    } //-- void setXmlSchema(XmlSchema) 
+    public void setSetMethod(java.lang.String _setMethod) {
+        this._setMethod = _setMethod;
+    } //-- void setSetMethod(java.lang.String) 
+
+    /**
+     * 
+     * @param _type
+    **/
+    public void setType(java.lang.String _type) {
+        this._type = _type;
+    } //-- void setType(java.lang.String) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.ClassMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.ClassMapping.class, reader);
-    } //-- org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.Container) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Container.class, reader);
+    } //-- org.exolab.castor.mapping.xml.Container unmarshal(java.io.Reader) 
 
     /**
     **/
