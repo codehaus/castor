@@ -191,10 +191,7 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
-        if ( typeInfo.getCollectionType() != null )
-            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
-        else
-            _colHandler = null;
+        _colHandler = typeInfo.getCollectionHandler();
     }
 
 
@@ -224,10 +221,7 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
-        if ( typeInfo.getCollectionType() != null )
-            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
-        else
-            _colHandler = null;
+        _colHandler = typeInfo.getCollectionHandler();
     }
 
 
@@ -272,10 +266,7 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
-        if ( typeInfo.getCollectionType() != null )
-            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
-        else
-            _colHandler = null;
+        _colHandler = typeInfo.getCollectionHandler();
     }
 
 

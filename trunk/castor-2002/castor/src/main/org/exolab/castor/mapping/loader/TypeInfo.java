@@ -48,6 +48,7 @@ package org.exolab.castor.mapping.loader;
 
 
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.CollectionHandler;
 
 
 /**
@@ -98,9 +99,9 @@ public class TypeInfo
 
 
     /**
-     * The collection type of the field.
+     * The collection handler of the field.
      */
-    private Class          _colType;
+    private CollectionHandler  _colHandler;
 
 
     /**
@@ -125,11 +126,11 @@ public class TypeInfo
      * @param required True if the field is required
      * @param defaultValue The default value of the field, null to
      *  use the known Java defaults
-     * @param colType The collection type for this field, or null if
+     * @param colHandler The collection handler for this field, or null if
      *  field is singular
      */
     public TypeInfo( Class fieldType, TypeConvertor convertorTo, TypeConvertor convertorFrom,
-                     boolean required, Object defaultValue, Class colType )
+                     boolean required, Object defaultValue, CollectionHandler colHandler )
     {
         _fieldType = Types.typeFromPrimitive( fieldType );
         _convertorTo = convertorTo;
@@ -139,7 +140,7 @@ public class TypeInfo
         // Note: must be called with fieldType (might be primitive) and not
         // _fieldType (never primitive) to get the proper default value
         _default = ( defaultValue == null ? Types.getDefault( fieldType ) : defaultValue );
-        _colType = colType;
+        _colHandler = colHandler;
     }
 
 
@@ -210,14 +211,15 @@ public class TypeInfo
 
 
     /**
-     * Return the collection type of this field.
+     * Return the collection handler of this field.
      *
-     * @return The collection type of this field
+     * @return The collection handler of this field
      */
-    public Class getCollectionType()
+    public CollectionHandler getCollectionHandler()
     {
-        return _colType;
+        return _colHandler;
     }
+
 
     /**
      * Sets a flag indictating if the field is required.
