@@ -8,6 +8,35 @@ create unique index test_table_pk
    on test_table ( id );
 grant all on test_table to test;
 
+-- test many to many
+drop table test_group_person;
+create table test_group_person (
+  gid int         not null,
+  pid int        not null 
+);
+create index test_group_person_p_pk on test_group_person ( pid );
+create index test_group_person_g_pk on test_group_person ( gid );
+grant all on test_group_person to test;
+
+drop table test_many_group;
+create table test_many_group (
+  gid       int           not null,
+  value    varchar(100)  not null
+);
+create unique index test_many_group_pk on test_many_group ( gid );
+grant all on test_many_group to test;
+
+drop table test_many_person;
+create table test_many_person (
+   pid      int          not null,
+   value   varchar(100) not null,
+   helloworld varchar(100) null,
+   sthelse varchar(100) null
+);
+create unique index test_many_person_pk on test_many_person ( pid );
+grant all on test_many_person to test;
+
+
 
 -- test_table_ex
 drop table test_table_ex;
@@ -21,6 +50,20 @@ create table test_table_ex (
 create unique index test_table_ex_pk on test_table_ex ( id );
 
 grant all on test_table_ex to test;
+
+
+-- test_table_ex
+drop table test_table_extends;
+
+create table test_table_extends (
+  id      int          not null,
+  value3  varchar(200) null,
+  value4  varchar(200) null
+);
+
+create unique index test_table_extends_pk on test_table_extends ( id );
+
+grant all on test_table_extends to test;
 
 
 -- test_race

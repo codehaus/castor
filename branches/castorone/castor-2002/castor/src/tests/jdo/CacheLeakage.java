@@ -62,7 +62,6 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.persist.CacheEngine;
 import org.exolab.castor.persist.Cache;
 import org.exolab.jtf.CWVerboseStream;
 import org.exolab.jtf.CWTestCase;
@@ -229,8 +228,8 @@ public class CacheLeakage extends CWTestCase {
 
             stream.writeVerbose( "force the cache to dispose all the object and test if it is still valid" );
             // force the cache to dispose all the object and test if it is still valid
-            if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_TIME_LIMITED ) {
-                Thread.currentThread().sleep( 1500 * CacheEngine.DEFAULT_CACHE_VALUE );
+            if ( true /*CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_TIME_LIMITED*/ ) {
+                Thread.currentThread().sleep( 1500 * 30 /*CacheEngine.DEFAULT_CACHE_VALUE*/ );
                 _db.begin();
                 count = 0;
                 // - create "cachesize - 5" objects for count limited
@@ -250,7 +249,7 @@ public class CacheLeakage extends CWTestCase {
                 } else {
                     stream.writeVerbose( "size match!" );
                 }
-            } else if ( CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_COUNT_LIMITED ) {
+            } else if ( true /*CacheEngine.DEFAULT_CACHE_TYPE == Cache.CACHE_COUNT_LIMITED*/ ) {
                 _db.begin();
                 count = 0;
                 // - create "cachesize - 5" objects for count limited

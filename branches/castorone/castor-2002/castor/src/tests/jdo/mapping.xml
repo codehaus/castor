@@ -4,6 +4,43 @@
 
   <!-- Mapping for TestObject to test_table
        Single object mapping, shared access, dirty checking on all fields -->
+
+  <class name="jdo.TestManyGroup" access="shared" identity="id">
+    <description>Table used for testing many to many relation</description>
+    <map-to table="test_many_group" />
+    <field name="id" type="integer">
+      <sql name="gid" type="integer" />
+    </field>
+    <field name="value" type="string"  required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="people" type="jdo.TestManyPerson" collection="collection" 
+	required="false" >
+	<sql many-table="test_group_person"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestManyPerson" access="shared" identity="id">
+    <description>Table used for testing many to many relation</description>
+    <map-to table="test_many_person" />
+    <field name="id" type="integer">
+      <sql name="pid" type="integer" />
+    </field>
+    <field name="value" type="string"  required="true">
+      <sql name="value" type="varchar" />
+    </field>
+    <field name="helloworld" type="string" >
+      <sql name="helloworld" type="varchar" />
+    </field>
+    <field name="sthelse" type="string"  >
+      <sql name="sthelse" type="varchar" />
+    </field>
+    <field name="group" type="jdo.TestManyGroup" collection="collection" 
+	required="false">
+	<sql many-table="test_group_person"/>
+    </field>
+  </class>
+
   <class name="jdo.TestObject" access="shared" identity="id">
     <description>Table used for concurrency and performance testing</description>
     <map-to table="test_table" />
@@ -15,6 +52,17 @@
     </field>
     <field name="value2" type="string">
       <sql name="value2" type="varchar" dirty="ignore"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestObjectExtends" access="shared" extends="jdo.TestObject">
+    <description>Table used for cache testing</description>
+    <map-to table="test_table_extends" />
+    <field name="value3" type="string">
+      <sql name="value3" type="varchar"/>
+    </field>
+    <field name="value4" type="string">
+      <sql name="value4" type="varchar" dirty="ignore"/>
     </field>
   </class>
 
@@ -102,10 +150,10 @@
     <field name="value" type="string"  required="true">
       <sql name="value" type="varchar" />
     </field>
-  </class>
+  </class> 
 
 
-  <!-- Classes for testing type handling -->
+  <!-- Classes for testing type handling --> 
   <class name="jdo.TestTypes" access="shared" identity="id">
     <description>Test various type handling and conversions</description>
     <map-to table="test_types" />
@@ -139,10 +187,10 @@
     <field name="timestamp2" type="java.util.Date" >
       <sql name="num_date" type="numeric[YMDhmsS]" />
     </field>
-  </class>
+  </class> -->
 
 
-  <!-- Classes for key generator testing -->
+  <!-- Classes for key generator testing --> 
   <class name="jdo.TestMaxObject" identity="id" key-generator="MAX">
     <description>Table used for MAX key generator testing</description>
     <map-to table="test_keygen" />
@@ -167,7 +215,7 @@
     <param name="key-column" value="table_name"/>
     <param name="value-column" value="max_id"/>
     <param name="grab-size" value="1000"/>
-  </key-generator>
+  </key-generator> 
 
   <class name="jdo.TestHighLowObject" identity="id" key-generator="HIGH/LOW">
     <description>Table used for HIGH/LOW key generator testing</description>
@@ -254,7 +302,7 @@
     </field>
   </class>
 
-
+	
   <class name="jdo.TestPersistent" access="shared" identity="id">
     <description>Test Persistent interface handling</description>
     <map-to table="test_persistent" />
@@ -271,11 +319,11 @@
       <sql name="value" type="varchar" />
     </field>
     <field name="parentId" type="integer" required="false">
-      <sql name="parent_id" dirty="ignore" />
+      <sql name="parent_id" type="integer" dirty="ignore" />
     </field>
-  </class>
+  </class> 
 
-
+<!--
   <class name="jdo.TestNestedFields" access="shared" identity="id">
     <description>Table used for nested fields testing</description>
     <map-to table="test_table" />
@@ -288,7 +336,6 @@
     <field name="nested2.nested3.value2" type="string">
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
-  </class>
+  </class> -->
 
 </mapping>
-
