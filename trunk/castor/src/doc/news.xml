@@ -19,6 +19,29 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
         <news>
+            <title>Castor 0.9.5.4 Release Candidates</title>
+            <author>Keith Visco</author>
+            <date>18 Oct 2004</date>
+            <time>22:00:00</time>
+            <summary>
+
+                I've placed a copy of the latest Castor 0.9.5.4 release candidate on the
+                <a href="ftp://ftp.exolab.org/pub/castor/castor_0.9.5.4/">FTP Server</a>.
+
+                This is a bug fix release, so please do not expect new features
+                slated for 0.9.6 to appear in this release. The release candidate
+                will be replaced by the official version by end of the week, so
+                please try this version and report any regression issues. A
+                regression for this release is something that was working in 0.9.5.3
+                but no longer working in this 0.9.5.4 release candidate. Only
+                regression issues will be considered for fixing before the final
+                release. All other bugs will be moved out to 0.9.6, or a 0.9.5.5
+                release if necessary.
+
+            </summary>
+        </news>
+
+        <news>
             <title>Castor Message Board</title>
             <author>Keith Visco</author>
             <date>04 Jul 2004</date>
