@@ -191,7 +191,8 @@ public final class Cache
                 if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
                     // move entry to cache
                     _locks.remove( oid );
-                    _cache.put( oid, entry );
+                    if ( !entry.lock.isDeleted() )
+                        _cache.put( oid, entry );
                 }
             }
             // }
@@ -212,7 +213,8 @@ public final class Cache
                 if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
                     // move entry to cache
                     _locks.remove( oid );
-                    _cache.put( oid, entry );
+                    if ( !entry.lock.isDeleted() )
+                        _cache.put( oid, entry );
                 }
             }
         }
@@ -232,8 +234,17 @@ public final class Cache
     
     synchronized void removeLock( OID oid )
     {
-        _locks.remove( oid );
-        _cache.remove( oid );
+        CacheEntry entry = (CacheEntry) _locks.get( oid ); 
+        
+        if ( entry == null )
+            return;
+
+        synchronized ( entry.lock ) {
+            //System.out.println("releaseLock " + "aquire counter: "+entry.aquireCounter+" entry.lock.isFree(): "+entry.lock.isFree());
+            if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
+                _locks.remove( oid );
+            }
+        }
     }
     
     
