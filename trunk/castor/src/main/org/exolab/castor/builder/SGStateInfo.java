@@ -89,18 +89,24 @@ class SGStateInfo extends ClassInfoResolverImpl {
 
     private Dialog _dialog = null;
     
+    private SourceGenerator _sgen = null;
+    
 //    private XMLBindingComponent _bindingComponent = null;
 
     /**
      * Creates a new SGStateInfo
-    **/
-    protected SGStateInfo(Schema schema) {
+     * 
+     * @param schema the Schema to generate source for
+     * @param sgen the SourceGenerator instance
+     */
+    protected SGStateInfo(Schema schema, SourceGenerator sgen) {
         super();
         _schema        = schema;
         packageName    = "";
         _classTypes    = new Hashtable();
         _processed     = new Vector();
         _dialog        = new ConsoleDialog();
+        _sgen          = sgen;
     } //-- SGStateInfo
 
 
@@ -133,6 +139,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
     Schema getSchema() {
         return _schema;
     } //-- getSchema
+    
+    /**
+     * Returns the SourceGenerator instance being used
+     */
+    SourceGenerator getSourceGenerator() {
+        return _sgen;
+    } //-- getSourceGenerator
     
     boolean getSuppressNonFatalWarnings() {
         return _suppressNonFatalWarnings;
