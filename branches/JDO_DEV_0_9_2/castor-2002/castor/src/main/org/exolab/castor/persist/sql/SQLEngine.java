@@ -134,6 +134,9 @@ public final class SQLEngine implements Persistence {
     private String              _sqlLoadLock;
 
 
+    private EntityInfo          _entityInfo;
+
+
     private FieldInfo[]         _fields;
 
 
@@ -180,6 +183,7 @@ public final class SQLEngine implements Persistence {
         throws MappingException {
 
         _clsDesc = null; //clsDesc;
+        _entityInfo = entityInfo;
         _stampField = stampField;
         _factory = factory;
         _logInterceptor = logInterceptor;
@@ -466,7 +470,7 @@ public final class SQLEngine implements Persistence {
                 _ids[0].name, null );
 
         if ( identity == null )
-            throw new PersistenceException( "persist.noIdentity" );
+            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
 
         return idToJava( 0, identity );
     }
@@ -491,26 +495,29 @@ public final class SQLEngine implements Persistence {
      */
     public Object create( TransactionContext tx, Object conn, Entity entity )
         throws DuplicateIdentityException, PersistenceException {
-/*
+
         PreparedStatement stmt = null;
         int               count;
         Object            sqlId;
+        Object[]          fields = null;
 
-        if ( _extends == null && _keyGen == null && identity == null )
-            throw new PersistenceException( "persist.noIdentity" );
+        if ( _extends == null && _keyGen == null && entity.identity == null )
+            throw new PersistenceException( Messages.format("persist.noIdentity", _clsDesc.getJavaClass().getName()) );
 
+        fields = extractFields(entity);
         try {
             // Must create record in the parent table first.
             // All other dependents are created afterwards.
             if ( _extends != null ) {
                 // | quick and very dirty hack to try to make multiple class on the same table work
-                if ( !_extends._mapTo.equals( _mapTo ) )
-                    identity = _extends.create( conn, fields, identity );
+                if ( !_extends._mapTo.equals( _mapTo ) ) {
+                    _extends.create( tx, conn, entity );
+                }
             }
 
             // Generate key before INSERT
             else if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT )
-                identity = generateKey( conn );   // genKey return identity in JDO type
+                entity.identity = generateKey( conn );   // genKey return identity in JDO type
 
 
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
@@ -521,11 +528,11 @@ public final class SQLEngine implements Persistence {
             // Must remember that SQL column index is base one
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                if ( _ids.length > 1 && !(identity instanceof Complex) )
+                if ( _ids.length > 1 && !(entity.identity instanceof Complex) )
                     throw new PersistenceException( "Multiple identities expected!" );
 
-                if ( identity instanceof Complex ) {
-                    Complex id = (Complex) identity;
+                if ( entity.identity instanceof Complex ) {
+                    Complex id = (Complex) entity.identity;
                     if ( id.size() != _ids.length || _ids.length <= 1 )
                         throw new PersistenceException( "Size of complex field mismatched!");
 
@@ -536,7 +543,7 @@ public final class SQLEngine implements Persistence {
                     if ( _ids.length != 1 )
                         throw new PersistenceException( "Complex field expected!" );
 
-                    stmt.setObject( count++, idToSQL( 0, identity ) );
+                    stmt.setObject( count++, idToSQL( 0, entity.identity ) );
                 }
             }
 
@@ -580,10 +587,10 @@ public final class SQLEngine implements Persistence {
                 // Identity is returned in the last parameter
                 // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
                 if ( sqlType == java.sql.Types.INTEGER )
-                    identity = new Integer( cstmt.getInt( count ) );
+                    entity.identity = new Integer( cstmt.getInt( count ) );
                 else
-                    identity = cstmt.getObject( count );
-                identity = idToJava( 0, identity );
+                    entity.identity = cstmt.getObject( count );
+                entity.identity = idToJava( 0, entity.identity );
             } else
                 stmt.executeUpdate();
 
@@ -591,26 +598,26 @@ public final class SQLEngine implements Persistence {
 
             // Generate key after INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.AFTER_INSERT ) {
-                identity = generateKey( conn );
+                entity.identity = generateKey( conn );
             }
 
-            return identity;
+            return entity.identity;
 
         } catch ( SQLException except ) {
             // [oleg] Check for duplicate key based on X/Open error code
             // Bad way: all validation exceptions are reported as DuplicateKey
             //if ( except.getSQLState() != null &&
             //     except.getSQLState().startsWith( "23" ) )
-            //    throw new DuplicateIdentityException( _clsDesc.getJavaClass(), identity );
+            //    throw new DuplicateIdentityException( _clsDesc.getJavaClass(), entity.identity );
 
             // Good way: let PersistenceFactory try to determine
             Boolean isDupKey;
 
             isDupKey = _factory.isDuplicateKeyException( except );
             if ( Boolean.TRUE.equals( isDupKey ) ) {
-                throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), identity ) );
+                throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), entity.identity ) );
             } else if ( Boolean.FALSE.equals( isDupKey ) ) {
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
             // else unknown, let's check directly.
 
@@ -626,8 +633,8 @@ public final class SQLEngine implements Persistence {
 
                 // bind the identity to the preparedStatement
                 count = 1;
-                if ( identity instanceof Complex ) {
-                    Complex id = (Complex) identity;
+                if ( entity.identity instanceof Complex ) {
+                    Complex id = (Complex) entity.identity;
                     if ( id.size() != _ids.length || _ids.length <= 1 )
                         throw new PersistenceException( "Size of complex field mismatched!");
 
@@ -638,12 +645,12 @@ public final class SQLEngine implements Persistence {
                     if ( _ids.length != 1 )
                         throw new PersistenceException( "Complex field expected!" );
 
-                    stmt.setObject( count++, idToSQL( 0, identity ) );
+                    stmt.setObject( count++, idToSQL( 0, entity.identity ) );
                 }
 
                 if ( stmt.executeQuery().next() ) {
                     stmt.close();
-                    throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), identity ) );
+                    throw new DuplicateIdentityException( Messages.format("persist.duplicateIdentity", _clsDesc.getJavaClass().getName(), entity.identity ) );
                 }
             } catch ( SQLException except2 ) {
                 // Error at the stage indicates it wasn't a duplicate
@@ -658,7 +665,6 @@ public final class SQLEngine implements Persistence {
             } catch ( SQLException except2 ) { }
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
-*/ return null;
     }
 
 
@@ -687,11 +693,11 @@ public final class SQLEngine implements Persistence {
      * If the RDBMS doesn't support setNull for "WHERE fld=?" and requires "WHERE fld IS NULL",
      * we need to modify the statement.
      */
-    private String getStoreStatement( Object[] original ) throws PersistenceException {
+    private String getStoreStatement( Object[] origFields ) throws PersistenceException {
         StringBuffer sb = null;
         int pos = 0;
 
-        if (original == null) {
+        if (origFields == null) {
             return _sqlStore;
         }
         if (((BaseFactory) _factory).supportsSetNullInWhere()) {
@@ -702,12 +708,12 @@ public final class SQLEngine implements Persistence {
         sb.append(_sqlStoreDirty);
         for (int i = _fields.length - 1; i >= 0; i--) {
             if (_fields[i].store && _fields[i].dirtyCheck) {
-                if (original[i] == null) {
+                if (origFields[i] == null) {
                     for (int j = _fields[i].columns.length - 1; j >= 0; j--) {
                         pos = nextParameter(true, sb, pos);
                     }
-                } else if ( original[i] instanceof Complex ) {
-                    Complex complex = (Complex) original[i];
+                } else if ( origFields[i] instanceof Complex ) {
+                    Complex complex = (Complex) origFields[i];
                     if ( complex.size() != _fields[i].columns.length )
                         throw new PersistenceException( "Size of complex field mismatch!" );
 
@@ -754,21 +760,26 @@ public final class SQLEngine implements Persistence {
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object store( TransactionContext tx, Object conn, Entity entity, Entity orginal )
+    public Object store( TransactionContext tx, Object conn, Entity entity, Entity original )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
-/*
+
         PreparedStatement stmt = null;
         int               count;
+        Object[]          fields;
+        Object[]          origFields;
 
+        fields = extractFields(entity);
+        origFields = extractFields(original);
         try {
             // Must store record in parent table first.
             // All other dependents are stored independently.
-            if ( _extends != null )
+            if ( _extends != null ) {
                 // | quick and very dirty hack to try to make multiple class on the same table work
-                if ( !_extends._mapTo.equals( _mapTo ) )
-                    _extends.store( conn, fields, identity, original, stamp );
-
-            stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( original ) );
+                if ( !_extends._mapTo.equals( _mapTo ) ) {
+                    _extends.store( tx, conn, entity, original );
+                }
+            }
+            stmt = ( (Connection) conn ).prepareStatement( getStoreStatement( origFields ) );
 
             count = 1;
 
@@ -797,8 +808,8 @@ public final class SQLEngine implements Persistence {
             }
 
             // bind the identity of the row to be stored into the preparedStatement
-            if ( identity instanceof Complex ) {
-                Complex id = (Complex) identity;
+            if ( entity.identity instanceof Complex ) {
+                Complex id = (Complex) entity.identity;
                 if ( id.size() != _ids.length || _ids.length <= 1 )
                     throw new PersistenceException( "Size of complex field mismatched!");
 
@@ -809,7 +820,7 @@ public final class SQLEngine implements Persistence {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
 
-                stmt.setObject( count++, idToSQL( 0, identity ) );
+                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
             }
 
             // bind the old fields of the row to be stored into the preparedStatement
@@ -818,13 +829,13 @@ public final class SQLEngine implements Persistence {
 
                 for ( int i = 0 ; i < _fields.length ; ++i ) {
                     if ( _fields[ i ].store && _fields[i].dirtyCheck ) {
-                        if ( original[i] == null ) {
+                        if ( origFields[i] == null ) {
                             if (supportsSetNull) {
                                 for ( int j=0; j < _fields[i].columns.length; j++ )
                                     stmt.setNull( count++, _fields[i].columns[j].sqlType );
                             }
-                        } else if ( original[i] instanceof Complex ) {
-                            Complex complex = (Complex) original[i];
+                        } else if ( origFields[i] instanceof Complex ) {
+                            Complex complex = (Complex) origFields[i];
                             if ( complex.size() != _fields[i].columns.length )
                                 throw new PersistenceException( "Size of complex field mismatch!" );
 
@@ -835,7 +846,7 @@ public final class SQLEngine implements Persistence {
                             if ( _fields[i].columns.length != 1 )
                                 throw new PersistenceException( "Complex field expected! ");
 
-                            SQLTypes.setObject( stmt, count++, toSQL( i, 0, original[i]), _fields[i].columns[0].sqlType );
+                            SQLTypes.setObject( stmt, count++, toSQL( i, 0, origFields[i]), _fields[i].columns[0].sqlType );
                         }
                     }
                 }
@@ -851,13 +862,13 @@ public final class SQLEngine implements Persistence {
 
                     // bind the identity to the prepareStatement
                     count = 1;
-                    if ( identity instanceof Complex ) {
-                        Complex id = (Complex) identity;
+                    if ( entity.identity instanceof Complex ) {
+                        Complex id = (Complex) entity.identity;
                         for ( int i=0; i<_ids.length; i++ )
                             stmt.setObject( count++, idToSQL( i, id.get(i) ) );
 
                     } else {
-                        stmt.setObject( count++, idToSQL( 0, identity ) );
+                        stmt.setObject( count++, idToSQL( 0, entity.identity ) );
                     }
 
                     ResultSet res = stmt.executeQuery();
@@ -865,12 +876,12 @@ public final class SQLEngine implements Persistence {
                     if ( res.next() ) {
 
                         stmt.close();
-                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity ) );
+                        throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), entity.identity ) );
                     }
                     stmt.close();
                 }
 
-                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), identity) );
+                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), entity.identity) );
             }
             stmt.close();
             return null;
@@ -880,9 +891,8 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
-*/ return null;
     }
 
 
@@ -900,15 +910,15 @@ public final class SQLEngine implements Persistence {
      */
     public void delete( TransactionContext tx, Object conn, Entity entity )
         throws PersistenceException {
-/*
+
         PreparedStatement stmt = null;
 
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             int count = 1;
             // bind the identity of the preparedStatement
-            if ( identity instanceof Complex ) {
-                Complex id = (Complex) identity;
+            if ( entity.identity instanceof Complex ) {
+                Complex id = (Complex) entity.identity;
                 if ( id.size() != _ids.length || _ids.length <= 1 )
                     throw new PersistenceException( "Size of complex field mismatched!");
 
@@ -918,28 +928,27 @@ public final class SQLEngine implements Persistence {
             } else {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
-                stmt.setObject( count++, idToSQL( 0, identity ) );
+                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
             }
 
             int result = stmt.executeUpdate();
             if ( result < 1 )
-                throw new PersistenceException("Object to be deleted does not exist! "+ identity );
+                throw new PersistenceException("Object to be deleted does not exist! "+ entity.identity );
 
             stmt.close();
 
             // Must delete record in parent table last.
             // All other dependents have been deleted before.
             if ( _extends != null )
-                _extends.delete( conn, identity );
+                _extends.delete( tx, conn, entity );
         } catch ( SQLException except ) {
             try {
                 // Close the insert/select statement
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
-*/
     }
 
 
@@ -961,19 +970,19 @@ public final class SQLEngine implements Persistence {
      */
     public void writeLock( TransactionContext tx, Object conn, Entity entity )
         throws ObjectDeletedException, PersistenceException {
-/*
+
         PreparedStatement stmt = null;
         try {
             // Must obtain lock on record in parent table first.
             if ( _extends != null )
-                _extends.writeLock( conn, identity );
+                _extends.writeLock( tx, conn, entity );
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 
             int count = 1;
             // bind the identity of the preparedStatement
-            if ( identity instanceof Complex ) {
-                Complex id = (Complex) identity;
+            if ( entity.identity instanceof Complex ) {
+                Complex id = (Complex) entity.identity;
                 if ( id.size() != _ids.length || _ids.length <= 1 )
                     throw new PersistenceException( "Size of complex field mismatched!");
 
@@ -984,13 +993,13 @@ public final class SQLEngine implements Persistence {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
 
-                stmt.setObject( count++, idToSQL( 0, identity ) );
+                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
             }
 
             // If no query was performed, the object has been previously
             // removed from persistent storage. Complain about this.
             if ( ! stmt.executeQuery().next() )
-                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), identity ) );
+                throw new ObjectDeletedException( Messages.format("persist.objectDeleted", _clsDesc.getJavaClass().getName(), entity.identity ) );
             stmt.close();
         } catch ( SQLException except ) {
             try {
@@ -998,9 +1007,8 @@ public final class SQLEngine implements Persistence {
                 if ( stmt != null )
                     stmt.close();
             } catch ( SQLException except2 ) { }
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
-*/
     }
 
 
@@ -1024,18 +1032,20 @@ public final class SQLEngine implements Persistence {
      */
     public Object load( TransactionContext tx, Object conn, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException {
-/*
+
         PreparedStatement stmt;
         ResultSet         rs;
         Object            stamp = null;
         boolean           notNull;
+        Object[]          fields;
 
+        fields = extractFields(entity);
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             int count = 1;
             // bind the identity of the preparedStatement
-            if ( identity instanceof Complex ) {
-                Complex id = (Complex) identity;
+            if ( entity.identity instanceof Complex ) {
+                Complex id = (Complex) entity.identity;
                 if ( id.size() != _ids.length || _ids.length <= 1 )
                     throw new PersistenceException( "Size of complex field mismatched! expected: "+_ids.length+" found: "+id.size() );
 
@@ -1045,13 +1055,13 @@ public final class SQLEngine implements Persistence {
             } else {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
-                stmt.setObject( count++, idToSQL( 0, identity ) );
+                stmt.setObject( count++, idToSQL( 0, entity.identity ) );
             }
 
             // query the object
             rs = stmt.executeQuery();
             if ( ! rs.next() )
-                throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _clsDesc.getJavaClass().getName(), identity) );
+                throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _clsDesc.getJavaClass().getName(), entity.identity) );
 
             // Load all the fields of the object including one-one relations
             count = 1;
@@ -1145,10 +1155,10 @@ public final class SQLEngine implements Persistence {
 
         } catch ( SQLException except ) {
             except.printStackTrace();
-            throw new PersistenceException( Messages.format("persist.nested", except) );
+            throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
+        entity.objectStamp = stamp;
         return stamp;
-*/ return null;
     }
 
     /**
@@ -1375,6 +1385,18 @@ public final class SQLEngine implements Persistence {
             throws MappingException {
     }
 
+
+    private Object[] extractFields(Entity entity) throws PersistenceException {
+        if (entity == null) {
+            return null;
+        }
+        for (int i = 0; i < entity.entityClasses.length; i++) {
+            if (entity.entityClasses[i].equals(_entityInfo)) {
+                return entity.fields[i];
+            }
+        }
+        throw new PersistenceException( "Entity of a wrong class passed" );
+    }
 
     public String toString() {
         return _clsDesc.toString();
@@ -1660,7 +1682,7 @@ public final class SQLEngine implements Persistence {
                     } catch ( SQLException e2 ) { }
                 }
                 _resultSetDone = true;
-                throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql );
+                throw new PersistenceException( Messages.format("persist.nested", except) + " while executing "+ _sql, except );
             }
         }
 
@@ -1764,7 +1786,7 @@ public final class SQLEngine implements Persistence {
 
             } catch ( SQLException except ) {
                 _lastIdentity = null;
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
         }
 
@@ -1924,7 +1946,7 @@ public final class SQLEngine implements Persistence {
                     _resultSetDone = true;
                 }
             } catch ( SQLException except ) {
-                throw new PersistenceException( Messages.format("persist.nested", except) );
+                throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
 
             return stamp;
