@@ -45,7 +45,9 @@
 
 package org.exolab.castor.xml;
 
+import org.xml.sax.ContentHandler;
 import org.xml.sax.helpers.AttributeListImpl;
+import org.xml.sax.SAXException;
 
 import java.util.Enumeration;
 import java.util.Vector;
@@ -383,6 +385,39 @@ public final class Namespaces {
     public void setParent(Namespaces namespaces) {
         _parent = namespaces;
     } //-- method: setParent
+
+    /**
+     * Calls the given ContentHandler's endPrefixMapping method
+     * for each locally declared namespace
+     * 
+     * @param handler the ContentHandler
+     */
+    public void sendEndEvents(ContentHandler handler) 
+        throws SAXException
+    {
+        Namespace ns = _first;
+        while (ns != null) {
+            handler.endPrefixMapping(ns.prefix);
+            ns = ns.next;
+        }
+    } //-- sendEndEvents
+    
+    
+    /**
+     * Calls the given ContentHandler's startPrefixMapping method
+     * for each locally declared namespace
+     * 
+     * @param handler the ContentHandler
+     */
+    public void sendStartEvents(ContentHandler handler) 
+        throws SAXException
+    {
+        Namespace ns = _first;
+        while (ns != null) {
+            handler.startPrefixMapping(ns.prefix, ns.uri);
+            ns = ns.next;
+        }
+    } //-- sendStartEvents
 
     /**
      * Declare the namespaces of this stack in as attributes.
