@@ -70,16 +70,46 @@ import java.util.Properties;
  * @version $Revision$ $Date$
 **/
 public class SourceGenerator {
+    
+    /**
+     * The application name
+    **/
+    static final String appName = "Castor";
+    
+    /**
+     * The application description
+    **/
+    static final String appDesc = "XML data binder for Java";
+    
+    /**
+     * The application version
+    **/
+    static final String version = "0.7.7 (20000208)";
 
-    static final String appName = "Castor XML Data Binder for Java";
-    static String DEFAULT_PARSER_CLASS = "org.apache.xerces.parsers.SAXParser";
-    
-    private static final String version = "0.7.7 (20000203)";
-    
+    /**
+     * The application URI
+    **/
+    static final String appURI = "http://castor.exolab.org";
+
+    /**
+     * The default code header,
+     * please leave "$" and "Id" separated with "+" so that the CVS server
+     * does not expand it here.
+    **/
+    private static final String DEFAULT_HEADER =
+        "This class was automatically generated with \n"+"<a href=\"" + 
+        appURI + "\">" + appName + " " + version + 
+        "</a>, using an XML Schema.\n$" + "Id";
+        
     private String lineSeparator = null;
+    private JComment header = null;
     
     public SourceGenerator() {
         super();    
+        
+        header = new JComment(JComment.HEADER_STYLE);
+        header.appendComment(DEFAULT_HEADER);
+        
     } //-- SourceGenerator
     
 
@@ -102,20 +132,14 @@ public class SourceGenerator {
     **/
     public void generateSource(Reader reader, String packageName) {
         
-        
-        //-- read the XML Schema definition
-        String parserClass = System.getProperty("org.xml.sax.parser");
-        if ((parserClass == null) || (parserClass.length() == 0))
-            parserClass = DEFAULT_PARSER_CLASS;
-
-            
+        //-- get default parser from Configuration
         Parser parser = null;
         try {
 	    parser = Configuration.getParser();
         }
         catch(RuntimeException rte) {}
         if (parser == null) {
-            System.out.println("unable to create SAX parser");
+            System.out.println("fatal error: unable to create SAX parser.");
             return;
         }
         
@@ -294,14 +318,17 @@ public class SourceGenerator {
         if (archetype != null) {
             processArchetype(archetype, sInfo);
             jClass = SourceFactory.createClassSource(classInfo);
+            jClass.setHeader(header);
             jClass.print(lineSeparator);
             jClass = MarshalInfoSourceFactory.createSource(classInfo);
+            jClass.setHeader(header);
             jClass.print(lineSeparator);
         }
         else {
             Datatype datatype = elementDecl.getDatatype();
             if (datatype != null) {
                 jClass = MarshalInfoSourceFactory.createSource(classInfo);
+                jClass.setHeader(header);
                 jClass.print(lineSeparator);
             }
             else {
@@ -330,9 +357,12 @@ public class SourceGenerator {
                 ClassInfo classInfo = new ClassInfo(archetype, 
                                                     sInfo.resolver, 
                                                     sInfo.packageName);
+                                                    
                 JClass jClass = SourceFactory.createClassSource(classInfo);
+                jClass.setHeader(header);
                 jClass.print(lineSeparator);
                 jClass = MarshalInfoSourceFactory.createSource(classInfo);
+                jClass.setHeader(header);
                 jClass.print(lineSeparator);
             }
             String source = null;
