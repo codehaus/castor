@@ -53,8 +53,8 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public abstract class XSType {
-    
-    
+
+
     /**
      * The name of the binary type
     **/
@@ -64,12 +64,12 @@ public abstract class XSType {
      * The name of the boolean type
     **/
     public static final String BOOLEAN_NAME        = "boolean";
-    
+
     /**
      * The name of the decimal type
     **/
     public static final String DECIMAL_NAME        = "decimal";
-    
+
     /**
      * The name of the double type
     **/
@@ -84,62 +84,72 @@ public abstract class XSType {
      * The name of the IDREF type
     **/
     public static final String IDREF_NAME          = "IDREF";
-    
+
+    /**
+     * The Name of the IDREFS type
+     */
+     public static final String IDREFS_NAME = "IDREFS";
+
     /**
      * The name of the integer type
     **/
     public static final String INTEGER_NAME        = "integer";
-    
-    
+
+
     /**
      * The name of the long type
     **/
     public static final String LONG_NAME           = "long";
-    
+
     /**
      * The name of the NCName type
     **/
     public static final String NCNAME_NAME         = "NCName";
-    
+
     /**
      * The name of the negative-interger type
     **/
     public static final String NEGATIVE_INTEGER_NAME  = "negative-integer";
-    
-    
+
+
     /**
      * The name of the NMTOKEN type
     **/
     public static final String NMTOKEN_NAME        = "NMTOKEN";
-    
+
     /**
      * The name of the posative-interger type
     **/
     public static final String POSITIVE_INTEGER_NAME  = "positive-integer";
-    
+
     /**
      * The name of the string type
     **/
     public static final String STRING_NAME         = "string";
-    
+
     /**
      * The name of the timeInstant type
     **/
     public static final String TIME_INSTANT_NAME   = "timeInstant";
-	
+
 	/**
+     * The name of the URIReference type
+     */
+     public static final String URIRREFERENCE_NAME = "uriReference";
+
+    /**
 	 * The name of the short type
 	 */
 	public static final String SHORT_NAME			= "short";
-    	
+
 	/**
 	 * The name of the int type
 	 */
-	public static final String INT_NAME				= "int";    
-    
-    
+	public static final String INT_NAME				= "int";
+
+
     public static final short NULL               = -1;
-    
+
     //-- this type should change to user-defined or
     //-- something like that
     public static final short CLASS              =  0;
@@ -150,38 +160,40 @@ public abstract class XSType {
     public static final short DOUBLE             =  4;
     public static final short ID                 =  5;
     public static final short IDREF              =  6;
-    public static final short INTEGER            =  7;
-    public static final short COLLECTION         =  8;
-    public static final short LONG               =  9;
-    public static final short NCNAME             = 10;
-    public static final short NEGATIVE_INTEGER   = 11;
-    public static final short NMTOKEN            = 12;
-    public static final short POSITIVE_INTEGER   = 13;
-    public static final short STRING             = 14;
-    public static final short TIME_INSTANT       = 15;
-	public static final short SHORT				 = 16;
-	public static final short INT				 = 17;    
-    
+    public static final short IDREFS             =  7;
+    public static final short INTEGER            =  8;
+    public static final short COLLECTION         =  9;
+    public static final short LONG               = 10;
+    public static final short NCNAME             = 11;
+    public static final short NEGATIVE_INTEGER   = 12;
+    public static final short NMTOKEN            = 13;
+    public static final short POSITIVE_INTEGER   = 14;
+    public static final short STRING             = 15;
+    public static final short TIME_INSTANT       = 16;
+    public static final short URIREFERENCE       = 17;
+	public static final short SHORT				 = 18;
+	public static final short INT				 = 19;
+
     private short   type       = NULL;
-    
+
     /**
      * Flag signaling an enumerated type
     **/
     private boolean enumerated = false;
-    
+
     /**
      * Creates a new XSType of the given type
     **/
     protected XSType(short type) {
         this.type = type;
     } //-- XSType
-    
+
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
     **/
     public abstract JType getJType();
-    
+
     /**
      * Returns the type of this XSType
      * @return the type of this XSType
@@ -189,7 +201,7 @@ public abstract class XSType {
     public short getType() {
         return this.type;
     } //-- getType
-    
+
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
@@ -202,7 +214,7 @@ public abstract class XSType {
     } //-- toJavaObject
 
     /**
-     * Returns the Java code neccessary to create a new instance of the 
+     * Returns the Java code neccessary to create a new instance of the
      * JType associated with this XSType
      */
     public String newInstanceCode() {
@@ -211,15 +223,15 @@ public abstract class XSType {
 
     /**
      * Returns the String necessary to convert an Object to
-     * an instance of this XSType. This method is really only useful 
+     * an instance of this XSType. This method is really only useful
      * for primitive types
      * @param variableName the name of the Object
-     * @return the String necessary to convert an Object to an 
+     * @return the String necessary to convert an Object to an
      * instance of this XSType
     **/
     public String createFromJavaObjectCode(String variableName) {
         StringBuffer sb = new StringBuffer();
-        
+
         JType jType = getJType();
         if (jType != null) {
             sb.append('(');
@@ -229,7 +241,7 @@ public abstract class XSType {
         sb.append(variableName);
         return sb.toString();
     } //-- fromJavaObject
-    
+
     /**
      * Returns true if this XSType represents an enumerated type
      * @return true if this XSType represents an enumerated type
@@ -237,7 +249,7 @@ public abstract class XSType {
     public boolean isEnumerated() {
         return enumerated;
     } //-- isEnumerated
-    
+
     public boolean isPrimitive() {
         switch (type) {
             case BOOLEAN:
@@ -253,8 +265,8 @@ public abstract class XSType {
                 return false;
         }
     }
-    
-    /** 
+
+    /**
      * Returns the name of this XSType
      * @return the name of this XSType
     **/
@@ -272,6 +284,8 @@ public abstract class XSType {
                 return ID_NAME;
             case IDREF:
                 return IDREF_NAME;
+            case IDREFS:
+                return IDREFS_NAME;
             case INTEGER:
                 return INTEGER_NAME;
             case LONG:
@@ -296,14 +310,14 @@ public abstract class XSType {
                 return null;
         }
     } //-- getName
-    
+
     /**
      * Sets the enumerated flag for this XSClass
-     * @param enumerated a boolean indicating whether or not this XSClass 
+     * @param enumerated a boolean indicating whether or not this XSClass
      * represents an enumerated type
     **/
     public void setAsEnumertated(boolean enumerated) {
         this.enumerated = enumerated;
     } //-- setAsEnumerated
-    
+
 } //-- XSType
