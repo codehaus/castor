@@ -221,46 +221,30 @@ public class DescriptorSourceFactory {
        if (member.getName().equals("_anyObject"))
            any = true;
 
+        if (xsType.getType() == XSType.COLLECTION)
+            //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
+            xsType = ((CollectionInfo)member).getContent().getSchemaType();
 
-           /*jsc.add("desc = (new XMLFieldDescriptorImpl(");
-           jsc.append("java.lang.Object.class, \"");
-           jsc.append(member.getName());
-           jsc.append("\", (String)null, NodeType.Element) { ");
-           jsc.indent();
-           jsc.add("public boolean matches(String xmlName) {");
-           jsc.add("    return true;");
-           jsc.add("}");
-           jsc.unindent();
-           jsc.add("});");
-        }
-        else {*/
-        //the previous section should not be used anymore
-
-            if (xsType.getType() == XSType.COLLECTION)
-                //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
-                xsType = ((CollectionInfo)member).getContent().getSchemaType();
-            //-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
-            String nodeName = member.getNodeName();
-			String nodeNameParam = null;
-			if ((nodeName!=null) && (!isText))
-			{
-				//-- By default the node name parameter is a literal string
-				nodeNameParam = "\""+nodeName+"\"";
-				if (SourceGenerator.classDescFieldNames())
-				{
-					//-- The node name parameter is a reference to a public static final
-					nodeNameParam = member.getNodeName().toUpperCase();
-					//-- Expose node name as public static final (reused by XMLFieldDescriptorImpl)
-					JModifiers publicStaticFinal = new JModifiers();
-					publicStaticFinal.makePublic();
-					publicStaticFinal.setStatic(true);
-					publicStaticFinal.setFinal(true);
-					JField jField = new JField(SGTypes.String, nodeNameParam);
-					jField.setModifiers(publicStaticFinal);
-					jField.setInitString("\""+nodeName+"\"");
-					classDesc.addMember(jField);
-				}
+        //-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
+        String nodeName = member.getNodeName();
+		String nodeNameParam = null;
+		if ((nodeName!=null) && (!isText)) {
+            //-- By default the node name parameter is a literal string
+		    nodeNameParam = "\""+nodeName+"\"";
+			if (SourceGenerator.classDescFieldNames()) {
+                //-- The node name parameter is a reference to a public static final
+				nodeNameParam = member.getNodeName().toUpperCase();
+				//-- Expose node name as public static final (reused by XMLFieldDescriptorImpl)
+				JModifiers publicStaticFinal = new JModifiers();
+				publicStaticFinal.makePublic();
+				publicStaticFinal.setStatic(true);
+				publicStaticFinal.setFinal(true);
+				JField jField = new JField(SGTypes.String, nodeNameParam);
+				jField.setModifiers(publicStaticFinal);
+				jField.setInitString("\""+nodeName+"\"");
+				classDesc.addMember(jField);
 			}
+		}
 
 			//-- Generate code to new XMLFieldDescriptorImpl instance
             jsc.add("desc = new XMLFieldDescriptorImpl(");
@@ -536,18 +520,28 @@ public class DescriptorSourceFactory {
         if (member.getName().equals("_anyObject")) return;
 
         XSType xsType = member.getSchemaType();
-        if (xsType.getType() == XSType.COLLECTION)
+
+        if (xsType.getType() == XSType.COLLECTION) {
+                XSList xsList = (XSList)xsType;
+                CollectionInfo cInfo = (CollectionInfo)member;
+                FieldInfo content = cInfo.getContent();
+
+                jsc.add("fieldValidator.setMinOccurs(");
+                jsc.append(Integer.toString(xsList.getMinimumSize()));
+                jsc.append(");");
+                if (xsList.getMaximumSize() > 0) {
+                    jsc.add("fieldValidator.setMaxOccurs(");
+                    jsc.append(Integer.toString(xsList.getMaximumSize()));
+                    jsc.append(");");
+                }
+
+
             xsType = ((CollectionInfo)member).getContent().getSchemaType();
-
-
-        //-- create local copy of field
-        //JMember jMember = member.createMember();
-
-        if (xsType.getType() != XSType.COLLECTION) {
-            if (member.isRequired()) {
-                jsc.add("fieldValidator.setMinOccurs(1);");
-            }
         }
+        else if (member.isRequired()) {
+            jsc.add("fieldValidator.setMinOccurs(1);");
+        }
+
 
         String fixed = member.getFixedValue();
         String pattern = null;
@@ -1040,21 +1034,6 @@ public class DescriptorSourceFactory {
                 jsc.add("fieldValidator.setValidator(new NameValidator(");
                 jsc.append("NameValidator.NMTOKEN));");
                 break;
-            case XSType.COLLECTION:
-                XSList xsList = (XSList)xsType;
-                CollectionInfo cInfo = (CollectionInfo)member;
-                FieldInfo content = cInfo.getContent();
-
-                jsc.add("fieldValidator.setMinOccurs(");
-                jsc.append(Integer.toString(xsList.getMinimumSize()));
-                jsc.append(");");
-                if (xsList.getMaximumSize() > 0) {
-                    jsc.add("fieldValidator.setMaxOccurs(");
-                    jsc.append(Integer.toString(xsList.getMaximumSize()));
-                    jsc.append(");");
-                }
-                break;
-
 
             case XSType.DATE_TYPE:
             jsc.add("{ //-- local scope");
