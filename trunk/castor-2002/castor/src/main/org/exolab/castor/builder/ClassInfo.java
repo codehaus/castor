@@ -102,10 +102,25 @@ public class ClassInfo  {
     **/
     public ClassInfo(ElementDecl element, ClassInfoResolver resolver)
     {
+        this(element, resolver, null);
+    } //-- ClassInfo
+    
+    /**
+     * Creates a new ClassInfo for the given XML Schema element declaration
+     * @param element the XML Schema element declaration to create the 
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param packageName the package to use when generating source
+     * from this ClassInfo
+    **/
+    public ClassInfo
+        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
+    {
         this.elementName = element.getName();
         this.nsPrefix    = element.getSchemaAbbrev();
         this.nsURI       = element.getSchemaName();
         this.className   = JavaXMLNaming.toJavaClassName(elementName);
+        this.packageName = packageName;
         
         Archetype archetype = element.getArchetype();
         
@@ -124,21 +139,7 @@ public class ClassInfo  {
             }
                 
         }
-    } //-- ClassInfo
-    
-    /**
-     * Creates a new ClassInfo for the given XML Schema element declaration
-     * @param element the XML Schema element declaration to create the 
-     * ClassInfo for
-     * @param resolver the ClassInfoResolver for resolving "derived" types.
-     * @param packageName the package to use when generating source
-     * from this ClassInfo
-    **/
-    public ClassInfo
-        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
-    {
-        this(element, resolver);
-        this.packageName = packageName;
+        
     } //-- ClassInfo
     
     /**
@@ -150,6 +151,22 @@ public class ClassInfo  {
     **/
     public ClassInfo(Archetype type, ClassInfoResolver resolver) 
     {
+        this(type, resolver, null);
+    } //-- ClassInfo
+    
+    /**
+     * Creates a new ClassInfo for the given XML Schema type declaration.
+     * The type declaration must be a top-level declaration.
+     * @param type the XML Schema type declaration to create the 
+     * ClassInfo for
+     * @param resolver the ClassInfoResolver for resolving "derived" types.
+     * @param packageName the package to which generated classes should
+     * belong
+    **/
+    public ClassInfo
+        (Archetype type, ClassInfoResolver resolver, String packageName) 
+    {
+        this.packageName = packageName;
         if (type == null)
             throw new IllegalArgumentException("null archetype");
             
@@ -163,6 +180,7 @@ public class ClassInfo  {
         init(type, resolver);
         
     } //-- ClassInfo
+    
     
     /**
      * Initializes this ClassInfo using the given Datatype
@@ -223,7 +241,7 @@ public class ClassInfo  {
                     classInfo = resolver.resolve(source);
                     
                 if (classInfo == null)
-                    classInfo = new ClassInfo(source, resolver);
+                    classInfo = new ClassInfo(source, resolver, packageName);
                 
                 if (resolver != null) 
                     resolver.bindReference(source, classInfo);

@@ -329,8 +329,9 @@ public class SourceGenerator {
         boolean alreadyGenerated = sInfo.sourceGenerated.contains(archetype);
         if (!alreadyGenerated) {
             if (archetype.isTopLevel()) {
-                ClassInfo classInfo 
-                    = new ClassInfo(archetype, sInfo.resolver);
+                ClassInfo classInfo = new ClassInfo(archetype, 
+                                                    sInfo.resolver, 
+                                                    sInfo.packageName);
                 JClass jClass = SourceFactory.createClassSource(classInfo);
                 jClass.print(lineSeparator);
                 jClass = MarshalInfoSourceFactory.createSource(classInfo);
