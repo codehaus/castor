@@ -22,10 +22,13 @@
 
 package org.exolab.adaptx.xpath.engine;
 
+import org.exolab.adaptx.xpath.XPathResult;
+import org.exolab.adaptx.xpath.XPathContext;
 
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.expressions.EqualityExpr;
+import org.exolab.adaptx.xpath.expressions.FilterExpr;
 import org.exolab.adaptx.xpath.expressions.FunctionCall;
 import org.exolab.adaptx.xpath.expressions.LocationStep;
 import org.exolab.adaptx.xpath.expressions.MatchExpression;
@@ -107,6 +110,7 @@ public class Parser {
             Token tok = lexer.nextToken();
 
             //System.out.println("tok: " + tok);
+            //System.out.println("tok-type: " + tok.type);
 
             if (lexer.isBinaryOp(tok)) {
                 if (!exprs.empty()) {
@@ -162,7 +166,7 @@ public class Parser {
                         switch(px.getType()) {
                             case PrimaryExpr.VARIABLE_REFERENCE:
                             case PrimaryExpr.FUNCTION_CALL:
-                                FilterExpr fx = new FilterExpr( px );
+                                FilterExprImpl fx = new FilterExprImpl( px );
                                 lexer.pushBack();
                                 expr = new PathExprImpl(fx, createPathExpr(lexer));
                                 break;
@@ -208,7 +212,7 @@ public class Parser {
                     if ((nextTok != null) &&
                         (nextTok.type == Token.L_BRACKET)) {
                         PathExpr pathExpr = null;
-                        FilterExpr filter = new FilterExpr( primaryExpr );
+                        FilterExprImpl filter = new FilterExprImpl( primaryExpr );
                         parsePredicates(filter, lexer);
                         pathExpr = new PathExprImpl(filter);
                         expr = pathExpr;
@@ -346,7 +350,7 @@ public class Parser {
                 }
                 break;
             case Token.VAR_REFERENCE:
-                pExpr = new VariableReference(tok.value);
+                pExpr = new VariableReferenceImpl(tok.value);
                 break;
             case Token.LITERAL:
                 pExpr = new LiteralExpr(tok.value);
@@ -383,13 +387,13 @@ public class Parser {
      * @returns the new FilterExpr
      * @exception InvalidExprException
     **/
-    private static FilterExpr createFilterExpr( Lexer lexer, int ancestryOp )
+    private static FilterExprImpl createFilterExpr( Lexer lexer )
         throws XPathException
     {
         PrimaryExpr primaryExpr = createPrimaryExpr(lexer);
         if ( primaryExpr == null )
             throw new XPathException( lexer.toString() );
-        FilterExpr filterExpr = new FilterExpr( primaryExpr, ancestryOp );
+        FilterExprImpl filterExpr = new FilterExprImpl( primaryExpr );
         parsePredicates( filterExpr, lexer );
         return filterExpr;
     } //-- createFilterExpr
@@ -460,10 +464,11 @@ public class Parser {
      * @returns the new LocationStep
      * @exception InvalidExprException
     **/
-    private static LocationStepImpl createLocationStep( Lexer lexer, int ancestryOp ) 
+    private static LocationStepImpl createLocationStep( Lexer lexer ) 
         throws XPathException
     {
-        LocationStepImpl locationStep = new LocationStepImpl( ancestryOp );
+        LocationStepImpl locationStep = new LocationStepImpl();
+        
         Token cTok = lexer.lookAhead(0);
         
         short axisIdentifier = LocationStep.CHILDREN_AXIS;
@@ -560,14 +565,15 @@ public class Parser {
     } //-- createLocationStep
 
     /**
-     * Parses the set of predicates for the given FilterBase
-     * @param filterBase the FilterBase to add Predicates to
+     * Parses the set of predicates for the given PathComponent
+     *
+     * @param pathComponent the PathComponent to add Predicates to
      * @param tokenizer the set of tokens to create the Predicates from
      * @param tokenStack the current Stack of group tokens
      * @exception InvalidExprException
     **/
     private static void parsePredicates
-        (FilterBase filterBase, Lexer lexer)
+        (AbstractPathComponent pathComponent, Lexer lexer)
             throws XPathException
     {
         //-- handle predicates
@@ -577,7 +583,7 @@ public class Parser {
 
             lexer.nextToken(); //-- remove '['
             XPathExpression expr = createExpr(lexer);
-            filterBase.addPredicate(expr);
+            pathComponent.addPredicate(expr);
             //-- make sure we have end of predicate ']'
             Token tok = lexer.nextToken();
             if ((tok == null) || (tok.type != Token.R_BRACKET))
@@ -872,8 +878,6 @@ public class Parser {
         //-- look for empty PathExpr
         if (!lexer.hasMoreTokens()) return pathExpr;
         
-        int ancestryOp = FilterBase.NO_OP;
-        
         Token tok = lexer.lookAhead(0);
         
         //-- look for ancestry operator, or RootExpr
@@ -881,10 +885,10 @@ public class Parser {
             //-- eat token
             lexer.nextToken();
             if (!lexer.hasMoreTokens()) return new RootExpr();
-            ancestryOp = FilterBase.PARENT_OP;
+            pathExpr.setAbsolute(true);
         }
         else if (tok.type == Token.ANCESTOR_OP) {
-            ancestryOp = FilterBase.PARENT_OP;
+            pathExpr.setAbsolute(true);
             //-- eat token
             lexer.nextToken();
             tempExpr = createDescendantOrSelf();
@@ -897,17 +901,16 @@ public class Parser {
         }
         
         tok = lexer.lookAhead(0);
-        FilterBase filterBase = null;
+        AbstractPathComponent pathComponent = null;
         //-- try to create a LocationStep
         if (isLocationStepToken(tok)) {
-            //filterBase = createLocationStep(lexer, LocationStep.NO_OP);
-            filterBase = createLocationStep(lexer, ancestryOp);
+            pathComponent = createLocationStep( lexer );
         }
         else 
-            filterBase = createFilterExpr( lexer, ancestryOp );
+            pathComponent = createFilterExpr( lexer );
                     
-        //-- add filterbase to pathExpr
-        pathExpr.setFilter(filterBase);
+        //-- add PathComponent to pathExpr
+        pathExpr.setFilter(pathComponent);
         
         if (lexer.hasMoreTokens()) {
             tok = lexer.lookAhead(0);
@@ -975,7 +978,7 @@ public class Parser {
      * @return the new descendant-or-self PathExpr.
     **/
     private static PathExprImpl createDescendantOrSelf() {
-        LocationStepImpl locationStep = new LocationStepImpl(FilterBase.PARENT_OP);
+        LocationStepImpl locationStep = new LocationStepImpl();
         locationStep.setAxisIdentifier(LocationStep.DESCENDANTS_OR_SELF_AXIS);
         locationStep.setNodeExpr(new AnyNodeExpr());        
         PathExprImpl pathExpr = new PathExprImpl();
@@ -1093,11 +1096,14 @@ public class Parser {
     } //-- unexpectedToken
     
     
+    
     /* For Debugging */
     /* */
     public static void main(String[] args) 
         throws XPathException
     {
+        
+        boolean union_only = false;
         
         String[] UNION_EXPRS = {
             "*",
@@ -1114,7 +1120,8 @@ public class Parser {
             "/*",
             "node()",
             "a/div/b/and/c",
-            "foo//bar"
+            "foo//bar",
+            "div"
         };
 
         String[] EXPRS = {
@@ -1127,9 +1134,12 @@ public class Parser {
             "@*[name(.)!='href']",
             "vin/text() = $process/order/orderRef/text()",
             "$booklist[author=$authorlist]/title",
+            "@div",
             "$foo mod 4",
             "cname mod 4",
-            "(9)*(7)"
+            "(9)*(7)",
+            "not((@align) or (../@align) or (../parent::*[(self::thead) or (self::tfoot) or (self::tbody)]/@align)) and (ancestor::table[1]/*[(self::col) or (self::colgroup)]/descendant-or-self::*/@align)",
+            "@text"
         };
         
         //-- UnionExpr tests
@@ -1142,6 +1152,8 @@ public class Parser {
         }
         System.out.println();
         
+        if (union_only) return;
+        
         //-- Expr tests
         
         System.out.println("Expr Tests\n");
@@ -1151,8 +1163,7 @@ public class Parser {
             System.out.print("Result: ");
             System.out.println(expr);
             System.out.println("Expr Type: " + expr.getExprType());
-        }
-       
+        }       
         
     } //-- main
     /* */
