@@ -124,8 +124,8 @@
     For example, to configure a PostgreSQL 7.0 DataSource, use:
 
     <data-source class-name="org.postgresql.PostgresqlDataSource">
-      <param host="machine" database="db"
-             user="arkin" password="secret" />
+      <param host="host" database="db"
+             user="user" password="secret" />
     </data-source>
 
     When running Castor inside a J2EE application server, it is
