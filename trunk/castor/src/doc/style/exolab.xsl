@@ -368,7 +368,7 @@
   </xsl:template>
 
   <xsl:template match="code-panel">
-    <table border="1" cellpadding="4">
+    <table border="1" cellpadding="4" width="100%">
       <tr>
         <td BGCOLOR="#CCCCCC">
           <xsl:apply-templates/>
