@@ -208,13 +208,15 @@ public class ParseTreeWalker implements TokenTypes
     if ( _clsDesc == null )
       throw new QueryException( "Could not get a descriptor for class " + _fromClassName );
 
-    for ( int curChild = 2; curChild < _parseTree.getChildCount() - 1; curChild++ ) {
+    for ( int curChild = 2; curChild <= _parseTree.getChildCount() - 1; curChild++ ) {
       int tokenType = _parseTree.getChild(curChild).getToken().getTokenType();
       switch ( tokenType ) {
         case KEYWORD_WHERE:
           checkWhereClause( _parseTree.getChild(curChild) );
+          break;
         case KEYWORD_ORDER:
           checkOrderClause( _parseTree.getChild(curChild) );
+          break;
       }
     }
   }
