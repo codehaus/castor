@@ -3,7 +3,7 @@
 
 <jdo-conf>
     <database name="mysql" engine="mysql" >
-        <driver url="jdbc:mysql://wolf/castor_tests" class-name="org.gjt.mm.mysql.Driver">
+        <driver url="jdbc:mysql://localhost/castor_tests" class-name="org.gjt.mm.mysql.Driver">
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
