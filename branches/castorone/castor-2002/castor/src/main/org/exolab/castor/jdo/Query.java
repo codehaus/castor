@@ -214,5 +214,11 @@ public interface Query
         throws QueryException, PersistenceException, TransactionNotInProgressException;
 
 
+    /**
+     * Close the query and release all resources held by the query.
+     */
+    public void close();
+
+
 }
 
