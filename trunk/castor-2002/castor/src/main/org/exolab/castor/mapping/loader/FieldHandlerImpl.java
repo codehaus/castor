@@ -53,6 +53,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.InvocationTargetException;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.util.Messages;
@@ -145,6 +146,12 @@ public final class FieldHandlerImpl
 
 
     /**
+     * The collection handler for multi valued fields.
+     */
+    private final CollectionHandler _colHandler;
+
+
+    /**
      * Construct a new field handler for the specified field. The field must
      * be public, and may not be static or transient. The field name is
      * determined from the Java field, the type from the type information.
@@ -169,6 +176,10 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
+        if ( typeInfo.getCollectionType() != null )
+            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
+        else
+            _colHandler = null;
         _getMethod = null;
         _setMethod = null;
     }
@@ -211,6 +222,10 @@ public final class FieldHandlerImpl
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
+        if ( typeInfo.getCollectionType() != null )
+            _colHandler = CollectionHandlers.getHandler( typeInfo.getCollectionType() );
+        else
+            _colHandler = null;
         _field = null;
     }
 
@@ -234,6 +249,10 @@ public final class FieldHandlerImpl
                                                               toString(), except.getMessage() ) );
         }
 
+        // If a collection, return an enumeration of it's values.
+        if ( _colHandler != null )
+            return _colHandler.elements( value );
+
         // If there is a convertor, apply it
         if ( _convertFrom == null )
             return value;
@@ -247,39 +266,69 @@ public final class FieldHandlerImpl
 
     public void setValue( Object object, Object value )
     {
-        // If there is a default value, use it for a null field.
-        // Otherwise, if there is a convertor, apply conversion.
-        if ( value == null && _default != null )
-            value = _default;
-        else if ( _convertTo != null ) {
-            try {
-                value = _convertTo.convert( value );
-            } catch ( ClassCastException except ) {
-                throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor", value.getClass().getName() ) );
-            }
-        }
+        if ( _colHandler == null ) {
 
-        try {
-            if ( _field != null )
-                _field.set( object, value );
-            else
-                _setMethod.invoke( object, new Object[] { value } );
-            // If the field has no set method, ignore it.
-            // If this is a problem, identity it someplace else.
-        } catch ( IllegalArgumentException except ) {
-            // Graceful way of dealing with unwrapping exception
-            if ( value == null )
-                throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
-            else
-                throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
-                                                                     toString(), value.getClass().getName() ) );
-        } catch ( IllegalAccessException except ) {
-            // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
-        } catch ( InvocationTargetException except ) {
-            // This should never happen
-            throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
-                                                              toString(), except.getMessage() ) );
+            // If there is a default value, use it for a null field.
+            // Otherwise, if there is a convertor, apply conversion.
+            if ( value == null && _default != null )
+                value = _default;
+            else if ( _convertTo != null ) {
+                try {
+                    value = _convertTo.convert( value );
+                } catch ( ClassCastException except ) {
+                    throw new IllegalArgumentException( Messages.format( "mapping.wrongConvertor", value.getClass().getName() ) );
+                }
+            }
+
+            try {
+                if ( _field != null )
+                    _field.set( object, value );
+                else
+                    _setMethod.invoke( object, new Object[] { value } );
+                // If the field has no set method, ignore it.
+                // If this is a problem, identity it someplace else.
+            } catch ( IllegalArgumentException except ) {
+                // Graceful way of dealing with unwrapping exception
+                if ( value == null )
+                    throw new IllegalArgumentException( Messages.format( "mapping.typeConversionNull", toString() ) );
+                else
+                    throw new IllegalArgumentException( Messages.format( "mapping.typeConversion",
+                                                                         toString(), value.getClass().getName() ) );
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+
+        } else if ( value != null ) {
+
+            Object collection;
+
+            try {
+                // Get the field value (the collection), add the value to it,
+                // possibly yielding a new collection (in the case of an array),
+                // and set that collection back into the field.
+                if ( _field != null ) {
+                    collection = _field.get( object );
+                    collection = _colHandler.add( collection, value );
+                    _field.set( object, collection );
+                } else {
+                    collection = _getMethod.invoke( object, null );
+                    collection = _colHandler.add( collection, value );
+                    _setMethod.invoke( object, new Object[] { collection } );
+                }                
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+
         }
     }
 
@@ -353,6 +402,7 @@ public final class FieldHandlerImpl
         _createMethod = method;
     }
 
+
     /**
      * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
      * Please understand how this method is used before you start
@@ -371,6 +421,7 @@ public final class FieldHandlerImpl
         _getMethod = method;
     }
 
+
     /**
      * Mutator method used by {@link org.exolab.castor.xml.MarshalHelper}.
      * Please understand how this method is used before you start
@@ -388,6 +439,7 @@ public final class FieldHandlerImpl
                                         method, method.getDeclaringClass().getName() );
         _setMethod = method;
     }
+
 
     public String toString()
     {
