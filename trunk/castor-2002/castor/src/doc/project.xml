@@ -33,7 +33,7 @@
     <item name="Using JDO" href="jdo.xml"/>
     <item name="Tips &amp; Tricks" href="tips-tricks.xml"/>
     <item name="JDO Config" href="database-conf.xml"/>
-    <!--<item name="Types" href="types.xml"/>-->
+    <item name="Types" href="types.xml"/>
     <item name="Source generator" href="sourcegen.xml"/>
     <item name="Running The Examples" href="examples.xml"/>
   </menu>
