@@ -127,7 +127,7 @@ public class Parser implements TokenTypes {
    * Creates a parser which will generate a parse tree from a series of 
    * tokens.
    *
-   * @param oqlQueryString The string representation of the OQL Query
+   * @param lexer Lexer instance.
    * @throws InvalidCharException thrown by primeLexer.
    * @throws OQLSyntaxException thrown by primeLexer.
    */
