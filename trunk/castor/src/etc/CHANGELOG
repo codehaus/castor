@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1706 - No support for XDoclet tags in Source Generator
+       (Bruce - 20040804)
+
 JDO:   Fixed bug 1705 - DuplicateIdentityExceptions not reported correctly
        when using PostgreSQL.
        (Bruce - 20040804)
