@@ -813,9 +813,11 @@ public class DescriptorSourceFactory {
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
-                    Integer.parseInt(fixed);
+                    //-- Only if we are not using Object
+                    if (!SourceGenerator.usePrimitiveWrapper())
+                       Integer.parseInt(fixed);
 
-                    jsc.add("iv.setFixedValue(");
+                    jsc.add("iv.setFixed(");
                     jsc.append(fixed);
                     jsc.append(");");
                 }
@@ -870,9 +872,11 @@ public class DescriptorSourceFactory {
                 //-- fixed values
                 if (fixed != null) {
                     //-- make sure we have a valid value...
-                    Integer.parseInt(fixed);
+                    //-- Only if we are not using Object
+                    if (!SourceGenerator.usePrimitiveWrapper())
+                       Integer.parseInt(fixed);
 
-                    jsc.add("iv.setFixedValue(");
+                    jsc.add("iv.setFixed(");
                     jsc.append(fixed);
                     jsc.append(");");
                 }
