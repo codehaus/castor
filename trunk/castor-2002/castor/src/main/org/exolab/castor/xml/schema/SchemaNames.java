@@ -110,6 +110,7 @@ public class SchemaNames {
     public static final String FIXED_ATTR          = "fixed";
     public static final String FORM                = "form";
     public static final String MAX_OCCURS_ATTR     = "maxOccurs";
+    public static final String MEMBER_TYPES_ATTR   = "memberTypes";
     public static final String MIN_OCCURS_ATTR     = "minOccurs";
     public static final String MIXED               = "mixed";
 	public static final String NAME_ATTR           = "name";
