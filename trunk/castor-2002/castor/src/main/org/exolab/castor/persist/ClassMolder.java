@@ -782,7 +782,7 @@ public class ClassMolder {
         Object ids;
         Object fid;
         Object o;
-        boolean autoCreated = false;
+
         int fieldType;
 
         if ( _persistence == null )
@@ -817,33 +817,7 @@ public class ClassMolder {
                         if ( fid != null ) {
                             fields[i] = fid;
                         }
-                        // dependent object will be created at preStore state
-                        // In auto-store mode create related object now
-                        if ( tx.isAutoStore() && !tx.isPersistent( o ) && !tx.isDeleted( o ) ) {
-                            // related object should be created right the way, if autoStore
-                            // is enabled, to obtain a database lock on the row. If both side
-                            // uses keygenerator, the current object will be updated in the
-                            // store state.
-                            OID fieldOid = tx.create( fieldEngine, fieldClassMolder, o, null );
-                            if ( _isKeyGenUsed ) {
-                                fields[i] = fieldOid.getIdentity();
-                                autoCreated = true;
-                            }
-                            // if _fhs[i].isStore is true for this field,
-                            // and if key generator is used
-                            // and if the related object is replaced this object by null
-                            // and if everything else is not modified
-                            // then, objectModifiedException will be thrown
-                            // there are two solutions, first introduce preCreate state,
-                            // and walk the create graph, and create non-store object
-                            // first. However, it doesn't guarantee solution. because
-                            // every object may have field which uses key-generator
-                            // second, we can do another SQLStatement at the very end of
-                            // this method.
-                            // note, one-many and many-many doesn't affected, because
-                            // it is always non-store fields.
-                        }
-                    }
+                    } // dependent object will be created at preStore state
                 }
                 break;
 
@@ -903,6 +877,8 @@ public class ClassMolder {
         // set the identity into the object
         setIdentity( tx, object, createdId );
 
+        boolean autoCreated = false;
+
         // iterate all the fields and create all the dependent object.
         for ( int i=0; i<_fhs.length; i++ ) {
             fieldType = _fhs[i].getFieldType();
@@ -939,6 +915,31 @@ public class ClassMolder {
                          */
                         //if ( !tx.isDepended( oid, o ) )
                         //    throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
+                    } else if ( tx.isAutoStore() ) {
+                        if ( !tx.isPersistent( o ) && !tx.isDeleted( o ) ) {
+                            // related object should be created right the way, if autoStore
+                            // is enabled, to obtain a database lock on the row. If both side
+                            // uses keygenerator, the current object will be updated in the
+                            // store state.
+                            OID fieldOid = tx.create( fieldEngine, fieldClassMolder, o, null );
+                            if ( _isKeyGenUsed ) {
+                                fields[i] = fieldOid.getIdentity();
+                                autoCreated = true;
+                            }
+                            // if _fhs[i].isStore is true for this field,
+                            // and if key generator is used
+                            // and if the related object is replaced this object by null
+                            // and if everything else is not modified
+                            // then, objectModifiedException will be thrown
+                            // there are two solutions, first introduce preCreate state,
+                            // and walk the create graph, and create non-store object
+                            // first. However, it doesn't guarantee solution. because
+                            // every object may have field which uses key-generator
+                            // second, we can do another SQLStatement at the very end of
+                            // this method.
+                            // note, one-many and many-many doesn't affected, because
+                            // it is always non-store fields.
+                        }
                     }
                 }
                 break;
