@@ -31,6 +31,7 @@ import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.NodeSet;
 import org.exolab.adaptx.xpath.XPathExpression;
 import org.exolab.adaptx.xpath.XPathParser;
+import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.util.List;
 import org.exolab.adaptx.xml.XMLUtil;
 
@@ -62,12 +63,11 @@ class NodeSorter {
             return nodes;
         
         // Build sortKeys table
-        Hashtable keyHash = new Hashtable(nodes.size());
+        Hashtable keyHash = new Hashtable();
         
         XSLSort         xslSort;
         XPathExpression selectExpr = null;
         XPathNode       node;
-        NodeSet         resultNodes;
         String          sortKey;
         NodeSet         bucket;
         
@@ -111,9 +111,9 @@ class NodeSorter {
             xpc.setPosition(i);
             try {
                 selectExpr = xslSort.getSelectExpr();
-                resultNodes = (NodeSet)selectExpr.evaluate(xpc);
-                sortKey = resultNodes.stringValue();
-                resultNodes = null;
+                XPathResult result = selectExpr.evaluate(xpc);
+                sortKey = result.stringValue();
+                result  = null;
                 if (sortKey.length() == 0) {
                     noKeyBucket.add(node, true);
                 }
@@ -181,7 +181,7 @@ class NodeSorter {
         // one method since they are virtually the same and
         // create a Number Collator
         
-        if (dataType.intern() == XSLSort.NUMBER_TYPE)
+        if (XSLSort.NUMBER_TYPE.equals(dataType))
             return sortAsNumbers(strings, ascending, lang);
         else
             return sortAsText(strings, ascending, lang);
