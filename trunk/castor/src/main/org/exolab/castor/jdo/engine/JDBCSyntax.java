@@ -47,9 +47,6 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.util.Hashtable;
-import java.util.Vector;
-import java.util.Enumeration;
 
 
 /**

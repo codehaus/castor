@@ -46,14 +46,15 @@
 
 package org.exolab.castor.jdo.engine;
 
-import java.util.NoSuchElementException;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.exolab.castor.jdo.QueryResults;
+import java.util.NoSuchElementException;
+
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.persist.spi.QueryExpression;
 
 /**

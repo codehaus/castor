@@ -47,8 +47,8 @@
 package org.exolab.castor.jdo.engine;
 
 
-import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 
 
