@@ -3,6 +3,11 @@ Version (CVS)
 -------------
 
 
+JDO:   Fixed bug 1777 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
+       Status property of Castor's TransactionContext set correctly in global transactions.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1777
+       (Werner - 20041203)
+
 JDO:   Fixed bug 1785 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Adds configuration of JDO using an inline JDBC DataSource by providing 
        configuration parameters using a Properties collection
