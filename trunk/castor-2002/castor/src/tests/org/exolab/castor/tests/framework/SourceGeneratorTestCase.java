@@ -184,7 +184,7 @@ public class SourceGeneratorTestCase extends XMLTestCase {
             // 1. Move the support file into tmp dir
             assertNotNull("Unable to find the name of the schema", _schemaName);
 
-            copySupportFiles(_outputRootFile);
+            FileServices.copySupportFiles(_test.getTestFile(), _outputRootFile);
 
             // 2. Run the source generator
             verbose("Running the source generator");
@@ -249,70 +249,6 @@ public class SourceGeneratorTestCase extends XMLTestCase {
         verbose("Test for '" + _name + "' complete");
         verbose("========================================");
 
-    }
-
-
-    /**
-     * Copy all the support files ('.xsd' and '.java' file) located in the jar
-     * into the given directory
-     */
-    private void copySupportFiles(File root)
-        throws IOException, FileNotFoundException {
-
-        if (_test.getType() == CastorTestCase.JAR) {
-            JarFile jar = new JarFile(_test.getTestFile());
-            for (Enumeration e = jar.entries(); e.hasMoreElements(); ) {
-                ZipEntry entry = (ZipEntry)e.nextElement();
-                if (isSupportFile(entry.getName())) {
-                    verbose("Moving file '" + entry.getName() + "' into the output directory");
-                    InputStream src = jar.getInputStream(entry);
-                    File out = new File(root, entry.getName());
-                    out.getParentFile().mkdirs();
-                    copy(src, new FileOutputStream(out));
-                }
-            }//for
-        }
-        else if (_test.getType() == CastorTestCase.DIRECTORY) {
-            File[] entries = _test.getTestFile().listFiles();
-            for (int i=0 ; i<entries.length; i++) {
-                File tempEntry = entries[i];
-                if (isSupportFile(tempEntry.getName())) {
-                    verbose("Moving file '" + tempEntry.getName() + "' into the output directory");
-                    InputStream src = new FileInputStream(tempEntry);
-                    File out = new File(root, tempEntry.getName());
-                    out.getParentFile().mkdirs();
-                    copy(src, new FileOutputStream(out));
-                }
-            }//for
-        }//else
-    }
-
-
-    /**
-     * Return true if the file is a support file for the test. A support file is
-     * a schema or a java file.
-     */
-    private boolean isSupportFile(String name) {
-        return ((name.endsWith(".xsd")) || (name.endsWith(".java")));
-    }
-
-    /**
-     * Copy an InputStream into a OutputStream
-     */
-    private void copy(InputStream src, OutputStream dst)
-        throws FileNotFoundException, IOException {
-
-        // use a 4K buffer
-        final int BUF_SIZE = 4096;
-        byte[] buf = new byte[BUF_SIZE];
-        int read;
-        while (true) {
-            read = src.read(buf, 0, BUF_SIZE);
-            if (read == -1) {
-                break;
-            }
-            dst.write(buf, 0, read);
-        }
     }
 
 }

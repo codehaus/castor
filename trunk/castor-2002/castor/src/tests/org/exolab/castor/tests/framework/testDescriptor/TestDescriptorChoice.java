@@ -34,6 +34,8 @@ public class TestDescriptorChoice implements java.io.Serializable {
 
     private MarshallingTest _marshallingTest;
 
+    private SchemaTest _schemaTest;
+
 
       //----------------/
      //- Constructors -/
@@ -56,6 +58,15 @@ public class TestDescriptorChoice implements java.io.Serializable {
     {
         return this._marshallingTest;
     } //-- MarshallingTest getMarshallingTest() 
+
+    /**
+     * Returns the value of field 'schemaTest'.
+     * @return the value of field 'schemaTest'.
+    **/
+    public SchemaTest getSchemaTest()
+    {
+        return this._schemaTest;
+    } //-- SchemaTest getSchemaTest() 
 
     /**
      * Returns the value of field 'sourceGeneratorTest'.
@@ -109,6 +120,15 @@ public class TestDescriptorChoice implements java.io.Serializable {
     {
         this._marshallingTest = marshallingTest;
     } //-- void setMarshallingTest(MarshallingTest) 
+
+    /**
+     * Sets the value of field 'schemaTest'.
+     * @param schemaTest the value of field 'schemaTest'.
+    **/
+    public void setSchemaTest(SchemaTest schemaTest)
+    {
+        this._schemaTest = schemaTest;
+    } //-- void setSchemaTest(SchemaTest) 
 
     /**
      * Sets the value of field 'sourceGeneratorTest'.
