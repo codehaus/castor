@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -83,13 +83,12 @@ import org.exolab.javasource.JSourceCode;
 import org.exolab.javasource.JType;
 
 import java.util.Enumeration;
-import java.util.Vector;
 
 /**
  * This class creates the Java Source classes for Schema
  * components
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
@@ -344,7 +343,7 @@ public class SourceFactory {
 
         //5--processing the type
         XMLType type = component.getXMLType();
-        boolean createForGroup = false;
+        boolean createForSingleGroup = false;
         boolean creatingForAnElement = false;
         
         if (type != null) {
@@ -450,8 +449,8 @@ public class SourceFactory {
         else {
             //--MODEL GROUP OR GROUP
             try{
-                createForGroup = true;
                 Group group = (Group)component.getAnnotated();
+                createForSingleGroup = (group.getMaxOccurs() == 1);                
                 processContentModel(group, state);
                 component.setView(group);
                 //-- Check Group Type
@@ -483,8 +482,8 @@ public class SourceFactory {
             fname  = JavaNaming.toJavaMemberName(fname, false);
 
             FieldInfo fInfo = null;
-            if (createForGroup) {
-                //A choice Item can occur only once in the nested group
+            if (createForSingleGroup) {
+                //By default a nested group Item can occur only once
                 fInfo = infoFactory.createFieldInfo(new XSClass(jClass),
                                                                 fname);
             } else {
