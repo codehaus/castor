@@ -120,7 +120,7 @@ public final class SapDbFactory
      * if it is a function. 
      *
      * @param text The text to be checked
-     * @see #quoteName
+     * @see #quoteName(String)
      */
     public boolean isAFunction( String text )
     {
