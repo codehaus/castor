@@ -289,8 +289,8 @@ public class DescriptorSourceFactory {
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
-			//-- Handle optional primitives?
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()) && (!member.isMultivalued()))
+			//-- handle primitives
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
 				jsc.indent();
@@ -311,18 +311,33 @@ public class DescriptorSourceFactory {
             jsc.unindent();
             jsc.add("{");
             jsc.indent();
-            //-- check for null primitives
-            if (xsType.isPrimitive()) {
-                jsc.add("// ignore null values for primitives");
-                jsc.add("if (value == null) return;");
-                jsc.add("");
-            }
             jsc.add("try {");
             jsc.indent();
             jsc.add(localClassName);
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
+            //-- check for null primitives
+            if (xsType.isPrimitive()) {
+                
+                if ((!member.isRequired()) && (!xsType.isEnumerated())) {
+                    jsc.add("// if null, use delete method for optional primitives ");
+                    jsc.add("if (value == null) {");
+                    jsc.indent();
+                    jsc.add("target.");
+                    jsc.append(member.getDeleteMethodName());
+                    jsc.append("();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");
+                    
+                }
+                else {
+                    jsc.add("// ignore null values for non optional primitives");
+                    jsc.add("if (value == null) return;");
+                    jsc.add("");
+                }
+            }
             jsc.add("target.");
             jsc.append(member.getWriteMethodName());
             jsc.append("( ");
@@ -507,8 +522,8 @@ public class DescriptorSourceFactory {
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
-			//-- Handle optional primatives?
-			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isRequired()) && (!member.isMultivalued()))
+			//-- handle primitives
+			if ((!xsType.isEnumerated()) && xsType.isPrimitive() && (!member.isMultivalued()))
 			{
 				jsc.add("if(!target."+member.getHasMethodName()+"())");
 				jsc.indent();
@@ -531,18 +546,33 @@ public class DescriptorSourceFactory {
             jsc.unindent();
             jsc.add("{");
             jsc.indent();
-            //-- check for null primitives
-            if (xsType.isPrimitive()) {
-                jsc.add("// ignore null values for primitives");
-                jsc.add("if (value == null) return;");
-                jsc.add("");
-            }
             jsc.add("try {");
             jsc.indent();
             jsc.add(localClassName);
             jsc.append(" target = (");
             jsc.append(localClassName);
             jsc.append(") object;");
+            //-- check for null primitives
+            if (xsType.isPrimitive()) {
+                
+                if ((!member.isRequired()) && (!xsType.isEnumerated())) {
+                    jsc.add("// if null, use delete method for optional primitives ");
+                    jsc.add("if (value == null) {");
+                    jsc.indent();
+                    jsc.add("target.");
+                    jsc.append(member.getDeleteMethodName());
+                    jsc.append("();");
+                    jsc.add("return;");
+                    jsc.unindent();
+                    jsc.add("}");                    
+                }
+                else {
+                    jsc.add("// ignore null values for non optional primitives");
+                    jsc.add("if (value == null) return;");
+                    jsc.add("");
+                }
+            }
+            
             jsc.add("target.");
             jsc.append(member.getWriteMethodName());
             jsc.append("( ");
