@@ -103,7 +103,6 @@ public class MemberFactory {
     public FieldInfo createFieldInfoForAny() {
 
         XSType xsType = new XSClass(SGTypes.Object, "any");
-        String memberName = "obj";
         String vName = "_anyObject";
         String xmlName = null;
         CollectionInfo cInfo = infoFactory.createCollection(xsType, vName, "_anyObject");
@@ -270,21 +269,27 @@ public class MemberFactory {
 
         ElementDecl eDecl = element;
 
-		//-- If mapping schema elements, replace element passed in with referenced element
-		if (SourceGenerator.mappingSchemaElement2Java())
-		{
-			if (eDecl.isReference()) {
-			    ElementDecl eRef = eDecl.getReference();
-			    if (eRef == null) {
-			        String err = "unable to resolve element reference: ";
-			        err += element.getName();
-			        System.out.println(err);
-			        return null;
-			    }
-			    else eDecl = eRef;
-			}
-		}
+        //-- the element is a reference:
+        //-- If mapping schema elements, replace element passed in with referenced element
+        //-- if not we just retrieve the correct NCNAME and check to see if the element referenced
+        //-- really exist (this check must be handle by the new version of the SOM)
+        if (eDecl.isReference()) {
+            ElementDecl eRef = eDecl.getReference();
 
+            if (eRef == null) {
+                String err = "unable to resolve element reference: ";
+			    err += element.getName();
+			    System.out.println(err);
+			    return null;
+            }
+
+            if (SourceGenerator.mappingSchemaElement2Java())
+		        eDecl = eRef;
+			else
+               eDecl.setName(eRef.getName());
+            //garbage collected
+            eRef = null;
+		}
 		//-- determine type
 
         JSourceCode jsc     = null;
@@ -350,7 +355,7 @@ public class MemberFactory {
             xsType = new XSClass(new JClass(className));
         }
 
-        String fieldName = JavaNaming.toJavaMemberName(eDecl.getName());
+        String fieldName = JavaNaming.toJavaMemberName(eDecl.getName(true));
         if (fieldName.charAt(0) != '_')
             fieldName = "_"+fieldName;
 
@@ -376,7 +381,7 @@ public class MemberFactory {
         }
 
         fieldInfo.setRequired(minOccurs > 0);
-        fieldInfo.setNodeName(eDecl.getName());
+        fieldInfo.setNodeName(eDecl.getName(true));
 
         //-- add annotated comments
 
