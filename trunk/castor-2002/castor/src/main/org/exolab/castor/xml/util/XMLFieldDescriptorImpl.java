@@ -478,11 +478,10 @@ public class XMLFieldDescriptorImpl
                         return true;
                 }
             }
-            else if (_container) {
-                if (_classDescriptor.getFieldDescriptor(xmlName, NodeType.Element) != null ||
-                   _classDescriptor.getFieldDescriptor(xmlName, NodeType.Attribute) != null )
-                    return true;
-            } else
+            else if ((_container) && (_classDescriptor != null)) {
+                return (_classDescriptor.getFieldDescriptor(xmlName, null) != null);
+            } 
+            else
                 return xmlName.equals(this._xmlName);
         }
         
