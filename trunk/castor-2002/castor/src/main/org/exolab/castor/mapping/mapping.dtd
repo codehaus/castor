@@ -133,7 +133,7 @@
     type           NMTOKEN  #IMPLIED
     required       ( true | false )  "false"
     direct         ( true | false )  "false"
-    lazy       ( true | false )  "false"
+    lazy           ( true | false )  "false"
     get-method     NMTOKEN  #IMPLIED
     set-method     NMTOKEN  #IMPLIED
     create-method  NMTOKEN  #IMPLIED
@@ -156,6 +156,8 @@
 <!ATTLIST sql
     name        NMTOKEN  #IMPLIED
     type        CDATA    #IMPLIED
+    many-key    NMTOKEN  #IMPLIED
+    many-table  NMTOKEN  #IMPLIED
     dirty  ( check | ignore )  "check"> 
 
 
