@@ -46,6 +46,7 @@ package org.exolab.castor.persist;
 
 import java.lang.ref.WeakReference;
 import java.lang.ref.ReferenceQueue;
+import javax.transaction.xa.Xid;
 
 /**
  * A Key is used by a KeyHolder to access locked Entities thru the LockEngine.
@@ -80,6 +81,11 @@ public final class Key {
      * Key share the same hashcode of it keyholder
      */
     private int hashCode;
+
+    /**
+     * The Xid of which hold this key. It is optional.
+     */
+    private Xid xid;
 
     /**
      * Constructor for Key.
