@@ -43,12 +43,12 @@ public class Cache extends CastorTestCase {
             stream.println("Putting some entries in the cache...");
             for (int i = 0; i < COUNT; i++) {
                 cache.put(new Integer(i), new CacheEntry(i, System.currentTimeMillis()));
-                Thread.currentThread().sleep(100);
+                Thread.sleep(100);
             }
 
             stream.println("Waiting for cache to expire...");
             // Wait at least as long as the cache needs to expire
-            Thread.currentThread().sleep((EXPIRE_SEC + 1) * 1000);
+            Thread.sleep((EXPIRE_SEC + 1) * 1000);
             stream.println("Finished waiting.");
         }
         catch (InterruptedException ie) {
@@ -67,7 +67,8 @@ public class Cache extends CastorTestCase {
         private List _expiredTooFast;
 
         TimeLimitedTest(int interval, List expiredTooFast) {
-            super(interval);
+            super();
+            setCapacity(interval);
             this._expiredTooFast = expiredTooFast;
         }
 
