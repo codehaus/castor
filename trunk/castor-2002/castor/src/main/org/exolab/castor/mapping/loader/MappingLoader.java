@@ -276,8 +276,8 @@ public abstract class MappingLoader
      *  the class cannot be created
      */
     protected ClassDescriptor createDescriptor( ClassMapping clsMap )
-        throws MappingException
-    {
+            throws MappingException {
+
         FieldDescriptor[] fields;
         FieldDescriptor[] identities;
         Enumeration       enum;
@@ -340,19 +340,6 @@ public abstract class MappingLoader
         // in there.
         FieldMapping[] fm = clsMap.getFieldMapping();
         fields = createFieldDescs( javaClass, fm );
-        /*
-        contMaps = clsMap.getContainer();
-        if ( contMaps != null && contMaps.length > 0 ) {
-            FieldDesc[] allFields;
-
-            allFields = new FieldDesc[ fields.length + contMaps.length ];
-            for ( int i = 0 ; i < fields.length ; ++i )
-                allFields[ i ] = fields[ i ];
-            for ( int i = 0 ; i < contMaps.length ; ++i )
-                allFields[ i + fields.length ] = createContainerFieldDesc( javaClass, contMaps[ i ] );
-            fields = allFields;
-        }
-        */
 
         // Make sure there are no two fields with the same name.
         // Crude but effective way of doing this.
@@ -396,9 +383,9 @@ public abstract class MappingLoader
                 badIdentities, javaClass.getName() );
             }
 
-            //System.out.println("getId....");
-            //breakApart( clsMap.getIdentity(), ' ' );
-            //System.out.println("field.length: "+fields.length+" id.length: "+ids.length);
+            // separates fields into identity fields and regular fields
+
+
             for ( int i=0; i < fields.length ; i++ ) {
                 //System.out.println("MappingLoader.createClassDesc.for:id: " + i );
                 idfield = false;
@@ -421,27 +408,56 @@ public abstract class MappingLoader
                     fieldList.addElement(fields[i]);
                 }
             }
+
+            // convert idList into array
             if (extend == null) {
                 identities = new FieldDescriptor[idList.size()];
                 idList.toArray(identities);
             } else {
-                identities = new FieldDescriptor[((ClassDescriptorImpl) extend).getIdentities().length];
-                for (int i = 0; i < identities.length; i++) {
-                    identities[i] = ((ClassDescriptorImpl) extend).getIdentities()[i];
-                    for (int j = 0; j < idList.size(); j++) {
-                        if (((FieldDescriptor) idList.elementAt(j)).getFieldName().equals(identities[i].getFieldName())) {
-                            identities[i] = (FieldDescriptor) idList.elementAt(j);
-                            idList.removeElementAt(j);
-                            break;
+                // we allows identity fields to be re-defined in the extends 
+                // class mapping to override some properties of the field, 
+                // for example, <sql name="..."/>.
+                if ( extend instanceof ClassDescriptorImpl ) {
+                    ClassDescriptorImpl extendImpl = (ClassDescriptorImpl) extend;
+                    identities = new FieldDescriptor[extendImpl.getIdentities().length];
+                    for (int i = 0; i < identities.length; i++) {
+                        identities[i] = extendImpl.getIdentities()[i];
+                        for (int j = 0; j < idList.size(); j++) {
+                            if (((FieldDescriptor) idList.elementAt(j)).getFieldName().equals(identities[i].getFieldName())) {
+                                identities[i] = (FieldDescriptor) idList.elementAt(j);
+                                idList.removeElementAt(j);
+                                break;
+                            }
                         }
                     }
+                } else {
+                    // we leave things in the old way for the XML side
+                    identities = new FieldDescriptor[idList.size()];
+                    idList.toArray(identities);
                 }
             }
+            
+            // convert fieldList into array
             fields = new FieldDescriptor[fieldList.size()];
             fieldList.toArray(fields);
+            
+            // the following check only needed by JDO side, move it to JDOMappingLoader
+            /*
             if ( identities == null || identities.length == 0 ) {
                 throw new MappingException( "mapping.identityMissing", clsMap.getIdentity(),
                                             javaClass.getName() );
+            }*/
+
+            // do a more general test instead
+            if ( ids != null && ids.length > 0 
+                    && (identities == null || identities.length <= 0 ) ) {
+                StringBuffer sb = new StringBuffer();
+                for ( int i=0; i < ids.length; i++ ) {
+                    if ( i != 0 ) sb.append("/");
+                    sb.append( ids[i] );
+                }
+                throw new MappingException("mapping.identityMissing", sb,
+                        javaClass.getName() );
             }
         }
 
@@ -452,7 +468,9 @@ public abstract class MappingLoader
         clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
                                            AccessMode.getAccessMode(hack) );
 
-        ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
+        if ( clsDesc instanceof ClassDescriptorImpl )
+            ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
+
         return clsDesc;
     }
 
