@@ -45,6 +45,9 @@
 
 package org.exolab.castor.xml;
 
+import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.LocalConfiguration;
+
 /**
  * An abstract class to handing XML naming
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
@@ -85,7 +88,8 @@ public abstract class XMLNaming {
      * @see org.exolab.castor.util.Configuration
     **/
     public static final XMLNaming getInstance() {
-        return org.exolab.castor.util.Configuration.getDefaultXMLNaming();       
+        Configuration config = LocalConfiguration.getInstance();
+        return config.getXMLNaming(); 
     } //-- getInstance
     
 } //-- Naming
