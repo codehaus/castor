@@ -298,7 +298,6 @@ public final class LockEngine {
             
             lockedOid.setStamp( stamp );
 
-
             if ( lockedOid != null ) {
                 oid = lockedOid;
             }
@@ -555,7 +554,6 @@ public final class LockEngine {
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 
         try {
-            System.out.println("delete");
             lock = typeInfo.assure( oid, tx, true );
 
             if ( _logInterceptor != null )
@@ -580,7 +578,6 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
 
-        System.out.println("markDelete");
         lock = typeInfo.upgrade( oid, tx, timeout );
 
         typeInfo.molder.markDelete( tx, oid, lock, object );
@@ -659,6 +656,7 @@ public final class LockEngine {
                 if ( _logInterceptor != null )
                     _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
             }*/
+            oid = lock.getOID();
 
             molder.update( tx, oid, lock, object, accessMode );
 
@@ -673,8 +671,6 @@ public final class LockEngine {
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object not existing
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
-        } catch ( ObjectModifiedException e ) {
-            return null;
         } finally {
             if ( lock != null ) 
                 lock.confirm( tx, succeed );
@@ -738,7 +734,6 @@ public final class LockEngine {
         // acquire write lock
         // setLockedField( );
         // 
-        System.out.println("store");
         lock = typeInfo.assure( oid, tx, false );
         modified = typeInfo.molder.store( tx, oid, lock, object );
         if ( modified )
@@ -778,7 +773,6 @@ public final class LockEngine {
         // Attempt to obtain a lock on the database. If this attempt
         // fails, release the lock and report the exception.
 
-        System.out.println("writeLock");
         typeInfo.upgrade( oid, tx, timeout );
     }
 
@@ -803,7 +797,6 @@ public final class LockEngine {
         TypeInfo   typeInfo;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
-        System.out.println("softLock");
         typeInfo.upgrade( oid, tx, timeout );
     }
 
@@ -827,8 +820,7 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
-            System.out.println("revertObject");
-            lock = typeInfo.assure( oid, tx, true );
+            lock = typeInfo.assure( oid, tx, false );
             typeInfo.molder.revertObject( tx, oid, lock, object );
         } catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
@@ -856,7 +848,6 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         try {
-            System.out.println("updateCache");
             lock = typeInfo.assure( oid, tx, false );
             typeInfo.molder.updateCache( tx, oid, lock, object );
         } catch ( LockNotGrantedException e ) {
@@ -902,8 +893,6 @@ public final class LockEngine {
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         //lock = typeInfo.locks.aquire( oid, tx );
         try {
-            //oid = new OID( typeInfo.molder, identity);
-            System.out.println("forgetObject");
             typeInfo.assure( oid, tx, true );
             
             typeInfo.delete( oid, tx );
@@ -1004,7 +993,7 @@ public final class LockEngine {
                 int timeout ) throws ObjectDeletedWaitingForLockException, 
                 LockNotGrantedException {
 
-            System.out.println("LockEngine.acquire");
+            //System.out.println("LockEngine.acquire");
             ObjectLock entry = null;
             boolean failed = true;;
             boolean newentry = false;
@@ -1035,9 +1024,11 @@ public final class LockEngine {
             try {
                 switch ( lockAction ) {
                 case ObjectLock.ACTION_READ:
+                    //(new Exception("acquire write lock on: "+entry)).printStackTrace();
                     entry.acquireLoadLock( tx, false, timeout );
                     break;
                 case ObjectLock.ACTION_WRITE:
+                    //(new Exception("acquire write lock on:"+entry)).printStackTrace();
                     entry.acquireLoadLock( tx, true, timeout );
                     break;
                 case ObjectLock.ACTION_CREATE:
@@ -1066,7 +1057,6 @@ public final class LockEngine {
                         // we ensure here that the entry which should be move 
                         // to "cache" from "locks" is actually moved.
                         if ( entry.isDisposable() ) {
-                            System.out.println("----- lock removed: "+entry+" tx: "+tx);
                             locks.remove( oid );
                             cache.put( oid, entry );
                         }
@@ -1119,7 +1109,7 @@ public final class LockEngine {
                 throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
 
             if ( !entry.hasLock( tx, write ) )
-                throw new IllegalStateException("Transaction does not hold the any lock on "+oid+"!");
+                throw new IllegalStateException("Transaction does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
 
             return entry;
         }
@@ -1181,6 +1171,7 @@ public final class LockEngine {
             ObjectLock entry;
             synchronized( this ) {
                 entry = (ObjectLock) locks.get( oid );
+
                 if ( entry == null )
                     throw new IllegalStateException("No lock to destory!");
                 entry.enter();
@@ -1193,8 +1184,6 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
-                        (new Exception("Stack trace when lock deleted")).printStackTrace();
-                        System.out.println("----- lock deleted: "+entry+" tx: "+tx);
                         locks.remove( oid );
                     }
                 }
@@ -1215,8 +1204,10 @@ public final class LockEngine {
             ObjectLock entry = null;
             synchronized( this ) {
                 entry = (ObjectLock) locks.get( oid );
+
                 if ( entry == null ) 
                     throw new IllegalStateException("No lock to release!");
+
                 entry.enter();
             }
             try {
@@ -1227,7 +1218,6 @@ public final class LockEngine {
                 synchronized( this ) {
                     entry.leave();
                     if ( !failed && entry.isDisposable() ) {
-                        System.out.println("----- lock removed: "+entry+" tx: "+tx);
                         cache.put( oid, entry );
                         locks.remove( oid );
                     }
