@@ -748,12 +748,13 @@ public class SourceGenerator {
             //-- handle top-leve complextypes
             if (complexType.isTopLevel()) {
 
-                JClass jClass
+                JClass[] classes
                     = sourceFactory.createSourceCode(complexType,
                                                      sInfo,
                                                      sInfo.packageName);
-                processJClass(jClass, sInfo);
-
+                                                     
+                for (int i = 0; i < classes.length; i++)
+                    processJClass(classes[i], sInfo);
             }
 
             //-- process base complextype if necessary
@@ -856,7 +857,10 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
-                    processContentModel((Group)struct, sInfo);
+                    if (cmGroup instanceof ComplexType) {
+                        processContentModel((Group)struct, sInfo);
+                    }
+                    else createClasses((Group)struct, sInfo);
                     break;
                 default:
                     break;
@@ -864,6 +868,26 @@ public class SourceGenerator {
         }
     } //-- process
 
+    private void createClasses(Group group, SGStateInfo sInfo) {
+        
+		if (sInfo.verbose()) {
+		    System.out.print("Creating classes for group: ");
+		    System.out.println(group.getName());
+            if (group.getName() == null) {
+                System.out.println("cannot create classes for unnamed nested groups");
+                return;
+            }
+		}
+		
+		JClass[] classes = sourceFactory.createSourceCode(group,
+                                                    sInfo,
+                                                    sInfo.packageName);
+                                                    
+        for (int i = 0; i < classes.length; i++) 
+            processJClass(classes[i], sInfo);
+        
+    } //-- createClasses
+    
     /**
      * Processes the given JClass by creating the
      * corresponding MarshalInfo and print the Java classes

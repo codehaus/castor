@@ -68,6 +68,13 @@ public class ClassInfo extends XMLInfo {
     private JClass _class = null;
 
     /**
+     * The group information for this ClassInfo
+    **/
+    private GroupInfo _groupInfo = null;
+    
+    private boolean _isContainer = false;
+    
+    /**
      * Creates a new ClassInfo
      * @param jClass the JClass which this ClassInfo describes
     **/
@@ -79,7 +86,11 @@ public class ClassInfo extends XMLInfo {
             throw new IllegalArgumentException(err);
         }
         this._class = jClass;
+        
+        _groupInfo = new GroupInfo();
+        
     } //-- ClassInfo
+    
 
 
     //------------------/
@@ -186,6 +197,15 @@ public class ClassInfo extends XMLInfo {
     } //-- getElementFields
 
     /**
+     * Returns the GroupInfo for this ClassInfo
+     *
+     * @return the GroupInfo for this ClassInfo
+    **/
+    public GroupInfo getGroupInfo() {
+        return _groupInfo;
+    } //-- getGroupInfo
+    
+    /**
      * Returns the JClass described by this ClassInfo
      * @return the JClass which is described by this ClassInfo
     **/
@@ -202,6 +222,45 @@ public class ClassInfo extends XMLInfo {
         return _textField;
     } //-- getTextField
 
+    /**
+     * Returns true if the compositor of this GroupInfo is a choice
+     * @return true if the compositor of this GroupInfo is a choice
+    **/
+    public boolean isChoice() {
+        return _groupInfo.isChoice();
+    } //-- isChoice
 
+    /**
+     * Returns true if this ClassInfo describes a container
+     * class. A container class is a class which should not be 
+     * marshalled as XML, but whose members should be.
+     *
+     * @return true if this ClassInfo describes a container class.
+    **/
+    public boolean isContainer() {
+        return _isContainer;
+    } //-- isContainer
+
+    /**
+     * Returns true if the compositor of this GroupInfo is a sequence
+     * @return true if the compositor of this GroupInfo is a sequence
+    **/
+    public boolean isSequence() {
+        return _groupInfo.isSequence();
+    } //-- isSequence
+
+    /**
+     * Sets whether or not this ClassInfo describes a container
+     * class. A container class is a class which should not be 
+     * marshalled as XML, but whose members should be. By default
+     * this is false.
+     *
+     * @param isContainer the boolean value when true indicates
+     * this class should be a container class.
+    **/
+    public void setContainer(boolean isContainer) {
+        _isContainer = isContainer;
+    } //-- setContainer
+    
 
 } //-- ClassInfo
