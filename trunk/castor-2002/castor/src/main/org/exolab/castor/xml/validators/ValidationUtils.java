@@ -52,34 +52,34 @@ package org.exolab.castor.xml.validators;
  * @version $Revision$ $Date$
 **/
 public class ValidationUtils {
-    
-    
+
+
     //----------------/
     //- Constructors -/
     //----------------/
-    
+
     private ValidationUtils() {
         super();
     }
-    
+
     //------------------/
     //- Public Methods -/
     //------------------/
-    
-    
+
+
     /**
      * Checks the given character to determine if it is a valid
      * CombiningChar as defined by the W3C XML 1.0 Recommendation
      * @return true if the given character is a CombiningChar
     **/
     public static boolean isCombiningChar(char ch) {
-        
+
         //-- NOTE: THIS METHOD IS NOT COMPLETE
-        
+
         return false;
-        
+
     } //-- isCombiningChar
-    
+
     /**
      * @param ch the character to check
      * @return true if the given character is a digit
@@ -87,16 +87,16 @@ public class ValidationUtils {
     public static boolean isDigit(char ch) {
         return Character.isDigit(ch);
     } //-- isDigit
-    
-    
+
+
     /**
-     * @param ch the character to check 
+     * @param ch the character to check
      * @return true if the given character is a letter
     **/
     public static boolean isLetter(char ch) {
         return Character.isLetter(ch);
     } //-- isLetter
-    
+
     /**
      * Checks the characters of the given String to determine if they
      * syntactically match the production of an NCName as defined
@@ -105,24 +105,24 @@ public class ValidationUtils {
      * @return true if the given String follows the Syntax of an NCName
     **/
     public static boolean isNCName(String str) {
-        
+
         if ((str == null) || (str.length() == 0)) return false;
-        
-        
+
+
         char[] chars = str.toCharArray();
-        
+
         char ch = chars[0];
-        
+
         //-- make sure String starts with a letter or '_'
-        if ((!isLetter(ch)) && (ch != '_')) 
+        if ((!isLetter(ch)) && (ch != '_'))
             return false;
-        
+
         for (int i = 1; i < chars.length; i++) {
             if (!isNCNameChar(chars[i])) return false;
         }
         return true;
     } //-- isNCName
-    
+
     /**
      * Checks the the given character to determine if it is
      * a valid NCNameChar as defined by the W3C XML
@@ -142,8 +142,8 @@ public class ValidationUtils {
                 return false;
         }
     } //-- isNCNameChar
-    
-    
+
+
     /**
      * Checks the characters of the given String to determine if they
      * syntactically match the production of an NMToken
@@ -151,10 +151,10 @@ public class ValidationUtils {
      * @return true if the given String follows the Syntax of an NMToken
     **/
     public static boolean isNMToken(String str) {
-        
+
         if (str == null) return false;
         char[] chars = str.toCharArray();
-        
+
         for (int i = 0; i < chars.length; i++) {
             char ch = chars[i];
             if (isLetter(ch) || isDigit(ch)) continue;
@@ -171,7 +171,32 @@ public class ValidationUtils {
         }
         return true;
     } //-- isNMToken
-    
+
+    /**
+     * Checks the characters of the given String to determine if they
+     * syntactically match the production of a CDATA
+     * @param str the String to check
+     * @return true if the given String follows the Syntax of an NMToken
+    **/
+    public static boolean isCDATA(String str) {
+
+        if (str == null) return false;
+        char[] chars = str.toCharArray();
+
+        for (int i = 0; i < chars.length; i++) {
+            char ch = chars[i];
+            switch(ch) {
+                case '\r':
+                case '\n':
+                case '\t':
+                    return false;
+                default:
+                    continue;
+            }
+        }
+        return true;
+    } //-- isCDATA
+
     /**
      * Returns true if the given character is a valid XML Extender
      * character, according to the XML 1.0 specification
@@ -179,10 +204,10 @@ public class ValidationUtils {
      * @return true if the character is a valid XML Extender character
     **/
     public static boolean isExtender(char ch) {
-        
+
         if ((ch >= 0x3031) && (ch <= 0x3035)) return true;
         if ((ch >= 0x30FC) && (ch <= 0x30FE)) return true;
-        
+
         switch(ch) {
             case 0x00B7:
             case 0x02D0:
@@ -200,15 +225,15 @@ public class ValidationUtils {
         }
         return false;
     } //-- isExtender
-    
+
     /**
-     * Test 
+     * Test
     **
     public static void main(String[] args) {
         System.out.println("0x00B7: " + (char)0x00B7);
     }
     /* */
-    
+
 } //-- Validator
 
 

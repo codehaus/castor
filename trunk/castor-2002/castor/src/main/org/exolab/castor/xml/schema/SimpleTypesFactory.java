@@ -130,39 +130,39 @@ public class SimpleTypesFactory
     public static final int ID_TYPE                       = 10;
     public static final int IDREF_TYPE                    = 11;
     public static final int ENTITY_TYPE                   = 12;
-    public static final int NOTATION_TYPE                 = 13;
-    public static final int QNAME_TYPE                    = 14;
+    public static final int QNAME_TYPE                    = 13;
     //Derived datatypes
-    public static final int LANGUAGE_TYPE                 = 15;
-    public static final int IDREFS_TYPE                   = 16;
-    public static final int ENTITIES_TYPE                 = 17;
-    public static final int NMTOKEN_TYPE                  = 18;
-    public static final int NMTOKENS_TYPE                 = 19;
-    public static final int NAME_TYPE                     = 20;
-    public static final int NCNAME_TYPE                   = 21;
-    public static final int INTEGER_TYPE                  = 22;
-    public static final int NON_POSITIVE_INTEGER_TYPE     = 23;
-    public static final int NEGATIVE_INTEGER_TYPE         = 24;
-    public static final int LONG_TYPE                     = 25;
-    public static final int INT_TYPE                      = 26;
-    public static final int SHORT_TYPE                    = 27;
-    public static final int BYTE_TYPE                     = 28;
-    public static final int NON_NEGATIVE_INTEGER_TYPE     = 29;
-    public static final int UNSIGNED_LONG_TYPE            = 30;
-    public static final int UNSIGNED_INT_TYPE             = 31;
-    public static final int UNSIGNED_SHORT_TYPE           = 32;
-    public static final int UNSIGNED_BYTE_TYPE            = 33;
-    public static final int POSITIVE_INTEGER_TYPE         = 34;
-    public static final int TIME_INSTANT_TYPE             = 35;
-    public static final int TIME_TYPE                     = 36;
-    public static final int TIME_PERIOD_TYPE              = 37;
-    public static final int DATE_TYPE                     = 38;
-    public static final int MONTH_TYPE                    = 39;
-    public static final int YEAR_TYPE                     = 40;
-    public static final int CENTURY_TYPE                  = 41;
-    public static final int RECURRING_DATE_TYPE           = 42;
-    public static final int RECURRING_DAY_TYPE            = 43;
-
+    public static final int NOTATION_TYPE                 = 14;
+    public static final int CDATA_TYPE                    = 15;
+    public static final int LANGUAGE_TYPE                 = 16;
+    public static final int IDREFS_TYPE                   = 17;
+    public static final int ENTITIES_TYPE                 = 18;
+    public static final int NMTOKEN_TYPE                  = 19;
+    public static final int NMTOKENS_TYPE                 = 20;
+    public static final int NAME_TYPE                     = 21;
+    public static final int NCNAME_TYPE                   = 22;
+    public static final int INTEGER_TYPE                  = 23;
+    public static final int NON_POSITIVE_INTEGER_TYPE     = 24;
+    public static final int NEGATIVE_INTEGER_TYPE         = 25;
+    public static final int LONG_TYPE                     = 26;
+    public static final int INT_TYPE                      = 27;
+    public static final int SHORT_TYPE                    = 28;
+    public static final int BYTE_TYPE                     = 29;
+    public static final int NON_NEGATIVE_INTEGER_TYPE     = 30;
+    public static final int UNSIGNED_LONG_TYPE            = 31;
+    public static final int UNSIGNED_INT_TYPE             = 32;
+    public static final int UNSIGNED_SHORT_TYPE           = 33;
+    public static final int UNSIGNED_BYTE_TYPE            = 34;
+    public static final int POSITIVE_INTEGER_TYPE         = 35;
+    public static final int TIME_INSTANT_TYPE             = 36;
+    public static final int TIME_TYPE                     = 37;
+    public static final int TIME_PERIOD_TYPE              = 38;
+    public static final int DATE_TYPE                     = 39;
+    public static final int MONTH_TYPE                    = 40;
+    public static final int YEAR_TYPE                     = 41;
+    public static final int CENTURY_TYPE                  = 42;
+    public static final int RECURRING_DATE_TYPE           = 43;
+    public static final int RECURRING_DAY_TYPE            = 44;
 
     /**
      * The resource location for the built-in types
@@ -170,18 +170,18 @@ public class SimpleTypesFactory
     **/
     static final String RESOURCE_LOCATION =
         "/org/exolab/castor/util/resources/";
-        
+
     /**
      * The resource for the mapping properties
     **/
-    static final String TYPE_MAPPINGS = RESOURCE_LOCATION + 
+    static final String TYPE_MAPPINGS = RESOURCE_LOCATION +
         "SimpleTypesMapping.properties";
 
     /**
      * The resource for the Simple types
     **/
     static final String TYPE_DEFINITIONS = RESOURCE_LOCATION +
-        "SimpleTypes.properties";    
+        "SimpleTypes.properties";
     /**
      * Holds simpletypesfactory.Type instances that record information about
      * xml schema built in types.
@@ -345,23 +345,23 @@ public class SimpleTypesFactory
     private synchronized void loadTypesDefinitions()
     {
         if ( (_typesByName == null) && (_typesByCode == null) ) {
-            
+
             InputStream is = null;
-            
+
 	        try
              {  //Load the mapping file
 		        Mapping mapping= new Mapping(getClass().getClassLoader());
 		        mapping.setLogWriter(getLogWriter());
-		        
+
 		        is = this.getClass().getResourceAsStream(TYPE_MAPPINGS);
 				mapping.loadMapping( new InputSource(is) );
-				
+
                 //unmarshall the list of built in simple types
 		        Unmarshaller unmarshaller= new Unmarshaller(TypeList.class);
 		        unmarshaller.setMapping(mapping);
 		        //-- turn off validation
 		        unmarshaller.setValidation(false);
-		        
+
                 is = this.getClass().getResourceAsStream(TYPE_DEFINITIONS);
 		        TypeList typeList= (TypeList)unmarshaller.unmarshal( new org.xml.sax.InputSource(is) );
 
