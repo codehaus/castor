@@ -258,10 +258,10 @@ design, which is important in larger projects. </p>
 
     <section title="Lazy Loading">
         <p>
-            Lazy loading of collection is also a new to castor 0.9. The following collection types are supported: java.util.Array, java.util.Vector, java.util.Hashtable, java.util.Collection, java.util.Set and java.util.Map. The elements in the collection are only loaded when the application asks for the object from the collection, using, for example, iterator.next(). The iterator in castor’s lazy collection is optimized to return a loaded object first. Lazy loading can be applied to both one-to-many and many-to-many relationship. </p>
+            Lazy loading of collection is also a new to castor 0.9. <!--The following collection types are supported: java.util.Array, java.util.Vector, java.util.Hashtable, java.util.Collection, java.util.Set and java.util.Map. -->Currently only the java.util.Collection type is supported. The elements in the collection are only loaded when the application asks for the object from the collection, using, for example, iterator.next(). The iterator in Castor’s lazy collection is optimized to return a loaded object first. Lazy loading can be applied to both one-to-many and many-to-many relationship. </p>
 
         <p>
-            In mapping file, lazy loading is specified in the element of the collection’s <i>&lt;field></i>, for example, 
+            In the mapping file, lazy loading is specified in the element of the collection’s <i>&lt;field></i>, for example, 
             <pre><![CDATA[
 <mapping>
     <class name="com.xzy.Department">
@@ -270,7 +270,7 @@ design, which is important in larger projects. </p>
                collection="collection"/>
     </class>
 </mapping>]]></pre>
-            declares that the collection of employee in a department is lazy loaded. </p>
+            declares that the collection of type Employee in a Department is lazy loaded. </p>
 
         <p>
             If lazy loading is specified for a field of a class, Castor will set the field with a special collection which contains only the identities of the objects. Because of that, it requires the data object to have the method setDepartment( Collection department ) in the data object class which was not required in previous versions. </p>
