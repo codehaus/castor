@@ -109,6 +109,7 @@ public class ParseTreeWalker implements TokenTypes
    *
    * @param dbEngine The Persistence Engine
    * @param parseTree The parse tree to walk
+   * @param classLoader A ClassLoader instance to load classes.
    * @throws QueryException Thrown by checkErrors.
    */
   public ParseTreeWalker(LockEngine dbEngine, ParseTreeNode parseTree, ClassLoader classLoader )
@@ -186,6 +187,7 @@ public class ParseTreeWalker implements TokenTypes
    * will be used by the QueryResults to follow the path if the object
    * selected is a DEPENDANT_OBJECT or DEPENDANT_OBJECT_VALUE.  Any other
    * projectionTypes do not need this, so null will be returned.
+   * @return Path info for the selected element, null otherwise. 
    */
   public Vector getPathInfo() {
     switch ( _projectionType ) {
@@ -334,6 +336,9 @@ public class ParseTreeWalker implements TokenTypes
   /**
    * Search for the field in the given class descriptor and descriptors of the superclasses,
    * return null if not found.
+   * @param fieldName The field name.
+   * @param clsDesc A JDO class descriptor.
+   * @return JDOFieldDescriptor for the specified field, null if not found.
    */
   private JDOFieldDescriptor getFieldDesc( String fieldName, JDOClassDescriptor clsDesc ) {
     JDOFieldDescriptor field;
@@ -398,7 +403,7 @@ public class ParseTreeWalker implements TokenTypes
    * _projectionType.
    *
    * @param projection The ParseTreeNode containing the projection.
-   * @param firstLevel pass true when calling on the top level of projection
+   * @param topLevel pass true when calling on the top level of projection
    *    in the parse tree.  False when recursing
    * @param onlySimple pass true if you want to throw errors if the
    *    object passed as the ParseTreeNode is not a simple type (use this
@@ -551,6 +556,7 @@ public class ParseTreeWalker implements TokenTypes
    * or (DOT, IDENTIFIER, IDENTIFIER)).  Als creates a Hashtable of paramInfo
    * with type information for query parameters (i.e. $(Class)1 or $1).
    *
+   * @param whereClause WHERE-clause to traverse.
    * @throws QueryException if an error is detected.
    */
   private void checkWhereClause(ParseTreeNode whereClause)
@@ -595,6 +601,7 @@ public class ParseTreeWalker implements TokenTypes
    * Traverses the limit clause sub-tree and checks for errors. Creates
    * a Hashtable of paramInfo with type information for query parameters
    * (i.e. $1).
+   * @param limitClause LIMIT-clause to traverse.
    * @throws QueryException if an error is detected.
    */
   private void checkLimitClause(ParseTreeNode limitClause)
@@ -697,11 +704,11 @@ public class ParseTreeWalker implements TokenTypes
     //get the param info for this numbered param
     ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
     if ( paramInfo == null ) {
-      paramInfo = new ParamInfo(userDefinedType, systemType, desc);
-      _paramInfo.put(paramNumber, paramInfo);
+        paramInfo = new ParamInfo(userDefinedType, systemType, desc, _classLoader);
+        _paramInfo.put(paramNumber, paramInfo);
     }
     else
-      paramInfo.check(userDefinedType, systemType);
+        paramInfo.check(userDefinedType, systemType);
 
   }
 
@@ -773,6 +780,7 @@ public class ParseTreeWalker implements TokenTypes
   /**
    * Traverses the order by clause sub-tree and checks for errors.
    *
+   * @param orderClause ORDER-BY clause to traverse.
    * @throws QueryException if an error is detected.
    */
   private void checkOrderClause(ParseTreeNode orderClause)
@@ -893,8 +901,9 @@ public class ParseTreeWalker implements TokenTypes
    * Builds the alias name for a table from the path info.
    *
    * @param tableName The name of the table to add to the select clause
-   * @param tableAlias The path info vector to build the alias with
-   * @param pathIndex Field index in the path info
+   * @param path The path info vector to build the alias with
+   * @param tableIndex Field index in the path info
+   * @return Alias name for a given table.
    */
   public String buildTableAlias( String tableName, Vector path, int tableIndex )
   {
@@ -945,6 +954,7 @@ public class ParseTreeWalker implements TokenTypes
   /**
    * Adds joins to the queryExpr for path expressions in the OQL.
    *
+   * @param path Path expression to be added to JOIN clause.
    */
   private void addJoinsForPathExpression( Vector path ) {
     if ( path == null )
@@ -1028,10 +1038,9 @@ public class ParseTreeWalker implements TokenTypes
 
 
   /**
-   * Returns a SQL version of an OQL where clause.
+   * Adds a SQL version of an OQL where clause.
    *
    * @param whereClause the parse tree node with the where clause
-   * @return The SQL translation of the where clause.
    */
   private void addWhereClause(ParseTreeNode whereClause) {
     String sqlExpr = getSQLExpr(whereClause.getChild(0));
@@ -1063,10 +1072,9 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
-   * Returns a SQL version of an OQL limit clause.
+   * Adds a SQL version of an OQL limit clause.
    *
    * @param limitClause the parse tree node with the limit clause
-   * @return The SQL translation of the limit clause.
    */
   private void addLimitClause(ParseTreeNode limitClause) {
     String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
