@@ -188,12 +188,12 @@
         <code>
         &lt;!ELEMENT class ( description?, cache-type?, map-to?, field+ )>
         &lt;!ATTLIST class
-                     name            ID       #REQUIRED
-                     extends         IDREF    #IMPLIED
-                     depends         IDREF    #IMPLIED
-                     identity        CDATA    #IMPLIED
-                     access          ( read-only | shared | exclusive | db-locked )  "shared"
-                     key-generator   IDREF    #IMPLIED >
+                  name            ID       #REQUIRED
+                  extends         IDREF    #IMPLIED
+                  depends         IDREF    #IMPLIED
+                  identity        CDATA    #IMPLIED
+                  access          ( read-only | shared | exclusive | db-locked )  "shared"
+                  key-generator   IDREF    #IMPLIED >
         </code>
 
 
