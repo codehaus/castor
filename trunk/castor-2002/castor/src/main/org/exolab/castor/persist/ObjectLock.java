@@ -457,7 +457,7 @@ final class ObjectLock implements DepositBox {
                 } catch ( InterruptedException e ) {
                     throw new LockNotGrantedException("Thread interrupted acquiring lock!");
                 } finally {
-                    _waitCount++;
+                    _waitCount--;
                 }
             } else if ( _readLock != null || _writeLock != null ) {
                 throw new LockNotGrantedException("Lock already exist!");
