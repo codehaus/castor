@@ -96,6 +96,10 @@ public class SourceFactory  {
         cMain = new JClass(cName);
         cMain.addInterface("java.io.Serializable");
         
+        String comment = classInfo.getComment();
+        if (comment != null)
+            cMain.getJDocComment().setComment(comment);
+        
         if (classInfo.isDerived()) {
             ClassInfo sourceInfo = classInfo.getSuperClassInfo();
             cMain.setSuperClass(sourceInfo.getClassName());

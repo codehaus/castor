@@ -102,6 +102,8 @@ public class SGMember {
     
     private short xmlNodeType = ELEMENT;
     
+    private String _comment    = null;
+    
     /**
      * Creates a new SGMember with the given XML Schema type
      * and the given member name
@@ -134,7 +136,9 @@ public class SGMember {
      * for this SGMember
     **/
     public JMember createMember() {
-        return new JMember(type.getJType(), name);
+        JMember jMember = new JMember(type.getJType(), name);
+        if (_comment != null) jMember.setComment(_comment);
+        return jMember;
     } //-- createMember
     
     
@@ -203,7 +207,15 @@ public class SGMember {
     } //-- generateConstructorCode
     
     
-        
+    /**
+     * Returns the comment associated with this Member
+     * @return the comment associated with this Member, or null
+     * if one has not been set.
+    **/
+    public String getComment() {
+        return _comment;
+    } //-- getComment
+    
     /**
      * Returns the name of this SGMember
      * @return the name of this SGMember
@@ -267,6 +279,14 @@ public class SGMember {
     public void setCodeHelper(CodeHelper codeHelper) {
         this.codeHelper = codeHelper;
     } //-- setCodeHelper
+    
+    /**
+     * Sets the comment for this Member
+     * @param comment the comment or description for this Member 
+    **/
+    public void setComment(String comment) {
+        _comment = comment;
+    } //-- setComment
     
     /**
      * Returns the ClassInfo to which this Member was declared,
