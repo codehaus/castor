@@ -139,6 +139,27 @@ public class YearDescriptor
         return _contentDescriptor;
     } // getContentDescriptor
 
+      /**
+     * Returns the XML field descriptor matching the given
+     * xml name and nodeType. If NodeType is null, then
+     * either an AttributeDescriptor, or ElementDescriptor
+     * may be returned. Null is returned if no matching
+     * descriptor is available.
+     *
+     * @param name the xml name to match against
+     * @param nodeType, the NodeType to match against, or null if
+     * the node type is not known.
+     * @return the matching descriptor, or null if no matching
+     * descriptor is available.
+     *
+    **/
+    public XMLFieldDescriptor getFieldDescriptor
+        (String name, NodeType nodeType)
+    {
+        return null;
+
+    } //-- getFieldDescriptor
+
     /**
      * Returns the set of XMLFieldDescriptors for all members
      * that should be marshalled as XML elements.
