@@ -624,10 +624,6 @@ public final class LockEngine {
         boolean    succeed;
 
         // If the object is new, don't try to load it from the cache
-        if ( ( object instanceof TimeStampable ) &&
-                ( ( TimeStampable ) object ).jdoGetTimeStamp() == 0 ) {
-            return null;
-        }
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getJavaClass() );
         if ( typeInfo == null )
@@ -1173,15 +1169,15 @@ public final class LockEngine {
         private synchronized ObjectLock assure( OID oid, TransactionContext tx, boolean write ) 
                 throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
 
-            System.out.print("assure "+(write?"write":"read") +" tx: "+tx);
+            //System.out.print("assure "+(write?"write":"read") +" tx: "+tx);
             ObjectLock entry = (ObjectLock) locks.get( oid );
             if ( entry == null ) 
                 throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
-            System.out.println(" lock: "+entry);
+            //System.out.println(" lock: "+entry);
             if ( !entry.hasLock( tx, write ) )
                 throw new IllegalStateException("Transaction "+tx+" does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
 
-            System.out.println(" entry: "+entry);
+            //System.out.println(" entry: "+entry);
             return entry;
         }
 
