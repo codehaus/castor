@@ -106,6 +106,10 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
     private Hashtable namespaces = null;
 
+    /**
+     * The SchemaUnmarsahller state
+     */
+    private SchemaUnmarshallerState _state = null;
       //----------------/
      //- Constructors -/
     //----------------/
@@ -117,11 +121,21 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         foundSchemaDef = false;
     } //-- SchemaUnmarshaller
 
-    public SchemaUnmarshaller(boolean include)
+     public SchemaUnmarshaller(SchemaUnmarshallerState state)
+           throws SAXException
+    {
+        this(null, null);
+        _state = state;
+        foundSchemaDef = false;
+    } //-- SchemaUnmarshaller
+
+    public SchemaUnmarshaller(boolean include, SchemaUnmarshallerState state)
            throws SAXException
     {
         this();
+        _state = state;
         _include = include;
+        foundSchemaDef = false;
     }
 
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver)
@@ -132,6 +146,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         setResolver(resolver);
         foundSchemaDef = true;
         namespaces = new Hashtable();
+        _state = new SchemaUnmarshallerState();
         init(atts);
     } //-- SchemaUnmarshaller
 
@@ -336,12 +351,12 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
             unmarshaller
-                = new IncludeUnmarshaller(_schema, atts, _resolver, getDocumentLocator());
+                = new IncludeUnmarshaller(_schema, atts, _resolver, getDocumentLocator(), _state);
         }
         //-- <import>
         else if (name == SchemaNames.IMPORT) {
             unmarshaller
-                = new ImportUnmarshaller(_schema, atts, _resolver, getDocumentLocator());
+                = new ImportUnmarshaller(_schema, atts, _resolver, getDocumentLocator(), _state);
         }
         else {
             //-- we should throw a new Exception here
@@ -462,6 +477,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             unmarshaller.characters(ch, start, length);
         }
     } //-- characters
+
 
 } //-- SGDocumentHandler
 
