@@ -178,10 +178,10 @@
         <tr>
           <td valign="top">PostgreSQL</td>
           <td valign="top"><pre><![CDATA[
-  <data-source class-name="org.postgresql.PostgresqlDataSource">
-    <param host="host" database="db"
-           user="user" password="secret" />
-  </data-source>]]></pre></td>
+   <data-source class-name="org.postgresql.PostgresqlDataSource">
+     <params server-name="host" database-name="db"
+             user="user" password="secret" />
+   </data-source>]]></pre></td>
         </tr>
         <tr>
           <td valign="top">InstantDB</td>
