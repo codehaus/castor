@@ -187,9 +187,9 @@ public final class SQLEngine implements Persistence {
         if ( _clsDesc.getExtends() == null ) {
             KeyGeneratorDescriptor keyGenDesc = clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
+                int[] tempType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
-                        _factory, keyGenDesc,
-                        ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType(),
+                        _factory, keyGenDesc, tempType==null? 0: tempType[0],
                         _logInterceptor );
             }
         }
@@ -257,10 +257,10 @@ public final class SQLEngine implements Persistence {
 
         for ( int i=0; i<idDescriptors.length; i++ ) {
             if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
-                String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
-                int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
+                String[] name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
+                int[] type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
                 FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
-                idsInfo.add( new ColumnInfo( name, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
+                idsInfo.add( new ColumnInfo( name==null? null: name[0], type==null? 0: type[0], fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
             } else
                 throw new MappingException("Except JDOFieldDescriptor");
         }
@@ -374,13 +374,15 @@ public final class SQLEngine implements Persistence {
         jdoFields0 = new String[ fields.length + 1 ];
         sqlTypes0 = new int[ fields.length + 1 ];
         // the first field is the identity
+
+        // | need some work here
         count = 1;
         jdoFields0[ 0 ] = _clsDesc.getIdentity().getFieldName();
-        sqlTypes0[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
+        sqlTypes0[ 0 ] = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType()[0];
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ] instanceof JDOFieldDescriptor ) {
-                jdoFields0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLName();
-                sqlTypes0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLType();
+                jdoFields0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLName()[0];
+                sqlTypes0[ count ] = ((JDOFieldDescriptor) fields[ i ]).getSQLType()[0];
                 ++count;
             }
         }
@@ -1269,19 +1271,19 @@ public final class SQLEngine implements Persistence {
                 FieldDescriptor[] relids = ((JDOClassDescriptor)related).getIdentities();
                 String[] names = null;
                 if ( fieldDesc instanceof JDOFieldDescriptor )
-                    names = breakApart( ((JDOFieldDescriptor)fieldDesc).getSQLName(), ' ' );
+                    names = ((JDOFieldDescriptor)fieldDesc).getSQLName();
                 String[] relnames = new String[relids.length];
                 for ( int i=0; i<relids.length; i++ ) {
-                    relnames[i] = ((JDOFieldDescriptor)relids[i]).getSQLName();
+                    relnames[i] = ((JDOFieldDescriptor)relids[i]).getSQLName()[0];
                     if ( relnames[i] == null )
                         throw new MappingException("Related class identities field does not contains sql information!");
                 }
                 String[] joins = null;
                 if ( fieldDesc instanceof JDOFieldDescriptor ) 
-                    joins = breakApart( ((JDOFieldDescriptor)fieldDesc).getManyKey(), ' ' );
+                    joins = ((JDOFieldDescriptor)fieldDesc).getManyKey();
                 String[] classnames = new String[classids.length];
                 for ( int i=0; i<classids.length; i++ ) {
-                    classnames[i] = ((JDOFieldDescriptor)classids[i]).getSQLName();
+                    classnames[i] = ((JDOFieldDescriptor)classids[i]).getSQLName()[0];
                     if ( classnames[i] == null )
                         throw new MappingException("Related class identities field does not contains sql information!");
                 }
@@ -1338,7 +1340,7 @@ public final class SQLEngine implements Persistence {
 
                     JDOFieldDescriptor relId = (JDOFieldDescriptor)relids[i];
                     FieldHandlerImpl fh = (FieldHandlerImpl) relId.getHandler();
-                    columns[i] = new ColumnInfo( names[i], relId.getSQLType(), 
+                    columns[i] = new ColumnInfo( names[i], relId.getSQLType()[0], 
                             fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ); 
                 }
             } else {
@@ -1354,8 +1356,8 @@ public final class SQLEngine implements Persistence {
 
                 FieldHandlerImpl fh = (FieldHandlerImpl) fieldDesc.getHandler();
                 this.columns = new ColumnInfo[1];
-                this.columns[0] = new ColumnInfo( ((JDOFieldDescriptor)fieldDesc).getSQLName(), 
-                        ((JDOFieldDescriptor)fieldDesc).getSQLType(), fh.getConvertTo(),
+                this.columns[0] = new ColumnInfo( ((JDOFieldDescriptor)fieldDesc).getSQLName()[0], 
+                        ((JDOFieldDescriptor)fieldDesc).getSQLType()[0], fh.getConvertTo(),
                         fh.getConvertFrom(), fh.getConvertParam() );
             }
         }
@@ -1430,7 +1432,7 @@ public final class SQLEngine implements Persistence {
             _types = types;
             _values = new Object[ _types.length ];
             _sql = sql;
-            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType();
+            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType()[0];
         }
 
 

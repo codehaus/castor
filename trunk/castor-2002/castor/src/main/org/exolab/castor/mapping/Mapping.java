@@ -468,6 +468,8 @@ public class Mapping
             unm.setIDResolver(_idResolver);
             
             loaded = (MappingRoot) unm.unmarshal( source );
+
+
             // gather "class" tags
             enum = loaded.enumerateClassMapping();
             while ( enum.hasMoreElements() )

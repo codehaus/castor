@@ -40,7 +40,7 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id: LockEngine.java,
+ * $Id$
  */
 
 
@@ -63,17 +63,11 @@ import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.JDOClassDescriptor;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
-import org.exolab.castor.persist.KeyGeneratorFactoryRegistry;
-import org.exolab.castor.persist.spi.KeyGenerator;
-import org.exolab.castor.persist.spi.KeyGeneratorFactory;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -821,9 +815,7 @@ public final class LockEngine {
         } catch ( LockNotGrantedException e ) {
             throw new IllegalStateException("Write Lock expected!");
         } catch ( PersistenceException except ) {
-            except.printStackTrace();   // | to be deleted
             typeInfo.delete( oid, tx );
-            //throw except;
         }
     }
 

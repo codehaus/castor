@@ -796,7 +796,7 @@ public class ParseTreeWalker implements TokenTypes
       throw new IllegalStateException( "path = null !" );
 
     JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
-    String identityColumn = identity.getSQLName();
+    String identityColumn = identity.getSQLName()[0];
 
     JDOClassDescriptor clsDesc = _clsDesc;
     JDOFieldDescriptor fieldDesc = null;
@@ -819,7 +819,7 @@ public class ParseTreeWalker implements TokenTypes
           _queryExpr.addInnerJoin( _clsDesc.getTableName(), 
                                    identityColumn,
                                    fieldDesc.getManyTable(), 
-                                   fieldDesc.getManyKey() );
+                                   fieldDesc.getManyKey()[0] );
         
     }
   }
@@ -1028,7 +1028,7 @@ public class ParseTreeWalker implements TokenTypes
       }
                   
           return _queryExpr.encodeColumn( clsDesc.getTableName(), 
-                      field.getSQLName() );
+                      field.getSQLName()[0] );
         }
 
       //parameters
