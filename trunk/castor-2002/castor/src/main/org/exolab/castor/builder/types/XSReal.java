@@ -46,7 +46,11 @@
 package org.exolab.castor.builder.types;
 
 import org.exolab.castor.xml.schema.SimpleType;
+import org.exolab.castor.xml.schema.Facet;
+
 import org.exolab.javasource.*;
+
+import java.util.Enumeration;
 
 /**
  * The XML Schema Real type
@@ -208,7 +212,35 @@ public final class XSReal extends XSType {
     public void setMinInclusive(Double min) {
         minInclusive = min;
     } //-- setMinInclusive
-    public void setFacets(SimpleType simpleType) {}
+
+    /**
+     * Reads and sets the facets for XSReal
+     * @param simpleType the SimpleType containing the facets
+     */
+    public void setFacets(SimpleType simpleType) {
+
+        //-- copy valid facets
+        Enumeration enum = getFacets(simpleType);
+        while (enum.hasMoreElements()) {
+
+            Facet facet = (Facet)enum.nextElement();
+            String name = facet.getName();
+
+            //-- maxExclusive
+            if (Facet.MAX_EXCLUSIVE.equals(name))
+                setMaxExclusive(facet.toDouble());
+            //-- maxInclusive
+            else if (Facet.MAX_INCLUSIVE.equals(name))
+                setMaxInclusive(facet.toDouble());
+            //-- minExclusive
+            else if (Facet.MIN_EXCLUSIVE.equals(name))
+                setMinExclusive(facet.toDouble());
+            //-- minInclusive
+            else if (Facet.MIN_INCLUSIVE.equals(name))
+                setMinInclusive(facet.toDouble());
+        }
+    }
+
     /**
      * Returns the String necessary to convert an instance of this XSType
      * to an Object. This method is really only useful for primitive types
