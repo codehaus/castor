@@ -1696,7 +1696,7 @@ public final class SQLEngine implements Persistence {
          }
 
          /**
-          * Uses the underlying db's cursors to most to the last row in the
+          * Uses the underlying db's cursors to move to the last row in the
           * result set, get the row number via getRow(), then move back to
           * where ever the user was positioned in the resultset.
           */
