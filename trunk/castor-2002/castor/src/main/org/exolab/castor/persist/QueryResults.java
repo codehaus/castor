@@ -215,6 +215,25 @@ public final class QueryResults
         if ( _lastIdentity == null )
             throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
 
+        handler = _engine.getClassHandler( _query.getResultType() );
+
+        // load the object thur the transaction of the query
+        object = _tx.load( _engine, handler, _lastIdentity, _accessMode );
+
+        return object;
+
+        /*
+        TransactionContext.ObjectEntry entry;
+        OID              oid;
+        ClassHandler     handler;
+        Object           object;
+        
+        // Make sure transaction is still open.
+        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
+            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
+        if ( _lastIdentity == null )
+            throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
+
         synchronized ( _tx ) {
             // Get the next OID from the query engine. The object is
             // already loaded into the persistence engine at this point and
@@ -298,7 +317,7 @@ public final class QueryResults
                 }
                 return object;
             }
-        }
+        }*/
     }
 
 
