@@ -307,14 +307,9 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     public void endElement(String name)
            throws SAXException
     {
-
-        String prefix = "";
-        String namespaceURI = null;
-        int idx = name.indexOf(':');
-        if (idx >= 0) {
-             prefix = name.substring(0,idx);
-        }
-        namespaceURI = _context.getNamespaceURI(prefix);
+		int idx = name.indexOf(':');
+		String prefix = (idx >= 0) ? name.substring(0,idx) : "";
+		String namespaceURI = _context.getNamespaceURI(prefix);
         endElement(namespaceURI,getLocalPart(name), name);
         _context = _context.getParent();
     }
