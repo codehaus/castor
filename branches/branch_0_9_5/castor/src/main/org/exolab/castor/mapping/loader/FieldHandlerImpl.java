@@ -685,7 +685,7 @@ public final class FieldHandlerImpl
         if (_fieldType.isInterface() && _createMethod == null)
             return null;
             
-        if ( _immutable )
+        if (( _immutable ) && ((args == null) || (args.length == 0)))
             throw new IllegalStateException( Messages.format( "mapping.classNotConstructable", _fieldType ) );
         if ( _handler != null ) {
             if (_handler instanceof ExtendedFieldHandler)
