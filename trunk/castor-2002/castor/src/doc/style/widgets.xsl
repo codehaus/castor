@@ -118,7 +118,18 @@
       <xsl:variable name="type" select="@name"/>
       <p><b><xsl:value-of select="@name"/></b></p>
       <p><xsl:value-of select="."/></p>
-      <table cellpadding="4" cellspacing="2">
+      <table cellpadding="4" cellspacing="2" width="90%">
+        <tr>
+          <td bgcolor="{$color-epsilon}">
+            <b>Name</b>
+          </td>
+          <td bgcolor="{$color-epsilon}">
+            <b>Contribution</b>
+          </td>
+          <td bgcolor="{$color-epsilon}">
+            <b>Company</b>
+          </td>
+        </tr>
         <xsl:for-each select="../contributor[@type=$type]">
            <tr>
              <td bgcolor="{$color-epsilon}">
@@ -131,6 +142,7 @@
                <xsl:variable name="company-id" select="company/@id"/>
                <xsl:variable name="company" select="../company[@id=$company-id]"/>
                <a href="http://{$company/url}"><xsl:value-of select="$company/name"/></a>
+               &#xA0;
              </td>
            </tr>
         </xsl:for-each>

@@ -43,23 +43,18 @@
 
     <section title="About the Castor Project">
 
+
       <p>The Castor project has been developed out of need: the need to get stuff done
          and the need to write useful code. It has been designed and coded over many cups
          of Latte and tall Americano, as proof that coffe beans do come in handy.</p>
 
-      <p>Contributors (listed alphabetically by surname):
-        <ul>
-          <li>Nitz, Oleg <email>on@ibis.odessa.ua</email></li>
-          <li>Liebner, Stefan <email>MailLiebner@gmx.ne</email></li>
-          <li>Thelan, Frank <email>frank.thelen@poet.de</email></li>
-          <li>Sundaranatha, Venkatakrishnan  <email>ssvk@msn.com</email></li>
-        </ul>
-      </p>
+      <p>For <a href="contributors.xml">a full list of contributors</a>.</p>
 
-      <p>Most of the code released through the Castor Project has been developed by Keith Visco,
-         Chief XML Architect, Exoffice Technologies, Inc. &lt;<email>visco@exoffice.com</email>&gt;
-         and Assaf Arkin, CTO &lt;<email>arkin@exoffice.com</email>&gt;. Contributors are welcome
-         to join this project. Please join us on the <a href="lists.xml">mailing list</a>.</p>
+      <p>Most of the code released through the Castor Project has been developed by
+         <a href="mailto:kvisco@exoffice.com">Keith Visco</a>, Chief XML Architect, Exoffice
+         Technologies, Inc. and <a href="mailto:arkin@exoffice.com">Assaf Arkin</a>.
+         Contributors are welcome to join this project. Please join us on the
+         <a href="lists.xml">mailing list</a>.</p>
     </section>
 
   </body>
