@@ -52,6 +52,7 @@ import java.util.Hashtable;
 
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.xml.schema.*;
+import org.exolab.castor.xml.schema.simpletypes.ListType;
 
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
@@ -1081,6 +1082,37 @@ public class SchemaWriter {
         }
         else if (simpleType instanceof Union) {
             processUnion((Union)simpleType, schemaPrefix);
+        }
+        //-- handle List
+        else {
+            
+            String ELEM_LIST = schemaPrefix + SchemaNames.LIST;
+
+            _atts.clear();
+
+            SimpleType itemType = ((ListType)simpleType).getItemType();
+            
+            boolean topLevel = (itemType.getParent() == itemType.getSchema());
+            if (itemType.isBuiltInType() || topLevel) {
+                String typeName = itemType.getName();
+                //-- add "xsd" prefix if necessary
+                if ((typeName.indexOf(':') < 0) && itemType.isBuiltInType()) {
+                    typeName = schemaPrefix + typeName;
+                }
+                _atts.addAttribute("itemType", CDATA, typeName);
+            }
+            _handler.startElement(ELEM_LIST, _atts);
+            
+            //-- processAnnotations
+            Annotation ann = ((ListType)simpleType).getLocalAnnotation();
+            if (ann != null) {
+                processAnnotation(ann, schemaPrefix);
+            }
+            //-- process simpleType if necessary
+            if ((! topLevel) && (! itemType.isBuiltInType())) {
+                processSimpleType(itemType, schemaPrefix);
+            }
+            _handler.endElement(ELEM_LIST);
         }
 
         _handler.endElement(ELEMENT_NAME);
