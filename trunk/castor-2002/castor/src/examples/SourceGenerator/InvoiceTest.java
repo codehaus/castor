@@ -80,7 +80,7 @@ public class InvoiceTest implements PropertyChangeListener {
 	    System.out.println("Unmarshalling Invoice");
 
 	    Invoice invoice = null;
-	    invoice = Invoice.unmarshal(new FileReader("c:\\travail\\intalio\\tests\\castortest\\sourcegenerator\\invoice1.xml"));
+	    invoice = Invoice.unmarshal(new FileReader("invoice1.xml"));
 
 
 	    System.out.println();
