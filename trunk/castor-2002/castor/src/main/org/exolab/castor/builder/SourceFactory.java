@@ -303,7 +303,7 @@ public class SourceFactory  {
             SimpleType simpleType = (SimpleType)type;
             classInfo.setSchemaType(TypeConversion.convertType(simpleType));
             //-- handle our special case for enumerated types
-            if (simpleType.hasFacet(Facet.ENUMERATION)) 
+            if (simpleType.hasFacet(Facet.ENUMERATION))
 			{
 				//-- Don't create source code for simple types that
 				//-- don't belong in the elements target namespace
@@ -580,7 +580,7 @@ public class SourceFactory  {
 
         String className   = JavaNaming.toJavaClassName(typeName);
         String packageName = sgState.packageName;
-		
+
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
             //-- XXXX Fix packageName...this is a hack I know,
@@ -728,8 +728,10 @@ public class SourceFactory  {
             //-- create main group class
             String fname = groupName + "Item";
             fname  = JavaNaming.toJavaMemberName(fname, false);
-            FieldInfo fInfo = infoFactory.createCollection(new XSClass(jClass),
-                                                           "_items", fname);
+
+            //A choice Item can occur only once in the nested group
+            FieldInfo fInfo = infoFactory.createFieldInfo(new XSClass(jClass),
+                                                           fname);
             fInfo.setContainer(true);
             className = className.substring(0,className.length()-4);
 
