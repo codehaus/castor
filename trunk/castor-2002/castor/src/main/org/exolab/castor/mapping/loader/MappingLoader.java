@@ -87,7 +87,7 @@ public abstract class MappingLoader
      * The suffix for the name of a compiled class.
      */
     private static final String CompiledSuffix = "Descriptor";
-    
+
     /**
      * The prefix for the "add" method
     **/
@@ -265,7 +265,7 @@ public abstract class MappingLoader
         }
     }
 
-    
+
     /**
      * Creates a new descriptor. The class mapping information is used
      * to create a new stock {@link ClassDescriptor}. Implementations may
@@ -318,9 +318,9 @@ public abstract class MappingLoader
         } else
             extend = null;
 
-        
+
         // If this class depends another class, need to obtain the depended class
-        if ( clsMap.getDepends() != null ) {            
+        if ( clsMap.getDepends() != null ) {
             try {
                 depend = getDescriptor( resolveType( ( (ClassMapping)  clsMap.getDepends() ).getName() ) );
                 if ( depend == null )
@@ -365,14 +365,15 @@ public abstract class MappingLoader
                                                 javaClass.getName() );
             }
         }
-        
+
         // Obtain the identity field from one of the above fields.
         // The identity field is removed from the list of fields.
         identities = null;
         boolean idfield = false;
         if ( clsMap.getIdentity() != null ) {
             //System.out.println("getId....");
-            String[] ids = breakApart( clsMap.getIdentity(), ' ' );
+            String[] ids = clsMap.getIdentity();
+            //breakApart( clsMap.getIdentity(), ' ' );
             newFields = new FieldDescriptor[fields.length - ids.length];
             //System.out.println("field.length: "+fields.length+" id.length: "+ids.length);
             identities = new FieldDescriptor[ids.length];
@@ -403,16 +404,17 @@ public abstract class MappingLoader
             }
             fields = newFields;
 
-            if ( identities == null || identities[0] == null )
+            if ( identities == null || (identities.length == 0) )
                 throw new MappingException( "mapping.identityMissing", clsMap.getIdentity(),
                                             javaClass.getName() );
         }
 
-        
+
 
         // Create the class descriptor.
+        String hack = (clsMap.getAccess() == null)?"shared":clsMap.getAccess().toString();
         clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
-                                           AccessMode.getAccessMode( clsMap.getAccess().toString() ) );
+                                           AccessMode.getAccessMode(hack) );
 
         ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
         return clsDesc;
@@ -420,7 +422,7 @@ public abstract class MappingLoader
 
     // expect a string which seperated by normalized delimitator
     private String[] breakApart( String strings, char delimit ) {
-        if ( strings == null ) 
+        if ( strings == null )
             return new String[0];
         Vector v = new Vector();
         int start = 0;
@@ -434,7 +436,7 @@ public abstract class MappingLoader
                     start = count;
                     continue;
                 }
-            } 
+            }
             count++;
         }
         if ( start < (count - 1) ) {
@@ -462,11 +464,11 @@ public abstract class MappingLoader
     protected FieldDescriptor[] createFieldDescs( Class javaClass, FieldMapping[] fieldMaps )
             throws MappingException {
         FieldDescriptor[] fields;
-        
+
         if ( fieldMaps == null || fieldMaps.length == 0 )
             return new FieldDescriptor[ 0 ];
         fields = new FieldDescriptor[ fieldMaps.length ];
-        for ( int i = 0 ; i < fieldMaps.length ; ++i ) 
+        for ( int i = 0 ; i < fieldMaps.length ; ++i )
             fields[ i ] = createFieldDesc( javaClass, fieldMaps[ i ] );
         return fields;
     }
@@ -494,8 +496,8 @@ public abstract class MappingLoader
         return new ContainerFieldDesc( fieldMap.getName(), fieldType, handler, fields );
     }
     */
-    
-    
+
+
     /**
      * Creates a single field descriptor. The field mapping is used to
      * create a new stock {@link FieldDescriptor}. Implementations may
@@ -524,7 +526,7 @@ public abstract class MappingLoader
 
 
         // If the field type is supplied, grab it and use it to locate the
-        // field/accessor. 
+        // field/accessor.
         if ( fieldMap.getType() != null ) {
             try {
                 fieldType = resolveType( fieldMap.getType() );
@@ -549,8 +551,8 @@ public abstract class MappingLoader
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getDirect() ) {
             // No accessor, map field directly.
-            Field field; 
-            
+            Field field;
+
             field = findField( javaClass, fieldName, ( colType == null ? fieldType : colType ) );
             if ( field == null )
                 throw new MappingException( "mapping.fieldNotAccessible", fieldName, javaClass.getName() );
@@ -566,7 +568,7 @@ public abstract class MappingLoader
                 Vector setSeq = new Vector();
                 String methodName;
                 Method method;
-                
+
                 if ( fieldName == null )
                     throw new MappingException( "mapping.missingFieldName", javaClass.getName() );
 
@@ -575,7 +577,7 @@ public abstract class MappingLoader
                         Class last;
 
                         point = fieldName.indexOf( '.' );
-                        if ( point < 0 ) 
+                        if ( point < 0 )
                             break;
                         last = javaClass;
                         // getter
@@ -651,14 +653,14 @@ public abstract class MappingLoader
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
-                    
+
                     String methodName = fieldMap.getSetMethod();
                     Class type = fieldType;
                     if (colType != null) {
                         if (!methodName.startsWith(ADD_METHOD_PREFIX))
                             type = colType;
                     }
-                    
+
                     setMethod = findAccessor( javaClass, fieldMap.getSetMethod(),
                                               type , false );
                     if ( setMethod == null )
@@ -669,9 +671,9 @@ public abstract class MappingLoader
                         fieldType = setMethod.getParameterTypes()[ 0 ];
                 }
             }
-            
+
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
-            
+
             fieldName = fieldMap.getName(); // Not the same for nested fields
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
@@ -718,12 +720,12 @@ public abstract class MappingLoader
                 handler.setHasDeleteMethod( hasMethod, deleteMethod );
             } catch ( Exception except ) { }
         }
-        
+
         FieldDescriptorImpl fieldDesc =
             new FieldDescriptorImpl( fieldName, typeInfo, handler, fieldMap.getTransient() );
-        
+
         fieldDesc.setRequired(fieldMap.getRequired());
-        
+
         return fieldDesc;
     }
 
@@ -751,7 +753,7 @@ public abstract class MappingLoader
         throws MappingException
     {
         Field field;
-        
+
         try {
             // Look up the field based on its name, make sure it's only modifier
             // is public. If a type was specified, match the field type.
@@ -793,7 +795,7 @@ public abstract class MappingLoader
         Class[] parameterTypes;
         Class fieldTypeFromPrimitive;
         int      i;
-        
+
         try {
             if ( getMethod ) {
                 // Get method: look for the named method or prepend get to the
@@ -823,7 +825,7 @@ public abstract class MappingLoader
                         } catch ( Exception except2 ) {
                         }
                     }
-                } 
+                }
                 if ( null == method ) {
                     methods = javaClass.getMethods();
                     method = null;
@@ -831,7 +833,7 @@ public abstract class MappingLoader
                         if ( methods[ i ].getName().equals( methodName ) ) {
                             parameterTypes = methods[ i ].getParameterTypes();
                             if (( parameterTypes.length == 1 ) &&
-                                (( fieldType == null ) || 
+                                (( fieldType == null ) ||
                                  Types.typeFromPrimitive( parameterTypes[0] ).isAssignableFrom( fieldTypeFromPrimitive ) )) {
                                 method = methods[ i ];
                                 break;
@@ -845,7 +847,7 @@ public abstract class MappingLoader
             // Make sure method is not abstract/static.
             // (note: Class.getMethod() returns only public methods).
             if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
-                 ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
                 throw new MappingException( "mapping.accessorNotAccessible",
                                             methodName, javaClass.getName() );
             return method;
