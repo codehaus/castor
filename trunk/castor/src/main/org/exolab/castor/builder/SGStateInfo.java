@@ -50,6 +50,7 @@ import org.exolab.castor.builder.binding.XMLBindingComponent;
 import org.exolab.castor.builder.util.ClassInfoResolverImpl;
 import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.builder.util.Dialog;
+import org.exolab.castor.xml.schema.Annotated;
 import org.exolab.castor.xml.schema.Schema;
 
 import org.exolab.javasource.*;
@@ -96,6 +97,8 @@ class SGStateInfo extends ClassInfoResolverImpl {
     
     private int _status = NORMAL_STATUS;
     
+    private Hashtable _sources = null;
+    
     
 //    private XMLBindingComponent _bindingComponent = null;
 
@@ -112,9 +115,21 @@ class SGStateInfo extends ClassInfoResolverImpl {
         _classTypes    = new Hashtable();
         _processed     = new Vector();
         _dialog        = new ConsoleDialog();
+        _sources       = new Hashtable();
         _sgen          = sgen;
     } //-- SGStateInfo
-
+    
+    /**
+     * Binds the given Annotated structure with it's
+     * generated source classes
+     *
+     * @param annotated the Annotated structure to add JClass bindings for
+     * @param classes the JClass[] to bind 
+     */
+    public void bindSourceCode(Annotated annotated, JClass[] classes) {
+        _sources.put(annotated, classes);
+    } //-- bindSourceCode
+       
     /**
      * Returns the processed JClass with the given name. If
      * no such JClass has been marked as processed, 
@@ -132,6 +147,17 @@ class SGStateInfo extends ClassInfoResolverImpl {
         return null;
     } //-- getProcessed
 
+    /**
+     * Returns the array of JClass for the given Annotated structure
+     * or null if no bindings have been specified for the given
+     * Structure.
+     * 
+     * @return the JClass array
+     */
+    public JClass[] getSourceCode(Annotated annotated) {
+        return (JClass[])_sources.get(annotated);
+    } //-- getSourceCode
+    
     /**
      * Returns the current status
      *
