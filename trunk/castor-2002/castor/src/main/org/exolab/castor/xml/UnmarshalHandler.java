@@ -298,10 +298,7 @@ public class UnmarshalHandler implements DocumentHandler {
                     state.object = decoder.getByteArray();
                 }
             }
-            else {
-                if (str == null) state.object = null;
-                else state.object = MarshalHelper.toPrimitiveObject(type,str);
-            }
+            else state.object = MarshalHelper.toPrimitiveObject(type,str);
         }
                
         //-- check for character content

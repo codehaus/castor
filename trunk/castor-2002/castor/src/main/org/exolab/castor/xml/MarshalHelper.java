@@ -399,36 +399,66 @@ public class MarshalHelper {
         
         //-- I tried to order these in the order in which
         //-- (I think) types are used more frequently
+        
+        boolean isNull = ((value == null) || (value.length() == 0));
+        
         // int
         if ((type == Integer.TYPE) || (type == Integer.class)) {
-            primitive = new Integer(value);
+            if (isNull)
+                primitive = new Integer(0);
+            else
+                primitive = new Integer(value);
         }
         // boolean
-        else if ((type == Boolean.TYPE) || (type == Boolean.class))
-            primitive = new Boolean(value);
+        else if ((type == Boolean.TYPE) || (type == Boolean.class)) {
+            if (isNull)
+                primitive = new Boolean(false);
+            else
+                primitive = new Boolean(value);
+        }
         // double
-        else if ((type == Double.TYPE) || (type == Double.class))
-            primitive = new Double(value);
+        else if ((type == Double.TYPE) || (type == Double.class)) {
+            if (isNull)
+                primitive = new Double(0.0);
+            else
+                primitive = new Double(value);
+        }
         // long
-        else if ((type == Long.TYPE) || (type == Long.class))
-            primitive = new Long(value);
+        else if ((type == Long.TYPE) || (type == Long.class)) {
+            if (isNull)
+                primitive = new Long(0);
+            else
+                primitive = new Long(value);
+        }
         // char
         else if (type == Character.TYPE) {
-            if (value.length() > 0)
+            if (!isNull)
                 primitive = new Character(value.charAt(0));
             else 
                 primitive = new Character('\0');
         }
         // short
-        else if ((type == Short.TYPE) || (type == Short.class))
-            primitive = new Short(value);
+        else if ((type == Short.TYPE) || (type == Short.class)) {
+            if (isNull)
+                primitive = new Short((short)0);
+            else 
+                primitive = new Short(value);
+        }
         // float
-        else if ((type == Float.TYPE) || (type == Float.class))
-            primitive = new Float(value);
+        else if ((type == Float.TYPE) || (type == Float.class)) {
+            if (isNull)
+                primitive = new Float((float)0);
+            else
+                primitive = new Float(value);
+        }
         // byte
-        else if (type == Byte.TYPE)
-            primitive = new Byte(value);
-        // do nothing
+        else if (type == Byte.TYPE) {
+            if (isNull)
+                primitive = new Byte((byte)0);
+            else
+                primitive = new Byte(value);
+        }
+        // otherwise do nothing
         else 
             primitive = value;
         
