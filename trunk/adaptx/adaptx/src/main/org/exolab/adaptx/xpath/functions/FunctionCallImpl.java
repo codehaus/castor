@@ -23,6 +23,7 @@
 package org.exolab.adaptx.xpath.functions;
 
 
+import org.exolab.adaptx.xpath.Parameters;
 import org.exolab.adaptx.xpath.XPathNode;
 import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.xpath.XPathContext;
@@ -39,7 +40,7 @@ import org.exolab.adaptx.xpath.expressions.PrimaryExpr;
  * @version $Revision$
  */
 public abstract class FunctionCallImpl
-    extends FunctionCall 
+    extends FunctionCall implements Parameters
 {
     
     public static final String INVALID_NUMBER_PARAMS = 
