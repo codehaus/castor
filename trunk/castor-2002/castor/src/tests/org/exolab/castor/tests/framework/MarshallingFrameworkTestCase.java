@@ -142,8 +142,13 @@ public class MarshallingFrameworkTestCase extends XMLTestCase {
         if (_inputName != null)
             _input  = _jarTest.getClassLoader().getResourceAsStream(_inputName);
 
+        assert("An input file is specified by can't be found", (_inputName == null) || (_input != null));
+
         if (_outputName != null)
             _output = _jarTest.getClassLoader().getResourceAsStream(_outputName);
+
+        assert("An output file is specified by can't be found", (_outputName == null) || (_output != null));
+
 
         RootObject rootType = _marshallingConf.getRootObject();
         _rootClassName = rootType.getContent();
