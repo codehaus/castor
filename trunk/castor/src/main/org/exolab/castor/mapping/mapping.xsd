@@ -170,6 +170,7 @@
 
       <xsd:sequence>
          <xsd:element ref="class" minOccurs="0" maxOccurs="1"/>
+         <xsd:element name="property" type="propertyType" minOccurs="0" maxOccurs="unbounded"/>
       </xsd:sequence>
 
       <!--
@@ -254,6 +255,7 @@
   </xsd:element>
 
 
+
   <xsd:element name="ldap">
     <xsd:complexType>
       <xsd:attribute name="name" type="xsd:NMTOKEN" use="optional"/>
@@ -292,5 +294,14 @@
       <xsd:attribute name="value" type="xsd:string"  use="required"/>
     </xsd:complexType>
   </xsd:element>
+
+
+  <xsd:complexType name="propertyType">
+    <xsd:sequence>
+      <xsd:element name="name"  type="xsd:string"/>
+      <xsd:element name="value" type="xsd:string"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
 
 </xsd:schema>
