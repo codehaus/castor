@@ -50,7 +50,6 @@ package org.exolab.castor.tools;
 //-- Castor Imports
 import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.MappingLoader;
@@ -62,11 +61,9 @@ import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.Marshaller;
-import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Introspector;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.XMLClassDescriptor;
@@ -82,16 +79,15 @@ import java.util.Enumeration;
 import java.util.Properties;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 
 /**
  * A tool which uses the introspector to automatically
  * create mappings for a given set of classes.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class MappingTool
 {
     
@@ -307,10 +303,10 @@ public class MappingTool
             }
             else {
                 xmlClass = _resolver.resolve( cls );
-                introspected = _introspector.introspected(xmlClass);
+                introspected = Introspector.introspected(xmlClass);
             }
         } 
-        catch ( MarshalException except ) {
+        catch ( Exception except ) {
             throw new MappingException( except );
         }
         classMap = new ClassMapping();
