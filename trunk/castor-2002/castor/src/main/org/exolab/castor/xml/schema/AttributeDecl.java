@@ -57,6 +57,8 @@ import java.util.Vector;
 **/
 public class AttributeDecl extends Annotated {
 
+    private static final short FIXED   = 1; // #b01
+    private static final short DEFAULT = 2; // #b10
     
     /**
      * Error message for a null argument
@@ -82,8 +84,9 @@ public class AttributeDecl extends Annotated {
     **/
     private Schema schema = null;
     
+    private String value = null;
     
-    private String _default = null;
+    private short useFlag = FIXED;
     
     /**
      * Creates a default Attribute declaration.
@@ -142,9 +145,12 @@ public class AttributeDecl extends Annotated {
      * Returns the default value, or null if none was defined
      * @return the default value, or null if none was defined
     **/
-    public String getDefault() {
-        return _default;
-    } //-- getDefault
+    public String getDefaultValue() {
+        if (useFlag == DEFAULT) {
+            return value;
+        }
+        return null;
+    } //-- getDefaultValue
     
     /**
      * Returns the maximum occurance that attributes defined by this
@@ -179,6 +185,30 @@ public class AttributeDecl extends Annotated {
         return (minOccurs == 1);
     } //-- getRequired
     
+    
+    /**
+     * Returns the fixed value of which attributes of this type must 
+     * lexically match, or null if no fixed value has been specified.
+     * @return the fixed value for this attribute declaration.
+    **/
+    public String getFixedValue() {
+        
+        if (useFlag == FIXED) {
+            return value;
+        }
+        return null;
+        
+    } //-- getFixedValue
+    
+    /**
+     * Returns true if this attribute declaration has a fixed value
+     * of which attributes of this type must lexically match.
+     * @return true if this attribute declaration has a fixed value.
+    **/
+    public boolean hasFixedValue() {
+        return ((value != null) && (useFlag == FIXED));
+    } //-- hasFixedValue
+    
     public void setDatatypeRef(String name) {
         this.typeRef = name;
     } //-- setDataTypeRef
@@ -189,9 +219,15 @@ public class AttributeDecl extends Annotated {
      *
      * @param value the default value
     **/
-    public void setDefault(String value) {
-        this._default = value;
+    public void setDefaultValue(String value) {
+        this.value = value;
+        if (value != null) this.useFlag = DEFAULT;
     } //-- setDefault
+    
+    public void setFixedValue(String value) {
+        this.value = value;
+        if (value != null) this.useFlag = FIXED;
+    } //-- setFixed
     
     /**
      * Sets the minimum occurance that attributes defined by this
@@ -216,6 +252,7 @@ public class AttributeDecl extends Annotated {
         this.name = name;
     } //-- setName
 
+    
     //-------------------------------/
     //- Implementation of Structure -/
     //-------------------------------/
