@@ -241,6 +241,9 @@ public class ParseTreeWalker implements TokenTypes
         case KEYWORD_LIMIT:
           checkLimitClause( _parseTree.getChild(curChild) );
           break;
+        case KEYWORD_OFFSET:
+            checkOffsetClause( _parseTree.getChild(curChild) );
+            break;
       }
     }
   }
@@ -357,8 +360,8 @@ public class ParseTreeWalker implements TokenTypes
    * Returns new Object[2] {fieldDesc, classDesc}, where classDesc is a descriptor of the class where
    * the field was found.
    * Also adds inner joins to the QueryExpression.
-   * @param tableAlias The path info vector to build the alias with
-   * @param pathIndex Field index in the path info
+   * @param path The path info vector to build the alias with
+   * @param tableIndex Field index in the path info
    */
   private Object[] getFieldAndClassDesc(String fieldName, JDOClassDescriptor clsDesc, QueryExpression expr,
                                         Vector path, int tableIndex) {
@@ -620,6 +623,29 @@ public class ParseTreeWalker implements TokenTypes
     }
   }
 
+  /**
+   * Traverses the offset clause sub-tree and checks for errors. Creates
+   * a Hashtable of paramInfo with type information for query parameters
+   * (i.e. $1).
+   * @param offsetClause OFFSET-clause to traverse.
+   * @throws QueryException if an error is detected.
+   */
+  private void checkOffsetClause(ParseTreeNode offsetClause)
+        throws QueryException {
+
+    int tokenType = offsetClause.getToken().getTokenType();
+    switch (tokenType) {
+      case DOLLAR:
+        checkParameter(offsetClause);
+        break;
+
+      default:
+        for (Enumeration e = offsetClause.children(); e.hasMoreElements(); ) {
+          checkLimitClause( (ParseTreeNode) e.nextElement() );
+        }
+    }
+  }
+
 
   /**
    * Checks whether the field passed in is valid within this object.  Also
@@ -687,6 +713,9 @@ public class ParseTreeWalker implements TokenTypes
       case PLUS: case MINUS: case TIMES:
       case DIVIDE: case KEYWORD_MOD: case KEYWORD_ABS:
       case KEYWORD_LIMIT: //Alex
+        systemType = "java.lang.Number";
+        break;
+      case KEYWORD_OFFSET:
         systemType = "java.lang.Number";
         break;
       case KEYWORD_LIKE:  case CONCAT:
@@ -873,6 +902,9 @@ public class ParseTreeWalker implements TokenTypes
         case KEYWORD_LIMIT:
           addLimitClause(curChild);
           break;
+        case KEYWORD_OFFSET:
+            addOffsetClause(curChild);
+            break;
       }
     }
   }
@@ -1106,6 +1138,38 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
+   * Adds a SQL version of an OQL offset clause.
+   * @param offsetClause The parse tree node with the offset clause
+   */
+  private void addOffsetClause(ParseTreeNode offsetClause) {
+    String sqlExpr = getSQLExpr(offsetClause/*.getChild(0)*/);
+
+    //Map numbered parameters
+    StringBuffer sb = new StringBuffer();
+    int startPos = 0;
+    int pos = sqlExpr.indexOf("?", startPos);
+    int SQLParamIndex = _SQLParamIndex;
+    while ( pos != -1 ) {
+      int endPos = sqlExpr.indexOf(" ", pos);
+      Integer paramNumber = null;
+      if ( endPos != -1 )
+        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+      else
+        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
+      paramInfo.mapToSQLParam( SQLParamIndex++ );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      startPos = endPos < 0 ? sqlExpr.length() : endPos;
+      pos = sqlExpr.indexOf("?", startPos);
+    }
+    if ( startPos < sqlExpr.length() )
+      sb.append( sqlExpr.substring( startPos ) );
+
+    _queryExpr.addOffsetClause( sb.toString() );
+    _SQLParamIndex = SQLParamIndex;
+  }
+
+  /**
    * Returns a SQL version of an OQL expr.
    *
    * @param exprTree the parse tree node with the expr
@@ -1313,6 +1377,7 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_UNDEFINED:
         return " NULL ";
       case KEYWORD_LIMIT: //Proceed it with it's own getSQLExpr
+      case KEYWORD_OFFSET:
         return getSQLExprForLimit(exprTree);
     }
 
