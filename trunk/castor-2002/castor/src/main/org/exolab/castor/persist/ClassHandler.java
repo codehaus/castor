@@ -455,10 +455,18 @@ public final class ClassHandler
                 } else {
                     Object relTarget;
 
-                    relTarget = ctx.load( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
+                    //[oleg] ObjectNotFoundException here 1) leads to incorrect behavior;
+                    // 2) doesn't give the possibility to load the object which can be result of
+                    // legal Castor operation of removing of the related object
+                    try {
+                        relTarget = ctx.load( _fields[ i ].relation.getRelatedHandler(), fields[ i ] );
+                    } catch (ObjectNotFoundException ex) {
+                        relTarget = null;
+                    }
                     if ( relTarget == null )
-                        throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
-                                                               fields[ i ] );
+                        fields[ i ] = null;
+                    //    throw new ObjectNotFoundExceptionImpl( _fields[ i ].relation.getRelatedClass(),
+                    //                                           fields[ i ] );
                     _fields[ i ].relation.setRelated( target, relTarget );
                 }
             }
