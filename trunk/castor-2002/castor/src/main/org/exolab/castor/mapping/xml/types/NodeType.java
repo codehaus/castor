@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -12,6 +12,7 @@ package org.exolab.castor.mapping.xml.types;
 //---------------------------------/
 
 import java.io.Serializable;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import org.exolab.castor.xml.*;
 
@@ -77,6 +78,14 @@ public class NodeType implements java.io.Serializable {
       //-----------/
      //- Methods -/
     //-----------/
+
+    /**
+     * Returns an enumeration of all possible instances of NodeType
+    **/
+    public static java.util.Enumeration enumerate()
+    {
+        return _memberTable.elements();
+    } //-- java.util.Enumeration enumerate() 
 
     /**
      * Returns the type of this NodeType
