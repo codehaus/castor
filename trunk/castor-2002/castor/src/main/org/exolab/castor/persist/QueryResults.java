@@ -123,7 +123,7 @@ public final class QueryResults
     
     public boolean fetch( Object obj, Object identity )
 	throws TransactionNotInProgressException, PersistenceException,
-	       ObjectNotFoundException
+	       ObjectNotFoundException, LockNotGrantedException
     {
 	OID                            oid;
 	TransactionContext.ObjectEntry entry;
@@ -206,23 +206,15 @@ public final class QueryResults
 		// must create a new record for this object. We only
 		// record the object in the transaction if in read-write
 		// or exclusive mode.
-		try {
-		    _cache.fetch( _tx, _query, identity,
-				  ( _accessMode == TransactionContext.AccessMode.Exclusive ),
-				  _tx.getLockTimeout() );
-		    _cache.copyObject( _tx, oid, obj );
-		    if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
-			_cache.releaseLock( _tx, oid );
-		    else
-			_tx.addObjectEntry( obj, oid, _cache );
-		    return true;
-		} catch ( ObjectNotFoundException except ) {
-		    // Object might have been deleted while query was
-		    // looking at it.
-		    throw except;
-		} catch ( LockNotGrantedException except ) {
-		    throw new ObjectNotFoundException( obj.getClass(), identity );
-		}
+		_cache.fetch( _tx, _query, identity,
+			      ( _accessMode == TransactionContext.AccessMode.Exclusive ),
+			      _tx.getLockTimeout() );
+		_cache.copyObject( _tx, oid, obj );
+		if ( _accessMode == TransactionContext.AccessMode.ReadOnly )
+		    _cache.releaseLock( _tx, oid );
+		else
+		    _tx.addObjectEntry( obj, oid, _cache );
+		return true;
 	    }
 	}
     }
