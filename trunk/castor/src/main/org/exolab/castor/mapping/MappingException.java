@@ -72,6 +72,13 @@ public class MappingException
         super( Messages.message( message ) );
     }
 
+    
+    public MappingException( String message, Exception e )
+    {
+        super( Messages.message( message ) );
+        setException (e);
+    }
+
 
     public MappingException( String message, Object arg1 )
     {
@@ -103,6 +110,9 @@ public class MappingException
         return _except;
     }
 
+    private void setException (Exception e) {
+    	_except = e;
+    }
 
     public void printStackTrace()
     {
