@@ -1,7 +1,16 @@
-Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P contributors
+Adaptx (C) 1998-2003 Intalio, Inc, Keith Visco and XSL:P/Adaptx contributors
 
 
 The following are changes from different versions of Adaptx
+
+
+Version 0.9.6, June 16, 2003
+----------------------------
+
+-- Added the "xpath/expressions" to allow XPath expressions
+   to be broken down into their respective sub-expressions.
+   (kvisco - 2003-05-13)
+
 
 Version 0.9.5, April 23, 2003
 -----------------------------
