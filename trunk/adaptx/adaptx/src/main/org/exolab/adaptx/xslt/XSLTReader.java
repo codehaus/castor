@@ -83,11 +83,13 @@ public class XSLTReader extends ErrorObserverAdapter {
     
     private URIResolver _resolver = null;
     
+    private EntityResolver _entityResolver = null;
+    
       //------------------/
      //- Public Methods -/
     //------------------/
 
-
+    
     /**
      * Creates a new Default XSLTReader
     **/
@@ -311,7 +313,18 @@ public class XSLTReader extends ErrorObserverAdapter {
         return read(document,location.getAbsoluteURI());
 	} //-- read
 
-
+    /**
+     * Sets an EntityResolver to be passed to the underlying
+     * XML parser. The EntityResolver will be passed to any
+     * SAX parser. If no SAX parser is utilized during the
+     * reading of the stylesheet, the resolver will be ignored.
+     *
+     * @param resolver the EntityResolver to use
+     */
+    public void setEntityResolver(EntityResolver resolver) {
+        _entityResolver = resolver;
+    } //-- setEntityResolver
+     
     /**
      * Sets the URIResolver for this XSLReader
      *
@@ -330,6 +343,8 @@ public class XSLTReader extends ErrorObserverAdapter {
         XSLTStylesheet stylesheet = handler.getStylesheet();
         stylesheet.setURILocation(location);
         parser.setDocumentHandler(handler);
+        if (_entityResolver != null)
+            parser.setEntityResolver(_entityResolver);
         try {
             parser.parse(source);
         }
