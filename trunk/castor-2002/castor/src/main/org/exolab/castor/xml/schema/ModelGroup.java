@@ -191,4 +191,11 @@ public class ModelGroup extends Group {
         //-- do nothing
     } //-- validate
 
+    /**
+     * Returns the schema that contains this modelGroup definition
+     */
+    public Schema getSchema() {
+       return _schema;
+    }
+
 } //-- Group
