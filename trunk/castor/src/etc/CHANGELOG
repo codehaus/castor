@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1877 using contribution from Nick Stuart [nick@newtsplace.com]
+       Fixed Compile issue on JDK 1.5.0_01.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1852
+       (Werner - 20050307)
+       
 Misc:  Eclipse reported a lot of warnings for the whole Castor source
        code. This change eliminates most of them without changing any
        functionality. It spares the XML packages to avoid CVS conflicts.

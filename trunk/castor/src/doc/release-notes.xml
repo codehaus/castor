@@ -31,6 +31,21 @@
               Short description days all ...
             </summary>
 			<bugs>
+				<bug id="1852">
+					<description>Fixed Compile issue on JDK 1.5.0_01.</description>
+					<contributor>
+						<name>Nick Stuart</name>
+						<email>nick@newtsplace.com</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter></reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050307</date>
+				</bug>
 				<bug id="1877">
 					<description>
 						Fixed wrong class and method name for Websphere 5.0 transaction manager factory.
