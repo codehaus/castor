@@ -45,7 +45,7 @@
 
 package org.exolab.castor.xml;
 
-import java.util.Vector;
+import java.util.HashSet;
 
 class UnmarshalState {
     
@@ -103,7 +103,7 @@ class UnmarshalState {
      * Note: Initialized upon demand, no need to create
      * the list for primitive fields
      */
-    private Vector _markedList = null;
+    private HashSet _markedList = null;
 
     /**
      * Is this a derived field? 
@@ -119,6 +119,8 @@ class UnmarshalState {
      * The whitespace preserve flag
      */
     boolean wsPreserve = false;
+    
+    boolean trailingWhitespaceRemoved = false;
     
     /**
      * The UnmarshalState which contains information
@@ -151,13 +153,14 @@ class UnmarshalState {
         classDesc = null;
         primitiveOrImmutable = false;
         if (_markedList != null) {
-            _markedList.removeAllElements();
+            _markedList.clear();
         }
         derived = false;
         wrapper = false;
         targetState = null;
         wsPreserve = false;
         parent = null;
+        trailingWhitespaceRemoved = false;
     } //-- clear
 
     /**
@@ -166,8 +169,8 @@ class UnmarshalState {
     **/
     void markAsUsed(XMLFieldDescriptor descriptor) {
         if (_markedList == null)
-            _markedList = new Vector(5);
-        _markedList.addElement(descriptor);
+            _markedList = new HashSet(5);
+        _markedList.add(descriptor);
     } //-- markAsUsed
 
     void markAsNotUsed(XMLFieldDescriptor descriptor) {
