@@ -14,9 +14,9 @@
             <param name="URL" value="jdbc:oracle:thin:@localhost:1521:TEST" />
             <param name="user" value="test" />
             <param name="password" value="secret" />
-            <param name="minLimit" value="5" />
-            <param name="maxLimit" value="10" />
-            <param name="cacheScheme" value="OracleConnectionCacheImpl.DYNAMIC_SCHEME" />
+            <param name="min-limit" value="5" />
+            <param name="max-limit" value="10" />
+            <param name="cache-scheme" value="1" />
         </data-source>
 -->        
 		<mapping href="jdo/mapping.xml" />
