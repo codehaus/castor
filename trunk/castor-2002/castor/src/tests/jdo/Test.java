@@ -27,7 +27,6 @@ public class Test
         "  duplicate    Duplicate primary key\n" +
         "  deadlock     Deadlock detection\n" +
         "  concurrenct  Concurrent locking\n" +
-        "  multiread \n" +
         "Concurrent require direct access to the database through JDBC.\n" +
         "The JDBC driver class and URI are passed as command line arguments.\n";
 
@@ -64,10 +63,6 @@ public class Test
                                              args.length > 1 ? args[ 1 ] : null,
                                              args.length > 2 ? args[ 2 ] : null );
                 concurrent.run();
-            } else if ( "multiread".startsWith( args[ 0 ] ) ) {
-                MultiRead multiread;
-                multiread = new MultiRead( jdo, logger );
-                multiread.run();
             } else {
                 System.out.println( Usage );
                 System.exit( 1 );

@@ -28,6 +28,9 @@ public class Deadlock
     private PrintWriter    _logger;
 
 
+    public static final long  Wait = 2000;
+
+
     public Deadlock( JDOSource jdo, PrintWriter logger )
 	throws PersistenceException
     {
@@ -101,18 +104,21 @@ public class Deadlock
 
         private PrintWriter    _logger;
 
-        
+
         public void run()
         {
             OQLQuery     oql;
             TestObject   object;
             Database     db = null;
+            long         start;
 
             try {
                 db = _jdo.getDatabase();
                 db.begin();
                 oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
+                start = System.currentTimeMillis();
+
                 // Load first object and change something about it (otherwise will not write)
                 _logger.println( "First: Loading object " + TestObject.DefaultId );
                 oql.bind( new Integer( TestObject.DefaultId ) );
@@ -122,7 +128,8 @@ public class Deadlock
                 // db.lock( group );
                 
                 // Give the other thread a 2 second opportunity.
-                sleep( 2000 );
+                sleep( start + Wait - System.currentTimeMillis() );
+                start = System.currentTimeMillis();
                 
                 _logger.println( "First: Loading object " + ( TestObject.DefaultId  + 1 ) );
                 oql.bind( new Integer( TestObject.DefaultId + 1 ) );
@@ -132,7 +139,7 @@ public class Deadlock
                 // db.lock( group );
                 
                 // Give the other thread a 2 second opportunity.
-                sleep( 2000 );
+                sleep( start + Wait - System.currentTimeMillis() );
 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.
@@ -141,7 +148,7 @@ public class Deadlock
                 _logger.println( "First: Committed" );
                 db.close();
             } catch ( Exception except ) {
-                _logger.println( "Second: " + except );
+                _logger.println( "First: " + except );
                 try {
                     if ( db != null )
                         db.close();
@@ -168,6 +175,7 @@ public class Deadlock
             OQLQuery     oql;
             TestObject   object;
             Database     db = null;
+            long         start;
 
             try {
                 db = _jdo.getDatabase();
@@ -175,7 +183,8 @@ public class Deadlock
                 oql = db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
                 
                 // Give the other thread a 2 second opportunity.
-                sleep( 2000 );
+                sleep( Wait / 2 );
+                start = System.currentTimeMillis();
                 
                 // Load first object and change something about it (otherwise will not write)
                 _logger.println( "Second: Loading object " + ( TestObject.DefaultId + 1 ) );
@@ -186,7 +195,8 @@ public class Deadlock
                 // db.lock( group );
                 
                 // Give the other thread a 2 second opportunity.
-                sleep( 2000 );
+                sleep( start + Wait - System.currentTimeMillis() );
+                start = System.currentTimeMillis();
                 
                 _logger.println( "Second: Loading object " + TestObject.DefaultId );
                 oql.bind( new Integer( TestObject.DefaultId ) );
@@ -196,7 +206,8 @@ public class Deadlock
                 // db.lock( group );
 
                 // Give the other thread a 2 second opportunity.
-                sleep( 2000 );
+                sleep( start + Wait - System.currentTimeMillis() );
+                start = System.currentTimeMillis();
                 
                 // Attempt to commit the transaction, must acquire a write
                 // lock blocking until the first transaction completes.

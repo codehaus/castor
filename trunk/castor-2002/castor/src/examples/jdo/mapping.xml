@@ -44,11 +44,13 @@
 
     <!-- Product has reference to Category with
          many-many relationship -->
+<!--
     <field name="category" type="myapp.Category" required="true"
            collection="vector">
       <sql-info name="category_id"
                 many-table="category_prod" many-key="prod_id" />
     </field>
+-->
   </class>
 
 
