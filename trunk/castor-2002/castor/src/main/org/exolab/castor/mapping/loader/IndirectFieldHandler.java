@@ -47,7 +47,7 @@
 package org.exolab.castor.mapping.loader;
 
 
-import org.exolab.castor.mapping.IntegrityException;
+import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.FieldHandler;
 
 
@@ -109,18 +109,18 @@ public class IndirectFieldHandler
     }
 
 
-    public void checkIntegrity( Object object )
-        throws IntegrityException
+    public void checkValidity( Object object )
+        throws ValidityException
     {
         Object ref;
 
         ref = _indirect.getValue( object );
         if ( ref == null ) {
             if ( _required )
-                throw new IntegrityException( "mapping.requiredField",
-                                              object.getClass().getName(), _indirect.toString() );
+                throw new ValidityException( "mapping.requiredField",
+                                             object.getClass().getName(), _indirect.toString() );
         } else
-            _handler.checkIntegrity( ref );
+            _handler.checkValidity( ref );
     }
 
 
