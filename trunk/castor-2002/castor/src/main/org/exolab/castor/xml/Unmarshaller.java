@@ -114,6 +114,19 @@ public class Unmarshaller {
     private boolean _debug = false;
 
     /**
+     * A boolean to indicate that objects should
+     * be re-used where appropriate
+    **/
+    private boolean _reuseObjects = false;
+
+    /**
+     * A boolean that indicates attribute processing should
+     * be strict and an error should be flagged if any
+     * extra attributes exist.
+    **/
+    private boolean _strictAttributes = false;
+    
+    /**
      * The flag indicating whether or not to validate during
      * unmarshalling
     **/
@@ -269,6 +282,18 @@ public class Unmarshaller {
     } //-- setMapping
 
 
+    /**
+     * Sets a boolean that when true indicates that objects
+     * contained within the object model should be re-used 
+     * where appropriate. This is only valid when unmarshalling 
+     * to an existing object.
+     *
+     * @param reuse the boolean indicating whether or not
+     * to re-use existing objects in the object model.
+    **/
+    public void setReuseObjects(boolean reuse) {
+        _reuseObjects = reuse;
+    } //-- setReuseObjects
 
     /**
      * Sets the ClassDescriptorResolver to use during unmarshalling
@@ -474,10 +499,12 @@ public class Unmarshaller {
      * @return the new UnmarshalHandler
     **/
     public UnmarshalHandler createHandler() {
+        
         UnmarshalHandler handler = new UnmarshalHandler(_class);
         handler.setResolver(_cdResolver);
         handler.setLogWriter(_pw);
         handler.setDebug(_debug);
+        handler.setReuseObjects(_reuseObjects);
         handler.setValidation(_validate);
 
         if (_instanceObj != null) {
