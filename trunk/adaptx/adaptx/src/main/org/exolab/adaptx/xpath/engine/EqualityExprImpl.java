@@ -148,7 +148,6 @@ class EqualityExprImpl extends BinaryExprImpl
         (XPathResult lResult, XPathResult rResult)
         throws XPathException
     {
-            
         if ( lResult == null || rResult == null )
             return BooleanResult.FALSE;
         
@@ -180,6 +179,9 @@ class EqualityExprImpl extends BinaryExprImpl
                         return BooleanResult.TRUE;
                 }
             }
+            if (_op == NOT_EQUAL) {
+                return BooleanResult.TRUE;
+            }
             return BooleanResult.FALSE;
         }
         else if ((rType == XPathResult.NODE_SET) && 
@@ -192,8 +194,12 @@ class EqualityExprImpl extends BinaryExprImpl
                 if (compare(lResult, rResult))
                     return BooleanResult.TRUE;
             }
+            if (_op == NOT_EQUAL) {
+                return BooleanResult.TRUE;
+            }
             return BooleanResult.FALSE;
         }
+        
         return BooleanResult.from(compare(lResult,rResult));
 
     } //-- execute
@@ -289,8 +295,6 @@ class EqualityExprImpl extends BinaryExprImpl
         
         boolean evalResult = false;
         boolean negate     = false;
-        
-        
         
         switch ( _op ) {
             case NOT_EQUAL:
