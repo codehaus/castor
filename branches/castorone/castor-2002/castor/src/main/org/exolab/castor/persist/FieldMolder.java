@@ -110,6 +110,8 @@ public class FieldMolder {
     private Class _fClass;
 
     private Field         _field;
+    private Method[]      _getSequence;
+    private Method[]      _setSequence;
     private Method        _getMethod;
     private Method        _setMethod;
     private Method        _hasMethod;
@@ -219,9 +221,16 @@ public class FieldMolder {
             if ( _field != null )
                 return _field.get( object );
             else if ( _getMethod != null ) {
+                if ( _getSequence != null ) 
+                    for ( int i = 0; i < _getSequence.length; i++ ) {
+                        object = _getSequence[ i ].invoke( object, null );
+                        if ( object == null )
+                            break;
+                    }
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise, 
-                if ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() )
+                if (  object == null || 
+                        ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() ) )
                     return null;
                 else
                     return _getMethod.invoke( object, null );
@@ -250,11 +259,30 @@ public class FieldMolder {
                 //System.out.println("_field: "+_field+"/"+object);
                 _field.set( object, value == null ? _default : value );
             } else if ( _setMethod != null ) {
+                if ( _getSequence != null ) 
+                    for ( int i = 0; i < _getSequence.length; i++ ) {
+                        Object last;
+
+                        last = object;
+                        object = _getSequence[ i ].invoke( object, null );
+                        if ( object == null ) {
+                            // if the value is not null, we must instantiate
+                            // the object in the sequence
+                            if ( value == null || _setSequence[ i ] == null )
+                                break;
+                            else {
+                                object = Types.newInstance( _getSequence[ i ].getReturnType() );
+                                _setSequence[ i ].invoke( last, new Object[] { object } );
+                            }
+                        }
+                    }
                 //System.out.println("_setMethod: "+_setMethod+" "+object);
-                if ( value == null && _deleteMethod != null )
-                    _deleteMethod.invoke( object, null );
-                else {
-                    _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
+                if ( object != null ) {
+                    if ( value == null && _deleteMethod != null )
+                        _deleteMethod.invoke( object, null );
+                    else {
+                        _setMethod.invoke( object, new Object[] { value == null ? _default : value } );
+                    }
                 }
             } else {
                 throw new RuntimeException("no method to set value");
@@ -413,11 +441,53 @@ public class FieldMolder {
                                             _field.getDeclaringClass().getName() );
             } else {
                 if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
+                    int point;
+                    ArrayList getSeq = new ArrayList();
+                    ArrayList setSeq = new ArrayList();
                     Class sgClass = _colClass==null? _colClass : _fClass;
+                    String name = fieldMap.getName();
+                    Class last;
+                    Method method;
+                    String methodName = null;
 
-                    String name = capitalize( fieldMap.getName() );
-
-                    _getMethod = findAccessor( javaClass, "get" + name, sgClass, true );
+                    try {
+                        while ( true ) {
+                            point = name.indexOf( '.' );
+                            if ( point < 0 ) 
+                                break;
+                            last = javaClass;
+                            methodName = "get" + capitalize( name.substring( 0, point ) );
+                            method = javaClass.getMethod( methodName, null );
+                            name = name.substring( point + 1 );
+                            // Make sure method is not abstract/static
+                            // (note: Class.getMethod() returns only public methods).
+                            if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                                throw new MappingException( "mapping.accessorNotAccessible",
+                                                            methodName, javaClass.getName() );
+                            getSeq.add( method );
+                            javaClass = method.getReturnType();
+                            // setter;   Note: javaClass already changed, use "last"
+                            methodName = "set" + methodName.substring(3);
+                            try {
+                                method = last.getMethod( methodName, new Class[] { javaClass } );
+                                if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+                                     ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                                    method = null;
+                            } catch ( Exception except ) {
+                                method = null;
+                            }
+                            setSeq.add( method );
+                        }
+                    } catch (Exception ex) {
+                        throw new MappingException( "mapping.accessorNotFound",
+                                methodName, null, javaClass.getName() );
+                    }
+                    if ( getSeq.size() > 0 ) {
+                        _getSequence = (Method[]) getSeq.toArray( new Method[ 0 ] );
+                        _setSequence = (Method[]) setSeq.toArray( new Method[ 0 ] );
+                    }
+                    _getMethod = findAccessor( javaClass, "get" + capitalize( name ), sgClass, true );
 
                     if ( _getMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
@@ -426,7 +496,7 @@ public class FieldMolder {
                     if ( _colClass == null && sgClass != _fClass )
                         _fClass = _getMethod.getReturnType();
 
-                    _setMethod = findAccessor( javaClass, "set" + name, sgClass, false );
+                    _setMethod = findAccessor( javaClass, "set" + capitalize( name ), sgClass, false );
 
                     //if ( _setMethod == null )
                     //    throw new MappingException( "mapping.accessorNotFound",
@@ -512,6 +582,11 @@ public class FieldMolder {
             e.printStackTrace();
             throw new MappingException("Unexpected Null pointer!\n"+e);
         }
+        // If the field is of a primitive type we use the default value
+        _default = Types.getDefault( _fClass);
+        if ( ( _field != null && ! _field.getType().isPrimitive() ) ||
+             ( _setMethod != null && ! _setMethod.getParameterTypes()[0].isPrimitive() ) )
+            _default = null;
     }
 
     /**

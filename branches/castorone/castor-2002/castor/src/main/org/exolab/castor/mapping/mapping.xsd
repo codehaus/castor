@@ -19,7 +19,7 @@
     <xsd:type content="elemOnly" order="seq">
       <xsd:element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <xsd:element ref="include" minOccurs="0" />
-      <xsd:element ref="class" minOccurs="1" />
+      <xsd:element ref="class" minOccurs="0" />
       <xsd:element ref="key-generator" minOccurs="0" />
     </xsd:type>
   </xsd:element>

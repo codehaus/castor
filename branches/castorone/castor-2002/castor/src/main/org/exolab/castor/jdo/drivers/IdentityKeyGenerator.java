@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.math.BigDecimal;
+import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.Statement;
 import java.sql.ResultSet;
@@ -73,18 +74,26 @@ public final class IdentityKeyGenerator implements KeyGenerator
     private final int _sqlType;
 
 
+    private final boolean _isHSQL;
+
+
     /**
      * Initialize the IDENTITY key generator.
      */
     public IdentityKeyGenerator( PersistenceFactory factory, int sqlType ) throws MappingException
     {
         String fName = factory.getFactoryName();
-        if ( !fName.equals("sybase") && !fName.equals("sql-server")) {
+        if ( !fName.equals("sybase") && !fName.equals("sql-server") && 
+                !fName.equals("hsql")) {
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
+        _isHSQL = fName.equals("hsql");
         _sqlType = sqlType;
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL)
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
+        if ( sqlType != Types.INTEGER && _isHSQL )
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
     }
@@ -104,15 +113,24 @@ public final class IdentityKeyGenerator implements KeyGenerator
     {
         Statement stmt = null;
         ResultSet rs;
-        int value;
 
         try {
-            stmt = conn.createStatement();
-            rs = stmt.executeQuery( "SELECT @@identity" );
+            if ( _isHSQL ) {
+                CallableStatement cstmt;
 
+                cstmt = conn.prepareCall( "{call IDENTITY()}" );
+                stmt = cstmt; //  for "finally"
+                cstmt.execute();
+                rs = cstmt.getResultSet();
+            } else {
+                stmt = conn.createStatement();
+                rs = stmt.executeQuery( "SELECT @@identity");
+            }
             if ( rs.next() ) {
+                int value;
+
                 value = rs.getInt( 1 );
-                if ( _sqlType == Types.INTEGER ) 
+                if ( _sqlType == Types.INTEGER )
                     return new Integer( value );
                 else
                     return new BigDecimal( value );

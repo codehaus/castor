@@ -66,6 +66,11 @@ public class FieldDescriptorImpl
     implements FieldDescriptor
 {
 
+    /**
+     * Containing Class (parent)
+     */
+    private ClassDescriptor     _contClsDesc;
+
 
     /**
      * The field handler for get/set field value.
@@ -147,6 +152,7 @@ public class FieldDescriptorImpl
      */
     protected FieldDescriptorImpl( FieldDescriptor fieldDesc )
     {
+        this._contClsDesc = fieldDesc.getContainingClassDescriptor();
         this._handler = fieldDesc.getHandler();
         this._fieldName = fieldDesc.getFieldName();
         this._fieldType = fieldDesc.getFieldType();
@@ -159,6 +165,19 @@ public class FieldDescriptorImpl
             this._relation = ((FieldDescriptorImpl)fieldDesc).getRelation();
         }
     }
+
+
+    public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
+    {
+        _contClsDesc = contClsDesc;
+    }
+    
+    
+    public ClassDescriptor getContainingClassDescriptor()
+    {
+        return _contClsDesc;
+    }
+
 
     public RelationDescriptor getRelation() {
         return _relation;

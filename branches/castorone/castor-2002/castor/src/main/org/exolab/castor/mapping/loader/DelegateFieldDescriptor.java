@@ -76,6 +76,21 @@ public class DelegateFieldDescriptor
         _desc = desc;
     }
 
+    /**
+     * Set the class which contains this field
+     */
+     public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
+     {
+      _desc.setContainingClassDescriptor( contClsDesc );
+     }
+
+    /**
+     * @return the class which contains this field
+     */
+    public ClassDescriptor getContainingClassDescriptor()
+    {
+      return _desc.getContainingClassDescriptor();
+    }
 
     public FieldHandler getHandler()
     {

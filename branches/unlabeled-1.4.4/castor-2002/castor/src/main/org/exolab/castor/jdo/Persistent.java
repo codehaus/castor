@@ -89,9 +89,15 @@ public interface Persistent
      * storage. This method is called immediately after synchronizing an
      * object with the database.
      *
+     * @param accessMode The access mode that was specified for this object
+     * either in {@link OQLQuery#execute( short accessMode )}, or in
+     * {@link Database#load( Class type, Object identity, short accessMode )}.
+     * The constants are defined in {@link Database}.
+     * @return null or the extending Class. In the latter case Castor will
+     * reload the object of the given class with the same identity.
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public void jdoLoad()
+    public Class jdoLoad(short accessMode)
         throws Exception;
 
 
@@ -123,6 +129,17 @@ public interface Persistent
     public void jdoRemove()
         throws Exception;
     
+
+
+    /**
+     * Called to indicate that an object has been included to the current
+     * transaction by means of db.update() method (at the end of a "long "
+     * transaction).
+     *
+     * @throws Exception An exception occured, the object cannot be stored
+     */
+    public void jdoUpdate()
+        throws Exception;
 
 }
 

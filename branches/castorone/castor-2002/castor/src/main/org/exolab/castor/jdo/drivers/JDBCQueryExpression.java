@@ -84,6 +84,9 @@ public class JDBCQueryExpression
     protected String    _order;
 
 
+    protected String    _limit;
+
+
     protected boolean   _distinct = false;
 
 
@@ -126,6 +129,13 @@ public class JDBCQueryExpression
         _tables.put( tableName, tableName );
         _conds.addElement( _factory.quoteName( tableName + JDBCSyntax.TableColumnSeparator + columnName ) +
                            condOp + value );
+    }
+
+    public String encodeColumn( String tableName, String columnName )
+    {
+        return _factory.quoteName( tableName + 
+                   JDBCSyntax.TableColumnSeparator +
+                   columnName );
     }
 
 
@@ -181,6 +191,11 @@ public class JDBCQueryExpression
     }
 
 
+    public void addLimitClause( String limit ) {
+        _limit = limit;
+    }
+
+
     protected String getColumnList()
     {
         StringBuffer sql;
@@ -226,7 +241,9 @@ public class JDBCQueryExpression
                 first = false;
             } else
                 sql.append( JDBCSyntax.And );
+            sql.append( '(' );
             sql.append( _where );
+            sql.append( ')' );
         }
         return first;
     }

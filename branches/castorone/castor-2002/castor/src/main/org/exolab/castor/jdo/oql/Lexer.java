@@ -101,6 +101,7 @@ public class Lexer implements TokenTypes {
     keywords.put("min", new Integer(KEYWORD_MIN));
     keywords.put("max", new Integer(KEYWORD_MAX));
     keywords.put("avg", new Integer(KEYWORD_AVG));
+    keywords.put("limit", new Integer(KEYWORD_LIMIT));
         
   }
 
@@ -299,7 +300,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new NoMoreTokensException());
-		}
+        }
       
     if (curChar != '"')
       throw (new InvalidCharException("stringLiteral() was called when the next character was not a double quote.  Position: " + _pos));
@@ -326,7 +327,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw ( new InvalidCharException( "End of query string reached, but \" expected." ) );
-		}
+        }
     
     return ( new Token( STRING_LITERAL, sb.toString() ) );
   }
@@ -350,7 +351,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new NoMoreTokensException());
-		}
+        }
       
     if (curChar != '\'')
       throw (new InvalidCharException("charLiteral() was called when the next character was not a double quote.  Position: " + _pos));
@@ -419,7 +420,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new NoMoreTokensException());
-		}
+        }
       
     if ( ! isDigit(curChar) )
       throw (new InvalidCharException("numericLiteral() was called when the next character was not a digit.  Position: " + _pos));
@@ -508,7 +509,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new NoMoreTokensException());
-		}
+        }
       
     if ( ! isLetter(curChar) )
       throw (new InvalidCharException("identifier() was called when the next character was not a letter.  Position: " + _pos));
@@ -638,7 +639,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new InvalidCharException("End of query encountered in the middle of date literal."));
-		}
+        }
   }
 
   /**
@@ -736,7 +737,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new InvalidCharException("End of query encountered in the middle of time literal."));
-		}
+        }
   }
 
 
@@ -893,7 +894,7 @@ public class Lexer implements TokenTypes {
     }
     catch (IndexOutOfBoundsException e) {
       throw (new InvalidCharException("End of query encountered in the middle of time literal."));
-		}
+        }
   }
 
   /**

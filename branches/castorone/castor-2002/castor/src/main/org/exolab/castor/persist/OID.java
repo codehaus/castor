@@ -46,6 +46,7 @@
 
 package org.exolab.castor.persist;
 
+import java.math.BigDecimal;
 import java.util.Vector;
 import java.util.Enumeration;
 import java.util.Iterator;
@@ -86,7 +87,7 @@ public final class OID {
     private final ClassMolder _molder;
 
 
-	private final OID         _depends;
+    private final OID         _depends;
 
     /**
      * The object's stamp, used for efficient dirty checking.
@@ -111,9 +112,9 @@ public final class OID {
      */
     private Class _topClass;
 
-	OID( LockEngine engine, ClassMolder molder, Object[] identities ) {
-		this( engine, molder, null, identities );
-	}
+    OID( LockEngine engine, ClassMolder molder, Object[] identities ) {
+        this( engine, molder, null, identities );
+    }
     OID( LockEngine engine, ClassMolder molder, OID depends, Object[] identities ){
 
         if ( engine == null )
@@ -125,7 +126,7 @@ public final class OID {
         _molder = molder;
         _identities = identities;
         _javaClass = molder.getJavaClass();
-		_depends = depends;
+        _depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
         while ( molder.getExtends() != null )
@@ -133,7 +134,7 @@ public final class OID {
         
         _topClass = molder.getJavaClass();
 
-		// calculate hashCode
+        // calculate hashCode
         int temp = _topClass.hashCode();
         if ( _identities != null ) {
             for ( int i=0; i<identities.length; i++ ) {
@@ -166,9 +167,7 @@ public final class OID {
                 if ( !isEquals( (Vector) object1[i], (Vector) object2[i] ) )
                     return false;                
             } else {      
-                if ( !object1[i].equals( object2[i] ) ) {
-                    return false;
-                }
+                return isEquals( object1[i], object2[i] );
             }
         }
         return true;
@@ -179,10 +178,10 @@ public final class OID {
             return true;
         if ( object1 == null || object2 == null )
             return false;
-        if ( object1.equals( object2 ) ) 
-            return true;
+        if (object1 instanceof BigDecimal)
+            return ( ( (BigDecimal) object1 ).compareTo( object2 ) == 0);
         else 
-            return false;
+            return object1.equals( object2 );
     }
 
     public static boolean isEquals( Vector object1, Vector object2 ) {
@@ -260,9 +259,9 @@ public final class OID {
         return false;
     }
 
-	public OID getDepends() {
-		return _depends;
-	}
+    public OID getDepends() {
+        return _depends;
+    }
 
     ClassMolder getMolder() {
         return _molder;

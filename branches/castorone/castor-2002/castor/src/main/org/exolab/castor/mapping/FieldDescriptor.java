@@ -60,6 +60,17 @@ import org.exolab.castor.mapping.loader.RelationDescriptor;
 public interface FieldDescriptor
 {
 
+    /**
+     * Set the class which contains this field
+     */
+    public void setContainingClassDescriptor( ClassDescriptor contClsDesc );
+
+
+    /**
+     * @return the class which contains this field
+     */
+    public ClassDescriptor getContainingClassDescriptor();
+
 
     /**
      * Returns the name of the field.
@@ -119,7 +130,6 @@ public interface FieldDescriptor
      * @return The class descriptor of the field type, or null
      */
     public ClassDescriptor getClassDescriptor();
-
 
 
     /**

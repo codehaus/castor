@@ -49,6 +49,7 @@ package org.exolab.castor.jdo.drivers;
 
 import java.sql.SQLException;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
@@ -80,7 +81,7 @@ public class SybaseFactory
         // Sometime gives wrong results
         //if ( except instanceof SQLException )
         //    switch ( ( (SQLException) except ).getErrorCode() ) {
-        //        case 2601:
+        //        case 2601: 
         //        case 548:  // sometimes Sybase ASA generates this code instead of 2601
         //            return Boolean.TRUE;
         //        default:
@@ -96,6 +97,21 @@ public class SybaseFactory
     }
 
 
+    /**
+     * Needed to process OQL queries of "CALL" type (using stored procedure
+     * call). This feature is specific for JDO.
+     * @param call Stored procedure call (without "{call")
+     * @param paramTypes The types of the query parameters
+     * @param javaClass The Java class of the query results
+     * @param fields The field names
+     * @param sqlTypes The field SQL types
+     * @return null if this feature is not supported.
+     */
+    public PersistenceQuery getCallQuery( String call, Class[] paramTypes, Class javaClass,
+                                          String[] fields, int[] sqlTypes )
+    {
+        return new MultiRSCallQuery( call, paramTypes, javaClass, fields, sqlTypes );
+    }
 }
 
 

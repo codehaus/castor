@@ -289,8 +289,8 @@ public class DependentUpdate
             stream.writeVerbose( "Test 2" );
             master2.addDetail( new TestDetail( 5 ) );
             master2.addDetail( new TestDetail( 6 ) );
-            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 8 ) ) );
-            master2.getDetails().remove( master.getDetails().indexOf( new TestDetail( 9 ) ) );
+            master2.getDetails().remove( new TestDetail( 8 ) );
+            master2.getDetails().remove( new TestDetail( 9 ) );
             try {
                 db.begin();
                 db.update( master2 );
@@ -308,7 +308,7 @@ public class DependentUpdate
                     + master2.getId() );
             _conn.commit();
             _conn.close();
-            master2.addDetail( new TestDetail( 10 ) );
+            master2.setValue( "long transaction new value" );
             try {
                 db.begin();
                 db.update( master2 );

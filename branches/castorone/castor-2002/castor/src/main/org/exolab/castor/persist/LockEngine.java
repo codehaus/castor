@@ -51,6 +51,7 @@ import java.util.Enumeration;
 import java.util.Properties;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -206,7 +207,7 @@ public final class LockEngine {
     
             _factory = factory;
         } catch ( ClassNotFoundException e ) {
-        	throw new MappingException("Declared Class not found!" );
+            throw new MappingException("Declared Class not found!" );
         }
     }
 
@@ -451,7 +452,7 @@ public final class LockEngine {
                 } catch ( LockNotGrantedException except ) {
                     // Someone else is using the object, definite duplicate key
                     throw new DuplicateIdentityException( Messages.format( "persist.duplicateIdentity", object.getClass().getName(), 
-							OID.flatten(oid.getIdentities())) );
+                            OID.flatten(oid.getIdentities())) );
                 } 
                 // Dump the memory image of the object, it might have been deleted
                 // from persistent storage
@@ -474,8 +475,8 @@ public final class LockEngine {
                     }
 
                     if ( !newoid.equals( oid ) ) {
-						typeInfo.locks.acquire( newoid, tx, true, 0, null );
-						
+                        typeInfo.locks.acquire( newoid, tx, true, 0, null );
+                        
                         typeInfo.locks.destory( oid, tx );
                         oid = newoid;
                     }
@@ -560,51 +561,93 @@ public final class LockEngine {
      * persistent and must not have the identity of a persistent object.
      * The object's OID is returned. The OID is guaranteed to be unique
      * for this engine even if no identity was specified.
+     * If the object implements TimeStampable interface, verify
+     * the object's timestamp.
      *
      * @param tx The transaction context
-     * @param object The object to update
-     * @param identity The identity of the object, or null
-     * @param db The database in which the object was created
+     * @param object The object
+     * @param accessMode The desired access mode
+     * @param timeout The timeout waiting to acquire a lock on the
+     *  object (specified in seconds)
      * @return The object's OID
+     * @throws ObjectNotFoundException The object was not found in
+     *  persistent storage
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
      * @throws PersistenceException An error reported by the
      *  persistence engine
      * @throws ClassNotPersistenceCapableException The class is not
      *  persistent capable
+     * @throws ObjectModifiedException Dirty checking mechanism may immediately
+     *  report that the object was modified in the database during the long
+     *  transaction.
      */
-     /*
-    public OID update( TransactionContext tx, PersistenceInfoGroup scope, ClassMolder molder, Object object )
-            throws DuplicateIdentityException, PersistenceException,
-            ClassNotPersistenceCapableException {
-        OID        oid;
-        ObjectLock lock;
-        ObjectBin  result;
+    public OID update( TransactionContext tx, Class type, Object object, AccessMode accessMode, int timeout )
+            throws ObjectNotFoundException, LockNotGrantedException, ObjectModifiedException,
+                   PersistenceException, ClassNotPersistenceCapableException,
+                   ObjectDeletedWaitingForLockException {
+
         TypeInfo   typeInfo;
+        Object[]   identities;
+        ObjectLock lock;
+        boolean    write;
+        OID        oid;
 
-        typeInfo = (TypeInfo) _typeInfo.get( object.getClass() );
-        if ( typeInfo == null )
-            throw new ClassNotPersistenceCapableException( object.getClass() );
-
-        // Must prevent concurrent attempt to create the same object
-        // Best way to do that is through the type
-        synchronized ( typeInfo ) {
-            // XXX If identity is null need to fine a way to determine it
-            if ( identity == null )
-                throw new PersistenceException( "persist.noIdentity" );
-
-            try {
-
-                oid = typeInfo.locks.acquire( new OID( typeInfo.molder, identity), 
-                    tx, true, 0 );
-                //result = 
-                //typeInfo.molder.update( tx, oid, object );   
-            } catch ( LockNotGrantedException except ) {
-                // Someone else is using the object, definite duplicate key
-                throw new DuplicateIdentityException( object.getClass(), identity );
-            } 
+        // If the object is new, don't try to load it from the cache
+        if ( ( object instanceof TimeStampable ) &&
+                ( ( TimeStampable ) object ).jdoGetTimeStamp() == 0 ) {
+            return null;
         }
-        return oid;
-        //result;
-    } */
+
+        typeInfo = (TypeInfo) _typeInfo.get( type );
+        if ( typeInfo == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", type.getName()) );
+
+        ClassMolder molder = typeInfo.molder;
+        PersistenceException pexcept = null;
+        Object[] cache = null;
+
+        identities = typeInfo.molder.getIdentities( object );
+        oid = new OID( this, typeInfo.molder, identities );
+        write = ( accessMode == AccessMode.Exclusive || accessMode == AccessMode.DbLocked );
+        try {
+            // Create an OID to represent the object and see if we
+            // have a lock (i.e. object is cached).
+            try {
+                // Object has been loaded before, must acquire lock
+                // on it (write in exclusive mode)
+                oid = typeInfo.locks.acquire( oid, tx, false, 0, false, null );
+
+                if ( write && ! oid.isDbLock() ) {
+                    // Db-lock mode we always synchronize the object with
+                    // the database and obtain a lock on the object.
+                    if ( _logInterceptor != null )
+                        _logInterceptor.loading( typeInfo.javaClass, OID.flatten( oid.getIdentities() ) );
+                }
+
+                molder.update( tx, oid, object, accessMode );
+
+                if ( accessMode == AccessMode.DbLocked )
+                    oid.setDbLock( true );
+                if ( accessMode == AccessMode.ReadOnly ) 
+                    typeInfo.locks.release( oid, tx );
+                return oid;
+            } catch (IllegalStateException ex) {
+                // Object has not been loaded yet, or cleared from the cache.
+                // If the object is not new, report an error
+                if ( ( object instanceof TimeStampable ) &&
+                        ( ( TimeStampable ) object ).jdoGetTimeStamp() != 0 ) {
+                    throw new ObjectModifiedException( Messages.format( "persist.objectModified", type.getName(),
+                                                       OID.flatten( oid.getIdentities() ) ) );
+                }
+                // Otherwise indicate that the object should be created
+                return null;
+            }
+        } catch ( ObjectDeletedWaitingForLockException except ) {
+            // This is equivalent to object not existing
+            throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", type, OID.flatten(oid.getIdentities())) );
+        }
+    }
 
 
     /**
@@ -654,7 +697,7 @@ public final class LockEngine {
 
         try {
             oid = new OID( this, typeInfo.molder, oid.getIdentities() );
-			System.out.println("Oid: "+oid);
+            System.out.println("Oid: "+oid);
             typeInfo.locks.acquire( oid, tx, false, 0, false, null );
             typeInfo.molder.store( tx, oid, object );
             return oid;
@@ -850,6 +893,7 @@ public final class LockEngine {
     {
         return _xaTx;
     }
+
 
     /**
      * Provides information about an object of a specific type

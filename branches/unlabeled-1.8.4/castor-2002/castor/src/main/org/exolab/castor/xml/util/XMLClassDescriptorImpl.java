@@ -189,6 +189,8 @@ public class XMLClassDescriptorImpl
     **/
     public void addFieldDescriptor(XMLFieldDescriptor descriptor) {
         
+	descriptor.setContainingClassDescriptor( this );
+
         NodeType nodeType = descriptor.getNodeType();
         switch(nodeType.getType()) {
             case NodeType.ATTRIBUTE:

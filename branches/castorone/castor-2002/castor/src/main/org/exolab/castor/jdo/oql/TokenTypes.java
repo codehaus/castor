@@ -108,4 +108,5 @@ public interface TokenTypes {
   int KEYWORD_MIN = 52;
   int KEYWORD_MAX = 53;
   int KEYWORD_AVG = 54;
+  int KEYWORD_LIMIT = 55;//Alex
 }

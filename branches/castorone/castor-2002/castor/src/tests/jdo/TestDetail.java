@@ -186,14 +186,16 @@ public class TestDetail
     }
 
 
+    public int hashCode() {
+        return _id;
+    }
+
     public boolean equals( Object other )
     {
         if ( other == this )
             return true;
         if ( other != null && other instanceof TestDetail ) {
-            if ( ( (TestDetail) other )._id == _id &&
-                 ( (TestDetail) other )._value.equals( _value ) )
-                return true;
+           return ( ( (TestDetail) other )._id == _id );
         }
         return false;
     }

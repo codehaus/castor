@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.engine.SQLEngine;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.loader.Types;
+import org.exolab.castor.jdo.engine.JDBCSyntax;
 
 /**
  * A class which walks the parse tree created by the parser to check for errors
@@ -82,6 +83,7 @@ public class ParseTreeWalker implements TokenTypes
   private Class _objClass;
   private QueryExpression _queryExpr;
   
+  private int _SQLParamIndex; //Alex
   private Hashtable _paramInfo;
   private Hashtable _fieldInfo;
   private Hashtable _pathInfo;
@@ -113,6 +115,7 @@ public class ParseTreeWalker implements TokenTypes
     _parseTree = parseTree;
     _classLoader = classLoader;
 
+    _SQLParamIndex = 1; //Alex
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
     _pathInfo = new Hashtable();
@@ -228,6 +231,9 @@ public class ParseTreeWalker implements TokenTypes
         case KEYWORD_ORDER:
           checkOrderClause( _parseTree.getChild(curChild) );
           break;
+        case KEYWORD_LIMIT:
+          checkLimitClause( _parseTree.getChild(curChild) );
+          break;
       }
     }
   }
@@ -253,7 +259,8 @@ public class ParseTreeWalker implements TokenTypes
           sb.append( theChild.getToken().getTokenValue() ).append(".");
         }
           
-        _fromClassName = sb.deleteCharAt( sb.length() - 1 ).toString();
+        sb.setLength( sb.length() - 1 );
+        _fromClassName = sb.toString();
       }
       else
         _fromClassName = classNameNode.getToken().getTokenValue();
@@ -391,11 +398,17 @@ public class ParseTreeWalker implements TokenTypes
             if ( curField == null )
               throw new QueryException( "An unknown field was requested in the select part of the query: " + curName );
             curClassDesc = (JDOClassDescriptor) curField.getClassDescriptor();
+            if ( curClassDesc == null && e.hasMoreElements() )
+                throw new QueryException( "An non-reference field was requested in the select part of the query: " + curName );
             count++;
           }
 
           _pathInfo.put( projection, projectionInfo );
           _fieldInfo.put( projection, curField );
+
+          // simple projection == Field => remember it
+          if ( projectionInfo.size() == 2 )
+              checkField( curNode );
           
           Class theClass = curField.getFieldType();
           // is it actually a Java primitive, or String, 
@@ -463,7 +476,10 @@ public class ParseTreeWalker implements TokenTypes
     
     int tokenType = whereClause.getToken().getTokenType();
     switch (tokenType) {
-      case DOT: case IDENTIFIER:
+      case DOT:
+        checkProjection( whereClause, false, false );
+        break;
+      case IDENTIFIER:
         checkField(whereClause);
         break;
       case DOLLAR:
@@ -479,6 +495,30 @@ public class ParseTreeWalker implements TokenTypes
         }
     }
   }
+
+  
+  /**
+   * Traverses the limit clause sub-tree and checks for errors. Creates
+   * a Hashtable of paramInfo with type information for query parameters
+   * (i.e. $1).
+   * @throws QueryException if an error is detected.
+   */
+  private void checkLimitClause(ParseTreeNode limitClause)
+        throws QueryException {
+
+    int tokenType = limitClause.getToken().getTokenType();
+    switch (tokenType) {
+      case DOLLAR:
+        checkParameter(limitClause);
+        break;
+
+      default:
+        for (Enumeration e = limitClause.children(); e.hasMoreElements(); ) {
+          checkLimitClause( (ParseTreeNode) e.nextElement() );
+        }
+    }
+  }
+
 
   /**
    * Checks whether the field passed in is valid within this object.  Also
@@ -508,11 +548,15 @@ public class ParseTreeWalker implements TokenTypes
         
     if ( ( ! fieldPrefix.equals(_projectionName) ) &&
          ( ! fieldPrefix.equals(_projectionAlias) ) &&
-         ( ! fieldPrefix.equals(_fromClassName) ) )
+         ( ! fieldPrefix.equals(_fromClassName) ) &&
+         ( ! fieldPrefix.equals(_fromClassAlias) ) )
       throw new QueryException( "Invalid prefix identifier used in where clause: " + fieldPrefix);
 
-    field = _clsDesc.getField(fieldSuffix);
-
+    for ( JDOClassDescriptor cd = _clsDesc; cd != null; cd = (JDOClassDescriptor) cd.getExtends() ) {
+        field = cd.getField(fieldSuffix);
+        if ( field != null )
+            break;
+    }
     if (field == null)
       throw new QueryException( "The field " + fieldSuffix + " was not found." );
       
@@ -554,6 +598,7 @@ public class ParseTreeWalker implements TokenTypes
     switch (operation) {
       case PLUS: case MINUS: case TIMES:
       case DIVIDE: case KEYWORD_MOD: case KEYWORD_ABS:
+      case KEYWORD_LIMIT: //Alex
         systemType = "java.lang.Number";
         break;
       case KEYWORD_LIKE:  case CONCAT:
@@ -640,19 +685,25 @@ public class ParseTreeWalker implements TokenTypes
     for (Enumeration e = orderClause.children(); e.hasMoreElements(); ) {
       ParseTreeNode curChild = (ParseTreeNode) e.nextElement();
 
-      int tokenType = curChild.getToken().getTokenType();
-      switch (tokenType) {
-        case KEYWORD_ASC:
-        case KEYWORD_DESC:
-          checkField(curChild.getChild(0));
-          break;
-        case DOT: case IDENTIFIER:
-          checkField(curChild);
-          break;
-        default:
-          throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
-      }
-    }
+	  int tokenType = curChild.getToken().getTokenType();
+	  switch (tokenType) {
+	  case KEYWORD_ASC:
+	  case KEYWORD_DESC:
+		  // iterate on child
+		  curChild = curChild.getChild(0);
+		  tokenType = curChild.getToken().getTokenType();
+	  }
+	  switch (tokenType) {
+	  case DOT:
+		  checkProjection( curChild, false, false );
+		  break;
+	  case IDENTIFIER:
+		  checkField(curChild);
+		  break;
+	  default:
+		  throw new QueryException( "Only identifiers, path expressions, and the keywords ASC and DESC are allowed in the ORDER BY clause." );
+	  }
+	}
   }
 
   /**
@@ -693,6 +744,9 @@ public class ParseTreeWalker implements TokenTypes
           break;
         case KEYWORD_ORDER:
           _queryExpr.addOrderClause( getOrderClause( curChild ) );
+        case KEYWORD_LIMIT:
+          addLimitClause(curChild);
+          break;
       }
     }
   }
@@ -722,6 +776,8 @@ public class ParseTreeWalker implements TokenTypes
    *
    */
   private void addJoinsForPathExpression( Vector path ) {
+    if ( path == null )
+      throw new IllegalStateException( "path = null !" );
 
     JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
     String identityColumn = identity.getSQLName();
@@ -731,7 +787,7 @@ public class ParseTreeWalker implements TokenTypes
     for ( int i = 1; i < path.size() - 1; i++ ) {
       fieldDesc = clsDesc.getField( (String) path.elementAt(i) );
       clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
-      if ( clsDesc != null )
+      if ( clsDesc != null && clsDesc != _clsDesc )
         //we must add this table as a join
         if ( fieldDesc.getManyTable() == null ) {
           //a many -> one relationship
@@ -764,7 +820,8 @@ public class ParseTreeWalker implements TokenTypes
 
     //Map numbered parameters
     StringBuffer sb = new StringBuffer();
-    int pos = sqlExpr.indexOf("?");
+    int startPos = 0;
+    int pos = sqlExpr.indexOf("?", startPos);
     int SQLParamIndex = 1;
     while ( pos != -1 ) {
       int endPos = sqlExpr.indexOf(" ", pos);
@@ -775,51 +832,51 @@ public class ParseTreeWalker implements TokenTypes
         paramNumber = new Integer(sqlExpr.substring(pos + 1));
       ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
       paramInfo.mapToSQLParam( SQLParamIndex++ );
-      addCondition( sqlExpr.substring(0, pos + 1) );
-      if (endPos != -1 )
-        sqlExpr = sqlExpr.substring(endPos);
-      else
-        sqlExpr = "";
-      pos = sqlExpr.indexOf("?");
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      startPos = endPos < 0 ? sqlExpr.length() : endPos;
+      pos = sqlExpr.indexOf("?", startPos);
     }
+    if ( startPos < sqlExpr.length() )
+      sb.append( sqlExpr.substring( startPos ) );
+  
+    _queryExpr.addWhereClause( sb.toString() ); 
 
-    addCondition(sqlExpr);
+    _SQLParamIndex = SQLParamIndex; //Alex
   }
 
   /**
-   * This method adds a condition to the query expression. It internally
-   *   uses a StringTokenizer to subdivide the condition in parts and then
-   *   calls the addCondition method of JDBCQuery expression.
-   * @param str a string which is part of the condition part in an oql query
-   *   The current implementation implies that this string is empty or
-   *   ends with a '?' character.
+   * Returns a SQL version of an OQL limit clause.
+   *
+   * @param limitClause the parse tree node with the limit clause
+   * @return The SQL translation of the limit clause.
    */
-  private void addCondition(String str)
-  {
-    if( str.trim().equals("") )
-      return;
+  private void addLimitClause(ParseTreeNode limitClause) {
+    String sqlExpr = getSQLExpr(limitClause/*.getChild(0)*/);
 
-    String table = null;
-    String column = null;
-
-    java.util.StringTokenizer tokenizer = new
-      java.util.StringTokenizer(str, ".=!<> ?", true);
-
-    do
-      { table = tokenizer.nextToken(); }
-    while( table.equals(" ") || table.equalsIgnoreCase("and") );
-
-    tokenizer.nextToken();
-    column = tokenizer.nextToken();
-    StringBuffer operator = new StringBuffer(5);
-    String token = tokenizer.nextToken();
-    while(tokenizer.hasMoreElements() && token.equals("?") == false)
-    {
-      operator.append(token);
-      token = tokenizer.nextToken();
+    //Map numbered parameters
+    StringBuffer sb = new StringBuffer();
+    int startPos = 0;
+    int pos = sqlExpr.indexOf("?", startPos);
+    int SQLParamIndex = _SQLParamIndex;
+    while ( pos != -1 ) {
+      int endPos = sqlExpr.indexOf(" ", pos);
+      Integer paramNumber = null;
+      if ( endPos != -1 )
+        paramNumber = new Integer(sqlExpr.substring(pos + 1, endPos));
+      else
+        paramNumber = new Integer(sqlExpr.substring(pos + 1));
+      ParamInfo paramInfo = (ParamInfo) _paramInfo.get(paramNumber);
+      paramInfo.mapToSQLParam( SQLParamIndex++ );
+      sb.append( sqlExpr.substring( startPos, pos+1 ) );
+      startPos = endPos < 0 ? sqlExpr.length() : endPos;
+      pos = sqlExpr.indexOf("?", startPos);
     }
+    if ( startPos < sqlExpr.length() )
+      sb.append( sqlExpr.substring( startPos ) );
 
-    _queryExpr.addCondition( table, column, operator.toString(), token );
+    _queryExpr.addLimitClause( sb.toString() );
+     System.out.println(sb.toString());
+    _SQLParamIndex = SQLParamIndex;
   }
 
   /**
@@ -921,19 +978,41 @@ public class ParseTreeWalker implements TokenTypes
           return sb.toString();
         }
         else {
-          //a field
-          if ( tokenType == DOT )
-            addJoinsForPathExpression( (Vector) _pathInfo.get(exprTree) );
+
+        //a field
+        if ( tokenType == DOT ) {
+        Vector path = (Vector) _pathInfo.get(exprTree);
+        if ( path == null ) {
+            System.err.println( "exprTree="+exprTree.toStringEx()+
+                    "\npathInfo = {" );
+            Enumeration enum = _pathInfo.keys();
+            ParseTreeNode n;
+            while ( enum.hasMoreElements() ) {
+            n = (ParseTreeNode)enum.nextElement();
+            System.err.println( "\t"+n.toStringEx() );
+            }
+            // Exception follows in addJoinsForPathExpression()
+        }
+        addJoinsForPathExpression( path );
+        }
             
           JDOFieldDescriptor field = 
                   (JDOFieldDescriptor) _fieldInfo.get(exprTree);
+      if ( field == null ) {
+          throw new IllegalStateException( "fieldInfo for "+exprTree.toStringEx()+
+                           " not found" );
+      }
           JDOClassDescriptor clsDesc = 
-                  (JDOClassDescriptor) field.getClassDescriptor();
-
-          if ( clsDesc == null )
-            clsDesc = _clsDesc;
+          // (JDOClassDescriptor) field.getClassDescriptor();
+          (JDOClassDescriptor) field.getContainingClassDescriptor();
+      
+          if ( clsDesc == null ) {
+          throw new IllegalStateException( "ContainingClass of "+
+                           field.toString()+" is null !" );
+      }
                   
-          return clsDesc.getTableName() + "." + field.getSQLName();
+          return _queryExpr.encodeColumn( clsDesc.getTableName(), 
+                      field.getSQLName() );
         }
 
       //parameters
@@ -995,6 +1074,8 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_NIL:
       case KEYWORD_UNDEFINED:
         return " NULL ";
+      case KEYWORD_LIMIT: //Proceed it with it's own getSQLExpr
+        return getSQLExprForLimit(exprTree);
     }
 
     return "";
@@ -1002,6 +1083,30 @@ public class ParseTreeWalker implements TokenTypes
     
   }
   
+
+  private String getSQLExprForLimit(ParseTreeNode limitClause) {
+
+    StringBuffer sb = new StringBuffer();
+    for (Enumeration e = limitClause.children(); e.hasMoreElements(); ) {
+        ParseTreeNode exprTree = (ParseTreeNode) e.nextElement();
+      int tokenType =  exprTree.getToken().getTokenType();
+          switch( tokenType ) {
+      //parameters
+        case DOLLAR:
+        //return a question mark with the parameter number.  The calling function
+        //will do a mapping
+          sb.append( "?" + exprTree.getChild(exprTree.getChildCount() - 1)
+                                .getToken().getTokenValue());
+          break;
+              case COMMA:
+                sb.append(" , ");
+                break;
+          }
+      }
+      return sb.toString();
+  }
+
+
   /**
    * Returns a SQL version of an OQL order by clause.
    *

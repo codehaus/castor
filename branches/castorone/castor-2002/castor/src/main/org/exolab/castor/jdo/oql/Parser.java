@@ -98,6 +98,10 @@ public class Parser implements TokenTypes {
     if ( _curToken.getTokenType() == KEYWORD_ORDER ) {
       _treeRoot.addChild(orderClause());
     }
+
+    if ( _curToken.getTokenType() == KEYWORD_LIMIT ) {
+      _treeRoot.addChild(limitClause());
+    }
     
     match(END_OF_QUERY);
 
@@ -137,7 +141,11 @@ public class Parser implements TokenTypes {
             throws InvalidCharException, OQLSyntaxException {
     
     if (_curToken.getTokenType() != tokenType)
-      throw (new OQLSyntaxException("An incorrect token type was found near " + _curToken.getTokenValue() ));
+      throw (new OQLSyntaxException("An incorrect token type was found near " + 
+                    _curToken.getTokenValue()+" ("+
+                    String.valueOf( _curToken.getTokenType() )+
+                    ", need "+
+                    String.valueOf( tokenType ) ));
 
     ParseTreeNode retNode = new ParseTreeNode(_curToken);
     _curToken = _nextToken;
@@ -332,19 +340,18 @@ public class Parser implements TokenTypes {
   private ParseTreeNode orExpr() 
             throws InvalidCharException, OQLSyntaxException {
     
-    ParseTreeNode retNode = null;
+    ParseTreeNode tmpNode = null;
     ParseTreeNode leftSide = andExpr();
 
-    if (_curToken.getTokenType() == KEYWORD_OR) {
-      retNode = match(KEYWORD_OR);
-      retNode.addChild(leftSide);
-      retNode.addChild(andExpr());
+    // consume all sequential OR's
+    while (_curToken.getTokenType() == KEYWORD_OR) {
+      tmpNode = match(KEYWORD_OR);
+      tmpNode.addChild(leftSide);
+      tmpNode.addChild(andExpr());
+      leftSide = tmpNode;
     }
     
-    if (retNode == null)
-      return leftSide;
-    else
-      return retNode;
+    return leftSide;
   }
   
   /**
@@ -358,19 +365,18 @@ public class Parser implements TokenTypes {
   private ParseTreeNode andExpr() 
             throws InvalidCharException, OQLSyntaxException {
     
-    ParseTreeNode retNode = null;
+    ParseTreeNode tmpNode = null;
     ParseTreeNode leftSide = equalityExpr();
 
-    if (_curToken.getTokenType() == KEYWORD_AND) {
-      retNode = match(KEYWORD_AND);
-      retNode.addChild(leftSide);
-      retNode.addChild(equalityExpr());
+    // consume all sequential AND's
+    while (_curToken.getTokenType() == KEYWORD_AND) {
+      tmpNode = match(KEYWORD_AND);
+      tmpNode.addChild(leftSide);
+      tmpNode.addChild(equalityExpr());
+      leftSide = tmpNode;
     }
-    
-    if (retNode == null)
-      return leftSide;
-    else
-      return retNode;
+        
+    return leftSide;
   }
   
   /**
@@ -662,7 +668,9 @@ public class Parser implements TokenTypes {
         retNode = match(tokenType);
         break;
       default:
-        throw (new OQLSyntaxException("An inapropriate token was encountered in an expression."));
+        throw (new OQLSyntaxException("An inapropriate token ("+
+                      String.valueOf( tokenType )+
+                      ") was encountered in an expression."));
     }
     
     if (retNode == null)
@@ -895,6 +903,30 @@ public class Parser implements TokenTypes {
 
     }
     
+    return retNode;
+  }
+
+  /**
+   * Consumes tokens of limitClause.
+   *
+   * @return a Parse tree containing LIMIT as the root, with children
+   *    as limit parameters.
+   * @throws InvalidCharException passed through from match().
+   * @throws OQLSyntaxException passed through from match(), or if an
+   *    unknown token is encountered here.
+   */
+  private ParseTreeNode limitClause()
+            throws InvalidCharException, OQLSyntaxException {
+
+    ParseTreeNode retNode = match(KEYWORD_LIMIT);
+
+    retNode.addChild(queryParam());
+      if ( _curToken.getTokenType() == COMMA )
+    {
+      retNode.addChild( match( COMMA ) );
+      retNode.addChild( queryParam() );
+    }
+
     return retNode;
   }
 

@@ -92,8 +92,7 @@ public class ParamInfo {
 
     if ( ! userDefinedType.equals("") ) {
       try {
-        userClass = Types.typeFromName(ClassLoader.getSystemClassLoader(),
-                                       userDefinedType);
+        userClass = Types.typeFromName(getClass().getClassLoader(), userDefinedType);
 
         if ( userClass.isPrimitive() ) 
           userClass = Types.typeFromPrimitive( userClass );
