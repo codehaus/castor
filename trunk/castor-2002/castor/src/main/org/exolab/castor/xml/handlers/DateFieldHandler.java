@@ -160,8 +160,11 @@ public class DateFieldHandler extends XMLFieldHandler {
                 date = df.parse(value.toString());
             }
             catch (java.text.ParseException ex) {
-                //-- ignore for now
-                date = new Date();
+                //-- if there is no value we return
+                //-- a new date
+                if (value == null) date = new Date();
+                //-- else it is not a valid timeInstant
+                throw new IllegalStateException("Bad 'timeInstant' format:it should be "+DATE_FORMAT+".\n");
             }
         }
         else date = (Date)value;
