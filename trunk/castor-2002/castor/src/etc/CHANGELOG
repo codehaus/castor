@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+XML:    Added nested Exception support for SimpleTypesFactory (kvisco)
+
+XML:    Added nested Exception support for FieldHandlerImpl (kvisco)
+
+XML:    Fixed CollectionInfoODMG30,  applied patch by Bernd Deichmann (kvisco)
+
 XML:    Added the auto-complete feature and transient field support to the mapping file.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
@@ -13,7 +19,7 @@ XML:    Added the support for the facets min/max Ex/Inclusive for the date/time 
 XML:	Added new supports for XML Schema Recommendation datatypes and remove old references to
         the Candidate Recommendation document (Arnaud).
 
-XML:    Added push behavior for the unmarshaller with SAX producer. Made some functions public 
+XML:    Added push behavior for the unmarshaller with SAX producer. Made some functions public
         and UnmarshalHandler final.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
@@ -21,17 +27,17 @@ XML:	Remove the xsi:type when using the generated descriptors.(Arnaud)
 
 XML:	Support for the <any> element in the Marshalling Framework.(Arnaud)
 
-XML:    Added setRootElement method to Marshaller.java to override default root element name for 	document. 
+XML:    Added setRootElement method to Marshaller.java to override default root element name for 	document.
         Usefull when using classes generated via 'type' mapping, as the root element name is not known.
         (Andrew Fawcett, andrew.fawcett@coda.com)
 
-XML:    Fix the Marshaller to handle correctly Vector by keeping the xsi:type information 
+XML:    Fix the Marshaller to handle correctly Vector by keeping the xsi:type information
         (Bug reported by Eric Kaplan (eric.kaplan@armanta.com) (Arnaud)
 
 XML: 	Fix the SourceGenerator to handle correctly the 'types' package when a
-        Date/Time type is used as an attribute.(thanks to 
-        Maria Gray <maria.gray@datalex.ie>, 
-        Christopher P. van Buskirk <Chris.vanBuskirk@vanderbilt.edu> and 
+        Date/Time type is used as an attribute.(thanks to
+        Maria Gray <maria.gray@datalex.ie>,
+        Christopher P. van Buskirk <Chris.vanBuskirk@vanderbilt.edu> and
         Dean Thompson <dthompson@medebiz.net> for their proposed solutions) (Arnaud)
 
 XML:    Removed a dependency to xerces jar in Configuration.java (Patch submitted by
@@ -45,6 +51,9 @@ XML:	Supports the <any> element in the Source Generator.(Arnaud)
 XML:	Support the wildcards <any> and <anyAttribute> in the Schema Object Model.
         (Arnaud)
 
+XML:    Improved grouping support....now handles maxOccurs > 1. Nested groups
+        are no longer simply flattened. (kvisco)
+
 XML:    Added object container support. Handle element and attributes, as well
         as container in container. Object container are object that exist in the
         object model, but will not appear directly in the XML document. There
@@ -52,21 +61,21 @@ XML:    Added object container support. Handle element and attributes, as well
         in its parent element.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
-JDO:    Fixed a problem in HypersonicSQL driver in which it creates invalid 
-        statements in case when there are mixture of outer joins and regular 
-        joins. The problem relates to the table aliassing. 
+JDO:    Fixed a problem in HypersonicSQL driver in which it creates invalid
+        statements in case when there are mixture of outer joins and regular
+        joins. The problem relates to the table aliassing.
         (Kesha Sibilev <ksibilev@powernetinc.com>)
 
-JDO:    Fixed an ObjectNotPersistentException in ClassMolder.preStore(). 
-        This method is trying to obtain write lock on the collection 
-        instance instead of doing that on the actual object. 
+JDO:    Fixed an ObjectNotPersistentException in ClassMolder.preStore().
+        This method is trying to obtain write lock on the collection
+        instance instead of doing that on the actual object.
         (Kesha Sibilev <ksibilev@powernetinc.com>)
 
 JDO:    Fixed when deleting an object which participates in the many-to-many
         relationship the corresponding record in the relation table is not being
         deleted problem. (Kesha Sibilev <ksibilev@powernetinc.com>)
 
-JDO:    Fixed the addMethod is not cloned for mutliple class loader enviorment 
+JDO:    Fixed the addMethod is not cloned for mutliple class loader enviorment
         problem. (Ralf Purnhagen <purnhar@gmx.net>)
 
 JDO:    Fixed identity name in complex identities not being recongnized problem
@@ -74,10 +83,10 @@ JDO:    Fixed identity name in complex identities not being recongnized problem
 
 JDO:    Added support for aliases in generated SQL queries.
         Before in some cases OQL queries were incorrectly translated into SQL.
-        (Thorsten Thielen <thorsten@ipcon.de>)	
+        (Thorsten Thielen <thorsten@ipcon.de>)
 
 JDO:    Added support for SQL functions in OQL queries.
-        (Thorsten Thielen <thorsten@ipcon.de>)	
+        (Thorsten Thielen <thorsten@ipcon.de>)
 
 JDO:    Fixed a bug which cause "remove(Object)" always return false.
         (Steve Vaughan <snmvaughan92@yahoo.com>)
@@ -86,41 +95,41 @@ JDO:    Fixed a problem that Castor JDO is trying to creates an related object
         on the m side of a 1:m relationship when the object should be updated.
         (Kim Madsen <kim.madsen@inceptor.com>)
 
-JDO:    Added SQL Direct Interface. Syntax: 
-        "CALL SQL <sql expression> AS classname". The fields that are returned 
+JDO:    Added SQL Direct Interface. Syntax:
+        "CALL SQL <sql expression> AS classname". The fields that are returned
         with you sql query must be the same, as the equivalent OQL Query would do.
         Tip: you may turn on Castor logging and study the generated SQL
         statements. (Thorsten Mauch <mauch@imkenberg.de>)
 
-JDO:    Added the overdued <sql many-key="??"/> and <sql many-table="??"/> 
+JDO:    Added the overdued <sql many-key="??"/> and <sql many-table="??"/>
         attributes into the mapping.dtd file.
         (reported by Vladimir Tsichevski <wowa@jet.msk.su>)
 
-JDO:    Fixed: Loading with "db-locked" mode is now always load from the 
+JDO:    Fixed: Loading with "db-locked" mode is now always load from the
         Database. (yip)
 
 JDO:    Moved the callback of storing(...) into TransactionContext.java. (yip)
 
 JDO:    Added the option for custom CallbackInterceptor. (yip)
 
-JDO:    Added an option to let users specify the instance of object to be 
-        loaded into, in the Database.load(...) method. (note, only for 
+JDO:    Added an option to let users specify the instance of object to be
+        loaded into, in the Database.load(...) method. (note, only for
         simple object with no persistence relationship) (yip)
 
 JDO:    Reduced the number of TimeThread used by Time-limited cache.
 
-JDO:    Fixed a bug that cause ObjectDeletedException being thrown at commit 
-        time, for one-many and many-many relationship when an object on the 
+JDO:    Fixed a bug that cause ObjectDeletedException being thrown at commit
+        time, for one-many and many-many relationship when an object on the
         many side is deleted. (yip)
         (reported by many people)
 
 JDO:    Fixed a many-many relationship update (long-trasaction) problem. (yip)
 
-JDO:    Rewritten a major part of ClassMolder.update(...) to better handle 
+JDO:    Rewritten a major part of ClassMolder.update(...) to better handle
         one-many and many-many relationship with key-generator and update. (yip)
 
-JDO:    As part of the rewritten mentioned above, update is now behavior like 
-        create if the TimeStampable.jdoGetTimeStamp return NO_TIMESTAMP if 
+JDO:    As part of the rewritten mentioned above, update is now behavior like
+        create if the TimeStampable.jdoGetTimeStamp return NO_TIMESTAMP if
         autoStore is set true. (yip)
 
 JDO:    Added a final static variable TimeStampable NO_TIMESTAMP. (yip)
