@@ -75,7 +75,6 @@ import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.Configuration;
 
 
 /**
@@ -108,7 +107,7 @@ public final class DatabaseImpl
     private TransactionContext _ctx;
 
 
-    private int                DefaultWaitLockTimeout = 10000;
+    private int                DefaultWaitLockTimeout = 10;
 
 
     // XXX Need accessors to set this and way to pass it to transaction
@@ -340,8 +339,6 @@ public final class DatabaseImpl
             _ctx.prepare();
             _ctx.commit();
         } catch ( TransactionAbortedException except ) {
-            if ( Configuration.debug() )
-                except.printStackTrace( _logWriter );
             try {
                 _ctx.rollback();
             } catch ( TransactionNotInProgressException except2 ) {
@@ -379,8 +376,6 @@ public final class DatabaseImpl
         try {
             _ctx.checkpoint();
         } catch ( TransactionAbortedException except ) {
-            if ( Configuration.debug() )
-                except.printStackTrace( _logWriter );
             try {
                 _ctx.rollback();
             } catch ( TransactionNotInProgressException except2 ) {
