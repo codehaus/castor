@@ -2307,7 +2307,8 @@ public class ClassMolder
         if ( _extendent != null ) {
             for ( int i=0; i < _extendent.size(); i++ ) {
                 if ( !extendPath.contains( _extendent.get(i) ) ) {
-                    //deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
+                	_log.debug ("About to call ClassMolder.deleteExtend on " + ((ClassMolder)_extendent.get(i)));
+                    // deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
                 }
             }
         }
