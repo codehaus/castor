@@ -239,8 +239,7 @@ public class DescriptorSourceFactory {
             if (xsType.getType() == XSType.COLLECTION)
                 //Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
                 xsType = ((CollectionInfo)member).getContent().getSchemaType();
-
-			//-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
+            //-- Resolve how the node name parameter to the XMLFieldDescriptorImpl constructor is supplied
             String nodeName = member.getNodeName();
 			String nodeNameParam = null;
 			if ((nodeName!=null) && (!isText))
@@ -458,7 +457,7 @@ public class DescriptorSourceFactory {
                     break;
                 case XSType.IDREF_TYPE:
                 case XSType.IDREFS_TYPE:
-                    //-- uses special code in UnmarshalHandler 
+                    //-- uses special code in UnmarshalHandler
                     //-- see UnmarshalHandler#processIDREF
                     jsc.add("desc.setMultivalued(" + member.isMultivalued());
                     jsc.append(");");
@@ -531,6 +530,9 @@ public class DescriptorSourceFactory {
         if (member.getName().equals("_anyObject")) return;
 
         XSType xsType = member.getSchemaType();
+        if (xsType.getType() == XSType.COLLECTION)
+            xsType = ((CollectionInfo)member).getContent().getSchemaType();
+
 
         //-- create local copy of field
         //JMember jMember = member.createMember();
@@ -1612,5 +1614,4 @@ public class DescriptorSourceFactory {
         return sb.toString();
 
     } //-- escape
-
 } //-- DescriptorSourceFactory
