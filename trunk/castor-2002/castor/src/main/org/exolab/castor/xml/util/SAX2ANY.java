@@ -208,7 +208,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     public void endElement(String name)
            throws SAXException
     {
-           endElement(null,name, name);
+           endElement(null,getLocalPart(name), name);
     }
 
     public void endElement(String namespaceURI, String localName, String qName)
@@ -216,7 +216,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     {
         //if it is the starting element just returns
         if (_startingNode.getLocalName().equals(localName))
-            return;
+           return;
 
         //else just add the node we have built to the previous node
         AnyNode _node = (AnyNode)_nodeStack.pop();
