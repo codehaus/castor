@@ -591,29 +591,56 @@ public class FieldMolder {
 
                 // Bean type object, map field to get<Method>/set<Method>
 
+                Class methodClass = _defaultReflectService._fClass;
+
                 // First look up the get accessors
                 if ( fieldMap.getGetMethod() != null ) {
-                    _defaultReflectService._getMethod = findAccessor( javaClass, fieldMap.getGetMethod(), _defaultReflectService._fClass, true );
+                    if ( _colClass != null ) {
+                        _defaultReflectService._getMethod 
+                            = findAccessor( javaClass, fieldMap.getGetMethod(), _colClass, true );
+                    } else {
+                        _defaultReflectService._getMethod 
+                            = findAccessor( javaClass, fieldMap.getGetMethod(), methodClass, true );
+                    }
 
                     if ( _defaultReflectService._getMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                fieldMap.getGetMethod(), _defaultReflectService._fClass, javaClass.getName() );
+                                fieldMap.getGetMethod(), methodClass, javaClass.getName() );
 
+                    // set/reset the fClass to actual field class
                     if ( _colClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._getMethod.getReturnType();
+
+                } else {
+                    throw new MappingException( "mapping.getMethodMappingNotFound",
+                                                _colClass!=null?_colClass:methodClass, javaClass.getName() );
                 }
 
                 // Second look up the set/add accessor
                 if ( fieldMap.getSetMethod() != null ) {
-                    Class methodClass = 
-                        _colClass!=null? _colClass: _defaultReflectService._fClass;
 
-                    _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
-                    if ( _defaultReflectService._setMethod == null )
+                    if ( _colClass != null ) {
+                        _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _colClass, false );
+
+                        // find addXXX method only if lazy loading is turned off
+                        if ( _defaultReflectService._setMethod == null && !fieldMap.getLazy() )
+                            _defaultReflectService._addMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
+
+                    } else {
+                        // find setXXX method
+                        _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
+                    }
+
+
+                    if ( _defaultReflectService._setMethod == null && _defaultReflectService._addMethod == null )
                         throw new MappingException( "mapping.accessorNotFound",
-                                fieldMap.getSetMethod(), _defaultReflectService._fClass, javaClass.getName() );
+                                fieldMap.getSetMethod(), methodClass, javaClass.getName() );
+
                     if ( _defaultReflectService._fClass == null )
                         _defaultReflectService._fClass = _defaultReflectService._setMethod.getParameterTypes()[ 0 ];
+                } else {
+                    throw new MappingException( "mapping.setMethodMappingNotFound",
+                                                _colClass!=null?_colClass:methodClass, javaClass.getName() );
                 }
             }
 
