@@ -52,6 +52,7 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import javax.transaction.xa.Xid;
 import org.exolab.castor.mapping.ClassDesc;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.Persistence;
@@ -111,8 +112,7 @@ public interface PersistenceEngine
      * @param tx The transaction context
      * @param type The type of the object to load
      * @param identity The identity of the object to load
-     * @param exclusive True if the object must be loaded for
-     *  exclusive access (write lock)
+     * @param accessMode The access mode (null equals shared)
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @return The object's OID
@@ -126,7 +126,7 @@ public interface PersistenceEngine
      *  persistent capable
      */
     public OID load( TransactionContext tx, Class type, Object identity,
-                     boolean exclusive, int timeout )
+                     AccessMode accessMode, int timeout )
         throws ObjectNotFoundException, LockNotGrantedException,
                PersistenceException, ClassNotPersistenceCapableException;
     
@@ -143,8 +143,7 @@ public interface PersistenceEngine
      * @param tx The transaction context
      * @param query The query persistence engine
      * @param identity The identity of the object to load
-     * @param exclusive True if the object must be loaded for
-     *  exclusive access (write lock)
+     * @param accessMode The access mode (null equals shared)
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @return The object's OID
@@ -156,7 +155,7 @@ public interface PersistenceEngine
      *  persistence engine
      */
     public OID fetch( TransactionContext tx, PersistenceQuery query, Object identity,
-                      boolean exclusive, int timeout )
+                      AccessMode accessMode, int timeout )
         throws ObjectNotFoundException, LockNotGrantedException,
                PersistenceException;
 
@@ -201,11 +200,12 @@ public interface PersistenceEngine
      * </ul>
      *
      * @param tx The transaction context
-     * @param oid The object OID
+     * @param obj The object to delete
+     * @param identity The object's identity
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public void delete( TransactionContext tx, OID oid )
+    public void delete( TransactionContext tx, Object obj, Object identity )
         throws PersistenceException;
     
 
@@ -219,7 +219,6 @@ public interface PersistenceEngine
      * during this process.
      *
      * @param tx The transaction context
-     * @param oid The object OID
      * @param obj The object to store
      * @param identity The object's identity
      * @param timeout The timeout waiting to acquire a lock on the
@@ -237,7 +236,7 @@ public interface PersistenceEngine
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public OID store( TransactionContext tx, OID oid, Object obj,
+    public OID store( TransactionContext tx, Object obj,
                       Object identity, int timeout )
         throws LockNotGrantedException, ObjectDeletedException,
                ObjectModifiedException, DuplicateIdentityException,
@@ -254,7 +253,7 @@ public interface PersistenceEngine
      * access.
      *
      * @param tx The transaction context
-     * @param oid The object's OID
+     * @param oid The object's oid
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -278,8 +277,11 @@ public interface PersistenceEngine
      * @param tx The transaction context
      * @param oid The object's oid
      * @param obj The object into which to copy
+     * @throws PersistenceException An error reported by the
+     *  persistence engine obtaining a dependent object
      */
-    public void copyObject( TransactionContext tx, OID oid, Object obj );
+    public void copyObject( TransactionContext tx, OID oid, Object obj )
+        throws PersistenceException;
 
 
     /**
