@@ -43,6 +43,7 @@ XML:	Refactored the handling of wildcard in the Schema Object Model and
 
 XML:	Added support in the Schema Object Model for 'remove' methods (Arnaud)
 
+XML:    Added support for timeZone in Marshaller and Unmarshaller.
 
 
 Version 0.9.3.9, December 12, 2001
