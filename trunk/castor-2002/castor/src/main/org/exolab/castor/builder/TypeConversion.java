@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,7 +51,7 @@ import org.exolab.castor.util.OrderedMap;
 
 import org.exolab.castor.xml.schema.Facet;
 import org.exolab.castor.xml.JavaXMLNaming;
-import org.exolab.castor.xml.schema.Simpletype;
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.castor.xml.schema.types.*;
 
 import java.util.Enumeration;
@@ -59,7 +59,7 @@ import java.util.Hashtable;
 
 
 /**
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class TypeConversion {
@@ -134,17 +134,17 @@ public class TypeConversion {
      * Converts the given Simpletype to the appropriate XSType.
      * @return the XSType which represets the given Simpletype
     **/
-    public static XSType convertType(Simpletype simpletype) {
+    public static XSType convertType(SimpleType simpleType) {
         
-        if (simpletype == null) return null;
+        if (simpleType == null) return null;
         
         XSType xsType = null;
         
         
         //-- enumerated types
-        if (simpletype.hasFacet("enumeration")) {
+        if (simpleType.hasFacet("enumeration")) {
             String className 
-                = JavaXMLNaming.toJavaClassName(simpletype.getName());
+                = JavaXMLNaming.toJavaClassName(simpleType.getName());
                 
             XSClass xsClass = new XSClass(new JClass(className));
             xsClass.setAsEnumertated(true);
@@ -152,13 +152,13 @@ public class TypeConversion {
         }
         
         //-- determine base type
-        Simpletype base = simpletype;
+        SimpleType base = simpleType;
         while ((base != null) && (!(base instanceof BuiltInType))) {
             base = base.getBase();
         }
         if (base == null) {
             String className 
-                = JavaXMLNaming.toJavaClassName(simpletype.getName());
+                = JavaXMLNaming.toJavaClassName(simpleType.getName());
             xsType = new XSClass(new JClass(className));
         }
         else {
@@ -189,35 +189,35 @@ public class TypeConversion {
                 case BuiltInType.INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSInteger();
-                    readIntegerFacets(simpletype, xsInteger);
+                    readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
                 //-- negative-integer 
                 case BuiltInType.NEGATIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSNegativeInteger();
-                    readIntegerFacets(simpletype, xsInteger);
+                    readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
                 //-- positive-integer
                 case BuiltInType.POSITIVE_INTEGER_TYPE:
                 {
                     XSInteger xsInteger = new XSPositiveInteger();
-                    readIntegerFacets(simpletype, xsInteger);
+                    readIntegerFacets(simpleType, xsInteger);
                     return xsInteger;
                 }
                 case BuiltInType.LONG_TYPE:
                     return new XSLong();
                 //-- string
                 case BuiltInType.STRING_TYPE:
-                    return toXSString(simpletype);
+                    return toXSString(simpleType);
                 //-- timeInstant
                 case BuiltInType.TIME_INSTANT_TYPE:
                     return new XSTimeInstant();
                 default:
                     //-- error
                     String className 
-                        = JavaXMLNaming.toJavaClassName(simpletype.getName());
+                        = JavaXMLNaming.toJavaClassName(simpleType.getName());
                     xsType = new XSClass(new JClass(className));
                     break;
                 
@@ -249,11 +249,11 @@ public class TypeConversion {
      * @return the XSInteger representation of the given Simpletype
     **/
     private static void readIntegerFacets
-        (Simpletype simpletype, XSInteger xsInteger) 
+        (SimpleType simpleType, XSInteger xsInteger) 
     {
         
         //-- copy valid facets
-        Enumeration enum = simpletype.getFacets();
+        Enumeration enum = simpleType.getFacets();
         while (enum.hasMoreElements()) {
             
             Facet facet = (Facet)enum.nextElement();
@@ -281,10 +281,10 @@ public class TypeConversion {
      * @param simpletype the Simpletype to convert
      * @return the XSString representation of the given Simpletype
     **/
-    private static XSString toXSString(Simpletype simpletype) {
+    private static XSString toXSString(SimpleType simpleType) {
         XSString xsString = new XSString();
         //-- copy valid facets
-        Enumeration enum = simpletype.getFacets();
+        Enumeration enum = simpleType.getFacets();
         while (enum.hasMoreElements()) {
             Facet facet = (Facet)enum.nextElement();
             String name = facet.getName();

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -57,7 +57,7 @@ import org.exolab.javasource.JType;
 import java.util.Enumeration;
 
 /**
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class MemberFactory {
@@ -151,20 +151,20 @@ public class MemberFactory {
             
         FieldInfo fieldInfo = null;
                 
-        Simpletype simpletype = attribute.getSimpletype();
+        SimpleType simpleType = attribute.getSimpleType();
         XSType   xsType = null;
         
         boolean enumeration = false;
         
-        if (simpletype != null) {
+        if (simpleType != null) {
             
-            if (simpletype.hasFacet(Facet.ENUMERATION)) {
+            if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 enumeration = true;
             
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                 ClassInfo cInfo = null;
                 if (resolver != null) {
-                    cInfo = resolver.resolve(simpletype);
+                    cInfo = resolver.resolve(simpleType);
                 }
             
                 if (cInfo != null)
@@ -172,7 +172,7 @@ public class MemberFactory {
             }
             
             if (xsType == null)
-                xsType = TypeConversion.convertType(simpletype);
+                xsType = TypeConversion.convertType(simpleType);
         }
         else
             xsType = new XSString();
@@ -257,15 +257,15 @@ public class MemberFactory {
         FieldInfo fieldInfo = null;
         XSType   xsType     = null;
         
-        Simpletype simpletype = eDecl.getSimpletype();
-        if (simpletype != null) {
+        SimpleType simpleType = eDecl.getSimpleType();
+        if (simpleType != null) {
             
             //-- handle special case for enumerated types
-            if (simpletype.hasFacet(Facet.ENUMERATION)) {
+            if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
                 ClassInfo cInfo = null;
                 if (resolver != null) {
-                    cInfo = resolver.resolve(simpletype);
+                    cInfo = resolver.resolve(simpleType);
                 }
                 
                 if (cInfo != null)
@@ -273,7 +273,7 @@ public class MemberFactory {
             }
             
             if (xsType == null) 
-                xsType = TypeConversion.convertType(simpletype);
+                xsType = TypeConversion.convertType(simpleType);
         }
         else {
             String className = JavaXMLNaming.toJavaClassName(eDecl.getName());

@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -53,7 +53,7 @@ import org.xml.sax.*;
 import java.util.Hashtable;
 
 /**
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class SchemaUnmarshaller extends SaxUnmarshaller {
@@ -258,9 +258,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         }
         
         //-- <type>
-        if (name == SchemaNames.COMPLEXTYPE) {
+        if (name == SchemaNames.COMPLEX_TYPE) {
             unmarshaller 
-                = new ComplextypeUnmarshaller(_schema, atts, _resolver);
+                = new ComplexTypeUnmarshaller(_schema, atts, _resolver);
         } 
         //-- <element>
         else if (name == SchemaNames.ELEMENT) {
@@ -268,9 +268,9 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
                 = new ElementUnmarshaller(_schema, atts, _resolver);
         }
         //-- <simpletype>
-        else if (name == SchemaNames.SIMPLETYPE) {
+        else if (name == SchemaNames.SIMPLE_TYPE) {
             unmarshaller 
-                = new SimpletypeUnmarshaller(_schema, atts, _resolver);
+                = new SimpleTypeUnmarshaller(_schema, atts, _resolver);
         }
         else {
             //-- we should throw a new Exception here
@@ -332,22 +332,22 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- call unmarshaller.finish() to perform any necessary cleanup
         unmarshaller.finish();
         
-        if (name == SchemaNames.COMPLEXTYPE) {
-            Complextype complextype = null;
-            complextype = ((ComplextypeUnmarshaller)unmarshaller).getComplextype();
-            _schema.addComplextype(complextype);
-            if (complextype.getName() != null) {
-                _resolver.addResolvable(complextype.getReferenceId(), complextype);
+        if (name == SchemaNames.COMPLEX_TYPE) {
+            ComplexType complexType = null;
+            complexType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
+            _schema.addComplexType(complexType);
+            if (complexType.getName() != null) {
+                _resolver.addResolvable(complexType.getReferenceId(), complexType);
             }
             else {
-                System.out.println("warning: top-level complextype with no name.");
+                System.out.println("warning: top-level complexType with no name.");
             }
         }
-        else if (name == SchemaNames.SIMPLETYPE) {
-            Simpletype simpletype = null;
-            simpletype = ((SimpletypeUnmarshaller)unmarshaller).getSimpletype();
-            _schema.addSimpletype(simpletype);
-            _resolver.addResolvable(simpletype.getReferenceId(), simpletype);
+        else if (name == SchemaNames.SIMPLE_TYPE) {
+            SimpleType simpleType = null;
+            simpleType = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
+            _schema.addSimpleType(simpleType);
+            _resolver.addResolvable(simpleType.getReferenceId(), simpleType);
         }
         else if (name == SchemaNames.ELEMENT) {
             ElementDecl element = null;

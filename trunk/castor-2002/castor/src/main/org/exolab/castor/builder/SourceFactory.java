@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -58,9 +58,9 @@ import org.exolab.javasource.*;
 import java.util.Enumeration;
 
 /**
- * This class takes an ElementDecl and creates the Java Source 
- * for for it
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * This class creates the Java Source classes for Schema
+ * components
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class SourceFactory  {
@@ -144,21 +144,21 @@ public class SourceFactory  {
             jClass.getJDocComment().setComment(comment);
             
         
-        Complextype complextype = element.getComplextype();
+        ComplexType complexType = element.getComplexType();
         
         boolean derived = false;
         
-        if (complextype != null) {
-            processComplextype(complextype, state);
+        if (complexType != null) {
+            processComplexType(complexType, state);
         }
         else {
-            Simpletype simpletype = element.getSimpletype();
-            if (simpletype != null) {
-                classInfo.setSchemaType(TypeConversion.convertType(simpletype));
+            SimpleType simpleType = element.getSimpleType();
+            if (simpleType != null) {
+                classInfo.setSchemaType(TypeConversion.convertType(simpleType));
                 
                 //-- handle our special case for enumerated types
-                if (simpletype.hasFacet(Facet.ENUMERATION)) {
-                    createSourceCode(simpletype, state, state.packageName);
+                if (simpleType.hasFacet(Facet.ENUMERATION)) {
+                    createSourceCode(simpleType, state, state.packageName);
                 }
             }
             else
@@ -195,13 +195,13 @@ public class SourceFactory  {
      * belong
     **/
     public JClass createSourceCode
-        (Complextype type, ClassInfoResolver resolver, String packageName) 
+        (ComplexType type, ClassInfoResolver resolver, String packageName) 
     {
         if (type == null)
-            throw new IllegalArgumentException("null complextype");
+            throw new IllegalArgumentException("null ComplexType");
             
         if (!type.isTopLevel())
-            throw new IllegalArgumentException("Complextype is not top-level.");
+            throw new IllegalArgumentException("ComplexType is not top-level.");
         
         String className = JavaXMLNaming.toJavaClassName(type.getName());
         className = resolveClassName(className, packageName);
@@ -231,7 +231,7 @@ public class SourceFactory  {
             jClass.getJDocComment().setComment(comment);
             
         
-        processComplextype(type, state);
+        processComplexType(type, state);
         
         //-- add imports required by the marshal methods
         jClass.addImport("java.io.Writer");
@@ -259,21 +259,21 @@ public class SourceFactory  {
      * @return the JClass representation of the given Simpletype
     **/
     public JClass createSourceCode
-        (Simpletype simpletype, ClassInfoResolver resolver, String packageName) 
+        (SimpleType simpleType, ClassInfoResolver resolver, String packageName) 
     {
         
-        if (simpletype instanceof BuiltInType) {
+        if (simpleType instanceof BuiltInType) {
             String err = "You cannot construct a ClassInfo for a " +
-                "built-in simpletype.";
+                "built-in SimpleType.";
             throw new IllegalArgumentException(err);
         }
         
         boolean enumeration = false;
         
         //-- class name information
-        String className = JavaXMLNaming.toJavaClassName(simpletype.getName());
+        String className = JavaXMLNaming.toJavaClassName(simpleType.getName());
         
-        if (simpletype.hasFacet(Facet.ENUMERATION)) {
+        if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
             //-- XXXX Fix packageName...this is a hack I know,
             //-- XXXX we should change this
@@ -294,29 +294,29 @@ public class SourceFactory  {
         initialize(jClass);
         
         //-- XML information
-        Schema  schema = simpletype.getSchema();        
+        Schema  schema = simpleType.getSchema();        
         classInfo.setNamespaceURI(schema.getTargetNamespace());
-        classInfo.setNodeName(simpletype.getName());
+        classInfo.setNodeName(simpleType.getName());
         
         
         //-- process annotation
-        String comment  = processAnnotations(simpletype);
+        String comment  = processAnnotations(simpleType);
         if (comment != null) 
             jClass.getJDocComment().setComment(comment);
             
-        XSClass xsClass = new XSClass(jClass, simpletype.getName());
+        XSClass xsClass = new XSClass(jClass, simpleType.getName());
         
         classInfo.setSchemaType(xsClass);
         
         //-- handle enumerated types
         if (enumeration) {
             xsClass.setAsEnumertated(true);
-            processEnumeration(simpletype, state);
+            processEnumeration(simpleType, state);
         }
         
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
-            resolver.bindReference(simpletype, classInfo);
+            resolver.bindReference(simpleType, classInfo);
         }
         
         return jClass;
@@ -491,28 +491,28 @@ public class SourceFactory  {
     } //-- resolveClassName
     
     /**
-     * @param complextype the Complextype for this ClassInfo
+     * @param complexType the ComplexType for this ClassInfo
      * @param resolver the ClassInfoResolver for resolving "derived" types.
     **/    
-    private void processComplextype
-        (Complextype complextype, FactoryState state) 
+    private void processComplexType
+        (ComplexType complexType, FactoryState state) 
     {
         
-        String typeName = complextype.getName();
+        String typeName = complexType.getName();
         
         ClassInfo classInfo = state.classInfo;
         classInfo.setSchemaType(new XSClass(state.jClass, typeName));
         
-        Schema schema = complextype.getSchema();
+        Schema schema = complexType.getSchema();
         classInfo.setNamespaceURI(schema.getTargetNamespace());
         
         
         
         //- Handle derived types
-        if (complextype.getBase() != null) {
+        if (complexType.getBase() != null) {
         
-            String baseName = complextype.getBase();
-            Complextype base = schema.getComplextype(baseName);
+            String baseName = complexType.getBase();
+            ComplexType base = schema.getComplexType(baseName);
             if (base != null) {
                 
                 String className = null;
@@ -551,15 +551,15 @@ public class SourceFactory  {
         //- handle attributes -/
         //---------------------/
         //-- loop throug each attribute
-        Enumeration enum = complextype.getAttributeDecls();
+        Enumeration enum = complexType.getAttributeDecls();
         while (enum.hasMoreElements()) {
             AttributeDecl attr = (AttributeDecl)enum.nextElement();
             
-            //-- if we have a new simpletype...generate ClassInfo
-            Simpletype dtype = attr.getSimpletype();
-            if (dtype != null) {
-                if ( ! (dtype instanceof BuiltInType) )
-                createSourceCode(dtype, state, state.packageName);
+            //-- if we have a new SimpleType...generate ClassInfo
+            SimpleType sType = attr.getSimpleType();
+            if (sType != null) {
+                if ( ! (sType instanceof BuiltInType) )
+                createSourceCode(sType, state, state.packageName);
             }
                 
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
@@ -570,7 +570,7 @@ public class SourceFactory  {
         //- handle content model -/
         //------------------------/
         //-- check contentType
-        ContentType contentType = complextype.getContent();
+        ContentType contentType = complexType.getContent();
             
         //-- create text member
         if ((contentType == ContentType.textOnly) ||
@@ -587,7 +587,7 @@ public class SourceFactory  {
             }
                 
         }
-        processContentModel(complextype, state);
+        processContentModel(complexType, state);
     } //-- processComplextype
 
 
@@ -687,10 +687,10 @@ public class SourceFactory  {
      * simpletype
     **/
     private void processEnumeration
-        (Simpletype simpletype, FactoryState state) 
+        (SimpleType simpleType, FactoryState state) 
     {
         
-        Enumeration enum = simpletype.getFacets("enumeration");
+        Enumeration enum = simpleType.getFacets("enumeration");
         
         
         
