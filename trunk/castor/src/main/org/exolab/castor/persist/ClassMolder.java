@@ -2492,6 +2492,7 @@ public class ClassMolder {
             switch (fieldType) {
             case FieldMolder.PRIMITIVE:
                 Object temp = fields[i];
+                _fhs[i].setValue( object, temp, tx.getClassLoader() );
                 break;
             case FieldMolder.SERIALIZABLE:
                 // deserialize byte[] into java object
