@@ -46,7 +46,6 @@
 
 package org.exolab.castor.jdo.engine;
 
-
 import java.io.Reader;
 import java.io.Writer;
 import java.io.InputStream;
@@ -106,39 +105,16 @@ public final class SQLTypes
         int sep;
 
         sep = sqlTypeName.indexOf( LeftParamSeparator );
-        if ( sep >= 0 )
+        if ( sep >= 0 ) 
             sqlTypeName = sqlTypeName.substring( 0, sep );
-
+        
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
                 return _typeInfos[ i ].javaType;
         }
         throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
     }
-
-
-    /**
-     * Returns the Java type from the SQL type name.
-     *
-     * @param sqlTypeName SQL type name (e.g. numeric)
-     * @return The suitable Java type
-     * @throws MappingException The SQL type is not recognized.
-     */
-    public static int sqlTypeFromName( String sqlTypeName )
-        throws MappingException
-    {
-        int sep;
-
-        sep = sqlTypeName.indexOf( LeftParamSeparator );
-        if ( sep >= 0 )
-            sqlTypeName = sqlTypeName.substring( 0, sep );
-
-        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
-            if ( sqlTypeName.equals( _typeInfos[ i ].sqlTypeName ) )
-                return _typeInfos[ i ].sqlType;
-        }
-        throw new MappingException( "jdo.sqlTypeNotSupported", sqlTypeName );
-    }
+    
 
     /**
      * Extracts parameter for type convertor from the name of the SQL type
@@ -155,7 +131,7 @@ public final class SQLTypes
 
         left = sqlTypeName.indexOf( LeftParamSeparator );
         right = sqlTypeName.indexOf( RightParamSeparator );
-        if ( right < 0 )
+        if ( right < 0 ) 
             right = sqlTypeName.length();
 
         if ( left >= 0 )
@@ -200,8 +176,8 @@ public final class SQLTypes
         }
         return java.sql.Types.OTHER;
     }
-
-
+    
+    
     /**
      * Convert from Java name to SQL name. Performs trivial conversion
      * by lowering case of all letters and adding underscore between
@@ -224,13 +200,13 @@ public final class SQLTypes
         int          i;
         char         ch;
         boolean      wasLower;
-
+        
         // Get only the last part of the Java name (whether it's
         // class name with package, or field name with parent)
         if ( javaName.indexOf( '.' ) > 0 ) {
             javaName = javaName.substring( javaName.lastIndexOf( '.' ) + 1 );
         }
-
+        
         sql = new StringBuffer( javaName.length() );
         wasLower = false;
         for ( i = 0 ; i < javaName.length() ; ++i ) {
@@ -276,7 +252,7 @@ public final class SQLTypes
     {
         StringBuffer java;
         int          i;
-
+        
         java = new StringBuffer( sqlName.length() );
         if ( scope != null )
             java.append( scope ).append( '.' );
@@ -298,19 +274,49 @@ public final class SQLTypes
     public static Object getObject( ResultSet rs, int index, int sqlType )
             throws SQLException
     {
+        Object value;
+        long longVal;
+        int intVal;
+        boolean boolVal;
+        double doubleVal;
+        float floatVal;
+        short shortVal;
+        byte byteVal;
+
         switch ( sqlType ) {
-        case Types.TIME:       return rs.getTime( index );
-        case Types.DATE:       return rs.getDate( index );
-        case Types.TIMESTAMP:  return rs.getTimestamp( index );
-        case Types.INTEGER:    return new Integer( rs.getInt( index ) );
-        case Types.LONGVARBINARY:
-        case Types.VARBINARY:
-        case Types.BINARY:
-            return rs.getBytes(index);
         case Types.CHAR:
         case Types.VARCHAR:
         case Types.LONGVARCHAR:
             return rs.getString(index);
+        case Types.DECIMAL:
+        case Types.NUMERIC:
+            return rs.getBigDecimal( index );
+        case Types.INTEGER:
+            intVal = rs.getInt( index );
+            return ( rs.wasNull() ? null : new Integer( intVal ) );
+        case Types.TIME:
+            return rs.getTime( index );
+        case Types.DATE:
+            return rs.getDate( index );
+        case Types.TIMESTAMP:
+            return rs.getTimestamp( index ); 
+        case Types.FLOAT:
+        case Types.DOUBLE:
+            doubleVal = rs.getDouble( index );
+            return ( rs.wasNull() ? null : new Double( doubleVal ) );
+        case Types.REAL:
+            floatVal = rs.getFloat( index );
+            return ( rs.wasNull() ? null : new Float( floatVal ) );
+        case Types.SMALLINT:
+            shortVal = rs.getShort( index );
+            return ( rs.wasNull() ? null : new Short( shortVal ) );
+        case Types.TINYINT:
+            byteVal = rs.getByte( index );
+            return ( rs.wasNull() ? null : new Byte( byteVal ) );
+        case Types.LONGVARBINARY:
+        case Types.VARBINARY:
+        case Types.BINARY:
+            return rs.getBytes(index);
         case Types.BLOB:
             try {
                 Blob blob = rs.getBlob( index );
@@ -341,7 +347,14 @@ public final class SQLTypes
             } catch ( IOException e ) {
                 throw new SQLException("IOException thrown while reading CLOB into a string!");
             }
-        default:               return rs.getObject( index );
+        case Types.BIGINT:
+            longVal = rs.getLong( index );
+            return ( rs.wasNull() ? null : new Long( longVal ) );
+        case Types.BIT:
+            boolVal = rs.getBoolean( index );
+            return ( rs.wasNull() ? null : new Boolean( boolVal ) );
+        default:               
+            return rs.getObject( index ); 
         }
     }
 
@@ -349,11 +362,11 @@ public final class SQLTypes
     static class TypeInfo
     {
         final int    sqlType;
-
+        
         final String sqlTypeName;
-
+        
         final Class  javaType;
-
+        
         TypeInfo( int sqlType, String sqlTypeName, Class javaType )
         {
             this.sqlType     = sqlType;
@@ -363,7 +376,7 @@ public final class SQLTypes
 
     }
 
-
+    
     /**
      * List of all the SQL types supported by Castor JDO.
      */
@@ -390,7 +403,7 @@ public final class SQLTypes
         new TypeInfo( java.sql.Types.OTHER,         "other",         java.lang.Object.class ),
         new TypeInfo( java.sql.Types.JAVA_OBJECT,   "javaobject",    java.lang.Object.class )
     };
-
+    
 
 }
 
