@@ -75,6 +75,11 @@ public final class EntityInfo {
     public final EntityInfo[] subEntities;
 
     /**
+     * The super entity of this entity
+     */
+    public final EntityInfo superEntity;
+
+    /**
      *
      */
     public final Object discriminator;
