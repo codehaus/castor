@@ -322,7 +322,8 @@ public class XMLClassDescriptorImpl extends Validator
 
                 }
             }
-            return result;
+            if (result != null)
+                return result;
         }
 
         if (wild || (nodeType == NodeType.Attribute)) {
