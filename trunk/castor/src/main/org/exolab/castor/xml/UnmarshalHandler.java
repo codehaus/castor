@@ -1908,6 +1908,14 @@ public final class UnmarshalHandler extends MarshalFramework
             else {
                 _class = descriptor.getFieldType();
             }
+            
+            //-- This *shouldn't* happen, but a custom implementation
+            //-- could return null in the XMLClassDesctiptor#getJavaClass
+            //-- or XMLFieldDescriptor#getFieldType. If so, just replace
+            //-- with java.lang.Object.class (basically "anyType").
+            if (_class == null) {
+                _class = java.lang.Object.class;
+            }
 
             // Retrieving the xsi:type attribute, if present
             String currentPackage = getJavaPackage(parentState.type);
