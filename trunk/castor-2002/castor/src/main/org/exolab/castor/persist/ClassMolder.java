@@ -1694,10 +1694,11 @@ public class ClassMolder {
 
                         // load the cached dependent object from the data store.
                         // The loaded will be compared with the new one
-                        value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
-                        if ( o != null )
-                            tx.update( fieldEngine, fieldClassMolder, o, oid );
-
+                        if ( fields[i] != null ) {
+                            value = tx.load( fieldEngine, fieldClassMolder, fields[i], null );
+                            if ( o != null )
+                                tx.update( fieldEngine, fieldClassMolder, o, oid );
+                        }
                     } else if ( tx.isAutoStore() ) {
                         if ( fields[i] != null ) {
                             if ( o != null && fields[i] == fieldClassMolder.getIdentity( tx, o ) )
