@@ -216,10 +216,10 @@ public final class DatabaseImpl
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
 	clsDesc = _dbEngine.getClassDesc( obj.getClass() );
-	if ( clsDesc == null || clsDesc.getIdentityField() == null )
+	if ( clsDesc == null || clsDesc.getIdentity() == null )
 	    throw new ClassNotPersistenceCapableException( obj.getClass().getName() );
 	try {
-	    tx.create( _dbEngine, obj, clsDesc.getIdentityField().getValue( obj ) );
+	    tx.create( _dbEngine, obj, clsDesc.getIdentity().getValue( obj ) );
 	} catch ( org.exolab.castor.persist.TransactionNotInProgressException except ) {
 	    throw new TransactionNotInProgressException( except.getMessage() );
 	} catch ( org.exolab.castor.persist.ClassNotPersistenceCapableException except ) {

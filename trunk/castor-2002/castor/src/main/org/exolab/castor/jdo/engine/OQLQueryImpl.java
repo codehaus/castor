@@ -69,6 +69,7 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 import org.exolab.castor.persist.LockNotGrantedException;
 import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.mapping.ContainerFieldDesc;
 
 
 /**
@@ -204,32 +205,32 @@ public class OQLQueryImpl
 	value = token.nextToken();
 	if ( name.indexOf( "." ) > 0 )
 	    name = name.substring( name.indexOf( "." ) + 1 );
-	fields = clsDesc.getJDOFields();
+	fields = (JDOFieldDesc[]) clsDesc.getFields();
 	field = null;
 	for ( int i = 0 ; i < fields.length ; ++i ) {
 	    if ( fields[ i ].getFieldName().equals( name ) ) {
-		sqlWhere.append( clsDesc.getSQLName( fields[ i ].getSQLName() ) );
+		sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
 		field = fields[ i ];
 		break;
 	    }
 	}
-	if ( field == null ) {
-	    fields = clsDesc.getPrimaryKey().getJDOFields();
-	    for ( int i = 0 ; i < fields.length ; ++i ) {
-		if ( fields[ i ].getFieldName().equals( name ) ) {
-		    sqlWhere.append( clsDesc.getSQLName( fields[ i ].getSQLName() ) );
-		    field = fields[ i ];
-		    break;
-		}
-	    }
-	}
+
 	if ( fields == null ) {
-	    if ( clsDesc.getPrimaryKey().isPrimitive() &&
-		 clsDesc.getPrimaryKeyField().getFieldName().equals( name ) ) {
-		sqlWhere.append( clsDesc.getSQLName( clsDesc.getPrimaryKey().getSQLName() ) );
-		field = clsDesc.getPrimaryKeyField();
+	    if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
+		fields = (JDOFieldDesc[]) ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
+		for ( int i = 0 ; i < fields.length ; ++i ) {
+		    if ( fields[ i ].getFieldName().equals( name ) ) {
+			sqlWhere.append( clsDesc.getTableName() + "." + fields[ i ].getSQLName() );
+			field = fields[ i ];
+			break;
+		    }
+		}
+	    } else if ( clsDesc.getIdentity().getFieldName().equals( name ) ) {
+		sqlWhere.append( clsDesc.getTableName() + "." + ( (JDOFieldDesc) clsDesc.getIdentity() ).getSQLName() );
+		field = (JDOFieldDesc) clsDesc.getIdentity();
 	    }
 	}
+
 	if ( field == null )
 	    throw new QueryInvalidException( "The field " + name + " was not found" );
 	sqlWhere.append( op );
