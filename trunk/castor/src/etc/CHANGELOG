@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1714 using contribution from Gregory Block [gblock@ctoforaday.com]
+       Added log statement to identfy problems with missing collection.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1714
+       (Werner - 20040817)
+
 JDO:   Fixed bug 1708 using contribution from Stein M. Hugubakken [dulci@start.no]
        Added (general JDO) Utils class.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1708
