@@ -164,7 +164,7 @@ public class SchemaWriter {
 
         _atts.clear();
 
-        String ELEMENT_NAME = "xs:annotation";
+        String ELEMENT_NAME = "xsd:annotation";
 
         _handler.startElement(ELEMENT_NAME, _atts);
 
@@ -174,9 +174,9 @@ public class SchemaWriter {
             String content = doc.getContent();
             if ((content != null) && (content.length() > 0)) {
                 char[] chars = content.toCharArray();
-                _handler.startElement("xs:documentation", _atts);
+                _handler.startElement("xsd:documentation", _atts);
                 _handler.characters(chars, 0, chars.length);
-                _handler.endElement("xs:documentation");
+                _handler.endElement("xsd:documentation");
             }
         }
 
@@ -192,7 +192,7 @@ public class SchemaWriter {
     private void processAttribute(AttributeDecl attribute)
         throws SAXException
     {
-        String ELEMENT_NAME = "xs:attribute";
+        String ELEMENT_NAME = "xsd:attribute";
 
         _atts.clear();
 
@@ -241,7 +241,7 @@ public class SchemaWriter {
     private void processComplexType(ComplexType complexType)
         throws SAXException
     {
-        String ELEMENT_NAME = "xs:complexType";
+        String ELEMENT_NAME = "xsd:complexType";
 
         _atts.clear();
 
@@ -299,7 +299,7 @@ public class SchemaWriter {
         throws SAXException
     {
 
-        String ELEMENT_NAME = "xs:element";
+        String ELEMENT_NAME = "xsd:element";
         _atts.clear();
 
 
@@ -364,7 +364,7 @@ public class SchemaWriter {
     private void processGroup(Group group)
         throws SAXException
     {
-        String ELEMENT_NAME = "xs:" + group.getOrder().toString();
+        String ELEMENT_NAME = "xsd:" + group.getOrder().toString();
 
         _atts.clear();
 
@@ -389,7 +389,7 @@ public class SchemaWriter {
         throws SAXException
     {
 
-        String ELEMENT_NAME = "xs:schema";
+        String ELEMENT_NAME = "xsd:schema";
 
         _handler.startDocument();
 
@@ -441,7 +441,7 @@ public class SchemaWriter {
 
         if (simpleType.isBuiltInType()) return;
 
-        String ELEMENT_NAME = "xs:simpleType";
+        String ELEMENT_NAME = "xsd:simpleType";
 
         _atts.clear();
 
@@ -462,7 +462,7 @@ public class SchemaWriter {
             _atts.clear();
             _atts.addAttribute("base", null, base.getName());
 
-            _handler.startElement("xs:restriction", _atts);
+            _handler.startElement("xsd:restriction", _atts);
 
             //-- process facets
             Enumeration enum = simpleType.getFacets();
@@ -470,12 +470,12 @@ public class SchemaWriter {
                 Facet facet = (Facet) enum.nextElement();
                 _atts.clear();
                 _atts.addAttribute("value", null, facet.getValue());
-                String facetName = "xs:" + facet.getName();
+                String facetName = "xsd:" + facet.getName();
                 _handler.startElement(facetName, _atts);
                 _handler.endElement(facetName);
             }
 
-            _handler.endElement("xs:restriction");
+            _handler.endElement("xsd:restriction");
         }
 
         _handler.endElement(ELEMENT_NAME);
