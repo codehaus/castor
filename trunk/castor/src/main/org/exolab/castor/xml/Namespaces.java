@@ -317,6 +317,12 @@ public final class Namespaces {
         if (_parent != null) {
             return _parent.getNonDefaultNamespacePrefix(nsURI);
         }
+        
+        //-- handle built-in namespace prefixes
+        if (XML_NAMESPACE.equals(nsURI)) {
+            return XML_NAMESPACE_PREFIX;
+        }
+        
         return null;
 
     } //-- method: getNonDefaultNamespacePrefix
