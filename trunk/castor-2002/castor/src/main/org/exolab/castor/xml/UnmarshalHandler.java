@@ -737,9 +737,13 @@ public class UnmarshalHandler extends MarshalFramework
             //-- the FieldDescriptor
             if (classDesc != null) {
                 _class = classDesc.getJavaClass();
-                //-- XXXX this is a hack I know...but we
-                //-- XXXX can't use the handler in this case
-                state.derived = true;
+                
+                //-- XXXX This is a hack I know...but we
+                //-- XXXX can't use the handler if the field
+                //-- XXXX types are different
+                if (descriptor.getFieldType() != _class) {
+                    state.derived = true;
+                }
             }
             else
                 _class = descriptor.getFieldType();
