@@ -99,6 +99,7 @@ public class OqlExtends
     {
         boolean result = true;
         Database db;
+        Date date;
 
         try {
             OQLQuery         oqlAll;
@@ -141,6 +142,7 @@ public class OqlExtends
             t.setGroup(group1);
             stream.writeVerbose( "Creating new object: " + t );
             db.create( t );
+            date = new Date();
             t = new TestOqlExtends();
             t.setId(TestOqlExtends.DefaultId + 11);
             t.setGroup(group2);
@@ -159,6 +161,21 @@ public class OqlExtends
                     stream.writeVerbose( "Error: ext field = " + t.getExt());
                     result = false;
                 }
+            }
+            oql.close();
+            if (cnt == 1) {
+                stream.writeVerbose( "OK" );
+            } else {
+                stream.writeVerbose( "Error: retrieved " + cnt + " objects");
+                result = false;
+            }
+
+            oql = db.getOQLQuery( "SELECT t FROM jdo.TestPersistent t WHERE t.creationTime<$1" );
+            oql.bind( date );
+            res = oql.execute();
+            for ( cnt = 0; res.hasMore(); cnt++ ) {
+                t = (TestOqlExtends) res.next();
+                stream.writeVerbose( "Retrieved object: " + t );
             }
             oql.close();
             if (cnt == 1) {
