@@ -100,7 +100,7 @@ public class TransformerImpl
     /**
      * The URIResolver to use
      */
-    private URIResolver _uriResolver = null;
+    private URIResolverWrapper _uriResolver = null;
 
     /** 
      * The error event handler in effect for the transformation.
@@ -177,7 +177,9 @@ public class TransformerImpl
      * URIResolver has been set.
      */
     public URIResolver getURIResolver() {
-        return _uriResolver;
+        if (_uriResolver != null)
+            return _uriResolver.getResolver();
+        return null;
     } //-- getURIResolver
     
     /**
@@ -304,7 +306,15 @@ public class TransformerImpl
      * or null.
      */
     public void setURIResolver(URIResolver resolver) {
-        _uriResolver = resolver;
+        
+        if (resolver == null) {
+            _uriResolver = null;
+        }
+        else {
+            _uriResolver = new URIResolverWrapper(resolver);
+        }
+        //-- result processors URIResolver
+        _processor.setURIResolver(_uriResolver);
     } //-- setURIResolver
     
     /**
