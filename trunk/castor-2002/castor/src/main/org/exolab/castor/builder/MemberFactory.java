@@ -192,7 +192,7 @@ public class MemberFactory {
             case XSType.COLLECTION:
                  fieldInfo = infoFactory.createCollection( ((XSList) xsType).getContentType(),
                                                              memberName,
-                                                             ((XSList) xsType).getContentType().getName()
+                                                             attribute.getName()
                                                               );
                  break;
             default:
@@ -205,12 +205,12 @@ public class MemberFactory {
         fieldInfo.setRequired(attribute.isRequired());
 
         String value = attribute.getValue();
-        
+
         if (value != null) {
-            
+
             //-- XXX Need to change this...and we
             //-- XXX need to validate the value.
-            
+
             //-- clean up value
             if (xsType.getType() == XSType.STRING) {
                 char ch = value.charAt(0);
@@ -224,7 +224,7 @@ public class MemberFactory {
                 }
             }
             else if (enumeration) {
-                
+
                 //-- we'll need to change this
                 //-- when enumerations are no longer
                 //-- treated as strings
@@ -233,7 +233,7 @@ public class MemberFactory {
                 tmp += "\");";
                 value = tmp;
             }
-            
+
             if (attribute.isFixed())
                 fieldInfo.setFixedValue(value);
             else
