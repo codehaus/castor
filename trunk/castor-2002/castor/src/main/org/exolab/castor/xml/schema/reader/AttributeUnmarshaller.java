@@ -51,7 +51,8 @@ import org.exolab.castor.xml.schema.*;
 import org.xml.sax.*;
 
 /**
- * The base class for unmarshallers
+ * The Unmarshaller for Attribute declarations
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
