@@ -1,6 +1,9 @@
 Version (CVS)
 -------------
 
+XML:   Added support for DOM in Marshaller.java and Unmarshaller.java
+          (Andrew Fawcett andrew.fawcett@coda.com)
+
 XML:   Added setPolymorph method to Marshaller.java. This can be used to force all field values
           to be marshalled as their field types rather than their instance types.
           (Andrew Fawcett andrew.fawcett@coda.com)

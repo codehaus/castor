@@ -47,6 +47,7 @@ package org.exolab.castor.xml;
 
 //-- xml related imports
 import org.xml.sax.*;
+import org.w3c.dom.*;
 import org.xml.sax.helpers.AttributeListImpl;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -353,6 +354,23 @@ public class Unmarshaller {
         return handler.getObject();
     } //-- unmarshal(InputSource)
 
+
+    /**
+     * Unmarshals Objects of this Unmarshaller's Class type.
+     * The Class must specify the proper access methods
+     * (setters/getters) in order for instances of the Class
+     * to be properly unmarshalled.
+     * @param node the DOM node to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
+    **/
+    public Object unmarshal(Node node)
+        throws MarshalException, ValidationException
+    {
+		return unmarshal(new DOMEventProducer(node));
+    } //-- unmarshal(EventProducer)
+	
     /**
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
@@ -385,6 +403,23 @@ public class Unmarshaller {
     {
         Unmarshaller unmarshaller = new Unmarshaller(c);
         return unmarshaller.unmarshal(source);
+    } //-- void unmarshal(Writer)
+
+    /**
+     * Unmarshals Objects of the given Class type. The Class must specify
+     * the proper access methods (setters/getters) in order for instances
+     * of the Class to be properly unmarshalled.
+     * @param c the Class to create a new instance of
+     * @param source the DOM Node to read the XML from
+     * @exception MarshalException when there is an error during
+     * the unmarshalling process
+     * @exception ValidationException when there is a validation error
+    **/
+    public static Object unmarshal(Class c, Node node)
+        throws MarshalException, ValidationException
+    {
+        Unmarshaller unmarshaller = new Unmarshaller(c);
+        return unmarshaller.unmarshal(node);
     } //-- void unmarshal(Writer)
 
     /**
