@@ -36,8 +36,8 @@
 
   <class name="jdo.TestRace" access="shared" identity="id">
     <description>Table used for cache testing</description>
-    <cache-type type="none" value="30"/>
     <map-to table="test_race" />
+    <cache-type type="count-limited" value="30"/>
     <field name="id" type="integer">
       <sql name="id" type="integer" />
     </field>
@@ -48,7 +48,6 @@
 
   <class name="jdo.TestMaster" access="shared" identity="id">
     <description>Test master table</description>
-    <cache-type type="unlimited" value="30"/>
     <map-to table="test_master" />
     <field name="id" type="integer">
       <sql name="id" type="numeric" />
