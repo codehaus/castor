@@ -758,7 +758,6 @@ public abstract class XMLTestCase extends TestCase {
         project.setBasedir(".");
         Javac compiler = new Javac();
         compiler.setProject(project);
-        compiler.setFork(true);
         compiler.setDestdir(destDir.getAbsoluteFile());
         Path classpath = compiler.createClasspath();
         classpath.setPath(System.getProperty("java.class.path"));
@@ -860,7 +859,6 @@ public abstract class XMLTestCase extends TestCase {
         return result;        
     }
     
-    
     class TestWithReferenceDocument extends TestCase {
             
             XMLTestCase _delegate;
@@ -949,5 +947,6 @@ public abstract class XMLTestCase extends TestCase {
                    else
                        throw new IllegalStateException("No test specified to tear down.");                
                }
-        }
+    }
+    
 }
