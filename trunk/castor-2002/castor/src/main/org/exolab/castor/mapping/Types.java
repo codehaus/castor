@@ -140,7 +140,7 @@ public abstract class Types
     {
 	for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
 	    if ( _typeInfos[ i ].javaType == type )
-		return true;
+		return _typeInfos[ i ].simpleType;
 	}
 	return false;
     }
@@ -243,20 +243,23 @@ public abstract class Types
 
 	public final Class   primitive;
 
+	public final boolean simpleType;
+
 	public final Class   javaType;
 
 	public final boolean immutable;
 
 	public final Object  defValue;
 
-	TypeInfo( String shortName, Class primitive, Class javaType,
-		  boolean immutable, Object defValue )
+	TypeInfo( String shortName, Class primitive, boolean simpleType,
+		  Class javaType, boolean immutable, Object defValue )
 	{
-	    this.shortName = shortName;
-	    this.primitive = primitive;
-	    this.javaType  = javaType;
-	    this.immutable = immutable;
-	    this.defValue  = defValue;
+	    this.shortName  = shortName;
+	    this.primitive  = primitive;
+	    this.simpleType = simpleType;
+	    this.javaType   = javaType;
+	    this.immutable  = immutable;
+	    this.defValue   = defValue;
 	}
 
     }
@@ -266,36 +269,38 @@ public abstract class Types
      * List of all the simple types supported by Castor.
      */
     static TypeInfo[] _typeInfos = new TypeInfo[] {
-	new TypeInfo( "other",       null,
+	new TypeInfo( "other",       null,                     false,
                       java.lang.Object.class,     false, null ),
-	new TypeInfo( "string",      null,
+	new TypeInfo( "string",      null,                     true,
                       java.lang.String.class,     true, "" ),
-	new TypeInfo( "integer",     java.lang.Integer.TYPE,
+	new TypeInfo( "integer",     java.lang.Integer.TYPE,   true,
 		      java.lang.Integer.class,    true, new Integer( 0 ) ),
-	new TypeInfo( "long",        java.lang.Long.TYPE,
+	new TypeInfo( "long",        java.lang.Long.TYPE,      true,
 		      java.lang.Long.class,       true, new Long( 0 ) ),
-	new TypeInfo( "boolean",     java.lang.Boolean.TYPE,
+	new TypeInfo( "boolean",     java.lang.Boolean.TYPE,   true,
 		      java.lang.Boolean.class,    true, Boolean.FALSE ),
-	new TypeInfo( "double",      java.lang.Double.TYPE,
+	new TypeInfo( "double",      java.lang.Double.TYPE,    true,
 		      java.lang.Double.class,     true, new Double( 0 ) ),
-	new TypeInfo( "float",       java.lang.Float.TYPE,
+	new TypeInfo( "float",       java.lang.Float.TYPE,     true,
 		      java.lang.Float.class,      true, new Float( 0 ) ),
-	new TypeInfo( "big-decimal", null,
+	new TypeInfo( "big-decimal", null,                     true,
                       java.math.BigDecimal.class, true, new BigDecimal( 0 ) ),
-	new TypeInfo( "big-integer", null,
+	new TypeInfo( "big-integer", null,                     true,
                       java.math.BigInteger.class, true, BigInteger.ZERO ),
-	new TypeInfo( "byte",        java.lang.Byte.TYPE,
+	new TypeInfo( "byte",        java.lang.Byte.TYPE,      true,
 		      java.lang.Byte.class,       true, new Byte( (byte) 0 ) ),
-	new TypeInfo( "date",        null,
+	new TypeInfo( "date",        null,                     true,
                       java.util.Date.class,       true, new Date() ),
-	new TypeInfo( "short",       java.lang.Short.TYPE,
+	new TypeInfo( "short",       java.lang.Short.TYPE,     true,
 		      java.lang.Short.class,      true, new Short( (short) 0 ) ),
-	new TypeInfo( "char",        java.lang.Character.TYPE,
+	new TypeInfo( "char",        java.lang.Character.TYPE, true,
 		      java.lang.Character.class,  true, new Character( (char) 0 ) ),
-	new TypeInfo( "bytes",       null,
+	new TypeInfo( "bytes",       null,                     true,
                       byte[].class,               false, new byte[ 0 ] ),
-	new TypeInfo( "chars",       null,
+	new TypeInfo( "chars",       null,                     true,
                       char[].class,               false, new char[ 0 ] ),
+	new TypeInfo( "strings",     null,                     false,
+                      String[].class,             false, new String[ 0 ] ),
 	/*
 	new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
 	new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
