@@ -69,10 +69,8 @@ public class DefaultObjectFactory implements ObjectFactory {
     public Object createInstance(Class type) 
         throws IllegalAccessException, InstantiationException
     {
-        //-- special case for java.sql.Date
-        if (java.sql.Date.class == type) {
-            long time = (new java.util.Date()).getTime();
-            return new java.sql.Date(time);
+        if (java.util.Date.class.isAssignableFrom(type)) {
+            return handleDates(type);
         }
         return type.newInstance();
     } //-- createInstance
@@ -88,10 +86,8 @@ public class DefaultObjectFactory implements ObjectFactory {
         throws IllegalAccessException, InstantiationException
     {
         if ((args == null) || (args.length == 0)) {
-            //-- special case for java.sql.Date
-            if (java.sql.Date.class == type) {
-                long time = (new java.util.Date()).getTime();
-                return new java.sql.Date(time);
+            if (java.util.Date.class.isAssignableFrom(type)) {
+                return handleDates(type);
             }
             return type.newInstance();
         }
@@ -112,10 +108,8 @@ public class DefaultObjectFactory implements ObjectFactory {
         throws IllegalAccessException, InstantiationException
     {
         if ((args == null) || (args.length == 0)) {
-            //-- special case for java.sql.Date
-            if (java.sql.Date.class == type) {
-                long time = (new java.util.Date()).getTime();
-                return new java.sql.Date(time);
+            if (java.util.Date.class.isAssignableFrom(type)) {
+                return handleDates(type);
             }
             return type.newInstance();
         }
@@ -156,5 +150,36 @@ public class DefaultObjectFactory implements ObjectFactory {
         }
             
     } //-- createInstance
+    
+    
+    /**
+     * Special Date Handling
+     */
+    private Object handleDates(Class type) 
+        throws IllegalAccessException, InstantiationException
+    {
+        
+        java.util.Date date = new java.util.Date();
+        
+        if (java.util.Date.class == type) {
+            return date;
+        }
+        else if (java.sql.Date.class == type) {
+            long time = date.getTime();
+            return new java.sql.Date(time);
+        }
+        else if (java.sql.Time.class == type) {
+            long time = date.getTime();
+            return new java.sql.Time(time);
+        }
+        else if (java.sql.Timestamp.class == type) {
+            long time = date.getTime();
+            return new java.sql.Timestamp(time);
+        }
+        else {
+            return type.newInstance();
+        }
+        
+    } //-- handleDates
     
 } //-- DefaultObjectFactory
