@@ -145,7 +145,7 @@
   </class>
 
   <class name="jdo.TestLazyContract" depends="jdo.TestLazyEmployee" identity="policyNo contractNo">
-    <description>Table used for testing multiple primany keys for extends</description>
+    <description>Table used for testing multiple primary keys for extends</description>
     <map-to table="test_pks_contract" />
     <field name="policyNo" type="integer" >
       <sql name="policy_no" type="integer"/>
@@ -195,9 +195,9 @@
   </class>
 
 
-  <!-- Test Multiple Primany Keys -->
+  <!-- Test Multiple primary Keys -->
   <class name="jdo.TestPKsPerson" identity="firstName lastName">
-    <description>Table used for testing multiple primany key</description>
+    <description>Table used for testing multiple primary key</description>
     <map-to table="test_pks_person" />
     <field name="firstName" type="string"  required="true">
       <sql name="fname" type="varchar" />
@@ -212,7 +212,7 @@
   </class>
 
   <class name="jdo.TestPKsAddress" depends="jdo.TestPKsPerson" identity="id">
-    <description>Table used for testing multiple primany key</description>
+    <description>Table used for testing multiple primary key</description>
     <map-to table="test_pks_address" />
     <field name="id" type="integer" >
       <sql name="id" type="integer" />
@@ -235,7 +235,7 @@
   </class>
 
   <class name="jdo.TestPKsEmployee" extends="jdo.TestPKsPerson">
-    <description>Table used for testing multiple primany keys for extends</description>
+    <description>Table used for testing multiple primary keys for extends</description>
     <map-to table="test_pks_employee" />
     <field name="startDate" type="date" >
       <sql name="start_date" type="date" />
@@ -245,7 +245,7 @@
   </class>
 
   <class name="jdo.TestPKsContract" depends="jdo.TestPKsEmployee" identity="policyNo contractNo">
-    <description>Table used for testing multiple primany keys for extends</description>
+    <description>Table used for testing multiple primary keys for extends</description>
     <map-to table="test_pks_contract" />
     <field name="policyNo" type="integer" >
       <sql name="policy_no" type="integer"/>
@@ -278,7 +278,7 @@
   </class>
 
   <class name="jdo.TestPKsPayRoll" depends="jdo.TestPKsEmployee" identity="id">
-    <description>Table used for testing multiple primany key</description>
+    <description>Table used for testing multiple primary key</description>
     <map-to table="test_pks_payroll" />
     <field name="id" type="integer">
       <sql name="id" type="integer"/>
