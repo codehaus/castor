@@ -2,6 +2,196 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.8.11  December, 15 2000"><pre>
+XML:    Updated Schema syntax and some of the Schema Object Model to support 
+        the W3C XML Schema Candidate Release. (kvisco)
+
+XML:    Allow the use of uninitialized collection. Castor will instiate a new 
+        collection of the proper type when necessary. (seb)
+
+XML:    Added #setResolver method to Marshaller, thanks to George Stewart for
+        pointing out to me that I neglected to add this method. (kvisco)
+
+XML:    Changed name of xml element in the mapping.dtd to bind-xml. This change
+        won't effect any existing mappings yet, because I've added backward
+        compatibility support. (kvisco)
+
+JDO:    For HIGH/LOW key generator the paramater "global" has been added, it gives possibility
+        to generate globally unique keys (Oleg Nitz).
+
+JDO:    SAP DB driver, improved support for MySQL (Oleg Nitz)
+
+JDO:    Added possibility to close OQL queries in order to release resources (Oleg Nitz)
+      </pre></section>
+    <section title="Version 0.8.10"><pre>
+XML:    Made the collection name in the mapping file NOT case sensitive. (Seb)
+
+XML:	Added new validation flag for the marshalling framework in castor.properties
+	Changed the parser validation property to og.exolab.castor.parser.validation
+	(Arnaud)
+
+XML:    Added fix to Marshaller#isPrimitive to support BigDecimal, submitted
+        by Don Kleppinger. (kvisco)
+
+XML:    Added "-nodesc" flag to source generater to disable generation of
+        class descriptors. Suggested by George Stewart. (kvisco)
+
+XML:    Fixed a bug in the unmarshalling of array of primitive type when using mapping.
+        (Seb &lt;gignoux@intalio.com>)
+
+XML:    Added feature to castorbuilder.properties to allow specifying a super
+        class of generated types (kvisco)
+      </pre></section>
+    <section title="Version 0.8.9"><pre>
+JDO:    SEQUENCE key generator for Interbase (contributed by Nic Wise &lt;nicw@xerxes.co.nz>).
+
+JDO:    MySQL driver (contributed by Leonardo Souza Mario Bueno &lt;leonardo@itera.com.br>).
+
+JDO:    Annoying type conversion problems solved:
+        - integer SQL type for Oracle now can be used for dependent objects
+          identities - before this caused type conversion error;
+        - timestamp SQL type can be used with Sybase - before dirty checking
+          failed;
+        - Database.load() now accepts identity value of the field type,
+          type conversion is performed correctly - before it was needed
+          to use the SQL type for Database.load(), but the field type
+          for OQLQuery.bind(). (Oleg Nitz)
+
+JDO:    Interbase driver (contributed by Terry Child &lt;tmchild@gmx.net>).
+
+JDO:    Added UUID key generator.
+        (contributed by Thomas Fach &lt;thomas.fach@publica.de>)
+
+JDO:    jdoBeforeCreate() callback method has been added to Persistent
+        interface. It is called during db.create() just before creating
+        object in the persistent storage (Oleg Nitz).
+
+JDO:    InstantDB driver (contributed by I. Burak Ozyurt &lt;bozyurt@san.rr.com>).
+
+JDO:    Replacing of extended object in the cache on load of extending object
+        implemented. jdoLoad signature changed. Now in jdoLoad you can request
+        reloading the object instance as an instance of an extending class.
+        You need some "type" field in the extended class, which determines 
+        the correct extending class, see example in
+        src\examples\myapp\Product.java. (Oleg Nitz)
+
+JDO:    Now IdentityKeyGenerator works with Hypersonic SQL identities
+        (idea by Mark Delanoy &lt;mdelanoy@niku.com>)
+
+JDO:    Fixed bugs (contributed by Bill Reynolds &lt;bill@leastsquares.com>)
+        - same OID for parent class instance and subclass instance
+          with the same identities causes cache corruption
+        - it is possible for a subclassed object to be reported as
+          non-persistable even if it has a legal mapping
+        - if you're using a class with the identity key generators and
+          no member fields, you get bad sql generated
+
+JDO:    Added support for LIMIT clause in OQL queries, currently for
+        PostrgeSQL only (contributed by Alexey Snisarenko &lt;alex@plesk.com>)
+
+JDO:    Added JDO.setClassLoader(). (Oleg Nitz &lt;on@ibis.odessa.ua>)
+
+JDO:    Fixed problem with Float/BigDecimal and Double/BigDecimal
+        type conversions. (Oleg Nitz &lt;on@ibis.odessa.ua>)
+
+JDO:    Implemented algorithm of "bounded" dirty checking for long
+        transactions, it uses local timestamps and is works only
+        if the object is still in the cache at the end of the transaction.
+        See interface TimeStampable and Database.update().
+        (Oleg Nitz &lt;on@ibis.odessa.ua>)
+
+JDO:    Changed HIGH/LOW key generator implementation: now holds lock
+        on the record in the sequence table until the end of the transaction
+        and doesn't use updatable ResultSets. (Oleg Nitz &lt;on@ibis.odessa.ua>)
+        Fixed a gap in HIGH/LOW key generator implementation: with databases
+        that don't support "SELECT FOR UPDATE" (like Hypersonic SQL and
+        InstantDB) it was possible to get the same key values in two concurrent
+        transactions (Reported by George Stewart &lt;georgestewartiv@yahoo.com>)
+        Now works in a separate connection, and commits changes to the sequence
+        table immediately.
+
+JDO:    Temporary fix to ClassLoader problem in EJB environment: application
+        classes are loaded using context classloader of the current thread.
+        (Oleg Nitz &lt;on@ibis.odessa.ua>)
+
+Misc:   JDK 1.1 compatibility is back. (Oleg Nitz &lt;on@ibis.odessa.ua>)
+
+XML:    Support for Bound Properties
+
+XML:    Added support for Pattern Facet 
+         - currently works for string, integer, and long 
+        (kvisco)
+
+XML:    Updated the Schema Object model to support the new Grouping syntax
+        - Groups are still not supported by the source code generator.
+        (kvisco)
+
+XML:    Updated Unmarshaller to support "empty" strings (kvisco)
+
+XML:    Added support for direct public field access for the Marshalling 
+        Framework when no accessor methods exist. (kvisco)
+
+XML:    Fixed Marshaller#setMarshalAsDocument so that XML fragment marshalling
+        works again. This used to work, but changes to the serializers had 
+        prevented this from working properly. Reported by Phil Grida. (kvisco)
+
+XML:    Fixed endless recursion bug when processing recursive element 
+        declarations, reported by Chris Schaefer (kvisco).
+
+XML:    Added George Stewarts changes to give mappings higher priority than
+        generated descriptors
+
+XML:    Added Patrick Higgins changes to the javasource package to fix
+        support for abstract methods (kvisco)
+
+XML:    Added support for in-lines SimpleTypes (anonymous) for 
+        attribute declarations (kvisco)
+
+XML:    Added support for in-lined SimpleTypes (anonymous) for 
+        element declarations. (kvisco)
+
+XML:    Added Luis Arias upgrade for the maxOccurs attribute of elements
+        for the April xML Schema draft (kvisco)
+
+XML:    Added support for top-level annotations (kvisco)
+
+XML:    Made some changes in Unmarshalling code to handle "null" primitives. 
+    Based on suggestions from Fabrice Gomez. (kvisco)
+
+XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers 
+    using dynamic-introspection. (kvisco)
+
+XML:    Changed some case-sensitive issues with the below mentioned Schema
+        syntax upgrade (kvisco)
+
+XML:    Update of the XML Schema syntax to the April 7th draft
+           (Remy Maucherat &lt;remm@apache.org>)
+
+        The following things in the April draft are supported :
+          - datatype -> simpleType
+          - type -> complexType
+          - the "source" attribute has been replaced by "base"
+          - the "fixed" attribute in an attribute element now is
+            part of the "use" attribute
+          - the "default" attribute, which is used to specify the default
+            value of an attribute, now is "value"
+          - the "minOccurs" attribute of an attribute element has been removed,
+            the attribute "use" has to be used instead. "use" can have the
+            following values : default, optional, required, fixed and
+            prohibited
+          - Info element is now Documentation
+          - maxOccurs = "*" is replaced by maxOccurs="unbounded"
+            (Andrew Fawcett)
+
+XML:    Java 2 types compatibility (Patrick Higgins)
+
+XML:    &lt;include> element support (Andrew Fawcett)
+
+XML:    decimal type support (Andrew Fawcett)
+
+XML:    Support xsi:type from XML Schema for Instances 
+    (Remy Maucherat &lt;remm@apache.org>)
+      </pre></section>
     <section title="Version 0.8.8  July 20, 2000"><pre>
 XML:     Added support for the Unmarshaller to automatically determine the Class of the
          root element, based on a given Mapping, or ClassDescriptorResolver
