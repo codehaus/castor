@@ -82,8 +82,8 @@
         <xsd:element ref="ldap"           minOccurs="0" maxOccurs="1"/>
       </xsd:sequence>
 
-      <xsd:attribute name="name"          type="NMTOKENS" use="required"/>
-      <xsd:attribute name="type"          type="NMTOKENS" use="optional"/>
+      <xsd:attribute name="name"          type="NMTOKEN" use="required"/>
+      <xsd:attribute name="type"          type="NMTOKEN" use="optional"/>
       <xsd:attribute name="required"      type="boolean"  use="optional"   value="false"/>
       <xsd:attribute name="transient"     type="boolean"  use="optional"   value="false"/>
       <xsd:attribute name="direct"        type="boolean"  use="optional"   value="false"/>
