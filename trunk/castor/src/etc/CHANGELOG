@@ -2,6 +2,13 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1733 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added support for RDBMS-specific meta data in general. This is currently used
+       within OracleQueryExpression to support the LIMIT clause implementation for
+       Oracle 8.1.6 and above only.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1733
+       (Werner - 20040927)
+
 JDO:   Fixed bug 1732 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added support for LIMIT/OFFSET clauses for Oracle, and fixed problems with 
        mySQL implementation (ordering of parameters).
