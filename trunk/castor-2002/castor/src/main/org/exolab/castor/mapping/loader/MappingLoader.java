@@ -47,6 +47,7 @@
 package org.exolab.castor.mapping.loader;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -558,19 +559,21 @@ public abstract class MappingLoader
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
         throws MappingException
     {
-        TypeInfo          typeInfo;
-        Class             fieldType = null;
-        Class             colType = null;
-        CollectionHandler colHandler = null;
-        boolean           getSetCollection = true;
-        FieldHandlerImpl  handler;
-        String            fieldName;
-        Method            getMethod = null;
-        Method            setMethod = null;
-        Method[]          getSequence = null;
-        Method[]          setSequence = null;
+        TypeInfo          typeInfo           = null;
+        Class             fieldType          = null;
+        Class             colType            = null;
+        CollectionHandler colHandler         = null;
+        boolean           getSetCollection   = true;
+        FieldHandlerImpl  handler            = null;
+        String            fieldName          = null;
+        Method            getMethod          = null;
+        Method            setMethod          = null;
+        Method[]          getSequence        = null;
+        Method[]          setSequence        = null;
 
 
+        fieldName = fieldMap.getName();
+        
         // If the field type is supplied, grab it and use it to locate the
         // field/accessor.
         if ( fieldMap.getType() != null ) {
@@ -592,8 +595,57 @@ public abstract class MappingLoader
             }
         }
 
-        fieldName = fieldMap.getName();
+        //-- check for user supplied FieldHandler
+        if (fieldMap.getHandler() != null) {
+            
+            FieldHandler userDefinedHandler = null;
+            
+            Class handlerClass = null;
+            try {
+                handlerClass = resolveType( fieldMap.getHandler() );
+            }
+            catch (ClassNotFoundException except) {
+                throw new MappingException( "mapping.classNotFound", fieldMap.getHandler() );
+            }
+            
+            if (!FieldHandler.class.isAssignableFrom(handlerClass)) {
+                String err = "The class '" + fieldMap.getHandler() + 
+                    "' must implement " + FieldHandler.class.getName();
+                throw new MappingException(err);
+            }
+            
+            //-- get default constructor to invoke. We can't use the
+            //-- newInstance method unfortunately becaue FieldHandler
+            //-- overloads this method 
+            Constructor constructor = null;
+            try {
+                constructor = handlerClass.getConstructor(new Class[0]);
+                userDefinedHandler = (FieldHandler) 
+                    constructor.newInstance(new Object[0]);
+            }
+            catch(java.lang.Exception except) {
+                String err = "The class '" + handlerClass.getName() + 
+                    "' must have a default public constructor.";
+                throw new MappingException(err);
+            }
+            
+            typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
+            
+            FieldDescriptorImpl fieldDesc =
+                new FieldDescriptorImpl( fieldName, 
+                                         typeInfo, 
+                                         userDefinedHandler, 
+                                         fieldMap.getTransient() );
 
+            fieldDesc.setRequired(fieldMap.getRequired());
+
+            return fieldDesc;
+        } //-- end user defined FieldHandler
+        
+        //-- Comment from Keith: The remainder of this method should really
+        //-- be moved to a "createFieldHandler" method.
+        
+        
         // If get/set methods not specified, use field names to determine them.
         if ( fieldMap.getDirect() ) {
             // No accessor, map field directly.
@@ -606,7 +658,8 @@ public abstract class MappingLoader
                 fieldType = field.getType();
             typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
             handler = new FieldHandlerImpl( field, typeInfo );
-        } else {
+        } 
+        else {
 
             if ( fieldMap.getGetMethod() == null && fieldMap.getSetMethod() == null ) {
                 int    point;
@@ -723,7 +776,14 @@ public abstract class MappingLoader
             fieldName = fieldMap.getName(); // Not the same for nested fields
             if ( fieldName == null )
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
-            handler = new FieldHandlerImpl( fieldName, getSequence, setSequence, getMethod, setMethod, typeInfo );
+                
+            //-- create handler
+            handler = new FieldHandlerImpl( fieldName, 
+                                            getSequence, 
+                                            setSequence, 
+                                            getMethod, 
+                                            setMethod, 
+                                            typeInfo );
 
             if ((setMethod != null) && (setMethod.getName().startsWith(ADD_METHOD_PREFIX)))
                 handler.setAddMethod(setMethod);
