@@ -56,7 +56,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;
-import org.exolab.castor.jdo.engine.DatabaseSource;
+import org.exolab.castor.jdo.engine.DatabaseRegistry;
 
 
 /**
@@ -65,11 +65,15 @@ import org.exolab.castor.jdo.engine.DatabaseSource;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ODMG
+public class JDO
+    implements DatabaseSource
 {
 
 
     private PrintWriter     _logWriter;
+
+
+    private String          _dbName;
 
 
     public void setLogWriter( PrintWriter logWriter )
@@ -84,60 +88,39 @@ public class ODMG
     }
 
 
-    public Transaction currentTransaction()
+    public void setDatabaseName( String dbName )
     {
-        return TransactionImpl.getCurrent();
+        _dbName = dbName;
     }
 
 
-    public Database getDatabase( Object obj )
+    public String getDatabaseName()
     {
-        /*
-          DatabaseEngine dbEngine;
-          DatabaseImpl   db;
-          
-          dbEngine = DatabaseEngine.getDatabaseEngine( obj );
-          if ( dbEngine == null )
-          throw new ObjectNotPersistentException( "The object could not be found in memory" );
-          db = new DatabaseImpl( dbEngine );
-          if ( _logWriter != null )
-          db.setLogWriter( _logWriter );
-          return db;
-        */
-        return null;
+        return _dbName;
     }
-    
-    
-    public String getObjectId( Object obj )
-    {
-        /*
-          return DatabaseEngine.createObjectOID( obj ).toString();
-        */
-        return null;
-    }
-    
-    
-    public Database openDatabase( String name )
+
+
+    public Database getDatabase()
         throws DatabaseNotFoundException
     {
         DatabaseImpl db;
         
-        db = new DatabaseImpl( name );
-        if ( _logWriter != null )
-            db.setLogWriter( _logWriter );
+        if ( _dbName == null )
+            throw new IllegalStateException( "Called 'getDatabase' without first setting database name" );
+        db = new DatabaseImpl( _dbName, _logWriter );
         return db;
-    }
-
-
-    public OQLQuery newOQLQuery()
-    {
-        return new OQLQueryImpl();
     }
 
 
     public Transaction newTransaction()
     {
         return new TransactionImpl();
+    }
+
+
+    public Transaction currentTransaction()
+    {
+        return TransactionImpl.getCurrent();
     }
 
 
@@ -150,10 +133,10 @@ public class ODMG
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public void loadDatabase( String url )
+    public static void loadDatabase( String url )
         throws MappingException
     {
-        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter, null );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, null );
     }
 
 
@@ -168,10 +151,10 @@ public class ODMG
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public void loadDatabase( String url, ClassLoader loader )
+    public static void loadDatabase( String url, ClassLoader loader )
         throws MappingException
     {
-        DatabaseSource.loadDatabase( new InputSource( url ), null, _logWriter, loader );
+        DatabaseRegistry.loadDatabase( new InputSource( url ), null, null, loader );
     }
     
     
@@ -189,10 +172,10 @@ public class ODMG
      * @throw MappingException The mapping file is invalid, or any
      *  error occured trying to load the JDO configuration/mapping
      */
-    public void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
+    public static void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
         throws MappingException
     {
-        DatabaseSource.loadDatabase( source, resolver, _logWriter, loader );
+        DatabaseRegistry.loadDatabase( source, resolver, null, loader );
     }
 
 
