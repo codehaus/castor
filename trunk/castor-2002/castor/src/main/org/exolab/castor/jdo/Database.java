@@ -338,18 +338,6 @@ public interface Database
 
 
     /**
-     * Returns true if the object is persistent. An object is persistent
-     * if it was created or queried in this transaction. If the object
-     * was created or queried in another transaction, or there is no
-     * open transaction, this method returns null.
-     *
-     * @param object The object
-     * @return True if persistent in this transaction
-     */
-    public boolean isPersistent( Object object );
-
-
-    /**
      * Begin a new transaction. A transaction must be open in order
      * to query and persist objects.
      *
@@ -424,6 +412,32 @@ public interface Database
      */
     public void close()
         throws PersistenceException;
+
+
+    /**
+     * Returns true if the object is persistent. An object is persistent
+     * if it was created or queried in this transaction. If the object
+     * was created or queried in another transaction, or there is no
+     * open transaction, this method returns null.
+     *
+     * @param object The object
+     * @return True if persistent in this transaction
+     */
+    public boolean isPersistent( Object object );
+
+
+    /**
+     * Returns the object's identity. If the identity was determined when
+     * the object was created, or if the object was retrieved, that identity
+     * is returned. If the identity has been modified, this will not be
+     * reflected until the transaction commits. Null is returned if the
+     * identity is null, the object does not have any identity, or the
+     * object is not persistent.
+     *
+     * @param object The object
+     * @return The object's identity, or null
+     */
+    public Object getIdentity( Object object );
 
 
     /**
