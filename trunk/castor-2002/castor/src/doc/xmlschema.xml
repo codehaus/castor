@@ -20,32 +20,32 @@
     <header>
     	<p></p>
     </header>
-    
+
     <section title="Introduction">
 
       <p>
-       The <a href="sourcegen.xml">Source Code Generator</a> is supporting the 
+       The <a href="sourcegen.xml">Source Code Generator</a> is supporting the
        <a href="http://www.w3.org/TR/xmlschema-1/">W3C XML Schema Candidate Recommendation document (10/24/2000).</a>
 	   Roughly speaking the Castor maps an XML Schema type to a  corresponding Java type.
-	   
-	   <p>But it happens that a Schema type does not have the corresponding one in Java. 
+
+	   <p>But it happens that a Schema type does not have the corresponding one in Java.
 	   Thus the Source Generator uses Castor implementation of these specific types (located in the <api package="org.exolab.castor.types"> types package</api>).
 	   For instance the <tt>TimeDuration</tt> type is implemented directly in Castor.
-	   Many built-in types are supported but not all of them. You will find next a detailed list of supported 
+	   Many built-in types are supported but not all of them. You will find next a detailed list of supported
 	   built-in types.</p>
-	   
-	   <p>Remember that the representation of XML Schema datatypes does not try to fit exactly the W3C XML Schema specifications, 
+
+	   <p>Remember that the representation of XML Schema datatypes does not try to fit exactly the W3C XML Schema specifications,
 	   the aim is to map an XML Schema type to the java type that fit the most to the XML Schema type.</p>
       </p>
 
-     
+
     </section>
 
     <section title="Supported XML Schema Built-in Datatypes">
-      	
+
       	<p>The following is a list of the supported datatypes with the corresponding facets and
       	the java mapping type.</p>
-      	
+
          <section title="Primitive Datatypes">
 
             <table>
@@ -89,15 +89,15 @@
                   	 minExclusive<br/>
                   	 maxInclusive<br/>
                   	 minInclusive<br/>
-                </td>  	 
+                </td>
                 <td valign="top">primitive float type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">ID</td><td></td>
                   <td valign="top">java.lang.String</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">IDREF</td><td></td>
                   <td valign="top">java.lang.Object</td>
@@ -115,7 +115,7 @@
                	 	java.lang.String
                	 </td>
                </tr>
-               
+
                <tr>
                   <td valign="top">recurringDuration</td>
                   <td>
@@ -126,7 +126,7 @@
                   </td>
                   <td>org.exolab.castor.types.RecurringDuration</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">string</td>
                   <td>
@@ -138,7 +138,7 @@
                   </td>
                   <td valign="top">java.lang.String</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">timeDuration</td>
                   <td>
@@ -176,19 +176,19 @@
                	 </td>
                	 <td valign="top">java.lang.string</td>
                </tr>
-               	 
+
                 <tr>
                   <td valign="top">date</td>
                   <td>
                   </td>
                	  <td valign="top">org.exolab.castor.types.Date</td>
                </tr>
-          
+
                <tr>
                   <td valign="top">IDREFS</td><td></td>
                   <td valign="top">java.util.Vector of IDREF</td>
                </tr>
-               
+
                 <tr>
                   <td valign="top">integer</td>
                   <td>
@@ -200,22 +200,22 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-            
+
                <tr>
                   <td valign="top">NCName</td><td></td>
                   <td valign="top">java.lang.String</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">NMToken</td><td></td>
                   <td valign="top"> java.lang.String</td>
                </tr>
-			   
+
 		       <tr>
                   <td valign="top">NMTOKENS</td><td></td>
                   <td valign="top">java.util.Vector of NMTOKEN</td>
                </tr>
-              
+
 		       <tr>
                   <td valign="top">long</td>
                   <td>
@@ -227,7 +227,7 @@
                   </td>
                	  <td valign="top">primitive long type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">month</td>
                   <td>
@@ -235,10 +235,10 @@
                   	minExclusive<br/>
                   	maxInclusive<br/>
                   	minInclusive<br/>
-                 </td> 
+                 </td>
                  <td valign="top">org.exolab.castor.types.Month</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">negativeInteger</td>
                   <td>
@@ -250,7 +250,7 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">nonNegativeInteger</td>
                   <td>
@@ -262,7 +262,7 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">nonPositiveInteger</td>
                   <td>
@@ -274,7 +274,7 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">positiveInteger</td>
                   <td>
@@ -286,7 +286,7 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">short</td>
                   <td>
@@ -298,21 +298,21 @@
                   </td>
                   <td valign="top">primitive int type</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">time</td>
                   <td>
                   </td>
                	  <td valign="top">org.exolab.castor.types.Time</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">timeInstant</td>
                   <td>
                   </td>
                   <td valign="top">java.util.Date</td>
                </tr>
-               
+
                 <tr>
                   <td valign="top">timePeriod</td>
                   <td>
@@ -323,7 +323,7 @@
                   </td>
                	  <td valign="top">org.exolab.castor.type.TimePeriod</td>
                </tr>
-               
+
                <tr>
                   <td valign="top">year</td>
                   <td>
@@ -334,7 +334,7 @@
                   </td>
                	  <td valign="top">org.exolab.castor.type.Year</td>
                </tr>
-              
+
             </table>
          </section>
        </section>
@@ -362,10 +362,16 @@
 
          <section title="Groups">
             <p>
-               The source code generator <i>currently</i> does not support
-               groups (choice, sequence, all). If it finds a group, it
-               flattens the group and treats the children of the group
-               as if they were children of the containing structure.
+               The source code generator <i>currently</i> supports
+               single level <b>choice</b> and <b>all</b>. The <b>sequence</b>
+               group is treated as an <b>all</b>. Nested groups (groups
+               which appear beneath other groups) are currently flattened
+               and the children of the group are treated as if they were
+               children of the containing structure.
+            </p>
+            <p>
+               A work around for nested groups is to simply create
+               a new complex type which represents the group.
             </p>
             <p>
               Grouping support is a work in progress.
