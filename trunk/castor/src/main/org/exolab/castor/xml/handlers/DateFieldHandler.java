@@ -598,7 +598,8 @@ public class DateFieldHandler extends XMLFieldHandler {
             }
             else
             {
-            	tz = TimeZone.getTimeZone(UTC_TIMEZONE);
+                //-- Clone static for UTC as TimeZone.getTimeZone is very expensive (requires fileio)
+                tz = (TimeZone)UTC_TIMEZONE_INSTANCE.clone();
 	            flags = HOURS_FLAG;
 	            int millis = 0;
 	            count = 0;
