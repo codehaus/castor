@@ -66,7 +66,7 @@ public class Deadlock
             _db.begin();
             
             // Create two objects in the database -- need something to lock
-            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE Id = $1" );
+            oql = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object WHERE id = $1" );
             oql.bind( TestObject.DefaultId );
             enum = oql.execute();
             if ( enum.hasMoreElements() ) {
