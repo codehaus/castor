@@ -69,6 +69,11 @@ public class DefaultObjectFactory implements ObjectFactory {
     public Object createInstance(Class type) 
         throws IllegalAccessException, InstantiationException
     {
+        //-- special case for java.sql.Date
+        if (java.sql.Date.class == type) {
+            long time = (new java.util.Date()).getTime();
+            return new java.sql.Date(time);
+        }
         return type.newInstance();
     } //-- createInstance
     
@@ -82,8 +87,14 @@ public class DefaultObjectFactory implements ObjectFactory {
     public Object createInstance(Class type, Object[] args) 
         throws IllegalAccessException, InstantiationException
     {
-        if ((args == null) || (args.length == 0))
+        if ((args == null) || (args.length == 0)) {
+            //-- special case for java.sql.Date
+            if (java.sql.Date.class == type) {
+                long time = (new java.util.Date()).getTime();
+                return new java.sql.Date(time);
+            }
             return type.newInstance();
+        }
         else 
             return createInstance(type, null, args);
     } //-- createInstance
@@ -100,8 +111,14 @@ public class DefaultObjectFactory implements ObjectFactory {
     public Object createInstance(Class type, Class[] argTypes, Object[] args)
         throws IllegalAccessException, InstantiationException
     {
-        if ((args == null) || (args.length == 0))
+        if ((args == null) || (args.length == 0)) {
+            //-- special case for java.sql.Date
+            if (java.sql.Date.class == type) {
+                long time = (new java.util.Date()).getTime();
+                return new java.sql.Date(time);
+            }
             return type.newInstance();
+        }
         
         if (argTypes == null) {
             argTypes = new Class[args.length];
