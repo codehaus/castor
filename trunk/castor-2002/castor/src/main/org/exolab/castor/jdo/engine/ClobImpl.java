@@ -53,16 +53,16 @@ import java.sql.Clob;
 import java.sql.SQLException;
 
 /**
- * This is an implementation of java.sql.Clob interface that is constructed 
- * from java.io.Reader, in needs information about the length of the stream 
+ * This is an implementation of java.sql.Clob interface that is constructed
+ * from java.io.Reader, in needs information about the length of the stream
  * (which is not provided by java.io.Reader interface).
- * 
+ *
  * It is useful for setting CLOB values in the database.
  * @author <a href="mailto:on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$
  */
 public class ClobImpl implements Clob {
-    
+
     private final Reader _reader;
 
     private final long _length;
@@ -110,7 +110,7 @@ public class ClobImpl implements Clob {
                 _reader.close();
             }
 
-        };    
+        };
     }
 
     public Reader getCharacterStream() {
@@ -138,7 +138,7 @@ public class ClobImpl implements Clob {
      * Not implemented, I guess it is not needed for writing CLOB
      */
     public long position(Clob searchstr, long start) {
-        return 0;    
+        return 0;
     }
 
     /**
@@ -151,7 +151,7 @@ public class ClobImpl implements Clob {
     /**
      * Not implemented.   Added to make ClobImpl complient with
      * JDBC 3.0, which is apart of JDK1.4 <p>
-     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a>
      */
     public OutputStream setAsciiStream(long pos)
                                 throws SQLException
@@ -162,7 +162,7 @@ public class ClobImpl implements Clob {
     /**
      * Not implemented.   Added to make ClobImpl complient with
      * JDBC 3.0, which is apart of JDK1.4 <p>
-     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a>
      */
     public Writer setCharacterStream(long pos)
                               throws SQLException
@@ -173,7 +173,7 @@ public class ClobImpl implements Clob {
     /**
      * Not implemented.   Added to make ClobImpl complient with
      * JDBC 3.0, which is apart of JDK1.4 <p>
-     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a>
      */
     public int setString(long pos, String str) throws SQLException
     {
@@ -183,10 +183,10 @@ public class ClobImpl implements Clob {
     /**
      * Not implemented.   Added to make ClobImpl complient with
      * JDBC 3.0, which is apart of JDK1.4 <p>
-     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a>
      */
     public int setString(long pos, String str, int offset,
-			 int len) throws SQLException
+             int len) throws SQLException
     {
         return -1;
     }
@@ -194,10 +194,10 @@ public class ClobImpl implements Clob {
     /**
      * Not implemented.   Added to make ClobImpl complient with
      * JDBC 3.0, which is apart of JDK1.4 <p>
-     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a> 
+     * @author <a href="mailto:adam_e@swbell.net">Adam Esterline</a>
      */
     public void truncate(long len) throws SQLException
     {
     }
-										 
-} 
+
+}
