@@ -50,6 +50,9 @@ import org.xml.sax.*;
 import org.apache.xml.serialize.Serializer;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.MimeBase64Encoder;
+import org.exolab.castor.util.List;
+import org.exolab.castor.util.Stack;
+
 import org.xml.sax.helpers.AttributeListImpl;
 
 import java.io.PrintWriter;
@@ -94,7 +97,7 @@ public class Marshaller {
     /**
      * The current namespace scoping
     **/
-    private Vector _nsScope = null;
+    private List _nsScope = null;
     
     /**
      * The MarshalInfoResolver used for Resolving MarshalInfo classes
@@ -106,7 +109,9 @@ public class Marshaller {
     **/
     int depth = 0;
     
-    private Vector _packages = null;
+    private List   _packages = null;
+    
+    private Stack   _parents  = null;
     
     /**
      * Creates a new Marshaller
@@ -114,9 +119,10 @@ public class Marshaller {
     private Marshaller() {
         _nsPrefixKeyHash = new Hashtable(3);
         _nsURIKeyHash    = new Hashtable(3);
-        _nsScope         = new Vector(3);
-        _packages        = new Vector(3);
+        _nsScope         = new List(3);
+        _packages        = new List(3);
         _mResolver       = new CachingMarshalInfoResolver();
+        _parents         = new Stack();
     } //-- Marshaller
     
     
@@ -227,6 +233,12 @@ public class Marshaller {
             throw new IllegalArgumentException(err);
         }
         
+        
+        //-- add object to stack so we don't potentially get into
+        //-- an endlessloop
+        if (_parents.search(object) >= 0) return;
+        _parents.push(object);
+        
         Class _class = object.getClass();
         
         boolean byteArray = false;
@@ -264,7 +276,7 @@ public class Marshaller {
                 String cname = MarshalHelper.toJavaName(name,true);
                 
                 for (int i = 0; i < _packages.size(); i++) {
-                    String pkgName = (String)_packages.elementAt(i);
+                    String pkgName = (String)_packages.get(i);
                     String className = pkgName+cname;
                     marshalInfo = MarshalHelper.getMarshalInfo(className);
                     if (marshalInfo != null) break;
@@ -281,7 +293,7 @@ public class Marshaller {
                 if (idx > 0) {
                     String pkgName = className.substring(0,idx+1);
                     if (!_packages.contains(pkgName))
-                        _packages.addElement(pkgName);
+                        _packages.add(pkgName);
                 }
                 marshalInfo = getMarshalInfo(_class);
             }
@@ -304,6 +316,7 @@ public class Marshaller {
                             (MarshalException.NON_SERIALIZABLE_ERR);
                     }
                 }
+                _parents.pop();
                 return;
             }
         }
@@ -365,7 +378,7 @@ public class Marshaller {
                 if (nsPrefix != null) {
                     if (nsPrefix.length() > 0) 
                         attName += ":" + nsPrefix;
-                    _nsScope.addElement(nsURI);
+                    _nsScope.add(nsURI);
                     addedNamespace = true;
                 }
                 atts.addAttribute(attName, null, nsURI);
@@ -483,7 +496,6 @@ public class Marshaller {
             }
             else marshal(obj, elemDescriptor, handler);
         }
-        --depth;
         
         //-- finish element
         try {
@@ -496,7 +508,9 @@ public class Marshaller {
             throw new MarshalException(sx);
         }
         
-        if (addedNamespace) _nsScope.removeElement(nsURI);
+        --depth;
+        _parents.pop();
+        if (addedNamespace) _nsScope.remove(nsURI);
         
     } //-- void marshal(DocumentHandler) 
     
