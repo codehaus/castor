@@ -145,6 +145,11 @@ JDO:    Fixed the 1:1 dependent object not being created when the it is newly
         link, or replaced to the master object in both long and short 
         transaction. (yip)
 
+JDO:    Added support of read-only field for Castor JDO. Read only can be
+        enable setting read-only attribute to true inside sql element in
+        the mapping file. (eg. <field><sql read-only="true".../></field> )
+        (Patch submitted by Jakob Braeuchi [jbraeuchi@hotmail.com])
+
 JDO:    (doc) Added FAQs for OQL and data model issues.
 
 JDO:    (doc) Corrected the PostgreSQL configuration example.
