@@ -717,7 +717,7 @@
     <field name="item" type="jdo.TestItem" collection="vector">
     </field>
   </class>
-<!--
+
   <class name="jdo.TestSerial" identity="id">
     <description>Table used for testing serializable field</description>
     <map-to table="test_serial" />
@@ -728,5 +728,4 @@
       <sql name="dep" type="blob" dirty="ignore"/>
     </field>
   </class>
--->  
 </mapping>

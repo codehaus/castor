@@ -443,6 +443,18 @@ sp_procxmode proc_check_permissions, "anymode"
 go
 
 
+-- test_serial
+drop table test_serial
+go
+create table test_serial (
+  id      integer        not null,
+  dep     blob           null
+)
+go
+create unique index test_serial_pk on test_serial( id )
+go
+
+
 -- test_persistent
 drop table test_persistent
 go
