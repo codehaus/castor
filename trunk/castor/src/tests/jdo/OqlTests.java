@@ -195,12 +195,24 @@ public class OqlTests extends CastorTestCase {
 		query.bind(MAX_ID);
 		tryQuery(query, MAX_ID+1-MIN_ID-2);
 
+		 // query using 2 bind variable parameters, find all but the first and last object
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id<$2 and id>$1");
+		query.bind(MIN_ID);
+		query.bind(MAX_ID);
+		tryQuery(query, MAX_ID+1-MIN_ID-2);
+
 
 		 // query using "BETWEEN" operator, finding all records
 		query = _db.getOQLQuery("select x from jdo.TestObject x where id between $1 and $2");
 		query.bind(MIN_ID);
 		query.bind(MAX_ID);
 		tryQuery(query, MAX_ID+1-MIN_ID);
+
+		 // query using "BETWEEN" operator, finding no records
+		query = _db.getOQLQuery("select x from jdo.TestObject x where id between $2 and $1");
+		query.bind(MIN_ID);
+		query.bind(MAX_ID);
+		tryQuery(query, 0);
 
 
 		 // query using "IN" operator
@@ -291,14 +303,6 @@ public class OqlTests extends CastorTestCase {
      * @see The <a href="http://www.castor.org/nested-attr.html">Nested Attributes</a> doc
      */
     public void testSelectWithNestedAttrs()
-    {}
-
-    /*
-     * Test the LIMIT clause
-     *
-     * @todo How should we implement database specific implemenations?
-     */
-    public void testSelectWithLimitClause()
     {}
 
     /*
