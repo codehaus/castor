@@ -110,11 +110,13 @@ public class ElementDecl extends ContentModelType {
     private String schemaAbbrev = null;
     
     /**
-     * The "anonymous" ComplexType of this ElementDecl
+     * The XMLType for this element declaration
     **/
-    private ComplexType complexType = null;
+    private XMLType xmlType = null;
     
-    
+    /**
+     * The parent schema that this element declaration belongs to
+    **/    
     private Schema schema = null;
     
     /**
@@ -144,14 +146,7 @@ public class ElementDecl extends ContentModelType {
         this.name = name;
     } //-- ElementDecl
     
-    
-    /**
-     *
-    **/
-    public void setComplexType(ComplexType complexType) {
-        this.complexType = complexType;
-    } //-- addAttribute
-    
+        
     /**
      * Returns the maximum number of occurances that this element
      * must appear within it's parent context
@@ -172,6 +167,10 @@ public class ElementDecl extends ContentModelType {
         return minOccurs;
     } //-- getMinimumOccurance
     
+    /**
+     * Returns the name of this Element declaration
+     * @return the name of this element declaration
+    **/
     public String getName() {
         if (isReference()) {
             return elementRef;
@@ -180,49 +179,30 @@ public class ElementDecl extends ContentModelType {
     } //-- getName
     
     /**
-     * Returns the Complextype of this ElementDecl. If the element content
-     * did not define a ComplexType, is a simple type (defined by a 
-     * 'SimpleType'declaration) or is a built-in type the this method will 
-     * return null.
-     * @return the complextype of this ElementDecl
+     * Returns the XMLType (ComplexType or SimpleType) of this ElementDecl. 
+     * @return the XMLType of this ElementDecl
     **/
-    public ComplexType getComplexType() {
+    public XMLType getType() {
         
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)
-                return element.getComplexType();
+                return element.getType();
             return null;
         }
         
-        if (complexType == null) {
+        if (xmlType == null) {
             //-- check simpletype first since it has higher
             //-- precedence
             if (typeRef != null) {
-                if (schema.getSimpleType(typeRef) != null) return null;
-                complexType = schema.getComplexType(typeRef);
+                
+                XMLType tmp = schema.getSimpleType(typeRef);
+                if (tmp != null) return tmp;
+                else return schema.getComplexType(typeRef);
             }
         }
-        return complexType;
-    } //-- getAttributes
-
-    /**
-     * Returns the Simpletype of this ElementDecl. If the element content
-     * is defined by an complexType, other than a built-in type, then this method
-     * will return null;
-     * @return the simpleType of this ElementDecl
-    **/
-    public SimpleType getSimpleType() {
-        if (complexType != null) return null;
-        if (isReference()) {
-            ElementDecl element = getReference();
-            if (element != null)             
-                return element.getSimpleType();
-            else 
-                return null;
-        }
-        return schema.getSimpleType(typeRef);
-    } //-- getSimpleType
+        return xmlType;
+    } //-- getXMLType
 
     /**
      * Returns the ElementDecl that this element definition references.
@@ -354,20 +334,27 @@ public class ElementDecl extends ContentModelType {
     } //-- setSchemaName
     
     
-    /*
-    public void setSimpleType() {
-    } //-- setSimpleType
-    */
+    /**
+     * Sets the XMLType for this Element declaration. 
+     * @param type the XMLType for this element declaration.
+     * <BR />
+     * <B>Note:</B> This method is mutually exclusive with
+     * #setTypeReference, if a reference has previously been
+     * set it will be ignored.
+    **/
+    public void setType(XMLType type) {
+        this.xmlType = type;
+    } //-- setType
 
     /**
      * Sets the type reference for this element (either complextype or
      * simpletype)
     **/
-    public void setTypeRef(String typeRef) {
+    public void setTypeReference(String typeRef) {
         this.typeRef = typeRef;
     } //-- setTypeRef
     
-    public String getTypeRef() {
+    public String getTypeReference() {
         return typeRef;
     } //-- getTypeRef
 

@@ -56,8 +56,8 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Group extends ContentModelGroup 
-    implements Referable
+public class Group extends Annotated
+    implements ContentModelGroup, Referable
 {
 
     
@@ -65,6 +65,11 @@ public class Group extends ContentModelGroup
      * The type of collection
     **/
     private Collection collection = Collection.no;
+
+    /**
+     * the implementation of ContentModelGroup
+    **/
+    private ContentModelGroup _contentModel = null;
     
     /**
      * The name of this Group
@@ -98,6 +103,7 @@ public class Group extends ContentModelGroup
     public Group(String name) {
         super();
         this.name  = name;
+        _contentModel = new ContentModelGroupImpl();
     } //-- Group
 
     
@@ -183,6 +189,38 @@ public class Group extends ContentModelGroup
         if (order == null) this.order = Order.all;
         else this.order = order;
     } //-- setOrder
+    
+    //---------------------------------------/
+    //- Implementation of ContentModelGroup -/
+    //---------------------------------------/
+    
+    /**
+     * Adds the given ElementDecl to this ContentModelGroup
+     * @param elementDecl the ElementDecl to add
+     * @exception SchemaException when an ElementDecl already
+     * exists with the same name as the given ElementDecl
+    **/
+    public void addElementDecl(ElementDecl elementDecl) 
+        throws SchemaException
+    {
+        _contentModel.addElementDecl(elementDecl);
+    } //-- addElementDecl
+    
+    /**
+     * Adds the given Group to this ContentModelGroup
+     * @param group the Group to add
+     * @exception SchemaException when a group with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(Group group) 
+        throws SchemaException
+    {
+        _contentModel.addGroup(group);
+    } //-- addGroup
+    
+    public Enumeration enumerate() {
+        return _contentModel.enumerate();
+    } //-- enumerate
     
     //-------------------------------/
     //- Implementation of Structure -/

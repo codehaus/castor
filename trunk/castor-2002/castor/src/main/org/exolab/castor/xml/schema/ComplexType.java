@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -56,8 +56,8 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ComplexType extends ContentModelGroup 
-    implements Referable
+public class ComplexType extends XMLType
+   implements ContentModelGroup, Referable
 {
 
     /**
@@ -86,6 +86,11 @@ public class ComplexType extends ContentModelGroup
     private String base = null;
     
     /**
+     * The ContentModel for this ComplexType
+    **/
+    private ContentModelGroup _contentModel = null;
+    
+    /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
     **/
@@ -108,6 +113,7 @@ public class ComplexType extends ContentModelGroup
         this.schema = schema;
         this.name = name;
         attributes   = new Hashtable();
+        _contentModel = new ContentModelGroupImpl();
     } //-- Complextype
     
     /**
@@ -162,12 +168,12 @@ public class ComplexType extends ContentModelGroup
     } //-- getAttributeDecls
 
     /**
-     * Returns the content type of this archetype
-     * @return the content type of this archetype
+     * Returns the content type of this ComplexType
+     * @return the content type of this ComplexType
     **/
-    public ContentType getContent() {
+    public ContentType getContentType() {
         return content;
-    } //-- getContent
+    } //-- getContentType
     
     /**
      * Returns the name of this Complextype, or null if no name was defined
@@ -219,10 +225,10 @@ public class ComplexType extends ContentModelGroup
      * Sets the content type of this archetype
      * @param contentType the ContentType for this archetype
     **/
-    public void setContent(ContentType contentType) 
+    public void setContentType(ContentType contentType) 
     {
         this.content = contentType;
-    } //-- setContent
+    } //-- setContentType
     
 
     /**
@@ -244,6 +250,38 @@ public class ComplexType extends ContentModelGroup
     public void useResolver(Resolver resolver) {
         // do nothing for now
     }
+
+    //---------------------------------------/
+    //- Implementation of ContentModelGroup -/
+    //---------------------------------------/
+    
+    /**
+     * Adds the given ElementDecl to this ContentModelGroup
+     * @param elementDecl the ElementDecl to add
+     * @exception SchemaException when an ElementDecl already
+     * exists with the same name as the given ElementDecl
+    **/
+    public void addElementDecl(ElementDecl elementDecl) 
+        throws SchemaException
+    {
+        _contentModel.addElementDecl(elementDecl);
+    } //-- addElementDecl
+    
+    /**
+     * Adds the given Group to this ContentModelGroup
+     * @param group the Group to add
+     * @exception SchemaException when a group with the same name as the
+     * specified group already exists in the current scope
+    **/
+    public void addGroup(Group group) 
+        throws SchemaException
+    {
+        _contentModel.addGroup(group);
+    } //-- addGroup
+    
+    public Enumeration enumerate() {
+        return _contentModel.enumerate();
+    } //-- enumerate
     
     //-------------------------------/
     //- Implementation of Structure -/
@@ -254,7 +292,7 @@ public class ComplexType extends ContentModelGroup
      * @return the type of this Schema Structure
     **/
     public short getStructureType() {
-        return Structure.ARCHETYPE;
+        return Structure.COMPLEX_TYPE;
     } //-- getStructureType
     
     /**

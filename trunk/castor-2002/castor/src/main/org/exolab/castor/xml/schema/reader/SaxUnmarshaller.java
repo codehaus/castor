@@ -198,6 +198,18 @@ public abstract class SaxUnmarshaller
     public void redefinedElement(String name) 
         throws org.xml.sax.SAXException
     {
+        redefinedElement(name, null);
+    } //-- redefinedElement
+
+    /**
+     * This method is called when an element which may only
+     * be defined once, is redefined.
+     * @param name the name of the element
+     * @exception org.xml.sax.SAXException always thrown.
+    **/
+    public void redefinedElement(String name, String xtraInfo) 
+        throws org.xml.sax.SAXException
+    {
         String err = "redefintion of element '" + name + 
             "' within element <" + elementName() + ">.";
             
@@ -205,7 +217,11 @@ public abstract class SaxUnmarshaller
             err += "\n   line: " + _locator.getLineNumber();
         }
         
-        throw new SAXException(err);
+        if (xtraInfo != null) {
+            err += "\n   " + xtraInfo;
+        }
+        
+        throw new SAXException(err+"\n");
     } //-- redefinedElement
     
     /**

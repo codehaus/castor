@@ -120,7 +120,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             
         //-- @type
         attValue = atts.getValue("type");
-        if (attValue != null) _element.setTypeRef(atts.getValue("type"));
+        if (attValue != null) _element.setTypeReference(attValue);
                 
         /*
          * @minOccurs
@@ -215,7 +215,8 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
                 = new ComplexTypeUnmarshaller(_schema, atts, getResolver());
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            throw new SAXException("<simpletype> not yet supported for <element>.");
+            unmarshaller 
+                = new SimpleTypeUnmarshaller(_schema, atts, getResolver());
         }
         else illegalElement(name);
         
@@ -257,15 +258,29 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
         }
         else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
             
-            ComplexType complexType = _element.getComplexType();
+            XMLType xmlType = _element.getType();
             
-            if (complexType != null) 
-                redefinedElement(name);
+            if ((xmlType != null) && xmlType.isComplexType()) {
+                String err = "Error defining '" + _element.getName();
+                err += "'. You may not have more than one 'complexType'.";
+                redefinedElement(name, err);
+            }
             
-            complexType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
-            _element.setComplexType(complexType);
+            xmlType = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
+            _element.setType(xmlType);
             
         } 
+        else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
+            XMLType xmlType = _element.getType();
+            if (xmlType != null) {
+                String err = "Error defining '" + _element.getName();
+                err += "'. You may not have more than one type.";
+                redefinedElement(name, err);
+            }
+            
+            xmlType = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
+            _element.setType(xmlType);
+        }
         
         unmarshaller = null;
     
