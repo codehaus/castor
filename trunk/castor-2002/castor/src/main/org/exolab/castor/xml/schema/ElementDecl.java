@@ -231,6 +231,14 @@ public class ElementDecl extends ContentModelType {
     } //-- getReference
     
     /**
+     * Returns the XML Schema to which this element declaration belongs.
+     * @return the XML Schema to which this element declaration belongs.
+    **/
+    public Schema getSchema() {
+        return this.schema;
+    } //-- getSchema
+
+    /**
      * Returns the Schema Abbreviation for the Schema name
      * @return the Schema Abbreviation for the Schema name
     **/
