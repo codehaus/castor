@@ -28,28 +28,28 @@
 
 	<p></p>
 
-	<p>What featues are supported in Castor's OQL?</p>
+	<p>What features are supported in Castor's OQL?</p>
 
 	<p>Due to some accident, we lost the xml source of the OQL document. Before we recover it, please click 
 	<a href="http://www.karpenstein.com/nissim/design-oql-parser.html">here</a> for the document</p>
 
-
+        <p>
 <field name="...." type="....">
    <sql name="...." dirty="ignore"/>
 </field>
 	</p>
      </section>
-     <section title="Featues requests">
-        <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?<b></p>
+     <section title="Features requests">
+        <p><b>When will castor support multiple columns primary keys, lazy loading, dependent/related relationship and many to many relationship?</b></p>
 
-	<p>Those features are implemented and available in development branch of the cvs.<p>
+	<p>Those features are implemented and available in development branch of the cvs.</p>
 	<p><code>
 	$ cvs -d :pserver:anoncvs@castor.exolab.org:/cvs/castor login
 	password: anoncvs
 	$ cvs -d :pserver:anoncvs@castor.exolab.org:/cvs/castor checkout -r castorone castor
 	</code>
 	</p>
-	<p>Please type "build doc" in castor directory and see the document under build\doc\castor-one.html for featues and limitations</p>
+	<p>Please type "build doc" in castor directory and see the document under build\doc\castor-one.html for features and limitations</p>
 
      </section>
 
