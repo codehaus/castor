@@ -332,7 +332,7 @@ public class OQLQueryImpl
         sql = new StringBuffer();
         paramCnt = 0;
         _paramInfo = new Hashtable();
-        if ( leftParen < 0 && rightParen < 0 ) {
+        if ( oql.startsWith("CALL SQL") || (leftParen < 0 && rightParen < 0) ) {
             sql.append( oql.substring( 5, as ) );
         } else {
             if ( ( leftParen < 0 && rightParen >= 0 )
