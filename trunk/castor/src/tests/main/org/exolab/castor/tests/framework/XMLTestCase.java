@@ -205,11 +205,6 @@ public abstract class XMLTestCase extends TestCase {
     protected Configuration _configuration;
 
     /**
-     * valueOf
-     */
-    private static final String VALUE_OF = "valueOf";
-  
-    /**
      * The ouput the unmarshalling test.
      */
     protected static Object _unmarshallingOutput;
@@ -353,8 +348,8 @@ public abstract class XMLTestCase extends TestCase {
             // 7. compare to initial model instance
             boolean result = unmarshalledRandomizedObject.equals(randomizedObject);
             verbose("----> Compare unmarshalled document to reference object: " + ((result)?"OK":"### Failed ### "));
-            assert("The initial randomized object and the one resulting of the marshal/unmarshal process are different", result);
-            assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+            assertTrue("The initial randomized object and the one resulting of the marshal/unmarshal process are different", result);
+            assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
          } catch (Exception ex) {
             //MarshallException or ValidationException
 
@@ -366,10 +361,11 @@ public abstract class XMLTestCase extends TestCase {
                    try {
                        Class expected = Class.forName(exceptionName);
                        if (expected.isAssignableFrom(ex.getClass())) {
-                           assert(_failure.getContent() == true);
+                           assertTrue(_failure.getContent());
                            return;
                        }
-                       else fail("Received:'"+ex+"' but expected:'"+exceptionName+"'.");
+                       else 
+                       	fail("Received:'"+ex+"' but expected:'"+exceptionName+"'.");
                    } catch (ClassNotFoundException cnfex) {
                         //Class#forName
                         fail("The exception specified:"+exceptionName+" cannot be found in the CLASSPATH");
@@ -378,7 +374,7 @@ public abstract class XMLTestCase extends TestCase {
                 }
                 //2--No exception specified --> the test is a success.
                 else {
-                    assert(_failure.getContent() == true);
+                    assertTrue(_failure.getContent());
                     return;
                 }
              }
@@ -450,8 +446,8 @@ public abstract class XMLTestCase extends TestCase {
                         writer.close();
                     }
 
-                    assert("The unmarshalled object differs from the hardcoded object.", result);
-                    assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+                    assertTrue("The unmarshalled object differs from the hardcoded object.", result);
+                    assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
                 }
 
             } else if (generated != null) {
@@ -476,10 +472,10 @@ public abstract class XMLTestCase extends TestCase {
 
                 verbose("----> Compare marshalled document to gold file '" + _goldFileName + "': " + ((result == 0)?"OK":"### Failed ### "));
                 if ((_failure != null) && (_failure.getContent() == true))
-                    assert(result != 0);
+                    assertTrue(result != 0);
                 else {
-                    assert("The Marshalled object differ from the gold file", result==0);
-                    assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+                    assertEquals("The Marshalled object differ from the gold file", result, 0);
+                    assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
                 }
             }
              // 5.  Marshal the Listener and compare it to the listener gold file, if any.
@@ -503,10 +499,10 @@ public abstract class XMLTestCase extends TestCase {
 
                verbose("----> Compare marshalled document to gold file '" + _listenerGoldFile + "': " + ((result == 0)?"OK":"### Failed ### "));
                if ((_failure != null) && (_failure.getContent() == true))
-                    assert(result != 0);
+                    assertTrue(result != 0);
                 else {
-                    assert("The Marshalled object differ from the gold file", result==0);
-                    assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+                    assertEquals("The Marshalled object differ from the gold file", result, 0);
+                    assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
                 }
 
             }
@@ -515,7 +511,7 @@ public abstract class XMLTestCase extends TestCase {
             verbose("--> Unmarshalling '" + marshal_output + "'\n");
             Object outAgain = testUnmarshal(marshal_output);
             assertNotNull("Unmarshalling '"+marshal_output.getName()+ "' results in a NULL object.", outAgain);
-            assert("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
+            assertTrue("-->The test case should have failed.",((_failure == null) || (_failure.getContent() == false)));
 
             if (builderClassName != null) {
                 //the equals method must be overriden
@@ -523,7 +519,7 @@ public abstract class XMLTestCase extends TestCase {
                 if (result == false)
                     verbose("Make sure the reference object model overrides Object#equals");
                 verbose("Compare to reference object: " + ((result)?"OK":" ### Failed ### "));
-                assert("The unmarshalled object differs from the hardcoded object.", result);
+                assertTrue("The unmarshalled object differs from the hardcoded object.", result);
             }
 
         } catch (Exception ex) {
@@ -537,7 +533,7 @@ public abstract class XMLTestCase extends TestCase {
                    try {
                        Class expected = Class.forName(exceptionName);
                        if (expected.isAssignableFrom(ex.getClass())) {
-                           assert(_failure.getContent() == true);
+                           assertTrue(_failure.getContent());
                            return;
                        }
                        else fail("Received:'"+ex+"' but expected:'"+exceptionName+"'.");
@@ -549,7 +545,7 @@ public abstract class XMLTestCase extends TestCase {
                 }
                 //2--No exception specified --> the test is a success.
                 else {
-                    assert(_failure.getContent() == true);
+                    assertTrue(_failure.getContent());
                     return;
                 }
              }
