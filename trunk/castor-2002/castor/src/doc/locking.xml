@@ -111,7 +111,7 @@
         <p>Castor detects such conflicts as they occur and uses two mechanisms to
            deal with them: write locks and deadlock detection. When a transaction commits
            Castor first tries to determine whether the object has been modified from
-           it's know state (i.e. during query). If the object has not been modified,
+           it's known state (i.e. during query). If the object has not been modified,
            Castor will not attempt to store the object to the database.</p>
 
         <p>If the object has been modified, Castor acquires a write lock on the object
@@ -149,7 +149,7 @@
            might not. Since the date does not depend on the original value of the
            account, but on the last modification to it, dirty checking can be avoided.</p>
 
-        <p>A field marked with dirty="ignore" will take part in dirty checking.
+        <p>A field marked with dirty="ignore" will not take part in dirty checking.
            Furthermore, modifications to such a field will not require a write lock
            on the object, further improving throughput. Marking fields as non-dirty
            should be done with extreme care.</p>
@@ -219,8 +219,8 @@
 
         <p>In some isolation levels, when Castor acquires a write lock on the database
            it will prevent other applications from accessing the same record until the
-           Castor transaction commits. In some isolation levels, other applications may
-           obtain a dirty image of the record.</p>
+           Castor transaction commits. However, certain isolation levels allow other 
+           applications to obtain a dirty image of the record.</p>
 
         <p>Write locks on the database have a severe impact on application performance.
            They incur overhead in the database manager, and increase lock contention.

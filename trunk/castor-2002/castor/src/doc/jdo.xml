@@ -231,7 +231,7 @@ oql = db.getOQLQuery( "CALL sp_something($) AS myapp.Product" );
       <section title="Create/remove/update">
 
         <p>The method <api class="org.exolab.castor.jdo.Database">create(java.lang.Object)</api>
-           creates a new objects in the database, or in JDO terminology makes a transient
+           creates a new object in the database, or in JDO terminology makes a transient
            object persistent. An object created with the <tt>create</tt> method will remain in
            the database if the transaction commits; if the transaction rolls back the object
            will be removed from the database. An exception is thrown if an object with the

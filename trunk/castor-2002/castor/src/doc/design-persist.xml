@@ -125,7 +125,7 @@
 
         <p>The transaction context (<javadoc>org.exolab.castor.persist.TransactionContext</javadoc>)
            is the only mechanism by which the top level APIs can interact with the persistence
-           engine. A new transaction must be opened in order to perform any operation and.</p>
+           engine. A new transaction must be opened in order to perform any operation.</p>
 
         <p>A transaction context is not created directly, but through a derived class that implements
            the proper mechanism for obtaining a new connection, committing and rolling back the
