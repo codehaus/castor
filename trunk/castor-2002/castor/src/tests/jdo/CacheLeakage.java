@@ -74,19 +74,22 @@ import harness.CastorTestCase;
 
 
 /**
- * This is a concurrent stress test. This test creates one write thread
- * that continuously create, load and modify, load and test if the 
- * modification is succeed, load and remove data objects and create 
- * again.... from a JDO database; multiple read threads are created and 
- * continuously read the data objects from a transaction and commit the 
- * transactions without modifying them. The read and commit action essentially 
- * lock and unlock the data object. These tests pass if all modification to
- * data objects via the write lock is properly persisted and no deadlock occurs.
- * Passing the tests confirm Castor JDO properly lock and release objects. 
- * Tests are performed on all four differnt cache-type.
- * (note, these tests may failed if the number of JDBC connections available
- * to Castor JDO is too small. To resolve the problem, reduce the number of 
- * read threads or increase the available connections.)
+ * This is a concurrent stress test. This test creates one writing thread
+ * that continuously creates, loads and modifies data objects. It loads 
+ * and test if the modifications has succeed, loads again and removes 
+ * data objects and creates a new object with the same identity again....; 
+ * multiple read threads are created and continuously read the data objects 
+ * from transactions and commit the transactions without modifying any
+ * data object. The 'read and commit' actions essentially lock and unlock 
+ * the data object. These tests pass if all modifications to data objects 
+ * via the write thread is properly persisted and there is no deadlock 
+ * occurring. Passing the tests confirm Castor JDO properly lock and release 
+ * objects. 
+ * <p>
+ * Tests are performed on all four different cache types. (note, these tests 
+ * may failed if the number of JDBC connections available to Castor JDO is 
+ * too small. To resolve the problem, reduce the number of read threads or 
+ * increase the available connections.)
  */
 public class CacheLeakage extends CastorTestCase {
 

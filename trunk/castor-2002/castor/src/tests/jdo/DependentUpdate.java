@@ -69,6 +69,12 @@ import harness.CastorTestCase;
 
 
 /**
+ * Test for dependent relationship between data objects for
+ * long transaction. A dependent object life cycle rely on 
+ * its master object. For example, if the master object is 
+ * deleted, it will be deleted by Castor as well. If the 
+ * dependent object is dereferenced, it will be removed from 
+ * the database.
  */
 public class DependentUpdate extends CastorTestCase {
 

@@ -80,9 +80,9 @@ import harness.CastorTestCase;
 
 
 /**
- *
- *
- *
+ * Test for lazy loading of collection supported by Castor.
+ * The object in a lazy collection is not loaded from the
+ * DBMS until is it requested by the collection.
  */
 public class LazyLoading extends CastorTestCase {
 

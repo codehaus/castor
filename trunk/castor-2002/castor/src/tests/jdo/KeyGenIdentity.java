@@ -55,7 +55,9 @@ import harness.CastorTestCase;
 
 
 /**
- * Test for IDENTITY key generator.
+ * Test for IDENTITY key generator. An IDENTITY key generator
+ * make uses of the RDBMS auto - increment features to generate
+ * a primary key for a newly created object.
  */
 public class KeyGenIdentity extends KeyGenGeneric {
 

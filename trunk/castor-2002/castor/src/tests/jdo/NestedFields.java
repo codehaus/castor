@@ -68,6 +68,8 @@ import harness.CastorTestCase;
 
 
 /**
+ * Test for nested-field support in Castor JDO. A nested-field
+ * is java field that maps to multiple database fields.
  */
 public class NestedFields extends CastorTestCase {
 

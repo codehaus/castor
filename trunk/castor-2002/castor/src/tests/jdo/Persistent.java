@@ -65,6 +65,9 @@ import harness.TestHarness;
 import harness.CastorTestCase;
 
 /**
+ * Test for the behaviors the persistent interface. A data object
+ * that implements the persistence interaface is notified by 
+ * Castor for loading, creating and storing events.
  */
 public class Persistent extends CastorTestCase {
 
