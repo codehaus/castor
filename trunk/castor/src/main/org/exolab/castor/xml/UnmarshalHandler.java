@@ -153,7 +153,7 @@ public final class UnmarshalHandler extends MarshalFramework
     /**
      * A StringBuffer used to created Debug/Log messages
     **/
-    private StringBuffer     buf           = null;
+    //private StringBuffer     buf           = null;
 
 
     /**
@@ -319,14 +319,14 @@ public final class UnmarshalHandler extends MarshalFramework
 
     /**
      * Creates a new UnmarshalHandler
+     * 
      * @param _class the Class to create the UnmarshalHandler for
-    **/
+     */
     protected UnmarshalHandler(Class _class) {
         super();
         _stateInfo          = new Stack();
         _idResolver         = new IDResolverImpl();
 		_javaPackages 		= new HashMap();        
-        buf                 = new StringBuffer();
         _topClass           = _class;
         _namespaces         = new Namespaces();
         _statePool          = new ArrayList();
@@ -2260,10 +2260,7 @@ public final class UnmarshalHandler extends MarshalFramework
 
         if (descriptor.isIncremental()) {
             if (debug) {
-                buf.setLength(0);
-                buf.append("debug: Processing incrementally for element: ");
-                buf.append(name);
-                message(buf.toString());
+                message("debug: Processing incrementally for element: " + name);
             }
             try {
                 handler.setValue(parentState.object, state.object);
@@ -2287,17 +2284,22 @@ public final class UnmarshalHandler extends MarshalFramework
             processNamespaces(classDesc);
         }
         else if ((state.type != null) && (!state.primitiveOrImmutable)) {
-            buf.setLength(0);
-            buf.append("The current object for element '");
-            buf.append(name);
-            buf.append("\' is null, ignoring attributes.");
-            message(buf.toString());
+            if (atts != null) {
+                processWrapperAttributes(atts);
+                StringBuffer buffer = new StringBuffer();
+                buffer.append("The current object for element '");
+                buffer.append(name);
+                buffer.append("\' is null. Processing attributes as location");
+                buffer.append("/wrapper only and ignoring all other attribtes.");
+                message(buffer.toString());
+            }
         }
         else {
         	//-- check for special attributes, such as xsi:nil
             if (atts != null) {
             	String nil = atts.getValue(NIL_ATTR, XSI_NAMESPACE);
                 state.nil = "true".equals(nil);
+                processWrapperAttributes(atts);
             }
         }
 
@@ -2620,11 +2622,9 @@ public final class UnmarshalHandler extends MarshalFramework
         if (classDesc == null) {
             classDesc = state.classDesc;
             if (classDesc == null) {
-                buf.setLength(0);
-                buf.append("No ClassDescriptor for '");
-                buf.append(state.elementName);
-                buf.append("', cannot process attributes.");
-                message(buf.toString());
+                //-- no class desc, cannot process atts
+                //-- except for wrapper/location atts
+                processWrapperAttributes(atts);                
                 return;
             }
         }
