@@ -55,6 +55,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
 import java.util.StringTokenizer;
+import java.net.URL;
 import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
@@ -102,7 +103,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Serializer = "org.exolab.castor.serializer";
-        
+
         /**
          * Property specifying the class name of the XML parser to use.
          * <pre>
@@ -110,7 +111,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Parser = "org.exolab.castor.parser";
-        
+
         /**
          * Property specifying whether to perform document validation by default.
          * <pre>
@@ -118,7 +119,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Validation = "org.exolab.castor.validation";
-        
+
         /**
          * Property specifying whether to support Namespaces by default.
          * <pre>
@@ -126,7 +127,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Namespaces = "org.exolab.castor.Namespaces";
-        
+
         /**
          * Property specifying whether XML documents should be indented by default.
          * <pre>
@@ -134,7 +135,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Indent = "org.exolab.castor.indent";
-        
+
         /**
          * Property specifying additional features for the parser.
          * This value contains a comma separated list of features that
@@ -144,9 +145,9 @@ public abstract class Configuration
          * </pre>
          */
         public static final String ParserFeatures = "org.exolab.castor.sax.features";
-        
+
         public static final String ParserFeatureSeparator = ",";
-        
+
         /**
          * Property specifying whether to run in debug mode.
          * <pre>
@@ -154,7 +155,7 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Debug = "org.exolab.castor.debug";
-        
+
         /**
          * The name of the configuration file.
          * <pre>
@@ -162,27 +163,27 @@ public abstract class Configuration
          * </pre>
          */
         public static final String FileName = "castor.properties";
-        
+
         static final String ResourceName = "/org/exolab/castor/castor.properties";
     }
-    
-    
+
+
     private static class Features
     {
         public static final String Validation = "http://xml.org/sax/features/validation";
         public static final String Namespaces = "http://xml.org/sax/features/namespaces";
     }
-    
-    
+
+
     // Some static string definitions
     private static final String TRUE_VALUE  = "true";
     private static final String ON_VALUE    = "on";
-    
+
     /**
      * The default properties loaded from the configuration file.
      */
     private static Properties _default;
-    
+
 
     /**
      * True if the default configuration specified debugging.
@@ -257,7 +258,7 @@ public abstract class Configuration
     {
         String prop;
         Parser parser;
-        
+
         prop = getDefault().getProperty( Property.Parser );
         if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
             // If no parser class was specified, we default to Xerces.
@@ -267,7 +268,7 @@ public abstract class Configuration
             // complain about creation error.
             try {
                 Class cls;
-                
+
                 cls = Class.forName( prop );
                 parser = (Parser) cls.newInstance();
             } catch ( Exception except ) {
@@ -279,7 +280,7 @@ public abstract class Configuration
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
             boolean         flag;
-            
+
             prop = getDefault().getProperty( Property.Validation, "false" );
             flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
             try {
@@ -294,7 +295,7 @@ public abstract class Configuration
             } catch ( SAXException except ) {
                 Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
-            
+
             features = getDefault().getProperty( Property.ParserFeatures, features );
             if ( features != null ) {
                 token = new StringTokenizer( features, ", " );
@@ -325,7 +326,7 @@ public abstract class Configuration
     {
         String     prop;
         Serializer serializer;
-        
+
         prop = getDefault().getProperty( Property.Serializer );
         if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
             // If no parser class was specified, we default to Xerces.
@@ -341,24 +342,25 @@ public abstract class Configuration
         serializer.setOutputFormat( getOutputFormat() );
         return serializer;
     }
-    
-    /** 
+
+    /**
      * Returns the default OutputFormat for use with a Serializer.
      *
      * @return the default OutputFormat
     **/
     public static OutputFormat getOutputFormat() {
-        
+
         boolean indent = false;
         String prop = getDefault().getProperty( Property.Indent, "" );
-        
+
         //-- get default indentation
         indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
                    prop.equalsIgnoreCase( ON_VALUE ) );
-            
+
         return new OutputFormat( Method.XML, null, indent );
     } //-- getOutputFormat
-    
+
+
     /**
      * Returns a default serializer for producing an XML document to
      * the designated output stream using the default serialization
@@ -372,7 +374,7 @@ public abstract class Configuration
     {
         Serializer      serializer;
         DocumentHandler docHandler;
-        
+
         serializer = getSerializer();
         serializer.setOutputByteStream( output );
         docHandler = serializer.asDocumentHandler();
@@ -381,7 +383,7 @@ public abstract class Configuration
                                                          serializer.getClass().getName() ) );
         return docHandler;
     }
-    
+
 
     /**
      * Returns a default serializer for producing an XML document to
@@ -396,7 +398,7 @@ public abstract class Configuration
     {
         Serializer      serializer;
         DocumentHandler docHandler;
-        
+
         serializer = getSerializer();
         serializer.setOutputCharStream( output );
         docHandler = serializer.asDocumentHandler();
@@ -418,7 +420,7 @@ public abstract class Configuration
     {
         File        file;
         InputStream is;
-        
+
         // Get detault configuration from the Castor JAR.
         // Complain if not found.
         _default = new Properties();
@@ -429,7 +431,7 @@ public abstract class Configuration
             throw new RuntimeException( Messages.format( "conf.noDefaultConfigurationFile",
                                                          Property.FileName ) );
         }
-        
+
         // Get overriding configuration from the Java
         // library directory, ignore if not found.
         try {
@@ -442,7 +444,7 @@ public abstract class Configuration
         } catch ( IOException except ) {
             // Do nothing
         }
-        
+
         // Get overriding configuration from the classpath,
         // ignore if not found.
         try {
@@ -454,13 +456,27 @@ public abstract class Configuration
         } catch ( Exception except ) {
             // Do nothing
         }
-        
+
         String     prop;
-        
+
         prop = _default.getProperty( Property.Debug, "" );
         if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
             _debug = true;
     }
-    
-    
+
+    /**
+     * Gets the url of the mapping file used to load the xml schema built-in type definitions.
+     */
+    public static URL getSimpleTypesMappingFileLocation()
+    {
+        return Configuration.class.getResource("/org/exolab/castor/util/resources/SimpleTypesMapping.properties");
+    }
+
+    /**
+     * Gets the url of the file that holds the xml schema built-in type definitions.
+     */
+    public static URL getSimpleTypesDefinitionLocation()
+    {
+        return Configuration.class.getResource("/org/exolab/castor/util/resources/SimpleTypes.properties");
+    }
 }
