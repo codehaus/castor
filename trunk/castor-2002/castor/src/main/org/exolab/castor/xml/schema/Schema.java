@@ -92,6 +92,11 @@ public class Schema extends Annotated {
 	 * A list of imported schemas
 	 */
 	private Hashtable importedSchemas = null;
+
+	/**
+	 * A list of  XML Schema files included in this schema
+	 */
+	private Vector includedSchemas = null;
 	
 	/**
 	 * A list of namespaces declared in this schema
@@ -117,6 +122,8 @@ public class Schema extends Annotated {
         simpleTypes  = new Hashtable();
         elements   = new Hashtable();
 		importedSchemas = new Hashtable();
+		includedSchemas = new Vector();
+		namespaces = new Hashtable();
         this.schemaNS = schemaNS;
         init();
     } //-- ScehamDef
@@ -316,7 +323,7 @@ public class Schema extends Annotated {
 		if (ns.equals(targetNS))
 			return (ComplexType)complexTypes.get(canonicalName);
 		else {
-			Schema schema = (Schema) importedSchemas.get(ns);
+			Schema schema = getImportedSchema(ns);
 			if (schema!=null)
 				return schema.getComplexType(canonicalName);
 		}
@@ -386,7 +393,7 @@ public class Schema extends Annotated {
 		else if (ns.equals(targetNS))
 			result = (SimpleType)simpleTypes.get(canonicalName);
 		else {
-			Schema schema = (Schema) importedSchemas.get(ns);
+			Schema schema = getImportedSchema(ns);
 			if (schema!=null)
 				result = schema.getSimpleType(canonicalName);
 		}
@@ -423,6 +430,32 @@ public class Schema extends Annotated {
         return elements.elements();
     } //-- getElementDecls
 
+	/**
+	 * Returns an imported schema by it's namespace
+	 * @return The imported schema
+	 */
+	public Schema getImportedSchema(String ns)
+	{
+		return (Schema) importedSchemas.get(ns);
+	} //-- getImportedSchema
+	
+	/**
+	 * Indicates that the given XML Schema file has been processed via an <xsd:include>
+	 */
+	public void addInclude(String include)
+	{
+		includedSchemas.addElement(include);		
+	} //-- addInclude
+	
+	/**
+	 * Returns True if the given XML Schema has already been included via <xsd:include>
+	 * @return True if the file specified has already been processed
+	 */
+	public boolean includeProcessed(String includeFile)
+	{
+		return includedSchemas.contains(includeFile);
+	} //-- includeProcessed
+	
     /**
      * Returns the namespace of the XML Schema
      * <BR />
@@ -518,11 +551,11 @@ public class Schema extends Annotated {
 
 
 	/**
-	 * Sets the namespaces declared in this Schema
+	 * Adds to the namespaces declared in this Schema
 	 * @param namespaces the list of namespaces
 	 */
-	public void setNamespaces(Hashtable namespaces) {
-		this.namespaces = namespaces;
+	public void addNamespace(String prefix, String ns) {
+		namespaces.put(prefix, ns);
 	} //-- setNamespaces
 	
 	
