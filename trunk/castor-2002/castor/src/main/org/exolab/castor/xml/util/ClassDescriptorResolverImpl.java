@@ -14,22 +14,22 @@
  *
  * 3. The name "Exolab" must not be used to endorse or promote
  *    products derived from this Software without prior written
- *    permission of Exoffice Technologies.  For written permission,
+ *    permission of Intalio, Inc.  For written permission,
  *    please contact info@exolab.org.
  *
  * 4. Products derived from this Software may not be called "Exolab"
  *    nor may "Exolab" appear in their names without prior written
- *    permission of Exoffice Technologies. Exolab is a registered
- *    trademark of Exoffice Technologies.
+ *    permission of Intalio, Inc. Exolab is a registered
+ *    trademark of Intalio, Inc.
  *
  * 5. Due credit should be given to the Exolab Project
  *    (http://www.exolab.org/).
  *
- * THIS SOFTWARE IS PROVIDED BY EXOFFICE TECHNOLOGIES AND CONTRIBUTORS
+ * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
  * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
  * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * EXOFFICE TECHNOLOGIES OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
  * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999-2000 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -254,21 +254,27 @@ public class ClassDescriptorResolverImpl
             setError("Cannot resolve a null or zero-length xml name.");
             return null;
         }
-                
+        
         XMLClassDescriptor classDesc = null;
-                
         Enumeration enum = null;
         
-        if (mappingLoader != null)
+        //-- check mapping loader first
+        if (mappingLoader != null) {
             enum = mappingLoader.listDescriptors();
-        else
-            enum = _cache.elements();
+            while (enum.hasMoreElements()) {
+                classDesc = (XMLClassDescriptor)enum.nextElement();
+                if (xmlName.equals(classDesc.getXMLName()))
+                    return classDesc;
+                classDesc = null;
+            }
+        }
         
+        //-- next look in local cache
+        enum = _cache.elements();
         while (enum.hasMoreElements()) {
             classDesc = (XMLClassDescriptor)enum.nextElement();
-            if (xmlName.equals(classDesc.getXMLName())) {
+            if (xmlName.equals(classDesc.getXMLName()))
                 return classDesc;
-            }
             classDesc = null;
         }
         
@@ -287,7 +293,7 @@ public class ClassDescriptorResolverImpl
     public void setMappingLoader(XMLMappingLoader mappingLoader) {
         this.mappingLoader = mappingLoader;
     } //-- setMappingLoader
-    
+
     
     //-------------------/
     //- Private Methods -/
