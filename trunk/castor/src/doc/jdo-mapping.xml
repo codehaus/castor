@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="ISO-8859-1"?>
 <document url="http://castor.exolab.org/jdo-mapping.xml">
   <properties>
     <title>Castor JDO Mapping</title>
@@ -278,16 +277,16 @@
         </code>
 
         <p>If 'get-method' or 'set-method' attributes are not provided, Castor will try to
-        find the following function:</p>
-
-        <code>
-        public &lt;type> get&lt;capitalized-name>();
-        </code>
-        or
-        <code>
-        public void set&lt;capitalized-name>(&lt;type> value);
-        </code>
-            
+        find the following functions:</p>
+	
+		<code>	public void is&lt;capitalized-name>()/public &lt;type> get&lt;capitalized-name>();</code>
+		
+		<p>the former for boolean types, the latter for all other types (or if the 
+		   'is&lt;capitalized-name>()' method is not defined for a boolean type), and 
+		   a standard set method of</p>
+        
+        <code>	public void set&lt;capitalized-name>(&lt;type> value);</code>        
+	
         <p>&lt;capitalized-name> means that Castor uses the &lt;name> attribute by changing its first
         letter to uppercase without modifying the other letters.</p>
 
