@@ -569,6 +569,22 @@ public class RecurringDuration extends RecurringDurationBase{
     }//parse
 
     /**
+     * Override the java.lang.equals method
+     * @see equal
+     */
+     public boolean equals(Object object) {
+        if (object instanceof RecurringDuration) {
+            try {
+                return equal( (RecurringDuration) object);
+            } catch (ValidationException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+        else return false;
+    }
+
+    /**
      * <p> Returns true if the present instance of Recurring Duration is equal to
      * the parameter.
      * <p>The equals relation is the following :
@@ -576,7 +592,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * @param reccD the recurring duration to compare with the present instance
      * @return true if the present instance is equal to the parameter false if not
      */
-     public boolean equals(RecurringDuration reccD) throws ValidationException
+     public boolean equal(RecurringDuration reccD) throws ValidationException
      {
         boolean result = false;
         if (reccD == null)
