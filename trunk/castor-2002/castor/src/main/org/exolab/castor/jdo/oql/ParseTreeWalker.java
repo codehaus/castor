@@ -126,7 +126,7 @@ public class ParseTreeWalker implements TokenTypes
     //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_TYPES));
     //System.out.println(ParseTest.treeToString(_parseTree, ParseTest.NODE_VALUES));
     
-    
+
     checkErrors();
     createQueryExpression();
   }
@@ -798,33 +798,44 @@ public class ParseTreeWalker implements TokenTypes
     JDOFieldDescriptor identity = (JDOFieldDescriptor) _clsDesc.getIdentity();
     String identityColumn = identity.getSQLName()[0];
 
-    JDOClassDescriptor clsDesc = _clsDesc;
+
+    // the class for the join is even this class
+    // or one of the base classes
+    JDOClassDescriptor sourceClass = _clsDesc;
+
     JDOFieldDescriptor fieldDesc = null;
     for ( int i = 1; i < path.size() - 1; i++ ) {
-      fieldDesc = clsDesc.getField( (String) path.elementAt(i) );
-      clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
-      if ( clsDesc != null && clsDesc != _clsDesc )
+        // Find the sorceclass and the fielsddescriptor
+        // in the class hierachie
+         while(fieldDesc == null){
+              fieldDesc = sourceClass.getField( (String) path.elementAt(i) );
+              if(fieldDesc ==null){
+                  sourceClass=(JDOClassDescriptor)sourceClass.getExtends();
+              }
+        }
+      JDOClassDescriptor clsDesc = (JDOClassDescriptor) fieldDesc.getClassDescriptor();
+      if ( clsDesc != null && clsDesc != sourceClass )
         //we must add this table as a join
         if ( fieldDesc.getManyTable() == null ) {
           //a many -> one relationship
-          JDOFieldDescriptor foreignKey = 
+          JDOFieldDescriptor foreignKey =
                           (JDOFieldDescriptor) clsDesc.getIdentity();
-          _queryExpr.addInnerJoin( _clsDesc.getTableName(),
+          _queryExpr.addInnerJoin( sourceClass.getTableName(),
                                    fieldDesc.getSQLName(),
                                    clsDesc.getTableName(),
                                    foreignKey.getSQLName() );
         }
         else
           //a one -> many relationship
-          _queryExpr.addInnerJoin( _clsDesc.getTableName(), 
+          _queryExpr.addInnerJoin( _clsDesc.getTableName(),
                                    identityColumn,
-                                   fieldDesc.getManyTable(), 
+                                   fieldDesc.getManyTable(),
                                    fieldDesc.getManyKey()[0] );
-        
+
     }
   }
 
- 
+
   /**
    * Returns a SQL version of an OQL where clause.
    *
