@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1722 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Moved CastorException to org.exolab.castore.core.exceptions. In addition, PersistenceException
+       now derives from CastorException.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1722
+       (Werner - 20040901)
+
 JDO:   Fixed bug 1696 using contribution from Matrin Fuchs [martin-fuchs@gmx.net]
        Fixed NPE in SQL CALL statements with master/detail relation.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1696
