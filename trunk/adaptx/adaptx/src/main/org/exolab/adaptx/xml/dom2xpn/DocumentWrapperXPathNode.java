@@ -135,6 +135,15 @@ public class DocumentWrapperXPathNode extends ParentDOMXPathNode {
     } //-- getNamespaceURI
 
     /**
+     * Returns the root node.
+     *
+     * @return The root node
+    **/
+    public XPathNode getRootNode() {
+        return this;
+    } //-- getRootNode
+
+    /**
      * Returns the string value of the node. The string value of a text
      * node or an attribute node is it's text value. The string value of
      * an element or a root node is the concatenation of the string value
