@@ -65,6 +65,20 @@ import org.exolab.javasource.*;
  */
 public class FieldInfo extends XMLInfo {
 
+    /**
+     * The Read / Getter method flag
+     */
+    public static final int READ_METHOD            = 1;
+    
+    /**
+     * The Write / Setter method flag
+     */
+    public static final int WRITE_METHOD           = 2;
+    
+    /**
+     * The Read and Write methods flags
+     */
+    public static final int READ_WRITE_METHODS     = 3;
     
     /**
      * The method prefixes
@@ -74,6 +88,8 @@ public class FieldInfo extends XMLInfo {
     private static final String METHOD_PREFIX_GET    = "get";
     private static final String METHOD_PREFIX_HAS    = "has";
     private static final String METHOD_PREFIX_SET    = "set";
+    
+    
     
     
     /**
@@ -101,6 +117,18 @@ public class FieldInfo extends XMLInfo {
     **/
     private boolean _final     = false;
 
+    /**
+     * The methods flags, indicates which methods
+     * to create
+     */
+    private int _methods = READ_WRITE_METHODS;
+    
+    /**
+     * A reference to this field within the
+     * same class
+     */
+    private String _reference = null;
+    
     /**
      * A flag to indicate a static member
     **/
@@ -230,8 +258,12 @@ public class FieldInfo extends XMLInfo {
      */
     public void createAccessMethods(JClass jClass) {
 
-        createGetterMethod(jClass);
-        createSetterMethod(jClass);
+        if ((_methods & READ_METHOD) > 0) {
+            createGetterMethod(jClass);
+        }
+        if ((_methods & WRITE_METHOD) > 0) {
+            createSetterMethod(jClass);
+        }
 
         if (isHasAndDeleteMethods()) {
             createHasAndDeleteMethods(jClass);
@@ -442,6 +474,14 @@ public class FieldInfo extends XMLInfo {
         jsc.append(" = ");
         jsc.append(paramName);
         jsc.append(";");
+        
+        if (_reference != null) {
+            jsc.add("this.");
+            jsc.append(_reference);
+            jsc.append(" = ");
+            jsc.append(paramName);
+            jsc.append(";");
+        }
 
         //-- hasProperty
         if (isHasAndDeleteMethods()) {
@@ -589,6 +629,16 @@ public class FieldInfo extends XMLInfo {
     } //-- getComment
 
     /**
+     * Returns the methods flag that indicates which
+     * methods will be created 
+     * 
+     * @return the methods flag
+     */
+    public int getMethods() {
+        return _methods;
+    } //-- getMethods
+    
+    /**
      * Returns the name of this FieldInfo
      * @return the name of this FieldInfo
     **/
@@ -724,6 +774,17 @@ public class FieldInfo extends XMLInfo {
     } //-- setFixedValue
 
     /**
+     * Sets which methods to create
+     * 
+     * READ_METHOD, WRITE_METHOD, READ_WRITE_METHODS
+     * 
+     * @param methods
+     */
+    public void setMethods(int methods) {
+        _methods = methods;
+    } //-- setMethods
+    
+    /**
      * Sets whether or not this field can be nillable.
      * 
      * @param nillable a boolean that when true means the
@@ -733,6 +794,16 @@ public class FieldInfo extends XMLInfo {
     public void setNillable(boolean nillable) {
     	_nillable = nillable;
     } //-- setNillable
+    
+    /**
+     * Sets the name of the field within the same class
+     * that is a reference to this field. 
+     * 
+     * @param fieldName
+     */
+    public void setReference(String fieldName) {
+        _reference = fieldName;
+    } //-- setReference
 
     /**
      * Sets the "static" status of this FieldInfo. Static
