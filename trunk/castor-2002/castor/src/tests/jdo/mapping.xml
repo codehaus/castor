@@ -11,10 +11,10 @@
       <sql name="id" type="integer" />
     </field>
     <field name="first" type="string" required="true">
-      <sql name="first" type="varchar"/>
+      <sql name="value1" type="varchar"/>
     </field>
     <field name="second" type="string">
-      <sql name="second" type="varchar" dirty="ignore"/>
+      <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
   </class>
 
@@ -62,6 +62,52 @@
     </field>
   </class>
 
+
+  <!-- Classes for key generator testing -->
+  <class name="jdo.TestMaxObject" identity="id" key-generator="MAX">
+    <description>Table used for MAX key generator testing</description>
+    <map-to table="test_keygen" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestMaxExtends" extends="jdo.TestMaxObject">
+    <description>Table used for MAX key generator testing</description>
+    <map-to table="test_keygen_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
+
+  <key-generator name="HIGH/LOW">
+    <param name="table" value="test_seqtable"/>
+    <param name="key-column" value="table_name"/>
+    <param name="value-column" value="max_id"/>
+    <param name="grab-size" value="1000"/>
+  </key-generator>
+
+  <class name="jdo.TestHighLowObject" identity="id" key-generator="HIGH/LOW">
+    <description>Table used for HIGH/LOW key generator testing</description>
+    <map-to table="test_keygen" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="attr" type="string" required="true">
+      <sql name="attr" type="varchar"/>
+    </field>
+  </class>
+
+  <class name="jdo.TestHighLowExtends" extends="jdo.TestHighLowObject">
+    <description>Table used for HIGH/LOW key generator testing</description>
+    <map-to table="test_keygen_ext" />
+    <field name="ext" type="string" required="true">
+      <sql name="ext" type="varchar"/>
+    </field>
+  </class>
 
 </mapping>
 
