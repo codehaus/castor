@@ -1134,11 +1134,11 @@ public final class LockEngine /*implements TransactionContextListener*/ {
             try {
                 switch ( lockAction ) {
                 case ObjectLock.ACTION_READ:
-                    entry.acquireLoadLock( key, false, timeout );
+                    //entry.acquireLoadLock( key, false, timeout );
                     break;
 
                 case ObjectLock.ACTION_WRITE:
-                    entry.acquireLoadLock( key, true, timeout );
+                    //entry.acquireLoadLock( key, true, timeout );
                     break;
 
                 case ObjectLock.ACTION_CREATE:
