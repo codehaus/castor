@@ -643,7 +643,9 @@ public class Marshaller {
                 else {
                     int length = Array.getLength(obj);
                     for (int j = 0; j < length; j++) {
-                        marshal(Array.get(obj, j), elemDescriptor, handler);
+                        Object arrayItem = Array.get(obj, j);
+                        if (arrayItem != null)
+                            marshal(arrayItem, elemDescriptor, handler);
                     }
                 }
             }
