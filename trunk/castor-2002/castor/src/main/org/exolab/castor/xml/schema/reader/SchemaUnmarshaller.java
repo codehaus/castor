@@ -96,8 +96,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
     private Hashtable namespaces = null;
 
-    private Vector includes = null;
-
       //----------------/
      //- Constructors -/
     //----------------/
@@ -107,12 +105,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         foundSchemaDef = false;
     } //-- SchemaUnmarshaller
 
-    public SchemaUnmarshaller(Vector includes) {
-        this(null, null);
-        foundSchemaDef = false;
-        this.includes = includes;
-    } //-- SchemaUnmarshaller
-
     public SchemaUnmarshaller(AttributeList atts, Resolver resolver) {
         super();
         _schema = new Schema();
@@ -120,7 +112,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         foundSchemaDef = true;
         namespaces = new Hashtable();
         init(atts);
-        includes = new Vector();
     } //-- SchemaUnmarshaller
 
     public Schema getSchema() {
@@ -185,7 +176,8 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
 
         //-- register namespace
         namespaces.put(prefix, attValue);
-
+		_schema.addNamespace(prefix, attValue);
+		
     } //-- handleXMLNS
 
     private void processNamespaces(AttributeList atts) {
@@ -196,7 +188,6 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
             if (attName.equals(XMLNS) || attName.startsWith(XMLNS_PREFIX))
                 handleXMLNS(attName, atts.getValue(i));
         }
-		_schema.setNamespaces(namespaces);
     } //-- processNamespaces
 
 
@@ -294,7 +285,7 @@ public class SchemaUnmarshaller extends SaxUnmarshaller {
         //-- <include>
         else if (name == SchemaNames.INCLUDE) {
             unmarshaller 
-                = new IncludeUnmarshaller(_schema, atts, _resolver, includes);
+                = new IncludeUnmarshaller(_schema, atts, _resolver);
         }
         //-- <import>
         else if (name == SchemaNames.IMPORT) {

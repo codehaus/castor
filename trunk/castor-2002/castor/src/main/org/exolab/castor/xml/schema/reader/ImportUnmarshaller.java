@@ -62,10 +62,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
     {
         super();
         setResolver(resolver);
-		
-		//-- Schema object to hold import schema
-		Schema importedSchema = new Schema();
-	
+			
 		//-- Get schemaLocation
 		String schemalocation = atts.getValue("schemaLocation");
 		if (schemalocation==null)
@@ -79,6 +76,20 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		//-- Is this namespace one the schema knows about?
 		if (!schema.isKnownNamespace(namespace))
 			throw new SAXException("namespace '"+namespace+"' not declared in schema"); 
+		
+		//-- Schema object to hold import schema
+		boolean addSchema = false;
+		Schema importedSchema = schema.getImportedSchema(namespace);
+		if (importedSchema==null)
+		{
+			importedSchema = new Schema();				
+			addSchema = true;
+		}
+		
+		//-- Have we already imported this XML Schema file?
+		if (importedSchema.includeProcessed(schemalocation))
+			return;		
+		importedSchema.addInclude(schemalocation);		
 		
 		//-- Parser Schema
 		Parser parser = null;
@@ -104,8 +115,9 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 		    throw new SAXException("Error reading import file '"+schemalocation+"'");
 		}	
 			
-		//-- Add schema to list of imported schemas
-		schema.addSchema(importedSchema);	
+		//-- Add schema to list of imported schemas (if not already present)
+		if (addSchema)
+			schema.addSchema(importedSchema);	
 	}	
 	
 

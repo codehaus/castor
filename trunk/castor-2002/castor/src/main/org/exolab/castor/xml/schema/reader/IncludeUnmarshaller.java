@@ -57,7 +57,7 @@ import java.util.Vector;
 public class IncludeUnmarshaller extends SaxUnmarshaller
 {
     public IncludeUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver, Vector includes) 
+        (Schema schema, AttributeList atts, Resolver resolver) 
 		throws SAXException
     {
         super();
@@ -67,9 +67,9 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		if (include==null)
 			throw new SAXException("'schemaLocation' attribute missing on 'include'");
 	
-		if (includes.contains(include))
+		if (schema.includeProcessed(include))
 			return;
-		includes.addElement(include);
+		schema.addInclude(include);
 		
 		Parser parser = null;
 		try {
@@ -81,7 +81,7 @@ public class IncludeUnmarshaller extends SaxUnmarshaller
 		}
 		else
 		{
-			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller(includes);
+			SchemaUnmarshaller schemaUnmarshaller = new SchemaUnmarshaller();
 			schemaUnmarshaller.setSchema(schema);
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
