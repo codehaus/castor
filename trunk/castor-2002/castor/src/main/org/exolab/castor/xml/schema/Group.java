@@ -165,6 +165,8 @@ public class Group extends Particle
 
     /**
      * Sets if the group is a model group definition
+     * @deprecated Since Castor 0.9.2, to handle properly the <group>
+     * element the class ModelGroup has been created
      */
     public void setIsModelGroupDefinition(boolean isModelGroupDefinition) {
         _isModelGroupDefinition= isModelGroupDefinition;
@@ -175,6 +177,9 @@ public class Group extends Particle
      * Tells if the group is a model group definition
      * @return true if the group is a model group definition (<group> tag), false
      * otherwise (<all>, <choice>, or <sequence> tags.
+     * @deprecated Since Castor 0.9.2, to handle properly the <group>
+     * element the class ModelGroup has been created
+
      */
     public boolean isModelGroupDefinition() {
         return _isModelGroupDefinition;
