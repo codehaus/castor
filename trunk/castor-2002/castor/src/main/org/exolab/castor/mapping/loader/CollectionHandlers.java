@@ -48,16 +48,19 @@ package org.exolab.castor.mapping.loader;
 
 
 import java.util.Vector;
-import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.NoSuchElementException;
+import java.util.StringTokenizer;
+import java.lang.reflect.Method;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.util.Configuration;
 
 
 /**
- * Implementation of various collection handlers for the Java 1.1
- * libraries.
+ * Utility class for obtaining collection handlers. Based on the
+ * configuration and supported classes it will return collections
+ * suitable for Java 1.1 and Java 1.2 run times.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -65,11 +68,6 @@ import org.exolab.castor.mapping.CollectionHandler;
  */
 final class CollectionHandlers
 {
-
-
-    // XXX Collection handlers to support for 1.2:
-    //   HashMap, HashSet, ArrayList, LinkedList
-    //   TreeMap, TreeSet, WeakHashMap
 
 
     /**
@@ -82,13 +80,15 @@ final class CollectionHandlers
      * @return The collection Java class
      * @throws MappingException The named collection is not supported
      */
-    static Class getCollectionType( String name )
+    public static Class getCollectionType( String name )
         throws MappingException
     {
-        for ( int i = 0 ; i < _colHandlers.length ; ++i )
-            if ( _colHandlers[ i ].shortName.equals( name ) ||
-                 _colHandlers[ i ].javaClass.getName().equals( name ) )
-                return _colHandlers[ i ].javaClass;
+        if ( _info == null )
+            loadInfo();
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].shortName.equals( name ) ||
+                 _info[ i ].javaClass.getName().equals( name ) )
+                return _info[ i ].javaClass;
         throw new MappingException( "mapping.noCollectionHandler", name );
     }
 
@@ -100,189 +100,80 @@ final class CollectionHandlers
      * @return The collection handler
      * @throws MappingException The collection class is not supported
      */
-    static CollectionHandler getHandler( Class javaClass )
+    public static CollectionHandler getHandler( Class javaClass )
         throws MappingException
     {
-        for ( int i = 0 ; i < _colHandlers.length ; ++i )
-            if ( _colHandlers[ i ].javaClass.equals( javaClass ) )
-                return _colHandlers[ i ].handler;
+        if ( _info == null )
+            loadInfo();
+        for ( int i = 0 ; i < _info.length ; ++i )
+            if ( _info[ i ].javaClass.equals( javaClass ) )
+                return _info[ i ].handler;
         throw new MappingException( "mapping.noCollectionHandler", javaClass.getName() );
     }
 
 
     /**
-     * Returns true if the collection is an enumeration. Enumeration are
-     * a special type, the 'set' method accepts an object while the 'get'
-     * method returns an enumeration of methods.
-     *
-     * @param colType The collection type as return from {@link #getCollectionType}
-     * @return True if the collection type is an enumeration
+     * Called once to load collection handler information for the various
+     * collection handlers (Java 1.1, Java 1.2) based on the configuration
+     * file.
      */
-    static boolean isEnumerate( Class colType )
+    private static synchronized void loadInfo()
     {
-        return ( colType == Enumeration.class );
+        if ( _info == null ) {
+            Vector          allInfo;
+            Info[]          info;
+            StringTokenizer tokenizer;
+            Class           infoClass;
+            Method          method;
+
+            allInfo = new Vector();
+            tokenizer = new StringTokenizer( Configuration.getProperty( "org.exolab.castor.mapping.collections", "" ), ", " );
+            while ( tokenizer.hasMoreTokens() ) {
+                try {
+                    if ( CollectionHandlers.class.getClassLoader() != null )
+                        infoClass = CollectionHandlers.class.getClassLoader().loadClass( tokenizer.nextToken() );
+                    else
+                        infoClass = Class.forName( tokenizer.nextToken() );
+                    method = infoClass.getMethod( "getCollectionHandlersInfo", null );
+                    info = (Info[]) method.invoke( null, null );
+                    for ( int i = 0 ; i < info.length ; ++i )
+                        allInfo.addElement( info[ i ] );
+                } catch ( Exception except ) {
+                    // System.err.println( "CollectionHandlers: " + except.toString() );
+                }
+            }
+            _info = new Info[ allInfo.size() ];
+            allInfo.copyInto( _info );
+        }
     }
 
+    
+    private static Info[]  _info;
 
-    /**
-     * Information about a collection handler. Registered in the
-     * constructor to support a collection.
-     */
-    static final class CollectionHandlerInfo
+
+    static class Info
     {
 
         /**
          * The short name of the collection (e.g. <tt>vector</tt>).
          */
         final String            shortName;
-
+        
         /**
          * The Java class of the collection (e.g. <tt>java.util.Vector</tt>).
          */
         final Class             javaClass;
-
+    
         /**
          * The collection handler instance.
          */
         final CollectionHandler handler;
-
-        CollectionHandlerInfo( String shortName, Class javaClass, CollectionHandler handler )
+        
+        Info( String shortName, Class javaClass, CollectionHandler handler )
         {
             this.shortName = shortName;
             this.javaClass = javaClass;
             this.handler = handler;
-        }
-
-    }
-
-
-    /**
-     * List of all the default collection handlers.
-     */
-    private static CollectionHandlerInfo[] _colHandlers = new CollectionHandlerInfo[] {
-        // For array (any)
-        new CollectionHandlerInfo( "array", Object[].class, new CollectionHandler() {
-            public Object add( Object collection, Object object ) {
-                Object[] array;
-                if ( collection == null ) {
-                    array = new Object[ 1 ];
-                    array[ 0 ] = object;
-                    return array;
-                }
-                Object[] newArray;
-                array = (Object[]) collection;
-                newArray = new Object[ array.length + 1 ];
-                for ( int i = 0 ; i < array.length ; ++i )
-                    newArray[ i ] = array[ i ];
-                newArray[ array.length ] = object;
-                return newArray;
-            }
-            public Enumeration elements( Object collection ) {
-                if ( collection == null )
-                    return new EmptyEnumerator();
-                return new ArrayEnumerator( (Object[]) collection );
-            }
-            public int size( Object collection ) {
-                if ( collection == null )
-                    return 0;
-                return ( (Object[]) collection ).length;
-            }
-            public boolean isGetSetCollection() {
-                return true;
-            }
-            public String toString() {
-                return "Object[]";
-            }
-        } ),
-        // For Vector (1.1)
-        new CollectionHandlerInfo( "vector", Vector.class, new CollectionHandler() {
-            public Object add( Object collection, Object object ) {
-                if ( collection == null ) {
-                    collection = new Vector();
-                    ( (Vector) collection ).addElement( object );
-                    return collection;
-                } else {
-                    if ( ! ( (Vector) collection ).contains( object ) )
-                        ( (Vector) collection ).addElement( object );
-                    return null;
-                }
-            }
-            public Enumeration elements( Object collection ) {
-                if ( collection == null )
-                    return new EmptyEnumerator();
-                return ( (Vector) collection ).elements();
-            }
-            public int size( Object collection ) {
-                if ( collection == null )
-                    return 0;
-                return ( (Vector) collection ).size();
-            }
-            public boolean isGetSetCollection() {
-                return true;
-            }
-            public String toString() {
-                return "Vector";
-            }
-        } ),
-        // For Hashtable (1.1)
-        new CollectionHandlerInfo( "hashtable", Hashtable.class, new CollectionHandler() {
-            public Object add( Object collection, Object object ) {
-                if ( collection == null ) {
-                    collection = new Hashtable();
-                    ( (Hashtable) collection ).put( object, object );
-                    return collection;
-                } else {
-                    if ( ! ( (Hashtable) collection ).contains( object ) )
-                        ( (Hashtable) collection ).put( object, object );
-                    return null;
-                }
-            }
-            public Enumeration elements( Object collection ) {
-                if ( collection == null )
-                    return new EmptyEnumerator();
-                return ( (Hashtable) collection ).elements();
-            }
-            public int size( Object collection ) {
-                if ( collection == null )
-                    return 0;
-                return ( (Hashtable) collection ).size();
-            }
-            public boolean isGetSetCollection() {
-                return true;
-            }
-            public String toString() {
-                return "Hashtable";
-            }
-        } )
-    };
-
-
-    /**
-     * Enumerator for an array.
-     */
-    static final class ArrayEnumerator
-        implements Enumeration
-    {
-
-        private final Object[] array;
-
-        private int            index;
-
-        ArrayEnumerator( Object[] array )
-        {
-            this.array = array;
-        }
-
-        public boolean hasMoreElements()
-        {
-            return ( index < array.length );
-        }
-
-        public Object nextElement()
-        {
-            if ( index > array.length )
-                throw new NoSuchElementException();
-            return array[ index++ ];
         }
 
     }
