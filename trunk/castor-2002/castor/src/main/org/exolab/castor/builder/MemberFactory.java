@@ -211,6 +211,7 @@ public class MemberFactory {
               value="\"\"";
             //-- XXX Need to change this...and we
             //-- XXX need to validate the value.
+            //-- This should be done by the SOM not the SourceGenerator (Arnaud)
 
             //-- clean up value
             //-- if the xsd field is mapped into a java.lang.String
@@ -237,8 +238,9 @@ public class MemberFactory {
                 value = tmp;
             }
 
-            if (attribute.isFixed())
+            if (attribute.isFixed()) {
                 fieldInfo.setFixedValue(value);
+            }
             else
                 fieldInfo.setDefaultValue(value);
         }
@@ -268,6 +270,7 @@ public class MemberFactory {
         int minOccurs = element.getMinOccurs();
 
         ElementDecl eDecl = element;
+        ClassInfo classInfo = null;
 
         //-- the element is a reference:
         //-- If mapping schema elements, replace element passed in with referenced element
@@ -297,7 +300,7 @@ public class MemberFactory {
         XSType   xsType     = null;
 
         XMLType xmlType = eDecl.getType();
-
+        boolean enumeration  = false;
         boolean isContainer = false;
 
         //-- SimpleType
@@ -308,13 +311,13 @@ public class MemberFactory {
             //-- handle special case for enumerated types
             if (simpleType.hasFacet(Facet.ENUMERATION)) {
                 //-- LOok FoR CLasSiNfO iF ReSoLvR is NoT NuLL
-                ClassInfo cInfo = null;
+                enumeration = true;
                 if (resolver != null) {
-                    cInfo = resolver.resolve(simpleType);
+                    classInfo = resolver.resolve(simpleType);
                 }
 
-                if (cInfo != null)
-                    xsType = cInfo.getSchemaType();
+                if (classInfo != null)
+                    xsType = classInfo.getSchemaType();
             }
 
             if (xsType == null)
@@ -394,7 +397,47 @@ public class MemberFactory {
         fieldInfo.setRequired(minOccurs > 0);
         fieldInfo.setNodeName(eDecl.getName(true));
         fieldInfo.setContainer(isContainer);
+        //handle fixed or default values
+        String value = (eDecl.getDefaultValue() != null)?eDecl.getDefaultValue():eDecl.getFixedValue();
+        if (value != null) {
 
+           if (value.length() == 0)
+              value="\"\"";
+            //-- XXX Need to change this...and we
+            //-- XXX need to validate the value.
+            //-- This should be done by the SOM not the SourceGenerator (Arnaud)
+
+            //-- clean up value
+            //-- if the xsd field is mapped into a java.lang.String
+            if  (xsType.getJType().toString().equals("java.lang.String"))
+            {
+                char ch = value.charAt(0);
+                switch (ch) {
+                    case '\'':
+                    case '\"':
+                        break;
+                    default:
+                        value = '\"' + value + '\"';
+                        break;
+                }
+            }
+            else if (enumeration) {
+
+                //-- we'll need to change this
+                //-- when enumerations are no longer
+                //-- treated as strings
+                JClass jClass = classInfo.getJClass();
+                String tmp = jClass.getName() + ".valueOf(\"" + value;
+                tmp += "\");";
+                value = tmp;
+            }
+
+            if (eDecl.getFixedValue() != null) {
+                fieldInfo.setFixedValue(value);
+            }
+            else
+                fieldInfo.setDefaultValue(value);
+        }
         //-- add annotated comments
 
         //-- use elementRef first if necessary
