@@ -181,6 +181,17 @@ public class Facet extends Annotated {
         return Double.valueOf(_value).doubleValue();
     } //-- toInt
 
+
+    /**
+     * Returns a byte representation of the value of this facet
+     * @return a byte representation of the value of this facet
+    **/
+    public byte toByte() throws NumberFormatException {
+        return Byte.parseByte(_value);
+    } //-- toInt
+
+
+
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
