@@ -602,9 +602,35 @@ public abstract class Configuration
         File        file;
         InputStream is;
 
+        Properties properties = new Properties();
+
+        // Get overriding configuration from the classpath,
+        // ignore if not found.
+        try {      
+            is = Configuration.class.getResourceAsStream( "/" + fileName );
+            if ( is != null ) {
+                properties.load( is );
+                return properties;
+            }      
+        } catch ( Exception except ) {
+            // Do nothing
+        }
+
+        // Get overriding configuration from the Java
+        // library directory, ignore if not found.
+        try {      
+            file = new File( System.getProperty( "java.home" ), "lib" );
+            file = new File( file, fileName );
+            if ( file.exists() ) {
+                properties.load( new FileInputStream( file ) );
+                return properties;
+            }      
+        } catch ( IOException except ) {
+            // Do nothing
+        }
+
         // Get detault configuration from the Castor JAR.
         // Complain if not found.
-        Properties properties = new Properties();
         try {
             properties.load( Configuration.class.getResourceAsStream( resourceName ) );
         } catch ( Exception except ) {
@@ -613,31 +639,6 @@ public abstract class Configuration
                                                          fileName ) );
         }
 
-        // Get overriding configuration from the Java
-        // library directory, ignore if not found.
-        try {
-            file = new File( System.getProperty( "java.home" ), "lib" );
-            file = new File( file, fileName );
-            if ( file.exists() ) {
-                properties = new Properties( properties );
-                properties.load( new FileInputStream( file ) );
-            }
-        } catch ( IOException except ) {
-            // Do nothing
-        }
-
-        // Get overriding configuration from the classpath,
-        // ignore if not found.
-        try {
-            is = Configuration.class.getResourceAsStream( "/" + fileName );
-            if ( is != null ) {
-                properties = new Properties( properties );
-                properties.load( is );
-            }
-        } catch ( Exception except ) {
-            // Do nothing
-        }
-
-		return properties;
+        return properties;
 	}
 } //-- Configuration
