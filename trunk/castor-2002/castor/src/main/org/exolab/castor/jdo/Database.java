@@ -16,6 +16,19 @@ public interface Database
 
 
     /**
+     * Returns a new OQL query.
+     */
+    public OQLQuery getOQLQuery();
+
+
+    /**
+     * Returns a new OQL query.
+     */
+    public OQLQuery getOQLQuery( String oql )
+        throws QueryException;
+
+
+    /**
      * Closes the database.
      *
      * @throws ODMGException Unable to close the database

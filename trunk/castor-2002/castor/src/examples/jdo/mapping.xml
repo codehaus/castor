@@ -5,7 +5,9 @@
   <!--  Mapping for ProductGroup  -->
   <class class-name="myapp.ProductGroup">
     <sql-table table-name="prod_group"/>
+<!--
     <description>Product group</description>
+-->
     <identity field-ref="id"/>
     <field name="id">
       <sql-info name="id" />
@@ -19,7 +21,9 @@
   <!--  Mapping for Product  -->
   <class class-name="myapp.Product">
     <sql-table table-name="prod"/>
+<!--
     <description>Product definition</description>
+-->
     <identity field-ref="id"/>
     <field name="id">
       <sql-info name="id"/>
@@ -57,7 +61,9 @@
   <!--  Mapping for Computer, extending Product  -->
   <class class-name="myapp.Computer" extends="myapp.Product">
     <sql-table table-name="computer"/>
+<!--
     <description>Computer definition, extends generic product</description>
+-->
     <field name="cpu">
       <sql-info name="cpu"/>
     </field>
@@ -67,7 +73,9 @@
   <!--  Mapping for Product Detail -->
   <class class-name="myapp.ProductDetail">
     <sql-table table-name="prod_detail"/>
+<!--
     <description>Product detail</description>
+-->
     <identity field-ref="id"/>
     <field name="id">
       <sql-info name="id"/>

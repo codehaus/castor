@@ -13,7 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import org.exolab.castor.jdo.ODMG;
+import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Transaction;
 import org.exolab.castor.jdo.OQLQuery;
@@ -39,19 +39,15 @@ public class Test
         logger = new Logger( System.out ).setPrefix( "test" );
         
         try {
-            ODMG          odmg;
-            Database      db;
+            JDO  jdo;
             
-            odmg = new ODMG();
-            odmg.setLogWriter( Logger.getSystemLogger() );
             logger.println( "Reading Java-SQL mapping from " + DatabaseFile );
-            odmg.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null );
-            
+            JDO.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null );
+            jdo = new JDO();
+            jdo.setLogWriter( Logger.getSystemLogger() );
             // Run the ODMG API test, see odmgTest()
-            db = odmg.openDatabase( "test" );
-            odmgTest( odmg, db, logger );
-            db.close();
-
+            jdo.setDatabaseName( "test" );
+            odmgTest( jdo, logger );
         } catch ( Exception except ) {
             logger.println( except );
             except.printStackTrace( logger );
@@ -59,10 +55,10 @@ public class Test
     }
     
     
-    public static void odmgTest( ODMG odmg, Database db,
-                                 PrintWriter logger )
+    public static void odmgTest( JDO jdo, PrintWriter logger )
         throws Exception
     {
+        Database      db;
         Product       product;
         ProductGroup  group;
         ProductDetail detail;
@@ -73,20 +69,18 @@ public class Test
         Enumeration   enum;
         Transaction   tx;
 
+        db = jdo.getDatabase();
 
         // Must be associated with an open transaction in order to
         // use the ODMG database
-        tx = odmg.newTransaction();
+        tx = jdo.newTransaction();
         tx.begin();
         logger.println( "Begin transaction" );
         
         // Create OQL queries for all three object types
-        productOql = odmg.newOQLQuery();
-        productOql.create( "SELECT p FROM myapp.Product p WHERE id = $1" );
-        groupOql = odmg.newOQLQuery();
-        groupOql.create( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
-        computerOql = odmg.newOQLQuery();
-        computerOql.create( "SELECT c FROM myapp.Computer c WHERE id = $1" );
+        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p WHERE id = $1" );
+        groupOql = db.getOQLQuery( "SELECT g FROM myapp.ProductGroup g WHERE id = $1" );
+        computerOql = db.getOQLQuery( "SELECT c FROM myapp.Computer c WHERE id = $1" );
         
         
         // Look up the product and if found in the database,
@@ -202,10 +196,9 @@ public class Test
         Object     result;
         Serializer ser;
 
-        tx = odmg.newTransaction();
+        tx = jdo.newTransaction();
         tx.begin();
-        productOql = odmg.newOQLQuery();
-        productOql.create( "SELECT p FROM myapp.Product p" );
+        productOql = db.getOQLQuery( "SELECT p FROM myapp.Product p" );
 
         result = productOql.execute();
         ser = new XMLSerializer( new OutputFormat( Method.XML, null, true ) );
@@ -221,6 +214,7 @@ public class Test
         ser.asDocumentHandler().endElement( "products" );
         ser.asDocumentHandler().endDocument();
         tx.commit();
+        db.close();
     }
 
 

@@ -87,8 +87,7 @@ public final class TransactionImpl
 
     public TransactionImpl()
     {
-        // Used by ODMG class which requires that thread be associated
-        // with the new transaction.
+        // Requires that thread be associated with the new transaction.
         join();
     }
 
@@ -136,7 +135,7 @@ public final class TransactionImpl
             -- _threadCount;
         } else {
             // Not inside transaction
-            throw new IllegalStateException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new IllegalStateException( Messages.message( "jdo.threadNotOwner" ) );
         }
     }
     
@@ -144,9 +143,9 @@ public final class TransactionImpl
     public synchronized void begin()
     {
         if ( _txLocal.get() != this )
-            throw new IllegalStateException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new IllegalStateException( Messages.message( "jdo.threadNotOwner" ) );
         if ( _txContext != null && _txContext.isOpen() )
-            throw new IllegalStateException( Messages.message( "jdo.odmg.txInProgress" ) );
+            throw new IllegalStateException( Messages.message( "jdo.txInProgress" ) );
         _txContext = new TransactionContextImpl();
     }
 
@@ -163,13 +162,13 @@ public final class TransactionImpl
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new PersistenceExceptionImpl( "jdo.odmg.threadNotSingleOwner" );
+            throw new PersistenceExceptionImpl( "jdo.threadNotSingleOwner" );
         try {
             _txContext.prepare();
             _txContext.commit();
@@ -194,11 +193,11 @@ public final class TransactionImpl
         // Thread must be inside transaction, transaction must be owner,
         // thread must be only thread associated with transaction
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.threadNotOwner" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _threadCount != 1 )
-            throw new PersistenceExceptionImpl( "jdo.odmg.threadNotSingleOwner" );
+            throw new PersistenceExceptionImpl( "jdo.threadNotSingleOwner" );
         try {
             _txContext.rollback();
         } finally {
@@ -212,11 +211,11 @@ public final class TransactionImpl
     {
         // Thread must be inside transaction, transaction must be open
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         try {
             _txContext.checkpoint();
         } catch ( TransactionAbortedException except ) {
@@ -237,11 +236,11 @@ public final class TransactionImpl
         throws LockNotGrantedException, PersistenceException
     {
         if ( _txLocal.get() != this )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.threadNotOwner" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.threadNotOwner" ) );
         if ( _txContext.getStatus() == Status.STATUS_ROLLEDBACK )
-            throw new TransactionAbortedException( Messages.message( "jdo.odmg.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
         if ( _txContext == null || ! _txContext.isOpen() )
-            throw new TransactionNotInProgressException( Messages.message( "jdo.odmg.txNotInProgress" ) );
+            throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( lockMode == WRITE )
             _txContext.writeLock( obj, DefaultWaitLockTimeout );
     }
