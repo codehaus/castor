@@ -1,5 +1,3 @@
-package org.exolab.castor.xml.util;
-
 /**
  * Redistribution and use of this software and associated documentation
  * ("Software"), with or without modification, are permitted provided
@@ -42,7 +40,11 @@ package org.exolab.castor.xml.util;
  *
  * Copyright 1999, 2000 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id$
  */
+
+package org.exolab.castor.xml.util;
+
 
 import java.util.Stack;
 
@@ -51,19 +53,18 @@ import org.w3c.dom.*;
 
 /**
  * A class for converting a SAX events to DOM nodes
+ *
  * @author <a href="mailto:andrew.fawcett@coda.com">Andrew Fawcett</a>
-**/
+ */
 public class SAX2DOMHandler extends HandlerBase
 {
 	private Node _document;
 	private Node _parent;
-	private StringBuffer _buffer;
 	private Stack _parents = new Stack();
 										
 	public SAX2DOMHandler(Node node)
 	{
 		_document = node;
-		_buffer = new StringBuffer();
 	}
 			
 	public void startElement(String name, AttributeList attributes)
@@ -84,18 +85,21 @@ public class SAX2DOMHandler extends HandlerBase
 			
 	public void characters(char[] chars, int offset, int length)
 	{
-		_buffer.append(chars, offset, length);
+	    String data  = new String(chars, offset, length);
+		Node parent = _parents.size()>0 ? (Node) _parents.peek() : _document;
+		Node last = parent.getLastChild();
+		if ((last != null) && (last.getNodeType() == Node.TEXT_NODE)) {
+		    ((Text)last).appendData(data);
+		}
+		else {
+		    Text text = parent.getOwnerDocument().createTextNode(data);
+		    parent.appendChild(text);
+		}
+	    
 	}
 			
 	public void endElement(String name)
 	{
-		Node parent = _parents.size()>0 ? (Node) _parents.peek() : _document;
-		if (_buffer.length()!=0)
-		{
-			Text text = parent.getOwnerDocument().createTextNode(_buffer.toString());
-			parent.appendChild(text);
-		}
 		_parents.pop();
-		_buffer.setLength(0);
 	}
 }	
