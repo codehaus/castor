@@ -61,7 +61,7 @@ import java.util.Locale;
 /**
  * A ClassDescriptor for java.util.Locale
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class LocaleDescriptor
@@ -238,6 +238,7 @@ public class LocaleDescriptor
      * descriptor is available.
      *
      * @param name the xml name to match against
+     * @param namespace the namespace uri
      * @param nodeType, the NodeType to match against, or null if
      * the node type is not known.
      * @return the matching descriptor, or null if no matching
@@ -245,7 +246,7 @@ public class LocaleDescriptor
      *
     **/
     public XMLFieldDescriptor getFieldDescriptor
-        (String name, NodeType nodeType)
+        (String name, String namespace, NodeType nodeType)
     {
         return null;
 
@@ -364,12 +365,13 @@ public class LocaleDescriptor
      * this field).
      * <p>This is mainly used for container object (that can contains other object), in this particular case
      * the implementation will return null.
-     * @param fieldName the name of the field to check
+     * @param name the xml name of the field to check
+     * @param namespace the namespace uri
      * @param object the object represented by this XMLCLassDescriptor
      * @return true if the given object represented by this XMLClassDescriptor
      * can accept a member whose name is given.
      */
-    public boolean canAccept(String fieldName, Object object) {
+    public boolean canAccept(String name, String namespace, Object object) {
          return false;
     }
     
