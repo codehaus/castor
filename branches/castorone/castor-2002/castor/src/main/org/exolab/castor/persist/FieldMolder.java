@@ -154,7 +154,8 @@ public class FieldMolder {
     }
 
     public boolean isStored() {
-        return _store;
+        return !isPersistanceCapable() || !isMulti();
+        //_store;
     }
 
     public boolean isManyToMany() {
