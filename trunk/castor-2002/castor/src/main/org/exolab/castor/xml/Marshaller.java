@@ -209,12 +209,7 @@ public class Marshaller extends MarshalFramework {
 	/**
 	 * Insert NameSpace prefix declarations at the root node
 	 */
-	private boolean _nsPrefixAtRoot = false;
-
-    /**
-     * The current namespace scoping
-    **/
-    private List _nsScope = null;
+	//private boolean _nsPrefixAtRoot = false;
 
     /**
      * current java packages being used during marshalling
@@ -314,7 +309,6 @@ public class Marshaller extends MarshalFramework {
     private void initialize() {
         _debug           = enableDebug;
         _namespaces      = new Namespaces();
-        _nsScope         = new List(3);
         _packages        = new List(3);
         _cdResolver      = new ClassDescriptorResolverImpl();
         _parents         = new Stack();
@@ -414,19 +408,22 @@ public class Marshaller extends MarshalFramework {
 	/**
 	 * Set to True to declare the given namespace mappings at the root node. Default is False.
 	 * @param nsPrefixAtRoot
+	 * @deprecated
 	 */
 	public void setNSPrefixAtRoot(boolean nsPrefixAtRoot)
 	{
-		_nsPrefixAtRoot = nsPrefixAtRoot;
+	    // leaving for now...backward compatability
+		//_nsPrefixAtRoot = nsPrefixAtRoot;
 	}
 
 	/**
 	 * Returns True if the given namespace mappings will be declared at the root node.
 	 * @return Returns True if the given namespace mappings will be declared at the root node.
+	 * @deprecated
 	 */
 	public boolean getNSPrefixAtRoot()
 	{
-		return _nsPrefixAtRoot;
+		return true;
 	}
 
     /**
@@ -743,7 +740,7 @@ public class Marshaller extends MarshalFramework {
             saveType = false;
         //-- XXXX end Date fix
 
-     if (saveType) {
+        if (saveType) {
 
              // When the type of the instance of the field is not the
              // type specified for the field, it might be necessary to
@@ -792,18 +789,16 @@ public class Marshaller extends MarshalFramework {
                      XMLFieldDescriptor fieldDescMatch = tempContaining.getFieldDescriptor(xmlElementName, NodeType.Element);
 
                      // Try to find a field descriptor by inheritance in the parent object
-                     MarshalFramework.InheritanceMatch[] matches =
-                           MarshalFramework.searchInheritance(xmlElementName, null, tempContaining, _cdResolver);
+                     InheritanceMatch[] matches =
+                           searchInheritance(xmlElementName, null, tempContaining, _cdResolver);
 
                      if (matches.length == 1) {
 
-                          MarshalFramework.InheritanceMatch match = matches[0];
-
                           boolean foundTheRightClass = ((xmlElementNameClassDesc != null) && (_class == xmlElementNameClassDesc.getJavaClass()));
 
-                          boolean oneAndOnlyOneMatchedField = ((fieldDescMatch != null) ||
-                                                              ( (matches.length == 1) &&
-                                                              (match.parentFieldDesc == descriptor)));
+                          boolean oneAndOnlyOneMatchedField 
+                            = ((fieldDescMatch != null) || 
+                                (matches[0].parentFieldDesc == descriptor));
 
                          // Can we remove the xsi:type ?
                          if (foundTheRightClass && oneAndOnlyOneMatchedField) {
@@ -815,6 +810,10 @@ public class Marshaller extends MarshalFramework {
              }
          }//--- End of "if (saveType)"
 
+        //-- Set a new namespace scoping
+        if (!atRoot) {
+            _namespaces = _namespaces.createNamespaces();
+        }
 
         //-- handle Attributes
         AttributeListImpl atts = new AttributeListImpl();
@@ -904,8 +903,6 @@ public class Marshaller extends MarshalFramework {
                 typeName = JAVA_PREFIX + _class.getName();
             }
             else {
-                //-- Before uncommenting this, UnmarshalHandler needs
-                //-- to be updated...kv 20020115
                 String dcn = classDesc.getClass().getName();
                 if (dcn.equals(XMLClassDescriptorImpl.class.getName())) {
                     typeName = JAVA_PREFIX + _class.getName();
@@ -936,17 +933,15 @@ public class Marshaller extends MarshalFramework {
 
         boolean declaredNS = false;
 		//-- declare namespace at this element scope?
-		if (nsURI != null)
-			//-- only if prefix not already been declared at root (via setNSPrefixAtRoot method)
-			if (!(_nsPrefixAtRoot && nsPrefix!=null))
-				declaredNS = declareNamespace(nsPrefix, nsURI, atts);
-
-		//-- declare all namespace prefix at root (via setNSPrefixAtRoot method)?
-		if (_nsPrefixAtRoot && atRoot)
-		{
-			//-- insert all namespace declarations at the root level
-			_namespaces.declareAsAttributes(atts);
+		if (nsURI != null) {
+		    if (nsPrefix == null) {
+		        nsPrefix = DEFAULT_PREFIX + (++NAMESPACE_COUNTER);
+		    }
+			declaredNS = declareNamespace(nsPrefix, nsURI, atts);
 		}
+
+		//-- declare all necesssary namespaces
+		_namespaces.declareAsAttributes(atts, true);
 
         String qName = null;
         if (nsPrefix != null) {
@@ -1080,9 +1075,8 @@ public class Marshaller extends MarshalFramework {
 
         --depth;
         _parents.pop();
-        if (declaredNS) _nsScope.remove(nsURI);
-        if (saveType) _nsScope.remove(XSI_NAMESPACE);
-
+        if (!atRoot) _namespaces = _namespaces.getParent();
+        
     } //-- void marshal(DocumentHandler)
 
     /**
@@ -1149,7 +1143,8 @@ public class Marshaller extends MarshalFramework {
 
         if ( (nsURI != null) && (nsURI.length() != 0)) {
 
-            if (!_nsScope.contains(nsURI)) {
+            String tmpPrefix = _namespaces.getNamespacePrefix(nsURI);
+            if ((tmpPrefix == null) || (!tmpPrefix.equals(nsPrefix))) {
                 String attName = XMLNS;
 
                 if (nsPrefix != null) {
@@ -1163,7 +1158,7 @@ public class Marshaller extends MarshalFramework {
                     }
                 }
 
-                _nsScope.add(nsURI);
+                _namespaces.addNamespace(nsPrefix, nsURI);
                 atts.addAttribute(attName, CDATA, nsURI);
                 declared = true;
             }
