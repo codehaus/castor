@@ -542,9 +542,9 @@ public abstract class TransactionContext
      *
      * @param engine The persistence engine
      * @param molder The class persistence molder
-     * @param object The object to fetch (single instance per transaction)
      * @param identity The object's identity
-     * @param accessMode The access mode (see {@link AccessMode})
+     * @param objectToBeLoaded The object to fetch (single instance per transaction)
+     * @param suggestedAccessMode The access mode (see {@link AccessMode})
      *  the values in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
@@ -571,9 +571,9 @@ public abstract class TransactionContext
      * <p>
      * @param engine The persistence engine
      * @param molder The class persistence molder
-     * @param object The object to fetch (single instance per transaction)
      * @param identity The object's identity
-     * @param accessMode The access mode (see {@link AccessMode})
+     * @param objectToBeLoaded The object to fetch (single instance per transaction)
+     * @param suggestedAccessMode The access mode (see {@link AccessMode})
      *  the values in persistent storage
      * @param results The QueryResult that the data to be loaded from.
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -668,6 +668,15 @@ public abstract class TransactionContext
             removeObjectEntry( object );
             // maybe we should remove it, when castor become stable
             throw new PersistenceException( Messages.format("persist.nested",except) );
+        } catch (InstantiationException e) {
+            removeObjectEntry( object );
+            throw new PersistenceException(e.getMessage(), e);
+        } catch (IllegalAccessException e) {
+            removeObjectEntry( object );
+            throw new PersistenceException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            removeObjectEntry( object );
+            throw new PersistenceException(e.getMessage(), e);
         }
 
         // Need to copy the contents of this object from the cached
