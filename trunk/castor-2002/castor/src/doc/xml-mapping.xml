@@ -168,7 +168,7 @@
         &lt;mapping>
                 &lt;description>Description of the mapping&lt;/description>
 
-                &lt;include include="other_mapping_file.xml"/>
+                &lt;include href="other_mapping_file.xml"/>
 
                 &lt;class name="A">
                         .........
