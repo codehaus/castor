@@ -54,6 +54,7 @@ import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.resolvers.Resolver;
 import org.exolab.castor.util.Messages;
 
 
