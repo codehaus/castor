@@ -19,6 +19,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
+    <case class="jdo.OqlTests" id="TC61" />
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
@@ -56,6 +57,7 @@
   <category name="oracle" class="jdo.JDOCategory">
     <description>JDO tests for Oracle8i</description>
     <jdo database-name="oracle" configuration="oracle.xml" />
+
     <!-- A -->
     <case class="jdo.DuplicateKey" />
     <case class="jdo.Concurrent" />
@@ -65,7 +67,8 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
-    
+    <case class="jdo.OqlTests" id="TC61" />
+
     <!-- B -->
     <case class="jdo.TypeHandling" />
     <case class="jdo.TypeConversion" />
@@ -113,6 +116,7 @@
   <category name="mysql" class="jdo.JDOCategory">
     <description>JDO tests for MySQL</description>
     <jdo database-name="mysql" configuration="mysql.xml" />
+
     <!-- A -->
     <case class="jdo.DuplicateKey" />
     <case class="jdo.Concurrent" />
@@ -122,6 +126,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
+    <case class="jdo.OqlTests" id="TC61" />
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
@@ -160,6 +165,7 @@
   <category name="sapdb" class="jdo.JDOCategory">
     <description>JDO tests for SAP DB</description>
     <jdo database-name="sapdb" configuration="sapdb.xml" />
+
     <!-- A -->
     <case class="jdo.DuplicateKey" />
     <case class="jdo.Concurrent" />
@@ -169,6 +175,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
+    <case class="jdo.OqlTests" id="TC61" />
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
@@ -215,6 +222,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
+    <case class="jdo.OqlTests" id="TC61" />
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
@@ -266,6 +274,7 @@
     <case class="jdo.CacheLeakage" />
     <case class="jdo.QueryFinalize" />
     <case class="jdo.Cache" />
+    <case class="jdo.OqlTests" id="TC61" />
 
     <!-- B -->
     <case class="jdo.TypeHandling" />
