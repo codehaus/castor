@@ -110,6 +110,11 @@ public class Marshaller extends MarshalFramework {
     private static final String XSI_TYPE = "xsi:type";
 
     /**
+     * The CDATA type..uses for SAX attributes
+    **/
+    private static final String CDATA = "CDATA";
+    
+    /**
      * A flag indicating whether or not to generate
      * debug information
     **/
@@ -773,7 +778,7 @@ public class Marshaller extends MarshalFramework {
 
             if (value == null) continue;
 
-            atts.addAttribute(xmlName, null, value.toString());
+            atts.addAttribute(xmlName, CDATA, value.toString());
         }
 
 
@@ -788,7 +793,7 @@ public class Marshaller extends MarshalFramework {
         //-- xsi:type
         if (saveType) {
             saveType = declareNamespace(XSI_PREFIX, XSI_NAMESPACE, atts);
-            atts.addAttribute(XSI_TYPE, null, "java:"+_class.getName());
+            atts.addAttribute(XSI_TYPE, CDATA, "java:"+_class.getName());
         }
 
         //------------------/
@@ -990,7 +995,7 @@ public class Marshaller extends MarshalFramework {
                 }
 
                 _nsScope.add(nsURI);
-                atts.addAttribute(attName, null, nsURI);
+                atts.addAttribute(attName, CDATA, nsURI);
                 declared = true;
             }
         }
@@ -1093,7 +1098,7 @@ public class Marshaller extends MarshalFramework {
                     continue;
                 }
                 if (value == null) continue;
-                atts.addAttribute(xmlName, null, value.toString());
+                atts.addAttribute(xmlName, CDATA, value.toString());
             }
                 
                 
