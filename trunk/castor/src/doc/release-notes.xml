@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <document url="http://castor.exolab.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -46,6 +46,23 @@
 					<module>JDO</module>
 					<date>20050307</date>
 				</bug>
+				<bug id="1896">
+					<description>
+						Elimination of unnecessary compiler warnings.
+					</description>
+					<contributor>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</submitter>
+					<reporter></reporter>
+					<type>Enhancement</type>
+					<module>Misc</module>
+					<date>20050305</date>
+				</bug>
 				<bug id="1877">
 					<description>
 						Fixed wrong class and method name for Websphere 5.0 transaction manager factory.
@@ -58,7 +75,7 @@
 						<name>Werner Guttmann</name>
 						<email>werner.guttmann@gmx.net</email>
 					</submitter>
-					<reporter>Lilians Auvigne)</reporter>
+					<reporter>Lilians Auvigne</reporter>
 					<type>Bug</type>
 					<module>JDO</module>
 					<date>20050217</date>
