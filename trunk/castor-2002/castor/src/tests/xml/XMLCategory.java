@@ -7,7 +7,7 @@ import org.exolab.exceptions.CWClassConstructorException;
 
 
 
-public class XMLTests
+public class XMLCategory
     extends CWTestCategory
 {
 
@@ -15,15 +15,10 @@ public class XMLTests
     public static final String MappingFile = "mapping.xml";
 
 
-    public XMLTests( String name, String description )
+    public XMLCategory( String name, String description, Object obj )
         throws CWClassConstructorException
     {
         super( name, description );
-        
-        CWTestCase tc;
-        
-        tc = new Mapping();
-        add( tc.name(), tc, true );
     }
 
 
