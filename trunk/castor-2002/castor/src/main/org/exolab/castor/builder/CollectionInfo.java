@@ -444,7 +444,7 @@ public class CollectionInfo extends FieldInfo {
         jsc.add("}");
         
         int maxSize = getXSList().getMaximumSize();
-        if (maxSize != 0) {
+        if (maxSize > 0) {
             jsc.add("if (!(");
             jsc.append(getName());
             jsc.append(".size() < ");
