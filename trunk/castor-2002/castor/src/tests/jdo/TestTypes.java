@@ -86,6 +86,12 @@ public class TestTypes
     private boolean        _boolValue;
 
 
+    private float          _floatValue;
+
+
+    private double         _doubleValue;
+
+
     private java.util.Date _date2;
 
 
@@ -135,6 +141,26 @@ public class TestTypes
     public long getId()
     {
         return _id;
+    }
+
+
+    public double getDoubleValue() {
+        return _doubleValue;
+    }
+
+
+    public void setDoubleValue( double doubleValue ) {
+        _doubleValue = doubleValue;
+    }
+
+
+    public float getFloatValue() {
+        return _floatValue;
+    }
+
+
+    public void setFloatValue( float floatValue ) {
+        _floatValue = floatValue;
     }
 
 

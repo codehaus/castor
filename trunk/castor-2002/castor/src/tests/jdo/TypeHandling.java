@@ -175,6 +175,34 @@ public class TypeHandling extends CastorTestCase {
 
     }
 
+    private void testSimpleFloat()
+            throws PersistenceException {
+
+        TestTypes    types;
+        Enumeration   enum;
+
+        stream.println( "Testing null in integer and long fields" );
+        _db.begin();
+        _oql.bind( TestTypes.DefaultId );
+        enum = _oql.execute();
+        if ( enum.hasMoreElements() ) {
+            types = (TestTypes) enum.nextElement();
+            types.setDoubleValue( 11.12345d );
+            types.setFloatValue(  22.46802f );
+        }
+        _db.commit();
+
+        _db.begin();
+        _oql.bind( TestTypes.DefaultId );
+        enum = _oql.execute();
+        if ( enum.hasMoreElements() ) {
+            types = (TestTypes) enum.nextElement();
+            if ( types.getDoubleValue() != 11.12345d || types.getFloatValue() != 22.46802f )
+                fail( "double and float doesn't work");
+        }
+        _db.commit();
+    }
+
     private void testNullIntegerAndLong()
             throws PersistenceException {
 

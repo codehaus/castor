@@ -547,6 +547,12 @@
     <field name="timestamp3" type="string" >
       <sql name="date_str" type="timestamp" />
     </field>
+    <field name="doubleValue" type="double" >
+      <sql name="float_val" type="float" />
+    </field>
+    <field name="floatValue" type="float" >
+      <sql name="real_val" type="real" />
+    </field>
   </class>
 
   <!-- Classes for key generator testing -->
