@@ -1264,12 +1264,37 @@ public final class UnmarshalHandler extends MarshalFramework
             XMLClassDescriptor classDesc = null;
             //-- If _topClass is null, then we need to search
             //-- the resolver for one
+            String instanceClassname = null;
             if (_topClass == null) {
                 classDesc = _cdResolver.resolveByXMLName(name, namespace, null);
 
-                if (classDesc != null)
+                if (classDesc != null) {
                     _topClass = classDesc.getJavaClass();
-
+                }
+                else {
+                    //-- check for xsi:type
+                    instanceClassname = getInstanceType(atts, null);
+                    if (instanceClassname != null) {
+                        
+                        //-- first try loading class directly
+                        try {
+                            _topClass = loadClass(instanceClassname, null);
+                        }
+                        catch(ClassNotFoundException cnfe) {};
+                        
+                        if (_topClass == null) {
+                            classDesc = getClassDescriptor(instanceClassname);
+                            if (classDesc != null) {
+                                _topClass = classDesc.getJavaClass();
+                            }
+                            if (_topClass == null) {
+                                throw new SAXException("Class not found: " +
+                                    instanceClassname);
+                            }
+                        }
+                    }
+                } //-- else xsi:type check
+                
                 if (_topClass == null) {
                     String err = "The class for the root element '" +
                         name + "' could not be found.";
@@ -1317,7 +1342,15 @@ public final class UnmarshalHandler extends MarshalFramework
             if  ((_topObject == null) && (!_topState.primitiveOrImmutable)) {
                 // Retrieving the xsi:type attribute, if present
                 String topPackage = getJavaPackage(_topClass);
-                String instanceClassname = getInstanceType(atts, topPackage);
+                
+                if (instanceClassname == null)
+                    instanceClassname = getInstanceType(atts, topPackage);
+                else {
+                    //-- instance type already processed above, reset
+                    //-- to null to prevent entering next block
+                    instanceClassname = null;
+                }
+                    
                 if (instanceClassname != null) {
                     Class instanceClass = null;
                     Object instance = null;
@@ -1326,8 +1359,25 @@ public final class UnmarshalHandler extends MarshalFramework
                         XMLClassDescriptor xcd =
                             getClassDescriptor(instanceClassname);
 
-                        if (xcd != null)
+                        boolean loadClass = true;
+                        if (xcd != null) {
                             instanceClass = xcd.getJavaClass();
+                            if (instanceClass != null) {
+                                loadClass = (!instanceClassname.equals(instanceClass.getName()));
+                            }
+                        }
+                        
+                        if (loadClass) {
+                            try {
+                                instanceClass = loadClass(instanceClassname, null);
+                            }
+                            catch(ClassNotFoundException cnfe) {
+                                //-- revert back to ClassDescriptor's associated
+                                //-- class
+                                if (xcd != null)
+                                    instanceClass = xcd.getJavaClass();
+                            }
+                        }
 
                         if (instanceClass == null) {
                             throw new SAXException("Class not found: " +

@@ -914,7 +914,7 @@ public class Marshaller extends MarshalFramework {
 				    //-- information in the XML using xsi:type
 				    //-- If we can resolve the class based on the
 				    //-- XML name, we don't need to save the type.
-				    if ((_class != descriptor.getFieldType()) && 
+				    if (((_class != descriptor.getFieldType()) || atRoot) && 
 				        (classDesc != null)) 
 				    {
 				        String nsURI = classDesc.getNameSpaceURI();
@@ -968,8 +968,9 @@ public class Marshaller extends MarshalFramework {
         
         //-- handle auto-naming by class
         if (autoNameByClass) {
-            if (classDesc.getXMLName() != null)
+            if (classDesc.getXMLName() != null) {
                 name = classDesc.getXMLName();
+            }
         }
         
         
