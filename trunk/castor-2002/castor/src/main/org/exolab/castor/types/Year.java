@@ -148,19 +148,19 @@ public class Year extends TimePeriod {
      */
      public String toString() {
 
-        String result = null;
-
-        result = String.valueOf(this.getCentury());
+        StringBuffer result = new StringBuffer();
+        result.append(this.getCentury());
         if (result.length() == 1)
-            result = "0"+result;
-        String temp = String.valueOf(this.getYear());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result =  result  + temp;
+            result.insert(0,0);
 
-        result = isNegative() ? "-"+result : result;
+        if ((this.getYear()/10) == 0)
+            result.append(0);
+        result.append(this.getYear());
 
-        return result;
+        if (isNegative())
+            result.insert(0,'-');
+
+        return result.toString();
 
     }//toString
 

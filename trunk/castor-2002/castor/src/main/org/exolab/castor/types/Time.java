@@ -112,44 +112,46 @@ public class Time extends RecurringDurationBase {
      */
     public String toString() {
 
-        String result = null;
-        String timeZone = null;
-        String temp = null;
-        temp = String.valueOf(this.getHour());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = temp;
+        StringBuffer result = new StringBuffer();
+        StringBuffer timeZone = null;
+        if ((this.getHour()/10) == 0)
+            result.append(0);
+        result.append(this.getHour());
 
-        temp = String.valueOf(this.getMinute());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = result + ":" + temp;
+        result.append(':');
+        if ((this.getMinute() / 10) == 0 )
+           result.append(0);
+        result.append(this.getMinute());
 
-        temp = String.valueOf(this.getSeconds());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = result + ":" + temp +"."+String.valueOf(this.getMilli());
+        result.append(':');
+        if ((this.getSeconds()/10) == 0 )
+            result.append(0);
+        result.append(this.getSeconds());
+        result.append('.');
+        result.append(this.getMilli());
 
-
-        result = isNegative() ? "-"+result : result;
+        if (isNegative())
+           result.append('-');
 
         // by default we choose to not concat the Z
         if (!isUTC()) {
-            temp = String.valueOf(this.getZoneHour());
-            if (temp.length()==1)
-                temp = "0"+temp;
-            timeZone = temp;
+            timeZone = new StringBuffer();
+            if ((this.getZoneHour()/10) == 0)
+                timeZone.append(0);
+            timeZone.append(this.getZoneHour());
 
-            temp = String.valueOf(this.getZoneMinute());
-            if (temp.length()==1)
-                temp = "0"+temp;
-            timeZone = timeZone + ":" + temp;
+            timeZone.append(':');
+            if ((this.getZoneMinute()/10) == 0)
+                timeZone.append(0);
+            timeZone.append(this.getZoneMinute());
 
-            timeZone = isZoneNegative() ? "-"+timeZone : "+"+timeZone;
-            result = result + timeZone;
+            if (isZoneNegative())
+               timeZone.insert(0,'-');
+            else timeZone.insert(0,'+');
+            result.append(timeZone.toString());
         }
 
-        return result;
+        return result.toString();
 
     }//toString
 

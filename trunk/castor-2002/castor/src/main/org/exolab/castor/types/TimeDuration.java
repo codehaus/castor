@@ -282,31 +282,39 @@ public class TimeDuration
      *@return a string representing the time duration
      */
      public String toString() {
-        String result = "P";
+        StringBuffer result = new StringBuffer();
+        result.append("P");
         if (_year != 0) {
-            result = result+_year+"Y";
+            result.append(_year);
+            result.append("Y");
         }
         if (_month != 0) {
-           result = result + _month+"M";
+           result.append(_month);
+           result.append("M");
         }
         if (_day !=0 ) {
-            result = result + _day+"D";
+            result.append(_day);
+            result.append("D");
         }
         boolean isThereTime = ( (_hour != 0) || (_minute != 0) || (_second != 0) );
         if (isThereTime) {
-            result = result + "T";
+            result.append("T");
             if (_hour !=0 ) {
-                result = result + _hour +"H";
+                result.append(_hour);
+                result.append("H");
             }
             if (_minute !=0) {
-                result = result + _minute +"M";
+                result.append(_minute);
+                result.append("M");
             }
             if (_second != 0) {
-                result = result + _second +"S";
+                result.append(_second);
+                result.append("S");
             }
         }
-        result = (_isNegative) ? "-" + result : result;
-        return result;
+        if (_isNegative)
+           result.insert(0,'-');
+        return result.toString();
     } //toString
 
    /**

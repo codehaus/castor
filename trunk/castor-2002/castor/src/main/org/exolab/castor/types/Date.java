@@ -165,28 +165,29 @@ public class Date extends TimePeriod {
      */
      public String toString() {
 
-        String result = null;
-        result = String.valueOf(this.getCentury());
+        StringBuffer result = new StringBuffer();
+        result.append(this.getCentury());
         if (result.length() == 1)
-            result = "0"+result;
-        String temp = String.valueOf(this.getYear());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result =  result  + temp;
+            result.insert(0,0);
 
-        temp = String.valueOf(this.getMonth());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = result + "-" + temp;
+        if ((this.getYear()/10) == 0)
+            result.append(0);
+        result.append(this.getYear());
 
-        temp=String.valueOf(this.getDay());
-        if (temp.length()==1)
-            temp = "0"+temp;
-        result = result + "-" + temp;
+        result.append('-');
+        if ((this.getMonth() / 10) == 0 )
+           result.append(0);
+        result.append(this.getMonth());
 
-        result = isNegative() ? "-"+result : result;
+        result.append('-');
+        if ((this.getDay()/10) == 0 )
+            result.append(0);
+        result.append(this.getDay());
 
-        return result;
+        if (isNegative())
+            result.insert(0,'-');
+
+        return result.toString();
     }//toString
 
     /**
