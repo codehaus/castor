@@ -3,9 +3,65 @@ Version (CVS)
 -------------
 
 
-Version 0.9.5.3, February 16, 2004
-----------------------------------
+Version 0.9.5.3, March 09, 2004
+-------------------------------
 
+XML:   Fixed bug with new HashMap handling when dealing with
+       references.
+       (kvisco - 20040308)
+
+XML:   Added behavior change in Mapping files...field mappings
+       now use parent namespace by default to help ease the
+       pain of writing mapping files.
+       (kvisco - 20040307)
+
+XML:   Added patch to prevent introspection of transient fields 
+       or static final fields.
+       (kvisco - 20040305)
+
+XML:   Updated unmarshalling to handle xml:space attribute.
+       Whitespace preserving + stripping can now be controlled
+       via the Unmarshaller#setWhitespacePreserve method.
+       (kvisco - 20040301)
+
+XML:   Fixed Bug 1539 Getting java.lang.IllegalStateException: 
+       Invalid dateTime format
+       (kvisco - 20040301)
+
+XML:   Added Marshaller patch that fixes container attribute 
+       processing for items in collection. Fixes an 
+       IllegalArgumentException
+       Patch from Balaji Adikesavelu
+       (kvisco - 20040223)
+
+XML:   Added minor enhancement to generated source for boolean
+       types to prevent unecessary creation of Boolean instances.
+       Enhancement request 1527.
+       (kvisco - 20040222)
+
+XML:   Fixed stack overflow with cyclic mapping imports.
+       (kvisco - 20040222)
+
+XML:   Removed dependency on Apache Commons Logger for Castor XML, 
+       this will become a dependency again in Castor 0.9.6.
+       (kvisco - 20040222)
+
+XML:   Prevented warning about name conficts from being printed if the
+       -f flag is being used.
+       (kvisco - 20040221)
+
+XML:   Fixed SourceGenerator warning with simpleTypes conflicting with 
+       element names.
+       (kvisco - 20040221)
+
+XML:   Fixed bug 1541, a regression which was causing an endless 
+       loop and source code that was uncompilable.
+       (kvisco - 20040221)
+
+XML:   Patch for bug 1474 SchemaWriter assigns wrong
+       namespace to base complexType.
+       Patch from Jackie Paradis
+       (kvisco - 20040216)
 
 XML:   Patch for bug 1461 JakartaRegExpEvaluator issue
        Patch from Johan Van vlerken.
