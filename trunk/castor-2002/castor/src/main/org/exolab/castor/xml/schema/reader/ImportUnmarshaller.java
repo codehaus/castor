@@ -118,7 +118,7 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			
 		//-- Add schema to list of imported schemas (if not already present)
 		if (addSchema)
-			schema.addSchema(importedSchema);	
+			schema.addImportedSchema(importedSchema);	
 	}	
 	
 
