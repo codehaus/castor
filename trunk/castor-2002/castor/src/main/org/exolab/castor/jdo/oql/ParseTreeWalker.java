@@ -251,7 +251,8 @@ public class ParseTreeWalker implements TokenTypes
           sb.append( theChild.getToken().getTokenValue() ).append(".");
         }
           
-        _fromClassName = sb.deleteCharAt( sb.length() - 1 ).toString();
+        sb.setLength( sb.length() - 1 );
+        _fromClassName = sb.toString();
       }
       else
         _fromClassName = classNameNode.getToken().getTokenValue();

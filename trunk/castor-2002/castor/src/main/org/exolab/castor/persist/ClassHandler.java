@@ -542,7 +542,7 @@ public final class ClassHandler
                 enum = (Enumeration) _fields[ i ].relation.getRelated( target );
                 if ( enum != null ) 
                     while ( enum.hasMoreElements() ) 
-                        vector.add( enum.nextElement() );
+                        vector.addElement( enum.nextElement() );
                 _fields[ i ].handler.resetValue( target );
                 enum = (Enumeration) _fields[ i ].relation.getRelated( source );
                 if ( enum == null ) 
@@ -649,7 +649,7 @@ public final class ClassHandler
                 enum = (Enumeration) _fields[ i ].relation.getRelated( source );
                 if ( enum != null ) 
                     while ( enum.hasMoreElements() ) 
-                        vector.add( enum.nextElement() );
+                        vector.addElement( enum.nextElement() );
                 relHandler = _fields[ i ].relation.getRelatedHandler();
                 _fields[ i ].handler.resetValue( target );
                 enum = vector.elements();

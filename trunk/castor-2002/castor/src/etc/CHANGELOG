@@ -1,6 +1,15 @@
 Version 0.8.9
 -------------
 
+JDO:    Changed HIGH/LOW key generator implementation: now holds lock
+        on the record in the sequence table until the end of the transaction
+        and doesn't use updatable ResultSets. (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:    Temporary fix to ClassLoader problem in EJB environment: application
+        classes are loaded using context classloader of the current thread.
+        (Oleg Nitz <on@ibis.odessa.ua>)
+
+Misc:   JDK 1.1 compatibility is back. (Oleg Nitz <on@ibis.odessa.ua>)
 
 XML:    Fixed a bug when Unmarshalling/Marshalling primitive Object wrappers using
         dynamic-introspection. (kvisco)

@@ -48,6 +48,7 @@ package jdo;
 
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Enumeration;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
@@ -105,6 +106,7 @@ public class Persistent
             QueryResults  qres;
             long          beforeModTime;
             long          afterModTime;
+            long          modTime;
             
             db = _category.getDatabase( stream.verbose() );
 
@@ -153,16 +155,23 @@ public class Persistent
             }
             if ( result )
                 stream.writeVerbose( "Created parent with children: " + parent );
-            beforeModTime = System.currentTimeMillis();
+            beforeModTime = System.currentTimeMillis() / 1000;
             db.commit();
-            afterModTime = System.currentTimeMillis();
+            afterModTime = System.currentTimeMillis() / 1000;
             db.begin();
             child = (TestPersistent) db.load( TestPersistent.class, new Integer( 73 ) );
-            if ( child == null || child.getModificationTime() == null ||
-                    child.getModificationTime().getTime() < beforeModTime || 
-                    child.getModificationTime().getTime() > afterModTime ) {
+            if ( child == null ) {
+                stream.writeVerbose( "Error: child not loaded" );
+                result  = false;
+            } else if ( child.getModificationTime() == null ) {
                 stream.writeVerbose( "Error: wrong modification time: " + child );
                 result  = false;
+            } else {
+                modTime = child.getModificationTime().getTime() / 1000;
+                if ( modTime < beforeModTime || modTime  > afterModTime ) {
+                    stream.writeVerbose( "Error: wrong modification time: " + child );
+                    result  = false;
+                }
             }
             db.commit();
             if ( ! result )
