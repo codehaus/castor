@@ -1630,10 +1630,6 @@ public final class CacheEngine
         if ( lock != null ) {
             try {
                 fields = (Object[]) lock.acquire( tx, true, 0 );
-        
-                // Forget all the dependent objects
-                typeInfo.handler.forgetDependent( fields, tx, this );
-        
                 typeInfo.cache.removeLock( oid );
                 lock.delete( tx );
             } catch ( LockNotGrantedException except ) {
