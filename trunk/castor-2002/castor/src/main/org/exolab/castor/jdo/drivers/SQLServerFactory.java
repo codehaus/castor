@@ -76,6 +76,13 @@ public final class SQLServerFactory
     }
 
 
+    /**
+     * SQL Server doesn't support setNull for "WHERE fld=?".
+     */
+    public boolean supportsSetNullInWhere()
+    {
+        return false;
+    }
 }
 
 
