@@ -82,9 +82,19 @@ public class ContainerFieldDesc
 
     public void copyInto( Object source, Object target )
     {
-	for ( int i = 0 ; i < _contained.length ; ++i )
-	    _contained[ i ].copyInto( source, target );
+	source = getValue( source );
+	if ( source == null )
+	    setValue( target, null );
+	else {
+	    Object value;
+
+	    value = Types.createNew( getFieldType() );
+	    setValue( target, value );
+	    for ( int i = 0 ; i < _contained.length ; ++i )
+		_contained[ i ].copyInto( source, value );
+	}
     }
 
 
 }
+
