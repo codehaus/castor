@@ -146,7 +146,7 @@ class JNDIEntryConsumer
 	} else if ( tagName.equals( XML.Entries.Elements.Entry ) ) {
 	    if ( _attrSet == null || _attr != null )
 		throw new SAXException( Messages.format( "dsml.closingTagNotRecognized", tagName ) );
-	    _entries.add( new SearchResult( _entryDN, null, _attrSet ) );
+	    _entries.addElement( new SearchResult( _entryDN, null, _attrSet ) );
 	    _entryDN = null;
 	    _attrSet = null;
 	} else if ( tagName.equals( XML.Entries.Elements.ObjectClass ) ||
