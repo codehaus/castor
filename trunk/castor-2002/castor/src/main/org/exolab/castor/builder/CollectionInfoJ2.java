@@ -47,7 +47,7 @@
  *
  * $Id$
  */
- 
+
 package org.exolab.castor.builder;
 
 
@@ -63,20 +63,20 @@ import org.exolab.javasource.*;
  * @version $Revision$ $Date$
 **/
 public class CollectionInfoJ2 extends CollectionInfo {
- 
-        
+
+
     /**
      * @param contextType the content type of the collection, ie. the type
      * of objects that the collection will contain
      * @param name the name of the Collection
      * @param elementName the element name for each element in collection
     **/
-    public CollectionInfoJ2(XSType contentType, String name, String elementName) 
+    public CollectionInfoJ2(XSType contentType, String name, String elementName)
     {
         super(contentType, name, elementName);
         setSchemaType(new XSListJ2(contentType));
     } //-- CollectionInfoJ2
-    
+
     /**
      * Creates code for initialization of this Member
      * @param jsc the JSourceCode in which to add the source to
@@ -85,11 +85,11 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add(getName());
         jsc.append(" = new ArrayList();");
     } //-- generateConstructorCode
-        
+
     //------------------/
     //- Public Methods -/
     //------------------/
-    
+
     /**
      * Creates the Access methods for the collection described
      * by this CollectionInfo
@@ -98,29 +98,29 @@ public class CollectionInfoJ2 extends CollectionInfo {
     **/
     public void createAccessMethods(JClass jClass) {
         JMethod method = null;
-        
+
         JType jType = getContentType().getJType();
-        
+
         JParameter contentParam = new JParameter(jType, getContentName());
-            
+
         JSourceCode jsc = null;
-        
+
         String cName = JavaNaming.toJavaClassName(getElementName());
-        
+
         //-- add{Name}(Object)
         method = new JMethod(null, "add"+cName);
         jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
         method.addParameter(contentParam);
-        createAddMethod(method);                                    
-    
+        createAddMethod(method);
+
         //-- {type} get{Name}(int index)
         method = new JMethod(jType, "get"+cName);
         jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
-        method.addParameter(new JParameter(JType.Int, "index"));                    
+        method.addParameter(new JParameter(JType.Int, "index"));
         createGetByIndexMethod(method);
-        
+
         //-- {type}[] get{Name}
         method = new JMethod(jType.createArray(), "get"+cName);
         jClass.addMethod(method);
@@ -129,15 +129,15 @@ public class CollectionInfoJ2 extends CollectionInfo {
           //----------------------/
          //- Create set methods -/
         //----------------------/
-        
+
         method = new JMethod(null, "set"+cName);
         jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
-        method.addParameter(contentParam);
         method.addParameter(new JParameter(JType.Int, "index"));
-        
+        method.addParameter(contentParam);
+
         createSetByIndexMethod(method);
-        
+
         //-- array setter
         JType arrayType = contentParam.getType().createArray();
         String pName = JavaNaming.toJavaMemberName(cName);
@@ -145,46 +145,46 @@ public class CollectionInfoJ2 extends CollectionInfo {
         method = new JMethod(null, "set"+cName);
         method.addParameter(arrayParam);
         jClass.addMethod(method);
-        
+
         createSetArrayMethod(method);
-        
+
           //-------------------/
          //- getCount method -/
         //-------------------/
-        
+
         method = new JMethod(JType.Int, "get"+cName+"Count");
         jClass.addMethod(method);
-        
+
         createGetCountMethod(method);
-        
+
           //------------------/
          //- Remove Methods -/
         //------------------/
-        
+
         //-- boolean remove{Name}({type})
         method = new JMethod(JType.Boolean, "remove"+cName);
         method.addParameter(contentParam);
         createRemoveMethod(method);
         jClass.addMethod(method);
-        
+
         //-- clear{Name}
         method = new JMethod(null, "clear"+cName);
         createClearMethod(method);
-        
+
         jClass.addMethod(method);
     } //-- createAccessMethods
 
 
-    /** 
+    /**
      * Creates implementation of add method.
      *
      * @param method the JMethod in which to create the source
      * code.
     **/
     public void createAddMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
-        
+
         int maxSize = getXSList().getMaximumSize();
         if (maxSize > 0) {
             jsc.add("if (!(");
@@ -201,14 +201,14 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.append(".add(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
     } //-- createAddMethod
-    
-                    
+
+
     /**
      * Creates implementation of Enumerate method.
      *
@@ -216,16 +216,16 @@ public class CollectionInfoJ2 extends CollectionInfo {
      * code.
     **/
     public void createEnumerateMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
-        
+
         jsc.add("return new org.exolab.castor.util.IteratorEnumeration(");
         jsc.append(getName());
         jsc.append(".iterator());");
-        
+
     } //-- createEnumerateMethod
 
-    /** 
+    /**
      * Creates implementation of object[] get() method.
      *
      * @param method the JMethod in which to create the source
@@ -235,15 +235,15 @@ public class CollectionInfoJ2 extends CollectionInfo {
 
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-        
+
         jsc.add("int size = ");
         jsc.append(getName());
         jsc.append(".size();");
-        
+
         String variableName = getName()+".get(index)";
-        
+
         JType compType = jType.getComponentType();
-        
+
         jsc.add(compType.toString());
         jsc.append("[] mArray = new ");
         jsc.append(compType.getLocalName());
@@ -252,7 +252,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         //-- size
         if (compType.isArray()) jsc.append("[]");
         jsc.append(";");
-        
+
         jsc.add("for (int index = 0; index < size; index++) {");
         jsc.indent();
         jsc.add("mArray[index] = ");
@@ -272,17 +272,17 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add("return mArray;");
     } //-- createGetMethod
 
-    /** 
+    /**
      * Creates implementation of the get(index) method.
      *
      * @param method the JMethod in which to create the source
      * code.
     **/
     public void createGetByIndexMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-        
+
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
         jsc.append(getName());
@@ -291,12 +291,12 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add("throw new IndexOutOfBoundsException();");
         jsc.unindent();
         jsc.add("}");
-        
+
         jsc.add("");
         jsc.add("return ");
-        
+
         String variableName = getName()+".get(index)";
-        
+
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
             jsc.append(jType.toString());
@@ -316,14 +316,14 @@ public class CollectionInfoJ2 extends CollectionInfo {
      * code.
     **/
     public void createSetArrayMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
-        
+
         String paramName = method.getParameter(0).getName();
-        
+
         String index = "i";
         if (paramName.equals(index)) index = "j";
-        
+
         jsc.add("//-- copy array");
         jsc.add(getName());
         jsc.append(".clear();");
@@ -343,14 +343,14 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.append(");");
         jsc.unindent();
         jsc.add("}");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-        
+
     } //-- createSetArrayMethod
-    
-    /** 
+
+    /**
      * Creates implementation of set method.
      *
      * @param method the JMethod in which to create the source
@@ -359,7 +359,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
     public void createSetByIndexMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
-        
+
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
         jsc.append(getName());
@@ -368,7 +368,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.add("throw new IndexOutOfBoundsException();");
         jsc.unindent();
         jsc.add("}");
-        
+
         int maxSize = getXSList().getMaximumSize();
         if (maxSize != 0) {
             jsc.add("if (!(");
@@ -386,12 +386,12 @@ public class CollectionInfoJ2 extends CollectionInfo {
         jsc.append(");");
 
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-        
+
     } //-- createSetMethod
-    
-    /** 
+
+    /**
      * Creates implementation of remove(Object) method.
      *
      * @param method the JMethod in which to create the source
@@ -399,68 +399,68 @@ public class CollectionInfoJ2 extends CollectionInfo {
     **/
     public void createRemoveMethod(JMethod method) {
         JSourceCode jsc = method.getSourceCode();
-        
+
         jsc.add("boolean removed = ");
         jsc.append(getName());
         jsc.append(".remove(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
         //-- return value
         jsc.add("return removed;");
-        
+
     } //-- createRemoveMethod
 
-    /** 
+    /**
      * Creates implementation of remove(Object) method.
      *
      * @param method the JMethod in which to create the source
      * code.
     **/
     public void createRemoveByObjectMethod(JMethod method) {
-        
-        JSourceCode jsc = method.getSourceCode();        
-        
+
+        JSourceCode jsc = method.getSourceCode();
+
         jsc.add("boolean removed = ");
         jsc.append(getName());
         jsc.append(".remove(");
         jsc.append(getContentName());
         jsc.append(");");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
         //-- return value
         jsc.add("return removed;");
-            
+
     } //-- createRemoveByObjectMethod
-    
-    /** 
+
+    /**
      * Creates implementation of remove(int i) method.
      *
      * @param method the JMethod in which to create the source
      * code.
     **/
     public void createRemoveByIndexMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-        
+
         jsc.add("Object obj = ");
         jsc.append(getName());
         jsc.append(".get(index);");
         jsc.add(getName());
         jsc.append(".remove(index);");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
         jsc.add("return ");
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
@@ -471,11 +471,11 @@ public class CollectionInfoJ2 extends CollectionInfo {
             jsc.append(getContentType().createFromJavaObjectCode("obj"));
             jsc.append(";");
         }
-        
-            
+
+
     } //-- createRemoveByIndexMethod
 
-    /** 
+    /**
      * Creates implementation of removeAll() method.
      *
      * @param method the JMethod in which to create the source
@@ -486,14 +486,14 @@ public class CollectionInfoJ2 extends CollectionInfo {
         JSourceCode jsc = method.getSourceCode();
         jsc.add(getName());
         jsc.append(".clear();");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
     } //-- createRemoveAllMethod
 
-    /** 
+    /**
      * Creates implementation of clear() method.
      *
      * @param method the JMethod in which to create the source
@@ -503,13 +503,13 @@ public class CollectionInfoJ2 extends CollectionInfo {
         JSourceCode jsc = method.getSourceCode();
         jsc.add(getName());
         jsc.append(".clear();");
-        
+
         //-- bound properties
-        if (isBound()) 
+        if (isBound())
             createBoundPropertyCode(jsc);
-            
+
     } //-- createClearMethod
-    
+
 
 } //-- CollectionInfoJ2
 

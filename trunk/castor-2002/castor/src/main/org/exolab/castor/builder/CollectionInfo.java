@@ -179,9 +179,8 @@ public class CollectionInfo extends FieldInfo {
         method = new JMethod(null, "set"+cName);
         jClass.addMethod(method);
         method.addException(SGTypes.IndexOutOfBoundsException);
-        method.addParameter(contentParam);
         method.addParameter(new JParameter(JType.Int, "index"));
-
+        method.addParameter(contentParam);
         createSetByIndexMethod(method);
 
         //-- array setter
@@ -420,7 +419,6 @@ public class CollectionInfo extends FieldInfo {
     public void createSetArrayMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
-
         String paramName = method.getParameter(0).getName();
 
         String index = "i";
