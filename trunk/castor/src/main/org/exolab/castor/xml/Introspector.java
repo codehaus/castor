@@ -379,16 +379,18 @@ public final class Introspector {
             }
             else {
                 //-- look for overloaded methods
-                Class[] args = method.getParameterTypes();
-                String name = method.getName();
-                Method tmpMethod = null;
-                try {
-                    tmpMethod = superClass.getMethod(name, args);
+                if (superClass != null) {
+                    Class[] args = method.getParameterTypes();
+                    String name = method.getName();
+                    Method tmpMethod = null;
+                    try {
+                        tmpMethod = superClass.getMethod(name, args);
+                    }
+                    catch(NoSuchMethodException nsme) {
+                        //-- do nothing
+                    }
+                    if (tmpMethod != null) continue;
                 }
-                catch(NoSuchMethodException nsme) {
-                    //-- do nothing
-                }
-                if (tmpMethod != null) continue;
             }
             
             
