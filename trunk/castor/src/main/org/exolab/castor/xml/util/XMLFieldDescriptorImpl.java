@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -59,7 +59,7 @@ import java.util.Properties;
  * XML field descriptor. Wraps {@link FieldDescriptor} and adds
  * XML-related information, type conversion, etc.
  *
- * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class XMLFieldDescriptorImpl
@@ -151,6 +151,11 @@ public class XMLFieldDescriptorImpl
      */
     private boolean _multivalued = false;
 
+    /**
+     * True if the field is allowed to have nil content
+     */
+    private boolean _nillable = false;
+    
     /**
      * The node type (attribute, element, text).
      */
@@ -704,6 +709,13 @@ public class XMLFieldDescriptorImpl
         return _multivalued;
     } //-- isMultivalued
 
+    /*
+     *  (non-Javadoc)
+     * @see org.exolab.castor.xml.XMLFieldDescriptor#isNillable()
+     */
+    public boolean isNillable() {
+    	return _nillable;
+    }
     /**
      * Returns true if the field described by this descriptor is
      * a reference (ie. IDREF) to another object in the
@@ -963,6 +975,20 @@ public class XMLFieldDescriptorImpl
     public void setMultivalued(boolean multivalued) {
         this._multivalued = multivalued;
     } //-- setMultivalued
+    
+    /**
+     * Sets whether or not the described field is allowed
+     * to be nil. A nillable field can have empty content
+     * (text or element content), but may have attribute
+     * values, and still be considered value, even if
+     * the child elements are required.
+     * 
+     * @param nillable a boolean indicating whether or not
+     * the described field may be nillable.
+     */
+    public void setNillable(boolean nillable) {
+    	_nillable = nillable;
+    } //-- setNillable
     
     /**     
      * Sets the value property with the given name
