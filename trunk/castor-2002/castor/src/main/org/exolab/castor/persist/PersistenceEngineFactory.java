@@ -57,7 +57,7 @@ import org.exolab.castor.persist.spi.LogInterceptor;
 /**
  * Factory for constructing new persistence engines. Used by the APIs
  * to obtain a new persistence engine using an SPI factory and mapping
- * resolver. The returned object implements the {@link PersistenceEngine}
+ * resolver. The returned object implements the {@link LockEngine}
  * interface.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>

@@ -154,7 +154,8 @@ public class Wildcard extends Particle {
     /**
      * Returns an enumeration that contains the different namespaces
      * of this wildcard
-     * @return
+     * @return an enumeration that contains the different namespaces
+     * of this wildcard
      */
      public Enumeration getNamespaces() {
          return _namespaces.elements();

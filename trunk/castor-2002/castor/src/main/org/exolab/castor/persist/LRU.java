@@ -207,9 +207,9 @@ public abstract class LRU {
 	 * map is full. If the map is full, a least-recently-used object 
      * will be disposed. 
 	 * <p>
-     * Method {@link dispose(Object)} will be called whenever an 
+     * Method {@link #dispose(Object)} will be called whenever an 
      * old object is diposed. Developer can get notify by overriding
-     * the dispose method {@link dispose(Object)}.
+     * the dispose method {@link #dispose(Object)}.
      *
      * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
@@ -565,9 +565,9 @@ public abstract class LRU {
 	 * <p>
 	 * Every object being put in the Map will be disposed. 
 	 * <p>
-     * Method {@link dispose(Object)} will be called whenever an 
+     * Method {@link #dispose(Object)} will be called whenever an 
      * old object is diposed. Developer can get notify by overriding
-     * the dispose method {@link dispose(Object)}.
+     * the dispose method {@link #dispose(Object)}.
      *
      * @author <a href="tyip@leafsoft.com">Thomas Yip</a>
 	 */
@@ -651,9 +651,9 @@ public abstract class LRU {
 	 * Every object being put in the Map will live until the timeout
 	 * expired. 
 	 * <p>
-     * Method {@link dispose(Object)} will be called whenever an 
+     * Method {@link #dispose(Object)} will be called whenever an 
      * old object is diposed. Developer can get notify by overriding
-     * the dispose method {@link dispose(Object)}.
+     * the dispose method {@link #dispose(Object)}.
      *
      * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
 	 */

@@ -163,7 +163,7 @@ public class JType {
      * Allows subtypes, such as JClass to alter the package to which
      * this JType belongs
      * @param newPackage the new package to which this JType belongs
-     * <BR />
+     * <BR>
      * <B>Note:</B> The package name cannot be changed on a primitive type.
     **/
     protected void changePackage(String newPackage) {

@@ -301,7 +301,7 @@ public class FieldInfo extends XMLInfo {
      * Returns the fixed production for this FieldInfo, or null
      * if no fixed value has been specified.
      * @return the fixed value for this FieldInfo
-     * <BR />
+     * <BR>
      * NOTE: Fixed values are NOT the same as default values
     **/
     public String getFixedValue() {

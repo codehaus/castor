@@ -55,7 +55,7 @@ import org.exolab.castor.mapping.ValidityException;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see FieldDescriptor
+ * @see org.exolab.castor.mapping.FieldDescriptor
  */
 public class XMLFieldHandler
     implements FieldHandler

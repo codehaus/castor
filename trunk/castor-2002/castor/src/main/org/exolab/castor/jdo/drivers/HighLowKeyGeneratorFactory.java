@@ -78,7 +78,7 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see HighLowGenerator
+ * @see HighLowKeyGenerator
  */
 public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
 {

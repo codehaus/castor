@@ -24,7 +24,7 @@ public class DecimalFieldHandler extends XMLFieldHandler {
     /**
      * Creates a new DecimalFieldHandler using the given
      * FieldHandler for delegation.
-     * @param
+     * @param fieldHandler the FieldHandler for delegation.
     **/
     public DecimalFieldHandler(FieldHandler fieldHandler) {
         

@@ -50,7 +50,7 @@ import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
- * {@link PersistenceFactory} for HypersonicSQL driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for HypersonicSQL driver.
  *
  * @author <a href="mailto:santiago.arriaga@catnet.com.mx">Santiago Arriaga</a>
  */

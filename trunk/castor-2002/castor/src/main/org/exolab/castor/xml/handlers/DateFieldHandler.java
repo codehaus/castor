@@ -77,7 +77,7 @@ public class DateFieldHandler extends XMLFieldHandler {
     /**
      * Creates a new DateFieldHandler using the given
      * FieldHandler for delegation.
-     * @param
+     * @param fieldHandler the fieldHandler for delegation.
     **/
     public DateFieldHandler(FieldHandler fieldHandler) {
 

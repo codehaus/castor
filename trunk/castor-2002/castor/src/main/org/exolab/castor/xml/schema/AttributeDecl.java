@@ -291,7 +291,7 @@ public final class AttributeDecl extends Annotated {
     /**
      * Sets the name of attributes defined by this attribute definition
      * @param name the name of the this AttributeDecl
-     * @exception SchemaException when the name is not valid
+     * @exception IllegalArgumentException when the name is not valid
     **/
     public void setName(String name) {
         if (name == null) {

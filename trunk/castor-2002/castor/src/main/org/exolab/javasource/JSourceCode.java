@@ -109,7 +109,7 @@ public class JSourceCode {
      * @param statement the statement to add
      * @param the indentSize is the size of the indentation to use
      * when printing this JSourceCode
-     * @see print
+     * @see #print
     **/
     public void add(String statement, short indentSize) {
         JCodeStatement jcs = new JCodeStatement(statement, indentSize);

@@ -491,7 +491,7 @@ public abstract class TransactionContext
      * to the same object within the transaction will return the same 
      * object instance (except for read-only access).
      * <p>
-     * This method work the same as {@link load(LockEngine,ClassMolder,Object,Object,AccessMode),
+     * This method work the same as {@link #load(LockEngine,ClassMolder,Object,Object,AccessMode)},
      * except a QueryResults can be specified.
      * <p>
      * @param engine The persistence engine

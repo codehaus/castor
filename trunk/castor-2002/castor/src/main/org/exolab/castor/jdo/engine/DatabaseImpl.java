@@ -104,7 +104,7 @@ public class DatabaseImpl
 
     /**
      * The transaction context is this database was accessed with an
-     * {@link XAResource}.
+     * {@link javax.transaction.xa.XAResource}.
      */
     protected TransactionContext       _ctx;
 

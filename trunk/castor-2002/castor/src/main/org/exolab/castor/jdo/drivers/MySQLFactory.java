@@ -56,7 +56,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
- * {@link PersistenceFactory} for MySQL JDBC driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for MySQL JDBC driver.
  *
  * @author <a href="leonardo@itera.com.br">Leonardo Souza Mario Bueno</a>
  * @version $Revision$ $Date$

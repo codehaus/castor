@@ -171,7 +171,7 @@ public abstract class RecurringDurationBase
      *          duration and period set up
      * @throws IllegalArgumentException this exception is thrown when the values array
      *                                  is not of length 6.
-     * @see setValues
+     * @see #setValues
      */
 
     protected RecurringDurationBase(String duration, String period, short[] values)
@@ -462,7 +462,7 @@ public abstract class RecurringDurationBase
 
      /**
      * Override the java.lang.equals method
-     * @see equal
+     * @see #equal
      */
      public boolean equals(Object object) {
         if (object instanceof RecurringDurationBase) {

@@ -17,14 +17,14 @@
     <p>An application API will use a {@link org.exolab.castor.persist.TransactionContext} in order
        to perform operations. All operations against the persistence engine are transactional.
        The persistence engine is obtained through the {@link org.exolab.castor.persist.PersistenceEngineFactory}
-       class which returns a {@link org.exolab.castor.persist.PersistenceEngine}. The factory requires
+       class which returns a {@link org.exolab.castor.persist.LockEngine}. The factory requires
        a factory of persistence SPIs (see <a href="spi/package-summary.html">SPI</a>.</p>
 
-    <p>{@link org.exolab.castor.persist.CacheEngine} implements a persistence engine that caches
+    <p>{@link org.exolab.castor.persist.LockEngine} implements a persistence engine that caches
        objects in memory for performance, and eliminates the number of persistent storage operations.
        In order to speed up interaction between the engines and the object, {@link
-       org.exolab.castor.persist.ClassHandler} and {@link org.exolab.castor.persist.RelationHandler}
-       are constructed to represent a flat view of the object graph that is efficient to process.</p>
+       org.exolab.castor.persist.ClassMolder} is constructed to represent a flat view 
+       of the object graph that is efficient to process.</p>
 
     <p>If the application API supports enlistment as an XA resource, it will use
        {@link org.exolab.castor.persist.XAResourceImpl} and implement {@link

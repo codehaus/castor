@@ -52,7 +52,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
- * {@link PersistenceFactory} for generic JDBC driver.
+ * {@link org.exolab.castor.persist.spi.PersistenceFactory} for generic JDBC driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$

@@ -125,7 +125,7 @@ public class RecurringDuration extends RecurringDurationBase{
      * @param values an array of shorts which contains the values of the fields
      * @return a recurringDuration with the facets
      *          duration and period set up
-     * @see setValues
+     * @see #setValues
      */
      public RecurringDuration(String duration, String period, short[] values)
         throws OperationNotSupportedException
@@ -289,7 +289,7 @@ public class RecurringDuration extends RecurringDurationBase{
      *
      * @throws OperationNotSupportedException this exception is thrown if changing
      *         the value of one field os not allowed
-     * @see RecurringDurationBase.setValues
+     * @see RecurringDurationBase#setValues
      */
      public void setValues(short[] values)
         throws OperationNotSupportedException
@@ -677,7 +677,7 @@ public class RecurringDuration extends RecurringDurationBase{
 
     /**
      * Override the java.lang.equals method
-     * @see equal
+     * @see #equal
      */
      public boolean equals(Object object) {
         if (object instanceof RecurringDuration) {
