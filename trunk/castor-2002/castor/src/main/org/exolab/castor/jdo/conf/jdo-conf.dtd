@@ -1,0 +1,116 @@
+<!--
+    Castor JDO Configuration DTD
+
+    <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
+                               "http://castor.exolab.org/jdo-conf.dtd"
+
+    Note: This DTD is under evolution and subject to change.
+ -->
+<!--
+    A database is a logic unit that defines mapping between a
+    collection of Java objects and a collection of tables.
+
+    The mapping can be specific to the database schema, or it can
+    be shared by several database mapping, using the include element.
+
+    The application will access the database by the given name
+    (db-name) and will be able to persist all the objects specified in
+    the database mapping and included from an external mapping.
+
+    The database mapping may optionally specify a means to acquire a
+    new database connection in order to talk to the database server.
+    Only one data source can be specified per database and applies to
+    that database alone, not to any database that includes it. If no
+    such data source is defined, the application must provide one
+    explicitly.
+
+    Two types of datasources are supported, JDBC drivers and JDBC
+    DataSources. It is highly recommended to use JDBC DataSources and
+    to obtain them through JNDI naming space, in particular when using
+    Castor from inside an application server.
+
+    For concurrency and integrity two database definitions should
+    never map to the same database server unless there is no overlap
+    in the objects/table mapping between the two.
+ -->
+
+<!ELEMENT database ((driver|data-source|data-source-ref)?,mapping+)>
+<!ATTLIST database db-name ID #REQUIRED>
+
+
+<!--
+    Includes mapping specified in an external database mapping. The
+    included mapping is acquired based on the other database's name.
+    If a URI is specified, the mapping will be loaded from that URI
+    if it has not been loaded before.
+ -->
+
+<!ELEMENT mapping EMPTY>
+<!ATTLIST mapping href CDATA #REQUIRED>
+
+
+<!--
+    Specifies a JDBC driver for obtaining new connections to the
+    database server. The driver is obtained from the JDBC DriverManager
+    and must be in the classpath.
+
+    The JDBC url is used to locate the driver, the optional class
+    name is used to register the driver, if the driver has not been
+    pre-registered by the application.
+
+    A sequence of one of more parameters may be supplied to the
+    driver.
+
+    It is recommended to use data-source-ref rather than driver, in
+    particular when using Castor from inside an application server.
+ -->
+
+<!ELEMENT driver (param*)>
+<!ATTLIST driver url        CDATA #REQUIRED
+                 class-name CDATA #IMPLIED>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param name  CDATA #REQUIRED
+                value CDATA #REQUIRED>
+
+
+<!--
+    Specifies a JDBC data source for obtaining new connections to the
+    database server. An implementation of javax.sql.DataSource is
+    specified in class-name.
+
+    DataSource-specific parameters are specified through the param
+    object based on the data source type. Because there is no single
+    definition of these parameters, the params element is no defined
+    in this DTD. The actual DataSource get/set methods are mapped
+    into XML attributes dynamically.
+
+    For example:
+
+      <data-source class-name="postgresql.PostgresqlDataSource">
+        <param database="test" user="arkin" password="secret"/>
+      </data-source>
+ -->
+
+<!ELEMENT data-source (params)>
+<!ATTLIST data-source class-name CDATA #REQUIRED>
+
+
+<!--
+    Specifies a JDBC data source for obtaining new connections to the
+    database server. The data source is specified by name only and
+    will be acquired through JNDI.
+
+    This is the recommended way for locating data sources when using
+    Castor inside an application server, and allows the application
+    server to offer distributed transactions and connection pooling.
+
+    This is the only way to use Castor for EJB entity bean support.
+
+    For example:
+
+      <data-source-ref jndi="java:/comp/env/jdbc/mydb"/>
+ -->
+
+<!ELEMENT data-source-ref ANY>
+<!ATTLIST data-source-ref jndi CDATA #REQUIRED>
