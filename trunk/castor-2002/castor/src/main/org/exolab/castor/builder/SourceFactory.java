@@ -116,8 +116,8 @@ public class SourceFactory  {
      * from this ClassInfo
     **/
     public JClass createSourceCode
-        (ElementDecl element, ClassInfoResolver resolver, String packageName) 
-    {		
+        (ElementDecl element, ClassInfoResolver resolver, String packageName)
+    {
         FactoryState state = null;
 
         String elementName = element.getName();
@@ -138,6 +138,11 @@ public class SourceFactory  {
 
         initialize(jClass);
 
+        //-- set super class if necessary
+        String base = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
+        if (base != null)
+            jClass.setSuperClass(base);
+
         //-- name information
         classInfo.setNodeName(element.getName());
 
@@ -153,7 +158,7 @@ public class SourceFactory  {
         XMLType type = element.getType();
 
         boolean derived = false;
-        
+
         // No Type?
         if (type == null) {
             // ???
@@ -164,7 +169,7 @@ public class SourceFactory  {
             ComplexType complexType = (ComplexType)type;
 
             if ( ! element.hasTypeReference() ) {
-                processComplexType( (ComplexType)type, state);                
+                processComplexType( (ComplexType)type, state);
                 derived = (state.jClass.getSuperClass() != null);
             }
             else {
@@ -197,7 +202,7 @@ public class SourceFactory  {
         createMarshalMethods(jClass);
         //-- #unmarshal()
         createUnmarshalMethods(jClass);
-        
+
 		//-- create Bound Properties code
 		if (state.hasBoundProperties() && (!derived))
 		    createPropertyChangeMethods(jClass);
@@ -238,12 +243,16 @@ public class SourceFactory  {
         JClass    jClass    = state.jClass;
 
         initialize(jClass);
-        
+        //-- set super class if necessary
+        String base = SourceGenerator.getProperty(SourceGenerator.Property.SUPER_CLASS, null);
+        if (base != null)
+            jClass.setSuperClass(base);
+
         //-- make class abstract?
-		//-- when mapping elements to Java classes this class forms the 
+		//-- when mapping elements to Java classes this class forms the
 		//-- base for elements that reference this type.
 		if (SourceGenerator.mappingSchemaElement2Java())
-			jClass.getModifiers().setAbstract(true);        
+			jClass.getModifiers().setAbstract(true);
 
 		//-- name information
         classInfo.setNodeName(type.getName());
@@ -274,7 +283,7 @@ public class SourceFactory  {
 			//-- #unmarshal()
 			createUnmarshalMethods(jClass);
 		}
-		
+
 		//-- create Bound Properties code
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
@@ -365,7 +374,7 @@ public class SourceFactory  {
 		//-- create Bound Properties code
 		if (state.hasBoundProperties())
 		    createPropertyChangeMethods(jClass);
-		
+
         if (resolver != null) {
             resolver.bindReference(jClass, classInfo);
             resolver.bindReference(simpleType, classInfo);
@@ -447,45 +456,45 @@ public class SourceFactory  {
 
 		parent.addImport("java.beans.PropertyChangeEvent");
 		parent.addImport("java.beans.PropertyChangeListener");
-		
+
         //-- add vector to hold listeners
         String vName = "propertyChangeListeners";
         JMember jMember = new JMember(SGTypes.Vector, vName);
         jMember.getModifiers().makePrivate();
         parent.addMember(jMember);
-            
-            
+
+
         JSourceCode jsc = parent.getConstructor(0).getSourceCode();
         jsc.add("propertyChangeListeners = new Vector();");
-        
+
         //---------------------------------/
         //- notifyPropertyChangeListeners -/
         //---------------------------------/
-        
+
         JMethod jMethod = new JMethod(null,"notifyPropertyChangeListeners");
         jMethod.getModifiers().makeProtected();
-        
+
         String desc = "Notifies all registered "+
             "PropertyChangeListeners when a bound property's value "+
             "changes.";
-            
+
         JDocComment jdc = jMethod.getJDocComment();
         JDocDescriptor jdDesc = null;
-        
+
         jdc.appendComment(desc);
-        
+
         jMethod.addParameter(new JParameter(SGTypes.String, "fieldName"));
         jdDesc = jdc.getParamDescriptor("fieldName");
         jdDesc.setDescription("the name of the property that has changed.");
-        
+
         jMethod.addParameter(new JParameter(SGTypes.Object, "oldValue"));
         jdDesc = jdc.getParamDescriptor("oldValue");
         jdDesc.setDescription("the old value of the property.");
-        
+
         jMethod.addParameter(new JParameter(SGTypes.Object, "newValue"));
         jdDesc = jdc.getParamDescriptor("newValue");
         jdDesc.setDescription("the new value of the property.");
-        
+
         parent.addMethod(jMethod);
         jsc = jMethod.getSourceCode();
         jsc.add("java.beans.PropertyChangeEvent event = new ");
@@ -502,59 +511,59 @@ public class SourceFactory  {
         jsc.append("propertyChange(event);");
         jsc.unindent();
         jsc.add("}");
-        
+
         //-----------------------------/
         //- addPropertyChangeListener -/
         //-----------------------------/
-        
+
         JType jType = new JClass("java.beans.PropertyChangeListener");
         jMethod = new JMethod(null,"addPropertyChangeListener");
-        
+
         desc = "Registers a PropertyChangeListener with this class.";
-            
+
         jdc = jMethod.getJDocComment();
         jdc.appendComment(desc);
-        
+
         jMethod.addParameter(new JParameter(jType, "pcl"));
         desc = "The PropertyChangeListener to register.";
         jdDesc = jdc.getParamDescriptor("pcl");
         jdDesc.setDescription(desc);
-                
+
         parent.addMethod(jMethod);
-        
+
         jsc = jMethod.getSourceCode();
         jsc.add(vName);
         jsc.append(".addElement(pcl);");
-        
+
         //--------------------------------/
         //- removePropertyChangeListener -/
         //--------------------------------/
-        
+
         jMethod = new JMethod(JType.Boolean,"removePropertyChangeListener");
-        
+
         desc = "Removes the given PropertyChangeListener "+
             "from this classes list of ProperyChangeListeners.";
-            
+
         jdc = jMethod.getJDocComment();
         jdc.appendComment(desc);
-        
+
         jMethod.addParameter(new JParameter(jType, "pcl"));
         desc = "The PropertyChangeListener to remove.";
         jdDesc = jdc.getParamDescriptor("pcl");
         jdDesc.setDescription(desc);
-        
+
         desc = "true if the given PropertyChangeListener was removed.";
         jdc.addDescriptor(JDocDescriptor.createReturnDesc(desc));
-        
+
         parent.addMethod(jMethod);
-        
+
         jsc = jMethod.getSourceCode();
         jsc.add("return ");
         jsc.append(vName);
         jsc.append(".removeElement(pcl);");
-        
+
     } //-- createPropertyChangeMethods
-        
+
     /**
      * Creates the #marshal methods for the given JClass
      * @param parent the JClass to create the #marshal methods for
@@ -594,12 +603,12 @@ public class SourceFactory  {
     private void createUnmarshalMethods(JClass parent) {
 
         //-- mangle method name to avoid compiler errors when this class is extended
-		String methodName = "unmarshal";		
+		String methodName = "unmarshal";
 		if (SourceGenerator.mappingSchemaType2Java())
 			methodName+= parent.getName(true);
-		
+
 		//-- create main marshal method
-        JMethod jMethod = new JMethod(parent,methodName); 
+        JMethod jMethod = new JMethod(parent,methodName);
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
@@ -704,7 +713,7 @@ public class SourceFactory  {
 			else
 			{
 				//-- Create package qualified class name to a base type class from another package
-				className = 
+				className =
 					SourceGenerator.getQualifiedClassName(
 							base.getSchema().getTargetNamespace(),
 							JavaXMLNaming.toJavaClassName(base.getName()));
@@ -774,7 +783,7 @@ public class SourceFactory  {
         //-- do not create access methods for transient fields
         if (!fieldInfo.isTransient()) {
             fieldInfo.createAccessMethods(state.jClass);
-            if (fieldInfo.isBound()) 
+            if (fieldInfo.isBound())
                 state.setBoundProperties(true);
         }
 
@@ -802,12 +811,12 @@ public class SourceFactory  {
 
             Structure struct = (Structure)enum.nextElement();
             switch(struct.getStructureType()) {
-                
+
                 //-- handle element declarations
                 case Structure.ELEMENT:
                 {
                     ElementDecl eDecl = (ElementDecl)struct;
-                    
+
 					//-- Output source for element definition?
 					boolean elementSource = false;
 					if (SourceGenerator.mappingSchemaElement2Java())
@@ -818,18 +827,18 @@ public class SourceFactory  {
 						//-- If mapping schema types to Java classes
 						//-- only when anonymous complexType used by element
 						elementSource = true;
-					
+
 					//-- Output Java class for element declaration?
 					if (elementSource)
 					{
 						//-- make sure we haven't processed this element yet
 						//-- to prevent endless recursion.
 						ElementDecl tmpDecl = eDecl;
-						while (tmpDecl.isReference()) 
+						while (tmpDecl.isReference())
 						    tmpDecl = tmpDecl.getReference();
-						    
+
 						boolean processed = state.processed(tmpDecl);
-                    
+
 						//-- make sure we process the element first
 						//-- so that it's available to the MemberFactory
 						if ((state.resolve(struct) == null) && (!processed))
@@ -837,9 +846,9 @@ public class SourceFactory  {
 						                      state,
 						                      state.packageName);
 					}
-					
-                    fieldInfo 
-                        = memberFactory.createFieldInfo((ElementDecl)struct, 
+
+                    fieldInfo
+                        = memberFactory.createFieldInfo((ElementDecl)struct,
                                                          state);
                     handleField(fieldInfo, state);
                     break;
@@ -1045,7 +1054,7 @@ class FactoryState implements ClassInfoResolver {
      * methods have been created
     **/
     private boolean           _bound = false;
-    
+
     //----------------/
     //- Constructors -/
     //----------------/
@@ -1074,10 +1083,10 @@ class FactoryState implements ClassInfoResolver {
             _resolver = resolver;
 
         this.packageName = packageName;
-        
+
         //-- boundProperties
         _bound = SourceGenerator.boundPropertiesEnabled();
-        
+
     } //-- FactoryState
 
     //-----------/
@@ -1118,7 +1127,7 @@ class FactoryState implements ClassInfoResolver {
     boolean hasBoundProperties() {
         return _bound;
     } //-- hasBoundProperties
-    
+
     /**
      * Allows setting the bound properties flag
      *
@@ -1128,7 +1137,7 @@ class FactoryState implements ClassInfoResolver {
     void setBoundProperties(boolean bound) {
         _bound = bound;
     } //-- setBoundProperties
-    
+
     /**
      * Returns the ClassInfo which has been bound to the given key
      * @param key the object to which the ClassInfo has been bound
