@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -23,18 +23,16 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class RootObject extends org.exolab.castor.tests.framework.testDescriptor.RootType 
-implements java.io.Serializable
-{
+public class Category implements java.io.Serializable {
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public RootObject() {
+    public Category() {
         super();
-    } //-- org.exolab.castor.tests.framework.testDescriptor.RootObject()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Category()
 
 
       //-----------/
@@ -80,11 +78,11 @@ implements java.io.Serializable
      * 
      * @param reader
     **/
-    public static org.exolab.castor.tests.framework.testDescriptor.RootObject unmarshal(java.io.Reader reader)
+    public static org.exolab.castor.tests.framework.testDescriptor.Category unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.tests.framework.testDescriptor.RootObject) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.RootObject.class, reader);
-    } //-- org.exolab.castor.tests.framework.testDescriptor.RootObject unmarshal(java.io.Reader) 
+        return (org.exolab.castor.tests.framework.testDescriptor.Category) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.Category.class, reader);
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Category unmarshal(java.io.Reader) 
 
     /**
     **/

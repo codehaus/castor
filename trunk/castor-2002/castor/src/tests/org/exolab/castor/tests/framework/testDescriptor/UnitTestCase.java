@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -36,7 +36,14 @@ public class UnitTestCase implements java.io.Serializable {
 
     private java.lang.String _output;
 
-    private java.lang.String _objectModelInstanceBuilder;
+    private java.lang.String _objectBuilder;
+
+    private boolean _failure = false;
+
+    /**
+     * keeps track of state for field: _failure
+    **/
+    private boolean _has_failure;
 
 
       //----------------/
@@ -54,12 +61,32 @@ public class UnitTestCase implements java.io.Serializable {
 
     /**
     **/
+    public void deleteFailure()
+    {
+        this._has_failure= false;
+    } //-- void deleteFailure() 
+
+    /**
+     * Returns the value of field 'failure'.
+     * @return the value of field 'failure'.
+    **/
+    public boolean getFailure()
+    {
+        return this._failure;
+    } //-- boolean getFailure() 
+
+    /**
+     * Returns the value of field 'input'.
+     * @return the value of field 'input'.
+    **/
     public java.lang.String getInput()
     {
         return this._input;
     } //-- java.lang.String getInput() 
 
     /**
+     * Returns the value of field 'name'.
+     * @return the value of field 'name'.
     **/
     public java.lang.String getName()
     {
@@ -67,18 +94,29 @@ public class UnitTestCase implements java.io.Serializable {
     } //-- java.lang.String getName() 
 
     /**
+     * Returns the value of field 'objectBuilder'.
+     * @return the value of field 'objectBuilder'.
     **/
-    public java.lang.String getObjectModelInstanceBuilder()
+    public java.lang.String getObjectBuilder()
     {
-        return this._objectModelInstanceBuilder;
-    } //-- java.lang.String getObjectModelInstanceBuilder() 
+        return this._objectBuilder;
+    } //-- java.lang.String getObjectBuilder() 
 
     /**
+     * Returns the value of field 'output'.
+     * @return the value of field 'output'.
     **/
     public java.lang.String getOutput()
     {
         return this._output;
     } //-- java.lang.String getOutput() 
+
+    /**
+    **/
+    public boolean hasFailure()
+    {
+        return this._has_failure;
+    } //-- boolean hasFailure() 
 
     /**
     **/
@@ -116,39 +154,49 @@ public class UnitTestCase implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
-     * 
-     * @param _input
+     * Sets the value of field 'failure'.
+     * @param failure the value of field 'failure'.
     **/
-    public void setInput(java.lang.String _input)
+    public void setFailure(boolean failure)
     {
-        this._input = _input;
+        this._failure = failure;
+        this._has_failure = true;
+    } //-- void setFailure(boolean) 
+
+    /**
+     * Sets the value of field 'input'.
+     * @param input the value of field 'input'.
+    **/
+    public void setInput(java.lang.String input)
+    {
+        this._input = input;
     } //-- void setInput(java.lang.String) 
 
     /**
-     * 
-     * @param _name
+     * Sets the value of field 'name'.
+     * @param name the value of field 'name'.
     **/
-    public void setName(java.lang.String _name)
+    public void setName(java.lang.String name)
     {
-        this._name = _name;
+        this._name = name;
     } //-- void setName(java.lang.String) 
 
     /**
-     * 
-     * @param _objectModelInstanceBuilder
+     * Sets the value of field 'objectBuilder'.
+     * @param objectBuilder the value of field 'objectBuilder'.
     **/
-    public void setObjectModelInstanceBuilder(java.lang.String _objectModelInstanceBuilder)
+    public void setObjectBuilder(java.lang.String objectBuilder)
     {
-        this._objectModelInstanceBuilder = _objectModelInstanceBuilder;
-    } //-- void setObjectModelInstanceBuilder(java.lang.String) 
+        this._objectBuilder = objectBuilder;
+    } //-- void setObjectBuilder(java.lang.String) 
 
     /**
-     * 
-     * @param _output
+     * Sets the value of field 'output'.
+     * @param output the value of field 'output'.
     **/
-    public void setOutput(java.lang.String _output)
+    public void setOutput(java.lang.String output)
     {
-        this._output = _output;
+        this._output = output;
     } //-- void setOutput(java.lang.String) 
 
     /**

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -41,9 +41,7 @@ public class TestDescriptor implements java.io.Serializable {
 
     private BugFix _bugFix;
 
-    private SourceGeneratorTest _sourceGeneratorTest;
-
-    private MarshallingTest _marshallingTest;
+    private TestDescriptorChoice _testDescriptorChoice;
 
 
       //----------------/
@@ -71,6 +69,17 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void addComment(java.lang.String) 
 
     /**
+     * 
+     * @param index
+     * @param vComment
+    **/
+    public void addComment(int index, java.lang.String vComment)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _commentList.insertElementAt(vComment, index);
+    } //-- void addComment(int, java.lang.String) 
+
+    /**
     **/
     public java.util.Enumeration enumerateComment()
     {
@@ -78,6 +87,8 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.util.Enumeration enumerateComment() 
 
     /**
+     * Returns the value of field 'bugFix'.
+     * @return the value of field 'bugFix'.
     **/
     public BugFix getBugFix()
     {
@@ -85,6 +96,8 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- BugFix getBugFix() 
 
     /**
+     * Returns the value of field 'category'.
+     * @return the value of field 'category'.
     **/
     public org.exolab.castor.tests.framework.testDescriptor.types.CategoryType getCategory()
     {
@@ -111,7 +124,7 @@ public class TestDescriptor implements java.io.Serializable {
     public java.lang.String[] getComment()
     {
         int size = _commentList.size();
-        java.lang.String[] mArray = new String[size];
+        java.lang.String[] mArray = new java.lang.String[size];
         for (int index = 0; index < size; index++) {
             mArray[index] = (String)_commentList.elementAt(index);
         }
@@ -126,13 +139,8 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- int getCommentCount() 
 
     /**
-    **/
-    public MarshallingTest getMarshallingTest()
-    {
-        return this._marshallingTest;
-    } //-- MarshallingTest getMarshallingTest() 
-
-    /**
+     * Returns the value of field 'name'.
+     * @return the value of field 'name'.
     **/
     public java.lang.String getName()
     {
@@ -140,11 +148,13 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- java.lang.String getName() 
 
     /**
+     * Returns the value of field 'testDescriptorChoice'.
+     * @return the value of field 'testDescriptorChoice'.
     **/
-    public SourceGeneratorTest getSourceGeneratorTest()
+    public TestDescriptorChoice getTestDescriptorChoice()
     {
-        return this._sourceGeneratorTest;
-    } //-- SourceGeneratorTest getSourceGeneratorTest() 
+        return this._testDescriptorChoice;
+    } //-- TestDescriptorChoice getTestDescriptorChoice() 
 
     /**
     **/
@@ -194,35 +204,35 @@ public class TestDescriptor implements java.io.Serializable {
     **/
     public java.lang.String removeComment(int index)
     {
-        Object obj = _commentList.elementAt(index);
+        java.lang.Object obj = _commentList.elementAt(index);
         _commentList.removeElementAt(index);
         return (String)obj;
     } //-- java.lang.String removeComment(int) 
 
     /**
-     * 
-     * @param _bugFix
+     * Sets the value of field 'bugFix'.
+     * @param bugFix the value of field 'bugFix'.
     **/
-    public void setBugFix(BugFix _bugFix)
+    public void setBugFix(BugFix bugFix)
     {
-        this._bugFix = _bugFix;
+        this._bugFix = bugFix;
     } //-- void setBugFix(BugFix) 
 
     /**
-     * 
-     * @param _category
+     * Sets the value of field 'category'.
+     * @param category the value of field 'category'.
     **/
-    public void setCategory(org.exolab.castor.tests.framework.testDescriptor.types.CategoryType _category)
+    public void setCategory(org.exolab.castor.tests.framework.testDescriptor.types.CategoryType category)
     {
-        this._category = _category;
+        this._category = category;
     } //-- void setCategory(org.exolab.castor.tests.framework.testDescriptor.types.CategoryType) 
 
     /**
      * 
-     * @param vComment
      * @param index
+     * @param vComment
     **/
-    public void setComment(java.lang.String vComment, int index)
+    public void setComment(int index, java.lang.String vComment)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -230,7 +240,7 @@ public class TestDescriptor implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _commentList.setElementAt(vComment, index);
-    } //-- void setComment(java.lang.String, int) 
+    } //-- void setComment(int, java.lang.String) 
 
     /**
      * 
@@ -246,31 +256,23 @@ public class TestDescriptor implements java.io.Serializable {
     } //-- void setComment(java.lang.String) 
 
     /**
-     * 
-     * @param _marshallingTest
+     * Sets the value of field 'name'.
+     * @param name the value of field 'name'.
     **/
-    public void setMarshallingTest(MarshallingTest _marshallingTest)
+    public void setName(java.lang.String name)
     {
-        this._marshallingTest = _marshallingTest;
-    } //-- void setMarshallingTest(MarshallingTest) 
-
-    /**
-     * 
-     * @param _name
-    **/
-    public void setName(java.lang.String _name)
-    {
-        this._name = _name;
+        this._name = name;
     } //-- void setName(java.lang.String) 
 
     /**
-     * 
-     * @param _sourceGeneratorTest
+     * Sets the value of field 'testDescriptorChoice'.
+     * @param testDescriptorChoice the value of field
+     * 'testDescriptorChoice'.
     **/
-    public void setSourceGeneratorTest(SourceGeneratorTest _sourceGeneratorTest)
+    public void setTestDescriptorChoice(TestDescriptorChoice testDescriptorChoice)
     {
-        this._sourceGeneratorTest = _sourceGeneratorTest;
-    } //-- void setSourceGeneratorTest(SourceGeneratorTest) 
+        this._testDescriptorChoice = testDescriptorChoice;
+    } //-- void setTestDescriptorChoice(TestDescriptorChoice) 
 
     /**
      * 

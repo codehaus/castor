@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.2</a>, using an
+ * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
  * XML Schema.
  * $Id$
  */
@@ -58,7 +58,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
         //-- _random
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_random", "random", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 RootType target = (RootType) object;
@@ -66,7 +66,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     return null;
                 return new Boolean(target.getRandom());
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -82,12 +82,11 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
         addFieldDescriptor(desc);
         
         //-- validation code for: _random
@@ -97,7 +96,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
         //-- _dump
         desc = new XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_dump", "dump", NodeType.Attribute);
         handler = (new XMLFieldHandler() {
-            public Object getValue( Object object ) 
+            public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
                 RootType target = (RootType) object;
@@ -105,7 +104,7 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     return null;
                 return new Boolean(target.getDump());
             }
-            public void setValue( Object object, Object value) 
+            public void setValue( java.lang.Object object, java.lang.Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
@@ -121,12 +120,11 @@ public class RootTypeDescriptor extends org.exolab.castor.tests.framework.testDe
                     throw new IllegalStateException(ex.toString());
                 }
             }
-            public Object newInstance( Object parent ) {
+            public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/Test");
         addFieldDescriptor(desc);
         
         //-- validation code for: _dump

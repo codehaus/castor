@@ -23,41 +23,23 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public abstract class StringType implements java.io.Serializable {
-
-
-      //--------------------------/
-     //- Class/Member Variables -/
-    //--------------------------/
-
-    /**
-     * internal content storage
-    **/
-    private java.lang.String _content = "";
+public class Root_Object extends RootType 
+implements java.io.Serializable
+{
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public StringType() {
+    public Root_Object() {
         super();
-    } //-- org.exolab.castor.tests.framework.testDescriptor.StringType()
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Root_Object()
 
 
       //-----------/
      //- Methods -/
     //-----------/
-
-    /**
-     * Returns the value of field 'content'. The field 'content'
-     * has the following description: internal content storage
-     * @return the value of field 'content'.
-    **/
-    public java.lang.String getContent()
-    {
-        return this._content;
-    } //-- java.lang.String getContent() 
 
     /**
     **/
@@ -76,25 +58,33 @@ public abstract class StringType implements java.io.Serializable {
      * 
      * @param out
     **/
-    public abstract void marshal(java.io.Writer out)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
+    public void marshal(java.io.Writer out)
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        
+        Marshaller.marshal(this, out);
+    } //-- void marshal(java.io.Writer) 
 
     /**
      * 
      * @param handler
     **/
-    public abstract void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException;
+    public void marshal(org.xml.sax.DocumentHandler handler)
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+    {
+        
+        Marshaller.marshal(this, handler);
+    } //-- void marshal(org.xml.sax.DocumentHandler) 
 
     /**
-     * Sets the value of field 'content'. The field 'content' has
-     * the following description: internal content storage
-     * @param content the value of field 'content'.
+     * 
+     * @param reader
     **/
-    public void setContent(java.lang.String content)
+    public static org.exolab.castor.tests.framework.testDescriptor.Root_Object unmarshal(java.io.Reader reader)
+        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        this._content = content;
-    } //-- void setContent(java.lang.String) 
+        return (org.exolab.castor.tests.framework.testDescriptor.Root_Object) Unmarshaller.unmarshal(org.exolab.castor.tests.framework.testDescriptor.Root_Object.class, reader);
+    } //-- org.exolab.castor.tests.framework.testDescriptor.Root_Object unmarshal(java.io.Reader) 
 
     /**
     **/
