@@ -64,6 +64,8 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.ObjectModifiedException;
 import org.exolab.castor.persist.ObjectDeletedException;
 import org.exolab.castor.persist.QueryException;
+import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.mapping.ContainerFieldDesc;
 
 
 /**
@@ -135,10 +137,10 @@ class SQLEngine
 	if ( clsDesc == null )
 	    throw new IllegalArgumentException( "Argument 'clsDesc' is null" );
 	_clsDesc = clsDesc;
-	_primKey = _clsDesc.getPrimaryKey();
-	if ( _primKey == null )
+	_identity = _clsDesc.getIdentity();
+	if ( _identity == null )
 	    throw new MappingException( "Cannot persist a table that lacks a primary key descriptor" );
-	if ( _clsDesc.getPrimaryKeyField() == null )
+	if ( _clsDesc.getIdentity() == null )
 	    throw new MappingException( "Cannot persist an object with an external primary key" );
 	buildCreateSql();
 	buildRemoveSql();
@@ -160,12 +162,14 @@ class SQLEngine
     }
 
 
+    /*
     SQLEngine( JDOClassDesc clsDesc, PrimaryKeyDesc primKey, PrintWriter logWriter )
 	throws MappingException
     {
 	this( clsDesc, logWriter );
 	_primKey = primKey;
     }
+    */
 
 
     public JDOClassDesc getClassDesc()
@@ -216,20 +220,19 @@ class SQLEngine
 	    count = 1;
 	    stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
 	    if ( _specifyKeyForCreate ) {
-		if ( _primKey.isPrimitive() ) {
-		    stmt.setObject( count, identity );
-		    count += 1;
-		} else {
-		    identity = _clsDesc.getPrimaryKeyField().getValue( obj );
-		    descs = _primKey.getJDOFields();
+		if ( _identity instanceof ContainerFieldDesc ) {
+		    descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
 			descs[ i ].getValue( identity, stmt, count + i );
 		    }
 		    count += i;
+		} else {
+		    stmt.setObject( count, identity );
+		    count += 1;
 		}
 	    }
 	    
-	    descs = _clsDesc.getJDOFields();
+	    descs = (JDOFieldDesc[]) _clsDesc.getFields();
 	    for ( i = 0 ; i < descs.length ; ++i ) {
 		value = descs[ i ].getValue( obj );
 		if ( value != null )
@@ -281,13 +284,13 @@ class SQLEngine
 		    stmt.close();
 
 		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-		if ( _primKey.isPrimitive() ) {
-		    stmt.setObject( 1, identity );
-		} else {
-		    descs = _primKey.getJDOFields();
+		if ( _identity instanceof ContainerFieldDesc ) {
+		    descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
 			descs[ i ].getValue( identity, stmt, i + 1 );
 		    }
+		} else {
+		    stmt.setObject( 1, identity );
 		}
 		if ( stmt.executeQuery().next() )
 		    throw new DuplicateIdentityException( obj.getClass(), identity );
@@ -323,13 +326,14 @@ class SQLEngine
                     ResultSet.TYPE_FORWARD_ONLY, lock ? ResultSet.CONCUR_UPDATABLE : ResultSet.CONCUR_READ_ONLY );
 	    else
 		stmt = ( (Connection) conn ).prepareStatement( lock ? _sqlLoadLock : _sqlLoad );
-	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, identity );
-	    } else {
-		pkDescs = _primKey.getJDOFields();
+
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		pkDescs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
 		    pkDescs[ i ].getValue( identity, stmt, i + 1 );
 		}
+	    } else {
+		stmt.setObject( 1, identity );
 	    }
 
 	    rs = stmt.executeQuery();
@@ -383,7 +387,7 @@ class SQLEngine
 
 	    stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
 
-	    descs = _clsDesc.getJDOFields();
+	    descs = (JDOFieldDesc[]) _clsDesc.getFields();
 	    count = 1;
 	    for ( i = 0 ; i < descs.length ; ++i ) {
 		value = descs[ i ].getValue( obj );
@@ -416,14 +420,14 @@ class SQLEngine
 		}
 	    }
 	    */
-	    
-	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( count, identity );
-	    } else {
-		descs = _primKey.getJDOFields();
+
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( i = 0 ; i < descs.length ; ++i ) {
 		    descs[ i ].getValue( identity, stmt, count + 1 );
 		}
+	    } else {	    
+		stmt.setObject( count, identity );
 	    }
 	    if ( stmt.executeUpdate() == 0 ) {
 		// If no update was performed, the object has been previously
@@ -458,13 +462,13 @@ class SQLEngine
 	    }
 
 	    stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
-	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, identity );
-	    } else {
-		descs = _primKey.getJDOFields();
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    descs[ i ].getValue( identity, stmt, i + 1 );
 		}
+	    } else {
+		stmt.setObject( 1, identity );
 	    }
 	    // [Oleg] Good practice to execute a statement if it was created
 	    // in the first place :-)
@@ -494,13 +498,13 @@ class SQLEngine
 	    else
 		stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 
-	    if ( _primKey.isPrimitive() ) {
-		stmt.setObject( 1, identity );
-	    } else {
-		descs = _primKey.getJDOFields();
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    descs[ i ].getValue( identity, stmt, i + 1 );
 		}
+	    } else {
+		stmt.setObject( 1, identity );
 	    }
 	    if ( ! stmt.executeQuery().next() )
 		throw new ObjectDeletedException( obj.getClass(), identity );
@@ -551,18 +555,18 @@ class SQLEngine
 	// if object with same primary key already exists
 	if ( _specifyKeyForCreate ) {
 	    sql = new StringBuffer( "SELECT 1 FROM " );
-	    sql.append( _clsDesc.getSQLName() ).append( " WHERE " );
-	    if ( _primKey.isPrimitive() ) {
-		sql.append( _primKey.getSQLName() );
-		sql.append( "=?" );
-	    } else {
-		descs = _primKey.getJDOFields();
+	    sql.append( getSQLName( _clsDesc, true ) ).append( " WHERE " );
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    if ( i > 0 )
 			sql.append( " AND " );
 		    sql.append( descs[ i ].getSQLName() );
 		    sql.append( "=?" );
 		}
+	    } else {
+		sql.append( ( (JDOFieldDesc) _identity ).getSQLName() );
+		sql.append( "=?" );
 	    }
 	    sql.append( " FOR UPDATE" );
 	    _pkLookup = sql.toString();
@@ -571,25 +575,25 @@ class SQLEngine
 	// Create statement to insert a new row into the table
 	// using the specified primary key if one is required
 	sql = new StringBuffer( "INSERT INTO " );
-	sql.append( _clsDesc.getSQLName() ).append( " (" );
+	sql.append( getSQLName( _clsDesc, false ) ).append( " (" );
 	if ( _specifyKeyForCreate ) {
-	    if ( _primKey.isPrimitive() ) {
-		sql.append( _primKey.getSQLName() );
-		count = 1;
-	    } else {
-		descs = _primKey.getJDOFields();
+	    if ( _identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    if ( i > 0 )
 			sql.append( ',' );
 		    sql.append( descs[ i ].getSQLName() );
 		}
 		count = descs.length;
+	    } else {
+		sql.append( ( (JDOFieldDesc) _identity ).getSQLName() );
+		count = 1;
 	    }
 	} else {
 	    count = 0;
 	}
 
-	descs = _clsDesc.getJDOFields();
+	descs = (JDOFieldDesc[]) _clsDesc.getFields();
 	for ( int i = 0 ; i < descs.length ; ++i ) {
 	    if ( count > 0 )
 		sql.append( ',' );
@@ -626,7 +630,7 @@ class SQLEngine
 	StringBuffer sql;
 
 	sql = new StringBuffer( "DELETE FROM " );
-	sql.append( _clsDesc.getSQLName() ).append( " WHERE " );
+	sql.append( getSQLName( _clsDesc, false ) ).append( " WHERE " );
 	sql.append( buildWherePK() );
 	_sqlRemove = sql.toString();
     }
@@ -640,8 +644,8 @@ class SQLEngine
 	//RelationDesc[] related;
 
 	sql = new StringBuffer( "UPDATE " );
-	sql.append( _clsDesc.getSQLName() ).append( " SET " );
-	descs = _clsDesc.getJDOFields();
+	sql.append( getSQLName( _clsDesc, false ) ).append( " SET " );
+	descs = (JDOFieldDesc[]) _clsDesc.getFields();
 	for ( int i = 0 ; i < descs.length ; ++i ) {
 	    if ( i > 0 )
 		sql.append( ',' );
@@ -677,23 +681,24 @@ class SQLEngine
 	int            i;
 
 	sql = new StringBuffer();
-	if ( _clsDesc.getPrimaryKey().isPrimitive() ) {
-	    sql.append( _clsDesc.getPrimaryKey().getSQLName() );
-	    sql.append( "=?" );
-	} else {
-	    descs = _clsDesc.getPrimaryKey().getJDOFields();
+	if ( _clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
+	    descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _clsDesc.getIdentity() ).getFields();
 	    for ( i = 0 ; i < descs.length ; ++i ) {
 		if ( i > 0 )
 		    sql.append( " AND " );
 		sql.append( descs[ i ].getSQLName() );
 		sql.append( "=?" );
 	    }
+	} else {
+	    sql.append( ( (JDOFieldDesc) _clsDesc.getIdentity() ).getSQLName() );
+	    sql.append( "=?" );
 	}
 	return sql;
     }
 
 
     protected void buildLoadSql()
+	throws MappingException
     {
 	Vector         loadFields;
 	StringBuffer   sqlFields;
@@ -729,49 +734,50 @@ class SQLEngine
     private int addLoadSql( JDOClassDesc clsDesc, StringBuffer sqlFields,
 			    StringBuffer sqlFrom, StringBuffer sqlJoin,
 			    Vector loadFields, int count, boolean loadPk )
+	throws MappingException
     {
 	JDOFieldDesc[] descs;
 	//RelationDesc[] related;
 	JDOClassDesc  extend;
-	PrimaryKeyDesc primKey;
+	FieldDesc     identity;
 
-	primKey = clsDesc.getPrimaryKey();
+	identity = clsDesc.getIdentity();
 	extend = (JDOClassDesc) clsDesc.getExtends();
 	// related = clsDesc.getRelated();
 
 	if ( count != 0 )
             sqlFrom.append( ',' );
-        sqlFrom.append( clsDesc.getSQLName() );
+        sqlFrom.append( getSQLName( clsDesc, false ) );
 
 	if ( ! loadPk ) {
-	    if ( primKey.isPrimitive() ) {
-		sqlJoin.append( clsDesc.getSQLName( primKey.getSQLName() ) );
-		sqlJoin.append( "=?" );
-	    } else {
-		descs = primKey.getJDOFields();
+	    if ( identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    if ( i > 0 )
 			sqlJoin.append( " AND " );
-		    sqlJoin.append( clsDesc.getSQLName( descs[ i ] ) );
+		    sqlJoin.append( getSQLName( clsDesc, descs[ i ] ) );
 		    sqlJoin.append( "=?" );
 		}
+	    } else {
+		sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
+		sqlJoin.append( "=?" );
 	    }
 	}
 
 	if ( extend != null ) {
-	    if ( primKey.isPrimitive() ) {
-		sqlJoin.append( " AND " );
-		sqlJoin.append( clsDesc.getSQLName( primKey.getSQLName() ) );
-		sqlJoin.append( "=" );
-		sqlJoin.append( extend.getSQLName( primKey.getSQLName() ) );
-	    } else {
-		descs = primKey.getJDOFields();
+	    if ( identity instanceof ContainerFieldDesc ) {
+		descs = (JDOFieldDesc[]) ( (ContainerFieldDesc) identity ).getFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
 		    sqlJoin.append( " AND " );
-		    sqlJoin.append( clsDesc.getSQLName( descs[ i ] ) );
+		    sqlJoin.append( getSQLName( clsDesc, descs[ i ] ) );
 		    sqlJoin.append( "=" );
-		    sqlJoin.append( extend.getSQLName( descs[ i ] ) );
+		    sqlJoin.append( getSQLName( extend, descs[ i ] ) );
 		}
+	    } else {
+		sqlJoin.append( " AND " );
+		sqlJoin.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
+		sqlJoin.append( "=" );
+		sqlJoin.append( getSQLName( extend, (JDOFieldDesc) identity ) );
 	    }
 	}
 
@@ -788,13 +794,13 @@ class SQLEngine
 		    if ( count > 0 )
 			sqlFields.append( ',' );
 		    sqlFields.append( getSQLName( clsDesc, descs[ i ] ) );
-		    loadFields.addElement( new JDOContainerFieldDesc( (ContainerFieldDesc) identity, descs[ i ] ) );
+		    loadFields.addElement( new JDOContainedFieldDesc( descs[ i ], (ContainerFieldDesc) identity, null ) );
 		    ++count;
 		}
 	    } else {
 		if ( count > 0 )
 		    sqlFields.append( ',' );
-		sqlFields.append( getSQLName( clsDesc, identity ) );
+		sqlFields.append( getSQLName( clsDesc, (JDOFieldDesc) identity ) );
 		loadFields.addElement( identity );
 		++count;
 	    }
@@ -935,14 +941,14 @@ class SQLEngine
 	    try {
 		if ( ! _rs.next() )
 		    return null;
-		if ( _engine._primKey.isPrimitive() ) {
-		    identity = _rs.getObject( 1 );
-		} else {
-		    identity = _engine._primKey.newInstance();
-		    pkDescs = _engine._primKey.getJDOFields();
+		if ( _engine._identity instanceof ContainerFieldDesc ) {
+		    identity = ( (ContainerFieldDesc) _engine._identity ).newInstance();
+		    pkDescs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _engine._identity ).getFields();
 		    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
 			pkDescs[ i ].setValue( identity, _rs, 1 + i );
 		    }
+		} else {
+		    identity = _rs.getObject( 1 );
 		}
 	    } catch ( SQLException except ) {
 		throw new PersistenceException( except );
@@ -961,14 +967,14 @@ class SQLEngine
 		_rs.absolute( index );
 		if ( _rs.isLast() )
 		    return null;
-		if ( _engine._primKey.isPrimitive() ) {
-		    identity = _rs.getObject( 1 );
-		} else {
-		    identity = _engine._primKey.newInstance();
-		    pkDescs = _engine._primKey.getJDOFields();
+		if ( _engine._identity instanceof ContainerFieldDesc ) {
+		    identity = ( (ContainerFieldDesc) _engine._identity ).newInstance();
+		    pkDescs = (JDOFieldDesc[]) ( (ContainerFieldDesc) _engine._identity ).getFields();
 		    for ( int i = 0 ; i < pkDescs.length ; ++i ) {
 			pkDescs[ i ].setValue( identity, _rs, 1 + i );
 		    }
+		} else {
+		    identity = _rs.getObject( 1 );
 		}
 	    } catch ( SQLException except ) {
 		throw new PersistenceException( except );
@@ -1001,10 +1007,10 @@ class SQLEngine
 	    Object stamp = null;
 	    
 	    try {
-		if ( _engine._primKey.isPrimitive() )
-		    count = 2;
+		if ( _engine._identity instanceof ContainerFieldDesc ) 
+		    count = ( (ContainerFieldDesc) _engine._identity ).getFields().length + 1;
 		else
-		    count = _engine._primKey.getJDOFields().length + 1;
+		    count = 2;
 		for ( int i = 0; i < _engine._loadFields.length ; ++i  ) {
 		    _engine._loadFields[ i ].setValue( obj, _rs, i + count );
 		}
