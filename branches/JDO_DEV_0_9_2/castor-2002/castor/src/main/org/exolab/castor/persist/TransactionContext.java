@@ -1608,7 +1608,7 @@ public class TransactionContext implements Key.KeyHolder {
      * @param oid The object's OID
      * @param engine The persistence engine used to create this object
      */
-    ObjectEntry addObjectEntry( OID oid, Object object )
+    public ObjectEntry addObjectEntry( OID oid, Object object )
     {
         if ( oid == null )
             throw new IllegalArgumentException("oid cannot be null");
