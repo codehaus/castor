@@ -89,7 +89,6 @@ public final class J2CollectionHandlers
                     ( (Collection) collection ).add( object );
                     return collection;
                 } else {
-                    if ( ! ( (Collection) collection ).contains( object ) )
                     ( (Collection) collection ).add( object );
                     return null;
                 }
@@ -122,7 +121,7 @@ public final class J2CollectionHandlers
                     ( (Set) collection ).add( object );
                     return collection;
                 } else {
-                    if ( ! ( (Set) collection ).contains( object ) )
+                    //if ( ! ( (Set) collection ).contains( object ) )
                     ( (Set) collection ).add( object );
                     return null;
                 }
@@ -155,7 +154,6 @@ public final class J2CollectionHandlers
                     ( (HashMap) collection ).put( object, object );
                     return collection;
                 } else {
-                    if ( ! ( (HashMap) collection ).containsValue( object ) )
                     ( (HashMap) collection ).put( object, object );
                     return null;
                 }
