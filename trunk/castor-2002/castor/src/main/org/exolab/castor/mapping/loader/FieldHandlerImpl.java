@@ -469,7 +469,6 @@ public final class FieldHandlerImpl
 
         } else if ( value != null ) {
             Object collect;
-
             try {
                 // Get the field value (the collection), add the value to it,
                 // possibly yielding a new collection (in the case of an array),
@@ -494,6 +493,7 @@ public final class FieldHandlerImpl
                     // and that has not been instantiated, we have to handle the
                     // instantiation here rather than in J1CollectionHandler,
                     // because we have acces to the Field object here.
+                    boolean setCollection = false;
                     if (collect == null) {
                         // The return type of the get method should be the type of the collection.
                         Class type = _getMethod.getReturnType();
@@ -507,12 +507,16 @@ public final class FieldHandlerImpl
                                 throw new IllegalStateException("Unable to instantiate an array of '" + type.getComponentType() + "' : " + e);
                             }
                         }
+                        setCollection = true;
                     }
 
+                    Object tmp = _colHandler.add(collect, value);
+                    
+                    //-- make sure we do not overwrite collect unless
+                    //-- it's null
+                    if (collect == null) collect = tmp;
 
-                    collect = _colHandler.add( collect, value );
-
-                    if ( collect != null && _setMethod != null)
+                    if ( setCollection && (_setMethod != null))
                         _setMethod.invoke( object, new Object[] { collect } );
                 }                
             } catch ( IllegalAccessException except ) {
