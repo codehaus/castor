@@ -2,6 +2,41 @@
 <document url="http://castor.exolab.org/changelog.xml">
   <body>
     <title>Change log</title>
+    <section title="Version 0.8.1  April 5, 2000"><pre>
+XML:     Added back inheritence support inside XMLClassDescriptor,
+         which was in MarshalInfo, but removed during the upgrade.
+
+XML:     Fixed bug with creating default XML name in XMLClassDescriptorImpl
+
+XML:     Fixed bug with unmarshalling primitive String types.
+            -- reported by Remy Maucherat and Kevin Burton
+
+XML:     Fixed bug with namespace support during marshalling of primitive
+         and immutable types
+
+XML:     Added back namespace support, which was temporarily removed during
+         the upgrade
+
+JDO:     Added Locked mode to provide locking at the database level, as
+         opposed to Exclusive mode which provides locking at the cache
+         level. Added support for loading/querying with a given access mode.
+
+JDO:     Improved concurrency for shared mode by eliminating write locks when
+         modified field is not marked as dirty.
+
+JDO:     Added isOpen method to database. Deprecated checkpoint.
+
+JDO:     Added preliminary support for controlling cache size and removing
+         objects from cache.
+
+JDO:     Fixed bug in bind( String) method of OQLQuery.
+
+JDO:     Fixed bug with modified exception not removing copy from cache.
+
+JDO:     Fixed bug with reusing queries.
+
+Misc:    Upgraded test cases to run inside JTF as a test harness.
+    </pre></section>
     <section title="Version 0.8  March 27, 2000"><pre>
 XML:     support for IDREF/ID has been added back in
 
