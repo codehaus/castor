@@ -44,7 +44,7 @@
            </xsd:choice>
         </xsd:sequence>
         <xsd:attribute name="name"     type="ID"         use="required"/>
-        <xsd:attribute name="extends"  type="string"     use="optional"/>
+        <xsd:attribute name="extends"  type="IDREF"      use="optional"/>
         <xsd:attribute name="depends"  type="IDREF"      use="optional"/>
         <xsd:attribute name="identity" type="NMTOKENS"   use="optional"/>
         <xsd:attribute name="access"   value="shared"    use="optional">
