@@ -212,7 +212,20 @@ public final class Introspector {
                 
                 Class type = method.getReturnType();
                 
+                if (type == null) continue;
                 if (!isDescriptable(type)) continue;
+                
+                //-- Handle Collections
+                boolean isCollection = false;
+                if (type.isArray()) {
+                    isCollection = true;
+                }
+                else if (java.util.Enumeration.class.isAssignableFrom(type)){
+                    isCollection = true;
+                }
+                else if (java.util.Vector.class.isAssignableFrom(type)) {
+                    isCollection = true;
+                }
                 
                 XMLFieldDescriptorImpl fieldDesc 
                     = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
@@ -221,6 +234,11 @@ public final class Introspector {
                     fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
                     descriptors.put(xmlName, fieldDesc);
                     classDesc.addFieldDescriptor(fieldDesc);
+                }
+                
+                if (isCollection) {
+                    fieldDesc.setMultivalued(true);
+                    fieldDesc.setNodeType(NodeType.Element);
                 }
                 
                 FieldHandlerImpl handler 
@@ -278,6 +296,22 @@ public final class Introspector {
                 
                 XMLFieldDescriptorImpl fieldDesc 
                     = (XMLFieldDescriptorImpl) descriptors.get(xmlName);
+                    
+                //-- For clean up purposes keep track of
+                //-- whether or not this is an "add" method
+                boolean isAdd = false;
+                
+                //-- collection
+                boolean isCollection = false;                
+                if (methodName.startsWith(ADD)) {
+                    isCollection = true;
+                    isAdd = true;
+                }
+                else if (type.isArray() || 
+                        (type == java.util.Vector.class)) 
+                {
+                    isCollection = true;
+                }
                 
                 if (fieldDesc == null) {
                     fieldDesc = createFieldDescriptor(type, fieldName, xmlName);
@@ -285,20 +319,9 @@ public final class Introspector {
                     classDesc.addFieldDescriptor(fieldDesc);
                 }
                 
-                //-- collection
-                boolean isAdd = false;
-                if (methodName.startsWith(ADD)) {
+                if (isCollection) {
                     fieldDesc.setNodeType(NodeType.Element);
                     fieldDesc.setMultivalued(true);
-                    isAdd = true;
-                }
-                else { 
-                    if (type.isArray() || 
-                       (type == java.util.Vector.class)) 
-                    {
-                        fieldDesc.setNodeType(NodeType.Element);
-                        fieldDesc.setMultivalued(true);
-                    }
                 }
                 
                 FieldHandlerImpl handler 
@@ -444,6 +467,7 @@ public final class Introspector {
                 XMLFieldDescriptorImpl fieldDesc =
                     (XMLFieldDescriptorImpl) dateDescriptors.get(i);
                 FieldHandler handler = fieldDesc.getHandler();
+                fieldDesc.setImmutable(true);
                 fieldDesc.setHandler(new DateFieldHandler(handler));
             }
         }
