@@ -26,7 +26,7 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
-    <!-- <case class="jdo.LazyLoading" /> -->
+    <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <!-- -->
     <!-- -->
@@ -42,6 +42,8 @@
     <case class="jdo.Persistent" />
     <case class="jdo.StoredProcedure" />
 
+    <!-- D -->
+    <case class="jdo.ListTypes" />
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -63,7 +65,7 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
-    <!-- <case class="jdo.LazyLoading" /> --> 
+    <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <!-- -->
     <!-- -->
@@ -76,6 +78,9 @@
     <case class="jdo.KeyGenReturning" />
     <!-- -->
     <case class="jdo.Persistent" />
+
+    <!-- D -->
+    <case class="jdo.ListTypes" />
   </category>
 
   <category name="xml" class="xml.XMLCategory">

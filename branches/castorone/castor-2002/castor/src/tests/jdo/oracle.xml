@@ -11,7 +11,7 @@
 </database>
 -->
 <database name="oracle" engine="oracle" >
-    <driver url="jdbc:oracle:oci8:@YIP"	
+    <driver url="jdbc:oracle:thin:@localhost:1521:LEAF"	
             class-name="oracle.jdbc.driver.OracleDriver">
 
       <param name="user" value="SYSTEM"/>
