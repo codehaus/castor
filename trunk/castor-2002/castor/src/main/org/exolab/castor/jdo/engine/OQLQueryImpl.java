@@ -49,6 +49,8 @@ package org.exolab.castor.jdo.engine;
 
 import java.util.Vector;
 import java.util.StringTokenizer;
+import java.util.Enumeration;
+import java.util.NoSuchElementException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.exolab.castor.jdo.OQLQuery;
@@ -120,6 +122,48 @@ public class OQLQueryImpl
             throw except;
         }
         ++_fieldNum;
+    }
+
+
+    public void bind( boolean value )
+    {
+        bind( new Boolean( value ) );
+    }
+
+
+    public void bind( short value )
+    {
+        bind( new Short( value ) );
+    }
+
+
+    public void bind( int value )
+    {
+        bind( new Integer( value ) );
+    }
+
+
+    public void bind( long value )
+    {
+        bind( new Long( value ) );
+    }
+
+
+    public void bind( String value )
+    {
+        bind( value );
+    }
+
+
+    public void bind( float value )
+    {
+        bind( new Float( value ) );
+    }
+
+
+    public void bind( double value )
+    {
+        bind( new Double( value ) );
     }
 
 
@@ -238,40 +282,120 @@ public class OQLQueryImpl
     }
     
     
-    public Object execute()
+    public Enumeration execute()
         throws QueryException, PersistenceException, TransactionNotInProgressException
     {
         QueryResults       results = null;
-        Object             obj;
-        Object             identity;
-        Vector             set;
         
         try {
             results = _dbImpl.getTransaction().query( _dbEngine, _query, AccessMode.Shared );
             _fieldNum = 0;
-            
-            set = new Vector();
-            identity = results.nextIdentity();
-            while ( identity != null ) {
-                try {
-                    obj = results.fetch();
-                    set.addElement( obj );
-                } catch ( ObjectNotFoundException except ) { }
-                identity = results.nextIdentity();
-            }
-            if ( set.size() == 0 )
-                return null;
-            if ( set.size() == 1 )
-                return set.elementAt( 0 );
-            return set.elements();
-        } catch ( LockNotGrantedException except ) {
-            throw new PersistenceExceptionImpl( except.toString() );
+            return new OQLEnumeration( results );
         } catch ( PersistenceException except ) {
-            throw except;
-        } finally {
             if ( results != null )
                 results.close();
+            throw except;
         }
+    }
+
+
+
+    static class OQLEnumeration
+        implements Enumeration
+    {
+
+        
+        private Object       _lastObject;
+
+
+        private QueryResults _results;
+
+
+        OQLEnumeration( QueryResults results )
+        {
+            _results = results;
+        }
+
+
+        public boolean hasMoreElements()
+        {
+            Object identity;
+
+            if ( _lastObject != null )
+                return true;
+            if ( _results == null )
+                return false;
+            try {
+                identity = _results.nextIdentity();
+                while ( identity != null ) {
+                    try {
+                        _lastObject = _results.fetch();
+                        if ( _lastObject != null )
+                            break;
+                    } catch ( PersistenceException except ) {
+                        identity = _results.nextIdentity();
+                    }
+                }
+                if ( identity == null ) {
+                    _results.close();
+                    _results = null;
+                }
+            } catch ( PersistenceException except ) {
+                _results.close();
+                _results = null;
+            }
+            return ( _lastObject != null );
+        }
+
+
+        public Object nextElement()
+        {
+            Object identity;
+
+            if ( _lastObject != null ) {
+                Object result;
+                
+                result = _lastObject;
+                _lastObject = null;
+                return result;
+            }
+            if ( _results == null )
+                throw new NoSuchElementException();
+            try {
+                identity = _results.nextIdentity();
+                while ( identity != null ) {
+                    try {
+                        Object result;
+                        
+                        result = _results.fetch();
+                        if ( result != null )
+                            return result;
+                    } catch ( PersistenceException except ) {
+                    }
+                    identity = _results.nextIdentity();
+                }
+                if ( identity == null ) {
+                    _results.close();
+                    _results = null;
+                }
+            } catch ( PersistenceException except ) { 
+                _results.close();
+                _results = null;
+            }
+            throw new NoSuchElementException();
+        }
+
+
+        protected void finalize()
+            throws Throwable
+        {
+            if ( _results != null ) {
+                _results.close();
+                _results = null;
+            }
+        }
+
+
     }
     
 
