@@ -55,6 +55,7 @@ package org.exolab.castor.persist;
  * <p>
  * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
  *
+ *
  */
 public interface Lazy {
 }
