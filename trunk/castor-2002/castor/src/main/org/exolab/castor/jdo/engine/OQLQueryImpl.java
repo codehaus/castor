@@ -132,8 +132,8 @@ public class OQLQueryImpl
             ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
             
             if ( value != null && ! info.getTheClass().isAssignableFrom( value.getClass() ) )
-                throw new IllegalArgumentException( "Query paramter " + _fieldNum + " is not of the expected type " + 
-                                                    _bindTypes[ _fieldNum ].getName() );
+                throw new IllegalArgumentException( "Query paramter " + ( _fieldNum + 1 ) + " is not of the expected type " + 
+                                                    info.getTheClass() );
             if ( _bindValues == null )
                 _bindValues = new Object[ _bindTypes.length ];
 
