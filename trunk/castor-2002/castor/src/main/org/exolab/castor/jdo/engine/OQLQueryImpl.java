@@ -71,6 +71,7 @@ import org.exolab.castor.jdo.oql.TokenTypes;
 import org.exolab.castor.jdo.oql.ParseTreeNode;
 import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
+import org.exolab.castor.persist.ClassHandler;
 import org.exolab.castor.persist.TransactionContext;
 //import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.PersistenceEngine;
@@ -145,12 +146,18 @@ public class OQLQueryImpl
 
     public void bind( Object value )
     {
+        ClassHandler handler;
 
         if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if ( _fieldNum == _paramInfo.size() )
             throw new IllegalArgumentException( "Only " + _paramInfo.size() +
                                                 " fields in this query" );
+
+        handler = _dbEngine.getClassHandler( value.getClass() );
+        if ( handler != null ) {
+            value = handler.getIdentity( value );
+        }
         try {
             ParamInfo info = (ParamInfo) _paramInfo.get(new Integer( _fieldNum + 1 ));
             
