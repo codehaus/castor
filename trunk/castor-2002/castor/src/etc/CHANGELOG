@@ -1,5 +1,7 @@
 Version (CVS)
 -------------
+XML:    Made the collection name in the mapping file NOT case sensitive. (Seb)
+
 XML:	Added new validation flag for the marshalling framework in castor.properties
 	Changed the parser validation property to og.exolab.castor.parser.validation
 	(Arnaud)
