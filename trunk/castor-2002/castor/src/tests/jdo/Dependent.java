@@ -294,6 +294,16 @@ public class Dependent
                 stream.writeVerbose( "OK: correct result of query 4 " );
             }
             oql.close();
+            oql = db.getOQLQuery( "SELECT master FROM jdo.TestMaster master WHERE master.group=$1" );
+            oql.bind(group);
+            qres = oql.execute();
+            if ( qres.hasMore() ) {
+                stream.writeVerbose( "OK: correct result of query 5 " );
+            } else {
+                stream.writeVerbose( "Error: incorrect result of query 5 " );
+                result = false;
+            }
+            oql.close();
             db.commit();
 
             if ( ! result )
