@@ -47,7 +47,7 @@
 package org.exolab.castor.jdo;
 
 
-
+import org.exolab.castor.persist.PersistenceInfoGroup;
 
 /**
  * An open connection to the database. This object represents an open
@@ -192,6 +192,10 @@ public interface Database
     public Query getQuery();
 
 
+
+    public PersistenceInfoGroup getScope();
+
+
     /**
      * Load an object of the specified type and given identity.
      * Once loaded the object is persistent. Calling this method with
@@ -210,9 +214,20 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity )
+    public Object load( Class type, Object[] identities )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
+
+
+    public Object load( Class type, Object identity )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
+
+    public Object load( Class type, Object identity, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException;
+
 
 
     /**
@@ -236,7 +251,7 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object load( Class type, Object identity, short accessMode )
+    public Object load( Class type, Object[] identities, short accessMode )
         throws ObjectNotFoundException, LockNotGrantedException,
                TransactionNotInProgressException, PersistenceException;
 
@@ -308,9 +323,11 @@ public interface Database
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
+
     public void update( Object object )
         throws ClassNotPersistenceCapableException,
                TransactionNotInProgressException, PersistenceException;
+
 
 
     /**
@@ -432,7 +449,7 @@ public interface Database
      * @param object The object
      * @return True if persistent in this transaction
      */
-    public boolean isPersistent( Object object );
+    //public boolean isPersistent( Object object );
 
 
     /**
@@ -446,7 +463,7 @@ public interface Database
      * @param object The object
      * @return The object's identity, or null
      */
-    public Object getIdentity( Object object );
+    public Object[] getIdentities( Object object );
 
 
     /**

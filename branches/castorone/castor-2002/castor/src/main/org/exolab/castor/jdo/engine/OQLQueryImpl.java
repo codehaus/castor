@@ -73,7 +73,7 @@ import org.exolab.castor.jdo.oql.ParseTreeWalker;
 import org.exolab.castor.jdo.oql.ParamInfo;
 import org.exolab.castor.persist.TransactionContext;
 //import org.exolab.castor.persist.QueryResults;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -86,7 +86,7 @@ import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.Logger;
-
+import org.exolab.castor.persist.OID;
 
 /**
  *
@@ -99,7 +99,7 @@ public class OQLQueryImpl
 {
 
 
-    private PersistenceEngine  _dbEngine;
+    private LockEngine  _dbEngine;
 
 
     private DatabaseImpl       _dbImpl;
@@ -250,7 +250,7 @@ public class OQLQueryImpl
         Parser parser = new Parser(lexer);
         ParseTreeNode parseTree = parser.getParseTree();
 
-        _dbEngine = _dbImpl.getPersistenceEngine(); 
+        _dbEngine = _dbImpl.getLockEngine(); 
         if ( _dbEngine == null )
             throw new QueryException( "Could not get a persistence engine" );
 
@@ -374,7 +374,7 @@ public class OQLQueryImpl
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }
-        _dbEngine = _dbImpl.getPersistenceEngine();
+        _dbEngine = _dbImpl.getLockEngine();
         if ( _dbEngine == null || _dbEngine.getPersistence( _objClass ) == null )
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
@@ -518,31 +518,33 @@ public class OQLQueryImpl
         public boolean hasMore( boolean skipError )
             throws PersistenceException
         {
-            Object identity;
+            Object[] identities;
 
             if ( _lastObject != null )
                 return true;
             if ( _results == null )
                 return false;
             try {
-                identity = _results.nextIdentity();
-                while ( identity != null ) {
+                identities = _results.nextIdentities();
+                while ( identities != null ) {
+                    System.out.println("While identities != null");
+                    System.out.println("id: "+OID.flatten( identities ));
                     try {
                         _lastObject = _results.fetch();
                         if ( _lastObject != null )
                             break;
                     } catch ( ObjectNotFoundException except ) {
                         // Object not found, deleted, etc. Just skip to next one.
-                        identity = _results.nextIdentity();
+                        identities = _results.nextIdentities();
                     } catch ( PersistenceException except ) {
                         // Error occured. If not throwing exception just skip to
                         // next object.
-                        identity = _results.nextIdentity();
+                        identities = _results.nextIdentities();
                         if ( ! skipError )
                             throw except;
                     }
                 }
-                if ( identity == null ) {
+                if ( identities == null ) {
                     _results.close();
                     _results = null;
                 }
@@ -578,7 +580,7 @@ public class OQLQueryImpl
         private Object next( boolean skipError )
             throws PersistenceException, NoSuchElementException
         {
-            Object identity;
+            Object[] identities;
 
             if ( _lastObject != null ) {
                 Object result;
@@ -593,8 +595,8 @@ public class OQLQueryImpl
             if ( _results == null )
                 throw new NoSuchElementException();
             try {
-                identity = _results.nextIdentity();
-                while ( identity != null ) {
+                identities = _results.nextIdentities();
+                while ( identities != null ) {
                     try {
                         Object result;
                         
@@ -612,9 +614,9 @@ public class OQLQueryImpl
                         if ( ! skipError )
                             throw except;
                     }
-                    identity = _results.nextIdentity();
+                    identities = _results.nextIdentities();
                 }
-                if ( identity == null ) {
+                if ( identities == null ) {
                     _results.close();
                     _results = null;
                 }

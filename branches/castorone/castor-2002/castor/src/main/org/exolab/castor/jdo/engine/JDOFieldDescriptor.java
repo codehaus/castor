@@ -97,7 +97,7 @@ public class JDOFieldDescriptor
      * @param fieldDesc The field descriptor
      * @throws MappingException Invalid mapping information
      */
-    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, Class sqlType,
+    public JDOFieldDescriptor( FieldDescriptorImpl fieldDesc, String sqlName, /*Class sqlType*/int sqlType,
                                boolean dirtyCheck, String manyTable, String manyKey )
         throws MappingException
     {
@@ -110,7 +110,8 @@ public class JDOFieldDescriptor
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
         _manyKey = manyKey;
-        _sqlType = SQLTypes.getSQLType( sqlType );
+        _sqlType = sqlType;
+        //SQLTypes.getSQLType( sqlType );
     }
 
 

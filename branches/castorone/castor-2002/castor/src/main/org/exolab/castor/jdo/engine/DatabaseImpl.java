@@ -66,13 +66,19 @@ import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.TransactionContext;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.PersistenceInfo;
+import org.exolab.castor.persist.PersistenceInfoGroup;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.ClassNotPersistenceCapableExceptionImpl;
 import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.util.Messages;
+
+
+
+
 
 
 /**
@@ -90,8 +96,8 @@ public class DatabaseImpl
     /**
      * The database engine used to access the underlying SQL database.
      */
-    protected PersistenceEngine   _dbEngine;
-
+    //protected LockEngine   _dbEngine;
+    protected PersistenceInfoGroup  _scope;
 
     /**
      * The transaction context is this database was accessed with an
@@ -129,8 +135,7 @@ public class DatabaseImpl
 
     public DatabaseImpl( String dbName, int lockTimeout, LogInterceptor logInterceptor,
                          Transaction transaction )
-        throws DatabaseNotFoundException
-    {
+            throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
@@ -140,7 +145,8 @@ public class DatabaseImpl
         dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
-        _dbEngine = DatabaseRegistry.getPersistenceEngine( dbs );
+        LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
+        _scope = new PersistenceInfoGroup( pe );
         _logInterceptor = logInterceptor;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
@@ -152,10 +158,12 @@ public class DatabaseImpl
         }
     }
 
-
-    PersistenceEngine getPersistenceEngine()
+    LockEngine getLockEngine()
     {
-        return _dbEngine;
+        return _scope.getLockEngine();
+    }
+    public PersistenceInfoGroup getScope() {
+        return _scope;
     }
 
 
@@ -173,46 +181,52 @@ public class DatabaseImpl
                 }
             }
         } finally {
-            _dbEngine = null;
+            _scope = null;
         }
     }
 
 
     public boolean isClosed()
     {
-        return ( _dbEngine == null );
+        return ( _scope == null );
     }
 
+    public Object load( Class type, Object identity ) 
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
+    
+        Object[] identities = { identity };
+        return load( type, identities );
+    }
 
-    public Object load( Class type, Object identity )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
-    {
+    public Object load( Class type, Object[] identities )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
-        Object             object;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( type );
-        if ( handler == null )
+        info = _scope.getPersistenceInfo( type );
+        if ( info == null )
             throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = tx.fetch( _dbEngine, handler, identity, null );
-        if ( object == null ) {
-            object = handler.newInstance();
-            tx.load( _dbEngine, handler, object, identity, null );
-        }
-        return object;
+
+        return tx.load( info.engine, info.molder, identities, null );
     }
 
-
     public Object load( Class type, Object identity, short accessMode )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
-    {
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
+
+        Object[] identities = { identity };
+        return load( type, identities );
+    }
+
+    public Object load( Class type, Object[] identities, short accessMode )
+            throws TransactionNotInProgressException, ObjectNotFoundException,
+            LockNotGrantedException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
         AccessMode         mode;
-        Object             object;
 
         switch ( accessMode ) {
         case ReadOnly:
@@ -230,46 +244,43 @@ public class DatabaseImpl
         default:
             throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
         }
-        tx = getTransaction();
-        handler = _dbEngine.getClassHandler( type );
-        if ( handler == null )
-            throw new ClassNotPersistenceCapableExceptionImpl( type );
-        object = tx.fetch( _dbEngine, handler, identity, mode );
-        if ( object == null ) {
-            object = handler.newInstance();
-            tx.load( _dbEngine, handler, object, identity, mode );
-        }
-        return object;
-    }
 
+        tx = getTransaction();
+        info = _scope.getPersistenceInfo( type );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( type );
+        
+        return tx.load( info.engine, info.molder, identities, mode );
+    }
 
     public void create( Object object )
-        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
-               TransactionNotInProgressException, PersistenceException
-    {
+            throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+            TransactionNotInProgressException, PersistenceException {
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( object.getClass() );
-        if ( handler == null )
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
             throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
-        tx.create( _dbEngine, object, handler.getIdentity( object ) );
+
+        tx.create( info.engine, info.molder, object, null );
     }
 
-
     public void update( Object object )
-        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
-               TransactionNotInProgressException, PersistenceException
-    {
+            throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+            TransactionNotInProgressException, PersistenceException {
+        /*
         TransactionContext tx;
-        ClassHandler       handler;
+        PersistenceInfo    info;
 
         tx = getTransaction();
-        handler = _dbEngine.getClassHandler( object.getClass() );
-        if ( handler == null )
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
             throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
-        tx.update( _dbEngine, object, handler.getIdentity( object ) );
+
+        tx.update( _scope, object );
+        */
     }
 
 
@@ -289,8 +300,13 @@ public class DatabaseImpl
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
+        PersistenceInfo info;
         
         tx = getTransaction();
+        info = _scope.getPersistenceInfo( object.getClass() );
+        if ( info == null )
+            throw new ClassNotPersistenceCapableExceptionImpl( object.getClass() );
+
         tx.delete( object );
     }
 
@@ -305,7 +321,7 @@ public class DatabaseImpl
         remove( object );
     }
 
-
+    /*
     public boolean isPersistent( Object object )
     {
         TransactionContext tx;
@@ -316,16 +332,16 @@ public class DatabaseImpl
             return _ctx.isPersistent( object );
         return false;
     }
+    */
 
-
-    public Object getIdentity( Object object )
+    public Object[] getIdentities( Object object )
     {
         TransactionContext tx;
         
-        if ( _dbEngine == null )
+        if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.getIdentity( object );
+            return _ctx.getIdentities( object );
         return null;
     }
 
@@ -366,7 +382,7 @@ public class DatabaseImpl
     protected void finalize()
         throws Throwable
     {
-        if ( _dbEngine != null )
+        if ( _scope != null )
             close();
     }
 
@@ -376,7 +392,7 @@ public class DatabaseImpl
     {
         TransactionContext tx;
         
-        if ( _dbEngine == null )
+        if ( _scope == null )
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
         if ( _ctx != null && _ctx.isOpen()  )
             return _ctx;
@@ -400,6 +416,7 @@ public class DatabaseImpl
     public void commit()
         throws TransactionNotInProgressException, TransactionAbortedException
     {
+
         if ( _transaction != null )
             throw new IllegalStateException( Messages.message( "jdo.txInJ2EE" ) );
 
@@ -515,8 +532,3 @@ public class DatabaseImpl
 
 
 }
-
-
-
-
-

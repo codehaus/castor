@@ -44,44 +44,23 @@
  */
 
 
-package org.exolab.castor.persist;
+package org.exolab.castor.mapping.loader;
 
 
-import java.io.PrintWriter;
-import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.MappingResolver;
-import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.exolab.castor.persist.spi.LogInterceptor;
+public class RelationDescriptor {
+    public final String name;
+    public final String table;
+    public final String type1;
+    public final String sql1;
+    public final String type2;
+    public final String sql2;
 
-
-/**
- * Factory for constructing new persistence engines. Used by the APIs
- * to obtain a new persistence engine using an SPI factory and mapping
- * resolver. The returned object implements the {@link PersistenceEngine}
- * interface.
- *
- * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
- * @version $Revision$ $Date$
- */
-public class PersistenceEngineFactory
-{
-
-
-    /**
-     * Creates and returns a new persistence engine.
-     *
-     * @param mapResolver All the descriptors supported by this engine
-     * @param factory Persistence SPI factory
-     * @param logInterceptor Optional log/trace interceptor
-     * @throws MappingException The SPI factory could not support one of
-     *  object types due to a mapping errot
-     */
-    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory,
-                                           LogInterceptor logInterceptor )
-        throws MappingException
-    {
-        return new LockEngine( mapResolver, factory, logInterceptor );
+    public RelationDescriptor( String name, String table, String type1, String sql1, String type2, String sql2 ) {
+        this.name = name;
+        this.table = table;
+        this.type1 = type1;
+        this.sql1 = sql1;
+        this.type2 = type2;
+        this.sql2 = sql2;
     }
-
-
 }

@@ -46,6 +46,8 @@
 
 package org.exolab.castor.persist;
 
+import java.util.Vector;
+import java.util.Enumeration;
 
 /**
  * Object identifier. An object identifier is unique within a cache
@@ -59,7 +61,7 @@ package org.exolab.castor.persist;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-final class OID
+public final class OID
 {
 
 
@@ -67,13 +69,21 @@ final class OID
      * The object's identity if known, null if the object was created
      * without an identity.
      */
-    private final Object       _identity;
+    private final Object[]     _identities;
 
 
     /**
      * The object's type.
      */
     private final Class        _javaClass;
+
+
+
+    private final LockEngine  _engine;
+
+
+
+    private final ClassMolder _molder;
 
 
     /**
@@ -100,19 +110,147 @@ final class OID
     private Class _topClass;
 
 
-    OID( ClassHandler handler, Object identity )
+    OID( LockEngine engine, ClassMolder molder, Object[] identities )
     {
-        _identity = identity;
-        _javaClass = handler.getJavaClass();
+        _engine = engine;
+        _molder = molder;
+        _identities = identities;
+        _javaClass = molder.getJavaClass();
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        while ( handler.getExtends() != null )
-            handler = (ClassHandler) handler.getExtends();
-        _topClass = handler.getJavaClass();
-        _hashCode = _topClass.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
+        while ( molder.getExtends() != null )
+            molder = (ClassMolder) molder.getExtends();
+        
+        _topClass = molder.getJavaClass();
+
+        int temp = _topClass.hashCode();
+        if ( _identities != null ) {
+            for ( int i=0; i<identities.length; i++ ) {
+                if ( identities[i] != null ) {
+                    temp += _identities[i].hashCode();
+                }
+            }
+        }
+        _hashCode = temp;
+        //System.out.println("OID is created: "+toString());
+    }
+
+    public static boolean isEquals( Object[] object1, Object[] object2 ) {
+        if ( object1 == object2 ) 
+            return true;
+        if ( object1 == null || object2 == null )
+            return false;
+        if ( object1.length != object2.length ) 
+            return false;
+        //System.out.println("array has the same length");
+        for ( int i=0; i<object1.length; i++ ) {
+            if ( object1[i] == object2[i] ) {
+                //System.out.println("object1[i] == object2[i]");
+                continue;
+            }
+            if ( object1[i] == null || object2[i] == null ) {
+                //System.out.println(object1[i] == null || object2[i] == null);
+                return false;
+            }
+            if ( !object1[i].equals( object2[i] ) ) {
+                //System.out.println();
+                return false;
+            }
+            //System.out.println("contine or object1[i].equals(object2[i])");
+        }
+        return true;
+    }
+
+    public static boolean isEquals( Object object1, Object object2 ) {
+        if ( object1 == object2 ) 
+            return true;
+        if ( object1 == null || object2 == null )
+            return false;
+        if ( object1.equals( object2 ) ) 
+            return true;
+        else 
+            return false;
+    }
+
+    public static boolean isEquals( Vector object1, Vector object2 ) {
+        if ( object1 == object2 ) 
+            return true;
+        if ( object1 == null || object2 == null )
+            return false;
+
+        System.out.println("Object1:");
+        for ( int i=0; i<object1.size(); i++ ) {
+            System.out.print(object1.elementAt(i));
+        }
+        System.out.println();
+
+        System.out.println("Object2:");
+        for ( int i=0; i<object2.size(); i++ ) {
+            System.out.print(object2.elementAt(i));
+        }
+        System.out.println();
+        if ( object1.size() != object2.size() )
+            return false;
+            
+        
+
+        Enumeration enum = object1.elements();
+        while ( enum.hasMoreElements() ) {
+            if ( !object2.contains( enum.nextElement() ) ) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static String flatten( Object[] objects ) {
+        if ( objects == null )
+            return null;
+
+        StringBuffer sb = new StringBuffer();
+        for ( int i=0; i<objects.length; i++ ) {
+            if ( i > 0 )
+                sb.append( "," );
+            sb.append( objects[i] );            
+        }
+        return sb.toString();
+    }
+
+    public static boolean isIdsNull( Object[] objects ) {
+        if ( objects == null )
+            return true;
+        if ( objects.length == 0 ) 
+            return true;
+        
+        for ( int i=0; i<objects.length; i++ ) {
+            if ( objects[i] == null )
+                return true;
+        }
+        return false;
+    }
+
+    public boolean isIdsNull() {
+        if ( _identities == null )
+            return true;
+        if ( _identities.length == 0 ) 
+            return true;
+        
+        for ( int i=0; i<_identities.length; i++ ) {
+            if ( _identities[i] == null )
+                return true;
+        }
+        return false;
     }
 
 
+    ClassMolder getMolder() {
+        return _molder;
+    }
+
+
+    LockEngine getLockEngine() {
+        return _engine;
+    }
     /**
      * Returns the OID's stamp. The stamp may be used to efficiently
      * implement dirty checking. The stamp is set with a call to
@@ -183,9 +321,9 @@ final class OID
      *
      * @return The object's identity, or null
      */
-    Object getIdentity()
+    Object[] getIdentities()
     {
-        return _identity;
+        return _identities;
     }
 
 
@@ -209,10 +347,8 @@ final class OID
      * specified for either or both objects, the objects are not
      * identical.
      */
-    public boolean equals( Object obj )
-    {
+    public boolean equals( Object obj ) {
         OID other;
-        
         if ( this == obj )
             return true;
         // Equality test is based on the following rules:
@@ -225,13 +361,15 @@ final class OID
         // have no primary identity, therefore all such objects are
         // not identical.
         other = (OID) obj;
-        return ( _topClass == other._topClass && _identity != null && _identity.equals( other._identity ) );
+
+        return ( _topClass == other._topClass && _identities != null 
+                && isEquals( _identities, other._identities ) );
     }
 
 
     public String toString()
     {
-        return _javaClass.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
+        return _javaClass.getName() + "/" + ( _identities == null ? "<new>" : OID.flatten( _identities ) );
     }
 
 

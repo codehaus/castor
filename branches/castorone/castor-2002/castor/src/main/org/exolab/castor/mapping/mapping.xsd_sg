@@ -13,24 +13,21 @@
  -->
 <schema>
 
-
   <element name="mapping-root">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="include" minOccurs="0" />
+      <element ref="many-to-many" minOccurs="0" />
       <element ref="class-mapping" minOccurs="1" />
       <element ref="key-generator-def" minOccurs="0" />
-      <element ref="relation-mapping" minOccurs="0" />
     </type>
   </element>
-
 
   <element name="include">
     <type content="empty">
       <attribute name="href" type="string" minOccurs="1"/>
     </type>
   </element>
-
 
   <element name="class-mapping">
     <type content="elemOnly" order="seq">
@@ -55,23 +52,21 @@
     </type>
   </element>
 
-
-  <element name="relation-mapping">
+  <element name="many-to-many">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
       <element ref="map-to" minOccurs="0" maxOccurs="1" />
-      <element ref="cache-type-mapping" minOccurs="0" maxOccurs="1" />
-      <element name="related-mapping" minOccurs="2" maxOccurs="2">
-	<type content="elemOnly" order="seq">
-	  <element ref="sql" minOccurs="0" maxOccurs="1"/>
-          <attribute name="name" type="IDREF" minOccurs="1"/>
-          <attribute name="type" type="NMTOKEN" minOccurs="0"/>
-	</type>
-      </element>
+      <element ref="type-mapping" minOccurs="2"/>
       <attribute name="name" type="ID" minOccurs="1"/>
     </type>
   </element>
 
+  <element name="type-mapping">
+    <type content="empty">
+      <attribute name="type" type="IDREF" minOccurs="0" />
+      <attribute name="sql" type="ID" minOccurs="0" />
+    </type>
+  </element>
 
   <element name="cache-type-mapping">
     <type content="empty">
@@ -85,7 +80,6 @@
     </type>
   </element>
 
-
   <element name="map-to">
     <type content="empty">
       <attribute name="table" type="NMTOKEN" minOccurs="0"/>
@@ -96,7 +90,6 @@
       <attribute name="ldap-oc" type="string" minOccurs="0"/>
     </type>
   </element>
-
 
   <element name="field-mapping">
     <type content="elemOnly" order="seq">
@@ -112,6 +105,7 @@
       <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="many-to-many" type="IDREF" minOccurs="0"/>
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
@@ -124,7 +118,6 @@
       <attribute name="transient" type="boolean" minOccurs="0" default="false"/>
     </type>
   </element>
-
 
   <element name="sql">
     <type content="empty">
@@ -139,7 +132,6 @@
     </type>
   </element>
 
-
   <element name="xml">
     <type content="empty">
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
@@ -153,13 +145,11 @@
     </type>
   </element>
 
-
   <element name="ldap">
     <type content="empty">
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
     </type>
   </element>
-
 
   <element name="container">
     <type content="elemOnly" order="seq">
@@ -175,8 +165,6 @@
     </type>
   </element>
 
-
-
   <element name="key-generator-def">
     <type content="elemOnly" order="seq">
       <element ref="param" minOccurs="0" />
@@ -184,7 +172,6 @@
       <attribute name="alias" type="string" minOccurs="0" maxOccurs="1"/>
     </type>
   </element>
-
 
   <element name="param">
     <type content="empty">

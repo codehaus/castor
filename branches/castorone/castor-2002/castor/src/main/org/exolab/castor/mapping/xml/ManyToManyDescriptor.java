@@ -26,7 +26,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
 **/
-public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
+public class ManyToManyDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
 
 
       //--------------------/
@@ -52,14 +52,14 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
      //- Constructors -/
     //----------------/
 
-    public KeyGeneratorDefDescriptor() {
-        xmlName = "key-generator";
+    public ManyToManyDescriptor() {
+        xmlName = "many-to-many";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
-        attributes = new XMLFieldDescriptorImpl[2];
+        attributes = new XMLFieldDescriptorImpl[1];
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         this.identity = desc;
@@ -67,14 +67,14 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
+                ManyToMany target = (ManyToMany) object;
                 return target.getName();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
+                    ManyToMany target = (ManyToMany) object;
                     target.setName( (java.lang.String) value);
                 }
                 catch (Exception ex) {
@@ -94,22 +94,25 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
         fieldValidator.setMinOccurs(1);
         desc.setValidator(fieldValidator);
         
-        //-- _alias
-        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_alias", "alias", NodeType.Attribute);
+        //-- initialize element descriptors
+        
+        elements = new XMLFieldDescriptorImpl[3];
+        //-- _description
+        desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
         desc.setImmutable(true);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
-                return target.getAlias();
+                ManyToMany target = (ManyToMany) object;
+                return target.getDescription();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
-                    target.setAlias( (java.lang.String) value);
+                    ManyToMany target = (ManyToMany) object;
+                    target.setDescription( (java.lang.String) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
@@ -120,9 +123,10 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
             }
         } );
         desc.setHandler(handler);
-        attributes[1] = desc;
+        desc.setMultivalued(false);
+        elements[0] = desc;
         
-        //-- validation code for: _alias
+        //-- validation code for: _description
         fieldValidator = new FieldValidator();
         { //-- local scope
             StringValidator sv = new StringValidator();
@@ -130,43 +134,73 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
         }
         desc.setValidator(fieldValidator);
         
-        //-- initialize element descriptors
-        
-        elements = new XMLFieldDescriptorImpl[1];
-        //-- _paramList
-        desc = new XMLFieldDescriptorImpl(Param.class, "_paramList", "param", NodeType.Element);
+        //-- _mapTo
+        desc = new XMLFieldDescriptorImpl(MapTo.class, "_mapTo", "map-to", NodeType.Element);
         handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
-                KeyGeneratorDef target = (KeyGeneratorDef) object;
-                return target.getParam();
+                ManyToMany target = (ManyToMany) object;
+                return target.getMapTo();
             }
             public void setValue( Object object, Object value) 
                 throws IllegalStateException, IllegalArgumentException
             {
                 try {
-                    KeyGeneratorDef target = (KeyGeneratorDef) object;
-                    target.addParam( (Param) value);
+                    ManyToMany target = (ManyToMany) object;
+                    target.setMapTo( (MapTo) value);
                 }
                 catch (Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public Object newInstance( Object parent ) {
-                return new Param();
+                return new MapTo();
             }
         } );
         desc.setHandler(handler);
-        desc.setMultivalued(true);
-        elements[0] = desc;
+        desc.setMultivalued(false);
+        elements[1] = desc;
         
-        //-- validation code for: _paramList
+        //-- validation code for: _mapTo
         fieldValidator = new FieldValidator();
-        fieldValidator.setMinOccurs(0);
         desc.setValidator(fieldValidator);
         
-    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDefDescriptor()
+        //-- _typeMappingList
+        desc = new XMLFieldDescriptorImpl(TypeMapping.class, "_typeMappingList", "type", NodeType.Element);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ManyToMany target = (ManyToMany) object;
+                return target.getTypeMapping();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ManyToMany target = (ManyToMany) object;
+                    target.addTypeMapping( (TypeMapping) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public Object newInstance( Object parent ) {
+                return new TypeMapping();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setRequired(true);
+        desc.setMultivalued(true);
+        elements[2] = desc;
+        
+        //-- validation code for: _typeMappingList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(2);
+        desc.setValidator(fieldValidator);
+        
+    } //-- org.exolab.castor.mapping.xml.ManyToManyDescriptor()
 
 
       //-----------/
@@ -231,7 +265,7 @@ public class KeyGeneratorDefDescriptor implements org.exolab.castor.xml.XMLClass
     /**
     **/
     public java.lang.Class getJavaClass() {
-        return org.exolab.castor.mapping.xml.KeyGeneratorDef.class;
+        return org.exolab.castor.mapping.xml.ManyToMany.class;
     } //-- java.lang.Class getJavaClass() 
 
     /**

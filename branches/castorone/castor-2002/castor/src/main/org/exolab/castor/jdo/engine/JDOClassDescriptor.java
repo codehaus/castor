@@ -75,6 +75,7 @@ public class JDOClassDescriptor
      */
     private String  _tableName;
 
+    private ClassDescriptor _depends;
 
     /**
      * The key generator specified for this class.
@@ -87,12 +88,15 @@ public class JDOClassDescriptor
     private final CacheType _cacheType;
 
 
-    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName,
-                                KeyGeneratorDescriptor keyGenDesc, CacheType cacheType )
+    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName, 
+            KeyGeneratorDescriptor keyGenDesc, CacheType cacheType )
         throws MappingException
     {
-        super( clsDesc.getJavaClass(), clsDesc.getFields(), clsDesc.getIdentity(),
-               clsDesc.getExtends(), clsDesc.getAccessMode() );
+        super( clsDesc.getJavaClass(), clsDesc.getFields(), 
+               (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getIdentities():null),
+               clsDesc.getExtends(), 
+               (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getDepends(): null), 
+               clsDesc.getAccessMode() );
         if ( tableName == null )
             throw new IllegalArgumentException( "Argument 'tableName' is null" );
         _tableName = tableName;
@@ -115,6 +119,10 @@ public class JDOClassDescriptor
     public String getTableName()
     {
         return _tableName;
+    }
+
+    public ClassDescriptor getDepends() {
+        return _depends;
     }
 
     /**

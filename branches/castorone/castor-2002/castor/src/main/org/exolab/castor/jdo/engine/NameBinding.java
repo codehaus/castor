@@ -49,7 +49,7 @@ package org.exolab.castor.jdo.engine;
 
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
-import org.exolab.castor.persist.ClassHandler;
+import org.exolab.castor.persist.ClassMolder;
 
 
 /**
@@ -75,13 +75,13 @@ public class NameBinding
     }
 
 
-    public NameBinding( String name, Object obj, ClassHandler handler )
+    public NameBinding( String name, Object obj, ClassMolder handler )
     {
         Object     primKey;
         
         this.name = name;
         type = obj.getClass().getName();
-        primKey = handler.getIdentity( obj );
+        primKey = handler.getIdentities( obj );
         // XXX Need to serialize the primary key to support non-string keys
         objectId = primKey.toString();
     }

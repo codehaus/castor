@@ -57,7 +57,8 @@ import javax.transaction.xa.XAResource;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.persist.PersistenceEngine;
+import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.TransactionAbortedExceptionImpl;
@@ -162,9 +163,7 @@ final class TransactionContextImpl
     }
 
 
-    public Object getConnection( PersistenceEngine engine )
-        throws PersistenceException
-    {
+    public Object getConnection( LockEngine engine ) throws PersistenceException {
         Connection conn;
         
         conn = (Connection) _conns.get( engine );

@@ -47,6 +47,8 @@
 package org.exolab.castor.mapping;
 
 
+import org.exolab.castor.mapping.loader.RelationDescriptor;
+
 /**
  * Describes the properties of a field. Implementations will extend
  * this inteface to provide additional properties.
@@ -117,6 +119,7 @@ public interface FieldDescriptor
      * @return The class descriptor of the field type, or null
      */
     public ClassDescriptor getClassDescriptor();
+
 
 
     /**

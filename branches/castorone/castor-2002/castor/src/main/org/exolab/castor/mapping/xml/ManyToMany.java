@@ -25,7 +25,7 @@ import org.xml.sax.DocumentHandler;
  * 
  * @version $Revision$ $Date$
 **/
-public class KeyGeneratorDef implements java.io.Serializable {
+public class ManyToMany implements java.io.Serializable {
 
 
       //--------------------/
@@ -34,19 +34,21 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     private java.lang.String _name;
 
-    private java.lang.String _alias;
+    private java.lang.String _description;
 
-    private java.util.Vector _paramList;
+    private MapTo _mapTo;
+
+    private java.util.Vector _typeMappingList;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public KeyGeneratorDef() {
+    public ManyToMany() {
         super();
-        _paramList = new Vector();
-    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef()
+        _typeMappingList = new Vector();
+    } //-- org.exolab.castor.mapping.xml.ManyToMany()
 
 
       //-----------/
@@ -55,25 +57,31 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
      * 
-     * @param vParam
+     * @param vTypeMapping
     **/
-    public void addParam(Param vParam) 
+    public void addTypeMapping(TypeMapping vTypeMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
-        _paramList.addElement(vParam);
-    } //-- void addParam(Param) 
+        _typeMappingList.addElement(vTypeMapping);
+    } //-- void addTypeMapping(TypeMapping) 
 
     /**
     **/
-    public java.util.Enumeration enumerateParam() {
-        return _paramList.elements();
-    } //-- java.util.Enumeration enumerateParam() 
+    public java.util.Enumeration enumerateTypeMapping() {
+        return _typeMappingList.elements();
+    } //-- java.util.Enumeration enumerateTypeMapping() 
 
     /**
     **/
-    public java.lang.String getAlias() {
-        return this._alias;
-    } //-- java.lang.String getAlias() 
+    public java.lang.String getDescription() {
+        return this._description;
+    } //-- java.lang.String getDescription() 
+
+    /**
+    **/
+    public MapTo getMapTo() {
+        return this._mapTo;
+    } //-- MapTo getMapTo() 
 
     /**
     **/
@@ -82,42 +90,42 @@ public class KeyGeneratorDef implements java.io.Serializable {
     } //-- java.lang.String getName() 
 
     /**
-     * 
-     * @param index
-    **/
-    public Param getParam(int index) 
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > _paramList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (Param) _paramList.elementAt(index);
-    } //-- Param getParam(int) 
-
-    /**
-    **/
-    public Param[] getParam() {
-        int size = _paramList.size();
-        Param[] mArray = new Param[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (Param) _paramList.elementAt(index);
-        }
-        return mArray;
-    } //-- Param[] getParam() 
-
-    /**
-    **/
-    public int getParamCount() {
-        return _paramList.size();
-    } //-- int getParamCount() 
-
-    /**
     **/
     public java.lang.String getReferenceId() {
         return this._name;
     } //-- java.lang.String getReferenceId() 
+
+    /**
+     * 
+     * @param index
+    **/
+    public TypeMapping getTypeMapping(int index) 
+        throws java.lang.IndexOutOfBoundsException
+    {
+        //-- check bounds for index
+        if ((index < 0) || (index > _typeMappingList.size())) {
+            throw new IndexOutOfBoundsException();
+        }
+        
+        return (TypeMapping) _typeMappingList.elementAt(index);
+    } //-- TypeMapping getTypeMapping(int) 
+
+    /**
+    **/
+    public TypeMapping[] getTypeMapping() {
+        int size = _typeMappingList.size();
+        TypeMapping[] mArray = new TypeMapping[size];
+        for (int index = 0; index < size; index++) {
+            mArray[index] = (TypeMapping) _typeMappingList.elementAt(index);
+        }
+        return mArray;
+    } //-- TypeMapping[] getTypeMapping() 
+
+    /**
+    **/
+    public int getTypeMappingCount() {
+        return _typeMappingList.size();
+    } //-- int getTypeMappingCount() 
 
     /**
     **/
@@ -159,27 +167,35 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
     **/
-    public void removeAllParam() {
-        _paramList.removeAllElements();
-    } //-- void removeAllParam() 
+    public void removeAllTypeMapping() {
+        _typeMappingList.removeAllElements();
+    } //-- void removeAllTypeMapping() 
 
     /**
      * 
      * @param index
     **/
-    public Param removeParam(int index) {
-        Object obj = _paramList.elementAt(index);
-        _paramList.removeElementAt(index);
-        return (Param) obj;
-    } //-- Param removeParam(int) 
+    public TypeMapping removeTypeMapping(int index) {
+        Object obj = _typeMappingList.elementAt(index);
+        _typeMappingList.removeElementAt(index);
+        return (TypeMapping) obj;
+    } //-- TypeMapping removeTypeMapping(int) 
 
     /**
      * 
-     * @param _alias
+     * @param _description
     **/
-    public void setAlias(java.lang.String _alias) {
-        this._alias = _alias;
-    } //-- void setAlias(java.lang.String) 
+    public void setDescription(java.lang.String _description) {
+        this._description = _description;
+    } //-- void setDescription(java.lang.String) 
+
+    /**
+     * 
+     * @param _mapTo
+    **/
+    public void setMapTo(MapTo _mapTo) {
+        this._mapTo = _mapTo;
+    } //-- void setMapTo(MapTo) 
 
     /**
      * 
@@ -191,28 +207,28 @@ public class KeyGeneratorDef implements java.io.Serializable {
 
     /**
      * 
-     * @param vParam
+     * @param vTypeMapping
      * @param index
     **/
-    public void setParam(Param vParam, int index) 
+    public void setTypeMapping(TypeMapping vTypeMapping, int index) 
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
-        if ((index < 0) || (index > _paramList.size())) {
+        if ((index < 0) || (index > _typeMappingList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _paramList.setElementAt(vParam, index);
-    } //-- void setParam(Param, int) 
+        _typeMappingList.setElementAt(vTypeMapping, index);
+    } //-- void setTypeMapping(TypeMapping, int) 
 
     /**
      * 
      * @param reader
     **/
-    public static org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader reader) 
+    public static org.exolab.castor.mapping.xml.ManyToMany unmarshal(java.io.Reader reader) 
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.KeyGeneratorDef) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.KeyGeneratorDef.class, reader);
-    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.ManyToMany) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.ManyToMany.class, reader);
+    } //-- org.exolab.castor.mapping.xml.ManyToMany unmarshal(java.io.Reader) 
 
     /**
     **/

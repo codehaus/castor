@@ -53,8 +53,7 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
     //----------------/
 
     public CacheTypeMappingDescriptor() {
-        nsURI = "http://castor.exolab.org/";
-        xmlName = "cache-type-mapping";
+        xmlName = "cache-type";
         XMLFieldDescriptorImpl  desc           = null;
         XMLFieldHandler         handler        = null;
         FieldValidator          fieldValidator = null;
@@ -86,7 +85,6 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         attributes[0] = desc;
         
         //-- validation code for: _capacity
@@ -123,7 +121,6 @@ public class CacheTypeMappingDescriptor implements org.exolab.castor.xml.XMLClas
             }
         } );
         desc.setHandler(handler);
-        desc.setNameSpaceURI("http://castor.exolab.org/");
         attributes[1] = desc;
         
         //-- validation code for: _type
