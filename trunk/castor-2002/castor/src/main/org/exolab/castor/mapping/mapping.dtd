@@ -63,7 +63,7 @@
     resulting XML document must preserve the order of elements.
 
  -->
-<!ELEMENT class ( description?, cache-type-mapping?, map-to?, (field|container)+ )>
+<!ELEMENT class ( description?, cache-type-mapping?, map-to?, field+ )>
 <!ATTLIST class
     name            ID       #REQUIRED
     extends         IDREF    #IMPLIED
