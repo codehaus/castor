@@ -166,6 +166,7 @@ public class Types
      * <li>All primitive types
      * <li>String
      * <li>Date
+     * <li>Timestamp
      * <li>byte/char arrays
      * <li>BigDecimal
      * </ul>
@@ -411,6 +412,8 @@ public class Types
                       java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
         new TypeInfo( "date",        null,
                       java.util.Date.class,       true,     null ),
+        new TypeInfo( "timestamp",        null,
+                      java.sql.Timestamp.class,       true,     null ),
         new TypeInfo( "sqldate",        null,
                       java.sql.Date.class,       true,     null ),
         new TypeInfo( "sqltime",        null,
