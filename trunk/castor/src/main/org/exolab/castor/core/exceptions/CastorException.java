@@ -78,15 +78,18 @@ public class CastorException extends Exception {
     }
 
     /**
-     * @param message
-     * @param cause
+     * Creates a new CastorException with the given message and cause.
+     * @param message The message for this exception.
+     * @param cause A Throwable instance.
      */
     public CastorException(String message, Throwable cause) {
+    	super (message);
         this.cause = cause;
     }
 
     /**
-     * @param cause
+     * Creates a new CastorException with the given cause.
+     * @param cause A Throwable instance.
      */
     public CastorException(Throwable cause) {
         this.cause = cause;
