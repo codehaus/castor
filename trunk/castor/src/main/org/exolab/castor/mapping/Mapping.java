@@ -58,8 +58,9 @@ import java.net.MalformedURLException;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
-import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Unmarshaller;
+import org.exolab.castor.xml.UnmarshalListener;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.Include;
@@ -350,6 +351,18 @@ public class Mapping
      */
     public void setBaseURL( String url )
     {
+        //-- remove filename if necessary:
+        if (url != null) {        
+            int idx = url.lastIndexOf('/');
+            if (idx < 0) idx = url.lastIndexOf('\\');
+            if (idx >= 0) {
+                int extIdx = url.indexOf('.', idx);
+                if (extIdx > 0) {
+                    url = url.substring(0, idx);
+                }
+            }
+        }
+        
         try {
           _resolver.setBaseURL( new URL( url ) );
         } catch ( MalformedURLException except ) {
@@ -511,6 +524,7 @@ public class Mapping
                 unm.setLogWriter( _logWriter );
             unm.setClassLoader( Mapping.class.getClassLoader() );
             unm.setIDResolver(_idResolver);
+            unm.setUnmarshalListener(new IncludeListener());
 
             loaded = (MappingRoot) unm.unmarshal( source );
 
@@ -520,14 +534,20 @@ public class Mapping
                 _state.markAsProcessed(source.getSystemId(), _mapping);
                 
             // Load all the included mapping by reference
+            //-- note: this is just for processing any
+            //-- includes which may have previously failed
+            //-- using the IncludeListener...and to
+            //-- report any potential errors.
             Enumeration includes = loaded.enumerateInclude();
             while ( includes.hasMoreElements() ) {
                 Include include = (Include) includes.nextElement();
-                try {
-                    loadMappingInternal( include.getHref() );
-                } 
-                catch ( Exception except ) {
-                    throw new MappingException( except );
+                if (!_state.processed( include.getHref() )) {
+                    try {
+                        loadMappingInternal( include.getHref() );
+                    } 
+                    catch ( Exception except ) {
+                        throw new MappingException( except );
+                    }
                 }
             }
             
@@ -635,7 +655,48 @@ public class Mapping
              return (MappingRoot)_processed.get(systemID);
          }
     }
+    
+    /**
+     * An UnmarshalListener to handle mapping includes
+     */
+    class IncludeListener implements UnmarshalListener {
 
-}
+        /* Not used for includes processing */
+        public void initialized (Object object) {};
+
+        /* Not used for includes processing */
+        public void attributesProcessed(Object object) {};
+
+        /* Not used for includes processing */
+        public void fieldAdded (String fieldName, Object parent, Object child) 
+        {
+            //-- do nothing
+        }
+
+        /**
+         * This method is called after an object
+         * has been completely unmarshalled, including
+         * all of its children (if any).
+         *
+         * @param object the Object that was unmarshalled.
+         */
+        public void unmarshalled (Object object) {
+            if (object instanceof Include) {
+                Include include = (Include) object;
+                try {
+                    loadMappingInternal( include.getHref() );
+                } 
+                catch ( Exception except ) {
+                    //-- ignore error, it'll get reported
+                    //-- later when we re-process the
+                    //-- includes of the parent Mapping in
+                    //-- loadMappingInternal
+                }
+            }
+        }
+
+    } //-- UnmarshalListener
+
+} // class: Mapping
 
 
