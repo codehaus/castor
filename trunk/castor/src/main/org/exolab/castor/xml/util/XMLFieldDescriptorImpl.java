@@ -317,9 +317,11 @@ public class XMLFieldDescriptorImpl
         }
 
         //-- check for instances of java.util.Date
-        if (java.util.Date.class.isAssignableFrom(_fieldType)) {
-            if (!(_handler instanceof DateFieldHandler)) {
-                _handler = new DateFieldHandler(_handler);
+        if (_fieldType != null) {
+            if (java.util.Date.class.isAssignableFrom(_fieldType)) {
+                if (!(_handler instanceof DateFieldHandler)) {
+                    _handler = new DateFieldHandler(_handler);
+                }
             }
         }
 
