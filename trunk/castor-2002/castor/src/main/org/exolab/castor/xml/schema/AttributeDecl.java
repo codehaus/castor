@@ -403,14 +403,15 @@ public final class AttributeDecl extends Annotated {
 
     /**
      * Sets the simple type of this attribute to be a reference.
-     */
-    public void setSimpleTypeReference(String name)
-    {
-        SimpleTypeReference reference= new SimpleTypeReference();
-        reference.setName(name);
-        reference.setSchema(_schema);
+     *
+     * @param name the name of the simpleType being referenced, must
+     * not be null.
+    **/
+    public void setSimpleTypeReference(String name) {
+        SimpleTypeReference reference
+            = new SimpleTypeReference(_schema, name);
         setSimpleType(reference);
-    }
+    } //-- setSimpleTypeReference
 
 
     /**
