@@ -59,7 +59,7 @@ public final class XSBinary extends XSType {
      * The JType represented by this XSType
     **/
     private static final JType jType
-        = (new JClass("byte")).createArray();
+        = JType.Byte.createArray();
 
 
     public XSBinary() {
