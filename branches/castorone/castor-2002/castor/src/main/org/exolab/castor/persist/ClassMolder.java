@@ -46,10 +46,14 @@
 package org.exolab.castor.persist;
 
 
+import java.math.BigDecimal;
+import java.util.Date;
 import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.Collection;
+import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
@@ -58,6 +62,7 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.SQLEngine;
+import org.exolab.castor.jdo.engine.JDOCallback;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.ClassMapping;
@@ -75,7 +80,7 @@ import org.exolab.castor.persist.spi.LogInterceptor;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 import org.exolab.castor.jdo.engine.JDOClassDescriptor;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.jdo.LockNotGrantedException;
+import org.exolab.castor.util.Messages;
 import java.sql.Connection;
 import java.util.Vector;
 import java.util.ArrayList;
@@ -104,6 +109,8 @@ public class ClassMolder {
     Persistence _persistence;
 
     LockEngine _engine;
+
+    CallbackInterceptor _callback;
 
     int _cachetype;
 
@@ -216,6 +223,9 @@ public class ClassMolder {
                 _fhs[i] = new FieldMolder( ds, this, fmFields[i] ); 
             }
         }
+
+        if ( Persistent.class.isAssignableFrom( _base ) )
+            _callback = new JDOCallback();
     }
     /**
      * Break a string into array of substring which serparated 
@@ -741,11 +751,41 @@ public class ClassMolder {
         if ( !OID.isEquals( oid.getIdentities(), getIdentities( object ) ) ) 
             throw new PersistenceException("Identities changes is not allowed!");
 
-        fields = (Object[]) locker.getObject( tx );
+        newfields = new Object[_fhs.length];
+
+        if ( getCallback() != null ) {
+            // Preliminary check for modifications - needed for jdoStore()
+            // To make it faster we will check only PRIMITIVE and PERSISTANCECAPABLE
+            modified = false;
+            for ( int i=0; i<newfields.length; i++ ) {
+                fieldType = _fhs[i].getFieldType();
+                if ( fieldType == FieldMolder.PRIMITIVE ||
+                     fieldType == FieldMolder.PERSISTANCECAPABLE ) {
+                    if ( fieldType == FieldMolder.PRIMITIVE ) {
+                        Object[] temp = new Object[1];
+                        temp[0] = _fhs[i].getValue( object );
+                        newfields[i] = temp;
+                    } else {
+                        o = _fhs[i].getValue( object );
+                        if ( o != null ) 
+                            newfields[i] = _fhs[i].getFieldClassMolder().getIdentities( o );
+                    }
+                    if ( !OID.isEquals( (Object[])ci.fields[i], (Object[])newfields[i] ) ) {
+                        modified = true;
+                        break;
+                    }
+                }
+            }
+            try {
+                getCallback().storing( object, modified );
+            } catch ( Exception except ) {
+                throw new PersistenceException( except.getMessage(), except );
+        }
 
         if ( fields == null ) {
             throw new PersistenceException("Object, "+oid+",  isn't loaded in the persistence storage!");
         }
+
         
         ids = oid.getIdentities();
 
@@ -1086,6 +1126,120 @@ public class ClassMolder {
         // call store of each fieldMolder
         // update oid and setStamp
     }
+
+    public void update( TransactionContext tx, OID oid, Object object, AccessMode accessMode )
+        throws PersistenceException, ObjectModifiedException {
+        System.out.println("ClassMolder.update(): Oid: "+oid);
+
+        ClassMolder fieldClassMolder;
+        LockEngine fieldEngine;
+        PersistenceInfo info;
+        ArrayVector list;
+        ArrayVector orgFields;
+        Iterator itor;
+        Object[] fields;
+        Object[] ids;
+        AccessMode am;
+        Object value;
+        Object stamp;        
+        Object[] temp;
+        int fieldType;
+        Object o;
+
+        // assumption, only one transaction with the same oid will attemp load at
+        // any given time.
+        // if cache is not in hold state, rise exception
+        CacheItem ci = (CacheItem) _cache.get( oid );
+        if ( !ci.isHold )
+            throw new PersistenceException( "Illegal Cache State!" );
+
+        fields = ci.fields;
+
+        ids = oid.getIdentities();
+
+        // If the object implements TimeStampable interface, verify
+        // the object's timestamp against the cache
+        if ( object instanceof TimeStampable ) {
+            if ( ci.stamp == 0 )
+                throw new IllegalStateException( Messages.format( "persist.internal",
+                                                "Cache stamp for the TimeStamped object is null " ) );
+            if ( ! checkObjectTimeStamp( object, ci ) )
+                throw new ObjectModifiedException( Messages.format( "persist.objectModified", object.getClass(), 
+                                                    OID.flatten( ids ) ) );
+        }
+
+        for ( int i=0; i<_fhs.length; i++ ) {
+            System.out.print("<"+i+":"+(fields[i] instanceof Object[]?OID.flatten((Object[])fields[i]):fields[i])+" of type: "+(_fhs[i]==null?null:_fhs[i].getJavaClass())+">  ");
+        }
+        System.out.println("  is updated!");
+        
+        for ( int i=0; i<_fhs.length; i++ ) {
+            fieldType = _fhs[i].getFieldType();
+            switch (fieldType) {
+            case FieldMolder.PRIMITIVE:
+                break;
+            case FieldMolder.PERSISTANCECAPABLE:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                if ( o != null ) {
+                    // need multi-pk
+                    if ( _fhs[i].isDependent() ) {
+                        if ( !tx.isPersistent( o ) ) 
+                            tx.update( fieldEngine, fieldClassMolder, o);
+                        else 
+                            // fail-fast principle: if the object depend on another object,
+                            // throw exception
+                            if ( !tx.isDepended( oid, o ) )
+                                throw new PersistenceException("Dependent object may not change its master. Object: "+o+" new master: "+oid);
+                    } else {
+                        //if ( !tx.isPersistent( o ) ) 
+                        //    tx.create( fieldEngine, fieldClassMolder, o, null );
+                    }
+                }
+                break;
+            case FieldMolder.ONE_TO_MANY:
+                fieldClassMolder = _fhs[i].getFieldClassMolder();
+                fieldEngine = _fhs[i].getFieldLockEngine();
+                o = _fhs[i].getValue( object );
+                orgFields = (ArrayVector)fields[i];
+                if ( ! (o instanceof Lazy) ) {
+                    itor = getIterator( o );
+                    ArrayList v = (ArrayList) o;
+                    list = new ArrayVector( v.size() );
+                    for ( int j=0; j<v.size(); j++ ) {
+                        list.add( (fieldClassMolder.getIdentities( v.get(j) )) );
+                    }
+                    if ( !OID.isEquals( (ArrayVector)ci.fields[i], list ) ) {
+                        if ( _fhs[i].isDependent() ) {
+                            if ( orgFields != null && list != null ) {
+                                // make sure that all dependent objects are included in the transaction,
+                                // otherwise objects that should be deleted won't be deleted
+                                for ( int j=0; j<orgFields.size(); j++ ) {
+                                    if ( !list.contains( orgFields.get(j) ) ) {
+                                        tx.load( fieldEngine, fieldClassMolder, (Object[])orgFields.get(j), null );
+                                    }
+                                }
+                                // update all dependent objects
+                                for ( int j=0; j<list.size(); j++ ) {
+                                    tx.update( fieldEngine, fieldClassMolder, v.get(j));
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    // I guess that lazy loading cannot be used together with 
+                    // long transactions
+                }
+                break;
+            case FieldMolder.MANY_TO_MANY:
+                break;
+            default:
+                throw new IllegalArgumentException("Field type invalid!");
+            }
+        }
+    }
+
     public void updateCache( TransactionContext tx, OID oid, DepositBox locker, Object object )
                         throws DuplicateIdentityException, PersistenceException {
         // similar to store, no recusrion is needed
@@ -1568,6 +1722,49 @@ public class ClassMolder {
         }
         return v;
     }
+
+    // TimeStamp related methods from CacheEngine
+
+
+    /**
+     * Set object's timestamp of type "long" in the object (if TimeStampable)
+     * and in the correspondent CacheItem
+     */
+    private void setObjectTimeStamp( Object stamp, Object object, CacheItem ci ) {
+        long timeStamp = 0;
+
+        if ( ! (object instanceof TimeStampable) ) {
+            return;
+        }
+
+        if (stamp == null) {
+            timeStamp = System.currentTimeMillis();
+        } else if ( stamp instanceof Long ) {
+            timeStamp = ( (Long) stamp ).longValue();
+        } else if ( stamp instanceof Date ) {
+            timeStamp = ( (Date) stamp ).getTime();
+        } else if ( stamp instanceof Integer ) {
+            timeStamp = ( (Integer) stamp ).intValue();
+        } else if ( stamp instanceof BigDecimal ) {
+            timeStamp = ( (BigDecimal) stamp ).longValue();
+        }
+        ( (TimeStampable) object ).jdoSetTimeStamp( timeStamp );
+        ci.stamp = timeStamp;
+    }
+
+
+    /**
+     * Check equality of object's timestamp and the cache timestamp 
+     * if the object is TimeStampable, otherwise return true
+     */
+    private boolean checkObjectTimeStamp( Object object, CacheItem ci ) {
+        if ( ! (object instanceof TimeStampable) ) {
+            return true;
+        }
+        return ( ci.stamp == ( (TimeStampable) object ).jdoGetTimeStamp() );
+    }
+
+
 }
 
 
