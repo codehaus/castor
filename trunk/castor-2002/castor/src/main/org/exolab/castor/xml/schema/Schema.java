@@ -306,6 +306,7 @@ public class Schema extends Annotated {
             throw new SchemaException(err + name);
         }
         complexTypes.put(name, complexType);
+        complexType.setParent(this);
 
     } //-- addComplextype
 
@@ -911,6 +912,7 @@ public class Schema extends Annotated {
         if (complexType.isTopLevel()) {
             if (complexTypes.contains(complexType)) {
                 complexTypes.remove(complexType.getName());
+                complexType.setParent(null);
                 return true;
             }
         }
