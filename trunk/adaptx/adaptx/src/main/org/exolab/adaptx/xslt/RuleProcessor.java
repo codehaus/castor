@@ -822,6 +822,7 @@ public class RuleProcessor extends ErrorObserverAdapter {
 	    Selection selection;
 	    
 	    rpState.pushAction(xslObject);
+	    rpState.pushCurrentNode(current);
 	    
         switch (xslObject.getType()) {
             // <xsl:apply-templates>
@@ -1168,7 +1169,9 @@ public class RuleProcessor extends ErrorObserverAdapter {
 		        break;
 		} //-- end switch
 		
+		
 	    rpState.popAction();
+	    rpState.popCurrentNode();
 	    
 	} //-- processAction
 	
