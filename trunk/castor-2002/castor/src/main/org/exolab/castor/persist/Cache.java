@@ -176,11 +176,11 @@ public final class Cache
         return null;
     }
     
-    synchronized void finishLockForAquire( OID oid ) {
+    synchronized void finishLockForAquire( OID oid, ObjectLock lock ) {
         //System.out.println("finishLockForAquire: "+oid);
         CacheEntry entry = (CacheEntry) _locks.get( oid );
         
-        if ( entry != null ) {
+        if ( entry != null && entry.lock == lock ) {
             // synchronized ( entry ) {
             entry.aquireCounter--;
             if ( entry.aquireCounter < 0 ) {
@@ -234,19 +234,6 @@ public final class Cache
     
     synchronized void removeLock( OID oid )
     {
-        /*
-        CacheEntry entry = (CacheEntry) _locks.get( oid ); 
-        
-        if ( entry == null )
-            return;
-
-        synchronized ( entry.lock ) {
-            //System.out.println("releaseLock " + "aquire counter: "+entry.aquireCounter+" entry.lock.isFree(): "+entry.lock.isFree());
-            if ( entry.aquireCounter <= 0 && entry.lock.isFree() ) {
-                _locks.remove( oid );
-            }
-        }
-        */
         _locks.remove( oid );
         _cache.remove( oid );
     }
