@@ -2,6 +2,19 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1875. The primary issue was that the generated
+       source code for simpleContent restrictions was not extending
+       the type it was restricting, so it wasn't able to be used
+       in place of the original type.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1875
+       (kvisco - 20050226)
+
+XML:   Fixed limitation that prevented using GeneralizedFieldHandler
+       from a binding-file. The generated source code now works
+       properly.
+       (kvisco - 20050222)
+
+
 JDO:   Fixed bug 1877 using contribution from Lilians Auvigne) [lilian.auvigne@bnpparibas.com ]
        Fixed wrong class and method name for Websphere 5.0 transaction manager factory.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1877
