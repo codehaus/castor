@@ -387,6 +387,14 @@
         <jar jarfile="${dist}/CTF-${version}.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" includes="LICENCE,README,org/**"/>
      </target>
 
+    <target name="rss" depends="prepare" description="Copy the RSS feeds">
+        <delete dir="${build}/doc/rss" />   
+        <mkdir dir="${build}/doc/rss" />   
+        <copy todir="${build}/doc/rss">
+           <fileset dir="${source}/rss" includes="*.xml"/>
+        </copy>
+    </target>   
+    
     <target name="doc" depends="prepare" description="Build the HTML docs">
         <delete dir="${build}/doc"/>
         <mkdir dir="${build}/doc"/>
@@ -444,7 +452,7 @@
         <javadoc sourcepath="${main}" destdir="${build}/doc/api" doctitle="${name} API" windowtitle="${name} API" bottom="${copyright}" public="true" author="true" packagenames="${apipackagenames}"/>
     </target>
 
-    <target name="docs" depends="doc,api,javadoc" description="Build the HTML docs, full and API javadocs">
+    <target name="docs" depends="doc,api,javadoc,rss" description="Build the HTML docs, full and API javadocs">
         <zip zipfile="${dist}/${archive.name}-doc.zip" basedir="${build}" includes="doc/**"/>
         <tar tarfile="${dist}/${archive.name}-doc.tar" basedir="${build}" includes="doc/**"/>
         <gzip src="${dist}/${archive.name}-doc.tar" zipfile="${dist}/${archive.name}-doc.tgz"/>
