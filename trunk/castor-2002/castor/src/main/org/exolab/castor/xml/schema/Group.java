@@ -139,6 +139,14 @@ public class Group extends Particle
     } //-- getCollection
 
     /**
+     * Returns the ContentModelGroup for this group
+     * Only used for a <group> element
+     * @return the ContentModelGroup for this group
+     */
+     public ContentModelGroup getContentModelGroup() {
+        return _contentModel;
+     }
+    /**
      * Returns the ID for this Group
      * @return the ID for this Group, or null if no ID is present
     **/
