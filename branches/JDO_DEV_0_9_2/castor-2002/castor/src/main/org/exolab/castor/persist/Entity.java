@@ -170,17 +170,8 @@ public final class Entity implements Cloneable {
      * @return an new instance of the same object that has the same values
      */
     public Object clone() throws CloneNotSupportedException {
-        Entity cloned = (Entity) super.clone();
-        copyInto( cloned );
-        return cloned;
-    }
 
-    /**
-     * Copy all the fields of this entity into the target entity
-     *
-     * @param target The entity that the fields to be copied into
-     */
-    public void copyInto( Entity target ) {
+        Entity target = (Entity) super.clone();
         if ( entityClasses != null ) {
             target.entityClasses = new String[target.entityClasses.length];
             System.arraycopy( entityClasses, 0, 
@@ -189,18 +180,38 @@ public final class Entity implements Cloneable {
             target.entityClasses = null;
         }
         if ( values != null ) {
-            target.values = new Object[values.length][];
-            for ( int i = 0; i <= values.length; i++ ) {
-                if ( values[i] != null ) {
-                    target.values[i] = new Object[values[i].length];
-                    System.arraycopy( values[i], 0, target.values[i], 0, values[i].length );
-                } else {
-                    target.values[i] = null;
-                }
-            }
+            target.values = new Object[values.length];
+            System.arraycopy( values, 0, target.values, 0, values.length );
+        } else {
+            target.values = null;
+        }
+        return target;
+    }
+
+    /**
+     * Copy all the fields of this entity into the target entity
+     *
+     * @param target The entity that the fields to be copied into
+     */
+    public void copyInto( Entity target ) {
+
+        target.info        = info;
+        target.identity    = identity;
+        target.longStamp   = longStamp;
+        target.objectStamp = objectStamp;
+        target.locked      = locked;
+        if ( entityClasses != null ) {
+            target.entityClasses = new String[target.entityClasses.length];
+            System.arraycopy( entityClasses, 0, 
+                target.entityClasses, 0, entityClasses.length );
+        } else {
+            target.entityClasses = null;
+        }
+        if ( values != null ) {
+            target.values = new Object[values.length];
+            System.arraycopy( values, 0, target.values, 0, values.length );
         } else {
             target.values = null;
         }
     }
-
 }
