@@ -55,27 +55,29 @@ import org.exolab.castor.mapping.AccessMode;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-class FetchContext
+final class FetchContext
 {
 
 
-    private TransactionContext _tx;
+    private final TransactionContext _tx;
 
 
-    private PersistenceEngine  _engine;
+    private final PersistenceEngine  _engine;
 
 
-    private AccessMode         _accessMode;
+    private final AccessMode         _accessMode;
 
 
-    public FetchContext( TransactionContext tx, PersistenceEngine engine )
+    FetchContext( TransactionContext tx, PersistenceEngine engine )
     {
         _tx = tx;
         _engine = engine;
+        // XXX Where do we get this from?
+        _accessMode = null;
     }
 
 
-    public Object fetch( ClassHandler handler, Object identity )
+    Object fetch( ClassHandler handler, Object identity )
         throws PersistenceException
     {
         return _tx.fetch( _engine, handler, identity, _accessMode );

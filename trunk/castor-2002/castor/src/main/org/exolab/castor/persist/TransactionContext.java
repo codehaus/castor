@@ -110,7 +110,7 @@ public abstract class TransactionContext
      * The object is used as key and {@link ObjectEntry} is the value.
      * @see #addObjectEntry
      */
-    private Hashtable   _objects = new Hashtable();
+    private final Hashtable   _objects = new Hashtable();
 
 
     /**
@@ -119,7 +119,7 @@ public abstract class TransactionContext
      * as the key, the value is a hashtable. In that hashtable {@link OID}
      * is the key and {@link ObjectEntry} is the value.
      */
-    private Hashtable   _engineOids = new Hashtable();
+    private final Hashtable   _engineOids = new Hashtable();
 
 
     /**
@@ -137,7 +137,7 @@ public abstract class TransactionContext
     /**
      * The Xid of this transaction is generated from an XA resource.
      */
-    private Xid         _xid;
+    private final Xid   _xid;
 
 
     /**
@@ -152,6 +152,7 @@ public abstract class TransactionContext
      */
     public TransactionContext()
     {
+        _xid = null;
         _status = Status.STATUS_ACTIVE;
     }
 
@@ -292,7 +293,7 @@ public abstract class TransactionContext
         ObjectEntry entry;
         OID         oid;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -343,12 +344,12 @@ public abstract class TransactionContext
         } catch ( ClassNotPersistenceCapableException except ) {
             throw new PersistenceException( except );
         }
-        
+
         // Need to copy the contents of this object from the cached
         // copy and deal with it based on the transaction semantics.
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
-        // the object in this transaction. 
+        // the object in this transaction.
         entry = addObjectEntry( object, oid, engine );
         try {
             engine.copyObject( this, oid, object );
@@ -411,7 +412,7 @@ public abstract class TransactionContext
         OID         oid;
         Object      object;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -460,12 +461,12 @@ public abstract class TransactionContext
         } catch ( ClassNotPersistenceCapableException except ) {
             throw new PersistenceException( except );
         }
-        
+
         // Need to copy the contents of this object from the cached
         // copy and deal with it based on the transaction semantics.
         // If the mode is read-only we release the lock and forget about
         // it in the contents of this transaction. Otherwise we record
-        // the object in this transaction. 
+        // the object in this transaction.
         object = handler.newInstance();
         entry = addObjectEntry( object, oid, engine );
         try {
@@ -489,7 +490,7 @@ public abstract class TransactionContext
      * the returned query results can only be used while this
      * transaction is open. It is assumed that the query mechanism is
      * compatible with the persistence engine.
-     * 
+     *
      * @param engine The persistence engine
      * @param query A query against the persistence engine
      * @param accessMode The access mode
@@ -546,7 +547,7 @@ public abstract class TransactionContext
         ObjectEntry  entry;
         ClassHandler handler;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -556,15 +557,26 @@ public abstract class TransactionContext
         handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
             throw new ClassNotPersistenceCapableException( object.getClass() );
-        
+
         // Create the object. This can only happen once for each object in
         // all transactions running on the same engine, so after creation
         // add a new entry for this object and use this object as the view
         if ( identity != null && getObjectEntry( engine, new OID( handler, identity ) ) != null )
             throw new DuplicateIdentityException( object.getClass(), identity );
-        oid = engine.create( this, object, identity );
+        oid = new OID( handler, identity );
         entry = addObjectEntry( object, oid, engine );
         entry.created = true;
+        try {
+            // Must perform creation after object is recorded in transaction
+            // to prevent circular references.
+            engine.create( this, object, identity );
+        } catch ( DuplicateIdentityException except ) {
+            removeObjectEntry( entry );
+            throw except;
+        } catch ( PersistenceException except ) {
+            removeObjectEntry( entry );
+            throw except;
+        }
         return oid;
     }
 
@@ -593,7 +605,7 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -644,7 +656,7 @@ public abstract class TransactionContext
      * will block until the other transaction will release its lock.
      * If the specified timeout has elapsed or a deadlock has been
      * detected, an exception will be thrown but the current lock will
-     * be retained. 
+     * be retained.
      *
      * @param object The object to lock
      * @param timeout Timeout waiting to acquire lock, specified in
@@ -665,7 +677,7 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -707,7 +719,7 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
 
-        /*        
+        /*
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
         */
@@ -745,44 +757,18 @@ public abstract class TransactionContext
         Enumeration enum;
         ObjectEntry entry;
         Object      object;
-        
+
         if ( _status == Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionAbortedException( "persist.markedRollback" );
         if ( _status != Status.STATUS_ACTIVE )
             throw new TransactionNotInProgressException();
 
-        /*
-        enum = _objects.elements();
-        while ( enum.hasMoreElements() ) {
-            entry = (ObjectEntry) enum.nextElement();
-            // If the object has been deleted, it is removed from the
-            // underlying database. This call will detect duplicate
-            // removal attempts. Otherwise the object is stored in
-            // the database.
-            if ( entry.deleted ) {
-                entry.engine.delete( this, entry.javaClass, entry.oid.getIdentity() );
-            } else {
-                Object       identity;
-                ClassHandler handler;
-                
-                // When storing the object it's OID might change
-                // if the primary identity has been changed
-                handler = entry.engine.getClassHandler( entry.javaClass );
-                identity = handler.getIdentity( entry.object );
-                if ( identity == null )
-                    throw new TransactionAbortedException( "persist.noIdentity", 
-                                                           handler.getJavaClass(), null );
-                entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
-            }
-        }
-        */
-        
         // No objects in this transaction -- this is a read only transaction
         if ( _objects.size() == 0 ) {
             _status = Status.STATUS_PREPARED;
             return false;
         }
-        
+
         try {
             _status = Status.STATUS_PREPARING;
             enum = _objects.elements();
@@ -797,13 +783,13 @@ public abstract class TransactionContext
                 } else {
                     Object       identity;
                     ClassHandler handler;
-                    
+
                     // When storing the object it's OID might change
                     // if the primary identity has been changed
                     handler = entry.engine.getClassHandler( entry.javaClass );
                     identity = handler.getIdentity( entry.object );
                     if ( identity == null )
-                        throw new TransactionAbortedException( "persist.noIdentity", 
+                        throw new TransactionAbortedException( "persist.noIdentity",
                                                                handler.getJavaClass(), null );
                     entry.oid = entry.engine.store( this, entry.object, identity, _lockTimeout );
                 }
@@ -835,7 +821,7 @@ public abstract class TransactionContext
     {
         Enumeration enum;
         ObjectEntry entry;
-        
+
         if ( _xid != null )
             throw new TransactionNotInProgressException( "persist.checkpointNotSupported" );
         // Never commit transaction that has been marked for rollback
@@ -845,14 +831,14 @@ public abstract class TransactionContext
         }
         // Prepare the transaction
         prepare();
-        
+
         try {
             _status = Status.STATUS_COMMITTING;
-            
+
             // Go through all the connections opened in this transaction,
             // commit and close them one by one.
             commitConnections( true );
-            
+
             // Assuming all went well in the connection department,
             // no deadlocks, etc. clean all the transaction locks with
             // regards to the persistence engine.
@@ -883,7 +869,7 @@ public abstract class TransactionContext
             throw new TransactionAbortedException( except );
         }
     }
-    
+
 
     /**
      * Commits all changes and closes the transaction releasing all
@@ -901,7 +887,7 @@ public abstract class TransactionContext
     {
         Enumeration enum;
         ObjectEntry entry;
-        
+
         // Never commit transaction that has been marked for rollback
         if ( _status == Status.STATUS_MARKED_ROLLBACK ) {
             rollback();
@@ -909,14 +895,14 @@ public abstract class TransactionContext
         }
         if ( _status != Status.STATUS_PREPARED )
             throw new IllegalStateException( "persist.missingPrepare" );
-        
+
         try {
             _status = Status.STATUS_COMMITTING;
-            
+
             // Go through all the connections opened in this transaction,
             // commit and close them one by one.
             commitConnections( false );
-            
+
             // Assuming all went well in the connection department,
             // no deadlocks, etc. clean all the transaction locks with
             // regards to the persistence engine.
@@ -939,7 +925,7 @@ public abstract class TransactionContext
             _objects.clear();
             _engineOids.clear();
             _status = Status.STATUS_COMMITTED;
-            
+
         } catch ( Exception except ) {
             // Any error that happens, we're going to rollback the transaction.
             _status = Status.STATUS_MARKED_ROLLBACK;
@@ -964,15 +950,15 @@ public abstract class TransactionContext
     {
         Enumeration enum;
         ObjectEntry entry;
-        
+
         if ( _status != Status.STATUS_ACTIVE && _status != Status.STATUS_PREPARED &&
              _status != Status.STATUS_MARKED_ROLLBACK )
             throw new TransactionNotInProgressException();
-        
+
         // Go through all the connections opened in this transaction,
         // rollback and close them one by one.
         rollbackConnections();
-        
+
         // Clean the transaction locks with regards to the
         // database engine
         enum = _objects.elements();
@@ -1008,6 +994,38 @@ public abstract class TransactionContext
     public boolean isPersistent( Object object )
     {
         return ( getObjectEntry( object ) != null );
+    }
+
+
+    /**
+     * Returns true if the object is persistent in this transaction.
+     *
+     * @param engine The persistence engine used to create this object
+     * @param oid The object's OID
+     * @return True if persistent in transaction
+     */
+    public boolean isPersistent( PersistenceEngine engine, Class type, Object identity )
+    {
+        return ( getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) ) != null );
+    }
+
+
+    public void markDelete( PersistenceEngine engine, Class type, Object identity )
+        throws LockNotGrantedException, PersistenceException
+    {
+        ObjectEntry entry;
+
+        entry = getObjectEntry( engine, new OID( engine.getClassHandler( type ), identity ) );
+        if ( entry != null && ! entry.deleted ) {
+            entry.deleted = true;
+            try {
+                entry.engine.writeLock( this, entry.oid, _lockTimeout );
+            } catch ( ObjectDeletedException except ) {
+                // Object has been deleted outside this transaction,
+                // forget about it
+                removeObjectEntry( entry.object );
+            }
+        }
     }
 
 
@@ -1075,7 +1093,7 @@ public abstract class TransactionContext
     {
         ObjectEntry entry;
         Hashtable   engineOids;
-        
+
         entry = new ObjectEntry( engine, object );
         entry.oid = oid;
         _objects.put( object, entry );
@@ -1087,12 +1105,19 @@ public abstract class TransactionContext
         engineOids.put( oid, entry );
         return entry;
     }
-    
-    
+
+
+    /**
+     * Retrieves the object entry for the specified object.
+     *
+     * @param engine The persistence engine used to create this object
+     * @param oid The object's OID
+     * @return The object entry
+     */
     ObjectEntry getObjectEntry( PersistenceEngine engine, OID oid )
     {
         Hashtable engineOids;
-        
+
         engineOids = (Hashtable) _engineOids.get( engine );
         if ( engineOids == null )
             return null;
@@ -1125,7 +1150,7 @@ public abstract class TransactionContext
     ObjectEntry removeObjectEntry( Object object )
     {
         ObjectEntry entry;
-        
+
         entry = (ObjectEntry) _objects.remove( object );
         if ( entry == null )
             return null;
@@ -1145,19 +1170,19 @@ public abstract class TransactionContext
      * identified as read only are not update when the transaction
      * commits.
      */
-    static class ObjectEntry
+    static final class ObjectEntry
     {
-        
+
         final PersistenceEngine  engine;
-        
+
         final Object             object;
 
         final Class              javaClass;
-        
+
         OID                      oid;
-        
+
         boolean                  deleted;
-        
+
         boolean                  created;
 
         ObjectEntry( PersistenceEngine  engine, Object object )
@@ -1166,8 +1191,8 @@ public abstract class TransactionContext
             this.object = object;
             javaClass = object.getClass();
         }
-        
+
     }
 
-    
+
 }

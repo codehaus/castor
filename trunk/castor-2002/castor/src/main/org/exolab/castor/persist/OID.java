@@ -67,13 +67,13 @@ final class OID
      * The object's identity if known, null if the object was created
      * without an identity.
      */
-    private Object       _identity;
+    private final Object       _identity;
 
 
     /**
      * The object's type.
      */
-    private Class        _javaClass;
+    private final Class        _javaClass;
 
 
     /**
@@ -91,7 +91,7 @@ final class OID
     /**
      * The OID's hash code.
      */
-    private int          _hashCode;
+    private final int          _hashCode;
 
 
     /**

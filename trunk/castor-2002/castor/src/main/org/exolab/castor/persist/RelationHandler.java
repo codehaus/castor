@@ -47,7 +47,11 @@
 package org.exolab.castor.persist;
 
 
+import java.util.Enumeration;
+import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.loader.IndirectFieldHandler;
 
 
 /**
@@ -56,24 +60,35 @@ import org.exolab.castor.mapping.FieldHandler;
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class RelationHandler
+public final class RelationHandler
 {
 
 
-    private FieldHandler     _field;
+    private final FieldHandler      _handler;
 
 
-    private ClassHandler     _relHandler;
+    private final CollectionHandler _colHandler;
 
 
-    private String           _fieldName;
+    private final ClassHandler      _relHandler;
 
 
-    RelationHandler( String fieldName, FieldHandler field, ClassHandler relHandler )
+    private final String            _fieldName;
+
+
+    private final boolean           _attached;
+
+
+    RelationHandler( FieldDescriptor fieldDesc, ClassHandler relHandler, boolean attached )
     {
-        _fieldName = fieldName;
-        _field = field;
+        _fieldName = fieldDesc.getFieldName();
+        if ( fieldDesc.getHandler() instanceof IndirectFieldHandler )
+            _handler = ( (IndirectFieldHandler) fieldDesc.getHandler() ).getHandler();
+        else
+            _handler = fieldDesc.getHandler();
+        _colHandler = fieldDesc.getCollectionHandler();
         _relHandler = relHandler;
+        _attached = attached;
     }
 
 
@@ -85,7 +100,7 @@ public class RelationHandler
 
     public FieldHandler getFieldHandler()
     {
-        return _field;
+        return _handler;
     }
 
 
@@ -97,30 +112,36 @@ public class RelationHandler
 
     public Object getRelated( Object object )
     {
-        return _field.getValue( object );
+        return _handler.getValue( object );
     }
 
 
-    public Object[] getRelateds( Object object )
+    public Enumeration listRelated( Object object )
     {
-        return null;
+        Object collection;
+
+        collection = _handler.getValue( object );
+        if ( collection == null )
+            return null;
+        return _colHandler.getValues( collection );
     }
 
 
     public void setRelated( Object object, Object related )
     {
-        _field.setValue( object, related );
-    }
-
-
-    public void setRelated( Object object, Object[] related )
-    {
+        _handler.setValue( object, related );
     }
 
 
     public boolean isMulti()
     {
-        return false;
+        return ( _colHandler != null );
+    }
+
+
+    public boolean isAttached()
+    {
+        return _attached;
     }
 
 
@@ -144,9 +165,9 @@ public class RelationHandler
 
     public String toString()
     {
-        return _field + " to " + _relHandler;
+        return _handler + " to " + _relHandler;
     }
-    
+
 
 }
 
