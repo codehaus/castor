@@ -92,6 +92,19 @@ public final class CoreDescriptors {
         new SQLDateClassDescriptor();
         
     /**
+     * The java.sql.Time ClassDescriptor
+     */
+    private static final XMLClassDescriptor SQL_TIME_DESCRIPTOR =
+        new SQLTimeClassDescriptor();
+        
+    /**
+     * The java.sql.Timestamp ClassDescriptor
+     */
+    private static final XMLClassDescriptor SQL_TIMESTAMP_DESCRIPTOR =
+        new SQLTimestampClassDescriptor();
+        
+        
+    /**
      * The Vector ClassDescriptor
     **/
     private static final XMLClassDescriptor VECTOR_DESCRIPTOR =
@@ -133,9 +146,6 @@ public final class CoreDescriptors {
         if (clazz == Date.class)
             return DATE_DESCRIPTOR;
             
-        if (clazz == java.sql.Date.class)
-            return SQL_DATE_DESCRIPTOR;            
-            
         if (Enumeration.class.isAssignableFrom(clazz))
             return ENUMERATION_DESCRIPTOR;
             
@@ -147,6 +157,17 @@ public final class CoreDescriptors {
             if ((LIST_CLASS == clazz) || LIST_CLASS.isAssignableFrom(clazz))
                 return LIST_DESCRIPTOR;
         }
+        
+        //-- java.sql Date/Time classes
+        if (clazz == java.sql.Date.class)
+            return SQL_DATE_DESCRIPTOR;
+            
+        if (clazz == java.sql.Time.class)
+            return SQL_TIME_DESCRIPTOR;
+            
+        if (clazz == java.sql.Timestamp.class)
+            return SQL_TIMESTAMP_DESCRIPTOR;
+            
         
         return null;
         
