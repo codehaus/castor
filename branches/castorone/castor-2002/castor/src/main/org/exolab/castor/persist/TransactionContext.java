@@ -65,7 +65,6 @@ import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.ObjectNotPersistentException;
-import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.mapping.AccessMode;
@@ -277,6 +276,16 @@ public abstract class TransactionContext
      *  commit fully or partially and should be rolled back
      */
     protected abstract void commitConnections()
+        throws TransactionAbortedException;
+
+
+    /**
+     * The derived class must implement this method and close all the
+     * connections used in this transaction.
+     * @throws TransactionAbortedException The transaction could not
+     *  close all the connections
+     */
+    protected abstract void closeConnections()
         throws TransactionAbortedException;
 
 
@@ -1125,7 +1134,7 @@ public abstract class TransactionContext
         // database engine
         enum = _objects.elements();
         while ( enum.hasMoreElements() ) {
-                
+
             entry = (ObjectEntry) enum.nextElement();
             try {
                 if ( entry.created ) {
@@ -1142,7 +1151,7 @@ public abstract class TransactionContext
                 }
                 if ( entry.molder.getCallback() != null )
                     entry.molder.getCallback().releasing( entry.object, false );
-            } catch ( Exception except ) { 
+            } catch ( Exception except ) {
                 // maybe we should remove it, when castor become stable
             }
         }
@@ -1158,6 +1167,39 @@ public abstract class TransactionContext
             entry.nextDeleted = null;
         }
         _status = Status.STATUS_ROLLEDBACK;
+    }
+
+
+    /**
+     * Closes all Connections.
+     * Must be called before the end of the transaction in EJB environment or after commit in standalone case.
+     *
+     * @throws TransactionAbortedException The transaction has been
+     *   aborted due to inconsistency, duplicate object identity, error
+     *   with the persistence engine or any other reason
+     * @throws IllegalStateException This method has been called
+     *   after the end of the transaction.
+     */
+    public synchronized void close()
+        throws TransactionAbortedException
+    {
+        Enumeration enum;
+        ObjectEntry entry;
+
+        if ( _status != Status.STATUS_ACTIVE &&
+             _status != Status.STATUS_MARKED_ROLLBACK ) {
+            throw new IllegalStateException( Messages.message( "persist.missingEnd" ) );
+        }
+        try {
+            // Go through all the connections opened in this transaction,
+            // close them one by one.
+            closeConnections();
+
+        } catch ( Exception except ) {
+            // Any error that happens, we're going to rollback the transaction.
+            _status = Status.STATUS_MARKED_ROLLBACK;
+            throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+        }
     }
 
 

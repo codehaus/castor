@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.util.Enumeration;
+import java.util.Vector;
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
@@ -71,23 +72,61 @@ public final class SapDbQueryExpression
 
     public String getStatement( boolean lock )
     {
+        Join         join;
         StringBuffer sql;
         boolean      first;
         Enumeration  enum;
+        int          size;
+        Vector       sorted = new Vector();
 
         sql = new StringBuffer();
         sql.append( JDBCSyntax.Select );
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
 
-        if ( _select == null )  
+        if ( _select == null )
           sql.append( getColumnList() );
         else
           sql.append( _select ).append(" ");
-        
+
         sql.append( JDBCSyntax.From );
         // Add all the tables to the FROM clause
+        // They should go in the special order: the table from the left side of outer join
+        // gould go before the table from the right side.
+        // first add elements that participate in outer joins
+        enum = _joins.elements();
+        while ( enum.hasMoreElements() ) {
+            int left;
+            int right;
+
+            join = (Join) enum.nextElement();
+            left = sorted.indexOf(join.leftTable);
+            right = sorted.indexOf(join.rightTable);
+            if (left >= 0 && right >= 0) {
+                if (left > right) {
+                    sorted.removeElement(join.leftTable);
+                    sorted.insertElementAt(join.leftTable, right + 1);
+                }
+            } else if (left < 0 && right >= 0) {
+                sorted.insertElementAt(join.leftTable, right + 1);
+            } else if (left >= 0 && right < 0) {
+                sorted.insertElementAt(join.rightTable, left);
+            } else { // (left < 0 && right < 0)
+                sorted.addElement(join.leftTable);
+                sorted.addElement(join.rightTable);
+            }
+        }
+        // now add elements that don't participate in outer joins
         enum = _tables.elements();
+        while ( enum.hasMoreElements() ) {
+            Object name;
+
+            name = enum.nextElement();
+            if (!sorted.contains(name)) {
+                sorted.addElement(name);
+            }
+        }
+        enum = sorted.elements();
         while ( enum.hasMoreElements() ) {
             sql.append( _factory.quoteName( (String) enum.nextElement() ) );
             if ( enum.hasMoreElements() )
@@ -96,9 +135,8 @@ public final class SapDbQueryExpression
         first = true;
         // Use asterisk notation to denote a left outer join
         // and equals to denote an inner join
-        for ( int i = 0 ; i < _joins.size() ; ++i ) {
-            Join join;
-
+        size = _joins.size();
+        for ( int i = 0 ; i < size; ++i ) {
             if ( first ) {
                 sql.append( JDBCSyntax.Where );
                 first = false;
