@@ -405,7 +405,8 @@ public class MozillaEngine
         if ( _rootDN == null )
             rdns = LDAPDN.explodeDN( dn, true );
         else
-            rdns = LDAPDN.explodeRDN( dn.substring( 0, dn.length() - _rootDN.length() ), true );
+            rdns = LDAPDN.explodeRDN( dn.substring( 0, dn.length() - _rootDN.length() - 1 ), true );
+
         if ( _dnFields != null ) {
             Object identity;
             
