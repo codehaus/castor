@@ -309,9 +309,13 @@ public class ElementDecl extends Particle {
     **/
     public void setType(XMLType type)
     {
-        if ((type != null) && (type.isSimpleType())) {
-            ((SimpleType)type).setParent(this);
+        //-- reset parent of current type
+        if (this.xmlType != null) {
+            this.xmlType.setParent(null);
         }
+        if (type != null) 
+            type.setParent(this);
+            
         this.xmlType = type;
     } //-- setType
 
