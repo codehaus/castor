@@ -847,7 +847,7 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( java.lang.Character.class, java.lang.String.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new String( obj.toString() );
+                return obj.toString();
             }
             public String toString() { return "Character->String"; }
         } ),
