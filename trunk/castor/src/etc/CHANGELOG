@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1262 using contribution from Jack Warner [jack.warner@agedwards.com]
+       Castor JDO now uses timezone information when reading date/timestamp/time
+       data from the RDBMS.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1262
+       (Werner - 20041020)
+
 JDO:   Fixed bug 1767 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Updated src/tests/jdo/oracle.xml and src/tests/jdo/postgresql.xml to be in-line
        with new grammar.
