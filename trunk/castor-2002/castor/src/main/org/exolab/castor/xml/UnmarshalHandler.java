@@ -247,6 +247,11 @@ public class UnmarshalHandler implements DocumentHandler {
         
         //-- clean up current Object
         Class type = state.type;
+
+        if ( type == null ) {
+            message("Ignoring " + state.elementName + " no descriptor was found");
+            return;
+        }
         
         //-- check for special cases
         boolean byteArray = false;
