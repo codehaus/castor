@@ -90,7 +90,6 @@ public class Date extends TimePeriod {
      */
     public Date(java.util.Date dateRef) {
         new Date();
-        System.out.println(dateRef.toString());
         GregorianCalendar tempCalendar = new GregorianCalendar();
         tempCalendar.setTime(dateRef);
         this.setCentury((short) (tempCalendar.get(tempCalendar.YEAR)/100));
