@@ -738,14 +738,15 @@ public final class CacheEngine
      * be created in persistent storage. Otherwise the object will be
      * stored and dirty checking might occur in order to determine
      * whether the object is valid. The object's OID might change
-     * during this process.
+     * during this process, and the new OID will be returned. If the
+     * object was not stored (not modified), null is returned.
      *
      * @param tx The transaction context
      * @param object The object to store
      * @param identity The object's identity
      * @param timeout The timeout waiting to acquire a lock on the
      *  object (specified in seconds)
-     * @return The object's OID
+     * @return The object's OID if stored, null if ignored
      * @throws LockNotGrantedException Timeout or deadlock occured
      *  attempting to acquire lock on object
      * @throws ObjectDeletedException The object has been deleted from
@@ -780,7 +781,7 @@ public final class CacheEngine
 
         // Acquire a read lock first. Only if the object has been modified
         // do we need a write lock.
-        original = (Object[]) lock.acquire( tx, false, timeout );
+        original = (Object[]) lock.acquire( tx, false, 0 );
         // Get the real OID with the exclusive and stamp info.
         oid = typeInfo.cache.getOID( original );
 
@@ -880,7 +881,7 @@ public final class CacheEngine
 
             // Check if object has been modified, and whether it can be stored.
             if ( ! typeInfo.handler.isModified( object, original ) )
-                return oid;
+                return null;
             try {
                 typeInfo.handler.checkValidity( object );
             } catch ( ValidityException except ) {
