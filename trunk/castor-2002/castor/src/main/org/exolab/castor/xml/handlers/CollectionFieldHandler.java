@@ -131,7 +131,7 @@ public class CollectionFieldHandler extends XMLFieldHandler {
                     i++;
                 }
                 //remove the last ' '
-                result=result.substring(0,result.length()-2);
+                result=result.substring(0,result.length()-1);
             }
             return result;
         }
