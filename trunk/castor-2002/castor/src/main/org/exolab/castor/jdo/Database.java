@@ -3,13 +3,7 @@ package org.exolab.castor.jdo;
 
 
 /**
- * Interface for opening and interacting with the database. Databases
- * must be opened before starting any transactions that use the
- * database and closed after ending these transactions.
  *
- * @author David Jordan (OMG)
- * @version ODMG 3.0
- * @version $Revision$ $Date$
  */
 public interface Database
 {
@@ -22,7 +16,7 @@ public interface Database
 
 
     /**
-     * Returns a new OQL query.
+     * Returns a new OQL query using the specified statement.
      */
     public OQLQuery getOQLQuery( String oql )
         throws QueryException;
@@ -38,80 +32,48 @@ public interface Database
 
 
     /**
-     * Associate a name with an object and make it persistent.
-     * An object instance may be bound to more than one name.
-     * Binding a previously transient object to a name makes that object persistent.
+     * Creates a new object in persistent storage and returns the.
+     * The object will be persisted only if the transaction commits.
+     * If the object has an identity then duplicate identity check
+     * happens in this method, if the identity is null,  duplicate
+     * identity check occurs when the transaction completes and the
+     * object is not visible in this transaction.
      *
-     * @param object The object to be named.
-     * @param name The name to be given to the object.
-     * @throws ObjectNameNotUniqueException
-     * If an attempt is made to bind a name to an object and that name is already bound
-     * to an object.
+     * @param object The object to create
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws DuplicateIdentityException An object with this identity
+     *  already exists in persistent storage
+     * @throws ClassNotPersistenceCapableException The class is not
+     *  persistent capable
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
      */
-    public void bind( Object object, String name )
-        throws DuplicateIdentityException, ClassNotPersistenceCapableException,
-               PersistenceException;
+    public void create( Object object )
+        throws ClassNotPersistenceCapableException, DuplicateIdentityException,
+               TransactionNotInProgressException, PersistenceException;
 
 
     /**
-     * Lookup an object via its name.
+     * Removes the object from persistent storage. The deletion will
+     * take effect only if the transaction is committed, but the
+     * object is no longer viewable for the current transaction and
+     * locks for access from other transactions will block until this
+     * transaction completes.
      *
-     * @param name The name of an object.
-     * @return The object with that name.
-     * @throws ObjectNameNotFoundException There is no object with the specified name.
-     * @see ObjectNameNotFoundException
+     * @param object The object to remove
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws ObjectNotPersistentException The object has not been
+     *  queried or created in this transaction
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
      */
-    public Object lookup( String name )
-        throws ObjectNotFoundException, PersistenceException;
-
-
-    /**
-     * Disassociate a name with an object
-     *
-     * @param name The name of an object.
-     * @throws ObjectNameNotFoundException No object exists in the database with that name.
-     */
-    public void unbind( String name )
-        throws ObjectNotFoundException, PersistenceException;
-
-
-    /**
-     * Makes a transient object durable in the database. Must be
-     * executed in the context of an open transaction.
-     * <p>
-     * If the transaction in which this method is executed commits,
-     * then the object is made durable. If the transaction aborts,
-     * then this operation is considered not to have been executed,
-     * and the target object is again transient.
-     *
-     * @param object The object to make persistent
-     * @throws ClassNotPersistenceCapableException The object cannot
-     *  be persisted due to the type of the object
-     */
-    public void makePersistent( Object object )
-        throws ClassNotPersistenceCapableException,
-               DuplicateIdentityException, PersistenceException;
-
-
-    /**
-     * Deletes an object from the database. Must be executed in the
-     * context of an open transaction.
-     * <p>
-     * If the object is not persistent, then {@link ObjectNotPersistent}
-     * is thrown. If the transaction in which this method is executed
-     * commits, then the object is removed from the database. If the
-     * transaction aborts, then this operation is considered not to
-     * have been executed, and the target object is again in the
-     * database.
-     *
-     * @param object The object to delete
-     * @throws ObjectNotPersistent The object does not exist in the
-     *  database
-     */
-    public void deletePersistent( Object object )
+    public void remove( Object object )
         throws ObjectNotPersistentException, LockNotGrantedException, 
-               PersistenceException;
-
+               TransactionNotInProgressException, PersistenceException;
 
 
     /**
@@ -169,18 +131,84 @@ public interface Database
 
 
     /**
-     * Upgrade the lock on the given object to the given lock mode.
-     * The call has no effect if the object's current lock is already at or above
-     * that level of lock mode.
+     * Acquire a write lock on the object. Read locks are implicitly
+     * available when the object is queried. A write lock is only
+     * granted for objects that are created or deleted or for objects
+     * loaded in exclusive mode - this method can obtain such a lock
+     * explicitly. If the object already has a write lock in this
+     * transaction or a read lock in this transaction but no read lock
+     * in any other transaction, a write lock is obtained. If this
+     * object has a read lock in any other transaction this method
+     * will block until the other transaction will release its lock.
+     * If the timeout has elapsed or a deadlock has been detected,
+     * an exception will be thrown but the current lock will be retained.
      *
-     * @param obj The object to acquire a lock on.
-     * @param lockMode The lock mode to acquire. The lock modes are <code>READ</code>,
-     * <code>UPGRADE</code>, and <code>WRITE</code>.
-     * @throws LockNotGrantedException Is thrown if the given lock mode could not be acquired.
+     * @param object The object to lock
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws ObjectNotPersistentException The object has not been
+     *  queried or created in this transaction
+     * @throws LockNotGrantedException Timeout or deadlock occured
+     *  attempting to acquire lock on object
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
      */
-    public void lock( Object obj )
-        throws LockNotGrantedException, PersistenceException;
+    public void lock( Object object )
+        throws LockNotGrantedException, ObjectNotPersistentException,
+               TransactionNotInProgressException,  PersistenceException;
 
+
+
+    /**
+     * Returns true if the object is persistent. An object is persistent
+     * if it was created or queried in this transaction. If the object
+     * was created or queried in another transaction, or there is no
+     * open transaction, this method returns null.
+     *
+     * @param object The object
+     * @return True if persistent in this transaction
+     */
+    public boolean isPersistent( Object object );
+
+
+    /**
+     * Makes a transient object durable in the database. Must be
+     * executed in the context of an open transaction.
+     * <p>
+     * If the transaction in which this method is executed commits,
+     * then the object is made durable. If the transaction aborts,
+     * then this operation is considered not to have been executed,
+     * and the target object is again transient.
+     *
+     * @param object The object to make persistent
+     * @throws ClassNotPersistenceCapableException The object cannot
+     *  be persisted due to the type of the object
+     * @deprecated See {@link #create}
+     */
+    public void makePersistent( Object object )
+        throws ClassNotPersistenceCapableException,
+               DuplicateIdentityException, PersistenceException;
+
+
+    /**
+     * Deletes an object from the database. Must be executed in the
+     * context of an open transaction.
+     * <p>
+     * If the object is not persistent, then {@link ObjectNotPersistent}
+     * is thrown. If the transaction in which this method is executed
+     * commits, then the object is removed from the database. If the
+     * transaction aborts, then this operation is considered not to
+     * have been executed, and the target object is again in the
+     * database.
+     *
+     * @param object The object to delete
+     * @throws ObjectNotPersistent The object does not exist in the
+     *  database
+     * @deprecated See {@link #remove}
+     */
+    public void deletePersistent( Object object )
+        throws ObjectNotPersistentException, LockNotGrantedException, 
+               PersistenceException;
 
 
 }
