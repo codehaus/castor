@@ -151,6 +151,9 @@
       <!-- Allows overriding the matching rule -->
       <xsd:attribute name="matches" type="string" use="optional"/>
 
+      <!-- Signal that this field should be marshalled as a reference -->
+      <xsd:attribute name="reference" type="boolean" use="optional"/>
+
       <xsd:attribute name="node" use="optional">
          <xsd:simpleType>
 	    <xsd:restriction base="string">
