@@ -137,12 +137,15 @@
     The SQL type can be the proper Java class type returned by the
     JDBC driver or the SQL type without precision (e.g.
     java.math.BigDecimal or numeric).
+    However, SQL type may contain the parameter for the SQL<->Java type 
+    convertors in square brackets (e.g., char[01] for false->0, true->1
+    conversion from Boolean Java type to char SQL type)
 
  -->
 <!ELEMENT sql EMPTY>
 <!ATTLIST sql
     name   NMTOKEN  #IMPLIED
-    type   NMTOKEN  #IMPLIED
+    type   CDATA    #IMPLIED
     dirty  ( check | ignore )  "check">
 
 

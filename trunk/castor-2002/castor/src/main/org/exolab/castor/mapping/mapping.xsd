@@ -103,7 +103,7 @@
   <xsd:element name="sql">
     <xsd:type content="empty">
       <xsd:attribute name="name" type="NMTOKEN" minOccurs="0"/>
-      <xsd:attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <xsd:attribute name="type" type="string" minOccurs="0"/>
       <xsd:attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="many-key" type="NMTOKEN" minOccurs="0"/>
       <xsd:attribute name="dirty" type="string" minOccurs="0" default="check">

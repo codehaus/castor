@@ -200,7 +200,7 @@ public class SqlDescriptor implements org.exolab.castor.xml.XMLClassDescriptor {
         
         //-- validation code for: _type
         fieldValidator = new FieldValidator();
-        fieldValidator.setValidator(new NameValidator(NameValidator.NMTOKEN));
+        fieldValidator.setValidator(new StringValidator());
         desc.setValidator(fieldValidator);
         
         //-- _name

@@ -296,6 +296,41 @@ public class Types
     }
 
 
+
+    /**
+     * Transforms short date format pattern into full format pattern
+     * for SimpleDateFormat (e.g., "YMD" to "yyyyMMdd").
+     *
+     * @param pattern The short pattern
+     * @return The full pattern
+     */
+    public static String getFullDatePattern( String pattern )
+    {        
+        StringBuffer sb;
+        int len; 
+
+        if ( pattern == null || pattern.length() == 0 )
+            return "yyyyMMdd";
+        
+        sb = new StringBuffer();
+        len = pattern.length();
+        
+        for ( int i = 0; i < len; i++ ) {
+            switch ( pattern.charAt( i ) ) {
+            case 'y': case 'Y': sb.append( "yyyy" ); break;
+            case 'M':           sb.append( "MM" ); break;
+            case 'd': case 'D': sb.append( "dd" ); break;
+            case 'h':           sb.append( "hh" ); break;
+            case 'm':           sb.append( "mm" ); break;
+            case 's':           sb.append( "ss" ); break;
+            case 'S': case 'n': sb.append( "SSS" ); break;
+            }
+        }
+        
+        return sb.toString();
+    }
+
+
     /**
      * Information about a specific Java type.
      */
@@ -425,6 +460,13 @@ public class Types
     
     
     /**
+     * Date format used by the date convertor when nonempy parameter 
+     * is specified.
+     */
+    private static SimpleDateFormat _paramDateFormat = new SimpleDateFormat();
+    
+    
+    /**
      * List of all the default convertors between Java types.
      */
     static TypeConvertorInfo[] _typeConvertors = new TypeConvertorInfo[] {
@@ -493,6 +535,13 @@ public class Types
                 return Integer.valueOf( (String) obj );
             }
             public String toString() { return "String->Integer"; }
+        } ),
+        new TypeConvertorInfo( java.util.Date.class, java.lang.Integer.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                return new Integer( _paramDateFormat.format( (Date) obj ) );
+            }
+            public String toString() { return "Date->Integer"; }
         } ),
         // Convertors to long
         new TypeConvertorInfo( java.lang.Integer.class, java.lang.Long.class, new TypeConvertor() {
@@ -643,6 +692,13 @@ public class Types
             }
             public String toString() { return "String->BigDecimal"; }
         } ),
+        new TypeConvertorInfo( java.util.Date.class, java.math.BigDecimal.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                return new BigDecimal( _paramDateFormat.format( (Date) obj ) );
+            }
+            public String toString() { return "Date->BigDecimal"; }
+        } ),
         // Convertors to string
         new TypeConvertorInfo( java.lang.Short.class, java.lang.String.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
@@ -682,7 +738,12 @@ public class Types
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.lang.String.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return obj.toString();
+                if ( param == null || param.length() == 0 )
+                    return obj.toString();
+                else {
+                    _paramDateFormat.applyPattern( param );
+                    return _paramDateFormat.format( (Date) obj );
+                }
             }
             public String toString() { return "Date->String"; }
         } ),
@@ -744,12 +805,39 @@ public class Types
         new TypeConvertorInfo( java.lang.String.class, java.util.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
                 try {
-                    return _dateFormat.parse( (String) obj );
+                    if ( param == null || param.length() == 0 )
+                        return _dateFormat.parse( (String) obj );
+                    else {
+                        _paramDateFormat.applyPattern( param );
+                        return _paramDateFormat.parse( (String) obj );
+                    }
                 } catch ( ParseException except ) {
                     throw new IllegalArgumentException( except.toString() );
                 }
             }
             public String toString() { return "String->Date"; }
+        } ),
+        new TypeConvertorInfo( java.lang.Integer.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                    return _paramDateFormat.parse( obj.toString() );
+                } catch ( ParseException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "Integer->Date"; }
+        } ),
+        new TypeConvertorInfo( java.math.BigDecimal.class, java.util.Date.class, new TypeConvertor() {
+            public Object convert( Object obj, String param ) {
+                try {
+                    _paramDateFormat.applyPattern( Types.getFullDatePattern( param ) );
+                    return _paramDateFormat.parse( obj.toString() );
+                } catch ( ParseException except ) {
+                    throw new IllegalArgumentException( except.toString() );
+                }
+            }
+            public String toString() { return "BigDecimal->Date"; }
         } ),
         new TypeConvertorInfo( java.util.Date.class, java.sql.Date.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
