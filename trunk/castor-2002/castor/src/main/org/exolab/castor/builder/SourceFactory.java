@@ -779,8 +779,7 @@ public class SourceFactory  {
         ContentType contentType = complexType.getContentType();
 
         //-- create text member
-        if ((contentType == ContentType.textOnly) ||
-            (contentType == ContentType.mixed) ||
+        if ((contentType == ContentType.mixed) ||
             (contentType == ContentType.any))
         {
 

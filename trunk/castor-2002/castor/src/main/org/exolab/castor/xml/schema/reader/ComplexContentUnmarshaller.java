@@ -94,9 +94,19 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
         (ComplexType complexType, AttributeList atts, Resolver resolver)
         throws SAXException
     {
-        
+
         _complexType = complexType;
-        
+
+		//-- read contentType
+        String content = atts.getValue(SchemaNames.MIXED);
+
+		if (content != null) {
+            if (content.equals("true"))
+		       _complexType.setContentType(ContentType.valueOf("mixed"));
+            if (content.equals("false"))
+			   _complexType.setContentType(ContentType.valueOf("elementOnly"));
+		}
+
     } //-- ComplexContentUnmarshaller
 
       //-----------/
@@ -135,21 +145,21 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
             ++depth;
             return;
         }
-        
+
         //-- extension
         if (SchemaNames.EXTENSION.equals(name)) {
-            
+
             if (foundExtension)
                 error("Only (1) 'extension' element may appear as a child "+
                     "of 'complexContent' elements.");
-                    
+
             if (foundRestriction)
                 error("Both 'extension' and 'restriction' elements may not "+
                     "appear as children of the same complexContent "+
                     "definition.");
-                
+
             foundExtension = true;
-            
+
             ExtensionUnmarshaller extension =
                 new ExtensionUnmarshaller(_complexType, atts, getResolver());
             extension.setAllowComplexContent(true);
@@ -157,18 +167,18 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
         }
         //-- restriction
         else if (SchemaNames.RESTRICTION.equals(name)) {
-            
+
             if (foundRestriction)
                 error("Only (1) 'restriction' element may appear as a child "+
                     "of 'complexContent' elements.");
-                    
+
             if (foundExtension)
                 error("Both 'extension' and 'restriction' elements may not "+
                     "appear as children of the same complexContent "+
                     "definition.");
-                
+
             foundRestriction = true;
-            
+
             error( "restriction currently not supported.");
         }
         //-- annotation
@@ -176,11 +186,11 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
             if (foundAnnotation)
                 error("Only (1) 'annotation' element may appear as a child "+
                     "of 'complexContent' elements.");
-                    
+
             if (foundRestriction || foundExtension)
                 error("An 'annotation' may only appear as the first child "+
                     "of a 'complexContent' element.");
-            
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
