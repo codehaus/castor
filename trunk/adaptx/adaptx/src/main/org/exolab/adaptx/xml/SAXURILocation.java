@@ -52,17 +52,14 @@ public final class SAXURILocation extends ObjectURILocation {
      */
     public SAXURILocation(XMLReader reader, InputSource source) {
         
-        if ((reader == null) || (source == null)) {
-            String err = "The arguments 'reader' and 'source' cannot both be null.";
+        if (source == null) {
+            String err = "The argument 'source' must not be null.";
             throw new IllegalArgumentException(err);
         }
         
         _source = source;
         _reader = reader;
-        
-        if (_source != null) {
-            _absoluteURI = _source.getSystemId();
-        }
+        _absoluteURI = _source.getSystemId();
         
     } //-- SAXURILocation
     
@@ -105,6 +102,15 @@ public final class SAXURILocation extends ObjectURILocation {
 	    return _reader;
 	} //-- getXMLReader
 	
+	/**
+	 * Returns the InputSource for this SAXURILocation
+	 * 
+	 * @return the InputSource
+	 */
+	public InputSource getInputSource() {
+	    return _source;
+	} //-- getInputSource
+	 
 	/**
 	 * Returns the Object from this ObjectURILocation.
 	 *
