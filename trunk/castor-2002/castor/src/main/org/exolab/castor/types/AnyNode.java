@@ -567,7 +567,17 @@ public final class AnyNode {
                       sb.append(siblingNode.toString());
 
              }//ELEMENT
-             else return this.getStringValue();
+             else {
+                //in case we are dealing with a TEXT node
+                // we got to make sure that there is no sibling TEXT nodes
+                //(<tag>text text</tag> contains indeed 2 text nodes)
+                AnyNode temp = this;
+                while (temp != null) {
+                    sb.append(temp.getStringValue());
+                    temp = temp.getNextSibling();
+                }
+                temp = null;
+             }
             return sb.toString();
           }
           return sb.toString();
