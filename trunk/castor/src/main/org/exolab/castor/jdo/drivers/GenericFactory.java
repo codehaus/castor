@@ -55,13 +55,13 @@ import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.spi.LogInterceptor;
 
 
 /**
  * {@link org.exolab.castor.persist.spi.PersistenceFactory} for generic JDBC driver.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public class GenericFactory
