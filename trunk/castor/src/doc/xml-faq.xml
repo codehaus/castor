@@ -181,21 +181,6 @@
 
         </section>
 
-        <section>
-            <section title="What is the order of the marshalled XML elements?">
-            <p>
-               <p>If you are using Castor's default introspection to automatically
-               map the objects into XML, then there is no guarantee on the order.
-               It simply depends on the order in which the fields are returned to
-               Castor using the Java reflection API.</p>
-
-               <p>Note: If you use a mapping file Castor will generate the XML in
-               the order in which the mapping file is specified.</p>
-            </p>
-            </section>
-        </section>
-
-
     </section>
 
     <section title="Introspection">
@@ -278,6 +263,21 @@
             <p>Note: This will slow down the marshalling process</p>
             </section>
         </section>
+
+        <section>
+            <section title="What is the order of the marshalled XML elements?">
+            <p>
+               <p>If you are using Castor's default introspection to automatically
+               map the objects into XML, then there is no guarantee on the order.
+               It simply depends on the order in which the fields are returned to
+               Castor using the Java reflection API.</p>
+
+               <p>Note: If you use a mapping file Castor will generate the XML in
+               the order in which the mapping file is specified.</p>
+            </p>
+            </section>
+        </section>
+
     </section>
 
     <section title="Source Code Generator">
