@@ -299,6 +299,19 @@ public class Mapping
 
 
     /**
+     * Returns the class loader used by this mapping object. The returned
+     * class loaded may be the one passed in the constructor, the one used
+     * to load Castor, or in some 1.1 JVMs null.
+     *
+     * @return The class loader used by this mapping object (may be null)
+     */
+    public ClassLoader getClassLoader()
+    {
+        return _loader;
+    }
+
+
+    /**
      * Loads the mapping from the specified URL. If an entity resolver
      * was specified, will use the entity resolver to resolve the URL.
      * This method is also used to load mappings referenced from another
