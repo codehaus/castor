@@ -692,23 +692,23 @@ public class DescriptorSourceFactory {
                 if (xsDecimal.hasMinimum()) {
                     java.math.BigDecimal min = xsDecimal.getMinExclusive();
                     if (min != null)
-                        jsc.add("dv.setMinExclusive(");
+                        jsc.add("dv.setMinExclusive(new java.math.BigDecimal(");
                     else {
                         min = xsDecimal.getMinInclusive();
-                        jsc.add("dv.setMinInclusive(");
+                        jsc.add("dv.setMinInclusive(new java.math.BigDecimal(");
                     }
-                    jsc.append(min.toString());
+                    jsc.append(min.toString()+")");
                     jsc.append(");");
                 }
                 if (xsDecimal.hasMaximum()) {
                     java.math.BigDecimal max = xsDecimal.getMaxExclusive();
                     if (max != null)
-                        jsc.add("dv.setMaxExclusive(");
+                        jsc.add("dv.setMaxExclusive(new java.math.BigDecimal(");
                     else {
                         max = xsDecimal.getMaxInclusive();
-                        jsc.add("dv.setMaxInclusive(");
+                        jsc.add("dv.setMaxInclusive(new java.math.BigDecimal(");
                     }
-                    jsc.append(max.toString());
+                    jsc.append(max.toString()+")");
                     jsc.append(");");
                 }
 
