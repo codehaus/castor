@@ -189,7 +189,7 @@
         <p>Because direct database access can modify the same record as represented by
            an exclusive locked object, Castor uses dirty checking when updating the
            database. Dirty checking does not have a severe affect on performance, and can
-           be turned on by marking all the fields of the object with dirty="ignore".</p>
+           be disabled by marking all the fields of the object with dirty="ignore".</p>
 
         <p>To reduce the possibility of dirty reads, Castor will always synchronize
            exclusive locked objects with the database at the beginning of a transaction.
