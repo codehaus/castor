@@ -157,7 +157,7 @@ public class DatabaseImpl implements Database, Synchronization {
 
         _transaction = transaction;
         if ( _transaction != null ) {
-            _ctx = new TransactionContext( _dbs, this );
+            _ctx = new TransactionContext( _dbs, this, true );
             _ctx.setLockTimeout( _lockTimeout );
             _ctx.setAutoStore( _autoStore );
         }
@@ -437,7 +437,7 @@ public class DatabaseImpl implements Database, Synchronization {
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
 
-        _ctx = new TransactionContext( _dbs, this );
+        _ctx = new TransactionContext( _dbs, this, false );
         _ctx.setLockTimeout( _lockTimeout );
         _ctx.setAutoStore( _autoStore );
     }
