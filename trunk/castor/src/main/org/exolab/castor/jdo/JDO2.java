@@ -301,7 +301,9 @@ public class JDO2
         	
         	_jdoInstances.put (databaseName, jdoInstance);
         	
-        	_log.debug ("Successfully created JDO instance: " + jdoInstance);
+            if(_log.isDebugEnabled()) {
+                _log.debug ("Successfully created JDO instance: " + jdoInstance);
+            }
         }
         
         return jdoInstance;

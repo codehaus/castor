@@ -578,7 +578,9 @@ public class FieldMolder {
                                 method = javaClass.getMethod( methodName, null );
                             } 
                             catch (NoSuchMethodException nsme) {
-                                _log.debug (Messages.format("mapping.accessorNotFound", methodName, "boolean", getName()));
+                                if(_log.isDebugEnabled()) {
+                                    _log.debug (Messages.format("mapping.accessorNotFound", methodName, "boolean", getName()));
+                                }
                             }
                         }
                         

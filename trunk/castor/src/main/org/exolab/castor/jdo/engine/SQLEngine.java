@@ -298,7 +298,9 @@ public final class SQLEngine implements Persistence {
             }
         }
 
-        _log.debug ("hasFieldsToPersist = " + hasFieldsToPersist);
+        if(_log.isDebugEnabled()) {
+            _log.debug ("hasFieldsToPersist = " + hasFieldsToPersist);
+        }
         
         try {
             buildSqlPKLookup();
@@ -379,7 +381,7 @@ public final class SQLEngine implements Persistence {
             accessMode = _clsDesc.getAccessMode();
         sql = query.getStatement( accessMode == AccessMode.DbLocked);
         
-        if(_log.isDebugEnabled()){
+        if(_log.isDebugEnabled()) {
             _log.debug( Messages.format( "jdo.createSql", sql ) );
         }
         
@@ -401,7 +403,7 @@ public final class SQLEngine implements Persistence {
         if (spCall.startsWith("SQL")) {
             sql = spCall.substring(4);
         	
-            if (_log.isDebugEnabled()){
+            if (_log.isDebugEnabled()) {
                 _log.debug (Messages.format ("jdo.directSQL", sql));
             }
             
@@ -543,7 +545,7 @@ public final class SQLEngine implements Persistence {
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
              
-            if(_log.isDebugEnabled()){
+            if(_log.isDebugEnabled()) {
                 _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), _sqlCreate) );
             }
             
@@ -588,7 +590,9 @@ public final class SQLEngine implements Persistence {
                         if ( _fields[i].columns.length != 1 )
                             throw new PersistenceException( "Complex field expected! ");
 
-                        _log.debug( "Storing field: " + _fields[i] );
+                        if(_log.isDebugEnabled()) {
+                            _log.debug( "Storing field: " + _fields[i] );
+                        }
                         SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
                     }
                 }
@@ -668,7 +672,7 @@ public final class SQLEngine implements Persistence {
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 
-                if(_log.isDebugEnabled()){
+                if(_log.isDebugEnabled()) {
                     _log.debug( Messages.format( "jdo.duplicateKeyCheck", _pkLookup ) );
                 }
                 
@@ -798,7 +802,7 @@ public final class SQLEngine implements Persistence {
                 storeStatement = getStoreStatement( original );
                 stmt = ( (Connection) conn ).prepareStatement( storeStatement );
                 
-                if(_log.isDebugEnabled()){
+                if(_log.isDebugEnabled()) {
                     _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), storeStatement ) );
                 }
                 
@@ -896,7 +900,7 @@ public final class SQLEngine implements Persistence {
                     if ( original != null ) {
                         stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
                         
-                        if(_log.isDebugEnabled()){
+                        if(_log.isDebugEnabled()) {
                             _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), 
                                     _sqlLoad ) );
                         }
@@ -964,7 +968,7 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             
-            if(_log.isDebugEnabled()){
+            if(_log.isDebugEnabled()) {
                 _log.debug( Messages.format( "jdo.removing", _clsDesc.getJavaClass().getName(), _sqlRemove ) );
             }
 
@@ -1019,7 +1023,7 @@ public final class SQLEngine implements Persistence {
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
             
-            if(_log.isDebugEnabled()){
+            if(_log.isDebugEnabled()) {
                 _log.debug( Messages.format( "jdo.acquireWriteLock", _pkLookup ) );
             }
             
@@ -1249,7 +1253,7 @@ public final class SQLEngine implements Persistence {
                 _sqlCreate = "{call " + _sqlCreate + "}";
         }
 
-        if(_log.isDebugEnabled()){
+        if(_log.isDebugEnabled()) {
             _log.debug( Messages.format( "jdo.creating", _type, _sqlCreate ) );
         }
         
@@ -1293,7 +1297,7 @@ public final class SQLEngine implements Persistence {
             }
             _sqlStoreDirty = sql.toString();
             
-            if(_log.isDebugEnabled()){
+            if(_log.isDebugEnabled()) {
                 _log.debug( Messages.format( "jdo.updating", _type, _sqlStoreDirty ) );
             }
         } 
@@ -1312,7 +1316,7 @@ public final class SQLEngine implements Persistence {
         sql.append (buildWherePK());
         _sqlRemove = sql.toString();
         
-        if(_log.isDebugEnabled()){
+        if(_log.isDebugEnabled()) {
             _log.debug( Messages.format( "jdo.removing", _type, _sqlRemove ) );
         }
         
@@ -1413,7 +1417,7 @@ public final class SQLEngine implements Persistence {
 
         _sqlFinder = find;
 
-        if(_log.isDebugEnabled()){
+        if(_log.isDebugEnabled()) {
             _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
         }
         
@@ -1769,7 +1773,7 @@ public final class SQLEngine implements Persistence {
                 for(int i=0; i<_values.length; ++i)
                     _values[i] = null;
 
-                if(_log.isDebugEnabled()){
+                if(_log.isDebugEnabled()) {
                     _log.debug (Messages.format ("jdo.executingSql", sql));
                 }
 

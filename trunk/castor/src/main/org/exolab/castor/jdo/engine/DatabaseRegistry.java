@@ -306,7 +306,9 @@ public class DatabaseRegistry
         		while ( mappings.hasMoreElements() )
         		{
         			String mappingUrl = ( (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement() ).getHref();
-        			_log.debug( "Loading the mapping descriptor: " + mappingUrl );
+                    if(_log.isDebugEnabled()) {
+                        _log.debug( "Loading the mapping descriptor: " + mappingUrl );
+                    }
         			
         			if ( mappingUrl != null )
         			{
@@ -367,8 +369,9 @@ public class DatabaseRegistry
 									mapping.getResolver (Mapping.JDO, factory), 
 									factory,
 									dataSource);
-		
-        _log.debug( "Using DataSource: " + database.getDatabaseChoice().getDataSource().getClassName() );
+        if(_log.isDebugEnabled()) {
+            _log.debug( "Using DataSource: " + database.getDatabaseChoice().getDataSource().getClassName() );
+        }
 		return dbs;
 	}
     
@@ -472,7 +475,9 @@ public class DatabaseRegistry
 		                            database.getDatabaseChoice().getDriver().getUrl(), 
 									props );
 		
-        _log.debug( "Using driver: " + driverName );
+        if(_log.isDebugEnabled()) {
+            _log.debug( "Using driver: " + driverName );
+        }
         
 		return dbs;
 
@@ -581,9 +586,10 @@ public class DatabaseRegistry
 
     public static synchronized DatabaseRegistry getDatabaseRegistry( String name )
     {
-        DatabaseRegistry dbs;
-        dbs = (DatabaseRegistry) _databases.get( name);
-        return dbs;
+        if(_log.isDebugEnabled()) {
+            _log.debug( "Fetching DatabaseRegistry: " + name );
+        }
+        return (DatabaseRegistry) _databases.get( name);
     }
 
 
