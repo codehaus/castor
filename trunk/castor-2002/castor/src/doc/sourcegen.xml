@@ -258,7 +258,7 @@
         </section>
         
        
-        <section title="Map XML namespaceS to Java packages">
+        <section title="Map XML namespaces to Java packages">
             <p>Since version: 0.9.0</p>
             <p>
                 An XML Schema grammar is identified by a namespace. For data-binding purpose
@@ -292,6 +292,31 @@
             </code>
             </p>
         </section>
+        
+        <section title="Maps java primitive types to wrapper object">
+             <p>Since version 0.9.4</p>
+             <p>
+		It may be convenient to use java objects instead of primitives, 
+		the Source Generator provides a way to do it. Thus the following mapping can be used:
+		<ul>
+			<li>boolean to java.lang.Boolean</li>
+			<li>byte to java.lang.Byte</li>
+			<li>double to java.lang.Double</li>
+			<li>float to java.lang.Float</li>
+			<li>int and integer to java.lang.Integer</li>
+			<li>long to java.lang.Long</li>
+			<li>short to java.lang.Short</li>
+		</ul>
+	     </p>
+ 	     <p>To enable this property, edit the castor builder.properties file:
+	     <code>
+	 # Set to true if you want to use Object Wrappers instead
+	 # of primitives (e.g Float instead of float).
+	 # false by default.
+	 #org.exolab.castor.builder.primitivetowrapper=false
+	     </code>
+	     </p>
+	</section>
         
        </section>
     </section>
