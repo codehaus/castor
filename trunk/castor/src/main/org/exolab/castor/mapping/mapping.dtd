@@ -135,15 +135,16 @@
  -->
 <!ELEMENT field ( description?, sql?, bind-xml?, ldap? )>
 <!ATTLIST field
-    name           NMTOKEN  #REQUIRED
-    type           NMTOKEN  #IMPLIED
+    name           CDATA  #REQUIRED
+    type           CDATA  #IMPLIED
     required       ( true | false )  "false"
     direct         ( true | false )  "false"
     lazy           ( true | false )  "false"
-    handler        NMTOKEN  #IMPLIED
-    get-method     NMTOKEN  #IMPLIED
-    set-method     NMTOKEN  #IMPLIED
-    create-method  NMTOKEN  #IMPLIED
+    handler        CDATA  #IMPLIED
+    get-method     CDATA  #IMPLIED
+    set-method     CDATA  #IMPLIED
+    has-method     CDATA    #IMPLIED
+    create-method  CDATA  #IMPLIED
     transient      (true|false) "false"
     container      ( true | false ) #IMPLIED
     collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate )  #IMPLIED>
