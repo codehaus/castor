@@ -100,9 +100,6 @@ public class TypeConversion {
                 //--AnyURI
                 case SimpleTypesFactory.ANYURI_TYPE:
                     return new XSAnyURI();
-                //-- NCName
-                case SimpleTypesFactory.NCNAME_TYPE:
-                    return new XSNCName();
                 //-- NMTOKEN
                 case SimpleTypesFactory.NMTOKEN_TYPE:
                     return new XSNMToken();
