@@ -66,6 +66,11 @@ public class FieldDescriptorImpl
     implements FieldDescriptor
 {
 
+    /**
+     * Containing Class (parent)
+     */
+    private ClassDescriptor     _contClsDesc;
+
 
     /**
      * The field handler for get/set field value.
@@ -125,7 +130,8 @@ public class FieldDescriptorImpl
      * @param handler The field handler (may be null)
      * @param trans True if the field is transient
      */
-    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, FieldHandler handler, boolean trans )
+    public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo, 
+				FieldHandler handler, boolean trans )
         throws MappingException
     {
         if ( fieldName == null )
@@ -145,6 +151,7 @@ public class FieldDescriptorImpl
      */
     protected FieldDescriptorImpl( FieldDescriptor fieldDesc )
     {
+	this._contClsDesc = fieldDesc.getContainingClassDescriptor();
         this._handler = fieldDesc.getHandler();
         this._fieldName = fieldDesc.getFieldName();
         this._fieldType = fieldDesc.getFieldType();
@@ -153,6 +160,15 @@ public class FieldDescriptorImpl
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
         this._multi = fieldDesc.isMultivalued();
+    }
+
+    public void setContainingClassDescriptor( ClassDescriptor contClsDesc )
+    {
+	_contClsDesc = contClsDesc;
+    }
+    public ClassDescriptor getContainingClassDescriptor()
+    {
+	return _contClsDesc;
     }
 
 

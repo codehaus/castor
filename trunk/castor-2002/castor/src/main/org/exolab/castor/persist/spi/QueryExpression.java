@@ -182,6 +182,13 @@ public interface QueryExpression
     public void addCondition( String tableName, String columnName,
                               String condOp, String value );
 
+    /**
+     * Encode a TableColumn for use in expressions
+     *
+     * @param tableName The table name
+     * @param columnName The column name
+     */
+    public String encodeColumn( String tableName, String columnName );
 
     /**
      * Adds a where clause.  Caller is responsible for making sure all tables

@@ -89,6 +89,23 @@ public class ParseTreeNode implements TokenTypes {
     _token = token;
   }
 
+  public String toString() {
+    return "ParseTreeNode{"+_token.getTokenValue()+"}"; 
+  }
+
+  public String toStringEx() { 
+      StringBuffer s = new StringBuffer( "ParseTreeNode{" );
+      s.append( _token.getTokenValue() );
+      java.util.Iterator i= _children.iterator();
+      while ( i.hasNext() ) {
+	  s.append(",");
+	  ParseTreeNode c = (ParseTreeNode)i.next();
+	  s.append( c.toStringEx() );
+      }
+      s.append( "}" ); 
+      return s.toString();
+  }
+
   /**
    * Changes the parent of this node.
    *

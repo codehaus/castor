@@ -69,6 +69,10 @@ public class Token implements TokenTypes {
     _tokenValue = tokenValue;
   }
 
+  public String toString() {
+    return _tokenValue; 
+  }
+
   /**
    * Token Type accessor method.
    *

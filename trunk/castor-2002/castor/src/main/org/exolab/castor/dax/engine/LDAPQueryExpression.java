@@ -97,6 +97,12 @@ public class LDAPQueryExpression
     {
     }
 
+    public String encodeColumn( String tableName, String columnName )
+    {
+	// ! not yet implemented => ToDo !
+	return tableName + "." + columnName;
+    }
+
 
     public void addInnerJoin( String leftTable, String leftColumn,
                               String rightTable, String rightColumn )

@@ -85,6 +85,7 @@ public class ClassMapping implements java.io.Serializable {
     public void addFieldMapping(FieldMapping vFieldMapping) 
         throws java.lang.IndexOutOfBoundsException
     {
+	vFieldMapping.setClassMapping( this );
         _fieldMappingList.addElement(vFieldMapping);
     } //-- void addFieldMapping(FieldMapping) 
 
