@@ -141,6 +141,7 @@ public class JavaXMLNaming {
         int next = 0;
         
         boolean uppercase = upperFirst;
+        boolean lowercase = (!uppercase);
         
         for (int i = 0; i < size; i++) {
             char ch = ncChars[i];
@@ -158,6 +159,10 @@ public class JavaXMLNaming {
                     if (uppercase) {
                         ncChars[next] = Character.toUpperCase(ch);
                         uppercase = false;
+                    }
+                    else if (lowercase) {
+                        ncChars[next] = Character.toLowerCase(ch);
+                        lowercase = false;
                     }
                     else ncChars[next] = ch;
                     ++next;
