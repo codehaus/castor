@@ -66,12 +66,13 @@ public class MemberFactory {
 
     /**
      * The FieldInfo factory.
-    */
+    **/
     private FieldInfoFactory infoFactory = null;
 
 
-    /** Constructor that creates a default type factory.
-    */
+    /** 
+     * Creates a new MemberFactory with default type factory.
+    **/
     public MemberFactory() {
         this(new FieldInfoFactory());
     } //-- MemberFactory
@@ -469,11 +470,19 @@ public class MemberFactory {
      * @return a new FieldInfo for the given Group
     **/
     public FieldInfo createFieldInfo
-        (Group group, ClassInfoResolver resolver)
+        (Group group, SGStateInfo sgState)
     {
 
-        if (group.getName() == null)
-            throw new IllegalArgumentException("Only named groups are currently by the MemberFactory");
+        String groupName = group.getName();
+        
+        if (groupName == null) {
+            groupName = sgState.getGroupNaming().createClassName(group);
+            if (groupName == null) {
+                String err = "Unable to create name for group";
+                throw new IllegalStateException(err);
+            }
+        }
+
 
         //-- check whether this should be a Vector or not
         int maxOccurs = group.getMaxOccurs();
@@ -488,7 +497,7 @@ public class MemberFactory {
         JClass groupClass = null;
 		String className = null;
 
-        ClassInfo classInfo = resolver.resolve(group);
+        ClassInfo classInfo = sgState.resolve(group);
         if (classInfo != null) {
             groupClass = classInfo.getJClass();
             xsType = classInfo.getSchemaType();
@@ -497,7 +506,7 @@ public class MemberFactory {
 
 		if (groupClass == null) {
 		    // Java class name is group name or.
-		    className = JavaNaming.toJavaClassName(group.getName());
+		    className = JavaNaming.toJavaClassName(groupName);
 		    xsType = new XSClass(new JClass(className));
 		}
 		else {
@@ -511,7 +520,7 @@ public class MemberFactory {
         if (maxOccurs != 1) {
             String vName = fieldName+"List";
             CollectionInfo cInfo
-                = infoFactory.createCollection(xsType, vName, group.getName());
+                = infoFactory.createCollection(xsType, vName, groupName);
 
             XSList xsList = cInfo.getXSList();
             xsList.setMaximumSize(maxOccurs);
@@ -535,6 +544,7 @@ public class MemberFactory {
         return fieldInfo;
     } //-- createFieldInfo(Group)
 
+    
 	/**
 	 * Returns the actual element type (handles 'ref' attribute and anonymous complextypes)
 	 * @param e The element the type is need from
