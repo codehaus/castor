@@ -1182,7 +1182,14 @@ public final class SQLEngine implements Persistence {
                 }
             }
         }
-        sql.append( ") VALUES (" );
+        // it is possible to have no fields in INSERT statement:
+        // only the primary key field in the table,
+        // with KeyGenerator DURING_INSERT or BEFORE_INSERT
+        if ( count == 0 ) 
+            sql.setLength( sql.length() - 2 ); // cut " ("
+        else 
+            sql.append( ")" );
+        sql.append( " VALUES (" );
         for ( int i = 0 ; i < count; ++i ) {
             if ( i > 0 )
                 sql.append( ',' );
@@ -1191,19 +1198,18 @@ public final class SQLEngine implements Persistence {
         sql.append( ')' );
         _sqlCreate = sql.toString();
 
-        if ( keyGened ) {
-            //try {
-            //    _sqlCreate = _keyGen.patchSQL( _sqlCreate, _ids[0].name /*primKeyName*/ );
-            //} catch ( MappingException except )  {
-            //    Logger.getSystemLogger().println( except.toString() );
-
+        if ( ! keyGened ) {
+            try {
+                _sqlCreate = _keyGen.patchSQL( _sqlCreate, _ids[0].name /*primKeyName*/ );
+            } catch ( MappingException except )  {
+                _logInterceptor.exception( except );
                 // proceed without this stupid key generator
-            //    _keyGen = null;
-            //    buildSql( clsDesc, logInterceptor );
-            //    return;
-            //}
-            //if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
-            //    _sqlCreate = "{call " + _sqlCreate + "}";
+                _keyGen = null;
+                buildSql();
+                return;
+            }
+            if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
+                _sqlCreate = "{call " + _sqlCreate + "}";
         }
         if ( _logInterceptor != null )
             _logInterceptor.storeStatement( "SQL for creating " + _type + ": " + _sqlCreate );
