@@ -706,7 +706,8 @@ public final class SQLEngine
         // add the load fields of the parent class (but not the store fields)
         if ( clsDesc.getExtends() != null ) {
             expr.addInnerJoin( clsDesc.getTableName(), identitySQL,
-                               ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(), identitySQL );
+                               ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(),
+                               ( (JDOFieldDescriptor) clsDesc.getExtends().getIdentity() ).getSQLName() );
             addLoadSql( (JDOClassDescriptor) clsDesc.getExtends(), expr, allFields,
             true, queryPk, false );
             loadPk = false;
