@@ -1176,7 +1176,7 @@ public class ClassMolder {
                 //       if old is not null
                 //          removeRelation
                 //       if new is not null
-                if ( isEquals( fields[i], newfields[i] ) && ! canCreate ) {
+                if ( isEquals( fields[i], newfields[i] ) ) {
                     if ( !_debug )
                         break;
 
