@@ -75,6 +75,28 @@
 
             </summary>
 			<bugs>
+				<bug id="1873">
+					<description>
+						Updated documentation to explain that no auto-mapping of 
+						java.util.Date takes place; users must decide whether to
+						map a particular date field to java.sql.Date, java.sql.Time,
+						or java.sql.Timestamp.
+					</description>
+					<contributor>
+						<name>Gregory Block</name>
+						<email>gblock@ctoforaday.com</email>
+					</contributor>
+					<submitter>
+						<name>Gregory Block</name>
+						<email>gblock@ctoforaday.com</email>
+					</submitter>
+					<reporter>Gregory Block</reporter>
+					<type>Bug</type>
+					<project>JDO</project>
+					<module>Core</module>
+					<date>20050303</date>
+				</bug>
+
 				<bug id="1855">
 					<description>
 						Fixed problem with TransactionContext.getObjectEntry(Object) that was

@@ -375,7 +375,10 @@
   
             <li><b>type:</b> The JDBC type of the column. It is inferred from the object
             when the type of this field is a persistent Java class that is defined
-            elsewhere in the mapping.</li>
+            elsewhere in the mapping.  The complete list of automatic type conversions, and
+            which values require manual mapping (e.g, java.util.Date) is listed in the
+            <a href="types.html#SQL Type Conversion">SQL Type Conversion section of the 
+            Type Support</a> document.</li>
   
             <li><b>read-only:</b> If true, the column in the relational database
             table will only be read, not updated or deleted.</li>
