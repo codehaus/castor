@@ -47,6 +47,7 @@ package org.exolab.castor.xml;
 
 //-- xml related imports
 import org.xml.sax.*;
+import org.w3c.dom.*;
 import org.apache.xml.serialize.Serializer;
 import org.apache.xml.serialize.OutputFormat;
 import org.exolab.castor.mapping.Mapping;
@@ -157,6 +158,7 @@ public class Marshaller {
     private DocumentHandler  _handler      = null;
     private Serializer       _serializer   = null;
     private XMLNaming        _naming       = null;
+	private Node             _node         = null;
 
     /**
      * The depth of the sub tree, 0 denotes document level
@@ -174,7 +176,7 @@ public class Marshaller {
     **/
     private static final StringClassDescriptor _StringClassDescriptor
         = new StringClassDescriptor();
-
+	
     /**
      * Creates a new Marshaller
     **/
@@ -215,6 +217,19 @@ public class Marshaller {
         }
     } //-- Marshaller
 
+	/**
+	 * Creates a new Marshaller
+	 */
+	public Marshaller( Node node )
+	{
+        if ( node == null )
+            throw new IllegalArgumentException( "Argument 'node' is null." );
+		_node = node;
+		_handler = new SAX2DOMHandler( node );
+		
+        // call internal initializer
+        initialize();
+	} //-- Marshaller
 
     /**
      * Initializes this Marshaller. This is common code shared among
@@ -402,6 +417,23 @@ public class Marshaller {
         Marshaller marshaller;
 
         marshaller = new Marshaller(handler);
+        marshaller.marshal(object);
+    } //-- marshal
+
+    /**
+     * Marshals the given Object as XML using the given DOM Node
+     * to send events to.
+     * @param obj the Object to marshal
+     * @param node the DOM Node to marshal to
+     * @exception org.exolab.castor.xml.MarshalException
+     * @exception org.exolab.castor.xml.ValidationException
+    **/
+    public static void marshal(Object object, Node node)
+        throws MarshalException, ValidationException
+    {
+        Marshaller marshaller;
+
+        marshaller = new Marshaller(node);
         marshaller.marshal(object);
     } //-- marshal
 
