@@ -101,6 +101,12 @@ final class ObjectLock
 
 
     /**
+     * The object's OID.
+     */
+    private OID                 _oid;
+
+
+    /**
      * Write lock on this object. Refers to the transaction that has
      * acquired the write lock. Read and write locks are mutually
      * exclusive.
@@ -140,9 +146,19 @@ final class ObjectLock
      *
      * @param obj The object to create a lock for
      */
-    ObjectLock( Object object )
+    ObjectLock( Object object, OID oid )
     {
         _object = object;
+        _oid = oid;
+    }
+
+
+    /**
+     * Return the object's OID.
+     */
+    OID getOID()
+    {
+        return _oid;
     }
 
 
