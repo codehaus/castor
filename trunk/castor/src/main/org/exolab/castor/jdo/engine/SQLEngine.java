@@ -601,10 +601,10 @@ public final class SQLEngine implements Persistence {
                 sqlType = _ids[0].sqlType;
                 cstmt.registerOutParameter( count, sqlType );
                 
-                // [WG]: TODO: Add below debug statement to show real values ???
-                // if (_log.isDebugEnabled()) {
-                //    _log.debug (Messages.format ("jdo.creating", _clsDesc.getJavaClass().getName(), cstmt));
-                // }
+                // [WG]: TODO: Verify that this really works !!!
+                if (_log.isDebugEnabled()) {
+                 	  _log.debug (Messages.format ("jdo.creating.bound", _clsDesc.getJavaClass().getName(), cstmt));
+                }
                 
                 cstmt.execute();
 
@@ -621,8 +621,12 @@ public final class SQLEngine implements Persistence {
                 else
                     identity = cstmt.getObject( count );
                 identity = idToJava( 0, identity );
-            } else
-                stmt.executeUpdate();
+            } else {
+            	if(_log.isDebugEnabled()) {
+               	  _log.debug (Messages.format ("jdo.creating.bound", _clsDesc.getJavaClass().getName(), stmt));
+            	}                
+            	stmt.executeUpdate();
+            }
 
             stmt.close();
 
