@@ -106,6 +106,7 @@ public class SimpleContentRestrictionUnmarshaller extends SaxUnmarshaller {
         super();
 	    setResolver(resolver);
 	    _complexType  = complexType;
+        _complexType.setRestriction(true);
         _schema  = complexType.getSchema();
         _id   = atts.getValue(SchemaNames.ID_ATTR);
 
