@@ -54,7 +54,7 @@ import java.io.PrintWriter;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class JConstructor {
+public class JConstructor extends JAnnotatedElementHelper {
 
     
 
@@ -219,18 +219,42 @@ public class JConstructor {
 
     public void print(JSourceWriter jsw) {
         
+        // -- print annotations
+        printAnnotations(jsw);
+        
         if (modifiers.isPrivate()) jsw.write("private");
         else if (modifiers.isProtected()) jsw.write("protected");
         else jsw.write("public");
         jsw.write(' ');
         jsw.write(declaringClass.getLocalName());
         jsw.write('(');
+                
+		//-- any parameter annotations?
+		boolean parameterAnnotations = false;
+		for (int i = 0; i < params.size(); i++) {
+			JParameter jParameter = (JParameter) params.get(i);
+			if(jParameter.hasAnnotations())
+			{
+				parameterAnnotations = true;
+				break;
+			}
+		}
         
         //-- print parameters
-        for (int i = 0; i < params.size(); i++) {
-            if (i > 0) jsw.write(", ");
-            jsw.write(params.get(i));
-        }
+		if(parameterAnnotations)
+			jsw.indent();
+		for (int i = 0; i < params.size(); i++) {
+			if (i > 0)
+				jsw.write(", ");
+			if(parameterAnnotations)
+				jsw.writeln();
+			JParameter jParameter = (JParameter) params.get(i);
+			jParameter.printAnnotations(jsw);
+			String typeAndName = jParameter.toString();
+			jsw.write(typeAndName);
+		}
+		if(parameterAnnotations)
+			jsw.unindent();
         jsw.writeln(") {");
         //jsw.indent();
         sourceCode.print(jsw);

@@ -57,7 +57,7 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class JMethod implements JMember {
+public class JMethod implements JMember, JAnnotatedElement {
 
     
     /**
@@ -341,6 +341,48 @@ public class JMethod implements JMember {
     public String toString() {
         return _signature.toString();
     } //-- toString
+    
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotation(org.exolab.javasource.JAnnotationType)
+	 */
+	public JAnnotation getAnnotation(JAnnotationType annotationType) {
+		return _signature.getAnnotation(annotationType);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotations()
+	 */
+	public JAnnotation[] getAnnotations() {
+		return _signature.getAnnotations();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#isAnnotationPresent(org.exolab.javasource.JAnnotationType)
+	 */
+	public boolean isAnnotationPresent(JAnnotationType annotationType) {
+		return _signature.isAnnotationPresent(annotationType);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#addAnnotation(org.exolab.javasource.JAnnotation)
+	 */
+	public void addAnnotation(JAnnotation annotation) throws IllegalArgumentException {
+		_signature.addAnnotation(annotation);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#removeAnnotation(org.exolab.javasource.JAnnotationType)
+	 */
+	public JAnnotation removeAnnotation(JAnnotationType annotationType) throws IllegalArgumentException {
+		return _signature.removeAnnotation(annotationType);
+	}    
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#hasAnnotations()
+	 */
+	public boolean hasAnnotations() {
+		return _signature.hasAnnotations();
+	}	
     
     //---------------------/
     //- PROTECTED METHODS -/

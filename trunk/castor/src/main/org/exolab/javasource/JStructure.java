@@ -65,7 +65,9 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-abstract class JStructure extends JType {
+abstract class JStructure extends JType
+	implements JAnnotatedElement 
+{
 
     /**
      * The Id for Source control systems
@@ -117,6 +119,11 @@ abstract class JStructure extends JType {
      * The package to which this JStructure belongs
      */
     private String packageName   = null;
+    
+    /**
+     * Implementation of JAnnoatedElement to delagate to
+     */
+    private JAnnotatedElementHelper annotatedElement = null;
 
     /**
      * Creates a new JStructure with the given name.
@@ -148,6 +155,7 @@ abstract class JStructure extends JType {
         jdc              = new JDocComment();
         methods          = new Vector();
         modifiers        = new JModifiers();
+		annotatedElement = new JAnnotatedElementHelper();
         //-- initialize default Java doc
         jdc.addDescriptor(JDocDescriptor.createVersionDesc(version));
         
@@ -220,6 +228,25 @@ abstract class JStructure extends JType {
             imports.addElement(className);
         }
     } //-- addImport
+    
+    /**
+     * Adds approprite import for this JAnnotation
+     * @param annotation
+     */
+    protected void addImport(JAnnotation annotation)
+    {
+    	addImport(annotation.getAnnotationType().getName());
+    }
+    
+	/**
+	 * Adds approprite imports for these JAnnotation's
+	 * @param annotation
+	 */
+	protected void addImport(JAnnotation[] annotations)
+	{
+		for(int i=0; i<annotations.length; i++)
+			addImport(annotations[i].getAnnotationType().getName());			
+	}
 
     /**
      * Adds the given interface to the list of interfaces this
@@ -411,6 +438,15 @@ abstract class JStructure extends JType {
         return jdc;
     } //-- getJDocComment
 
+	/**
+	 * Returns the object managing the annotations for this JStructure
+	 * @return
+	 */
+	protected JAnnotatedElementHelper getAnnotatedElementHelper()
+	{
+		return annotatedElement;	
+	} //-- getAnnotatedElementHelper
+	
     /**
      * Returns an array of all the JMethodSignatures of this JInterface.
      *
@@ -764,6 +800,48 @@ abstract class JStructure extends JType {
         changePackage(packageName);
     } //-- setPackageName
 
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#addAnnotation(org.exolab.javasource.JAnnotation)
+	 */
+	public void addAnnotation(JAnnotation annotation) {
+		annotatedElement.addAnnotation(annotation);	
+		addImport(annotation);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotation(org.exolab.javasource.JAnnotationType)
+	 */
+	public JAnnotation getAnnotation(JAnnotationType annotationType) {
+		return annotatedElement.getAnnotation(annotationType);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#getAnnotations()
+	 */
+	public JAnnotation[] getAnnotations() {
+		return annotatedElement.getAnnotations();
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#isAnnotationPresent(org.exolab.javasource.JAnnotation)
+	 */
+	public boolean isAnnotationPresent(JAnnotationType annotationType) {
+		return annotatedElement.isAnnotationPresent(annotationType);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#removeAnnotation(org.exolab.javasource.JAnnotation)
+	 */
+	public JAnnotation removeAnnotation(JAnnotationType annotationType) {
+		return annotatedElement.removeAnnotation(annotationType);
+	}
+	
+	/* (non-Javadoc)
+	 * @see org.exolab.javasource.JAnnotatedElement#hasAnnotations()
+	 */
+	public boolean hasAnnotations() {
+		return annotatedElement.hasAnnotations();
+	}	
 
     //---------------------/
     //- Protected Methods -/

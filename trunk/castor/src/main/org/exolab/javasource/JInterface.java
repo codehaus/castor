@@ -146,6 +146,9 @@ public final class JInterface extends JStructure {
         while (type.isArray()) type = type.getComponentType();
         if ( !type.isPrimitive() )
             addImport( ((JClass)type).getName());
+            
+		// ensure annotation classes are imported
+		addImport(jField.getAnnotations());            
     }
         
     /**
@@ -243,6 +246,12 @@ public final class JInterface extends JStructure {
         for (int i = 0; i < exceptions.length; i++) {
             addImport(exceptions[i].getName());
         }
+		//-- ensure method and parameter annotations imported
+		addImport(jMethodSig.getAnnotations());
+		JParameter[] params = jMethodSig.getParameters();
+		for (int i = 0; i < params.length; i++) {
+			addImport(params[i].getAnnotations());
+		}        
     } //-- addMethod
 
     /**
@@ -348,6 +357,12 @@ public final class JInterface extends JStructure {
         //------------/
 
         getJDocComment().print(jsw);
+        
+        //---------------/
+        //- Annotations -/
+		//---------------/
+		
+		getAnnotatedElementHelper().printAnnotations(jsw);
 
         //-- print class information
         //-- we need to add some JavaDoc API adding comments
@@ -415,6 +430,9 @@ public final class JInterface extends JStructure {
                 //-- print Java comment
                 JDocComment comment = jField.getComment();
                 if (comment != null) comment.print(jsw);
+                
+                // -- annotations
+                jField.printAnnotations(jsw);
 
                 // -- print member
                 jsw.write(jField.getModifiers().toString());

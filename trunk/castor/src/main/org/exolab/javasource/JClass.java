@@ -150,6 +150,12 @@ public class JClass extends JStructure {
             err += "by this JClass";
             throw new IllegalArgumentException(err);
         }
+        
+        //-- ensure constructor and parameter annotation classes imported
+        addImport(constructor.getAnnotations());
+        JParameter[] params = constructor.getParameters();
+        for(int i=0; i<params.length; i++)
+        	addImport(params[i].getAnnotations());
     }
 
     /**
@@ -180,7 +186,9 @@ public class JClass extends JStructure {
         while (type.isArray()) type = type.getComponentType();
         if ( !type.isPrimitive() )
             addImport( type.getName());
-
+            
+        // ensure annotation classes are imported
+        addImport(jField.getAnnotations());
     } //-- addField
 
     /**
@@ -281,8 +289,8 @@ public class JClass extends JStructure {
 
         String[] pkgNames = jMethod.getParameterClassNames();
         for (int i = 0; i < pkgNames.length; i++) {
-            addImport(pkgNames[i]);
-        }
+            addImport(pkgNames[i]);            
+        }        
         //-- check return type to make sure it's included in the
         //-- import list
         JType jType = jMethod.getReturnType();
@@ -299,6 +307,12 @@ public class JClass extends JStructure {
         for (int i = 0; i < exceptions.length; i++) {
             addImport(exceptions[i].getName());
         }
+        //-- ensure method and parameter annotations imported
+        addImport(jMethod.getAnnotations());
+        JParameter[] params = jMethod.getParameters();
+        for (int i = 0; i < params.length; i++) {
+        	addImport(params[i].getAnnotations());
+		}        	
     } //-- addMethod
 
     /**
@@ -562,6 +576,9 @@ public class JClass extends JStructure {
 
         buffer.setLength(0);
 
+		//-- print annotations
+		getAnnotatedElementHelper().printAnnotations(jsw);
+				
         JModifiers modifiers = getModifiers();
         if (modifiers.isPrivate()) {
             buffer.append("private ");
@@ -628,6 +645,9 @@ public class JClass extends JStructure {
             JDocComment comment = jField.getComment();
             if (comment != null) comment.print(jsw);
 
+			//-- print Annotations
+			jField.printAnnotations(jsw);
+			
             // -- print member
             jsw.write(jField.getModifiers().toString());
             jsw.write(' ');
