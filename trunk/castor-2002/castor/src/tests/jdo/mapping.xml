@@ -376,7 +376,7 @@
   </class>
 
 
-  <class name="jdo.TestDetail2" depends="jdo.TestDetail" access="shared" identity="id">
+  <class name="jdo.TestDetail2" depends="jdo.TestDetail" access="shared" identity="id" key-generator="MAX">
     <description>Test detail2 table</description>
     <map-to table="test_detail2" />
     <field name="id" type="integer">
