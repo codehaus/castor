@@ -1,6 +1,12 @@
 
 Version (CVS) 
 -------------
+JDO:   Fixed bug 1521 refactoring the performance cache code.
+	   This introduces a new interface (Cache.java) which all existing cache 
+	   implementations implement. This lays the foundation for many additions 
+	   as noted in the bug report. 
+       (Werner - 20040210)
+       
 JDO:   Fixed bug 1514 adding Eclipse related project files.
 	   Added new Ant target 'prepare-eclipse' to copy Eclipse-specific project files 
 	   to the base directory.
