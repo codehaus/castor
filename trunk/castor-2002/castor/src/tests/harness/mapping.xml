@@ -5,10 +5,10 @@
     <map-to xml="jdo"/>
     <description></description>
     <field name="databaseName" type="string">
-      <xml name="database-name"/>
+      <bind-xml name="database-name" node="attribute" />
     </field>
     <field name="configuration" type="string">
-      <xml name="configuration"/>
+      <bind-xml name="configuration" node="attribute" />
     </field>
   </class>
 </mapping>
