@@ -226,6 +226,15 @@ public class OqlTests extends CastorTestCase {
 		tryQuery(query, 0);
 
 
+		 // query using string constants containing a question mark in the WHERE clause, finding all records
+		query = _db.getOQLQuery("select x from jdo.TestObject x where \"abc123?הצü\" = \"abc123?הצü\"");
+		tryQuery(query, MAX_ID+1-MIN_ID);
+
+		 // query using string constants containing a question mark in the WHERE clause, finding no records
+		query = _db.getOQLQuery("select x from jdo.TestObject x where \"abc\" = \"?123\"");
+		tryQuery(query, 0);
+
+
 		 // query using "IN" operator
 		assertTrue("internal error: MIN_ID<=15 && MAX_ID>=18", MIN_ID<=15 && MAX_ID>=15);
 		assertTrue("internal error: MIN_ID>5", MIN_ID>5);
