@@ -125,11 +125,11 @@ public final class XMLInstance2SchemaHandler
         //-- find or declare namespace prefix
         else {
             _nsPrefix = null;
-            Hashtable namespaces = _schema.getNamespaces();
-            Enumeration enum = namespaces.keys();
+            Namespaces namespaces = _schema.getNamespaces();
+            Enumeration enum = namespaces.getLocalNamespacePrefixes();
             while (enum.hasMoreElements()) {
                 String key = (String) enum.nextElement();
-                if (namespaces.get(key).equals(Schema.DEFAULT_SCHEMA_NS)) {
+                if (namespaces.getNamespaceURI(key).equals(Schema.DEFAULT_SCHEMA_NS)) {
                     _nsPrefix = key;
                     break;
                 }
@@ -238,6 +238,7 @@ public final class XMLInstance2SchemaHandler
         }
         else {
             ComplexType cType = (ComplexType)sInfo.element.getType();
+            
             if (cType != null) {
                 //-- add attributes
                 try {

@@ -160,7 +160,7 @@ public class SchemaUnmarshaller extends ComponentReader {
         _schema = new Schema();
         //--initialize the schema to ensure that the default namespace
         //--is not set
-        _schema.getNamespaces().remove("");
+        _schema.getNamespaces().removeNamespace("");
         setResolver(resolver);
         if (uriResolver == null)
             uriResolver = new URIResolverImpl();
