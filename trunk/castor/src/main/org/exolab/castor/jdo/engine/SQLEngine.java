@@ -379,9 +379,11 @@ public final class SQLEngine implements Persistence {
         if ( accessMode == null )
             accessMode = _clsDesc.getAccessMode();
         sql = query.getStatement( accessMode == AccessMode.DbLocked);
-
-        _log.debug( Messages.format( "jdo.createSql", sql ) );
-
+        
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.createSql", sql ) );
+        }
+        
         return new SQLQuery( this, sql, types );
     }
 
@@ -396,8 +398,10 @@ public final class SQLEngine implements Persistence {
         int[] sqlTypes;
         int count;
 
-        _log.debug( Messages.format( "jdo.spCall", spCall ) );
-
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.spCall", spCall ) );
+        }
+        
         fields = _clsDesc.getFields();
         jdoFields0 = new String[ fields.length + 1 ];
         sqlTypes0 = new int[ fields.length + 1 ];
@@ -532,8 +536,10 @@ public final class SQLEngine implements Persistence {
                 stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
-                
-            _log.debug( Messages.format( "jdo.create", _sqlCreate ) );
+             
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.create", _sqlCreate ) );
+            }
             
             // Must remember that SQL column index is base one
             count = 1;
@@ -643,8 +649,10 @@ public final class SQLEngine implements Persistence {
 
                 stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
 
-                _log.debug( Messages.format( "jdo.duplicateKeyCheck", _pkLookup ) );
-
+                if(_log.isDebugEnabled()){
+                    _log.debug( Messages.format( "jdo.duplicateKeyCheck", _pkLookup ) );
+                }
+                
                 // bind the identity to the preparedStatement
                 count = 1;
                 if ( identity instanceof Complex ) {
@@ -763,8 +771,11 @@ public final class SQLEngine implements Persistence {
 
             storeStatement = getStoreStatement( original );
             stmt = ( (Connection) conn ).prepareStatement( storeStatement );
-            _log.debug( Messages.format( "jdo.storing", storeStatement ) );
-
+            
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.storing", storeStatement ) );
+            }
+            
             count = 1;
 
             // bind fields of the row to be stored into the preparedStatement
@@ -843,8 +854,11 @@ public final class SQLEngine implements Persistence {
                 stmt.close();
                 if ( original != null ) {
                     stmt = ( (Connection) conn ).prepareStatement( /*_pkLookup*/_sqlLoad );
-                    _log.debug( Messages.format( "jdo.storing", _sqlLoad ) );
-
+                    
+                    if(_log.isDebugEnabled()){
+                        _log.debug( Messages.format( "jdo.storing", _sqlLoad ) );
+                    }
+                    
                     // bind the identity to the prepareStatement
                     count = 1;
                     if ( identity instanceof Complex ) {
@@ -890,8 +904,10 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             
-            _log.debug( Messages.format( "jdo.removing", _sqlRemove ) );
-            
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.removing", _sqlRemove ) );
+            }
+
             int count = 1;
             // bind the identity of the preparedStatement
             if ( identity instanceof Complex ) {
@@ -940,8 +956,11 @@ public final class SQLEngine implements Persistence {
                 _extends.writeLock( conn, identity );
 
             stmt = ( (Connection) conn ).prepareStatement( _pkLookup );
-            _log.debug( Messages.format( "jdo.acquireWriteLock", _pkLookup ) );
-
+            
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.acquireWriteLock", _pkLookup ) );
+            }
+            
             int count = 1;
             // bind the identity of the preparedStatement
             if ( identity instanceof Complex ) {
@@ -986,7 +1005,9 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             
-            _log.debug( Messages.format( "jdo.loading", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.loading", ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) );
+            }
             
             int count = 1;
             // bind the identity of the preparedStatement
@@ -1183,13 +1204,18 @@ public final class SQLEngine implements Persistence {
                 _sqlCreate = "{call " + _sqlCreate + "}";
         }
 
-        _log.debug( Messages.format( "jdo.creating", _type, _sqlCreate ) );
-
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.creating", _type, _sqlCreate ) );
+        }
+        
         sql = new StringBuffer( "DELETE FROM " ).append( _factory.quoteName( tableName ) );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
-        _log.debug( Messages.format( "jdo.removing", _type, _sqlRemove ) );
-
+        
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.removing", _type, _sqlRemove ) );
+        }
+        
         sql = new StringBuffer( "UPDATE " );
         sql.append( _factory.quoteName( _mapTo ) );
         sql.append( " SET " );
@@ -1218,7 +1244,10 @@ public final class SQLEngine implements Persistence {
             }
         }
         _sqlStoreDirty = sql.toString();
-        _log.debug( Messages.format( "jdo.updating", _type, _sqlStoreDirty ) );
+        
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.updating", _type, _sqlStoreDirty ) );
+        }
     }
 
 
@@ -1290,8 +1319,10 @@ public final class SQLEngine implements Persistence {
 
         _sqlFinder = find;
 
-        _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
-
+        if(_log.isDebugEnabled()){
+            _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
+        }
+        
     }
 
 
@@ -1651,7 +1682,9 @@ public final class SQLEngine implements Persistence {
                     _stmt.setObject( i + 1, _values[ i ] );
                     _values[ i ] = null;
                 }
-                _log.debug( Messages.format( "jdo.executing", _sql ) );
+                if(_log.isDebugEnabled()){
+                    _log.debug( Messages.format( "jdo.executing", _sql ) );
+                }
                 _rs = _stmt.executeQuery();
                 _resultSetDone = false;
             } catch ( SQLException except ) {
