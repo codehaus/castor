@@ -25,6 +25,7 @@ package org.exolab.adaptx.xslt.util;
 import org.exolab.adaptx.net.URILocation;
 import org.exolab.adaptx.net.URIResolver;
 import org.exolab.adaptx.net.URIException;
+import org.exolab.adaptx.net.impl.URIUtils;
 
 import org.exolab.adaptx.util.ErrorObserverAdapter;
 import org.exolab.adaptx.util.ErrorObserver;
@@ -1062,8 +1063,14 @@ public class StylesheetHandler extends ErrorObserverAdapter
         catch (URIException exception) {
             throw new SAXException(exception);
         }
+        
+        if (location.getAbsoluteURI() != null)
+            href = location.getAbsoluteURI();
+        else {
+            href = URIUtils.resolveAsString(href, _stylesheet.getDocumentBase());
+        }
             
-        href = location.getAbsoluteURI();
+        
         
         // Make sure we aren't trying to import stylesheet already 
         // imported
@@ -1107,7 +1114,11 @@ public class StylesheetHandler extends ErrorObserverAdapter
             throw new SAXException(exception);
         }
             
-        href = location.getAbsoluteURI();
+        if (location.getAbsoluteURI() != null)
+            href = location.getAbsoluteURI();
+        else {
+            href = URIUtils.resolveAsString(href, _stylesheet.getDocumentBase());
+        }
         
         // Make sure we aren't trying to import stylesheet already 
         // imported
