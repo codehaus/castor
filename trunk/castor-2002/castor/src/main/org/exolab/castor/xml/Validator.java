@@ -159,9 +159,9 @@ public class Validator implements TypeValidator {
             
        FieldValidator validator = fieldDesc.getValidator();
         
-        if (validator != null) {
+        if (validator != null)
             validator.validate(parent, this);
-        }
+        /*
         //-- do default validation
         else {
             FieldHandler handler = fieldDesc.getHandler();
@@ -175,9 +175,11 @@ public class Validator implements TypeValidator {
                     }
                 }
                 //-- recursively handle validation
-                validate(value);
+                if ( value != null )
+                    validate(value);
             }
         }
+        */
         
     } //-- validate
     
