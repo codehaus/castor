@@ -62,6 +62,17 @@ import org.exolab.castor.mapping.FieldDescriptor;
 public interface XMLFieldDescriptor extends FieldDescriptor {
 
     /**
+     * The xml:space property
+     */
+    public static final String PROPERTY_XML_SPACE = "xml:space";
+    
+    /**
+     * The xml:lang property
+     */
+    public static final String PROPERTY_XML_LANG = "xml:lang";
+        
+    
+    /**
      * Returns the index within the constructor argument array where the 
      * value of this field should be. A value less than zero indicates
      * that the value of this field is set via a normal setter method
@@ -99,6 +110,20 @@ public interface XMLFieldDescriptor extends FieldDescriptor {
      * @return the NodeType of the Field being described.
      */
     public NodeType getNodeType();
+    
+    /**     
+     * Returns the value property with the given name or null
+     * if no such property exists. This method is useful for
+     * future evolutions of this interface as well as for
+     * user-defined extensions. See class declared properties
+     * for built-in properties.
+     *
+     * @param propertyName the name of the property whose value
+     * should be returned.
+     *
+     * @return the value of the property, or null.
+     */
+    public String getProperty(String propertyName);
 
     
     /**
