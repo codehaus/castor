@@ -60,5 +60,15 @@
   db.close();
        </pre></p>
 
+	<p>A {@link org.exolab.castor.jdo.CacheManager} instance can be optained by issueing the 
+	   following code:</p>
+	  
+Database db = jdo.getDatabase();
+CacheManager manager = ((DatabaseImpl) db.getCacheManager();
+	   </code>
+	
+	<p>This instance can subsequently be used to selectively clear the Castor performance 
+	   cache one of the {@link org.exolab.castor.jdo.CacheManager#clearCache()} methods.</p>
+	   
   </body> 
 </html>
