@@ -265,6 +265,19 @@ public interface QueryExpression
                               String rightTable, String rightColumn );
 
 
+    /**
+     * Add an outer join. May use an inner join if outer
+     * joins are not supported.
+     *
+     * @param leftTable The table name on the left side
+     * @param leftColumn The column name on the left side
+     * @param rightTable The table name on the right side
+     * @param rightColumn The column name on the right side
+     * @param rightTableAlias The alias name to use for the table on the right side
+     */
+    public void addOuterJoin( String leftTable, String leftColumn,
+                              String rightTable, String rightColumn, String rightTableAlias );
+
 
     public void addInnerJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn );
@@ -285,6 +298,9 @@ public interface QueryExpression
 
     public void addOuterJoin( String leftTable, String[] leftColumn,
                               String rightTable, String[] rightColumn );
+
+    public void addOuterJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn, String rightTableAlias );
 
     /**
      * Return the query expression as an SQL statement. The resulting

@@ -1258,6 +1258,7 @@ public final class SQLEngine implements Persistence {
         // join all the related/depended table
         Vector joinTables = new Vector();
         for ( int i=0; i<_fields.length; i++ ) {
+            String alias = _fields[i].tableName;
             if ( _fields[i].load ) {
                 if ( _fields[i].joined /*&& !joinTables.contains( _fields[i].tableName )*/ ) {
                     int offset = 0;
@@ -1266,15 +1267,23 @@ public final class SQLEngine implements Persistence {
                     for ( int j=0; j<leftCol.length; j++ ) {
                         leftCol[j] = _ids[j+offset].name;
                     }
-                    expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
-                    find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
-                    joinTables.add( _fields[i].tableName );
+                    if (joinTables.contains( _fields[i].tableName )) {
+                        alias = alias.replace('.', '_') + "_f" + i; // should not mix with aliases in ParseTreeWalker
+                        expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol, alias );
+                        find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol, alias );
+                    } else {
+                        expr.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
+                        find.addOuterJoin( _mapTo, leftCol, _fields[i].tableName, rightCol );
+                        joinTables.add( _fields[i].tableName );
+                    }
                 }
 
                 for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                    expr.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
-                    find.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
+                    expr.addColumn( alias, _fields[i].columns[j].name );
+                    find.addColumn( alias, _fields[i].columns[j].name );
                 }
+                expr.addTable(_fields[i].tableName, alias);
+                find.addTable(_fields[i].tableName, alias);
             }
         }
         _sqlLoad = expr.getStatement( false );
