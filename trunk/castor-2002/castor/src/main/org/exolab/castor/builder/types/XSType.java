@@ -195,6 +195,7 @@ public abstract class XSType {
     //-- this type should change to user-defined or
     //-- something like that
     public static final short CLASS              =  0;
+    
     //--
     public static final short BINARY             =  1;
     public static final short BOOLEAN            =  2;
@@ -333,10 +334,8 @@ public abstract class XSType {
             case LONG:
             case NEGATIVE_INTEGER:
             case POSITIVE_INTEGER:
-			case SHORT:
-			case INT:
-            case RECURRING_DURATION:
-            case TIME_DURATION:
+            case SHORT:
+            case INT:
                 return true;
             default:
                 return false;
