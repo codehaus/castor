@@ -461,6 +461,9 @@
     <field name="details2" type="jdo.TestDetailKeyGen2" collection="arraylist" required="false">
       <sql many-key="detail_id"/>
     </field>
+    <field name="detail3" type="jdo.TestDetailKeyGen3" required="false">
+      <sql many-key="detail_id"/>
+    </field>
   </class>
 
   <class name="jdo.TestDetailKeyGen2" depends="jdo.TestDetailKeyGen" access="shared" identity="id" key-generator="MAX">
@@ -468,6 +471,20 @@
     <map-to table="test_detail2" />
     <field name="id" type="integer">
       <sql name="detail2_id" type="numeric" />
+    </field>
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar" />
+    </field>
+    <field name="detail" type="jdo.TestDetailKeyGen" required="true">
+      <sql name="detail_id" />
+    </field>
+  </class>
+
+  <class name="jdo.TestDetailKeyGen3" depends="jdo.TestDetailKeyGen" access="shared" identity="id" key-generator="MAX">
+    <description>Test detail3 table</description>
+    <map-to table="test_detail3" />
+    <field name="id" type="integer">
+      <sql name="detail3_id" type="numeric" />
     </field>
     <field name="value1" type="string" required="true">
       <sql name="value1" type="varchar" />
