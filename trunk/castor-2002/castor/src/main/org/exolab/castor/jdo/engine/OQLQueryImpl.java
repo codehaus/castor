@@ -63,9 +63,10 @@ import org.odmg.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
-import org.exolab.castor.persist.TransactionContext.QueryResults;
 import org.exolab.castor.persist.TransactionContext.AccessMode;
+import org.exolab.castor.persist.QueryResults;
 import org.exolab.castor.persist.Query;
+import org.exolab.castor.persist.ObjectNotFoundException;
 import org.exolab.castor.persist.PersistenceException;
 
 
@@ -235,6 +236,7 @@ public class OQLQueryImpl
 	TransactionContext tx;
 	QueryResults       results;
 	Object             obj;
+	Object             identity;
 	Vector             set;
 
 	try {
@@ -244,18 +246,21 @@ public class OQLQueryImpl
 	    results = tx.query( _dbEngine, _query, AccessMode.ReadWrite );
 	    _fieldNum = 0;
 
-	    obj = results.nextResult();
-	    if ( obj == null )
-		return null;
 	    set = new Vector();
-	    set.addElement( obj );
-	    obj = results.nextResult();
-	    if ( obj == null )
-		return set.firstElement();
-	    while ( obj != null ) {
-		set.addElement( obj );
-		obj = results.nextResult();
+	    identity = results.nextIdentity();
+	    while ( identity != null ) {
+		try {
+		    obj = results.getObjectDesc().createNew();
+		    results.fetch( obj, identity );
+		    set.addElement( obj );
+		} catch ( ObjectNotFoundException except ) {
+		}
+		identity = results.nextIdentity();
 	    }
+	    if ( set.size() == 0 )
+		return null;
+	    if ( set.size() == 1 )
+		return set.elementAt( 0 );
 	    return set.elements();
 	} catch ( org.exolab.castor.persist.QueryException except ) {
 	    throw new QueryException( except.getMessage() );
