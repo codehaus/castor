@@ -98,9 +98,9 @@ public final class XSBoolean extends XSType {
         if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("java.lang.Boolean.valueOf(");
+            StringBuffer sb = new StringBuffer("(");
             sb.append(variableName);
-            sb.append(")");
+            sb.append(" ? java.lang.Boolean.TRUE : java.lang.Boolean.FALSE)");
             return sb.toString();
         }
     } //-- toJavaObject
