@@ -93,14 +93,12 @@ public class IncludeUnmarshaller extends ComponentReader
         if (uri != null)
             include = uri.toString();
 
-        //-- Has this schema location been processed?
-        if (state.processed(include)) {
+        //-- Has this schema location been included yet?
+        if (schema.includeProcessed(include)) {
             return;
         }
-		state.markAsProcessed(include, schema);
-
-
-        //just keep track of the schemaLocation
+        
+        //-- keep track of the schemaLocation
         schema.addInclude(include);
 
 		Parser parser = null;
