@@ -71,7 +71,7 @@ import org.exolab.castor.persist.ObjectNotFoundException;
  * <p>
  * Queries are either forward only or traversable, depending on the
  * underlying implementation. Traversable queries implement the {@link
- * #getIdentity(int)} and {@link #getLocation} methods.
+ * #getIdentity(int)} and {@link #getPosition} methods.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -166,14 +166,14 @@ public interface PersistenceQuery
 
 
     /**
-     * Returns the location of the last identity retrieved. The
+     * Returns the position of the last identity retrieved. The
      * index is one based.
      *
      * @return The index of the last identity retruned (one based) 
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public int getLocation()
+    public int getPosition()
 	throws PersistenceException;
 
 
