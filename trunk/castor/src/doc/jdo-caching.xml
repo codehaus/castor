@@ -10,6 +10,8 @@
     <section title="News">
        <p><b>Release 0.9.6</b>:<br/>
           <ul>
+             <li>Added information about inquiring whether objects are cached (or not) to the 
+                 <a href="#CacheManager---monitoring-and-clearing-caches">CacheManager</a> section.</li>
              <li>Added a section about (selectively) expiring caches, using the CacheManager interface.</li>
           </ul>
        </p>
@@ -157,10 +159,13 @@ org.exolab.castor.jdo.cacheFactories=\
 
    </section>
    
-   <section title="CacheManager and clearing caches">
+   <section title="CacheManager - monitoring and clearing caches">
    
-	  <p>Sometimes it is necessary to (selectively) clear a Castor performance cache of its content. 
-	     For this purpose a <api class="org.exolab.castor.jdo.CacheManager">CacheManager</api> can 
+	  <p>Sometimes it is necessary to interact with Castor's performance caches to e.g.  
+	     (selectively) clear a Castor performance cache of its content, or inquire about whether 
+	     a particular object instance (as identified by its identity) is cached already.</p>
+	     
+	  <p>For this purpose a <api class="org.exolab.castor.jdo.CacheManager">CacheManager</api> can 
 	     be obtained from a <api class="org.exolab.castor.jdo.Database">Database</api> instance by 
 	     issuing the following code:</p>
 	  
@@ -180,6 +185,12 @@ CacheManager manager = ((DatabaseImpl) db.getCacheManager();
 	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class,Object)</api></li>
 	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class,Object[])</api></li>
 	        <li><api class="org.exolab.castor.jdo.CacheManager">expireCache(Class[])</api></li>
+	     </ul></p>
+	     
+	  <p>To inquire whether an object has already been cached, please use the following method:</p>
+
+	  <p><ul>
+	        <li><api class="org.exolab.castor.jdo.CacheManager">isCached (Class, Object);</api></li>
 	     </ul></p>
 	     
 	  <p>Please note that once you have closed the Database instance from which you have obtained 
