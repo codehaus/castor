@@ -1,7 +1,11 @@
 
 Version (CVS)
 -------------
-XML:	Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and 
+
+XML:  Add an option in the Source Generator that allows to use wrapper objects instead of primitives
+      (Eg java.lang.Double instead of double) (Arnaud)
+
+XML:  Fix a bug when handling attibutes in the UnMarshallerHandler (bug reported and 
       patch submitted by Marcin Chalotowski <Marcin.Chalotowski@3dart.com>) (Arnaud)
 
 
