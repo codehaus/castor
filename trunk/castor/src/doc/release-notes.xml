@@ -6,19 +6,13 @@
 
 		<p>For all releases prior to 0.9.6, the release notes can be found <a href="changelog.html">here</a>.</p>
 
-	    <release version="0.9.6 RC3">
-    		<description>Bug fixes in Castor JDO.</description>
-    		<date>January 11, 2005</date>
-    		<managed-by>Werner Guttmann</managed-by>
-            <summary>
-				<p>Preparations for the final release have started. Since the second release candidate, 
-				   the following problem areas have been addressed.</p>
-            </summary>
-			<bugs>
 <!--
 				<bug id="">
 					<description></description>
-					<contributor></contributor>
+					<contributor>
+						<name></name>
+						<email></email>
+					</contributor>
 					<submitter>
 						<name></name>
 						<email></email>
@@ -29,6 +23,83 @@
 					<date></date>
 				</bug>
 -->
+
+	    <release version="0.9.6">
+    		<description>Bug fixes in Castor JDO.</description>
+    		<date>February 9, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<p>Final release. Since the third release candidate, the following problem areas 
+					have been addressed.</p>
+            </summary>
+			<bugs>
+				<bug id="1855">
+					<description>
+						Fixed problem with TransactionContext.getObjectEntry(Object) that was 
+						introduced as a result of adding support for lazy loading 1:1 relations.
+					</description>
+					<contributor>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>Jon Wilmoth</reporter>
+					<type>JDO</type>
+					<module>Core</module>
+					<date>20050208</date>
+				</bug>
+
+				<bug id="1849">
+					<description>
+						Added F.A.Q. entry describing compatibility problems between various releases of 
+						mySQL 4.1.x and its JDBC drivers.
+					</description>
+					<contributor>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>Stein M. Hugubakken</reporter>
+					<type>JDO</type>
+					<module>Docs</module>
+					<date>20050204</date>
+				</bug>
+
+				<bug id="1848">
+					<description>Reverted various DOCTYPE definitions in src/tests/jdo to use DTDs.</description>
+					<contributor>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>Bruce Snyder</reporter>
+					<type>JDO</type>
+					<module>Tests</module>
+					<date>20050204</date>
+				</bug>
+				
+			</bugs>
+			
+		</release>
+
+	    <release version="0.9.6 RC3">
+    		<description>Bug fixes in Castor JDO.</description>
+    		<date>January 11, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<p>Preparations for the final release have started. Since the second release candidate, 
+				   the following problem areas have been addressed.</p>
+            </summary>
+			<bugs>
 				<bug id="1839">
 					<description>Added getCacheManager() method in Database interface</description>
 					<contributor>

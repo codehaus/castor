@@ -2,6 +2,23 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1855 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed problem with TransactionContext.getObjectEntry(Object) that was introduced as a 
+       result of adding support for lazy loading 1:1 relations.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1855
+       (Werner - 20050208)
+
+JDO:   Fixed bug 1849 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added F.A.Q. entry describing compatibility problems between various releases of mySQL 4.1.x 
+       and its JDBC drivers.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1849
+       (Werner - 20050204)
+
+JDO:   Fixed bug 1848 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Reverted various DOCTYPE definitions in src/tests/jdo to use DTDs.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1848
+       (Werner - 20050204)
+       
 XML:   Fixed issue with GeneralizedFieldHandler not able to handle collections.
        Collections are now automatically iterated over during getValue() calls
        and each item in the collection is passed into the convertUponGet method.
