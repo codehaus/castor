@@ -248,15 +248,11 @@ public class FieldMolder {
     
     public void setValue( Object object, Object value ) {
         // If there is a convertor, apply conversion here.
-        //System.out.print("FieldMolder.setValue(");
-        //System.out.print((value!=null?value.getClass().toString():"null")+"/"+value
-        //        +") using ");
         try {
             //if ( _handler != null )
             //    _handler.setValue( object, value );
             //else 
             if ( _field != null ) {
-                //System.out.println("_field: "+_field+"/"+object);
                 _field.set( object, value == null ? _default : value );
             } else if ( _setMethod != null ) {
                 if ( _getSequence != null ) 
@@ -579,7 +575,6 @@ public class FieldMolder {
 
             ds.pairFieldClass( this, _fType );
         } catch ( NullPointerException e ) {
-            e.printStackTrace();
             throw new MappingException("Unexpected Null pointer!\n"+e);
         }
         // If the field is of a primitive type we use the default value
