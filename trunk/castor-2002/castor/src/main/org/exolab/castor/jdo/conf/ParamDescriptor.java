@@ -254,4 +254,12 @@ public class ParamDescriptor implements org.exolab.castor.xml.XMLClassDescriptor
         return xmlName;
     } //-- java.lang.String getXMLName()
 
+    /**
+     * false
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
+
+
 }

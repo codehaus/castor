@@ -264,7 +264,6 @@ public class CenturyDescriptor
         return null;
     } //-- getIdentity
 
-
     /**
      * Returns the access mode specified for this class.
      *
@@ -275,6 +274,22 @@ public class CenturyDescriptor
     } //-- getAccessMode
 
 
+    /**
+     * <p>Returns true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     * An XMLClassDescriptor can accept a field if it contains a descriptor that matches
+     * the given name and if the given object can hold this field (i.e a value is not already set for
+     * this field).
+     * <p>This is mainly used for container object (that can contains other object), in this particular case
+     * the implementation will return null.
+     * @param fieldName the name of the field to check
+     * @param object the object represented by this XMLCLassDescriptor
+     * @return true if the given object represented by this XMLClassDescriptor
+     * can accept a member whose name is given.
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
     /**
      * A specialized FieldHandler for the XML Schema
      * Century related types

@@ -316,4 +316,11 @@ public class DriverDescriptor implements org.exolab.castor.xml.XMLClassDescripto
         return xmlName;
     } //-- java.lang.String getXMLName()
 
+    /**
+     * false
+     */
+    public boolean canAccept(String fieldName, Object object) {
+         return false;
+    }
+
 }
