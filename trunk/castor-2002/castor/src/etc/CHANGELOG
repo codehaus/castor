@@ -1,8 +1,15 @@
-Version 0.8.9
+Version (CVS)
 -------------
 
 XML:    Fixed a bug in the unmarshalling of array of primitive type when using mapping.
         (Seb <gignoux@intalio.com>)
+
+XML:    Added feature to castorbuilder.properties to allow specifying a super
+        class of generated types (kvisco)
+
+Version 0.8.9
+-------------
+
 
 JDO:    SEQUENCE key generator for Interbase (contributed by Nic Wise <nicw@xerxes.co.nz>).
 
