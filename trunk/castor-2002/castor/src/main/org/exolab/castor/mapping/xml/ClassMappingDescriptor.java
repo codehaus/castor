@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8 (20000324)</a>,
+ * <a href="http://castor.exolab.org">Castor 0.8.3 (2000502)</a>,
  * using an XML Schema.
  * $Id
  */
@@ -15,6 +15,8 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.FieldValidator;
+import org.exolab.castor.xml.TypeValidator;
 import org.exolab.castor.xml.XMLFieldDescriptor;
 import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 
@@ -50,15 +52,16 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
 
     public ClassMappingDescriptor() {
         xmlName = "class";
-        XMLFieldDescriptorImpl desc = null;
-        XMLFieldHandler handler = null;
+        XMLFieldDescriptorImpl  desc           = null;
+        XMLFieldHandler         handler        = null;
+        FieldValidator          fieldValidator = null;
         //-- initialize attribute descriptors
         
         attributes = new XMLFieldDescriptorImpl[5];
         //-- _access
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_access", "access", NodeType.Attribute);
         desc.setImmutable(true);
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -80,12 +83,18 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return null;
             }
         } );
+        desc.setHandler(handler);
         attributes[0] = desc;
+        
+        //-- validation code for: _access
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
         
         //-- _identity
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_identity", "identity", NodeType.Attribute);
         desc.setImmutable(true);
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -107,12 +116,18 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return null;
             }
         } );
+        desc.setHandler(handler);
         attributes[1] = desc;
+        
+        //-- validation code for: _identity
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
         
         //-- _extends
         desc = new XMLFieldDescriptorImpl(java.lang.Object.class, "_extends", "extends", NodeType.Attribute);
         desc.setReference(true);
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -134,12 +149,17 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return new java.lang.Object();
             }
         } );
+        desc.setHandler(handler);
         attributes[2] = desc;
+        
+        //-- validation code for: _extends
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
         
         //-- _keyGenerator
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_keyGenerator", "key-generator", NodeType.Attribute);
         desc.setImmutable(true);
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -161,12 +181,18 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return null;
             }
         } );
+        desc.setHandler(handler);
         attributes[3] = desc;
+        
+        //-- validation code for: _keyGenerator
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
         
         //-- _name
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", NodeType.Attribute);
         this.identity = desc;
-        desc.setHandler( new XMLFieldHandler() {
+        handler = (new XMLFieldHandler() {
             public Object getValue( Object object ) 
                 throws IllegalStateException
             {
@@ -188,8 +214,14 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
                 return new java.lang.String();
             }
         } );
+        desc.setHandler(handler);
         desc.setRequired(true);
         attributes[4] = desc;
+        
+        //-- validation code for: _name
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(1);
+        desc.setValidator(fieldValidator);
         
         //-- initialize element descriptors
         
@@ -223,6 +255,11 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setMultivalued(false);
         elements[0] = desc;
         
+        //-- validation code for: _description
+        fieldValidator = new FieldValidator();
+        fieldValidator.setValidator(new StringValidator());
+        desc.setValidator(fieldValidator);
+        
         //-- _mapTo
         desc = new XMLFieldDescriptorImpl(MapTo.class, "_mapTo", "map-to", NodeType.Element);
         handler = (new XMLFieldHandler() {
@@ -251,6 +288,10 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         desc.setMultivalued(false);
         elements[1] = desc;
         
+        //-- validation code for: _mapTo
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
+        
         //-- _fieldMappingList
         desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMappingList", "field", NodeType.Element);
         handler = (new XMLFieldHandler() {
@@ -276,9 +317,13 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             }
         } );
         desc.setHandler(handler);
-        desc.setRequired(true);
         desc.setMultivalued(true);
         elements[2] = desc;
+        
+        //-- validation code for: _fieldMappingList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        desc.setValidator(fieldValidator);
         
         //-- _containerList
         desc = new XMLFieldDescriptorImpl(Container.class, "_containerList", "container", NodeType.Element);
@@ -305,9 +350,13 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
             }
         } );
         desc.setHandler(handler);
-        desc.setRequired(true);
         desc.setMultivalued(true);
         elements[3] = desc;
+        
+        //-- validation code for: _containerList
+        fieldValidator = new FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        desc.setValidator(fieldValidator);
         
     } //-- org.exolab.castor.mapping.xml.ClassMappingDescriptor()
 
@@ -391,15 +440,14 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
 
     /**
     **/
+    public org.exolab.castor.xml.TypeValidator getValidator() {
+        return null;
+    } //-- org.exolab.castor.xml.TypeValidator getValidator() 
+
+    /**
+    **/
     public java.lang.String getXMLName() {
         return xmlName;
     } //-- java.lang.String getXMLName() 
 
-    public TypeValidator getValidator()
-    {
-        return null;
-    }
-
 }
-
-
