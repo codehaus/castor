@@ -212,13 +212,11 @@ public final class SQLEngine
     }
 
 
-/*
-Will be adding this later.
 
     public QueryExpression getQueryExpression() {
         return _factory.getQueryExpression();
     }
-*/
+    
     public QueryExpression getFinder()
     {
         return (QueryExpression) _sqlFinder.clone();
