@@ -561,7 +561,7 @@ public class DatabaseImpl
                 throw new IllegalStateException( Messages.message( "jdo.txNotInProgress" ) );
             if ( _ctx.getStatus() == Status.STATUS_ROLLEDBACK )
                 return;
-            if ( _ctx.getStatus() != Status.STATUS_PREPARED )
+            if ( _ctx.getStatus() != Status.STATUS_PREPARED && status != Status.STATUS_ROLLEDBACK )
                 throw new IllegalStateException( "Unexpected state: afterCompletion called at status " + _ctx.getStatus() );
             switch ( status ) {
             case Status.STATUS_COMMITTED:
