@@ -283,8 +283,7 @@
 
         <p>The object's identity is an object that unique identifies the object within persistent
            storage. Typically this would be the primary key on a table, or an RDN for LDAP.
-           The identity object may be a simple type (e.g. integer, string) or a complex type.
-           For more information refer to the <a href="mapping.xml">mapping specification</a>.</p>
+           The identity object may be a simple type (e.g. integer, string) or a complex type.</p>
 
         <p>The service provider may support the stamp mechanism for efficiently tracking dirty
            objects. The stamp mechanism is a unique identifier of the persistent object
