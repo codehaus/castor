@@ -50,7 +50,6 @@ package org.exolab.castor.persist;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.StringTokenizer;
-import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.util.Messages;

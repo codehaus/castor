@@ -47,10 +47,8 @@
 package org.exolab.castor.persist;
 
 import org.exolab.castor.persist.spi.Complex;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.jdo.PersistenceException;
-import java.util.Vector;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

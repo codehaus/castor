@@ -56,7 +56,6 @@ import java.lang.reflect.Array;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 
 /**
  * RelationCollection implements {@link java.util.Collection}
