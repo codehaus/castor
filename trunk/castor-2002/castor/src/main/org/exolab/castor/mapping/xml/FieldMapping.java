@@ -45,6 +45,11 @@ public class FieldMapping implements java.io.Serializable {
     /**
      * 
     **/
+    private java.lang.String vCreateMethod;
+
+    /**
+     * 
+    **/
     private java.lang.String vType;
 
     /**
@@ -129,6 +134,19 @@ public class FieldMapping implements java.io.Serializable {
     public void setGetMethod(java.lang.String vGetMethod) {
         this.vGetMethod = vGetMethod;
     } //-- void setGetMethod(java.lang.String) 
+
+    /**
+    **/
+    public java.lang.String getCreateMethod() {
+        return this.vCreateMethod;
+    } //-- java.lang.String getCreateMethod() 
+
+    /**
+     * @param vCreateMethod
+    **/
+    public void setCreateMethod(java.lang.String vCreateMethod) {
+        this.vCreateMethod = vCreateMethod;
+    } //-- void setCreateMethod(java.lang.String) 
 
     /**
     **/
