@@ -97,6 +97,13 @@ public class ComplexType extends XMLType
 	private String block;
 
     /**
+     * A wildcard that represents an <anyAttribute> element if any.
+     * Only one <anyAttribute> can appear inside the global scope of
+     * a complexType
+     */
+     private Wildcard _anyAttribute;
+
+    /**
      * Creates a new Complextype, with no name
      * @param schema the owning Schema document
     **/
@@ -207,8 +214,9 @@ public class ComplexType extends XMLType
      * @return the parent type.
     **/
     public XMLType getBaseType() {
-        if ( (base != null) && (super.getBaseType() == null) )
+        if ( (base != null) && (super.getBaseType() == null) ) {
             setBaseType( getSchema().getType(base) );
+        }
         return super.getBaseType();
     } //-- getBaseType
 
@@ -364,12 +372,44 @@ public class ComplexType extends XMLType
 
 	/**
 	 * Returns the value of the 'block' attribute for this element
+     * @return the value of the 'block' attribute for this element
 	 */
 	public String getBlock()
 	{
 		return block;
 	}
 
+    /**
+     * Returns the wilcard used in this complexType (can be null)
+     * @return the wilcard used in this complexType (can be null)
+     */
+     public Wildcard getAnyAttribute() {
+         return _anyAttribute;
+     }
+    /**
+     * Sets the wildcard (anyAttribute) of the complexType
+     * @exception SchemaException thrown when a wildcard as already be set
+     * or when the wildCard is not an <anyAttribute>.
+     */
+     public void setAnyAttribute(Wildcard wildcard)
+            throws SchemaException
+     {
+        if (wildcard != null) {
+           if (_anyAttribute != null) {
+              String err = "<anyAttribute> already set in this complexType: "
+                           + this.getName();
+              throw new SchemaException(err);
+           }
+
+           if (!wildcard.isAttributeWildcard()){
+              String err = "In complexType, "+this.getName()
+                            +"the wildcard must be an <anyAttribute>";
+               throw new SchemaException(err);
+           }
+        }
+        _anyAttribute = wildcard;
+
+     }
 	/**
 	 * Sets the value of the 'block' attribute for this element
 	 */
