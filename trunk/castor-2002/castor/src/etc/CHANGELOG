@@ -1,6 +1,18 @@
 Version (CVS)
 -------------
 
+XML:   Added improved grouping support. Grouping support is not finished,
+       but is definately improved over Castor 0.8.11. 1st-level choice is
+       now supported. (kvisco)
+
+XML:   Added enumerate() method to generated enumeration types. (kvisco)
+
+XML:   Added support for specifying certain properties of the Introspector, such
+       as whether primitives should be treated as attributes or elements, and
+       default naming conventions. (kvisco)
+
+XML:   Updated mapping.xsd_sg to be compliant with latest XML Schema. (kvisco)
+
 XML:   Added support for DOM in Marshaller.java and Unmarshaller.java
           (Andrew Fawcett andrew.fawcett@coda.com)
 
@@ -12,22 +24,6 @@ XML:    Changed the default behavior of the Xerces Serializer to preserve space
         by default.
         (Sebastien Gignoux <gignoux@intalio.com>)
 
-JDO:    Bug fix when castor closed Connection during db.close() (before the end of
-        transaction) and the got new Connection during beforeCompletion(),
-        which remains open after the end of transaction.
-        (Solution submitted by Terry Child <tmchild@gmx.net>)
-
-JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
-        This is especially relevant when used in a BMP/CMP environment where the 
-        EJB container might assign a ClassLoader instance per set of Beans, or 
-        might attach a different classloader for each new transaction.
-        (Sebastien Sahuc <ssahuc@intalio.com>)
-
-XML & JDO:  
-        Check that an XML mapping file do not declare more identity attributes
-        for a given class than there are field elementsdefined for that
-        class.
-        (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)
 
 XML:	Added support for restriction in simpleContent and enhanced complexType support
 	(Arnaud <blandin@intalio.com>)	
@@ -62,6 +58,12 @@ XML:    Solved a performance bug for unmarshalling of primitive type. We don't
         the parser.
         (Sebastien Gignoux <gignoux@intalio.com>) 
 
+XML & JDO:  
+        Check that an XML mapping file do not declare more identity attributes
+        for a given class than there are field elementsdefined for that
+        class.
+        (Patch submitted by Gabriel Richard Pack <gpack@electroneconomy.com>)
+
 XML & JDO:
 	Regenerated data objects in the org.exolab.castor.mapping.xml package,
 	using an updated version of schema (Nov 2000).
@@ -71,6 +73,17 @@ XML & JDO:
 	the class declared in mapping.xml (was: sub-class).
 	Note, that now "arraylist" can be used as a value of "collection"
 	attribute in mapping.xml 
+
+JDO:    Bug fix when castor closed Connection during db.close() (before the end of
+        transaction) and the got new Connection during beforeCompletion(),
+        which remains open after the end of transaction.
+        (Solution submitted by Terry Child <tmchild@gmx.net>)
+
+JDO:    Castor JDO should now behave shamelessly in a multi classloader context.
+        This is especially relevant when used in a BMP/CMP environment where the 
+        EJB container might assign a ClassLoader instance per set of Beans, or 
+        might attach a different classloader for each new transaction.
+        (Sebastien Sahuc <ssahuc@intalio.com>)
 
 JDO:    Added an AutoStore option to JDO. Method of setAutoStore and isAutoStore
 	are added into the jdo.Database interface. If autoStore is set, Castor 
