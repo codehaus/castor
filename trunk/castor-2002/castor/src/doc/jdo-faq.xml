@@ -112,11 +112,11 @@
 	   you may use interface Persistent to code the desired behavior.</p>
 
 	<p><b>Is Castor JDO using any connection pooling mechanism to improve the overall performance ?</b></p>
-        
-        <p>No, Castor JDO doesn't have any built-in JDBC resource pooling. However the 
-        framework can transparently use any resource pooling facilities provided through 
+
+        <p>No, Castor JDO doesn't have any built-in JDBC resource pooling. However the
+        framework can transparently use any resource pooling facilities provided through
         DataSource implementation of -even better- through JDNI. In fact we even recommend
-        people to use some Connection and PreparedStatement pool with Castor as this can 
+        people to use some Connection and PreparedStatement pool with Castor as this can
         increase Castor's performance 3-5 fold.</p>
 
         <p>For example the following set of statements :
@@ -125,7 +125,7 @@
         db.execute(...)
         db.commit()
         </code>
-        will be executed in much less time with the resource pooling because it will avoid creating 
+        will be executed in much less time with the resource pooling because it will avoid creating
         a new physical JDBC connection at every execution.</p>
 
         <p>With Oracle, instead of specifying the usual JDBC driver you can use a
@@ -134,7 +134,7 @@
         <p>Thus if your jdo config file looks like :
         <code><![CDATA[
         <database name="..." engine="oracle" >
-            <driver class-name="oracle.jdbc.driver.OracleDriver" 
+            <driver class-name="oracle.jdbc.driver.OracleDriver"
                     url="jdbc:oracle:thin:@localhost:1521:TEST" >
                 <param name="user" value="SYSTEM"/>
                 <param name="password" value="manager"/>
@@ -145,16 +145,16 @@
         then it can be changed into (for example):
         <code><![CDATA[
         <database name="..." engine="oracle" >
-            <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl"> 
+            <data-source class-name="oracle.jdbc.pool.OracleConnectionCacheImpl">
                 <params URL="jdbc:oracle:thin:@localhost:1521:TEST" user="SYSTEM" password="manager"/>
-            </data-source> 
+            </data-source>
             ...
         </database>
         ]]></code>
         </p>
-        
-        <p>When Castor is used inside a Container such as an EJB container (within BMP 
-        or Session Bean), then the Container usually provides the JDBC Resource 
+
+        <p>When Castor is used inside a Container such as an EJB container (within BMP
+        or Session Bean), then the Container usually provides the JDBC Resource
         through the JNDI ENC, which implicitely includes pooling facilities.</p>
 
         <p><b>I am getting ClassNotFoundException for my JDO class, but it is in the class path. Why?</b></p>
@@ -176,6 +176,34 @@
     <p><b>I call db.remove() on the dependent object and commit, but this doesn't work...</b></p>
 
     <p>You should not add/remove dependent objects directly. In order to add/remove the dependent object you should just add/remove it from the collection in the master object and call db.commit()</p>
+
+    <p><b>How should I represent string/date/boolean literals in OQL query?</b></p>
+
+    <p>It is recommended to replace literals with parameters and to set them via OQLQuery.bind(), for example:</p>
+         <code>
+  OQLQuery query = db.getOQLQuery("SELECT p FROM Person p WHERE name LIKE $1 AND dob>$2 AND married=$3");
+  query.bind("John %");
+  query.bind((new SimpleDateFormat("yyyy-MM-dd")).parse("1960-01-01"));
+  query.bind(false);
+         </code>
+
+    <p><b>Sometimes long transaction fails: on update() it is thrown ObjectModifiedException. Why?</b></p>
+
+    <p>Most probably the object that is being updated has more than 100 related objects of one class
+    and the cache size for this class is not enough. You should either increase the size of the cache
+    or change the cache type to time-limited (the default cache type is size-limited, the default size is 100),
+    for example:
+        <code><![CDATA[
+  <class ...>
+    <cache-type type="size-limited" capacity="1000"/>
+    ...
+  </class>
+        ]]></code>
+    </p>
+
+    <p><b>I get "java.lang.AbstractMethodError: getBigDecimal" for numeric fields. Why?</b></p>
+
+    <p>Your JDBC driver is not JDBC 2.0 compliant, upgrade it or find another one.</p>
 
     </section>
 
