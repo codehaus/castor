@@ -2,6 +2,10 @@
 Version (CVS) 
 -------------
 
+ALL:   Fixed bug 1568 using contribution from jpinto@inescporto.pt [João Luis Pinto].
+       Streamlines Eclipse related project files.
+       (Werner - 20040319)
+
 JDO:   Added many enhancements to the tx mgr API including code improvements,
        jdo-conf.xsd changes, dynamic code generation using Castor XML as well
        as a refactored Ant build descriptor all from both myself and Werner. 
