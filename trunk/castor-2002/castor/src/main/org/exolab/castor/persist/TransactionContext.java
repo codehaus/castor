@@ -518,6 +518,7 @@ public abstract class TransactionContext
             entry.created = true;
             return oid;
         } catch ( Exception except ) {
+
             if ( handler.getCallback() != null )
                 handler.getCallback().releasing( object, false );
             removeObjectEntry( object );
