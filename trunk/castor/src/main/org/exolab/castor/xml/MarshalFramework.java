@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -59,9 +59,10 @@ import java.util.Vector;
 /**
  * A core class for common code shared throughout the
  * Marshalling Framework
+ * 
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 abstract class MarshalFramework {
 
     //--------------------------/
@@ -91,9 +92,25 @@ abstract class MarshalFramework {
     public static final String XML_LANG_ATTR = "xml:lang";
     
     /**
+     * The xml:lang attribute, without the "xml:" prefix.
+     */
+    public static final String LANG_ATTR = "lang";
+    
+    
+    /**
      * The xml:space attribute name
      */    
     public static final String XML_SPACE_ATTR = "xml:space";
+    
+    /**
+     * The xml:space attribute name, without the "xml:" prefix
+     */    
+    public static final String SPACE_ATTR = "space";
+    
+    /**
+     * The xsi:type attribute name, without the "xsi:" prefix
+     */    
+    public static final String TYPE_ATTR = "type";
     
     
 
