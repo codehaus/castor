@@ -162,7 +162,6 @@ public class ComplexContentUnmarshaller extends SaxUnmarshaller {
 
             ExtensionUnmarshaller extension =
                 new ExtensionUnmarshaller(_complexType, atts, getResolver());
-            extension.setAllowComplexContent(true);
             unmarshaller = extension;
         }
         //-- restriction
