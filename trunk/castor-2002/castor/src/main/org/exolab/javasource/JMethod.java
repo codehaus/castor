@@ -139,10 +139,12 @@ public class JMethod implements JMember {
         
         //-- be considerate and add the class name to the
         //-- each declaring class' list of imports
-        if (!parameter.getType().isPrimitive()) {
-            JClass type = (JClass)parameter.getType();
+        JType jType = parameter.getType();
+        while(jType.isArray()) jType = jType.getComponentType();
+        if (!jType.isPrimitive()) {
+            JClass jClass = (JClass)jType;
             for (int i = 0; i < _classes.size(); i++) {
-                ((JClass)_classes.elementAt(i)).addImport(type.getName());
+                ((JClass)_classes.elementAt(i)).addImport(jClass.getName());
             }
         }
     } //-- addParameter
