@@ -4,10 +4,10 @@
 
 
 <project name="Castor" default="main" basedir="..">
- 
+
   		<!-- ================================================================== -->
  		<!--                            Properties                              -->
-  		<!-- ================================================================== -->   
+  		<!-- ================================================================== -->
         <property name="name" value="Castor"/>
         <property name="source" value="src"/>
         <property name="main" value="${source}/main"/>
@@ -33,7 +33,7 @@
         />
         <!--    org.exolab.castor.dax, -->
         <property name="allpackagenames" value="org.*"/>
-  
+
     <!-- ================================================================== -->
     <!--            The pattern for the support files that need             -->
     <!--                to be copied when compiling classes                 -->
@@ -45,8 +45,8 @@
         <include name="**/*.properties" />
         <include name="**/*.dtd" />
         <exclude name="**/MasterTestSuite/**" />
-    </patternset>  
-    
+    </patternset>
+
     <!-- Display all the targets -->
     <target name="targets">
         <echo message=""/>
@@ -130,15 +130,15 @@
         <mkdir dir="${build}/examples"/>
         <javac srcdir="${source}/examples" destdir="${build}/examples" classpath="${classpath}" debug="on" deprecation="${deprecation}"
                excludes="SourceGenerator/*,dax/*"/>
- 		
+
  		<copy todir="${build}/examples">
             <fileset dir="${source}/examples">
                 <patternset refid="support.files" />
             </fileset>
-        </copy>   
+        </copy>
 
         <!-- Make a webapps out of the servlet example -->
-        <available property="project_jar.present" file="${dist}/${archive}.jar" /> 
+        <available property="project_jar.present" file="${dist}/${archive}.jar" />
         <mkdir dir="${build}/examples/webapp"/>
         <copy toDir="${build}/examples/webapp/WEB-INF/classes">
             <fileset dir="${build}/examples">
@@ -157,7 +157,7 @@
                 <exclude name="optional*.jar"/>
                 <exclude name="junit*.jar"/>
                 <exclude name="servlet*.jar"/>
-                    
+
             </fileset>
             <fileset dir="${dist}">
                 <include name="${archive}.jar" if="project_jar.present"/>
@@ -165,13 +165,13 @@
         </copy>
 
         <jar jarfile="${build}/examples/webapp-example-${project}.war" basedir="${build}/examples/webapp" includes="**"/>
-       
+
     </target>
     <!-- Build the test packages -->
     <target name="tests" depends="prepare">
         <mkdir dir="${build}/tests"/>
         <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
-        
+
         <copy todir="${build}/tests">
             <fileset dir="${source}/tests">
                 <patternset refid="support.files" />
@@ -179,85 +179,85 @@
         </copy>
 
     </target>
-    
+
     <target name="runtests" depends="prepare, main">
         <!--Test for include of include-->
         <!--to be removed when integrated-->
         <!--to the Castor Testing Framework-->
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/includeA.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/includeA.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
         	<!-- <arg value="-i testtype1.xsd -f -dest ../../../../build -package xml.xml2java" /> do not work because ant add " -->
-        	<arg value="-i${source}/tests/xml/xml2java/testtype1.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/testtype1.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/timeInstantTestxsd.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/timeInstantTestxsd.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs2.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/maxOccurs2.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minmaxOccurs.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/minmaxOccurs.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/minOccurs.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs2.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/minOccurs2.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <java classname="org.exolab.castor.builder.SourceGenerator">
-        	<arg value="-i${source}/tests/xml/xml2java/minOccurs3.xsd" /> 
+        	<arg value="-i${source}/tests/xml/xml2java/minOccurs3.xsd" />
         	<arg value="-f" />
         	<arg value="-dest${build}/tests" />
-        	<arg value="-packagexml.xml2java" /> 
+        	<arg value="-packagexml.xml2java" />
         </java>
-        
+
         <javac srcdir="${build}/tests" destdir="${build}/tests" classpath="${classpath}" debug="on" deprecation="${deprecation}" />
-        
+
         <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" classpath="${classpath}" debug="on" deprecation="${deprecation}"/>
-        
+
         <copy todir="${build}/tests">
             <fileset dir="${source}/tests">
                 <patternset refid="support.files" />
             </fileset>
         </copy>
-        
+
         <junit printsummary="yes" fork="no" haltonfailure="no">
     		<formatter type="plain" />
     		<!-- <classpath  refid="project.class.path" /> -->
@@ -272,17 +272,17 @@
     			</fileset>
     		</batchtest>
     	</junit>
-        
-        
+
+
     </target>
-    
-    
-    
+
+
+
     <!-- Build the JAR file using main-opt -->
     <target name="jar" depends="main-opt">
         <delete file="${dist}/${archive}.jar"/>
         <delete file="${classes}/MANIFEST.MF"/>
-        
+
         <copy todir="${classes}">
         	<fileset dir="${source}/etc" includes="MANIFEST.MF" />
        	</copy>
@@ -290,10 +290,10 @@
         <copy todir="${classes}">
             <fileset dir="${source}/etc" includes="LICENSE,README" />
         </copy>
-        
+
         <jar jarfile="${dist}/${archive}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,org/**"/>
         <jar jarfile="${dist}/${archive}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF" includes="LICENSE,README,
-              org/exolab/castor/builder/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,org/exolab/castor/types/**,org/exolab/castor/xml/**,
+              org/exolab/castor/builder/**,org/exolab/javasource/**,org/exolab/castor/mapping/**,org/exolab/castor/util/**,org/exolab/castor/types/**,org/exolab/castor/xml/**,
               org/exolab/castor/*"/>
         <!--
     <delete   file="${classes}/MANIFEST.MF" />
@@ -323,18 +323,18 @@
         <copy todir="${build}/doc">
 			<fileset dir="${schema}" includes="*.dtd,*.xsd"/>
 		</copy>
-        
-        
-        
+
+
+
         <replace file="${build}/doc/index.html" token="$$VERSION$$" value="${version}"/>
         <replace file="${build}/doc/index.html" token="$$RELEASE_DATE$$" value="${release_date}"/>
         <replace file="${build}/doc/download.html" token="$$VERSION$$" value="${version}"/>
         <mkdir dir="${build}/doc/ora-mar-2k"/>
-        
+
         <copy todir="${build}/doc/ora-mar-2k">
 			<fileset dir="${doc}/ora-mar-2k" />
 		</copy>
-       
+
     </target>
     <!-- Build the full JavaDocs -->
     <target name="javadoc" depends="prepare">
@@ -367,15 +367,15 @@
 			<fileset dir="${source}" />
 		</copy>
         <mkdir dir="${build}/${archive}/lib"/>
-        
+
         <copy todir="${build}/${archive}/lib">
 			<fileset dir="${lib}" excludes="jconn2.jar"/>
 		</copy>
-        
+
         <copy todir="${build}/${archive}">
 			<fileset dir="." includes="*.sh,*.bat"/>
 		</copy>
-        
+
         <tar includes="${archive}/**" basedir="${build}" tarfile="${dist}/${archive}-src.tar"/>
         <gzip src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
         <delete file="${dist}/${archive}-src.tar"/>
@@ -404,8 +404,8 @@
         <copy todir="${build}/${archive}/doc">
 			<fileset dir="${build}/doc" />
 		</copy>
-        
-         
+
+
         <delete dir="${build}/${archive}/doc/javadoc"/>
         <tar tarfile="${build}/${archive}/examples.tar" basedir="${source}" includes="examples/**" defaultexcludes="true"/>
         <gzip src="${build}/${archive}/examples.tar" zipfile="${build}/${archive}/examples.tgz"/>
