@@ -106,7 +106,12 @@ public class SourceGenerator {
     private JComment header = null;
 
     private boolean warnOnOverwrite = true;
-
+    
+    /**
+     * Determines whether or not to print extra messages
+    **/
+    private boolean verbose         = false;
+    
     private String  destDir = null;
 
     /**
@@ -161,6 +166,7 @@ public class SourceGenerator {
 			sInfo.packageName=SourceGeneratorConfiguration.getJavaPackage(schema.getTargetNamespace());
 
         sInfo.setPromptForOverwrite(warnOnOverwrite);
+        sInfo.setVerbose(verbose);
 
         createClasses(schema, sInfo);
     } //-- generateSource
@@ -248,7 +254,17 @@ public class SourceGenerator {
     public void setSuppressNonFatalWarnings(boolean suppress) {
         warnOnOverwrite = (!suppress);
     } //-- setSuppressNonFatalWarnings
-
+    
+    /**
+     * Sets whether or not the source code generator prints
+     * additional messages during generating source code
+     * @param verbose a boolean, when true indicates to
+     * print additional messages
+    **/
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    } //-- setVerbose
+    
     /**
      * main class used for command line invocation
      * @param args the String[] consisting of the command line arguments
@@ -273,13 +289,17 @@ public class SourceGenerator {
         allOptions.addFlag("line-separator", "( unix | mac | win)", desc, true);
 
         //-- Force flag
-        desc = "Suppress non fatal warnings, such as overwriting files.";
+        desc = "Suppresses non fatal warnings, such as overwriting files.";
         allOptions.addFlag("f", "", desc, true);
 
         //-- Help flag
         desc = "Displays this help screen.";
         allOptions.addFlag("h", "", desc, true);
 
+        //-- verbose flag
+        desc = "Prints out additional messages when creaing source";
+        allOptions.addFlag("verbose", "", desc, true);
+        
         //-- source generator types name flag
         desc = "Sets the source generator types name (SGTypeFactory)";
         allOptions.addFlag("types", "types", desc, true);
@@ -298,11 +318,12 @@ public class SourceGenerator {
             return;
         }
 
-        String  schemaFilename = options.getProperty("i");
-        String  packageName    = options.getProperty("package");
-        String  lineSepStyle   = options.getProperty("line-separator");
-        boolean force         = (options.getProperty("f") != null);
-        String  typeFactory    = options.getProperty("types");
+        String  schemaFilename  = options.getProperty("i");
+        String  packageName     = options.getProperty("package");
+        String  lineSepStyle    = options.getProperty("line-separator");
+        boolean force           = (options.getProperty("f") != null);
+        String  typeFactory     = options.getProperty("types");
+        boolean verbose         = (options.getProperty("verbose") != null);
 
         // -- XXX maintained temporarily
         if (typeFactory == null)
@@ -350,6 +371,7 @@ public class SourceGenerator {
         sgen.setDestDir(options.getProperty("dest"));
         sgen.setLineSeparator(lineSep);
         sgen.setSuppressNonFatalWarnings(force);
+        sgen.setVerbose(verbose);
         if (force) System.out.println("-- Suppressing non fatal warnings.");
 
         if (schemaFilename == null) {
@@ -417,7 +439,7 @@ public class SourceGenerator {
     } //-- createClasses
 
     private void createClasses(ElementDecl elementDecl, SGStateInfo sInfo) {
-
+        
 		//-- when mapping schema types, only interested in producing classes
 		//-- for elements with anonymous complex types
 		if (SourceGeneratorConfiguration.mappingSchemaType2Java())
@@ -426,6 +448,10 @@ public class SourceGenerator {
 				 elementDecl.getType().getName()!=null))
 				return;
 		
+		if (sInfo.verbose()) {
+		    System.out.print("Creating classes for element: ");
+		    System.out.println(elementDecl.getName());
+		}
         //-- create classes for sub-elements if necessary
         XMLType xmlType = elementDecl.getType();
 		

@@ -64,11 +64,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
     **/
     protected String  packageName = null;
         
-    private Hashtable classTypes  = null;
+    private Hashtable _classTypes  = null;
     
-    private Vector    processed   = null;
+    private Vector    _processed   = null;
     
-    private boolean   promptForOverwrite = true;
+    private boolean   _promptForOverwrite = true;
+    
+    private boolean   _verbose     = false;
     
     
     /**
@@ -76,9 +78,9 @@ class SGStateInfo extends ClassInfoResolverImpl {
     **/
     protected SGStateInfo() {        
         super();
-        classTypes    = new Hashtable();
         packageName   = "";
-        processed     = new Vector();
+        _classTypes    = new Hashtable();
+        _processed     = new Vector();
     } //-- SGStateInfo
     
     
@@ -88,8 +90,8 @@ class SGStateInfo extends ClassInfoResolverImpl {
     **/
     void markAsProcessed(JClass jClass) {
         String className = jClass.getName();
-        if (!processed.contains(className))
-            processed.addElement(className);
+        if (!_processed.contains(className))
+            _processed.addElement(className);
     } //-- markAsProcessed
         
     /**
@@ -97,16 +99,36 @@ class SGStateInfo extends ClassInfoResolverImpl {
      * @param jClass the JClass to check for being marked as processed
     **/
     boolean processed(JClass jClass) {
-        return processed.contains(jClass.getName());
+        return _processed.contains(jClass.getName());
     } //-- processed
     
     boolean promptForOverwrite() {
-        return promptForOverwrite;
+        return _promptForOverwrite;
     } //-- promptForOverwrite
 
     void setPromptForOverwrite(boolean promptForOverwrite) {
-        this.promptForOverwrite = promptForOverwrite;
+        this._promptForOverwrite = promptForOverwrite;
     } //-- setPromptForOverwrite
+    
+    /**
+     * Sets whether or not the source code generator prints
+     * additional messages during generating source code
+     * @param verbose a boolean, when true indicates to
+     * print additional messages
+    **/
+    public void setVerbose(boolean verbose) {
+        this._verbose = verbose;
+    } //-- setVerbose
+    
+    /**
+     * Returns the value of the verbose flag. A true value
+     * indicates that additional messages may be printed
+     * during processing
+     * @return the value of the verbose flag.
+    **/
+    public boolean verbose() {
+        return this._verbose;
+    } //-- verbose
     
     /*
     protected JClass getJClass(String name) {
