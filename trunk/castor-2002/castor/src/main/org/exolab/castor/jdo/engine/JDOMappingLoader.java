@@ -128,7 +128,7 @@ public class JDOMappingLoader
         ClassDescriptor   clsDesc;
         String            keyGenName;
         KeyGeneratorDescriptor keyGenDesc;
-        
+
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
         if ( clsMap.getMapTo() == null || clsMap.getMapTo().getTable() == null )
@@ -153,8 +153,9 @@ public class JDOMappingLoader
             throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
 
         // create a key generator descriptor
-        if ( clsMap.getKeyGenerator() != null )
-            keyGenName = ((KeyGeneratorDef)clsMap.getKeyGenerator()).getName();
+
+         if ( clsMap.getKeyGenerator() != null )
+            keyGenName = clsMap.getKeyGenerator();
         else
             keyGenName = null;
 
@@ -188,11 +189,11 @@ public class JDOMappingLoader
 
         JDOClassDescriptor jd;
         CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
-        if ( cacheMapping != null ) 
-            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+        if ( cacheMapping != null )
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
                     keyGenDesc, cacheMapping.getType().toString(), cacheMapping.getCapacity() );
-        else 
-            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), 
+        else
+            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
                     keyGenDesc, null, 0 );
 
         jd.setMapping( clsMap );
@@ -211,7 +212,8 @@ public class JDOMappingLoader
 
         fieldType = Types.typeFromPrimitive( fieldType );
         if ( fieldMap.getSql() != null && fieldMap.getSql().getType() != null ) {
-            typeName = fieldMap.getSql().getType();
+            //--TO Check
+            typeName = fieldMap.getSql().getType()[0];
             sqlType = SQLTypes.typeFromName( typeName );
         } else {
             sqlType = fieldType;
@@ -237,15 +239,15 @@ public class JDOMappingLoader
         FieldDescriptor fieldDesc;
         String          sqlName;
         Class           sqlType;
-        
+
         // If not an SQL field, return a stock field descriptor.
         if ( fieldMap.getSql() == null )
             return super.createFieldDesc( javaClass, fieldMap );
-        
+
         // Create a JDO field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
-
-        sqlName = fieldMap.getSql().getName();
+        // TO Check
+        sqlName = fieldMap.getSql().getName()[0];
         /*
         if ( fieldMap.getSql().getName() == null )
             sqlName = SQLTypes.javaToSqlName( fieldDesc.getFieldName() );
@@ -257,8 +259,9 @@ public class JDOMappingLoader
             sqlType = fieldDesc.getFieldType();
         else
             sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() ); */
+        //TO Check
         if ( fieldMap.getSql().getType() != null  ) {
-            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType() );
+            sqlType = SQLTypes.typeFromName( fieldMap.getSql().getType()[0] );
         } else {
             try {
                 sqlType = Types.typeFromName( this.getClass().getClassLoader(), fieldMap.getType() );
@@ -269,9 +272,10 @@ public class JDOMappingLoader
         if ( _factory != null ) {
             sqlType = _factory.adjustSqlType( sqlType );
         }
+        //To Check
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, SQLTypes.getSQLType(sqlType),
             ! IgnoreDirty.equals( fieldMap.getSql().getDirty() ),
-            fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey() );
+            fieldMap.getSql().getManyTable(), fieldMap.getSql().getManyKey()[0] );
     }
 
     public void loadMapping( MappingRoot mapping, Object param )
