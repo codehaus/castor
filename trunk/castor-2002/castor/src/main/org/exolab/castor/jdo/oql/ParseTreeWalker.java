@@ -88,6 +88,8 @@ public class ParseTreeWalker implements TokenTypes
   private Hashtable _fieldInfo;
   private Hashtable _pathInfo;
 
+  private Hashtable _allPaths;
+
   private SQLEngine _engine;
   private JDOClassDescriptor _clsDesc;
 
@@ -119,6 +121,8 @@ public class ParseTreeWalker implements TokenTypes
     _paramInfo = new Hashtable();
     _fieldInfo = new Hashtable();
     _pathInfo = new Hashtable();
+
+    _allPaths = new Hashtable();
 
     if ( ! _parseTree.isRoot() )
       throw (new QueryException( "ParseTreeWalker must be created with the root node of the parse tree."));
@@ -827,20 +831,32 @@ public class ParseTreeWalker implements TokenTypes
    */
   public String buildTableAlias( String tableName, Vector path )
   {
-      // FIXME This will cause problems if a (different) table with
-      // the same name as our alias already exists (or will be added at a later time)
-      // in the query. Catching this might become a bit tricky ...
-      StringBuffer tableAlias = new StringBuffer( tableName );
-      // We don't just alias all tables here, but only those where some attribute is queried (not those
-      // where we query a whole object). The reasons for this are impossible for me to explain right now,
-      // as I am rather tired; I'll write some better explanation later - I promise! :-)
+      /* FIXME This aliasing will cause problems if a (different) table
+      with the same name as our alias already exists (or will be added
+      at a later time) in the query. Catching this might become a bit
+      tricky ... */
+
+      String tableAlias = tableName;
+      int index;
+      Integer i;
+
+      /* We don't just alias all tables here, but only those where some
+       attribute is queried (not those where we query a whole object).
+       The reasons for this are impossible for me to explain right now,
+       as I am rather tired; I'll write some better explanation later -
+       I promise! :-) */
       if( path != null && path.size() > 2 ) {
-          tableAlias.append( "_for_" );
-          for ( int i = 1; i < path.size(); i++ ) {
-              tableAlias.append( (String) path.elementAt(i) + "_" ); }
-          tableAlias.deleteCharAt( tableAlias.length() - 1 );
+          i = (Integer) _allPaths.get( path );
+          if ( i == null ) {
+              index = _allPaths.size();
+              _allPaths.put( path, new Integer( index ) );
+          } else {
+              index = i.intValue();
+          }
+          tableAlias = tableAlias + "_" + index;
       }
-      return tableAlias.toString();
+      //System.out.println( "TableAlias: " + tableAlias );
+      return tableAlias;
   }
 
   /**
