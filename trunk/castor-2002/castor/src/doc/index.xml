@@ -8,7 +8,7 @@
          directories. It provides Java to XML binding, Java to SQL/LDAP persistence, and then
          some more.</p>
 
-      <p><b>July 20, 2000</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.</p>
+      <p><b>October 30, 2000</b> Version $VERSION$ is now <a href="download.xml">available for download</a>.</p>
 
       <p><a href="ora-mar-2k/castor.htm">The presentation we did at the Java O'Reilly Conference
          is now available online</a>. For those who could not attend we promise to make another
@@ -26,7 +26,10 @@
 
       <p>Short feature list (we haven't got all day):
         <ul>
-          <li>Castor XML: Java object to XML document</li>
+          <li>
+             Castor XML: Java object model to and from XML
+             <br/>&#160;&#160; - Generate source code from an XML Schema
+          </li>
           <li>Castor JDO: Java object persistence to RDBMS</li>
           <li>Castor DAX: Java object persistence to LDAP</li>
           <li>Castor DSML: LDAP directory exchange through XML</li>
@@ -46,7 +49,7 @@
 
       <p>The Castor project has been developed out of need: the need to get stuff done
          and the need to write useful code. It has been designed and coded over many cups
-         of Latte and tall Americano, as proof that coffe beans do come in handy.</p>
+         of Latte and tall Americano, as proof that coffee beans do come in handy.</p>
 
       <p>For <a href="contributors.xml">a full list of contributors</a>.</p>
 
