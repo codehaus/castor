@@ -1,6 +1,8 @@
 Version 0.8.9
 -------------
 
+JDO:    InstantDB driver (contributed by I. Burak Ozyurt <bozyurt@san.rr.com>).
+
 JDO:    Replacing of extended object in the cache on load of extending object
         implemented. jdoLoad signature changed. Now in jdoLoad you can request
         reloading the object instance as an instance of an extending class.
