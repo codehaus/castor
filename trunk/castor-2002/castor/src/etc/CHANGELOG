@@ -1,5 +1,14 @@
+
 Version (CVS)
 -------------
+
+XML:    Added fix for enumerated simpleTypes. When a simpleType restricted another
+        simpleType, if both types defined an enumertion facet with the same value
+        Castor wouldn't handle this properly. Bug reported by Stephan Goetter.
+        (kvisco)
+
+XML:    Added fix for generating source code using the element-method. Classes
+        were no longer extending their abstract type definitions. (kvisco)
 
 XML: 	Add a command line property for the Source Generator to use the generated files in
         the Castor Testing Framework(Arnaud)
@@ -7,6 +16,7 @@ XML: 	Add a command line property for the Source Generator to use the generated 
 XML: 	Add a property in castorbuilder.properties to generate a clean 'equals' method (Arnaud)
 
 XML:	Fix a bug concerning the handling of 'Enumeration' in inner elements (Arnaud)
+
 	
 Version 0.9 February, 15 2001
 -----------------------------
