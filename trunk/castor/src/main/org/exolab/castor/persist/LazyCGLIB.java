@@ -63,6 +63,22 @@ import java.io.Serializable;
  */
 public interface LazyCGLIB extends Serializable {
 	
+	/** 
+	 * Implementation of writeReplace specific to lazy loading.
+	 * @return The real object.
+	 * @throws ObjectStreamException If the replace activity failed.
+	 */
 	Object writeReplace () throws ObjectStreamException; 
-
+	
+	/**
+	 * Returns the Class instance for the class to be intercepted.
+	 * @return Class instance for the intercepted class.
+	 */
+	Class interceptedClass();
+	
+	/**
+	 * Returns the identity of the object (class) intercepted.
+	 * @return identity of the object (class) intercepted.
+	 */
+	Object interceptedIdentity();
 }
