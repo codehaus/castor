@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1751 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added Castor JDO test TC20b to mySQL and sapdb categoeries (incl. additions to the
+       SQL DDL).
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1751
+       (Werner - 20040928)
+
 JDO:   Fixed bug 1733 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added support for RDBMS-specific meta data in general. This is currently used
        within OracleQueryExpression to support the LIMIT clause implementation for
