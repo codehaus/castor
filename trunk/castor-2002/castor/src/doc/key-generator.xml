@@ -26,7 +26,7 @@
            <tr><td>MAX</td><td>"MAX( pk ) + 1" generic algorithm</td></tr>
            <tr><td>HIGH/LOW</td><td>HIGH/LOW generic algorithm</td></tr>
            <tr><td>IDENTITY</td><td>Supports autoincrement identity fields in
-                                  Sybase ASE/ASA and Microsoft SQL Server</td></tr>
+                                  Sybase ASE/ASA, MS SQL Server and Hypersonic SQL</td></tr>
            <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle and PostgreSQL</td></tr>
          </table></p>
 
@@ -142,10 +142,14 @@
 
     <section title="IDENTITY key generator">
       <p>IDENTITY key generator can be used only with autoincrement primary 
-         key columns (identities) with Sybase ASE/ASA and MS SQL Server.
+         key columns (identities) with Sybase ASE/ASA, MS SQL Server and
+         Hypersonic SQL.
          After the insert the key generator selects system variable 
          <tt>@@identity</tt> which contains the last identity value for 
-         the current database connection.</p>
+         the current database connection.
+         In the case of Hypersonic SQL the system function <tt>IDENTITY()</tt>
+         is called.
+         </p>
       <p>This algorithm has no parameters.</p>
     </section>
 
