@@ -614,6 +614,11 @@ public class Unmarshaller {
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
      * of the Class to be properly unmarshalled.
+     *
+     * <p><b>Note:</b>This is a *static* method, any mapping files set
+     * on a particular Unmarshaller instance, and any changes made
+     * via setters will be unavailable to this method.</p>
+     *
      * @param c the Class to create a new instance of
      * @param reader the Reader to read the XML from
      * @exception MarshalException when there is an error during
@@ -637,12 +642,17 @@ public class Unmarshaller {
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
      * of the Class to be properly unmarshalled.
+     *
+     * <p><b>Note:</b>This is a *static* method, any mapping files set
+     * on a particular Unmarshaller instance, and any changes made
+     * via setters will be unavailable to this method.</p>
+     *
      * @param c the Class to create a new instance of
      * @param source the InputSource to read the XML from
      * @exception MarshalException when there is an error during
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
-    **/
+     */
     public static Object unmarshal(Class c, InputSource source)
         throws MarshalException, ValidationException
     {
@@ -659,12 +669,17 @@ public class Unmarshaller {
      * Unmarshals Objects of the given Class type. The Class must specify
      * the proper access methods (setters/getters) in order for instances
      * of the Class to be properly unmarshalled.
+     *
+     * <p><b>Note:</b>This is a *static* method, any mapping files set
+     * on a particular Unmarshaller instance, and any changes made
+     * via setters will be unavailable to this method.</p>
+     *
      * @param c the Class to create a new instance of
      * @param source the DOM Node to read the XML from
      * @exception MarshalException when there is an error during
      * the unmarshalling process
      * @exception ValidationException when there is a validation error
-    **/
+     */
     public static Object unmarshal(Class c, Node node)
         throws MarshalException, ValidationException
     {
