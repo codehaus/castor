@@ -11,7 +11,7 @@
       <sql-info name="id" />
     </field>
     <field name="name">
-      <sql-info name="name" />
+      <sql-info name="name" dirty="check" />
     </field>
   </class>
 

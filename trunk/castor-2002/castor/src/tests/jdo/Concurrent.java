@@ -83,6 +83,7 @@ public class Concurrent
 		logger.println( "Creating new group: " + group );
 		db.makePersistent( group );
 	    } else {
+		group.name = "new group";
 		logger.println( "Query result: " + group );
 	    }
 	    logger.println( "Assured one group exists in the database" );
@@ -91,7 +92,6 @@ public class Concurrent
 	    tx.begin();
 	    oql.bind( new Integer( GroupId ) );
 	    group = (ProductGroup) oql.execute();
-	    tx.lock( group, tx.WRITE );
 	    
 	    JdbcThread jdbc;
 	    
@@ -100,7 +100,8 @@ public class Concurrent
 	    jdbc.jdbcUri = jdbcUri;
 	    jdbc.start();
 	    // Give JDBC thread 2 seconds to wait for lock
-	    Thread.currentThread().sleep( 4000 );
+	    jdbc.join();
+	    group.name = group.name + "XXX";
 	    
 	    tx.commit();
 	    db.close();

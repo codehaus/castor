@@ -55,9 +55,9 @@ import org.exolab.castor.persist.ObjectNotFoundException;
 
 /**
  * The persistence engine implements this interface in order to allow
- * objects to allow queries to be performed and multiple objects to be
- * returned. This is an extension of {@link Persistence#load} for
- * dealing with complex queries.
+ * queries to be performed and multiple objects to be returned. This is
+ * an extension of {@link Persistence#load} for dealing with complex
+ * queries.
  * <p>
  * The caller takes full responsibility to assure integrity of
  * transactions and object caching and only relies on the engine to
@@ -137,8 +137,10 @@ public interface PersistenceQuery
      * When the result set has been exhuasted, this method will
      * return null.
      *
-     * @param identity The identity of the previous object
-     * @return The identity of the next object
+     * @param identity The identity of the previous object,
+     *  null if this method is called for the first time
+     * @return The identity of the next object, null if the
+     *  result set has been exhausted
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
@@ -147,8 +149,8 @@ public interface PersistenceQuery
     
 
     /**
-     * Returns the next object. This method must be called immediately
-     * after {@link #nextIdentity}.
+     * Loades the object. This method must be called immediately
+     * after {@link #nextIdentity} with the same identity.
      * <p>
      * If the object is locked by another transaction this method will
      * block until the lock is released, or a timeout occured. If a

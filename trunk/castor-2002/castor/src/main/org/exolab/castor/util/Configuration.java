@@ -170,7 +170,7 @@ public abstract class Configuration
     private static class Features
     {
         public static final String Validation = "http://xml.org/sax/features/validation";
-        public static final String Propertypaces = "http://xml.org/sax/features/Propertypaces";
+        public static final String Propertypaces = "http://xml.org/sax/features/propertypaces";
     }
     
     
@@ -212,6 +212,21 @@ public abstract class Configuration
 
 
     /**
+     * Returns a property from the default configuration file.
+     * Equivalent to calling <tt>getProperty</tt> on the result
+     * of {@link #getDefault}.
+     *
+     * @param name The property name
+     * @param default The property's default value
+     * @return The property's value
+     */
+    public static String getProperty( String name, String defValue )
+    {
+        return getDefault().getProperty( name, defValue );
+    }
+
+
+    /**
      * Return an XML document parser implementing the feature list
      * specified in the configuration file.
      *
@@ -219,7 +234,7 @@ public abstract class Configuration
      */
     public static Parser getParser()
     {
-        return getParser( "" );
+        return getParser( null );
     }
 
 
@@ -241,7 +256,7 @@ public abstract class Configuration
         Parser parser;
         
         prop = getDefault().getProperty( Property.Parser );
-        if ( prop == null || prop.equals( "Xerces" ) ) {
+        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
             // If no parser class was specified, we default to Xerces.
             parser = new org.apache.xerces.parsers.SAXParser();
         } else {
@@ -257,35 +272,35 @@ public abstract class Configuration
                                                              prop, except ) );
             }
         }
-        
+
         if ( parser instanceof XMLReader ) {
             StringTokenizer token;
             boolean         flag;
             
-            if ( features == null ) {
-                prop = getDefault().getProperty( Property.Validation, "false" );
-                flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-                try {
-                    ( (XMLReader) parser ).setFeature( Features.Validation, flag );
-                } catch ( SAXException except ) {
-                    // Ignore if feature not supported
-                }
-                prop = getDefault().getProperty( Property.Propertypaces, "false" );
-                flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
-                try {
-                    ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
-                } catch ( SAXException except ) {
-                    // Ignore if feature not supported
-                }
-                
-                features = getDefault().getProperty( Property.ParserFeatures, features );
+            prop = getDefault().getProperty( Property.Validation, "false" );
+            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+            try {
+                ( (XMLReader) parser ).setFeature( Features.Validation, flag );
+            } catch ( SAXException except ) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
             }
-            token = new StringTokenizer( features, ", " );
-            while ( token.hasMoreTokens() ) {
-                try {
-                    ( (XMLReader) parser ).setFeature( token.nextToken(), true );
-                } catch ( SAXException except ) {
-                    // Ignore if feature not supported
+            prop = getDefault().getProperty( Property.Propertypaces, "false" );
+            flag = ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) );
+            try {
+                ( (XMLReader) parser ).setFeature( Features.Propertypaces, flag );
+            } catch ( SAXException except ) {
+                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+            }
+            
+            features = getDefault().getProperty( Property.ParserFeatures, features );
+            if ( features != null ) {
+                token = new StringTokenizer( features, ", " );
+                while ( token.hasMoreTokens() ) {
+                    try {
+                        ( (XMLReader) parser ).setFeature( token.nextToken(), true );
+                    } catch ( SAXException except ) {
+                        Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+                    }
                 }
             }
         }
@@ -309,20 +324,21 @@ public abstract class Configuration
         Serializer serializer;
         
         prop = getDefault().getProperty( Property.Serializer );
-        if ( prop == null )
-            throw new RuntimeException( Messages.format( "conf.missingProperty",
-                                                         Property.Serializer ) );
-        try {
-            serializer = (Serializer) Class.forName( prop ).newInstance();
-            prop = getDefault().getProperty( Property.Indent, "" );
-            if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) ) {
-                serializer.setOutputFormat( new OutputFormat( Method.XML, null, true ) );
+        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
+            // If no parser class was specified, we default to Xerces.
+            serializer = new org.apache.xml.serialize.XMLSerializer();
+        } else {
+            try {
+                serializer = (Serializer) Class.forName( prop ).newInstance();
+            } catch ( Exception except ) {
+                throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
+                                                             prop, except ) );
             }
-            return serializer;
-        } catch ( Exception except ) {
-            throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
-                                                         prop, except ) );
         }
+        prop = getDefault().getProperty( Property.Indent, "" );
+        if ( prop.equalsIgnoreCase( "true" ) || prop.equalsIgnoreCase( "on" ) )
+            serializer.setOutputFormat( new OutputFormat( Method.XML, null, true ) );
+        return serializer;
     }
     
     
@@ -335,16 +351,13 @@ public abstract class Configuration
      * @return A suitable serializer
      */
     public static DocumentHandler getSerializer( OutputStream output )
+        throws IOException
     {
         Serializer      serializer;
         DocumentHandler docHandler;
         
         serializer = getSerializer();
-        try {
-            serializer.setOutputByteStream( output );
-        } catch ( IOException except ) {
-            // This should never happen
-        }
+        serializer.setOutputByteStream( output );
         docHandler = serializer.asDocumentHandler();
         if ( docHandler == null )
             throw new RuntimeException( Messages.format( "conf.serializerNotSaxCapable",
@@ -362,6 +375,7 @@ public abstract class Configuration
      * @return A suitable serializer
      */
     public static DocumentHandler getSerializer( Writer output )
+        throws IOException
     {
         Serializer      serializer;
         DocumentHandler docHandler;

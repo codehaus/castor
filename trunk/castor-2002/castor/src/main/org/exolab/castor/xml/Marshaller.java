@@ -55,6 +55,7 @@ import org.exolab.castor.util.Stack;
 
 import org.xml.sax.helpers.AttributeListImpl;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Serializable;
 import java.io.Writer;
@@ -165,7 +166,11 @@ public class Marshaller {
         (Object obj, Writer out, PrintWriter logger, boolean debug) 
         throws MarshalException, ValidationException
     {
-        marshal(obj, Configuration.getSerializer( out ), logger, debug);
+	try {
+	    marshal(obj, Configuration.getSerializer( out ), logger, debug);
+	} catch ( IOException except ) {
+	    throw new MarshalException( except );
+	}
         try {
             out.flush();
         }
