@@ -229,7 +229,7 @@ final class OID
 
     public String toString()
     {
-        return _type.getName() + ( _identity == null ? "/new" : _identity.toString() );
+        return _type.getName() + "/" + ( _identity == null ? "<new>" : _identity.toString() );
     }
 
 

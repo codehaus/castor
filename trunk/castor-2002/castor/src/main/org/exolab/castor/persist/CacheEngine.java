@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.IntegrityException;
+import org.exolab.castor.mapping.RelationDesc;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -114,17 +115,16 @@ final class CacheEngine
     private Hashtable _xaTx = new Hashtable();
 
 
-    private PersistenceEngine  _topEngine;
-
-
-    private PrintWriter _logWriter;
+    /**
+     * The log writer used to trace persistence operations. May be null.
+     */
+    private PrintWriter        _logWriter;
 
 
     /**
      * Construct a new cache engine with the specified name, mapping
      * table and persistence engine.
      *
-     * @param topEngine The top level persistence engine
      * @param mapResolver Provides mapping information for objects
      *  supported by this cache
      * @param factory Factory for creating persistence engines for each
@@ -134,7 +134,7 @@ final class CacheEngine
      * @throws MappingException Indicate that one of the mappings is
      *  invalid
      */
-    CacheEngine( PersistenceEngine topEngine, MappingResolver mapResolver,
+    CacheEngine( MappingResolver mapResolver,
                  PersistenceFactory factory, PrintWriter logWriter )
         throws MappingException
     {
@@ -142,7 +142,6 @@ final class CacheEngine
         ClassDesc  clsDesc;
         Persistence persist;
         
-        _topEngine = ( topEngine == null ? this : topEngine );
         _logWriter = logWriter;
         enum = mapResolver.listDescriptors();
         while ( enum.hasMoreElements() ) {
@@ -178,6 +177,12 @@ final class CacheEngine
             return null;
         else
             return typeInfo.clsDesc;
+    }
+
+
+    public PrintWriter getLogWriter()
+    {
+        return _logWriter;
     }
 
 
@@ -251,7 +256,7 @@ final class CacheEngine
                     if ( _logWriter != null )
                         _logWriter.println( "PE: Loading " + obj.getClass().getName() +
                                             " (" + identity + ")" );
-                    oid.setStamp( typeInfo.persist.load( tx.getConnection( _topEngine ),
+                    oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                          new RelationContext( tx, this ),
                                                          obj, identity, accessMode ) );
                     oid.setExclusive( true );
@@ -288,7 +293,7 @@ final class CacheEngine
                 if ( _logWriter != null )
                     _logWriter.println( "PE: Loading " + obj.getClass().getName() + " ("
                                         + identity + ")" );
-                oid.setStamp( typeInfo.persist.load( tx.getConnection( _topEngine ),
+                oid.setStamp( typeInfo.persist.load( tx.getConnection( this ),
                                                      new RelationContext( tx, this ),
                                                      obj, identity, accessMode ) );
             } catch ( ObjectNotFoundException except ) {
@@ -357,7 +362,7 @@ final class CacheEngine
         lock = getLock( oid );
         
         if ( lock != null ) {
-            
+
             // Object has been loaded before, must acquire lock on it
             try {
                 obj = lock.acquire( tx, false, timeout );
@@ -465,6 +470,31 @@ final class CacheEngine
         typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
         if ( typeInfo == null )
             throw new ClassNotPersistenceCapableException( obj.getClass() );
+
+        // Create all the dependent objects first. Must perform that
+        // operation on all descendent classes.
+        RelationDesc[] relations;
+        ClassDesc      clsDesc;
+
+        clsDesc = typeInfo.clsDesc;
+        while ( clsDesc != null ) {
+            relations = clsDesc.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                Object related;
+                Object relatedId;
+                
+                related = relations[ i ].getRelationField().getValue( obj );
+                if ( related != null && ! tx.isPersistent( related ) ) {
+                    if ( relations[ i ].isAttached() )
+                        relatedId = identity;
+                    else
+                        relatedId = relations[ i ].getRelatedClassDesc().getIdentity().getValue( related );
+                    tx.create( this, related, relatedId );
+                }
+            }
+            clsDesc = clsDesc.getExtends();
+        }
+
         // Must prevent concurrent attempt to create the same object
         // Best way to do that is through the type
         synchronized ( typeInfo ) {
@@ -490,7 +520,7 @@ final class CacheEngine
                 if ( _logWriter != null )
                     _logWriter.println( "PE: Creating " + obj.getClass().getName() + " ("
                                         + identity + ")" );
-                oid.setStamp( typeInfo.persist.create( tx.getConnection( _topEngine ), obj, identity ) );
+                oid.setStamp( typeInfo.persist.create( tx.getConnection( this ), obj, identity ) );
                 oid.setExclusive( true );
             }
 
@@ -561,10 +591,38 @@ final class CacheEngine
             throw new IllegalStateException( Messages.format( "persist.internal",
                                                               "Attempt to delete object for which no lock was acquired" ) );
         }
+
+        // Delete all the related objects as well. Detached objects are not
+        // deleted when the primary object is deleted, but attached objects
+        // are. These objects exist in persistent storage, but not in the cache.
+        ClassDesc      clsDesc;
+        RelationDesc[] relations;
+
+        clsDesc = typeInfo.clsDesc;
+        while ( clsDesc != null ) {
+            relations = clsDesc.getRelations();
+            for ( int i = 0 ; i < relations.length ; ++i ) {
+                if ( relations[ i ].isAttached() ) {
+                    Object   related;
+                    TypeInfo relTypeInfo;
+                    
+                    related = relations[ i ].getRelationField().getValue( obj );
+                    if ( related != null ) {
+                        relTypeInfo = (TypeInfo) _typeInfo.get( related.getClass() );
+                        if ( _logWriter != null )
+                            _logWriter.println( "PE: Deleting " + related.getClass().getName() + " ("
+                                                + oid.getIdentity() + ")" );
+                        relTypeInfo.persist.delete( tx.getConnection( this ), related, oid.getIdentity() );
+                    }
+                }
+            }
+            clsDesc = clsDesc.getExtends();
+        }
+
         if ( _logWriter != null )
             _logWriter.println( "PE: Deleting " + obj.getClass().getName() + " ("
                                 + oid.getIdentity() + ")" );
-        typeInfo.persist.delete( tx.getConnection( _topEngine ), obj, oid.getIdentity() );
+        typeInfo.persist.delete( tx.getConnection( this ), obj, oid.getIdentity() );
     }
     
 
@@ -654,10 +712,10 @@ final class CacheEngine
                 _logWriter.println( "PE: Storing " + obj.getClass().getName() + " (" +
                                     identity + ")" );
             if ( oid.isExclusive() )
-                oid.setStamp( typeInfo.persist.store( tx.getConnection( _topEngine ),
+                oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       obj, oldIdentity, null, null ) );
             else
-                oid.setStamp( typeInfo.persist.store( tx.getConnection( _topEngine ),
+                oid.setStamp( typeInfo.persist.store( tx.getConnection( this ),
                                                       obj, oldIdentity, locked, oid.getStamp() ) );
             oid.setExclusive( false );
 
@@ -666,7 +724,7 @@ final class CacheEngine
                 // and then store the new object value. This requires a new OID.
                 // If the transaction is rolledback, both old and new OID will be
                 // removed.
-                typeInfo.persist.changeIdentity( tx.getConnection( _topEngine ),
+                typeInfo.persist.changeIdentity( tx.getConnection( this ),
                                                  obj, oldIdentity, identity );
                 removeLock( removeOID( locked ) );
                 oid = new OID( typeInfo.clsDesc, identity );
@@ -718,7 +776,7 @@ final class CacheEngine
         // fails, release the lock and report the exception.
         obj = lock.acquire( tx, true, timeout );
         try {
-            typeInfo.persist.writeLock( tx.getConnection( _topEngine ), obj, oid.getIdentity() );
+            typeInfo.persist.writeLock( tx.getConnection( this ), obj, oid.getIdentity() );
         } catch ( ObjectDeletedException except ) {
             removeLock( oid );
             removeOID( obj );
