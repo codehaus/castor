@@ -44,9 +44,6 @@
  */
 package org.exolab.castor.persist.cache;
 
-import java.util.Collection;
-import java.util.Iterator;
-
 import junit.framework.TestCase;
 
 /**
@@ -80,7 +77,7 @@ public class TestTimeLimited extends TestCase {
     public void testGetCache() throws Exception {
         Cache cache = null;
         
-        cache = CacheRegistry.getCache("time-limited", 10, "org.exolab.castor.entity.Sample");
+        cache = CacheRegistry.getCache("time-limited", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("time-limited", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
         

@@ -297,7 +297,7 @@ public class BatchUpdateSQL {
             // to create a new registry object.
             DataSource ds;
 
-            ds = DatabaseRegistry.loadDataSource(jdoConf.getDatabase()[0]);
+            ds = DatabaseRegistry.loadDataSource(jdoConf.getDatabase()[0], BatchUpdateSQL.class.getClassLoader());
             // ds = (DataSource) jdoConf.getDatabase()[0].getDatabaseChoice().getDataSource().getParams();
             if ( ds == null )
                 throw new RuntimeException( "jdo.missingDataSource" );
