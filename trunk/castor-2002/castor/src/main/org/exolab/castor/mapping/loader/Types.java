@@ -235,10 +235,24 @@ public class Types
      */
     public static boolean isConstructable( Class type )
     {
+        return isConstructable( type, false );
+    }
+
+    /**
+     * Returns true if the objects of this class are constructable.
+     * The class must be publicly available and have a default public
+     * constructor.
+     *
+     * @param type The Java type
+     * @return True if constructable
+     */
+    public static boolean isConstructable( Class type, boolean allowAbstractOrInterface )
+    {
         try {
             if ( ( type.getModifiers() & Modifier.PUBLIC ) == 0 )
                 return false;
-            if ( ( type.getModifiers() & ( Modifier.ABSTRACT | Modifier.INTERFACE ) ) != 0 )
+            if ((! allowAbstractOrInterface) && 
+                (( type.getModifiers() & ( Modifier.ABSTRACT | Modifier.INTERFACE ) ) != 0 ))
                 return false;
             if ( ( type.getConstructor( new Class[0] ).getModifiers() & Modifier.PUBLIC ) != 0 )
                 return true;
