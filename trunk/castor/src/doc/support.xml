@@ -38,11 +38,16 @@
 
     </section>
 
-    <section title="Reporting Bugs">
+    <section title="Reporting Bugs and Bug Tracking">
        <p>
        If you find a bug, please file a report in our Bugzilla server at:
        <url>http://bugzilla.exolab.org</url>
-       </p>
+      </p>
+      <p>
+         Before submitting bugs, please read the
+         <a href="http://bugzilla.mozilla.org/page.cgi?id=etiquette.html">Bugzilla Etiguette</a> and
+         <a href="http://bugzilla.mozilla.org/bugwritinghelp.html">Bug Writing Guidelines</a> from Mozilla.org.
+      </p>
     </section>
 
     <section title="Commercial Support">
