@@ -25,12 +25,13 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
+    <case class="jdo.DependentKeyGen" />
+    <case class="jdo.DependentKeyGenUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
     <case class="jdo.OqlExtends" />
     <case class="jdo.ManyToManyKeyGen" />
-    <case class="jdo.DependentKeyGen" />
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
@@ -67,13 +68,14 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
+    <case class="jdo.DependentKeyGen" />
+    <case class="jdo.DependentKeyGenUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
     <case class="jdo.SerializableObject" />
     <case class="jdo.OqlExtends" />
     <case class="jdo.ManyToManyKeyGen" />
-    <case class="jdo.DependentKeyGen" />
 
     <!-- C -->
     <case class="jdo.KeyGenGeneric" />
@@ -89,7 +91,6 @@
               writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
   </category>
-
   <category name="mysql" class="jdo.JDOCategory">
     <description>JDO tests for MySQL</description>
     <jdo database-name="mysql" configuration="mysql.xml" />
@@ -107,6 +108,8 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
+    <case class="jdo.DependentKeyGen" />
+    <case class="jdo.DependentKeyGenUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
@@ -142,6 +145,8 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
+    <case class="jdo.DependentKeyGen" />
+    <case class="jdo.DependentKeyGenUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
@@ -179,6 +184,8 @@
     <case class="jdo.ManyToMany" />
     <case class="jdo.Dependent" />
     <case class="jdo.DependentUpdate" />
+    <case class="jdo.DependentKeyGen" />
+    <case class="jdo.DependentKeyGenUpdate" />
     <case class="jdo.LazyLoading" />
     <case class="jdo.NestedFields" />
     <case class="jdo.Collections" />
@@ -194,7 +201,6 @@
     <case class="jdo.Persistent" />
 
     <!-- D -->
-    <!-- <case class="jdo.ListTypes" /> -->
   </category>
 
 </harness>
