@@ -15,6 +15,14 @@ JDO:     Added package org.exolab.castor.jdo.drivers which includes RDBMS specif
          factories, query expressions and key generators. Added factories for DB2,
          and SQL Server.
 
+Misc:    Added support for hasXXX()/deleteXXX() methods to determine if a value
+         exists when the value is a primitive (thus, cannot be null). Used by both
+         JDO and XML.
+
+Misc:    Fixed null pointer exception with collection handler. Deprecated
+         checkValidity on field handler (new validation code from XML will come
+         shortly).
+
 JDO:     Added and tested outer joins.
 
 Persist: Added getIdentity() method to TransactionContext().
