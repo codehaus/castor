@@ -110,6 +110,7 @@ public class DependentUpdate
             TestMaster    master;
             TestGroup     group;
             TestDetail    detail;
+            TestDetail2   detail2;
             QueryResults  qres;
             TestMaster    master2;
             int           cnt;
@@ -229,7 +230,7 @@ public class DependentUpdate
             master.addDetail( new TestDetail( 8 ) );
             // add new detail and create it explicitely
             detail = new TestDetail( 9 );
-            master.addDetail( detail );
+            master.addDetail( detail );        
             //db.create( detail );
             // delete, then create detail with id == 7 explicitly
             detail = (TestDetail) master.findDetail( 7 );
@@ -287,7 +288,9 @@ public class DependentUpdate
             }
  
             stream.writeVerbose( "Test 2" );
-            master2.addDetail( new TestDetail( 5 ) );
+            detail = new TestDetail( 5 );
+            detail.addDetail2( new TestDetail2( 51 ) );
+            master2.addDetail( detail );
             master2.addDetail( new TestDetail( 6 ) );
             master2.getDetails().remove( new TestDetail( 8 ) );
             master2.getDetails().remove( new TestDetail( 9 ) );
@@ -326,6 +329,7 @@ public class DependentUpdate
             if ( master != null ) {
                 if ( master.getDetails().size() == 0 ||
                      ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                     master.findDetail( 5 ).findDetail2( 51 ) == null  ||
                      ! master.getDetails().contains( new TestDetail( 6 ) ) ||
                      ! master.getDetails().contains( new TestDetail( 7 ) ) ||
                      master.getDetails().contains( new TestDetail( 8 ) ) ||
@@ -339,12 +343,42 @@ public class DependentUpdate
                 stream.writeVerbose( "Error: master not found" );
                 result = false;
             }
-            //db.remove( master );
             db.commit();
+
+            // modify an dependent object and see if it got updated
+            detail = master.findDetail( 5 );
+            detail.setValue1("new updated value");
+            detail.findDetail2( 51 ).setValue1("new detail 2 value");
+            db.begin();
+            db.update( master );
+            db.commit();
+
+            db.begin();
+            master = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
+            if ( master != null ) {
+                if ( master.getDetails().size() == 0 ||
+                     ! master.getDetails().contains( new TestDetail( 5 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 6 ) ) ||
+                     ! master.getDetails().contains( new TestDetail( 7 ) ) ||
+                     master.getDetails().contains( new TestDetail( 8 ) ) ||
+                     master.getDetails().contains( new TestDetail( 9 ) ) || 
+                     ! "new updated value".equals( master.findDetail( 5 ).getValue1()) ||
+                     ! "new detail 2 value".equals( master.findDetail( 5 ).findDetail2( 51 ).getValue1() ) ) {
+
+                    stream.writeVerbose( "Error: loaded master has wrong set of details: " + master );
+
+                    result  = false;
+                } else {
+                    stream.writeVerbose( "Details changed correctly in the long transaction: " + master );
+                }
+            } else {
+                stream.writeVerbose( "Error: master not found" );
+                result = false;
+            }
+            db.commit();
+
             if ( ! result )
                 return false;
-
-
             db.close();
         } catch ( Exception except ) {
             stream.writeVerbose( "Error: " + except );
