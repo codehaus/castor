@@ -52,6 +52,7 @@ import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Types;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -201,7 +202,10 @@ final class SQLEngine
             count = 2;
             for ( int i = 0 ; i < _fields.length ; ++i )
                 if ( _fields[ i ].store ) {
-                    stmt.setObject( count, fields[ i ] );
+                    if ( fields[ i ] == null )
+                        stmt.setNull( count, _fields[ i ].sqlType );
+                    else
+                        stmt.setObject( count, fields[ i ] );
                     ++count;
                 }
             stmt.executeUpdate();
@@ -260,7 +264,10 @@ final class SQLEngine
             count = 1;
             for ( int i = 0 ; i < _fields.length ; ++i )
                 if ( _fields[ i ].store ) {
-                    stmt.setObject( count, fields[ i ] );
+                    if ( fields[ i ] == null )
+                        stmt.setNull( count, _fields[ i ].sqlType );
+                    else
+                        stmt.setObject( count, fields[ i ] );
                     ++count;
                 }
             stmt.setObject( count, identity );
@@ -269,7 +276,10 @@ final class SQLEngine
 	    if ( original != null ) {
 		for ( int i = 0 ; i < _fields.length ; ++i )
 		    if ( _fields[ i ].dirtyCheck ) {
-			stmt.setObject( count, original[ i ] );
+                        if ( original[ i ] == null )
+                            stmt.setNull( count, _fields[ i ].sqlType );
+                        else
+                            stmt.setObject( count, original[ i ] );
 			++count;
 		    }
 	    }
@@ -608,15 +618,20 @@ final class SQLEngine
 
         final boolean dirtyCheck;
 
+        final int     sqlType;
+
         FieldInfo( FieldDescriptor fieldDesc, boolean store )
         {
             this.name = fieldDesc.getFieldName();
             this.store = store;
             this.multi = fieldDesc.isMultivalued();
-            if ( store && fieldDesc instanceof JDOFieldDescriptor )
+            if ( store && fieldDesc instanceof JDOFieldDescriptor ) {
                 this.dirtyCheck = ( (JDOFieldDescriptor) fieldDesc ).isDirtyCheck();
-            else
+                this.sqlType = ( (JDOFieldDescriptor) fieldDesc ).getSQLType();
+            } else {
                 this.dirtyCheck = false;
+                this.sqlType = Types.OTHER;
+            }
         }
 
     }
