@@ -114,10 +114,6 @@ public class DateFieldHandler extends XMLFieldHandler {
 
         DateFormat df = new SimpleDateFormat(DATE_FORMAT);
 
-        if ( (val.toString().indexOf(".")) != -1) {
-             df = new SimpleDateFormat(DATE_FORMAT_2);
-        }
-
         if (val.getClass().isArray()) {
 
             int size = Array.getLength(val);
@@ -155,6 +151,10 @@ public class DateFieldHandler extends XMLFieldHandler {
         if (! (value instanceof Date) ) {
 
             DateFormat df = new SimpleDateFormat(DATE_FORMAT);
+
+            if ( (value.toString().indexOf(".")) == -1)
+                df = new SimpleDateFormat(DATE_FORMAT_2);
+
 
             try {
                 date = df.parse(value.toString());
