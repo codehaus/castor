@@ -96,6 +96,11 @@ public class SchemaWriter {
     private static final String ELEMENT       =  "element";
     
     /**
+     * ModelGroup element name.
+     */
+    private static final String GROUP         =  "group";
+    
+    /**
      * Restriction element name.
      */
     private static final String RESTRICTION   =  "restriction";
@@ -369,6 +374,7 @@ public class SchemaWriter {
                 case Structure.ELEMENT:
                     processElement((ElementDecl)structure, schemaPrefix);
                     break;
+                case Structure.MODELGROUP:
                 case Structure.GROUP:
                     processGroup((Group)structure, schemaPrefix);
                     break;
@@ -479,7 +485,24 @@ public class SchemaWriter {
     private void processGroup(Group group, String schemaPrefix)
         throws SAXException
     {
-        String ELEMENT_NAME = schemaPrefix + group.getOrder().toString();
+        String ELEMENT_NAME = schemaPrefix;
+        
+        //-- ModelGroup
+        String reference = null;
+        if (group instanceof ModelGroup) {
+            ELEMENT_NAME += GROUP;
+            ModelGroup mGroup = (ModelGroup)group;
+            if (mGroup.hasReference()) {
+                ModelGroup refGroup = mGroup.getReference();
+                if (refGroup != null) {
+                    reference = refGroup.getName();
+                }
+            }
+        }
+        //-- Group
+        else {
+            ELEMENT_NAME += group.getOrder().toString();
+        }
 
         _atts.clear();
 
@@ -487,6 +510,11 @@ public class SchemaWriter {
         if (groupName != null) {
             _atts.addAttribute(ATTR_NAME, CDATA, groupName);
         }
+        //-- reference
+        else if (reference != null) {
+            _atts.addAttribute("ref", CDATA, reference);
+        }
+        
         _handler.startElement(ELEMENT_NAME, _atts);
 
         //-- process annotations
@@ -571,12 +599,20 @@ public class SchemaWriter {
             processElement((ElementDecl) enum.nextElement(), 
                 schemaPrefix);
         }
+        
         //-- process all top level complex types
         enum = schema.getComplexTypes();
         while (enum.hasMoreElements()) {
             processComplexType((ComplexType) enum.nextElement(), 
                 schemaPrefix);
         }
+        
+        //-- process all top level groups
+        enum = schema.getModelGroups();
+        while (enum.hasMoreElements()) {
+            processGroup((Group)enum.nextElement(), schemaPrefix);
+        }
+        
         //-- process all top level simple types
         enum = schema.getSimpleTypes();
         while (enum.hasMoreElements()) {
