@@ -197,6 +197,7 @@ public interface Database
 
     /**                              
      * Return the name of the database
+     * @return The database name.
      */                               
     public String getDatabaseName(); 
 
@@ -211,6 +212,7 @@ public interface Database
      *
      * @param type The object's type
      * @param identity The object's identity
+     * @return The object instance.
      * @throws ObjectNotFoundException No object of the given type and
      *  identity was found in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -230,6 +232,7 @@ public interface Database
      *
      * @param type The object's type
      * @param identity The object's identity
+     * @return The Object instance.
      * @throws ObjectNotFoundException No object of the given type and
      *  identity was found in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -254,6 +257,7 @@ public interface Database
      * @param type The object's type
      * @param identity The object's identity
      * @param accessMode The access mode
+     * @return The object instance.
      * @throws ObjectNotFoundException No object of the given type and
      *  identity was found in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -280,6 +284,7 @@ public interface Database
      * @param type The object's type
      * @param identity The object's identity
      * @param accessMode The access mode
+     * @return The object instance.
      * @throws ObjectNotFoundException No object of the given type and
      *  identity was found in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -307,6 +312,7 @@ public interface Database
      * @param type The object's type
      * @param identity The object's identity
      * @param object The object instance to be loaded into
+     * @return The object instance.
      * @throws ObjectNotFoundException No object of the given type and
      *  identity was found in persistent storage
      * @throws LockNotGrantedException Timeout or deadlock occured
@@ -449,6 +455,7 @@ public interface Database
      * all reachable object if the object is not loaded from the
      * transaction. If it is turn off, only dependent object will 
      * be created automatically.
+     * @return True if the current transaction is set to 'autoStore'.
      */
     public boolean isAutoStore();
 
@@ -471,6 +478,7 @@ public interface Database
      * If autoStore is not set, Castor will only create/update/store
      * dependent object, and related objects must be created/update 
      * explicitly.
+     * @param autoStore True if this feature should be enabled.
      */
     public void setAutoStore( boolean autoStore );
 
@@ -580,6 +588,5 @@ public interface Database
      */
     public ClassLoader getClassLoader ();
     
-
 }
 
