@@ -382,6 +382,9 @@ final class CacheEngine
                 // Exclusive mode we always synchronize the object with
                 // the database and obtain a lock on the object.
                 try {
+                    if ( _logWriter != null )
+                        _logWriter.println( "PE: Loading " + typeInfo.clsDesc.getJavaClass().getName() +
+                                            " (" + identity + ")" );
                     oid.setStamp( query.fetch( obj ) );
                     oid.setExclusive( true );
                 } catch ( ObjectNotFoundException except ) {
@@ -414,6 +417,9 @@ final class CacheEngine
             obj = typeInfo.clsDesc.newInstance();
             typeInfo.clsDesc.getIdentity().setValue( obj, identity );
             try {
+                if ( _logWriter != null )
+                    _logWriter.println( "PE: Loading " + typeInfo.clsDesc.getJavaClass().getName() +
+                                        " (" + identity + ")" );
                 oid.setStamp( query.fetch( obj ) );
             } catch ( PersistenceException except ) {
                 // Report any error talking to the persistence engine

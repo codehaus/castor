@@ -300,9 +300,6 @@ public final class QueryResults
                 // record the object in the transaction if in read-write
                 // or exclusive mode.
                 try {
-                    if ( _engine.getLogWriter() != null )
-                        _engine.getLogWriter().println( "PE: Loading " + clsDesc.getJavaClass().getName() +
-                                                        " (" + _lastIdentity + ")" );
                     oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
                     obj = clsDesc.newInstance();
                     _engine.copyObject( _tx, oid, obj );
