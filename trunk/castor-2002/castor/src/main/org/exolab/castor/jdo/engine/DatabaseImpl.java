@@ -163,6 +163,11 @@ public class DatabaseImpl
     }
 
 
+    public boolean isClosed()
+    {
+        return ( _dbEngine == null );
+    }
+
 
     public Object load( Class type, Object identity )
         throws TransactionNotInProgressException, ObjectNotFoundException,

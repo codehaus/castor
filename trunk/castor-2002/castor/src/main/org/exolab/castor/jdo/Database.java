@@ -295,6 +295,14 @@ public interface Database
 
 
     /**
+     * Returns true if the database is closed.
+     *
+     * @return True if the database is closed
+     */
+    public boolean isClosed();
+
+
+    /**
      * Closes the database. If a transaction is in progress the
      * transaction will be rolled back and an exception thrown.
      *
