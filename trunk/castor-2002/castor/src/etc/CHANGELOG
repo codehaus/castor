@@ -1,6 +1,7 @@
 
 Version (CVS)
 -------------
+XML:	Fixed bug 879 (Arnaud - 20020405)
 
 XML:    Added Unmarshaller#setAllowExtraAttributes method to allow control
         over whether or not extra (non-matched) attributes should be flagged
@@ -20,9 +21,7 @@ XML:    Added methods to Marshaller for setting schemaLocation and
 XML:    Added some support for SAX 2 in Marshalling Framework.
         (kvisco - 20020309)
 
-XML:	Refactored the entire container support. A lot of changes have been made during the
-        Unmarshalling process and a method (canAccept) has been added to the XMLClassDescriptor 
-        interface. These changes fix bug 884 (and potentially many others) (Arnaud - 20020306)
+XML:	Refactored the entire container support. A lot of changes have been made during          the Unmarshalling process and a method (canAccept) has been added to the                 XMLClassDescriptor interface. These changes fix bug 884 (and potentially many            others) (Arnaud - 20020306)
 
 XML:    Added initial support for Unmarshaller#setReuseObjects.
         (kvisco - 20020227)

@@ -1288,9 +1288,9 @@ public class SourceFactory  {
             String className = null;
 
 			//-- Is this base type from the schema we are currently generating source for?
-			if (base.getSchema()==schema)
-			{
-				ClassInfo cInfo = state.resolve(base);
+			if (base.getSchema() == schema) {
+
+                ClassInfo cInfo = state.resolve(base);
 				if (cInfo == null) {
 
 					String packageName = state.jClass.getPackageName();
@@ -1300,9 +1300,10 @@ public class SourceFactory  {
 					className = classes[0].getName();
 				}
 				else className = cInfo.getJClass().getName();
+                //set the base class
+                classInfo.setBaseClass(cInfo);
 			}
-			else
-			{
+			else {
 				//-- Create package qualified class name to a base type class from another package
 				className =
 					SourceGenerator.getQualifiedClassName(
@@ -1333,6 +1334,12 @@ public class SourceFactory  {
         if (!state.isCreateGroupItem())
             processContentType(complexType.getContentType(), state);
 
+        boolean restricted = complexType.isRestricted();
+        if (restricted && base.isComplexType()) {
+             //process a restricted content model only if the base type
+             //doesn't have an <any>
+             restricted = restricted && ! ((ComplexType)base).hasAny();
+        }
         processContentModel(complexType, state);
     } //-- processComplextype
 
@@ -1380,6 +1387,8 @@ public class SourceFactory  {
                 createSourceCode(sType, state.getSGStateInfo());
             }
             FieldInfo fieldInfo = memberFactory.createFieldInfo(attr, state);
+            //set the restricted status of the FieldInfo --> to be moved in the MemberFactory?
+
             handleField(fieldInfo, state);
         }
         return;
@@ -1410,17 +1419,33 @@ public class SourceFactory  {
         JSourceCode scInitializer
             = state.jClass.getConstructor(0).getSourceCode();
 
+        ClassInfo base = state.classInfo.getBaseClass();
 
+        boolean present = false;
+        if (base != null) {
+            switch (fieldInfo.getNodeType()) {
+                case NodeType.ATTRIBUTE:
+                    present = (base.getAttributeField(fieldInfo.getNodeName()) != null);
+                    break;
+                case NodeType.ELEMENT:
+                    present = (base.getElementField(fieldInfo.getNodeName()) != null);
+                    break;
+                default:
+                    break;
+            }
+        }
         state.classInfo.addFieldInfo(fieldInfo);
 
-        //-- Have FieldInfo create the proper field
-        fieldInfo.createJavaField(state.jClass);
-
-        //-- do not create access methods for transient fields
-        if (!fieldInfo.isTransient()) {
-            fieldInfo.createAccessMethods(state.jClass);
-            if (fieldInfo.isBound())
-                state.setBoundProperties(true);
+        //create the relevant Java fields only if the field
+        //info is not yet in the base classInfo
+        if (!present) {
+            fieldInfo.createJavaField(state.jClass);
+            //-- do not create access methods for transient fields
+            if (!fieldInfo.isTransient()) {
+                fieldInfo.createAccessMethods(state.jClass);
+                if (fieldInfo.isBound())
+                    state.setBoundProperties(true);
+            }
         }
 
         //-- Add initialization code
@@ -1431,6 +1456,7 @@ public class SourceFactory  {
     /**
      * Processes the given ContentModelGroup
      * @param contentModel the ContentModelGroup to process
+     * @param restricted true if we process a restricted content Model
     **/
     private void processContentModel
         (ContentModelGroup contentModel, FactoryState state)
@@ -1501,8 +1527,8 @@ public class SourceFactory  {
 					}
 
                     fieldInfo
-                        = memberFactory.createFieldInfo((ElementDecl)struct,
-                                                         state);
+                            = memberFactory.createFieldInfo((ElementDecl)struct,
+                                                             state);
                     handleField(fieldInfo, state);
                     break;
                 }
@@ -1679,7 +1705,6 @@ public class SourceFactory  {
         jsc = constructor.getSourceCode();
         jsc.add("this.type = type;");
         jsc.add("this.stringValue = value;");
-
 
 
         //-- #valueOf method
