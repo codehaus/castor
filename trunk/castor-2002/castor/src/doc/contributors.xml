@@ -101,6 +101,14 @@
     <description>Testing for Oracle and Castor XML.</description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Stewart" given="George"/>
+    <email>georgestewartiv@yahoo.com</email>
+    <description>
+       Enhancement to give mapping loader higher priority than compiled descriptors
+    </description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Sundaranatha" given="Venkatakrishnan"/>
     <email>ssvk@msn.com</email>
