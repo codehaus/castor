@@ -12,7 +12,7 @@
   <property name="classpath" value="${classpath}:${classes}" />
   <property name="build.compiler" file="classic" />
   <property name="deprecation" value="true" />
-  <property file="${source}/VERSION" />
+  <property file="${etc}/VERSION" />
   <property name="archive" value="${project}-${version}" />
 
  
@@ -113,16 +113,16 @@
   </target>
 
   <!-- Build the API JavaDoc -->
+  <!-- Note: you need the proper permission to get it running -->
   <target name="javadoc" depends="prepare">
     <mkdir dir="${build}/doc" />
     <mkdir dir="${build}/doc/javadoc" />
-    <exec command="javadoc -sourcepath ${source}/main -d ${build}/doc/javadoc
-                           -doctitle Castor -public -noindex -author
-                           org.exolab.castor.xml
-			   org.exolab.castor.jdo org.exolab.castor.persist
-			   org.exolab.castor.dsml org.exolab.castor.dsml.jndi
-			   org.exolab.castor.dsml.mozilla org.exolab.castor.dsml.tools
-			   org.exolab.castor.util" />
+    <javadoc2 sourcepath="${source}/main" destdir="${build}/doc/javadoc"
+              doctitle="Castor" public="true" noindex="true" author="true"
+	      packagenames="org.exolab.castor.xml,org.exolab.castor.jdo,org.exolab.castor.dax,
+                            org.exolab.castor.persist,org.exolab.castor.util,
+                            org.exolab.castor.dsml,org.exolab.castor.dsml.jndi,org.exolab.castor.dsml.mozilla,
+                            org.exolab.castor.dsml.tools" />
   </target>
 
 
@@ -131,12 +131,12 @@
     <deltree dir="${dist}/${archive}-src.tar.gz" />
     <exec command="tar --create --compress --exclude-from ${source}/etc/exclude
                    *.sh *.bat ${source} ${lib}"
-          output="${dist}/${archive}-src.tgz" />
+          dir="." output="${dist}/${archive}-src.tgz" />
   </target>
 
 
   <!-- Build the tarball including JAR and all dependent packages -->
-  <target name="tarball" depends="prepare">
+  <target name="tarball" depends="prepare,jar,examples">
     <property name="bin" value="${build}/${archive}" />
     <deltree  dir="${dist}/${archive}.tar.gz" />
     <deltree  dir="${bin}" />
@@ -166,9 +166,9 @@
     <copydir  src="${source}/schema" dest="${bin}/schema" />
     <exec command="tar --create --compress --directory ${source}
                        --exclude-from ${source}/etc/exclude examples"
-          output="${bin}/examples.tgz" />
+          dir="." output="${bin}/examples.tgz" />
     <exec command="tar --create --compress --directory ${build} ${archive}"
-          output="${dist}/${archive}.tgz" />
+          dir="." output="${dist}/${archive}.tgz" />
   </target>
 
 

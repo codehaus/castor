@@ -2,7 +2,7 @@
 <document url="http://castor.exolab.org/contacts.xml">
   <body>
     <title>Change log</title>
-    <section title="Version 0.7.6  February 1, 2000"><pre>
+    <section title="Version 0.7.6  February 2, 2000"><pre>
 DAX:  First appearance of the DAX implementation based on the Mozilla
       Directory SDK, using the persistence cache engine and the new
       mapping DTD.

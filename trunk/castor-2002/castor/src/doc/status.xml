@@ -58,6 +58,12 @@
         </ul>
       </section>
 
+      <section title="Castor DAX">
+        <ul>
+          <li>Still work in progress</li>
+        </ul>
+      </section>
+
       <section title="Castor DSML">
         <ul>
           <li>Import/export an LDAP directory or search results to/from XML

@@ -27,9 +27,9 @@
          use the following commands:</p>
 
       <pre>
-  <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> login
-  <b>password:</b> anoncvs
-  <b>$</b>cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> checkout <project-repository/>
+  $ cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> login
+  password: anoncvs
+  $ cvs -d :pserver:anoncvs@<project-repository/>.exolab.org:/cvs/<project-repository/> checkout <project-repository/>
       </pre>
 
       <p><b>Note:</b> There have been reports of problems using jCVS with ours CVS servers.
