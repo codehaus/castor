@@ -60,7 +60,7 @@ import java.util.Enumeration;
 public class Schema extends Annotated {
 
     public static final String DEFAULT_SCHEMA_NS
-        = "http://www.w3.org/TR/1999/09/24-xmlschema";
+        = "http://www.w3.org/1999/XMLSchema";
 
 
     private static final String NULL_ARGUMENT
@@ -88,6 +88,16 @@ public class Schema extends Annotated {
     **/
     private Hashtable elements = null;
 
+	/**
+	 * A list of imported schemas
+	 */
+	private Hashtable importedSchemas = null;
+	
+	/**
+	 * A list of namespaces declared in this schema
+	 */
+	private Hashtable namespaces = null;
+	
     private static SimpleTypesFactory simpleTypesFactory= new SimpleTypesFactory();
 
     /**
@@ -106,6 +116,7 @@ public class Schema extends Annotated {
         complexTypes = new Hashtable();
         simpleTypes  = new Hashtable();
         elements   = new Hashtable();
+		importedSchemas = new Hashtable();
         this.schemaNS = schemaNS;
         init();
     } //-- ScehamDef
@@ -114,6 +125,37 @@ public class Schema extends Annotated {
 
     } //-- init
 
+	/**
+	 * Adds the given Schema definition to this Schema definition as an imported schenma
+	 * @param schema the Schema to add to this Schema as an imported schema
+     * @exception SchemaException if the Schema already exists
+	 */
+	public synchronized void addSchema(Schema schema)
+        throws SchemaException		
+	{
+		String targetNamespace = schema.getTargetNamespace();
+		if (importedSchemas.get(targetNamespace)!=null)
+		{
+            String err = "a Schema has already been imported with the given namespace: ";
+            throw new SchemaException(err + targetNamespace);
+		}
+		importedSchemas.put(targetNamespace, schema);
+	}
+
+	/**
+	 * Returns True if the namespace is known to this schema
+	 * @param namespace the namespace URL
+	 * @return True if the namespace was declared in the schema
+	 */
+	public boolean isKnownNamespace(String namespaceURL)
+	{
+		Enumeration urls = namespaces.elements();
+		while(urls.hasMoreElements())
+			if (urls.nextElement().equals(namespaceURL))
+				return true;
+		return false;
+	}
+	
     /**
      * Adds the given Complextype definition to this Schema defintion
      * @param complextype the Complextype to add to this Schema
@@ -245,17 +287,42 @@ public class Schema extends Annotated {
      *  null if no ComplexType with the given name was found.
     **/
     public ComplexType getComplexType(String name) {
+		
+		//-- Null?	
         if (name == null)  {
             String err = NULL_ARGUMENT + "getComplexType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        // [Remm] Strip namespace prefix
+		
+        //-- Namespace prefix?
         String canonicalName = name;
+		String nsprefix = "";
+		String ns = targetNS;
         int colon = name.indexOf(':');
         if (colon != -1)
+		{
             canonicalName = name.substring(colon + 1);
-        return (ComplexType)complexTypes.get(canonicalName);
+			nsprefix = name.substring(0,colon);
+			ns = (String) namespaces.get(nsprefix);
+			if (ns == null)  {
+			    String err = "getSimpleType: ";
+			    err += "Namespace prefix not recognised '"+name+"'";
+			    throw new IllegalArgumentException(err);
+			}
+		}
+		
+		//-- Get GetComplexType object
+		if (ns.equals(targetNS))
+			return (ComplexType)complexTypes.get(canonicalName);
+		else {
+			Schema schema = (Schema) importedSchemas.get(ns);
+			if (schema!=null)
+				return schema.getComplexType(canonicalName);
+		}
+		
+		return null;	
+		
     } //-- getComplexType
 
     /**
@@ -273,7 +340,7 @@ public class Schema extends Annotated {
     public String getBuiltInTypeName(int builtInTypeCode) {
         return simpleTypesFactory.getBuiltInTypeName(builtInTypeCode);
     }
-
+	
     /**
      * Returns the SimpleType associated with the given name,
      * or null if no such SimpleType exists.
@@ -281,26 +348,46 @@ public class Schema extends Annotated {
      * or null if no such SimpleType exists.
     **/
     public SimpleType getSimpleType(String name) {
+		
+		//-- Null?	
         if (name == null)  {
             String err = NULL_ARGUMENT + "getSimpleType: ";
             err += "'name' cannot be null.";
             throw new IllegalArgumentException(err);
         }
-        // [Remm] Strip namespace prefix
+		
+        //-- Namespace prefix?
         String canonicalName = name;
+		String nsprefix = "";
+		String ns = targetNS;
         int colon = name.indexOf(':');
         if (colon != -1)
+		{
             canonicalName = name.substring(colon + 1);
-        SimpleType result= (SimpleType)simpleTypes.get(canonicalName);
+			nsprefix = name.substring(0,colon);
+			ns = (String) namespaces.get(nsprefix);
+			if (ns == null)  {
+			    String err = "getSimpleType: ";
+			    err += "Namespace prefix not recognised '"+name+"'";
+			    throw new IllegalArgumentException(err);
+			}
+		}
+		
+		//-- Get SimpleType object
+		SimpleType result = null;
+		if (ns.equals(schemaNS))
+			result= simpleTypesFactory.getBuiltInType(canonicalName);
+		else if(ns.equals(targetNS))
+			result = (SimpleType)simpleTypes.get(canonicalName);
+		else {
+			Schema schema = (Schema) importedSchemas.get(ns);
+			if (schema!=null)
+				result = schema.getSimpleType(canonicalName);
+		}
 
-        if (result == null) {
-            //the type may be built in, ask the factory for it.
-            result= simpleTypesFactory.getBuiltInType(canonicalName);
-        }
-        else {
-            //result could be a deferredSimpleType => getType will resolve it
+		//-- Result could be a deferredSimpleType => getType will resolve it
+		if (result!=null)
             result= (SimpleType)result.getType();
-        }
 
         return result;
     } //-- getSimpleType
@@ -355,6 +442,14 @@ public class Schema extends Annotated {
     } //-- getTargetNamespace
 
     /**
+     * Returns the namespaces declared for this Schema
+     * @return the namespaces declared for this Schema
+    **/
+    public Hashtable getNamespaces() {
+        return this.namespaces;
+    } //-- getNamespaces
+
+    /**
      * Removes the given top level ComplexType from this Schema
      * @param complexType the ComplexType to remove
      * @return true if the complexType has been removed, or
@@ -364,12 +459,27 @@ public class Schema extends Annotated {
     public boolean removeComplexType(ComplexType complexType) {
         if (complexType.isTopLevel()) {
             if (complexTypes.contains(complexType)) {
-                complexTypes.remove(complexType);
+                complexTypes.remove(complexType.getName());
                 return true;
             }
         }
         return false;
     } //-- removeComplexType
+
+    /**
+     * Removes the given top level SimpleType from this Schema
+     * @param SimpleType the SimpleType to remove
+     * @return true if the SimpleType has been removed, or
+     * false if the SimpleType wasn't top level or
+     * didn't exist in this Schema
+    **/
+    public boolean removeSimpleType(SimpleType simpleType) {
+        if (simpleTypes.contains(simpleType)) {
+            simpleTypes.remove(simpleType.getName());
+            return true;
+        }
+        return false;
+    } //-- removeSimpleType
 
     /**
      * Sets the name of this Schema definition
@@ -401,6 +511,15 @@ public class Schema extends Annotated {
     } //-- setTargetNamespace
 
 
+	/**
+	 * Sets the namespaces declared in this Schema
+	 * @param namespaces the list of namespaces
+	 */
+	public void setNamespaces(Hashtable namespaces) {
+		this.namespaces = namespaces;
+	} //-- setNamespaces
+	
+	
     /** Gets the type factory, package private */
     static SimpleTypesFactory getTypeFactory() { return simpleTypesFactory; }
 
