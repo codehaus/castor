@@ -138,6 +138,12 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
                 throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
             _element.setFixedValue(temp);
         }
+        
+        //-- @form
+        temp = atts.getValue(SchemaNames.FORM);
+        if (temp != null) {
+            _element.setForm(Form.valueOf(temp));
+        }
 
         temp = null;
         //-- @type

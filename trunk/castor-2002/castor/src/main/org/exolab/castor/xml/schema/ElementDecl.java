@@ -59,6 +59,9 @@ public class ElementDecl extends Particle
     implements Referable
 {
 
+   //-------------------/
+   //- Class Variables -/
+   //-------------------/
 
     /**
      * Error message for a null argument
@@ -67,6 +70,18 @@ public class ElementDecl extends Particle
         = "A null argument was passed to the constructor of " +
            ElementDecl.class.getName();
 
+
+    //--------------------/
+    //- Member Variables -/
+    //--------------------/
+    
+    /**
+     * The form type for this element definition. 
+     * Specifies whether names should be qualified or unqualified.
+     * Uses the default Form from the parent Schema if unspecified.
+    **/
+    private Form _form = null;
+    
     /**
      * Flag indicating whether or not this Element declaration is
      * abstract
@@ -163,6 +178,18 @@ public class ElementDecl extends Particle
         return _fixed;
     } //-- getFixedValue
 
+    /**
+     * Returns the Form for this element definition. The Form object species
+     * whether or not names are qualified or unqualified in the scope of
+     * this element definition. If null, the Form should be obtained from the 
+     * parent Schema.
+     *
+     * @return the Form for this element definition, or null if not set.
+    **/
+    public Form getForm() {
+        return _form;
+    } //-- getForm
+    
     /**
      * Returns an Enumeration of IdentityConstraint objects contained within
      * this element definition.
@@ -341,6 +368,18 @@ public class ElementDecl extends Particle
         this._fixed = value;
     } //-- setDefaultValue
 
+    /**
+     * Sets the Form for this element definition. The Form object species
+     * whether or not names are qualified or unqualified in the scope of
+     * this element definition. If null, the Form is to be obtained from the 
+     * parent Schema.
+     *
+     * @param form the Form type for this element definition.
+    **/
+    public void setForm(Form form) {
+        _form = form;
+    } //-- setForm
+    
     /**
      * Sets the name of the element that this Element definition defines
      * @param name the name of the defined element
