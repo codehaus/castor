@@ -20,6 +20,7 @@
       <element ref="include" minOccurs="0" />
       <element ref="class-mapping" minOccurs="1" />
       <element ref="key-generator-def" minOccurs="0" />
+      <element ref="relation-mapping" minOccurs="0" />
     </type>
   </element>
 
@@ -34,6 +35,7 @@
   <element name="class-mapping">
     <type content="elemOnly" order="seq">
       <element name="description" type="string" minOccurs="0" maxOccurs="1" />
+      <element ref="cache-type-mapping" minOccurs="0" maxOccurs="1" />
       <element ref="map-to" minOccurs="0" maxOccurs="1" />
       <group order="choice" minOccurs="1">
         <element ref="field-mapping" minOccurs="0"/>
@@ -41,6 +43,7 @@
       </group>
       <attribute name="name" type="ID" minOccurs="1"/>
       <attribute name="extends" type="IDREF" minOccurs="0"/>
+      <attribute name="depends" type="IDREF" minOccurs="0"/>
       <attribute name="identity" type="string" minOccurs="0"/>
       <attribute name="access" type="string" minOccurs="0" default="shared">
         <enumeration value="read-only"/>
@@ -49,6 +52,36 @@
         <enumeration value="db-locked"/>
       </attribute>
       <attribute name="key-generator" type="string" minOccurs="0"/>
+    </type>
+  </element>
+
+
+  <element name="relation-mapping">
+    <type content="elemOnly" order="seq">
+      <element name="description" type="string" minOccurs="0" maxOccurs="1" />
+      <element ref="map-to" minOccurs="0" maxOccurs="1" />
+      <element ref="cache-type-mapping" minOccurs="0" maxOccurs="1" />
+      <element name="related-mapping" minOccurs="2" maxOccurs="2">
+	<type content="elemOnly" order="seq">
+	  <element ref="sql" minOccurs="0" maxOccurs="1"/>
+          <attribute name="name" type="ID" minOccurs="1"/>
+          <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+	</type>
+      </element>
+      <attribute name="name" type="ID" minOccurs="1"/>
+    </type>
+  </element>
+
+
+  <element name="cache-type-mapping">
+    <type content="empty">
+      <attribute name="type" type="string" minOccurs="0" default="count-limited">
+        <enumeration value="none"/>
+        <enumeration value="count-limited"/>
+        <enumeration value="time-limited"/>
+        <enumeration value="unlimited"/>
+      </attribute>
+      <attribute name="capacity" type="integer" minOccurs="0"/>
     </type>
   </element>
 
@@ -73,30 +106,22 @@
       <element ref="ldap" minOccurs="0" maxOccurs="1"/>
       <attribute name="name" type="NMTOKEN" minOccurs="1"/>
       <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="direct" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="lazy" type="boolean" minOccurs="0" default="false"/>      
       <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
       <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
-      <attribute name="transient" type="boolean" minOccurs="0" default="false"/>
       <attribute name="collection" type="string" minOccurs="0">
         <enumeration value="array"/>
         <enumeration value="vector"/>
+	<enumeration value="hashtable"/>
+	<enumeration value="collection"/>
+	<enumeration value="set"/>
+	<enumeration value="map"/>
         <enumeration value="enumerate"/>
       </attribute>
-    </type>
-  </element>
-
-
-  <element name="container">
-    <type content="elemOnly" order="seq">
-      <element name="description" type="string" minOccurs="0" maxOccurs="1" />
-      <element ref="field-mapping" minOccurs="1"/>
-      <attribute name="name" type="NMTOKEN" minOccurs="1"/>
-      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="transient" type="boolean" minOccurs="0" default="false"/>
     </type>
   </element>
 
@@ -104,9 +129,9 @@
   <element name="sql">
     <type content="empty">
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="type" type="string" minOccurs="0"/>
       <attribute name="many-table" type="NMTOKEN" minOccurs="0"/>
-      <attribute name="many-key" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="many-key" type="NMTOKEN" minOccurs="0"/> 
       <attribute name="dirty" type="string" minOccurs="0" default="check">
         <enumeration value="check"/>
         <enumeration value="ignore"/>
@@ -119,6 +144,7 @@
     <type content="empty">
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
       <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="match" type="string" minOccurs="0"/>
       <attribute name="node" type="string" minOccurs="0">
         <enumeration value="attribute"/>
         <enumeration value="element"/>
@@ -133,6 +159,22 @@
       <attribute name="name" type="NMTOKEN" minOccurs="0"/>
     </type>
   </element>
+
+
+  <element name="container">
+    <type content="elemOnly" order="seq">
+      <element name="description" type="string" minOccurs="0" maxOccurs="1" />
+      <element ref="field-mapping" minOccurs="1"/>
+      <attribute name="name" type="NMTOKEN" minOccurs="1"/>
+      <attribute name="type" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="required" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="direct" type="boolean" minOccurs="0" default="false"/>
+      <attribute name="get-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="set-method" type="NMTOKEN" minOccurs="0"/>
+      <attribute name="create-method" type="NMTOKEN" minOccurs="0"/>
+    </type>
+  </element>
+
 
 
   <element name="key-generator-def">
