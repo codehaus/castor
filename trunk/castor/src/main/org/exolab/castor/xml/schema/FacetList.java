@@ -103,9 +103,20 @@ public class FacetList implements java.io.Serializable {
      * Removes the given Facet from this list
      * @param facet the Facet to remove
     **/
-    public void remove(Facet facet) {
-        facets.remove(facet);
+    public boolean remove(Facet facet) {
+        return facets.remove(facet);
     } //-- remove
+    
+    /**
+     * Removes the facet located at the given index
+     *
+     * @param index the index of the Facet to remove
+     * @return the removed facet
+     */
+    public Facet remove(int index) {
+        return (Facet) facets.remove(index);
+    } //-- remove
+    
 
     /**
      * Returns the number of Facets in this list
