@@ -6,7 +6,6 @@
     <header>
       <p>Reference: <api package="org.exolab.castor.xml">The XML Framework API</api></p>
       <p>Note: This documentation is not yet finished</p>
-      <p align="center"><date>2000-03-27</date></p>
     </header>
 
     <section title="Introduction">
@@ -44,6 +43,7 @@
 /**
  * An simple person class
  */
+</comment>
 public class Person implements java.io.Serializable {
 
    <comment>
@@ -67,7 +67,6 @@ public class Person implements java.io.Serializable {
      * Creates a Person with the given name
      */
    </comment>
-
    public Person(String name) {
       this.name  = name;
    }
@@ -133,11 +132,11 @@ Person person = Unmarshaller.unmarshal(Person.class, reader);
         Castor can marshal "almost" any arbitrary Object to and from XML. When descriptors
         are not available for a specfic Class, the marshalling framework uses reflection
         to gain information about the object.
-        <note>
+        <body-note>
            Actually an in memory set of descriptors are created for the object
            and we will soon have a way for saving these descriptors as Java source,
            so that they may be modified and compiled with little effort.
-        </note>
+        </body-note>
       </p>
       <p>If a set of descriptors exist for the classes, then Castor will use those
          to gain information about how to handle the marshalling.
@@ -148,9 +147,9 @@ Person person = Unmarshaller.unmarshal(Person.class, reader);
          that all Classes must implement "java.io.Serializable". The
          reason we force this restriction is that we needed a way to prevent
          marshalling of certain objects.
-         <note>We are contemplating changing this restriction, as long as we provide a way to
+         <body-note>We are contemplating changing this restriction, as long as we provide a way to
          prevent objects from being marshalled.
-         </note>
+         </body-note>
          There second, which applies only to classes that do NOT have associated descriptors.
          These classes must have have a public default constructor
          (ie. a constructor with no arguments) and adequete "getter" and "setter"

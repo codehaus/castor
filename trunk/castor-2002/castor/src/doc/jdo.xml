@@ -5,6 +5,7 @@
 
     <header>
       <p>Reference: <api package="org.exolab.castor.jdo">The Java Data Objects API</api></p>
+      <p>Note: This documentation is not yet finished</p>
     </header>
 
     <section title="Opening A JDO Database">

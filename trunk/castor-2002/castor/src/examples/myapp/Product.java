@@ -1,19 +1,20 @@
 package myapp;
 
 
+import java.util.Vector;
+import java.util.Enumeration;
 import java.io.Serializable;
+
 
 public class Product
     implements Serializable
 {
 
+
     public int       id;
 
 
-    private boolean  flag;
-
-
-    public String    name = "";
+    public String    name;
 
 
     public float     price;
@@ -22,16 +23,21 @@ public class Product
     public ProductGroup     group;
 
 
-    public ProductInventory inventory;
+    public Vector           detail;
 
 
-    public String toString()
-    {
-	return ( Integer.toString( id ) ) + " " +
-	    ( name == null ? "<no-name>" : name ) + " $" + price + " " +
-	    ( group == null ? "<no-group>" : "[" + group.toString() + "]" ) + " " +
-	    ( inventory == null ? "<no-stock>" : inventory.toString() );
-    }
+    public Vector           category;
+
+
+    public int getId() { return id; }
+
+    public String getName() { return name; }
+
+    public float getPrice() { return price; }
+
+    public Enumeration getDetail() { return detail.elements(); }
+
+    public Enumeration getCategory() { return category.elements(); }
 
 
 }

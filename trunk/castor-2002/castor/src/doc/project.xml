@@ -29,6 +29,7 @@
     <item name="DTDs" href="schema.xml"/>
   </menu>
   <menu name="Using">
+    <item name="Using XML" href="xml-framework.xml"/>
     <item name="Using JDO" href="jdo.xml"/>
     <item name="JDO Config" href="database-conf.xml"/>
     <item name="Types" href="types.xml"/>
