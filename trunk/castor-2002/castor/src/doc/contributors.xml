@@ -58,6 +58,13 @@
   </contributor>
 
   <contributor type="Committer">
+    <name surname="Gignoux" given="Sebastien"/>
+    <email>gignoux@intalio.com</email>
+    <company id="intalio"/>
+    <description>XML Mapping enhancements, bug Fixes, Documentations and some testing.</description>
+  </contributor>
+
+  <contributor type="Committer">
     <name surname="Maucherat" given="Remy"/>
     <email>remm@apache.org</email>
     <company id="apache"/>
