@@ -2,7 +2,8 @@
 REM $Id$
 set JAVA=%JAVA_HOME%\bin\java
 set CLASSPATH=build\classes;build\examples;%CLASSPATH%
-for %%i in (lib\*.jar) do set CLASSPATH=%%i;%CLASSPATH%
-set CLASSPATH=%CLASSPATH%;%JAVA_HOME%\lib\tools.jar
+set cp=%CLASSPATH%
+for %%i in (lib\*.jar) do call b.bat %%i
+set CP=%CP%;%JAVA_HOME%\lib\tools.jar
 
-%JAVA% -classpath %CLASSPATH% %1.Test %2 %3 %4 %5 %6
+%JAVA% -classpath %CP% %1.Test %2 %3 %4 %5 %6
