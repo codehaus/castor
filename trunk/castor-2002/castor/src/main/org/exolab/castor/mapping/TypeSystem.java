@@ -48,86 +48,52 @@ package org.exolab.castor.mapping;
 
 
 /**
- * The access mode for a class. In persistent storage each class is
- * defined as having one of three access modes:
- * <ul>
- * <li>Read only
- * <li>Shared (aka optimistic locking)
- * <li>Exclusive (aka pessimistic locking)
- * </ul>
- * Transactions typically access objects based on the specified access
- * mode. A transaction may be requested to access any object as read
- * only or exclusive, but may not access exclusive objects as shared.
- *
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class AccessMode
+public interface TypeSystem
 {
 
 
     /**
-     * Read only access. Objects can be read but are not made
-     * persistent and changes to objects are not reflected in
-     * persistent storage.
-     */
-    public static final AccessMode ReadOnly = new AccessMode( "read-only" );
-
-
-    /**
-     * Shared access. Objects can be read by multiple concurrent
-     * transactions. Equivalent to optimistic locking.
-     */
-    public static final AccessMode Shared = new AccessMode( "shared" );
-
-
-    /**
-     * Exclusive access. Objects can be access by a single transaction
-     * at any given time. Equivalent to pessimistic locking.
-     */
-    public static final AccessMode Exclusive = new AccessMode( "exclusive" );
-
-
-    /**
-     * Returns the access mode from the name. If <tt>accessMode</tt>
-     * is null, return the default access mode ({@link #Shared}).
-     * Otherwise returns the named access mode.
+     * Returns the class name based on the supplied type name. The type name
+     * can be a short name (e.g. int, byte) or any other Java class (e.g.
+     * myapp.Product). If a short type name is used, the proper class will
+     * be returned. If a Java class name is used, the class will be loaded and
+     * returned through the supplied class loader.
      *
-     * @param accessMode The access mode name
-     * @return The access mode
+     * @param loader The class loader to use
+     * @param typeName The type name
+     * @return The type class
+     * @throws ClassNotFoundException The specified class could not be found
      */
-    public static AccessMode getAccessMode( String accessMode )
-    {
-        if ( accessMode == null )
-            return Shared;
-        if ( accessMode.equals( Shared._name ) )
-            return Shared;
-        if ( accessMode.equals( Exclusive._name ) )
-            return Exclusive;
-        if ( accessMode.equals( ReadOnly._name ) )
-            return ReadOnly;
-        throw new IllegalArgumentException( "Unrecognized access mode" );
-    }
+    public Class typeFromName( ClassLoader loader, String typeName )
+        throws ClassNotFoundException;
 
 
     /**
-     * The name of this access mode as it would appear in a
-     * mapping file.
+     * Returns the default value for this Java type (e.g. 0 for integer, empty
+     * string) or null if no default value is known.
+     *
+     * @param type The Java type
+     * @return The default value or null
      */
-    private String _name;
+    public Object getDefault( Class type );
 
 
-    private AccessMode( String name )
-    {
-        _name = name;
-    }
-
-
-    public String toString()
-    {
-        return _name;
-    }
+    /**
+     * Returns a type convertor. A type convertor can be used to convert
+     * an object from Java type <tt>fromType</tt> to Java type <tt>toType</tt>.
+     *
+     * @param fromType The Java type to convert from
+     * @param toType The Java type to convert to
+     * @throws MappingException No suitable convertor was found
+     */
+    public TypeConvertor getConvertor( Class fromType, Class toType )
+        throws MappingException;
 
 
 }
+
+

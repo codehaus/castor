@@ -48,86 +48,57 @@ package org.exolab.castor.mapping;
 
 
 /**
- * The access mode for a class. In persistent storage each class is
- * defined as having one of three access modes:
- * <ul>
- * <li>Read only
- * <li>Shared (aka optimistic locking)
- * <li>Exclusive (aka pessimistic locking)
- * </ul>
- * Transactions typically access objects based on the specified access
- * mode. A transaction may be requested to access any object as read
- * only or exclusive, but may not access exclusive objects as shared.
- *
+ * Describes the properties of a class and its fields. Implementations
+ * will extend this inteface to provide additional properties.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
+ * @see FieldDesc
  */
-public class AccessMode
+public interface ClassDescriptor
 {
 
 
     /**
-     * Read only access. Objects can be read but are not made
-     * persistent and changes to objects are not reflected in
-     * persistent storage.
-     */
-    public static final AccessMode ReadOnly = new AccessMode( "read-only" );
-
-
-    /**
-     * Shared access. Objects can be read by multiple concurrent
-     * transactions. Equivalent to optimistic locking.
-     */
-    public static final AccessMode Shared = new AccessMode( "shared" );
-
-
-    /**
-     * Exclusive access. Objects can be access by a single transaction
-     * at any given time. Equivalent to pessimistic locking.
-     */
-    public static final AccessMode Exclusive = new AccessMode( "exclusive" );
-
-
-    /**
-     * Returns the access mode from the name. If <tt>accessMode</tt>
-     * is null, return the default access mode ({@link #Shared}).
-     * Otherwise returns the named access mode.
+     * Returns the Java class represented by this descriptor.
      *
-     * @param accessMode The access mode name
+     * @return The Java class
+     */
+    public Class getJavaClass();
+
+
+    /**
+     * Returns a list of fields represented by this descriptor.
+     *
+     * @return A list of fields
+     */
+    public FieldDescriptor[] getFields();
+
+
+    /**
+     * Returns the class descriptor of the class extended by this class.
+     *
+     * @return The extended class descriptor
+     */
+    public ClassDescriptor getExtends();
+
+
+    /**
+     * Returns the identity field, null if this class has no identity.
+     *
+     * @return The identity field
+     */
+    public FieldDescriptor getIdentity();
+
+
+    /**
+     * Returns the access mode specified for this class.
+     *
      * @return The access mode
      */
-    public static AccessMode getAccessMode( String accessMode )
-    {
-        if ( accessMode == null )
-            return Shared;
-        if ( accessMode.equals( Shared._name ) )
-            return Shared;
-        if ( accessMode.equals( Exclusive._name ) )
-            return Exclusive;
-        if ( accessMode.equals( ReadOnly._name ) )
-            return ReadOnly;
-        throw new IllegalArgumentException( "Unrecognized access mode" );
-    }
-
-
-    /**
-     * The name of this access mode as it would appear in a
-     * mapping file.
-     */
-    private String _name;
-
-
-    private AccessMode( String name )
-    {
-        _name = name;
-    }
-
-
-    public String toString()
-    {
-        return _name;
-    }
+    public AccessMode getAccessMode();
 
 
 }
+
+

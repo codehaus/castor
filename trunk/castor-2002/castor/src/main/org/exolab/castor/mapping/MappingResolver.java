@@ -72,12 +72,12 @@ public interface MappingResolver
      * @param javaClass The Java class
      * @return A suitable class descriptor or null
      */
-    public ClassDesc getDescriptor( Class javaClass );
+    public ClassDescriptor getDescriptor( Class javaClass );
 
 
     /**
      * Returns an enumeration of all the known descriptors. Each
-     * element is of type {@link ClassDesc}.
+     * element is of type {@link ClassDescriptor}.
      */
     public Enumeration listDescriptors();
 
