@@ -103,6 +103,7 @@ public class XMLMappingLoader
             } else if ( relDesc != null && relDesc instanceof XMLClassDescriptor &&
                         fields[ i ] instanceof XMLFieldDescriptorImpl ) {
 		( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
+                ( (XMLFieldDescriptorImpl) fields[ i ] ).setNodeType( NodeType.Element );
             }
         }
     }
