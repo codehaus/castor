@@ -61,7 +61,7 @@ import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
  * Implements {link org.exolab.castor.jdo.transactionmanager.
  * TransactionManagerFactory}.
  *
- * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>, <a href=" mailto:
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>, <a href=" mailto:
  * werner.guttmann@gmx.net">Werner Guttmann</a>
  */
 public abstract class BaseTransactionManagerFactory 

@@ -59,7 +59,7 @@ import org.exolab.castor.util.Messages;
   * An IBM Websphere 4 and prior specific factory for acquiring transactions
   * from this particular J2EE container.
   *
-  * @author <a href="mailto:ferret@frii.com">Bruce Snyder</a>
+  * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
   * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
   */
 public class WebSphereTransactionManagerFactory 
