@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2002 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -98,7 +98,7 @@ public final class XSBoolean extends XSType {
         if (_asWrapper)
             return super.createToJavaObjectCode(variableName);
         else {
-            StringBuffer sb = new StringBuffer("new java.lang.Boolean(");
+            StringBuffer sb = new StringBuffer("java.lang.Boolean.valueOf(");
             sb.append(variableName);
             sb.append(")");
             return sb.toString();
