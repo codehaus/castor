@@ -862,12 +862,29 @@ public abstract class MappingLoader
 
                 if ( fieldType == null ) {
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                } else if ( fieldType == java.io.Serializable.class && java.io.Serializable.class.isAssignableFrom( method.getReturnType() ) ) {
-                    // special case for serializable type
-                } else if ( ! Types.typeFromPrimitive( method.getReturnType() ).isAssignableFrom( Types.typeFromPrimitive( fieldType ) ) )
-                    throw new MappingException( "mapping.accessorReturnTypeMismatch",
-                                                method, fieldType.getName() );
-            } else {
+                }
+                else {
+                    fieldType = Types.typeFromPrimitive(fieldType);
+                    Class returnType = Types.typeFromPrimitive( method.getReturnType());
+                    if (fieldType.isInterface() ||
+                        (fieldType.getModifiers() & Modifier.ABSTRACT) != 0) {
+                        if ( ! fieldType.isAssignableFrom( returnType ) )
+                        throw new MappingException("mapping.accessorReturnTypeMismatch",
+                                                    method, fieldType.getName() );
+                    }
+                    else if ( fieldType == java.io.Serializable.class && java.io.Serializable.class.isAssignableFrom( method.getReturnType() ) ) {
+                        // Since user declared type as Serializable we
+                        // simply let it slip passed this code. This is
+                        // needed for CMP 1.1 compatibility. 
+                    }
+                    else {
+                        if ( ! returnType.isAssignableFrom( fieldType ) )
+                        throw new MappingException("mapping.accessorReturnTypeMismatch",
+                                                    method, fieldType.getName() );
+                    }
+                }                    
+            } 
+            else {
                 method = null;
                 fieldTypeFromPrimitive = null;
                 // Set method: look for the named method or prepend set to the
