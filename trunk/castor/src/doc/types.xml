@@ -86,6 +86,14 @@
         <tr><td>stream</td><td>N</td><td>java.io.InputStream</td></tr>
       </table>
 
+      <p>In addition, support for the following Castor-internal field types 
+         has been added:</p>
+
+      <table border="1" cellpadding="4">
+        <tr><th>short name</th><th>Primitive type?</th><th>Java Class</th></tr>
+        <tr><td>duration</td><td>N</td><td>org.exolab.castor.types.Duration</td></tr>
+      </table>
+
     </section>
 
     <section title="SQL Type Conversion">
