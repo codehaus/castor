@@ -88,55 +88,46 @@ class SQLEngine
 {
 
 
-    private boolean             _specifyKeyForCreate = true;
+    private boolean           _specifyKeyForCreate = true;
 
 
-    private boolean             _useCursorForLock = false;
+    private boolean           _useCursorForLock = false;
 
 
-    private String          _stampField; // = "ctid";
+    private String            _stampField; // = "ctid";
 
 
-    private String          _pkLookup;
+    private String            _pkLookup;
 
 
-    private String          _sqlCreate;
+    private String            _sqlCreate;
 
 
-    private String          _sqlRemove;
+    private String            _sqlRemove;
 
 
-    private String          _sqlStore;
+    private String            _sqlStore;
 
 
-    private String          _sqlLoad;
+    private String            _sqlLoad;
 
 
-    private String          _sqlLoadLock;
+    private String            _sqlLoadLock;
 
 
-    private QueryExpr       _sqlFinder;
+    private QueryExpr         _sqlFinder;
 
 
     private ClassHandler      _handler;
 
 
-    private FieldHandler[]    _loadFields;
-
-
-    private RelationHandler[] _loadRels;
-
-
-    private FieldHandler[]    _storeFields;
-
-
-    private RelationHandler[] _storeRels;
+    private FieldInfo[]       _fields;
 
 
     private SQLEngine         _extends;
 
 
-    private int               _firstField;
+    private PrintWriter       _logWriter;
 
 
     SQLEngine( ClassHandler handler, PrintWriter logWriter )
@@ -145,14 +136,12 @@ class SQLEngine
         JDOClassDescriptor clsDesc;
 
         _handler = handler;
-        if ( handler.getExtends() != null ) {
+        if ( handler.getExtends() != null )
             _extends = new SQLEngine( handler.getExtends(), logWriter );
-            _firstField = handler.getExtends().getFieldCount();
-        } else
-            _firstField = 0;
         clsDesc = (JDOClassDescriptor) _handler.getDescriptor();
         buildSql( clsDesc, logWriter );
         buildFinder( handler, logWriter );
+        _logWriter = logWriter;
     }
 
 
@@ -203,10 +192,12 @@ class SQLEngine
                 stmt.setObject( count, identity );
                 count += 1;
             }
-            
-            for ( int i = 0 ; i < _storeFields.length ; ++i ) {
-                stmt.setObject( count, fields[ _firstField + i ] );
-                ++count;
+
+            for ( int i = 0 ; i < _fields.length ; ++i ) {
+                if ( _fields[ i ].store ) {
+                    stmt.setObject( count, fields[ i ] );
+                    ++count;
+                }
             }
 
             stmt.executeUpdate();
@@ -261,9 +252,11 @@ class SQLEngine
             count = 1;
             stmt = ( (Connection) conn ).prepareStatement( _sqlStore );
 
-            for ( int i = 0 ; i < _storeFields.length ; ++i ) {
-                stmt.setObject( count, fields[ _firstField + i ] );
-                ++count;
+            for ( int i = 0 ; i < _fields.length ; ++i ) {
+                if ( _fields[ i ].store ) {
+                    stmt.setObject( count, fields[ i ] );
+                    ++count;
+                }
             }
 
             stmt.setObject( count, identity );
@@ -357,20 +350,10 @@ class SQLEngine
                 throw new ObjectNotFoundException( getDescriptor().getJavaClass(), identity );
             
             do {
-                // First iteration for a PK: traverse all the fields
                 for ( int i = 0; i < fields.length ; ++i  ) {
-                    // Usinging typed setValue so float/double, int/long
-                    // can be intermixed with automatic conversion, something
-                    // that throws an exception in the untyped version
                     fields[ i ] = rs.getObject( i + 1 );
-                    // _loadFields[ i ].setValue( obj, rs.getObject( i + 1 ) );
                 }
             } while ( rs.next() );
-
-            /*
-            if ( _stampField != null )
-                stamp = rs.getObject( _loadFields.length + 1 );
-            */
             rs.close();
             stmt.close();
         } catch ( SQLException except ) {
@@ -449,12 +432,14 @@ class SQLEngine
 
         sql = new StringBuffer( "UPDATE " );
         sql.append( clsDesc.getTableName() ).append( " SET " );
+        count = 0;
         for ( int i = 0 ; i < jdoFields.length ; ++i ) {
             if ( jdoFields[ i ] != null ) {
-                if ( i > 0 )
+                if ( count > 0 )
                     sql.append( ',' );
                 sql.append( jdoFields[ i ].getSQLName() );
                 sql.append( "=?" );
+                ++count;
             }
         }
         sql.append( " WHERE " ).append( wherePk );
@@ -462,82 +447,57 @@ class SQLEngine
         if ( logWriter != null )
             logWriter.println( "SQL for updating " + clsDesc.getJavaClass().getName() +
                                ": " + _sqlStore );
-
-        Vector    storeFields;
-
-        storeFields = new Vector();
-        fields = clsDesc.getFields();
-        for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof JDOFieldDescriptor )
-                storeFields.addElement( fields[ i ].getHandler() );
-        }
-        _storeFields = new FieldHandler[ storeFields.size() ];
-        storeFields.copyInto( _storeFields );
     }
     
     
     protected void buildFinder( ClassHandler handler, PrintWriter logWriter )
         throws MappingException
     {
-        Vector             loadFields;
-        Vector             loadRels;
-        QueryExpr          expr;
+        Vector    fields;
+        QueryExpr expr;
 
-        loadFields = new Vector();
-        loadRels = new Vector();
+        fields = new Vector();
         expr = new QueryExpr();
-        addLoadSql( handler, expr, loadFields, loadRels, false, true );
-        /*
-          if ( _stampField != null )
-            sqlFields.append( ',' ).append( _stampField );
-        */
+        addLoadSql( handler, expr, fields, false, true, true );
         
         _sqlLoad = expr.getQuery( false );
         _sqlLoadLock = expr.getQuery( true );
-        _loadFields = new FieldHandler[ loadFields.size() ];
-        loadFields.copyInto( _loadFields );
-        _loadRels = new RelationHandler[ loadRels.size() ];
-        loadRels.copyInto( _loadRels );
+        _fields = new FieldInfo[ fields.size() ];
+        fields.copyInto( _fields );
         if ( logWriter != null )
             logWriter.println( "SQL for loading " + handler.getJavaClass().getName() +
                                ":  " + _sqlLoad );
 
         _sqlFinder = new QueryExpr();
-        addLoadSql( handler, _sqlFinder, loadFields, loadRels, true, false );
-        /*
-        if ( _stampField != null )
-            sqlFields.append( ',' ).append( _stampField );
-        */
+        addLoadSql( handler, _sqlFinder, fields, true, false, true );
     }
 
 
-    private void addLoadSql( ClassHandler handler, QueryExpr expr, Vector loadFields,
-                             Vector loadRels, boolean loadPk, boolean queryPk )
+    private void addLoadSql( ClassHandler handler, QueryExpr expr, Vector allFields,
+                             boolean loadPk, boolean queryPk, boolean store )
         throws MappingException
     {
         JDOClassDescriptor   clsDesc;
         FieldDescriptor[]    fields;
         JDOClassDescriptor   extend;
         FieldDescriptor      identity;
-        RelationHandler[]    rels;
         
         clsDesc = (JDOClassDescriptor) handler.getDescriptor();
         identity = clsDesc.getIdentity();
-        // rels = clsDesc.getRels();
         expr.addTable( clsDesc );
         
+        // If this class extends another class, create a join with the parent table and
+        // add the load fields of the parent class (but not the store fields)
         if ( handler.getExtends() != null ) {
             expr.addJoin( clsDesc, (JDOFieldDescriptor) identity,
                           (JDOClassDescriptor) clsDesc.getExtends(), (JDOFieldDescriptor) identity );
-            addLoadSql( handler.getExtends(), expr, loadFields, loadRels, true, queryPk );
+            addLoadSql( handler.getExtends(), expr, allFields, true, queryPk, false );
             loadPk = false;
             queryPk = false;
         }
         
-        if ( loadPk  ) {
+        if ( loadPk  )
             expr.addColumn( clsDesc, (JDOFieldDescriptor) identity );
-            // XXX How do we handle ProductInventory?
-        }
         
         if ( queryPk )
             expr.addParameter( clsDesc, (JDOFieldDescriptor) identity, null );
@@ -546,16 +506,17 @@ class SQLEngine
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ] instanceof JDOFieldDescriptor ) {
                 expr.addColumn( clsDesc, (JDOFieldDescriptor) fields[ i ] );
-                loadFields.addElement( fields[ i ].getHandler() );
+                allFields.addElement( new FieldInfo( fields[ i ], store ) );
             } else {
                 JDOClassDescriptor relDesc;
 
-                relDesc = (JDOClassDescriptor) fields[ i ].getTypeDescriptor();
+                relDesc = (JDOClassDescriptor) fields[ i ].getClassDescriptor();
                 expr.addTable( relDesc );
                 expr.addColumn( relDesc, (JDOFieldDescriptor) relDesc.getIdentity() );
                 expr.addJoin( clsDesc.getTableName(), ( (JDOFieldDescriptor) identity ).getSQLName(),
-                              "prod_detail", "prod_id" );
-                loadFields.addElement( fields[ i ].getHandler() );
+                              relDesc.getTableName(), "prod_id" );
+                // XXX                                ^^^
+                allFields.addElement( new FieldInfo( fields[ i ], false ) );
             }
         }
     }
@@ -564,6 +525,22 @@ class SQLEngine
     public String toString()
     {
         return getDescriptor().toString();
+    }
+
+
+    static class FieldInfo
+    {
+
+        final boolean store;
+
+        final String  name;
+
+        FieldInfo( FieldDescriptor fieldDesc, boolean store )
+        {
+            this.name = fieldDesc.getFieldName();
+            this.store = store;
+        }
+
     }
 
 
@@ -632,6 +609,8 @@ class SQLEngine
             PreparedStatement stmt;
 
             _lastIdentity = null;
+            if ( _engine._logWriter != null )
+                _engine._logWriter.println( _sql );
             try {
                 stmt = ( (Connection) conn ).prepareStatement( _sql );
                 for ( int i = 0 ; i < _values.length ; ++i )
@@ -691,16 +670,12 @@ class SQLEngine
                 // Load all the fields of the object including one-one relations
                 for ( int i = 0 ; i < fields.length ; ++i  )
                     fields[ i ] = _rs.getObject( i + count );
-                /*
-                _engine._loadFields[ i ].setValue( obj, _rs.getObject( i + count ) );
-                */
 
                 if ( _rs.next() ) {
                     _lastIdentity = _rs.getObject( 1 );
                     while ( identity.equals( _lastIdentity ) ) {
                         for ( int i = 0; i < fields.length ; ++i  )
                             fields[ i ] = _rs.getObject( i + count );
-                            //    _engine._loadFields[ i ].setValue( obj, _rs.getObject( i + 2 ) );
                         if ( _rs.next() )
                             _lastIdentity = _rs.getObject( 1 );
                         else
@@ -708,10 +683,6 @@ class SQLEngine
                     }
                     _lastIdentity = null;
                 }
-                /*
-                if ( _engine._stampField != null )
-                    stamp = _rs.getString( _engine._loadFields.length + count );
-                */
             } catch ( SQLException except ) {
                 throw new PersistenceException( except );
             }
