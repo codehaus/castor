@@ -527,6 +527,7 @@ public abstract class MappingLoader
                                             fieldMap.getCreateMethod(), javaClass.getName() );
             }
         } else if ( fieldMap.getName() != null ) {
+            // XXX Only need to do this is the field is not a simple type
             try {
                 Method method;
 

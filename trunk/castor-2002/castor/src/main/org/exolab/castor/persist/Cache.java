@@ -129,18 +129,20 @@ final class Cache
     {
         Enumeration enum;
         CacheEntry  entry;
+        OID         oid;
 
         while ( true ) {
-            enum = _locks.elements();
+            enum = _locks.keys();
             while ( enum.hasMoreElements() ) {
-                entry = (CacheEntry) enum.nextElement();
+                oid = (OID) enum.nextElement();
+                entry = (CacheEntry) _locks.get( oid );
                 synchronized ( this ) {
                     if ( entry.stamp != StampInUse ) {
                         try {
                             Object obj;
                             
                             obj = entry.lock.acquire( _cacheTx, true, 0 );
-                            _locks.remove( entry.oid );
+                            _locks.remove( oid );
                             entry.lock.release( _cacheTx );
                         } catch ( LockNotGrantedException except ) { }
                     }
@@ -153,15 +155,12 @@ final class Cache
     static class CacheEntry
     {
 
-        final OID        oid;
-
         final ObjectLock lock;
         
         long             stamp;
 
         CacheEntry( OID oid, ObjectLock lock )
         {
-            this.oid = oid;
             this.lock = lock;
         }
 
@@ -177,7 +176,7 @@ final class Cache
             return null;
         }
 
-        protected void commitConnections( boolean keepOpen )
+        protected void commitConnections()
         {
         }
 

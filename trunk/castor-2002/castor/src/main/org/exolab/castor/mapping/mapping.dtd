@@ -68,7 +68,7 @@
     name       ID #REQUIRED
     extends    IDREF #IMPLIED
     identity   CDATA #IMPLIED
-    access     (read-only|shared|exclusive|locked) "shared">
+    access     (read-only|shared|exclusive|db-locked) "shared">
 
 
 <!--
