@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * $Id: LRU.java
+ * $Id$
  */
 
 package org.exolab.castor.persist.cache;
@@ -55,9 +55,9 @@ import java.util.Enumeration;
 public interface Cache {
 	
 	/**
-	 *Returns the value to which the specified key is mapped in this hashtable.
-	 *@param key - a key in the hashtable.
-	 *@return the value to which the key is mapped in this hashtable; null if 
+	 * Returns the value to which the specified key is mapped in this hashtable.
+	 * @param key - a key in the hashtable.
+	 * @return the value to which the key is mapped in this hashtable; null if 
 	 * the key is not mapped to any value in this hashtable.
 	 */
 	public Object get(Object key);
@@ -118,15 +118,24 @@ public interface Cache {
      * Indicates the type of this cache.
      * @return the cache type.
      */
-    public CacheType getCacheType ();
+    public String getCacheType ();
     
     /**
      * Sets the type of this cache instance.
-     * @param cacheType the type of this cache.
+     * @param cacheType The type of this cache.
      */
-    public void setCacheType (CacheType cacheType);
+    public void setCacheType (String cacheType);
 	
-	
-	
+    /**
+     * Indicates the cache capacity.
+     * @return the cache capacity.
+     */
+    public int getCapacity();
+    
+    /**
+     * Sets the cache capacity.
+     * @param capacity the cache capacity.
+     */
+    public void setCapacity (int capacity);
 	
 }
