@@ -47,9 +47,11 @@
 package org.exolab.castor.persist;
 
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.LockNotGrantedException;
-import org.exolab.castor.util.Messages;
 import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.util.Messages;
 
 
 /**
@@ -94,7 +96,12 @@ import org.exolab.castor.jdo.ObjectDeletedException;
 
 final class ObjectLock implements DepositBox {
 
-
+	/**
+	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+	 * Commons Logging</a> instance used for all logging.
+	 */
+	private static Log log = LogFactory.getFactory().getInstance(ObjectLock.class );
+	
     final static short ACTION_READ = 1;
 
     final static short ACTION_WRITE = 2;
@@ -108,9 +115,6 @@ final class ObjectLock implements DepositBox {
     final static int[] lock = new int[0];
 
     private int    _id;
-
-    final static boolean TRACE = false;
-
 
     /**
      * The object being locked.
@@ -191,7 +195,7 @@ final class ObjectLock implements DepositBox {
      * locks for the same object. This will be the object returned from
      * a successful call to one of the <tt>acquire</tt>.
      *
-     * @param obj The object to create a lock for
+     * @param oid The object to create a lock for
      */
     ObjectLock( OID oid ) {
         _oid = oid;
@@ -305,8 +309,6 @@ final class ObjectLock implements DepositBox {
     }
 
     boolean isExclusivelyOwned( TransactionContext tx ) {
-        LinkedTx read;
-
         if ( _writeLock == null && _readLock == null )
             return false;
 
@@ -423,13 +425,15 @@ final class ObjectLock implements DepositBox {
                     // other transaction holding writeLock, waits for write
                     // or, other transaction holding readLock, waiting for read
                     if ( timeout == 0 ) {
-                        if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
+                        if (log.isDebugEnabled()) {
+                            log.debug ( "Timeout on " + this.toString() + " by " + tx );
+                        }
                         throw new LockNotGrantedException( (write ? "persist.writeLockTimeout" :
                                                                "persist.readLockTimeout") + _oid + "/" + _id + " by " + tx );
                     }
-                    if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                    if (log.isDebugEnabled()) {
+                        log.debug ( "Waiting on " + this.toString() + " by " + tx );
+                    }
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
                     tx.setWaitOnLock( this );
@@ -542,12 +546,14 @@ final class ObjectLock implements DepositBox {
                     return;
                 } else {
                     if ( timeout == 0 ) {
-                        if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
-                        throw new LockNotGrantedException( "persist.writeLockTimeout" );
+                        if (log.isDebugEnabled()) {
+                            log.debug ( "Timeout on " + this.toString() + " by " + tx );
+                        }
+                        throw new LockNotGrantedException( Messages.message ("persist.writeLockTimeout") );
                     }
-                    if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                    if (log.isDebugEnabled()) {
+                        log.debug ( "Waiting on " + this.toString() + " by " + tx );
+                    }
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
                     tx.setWaitOnLock( this );
@@ -566,12 +572,12 @@ final class ObjectLock implements DepositBox {
                         wait( waittime<0? 0: waittime );
                     } catch ( InterruptedException except ) {
                         // If the thread is interrupted, come out with the proper message
-                        throw new LockNotGrantedException( "persist.writeLockTimeout" + _oid + "/" + _id + " by " + tx );
+                        throw new LockNotGrantedException( Messages.message ("persist.writeLockTimeout") + _oid + "/" + _id + " by " + tx );
                     }
 
                     if ( _deleted )
                         // If object has been deleted while waiting for lock, report deletion.
-                        throw new ObjectDeletedWaitingForLockException("object deleted" + _oid + "/" + _id + " by " + tx);
+                        throw new ObjectDeletedWaitingForLockException("Object deleted " + _oid + "/" + _id + " by " + tx);
 
                     // Try to re-acquire lock, this time less timeout,
                     // eventually timeout of zero will either succeed or fail
@@ -704,10 +710,8 @@ final class ObjectLock implements DepositBox {
      * cancelled whether or not the write is acquired.
      *
      * @param tx The transaction requesting the lock
-     * @param write The type of lock requested
      * @param timeout Timeout waiting to acquire lock (in milliseconds),
      *  zero for no waiting
-     * @return The locked object
      * @throws LockNotGrantedException Lock could not be granted in
      *  the specified timeout or a dead lock has been detected
      * @throws ObjectDeletedWaitingForLockException The object has
@@ -725,7 +729,7 @@ final class ObjectLock implements DepositBox {
             throw e;
         }
         if ( !hasLock( tx, false ) ) {
-            IllegalStateException e = new IllegalStateException("Transaction doesn't previously acquire this lock");
+            IllegalStateException e = new IllegalStateException("Transaction didn't previously acquire this lock");
             throw e;
         }
 
@@ -742,20 +746,23 @@ final class ObjectLock implements DepositBox {
                     // Upgrading from read to write, no other locks, can upgrade
                     // Order is important in case thread is stopped in the middle
                     //_readLock = null;
-                    if ( TRACE )
-                        System.out.println( "Acquired on " + toString() + " by " + tx );
+                    if (log.isDebugEnabled()) {
+                        log.debug ( "Acquired on " + this.toString() + " by " + tx );
+                    }
                     _writeLock = tx;
                     _readLock = null;
                     return;
                 } else {
                     // Don't wait if timeout is zero
                     if ( timeout == 0 ) {
-                        if ( TRACE )
-                            System.out.println( "Timeout on " + this.toString() + " by " + tx );
+                        if (log.isDebugEnabled()) {
+                            log.debug ( "Timeout on " + this.toString() + " by " + tx );
+                        }
                         throw new LockNotGrantedException( "persist.writeTimeout" + _oid + "/" + _id + " by " + tx );
                     }
-                    if ( TRACE )
-                        System.out.println( "Waiting on " + this.toString() + " by " + tx );
+                    if (log.isDebugEnabled()) {
+                        log.debug ( "Waiting on " + this.toString() + " by " + tx );
+                    }
                     // Detect possibility of dead-lock. Must remain in wait-on-lock
                     // position until lock is granted or exception thrown.
 
@@ -810,8 +817,9 @@ final class ObjectLock implements DepositBox {
      */
     synchronized void release( TransactionContext tx ) {
 
-        if ( TRACE )
-            System.out.println( "Release " + this.toString() + " by " + tx );
+        if (log.isDebugEnabled()) {
+            log.debug ( "Release " + this.toString() + " by " + tx );
+        }
 
         try {
             tx.setWaitOnLock( null );
@@ -840,10 +848,10 @@ final class ObjectLock implements DepositBox {
                         read = read.next;
                     }
                     if ( read == null )
-                        throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + tx );
+                        throw new IllegalStateException( Messages.message ("persist.notOwnerLock") + _oid + "/" + _id + " by " + tx );
                 }
             } else 
-                throw new IllegalStateException( "persist.notOwnerLock" + _oid + "/" + _id + " by " + tx );
+                throw new IllegalStateException( Messages.message ("persist.notOwnerLock") + _oid + "/" + _id + " by " + tx );
 
             // Notify all waiting transactions that they may attempt to
             // acquire lock. First one to succeed wins (or multiple if
@@ -870,10 +878,11 @@ final class ObjectLock implements DepositBox {
     synchronized void delete( TransactionContext tx ) {
 
         if ( tx != _writeLock )
-            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + tx );
+            throw new IllegalStateException( Messages.message("persist.notOwnerLock") + " oid:" + _oid + "/" + _id + " by " + tx );
 
-        if ( TRACE )
-            System.out.println( "Delete " + this.toString() + " by " + tx );
+        if (log.isDebugEnabled()) {
+            log.debug ( "Delete " + this.toString() + " by " + tx );
+        }
 
         try {
             // Mark lock as unlocked and deleted, notify all waiting transactions
@@ -892,10 +901,11 @@ final class ObjectLock implements DepositBox {
     synchronized void invalidate( TransactionContext tx ) {
         
         if ( tx != _writeLock ) 
-            throw new IllegalStateException( "persist.notOwnerLock oid:" + _oid + "/" + _id + " by " + tx );
+            throw new IllegalStateException( Messages.message ("persist.notOwnerLock") + " oid:" + _oid + "/" + _id + " by " + tx );
 
-        if ( TRACE )
-            System.out.println( "Delete " + this.toString() + " by " + tx );
+        if (log.isDebugEnabled()) {
+            log.debug ( "Delete " + this.toString() + " by " + tx );
+        }
 
         _invalidated = true;
     }
@@ -940,12 +950,12 @@ final class ObjectLock implements DepositBox {
                 // Is the blocked transaction blocked by the transaction locking
                 // this object? This is a deadlock.
                 if ( waitOn._writeLock == waitingTx ) {
-                    throw new LockNotGrantedException( "persist.deadlock" );
+                    throw new LockNotGrantedException( Messages.message("persist.deadlock") );
                 }
                 read = waitOn._readLock;
                 while ( read != null ) {
                     if ( read.tx == waitingTx )
-                        throw new LockNotGrantedException( "persist.deadlock" );
+                        throw new LockNotGrantedException( Messages.message ("persist.deadlock" ));
                     read = read.next;
                 }
                 waitOn.detectDeadlock( waitingTx, numOfRec - 1 );
@@ -965,12 +975,12 @@ final class ObjectLock implements DepositBox {
                     LinkedTx read;
 
                     if ( waitOn._writeLock == waitingTx ) {
-                        throw new LockNotGrantedException( "persist.deadlock" );
+                        throw new LockNotGrantedException( Messages.message ("persist.deadlock") );
                     }
                     read = waitOn._readLock;
                     while ( read != null ) {
                         if ( read.tx == waitingTx )
-                            throw new LockNotGrantedException( "persist.deadlock" );
+                            throw new LockNotGrantedException( Messages.message ("persist.deadlock") );
                         read = read.next;
                     }
                     waitOn.detectDeadlock( waitingTx, numOfRec - 1 );
