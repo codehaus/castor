@@ -1017,11 +1017,28 @@ public abstract class MappingLoader
                     for ( i = 0 ; i < methods.length ; ++i ) {
                         if ( methods[ i ].getName().equals( methodName ) ) {
                             parameterTypes = methods[ i ].getParameterTypes();
-                            if (( parameterTypes.length == 1 ) &&
-                                (( fieldType == null ) ||
-                                 Types.typeFromPrimitive( parameterTypes[0] ).isAssignableFrom( fieldTypeFromPrimitive ) )) {
+                            if (parameterTypes.length != 1) continue;
+                            
+                            Class paramType = Types.typeFromPrimitive( parameterTypes[0] );
+                            
+                            //-- check straight match
+                            if ((fieldType == null) ||
+                                 paramType.isAssignableFrom( fieldTypeFromPrimitive )) 
+                            {
                                 method = methods[ i ];
                                 break;
+                            }
+                            //-- Check against whether the declared type is
+                            //-- an interface or abstract class. 
+                            else if (fieldType.isInterface() ||
+                                    ((fieldType.getModifiers() & Modifier.ABSTRACT) != 0))
+                            {
+                                if (fieldTypeFromPrimitive.isAssignableFrom( paramType )) 
+                                {
+                                    method = methods[i];
+                                    break;
+                                }
+                                    
                             }
                         }
                     }
