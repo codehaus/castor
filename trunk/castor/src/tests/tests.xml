@@ -107,7 +107,7 @@
               writing castor jdo driver      -->
     <!-- <case class="jdo.ListTypes" /> -->
     <case class="jdo.TimeStampMismatched" />
-    <case class="jdo.Size" />
+    <case class="jdo.SizeOracle" id="TC66a" />
     <case class="jdo.Absolute" />
     <case class="jdo.TestLimitWithOffsetClause" id="TC62a" />
 
