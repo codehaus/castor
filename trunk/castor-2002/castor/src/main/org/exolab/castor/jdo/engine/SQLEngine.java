@@ -140,20 +140,20 @@ class SQLEngine
         _clsDesc = clsDesc;
         _identity = _clsDesc.getIdentity();
         if ( _identity == null )
-            throw new MappingException( "Cannot persist a table that lacks a primary key descriptor" );
+            throw new MappingException( "mapping.noIdentity", _clsDesc.getJavaClass().getName() );
 
         buildCreateSql();
         buildRemoveSql();
         buildStoreSql();
         buildLoadSql();
         if ( logWriter != null ) {
-            logWriter.println( "SQL for " + _clsDesc.getJavaClass().getName() +
-                               ": " + _sqlLoad );
-            logWriter.println( "SQL for " + _clsDesc.getJavaClass().getName() +
+            logWriter.println( "SQL for loading " + _clsDesc.getJavaClass().getName() +
+                               ":  " + _sqlLoad );
+            logWriter.println( "SQL for creating " + _clsDesc.getJavaClass().getName() +
                                ": " + _sqlCreate );
-            logWriter.println( "SQL for " + _clsDesc.getJavaClass().getName() +
+            logWriter.println( "SQL for updating " + _clsDesc.getJavaClass().getName() +
                                ": " + _sqlStore );
-            logWriter.println( "SQL for " + _clsDesc.getJavaClass().getName() +
+            logWriter.println( "SQL for deleting " + _clsDesc.getJavaClass().getName() +
                                ": " + _sqlRemove );
         }
         if ( _clsDesc.getExtends() != null )
@@ -197,7 +197,7 @@ class SQLEngine
             // also lock the table against creation of an object with such
             // a primary key.
             if ( _specifyKeyForCreate && identity == null )
-                throw new PersistenceException( "This implementation requires a primary key to be set prior to object creation" );
+                throw new PersistenceException( "persist.createWithoutIdentity" );
             
             // Must remember that SQL column index is base one
             count = 1;
@@ -713,11 +713,9 @@ class SQLEngine
                 descs = getJDOFields( (ContainerFieldDesc) identity );
                 for ( int i = 0 ; i < descs.length ; ++i ) {
                     expr.addColumn( clsDesc, descs[ i ] );
-                    //                    loadFields.addElement( new JDOContainedFieldDesc( descs[ i ], (ContainerFieldDesc) identity, null ) );
                 }
             } else {
                 expr.addColumn( clsDesc, (JDOFieldDesc) identity );
-                //                loadFields.addElement( identity );
             }
             // XXX How do we handle ProductInventory?
         }
@@ -791,11 +789,11 @@ class SQLEngine
         FieldDesc[] cFields;
 
         identity = clsDesc.getIdentity();
-        identity = new JDOContainedFieldDesc( (JDOFieldDesc) identity, refField, null );
+        identity = new JDOContainedFieldDesc( (JDOFieldDesc) identity, refField );
         fields = clsDesc.getFields();
         cFields = new FieldDesc[ fields.length ];
         for ( int i = 0 ; i < fields.length ; ++i )
-            cFields[ i ] = new JDOContainedFieldDesc( (JDOFieldDesc) fields[ i ], refField, null );
+            cFields[ i ] = new JDOContainedFieldDesc( (JDOFieldDesc) fields[ i ], refField );
         return new JDOClassDesc( new ClassDesc( clsDesc.getJavaClass(), cFields,
                                                 clsDesc.getRelations(), identity, clsDesc.getExtends(),
                                                 clsDesc.getAccessMode() ), clsDesc.getTableName() );
@@ -983,7 +981,7 @@ class SQLEngine
             Object stamp = null;
             
             if ( _lastIdentity == null )
-                throw new PersistenceException( "Internal error: fetch called without an identity returned from getIdentity/nextIdentity" );
+                throw new PersistenceException( "persist.fetchWithoutIdentity" );
             try {
                 if ( _engine._identity instanceof ContainerFieldDesc ) {
                     JDOFieldDesc[] descs;
