@@ -2,6 +2,15 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed bug 1560 by adding some additional checks for null
+       in the XMLClassDescriptorImpl.
+       (kvisco - 20040729)
+
+XML:   Updated the Unmarshaller to make sure it gets the ClassLoader
+       from the passed in class if no user specific loader has been
+       specified.
+       (kvisco - 20040729)
+
 XML:   Fixed bug with FieldHandlerFactory support in introspector by
        making sure the the type specified by the FieldHandler 
        replaces that of the introspection. This allows primitives
