@@ -170,7 +170,9 @@ public class MemberFactory {
                 if (cInfo != null)
                     xsType = cInfo.getSchemaType();
             }
-            else xsType = TypeConversion.convertType(datatype);
+            
+            if (xsType == null)
+                xsType = TypeConversion.convertType(datatype);
         }
         else
             xsType = new XSString();
