@@ -195,6 +195,23 @@ abstract class MarshalFramework {
     } //-- hasFieldsAtLocation
     
     /**
+     * Compares the given namespaces (as strings) for equality.
+     * null and empty values are considered equal.
+     *
+     * @param ns1 the namespace to compare to argument ns2
+     * @param ns2 the namespace to compare to argument ns1
+     */
+    public static boolean namespaceEquals(String ns1, String ns2) {
+        if (ns1 == null) {
+            return ((ns2 == null) || (ns2.length() == 0));
+        }
+        if (ns2 == null) {
+            return (ns1.length() == 0);
+        }
+        return ns1.equals(ns2);
+    } //-- namespaceEquals
+    
+    /**
      * Returns true if the given classes are both the same
      * primitive or primitive wrapper class. For exmaple, if 
      * class "a" is an int (Integer.TYPE) and class "b" is 
