@@ -1,14 +1,21 @@
 Version 0.8     March 24, 2000
 ------------------------------
 
-XML:     We are now one step closer to using the mapping files with Castor XML.
+XML:     Updated the Source code generator to work with new Framework
+         - Note I currently removed validation support, this will be back ASAP
+         - There is a known bug with using "binary" type...I'll have this fixed ASAP also.
 
-         - Changed MarshalInfoResolver to ClassDescriptorResolver
-         - Changed MarshalDescriptor to XMLFieldDescriptor which extends
-           the mapping framework FieldDescriptor interface.
-         - Added XMLFieldDescriptorImpl
-         - Changed MarshalInfo to XMLClassDescriptor, which extends
-           the mapping ClassDescriptor interface
+XML:     We are now one step closer to using the mapping files with Castor XML.
+         A lot of changes have gone into sharing the "descriptor" framework
+         between Castor XML and Castor JDO...I can't enumerate all the changes
+         in this log, but here are a few:
+
+         - MarshalInfo and MarshalDescriptor have been changed to XMLClassDescriptor,
+           and XMLFieldDescriptor respectively, and the interfaces have changed so
+           be careful.
+         - We added the XMLFieldHandler
+         - Changed MarshalInfoResolver to ClassDescriptorResolver and moved
+           the automatic ClassDescriptor creation from MarshalHelper to this class
 
 Version 0.7.12  March 15, 2000
 ------------------------------
