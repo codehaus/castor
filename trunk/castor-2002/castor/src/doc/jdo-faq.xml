@@ -53,16 +53,6 @@
     </section>
 
     <section title="Technical questions">
-    <p><b>I am using Oracle, I got ObjectModifiedException during commit. But, Castor is the only program access the database. Why?</b></p>
-
-	<p>The problem happens when some fields of a class contains null value. It dues to a bugs in Oracle's JDBC driver's setNull method. We're developing workaround to modify the SQLStatement to work around the problem. However, in the mean time, please set the potential null field to dirty="ignore" in the mapping file:
-         <code><![CDATA[
-<field name="...." type="....">
-   <sql name="...." dirty="ignore"/>
-</field>]]>
-         </code>
-       </p>
-
     <p><b>I have encountered problems using Sun JDBC-ODBC bridge with Castor...</b></p>
 
 	<p>It cannot be used with Castor, because it doesn't allow to keep two open ResultSets at the same time.
