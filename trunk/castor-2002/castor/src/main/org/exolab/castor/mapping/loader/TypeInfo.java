@@ -163,9 +163,8 @@ public class TypeInfo
                      CollectionHandler colHandler )
     {
 
-        if (colHandler == null) {
-            
-            if (fieldType.isArray() && ! Types.isPrimitiveType(fieldType.getComponentType())) {
+        if (colHandler == null) {            
+            if (fieldType.isArray()) {
                 try {
                     colHandler = CollectionHandlers.getHandler(Object[].class);
                 } catch (Exception e) {
