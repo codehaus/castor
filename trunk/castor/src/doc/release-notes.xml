@@ -31,6 +31,24 @@
               Short description says all ...
             </summary>
 			<bugs>
+				<bug id="1882">
+					<description>
+						Fixed failure in hash code calculation of
+						org.exolab.castor.persist.spi.Complex.
+					</description>
+					<contributor>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter></reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050312</date>
+				</bug>
 				<bug id="1851">
 					<description>Added RSS news feed</description>
 					<contributor>

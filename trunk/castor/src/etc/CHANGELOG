@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1882 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed failure in hash code calculation of org.exolab.castor.persist.spi.Complex.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1882
+       (Ralf - 20050312)
+       
 All:   Fixed bug 1851 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added RSS news feed.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1851
