@@ -53,6 +53,8 @@ import java.util.Enumeration;
 import java.util.NoSuchElementException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.MapItem;
+
 import java.lang.reflect.*;
 
 /**
@@ -162,15 +164,32 @@ public final class J1CollectionHandlers
         // For Hashtable (1.1)
         new CollectionHandlers.Info( "hashtable", Hashtable.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
+                
+                Object key = object;
+                Object value = object;
+                
+                if (object instanceof org.exolab.castor.mapping.MapItem) {
+                    MapItem mapItem = (MapItem)object;
+                    key = mapItem.getKey();
+                    value = mapItem.getValue();
+                    if (value == null) {
+                        value = object;
+                    }
+                    if (key == null) {
+                        key = value;
+                    }
+                }
+                
                 if ( collection == null ) {
                     collection = new Hashtable();
-                    ( (Hashtable) collection ).put( object, object );
+                    ( (Hashtable) collection ).put( key, value );
                     return collection;
                 } else {
-                        ( (Hashtable) collection ).put( object, object );
+                        ( (Hashtable) collection ).put( key, value );
                     return null;
                 }
             }
+            
             public Enumeration elements( Object collection ) {
                 if ( collection == null )
                     return new CollectionHandlers.EmptyEnumerator();
