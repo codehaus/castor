@@ -45,6 +45,11 @@
 
 package org.exolab.castor.util;
 
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
+import org.exolab.castor.jdo.engine.JDBCSyntax;
+
 /**
  * Utility class to parse an SQL or OQL expression for bind variables
  * Bind variables are subexpressions of the form "$n", where n is a
@@ -180,5 +185,48 @@ final public class SqlBindParser
             return Integer.parseInt(_sql.substring(idx, _pos));
         else
             return 0;	// no numbered bind variable
+    }
+
+
+    /**
+     * Creates a SQL statement from pre_sql, replacing bind expressions like "?1" by "?"
+     * @param pre_sql SQL statement string with bind variables of the form "?1"
+     * @return SQL statement string with bind variables of the form "?"
+     */
+    public static String getJdbcSql(String pre_sql)
+    {
+        StringBuffer sb = new StringBuffer();
+        SqlBindParser parser = new SqlBindParser(pre_sql);
+
+        while(parser.next()) {
+            sb.append(parser.getLastExpr());
+            sb.append(JDBCSyntax.Parameter);
+        }
+
+        sb.append(parser.getLastExpr());
+
+        return sb.toString();
+    }
+
+    /**
+     * Binds values to prepared SQL statement using the given
+     * sql string as reference for the bind variable order.
+     * @param pre_sql SQL statement string with bind variables of the form "?1"
+     * @param sql
+     * @param values
+     * @throws SQLException
+     */
+    public static void bindJdbcValues(PreparedStatement stmt, String pre_sql, Object[] values) throws SQLException
+    {
+        SqlBindParser parser = new SqlBindParser(pre_sql);
+
+        for(int i=1; parser.next(); ++i) {
+            int bindNum = parser.getParamNumber();
+
+            if (bindNum == 0)
+                bindNum = i;	// handle CALL SQL statements with unnumbered bind variables
+
+            stmt.setObject(i, values[bindNum-1]);
+        }
     }
 }
