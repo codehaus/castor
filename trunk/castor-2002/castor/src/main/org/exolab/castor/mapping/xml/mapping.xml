@@ -17,13 +17,6 @@
     </field-mapping>
   </class-mapping>
 
-  <class-mapping class-name="org.exolab.castor.mapping.xml.SqlTable">
-    <xml-schema xml-name="sql-table"/>
-    <field-mapping set-method="setTableName" type="string">
-      <xml-info name="table-name"/>
-    </field-mapping>
-  </class-mapping>
-
   <class-mapping class-name="org.exolab.castor.mapping.xml.ClassMapping">
     <xml-schema xml-name="class"/>
     <field-mapping set-method="setExtends" type="string">
@@ -52,8 +45,8 @@
     <field-mapping set-method="setIdentity" type="org.exolab.castor.mapping.xml.Identity">
       <xml-info name="identity"/>
     </field-mapping>
-    <field-mapping set-method="addFieldMapping">
-      <xml-info name="field-mapping"/>
+    <field-mapping set-method="addFieldMapping" type="org.exolab.castor.mapping.xml.FieldMapping">
+      <xml-info name="field" node="element"/>
     </field-mapping>
     <field-mapping set-method="addContainerMapping">
       <xml-info name="container"/>
@@ -74,11 +67,9 @@
     <field-mapping set-method="setType" type="string">
       <xml-info name="type"/>
     </field-mapping>
-<!--
     <field-mapping set-method="setRequired" type="boolean">
       <xml-info name="required"/>
     </field-mapping>
--->
     <field-mapping set-method="setName" type="string">
       <xml-info name="name"/>
     </field-mapping>
@@ -86,13 +77,40 @@
       <xml-info name="description" node-type="element"/>
     </field-mapping>
     <field-mapping set-method="setSqlInfo" type="org.exolab.castor.mapping.xml.SqlInfo">
-      <xml-info name="sql-info"/>
+      <xml-info name="sql-info" node-type="element"/>
     </field-mapping>
     <field-mapping set-method="setXmlInfo" type="org.exolab.castor.mapping.xml.XmlInfo">
       <xml-info name="xml-info"/>
     </field-mapping>
     <field-mapping set-method="setLdapInfo" type="org.exolab.castor.mapping.xml.LdapInfo">
       <xml-info name="ldap-info"/>
+    </field-mapping>
+  </class-mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.SqlTable">
+    <xml-schema xml-name="sql-table"/>
+    <field-mapping set-method="setTableName" type="string">
+      <xml-info name="table-name"/>
+    </field-mapping>
+  </class-mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.Identity">
+    <xml-schema xml-name="identity"/>
+    <field-mapping set-method="setFieldRef" type="string">
+      <xml-info name="field-ref"/>
+    </field-mapping>
+  </class-mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.SqlInfo">
+    <xml-schema xml-name="sql-info"/>
+    <field-mapping set-method="setName" type="string">
+      <xml-info name="name"/>
+    </field-mapping>
+    <field-mapping set-method="setType" type="string">
+      <xml-info name="type"/>
+    </field-mapping>
+    <field-mapping set-method="setDirty" type="string">
+      <xml-info name="dirty"/>
     </field-mapping>
   </class-mapping>
 

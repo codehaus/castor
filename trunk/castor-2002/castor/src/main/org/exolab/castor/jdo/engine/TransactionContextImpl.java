@@ -65,11 +65,10 @@ import org.exolab.castor.persist.TransactionAbortedExceptionImpl;
 /**
  * A transaction context is required in order to perform operations
  * against the database. The transaction context is mapped to {@link
- * org.odmg.Transaction} for the ODMG API and into {@link
- * javax.transaction.xa.XAResource} for XA databases. The only way
- * to begin a new transaction is through the creation of a new
- * transaction context. All database access must be performed
- * through a transaction context.
+ * Transaction} for the ODMG API and into {@link javax.transaction.xa.XAResource}
+ * for XA databases. The only way to begin a new transaction is through
+ * the creation of a new transaction context. All database access must
+ * be performed through a transaction context.
  *
  * @author <a href="arkin@exoffice.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
@@ -182,7 +181,7 @@ final class TransactionContextImpl
                 // this sort of round trip. An attempt to have the
                 // transaction association in the engine inflates the
                 // code size in other places.
-                conn = DatabaseSource.createConnection( engine );
+                conn = DatabaseRegistry.createConnection( engine );
                 if ( getXid() == null )
                     conn.setAutoCommit( false );
                 _conns.put( engine, conn );

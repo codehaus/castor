@@ -6,7 +6,7 @@
     <params user="test" password="test" database-name="test"/>
   </data-source>
 -->
-  <driver class-name="postgresql.PostgresqlDriver" url="jdbc:postgresql:test?user=test&amp;password=test"/>
+  <driver class-name="postgresql.Driver" url="jdbc:postgresql:test?user=test&amp;password=test"/>
   <engine name="postgresql" />
   <mapping href="mapping.xml" />
 </database>

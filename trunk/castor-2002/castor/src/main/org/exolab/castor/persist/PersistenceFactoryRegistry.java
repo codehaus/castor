@@ -139,7 +139,7 @@ public class PersistenceFactoryRegistry
                 prop = tokenizer.nextToken();
                 try {
                     cls = PersistenceFactoryRegistry.class.getClassLoader().loadClass( prop );
-                    factory = ( PersistenceFactory) cls.newInstance();
+                    factory = (PersistenceFactory) cls.newInstance();
                     _factories.put( factory.getFactoryName(), factory );
                 } catch ( Exception except ) {
                     Logger.getSystemLogger().println( Messages.format( "persist.missingPersistenceFactory", prop ) );
