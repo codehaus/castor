@@ -1,5 +1,6 @@
-Version (CVS)
--------------
+Version 0.8.10
+--------------
+
 XML:    Made the collection name in the mapping file NOT case sensitive. (Seb)
 
 XML:	Added new validation flag for the marshalling framework in castor.properties
