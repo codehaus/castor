@@ -126,6 +126,11 @@ public class FieldMolder {
         return "FieldMolder of "+_eMold.getName()+".set"+_fieldName+"("+_fType+" "+_fieldName+")";
     }
 
+    public String getName()
+    {
+        return _fieldName;
+    }
+
     /*
     void setRelationDescriptor( RelationDescriptor rd ) throws MappingException {
         _loader = new SQLRelationLoader( rd, _eMold.getName() );
