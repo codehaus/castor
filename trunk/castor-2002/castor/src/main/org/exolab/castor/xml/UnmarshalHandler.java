@@ -433,6 +433,7 @@ public class UnmarshalHandler implements DocumentHandler {
                     throw new SAXException(err + _topClass.getName());
                 }
             }
+            _topState.mInfo = mInfo;
             _topState.type = _topClass;
             //-- try to create instance of the given Class
             String err = null;
