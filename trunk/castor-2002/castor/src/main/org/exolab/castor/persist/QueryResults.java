@@ -236,7 +236,7 @@ public final class QueryResults
                 else {
                     if ( ( _accessMode == AccessMode.Exclusive ||
                            _accessMode == AccessMode.DbLocked ) &&
-                         ! oid.isDbLock() ) {
+                         ! entry.oid.isDbLock() ) {
                         // If we are in exclusive mode and object has not been
                         // loaded in exclusive mode before, then we have a
                         // problem. We cannot return an object that is not
