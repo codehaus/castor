@@ -414,8 +414,10 @@ public interface Database
 
 
     /**
-     * Closes the database. If a transaction is in progress the
+     * Closes the database. If a client transaction is in progress the
      * transaction will be rolled back and an exception thrown.
+     * If an app-server transaction is in progress, the transaction
+     * will commit/rollback when triggered by the application server.  
      *
      * @throws PersistenceException An error occured while
      *  attempting to close the database

@@ -44,64 +44,76 @@
  */
 
 
+package jdo;
+
+
 import java.util.Vector;
 import java.util.Enumeration;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.DriverManager;
+import org.exolab.castor.jdo.JDO;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.util.Logger;
 import org.exolab.jtf.CWTestCategory;
 import org.exolab.jtf.CWTestCase;
-import org.exolab.jtf.CWBaseApplication;
 import org.exolab.exceptions.CWClassConstructorException;
 
 
-/**
- * Test harness for Castor.
- */
-public class TestHarness
-    extends CWBaseApplication
+
+public class TestBase
+    extends CWTestCategory
 {
 
 
-    static Vector _categories = new Vector();
+    public static final String DatabaseName = "test";
 
 
-    static
-    {
-        _categories.addElement( jdo.Postgres.class.getName() );
-        _categories.addElement( jdo.Sybase.class.getName() );
-        _categories.addElement( xml.XMLTests.class.getName() );
-    }
+    private String    _databaseFile;
 
 
-
-    static public void main( String args[] )
-    {
-        try {
-            TestHarness harness;
-
-            harness = new TestHarness();
-            harness.run( args );
-        } catch ( Exception except ) {
-            except.printStackTrace();
-        }
-    }
-
-
-    public TestHarness()
+    public TestBase( String database, String databaseFile )
         throws CWClassConstructorException
     {
-        super( "Castor" );
+        super( database, "JDO Tests for " + database );
+        
+        CWTestCase tc;
+        
+        _databaseFile = databaseFile;
+        tc = new Concurrent( this );
+        add( tc.name(), tc, true );
+        tc = new Deadlock( this );
+        add( tc.name(), tc, true );
+        tc = new DuplicateKey( this );
+        add( tc.name(), tc, true );
+        tc = new ReadOnly( this );
+        add( tc.name(), tc, true );
+        tc = new TypeHandling( this );
+        add( tc.name(), tc, true );
     }
 
 
-    protected Enumeration getCategoryClassNames()
+    public Database getDatabase()
+        throws PersistenceException
     {
-        return _categories.elements();
+        JDO jdo;
+
+        jdo = new JDO();
+        jdo.setConfiguration( TestBase.class.getResource( _databaseFile ).toString() );
+        jdo.setDatabaseName( DatabaseName );
+        jdo.setLogWriter( Logger.getSystemLogger() );
+        return jdo.getDatabase();
     }
 
 
-    protected String getApplicationName()
+    public Connection getJDBCConnection()
+        throws SQLException
     {
-        return getClass().getName();
+        return DatabaseRegistry.getDatabaseRegistry( DatabaseName ).createConnection();
     }
+
 
 
 }

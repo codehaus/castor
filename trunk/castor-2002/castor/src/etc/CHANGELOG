@@ -1,3 +1,11 @@
+Version 0.8.3  April 17, 2000
+-----------------------------
+
+JDO:     Added support for null fields by calling the relevant setNull() method
+         when setting a null field. Does not apply to query parameters yet, does
+         not apply to identity fields.
+
+
 Version 0.8.2   April 7, 2000
 -----------------------------
 
