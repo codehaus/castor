@@ -105,7 +105,7 @@ public interface FieldDescriptor
      *
      * @return True if the field is multi valued
      */
-    public boolean isMulti();
+    public boolean isMultivalued();
 
 
     /**

@@ -152,7 +152,7 @@ public class FieldDescriptorImpl
         this._immutable = fieldDesc.isImmutable();
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
-        this._multi = fieldDesc.isMulti();
+        this._multi = fieldDesc.isMultivalued();
     }
 
 
@@ -186,7 +186,7 @@ public class FieldDescriptorImpl
     }
 
 
-    public boolean isMulti()
+    public boolean isMultivalued()
     {
         return _multi;
     }

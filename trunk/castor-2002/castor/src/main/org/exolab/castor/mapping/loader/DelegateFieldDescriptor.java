@@ -113,9 +113,9 @@ public class DelegateFieldDescriptor
     }
 
 
-    public boolean isMulti()
+    public boolean isMultivalued()
     {
-        return _desc.isMulti();
+        return _desc.isMultivalued();
     }
 
 
