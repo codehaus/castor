@@ -34,6 +34,8 @@ public class Root extends ParentNode {
 
     private static final String ROOT_NAME = "#root";
     
+    private String _uri = null;
+    
     /**
      * Creates a new Root Node
      *
@@ -41,6 +43,15 @@ public class Root extends ParentNode {
     public Root() {
         super(null, ROOT_NAME);
     } //-- Root
+    
+    /**
+     * Returns the URI for this root node, or null if unknown.
+     *
+     * @return the URI for this root node, or null if unknown.
+     */
+    public String getDocumentURI() {
+        return _uri;
+    } //-- getDocumentURI
 
     /**
      * Returns the type of this node.
@@ -59,5 +70,14 @@ public class Root extends ParentNode {
     public XPathNode getRootNode() {
         return this;
     } //-- getRootNode
+    
+    /**
+     * Sets the DocumentURI for this root node
+     *
+     * @param uri the document URI 
+     */
+    protected void setDocumentURI(String uri) {
+        _uri = uri;
+    } //-- setDocumentURI
 
 } //-- Root
