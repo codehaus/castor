@@ -407,6 +407,16 @@ public class XMLFieldDescriptorImpl
      * @return the namespace URI.
     **/
     public String getNameSpaceURI() {
+        
+        //-- use containing class's namespace if
+        //-- necessary
+        if ((nsURI == null) && (this._contClsDescriptor != null)) {
+            if (isPrimitive(_fieldType)) {
+                if (_contClsDescriptor instanceof XMLClassDescriptor) {
+                    return ((XMLClassDescriptor)_contClsDescriptor).getNameSpaceURI();
+                }
+            }
+        }
         return nsURI;
     } //-- getNameSpaceURI
 
@@ -747,6 +757,32 @@ public class XMLFieldDescriptorImpl
     protected void setDescriptorResolver(MappingResolver resolver) {
         _resolver = resolver;
     } //-- setDescriptorResolver
+
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type. This method will return true for all Java primitive
+     * types, the set of primitive object wrappers, as well
+     * as Strings.
+     *
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    protected static boolean isPrimitive(Class type) {
+
+        if (type == null) return false;
+
+        //-- java primitive
+        if (type.isPrimitive()) return true;
+
+        //-- we treat strings as primitives
+        if (type == String.class) return true;
+
+        //-- primtive wrapper classes
+        if ((type == Boolean.class) || (type == Character.class))
+            return true;
+
+        return (type.getSuperclass() == Number.class);
+    } //-- isPrimitive
 
 } //-- XMLFieldDescriptor
 
