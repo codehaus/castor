@@ -1458,7 +1458,16 @@ public class SourceFactory  {
 					if (SourceGenerator.mappingSchemaElement2Java())
 						//-- If mapping elements to Java classes
 						elementSource = true;
-					else if (SourceGenerator.mappingSchemaType2Java()
+
+                    if (eDecl.getType() == null) {
+                        if (state.getSGStateInfo().verbose()) {
+                            System.out.print("No type found for element:");
+                            System.out.println(eDecl.getName());
+                        }
+                        return;
+                    }
+
+                    if (SourceGenerator.mappingSchemaType2Java()
                              && ( (eDecl.getType().getName() == null)
                                   || (eDecl.getType().isSimpleType())) )
                     {
