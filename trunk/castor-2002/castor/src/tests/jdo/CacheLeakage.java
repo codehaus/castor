@@ -127,6 +127,8 @@ public class CacheLeakage extends CWTestCase {
         try {
             _db = _category.getDatabase( stream.verbose() );
             _conn = _category.getJDBCConnection();
+            _conn.setAutoCommit( false );
+
 
             boolean result = true;
             for ( int i=0; i < 4; i++ ) {

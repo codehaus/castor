@@ -55,6 +55,7 @@ import java.text.SimpleDateFormat;
 import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.TransactionAbortedException;
@@ -102,7 +103,7 @@ public class TypeHandling
         try {
             OQLQuery      oql;
             TestTypes     types;
-            Enumeration   enum;
+            QueryResults  res;
             Date          date;
             Date          time;
             Date          timestamp;
@@ -119,9 +120,9 @@ public class TypeHandling
             oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $(integer)1" );
             // This one tests that bind performs type conversion
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 stream.writeVerbose( "Updating object: " + types );
             } else {
                 types = new TestTypes();
@@ -136,16 +137,16 @@ public class TypeHandling
             oql = db.getOQLQuery( "SELECT types FROM jdo.TestTypes types WHERE id = $1" );
             // This one tests that bind performs type conversion
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 stream.writeVerbose( "Date type: " + types.getDate().getClass() );
                 stream.writeVerbose( "Time type: " + types.getTime().getClass() );
                 stream.writeVerbose( "Deleting object: " + types );
                 db.remove( types );
             } else {
                 stream.writeVerbose( "Error: Could not load types object" );
-                result = false; 
+                result = false;
             }
             db.commit();
             db.begin();
@@ -159,9 +160,9 @@ public class TypeHandling
             stream.writeVerbose( "Testing null in integer and long fields" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 types.setIntValue( 5 );
                 types.deleteIntValue();
                 types.setLongValue( null );
@@ -169,9 +170,9 @@ public class TypeHandling
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( types.getIntValue() != 0 || types.hasIntValue() ) {
                     stream.writeVerbose( "Error: null integer value was not set" );
                     result = false;
@@ -189,9 +190,9 @@ public class TypeHandling
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( types.getIntValue() != 5 || ! types.hasIntValue() ) {
                     stream.writeVerbose( "Error: non-null integer value was not set" );
                     result = false;
@@ -214,17 +215,17 @@ public class TypeHandling
             stream.writeVerbose( "Testing value in char field" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 types.setCharValue( 'A' );
             }
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( types.getCharValue() != 'A' ) {
                     stream.writeVerbose( "Error: char value was not set" );
                     result = false;
@@ -243,17 +244,17 @@ public class TypeHandling
             stream.writeVerbose( "Testing the boolean->char[01] conversion" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 types.setBoolValue( true );
             }
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( types.getBoolValue() != true ) {
                     stream.writeVerbose( "Error: bool value was not set" );
                     result = false;
@@ -268,21 +269,21 @@ public class TypeHandling
             else
                 stream.writeVerbose( "OK: The boolean->char[01] conversion passed" );
 
-            
+
             stream.writeVerbose( "Testing the double->numeric conversion" );
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 types.setDoubleValue( 0.2 );
             }
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( types.getDoubleValue() != 0.2 ) {
                     stream.writeVerbose( "Error: double value was not set" );
                     result = false;
@@ -297,7 +298,7 @@ public class TypeHandling
             else
                 stream.writeVerbose( "OK: The double->numeric conversion passed" );
 
-            
+
             stream.writeVerbose( "Testing date->int/numeric/char parameterized conversion" );
             df = new SimpleDateFormat();
             df.applyPattern("yyyy/MM/dd");
@@ -308,9 +309,9 @@ public class TypeHandling
             timestamp = df.parse("2000/05/27 02:16:01.234");
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 types.setDate2( date );
                 types.setTime2( time );
                 types.setTimestamp2( timestamp );
@@ -318,9 +319,9 @@ public class TypeHandling
             db.commit();
             db.begin();
             oql.bind( TestTypes.DefaultId );
-            enum = oql.execute();
-            if ( enum.hasMoreElements() ) {
-                types = (TestTypes) enum.nextElement();
+            res = oql.execute();
+            if ( res.hasMore() ) {
+                types = (TestTypes) res.next();
                 if ( !date.equals( types.getDate2() ) ) {
                     stream.writeVerbose( "Error: date/int value was not set" );
                     result = false;

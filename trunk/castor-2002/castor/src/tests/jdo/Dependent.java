@@ -264,7 +264,7 @@ public class Dependent
             db.commit();
             db.begin();
             master2 = (TestMaster) db.load( TestMaster.class, new Integer( TestMaster.DefaultId ) );
-            master2.setValue( master2.getValue() + "2" );
+            master2.setValue1( master2.getValue1() + "2" );
             db.commit();
 
             stream.writeVerbose( "Test 1" );
@@ -297,7 +297,7 @@ public class Dependent
             stream.writeVerbose( "Test 3" );
             _conn = _category.getJDBCConnection(); 
             _conn.setAutoCommit( false );
-            _conn.createStatement().execute( "UPDATE test_master SET value='concurrent' WHERE id=" 
+            _conn.createStatement().execute( "UPDATE test_master SET value1='concurrent' WHERE id="
                     + master2.getId() );
             _conn.commit();
             _conn.close();

@@ -142,13 +142,13 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
-    public void setValue( String value )
+    public void setValue1( String value )
     {
         _value = value;
     }
 
 
-    public String getValue()
+    public String getValue1()
     {
         return _value;
     }
@@ -348,7 +348,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     public void jdoRemove() 
         throws Exception
     {
-        for ( Enumeration enum = _children.elements(); enum.hasMoreElements(); ) 
+        for ( Enumeration enum = _origChildren.elements(); enum.hasMoreElements(); ) 
             _db.remove( enum.nextElement() );
     }                   
          
