@@ -61,9 +61,6 @@ JDO:     Added type convertors BigDecimal &lt;-&gt; Boolean
 JDO:     Fixes multiple request of same object with DBLocked
      (Oleg Nitz and Markus Fritz)
 
-JDO:     Hypersonic SQL driver 
-     (Contributed by Santiago Arriaga &lt;santiago.arriaga@catnet.com.mx&gt;
-
 JDO:     Changes to Persistent interface enable developer to use database 
      operations inside jdoStore, jdoCreate, jdoRemove.
      (Oleg Nitz &lt;on@ibis.odessa.ua&gt;)
