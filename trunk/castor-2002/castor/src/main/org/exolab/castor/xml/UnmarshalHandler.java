@@ -48,6 +48,7 @@ package org.exolab.castor.xml;
 //-- Castor imports
 import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.List;
+import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
