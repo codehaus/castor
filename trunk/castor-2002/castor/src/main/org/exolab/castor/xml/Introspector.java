@@ -79,6 +79,7 @@ public final class Introspector {
           
     private static final String ADD     = "add";
     private static final String GET     = "get";
+    private static final String IS      = "is";
     private static final String SET     = "set";
     private static final String CREATE  = "create";
     
@@ -226,6 +227,31 @@ public final class Introspector {
                 }
                 methodSet.get = method;
             }
+            else if (methodName.startsWith(IS)) {
+                if (method.getParameterTypes().length != 0) continue;
+                //-- make sure type is not null, and a boolean
+                Class type = method.getReturnType();
+                if (type == null) continue;
+                if (type.isPrimitive()) {
+                    if (type != Boolean.TYPE) continue;
+                }
+                else {
+                    if (type != Boolean.class) continue;
+                }                
+                //-- disable direct field access
+                ++methodCount;
+                //-- caclulate name from Method name
+                String fieldName = methodName.substring(IS.length());
+                fieldName = JavaNaming.toJavaMemberName(fieldName);
+                
+                MethodSet methodSet = (MethodSet)methodSets.get(fieldName);
+                if (methodSet == null) {
+                    methodSet = new MethodSet(fieldName);
+                    methodSets.put(fieldName, methodSet);
+                }
+                methodSet.get = method;
+            }
+            //-----------------------------------/
             //-- write methods (collection item)
             else if (methodName.startsWith(ADD)) {
                 if (method.getParameterTypes().length != 1) continue;
