@@ -47,13 +47,13 @@
 package org.exolab.castor.jdo.engine;
 
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.mapping.Types;
+import org.exolab.castor.mapping.TypeConvertor;
 
 
 /**
@@ -104,14 +104,15 @@ public class JDOFieldDesc
         throws MappingException
     {
         super( fieldDesc );
+
         if ( sqlName == null )
             throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = sqlName;
         if ( sqlType == null )
             throw new IllegalArgumentException( "Argument 'sqlType' is null" );
         if ( getFieldType() != sqlType ) {
-            _javaToSql = SQLTypes.getConvertor( getFieldType(), sqlType );
-            _sqlToJava = SQLTypes.getConvertor( sqlType, getFieldType() );
+            _javaToSql = Types.getConvertor( getFieldType(), sqlType );
+            _sqlToJava = Types.getConvertor( sqlType, getFieldType() );
         }
         _dirtyCheck = _dirtyCheck;
     }
@@ -130,36 +131,64 @@ public class JDOFieldDesc
     }
 
 
+    /**
+     * Returns the SQL name of this field.
+     *
+     * @return The SQL name of this field
+     */
     public String getSQLName()
     {
         return _sqlName;
     }
 
 
+    /**
+     * Returns true if dirty checking is required for this field.
+     *
+     * @return True if dirty checking required
+     */
     public boolean isDirtyCheck()
     {
         return _dirtyCheck;
     }
 
 
-    public void getValue( Object obj, PreparedStatement stmt, int column )
+    /**
+     * Obtains the value of the field and places it directly in the
+     * prepared statement.
+     *
+     * @param obj The object
+     * @param stmt A prepared statement with parameters
+     * @param index The parameter index
+     * @throws SQLException An exception occured attempting to set
+     *  the field in the prepared statement
+     */
+    public void getValue( Object obj, PreparedStatement stmt, int index )
         throws SQLException
     {
         if ( _javaToSql == null )
-            stmt.setObject( column, super.getValue( obj ) );
+            stmt.setObject( index, super.getValue( obj ) );
         else
-            stmt.setObject( column, _javaToSql.convert( super.getValue( obj ) ) );
+            stmt.setObject( index, _javaToSql.convert( super.getValue( obj ) ) );
     }
     
 
-    public void setValue( Object obj, ResultSet rs, int column )
+    /**
+     * Sets the value of the field from the result set.
+     *
+     * @param obj The object
+     * @param rs The result set
+     * @param index The field in the result set
+     * @throws SQLException An exception occured attempting to get
+     *  the field from the result set
+     */
+    public void setValue( Object obj, ResultSet rs, int index )
         throws SQLException
     {
         if ( _sqlToJava == null )
-            super.setValue( obj, rs.getObject( column ) );
-        else {
-            super.setValue( obj, _sqlToJava.convert( rs.getObject( column ) ) );
-        }
+            super.setValue( obj, rs.getObject( index ) );
+        else
+            super.setValue( obj, _sqlToJava.convert( rs.getObject( index ) ) );
     }
     
     
