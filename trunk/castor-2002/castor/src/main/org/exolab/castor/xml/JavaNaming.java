@@ -250,11 +250,6 @@ public class JavaNaming {
                 case '-':
                     uppercase = true;
                     break;
-                case '_':
-                    uppercase = true;
-                    ncChars[next] = ch;
-                    ++next;
-                    break;
                 default:
                     if (uppercase) {
                         ncChars[next] = Character.toUpperCase(ch);
@@ -273,7 +268,7 @@ public class JavaNaming {
     } //-- toJavaName
 
 
-    /* for debuging
+    /* for debuging 
     public static void main(String[] args) {
 
         String[] names = {
