@@ -615,7 +615,7 @@
     </field>
   </class>
 
-  <class name="jdo.TestPersistRelated" access="shared" identity="id">
+  <class name="jdo.TestPersistRelated" access="shared" identity="id" key-generator="MAX">
     <description>Test Persistent interface handling</description>
     <map-to table="test_related" />
     <field name="id" type="integer">
