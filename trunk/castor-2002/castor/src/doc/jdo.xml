@@ -139,7 +139,8 @@ db.close();
            database.</p>
 
         <p>An object becomes persistent in one of two ways: it is the result of a query,
-           or it is added to the database using <api class="org.exolab.castor.jdo.Database">create(java.lang.Object)</api>
+           (and the query is not performed in read-only mode) or it is added to the database 
+           using <api class="org.exolab.castor.jdo.Database">create(java.lang.Object)</api>
            or <api class="org.exolab.castor.jdo.Database">update(java.lang.Object)</api>.
            All objects that are not persistent are transient. When the transaction commits or
            rolls back, all persistent objects become transient.</p>
