@@ -103,6 +103,7 @@ public interface QueryResults
      * moves the result of the query to the absolute position in the
      * resultset
      * @param row The row to move to
+     * @return ???
      * @throws PersistenceException A persistence error occured
      */
     public boolean absolute(int row)
@@ -110,6 +111,8 @@ public interface QueryResults
 
     /**
      * finds the size of the resulting resultset from the query.
+     * @return Size of the resulting result set.
+     * @throws PersistenceException A persistence error occured
      */
     public int size()
       throws PersistenceException;
