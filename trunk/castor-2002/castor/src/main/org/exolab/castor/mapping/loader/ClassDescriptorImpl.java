@@ -181,6 +181,38 @@ public class ClassDescriptorImpl
     }
 
 
+    /**
+     * Checks the object validity. Returns successfully if the object
+     * can be stored, is valid, etc, throws an exception otherwise.
+     *
+     * @param object The object
+     * @throws ValidityException The object is invalid, a required is
+     *  null, or any other validity violation
+     * @throws IllegalStateException The Java object has changed and
+     *  is no longer supported by this handler, or the handler
+     *  is not compatiable with the Java object
+     */
+    public void checkValidity( Object object )
+        throws ValidityException, IllegalStateException
+    {
+        // Object cannot be saved if one of the required fields is null
+        for ( int i = 0 ; i < _fields.length ; ++i ) {
+            try {
+                if ( _fields[ i ].isRequired() && _fields[ i ].getHandler().getValue( object ) == null )
+                    throw new ValidityException( "mapping.requiredField",
+                                                 object.getClass().getName(), _fields[ i ].getFieldName() );
+            } catch ( IllegalAccessException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeNoAccess", toString() ) );
+            } catch ( InvocationTargetException except ) {
+                // This should never happen
+                throw new IllegalStateException( Messages.format( "mapping.schemaChangeInvocation",
+                                                                  toString(), except.getMessage() ) );
+            }
+        }
+    }
+
+
     public String toString()
     {
         return _javaClass.getName();
