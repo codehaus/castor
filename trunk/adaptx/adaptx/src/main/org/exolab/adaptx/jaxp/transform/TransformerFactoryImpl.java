@@ -323,6 +323,7 @@ public class TransformerFactoryImpl
     public Transformer newTransformer(Source source)
         throws TransformerConfigurationException 
     {
+        if (source == null) return newTransformer();
         return newTemplates(source).newTransformer();
     } //-- newTransformer
 
@@ -343,7 +344,7 @@ public class TransformerFactoryImpl
     public Transformer newTransformer()
         throws TransformerConfigurationException 
     {
-        return new TransformerImpl();
+        return new IdentityTransformer();
 
     } //-- newTransformer
 
