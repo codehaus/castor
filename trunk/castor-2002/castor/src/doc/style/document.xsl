@@ -20,8 +20,13 @@
           <td valign="top">
             <xsl:value-of select="."/>&#xA0;
             <xsl:if test="@email">
-              <a href="mailto:{@email}"><xsl:value-of select="@email"/></a><br/>
+              [ <a href="mailto:{@email}"><xsl:value-of select="@email"/></a> ]
             </xsl:if>
+<!--
+            <xsl:if test="@ldap">
+              [ <a href="ldap://{@ldap}">LDAP</a> ]<br/>
+            </xsl:if>
+ -->
           </td>
         </tr>
       </xsl:for-each>

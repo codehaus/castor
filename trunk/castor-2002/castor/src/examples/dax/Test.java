@@ -4,7 +4,7 @@ package dax;
 import java.net.URL;
 import org.xml.sax.InputSource;
 import org.exolab.castor.dax.engine.DirectorySource;
-import org.exolab.castor.dax.Directory;
+import org.exolab.castor.dax.DirectoryImpl;
 import org.exolab.castor.dax.engine.TransactionImpl;
 
 
@@ -18,11 +18,11 @@ public class Test
 
 	    DirectorySource.loadMapping( new InputSource( Test.class.getResource( "mapping.xml" ).toString() ) );
 
-	    Directory       dir;
+	    DirectoryImpl   dir;
 	    User            user;
 	    TransactionImpl tx;
 
-	    dir = new Directory( new URL( "http://localhost/ou=people,dc=exoffice,dc=com" ), null );
+	    dir = new DirectoryImpl( new URL( "http://localhost/ou=people,dc=exoffice,dc=com" ), null );
 	    tx = new TransactionImpl();
 	    tx.begin();
 	    user = (User) dir.lookup( User.class, "kvisco" );

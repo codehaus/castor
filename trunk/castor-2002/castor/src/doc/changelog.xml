@@ -11,6 +11,12 @@ Mapping: The mapping package has been upgraded to the new mapping DTD,
       and gained an XML sub-package that can be used to serialize
       mapping information. MappingResolver and MappingHelper are used
       to convert mapping files into descriptors.
+
+Mapping: Added type strings (array of String) and big-integer
+      (java.math.BigInteger).
+
+Docs: Contents of readme file and changelog are now available from the
+      HTML documentation.
     </pre></section>
     <section title="Version 0.7.5  January 28, 2000"><pre>
 JDO:  Finalized the transaction and locking semantics and started working
