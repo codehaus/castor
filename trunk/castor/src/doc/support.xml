@@ -4,22 +4,27 @@
     <title>Castor Support</title>
 
     <section title="Introduction">
-       <p>
-       Castor is an open-source product. This means that the source code is
-       available at no charge and may be obtained using <a href="cvs.xml">CVS</a> or
-       <a href="download.xml">downloaded</a>
-       via our ftp server.
-       </p>
-       <p>
-       Since castor is freely available, including the source code,
-       there is no guaranteed level of support available. The online
-       <a href="#Documentation">documentation</a> is
-       the best place to start. If you have trouble or have more advanced
-       questions not available in the online documentation then please subscribe
-       to the <a href="lists.xml">castor dev or user mailing lists</a> or join the
-       <a href="/phpBB2">Castor Forums</a>. The lists and forums are the best
-       place to ask questions about the product.
-       </p>
+       <p>Castor is an open-source product. This means that the source code is
+          available at no charge and may be obtained using <a href="cvs.xml">CVS</a> or
+         <a href="download.xml">downloaded</a> via our ftp server.</p>
+	   
+       <p>Since castor is freely available, including the source code,
+          there is no guaranteed level of support available. The online
+          <a href="#Documentation">documentation</a> is
+          the best place to start. If you have trouble or have more advanced
+          questions not available in the online documentation then please subscribe
+          to the <a href="lists.xml">castor dev or user mailing lists</a> or join the
+          <a href="/phpBB2">Castor Forums</a>. The lists and forums are the best
+          place to ask questions about the product.</p>
+	   
+	   <p>Due to our move to <a href="http://www.codehaus.org">the Codehaus</a> in January 
+		  2005, we greatly benefit from the infrastructure available at this site, and are
+		  in a position to offer you to join us on the #castor IRC channel at 
+		  irc.codehaus.org, where you'll mainly be able to talk to committers and
+		  fellow users/developers exchanging ideas and bouncing off problems.</p>
+		  
+		<p>Please note though, that for problems of any kind, you should still use one of 
+		   the mailing list as your prefered way of communicating to us.</p>
     </section>
 
     <section title="Documentation">
