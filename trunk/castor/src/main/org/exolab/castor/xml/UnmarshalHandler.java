@@ -744,6 +744,7 @@ public final class UnmarshalHandler extends MarshalFramework
         /// DEBUG System.out.println("end: " + name);
 
         if (state.primitiveOrImmutable) {
+            
             String str = null;
 
             if (state.buffer != null) {
@@ -754,8 +755,12 @@ public final class UnmarshalHandler extends MarshalFramework
             if (type == String.class) {
                 if (str != null)
                     state.object = str;
-                else
+                else if (state.nil) {
+                    state.object = null;
+                }
+                else {
                     state.object = "";
+                }
             }
             //-- special handling for byte[]
             else if (byteArray) {
@@ -2248,6 +2253,13 @@ public final class UnmarshalHandler extends MarshalFramework
             buf.append("\' is null, ignoring attributes.");
             message(buf.toString());
         }
+        else {
+        	//-- check for special attributes, such as xsi:nil
+            if (atts != null) {
+            	String nil = atts.getValue(NIL_ATTR, XSI_NAMESPACE);
+                state.nil = "true".equals(nil);
+            }
+        }
 
     } //-- void startElement(String, AttributeList)
 
@@ -2611,12 +2623,17 @@ public final class UnmarshalHandler extends MarshalFramework
             if (processedAtts[i]) continue;
 
             String namespace = atts.getNamespace(i);
+            String name = atts.getName(i);
             
             //-- skip XSI attributes
-            if (XSI_NAMESPACE.equals(namespace))
+            if (XSI_NAMESPACE.equals(namespace)) {
+                if (NIL_ATTR.equals(name)) {
+                	String value = atts.getValue(i);
+                    state.nil = ("true".equals(value));
+                }
                 continue;
+            }
                 
-            String name = atts.getName(i);
 
             if (name.startsWith(XML_PREFIX + ':')) {
                 
