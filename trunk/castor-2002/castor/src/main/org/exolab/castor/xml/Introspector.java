@@ -82,6 +82,9 @@ public final class Introspector {
     
     
     private static final Class[] EMPTY_CLASS_ARGS = new Class[0];
+
+    private static final DateClassDescriptor _DateClassDescriptor 
+        = new DateClassDescriptor();
     
     private static final StringClassDescriptor _StringClassDescriptor 
         = new StringClassDescriptor();
@@ -167,6 +170,11 @@ public final class Introspector {
         //-- plug&play for JDK 1.2
         if (c == java.util.Vector.class) {
             return new VectorClassDescriptor();
+        }
+        
+        //-- handle Dates
+        if (c == java.util.Date.class) {
+            return _DateClassDescriptor;
         }
         
         //-- handle base objects
