@@ -469,7 +469,7 @@ public class SourceGenerator {
                                                      sInfo,
                                                      sInfo.packageName);
                 processJClass(jClass, sInfo);
-
+                
             }
 
             //-- process base complextype if necessary
@@ -479,13 +479,20 @@ public class SourceGenerator {
                 processComplexType(schema.getComplexType(base), sInfo);
             }
 
-            process(complexType, sInfo);
+            //-- process AttributeDecl
+            processAttributes(complexType, sInfo);
+            
+            //-- process ContentModel
+            processContentModel(complexType, sInfo);
 
         }
         else {
             JClass jClass = classInfo.getJClass();
             if (!sInfo.processed(jClass)) {
-                process(complexType, sInfo);
+                //-- process AttributeDecl
+                processAttributes(complexType, sInfo);
+                //-- process ContentModel
+                processContentModel(complexType, sInfo);
                 processJClass(jClass, sInfo);
             }
         }
@@ -524,7 +531,30 @@ public class SourceGenerator {
         }
     } //-- processSimpleType
 
-    private void process(ContentModelGroup cmGroup, SGStateInfo sInfo) {
+    /**
+     * Processes the attribute declarations for the given complex type
+     * @param complexType the ComplexType containing the attribute 
+     * declarations to process.
+     * @param sInfo the current source generator state information
+    **/
+    private void processAttributes(ComplexType complexType, SGStateInfo sInfo) {
+        
+        if (complexType == null) return;
+        
+        Enumeration enum = complexType.getAttributeDecls();
+        while (enum.hasMoreElements()) {
+            AttributeDecl attribute = (AttributeDecl)enum.nextElement();
+            processSimpleType(attribute.getSimpleType(), sInfo);
+        }
+        
+    } //-- processAttributes
+    
+    /**
+     * Processes the given ContentModelGroup
+     * @param cmGroup the ContentModelGroup to process
+     * @param sInfo the current source generator state information
+    **/
+    private void processContentModel(ContentModelGroup cmGroup, SGStateInfo sInfo) {
 
 
         Enumeration enum = cmGroup.enumerate();
@@ -540,7 +570,7 @@ public class SourceGenerator {
                     createClasses(eDecl, sInfo);
                     break;
                 case Structure.GROUP:
-                    process((Group)struct, sInfo);
+                    processContentModel((Group)struct, sInfo);
                     break;
                 default:
                     break;
