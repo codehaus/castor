@@ -19,7 +19,7 @@
     </appender>
     
     <category name="org.exolab.castor">
-      <priority value="debug" />
+      <priority value="info" />
     </category>
 
     <!-- to set the level to DEBUG for Castor, please replace above with -->
