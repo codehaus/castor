@@ -288,7 +288,7 @@
             <fileset dir="${source}/etc" includes="MANIFEST.MF" />
         </copy>
 
-        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${classes}/MANIFEST.MF" 
+        <jar jarfile="${dist}/${archive}-tests.jar" basedir="${build}/tests" manifest="${build}/tests/MANIFEST.MF" 
         includes="LICENSE,README,jdo/**,harness/**,*" excludes="xml" />
 
     </target> 
