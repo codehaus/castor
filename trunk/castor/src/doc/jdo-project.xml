@@ -154,6 +154,12 @@
         this work can take place. This will provide a baseline before the
         removal of the current OQL engine. 
         </p>
+
+        <p>
+        Tranql may be used to achieve this task. As a side affect, Tranql may
+        be also do a couple other jobs as well (e.g. caching and transaction
+        context). There will also be a programmtic query API for this.
+        </p>
         </section>
 
         <section title="Query Externalization">
@@ -172,6 +178,10 @@
         Castor XML unmarshalling of the object mapping descriptor via the 
         &lt;includes> element.
         </p>
+        <p>
+        This may not be able to be accomplished at all with new programmtic
+        query API.
+        </p>
         </section>
 
         <section title="ClassMolder Refactoring">
@@ -187,7 +197,8 @@
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
         The relationship type (e.g. one-to-one, one-to-many, many-to-many) is 
-        already determined by the <tt>FieldMolder</tt>.
+        the first strategy layer. The implementation type (e.g. interface,
+        abstract, concrete) is the second strategy layer.
         </p>
         </section>
 
@@ -200,12 +211,23 @@
         </p>
         <p>
         <b>Volunteer:</b> Werner Guttmann/Bruce Snyder<br />
-        <b>Status:</b> started<br />
-        <b>Date Started:</b> Apr 2003<br />
+        <b>Status:</b> completed<br />
+        <b>Date Started:</b> Apr 2004<br />
         <b>Notes:</b><br />
-        Werner and I have been working together to get this implemenation
-        working. It's proceeding and I expect that it will be working by the
-        end of May 2003.
+        </p>
+        </section>
+
+        <section title="Possible TransactionContext Replacement">
+        <p>
+        <b>Description:</b><br />
+        Investigate whether the TransactionContext class can be replaced
+        through the use of ThreadLocal. 
+        </p>
+        <p>
+        <b>Volunteer:</b> Bruce Snyder<br />
+        <b>Status:</b> completed<br />
+        <b>Date Started:</b> Apr 2004<br />
+        <b>Notes:</b><br />
         </p>
         </section>
 
@@ -237,6 +259,10 @@
         <br />
         Also, the dirty checking needs to be refactored so it's cleaner and
         more straightforward in its duties. 
+        </p>
+
+        <p>
+        Tranql may be used to achieve this task. 
         </p>
         </section>
 
@@ -342,30 +368,6 @@ SELECT p FROM myapp.Product p]]>
         </p>
         </section>
 
-        <section title="Tyrex Integration">
-        <p>
-        <b>Description:</b><br />
-        Internally Castor handles its own transactions through somewhat of a
-        home grown approach. This should be replaced with <a
-        href="http://tyrex.sf.net/">Tyrex</a> or even better, <a
-        href="http://jotm.objectweb.org/">JOTM</a>. This would allow us to 
-        provide the following features: 
-        <ul type="bullet">
-            <li>nested tx</li>
-            <li>tx timeouts</li>
-            <li>max number of open tx</li>
-            <li>IIOP support</li>
-            <li>tx journaling</li>
-        </ul>
-        </p>
-        <p>
-        <b>Volunteer:</b><br />
-        <b>Status:</b><br />
-        <b>Date Started:</b> not started<br />
-        <b>Notes:</b><br />
-        </p>
-        </section>
-
         <section title="JCA Research">
         <p>
         <b>Description:</b><br />
@@ -414,7 +416,7 @@ SELECT p FROM myapp.Product p]]>
         to implement the <a
         href="http://www.castor.org/javadoc/org/exolab/castor/jdo/TimeStampable.html">Timestampable</a>
         interface. This requirement can easily be removed via a dymanic proxy
-        implementation.
+        implementation. 
         </p>
         </section>
 
@@ -424,7 +426,6 @@ SELECT p FROM myapp.Product p]]>
         There are a few bugs that *must* be fixed, specifically 
         <a href="http://bugzilla.exolab.org/show_bug.cgi?id=986">986</a>, 
         <a href="http://bugzilla.exolab.org/show_bug.cgi?id=925">925</a>, 
-        <a href="http://bugzilla.exolab.org/show_bug.cgi?id=997">997</a>. 
         These bugs have been around for quite a while and should have been 
         fixed long ago. 
         </p>
