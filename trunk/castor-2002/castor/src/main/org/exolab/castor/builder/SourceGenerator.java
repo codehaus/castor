@@ -256,34 +256,30 @@ public class SourceGenerator {
         allOptions.addFlag("i", "filename", "Sets the input filename");
 
         //-- package name flag
-        allOptions.addFlag("package", "package-name", "Sets the package name");
-        allOptions.setOptional("package", true);
+        allOptions.addFlag("package", "package-name", "Sets the package name", true);
 
         //-- destination directory
-        allOptions.addFlag("dest", "dest-dir", "Sets the destination output directory");
-        allOptions.setOptional("dest", true);
+        String desc = "Sets the destination output directory";
+        allOptions.addFlag("dest", "dest-dir", desc, true);
 
         //-- line break flag
-        String desc = "Sets the line separator style for the desired platform";
-        allOptions.addFlag("line-separator", "( unix | mac | win)", desc);
-        allOptions.setOptional("line-separator", true);
+        desc = "Sets the line separator style for the desired platform";
+        allOptions.addFlag("line-separator", "( unix | mac | win)", desc, true);
 
         //-- Force flag
         desc = "Suppress non fatal warnings, such as overwriting files.";
-        allOptions.addFlag("f", "", desc);
-        allOptions.setOptional("f", true);
+        allOptions.addFlag("f", "", desc, true);
 
         //-- Help flag
         desc = "Displays this help screen.";
-        allOptions.addFlag("h", "", desc);
-        allOptions.setOptional("h", true);
+        allOptions.addFlag("h", "", desc, true);
 
         //-- source generator types name flag
-        allOptions.addFlag("types", "types", "Sets the source generator types name (SGTypeFactory)");
-        allOptions.setOptional("types", true);
+        desc = "Sets the source generator types name (SGTypeFactory)";
+        allOptions.addFlag("types", "types", desc, true);
+        
         //-- XXX maintained temporarily
-        allOptions.addFlag("type-factory", "");
-        allOptions.setOptional("type-factory", true);
+        allOptions.addFlag("type-factory", "classname", "", true);
 
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);

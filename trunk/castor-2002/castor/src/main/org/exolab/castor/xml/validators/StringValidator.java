@@ -56,13 +56,16 @@ import org.exolab.castor.xml.*;
 public class StringValidator implements TypeValidator {
     
     
-    private String  regex     = null;
+    private String  fixed      = null;
     
-    private boolean required  = false;
+    private String  regex      = null;
     
-    private int minLength = 0;
+    private boolean required   = false;
     
-    private int maxLength = -1;
+    private int     minLength  = 0;
+    
+    private int     maxLength  = -1;
+    
     
     /**
      * Creates a new StringValidator with no restrictions
@@ -71,6 +74,14 @@ public class StringValidator implements TypeValidator {
         super();
     } //-- StringValidator
     
+    
+    /**
+     * Sets the fixed value in which all valid Strings must match.
+     * @param fixedValue the fixed value that all Strings must match
+    **/
+    public void setFixedValue(String fixedValue) {
+        this.fixed = fixedValue;
+    } //-- setFixedValue
     
     /**
      * Sets the maximum length of that a valid String must be.
@@ -116,6 +127,14 @@ public class StringValidator implements TypeValidator {
             }
         }
         else {
+            
+            if (fixed != null) {
+                if (!fixed.equals(value)) {
+                    String err = "strings of this type must be equal to the "
+                        + "fixed value of " + fixed;
+                    throw new ValidationException(err);
+                }
+            }
             int len = value.length();
             if ((minLength > 0) && (len < minLength)) {
                 String err = "strings of this type must have a minimum "

@@ -58,11 +58,14 @@ import org.exolab.castor.xml.*;
 public class IntegerValidator implements TypeValidator {
     
     
-    private boolean useMin = false;
-    private boolean useMax = false;
+    private boolean useMin   = false;
+    private boolean useMax   = false;
+    private boolean useFixed = false;
     
     private int min = 0;
     private int max = 0;
+    
+    private int fixed = 0;
     
     /**
      * Creates a new IntegerValidator with no restrictions
@@ -70,6 +73,13 @@ public class IntegerValidator implements TypeValidator {
     public IntegerValidator() {
         super();
     } //-- IntegerValidator
+    
+    /**
+     * Clears the fixed value for this IntegerValidator
+    **/
+    public void clearFixed() {
+        useFixed = false;
+    } //-- clearFixed
     
     /**
      * Clears the maximum value for this IntegerValidator
@@ -85,6 +95,20 @@ public class IntegerValidator implements TypeValidator {
         useMin = false;
     } //-- clearMin
     
+    /**
+     * Sets the fixed value that integers validated with this
+     * validated must be equal to
+     * @param fixedValue the fixed value an integer validated with
+     * this validator must be equal to.
+     * <BR />
+     * NOTE: Using Fixed values takes preceedence over using max and mins,
+     * and is really the same as setting both max-inclusive and 
+     * min-inclusive to the same value 
+    **/
+    public void setFixed(int fixedValue) {
+        useFixed = true;
+        this.fixed = fixedValue;
+    } //-- setFixed
     
     /**
      * Sets the minimum value that integers validated with this
@@ -133,6 +157,16 @@ public class IntegerValidator implements TypeValidator {
     public void validate(int i) 
         throws ValidationException 
     {
+        
+        if (useFixed) {
+            if (i != fixed) {
+                String err = i + " is not equal to the fixed value of " 
+                    + fixed;
+                throw new ValidationException(err);
+            }
+            return;
+        }
+        
         if (useMin) {
             if (i < min) {
                 String err = i + " is less than the minimum allowable ";

@@ -196,7 +196,7 @@ public class MemberFactory {
         fieldInfo.setRequired(attribute.getRequired());
         
         if (xsType.getType() == XSType.STRING) {
-            String def = attribute.getDefault();
+            String def = attribute.getDefaultValue();
             if ((def != null) && (def.length() > 0)) {
                 char ch = def.charAt(0);
                 switch (ch) {
@@ -210,7 +210,11 @@ public class MemberFactory {
                 }
             }
         }
-        else fieldInfo.setDefaultValue(attribute.getDefault());
+        else fieldInfo.setDefaultValue(attribute.getDefaultValue());
+        
+        if (attribute.hasFixedValue()) {
+            fieldInfo.setFixedValue(attribute.getFixedValue());
+        }
         
         //fieldInfo.setSchemaType(attribute.getDatatypeRef());
         

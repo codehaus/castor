@@ -638,6 +638,10 @@ public class DescriptorSourceFactory {
             }
         }
         
+        String fixed = member.getFixedValue();
+        
+        //-- create proper validator
+        
         switch (xsType.getType()) {
             
             case XSType.NEGATIVE_INTEGER:
@@ -670,6 +674,16 @@ public class DescriptorSourceFactory {
                     jsc.append(");");
                 }
                 
+                //-- fixed values
+                if (fixed != null) {
+                    //-- make sure we have a valid value...
+                    Integer.parseInt(fixed);
+                    
+                    jsc.add("iv.setFixedValue(");
+                    jsc.append(fixed);
+                    jsc.append(");");
+                }
+                
                 jsc.add("fieldValidator.setValidator(iv);");
                 jsc.unindent();
                 jsc.add("}");
@@ -689,6 +703,13 @@ public class DescriptorSourceFactory {
                     jsc.append(Integer.toString(xsString.getMaxLength()));
                     jsc.append(");");
                 }
+                //-- fixed values
+                if (fixed != null) {
+                    jsc.add("sv.setFixedValue(\"");
+                    jsc.append(fixed);
+                    jsc.append("\");");
+                }
+                
                 jsc.add("fieldValidator.setValidator(sv);");
                 jsc.unindent();
                 jsc.add("}");
