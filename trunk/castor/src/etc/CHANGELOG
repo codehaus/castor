@@ -3,6 +3,12 @@ Version (CVS)
 -------------
 
 
+JDO:   Fixed bug 1814 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Fixed a problem parsing OQL WHERE clauses containing string or character constants 
+       including a question mark character.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1814
+       (Werner - 20041204)
+
 JDO:   Fixed bug 1777 using contribution from Patrick vanKann [patrick.vankann@cookie-fortune.com]
        Status property of Castor's TransactionContext set correctly in global transactions.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1777
