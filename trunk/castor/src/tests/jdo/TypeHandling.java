@@ -47,30 +47,15 @@
 package jdo;
 
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.io.ByteArrayInputStream;
-import java.io.CharArrayReader;
-import java.io.StringReader;
 import java.util.Date;
 import java.util.Enumeration;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.exolab.castor.jdo.DataObjects;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.TransactionAbortedException;
-import org.exolab.castor.jdo.engine.ClobImpl;
-
-import junit.framework.TestSuite;
-import junit.framework.TestCase;
-import junit.framework.Assert;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -131,21 +116,6 @@ public class TypeHandling extends CastorTestCase {
             _db.create( types );
         }
         _db.commit();
-    }
-
-    public void runTest()
-            throws PersistenceException, ParseException {
-
-        testDateTimeConversion();
-
-        testNullIntegerAndLong();
-
-        testSimpleChar();
-
-        testCharToBoolean();
-
-        testDateParameterized();
-
     }
 
     private void testDateTimeConversion()
@@ -302,6 +272,47 @@ public class TypeHandling extends CastorTestCase {
         stream.println( "OK: value in character field passed" );
     }
 
+    private void testBooleanIsMethod() 
+            throws PersistenceException 
+	{
+        
+        TestTypes       types;
+        Enumeration     en;
+        
+        stream.println("Testing boolean get/is methods.");
+        _db.begin();
+        _oql.bind( TestTypes.DefaultId );
+        en = _oql.execute();
+        if ( en.hasMoreElements() ) {
+            types = (TestTypes) en.nextElement();
+            types.setBoolValue( true );
+            types.setBoolIsMethod( true );
+        }
+        _db.commit();
+
+        _db.begin();
+        _oql.bind( TestTypes.DefaultId );
+        en = _oql.execute();
+        if ( en.hasMoreElements() ) {
+            types = (TestTypes) en.nextElement();
+            if ( types.getBoolValue() != true ) {
+                stream.println( "Error: (get) bool value was not set" );
+                fail("(get) bool value was not set");
+            }
+            
+            if ( types.isBoolIsMethod() != true ){
+                stream.println( "Error: (is) bool value was not set" );
+                fail( "(is) bool value was not set" );
+            }
+        } else {
+            stream.println( "Error: failed to load object" );
+            fail("failed to load object");
+        }
+        _db.commit();
+        
+        stream.println( "OK: Boolean get/is methods passed" );
+    }
+    
     private void testCharToBoolean()
             throws PersistenceException {
 
@@ -398,5 +409,19 @@ public class TypeHandling extends CastorTestCase {
         if ( _db.isActive() ) _db.rollback();
         _db.close();
     }
+    
+    public void runTest()
+    	throws PersistenceException, ParseException 
+	{
+    	testDateTimeConversion();
+    	testNullIntegerAndLong();
+    	testSimpleChar();
+    	testCharToBoolean();
+    	testDateParameterized();
+    	testBooleanIsMethod();
+    	testSimpleFloat();
+    }
+    
+
 }
 

@@ -1,12 +1,12 @@
 <?xml version="1.0" ?>
 <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-conf.xsd">
+                           "http://castor.exolab.org/jdo-conf.xsd"> 
 
 <jdo-conf>
     <database name="mysql" engine="mysql" >
-        <driver url="jdbc:mysql://localhost:3306/test" class-name="org.gjt.mm.mysql.Driver">
-            <param name="user" value="test" />
-            <param name="password" value="test" />
+        <driver url="jdbc:mysql://localhost:3306/test" class-name="com.mysql.jdbc.Driver">
+            <param name="user" value="me" />
+            <param name="password" value="uLive2C" />
         </driver>
         <mapping href="jdo/mapping.xml" />
     </database>
