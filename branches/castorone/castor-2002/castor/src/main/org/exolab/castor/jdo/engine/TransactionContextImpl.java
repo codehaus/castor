@@ -109,9 +109,11 @@ final class TransactionContextImpl
     {
         Enumeration enum;
         Connection  conn;
-        
-        try {
-            if ( ! _globalTx ) {
+
+        if ( _globalTx ) {
+            _conns.clear();
+        } else {
+            try {
                 // Go through all the connections opened in this transaction,
                 // commit and close them one by one.
                 enum = _conns.elements();
@@ -121,22 +123,46 @@ final class TransactionContextImpl
                     // under transaction monitor
                     conn.commit();
                 }
+            } catch ( SQLException except ) {
+                throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+            } finally {
+                enum = _conns.elements();
+                while ( enum.hasMoreElements() ) {
+                    try {
+                        ( (Connection) enum.nextElement() ).close();
+                    } catch ( SQLException except ) { }
+                }
+                _conns.clear();
             }
-        } catch ( SQLException except ) {
-            // [oleg] Check for rollback exception based on X/Open error code
-            if ( except.getSQLState() != null &&
-                 except.getSQLState().startsWith( "40" ) )
-                throw new TransactionAbortedException( Messages.format("persist.nested", except) );
-            
-            throw new TransactionAbortedException( Messages.format("persist.nested", except) );
-        } finally {
-            enum = _conns.elements();
-            while ( enum.hasMoreElements() ) {
-                try {
-                    ( (Connection) enum.nextElement() ).close();
-                } catch ( SQLException except ) { }
+        }
+    }
+
+
+    protected void closeConnections()
+        throws TransactionAbortedException
+    {
+        Enumeration enum;
+        Connection  conn;
+        Exception   error = null;
+
+        if ( ! _globalTx ) {
+            return;
+        }
+        // Go through all the connections opened in this transaction,
+        // close them one by one.
+        // Close all that can be closed, after that report error if any.
+        enum = _conns.elements();
+        while ( enum.hasMoreElements() ) {
+            conn = (Connection) enum.nextElement();
+            try {
+                conn.close();
+            } catch ( SQLException except ) {
+                error = except;
             }
-            _conns.clear();
+        }
+        _conns.clear();
+        if ( error != null ) {
+            throw new TransactionAbortedException( Messages.format("persist.nested", error ), error );
         }
     }
 
@@ -164,7 +190,7 @@ final class TransactionContextImpl
 
     public Object getConnection( LockEngine engine ) throws PersistenceException {
         Connection conn;
-        
+
         conn = (Connection) _conns.get( engine );
         if ( conn == null ) {
             try {

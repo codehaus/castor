@@ -199,7 +199,11 @@ public class DatabaseImpl
                         _ctx.rollback();
                     } catch ( Exception except ) {
                     }
-                    throw new PersistenceException( "jdo.dbClosedTxRolledback" );
+                    try {
+                        _ctx.close();
+                    } catch ( Exception except ) {
+                    }
+                     throw new PersistenceException( "jdo.dbClosedTxRolledback" );
                 }
             }
         } finally {
@@ -455,7 +459,11 @@ public class DatabaseImpl
             _ctx.rollback();
             throw except;
         } finally {
-            _ctx = null;
+             try {
+                _ctx.close();
+            } catch (Exception ex) {
+            }
+           _ctx = null;
         }
     }
 
