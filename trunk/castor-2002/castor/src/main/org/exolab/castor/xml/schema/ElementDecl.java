@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Exoffice Technologies Inc. All Rights Reserved.
+ * Copyright 1999 (C) Intalio Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -51,7 +51,7 @@ import java.util.Vector;
 
 /**
  * An XML Schema ElementDecl
- * @author <a href="mailto:kvisco@exoffice.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class ElementDecl extends ContentModelType {
@@ -104,9 +104,9 @@ public class ElementDecl extends ContentModelType {
     private String schemaAbbrev = null;
     
     /**
-     * The Complextype of this ElementDecl
+     * The ComplexType of this ElementDecl
     **/
-    private Complextype complextype = null;
+    private ComplexType complexType = null;
     
     
     private Schema schema = null;
@@ -142,8 +142,8 @@ public class ElementDecl extends ContentModelType {
     /**
      *
     **/
-    public void setComplextype(Complextype complextype) {
-        this.complextype = complextype;
+    public void setComplexType(ComplexType complexType) {
+        this.complexType = complexType;
     } //-- addAttribute
     
     /**
@@ -175,48 +175,48 @@ public class ElementDecl extends ContentModelType {
     
     /**
      * Returns the Complextype of this ElementDecl. If the element content
-     * did not define an complextype, is a simple type (defined by a 
-     * 'simpletype'declaration) or is a built-in type the this method will 
+     * did not define a ComplexType, is a simple type (defined by a 
+     * 'SimpleType'declaration) or is a built-in type the this method will 
      * return null.
      * @return the complextype of this ElementDecl
     **/
-    public Complextype getComplextype() {
+    public ComplexType getComplexType() {
         
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)
-                return element.getComplextype();
+                return element.getComplexType();
             return null;
         }
         
-        if (complextype == null) {
+        if (complexType == null) {
             //-- check simpletype first since it has higher
             //-- precedence
             if (typeRef != null) {
-                if (schema.getSimpletype(typeRef) != null) return null;
-                complextype = schema.getComplextype(typeRef);
+                if (schema.getSimpleType(typeRef) != null) return null;
+                complexType = schema.getComplexType(typeRef);
             }
         }
-        return complextype;
+        return complexType;
     } //-- getAttributes
 
     /**
      * Returns the Simpletype of this ElementDecl. If the element content
-     * is defined by an complextype a built-in type the this method
+     * is defined by an complexType, other than a built-in type, then this method
      * will return null;
-     * @return the complextype of this ElementDecl
+     * @return the simpleType of this ElementDecl
     **/
-    public Simpletype getSimpletype() {
-        if (complextype != null) return null;
+    public SimpleType getSimpleType() {
+        if (complexType != null) return null;
         if (isReference()) {
             ElementDecl element = getReference();
             if (element != null)             
-                return element.getSimpletype();
+                return element.getSimpleType();
             else 
                 return null;
         }
-        return schema.getSimpletype(typeRef);
-    } //-- getSimpletype
+        return schema.getSimpleType(typeRef);
+    } //-- getSimpleType
 
     /**
      * Returns the ElementDecl that this element definition references.

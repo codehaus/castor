@@ -137,13 +137,13 @@ public class AttributeDecl extends Annotated {
      * Returns the data type associated with this AttributeDecl
      * @return the data type associated with this AttributeDecl
     **/
-    public Simpletype getSimpletype() {
-        return schema.getSimpletype(typeRef);
-    } //-- getSimpletype
+    public SimpleType getSimpleType() {
+        return schema.getSimpleType(typeRef);
+    } //-- getSimpleType
 
-    public String getSimpletypeRef() {
+    public String getSimpleTypeRef() {
         return typeRef;
-    } //-- getSimpletypeRef
+    } //-- getSimpleTypeRef
     
     /**
      * Returns the default value, or null if none was defined
