@@ -48,6 +48,8 @@ package org.exolab.castor.jdo.drivers;
 
 
 import java.sql.SQLException;
+import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.persist.spi.PersistenceQuery;
 
 
 /**
@@ -65,6 +67,12 @@ public final class SQLServerFactory
     public String getFactoryName()
     {
         return "sql-server";
+    }
+
+
+    public QueryExpression getQueryExpression()
+    {
+        return new SQLServerQueryExpression( this );
     }
 
 
