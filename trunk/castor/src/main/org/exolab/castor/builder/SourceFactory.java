@@ -416,7 +416,7 @@ public class SourceFactory {
                 } else {
                     //////////////////////////////////////////////////////////
                     //NOTE: generate sources if the flag for generating sources
-                    //from imported schemas in on
+                    //from imported schemas is on
                     //////////////////////////////////////////////////////////
                     return new JClass[0];
                 }
@@ -665,6 +665,8 @@ public class SourceFactory {
 
         String className   = JavaNaming.toJavaClassName(typeName);
         
+        //--XMLBindingComponent is only used to retrieve the java package
+        //-- we need to optimize it by enabling the binding of simpleTypes.
         XMLBindingComponent comp = new XMLBindingComponent(_config);
         if (_binding != null) {
             comp.setBinding(_binding);
@@ -709,7 +711,7 @@ public class SourceFactory {
 
         //-- handle enumerated types
         if (enumeration) {
-            xsClass.setAsEnumertated(true);
+            xsClass.setAsEnumerated(true);
             processEnumeration(simpleType, state);
         }
 
@@ -1227,7 +1229,9 @@ public class SourceFactory {
     //////////////////////////////////////////////
     //Process XML Schema structures
     //Note: This code is XML specific, it has to be
-    //move in XMLBindingComponent
+    //moved somehow in XMLBindingComponent. The aim
+    //of the SourceFactory is to generate code from 
+    //a BindingComponent.
     ///////////////////////////////////////////////
     /**
      * Creates Comments from Schema annotations
@@ -1344,7 +1348,7 @@ public class SourceFactory {
 				component.setView(complexType);
                 //--only set a super class name if the current complexType
                 //--is not a restriction of a simpleContent (--> no object hierarchy, only content hierarchy)
-                if (!(complexType.isSimpleContent() && ((ComplexType)base).isRestricted()) )
+                if (! ( complexType.isRestricted() && ((ComplexType)base).isSimpleContent() ) )
                     state.jClass.setSuperClass(baseClassName);
             } //--complexType
 

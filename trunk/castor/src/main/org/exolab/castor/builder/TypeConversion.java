@@ -67,6 +67,7 @@ import java.util.Enumeration;
  * A class used to convert XML Schema SimpleTypes into
  * the appropriate XSType
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
 public class TypeConversion {
@@ -383,7 +384,7 @@ public class TypeConversion {
 
                         className = packageName  + '.' + className;
                         xsType = new XSClass(new JClass(className));
-                        xsType.setAsEnumertated(true);
+                        xsType.setAsEnumerated(true);
                     } //- End Enumeration
                     else {
                         XSString xsString = new XSString();
