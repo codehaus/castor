@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML: Added an option (default is off) to expose the names of each attribute and element described in the class descriptor.
+            Use org.exolab.castor.builder.classdescfieldnames=true in castorbuilder.properties to enable
+	(andrew.fawcett@coda.com, Andrew Fawcett)
+
 XML:  Fix a bug in SimpleTypeFactory.
       (Reported by Risheng Lin <rlin@eng.utoledo.edu>) (Arnaud)
 
