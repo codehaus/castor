@@ -244,16 +244,7 @@ public class Types
             return newInstance( type );
             
         try {
-            Class[] paramTypes = new Class[args.length];
-            for (int i = 0; i < args.length; i++) {
-                if (args[i] != null) {
-                    paramTypes[i] = args[i].getClass();
-                }
-                else {
-                    throw new IllegalStateException("Null arguments to constructor not accepted at this time.");
-                }
-            }
-            Constructor cons = type.getConstructor(paramTypes);
+            Constructor cons = findConstructor(type, args);
             return cons.newInstance(args);
         }
         catch (NoSuchMethodException except) {
@@ -392,6 +383,73 @@ public class Types
         return sb.toString();
     }
 
+    /**
+     * Returns the matching constructor for the given arguments
+     *
+     * @returns the matching constructor for the given arguments
+     */
+    private static Constructor findConstructor(Class type, Object[] args) 
+        throws IllegalAccessException, NoSuchMethodException
+    {
+        
+        Constructor[] constructors = type.getConstructors();
+        Constructor cons = null;
+        int rank = 0;
+        
+        for (int c = 0; c < constructors.length; c++) {
+            Class[] paramTypes = constructors[c].getParameterTypes();
+            if (paramTypes.length != args.length) continue;
+            
+            int tmpRank = 0;
+            boolean matches = true;
+            for (int p = 0; p < paramTypes.length; p++) {
+                if (args[p] == null) {
+                    if (paramTypes[p].isPrimitive()) {
+                        matches = false;
+                        break;
+                    }
+                    // null matches any non primitive object
+                    continue;
+                }
+                
+                //-- check direct param match
+                if (paramTypes[p] == args[p].getClass()) {
+                    ++tmpRank;
+                    continue;
+                }
+                
+                //-- check for inheritence
+                if (paramTypes[p].isAssignableFrom(args[p].getClass())) {
+                    //-- good keep going, but don't increment rank
+                    continue;
+                }
+                //-- check for primitive match
+                if (paramTypes[p].isPrimitive()) {
+                    Class pType = typeFromPrimitive(paramTypes[p]);
+                    if (pType.isAssignableFrom(args[p].getClass())) {
+                        //-- good keep going, but don't increment rank
+                        continue;
+                    }
+                }
+                matches = false;
+                break;
+            }
+            
+            if (matches) {                
+                if (tmpRank == paramTypes.length)
+                    return constructors[c];                 
+                if ((cons == null) || (tmpRank > rank)) {
+                    cons = constructors[c];
+                    rank = tmpRank;
+                }
+            }
+        }
+        
+        if (cons == null)
+            throw new NoSuchMethodException();
+            
+        return cons;
+    } //-- findConstructor
 
     /**
      * Information about a specific Java type.
