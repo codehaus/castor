@@ -306,7 +306,7 @@ public class Schema extends Annotated {
 			nsprefix = name.substring(0,colon);
 			ns = (String) namespaces.get(nsprefix);
 			if (ns == null)  {
-			    String err = "getSimpleType: ";
+			    String err = "getComplexType: ";
 			    err += "Namespace prefix not recognised '"+name+"'";
 			    throw new IllegalArgumentException(err);
 			}
@@ -358,14 +358,13 @@ public class Schema extends Annotated {
 		
         //-- Namespace prefix?
         String canonicalName = name;
-		String nsprefix = "";
-		String ns = targetNS;
+		String nsPrefix = "";
+		String ns = null;
         int colon = name.indexOf(':');
-        if (colon != -1)
-		{
+        if (colon >= 0) {
             canonicalName = name.substring(colon + 1);
-			nsprefix = name.substring(0,colon);
-			ns = (String) namespaces.get(nsprefix);
+			nsPrefix = name.substring(0,colon);
+			ns = (String) namespaces.get(nsPrefix);
 			if (ns == null)  {
 			    String err = "getSimpleType: ";
 			    err += "Namespace prefix not recognised '"+name+"'";
@@ -375,9 +374,16 @@ public class Schema extends Annotated {
 		
 		//-- Get SimpleType object
 		SimpleType result = null;
-		if (ns.equals(schemaNS))
-			result= simpleTypesFactory.getBuiltInType(canonicalName);
-		else if(ns.equals(targetNS))
+		if (ns == null) {
+		    //-- first try built-in types
+			result= simpleTypesFactory.getBuiltInType(name);
+			//-- otherwise check user-defined types
+			if (result == null)
+			    result = (SimpleType)simpleTypes.get(name);			    
+		}
+		else if (ns.equals(schemaNS))
+			result= simpleTypesFactory.getBuiltInType(canonicalName);			
+		else if (ns.equals(targetNS))
 			result = (SimpleType)simpleTypes.get(canonicalName);
 		else {
 			Schema schema = (Schema) importedSchemas.get(ns);
