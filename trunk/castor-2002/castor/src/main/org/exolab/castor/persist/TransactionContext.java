@@ -264,123 +264,11 @@ public abstract class TransactionContext
 
 
     /**
-     * Loads the object from the database based on the identity of
-     * the object. If the object is loaded for read-only then no
-     * lock is acquired and updates to the object are not reflected
-     * at commit time. If the object is loaded for read-write then a
-     * read lock is acquired (unless timeout or deadlock detected) and
-     * the object is stored at commit time. The object is then
-     * considered persistent and may be deleted or upgraded to write
-     * lock. If the object is loaded for exclusive access then a write
-     * lock is acquired and the object is synchronized with the
-     * persistent copy.
-     * <p>
-     * This method may be called multiple times for an object in the
-     * same transaction and will always behave as if called on the
-     * object for the first time. On the first call within a transaction
-     * the object will be loaded and true returned. On subsequent calls
-     * the object will not be loaded and false returned.
-     * <p>
-     * Attempting to load the object twice in the same transaction, once
-     * with exclusive lock and once with read-write lock will result in
-     * an exception.
-     *
-     * @param engine The persistence engine
-     * @param object The object to load
-     * @param identity The object's identity
-     * @param accessMode The access mode (see {@link AccessMode})
-     * @return True if the object contents has been modified to reflect
-     *  the values in persistent storage
-     * @throws TransactionNotInProgressException Method called while
-     *   transaction is not in progress
-     * @throws LockNotGrantedException Timeout or deadlock occured
-     *  attempting to acquire lock on object
-     * @throws ObjectNotFoundException The object was not found in
-     *  persistent storage
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public synchronized boolean load( PersistenceEngine engine, Object object,
-                                      Object identity, AccessMode accessMode )
-        throws TransactionNotInProgressException, ObjectNotFoundException,
-               LockNotGrantedException, PersistenceException
-    {
-        ObjectEntry entry;
-        OID         oid;
-
-        // Handle the case where object has already been loaded in
-        // the context of this transaction. The case where object
-        // has been loaded in another transaction is handled by the
-        // locking mechanism.
-        entry = getObjectEntry( object );
-        if ( entry != null ) {
-            // If the object has been loaded in this transaction from a
-            // different engine this is an error. If the object has been
-            // deleted in this transaction, it cannot be re-loaded. If the
-            // object has been created in this transaction, it cannot be
-            // re-loaded but no error is reported.
-            if ( entry.engine != engine )
-                throw new PersistenceExceptionImpl( "persist.multipleLoad", object.getClass(), identity );
-            if ( entry.deleted )
-                throw new ObjectNotFoundExceptionImpl( object.getClass(), identity );
-            if ( object.getClass() != entry.object.getClass() )
-                throw new PersistenceExceptionImpl( "persist.typeMismatch", object.getClass(), entry.object.getClass() );
-            if ( entry.created )
-                return false;
-            if ( accessMode == AccessMode.Exclusive && ! entry.oid.isExclusive() ) {
-                // If we are in exclusive mode and object has not been
-                // loaded in exclusive mode before, then we have a
-                // problem. We cannot return an object that is not
-                // synchronized with the database, but we cannot
-                // synchronize a live object.
-                throw new PersistenceExceptionImpl( "persist.lockConflict", object.getClass(), identity );
-            }
-            return false;
-        }
-
-        // Load (or reload) the object through the persistence engine with the
-        // requested lock. This might report failure (object no longer exists),
-        // hold until a suitable lock is granted (or fail to grant), or
-        // report error with the persistence engine.
-        accessMode = engine.getClassHandler( object.getClass() ).getAccessMode( accessMode );
-        try {
-            oid = engine.load( this, object.getClass(), identity,
-                               accessMode, _lockTimeout );
-        } catch ( ObjectNotFoundException except ) {
-            throw except;
-        } catch ( LockNotGrantedException except ) {
-            throw except;
-        } catch ( ClassNotPersistenceCapableException except ) {
-            throw new PersistenceExceptionImpl( except );
-        }
-
-        // Need to copy the contents of this object from the cached
-        // copy and deal with it based on the transaction semantics.
-        // If the mode is read-only we release the lock and forget about
-        // it in the contents of this transaction. Otherwise we record
-        // the object in this transaction.
-        entry = addObjectEntry( object, oid, engine );
-        try {
-            engine.copyObject( this, oid, object );
-        } catch ( PersistenceException except ) {
-            removeObjectEntry( object );
-            engine.forgetObject( this, oid );
-            throw except;
-        }
-        if ( accessMode == AccessMode.ReadOnly ) {
-            removeObjectEntry( object );
-            engine.releaseLock( this, oid );
-        }
-        return true;
-    }
-
-
-    /**
      * Obtains an object for use within the transaction. Before an
      * object can be used in a transaction it must be fetched.
      * Multiple access to the same object within the transaction will
      * return the same object instance (except for read-only access).
-     * This method is similar to {@link #load} except that it will
+     * This method is similar to {@link #fetch} except that it will
      * load the object only once within a transaction and always
      * return the same instance.
      * <p>
@@ -545,8 +433,12 @@ public abstract class TransactionContext
         ClassHandler handler;
 
         // Make sure the object has not beed persisted in this transaction.
-        if ( getObjectEntry( object ) != null )
+        entry = getObjectEntry( object );
+        if ( entry != null ) {
+            if ( entry.deleted )
+                throw new ObjectDeletedExceptionImpl( object.getClass(), identity );
             throw new PersistenceExceptionImpl( "persist.objectAlreadyPersistent", object.getClass(), identity );
+        }
         handler = engine.getClassHandler( object.getClass() );
         if ( handler == null )
             throw new ClassNotPersistenceCapableException( Messages.format( "persist.classNotPersistenceCapable", object.getClass().getName() ) );
@@ -608,7 +500,7 @@ public abstract class TransactionContext
             throw new ObjectNotPersistentExceptionImpl( object.getClass() );
         // Cannot delete same object twice
         if ( entry.deleted )
-            throw new PersistenceExceptionImpl( "persist.cannotDeleteTwice", object.getClass(), entry.oid.getIdentity() );
+            throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
 
         // If the object has been created in this transaction and had no
         // identity we don't need to remove it from persistent storage
@@ -671,8 +563,10 @@ public abstract class TransactionContext
         // Get the entry for this object, if it does not exist
         // the object has never been persisted in this transaction
         entry = getObjectEntry( object );
-        if ( entry == null || entry.deleted )
+        if ( entry == null )
             throw new ObjectNotPersistentExceptionImpl( object.getClass() );
+        if ( entry.deleted )
+            throw new ObjectDeletedExceptionImpl( object.getClass(), entry.oid.getIdentity() );
         try {
             entry.engine.writeLock( this, entry.oid, timeout );
         } catch ( ObjectDeletedException except ) {
