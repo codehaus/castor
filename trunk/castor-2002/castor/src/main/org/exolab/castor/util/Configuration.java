@@ -409,7 +409,7 @@ public abstract class Configuration
             _default.load( Configuration.class.getResourceAsStream( Property.ResourceName ) );
         } catch ( Exception except ) {
             // This should never happen
-            throw new RuntimeException( Messages.format( "conf.notDefaultConfigurationFile",
+            throw new RuntimeException( Messages.format( "conf.noDefaultConfigurationFile",
                                                          Property.FileName ) );
         }
         
