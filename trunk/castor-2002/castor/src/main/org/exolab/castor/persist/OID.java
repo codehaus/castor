@@ -47,9 +47,6 @@
 package org.exolab.castor.persist;
 
 
-import org.exolab.castor.mapping.ClassDesc;
-
-
 /**
  * Object identifier. An object identifier is unique within a cache
  * engine or other persistence mechanism and is used to locate object
@@ -97,16 +94,16 @@ final class OID
     private int          _hashCode;
 
 
-    OID( ClassDesc clsDesc, Object identity )
+    OID( ClassHandler handler, Object identity )
     {
         _identity = identity;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        /*
+        /* XXX Need to fix that
           while ( clsDesc.getExtends() != null )
           clsDesc = (ClassDesc) clsDesc.getExtends();
         */
-        _type = clsDesc.getJavaClass();
+        _type = handler.getJavaClass();
         _hashCode = _type.hashCode() + ( _identity == null ? 0 : _identity.hashCode() );
     }
 
