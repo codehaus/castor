@@ -47,6 +47,7 @@ package org.exolab.castor.xml.schema;
 
 import org.exolab.castor.xml.*;
 
+import java.util.Enumeration;
 import java.util.Vector;
 
 /**
@@ -100,6 +101,11 @@ public class ElementDecl extends Particle
     private String _block;
 
     /**
+     * collection of Identity Constraints
+    **/
+    private Vector _constraints = null;
+    
+    /**
      * Creates a new default element definition
      * @param schema, the XML Schema to which this element declartion
      * belongs
@@ -124,8 +130,19 @@ public class ElementDecl extends Particle
         }
         this.schema = schema;
         this.name = name;
+        _constraints = new Vector(3);
     } //-- ElementDecl
 
+    /**
+     * Adds the given IdentityConstraint to this element definition.
+     *
+     * @param constraint the IdentityConstraint to add.
+    **/
+    public void addIdentityConstraint(IdentityConstraint constraint) {
+        if (constraint == null) return;
+        _constraints.addElement(constraint);
+    } //-- addIdentityConstraint
+    
     /**
      * Returns the default value of this element definition.
      *
@@ -146,6 +163,17 @@ public class ElementDecl extends Particle
         return _fixed;
     } //-- getFixedValue
 
+    /**
+     * Returns an Enumeration of IdentityConstraint objects contained within
+     * this element definition.
+     *
+     * @return an Enumeration of IdentityConstraint objects contained within
+     * this element definition.
+    **/
+    public Enumeration getIdentityConstraints() {
+        return _constraints.elements();
+    } //-- getIdentityConstraints
+    
     /**
      * Returns the name of this Element declaration. The name of the
      * referenced element is returned if the 'ref' attribute was used.
@@ -279,7 +307,21 @@ public class ElementDecl extends Particle
         }
 
         return false;
-    }
+    } //-- hasChildren
+    
+    /**
+     * Removes the given IdentityConstraint from this element definition.
+     *
+     * @param constraint the IdentityConstraint to remove.
+     * @return true if the IdentityConstraint was contained within this
+     * element defintion.
+    **/
+    public boolean removeIdentityConstraint(IdentityConstraint constraint) 
+    {
+        if (constraint ==  null) return false;
+        return _constraints.removeElement(constraint);
+    } //-- removeIdentityConstraint
+    
 
     /**
      * Sets the default value for this element definition.
