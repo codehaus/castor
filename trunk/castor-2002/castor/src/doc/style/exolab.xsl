@@ -78,7 +78,7 @@
                 <tr>
                   <td bgcolor="{$color-alpha}" width="*" align="left" valign="top">
                     <xsl:value-of select="$nbsp"/><xsl:value-of select="$nbsp"/>
-                    <a href="{$project/@href}"><img src="{$project/@image}" border="0" vspace="16" hspace="16"/></a>
+                    <a href="{$project/@href}"><img src="{$project/@image}" border="0" vspace="8" hspace="16"/></a>
                   </td>
                 </tr>
 
@@ -96,7 +96,7 @@
               <xsl:for-each select="$project/menu">
                 <tr>
                   <td align="left" colspan="2">
-                    <font color="{$color-alpha}"><xsl:value-of select="@name"/></font>
+                    <font color="{$color-alpha}"><small><xsl:value-of select="@name"/></small></font>
                   </td>
                 </tr>
                 <xsl:for-each select="item">

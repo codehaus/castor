@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE document SYSTEM "document.dtd">
 <document url="http://castor.exolab.org/types.xml">
   <properties>
     <title>Castor Type Support</title>
     <abstract>Defines the type mechanism in Castor, how types are specified in the mapping file and how Java to SQL type conversion is used</abstract>
-    <author email="arkin@exoffice.com">Assaf Arkin</author>
+    <author email="arkin@exoffice.com"
+            ldap="ldap.exoffice.com/uid=arkin,ou=people,dc=exoffice,dc=com">Assaf Arkin</author>
     <status>Preliminary Draft</status>
   </properties>
   <body>
