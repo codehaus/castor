@@ -280,6 +280,16 @@ public abstract class TransactionContext
 
 
     /**
+     * The derived class must implement this method and close all the
+     * connections used in this transaction.
+     * @throws TransactionAbortedException The transaction could not
+     *  close all the connections
+     */
+    protected abstract void closeConnections()
+        throws TransactionAbortedException;
+
+
+    /**
      * The derived class must implement this method and rollback all
      * the connections used in this transaction. The connections may
      * be closed, as they will not be reused in this transaction.
@@ -1082,6 +1092,40 @@ public abstract class TransactionContext
             entry.nextDeleted = null;
         }
         _status = Status.STATUS_ROLLEDBACK;
+    }
+
+
+    /**
+     * Closes all Connections when working in EJB environment,
+     * otherwise does nothing.
+     * Must be called before the end of the transaction.
+     *
+     * @throws TransactionAbortedException The transaction has been
+     *   aborted due to inconsistency, duplicate object identity, error
+     *   with the persistence engine or any other reason
+     * @throws IllegalStateException This method has been called
+     *   after the end of the transaction.
+     */
+    public synchronized void close()
+        throws TransactionAbortedException
+    {
+        Enumeration enum;
+        ObjectEntry entry;
+
+        if ( _status != Status.STATUS_ACTIVE &&
+             _status != Status.STATUS_MARKED_ROLLBACK ) {
+            throw new IllegalStateException( Messages.message( "persist.missingEnd" ) );
+        }
+        try {
+            // Go through all the connections opened in this transaction,
+            // close them one by one.
+            closeConnections();
+
+        } catch ( Exception except ) {
+            // Any error that happens, we're going to rollback the transaction.
+            _status = Status.STATUS_MARKED_ROLLBACK;
+            throw new TransactionAbortedExceptionImpl( except );
+        }
     }
 
 

@@ -110,17 +110,18 @@ final class TransactionContextImpl
         Enumeration enum;
         Connection  conn;
         
+        if ( _globalTx ) {
+            return;
+        }
         try {
-            if ( ! _globalTx ) {
-                // Go through all the connections opened in this transaction,
-                // commit and close them one by one.
-                enum = _conns.elements();
-                while ( enum.hasMoreElements() ) {
-                    conn = (Connection) enum.nextElement();
-                    // Checkpoint can only be done if transaction is not running
-                    // under transaction monitor
-                    conn.commit();
-                }
+            // Go through all the connections opened in this transaction,
+            // commit and close them one by one.
+            enum = _conns.elements();
+            while ( enum.hasMoreElements() ) {
+                conn = (Connection) enum.nextElement();
+                // Checkpoint can only be done if transaction is not running
+                // under transaction monitor
+                conn.commit();
             }
         } catch ( SQLException except ) {
             // [oleg] Check for rollback exception based on X/Open error code
@@ -137,6 +138,35 @@ final class TransactionContextImpl
                 } catch ( SQLException except ) { }
             }
             _conns.clear();
+        }
+    }
+
+
+    protected void closeConnections()
+        throws TransactionAbortedException
+    {
+        Enumeration enum;
+        Connection  conn;
+        Exception   error = null; 
+
+        if ( ! _globalTx ) {
+            return;
+        }
+        // Go through all the connections opened in this transaction,
+        // close them one by one.
+        // Close all that can be closed, after that report error if any.
+        enum = _conns.elements();
+        while ( enum.hasMoreElements() ) {
+            conn = (Connection) enum.nextElement();
+            try {
+                conn.close();
+            } catch ( SQLException except ) {
+                error = except;
+            }
+        }
+        _conns.clear();
+        if ( error != null ) {
+            throw new TransactionAbortedExceptionImpl( error );
         }
     }
 
