@@ -1060,6 +1060,8 @@ public abstract class TransactionContext
                 throw (TransactionAbortedException) except;
             // Any error is reported as transaction aborted
             throw new TransactionAbortedException( Messages.format("persist.nested", except), except );
+        } finally {
+          closeConnections();
         }
     }
 

@@ -493,7 +493,6 @@ public class DatabaseImpl
         }
         try {
             _ctx.prepare();
-            _ctx.close();
         } catch ( TransactionAbortedException except ) {
             if ( _logInterceptor != null )
                 _logInterceptor.exception( except );
