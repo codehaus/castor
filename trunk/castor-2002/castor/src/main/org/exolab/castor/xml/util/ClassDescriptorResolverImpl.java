@@ -124,7 +124,8 @@ public class ClassDescriptorResolverImpl
         
         String className = type.getName() + "Descriptor";
         try {
-	        Class dClass = Class.forName(className);
+            ClassLoader loader = type.getClassLoader();
+	        Class dClass = loader.loadClass(className);
             classDesc = (XMLClassDescriptor) dClass.newInstance();
             _cache.put(type, classDesc);
         }
