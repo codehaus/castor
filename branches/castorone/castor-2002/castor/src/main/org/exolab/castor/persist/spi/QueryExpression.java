@@ -227,6 +227,14 @@ public interface QueryExpression
                               String rightTable, String rightColumn );
 
 
+
+    public void addInnerJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn );
+
+
+    public void addOuterJoin( String leftTable, String[] leftColumn,
+                              String rightTable, String[] rightColumn );
+
     /**
      * Return the query expression as an SQL statement. The resulting
      * SQL is fed directly to a JDBC statement. <tt>writeLock</tt> is

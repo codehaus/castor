@@ -104,8 +104,8 @@ public class JDOFieldDescriptor
         super( fieldDesc );
         if ( fieldDesc.isTransient() || fieldDesc.getHandler() == null )
             throw new IllegalArgumentException( "Argument 'fieldDesc' is a transient field or has no handler" );
-        if ( sqlName == null )
-            throw new IllegalArgumentException( "Argument 'sqlName' is null" );
+        //if ( sqlName == null )
+        //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = sqlName;
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;

@@ -288,8 +288,9 @@ public class ManyToMany extends CWTestCase {
                     Iterator itor = p.iterator();
                     if ( itor.hasNext() ) 
                         person1 = (TestManyPerson) itor.next();
-                    if ( itor.hasNext() )
-                        throw new Exception("Error: more people than expected!");
+                    if ( itor.hasNext() ) {
+                        throw new Exception("Error: more people than expected! 1:("+person1+") 2: ("+itor.next()+")");
+                    }
                 
                     if ( person1 == null )
                         throw new Exception("Error: expect person1 in group");

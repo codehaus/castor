@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.util.Vector;
+import java.util.Stack;
 import java.sql.SQLException;
 import java.sql.Connection;
 import java.sql.CallableStatement;
@@ -115,8 +116,8 @@ public final class SQLEngine implements Persistence {
 
 
     private final static boolean FIELD_TYPE = false;
-    
-    
+
+
     private String              _pkLookup;
 
 
@@ -141,7 +142,10 @@ public final class SQLEngine implements Persistence {
     private FieldInfo[]         _fields;
 
 
-    private FieldInfo[]         _ids;
+    private ColumnInfo[]         _ids;
+
+
+    private ColumnInfo[]        _dependedIds;
 
 
     private SQLEngine           _extends;
@@ -156,6 +160,15 @@ public final class SQLEngine implements Persistence {
     private String              _stampField;
 
 
+    private String              _type;
+
+
+    private String              _mapTo;
+
+
+    private String              _extTable;
+
+
     private LogInterceptor       _logInterceptor;
 
 
@@ -166,9 +179,11 @@ public final class SQLEngine implements Persistence {
 
 
     private ClassMolder          _mold;
-  
 
-    SQLEngine( JDOClassDescriptor clsDesc, 
+
+
+
+    SQLEngine( JDOClassDescriptor clsDesc,
                LogInterceptor logInterceptor, PersistenceFactory factory, String stampField )
         throws MappingException {
 
@@ -177,14 +192,12 @@ public final class SQLEngine implements Persistence {
         _factory = factory;
         _logInterceptor = logInterceptor;
         _keyGen = null;
+        _type = clsDesc.getJavaClass().getName();
+        _mapTo = clsDesc.getTableName();
 
-        if ( _clsDesc.getExtends() != null ) {
-            //_extends = new SQLEngine( (JDOClassDescriptor) _clsDesc.getExtends(), null,
-            //          _factory, _stampField );
-        } else {
+        if ( _clsDesc.getExtends() == null ) {
             KeyGeneratorDescriptor keyGenDesc = clsDesc.getKeyGeneratorDescriptor();
             if ( keyGenDesc != null ) {
-                
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
                         _factory, keyGenDesc,
                         ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType(),
@@ -196,67 +209,118 @@ public final class SQLEngine implements Persistence {
         Vector idsInfo = new Vector();
         Vector fieldsInfo = new Vector();
 
-        // we always put the original id info in front
-        FieldDescriptor[] idDescriptors = clsDesc.getIdentities();
-        for ( int i=0; i<idDescriptors.length; i++ ) {
-            KeyGeneratorDescriptor keyGenDesc = clsDesc.getKeyGeneratorDescriptor();
-            if ( keyGenDesc != null ) {
-                if ( idDescriptors.length != 1 )
-                    throw new MappingException("Confussed KeyGenerator!");
-                _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
-                        _factory, keyGenDesc, ((JDOFieldDescriptor)idDescriptors[i]).getSQLType(),
-                        _logInterceptor );
-                if ( idDescriptors[i] instanceof JDOFieldDescriptor )
-                    idsInfo.add( new FieldInfo( (JDOFieldDescriptor)idDescriptors[i], true, _keyGen ) );
-                else 
-                    throw new MappingException("Except JDOFieldDescriptor");
-            } else {
-                if ( idDescriptors[i] instanceof JDOFieldDescriptor )
-                    idsInfo.add( new FieldInfo( (JDOFieldDescriptor)idDescriptors[i], true ) );
-                else 
-                    throw new MappingException("Except JDOFieldDescriptor");
-            }
+        /*
+         * Implementation Note:
+         * Extends and Depends has some special mutual exclusive
+         * properties, which implementator should aware of.
+         *
+         * A Depended class may depends on another depended class
+         * A class should either extends or depends on other class
+         * A class should not depend on extending class.
+         *  because, it is the same as depends on the base class
+         * A class may be depended by zero or more classes
+         * A class may be extended by zero or more classes
+         * A class may extends only zero or one class
+         * A class may depends only zero or one class
+         * A class may depend on extended class
+         * A class may extend a dependent class.
+         * A class may extend a depended class.
+         * No loop or circle should exist
+         *
+         * In other word,
+         *
+         */
+        // then, we put depended class ids in the back
+        JDOClassDescriptor base = clsDesc;
+
+        // make sure there is forbidded cases
+        while ( base.getDepends() != null ) {
+            if ( base.getExtends() != null )
+                throw new MappingException("Class should not both depends on and extended other classes");
+
+            base = (JDOClassDescriptor)base.getDepends();
+            if ( base.getExtends() != null )
+                throw new MappingException("Class should not depends on an extended class");
+            // do we need to add loop detection?
         }
 
-        // then, we put depended class id in the back
-        ClassDescriptor base = clsDesc;
-        // walk until the base class which this class extends found
+        // walk until the base class which this class extends
+        base = clsDesc;
+        Stack stack = new Stack();
+        stack.push( base );
         while ( base.getExtends() != null ) {
-            base = (ClassDescriptor) base.getExtends();
+            if ( base.getDepends() != null )
+                throw new MappingException("Class should not both depends on and extended other classes");
+            base = (JDOClassDescriptor) base.getExtends();
+            stack.push( base );
+            // do we need to add loop detection?
         }
+        if ( base != clsDesc ) {
+            _extTable = base.getTableName();
+        }
+
+        // now base is either the base of extended class, or
+        // clsDesc
+        // we always put the original id info in front
         JDOClassDescriptor jdoBase = (JDOClassDescriptor) base;
+        FieldDescriptor[] idDescriptors = base.getIdentities();
+        for ( int i=0; i<idDescriptors.length; i++ ) {
+            if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
+                String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
+                int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
+                FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
+                idsInfo.add( new ColumnInfo( name, null, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
+            } else
+                throw new MappingException("Except JDOFieldDescriptor");
+        }
+
+        // if class or base class depend on other class,
+        // depended class ids will be part of this ids and
+        // will be added in the back. We don't need to take
+        // care depended class which is depends on other class.
+        // ClassMolder will take care of it.
         idDescriptors = null;
         if ( jdoBase.getDepends()!= null ) {
             idDescriptors = ((ClassDescriptorImpl)jdoBase.getDepends()).getIdentities();
             for ( int i=0; i<idDescriptors.length; i++ ) {
-                if ( idDescriptors[i] instanceof JDOFieldDescriptor )
-                    idsInfo.add( new FieldInfo( (JDOFieldDescriptor)idDescriptors[i], true ) );
-                else 
+                if ( idDescriptors[i] instanceof JDOFieldDescriptor ) {
+                    String name = ((JDOFieldDescriptor)idDescriptors[i]).getSQLName();
+                    int type = ((JDOFieldDescriptor)idDescriptors[i]).getSQLType();
+                    FieldHandlerImpl fh = (FieldHandlerImpl)idDescriptors[i].getHandler();
+
+                    idsInfo.add( new ColumnInfo( name, null, type, fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ) );
+                } else
                     throw new MappingException("Except JDOFieldDescriptor");
             }
         }
 
         // then do the fields
-        FieldDescriptor[] fieldDescriptors = clsDesc.getFields();
-        for ( int i=0; i<fieldDescriptors.length; i++ ) {
-            if ( fieldDescriptors[i] instanceof JDOFieldDescriptor )
-                fieldsInfo.add( new FieldInfo( (JDOFieldDescriptor)fieldDescriptors[i], true  ) );
-            else 
-                fieldsInfo.add( new FieldInfo( fieldDescriptors[i], true ) );
+        boolean extendField = true;
+        while ( !stack.empty() ) {
+            base = (JDOClassDescriptor)stack.pop();
+            FieldDescriptor[] fieldDescriptors = base.getFields();
+            for ( int i=0; i<fieldDescriptors.length; i++ ) {
+                if ( stack.empty() ) {
+                    fieldsInfo.add( new FieldInfo( clsDesc, fieldDescriptors[i], clsDesc.getTableName(), !extendField ) );
+                } else {
+                    fieldsInfo.add( new FieldInfo( clsDesc, fieldDescriptors[i], base.getTableName(), extendField ) );
+                }
+            }
         }
 
-        _ids = new FieldInfo[idsInfo.size()];        
+        _ids = new ColumnInfo[idsInfo.size()];
         idsInfo.copyInto( _ids );
 
-        _fields = new FieldInfo[fieldsInfo.size()];        
+        _fields = new FieldInfo[fieldsInfo.size()];
         fieldsInfo.copyInto( _fields );
 
         try {
-            buildSql( _clsDesc, _logInterceptor );
-            buildFinder( _clsDesc, _logInterceptor );
+            buildSql();
+            buildFinder( clsDesc );
         } catch ( QueryException except ) {
+            except.printStackTrace();
             throw new MappingException( except );
-        }        
+        }
     }
 
 
@@ -335,158 +399,252 @@ public final class SQLEngine implements Persistence {
     public QueryExpression getQueryExpression() {
         return _factory.getQueryExpression();
     }
-    
+
     public QueryExpression getFinder()
     {
         return (QueryExpression) _sqlFinder.clone();
     }
-
-    private Object[] toSql( Object[] objects, boolean ids ) 
+    private Object[] idToSql( Object[] objects )
             throws PersistenceException {
+
+        if ( objects == null ) return null;
+
+        try {
+            Object[] result = new Object[objects.length];
+            for ( int i=0; i<_ids.length; i++ ) {
+                if ( _ids[i].convertFrom != null && objects[i] != null ) {
+                    result[i] = _ids[i].convertFrom.convert( objects[i], _ids[i].convertParam );
+                } else {
+                    result[i] = objects[i];
+                }
+            }
+            return result;
+        } catch ( ClassCastException e ) {
+            throw new PersistenceException( Messages.format( "mapping.wrongConvertor",  "" ) );
+        }
+    }
+
+    private Object toSQL( int field, int column, Object object ) 
+            throws PersistenceException {
+        ColumnInfo col = _fields[field].columns[column];
+        if ( object == null || col.convertFrom == null )
+            return object;
+        return col.convertFrom.convert( object, col.convertParam );
+    }
+    /*
+    private Object[] toSql( Object[] objects )
+            throws PersistenceException {
+
         Object[] result = null;
 
         if ( objects == null ) return null;
 
-        /*
-        System.out.print("toSql. object: ");
-        if ( objects == null ) {
-            System.out.println(" null ");
-        } else {
-            System.out.println(" not null");
+
+            System.out.print("Before toSQL. object: ");
+            if ( objects == null ) {
+                System.out.println(" null ");
+            } else {
+                System.out.println(" not null");
+                for ( int i=0; i<objects.length; i++ ) {
+                    if ( i > 0 ) System.out.print(";  ");
+                    System.out.print("[");
+                    if ( objects[i] == null ) 
+                        System.out.print("null:");
+                    else {
+                        if ( _fields[i].multi ) {
+                            System.out.print("multi");
+                        } else {
+
+                            Object[] temp = (Object[]) objects[i];
+                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                                if ( j > 0 ) System.out.print(",  ");
+                                System.out.print( 
+                                ((temp==null||temp[j]==null)?null:temp[j].getClass().getName()) + "/" +
+                                 (temp==null?null:temp[j]));
+                            }
+                        }
+                        
+                    }
+                    System.out.print("]");
+                }
+                System.out.println();
+            }
+        try {
+            // using field convert
+            result = new Object[objects.length];
+            for ( int i=0; i<_fields.length; i++ ) {
+                if ( objects[i] != null && _fields[i].store ) {
+                    Object[] inner = (Object[]) objects[i];
+                    Object[] temp = new Object[inner.length];
+                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                        if ( _fields[i].columns[j].convertFrom != null && inner[j] != null ) {
+                            temp[j] = _fields[i].columns[j].convertFrom.convert(
+                                    inner[j], _fields[i].columns[j].convertParam );
+                        } else {
+                            temp[j] = inner[j];
+                        }
+                    }
+                    result[i] = temp;
+                }
+            }
+            /*
+            System.out.println("result:");
             for ( int i=0; i<objects.length; i++ ) {
                 if ( i > 0 ) System.out.print(",");
                 System.out.print( (objects[i]==null?null:objects[i].getClass()) + "/" + objects[i] + "    ");
-            }
-            System.out.println();
+            }*//*
+            return result;
+        } catch ( ClassCastException e ) {
+            throw new PersistenceException( Messages.format( "mapping.wrongConvertor",  "" ) );
         }*/
+    //}*/
+    private Object[] idToJava( Object[] objects )
+            throws PersistenceException {
+
+        if ( objects == null ) return null;
+
         try {
-            if ( ids == ID_TYPE ) {
-                // using id convert
-                result = new Object[objects.length];
-                for ( int i=0; i<_ids.length; i++ ) {
-                    if ( _ids[i].convertFrom != null && objects[i] != null ) {
-                        result[i] = _ids[i].convertFrom.convert( objects[i], _ids[i].convertParam );
-                    } else {
-                        result[i] = objects[i];
-                    }
+            // using id convert
+            Object[] result = new Object[objects.length];
+            for ( int i=0; i<_ids.length; i++ ) {
+                if ( _ids[i].convertTo != null && objects[i] != null ) {
+                    result[i] = _ids[i].convertTo.convert( objects[i], _ids[i].convertParam );
+                    //System.out.println("..."+result[i].getClass()+"...");
+                } else {
+                    result[i] = objects[i];
                 }
-                /*
-                System.out.println("result:");
-                for ( int i=0; i<objects.length; i++ ) {
-                    if ( i > 0 ) System.out.print(",");
-                    System.out.print( (result[i]==null?null:result[i].getClass()) + "/" + result[i] + "    ");
-                }*/
-                return result;
-            } else {
-                // using field convert
-                result = new Object[objects.length];
-                for ( int i=0; i<_fields.length; i++ ) {
-                    if ( _fields[i].store && _fields[i].convertFrom != null && objects[i] != null ) {
-                        result[i] = _fields[i].convertFrom.convert( objects[i], _fields[i].convertParam );
-                    } else {
-                        result[i] = objects[i];
-                    }
-                }
-                /*
-                System.out.println("result:");
-                for ( int i=0; i<objects.length; i++ ) {
-                    if ( i > 0 ) System.out.print(",");
-                    System.out.print( (objects[i]==null?null:objects[i].getClass()) + "/" + objects[i] + "    ");
-                }*/
-                return result;
             }
+            return result;
         } catch ( ClassCastException e ) {
             throw new PersistenceException( Messages.format( "mapping.wrongConvertor",  "" ) );
         }
+
     }
 
-    private Object[] toJava( Object[] objects, boolean ids ) 
+    private Object toJava( int field, int column, Object object ) 
             throws PersistenceException {
-
-        /*
-        System.out.print("toJava. ");
-        if ( objects == null ) {
-            System.out.println("object null ");
-        } else {
-            if ( ids == ID_TYPE ) {
-                for ( int i=0; (i<objects.length)&&(i<_ids.length); i++ ) {
-                    if ( i > 0 ) System.out.print("     ,");
-                    System.out.print( (objects[i]==null?null:objects[i].getClass()) + "/" + objects[i] + "|");
-                    System.out.println(_ids[i].convertTo);
-                }
-            } else {
-                for ( int i=0; (i<objects.length)&&(i<_fields.length); i++ ) {
-                    if ( i > 0 ) System.out.print("     ,");
-                    System.out.print( (objects[i]==null?null:objects[i].getClass()) + "/" + objects[i] + "|");
-                    System.out.println(_fields[i].convertTo);
-                }
-            }
-
-            System.out.println();
-        }*/
+        ColumnInfo col = _fields[field].columns[column];
+        if ( object == null || col.convertTo == null )
+            return object;
+        return col.convertTo.convert( object, col.convertParam );
+    }
+    /*
+    private Object[] toJava( Object[] objects )
+            throws PersistenceException {
 
         if ( objects == null ) return null;
 
         Object[] result = null;
 
-        try {
-            if ( ids == ID_TYPE ) {
-                // using id convert
-                result = new Object[objects.length];
-                for ( int i=0; i<_ids.length; i++ ) {
-                    if ( _ids[i].convertTo != null && objects[i] != null ) {
-                        result[i] = _ids[i].convertTo.convert( objects[i], _ids[i].convertParam );
-                        //System.out.println("..."+result[i].getClass()+"...");
-                    } else {
-                        result[i] = objects[i];
-                    }
-                }
-                /*
-                System.out.println("result:");
-                for ( int i=0; i<result.length; i++ ) {
-                    if ( i > 0 ) System.out.print(",");
-                    System.out.print( result[i].getClass() + "/" + result[i] + "    ");
-                    System.out.print( _ids[i].convertTo );
-                }
-                System.out.println();
-                */
-                return result;
+
+
+            System.out.print("Before toJava. object: ");
+            if ( objects == null ) {
+                System.out.println(" null ");
             } else {
-                // using field convert
-                result = new Object[objects.length];
-                for ( int i=0; i<_fields.length; i++ ) {
-                    if ( _fields[i].load && _fields[i].convertTo != null && objects[i] != null ) {
+                System.out.println(" not null");
+                for ( int i=0; i<objects.length; i++ ) {
+                    if ( i > 0 ) System.out.print(";  ");
+                    System.out.print("[");
+                    if ( objects[i] == null ) 
+                        System.out.print("null:");
+                    else {
                         if ( _fields[i].multi ) {
-                            Vector v = new Vector();
-                            Vector loaded = (Vector) objects[i];
-                            for ( int j=0; j<loaded.size(); j++ ) {
-                                v.addElement( _fields[i].convertTo.convert( loaded.elementAt(j), 
-                                    _fields[i].convertParam ) );
-                            }
-                            result[i] = v;
+                            System.out.print("multi");
                         } else {
-                            result[i] = _fields[i].convertTo.convert( objects[i], 
-                                    _fields[i].convertParam );
+
+                            Object[] temp = (Object[]) objects[i];
+                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                                if ( j > 0 ) System.out.print(",  ");
+                                System.out.print( 
+                                ((temp==null||temp[j]==null)?null:temp[j].getClass().getName()) + "/" +
+                                 (temp==null?null:temp[j]));
+                            }
                         }
-                    } else {
-                        result[i] = objects[i];
+                        
                     }
-                }
-                /*
-                System.out.println("result:");
-                for ( int i=0; (i<objects.length)&&(i<_fields.length); i++ ) {
-                    if ( i > 0 ) System.out.print(",");
-                    System.out.print( (objects[i]==null?null:objects[i].getClass()) + "/" + objects[i] + "    ");
-                    System.out.print(_fields[i].convertTo);
+                    System.out.print("]");
                 }
                 System.out.println();
-                */
-                return result;
             }
+
+
+        try {
+            // using field convert
+            result = new Object[objects.length];
+            for ( int i=0; i<_fields.length; i++ ) {
+                if ( objects[i] != null && _fields[i].load  ) {
+                    if ( !_fields[i].multi ) {
+                        Object[] inner = (Object[]) objects[i];
+                        Object[] temp =  new Object[inner.length];
+
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            if ( inner[j] != null && _fields[i].columns[j].convertTo != null ) {
+                                
+                                temp[j] = _fields[i].columns[j].convertTo.convert( inner[j],
+                                        _fields[i].columns[j].convertParam );
+                            } else {
+                                
+                                temp[j] = inner[j];
+                            }
+                        }
+                        result[i] = temp;
+                    } else {
+                        Vector vec = (Vector) objects[i];
+                        Vector res = new Vector( vec.size() );
+                        for ( int k=0; k<vec.size(); k++ ) {
+                            Object[] inner = (Object[]) vec.elementAt(k);
+                            Object[] temp = new Object[inner.length];
+                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                                if ( inner[j] != null && _fields[i].columns[j].convertTo != null ) {
+                                    temp[j] = _fields[i].columns[j].convertTo.convert( inner[j],
+                                            _fields[i].columns[j].convertParam );
+                                } else {
+                                    temp[j] = inner[j];
+                                }
+                            }
+                            res.addElement(temp);
+                        }
+                        result[i] = res;
+                    }
+                }
+            }
+
+
+            System.out.print("Result of toJava. object: ");
+            if ( result == null ) {
+                System.out.println(" null ");
+            } else {
+                System.out.println(" not null");
+                for ( int i=0; i<result.length; i++ ) {
+                    if ( i > 0 ) System.out.print(";  ");
+                    System.out.print("[");
+                    if ( result[i] == null ) 
+                        System.out.print("null:");
+                    else {
+                        if ( _fields[i].multi ) {
+                            System.out.print("multi");
+                        } else {
+
+                            Object[] temp = (Object[]) objects[i];
+                            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                                if ( j > 0 ) System.out.print(",  ");
+                                System.out.print( 
+                                ((temp==null||temp[j]==null)?null:temp[j].getClass().getName()) + "/" +
+                                 (temp==null?null:temp[j]));
+                            }
+                        }                        
+                    }
+                    System.out.print("]");
+                }
+                System.out.println();
+            }
+
+            return result;
         } catch ( ClassCastException e ) {
             throw new PersistenceException( Messages.format( "mapping.wrongConvertor",  "" ) );
         }
-    }
+    }*/
 
     private Object generateKey( Object conn ) throws PersistenceException
     {
@@ -495,12 +653,12 @@ public final class SQLEngine implements Persistence {
         identity = _keyGen.generateKey( (Connection) conn, _clsDesc.getTableName(),
                 _ids[0].name, null );
 
-        if ( identity == null ) 
+        if ( identity == null )
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
 
         if ( _ids[0].convertTo != null && _ids[0].convertTo != null ) {
             identity = _ids[0].convertTo.convert( identity, _ids[0].convertParam );
-        } 
+        }
 
         return identity;
     }
@@ -511,11 +669,11 @@ public final class SQLEngine implements Persistence {
     {
         PreparedStatement stmt;
         int               count;
-        Object[]          convertedFields;
+        //Object[]          convertedFields;
         Object[]          sqlIdentities;
-        Object            tempId;        
+        Object            tempId;
 
-        convertedFields = toSql( fields, FIELD_TYPE );
+        //convertedFields = toSql( fields );
 
         stmt = null;
         try {
@@ -532,7 +690,7 @@ public final class SQLEngine implements Persistence {
                 identities[0] = generateKey( conn );   // genKey return identity in JDO type
             }
 
-            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) 
+            if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
                 stmt = ( (Connection) conn ).prepareCall( _sqlCreate );
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
@@ -541,7 +699,7 @@ public final class SQLEngine implements Persistence {
             // Must remember that SQL column index is base one
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
-                sqlIdentities = toSql( identities, ID_TYPE );
+                sqlIdentities = idToSql( identities );
                 for ( int i=0; i<_ids.length; i++ ) {
                     System.out.print("<<<<id:"+count+":"+sqlIdentities[i]+":"+_ids[i].name+">>>>");
                     stmt.setObject( count, sqlIdentities[i] );
@@ -549,19 +707,25 @@ public final class SQLEngine implements Persistence {
                 }
             }
 
-
-            for ( int i = 0 ; i < _fields.length ; ++i ) 
+            for ( int i = 0 ; i < _fields.length ; ++i ) {
                 if ( _fields[ i ].store ) {
-                    if ( convertedFields[ i ] == null ) {
-                        System.out.print("<<<<"+count+":null:"+_fields[i].name+" type: "+_fields[ i ].sqlType+">>>>");
-                        stmt.setNull( count, _fields[ i ].sqlType );
-                    } else {
-                        System.out.print("<<<<"+count+":"+convertedFields[i]+":"+_fields[i].name+" type: "+_fields[ i ].sqlType+">>>>");
-                        stmt.setObject( count, convertedFields[ i ], _fields[ i ].sqlType );
+                    System.out.println(_fields[i].jdoName);
+                    Object[] inner = (Object[])fields[i];
+                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                        if ( inner == null || inner[j] == null ) {
+                            System.out.print("<<<<"+count+":null:"+_fields[i].columns[j].name+" type: "
+                            +_fields[i].columns[j].sqlType+">>>>");
+                            stmt.setNull( count, _fields[i].columns[j].sqlType );
+                        } else {
+                            System.out.print("<<<<"+count+":"+inner[j]+":"
+                                +_fields[i].columns[j].name+" type: "+_fields[i].columns[j].sqlType+">>>>");
+                            stmt.setObject( count, toSQL( i, j, inner[j]), _fields[i].columns[j].sqlType );
+                        }
+                        ++count;
                     }
-
-                    ++count;
                 }
+            }
+
             System.out.println();
             //System.out.println();
             // Generate key during INSERT
@@ -581,7 +745,7 @@ public final class SQLEngine implements Persistence {
                 // Workaround: for INTEGER type in Oracle getObject returns BigDecimal
                 if ( sqlType == java.sql.Types.INTEGER )
                     tempId = new Integer( cstmt.getInt( count ) );
-                else 
+                else
                     tempId = cstmt.getObject( count );
 
                 if ( _ids[0].convertTo != null && tempId != null ) {
@@ -589,9 +753,9 @@ public final class SQLEngine implements Persistence {
                 } else {
                     identities[0] = tempId;
                 }
-            } else 
+            } else
                 stmt.executeUpdate();
-            
+
             stmt.close();
 
             // Generate key after INSERT
@@ -658,80 +822,75 @@ public final class SQLEngine implements Persistence {
 
     public Object store( Object conn, Object[] fields, Object[] identities,
                          Object[] original, Object stamp )
-        throws ObjectModifiedException, ObjectDeletedException, PersistenceException
-    {
+        throws ObjectModifiedException, ObjectDeletedException, PersistenceException {
         PreparedStatement stmt = null;
         int               count;
 
-        Object[]          convertedFields;
-        Object[]          convertedOriginal = null;
+        //Object[]        convertedFields;
+        //Object[]        convertedOriginal = null;
         Object[]          sqlIdentities;
 
-        convertedFields = toSql( fields, FIELD_TYPE );
+        //convertedFields = toSql( fields );
 
-        if ( original != null ) {
-            convertedOriginal = toSql( original, FIELD_TYPE );
-        } else {
-            convertedOriginal = null;
-        }
+        //convertedOriginal = toSql( original );
 
-
-        sqlIdentities = toSql( identities, ID_TYPE );
+        sqlIdentities = idToSql( identities );
 
         try {
             // Must store record in parent table first.
             // All other dependents are stored independently.
             if ( _extends != null )
                 _extends.store( conn, fields, identities, original, stamp );
-            
+
             stmt = ( (Connection) conn ).prepareStatement( original == null ? _sqlStore : _sqlStoreDirty );
             System.out.println(original == null ? _sqlStore : _sqlStoreDirty);
 
             count = 1;
-            for ( int i = 0 ; i < _fields.length ; ++i )
+            for ( int i = 0 ; i < _fields.length ; ++i ) {
                 if ( _fields[ i ].store ) {
-                    if ( convertedFields[ i ] == null ) {
-                        System.out.print("<<"+_fields[i].name+":"+count+":NULL:type "+_fields[ i ].sqlType+">>");
-                        if ( _fields[ i ].sqlType == 12 ) {
-                            System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                            stmt.setObject( count, "", _fields[ i ].sqlType );
+                    Object[] inner = (Object[])fields[i];
+                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                        if ( inner == null || inner[j] == null ) {
+                            System.out.print("<<<<"+count+":null:"+_fields[i].columns[j].name+" type: "
+                            +_fields[i].columns[j].sqlType+">>>>");
+                            stmt.setNull( count, _fields[i].columns[j].sqlType );
                         } else {
-                            stmt.setNull( count, _fields[ i ].sqlType );
-                        }
-                    } else {
-                        System.out.print("<<"+_fields[i].name+":"+count+":"+convertedFields[i]+":type "+_fields[ i ].sqlType+">>");
-                        stmt.setObject( count, convertedFields[ i ], _fields[ i ].sqlType );
-                    }
-                    ++count;
-                }
-
-            for ( int i=0; i< sqlIdentities.length; i++ ) {
-                System.out.print("<<id#"+_ids[i].name+":"+count+":"+sqlIdentities[i]+":type "+_ids[ i ].sqlType+">>");
-                stmt.setObject( count, sqlIdentities[i], _ids[i].sqlType );
-                ++count;
-            }
-
-            if ( original != null ) {
-                for ( int i = 0 ; i < _fields.length ; ++i ) {
-                    if ( _fields[ i ].dirtyCheck && _fields[i].store ) {
-                        if ( convertedOriginal[ i ] == null ) {
-                            System.out.print("<<"+_fields[i].name+":"+count+":"+"NULL"+":type "+_fields[ i ].sqlType+">>");
-                            if ( _fields[ i ].sqlType == 12 ) {
-                                System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                                stmt.setObject( count, "", _fields[ i ].sqlType );
-                            } else 
-                                stmt.setNull( count, _fields[ i ].sqlType );
-
-                        } else {
-                            System.out.print("<<"+_fields[i].name+":"+count+":"+convertedOriginal[ i ]+":type "+_fields[ i ].sqlType+">>");
-                            stmt.setObject( count, convertedOriginal[ i ], _fields[ i ].sqlType );
+                            System.out.print("<<<<"+count+":"+inner[j]+":"
+                                +_fields[i].columns[j].name+" type: "+_fields[i].columns[j].sqlType+">>>>");
+                            stmt.setObject( count, toSQL( i, j, inner[j]), _fields[i].columns[j].sqlType );
                         }
                         ++count;
                     }
                 }
-            } 
+            }
+
+            for ( int i=0; i< sqlIdentities.length; i++ ) {
+                System.out.print("<<id#"+_ids[i].name+":"+count+":"+sqlIdentities[i]+":type "+_ids[ i ].sqlType+">>");
+                stmt.setObject( count, sqlIdentities[i], _ids[i].sqlType );
+                count++;
+            }
+
+            if ( original != null ) {
+                for ( int i = 0 ; i < _fields.length ; ++i ) {
+                    if ( _fields[ i ].store && _fields[i].dirtyCheck ) {
+                        Object[] inner = (Object[])original[i];
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            if ( inner == null || inner[j] == null ) {
+                                System.out.print("<<<<"+count+":null:"+_fields[i].columns[j].name+" type: "
+                                +_fields[i].columns[j].sqlType+">>>>");
+                                stmt.setNull( count, _fields[i].columns[j].sqlType );
+                            } else {
+                                System.out.print("<<<<"+count+":"+inner[j]+":"
+                                    +_fields[i].columns[j].name+" type: "+_fields[i].columns[j].sqlType+">>>>");
+                                stmt.setObject( count, toSQL( i, j, inner[j]), _fields[i].columns[j].sqlType );
+                            }
+                            ++count;
+                        }
+                    }
+                }
+            }
             System.out.println();
-            
+
             if ( stmt.executeUpdate() == 0 ) {
                 // If no update was performed, the object has been previously
                 // removed from persistent storage or has been modified if
@@ -757,7 +916,7 @@ public final class SQLEngine implements Persistence {
                     }
                     stmt.close();
                 }
-                
+
                 throw new ObjectDeletedExceptionImpl( _clsDesc.getJavaClass(), OID.flatten( identities ) );
             }
             stmt.close();
@@ -778,7 +937,7 @@ public final class SQLEngine implements Persistence {
     {
         PreparedStatement stmt = null;
 
-        Object[] sqlIdentities = toSql( identities, ID_TYPE );
+        Object[] sqlIdentities = idToSql( identities );
 
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
@@ -812,7 +971,7 @@ public final class SQLEngine implements Persistence {
     {
         PreparedStatement stmt = null;
 
-        Object[] sqlIdentities = toSql( identities, ID_TYPE );
+        Object[] sqlIdentities = idToSql( identities );
 
         try {
             // Must obtain lock on record in parent table first.
@@ -840,89 +999,133 @@ public final class SQLEngine implements Persistence {
 
 
     public Object load( Object conn, Object[] fields, Object[] identities, AccessMode accessMode )
-        throws ObjectNotFoundException, PersistenceException
-    {
+            throws ObjectNotFoundException, PersistenceException {
+
         PreparedStatement stmt;
         ResultSet         rs;
         Object            stamp = null;
         Object[]          sqlIdentities;
-        Object[]          sqlFields;
-        Object[]          tempFields;
+        //Object[]          sqlFields;
+        //Object[]          tempFields;
         int               count;
+        boolean           notNull;
 
         try {
-            sqlIdentities = toSql( identities, ID_TYPE );
+            sqlIdentities = idToSql( identities );
             stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
             System.out.println(( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad);
 
             for ( int i=0; i<sqlIdentities.length; i++ ) {
-                System.out.println("sqlId: " + (sqlIdentities[i]==null?null:(sqlIdentities[i]+"/"+sqlIdentities[i].getClass())));
+                //System.out.println("sqlId: " + (sqlIdentities[i]==null?null:(sqlIdentities[i]+"/"+sqlIdentities[i].getClass())));
                 stmt.setObject( i+1, sqlIdentities[i], _ids[i].sqlType );
             }
 
-            sqlFields = new Object[fields.length];
+            //sqlFields = new Object[fields.length];
 
             rs = stmt.executeQuery();
             if ( ! rs.next() )
                 throw new ObjectNotFoundExceptionImpl( _clsDesc.getJavaClass(), OID.flatten( identities ) );
-
-            count = 1;
             // Load all the fields of the object including one-one relations
-            for ( int i = 0 ; i < _fields.length ; ++i  ) {
-                Object value;
 
-                fields[ i ] =  null;
-                if ( ! _fields[ i ].load )
+            System.out.println("SQLEngine.load()");
+            count = 1;
+            for ( int i = 0 ; i < _fields.length ; ++i  ) {
+                if ( !_fields[i].load )
                     continue;
 
-                if ( _fields[ i ].multi ) {
-                    sqlFields[ i ] = new Vector();
-                    System.out.println("is multi................");
-                    value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
-                    if ( ! rs.wasNull() )
-                        ( (Vector) sqlFields[ i ] ).addElement( value );
+                if ( !_fields[i].multi ) {
+                    notNull = false;
+                    Object[] inner = (Object[]) fields[i];
+                    Object[] temp = new Object[_fields[i].columns.length];
+                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                        Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                        if ( !rs.wasNull() ) {
+                            temp[j] = value;
+                            notNull = true;
+                        } 
+                        count++;
+                    }
+                    fields[i] = temp;
                 } else {
-                    System.out.println("not multi................");
-                    value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
-                    sqlFields[ i ] =  rs.wasNull() ? null : value;
+                    Vector res = new Vector();
+                    Object[] temp = new Object[_fields[i].columns.length];
+                    notNull = false;
+                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                        Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                        if ( !rs.wasNull() ) {
+                            temp[j] = value;
+                            notNull = true;
+                        }
+                        count++;
+                    }
+                    if ( notNull ) res.addElement(temp);
+                    fields[i] = res;
                 }
-                ++count;
             }
 
             while ( rs.next() ) {
+                System.out.println("while res.next()");
                 count = 1;
                 for ( int i = 0; i < _fields.length ; ++i  ) {
-                    if ( ! _fields[ i ].load )
+                    if ( !_fields[i].load )
                         continue;
 
-                    if ( _fields[ i ].multi ) {
-                        Object value;
-                        System.out.println("while loop.........is multi");
-                        value = SQLTypes.getObject( rs, count, _fields[ i ].sqlType );
-                        if ( ! rs.wasNull() && ! ( (Vector) sqlFields[ i ] ).contains( value ) ) {
-                            ( (Vector) sqlFields[ i ] ).addElement( value );
+                    if ( _fields[i].multi ) {
+                        Vector res = (Vector)fields[i];
+                        Object[] temp = new Object[_fields[i].columns.length];
+                        notNull = false;
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                            if ( !rs.wasNull() ) {
+                                temp[j] = value;
+                                notNull = true;
+                            }
+                            count++;
                         }
-                    
+                        if ( notNull || !res.contains( temp ) ) res.addElement(temp);
+                    } else {
+                        count += _fields[i].columns.length;
                     }
-                    count ++;
                 }
             }
             rs.close();
             stmt.close();
-            
+
         } catch ( SQLException except ) {
             throw new PersistenceExceptionImpl( except );
         }
-
-        tempFields = toJava( sqlFields, FIELD_TYPE );
-        System.arraycopy( tempFields, 0, fields, 0, tempFields.length );
         return stamp;
     }
 
+    private static String[] breakApart( String strings, char delimit ) {
+        if ( strings == null )
+            return null;
 
-    private void buildSql( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor )
-            throws QueryException
-    {
+        Vector v = new Vector();
+        int start = 0;
+        int count = 0;
+        while ( count < strings.length() ) {
+            if ( strings.charAt( count ) == delimit ) {
+                if ( start < (count - 1) ) {
+                    v.add( strings.substring( start, count ) );
+                    count++;
+                    start = count;
+                    continue;
+                }
+            }
+            count++;
+        }
+        if ( start < (count - 1) ) {
+            v.add( strings.substring( start, count ) );
+        }
+
+        String[] result = new String[v.size()];
+        v.copyInto( result );
+        return result;
+    }
+
+    private void buildSql() throws QueryException {
+
         StringBuffer         sql;
         JDOFieldDescriptor[] jdoFields;
         FieldDescriptor[]    fields;
@@ -932,9 +1135,9 @@ public final class SQLEngine implements Persistence {
         String               primKeyName;
         String               tableName;
         boolean              keyGened = false;
-      
 
-        tableName = clsDesc.getTableName();
+
+        tableName = _mapTo;
         query = _factory.getQueryExpression();
 
         // initalize lookup query
@@ -946,12 +1149,11 @@ public final class SQLEngine implements Persistence {
         // create sql statements
         StringBuffer sb = new StringBuffer();
         sb.append( JDBCSyntax.Where );
-        for ( int i=0; i<_ids.length; i++ ) {      
+        for ( int i=0; i<_ids.length; i++ ) {
             if ( i > 0 ) sb.append( " AND " );
             sb.append( _factory.quoteName( _ids[i].name ) );
             sb.append( QueryExpression.OpEquals );
             sb.append( JDBCSyntax.Parameter );
-            
         }
         wherePK = sb.toString();
 
@@ -961,30 +1163,32 @@ public final class SQLEngine implements Persistence {
         sql.append( _factory.quoteName( tableName ) ).append( " (" );
         count = 0;
         for ( int i=0; i<_ids.length; i++ ) {
-            if ( _ids[i].keyGen == null || _ids[i].keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
+            if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
                 if ( count > 0 ) sql.append( ',' );
                 keyGened = true;
                 sql.append( _factory.quoteName( _ids[i].name ) );
                 ++count;
             }
         }
-        for ( int i = 0 ; i < _fields.length ; ++i ) {
+        for ( int i = 0 ; i < _fields.length; ++i ) {
             if ( _fields[i].store ) {
-                if ( count > 0 ) {
-                    sql.append( ',' );
-                    sql.append( _factory.quoteName( _fields[i].name ) );                    
+                for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                    if ( count > 0 )
+                        sql.append( ',' );
+                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
+                    ++count;
                 }
-                ++count;
             }
         }
         sql.append( ") VALUES (" );
-        for ( int i = 0 ; i < count ; ++i ) {
+        for ( int i = 0 ; i < count; ++i ) {
             if ( i > 0 )
                 sql.append( ',' );
             sql.append( '?' );
         }
         sql.append( ')' );
         _sqlCreate = sql.toString();
+
         if ( keyGened ) {
             //try {
             //    _sqlCreate = _keyGen.patchSQL( _sqlCreate, _ids[0].name /*primKeyName*/ );
@@ -999,74 +1203,110 @@ public final class SQLEngine implements Persistence {
             //if ( _keyGen.getStyle() == KeyGenerator.DURING_INSERT )
             //    _sqlCreate = "{call " + _sqlCreate + "}";
         }
-        if ( logInterceptor != null )
-            logInterceptor.storeStatement( "SQL for creating " + clsDesc.getJavaClass().getName() +
-                                           ": " + _sqlCreate );
+        if ( _logInterceptor != null )
+            _logInterceptor.storeStatement( "SQL for creating " + _type + ": " + _sqlCreate );
 
 
         sql = new StringBuffer( "DELETE FROM " ).append( _factory.quoteName( tableName ) );
         sql.append( wherePK );
         _sqlRemove = sql.toString();
-        if ( logInterceptor != null )
-            logInterceptor.storeStatement( "SQL for deleting " + clsDesc.getJavaClass().getName() +
-                                           ": " + _sqlRemove );
-
+        if ( _logInterceptor != null )
+            _logInterceptor.storeStatement( "SQL for deleting " + _type + ": " + _sqlRemove );
 
         sql = new StringBuffer( "UPDATE " );
-        sql.append( _factory.quoteName( clsDesc.getTableName() ) ).append( " SET " );
+        sql.append( _factory.quoteName( _mapTo ) );
+        sql.append( " SET " );
         count = 0;
         for ( int i = 0 ; i < _fields.length ; ++i ) {
             if ( _fields[ i ].store ) {
-                if ( count > 0 )
-                    sql.append( ',' );
-                sql.append( _factory.quoteName( _fields[ i ].name ) );
-                sql.append( "=?" );
-                ++count;
+                for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                    if ( count > 0 )
+                        sql.append( ',' );
+                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
+                    sql.append( "=?" );
+                    ++count;
+                }
             }
         }
         sql.append( wherePK );
         _sqlStore = sql.toString();
 
         for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( _fields[ i ] != null && _fields[i].store ) {
-                if ( _fields[i].dirtyCheck ) {
+            if ( _fields[i].store && _fields[i].dirtyCheck ) {
+                for ( int j=0; j<_fields[i].columns.length; j++ ) {
                     sql.append( " AND " );
-                    sql.append( _factory.quoteName( _fields[i].name ) );
+                    sql.append( _factory.quoteName( _fields[i].columns[j].name ) );
                     sql.append( "=?" );
                 }
             }
         }
         _sqlStoreDirty = sql.toString();
-        if ( logInterceptor != null )
-            logInterceptor.storeStatement( "SQL for updating " + clsDesc.getJavaClass().getName() +
-                                           ": " + _sqlStoreDirty );
+        if ( _logInterceptor != null )
+            _logInterceptor.storeStatement( "SQL for updating " + _type + ": " + _sqlStoreDirty );
     }
 
 
-    private void buildFinder( JDOClassDescriptor clsDesc, LogInterceptor logInterceptor )
-        throws MappingException, QueryException
-    {
+    private void buildFinder( JDOClassDescriptor clsDesc ) throws MappingException, QueryException {
         Vector          fields;
         QueryExpression expr;
+        QueryExpression find;
 
         fields = new Vector();
         expr = _factory.getQueryExpression();
-        addLoadSql( clsDesc, expr, fields, false, true, true );
+        find = _factory.getQueryExpression();
+        //addLoadSql( expr, fields, false, true, true );
 
+        //_fields = new FieldInfo[ fields.size() ];
+        //fields.copyInto( _fields );
+
+        // get id columns' names
+        String[] idnames = new String[_ids.length];
+        for ( int i=0; i<_ids.length; i++ ) {
+            idnames[i] = _ids[i].name;
+            expr.addParameter( _mapTo, _ids[i].name, QueryExpression.OpEquals );
+        }
+
+        // join all the extended table
+        JDOClassDescriptor base = clsDesc;
+        while ( base.getExtends() != null ) {
+            base = (JDOClassDescriptor)base.getExtends();
+            expr.addInnerJoin( _mapTo, idnames, base.getTableName(), idnames );
+            find.addInnerJoin( _mapTo, idnames, base.getTableName(), idnames );
+        }
+        for ( int i=0; i<_ids.length; i++ ) {
+            find.addColumn( _mapTo, idnames[i] );
+        }
+
+        // join all the related/depended table
+        Vector joinTables = new Vector();
+        for ( int i=0; i<_fields.length; i++ ) {
+            if ( _fields[i].load ) {
+                if ( _fields[i].joined && !joinTables.contains( _fields[i].tableName ) ) {
+                    String[] rightCol = new String[_fields[i].columns.length];
+                    for ( int j=0; j<_fields[i].columns.length; j++ )
+                        rightCol[j] = _fields[i].columns[j].join;
+                    expr.addOuterJoin( _mapTo, idnames, _fields[i].tableName, rightCol );
+                    find.addOuterJoin( _mapTo, idnames, _fields[i].tableName, rightCol );
+                }
+    
+                for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                    expr.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
+                    find.addColumn( _fields[i].tableName, _fields[i].columns[j].name );
+                }
+            }
+        } 
         _sqlLoad = expr.getStatement( false );
         _sqlLoadLock = expr.getStatement( true );
-        _fields = new FieldInfo[ fields.size() ];
-        fields.copyInto( _fields );
-        if ( logInterceptor != null )
-            logInterceptor.storeStatement( "SQL for loading " + clsDesc.getJavaClass().getName() +
-                                           ":  " + _sqlLoad );
 
-        _sqlFinder = _factory.getQueryExpression();
-        addLoadSql( clsDesc, _sqlFinder, fields, true, false, true );
+        _sqlFinder = find;
+
+        if ( _logInterceptor != null )
+            _logInterceptor.storeStatement( "SQL for loading " + _type + ":  " + _sqlLoad );
+
     }
 
 
-    private void addLoadSql( JDOClassDescriptor clsDesc, QueryExpression expr, Vector allFields,
+    private void addLoadSql( QueryExpression expr, Vector allFields,
                              boolean loadPk, boolean queryPk, boolean store )
         throws MappingException
     {
@@ -1075,34 +1315,38 @@ public final class SQLEngine implements Persistence {
         FieldDescriptor      identity;
         String               identitySQL;
 
-        identity = clsDesc.getIdentity();
-        identitySQL = ( (JDOFieldDescriptor) identity ).getSQLName();
+        //identity = clsDesc.getIdentity();
+        //identitySQL = ( (JDOFieldDescriptor) identity ).getSQLName();
 
         // need depend......
 
         // If this class extends another class, create a join with the parent table and
         // add the load fields of the parent class (but not the store fields)
+        /*
         if ( clsDesc.getExtends() != null ) {
             expr.addInnerJoin( clsDesc.getTableName(), identitySQL,
-                               ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(), identitySQL );
+                    ((JDOClassDescriptor)clsDesc.getExtends()).getTableName(), identitySQL );
             addLoadSql( (JDOClassDescriptor) clsDesc.getExtends(), expr, allFields,
             true, queryPk, false );
             loadPk = false;
             queryPk = false;
-        }
+        }*/
 
+        /*
         if ( loadPk )
             expr.addColumn( clsDesc.getTableName(), identitySQL );
         if ( queryPk )
             expr.addParameter( clsDesc.getTableName(), identitySQL, QueryExpression.OpEquals );
+   
 
         fields = clsDesc.getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
             if ( fields[ i ] instanceof JDOFieldDescriptor ) {
+                // Basically, meaning that FieldMapping have <sql> as sub-element
                 ClassDescriptor relDesc = fields[i].getClassDescriptor();
 
                 if ( ((JDOFieldDescriptor)fields[i]).getManyTable() == null ) {
-                    // Field is primitive.
+                    // Field is primitive (or one-to-many.
                     expr.addColumn( clsDesc.getTableName(),
                                     ( (JDOFieldDescriptor) fields[ i ] ).getSQLName() );
 
@@ -1111,13 +1355,14 @@ public final class SQLEngine implements Persistence {
                     else
                         allFields.addElement( new FieldInfo( (JDOFieldDescriptor)fields[i], store,
                             ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLType() ) );
-                    
+
                 } else {
+                    // Field is many-to-many
                     String manyTable = ((JDOFieldDescriptor)fields[i]).getManyTable();
                     String idSQL = null;
                     if ( clsDesc instanceof JDOClassDescriptor ) {
                         FieldDescriptor[] idFields = ((JDOClassDescriptor)clsDesc).getIdentities();
-                        if ( idFields != null && idFields.length == 1 
+                        if ( idFields != null && idFields.length == 1
                                 && (idFields[0] instanceof JDOFieldDescriptor) ) {
                             idSQL = ((JDOFieldDescriptor)idFields[0]).getSQLName();
                         } else {
@@ -1127,7 +1372,7 @@ public final class SQLEngine implements Persistence {
                     String relatedIdSQL = null;
                     if ( relDesc instanceof JDOClassDescriptor ) {
                         FieldDescriptor[] relatedIds = ((JDOClassDescriptor)relDesc).getIdentities();
-                        if ( relatedIds != null && relatedIds.length == 1 
+                        if ( relatedIds != null && relatedIds.length == 1
                                 && (relatedIds[0] instanceof JDOFieldDescriptor) ) {
                             relatedIdSQL = ((JDOFieldDescriptor)relatedIds[0]).getSQLName();
                         } else {
@@ -1163,7 +1408,7 @@ public final class SQLEngine implements Persistence {
                                 break;
                              }
                     }
-                    if ( foreKey == null ) 
+                    if ( foreKey == null )
                         throw new MappingException( "mapping.noRelation", relDesc.getTableName(), fields[ i ] );
                     else {
                         expr.addColumn( relDesc.getTableName(), ( (JDOFieldDescriptor) relDesc.getIdentity() ).getSQLName() );
@@ -1173,33 +1418,172 @@ public final class SQLEngine implements Persistence {
                     }
                 }
             }
-        }
+        } */
     }
 
 
-    public String toString()
-    {
+    public String toString() {
         return _clsDesc.toString();
     }
 
-
     static final class FieldInfo {
+
+        final String  tableName;
+
+        final String  jdoName;
 
         final boolean load;
 
         final boolean store;
 
-        boolean manyToMany;
-
-        final String  name;
-
         final boolean multi;
+
+        final boolean joined;
 
         final boolean dirtyCheck;
 
-        int           sqlType;
+        //final boolean foreign;
 
-        KeyGenerator  keyGen;
+        ColumnInfo[] columns;
+
+        FieldInfo( JDOClassDescriptor clsDesc, FieldDescriptor fieldDesc, String classTable, boolean ext )
+                throws MappingException{
+
+            // for readability
+            final int FIELD_TYPE = 0;
+
+            final int REF_TYPE = 1;
+
+            final int REL_TABLE_TYPE = 2;
+
+            int type;
+
+            FieldDescriptor[] classids = clsDesc.getIdentities();
+            ClassDescriptor related = fieldDesc.getClassDescriptor();
+            if ( related != null && !( related instanceof JDOClassDescriptor ) )
+                    throw new MappingException("Related class is not JDOClassDescriptor");
+
+            if ( fieldDesc.getClassDescriptor() != null ) {
+                // !(fieldDesc instanceof JDOFieldDescriptor) ) {
+                // no <sql> tag, treated as foreign key field of
+                // PersistenceCapable
+
+                // determine the type of field 
+                if ( !( fieldDesc instanceof JDOFieldDescriptor ) )
+                    type = REF_TYPE;
+                else if ( ((JDOFieldDescriptor)fieldDesc).getManyTable() != null )
+                    type = REL_TABLE_TYPE;
+                else if ( ((JDOFieldDescriptor)fieldDesc).getSQLName() != null )
+                    type = FIELD_TYPE;
+                else 
+                    type = REF_TYPE;
+                        
+
+                // initalize the column names
+                FieldDescriptor[] relids = ((JDOClassDescriptor)related).getIdentities();
+                String[] names = null;
+                if ( fieldDesc instanceof JDOFieldDescriptor )
+                    names = breakApart( ((JDOFieldDescriptor)fieldDesc).getSQLName(), ' ' );
+                String[] relnames = new String[relids.length];
+                for ( int i=0; i<relids.length; i++ ) {
+                    relnames[i] = ((JDOFieldDescriptor)relids[i]).getSQLName();
+                    if ( relnames[i] == null )
+                        throw new MappingException("Related class identities field does not contains sql information!");
+                }
+                String[] joins = null;
+                if ( fieldDesc instanceof JDOFieldDescriptor ) 
+                    joins = breakApart( ((JDOFieldDescriptor)fieldDesc).getManyKey(), ' ' );
+                String[] classnames = new String[classids.length];
+                for ( int i=0; i<classids.length; i++ ) {
+                    classnames[i] = ((JDOFieldDescriptor)classids[i]).getSQLName();
+                    if ( classnames[i] == null )
+                        throw new MappingException("Related class identities field does not contains sql information!");
+                }
+
+                // basic check of column names
+                if ( names != null && names.length != relids.length )
+                    throw new MappingException("The number of column of foreign keys doesn't not match with what specified in manyKey");                
+                if ( joins != null && joins.length != classids.length )
+                    throw new MappingException("The number of column of foreign keys doesn't not match with what specified in manyKey");
+
+
+                switch (type) {
+                case FIELD_TYPE:
+                    this.tableName = ((JDOClassDescriptor)clsDesc).getTableName();;
+                    this.jdoName = fieldDesc.getFieldName();
+                    this.load = true;
+                    this.store = !ext;
+                    this.multi = false;
+                    this.joined = false;
+                    this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
+                    names = (names!=null?names:relnames);
+                    joins = classnames;
+                    break;
+                case REF_TYPE:
+                    this.tableName = ((JDOClassDescriptor)related).getTableName();
+                    this.jdoName = fieldDesc.getFieldName();
+                    this.load = true;
+                    this.store = false;
+                    this.multi = fieldDesc.isMultivalued();
+                    this.joined = true;
+                    this.dirtyCheck = (fieldDesc instanceof JDOFieldDescriptor)?((JDOFieldDescriptor)fieldDesc).isDirtyCheck():true;
+                    names = (names!=null?names:relnames);
+                    joins = (joins!=null?joins:classnames);
+                    break;
+                case REL_TABLE_TYPE:
+                    this.tableName = ((JDOFieldDescriptor)fieldDesc).getManyTable();
+                    this.jdoName = fieldDesc.getFieldName();
+                    this.load = true;
+                    this.store = false;
+                    this.multi = fieldDesc.isMultivalued();
+                    this.joined = true;
+                    this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
+                    names = (names!=null?names:relnames);
+                    joins = (joins!=null?joins:classnames);
+                    break;
+                default:
+                    throw new MappingException("Never happen! But, it won't compile without the exception");
+                }
+                
+                this.columns = new ColumnInfo[relids.length];
+                for ( int i=0; i<relids.length; i++ ) {
+                    if ( !(relids[i] instanceof JDOFieldDescriptor) )
+                        throw new MappingException("Related class identities field does not contains sql information!");
+
+                    JDOFieldDescriptor relId = (JDOFieldDescriptor)relids[i];
+                    FieldHandlerImpl fh = (FieldHandlerImpl) relId.getHandler();
+                    columns[i] = new ColumnInfo( names[i], joins[i], relId.getSQLType(), 
+                            fh.getConvertTo(), fh.getConvertFrom(), fh.getConvertParam() ); 
+                }
+            } else {
+                // primitive field
+                this.tableName = classTable;
+                this.jdoName = fieldDesc.getFieldName();
+                this.load = true;
+                this.store = !ext;
+                this.multi = false;
+                this.joined = false;
+                this.dirtyCheck = ((JDOFieldDescriptor)fieldDesc).isDirtyCheck();
+
+                FieldHandlerImpl fh = (FieldHandlerImpl) fieldDesc.getHandler();
+                this.columns = new ColumnInfo[1];
+                this.columns[0] = new ColumnInfo( ((JDOFieldDescriptor)fieldDesc).getSQLName(), null,
+                        ((JDOFieldDescriptor)fieldDesc).getSQLType(), fh.getConvertTo(),
+                        fh.getConvertFrom(), fh.getConvertParam() );
+            }
+        }
+        public String toString() {
+            return tableName;
+        }
+    }
+
+    static final class ColumnInfo {
+
+        final String  name;
+
+        final String  join;
+
+        final int sqlType;
 
         final TypeConvertor convertTo;
 
@@ -1207,135 +1591,16 @@ public final class SQLEngine implements Persistence {
 
         final String convertParam;
 
-        
-
-        FieldInfo( FieldDescriptor fieldDesc, boolean store ) 
-                throws MappingException{
-            this.name = fieldDesc.getFieldName();
-            this.dirtyCheck = false;
-
-            ClassDescriptor related = fieldDesc.getClassDescriptor();
-            if ( related == null ) 
-                throw new MappingException("No related object!");
-
-            if ( related instanceof JDOClassDescriptor ) {
-                FieldDescriptor[] ids = ((JDOClassDescriptor)related).getIdentities();
-                if ( ids.length != 1 ) 
-                    throw new MappingException("Many-to-Many relation must have single column pk");
-
-                FieldHandlerImpl fh = (FieldHandlerImpl) ids[0].getHandler();
-                convertTo = fh.getConvertTo();
-                convertFrom = fh.getConvertFrom();
-                convertParam = fh.getConvertParam();
-                this.sqlType = ((JDOFieldDescriptor)ids[0]).getSQLType();
-                this.manyToMany = true;
-                this.multi = true;
-                //System.out.println("new FieldInfo. name: "+this.name+" sqltype: "+this.sqlType+" one-to-many");
-            } else {
-                FieldDescriptor id = related.getIdentity();
-                if ( id == null ) 
-                    throw new MappingException("One-to-Many relation must have single column pk");
-
-                FieldHandlerImpl fh = (FieldHandlerImpl) id.getHandler();
-                convertTo = fh.getConvertTo();
-                convertFrom = fh.getConvertFrom();
-                convertParam = fh.getConvertParam();
-                if ( id instanceof JDOFieldDescriptor ) {
-                    this.sqlType = ((JDOFieldDescriptor)id).getSQLType();
-                } else 
-                    throw new MappingException("Related object's id field is not an SQL field!");
-
-                //System.out.println("new FieldInfo. name: "+this.name+" sqltype: "+this.sqlType+" one-to-many");
-                this.manyToMany = false;
-                this.multi = true;
-            }                
-
-            this.store = false;
-            this.load = true;
-
+        ColumnInfo( String name, String join, int type, TypeConvertor convertTo,
+                TypeConvertor convertFrom, String convertParam ) {
+            this.name = name;
+            this.join = join;
+            this.sqlType = type;
+            this.convertTo = convertTo;
+            this.convertFrom = convertFrom;
+            this.convertParam = convertParam;
         }
-        FieldInfo( JDOFieldDescriptor fieldDesc, boolean store ) 
-                throws MappingException {
-
-            this.name = fieldDesc.getSQLName();
-            this.manyToMany = fieldDesc.getManyTable() != null;
-            this.multi = fieldDesc.isMultivalued() || this.manyToMany;
-            this.dirtyCheck = fieldDesc.isDirtyCheck();
-            
-            if ( ! this.multi ) {
-                // field is primitive
-                FieldHandlerImpl fh = (FieldHandlerImpl) fieldDesc.getHandler();
-                this.convertTo = fh.getConvertTo();
-                this.convertFrom = fh.getConvertFrom();
-                this.convertParam = fh.getConvertParam();
-
-                this.store = true;
-                this.load = true;
-                this.sqlType = fieldDesc.getSQLType();
-                //System.out.println("new FieldInfo. name: "+this.name+" sqltype: "+this.sqlType+" prim");
-            } else if ( ! this.manyToMany ) {
-                // field is one-to-many
-                ClassDescriptor related = fieldDesc.getClassDescriptor();
-                if ( related instanceof JDOClassDescriptor ) {
-                    FieldDescriptor[] ids = ((JDOClassDescriptor)related).getIdentities();
-                    if ( ids.length != 1 ) 
-                        throw new MappingException("Many-to-Many relation must have single column pk");
-
-                    FieldHandlerImpl fh = (FieldHandlerImpl) ids[0].getHandler();
-                    convertTo = fh.getConvertTo();
-                    convertFrom = fh.getConvertFrom();
-                    convertParam = fh.getConvertParam();
-                    this.sqlType = ((JDOFieldDescriptor)ids[0]).getSQLType();
-                    //System.out.println("new FieldInfo. name: "+this.name+" sqltype: "+this.sqlType);
-                } else 
-                    throw new MappingException("Except JDOClassDescriptor");
-
-                this.store = false;
-                this.load = true;
-
-            } else {
-                // actually exactly the same as many-to-many now....
-                ClassDescriptor related = fieldDesc.getClassDescriptor();
-                if ( related instanceof JDOClassDescriptor ) {
-                    FieldDescriptor[] ids = ((JDOClassDescriptor)related).getIdentities();
-                    if ( ids.length != 1 ) 
-                        throw new MappingException("Many-to-Many relation must have single column pk");
-
-                    FieldHandlerImpl fh = (FieldHandlerImpl) ids[0].getHandler();
-                    convertTo = fh.getConvertTo();
-                    convertFrom = fh.getConvertFrom();
-                    convertParam = fh.getConvertParam();
-                    this.sqlType = ((JDOFieldDescriptor)ids[0]).getSQLType();
-
-                    //System.out.println("new FieldInfo. name: "+this.name+" sqltype: "+this.sqlType+" M:N");
-                    //System.out.println(" VARCHAR: "+java.sql.Types.VARCHAR+" "
-                    //                    +" INT: "+java.sql.Types.INTEGER);
-
-                } else 
-                    throw new MappingException("Except JDOClassDescriptor");
-                this.store = false;
-                this.load = true;
-            } 
-        }
-        FieldInfo( FieldDescriptor fieldDesc, boolean store, KeyGenerator keyGen )
-                throws MappingException {
-            this( fieldDesc, store );
-            this.keyGen = keyGen;
-        }
-        FieldInfo( FieldDescriptor fieldDesc, boolean store, int sqlType )
-                throws MappingException {
-            this( fieldDesc, store );
-            this.sqlType = sqlType;
-        }
-
-        public String toString()
-        {
-            return name;
-        }
-
     }
-
-
     static final class SQLQuery
         implements PersistenceQuery
     {
@@ -1384,6 +1649,7 @@ public final class SQLEngine implements Persistence {
         public Class getParameterType( int index )
             throws ArrayIndexOutOfBoundsException
         {
+
             return _types[ index ];
         }
 
@@ -1451,11 +1717,11 @@ public final class SQLEngine implements Persistence {
                         System.out.println("result set done!");
                         return null;
                     } else {
-                        return _engine.toJava(_lastIdentities,_engine.ID_TYPE);
+                        return _engine.idToJava( _lastIdentities );
                     }
                 }
 
-                sqlIdentities = _engine.toSql( identities, _engine.ID_TYPE );
+                sqlIdentities = _engine.idToSql( identities );
                 /*
                 System.out.println("id: "+OID.flatten( identities ) + "  " + identities[0].getClass() );
                 System.out.println("sql-ed id: "+OID.flatten( sqlIdentities ) + "  " + sqlIdentities[0].getClass() );
@@ -1480,7 +1746,7 @@ public final class SQLEngine implements Persistence {
                     if ( empty )
                         _lastIdentities = null;
                 }
-                return _engine.toJava( _lastIdentities, _engine.ID_TYPE );
+                return _engine.idToJava( _lastIdentities );
             } catch ( SQLException except ) {
                 _lastIdentities = null;
                 throw new PersistenceExceptionImpl( except );
@@ -1512,45 +1778,66 @@ public final class SQLEngine implements Persistence {
             int    count;
             Object stamp = null;
             Object[] sqlIdentities;
-            Object[] sqlFields = new Object[fields.length];
+            //Object[] sqlFields = new Object[fields.length];
 
 
             try {
-                count = _engine._ids.length + 1; 
-
-                sqlIdentities = _engine.toSql( identities, _engine.ID_TYPE );
+                sqlIdentities = _engine.idToSql( identities );
 
                 // Load all the fields of the object including one-one relations
+                count = _engine._ids.length;
                 for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
-                    Object value;
-                    
-                    value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
-                    if ( _engine._fields[ i ].multi ) {
-                        sqlFields[ i ] = new Vector();
-                        if ( ! _rs.wasNull() )
-                            ( (Vector) sqlFields[ i ] ).addElement( value );
-                    } else
-                        sqlFields[ i ] =  _rs.wasNull() ? null : value;
+                    if ( _engine._fields[i].multi ) {
+                        Vector res = new Vector();
+                        Object[] temp = new Object[_engine._fields[i].columns.length];
+                        for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                            Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                            if ( ! _rs.wasNull() )
+                                temp[j] = value ;
+                            count++;
+                        }
+                        res.add( temp );
+                        fields[i] = res;
+                    } else {
+                        Object[] temp = new Object[_engine._fields[i].columns.length];
+                        for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                            Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                            temp[j] =  _rs.wasNull() ? null : value;
+                            count++;
+                        }
+                        fields[i] = temp;
+                    }
                 }
 
                 if ( _rs.next() ) {
+                    count = 1;
                     if ( _lastIdentities == null )
                         _lastIdentities = new Object[_engine._ids.length];
                     for ( int i=0; i<_lastIdentities.length; i++ ) {
-                        _lastIdentities[i] = SQLTypes.getObject( _rs, i+1, _identSqlType );
+                        _lastIdentities[i] = SQLTypes.getObject( _rs, count, _identSqlType );
+                        count++;
                     }
                     while ( OID.isEquals( sqlIdentities, _lastIdentities ) ) {
-                        for ( int i = 0; i < _engine._fields.length ; ++i  )
-                            if ( _engine._fields[ i ].multi ) {
-                                Object value;
-
-                                value = SQLTypes.getObject( _rs, i + count, _engine._fields[ i ].sqlType );
-                                if ( ! _rs.wasNull() && ! ( (Vector) sqlFields[ i ] ).contains( value ) )
-                                    ( (Vector) sqlFields[ i ] ).addElement( value );
+                        for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
+                            if ( _engine._fields[i].multi ) {
+                                Vector res = (Vector) fields[i];
+                                Object[] temp = new Object[_engine._fields[i].columns.length];
+                                for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                                    Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                                    if ( ! _rs.wasNull() )
+                                        temp[j] = value ;
+                                }
+                                res.add( temp );
+                                fields[i] = res;
+                                count++;
+                            } else {
+                                count += _engine._fields[i].columns.length;
                             }
+                        }
+
                         if ( _rs.next() )
                             for ( int i=0; i<_engine._ids.length; i++ ) {
-                                _lastIdentities[i] = SQLTypes.getObject( _rs, 1, _identSqlType );
+                                _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
                             }
                         else
                             _lastIdentities = null;
@@ -1561,10 +1848,242 @@ public final class SQLEngine implements Persistence {
                 throw new PersistenceExceptionImpl( except );
             }
 
-            Object[] tempFields = _engine.toJava( sqlFields, FIELD_TYPE );
-            System.arraycopy( tempFields, 0, fields, 0, fields.length );
             return stamp;
         }
     }
-}
 
+
+
+    /**
+     * PersistenceQuery implementation for use with stored procedures.
+     * It can deals with multiple ResultSets.
+     *
+     * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+     * @version $Revision$ $Date$
+     */
+    static final class StoredProcedure implements PersistenceQuery
+    {
+
+
+        private CallableStatement _stmt;
+
+
+        private ResultSet         _rs;
+
+
+        private final SQLEngine   _engine;
+
+
+        private final Class[]     _types;
+
+
+        private final Object[]    _values;
+
+
+        private final String      _sql;
+
+
+        private Object[]          _lastIdentities;
+
+
+        private int               _identSqlType;
+
+
+        StoredProcedure( SQLEngine engine, String sql, Class[] types )
+        {
+            _engine = engine;
+            _types = types;
+            _values = new Object[ _types.length ];
+            _sql = sql;
+            _identSqlType = ( (JDOFieldDescriptor) _engine._clsDesc.getIdentity() ).getSQLType();
+        }
+
+
+        public int getParameterCount()
+        {
+            return _types.length;
+        }
+
+
+        public Class getParameterType( int index )
+            throws ArrayIndexOutOfBoundsException
+        {
+            return _types[ index ];
+        }
+
+
+        public void setParameter( int index, Object value )
+            throws ArrayIndexOutOfBoundsException, IllegalArgumentException
+        {
+            _values[ index ] = value;
+        }
+
+
+        public Class getResultType()
+        {
+            return _engine.getDescriptor().getJavaClass();
+        }
+
+
+        public void execute( Object conn, AccessMode accessMode )
+            throws QueryException, PersistenceException
+        {
+            //System.out.println("SQLQuery executed!");
+            _lastIdentities = null;
+            try {
+                _stmt = ( (Connection) conn ).prepareCall( _sql );
+                for ( int i = 0 ; i < _values.length ; ++i ) {
+                    _stmt.setObject( i + 1, _values[ i ] );
+                    _values[ i ] = null;
+                }
+                _stmt.execute();
+                _rs = _stmt.getResultSet();
+            } catch ( SQLException except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
+        }
+
+
+        private boolean nextRow() throws SQLException {
+            while ( true ) {
+                if ( _rs != null && _rs.next() ) {
+                    return true;
+                }
+                if ( !_stmt.getMoreResults() && _stmt.getUpdateCount() == -1 ) {
+                    _rs = null;
+                    return false;
+                }
+                _rs = _stmt.getResultSet();
+            }
+        }
+
+
+        public Object[] nextIdentities( Object[] identities )
+            throws PersistenceException
+        {
+            try {
+                if ( _lastIdentities == null ) {
+                    if ( !nextRow() )
+                        return null;
+                    // need for loop
+                    _lastIdentities = new Object[_engine._ids.length];
+                    for ( int i=0; i<_engine._ids.length; i++ ) {
+                        _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
+                    }
+                    return _engine.idToJava( _lastIdentities );
+                }
+
+                while ( _lastIdentities.equals( identities ) ) {
+                    if ( ! nextRow() ) {
+                        _lastIdentities = null;
+                        return null;
+                    }
+                    for ( int i=0; i<_engine._ids.length; i++ ) {
+                        _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
+                    }
+                }
+                return _engine.idToJava( _lastIdentities );
+            } catch ( SQLException except ) {
+                _lastIdentities = null;
+                throw new PersistenceExceptionImpl( except );
+            }
+        }
+
+
+        public void close()
+        {
+            if ( _rs != null ) {
+                try {
+                    _rs.close();
+                } catch ( SQLException except ) { }
+                _rs = null;
+            }
+            if ( _stmt != null ) {
+                try {
+                    _stmt.close();
+                } catch ( SQLException except ) { }
+                _stmt = null;
+            }
+        }
+
+
+        public Object fetch( Object[] fields, Object[] identities )
+            throws ObjectNotFoundException, PersistenceException
+        {
+            int    count;
+            Object stamp = null;
+            Object[] sqlIdentities = null;
+            //Object[] sqlFields = new Object[fields.length];
+
+
+            try {
+                sqlIdentities = _engine.idToSql( identities );
+
+                // Load all the fields of the object including one-one relations
+                count = _engine._ids.length;
+                for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
+                    if ( _engine._fields[i].multi ) {
+                        Vector res = new Vector();
+                        Object[] temp = new Object[_engine._fields[i].columns.length];
+                        for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                            Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                            if ( ! _rs.wasNull() )
+                                temp[j] = value ;
+                            count++;
+                        }
+                        res.add( temp );
+                        fields[i] = res;
+                    } else {
+                        Object[] temp = new Object[_engine._fields[i].columns.length];
+                        for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                            Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                            temp[j] =  _rs.wasNull() ? null : value;
+                            count++;
+                        }
+                        fields[i] = temp;
+                    }
+                }
+
+                if ( _rs.next() ) {
+                    count = 1;
+                    if ( _lastIdentities == null )
+                        _lastIdentities = new Object[_engine._ids.length];
+                    for ( int i=0; i<_lastIdentities.length; i++ ) {
+                        _lastIdentities[i] = SQLTypes.getObject( _rs, count, _identSqlType );
+                        count++;
+                    }
+                    while ( OID.isEquals( sqlIdentities, _lastIdentities ) ) {
+                        count = 1;
+                        for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
+                            if ( _engine._fields[i].multi ) {
+                                Vector res = (Vector) fields[i];
+                                Object[] temp = new Object[_engine._fields[i].columns.length];
+                                for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                                    Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                                    if ( ! _rs.wasNull() )
+                                        temp[j] = value ;
+                                }
+                                res.add( temp );
+                                fields[i] = res;
+                            } else {
+                                count += _engine._fields[i].columns.length;
+                            }
+                        }
+
+                        if ( _rs.next() )
+                            for ( int i=0; i<_engine._ids.length; i++ ) {
+                                _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
+                            }
+                        else
+                            _lastIdentities = null;
+                    }
+                } else
+                    _lastIdentities = null;
+            } catch ( SQLException except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
+            return stamp;
+        }
+
+    }
+}

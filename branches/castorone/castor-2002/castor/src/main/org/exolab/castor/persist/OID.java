@@ -142,21 +142,22 @@ public final class OID
             return false;
         if ( object1.length != object2.length ) 
             return false;
-        //System.out.println("array has the same length");
         for ( int i=0; i<object1.length; i++ ) {
             if ( object1[i] == object2[i] ) {
-                //System.out.println("object1[i] == object2[i]");
                 continue;
             }
             if ( object1[i] == null || object2[i] == null ) {
-                //System.out.println(object1[i] == null || object2[i] == null);
                 return false;
             }
-            if ( !object1[i].equals( object2[i] ) ) {
-                //System.out.println();
-                return false;
+            if ( (object1[i] instanceof Object[]) && (object2[i] instanceof Object[]) ) {
+                System.out.println("array of array");
+                if ( !isEquals( (Object[]) object1[i], (Object[]) object2[i] ) )
+                    return false;
+            } else {      
+                if ( !object1[i].equals( object2[i] ) ) {
+                    return false;
+                }
             }
-            //System.out.println("contine or object1[i].equals(object2[i])");
         }
         return true;
     }
@@ -191,8 +192,6 @@ public final class OID
         System.out.println();
         if ( object1.size() != object2.size() )
             return false;
-            
-        
 
         Enumeration enum = object1.elements();
         while ( enum.hasMoreElements() ) {

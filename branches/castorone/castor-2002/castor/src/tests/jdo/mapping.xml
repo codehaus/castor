@@ -102,9 +102,10 @@
       <sql name="value" type="varchar" />
     </field>
     <field name="group" type="jdo.TestGroup" required="false">
-      <sql name="group_id" />
+      <sql name="group_id"/>
     </field>
     <field name="details" type="jdo.TestDetail" collection="vector" required="false">
+      <sql many-key="master_id"/>
     </field>
   </class>
 

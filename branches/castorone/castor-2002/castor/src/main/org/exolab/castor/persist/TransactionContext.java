@@ -364,6 +364,8 @@ public abstract class TransactionContext
 
         if ( identities == null ) 
             throw new PersistenceException("Identities can't be null!");
+        if ( OID.isIdsNull( identities ) )
+            throw new PersistenceException("Identities can't be null!");
 
         object = fetch( engine, molder, identities, accessMode );
         if ( object != null ) return object;

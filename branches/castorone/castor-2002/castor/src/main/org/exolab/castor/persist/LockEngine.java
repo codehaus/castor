@@ -279,7 +279,6 @@ public final class LockEngine {
 
             molder.load( tx, oid, object, accessMode );
 
-            System.out.println(">>>>>>>>>>>>LockEngine, yeap CMolder.load returned! oid: "+oid);
             if ( accessMode == AccessMode.DbLocked )
                 oid.setDbLock( true );
         } catch ( ObjectDeletedWaitingForLockException except ) {
