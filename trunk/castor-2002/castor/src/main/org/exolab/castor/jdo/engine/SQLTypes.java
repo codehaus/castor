@@ -107,6 +107,25 @@ public final class SQLTypes
         }
         throw new MappingException( "jdo.sqlTypeNotSupported", new Integer( sqlType ) );
     }
+
+
+    /**
+     * Returns the SQL type from the specified Java type. Returns <tt>OTHER</tt>
+     * if the Java type has no suitable SQL type mapping. The argument
+     * <tt>sqlType</tt> must be the return value from a previous call to
+     * {@link #typeFromSQLType} or {@link #typeFromName}.
+     *
+     * @param sqlType The Java class of the SQL type
+     * @return SQL type from the specified Java type
+     */
+    public static int getSQLType( Class sqlType )
+    {
+        for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
+            if ( sqlType == _typeInfos[ i ].javaType )
+                return _typeInfos[ i ].sqlType;
+        }
+        return java.sql.Types.OTHER;
+    }
     
     
     /**
