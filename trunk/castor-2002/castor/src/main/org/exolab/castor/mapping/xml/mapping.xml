@@ -2,7 +2,21 @@
 <!DOCTYPE databases PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                              "http://castor.exolab.org/mapping.dtd">
 -->
-<mapping>
+<mapping-mapping>
+
+  <class-mapping class-name="org.exolab.castor.mapping.xml.Mapping">
+    <xml-schema xml-name="mapping"/>
+    <field-mapping set-method="setDescription" type="string">
+      <xml-info name="description" node-type="element"/>
+    </field-mapping>
+    <field-mapping set-method="addInclude" type="org.exolab.castor.mapping.xml.Include">
+      <xml-info name="include"/>
+    </field-mapping>
+    <field-mapping set-method="addClassMapping" type="org.exolab.castor.mapping.xml.ClassMapping">
+      <xml-info name="class"/>
+    </field-mapping>
+  </class-mapping>
+
 
   <class-mapping class-name="org.exolab.castor.mapping.xml.ClassMapping">
     <xml-schema xml-name="class"/>
@@ -54,9 +68,11 @@
     <field-mapping set-method="setType" type="string">
       <xml-info name="type"/>
     </field-mapping>
-    <field-mapping set-method="setRequired" type="string">
+<!--
+    <field-mapping set-method="setRequired" type="boolean">
       <xml-info name="required"/>
     </field-mapping>
+-->
     <field-mapping set-method="setName" type="string">
       <xml-info name="name"/>
     </field-mapping>
@@ -74,5 +90,5 @@
     </field-mapping>
   </class-mapping>
 
-</mapping>
+</mapping-mapping>
 

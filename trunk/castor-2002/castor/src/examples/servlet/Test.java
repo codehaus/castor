@@ -56,9 +56,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Transaction;
+import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.util.Logger;
 import org.exolab.castor.jdo.ODMG;
 import org.exolab.castor.xml.Marshaller;
@@ -100,8 +100,7 @@ public class Test
             // database for read/write access
             odmg = new ODMG();
             odmg.loadDatabase( getClass().getResource( DatabaseFile ).toString(), null );
-            db = odmg.newDatabase();
-            db.open( "test", db.OPEN_READ_WRITE );
+            db = odmg.openDatabase( "test" );
 
             // All ODMG database access requires a transaction
             tx = odmg.newTransaction();

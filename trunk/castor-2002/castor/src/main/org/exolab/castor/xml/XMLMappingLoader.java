@@ -88,53 +88,24 @@ public class XMLMappingLoader
     }
 
 
-    /*
     protected void resolveRelations( ClassDescriptor clsDesc )
         throws MappingException
     {
-        super.resolveRelations( clsDesc );
+        FieldDescriptor[] fields;
 
-        // At this point the descriptor may contain only JDO fields,
-        // and all container fields must be flattened.
-        FieldDesc[] fields;
-        Vector      allFields;
-
-        allFields = new Vector();
         fields = clsDesc.getFields();
         for ( int i = 0 ; i < fields.length ; ++i ) {
-            if ( fields[ i ] instanceof ContainerFieldDesc ) {
-                FieldDesc[] cFields;
-                
-                cFields = ( (ContainerFieldDesc) fields[ i ] ).getFields();
-                for ( int j = 0 ; j < cFields.length ; ++j )
-                    allFields.add( cFields[ j ] );
-            } else if ( fields[ i ] instanceof XMLFieldDesc ) {
-                allFields.add( fields[ i ] );
-            } else {
-                allFields.add( new XMLFieldDesc( fields[ i ], null, null ) );
-            }
-        }
-        if ( clsDesc.getIdentity() != null ) {
-            if ( clsDesc.getIdentity() instanceof ContainerFieldDesc ) {
-                FieldDesc[] cFields;
-                
-                cFields = ( (ContainerFieldDesc) clsDesc.getIdentity() ).getFields();
-                for ( int j = 0 ; j < cFields.length ; ++j )
-                    allFields.add( cFields[ j ] );
-            } else if ( clsDesc.getIdentity() instanceof XMLFieldDesc ) {
-                allFields.add( clsDesc.getIdentity() );
-            } else {
-                allFields.add( new XMLFieldDesc( clsDesc.getIdentity(), null, null ) );
-            }
-        }
-        
-        XMLFieldDesc[] xmlFields;
+            ClassDescriptor   relDesc;
 
-        xmlFields = new XMLFieldDesc[ allFields.size() ];
-        allFields.copyInto( xmlFields );
-        ( (XMLClassDesc) clsDesc ).setXMLFields( xmlFields );
+            relDesc = getDescriptor( fields[ i ].getFieldType() );
+            if ( relDesc == NoDescriptor ) {
+                // XXX Error message should come here
+            } else if ( relDesc != null && relDesc instanceof XMLClassDescriptor &&
+                        fields[ i ] instanceof XMLFieldDescriptorImpl ) {
+		( (XMLFieldDescriptorImpl) fields[ i ] ).setClassDescriptor( (XMLClassDescriptor) relDesc );
+            }
+        }
     }
-    */
 
 
     protected ClassDescriptor createDescriptor( ClassMapping clsMap )

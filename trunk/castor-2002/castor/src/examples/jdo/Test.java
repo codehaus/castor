@@ -13,12 +13,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.DriverManager;
-import org.odmg.Implementation;
-import org.odmg.Database;
-import org.odmg.Transaction;
-import org.odmg.OQLQuery;
-import org.exolab.castor.util.Logger;
 import org.exolab.castor.jdo.ODMG;
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.Transaction;
+import org.exolab.castor.jdo.OQLQuery;
+import org.exolab.castor.util.Logger;
 import org.exolab.castor.xml.Marshaller;
 import org.apache.xml.serialize.*;
 
@@ -49,8 +48,7 @@ public class Test
             odmg.loadDatabase( Test.class.getResource( DatabaseFile ).toString(), null );
             
             // Run the ODMG API test, see odmgTest()
-            db = odmg.newDatabase();
-            db.open( "test", db.OPEN_READ_WRITE );
+            db = odmg.openDatabase( "test" );
             odmgTest( odmg, db, logger );
             db.close();
 
@@ -61,7 +59,7 @@ public class Test
     }
     
     
-    public static void odmgTest( Implementation odmg, Database db,
+    public static void odmgTest( ODMG odmg, Database db,
                                  PrintWriter logger )
         throws Exception
     {
