@@ -141,10 +141,11 @@ public class JavaXMLNaming {
             switch(ch) {
                 case ':':
                 case '-':
+                case '_':
                     uppercase = true;
                     break;
                 default:
-                    if (uppercase == true) {
+                    if (uppercase) {
                         ncChars[next] = Character.toUpperCase(ch);
                         uppercase = false;
                     }
