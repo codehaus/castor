@@ -428,17 +428,17 @@ public class Converter {
           elem.setReference(dtdContent.getReference());
 
           if (dtdContent.isOneOccurance()) {
-             elem.setMinimumOccurance(1);
-             elem.setMaximumOccurance(1);
+             elem.setMinOccurs(1);
+             elem.setMaxOccurs(1);
           } else if (dtdContent.isOneOrMoreOccurances()) {
-             elem.setMinimumOccurance(1);
-             elem.setMaximumOccurance(-1);
+             elem.setMinOccurs(1);
+             elem.setMaxOccurs(-1);
           } else if (dtdContent.isZeroOrMoreOccurances()) {
-             elem.setMinimumOccurance(0);
-             elem.setMaximumOccurance(-1);
+             elem.setMinOccurs(0);
+             elem.setMaxOccurs(-1);
           } else if (dtdContent.isZeroOrOneOccurance()) {
-             elem.setMinimumOccurance(0);
-             elem.setMaximumOccurance(1);
+             elem.setMinOccurs(0);
+             elem.setMaxOccurs(1);
           } else {
              //-- a content particle always has "one occurance" default
              //-- occurance specification
