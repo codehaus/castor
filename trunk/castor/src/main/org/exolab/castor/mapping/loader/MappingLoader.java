@@ -157,6 +157,28 @@ public abstract class MappingLoader
         _logWriter = logWriter;
     }
 
+    /**
+     * Returns the ClassDescriptor for the class with the given name.
+     * If no such ClassDescriptor exists, within the set of mappings
+     * for this MappingLoader, null will be returned.
+     *
+     * @param className the className for which to return 
+     * the associated ClassDescriptor.
+     * @return the ClassDescriptor or null if not found.
+     */
+    public ClassDescriptor getDescriptor( String className )
+    {
+        if (className == null) return null;
+        
+        Enumeration enum = _clsDescs.keys();
+        while (enum.hasMoreElements()) {
+            Class type = (Class) enum.nextElement();
+            if (className.equals(type.getName())) {
+                return (ClassDescriptor) _clsDescs.get( type );
+            }
+        }
+        return null;
+    } //-- getDescriptor
 
     public ClassDescriptor getDescriptor( Class type )
     {
@@ -225,12 +247,27 @@ public abstract class MappingLoader
         // Load the mapping for all the classes. This is always returned
         // in the same order as it appeared in the mapping file.
         enum = mapping.enumerateClassMapping();
+        
+        Vector retryList = null;
         while ( enum.hasMoreElements() ) {
-            ClassMapping    clsMap;
-            ClassDescriptor clsDesc;
 
-            clsMap = (ClassMapping) enum.nextElement();
-            clsDesc = createDescriptor( clsMap );
+            ClassMapping clsMap = (ClassMapping) enum.nextElement();
+            ClassDescriptor clsDesc = null;
+            
+            try {
+                clsDesc = createDescriptor( clsMap );
+            }
+            catch(MappingException mx) {
+                //-- save for later for possible out-of-order
+                //-- mapping files...
+                if (retryList == null) {
+                    retryList = new Vector();
+                }
+                retryList.addElement(clsMap); 
+                continue;
+            }
+            
+            
             if ( clsDesc != NoDescriptor )
                 addDescriptor( clsDesc );
             // If the return value is NoDescriptor then the derived
@@ -239,6 +276,27 @@ public abstract class MappingLoader
                 _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getName() ) );
             }
         }
+        
+        //-- handle possible retries, for now we only loop once
+        //-- on the retries, but we should change this to keep
+        //-- looping until we have no more success rate.
+        if (retryList != null) {
+            Vector tmpRetryList = retryList;
+            retryList = null;
+            enum = tmpRetryList.elements();
+            while ( enum.hasMoreElements() ) {
+                ClassMapping clsMap = (ClassMapping) enum.nextElement();
+                ClassDescriptor clsDesc = createDescriptor( clsMap );
+                if ( clsDesc != NoDescriptor )
+                    addDescriptor( clsDesc );
+                // If the return value is NoDescriptor then the derived
+                // class was not successful in constructing a descriptor.
+                if ( clsDesc == NoDescriptor && _logWriter != null ) {
+                    _logWriter.println( Messages.format( "mapping.ignoringMapping", clsMap.getName() ) );
+                }
+            }
+        }
+        
 
         enum = _clsDescs.elements();
         while ( enum.hasMoreElements() ) {
