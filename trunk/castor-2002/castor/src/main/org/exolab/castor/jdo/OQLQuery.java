@@ -177,20 +177,6 @@ public interface OQLQuery
      *  expected type, or more parameters were supplied that the
      *  query specified
      */
-    public void bind( String value )
-      throws IllegalArgumentException;
-    
-
-    /**
-     * Bind a parameter value to the query. Parameters are set in the
-     * order in which they appear in the query and must match in number
-     * and type of each parameter.
-     *
-     * @param value The parameter value
-     * @throws IllegalArgumentException The parameter is not of the
-     *  expected type, or more parameters were supplied that the
-     *  query specified
-     */
     public void bind( float value )
       throws IllegalArgumentException;
     
