@@ -82,6 +82,7 @@ public class UnmarshalHandler implements DocumentHandler {
     
     private static final Class[]  EMPTY_CLASS_ARGS  = new Class[0];
     private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
+    private static final String   EMPTY_STRING      = "";
     
     private Stack            _stateInfo    = null;
     private UnmarshalState   _topState     = null;
@@ -271,8 +272,9 @@ public class UnmarshalHandler implements DocumentHandler {
             
             if (state.buffer != null) {
                 str = state.buffer.toString();
+                state.buffer.setLength(0);
             }
-            else str = new String();
+            else str = EMPTY_STRING;
             
             if (type == String.class)
                 state.object = str;
