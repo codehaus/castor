@@ -22,7 +22,8 @@
 
 package org.exolab.adaptx.xpath.functions;
 
-
+import org.exolab.adaptx.xpath.FunctionState;
+import org.exolab.adaptx.xpath.Parameters;
 import org.exolab.adaptx.xpath.XPathNode;
 import org.exolab.adaptx.xpath.XPathResult;
 import org.exolab.adaptx.xpath.XPathContext;
@@ -30,7 +31,6 @@ import org.exolab.adaptx.xpath.StringResult;
 import org.exolab.adaptx.xpath.XPathException;
 import org.exolab.adaptx.xpath.XPathFunction;
 import org.exolab.adaptx.xpath.XPathExpression;
-import org.exolab.adaptx.xpath.engine.Names;
 
 
 /**
@@ -50,9 +50,25 @@ public class ExtensionFunctionCall
         "The following function has not been defined: ";
         
 
+    /**
+     * The function state, to pass to the actual 
+     * XPathFunction implementation
+     */
+    private XFState _state = null;
+    
+    /**
+     * Creates a new ExtensionFunctionCall for the
+     * function with the given name
+     *
+     * @param name the name of the function to call
+     * when the execute method is invoked.
+     */
     public ExtensionFunctionCall( String name )
     {
         super( name );
+        
+        _state = new XFState(this);
+        
     } //-- ExtensionFunctionCall
     
     
@@ -90,8 +106,36 @@ public class ExtensionFunctionCall
         params = new XPathResult[ nbrParams ];
         for ( int i = 0 ; i < nbrParams ; i++ )
             params[ i ] = getParameter( i ).evaluate( context );
-        return fnCall.call( context, params );
+            
+        return fnCall.call( context, params, _state );
+        
     } //-- evaluate
 
+    /**
+     * An implementation of FunctionState
+     */
+    static class XFState extends FunctionState {
+        
+        private Parameters _params = null;
+        
+        /**
+         * Creates a new FunctionState
+         */
+        XFState(Parameters params) {
+            _params = params;
+        }
+        
+        /**
+         * Returns the function parameters as a set
+         * of XPathExpressions
+         *
+         * @return the function parameters
+         */
+        public Parameters getParameters() {
+            return _params;
+        } //-- getParameters
+        
+        
+    } //-- class: XFState
     
 } //-- ExtensionFunctionCall
