@@ -78,7 +78,7 @@ public class Types
     /**
      * Returns the class name based on the supplied type name. The type name
      * can be a short name (e.g. int, byte) or any other Java class (e.g.
-     * myapp.Product). If a short type name is used, the proper class will
+     * myapp.Product). If a short type name is used, the primitive type might
      * be returned. If a Java class name is used, the class will be loaded and
      * returned through the supplied class loader.
      *
@@ -92,7 +92,8 @@ public class Types
     {
         for ( int i = 0 ; i < _typeInfos.length ; ++i ) {
             if ( typeName.equals( _typeInfos[ i ].shortName ) )
-                return _typeInfos[ i ].javaType;
+                return ( _typeInfos[ i ].primitive != null ? _typeInfos[ i ].primitive :
+                         _typeInfos[ i ].javaType );
         }
         return loader.loadClass( typeName );
     }
@@ -331,22 +332,38 @@ public class Types
      * List of all the simple types supported by Castor.
      */
     static TypeInfo[] _typeInfos = new TypeInfo[] {
-        //            shortName      primitive                 javaType                    immutable defValue
-        new TypeInfo( "other",       null,                     java.lang.Object.class,     false,    null ),
-        new TypeInfo( "string",      null,                     java.lang.String.class,     true,     null ),
-        new TypeInfo( "integer",     java.lang.Integer.TYPE,   java.lang.Integer.class,    true,     new Integer( 0 ) ),
-        new TypeInfo( "long",        java.lang.Long.TYPE,      java.lang.Long.class,       true,     new Long( 0 ) ),
-        new TypeInfo( "boolean",     java.lang.Boolean.TYPE,   java.lang.Boolean.class,    true,     Boolean.FALSE ),
-        new TypeInfo( "double",      java.lang.Double.TYPE,    java.lang.Double.class,     true,     new Double( 0 ) ),
-        new TypeInfo( "float",       java.lang.Float.TYPE,     java.lang.Float.class,      true,     new Float( 0 ) ),
-        new TypeInfo( "big-decimal", null,                     java.math.BigDecimal.class, true,     new BigDecimal( 0 ) ),
-        new TypeInfo( "byte",        java.lang.Byte.TYPE,      java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
-        new TypeInfo( "date",        null,                     java.util.Date.class,       true,     new Date() ),
-        new TypeInfo( "short",       java.lang.Short.TYPE,     java.lang.Short.class,      true,     new Short( (short) 0 ) ),
-        new TypeInfo( "char",        java.lang.Character.TYPE, java.lang.Character.class,  true,     new Character( (char) 0 ) ),
-        new TypeInfo( "bytes",       null,                     byte[].class,               false,    null ),
-        new TypeInfo( "chars",       null,                     char[].class,               false,    null ),
-        new TypeInfo( "strings",     null,                     String[].class,             false,    null ),
+        //            shortName      primitive
+        //            javaType                    immutable defValue
+        new TypeInfo( "other",       null,
+                      java.lang.Object.class,     false,    null ),
+        new TypeInfo( "string",      null,
+                      java.lang.String.class,     true,     null ),
+        new TypeInfo( "integer",     java.lang.Integer.TYPE,
+                      java.lang.Integer.class,    true,     new Integer( 0 ) ),
+        new TypeInfo( "long",        java.lang.Long.TYPE,
+                      java.lang.Long.class,       true,     new Long( 0 ) ),
+        new TypeInfo( "boolean",     java.lang.Boolean.TYPE,
+                      java.lang.Boolean.class,    true,     Boolean.FALSE ),
+        new TypeInfo( "double",      java.lang.Double.TYPE,
+                      java.lang.Double.class,     true,     new Double( 0 ) ),
+        new TypeInfo( "float",       java.lang.Float.TYPE,
+                      java.lang.Float.class,      true,     new Float( 0 ) ),
+        new TypeInfo( "big-decimal", null,
+                      java.math.BigDecimal.class, true,     new BigDecimal( 0 ) ),
+        new TypeInfo( "byte",        java.lang.Byte.TYPE,
+                      java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
+        new TypeInfo( "date",        null,
+                      java.util.Date.class,       true,     new Date() ),
+        new TypeInfo( "short",       java.lang.Short.TYPE,
+                      java.lang.Short.class,      true,     new Short( (short) 0 ) ),
+        new TypeInfo( "char",        java.lang.Character.TYPE,
+                      java.lang.Character.class,  true,     new Character( (char) 0 ) ),
+        new TypeInfo( "bytes",       null,
+                      byte[].class,               false,    null ),
+        new TypeInfo( "chars",       null,
+                      char[].class,               false,    null ),
+        new TypeInfo( "strings",     null,
+                      String[].class,             false,    null ),
         /*
           new TypeInfo( Stream,     "stream",      java.io.InputStream.class,  null ),
           new TypeInfo( Reader,     "reader",      java.io.Reader.class,       null ),
