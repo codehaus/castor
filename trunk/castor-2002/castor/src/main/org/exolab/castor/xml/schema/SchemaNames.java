@@ -48,7 +48,7 @@ package org.exolab.castor.xml.schema;
 
 /**
  * A class which holds the names for many of the Schema
- * related components
+ * related components.
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
@@ -132,6 +132,8 @@ public class SchemaNames {
     public static final String SKIP             = "skip";
     public static final String STRICT           = "strict";
 
+    //-- Wildcard name
+    public static final String WILDCARD         = "wildcard";
     /**
      * Determines whether or not the given name is the name
      * of an XML Schema group structure.
