@@ -50,9 +50,9 @@ package org.exolab.castor.jdo.engine;
 import java.util.Vector;
 import java.sql.SQLException;
 import java.sql.Connection;
+import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.Types;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -68,7 +68,9 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.FieldHandler;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.persist.spi.KeyGenerator;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -190,6 +192,16 @@ public final class SQLEngine
         return new SQLQuery( this, sql, types );
     }
 
+
+    public PersistenceQuery createCall( String spCall, Class[] types )
+        throws QueryException
+    {
+        if ( _logInterceptor != null )
+            _logInterceptor.queryStatement( spCall );
+        return new StoredProcedure( this, spCall, types );
+    }
+
+
 /*
 Will be adding this later.
 
@@ -207,6 +219,9 @@ Will be adding this later.
         Object identity;
         JDOFieldDescriptor pkDesc;
         String primKey;
+        Class idClass;
+        Class pkClass;
+        TypeConvertor conv;
 
         pkDesc = (JDOFieldDescriptor) _clsDesc.getIdentity();
         primKey = pkDesc.getSQLName();
@@ -216,10 +231,17 @@ Will be adding this later.
         if ( identity == null ) {
             throw new PersistenceExceptionImpl( "persist.noIdentity" );
         }
-        // Conversion 
-        if ( identity.getClass().equals( java.math.BigDecimal.class )
-                && pkDesc.getSQLType() == Types.INTEGER ) {
-            identity = new Integer( ( (java.math.BigDecimal) identity ).intValue() );
+
+        // Type conversion
+        try {
+            idClass = identity.getClass();
+            pkClass = SQLTypes.typeFromSQLType(pkDesc.getSQLType());
+            if ( !pkClass.isAssignableFrom( idClass ) ) {
+                conv = Types.getConvertor( idClass, pkClass );
+                identity = conv.convert( identity );
+            }
+        } catch ( Exception except ) {
+            throw new PersistenceExceptionImpl( "persist.keyGenNoConvertor" );
         }
 
         return identity;
@@ -705,7 +727,7 @@ Will be adding this later.
                 this.sqlType = ( (JDOFieldDescriptor) fieldDesc ).getSQLType();
             } else {
                 this.dirtyCheck = false;
-                this.sqlType = Types.OTHER;
+                this.sqlType = java.sql.Types.OTHER;
             }
         }
 
@@ -886,5 +908,196 @@ Will be adding this later.
 
     }
 
+
+
+    /**
+     * PersistenceQuery implementation for use with stored procedures.
+     * It can deals with multiple ResultSets.
+     *
+     * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+     * @version $Revision$ $Date$
+     */
+    static final class StoredProcedure implements PersistenceQuery
+    {
+
+
+        private CallableStatement _stmt;
+
+
+        private ResultSet         _rs;
+
+
+        private final SQLEngine _engine;
+
+
+        private final Class[]   _types;
+
+
+        private final Object[]  _values;
+
+
+        private final String    _sql;
+
+
+        private Object         _lastIdentity;
+
+
+        StoredProcedure( SQLEngine engine, String sql, Class[] types )
+        {
+            _engine = engine;
+            _types = types;
+            _values = new Object[ _types.length ];
+            _sql = sql;
+        }
+
+
+        public int getParameterCount()
+        {
+            return _types.length;
+        }
+
+
+        public Class getParameterType( int index )
+            throws ArrayIndexOutOfBoundsException
+        {
+            return _types[ index ];
+        }
+
+
+        public void setParameter( int index, Object value )
+            throws ArrayIndexOutOfBoundsException, IllegalArgumentException
+        {
+            _values[ index ] = value;
+        }
+
+
+        public Class getResultType()
+        {
+            return _engine.getDescriptor().getJavaClass();
+        }
+
+
+        public void execute( Object conn, AccessMode accessMode )
+            throws QueryException, PersistenceException
+        {
+            _lastIdentity = null;
+            try {
+                _stmt = ( (Connection) conn ).prepareCall( _sql );
+                for ( int i = 0 ; i < _values.length ; ++i ) {
+                    _stmt.setObject( i + 1, _values[ i ] );
+                    _values[ i ] = null;
+                }
+                _stmt.execute();
+                _rs = _stmt.getResultSet();
+            } catch ( SQLException except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
+        }
+
+
+        private boolean nextRow() throws SQLException {
+            while ( true ) {
+                if ( _rs != null && _rs.next() ) {
+                    return true;
+                }
+                if ( !_stmt.getMoreResults() && _stmt.getUpdateCount() == -1 ) {
+                    _rs = null;
+                    return false;
+                }
+                _rs = _stmt.getResultSet();
+            }
+        }
+
+
+        public Object nextIdentity( Object identity )
+            throws PersistenceException
+        {
+            try {
+                if ( _lastIdentity == null ) {
+                    if ( !nextRow() )
+                        return null;
+                    _lastIdentity = _rs.getObject( 1 );
+                    return _lastIdentity;
+                }
+
+                while ( _lastIdentity.equals( identity ) ) {
+                    if ( ! nextRow() ) {
+                        _lastIdentity = null;
+                        return null;
+                    }
+                    _lastIdentity = _rs.getObject( 1 );
+                }
+                return _lastIdentity;
+            } catch ( SQLException except ) {
+                _lastIdentity = null;
+                throw new PersistenceExceptionImpl( except );
+            }
+        }
+
+
+        public void close()
+        {
+            if ( _rs != null ) {
+                try {
+                    _rs.close();
+                } catch ( SQLException except ) { }
+                _rs = null;
+            }
+            if ( _stmt != null ) {
+                try {
+                    _stmt.close();
+                } catch ( SQLException except ) { }
+                _stmt = null;
+            }
+        }
+
+
+        public Object fetch( Object[] fields, Object identity )
+            throws ObjectNotFoundException, PersistenceException
+        {
+            int    count;
+            Object stamp = null;
+
+            try {
+                count = 2;
+
+                // Load all the fields of the object including one-one relations
+                for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
+                    if ( _engine._fields[ i ].multi ) {
+                        Object value;
+
+                        fields[ i ] = new Vector();
+                        value = _rs.getObject( i + count );
+                        if ( value != null )
+                            ( (Vector) fields[ i ] ).addElement( value );
+                    } else
+                        fields[ i ] = _rs.getObject( i + count );
+                }
+
+                if ( nextRow() ) {
+                    _lastIdentity = _rs.getObject( 1 );
+                    while ( identity.equals( _lastIdentity ) ) {
+                        for ( int i = 0; i < _engine._fields.length ; ++i  )
+                            if ( _engine._fields[ i ].multi ) {
+                                Object value;
+
+                                value = _rs.getObject( i + count );
+                                if ( value != null && ! ( (Vector) fields[ i ] ).contains( value ) )
+                                    ( (Vector) fields[ i ] ).addElement( value );
+                            }
+                        if ( nextRow() )
+                            _lastIdentity = _rs.getObject( 1 );
+                        else
+                            _lastIdentity = null;
+                    }
+                } else
+                    _lastIdentity = null;
+            } catch ( SQLException except ) {
+                throw new PersistenceExceptionImpl( except );
+            }
+            return stamp;
+        }
+
+    }
 
 }

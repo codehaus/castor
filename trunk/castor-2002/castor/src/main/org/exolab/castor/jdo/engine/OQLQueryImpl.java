@@ -105,6 +105,12 @@ public class OQLQueryImpl
     private QueryExpression    _expr;
 
 
+    /**
+     * Stored procedure call
+     */
+    private String             _spCall;
+
+
     private Class[]            _bindTypes;
 
 
@@ -123,7 +129,7 @@ public class OQLQueryImpl
 
    public void bind( Object value )
     {
-        if ( _expr == null )
+        if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         if ( _fieldNum == _paramInfo.size() )
             throw new IllegalArgumentException( "Only " + _paramInfo.size() +
@@ -196,6 +202,13 @@ public class OQLQueryImpl
 
         _fieldNum = 0;
         _expr = null;
+        _spCall = null;
+
+        // Separate parser for CALL-type queries (using stored procedured)
+        if ( oql.startsWith("CALL ") ) {
+            createCall( oql );
+            return;
+        }
         
         Lexer lexer = new Lexer(oql);
         Parser parser = new Parser(lexer);
@@ -238,6 +251,92 @@ public class OQLQueryImpl
         }
          
     }
+
+    /**
+     * The simple parser for CALL-type queries (using stored procedured)
+     */
+    public void createCall( String oql ) throws QueryException {
+        StringBuffer sql;
+        int as;
+        int leftParen;
+        int rightParen;
+        int paramCnt;
+        String objType;
+        ParamInfo info;
+        StringBuffer sb;
+        int paramNo;
+
+        if ( !oql.startsWith("CALL ") ) {
+            throw new QueryException( "Stored procedure call must start with CALL" );
+        }
+        as = oql.indexOf( " AS " );
+        if ( as < 0 ) {
+            throw new QueryException( "Stored procedure call must end with \"AS <class-name>\"" );
+        }
+        leftParen = oql.indexOf( "(" );
+        rightParen = oql.indexOf( ")" );
+        sql = new StringBuffer();
+        sql.append( "{call " );
+        paramCnt = 0;
+        _paramInfo = new Hashtable();
+        if ( leftParen < 0 && rightParen < 0 ) {
+            sql.append( oql.substring( 5, as ) );
+        } else {
+            if ( ( leftParen < 0 && rightParen >= 0 )
+                    || ( leftParen > rightParen ) ) {
+                throw new QueryException( "Syntax error: parenthesis" );
+            }
+            sql.append( oql.substring( 5, leftParen ) );
+            sql.append( '(' );
+            for ( int i = leftParen + 1; i < rightParen; i++ ) {
+                if ( oql.charAt( i ) == '$' ) {
+                    info = new ParamInfo( "", "java.lang.Object");
+                    info.mapToSQLParam( paramCnt + 1 );
+                    // get parameter number if given
+                    sb = new StringBuffer();
+                    for ( int j = i + 1; j < rightParen; j++ ) {
+                        char c;
+
+                        c = oql.charAt( j );
+                        if ( c < '0' || c > '9' ) {
+                            break;
+                        }
+                        sb.append( c );
+                    }
+                    if ( sb.length() > 0 ) {
+                        paramNo = Integer.parseInt( sb.toString() );
+                    } else {
+                        paramNo = paramCnt + 1;
+                    }
+                    _paramInfo.put(new Integer( paramNo ), info);
+                    paramCnt++;
+                }
+            }
+            for ( int i = 0; i < paramCnt; i++ ) {
+                sql.append( '?' );
+                sql.append( ( i == paramCnt - 1 ? ')' : ',' ) );
+            }
+        }
+        sql.append( '}' );
+        _spCall = sql.toString();
+        _bindTypes = new Class[ paramCnt ];
+        java.util.Arrays.fill( _bindTypes, Object.class );
+
+        objType = oql.substring( as + 4 ).trim();
+        if ( objType.length() == 0 ) {
+            throw new QueryException( "Missing object name" );
+        }
+        try {
+            _objClass = Class.forName( objType );
+        } catch ( ClassNotFoundException except ) {
+            throw new QueryException( "Could not find class " + objType );
+        }
+        _dbEngine = _dbImpl.getPersistenceEngine();
+        if ( _dbEngine == null )
+            throw new QueryException( "Could not find an engine supporting class " + objType );
+        if ( _dbEngine.getPersistence( _objClass ) == null )
+            throw new QueryException( "Could not find an engine supporting class " + objType );
+    }
     
    
     public Enumeration execute()
@@ -272,12 +371,16 @@ public class OQLQueryImpl
         PersistenceQuery  query;
         SQLEngine         engine;
         
-        if ( _expr == null )
+        if ( _expr == null && _spCall == null )
             throw new IllegalStateException( "Must create query before using it" );
         try {
             try {
                 engine = (SQLEngine) _dbEngine.getPersistence( _objClass );
-                query = engine.createQuery( _expr, _bindTypes );
+                if ( _expr != null ) {
+                    query = engine.createQuery( _expr, _bindTypes );
+                } else {
+                    query = engine.createCall( _spCall, _bindTypes );
+                }
                 if ( _bindValues != null ) {
                     for ( int i = 0 ; i < _bindValues.length ; ++i )
                         query.setParameter( i, _bindValues[ i ] );
