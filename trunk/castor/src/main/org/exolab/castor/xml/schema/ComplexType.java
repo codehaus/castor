@@ -278,22 +278,6 @@ public class ComplexType extends XMLType
         if ( (_baseType != null) && (super.getBaseType() == null) ) {
             XMLType baseType = getSchema().getType(_baseType);
             setBaseType( baseType );
-            if (baseType != null) {
-                if (isSimpleContent() && (!_restricted)) {
-                    ContentType content = ContentType.valueOf("simpleType");
-                    //--set the content type
-                    if (baseType.isSimpleType()) {
-                        content.setSimpleType((SimpleType)baseType);
-                	    setContentType(content);
-                    } 
-                    else {
-                        ComplexType temp = (ComplexType)baseType;
-                        content.setSimpleType(temp.getContentType().getSimpleType());
-                        setContentType(content);
-                        temp = null;
-                    }
-                }
-            }
         }
         return super.getBaseType();
     } //-- getBaseType
@@ -485,6 +469,29 @@ public class ComplexType extends XMLType
         _baseType = base;
     } //-- setBase
 
+    /**
+     * Sets the base type for this ComplexType
+     *
+     * @param baseType the base type which this ComplexType 
+     * extends or restricts
+     */
+    public void setBaseType(XMLType baseType) {
+        super.setBaseType(baseType);
+        if (baseType != null) {
+            if (baseType.isSimpleType()) {
+                _simpleContent = true;
+                _content = new SimpleContent((SimpleType)baseType);
+            }
+            else if (baseType.isComplexType()) {
+                ComplexType complexType = (ComplexType)baseType;
+                if (complexType.isSimpleContent()) {
+                    _simpleContent = true;
+                    _content = ((SimpleContent)complexType.getContentType()).copy();
+                }
+            }
+        }
+    } //-- setBaseType
+    
 	/**
 	 * Sets the value of the 'block' attribute for this ComplexType.
 	 *
@@ -798,12 +805,23 @@ public class ComplexType extends XMLType
         if (type != null) {
             if (type.getStructureType() == Structure.SIMPLE_TYPE) {
                 if (_restricted) {
-                    String err ="complexType: "+(getName()) != null?
-                                             getName():"\n";
-                    err += "A complex type cannot be a restriction"+
+                    String name = getName();
+                    if (name == null) {
+                        name = "anonymous-complexType-for-element: ";
+                        if (_parent != null) {
+                            //-- parent should be an element if name is null, but
+                            //-- we'll check the type to be on the safe side
+                            if (_parent.getStructureType() == Structure.ELEMENT)
+                                name += ((ElementDecl)_parent).getName();
+                            else 
+                                name += _parent.toString();
+                        }
+                    }
+                    String err ="complexType: " + name;
+                    err += "; A complex type cannot be a restriction"+
                            " of a simpleType:";
                     err += type.getName();
-                    throw new IllegalStateException(err);
+                    throw new ValidationException(err);
                 }
             }
 		    else if (type.getStructureType() == Structure.COMPLEX_TYPE) {
@@ -811,12 +829,24 @@ public class ComplexType extends XMLType
                 if (_simpleContent) {
    			        //we are now sure that the base is a ComplexType
                     //but is the base of this complexType a simpleType? (see 4.3.3->simpleContent->content type)
-                    if ( ((ComplexType)type).getContentType().getType() != ContentType.SIMPLETYPE) {
-                        String err ="complexType: "+(getName()) != null?
-                                                  getName():"\n";
-                        err += "In a simpleContent when using restriction the base type"+
-                               " must be a complexType whose base is a simpleType.";
-                        throw new IllegalStateException(err);
+                    if ( ((ComplexType)type).getContentType().getType() != ContentType.SIMPLE) 
+                    {
+                        String name = getName();
+                        if (name == null) {
+                            name = "anonymous-complexType-for-element: ";
+                            if (_parent != null) {
+                                //-- parent should be an element if name is null, but
+                                //-- we'll check the type to be on the safe side
+                                if (_parent.getStructureType() == Structure.ELEMENT)
+                                    name += ((ElementDecl)_parent).getName();
+                                else 
+                                    name += _parent.toString();
+                            }
+                        }
+                        String err ="complexType: " + name;
+                        err += "; When a complexType is a restriction of simpleContent the base type"+
+                               " must be a complexType whose base is also simpleContent.";
+                        throw new ValidationException(err);
                     }
                 }
 		    }

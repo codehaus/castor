@@ -52,21 +52,28 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 
 /**
- * An XML Schema Definition. This class also contains the Factory methods for
- * creating Top-Level structures.
+ * A class representing an XML Schema Definition. This class also 
+ * contains some Factory methods for creating Top-Level structures.
+ * 
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class Schema extends Annotated {
 
+    //-----------------------------/
+    //- Class Fields / Constants  -/
+    //-----------------------------/
+    
     /*
-      April 200 Working Draft Namespace
+       // Old schema namespaces, left here for
+       // reference
+       
+      April 2000 Working Draft Namespace
         = "http://www.w3.org/1999/XMLSchema";
-    */
-
-    /*
+        
       October 2000 Candidate Release Namespace
         = "http://www.w3.org/2000/10/XMLSchema";
+        
      */
 
     /**
@@ -76,6 +83,17 @@ public class Schema extends Annotated {
     public static final String DEFAULT_SCHEMA_NS
         = "http://www.w3.org/2001/XMLSchema";
 
+    /**
+     * The Namespace supported by the W3C XML Schema
+     * Recommendation for the built-in types:
+     * xsi:type, xsi:nil, and xsi:schemaLocation.
+     */
+    public static final String XSI_NAMESPACE
+        = "http://www.w3.org/2001/XMLSchema-instance";
+        
+    /** 
+     * Null argument error message
+     */
     private static final String NULL_ARGUMENT
         = "A null argument was passed to " +
            Schema.class.getName() + "#";
@@ -110,6 +128,7 @@ public class Schema extends Annotated {
     **/
     private BlockList _block = null;
 
+    
     /**
      * A list of defined architypes
     **/
@@ -189,17 +208,31 @@ public class Schema extends Annotated {
     //----------------/
 
     /**
-     * Creates a new SchemaDef
-    **/
+     * Creates a new Schema definition
+     */
     public Schema() {
-        this(DEFAULT_SCHEMA_NS);
-    } //-- ScehamDef
+        this(null, DEFAULT_SCHEMA_NS);
+    } //-- Schema
 
 
     /**
-     * Creates a new SchemaDef
-    **/
+     * Creates a new Schema definition
+     *
+     * @param schemaNS the namespace of the XML Schema itself. Note
+     * this is not the same as the targetNamespace.
+     */
     public Schema(String schemaNS) {
+        this(null, schemaNS);
+    } //-- Schema
+
+    /**
+     * Creates a new Schema definition
+     *
+     * @param prefix the desired namespace prefix for the schemaNS.
+     * @param schemaNS the namespace of the XML Schema itself. Note
+     * this is not the same as the targetNamespace.
+     */
+    public Schema(String prefix, String schemaNS) {
         super();
 
         _attributes       = new Hashtable();
@@ -216,14 +249,16 @@ public class Schema extends Annotated {
         if (_schemaNamespace == null) {
             _schemaNamespace = DEFAULT_SCHEMA_NS;
         }
+        
         //-- declare default namespace bindings
-        addNamespace("", _schemaNamespace);
+        if (prefix == null) prefix = "";
+        addNamespace(prefix, _schemaNamespace);
 
         init();
     } //-- ScehamDef
-
+    
     private void init() {
-
+        
     } //-- init
 
 
@@ -1188,6 +1223,17 @@ public class Schema extends Annotated {
         return false;
     } //-- removeGroup
 
+    /**
+     * Removes the namespace from the set of namespace declarations for 
+     * this Schema definition.
+     *
+     * @param prefix the namespace prefix of the namespace to remove.
+     */
+    public boolean removeNamespace(String prefix) {
+        if (prefix == null) prefix = "";
+        return (_namespaces.remove(prefix) != null);
+    } //-- removeNamespace
+    
     /**
      * Removes the given top level SimpleType from this Schema
      * @param SimpleType the SimpleType to remove
