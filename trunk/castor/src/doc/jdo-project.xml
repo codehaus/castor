@@ -98,28 +98,34 @@
         </p>
         </section>
 
-        <section title="OQL Engine Refactoring">
+        <section title="Query Engine Refactoring">
         <p>
         <b>Description:</b><br />
-        The Castor OQL engine should be refactored to make us of
-        <a href="http://antlr.org">ANTLR</a>. This will make maintenance and
-        adding features incredibly easier. 
+        The Castor OQL engine should be refactored to make us of a parser
+        generator like <a href="http://antlr.org">ANTLR</a> or <a
+        href="http://www.experimentalstuff.com/Technologies/JavaCC/">JavaCC</a>. 
+        This will make maintenance and adding features incredibly easier. 
         </p>
         <p>
         <b>Volunteer:</b> Paul Botta<br />
-        <b>Status:</b> implemenation complete<br />
+        <b>Status:</b> ANTLR implemenation complete<br />
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
-        Many thanks to Paul Botta for his hard work on this implemenation. Now it 
-        just needs some tests to prove it so that it can be committted it to CVS. 
+        Many thanks to Paul Botta for his hard work on the ANTLR implemenation. 
+        Now this implementation just needs some tests to prove it so that it can 
+        be committted it to CVS. 
+        </p>
+        <p>
+        This layer should also be made pluggable allowing one or more query 
+        engines to plugged in simultaneously (e.g. OQL, XQuery, EJBQL, etc.).
         </p>
         </section>
 
         <section title="OQL Query Externalization">
         <p>
         <b>Description:</b><br />
-        Castor should include a mechanism for OQL queries to be externalized
-        in the object mapping descriptor. 
+        Castor should include a mechanism for queries to be externalized in the 
+        object mapping descriptor. 
         </p>
         <p>
         <b>Volunteer:</b><br />
@@ -127,8 +133,9 @@
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
         This would allow for named queries that do not require recompilation 
-        for changes. These queries would be specified in the &lt;class> elements 
-        and would just be included automatically via Castor XML unmarshalling.
+        for changes. These queries would be specified within the &lt;class> elements 
+        and would just be included automatically via the Castor XML unmarshalling 
+        of the object mapping descriptor.
         </p>
         </section>
 
@@ -165,18 +172,17 @@
         </p>
         </section>
 
-        <section title="Cache Refactoring">
+        <section title="Cache Engine Refactoring">
         <p>
         <b>Description:</b><br />
-        Castor's current cache implemenation is not that robust. It lacks any
+        Castor's current cache implemenation is not very robust. It lacks any
         procedure for manual object eviction and it should really be using
         some sort of balanced tree (e.g. java.util.TreeMap) for reasons of
-        speed. Also, there should really be an API for the cache rather than
-        just using the API from a java.util.Collection. 
+        speed, etc., etc.
         </p>
         <p>
-        Note that Vince Adamo has posted a <a
-        href="http://bugzilla.exolab.org/show_bug.cgi?id=1091">patch</a> for 
+        Note that Vince Adamo has posted a 
+        <a href="http://bugzilla.exolab.org/show_bug.cgi?id=1091">patch</a> for 
         object eviction in the current Castor API. 
         </p>
         <p>
@@ -184,6 +190,10 @@
         <b>Status:</b> open<br />
         <b>Date Started:</b><br />
         <b>Notes:</b><br />
+        There should really be a cache API. This would abstract the entire cache 
+        engine allowing it to be made pluggable. In fact, I would much rather 
+        consider using a <a href="http://jcp.org/en/jsr/detail?id=107">JSR 107</a>
+        implementation than writing our own API. 
         </p>
         </section>
 
