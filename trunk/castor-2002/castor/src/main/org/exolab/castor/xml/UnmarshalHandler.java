@@ -591,12 +591,20 @@ public class UnmarshalHandler implements DocumentHandler {
                 }
                 try {
                     
-                    state.object = handler.newInstance(parentState.object);
+                    _class = descriptor.getFieldType();
                     
-                    //-- assign new class value                          
-                    if (state.object != null) 
-                        _class = state.object.getClass();
-                        
+                    //-- check for immutable
+                    if (isPrimitive(_class) || descriptor.isImmutable())
+                        state.object = null; 
+                    else {
+                        state.object = handler.newInstance(parentState.object);
+                        //-- reassign class in case there is a conflict
+                        //-- between descriptor#getFieldType and
+                        //-- handler#newInstance...I should hope not, but
+                        //-- who knows
+                        if (state.object != null) 
+                            _class = state.object.getClass();
+                    }
                     state.type = _class;
                 }
                 catch (java.lang.IllegalStateException ise) {
@@ -858,6 +866,30 @@ public class UnmarshalHandler implements DocumentHandler {
         }
         return type.getName();
     } //-- className
+    
+    /**
+     * Returns true if the given class should be treated as a primitive
+     * type
+     * @return true if the given class should be treated as a primitive
+     * type
+    **/
+    private boolean isPrimitive(Class type) {
+        
+        if (type.isPrimitive()) return true;
+        
+        if ((type == Boolean.class)   ||
+            (type == Byte.class)      ||
+            (type == Character.class) ||
+            (type == Double.class)    ||
+            (type == Float.class)     ||
+            (type == Integer.class)   ||
+            (type == Long.class)      ||
+            (type == Short.class)) 
+            return true;
+            
+       return false;
+       
+    } //-- isPrimitive
     
 } //-- Unmarshaller
 

@@ -296,7 +296,7 @@ public class Marshaller {
                     if (classDesc != null) break;
                 }
                 if (classDesc == null) {
-                    classDesc = new StringMarshalInfo();
+                    classDesc = new StringClassDescriptor();
                 }
             }
             else {
