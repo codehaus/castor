@@ -3,6 +3,7 @@ package org.exolab.castor.builder;
 
 import org.exolab.castor.builder.*;
 import org.exolab.castor.builder.types.*;
+import org.exolab.castor.xml.JavaNaming;
 import org.exolab.javasource.*;
 
 import java.util.Vector;
@@ -10,12 +11,13 @@ import java.util.Vector;
 
 /**
  * A helper used for generating source that deals with Collections.
- * @author <a href="mailto:frank.thelen@poet.de">frank Thelen</a>
+ * @author <a href="mailto:frank.thelen@poet.de">Frank Thelen</a>
+ * @author <a href="mailto:bernd.deichmann@poet.de">Bernd Deichmann</a>
  * @version $Revision$ $Date$
 **/
 public class CollectionInfoODMG30 extends CollectionInfo {
- 
-        
+
+
     /**
      * Creates a new CollectionInfoODMG30
      * @param contextType the content type of the collection, ie. the type
@@ -23,13 +25,13 @@ public class CollectionInfoODMG30 extends CollectionInfo {
      * @param name the name of the Collection
      * @param elementName the element name for each element in collection
     **/
-    public CollectionInfoODMG30(XSType contentType, String name, String elementName) 
+    public CollectionInfoODMG30(XSType contentType, String name, String elementName)
     {
         super(contentType, name, elementName);
         //getSchemaType().setJType(new JClass("org.odmg.DArray"));
 		setSchemaType(new XSListODMG30(contentType));
     } //-- CollectionInfoODMG30
-    
+
     /**
      * Creates code for initialization of this Member
      * @param jsc the JSourceCode in which to add the source to
@@ -39,18 +41,18 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         //jsc.append(" = new Vector();");
 		jsc.append(" = ODMG.getImplementation().newDArray();");
     } //-- generateConstructorCode
-        
+
     //------------------/
     //- Public Methods -/
     //------------------/
-    
-    /** 
+
+    /**
      * Creates implementation of add method.
     **/
     public void createAddMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
-        
+
         int maxSize = getXSList().getMaximumSize();
         if (maxSize > 0) {
             jsc.add("if (!(");
@@ -68,27 +70,27 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.append(".add(");
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
-        
+
     } //-- createAddMethod
-    
-                    
-    /** 
+
+
+    /**
      * Creates implementation of object[] get() method.
     **/
     public void createGetMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-                    
+
         jsc.add("int size = ");
         jsc.append(getName());
         jsc.append(".size();");
-        
+
         //String variableName = getName()+".elementAt(index)";
         String variableName = getName()+".get(index)";
-        
+
         JType compType = jType.getComponentType();
-        
+
         jsc.add(compType.toString());
         jsc.append("[] mArray = new ");
         jsc.append(compType.getLocalName());
@@ -97,7 +99,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         //-- size
         if (compType.isArray()) jsc.append("[]");
         jsc.append(";");
-        
+
         jsc.add("for (int index = 0; index < size; index++) {");
         jsc.indent();
         jsc.add("mArray[index] = ");
@@ -115,15 +117,15 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.add("}");
         jsc.add("return mArray;");
     } //-- createGetMethod
-    
-    /** 
+
+    /**
      * Creates implementation of the get(index) method.
     **/
     public void createGetByIndexMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-        
+
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
         jsc.append(getName());
@@ -132,13 +134,13 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.add("throw new IndexOutOfBoundsException();");
         jsc.unindent();
         jsc.add("}");
-        
+
         jsc.add("");
         jsc.add("return ");
-        
+
         //String variableName = getName()+".elementAt(index)";
         String variableName = getName()+".get(index)";
-        
+
         if (getContentType().getType() == XSType.CLASS) {
             jsc.append("(");
             jsc.append(jType.toString());
@@ -152,13 +154,53 @@ public class CollectionInfoODMG30 extends CollectionInfo {
     } //-- createGetByIndex
 
 
-    /** 
-     * Creates implementation of set method.
+    /**
+     * Creates implementation of array set method
+     *
+     * Method added 12/14/2000 BD
     **/
-    public void createSetMethod(JMethod method) {
+    public void createSetArrayMethod(JMethod method) {
 
         JSourceCode jsc = method.getSourceCode();
-        
+
+        String paramName = method.getParameter(0).getName();
+
+        String index = "i";
+        if (paramName.equals(index)) index = "j";
+
+        jsc.add("//-- copy array");
+        jsc.add(getName());
+        jsc.append(".clear();");
+        jsc.add("for (int ");
+        jsc.append(index);
+        jsc.append(" = 0; ");
+        jsc.append(index);
+        jsc.append(" < ");
+        jsc.append(paramName);
+        jsc.append(".length; ");
+        jsc.append(index);
+        jsc.append("++) {");
+        jsc.indent();
+        jsc.add(getName());
+        jsc.append(".add(");
+        jsc.append(getContentType().createToJavaObjectCode(paramName+'['+index+']'));
+        jsc.append(");");
+        jsc.unindent();
+        jsc.add("}");
+
+        //-- bound properties
+        if (isBound())
+            createBoundPropertyCode(jsc);
+
+    } //-- createSetArrayMethod
+
+    /**
+     * Creates implementation of set method.
+    **/
+    public void createSetByIndexMethod(JMethod method) {
+
+        JSourceCode jsc = method.getSourceCode();
+
         jsc.add("//-- check bounds for index");
         jsc.add("if ((index < 0) || (index > ");
         jsc.append(getName());
@@ -167,7 +209,7 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.add("throw new IndexOutOfBoundsException();");
         jsc.unindent();
         jsc.add("}");
-        
+
         int maxSize = getXSList().getMaximumSize();
         if (maxSize != 0) {
             jsc.add("if (!(");
@@ -189,22 +231,22 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.append(getContentType().createToJavaObjectCode(getContentName()));
         jsc.append(");");
     } //-- createSetMethod
-    
 
-    /** 
+
+    /**
      * Creates implementation of getCount method.
     **/
     public void createGetCountMethod(JMethod method) {
         super.createGetCountMethod(method);
     } //-- createGetCoundMethod
 
-    /** 
+    /**
      * Creates implementation of Enumerate method.
     **/
     public void createEnumerateMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
-        
+
         //jsc.add("return ");
         //jsc.append(getName());
         //jsc.append(".elements();");
@@ -214,24 +256,24 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.append(".iterator();");
         jsc.add("while(i.hasNext()) v.add(i.next());");
         jsc.add("return v.elements();");
-        
+
     } //-- createEnumerateMethod
 
-    /** 
+    /**
      * Creates implementation of remove(Object) method.
     **/
     public void createRemoveByObjectMethod(JMethod method) {
 		super.createRemoveByObjectMethod(method);
     } //-- createRemoveByObjectMethod
 
-    /** 
+    /**
      * Creates implementation of remove(int i) method.
     **/
     public void createRemoveByIndexMethod(JMethod method) {
-        
+
         JSourceCode jsc = method.getSourceCode();
         JType jType = method.getReturnType();
-        
+
         jsc.add("Object obj = ");
         jsc.append(getName());
         //jsc.append(".elementAt(index);");
@@ -249,10 +291,10 @@ public class CollectionInfoODMG30 extends CollectionInfo {
             jsc.append(getContentType().createFromJavaObjectCode("obj"));
             jsc.append(";");
         }
-        
+
     } //-- createRemoveByIndexMethod
 
-    /** 
+    /**
      * Creates implementation of removeAll() method.
     **/
     public void createRemoveAllMethod (JMethod method) {
@@ -261,9 +303,9 @@ public class CollectionInfoODMG30 extends CollectionInfo {
         jsc.add(getName());
         //jsc.append(".removeAllElements();");
         jsc.append(".clear();");
-        
+
     } //-- createRemoveAllMethod
-    
+
 
 } //-- CollectionInfoODMG30
 
