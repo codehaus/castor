@@ -197,7 +197,7 @@ public class FieldValidator extends Validator {
         if ((value == null) && (_descriptor.isRequired())) {
             String err = "The field '" + _descriptor.getFieldName() + "' ";
             if (!ERROR_NAME.equals(_descriptor.getXMLName())) {
-                err += "(whose xml name is '" + _descriptor.getXMLName() + ") ";
+                err += "(whose xml name is '" + _descriptor.getXMLName() + "') ";
             }
             err += "is a required field.";
             throw new ValidationException(err);
