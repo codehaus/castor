@@ -98,12 +98,24 @@ public class JClass extends JType {
     private Vector constructors  = null;
 
     /**
+     * The set of interfaces implemented by this JClass
+    **/
+    private Vector interfaces    = null;
+    
+    /**
      * The list of methods of this JClass
     **/
     private Vector methods       = null;
 
-    private Vector interfaces    = null;
-
+    /**
+     * The JModifiers for this JClass, which allows us to
+     * change the resulting qualifiers
+    **/
+    private JModifiers modifiers = null;
+    
+    /**
+     * The package to which this JClass belongs
+    **/
     private String packageName   = null;
     
     /**
@@ -135,6 +147,7 @@ public class JClass extends JType {
         constructors  = new Vector();
         members       = new JNamedMap();
         methods       = new Vector();
+        modifiers     = new JModifiers();
     } //-- JClass
 
     
@@ -325,6 +338,14 @@ public class JClass extends JType {
     } 
     
     /**
+     * Returns the JModifiers which allows the qualifiers to be changed
+     * @return the JModifiers for this JClass
+    **/
+    public JModifiers getModifiers() {
+        return modifiers;
+    } //-- getModifiers
+    
+    /**
      * Returns the name of the package that this JClass is a member of
      * @return the name of the package that this JClass is a member of,
      * or null if there is no current package name defined
@@ -438,7 +459,19 @@ public class JClass extends JType {
         //-- we need to add some JavaDoc API adding comments
         
         buffer.setLength(0);
-        buffer.append("public class ");
+        
+        if (modifiers.isPrivate()) {
+            buffer.append("private ");
+        }
+        else if (modifiers.isPublic()) {
+            buffer.append("public ");
+        }
+        
+        if (modifiers.isAbstract()) {
+            buffer.append("abstract ");
+        }
+        
+        buffer.append("class ");
         buffer.append(getLocalName());
         buffer.append(' ');
         if (superClass != null) {
@@ -543,10 +576,6 @@ public class JClass extends JType {
     public void setSuperClass(String superClass) {
         this.superClass = superClass;
     } //-- setSuperClass
-
-    public String toString() {
-        return getName();
-    } //-- toString
     
     //-------------------/
     //- Private Methods -/

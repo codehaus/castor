@@ -290,7 +290,6 @@ public class JMethod {
         jsw.write(' ');
         if (returnType != null) {
             jsw.write(returnType);
-            if (returnType.isArray()) jsw.write("[]");
         }
         else jsw.write("void");
         jsw.write(' ');
@@ -332,7 +331,6 @@ public class JMethod {
         StringBuffer sb = new StringBuffer();
         if (returnType != null) {
             sb.append(returnType);
-            if (returnType.isArray()) sb.append("[]");
         }
         else sb.append("void");
         sb.append(' ');

@@ -65,7 +65,7 @@ public class JType {
 
     private String name = null;
     
-    private boolean isArray = false;
+    private boolean _isArray = false;
     
     
     /**
@@ -79,7 +79,7 @@ public class JType {
     } //-- JType
     
     protected JType(String name, boolean isArray) {
-        this.isArray = isArray;
+        this._isArray = isArray;
         this.name = name;
     } //-- JType
     
@@ -113,8 +113,8 @@ public class JType {
      * Checks to see if this JType represents an array.
      * @return true if this JType represents an array, otherwise false
     **/
-    public boolean isArray() {
-        return isArray;
+    public final boolean isArray() {
+        return _isArray;
     }
     
     /**
@@ -133,7 +133,10 @@ public class JType {
     } //-- isPrimitive
     
     public String toString() {
-        return this.name;
+        
+        if (_isArray) return this.name+"[]";
+        else return this.name;
+        
     } //-- toString
     
 } //-- JType
