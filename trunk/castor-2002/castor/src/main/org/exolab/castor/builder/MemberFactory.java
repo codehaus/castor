@@ -297,9 +297,9 @@ public class MemberFactory {
         XSType   xsType     = null;
 
         XMLType xmlType = eDecl.getType();
-        
+
         boolean isContainer = false;
-        
+
         //-- SimpleType
         if ((xmlType != null) && xmlType.isSimpleType()) {
 
@@ -333,14 +333,8 @@ public class MemberFactory {
         }
         //-- ComplexType
         else {
-            
-            ComplexType cType = (ComplexType)xmlType;
-            int max = cType.getMaxOccurs();
-            if ((max < 0) || (max > 1)) {
-                //isContainer = true;
-            }
-            
-			String className = null;
+
+            String className = null;
 			//-- Java class name depends on mapping setup in properties file
 			if (SourceGenerator.mappingSchemaElement2Java())
 			{
@@ -363,7 +357,14 @@ public class MemberFactory {
 				}
 			}
             xsType = new XSClass(new JClass(className));
-        }
+            if ((xmlType != null) && (xmlType.isComplexType())) {
+                ComplexType cType = (ComplexType)xmlType;
+                int max = cType.getMaxOccurs();
+                if ((max < 0) || (max > 1)) {
+                    //isContainer = true;
+                }
+            }
+        } // complexType
 
         String fieldName = JavaNaming.toJavaMemberName(eDecl.getName(true));
         if (fieldName.charAt(0) != '_')
@@ -380,7 +381,7 @@ public class MemberFactory {
             fieldInfo = cInfo;
 
         }
-        else {
+        else  {
              if (xsType.getType() == xsType.COLLECTION)
                  fieldInfo = infoFactory.createCollection( ((XSList) xsType).getContentType(),
                                                              fieldName,
