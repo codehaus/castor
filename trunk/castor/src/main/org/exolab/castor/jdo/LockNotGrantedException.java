@@ -64,5 +64,10 @@ public class LockNotGrantedException
         super ( message );
     }
 
+    public LockNotGrantedException( String message, Throwable exception )
+    {
+        super ( message, exception );
+    }
+
 
 }

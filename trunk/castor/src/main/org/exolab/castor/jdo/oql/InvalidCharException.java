@@ -58,7 +58,11 @@ import org.exolab.castor.jdo.QueryException;
 public class InvalidCharException extends QueryException {
 
 	public InvalidCharException( String message ) {
-    super( message );
-  }
-	
+		super( message );
+	}
+
+	public InvalidCharException( String message, Throwable exception ) {
+		super( message );
+	}
+
 }

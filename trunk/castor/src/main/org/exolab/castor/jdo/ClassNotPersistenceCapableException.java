@@ -57,13 +57,17 @@ package org.exolab.castor.jdo;
 public class ClassNotPersistenceCapableException
     extends PersistenceException
 {
-
     
     public ClassNotPersistenceCapableException( String message )
     {
         super( message );
     }
 
+    public ClassNotPersistenceCapableException( String message, Throwable exception )
+    {
+        super( message, exception );
+    }
 
+    
 }
 
