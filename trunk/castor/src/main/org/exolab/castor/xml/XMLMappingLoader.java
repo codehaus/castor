@@ -53,6 +53,7 @@ import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.CollectionHandler;
+import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
@@ -437,8 +438,19 @@ public class XMLMappingLoader
             }
         }
 
-        //-- isMapped item
+        //-- Get collection type
         CollectionType colType = fieldMap.getCollection();
+        if (colType == null) {
+            //-- just in case use forgot to use collection="..."
+            //-- in the mapping file
+            Class type = fieldDesc.getFieldType();
+            if (CollectionHandlers.hasHandler(type)) {
+                String typeName = CollectionHandlers.getCollectionName(type);
+                colType = CollectionType.valueOf(typeName);
+            }
+        }
+        
+        //-- isMapped item
         if (colType != null) {
             
             if ((colType == CollectionType.HASHTABLE) ||
@@ -458,7 +470,7 @@ public class XMLMappingLoader
             //-- special NodeType.Namespace handling
             //-- prevent FieldHandlerImpl from using CollectionHandler
             //-- during calls to #getValue
-            if (nodeType == NodeType.Namespace) {
+            if ((nodeType == NodeType.Namespace) || (xmlDesc.isMapped())) {
                 Object handler = xmlDesc.getHandler();
                 if (handler instanceof FieldHandlerImpl) {
                     FieldHandlerImpl handlerImpl = (FieldHandlerImpl)handler;
