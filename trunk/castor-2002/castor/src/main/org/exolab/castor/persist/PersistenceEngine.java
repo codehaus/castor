@@ -50,10 +50,10 @@ package org.exolab.castor.persist;
 import java.io.PrintWriter;
 import java.util.Hashtable;
 import javax.transaction.xa.Xid;
-import org.exolab.castor.mapping.ClassDesc;
-import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.PersistenceFactory;
@@ -81,13 +81,13 @@ public interface PersistenceEngine
 
 
     /**
-     * Returns the object descriptor for this Java type. The descriptor
+     * Returns the class handler for this Java type. The type
      * must be known to this engine.
      *
      * @param type The Java type
-     * @return The object descriptor
+     * @return The class handler
      */
-    public ClassDesc getClassDesc( Class type );
+    public ClassHandler getClassHandler( Class type );
 
 
     /**

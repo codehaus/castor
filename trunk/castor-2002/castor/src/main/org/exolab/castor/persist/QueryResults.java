@@ -48,7 +48,6 @@ package org.exolab.castor.persist;
 
 
 import javax.transaction.Status;
-import org.exolab.castor.mapping.ClassDesc;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 
@@ -249,9 +248,9 @@ public final class QueryResults
                ObjectNotFoundException, LockNotGrantedException
     {
         TransactionContext.ObjectEntry entry;
-        OID       oid;
-        ClassDesc clsDesc;
-        Object    obj;
+        OID              oid;
+        ClassHandler     handler;
+        Object           obj;
         
         // Make sure transaction is still open.
         if ( _tx.getStatus() != Status.STATUS_ACTIVE )
@@ -264,8 +263,8 @@ public final class QueryResults
             // already loaded into the persistence engine at this point and
             // has a lock based on the original query (i.e. read write
             // or exclusive). If no next record return null.
-            clsDesc = _engine.getClassDesc( _query.getResultType() );
-            oid = new OID( clsDesc, _lastIdentity );
+            handler = _engine.getClassHandler( _query.getResultType() );
+            oid = new OID( handler, _lastIdentity );
             
             // Did we already load (or created) this object in this
             // transaction.
@@ -276,7 +275,7 @@ public final class QueryResults
                 if ( entry.deleted )
                     // Object has been deleted in this transaction, so skip
                     // to next object.
-                    throw new ObjectNotFoundException( clsDesc.getJavaClass(), _lastIdentity );
+                    throw new ObjectNotFoundException( handler.getJavaClass(), _lastIdentity );
                 else {
                     if ( _accessMode == AccessMode.Exclusive &&
                          ! oid.isExclusive() ) {
@@ -301,7 +300,7 @@ public final class QueryResults
                 // or exclusive mode.
                 try {
                     oid = _engine.fetch( _tx, _query, _lastIdentity, _accessMode, _tx.getLockTimeout() );
-                    obj = clsDesc.newInstance();
+                    obj = handler.newInstance();
                     _engine.copyObject( _tx, oid, obj );
                     if ( _accessMode == AccessMode.ReadOnly )
                         _engine.releaseLock( _tx, oid );
