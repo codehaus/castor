@@ -28,7 +28,7 @@
            <tr><td>UUID</td><td>UUID generic algorithm</td></tr>
            <tr><td>IDENTITY</td><td>Supports autoincrement identity fields in
                                   Sybase ASE/ASA, MS SQL Server and Hypersonic SQL</td></tr>
-           <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle, PostgreSQL and Interbase</td></tr>
+           <tr><td>SEQUENCE</td><td>Supports SEQUENCEs in Oracle, PostgreSQL, Interbase and SAP DB</td></tr>
          </table></p>
 
       <p>Some of these algorithms have parameters, which can be specified 
@@ -165,8 +165,8 @@
     </section>
 
     <section title="SEQUENCE key generator">
-      <p>SEQUENCE key generator can be used only with Oracle, PostgreSQL
-         and Interbase.
+      <p>SEQUENCE key generator can be used only with Oracle, PostgreSQL,
+         Interbase and SAP DB.
          It generates keys using sequences.</p>    
       <p>The key generator has two parameters:
          <table border="1" cellpadding="4">
@@ -193,8 +193,8 @@
          Similarly, with Interbase it performs
          "select gen_id(sequenceName, increment) from rdb$database" before
          INSERT.
-         With Oracle by default (returning=false) it transforms the
-         Castor-generated INSERT statement into the form
+         With Oracle by default (returning=false) and with SAP DB it transforms
+         the Castor-generated INSERT statement into the form
          "INSERT INTO tableName (pkName,...) VALUES 
          (sequenceName.nextval,...)" and after INSERT it performs "SELECT 
          seqName.currval FROM tableName" to obtain the identity value. With 
