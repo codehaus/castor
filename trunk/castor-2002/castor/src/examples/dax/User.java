@@ -6,37 +6,29 @@ import org.exolab.castor.dax.Attribute;
 import org.exolab.castor.dax.AttributeSet;
 
 
-public class Person
+public class User
 {
 
-    public String uid;
+    // The identity of the user is contained in uid
+    public String   uid;
 
 
-    public String full;
+    public String   full;
 
 
-    public String first;
+    public String   first;
 
 
-    public String last;
+    public String   last;
 
 
     public String[] email;
 
 
-    public String[] dc;
-
-
-    public String  ou;
+    public String   ou;
 
 
     public AttributeSet attrSet;
-
-
-    public String getDN()
-    {
-	return "uid=" + uid + ",ou=" + ou + ",dc=" + dc[ 0 ] + ",dc=" + dc[ 1 ];
-    }
 
 
     public String toString()
@@ -44,7 +36,6 @@ public class Person
 	StringBuffer str;
 
 	str = new StringBuffer();
-	str.append( "DN: " ).append( getDN() ).append( '\n' );
 	if ( uid != null )
 	    str.append( "uid: " ).append( uid ).append( '\n' );
 	if ( full != null )
