@@ -56,20 +56,8 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ModelGroup extends Particle
-       implements Referable
-{
+public class ModelGroup extends Group {
 
-
-    /**
-     * The name of this ModelGroup
-    **/
-    private String    name       = null;
-
-    /**
-     *
-    **/
-    private boolean   export     = false;
 
     /**
      * the name of the ModelGroup referenced
@@ -81,27 +69,11 @@ public class ModelGroup extends Particle
     **/
     private Vector modelDefs;
 
-    /**
-     * the implementation of ContentModelGroup
-    **/
-    private ContentModelGroup _contentModel = null;
 
-
-    /**
-     * An unordered list of just the the element declarations
-    **/
-    private Hashtable elements;
-
-    /**
-     *
-    **/
-    private Order order = Order.all;
     /**
      * the schema that contains this model group
      */
      private Schema _schema = null;
-
-     private String _id  = null;
 
     /**
      * Creates a new ModelGroup, with no name
@@ -124,38 +96,10 @@ public class ModelGroup extends Particle
      * @param name of the ModelGroup
     **/
     public ModelGroup(String name, Schema schema) {
-        super();
-        this.name  = name;
+        super(name);
         _schema = schema;
         modelDefs = new Vector();
-        elements = new Hashtable();
-        _contentModel = new ContentModelGroupImpl();
     } //-- ModelGroup
-
-
-    /**
-     * Adds the given ElementDecl to this Archetype
-     * @param elementDecl the ElementDecl to add to this Archetype
-     * @exception SchemaException when an ElementDecl already
-     * exists with the same name as the given ElementDecl
-     * @exception SchemaException when this Archetype content
-     * model is either "empty" or "textOnly"
-    **/
-    public void addElementDecl(ElementDecl elementDecl)
-        throws SchemaException
-    {
-        //-- check for naming collisions
-        if (elements.get(elementDecl.getName()) != null) {
-            String err = "An element declaration with the given name, ";
-            err += elementDecl.getName() + ", already exists in this scope.";
-            throw new SchemaException(err);
-        }
-
-        //-- add element to modelDefs
-        modelDefs.addElement(elementDecl);
-        //-- save elements in cache for doing name lookups
-        elements.put(elementDecl.getName(), elementDecl);
-    } //-- addElementDecl
 
 
     /**
@@ -168,25 +112,6 @@ public class ModelGroup extends Particle
         }
     } //-- addModelGroup
 
-    /**
-     * Gets the contentModelGroup
-     * @returns the contentModelGroup
-     */
-     public ContentModelGroup getContentModelGroup() {
-        return _contentModel;
-     }
-
-     /**
-     * Adds the given Group to this ContentModelGroup
-     * @param group the Group to add
-     * @exception SchemaException when a group with the same name as the
-     * specified group already exists in the current scope
-    **/
-    public void addGroup(Group group)
-        throws SchemaException
-    {
-        _contentModel.addGroup(group);
-    } //-- addGroup
 
     /**
      * Returns an ordered Enumeration of all the ContentModelType
@@ -195,53 +120,6 @@ public class ModelGroup extends Particle
     public Enumeration getDeclarations() {
         return modelDefs.elements();
     } //-- getDeclarations
-
-    public boolean getExport() {
-        return this.export;
-    } //-- getExport
-
-    /**
-     * Returns the ID for this Group
-     * @return the ID for this Group, or null if no ID is present
-     */
-    public String getId() {
-        return _id;
-    } //-- getId
-
-
-    /**
-     * Returns the name of this ModelGroup, or null if no name was defined
-     * @return the name of this ModelGroup, or null if no name was defined
-    **/
-    public String getName() {
-        return name;
-    } //-- getName
-
-    public Order getOrder() {
-        return order;
-    } //-- getOrder
-
-    /**
-     * Sets the ID for this Group
-     * @param id the ID for this Group
-    **/
-    public void setId(String id) {
-        _id = id;
-    } //-- setId
-
-    /**
-     * Sets the name of this ModelGroup
-     * @param name the new name for this ModelGroup
-    **/
-    public void setName(String name) {
-        this.name = name;
-    } //--setName
-
-    public void setOrder(Order order) {
-        if (order == null) this.order = Order.all;
-        this.order = order;
-    }
-
 
     /**
      * Sets the reference for this ModelGroup definition
@@ -270,7 +148,7 @@ public class ModelGroup extends Particle
      * @see Referable
     **/
     public String getReferenceId() {
-        if (name != null) return "group:"+name;
+        if (this.getName() != null) return "group:"+this.getName();
         return null;
     } //-- getReferenceId
 
