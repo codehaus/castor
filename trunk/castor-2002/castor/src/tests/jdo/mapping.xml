@@ -6,6 +6,7 @@
        Single object mapping, shared access, dirty checking on all fields -->
   <class name="jdo.TestObject" access="shared" identity="id">
     <description>Table used for concurrency and performance testing</description>
+    <cache-type type="time-limited" value="30"/>
     <map-to table="test_table" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -20,6 +21,7 @@
 
   <class name="jdo.TestObjectEx" access="shared" identity="id">
     <description>Table used for cache testing</description>
+    <cache-type type="count-limited" value="30"/>
     <map-to table="test_table_ex" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -34,6 +36,7 @@
 
   <class name="jdo.TestRace" access="shared" identity="id">
     <description>Table used for cache testing</description>
+    <cache-type type="none" value="30"/>
     <map-to table="test_race" />
     <field name="id" type="integer">
       <sql name="id" type="integer" />
@@ -45,6 +48,7 @@
 
   <class name="jdo.TestMaster" access="shared" identity="id">
     <description>Test master table</description>
+    <cache-type type="unlimited" value="30"/>
     <map-to table="test_master" />
     <field name="id" type="integer">
       <sql name="id" type="numeric" />

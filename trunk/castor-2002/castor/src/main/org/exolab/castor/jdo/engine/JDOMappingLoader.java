@@ -119,6 +119,7 @@ public class JDOMappingLoader
     {
         ClassDescriptor   clsDesc;
         String            keyGenName;
+        CacheType         cacheType;
         KeyGeneratorDescriptor keyGenDesc;
         
         // If no SQL information for class, ignore it. JDO only
@@ -174,7 +175,9 @@ public class JDOMappingLoader
             }
         }
 
-        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), keyGenDesc );
+        cacheType = new CacheType( clsMap.getCacheTypeMapping() );
+
+        return new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(), keyGenDesc, cacheType );
     }
 
 

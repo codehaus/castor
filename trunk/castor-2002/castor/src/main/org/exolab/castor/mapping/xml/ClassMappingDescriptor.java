@@ -244,7 +244,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         
         //-- initialize element descriptors
         
-        elements = new XMLFieldDescriptorImpl[4];
+        elements = new XMLFieldDescriptorImpl[5];
         //-- _description
         desc = new XMLFieldDescriptorImpl(java.lang.String.class, "_description", "description", NodeType.Element);
         desc.setImmutable(true);
@@ -318,6 +318,43 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         //-- validation code for: _mapTo
         fieldValidator = new FieldValidator();
         desc.setValidator(fieldValidator);
+
+        //-- _cacheTypeMapping
+        desc = new XMLFieldDescriptorImpl(CacheTypeMapping.class, "_cacheTypeMapping", "cache-type", NodeType.Element);
+        handler = (new XMLFieldHandler() {
+            public Object getValue( Object object ) 
+                throws IllegalStateException
+            {
+                ClassMapping target = (ClassMapping) object;
+                return target.getCacheTypeMapping();
+            }
+            public void setValue( Object object, Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    ClassMapping target = (ClassMapping) object;
+                    target.setCacheTypeMapping( (CacheTypeMapping) value);
+                }
+                catch (Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public void resetValue( Object object )
+            {
+                setValue( object, null );
+            }
+            public Object newInstance( Object parent ) {
+                return new CacheTypeMapping();
+            }
+        } );
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        desc.setMultivalued(false);
+        elements[2] = desc;
+        
+        //-- validation code for: _cacheTypeMapping
+        fieldValidator = new FieldValidator();
+        desc.setValidator(fieldValidator);
         
         //-- _fieldMappingList
         desc = new XMLFieldDescriptorImpl(FieldMapping.class, "_fieldMappingList", "field", NodeType.Element);
@@ -356,7 +393,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         } );
         desc.setHandler(handler);
         desc.setMultivalued(true);
-        elements[2] = desc;
+        elements[3] = desc;
         
         //-- validation code for: _fieldMappingList
         fieldValidator = new FieldValidator();
@@ -400,7 +437,7 @@ public class ClassMappingDescriptor implements org.exolab.castor.xml.XMLClassDes
         } );
         desc.setHandler(handler);
         desc.setMultivalued(true);
-        elements[3] = desc;
+        elements[4] = desc;
         
         //-- validation code for: _containerList
         fieldValidator = new FieldValidator();
