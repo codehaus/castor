@@ -44,6 +44,7 @@
 
 package org.exolab.castor.builder.types;
 
+import org.exolab.castor.xml.schema.SimpleType;
 import org.exolab.javasource.*;
 
 /**
@@ -51,13 +52,13 @@ import org.exolab.javasource.*;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
 **/
-public class XSDate extends XSType {
+public final class XSDate extends XSType {
 
     /**
      * The JType represented by this XSType
     **/
     private static final JType jType
-        = new JClass("org.exolab.castor.types.Date");
+        = new JClass("org.exolab.castor.types.DateType");
         //("java.sql.Date");
 
     private String value = null;
@@ -75,6 +76,7 @@ public class XSDate extends XSType {
         return "new "+getJType().getName()+"(0);";
     } //-- newInstanceCode*/
 
+    public void setFacets(SimpleType simpleType) {}
     /**
      * Returns the JType that this XSType represents
      * @return the JType that this XSType represents
