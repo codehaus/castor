@@ -808,7 +808,7 @@ public abstract class MappingLoader
 
                 if ( fieldType == null )
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
+                else if ( ! Types.typeFromPrimitive( method.getReturnType() ).isAssignableFrom( Types.typeFromPrimitive( fieldType ) ) )
                     throw new MappingException( "mapping.accessorReturnTypeMismatch",
                                                 method, fieldType.getName() );
             } else {

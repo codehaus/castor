@@ -81,6 +81,37 @@ public final class J2CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlers.Info[] _colHandlers = new CollectionHandlers.Info[] {
+        new CollectionHandlers.Info( "arraylist", ArrayList.class, false, new CollectionHandler() {
+            public Object add( Object collection, Object object ) {
+                if ( collection == null ) {
+                    collection = new ArrayList();
+                    ( (Collection) collection ).add( object );
+                    return collection;
+                } else {
+                    ( (Collection) collection ).add( object );
+                    return null;
+                }
+            }
+            public Enumeration elements( Object collection ) {
+                if ( collection == null )
+                    return new CollectionHandlers.EmptyEnumerator();
+                return new IteratorEnumerator( ( (Collection) collection ).iterator() );
+            }
+            public int size( Object collection )
+            {
+                if ( collection == null )
+                    return 0;
+                return ( (Collection) collection ).size();
+            }
+            public Object clear( Object collection ) {
+                if ( collection != null )
+                    ( (Collection) collection ).clear();
+                return null;
+            }
+            public String toString() {
+                return "ArrayList";
+            }
+        } ),
         // For Collection/ArrayList (1.2)
         new CollectionHandlers.Info( "collection", Collection.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
