@@ -585,6 +585,13 @@ public interface Database
      * ClassLoader's instance has been explicitely set.
      */
     public ClassLoader getClassLoader ();
-    
+
+    /**
+     * Get's the CacheManager instance.
+     * Call getCacheManager for every Database-instances.
+     * @return the CacheManager-instance.
+     */
+    public CacheManager getCacheManager();
+
 }
 
