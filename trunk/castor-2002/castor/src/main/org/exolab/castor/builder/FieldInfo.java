@@ -261,7 +261,16 @@ public class FieldInfo extends XMLInfo {
             jsc.add("return this._has");
             jsc.append(getName());
             jsc.append(";");
+			
+			//-- create nullMethod
+            method = new JMethod(null, "null"+mname);
+            jClass.addMethod(method);
+            jsc = method.getSourceCode();
+            jsc.add("this._has");
+            jsc.append(getName());
+            jsc.append("= false;");			
         }
+		
         
         
     } //-- createAccessMethods
