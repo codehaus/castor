@@ -1475,6 +1475,20 @@ public class SourceFactory {
 
         Enumeration enumeration = contentModel.enumerate();
 
+        //-- handle choice item
+        if (state.classInfo.isChoice() && 
+            (state.fieldInfoForChoice == null)) 
+        {
+            state.fieldInfoForChoice 
+                = memberFactory.createFieldInfoForChoiceValue();
+            state.fieldInfoForChoice.setTransient(false);
+            handleField(state.fieldInfoForChoice, state);
+            //-- set transient to true so that the 
+            //-- descriptor source generator won't create
+            //-- a field descriptor
+            state.fieldInfoForChoice.setTransient(true);
+        }
+        
         FieldInfo fieldInfo = null;
         XMLBindingComponent component = new XMLBindingComponent(_config);
         if (_binding != null) component.setBinding(_binding);
@@ -1495,7 +1509,6 @@ public class SourceFactory {
                     if (contentModel.getMinOccurs() == 0) { 
                         fieldInfo.setRequired(false); 
                     }
-                    
                     handleField(fieldInfo, state);
                     break;
 
@@ -2027,6 +2040,12 @@ public class SourceFactory {
             }
         }
 
+        if (state.fieldInfoForChoice != null) {
+            if (fieldInfo != state.fieldInfoForChoice) {
+                fieldInfo.setReference(state.fieldInfoForChoice.getName());
+            }
+        }
+        
         state.classInfo.addFieldInfo(fieldInfo);
         present = present && !fieldInfo.isMultivalued();
         //create the relevant Java fields only if the field
