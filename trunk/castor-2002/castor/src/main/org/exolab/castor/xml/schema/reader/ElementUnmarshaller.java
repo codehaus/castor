@@ -53,7 +53,7 @@ import org.xml.sax.*;
 /**
  * A class for Unmarshalling element definitions
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
- * @version $Revision$ $Date$ 
+ * @version $Revision$ $Date$
 **/
 public class ElementUnmarshaller extends SaxUnmarshaller {
 
@@ -70,27 +70,27 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
      * The current SaxUnmarshaller
     **/
     private SaxUnmarshaller unmarshaller;
-    
+
     /**
      * The current branch depth
     **/
     private int depth = 0;
-    
+
     /**
      * The element reference for the element definition we are "unmarshalling".
     **/
     private ElementDecl _element = null;
-    
-    
+
+
     private CharacterUnmarshaller charUnmarshaller = null;
-    
+
     private Schema _schema = null;
-    
+
     private boolean foundAnnotation         = false;
     private boolean foundIdentityConstraint = false;
     private boolean foundSimpleType         = false;
     private boolean foundComplexType        = false;
-    
+
       //----------------/
      //- Constructors -/
     //----------------/
@@ -102,34 +102,48 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
      * @param resolver the resolver being used for reference resolving
     **/
     public ElementUnmarshaller
-        (Schema schema, AttributeList atts, Resolver resolver) 
+        (Schema schema, AttributeList atts, Resolver resolver)
     {
         super();
         setResolver(resolver);
-        
+
         this._schema = schema;
-        
+
         _element = new ElementDecl(schema);
-        
+
         String attValue = null;
-        
+
         //-- @ref
         attValue = atts.getValue("ref");
         if (attValue != null) {
             _element.setReference(attValue);
         }
-            
-            
+
+
         //-- @name
         _element.setName(atts.getValue("name"));
-            
+
         //-- @default
-        _element.setDefaultValue(atts.getValue(SchemaNames.DEFAULT_ATTR));
-        
+        String temp = atts.getValue(SchemaNames.DEFAULT_ATTR);
+        if (temp != null) {
+            if (_element.getFixedValue() != null)
+                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
+            _element.setFixedValue(temp);
+        }
+
+        //@fixed
+        temp = atts.getValue(SchemaNames.FIXED_ATTR);
+        if (temp != null) {
+            if (_element.getDefaultValue() != null)
+                throw new IllegalArgumentException("'default' and 'fixed' must not both be present.");
+            _element.setDefaultValue(temp);
+        }
+
+        temp = null;
         //-- @type
         attValue = atts.getValue("type");
         if (attValue != null) _element.setTypeReference(attValue);
-          
+
         //-- @nullable
         attValue = atts.getValue(SchemaNames.NULLABLE_ATTR);
         if (attValue != null) {
@@ -140,7 +154,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
                 throw new IllegalArgumentException(err);
             }
         }
-        
+
         /*
          * @minOccurs
          * if minOccurs is present the value is the int value of
@@ -152,11 +166,11 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             minOccurs = toInt(attValue);
             _element.setMinOccurs(minOccurs);
         }
-        
+
         /*
          * @maxOccurs
          * If maxOccurs is present, the value is either unbounded
-         * or the int value of the attribute, otherwise maxOccurs 
+         * or the int value of the attribute, otherwise maxOccurs
          * equals the minOccurs value.
          */
         attValue = atts.getValue(SchemaNames.MAX_OCCURS_ATTR);
@@ -169,10 +183,10 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             _element.setMaxOccurs(minOccurs);
         else
             _element.setMaxOccurs(1);
-		
+
         //-- @block
         _element.setBlock(atts.getValue(SchemaNames.BLOCK_ATTR));
-        
+
         charUnmarshaller = new CharacterUnmarshaller();
     } //-- ElementUnmarshaller
 
@@ -191,7 +205,7 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     } //-- elementName
 
     /**
-     * 
+     *
     **/
     public ElementDecl getElement() {
         return _element;
@@ -204,66 +218,66 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
     public Object getObject() {
         return _element;
     } //-- getObject
-    
+
     /**
-     * @param name 
-     * @param atts 
+     * @param name
+     * @param atts
      * @see org.xml.sax.DocumentHandler
     **/
-    public void startElement(String name, AttributeList atts) 
+    public void startElement(String name, AttributeList atts)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if (unmarshaller != null) {
             unmarshaller.startElement(name, atts);
             ++depth;
             return;
         }
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             if (foundSimpleType || foundIdentityConstraint ||foundComplexType)
                 error("An annotation may only appear as the first child "+
                     "of an element definition.");
-            
-            
+
+
             if (foundAnnotation)
                 error("Only one (1) 'annotation' is allowed as a child of "+
                     "element definitions.");
-                    
+
             foundAnnotation = true;
             unmarshaller = new AnnotationUnmarshaller(atts);
         }
         else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
-            
-            if (foundComplexType) 
+
+            if (foundComplexType)
                 error("Only one (1) 'complexType' may appear in an "+
                     "element definition.");
             if (foundSimpleType)
                 error("Both 'simpleType' and 'complexType' cannot appear "+
                     "in the same element definition.");
-            
-            if (foundIdentityConstraint) 
+
+            if (foundIdentityConstraint)
                 error("A 'complexType' must appear before 'key', "+
                     "'keyref' and 'unique' elements.");
-                    
+
             foundComplexType = true;
-            unmarshaller 
+            unmarshaller
                 = new ComplexTypeUnmarshaller(_schema, atts, getResolver());
         }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            
-            if (foundSimpleType) 
+
+            if (foundSimpleType)
                 error("Only one (1) 'simpleType' may appear in an "+
                     "element definition.");
             if (foundComplexType)
                 error("Both 'simpleType' and 'complexType' cannot appear "+
                     "in the same element definition.");
-            
-            if (foundIdentityConstraint) 
+
+            if (foundIdentityConstraint)
                 error("A 'simpleType' must appear before 'key', "+
                     "'keyref' and 'unique' elements.");
-                    
+
             foundSimpleType = true;
             unmarshaller = new SimpleTypeUnmarshaller(_schema, atts);
         }
@@ -280,27 +294,27 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
             error("Identity constraints are not yet supported");
         }
         else illegalElement(name);
-        
+
         unmarshaller.setResolver(getResolver());
         unmarshaller.setDocumentLocator(getDocumentLocator());
-        
+
     } //-- startElement
 
     /**
-     * 
-     * @param name 
+     *
+     * @param name
     **/
-    public void endElement(String name) 
+    public void endElement(String name)
         throws org.xml.sax.SAXException
     {
-        
+
         //-- Do delagation if necessary
         if ((unmarshaller != null) && (depth > 0)) {
             unmarshaller.endElement(name);
             --depth;
             return;
         }
-        
+
         //-- check for name mismatches
         if ((unmarshaller != null) && (charUnmarshaller != unmarshaller)) {
             if (!name.equals(unmarshaller.elementName())) {
@@ -309,33 +323,33 @@ public class ElementUnmarshaller extends SaxUnmarshaller {
                 throw new SAXException(err);
             }
         }
-        
+
         //-- call finish for any necessary cleanup
         unmarshaller.finish();
-        
+
         if (SchemaNames.ANNOTATION.equals(name)) {
             Annotation ann = (Annotation)unmarshaller.getObject();
             _element.addAnnotation(ann);
         }
         else if (SchemaNames.COMPLEX_TYPE.equals(name)) {
-            
-            XMLType xmlType 
+
+            XMLType xmlType
                 = ((ComplexTypeUnmarshaller)unmarshaller).getComplexType();
-                
+
             _element.setType(xmlType);
-            
-        } 
+
+        }
         else if (SchemaNames.SIMPLE_TYPE.equals(name)) {
-            XMLType xmlType 
+            XMLType xmlType
                 = ((SimpleTypeUnmarshaller)unmarshaller).getSimpleType();
             _element.setType(xmlType);
         }
-        
+
         unmarshaller = null;
-    
+
     } //-- endElement
-    
-    public void characters(char[] ch, int start, int length) 
+
+    public void characters(char[] ch, int start, int length)
         throws SAXException
     {
         //-- Do delagation if necessary
