@@ -97,6 +97,9 @@ public class IncludeUnmarshaller extends ComponentReader
         if (schema.includeProcessed(include)) {
             return;
         }
+        else if (include.equals(schema.getSchemaLocation())) {
+            return;
+        }
         
         //-- keep track of the schemaLocation
         schema.addInclude(include);
