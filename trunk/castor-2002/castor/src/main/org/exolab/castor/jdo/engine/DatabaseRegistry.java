@@ -199,7 +199,7 @@ public class DatabaseRegistry
     }
 
 
-    static DatabaseRegistry registerDatabase( String name, String engine, PrintWriter logWriter )
+    static synchronized DatabaseRegistry registerDatabase( String name, String engine, PrintWriter logWriter )
         throws MappingException
     {
         DatabaseRegistry   dbs;
@@ -244,8 +244,8 @@ public class DatabaseRegistry
     }
 
 
-    public static void loadDatabase( InputSource source, EntityResolver resolver,
-                                     PrintWriter logWriter, ClassLoader loader )
+    public static synchronized void loadDatabase( InputSource source, EntityResolver resolver,
+                                                  PrintWriter logWriter, ClassLoader loader )
         throws MappingException
     {
         Unmarshaller       unm;
@@ -257,6 +257,9 @@ public class DatabaseRegistry
 
         unm = new Unmarshaller( Database.class );
         try {
+            // Load the JDO database configuration file from the specified
+            // input source. If the database was already configured, ignore
+            // this file (allowing multiple loadings).
             if ( resolver == null )
                 unm.setEntityResolver( new DTDResolver() );
             else
@@ -264,7 +267,20 @@ public class DatabaseRegistry
             if ( logWriter != null )
                 unm.setLogWriter( logWriter );
             database = (Database) unm.unmarshal( source );
+            if ( _databases.get( database.getName() ) != null )
+                return;
 
+            // Complain if no database engine was specified, otherwise get
+            // a persistence factory for that database engine.
+            if ( database.getEngine() == null || database.getEngine().getName() == null )
+                throw new MappingException( "jdo.missingEngine", database.getName() );
+            factory = PersistenceFactoryRegistry.getPersistenceFactory( database.getEngine().getName() );
+            if ( factory == null )
+                throw new MappingException( "jdo.noSuchEngine", database.getEngine().getName() );
+
+            // Load the mapping file from the URL specified in the database
+            // configuration file, relative to the configuration file.
+            // Fail if cannot load the mapping for whatever reason.
             mapping = new JDOMappingLoader( loader );
             if ( resolver != null )
                 mapping.setEntityResolver( resolver );
@@ -277,13 +293,9 @@ public class DatabaseRegistry
                 mapping.loadMapping( mappings[ i ].getHref() );
             }
 
-            if ( database.getEngine() == null || database.getEngine().getName() == null )
-                throw new MappingException( "jdo.missingEngine", database.getName() );
-            factory = PersistenceFactoryRegistry.getPersistenceFactory( database.getEngine().getName() );
-            if ( factory == null )
-                throw new MappingException( "jdo.noSuchEngine", database.getEngine().getName() );
-
             if ( database.getDriver() != null ) {
+                // JDO configuration file specifies a driver, use the driver
+                // properties to create a new registry object.
                 Properties  props;
                 Enumeration params;
                 Param       param;
@@ -307,6 +319,9 @@ public class DatabaseRegistry
                 dbs = new DatabaseRegistry( database.getName(), mapping, factory,
                                             database.getDriver().getUrl(), props, logWriter );
             } else if ( database.getDataSource() != null ) {
+                // JDO configuration file specifies a DataSource object, use the
+                // DataSource which was configured from the JDO configuration file
+                // to create a new registry object.
                 DataSource ds;
 
                 ds = (DataSource) database.getDataSource().getParams();
@@ -315,6 +330,8 @@ public class DatabaseRegistry
                 dbs = new DatabaseRegistry( database.getName(), mapping, factory,
                                             ds, logWriter );
             } else if ( database.getJndi() != null ) {
+                // JDO configuration file specifies a DataSource lookup through JNDI,
+                // locate the DataSource object frome the JNDI namespace and use it.
                 Object    ds;
 
                 try {
@@ -333,6 +350,7 @@ public class DatabaseRegistry
                 throw new MappingException( "jdo.missingDataSource", database.getName() );
             }
 
+            // Register the new registry object for the given database name.
             _databases.put( dbs.getName(), dbs );
 
         } catch ( MappingException except ) {
@@ -390,7 +408,6 @@ public class DatabaseRegistry
 
 
     public static synchronized DatabaseRegistry getDatabaseRegistry( String name )
-        throws MappingException
     {
         DatabaseRegistry dbs;
 
