@@ -125,9 +125,9 @@ public final class SapDbQueryExpression
         if ( _order != null )
           sql.append(JDBCSyntax.OrderBy).append(_order);
  
-        // Use WITH LOCK EXCLUSIVE to lock selected tables.
+        // Use WITH LOCK to lock selected tables.
         if ( lock && _select == null ) {
-            sql.append( " WITH LOCK EXCLUSIVE" );
+            sql.append( " WITH LOCK" );
         }
         return sql.toString();
     }
