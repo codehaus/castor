@@ -109,13 +109,12 @@ public interface Persistence {
      * by this method.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param entity The entity to create
      * @throws DuplicateIdentityException An object with the same
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void create( Key key, Object conn, Entity entity )
+    public void create( Key key, Entity entity )
         throws DuplicateIdentityException, PersistenceException;
 
 
@@ -129,14 +128,13 @@ public interface Persistence {
      * locked in persistence storage to prevent concurrent updates.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param entity The entity to load into
      * @param accessMode The access mode (null equals shared)
      * @throws ObjectNotFoundException The object was not found in
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
+    public void load( Key key, Entity entity, AccessMode accessMode )
         throws ObjectNotFoundException, PersistenceException;
 
 
@@ -146,12 +144,11 @@ public interface Persistence {
      * field; the supplied values is the value the foreign key.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param related The relation of the specified entity
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public void loadRelated( Key key, Object conn, Relation related, AccessMode accessMode )
+    public void loadRelated( Key key, Relation related, AccessMode accessMode )
         throws PersistenceException;
 
     /**
@@ -173,7 +170,6 @@ public interface Persistence {
      * retrieved with an exclusive lock.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param entity The entity to store
      * @param original The original entity, or null
      * @throws ObjectModifiedException The object has been modified
@@ -182,7 +178,7 @@ public interface Persistence {
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void store( Key key, Object conn, Entity entity, Entity orginal )
+    public void store( Key key, Entity entity, Entity orginal )
         throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
 
 
@@ -194,11 +190,10 @@ public interface Persistence {
      * completed.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param original The entity to delete (the original value).
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Key key, Object conn, Entity original )
+    public void delete( Key key, Entity original )
         throws PersistenceException;
 
 
@@ -212,13 +207,12 @@ public interface Persistence {
      * reload the object.
      *
      * @param key The transaction context
-     * @param conn An open connection
      * @param entity The entity to lock
      * @throws ObjectDeletedException Indicates the object has been
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Key key, Object conn, Entity entity )
+    public void writeLock( Key key, Entity entity )
         throws ObjectDeletedException, PersistenceException;
 
 
