@@ -55,15 +55,16 @@ import org.exolab.castor.xml.*;
  * @version $Revision$ $Date$
 **/
 public class NameValidator extends StringValidator {
-    
-    
+
+
     public static final short NCNAME  = 0;
     public static final short NMTOKEN = 1;
-    
+    public static final short CDATA = 2;
+
     private short type = NCNAME;
-    
+
     private boolean required = false;
-    
+
     /**
      * Creates a new NameValidator with the default validation
      * set to NCName
@@ -80,52 +81,59 @@ public class NameValidator extends StringValidator {
         super();
         this.type = type;
     } //-- NMTokenValidator
-    
-    /** 
+
+    /**
      * Sets whether or not a String is required (non null)
      * @param required the flag indicating whether Strings are required
     **/
     public void setRequired(boolean required) {
         this.required = required;
     } //-- setRequired
-    
-    public void validate(String value) 
-        throws ValidationException 
+
+    public void validate(String value)
+        throws ValidationException
     {
         super.validate(value);
-        
+
         switch (type) {
-            
+
+            case CDATA:
+                if (!ValidationUtils.isCDATA(value)) {
+                    String err = "\"";
+                    err += value + "\" is not a valid CDATA.";
+                    throw new ValidationException(err);
+                }
+
             case NMTOKEN:
                 if (!ValidationUtils.isNMToken(value)) {
                     String err = "\"";
-                    err += value + "\" is not a valid NMToken."; 
+                    err += value + "\" is not a valid NMToken.";
                     throw new ValidationException(err);
                 }
             case NCNAME:
-            default: 
+            default:
                 if (!ValidationUtils.isNCName(value)) {
                     String err = "\"";
-                    err += value + "\" is not a valid NCName."; 
+                    err += value + "\" is not a valid NCName.";
                     throw new ValidationException(err);
                 }
                 break;
         }
-        
+
     } //-- validate
-    
+
     /**
      * Validates the given Object
      * @param object the Object to validate
     **/
     public void validate(Object object)
-        throws ValidationException 
+        throws ValidationException
     {
-        if (object != null) 
+        if (object != null)
             validate(object.toString());
-        else 
+        else
             validate(null);
-        
+
     } //-- validate
-    
+
 } //-- NameValidator
