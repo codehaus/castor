@@ -738,9 +738,9 @@ public class Schema extends Annotated {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
                 String warning = "Warning : do not forget to generate the source ";
-                warning += "for the schema with this targetNamespace"+schema.getTargetNamespace();
+                warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
                 System.out.println(warning);
-               return schema.getElementDecl(name);
+                return schema.getElementDecl(name);
             }
         }
 
@@ -788,9 +788,9 @@ public class Schema extends Annotated {
             Schema schema = getImportedSchema(ns);
             if (schema!=null) {
                 String warning = "Warning : do not forget to generate the source ";
-                warning += "for the schema with this targetNamespace"+schema.getTargetNamespace();
+                warning += "for the schema with this targetNamespace: "+schema.getTargetNamespace();
                 System.out.println(warning);
-               return schema.getModelGroup(name);
+                return schema.getModelGroup(name);
             }
         }
 
