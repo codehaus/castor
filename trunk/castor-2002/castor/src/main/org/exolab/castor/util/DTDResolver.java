@@ -203,6 +203,12 @@ public class DTDResolver
     }
 
 
+    public URL getBaseURL( )
+    {
+        return _baseUrl;
+    }
+
+
     public InputSource resolveEntity( String publicId, String systemId )
         throws IOException, SAXException
     {
