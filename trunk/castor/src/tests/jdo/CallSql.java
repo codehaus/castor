@@ -129,7 +129,7 @@ public class CallSql extends CastorTestCase
         try {
           stream.println( "CALL SQL query" );
           _db.begin();
-          oql = _db.getOQLQuery( "CALL SQL SELECT ID,VALUE1,VALUE2 FROM TEST_TABLE WHERE ID = $1 AS jdo.TestObject" );
+          oql = _db.getOQLQuery( "CALL SQL SELECT ID,VALUE1,VALUE2 FROM TEST_TABLE WHERE (ID = $1) AS jdo.TestObject" );
           oql.bind( 50 );
           enum = oql.execute();
           if (enum.hasMore()) {

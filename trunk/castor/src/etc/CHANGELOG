@@ -2,6 +2,9 @@
 Version (CVS) 
 -------------
 
+JDO:    Fixed Bug 1261 and 1253 : In case of CALL SQL binding param inside parens results adds extra paren
+        (Mickael - 20030415)
+
 JDO:    Fixed bug 1290: Possible bug in object value rollback of primitive types. 
         (Bruce 20030413)
 
