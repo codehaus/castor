@@ -48,7 +48,6 @@ package org.exolab.castor.persist.resolvers;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.OID;
-import org.exolab.castor.persist.Resolver;
 import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
@@ -107,8 +106,16 @@ public class RelationResolver extends Resolver {
             ObjectDeletedException, LockNotGrantedException, PersistenceException {
     }
 
+    public void preCreate( TransactionContext tx, OID id, Object objectToBeCreated )
+            throws DuplicateIdentityException, PersistenceException {
+    }
+
     public void create( TransactionContext tx, OID id, Object objectToBeCreated )
             throws DuplicateIdentityException, PersistenceException {
+    }
+
+    public void postCreate( TransactionContext tx, OID id, Object objectToBeCreated )
+            throws PersistenceException {
     }
 
     public void update( TransactionContext tx, OID id, 

@@ -70,6 +70,9 @@ public abstract class ResolvingStrategy {
             Object objectToBeLoaded, Entity entityFromDataStore, 
             AccessMode mode, int timeout );
 
+    public abstract void preCreate( TransactionContext tx, OID id, 
+            Object objectToBeCreated );
+
     public abstract void create( TransactionContext tx, OID id, 
             Object objectToBeCreated, Entity entityToBeCreated );
 
