@@ -70,8 +70,6 @@ package org.exolab.castor.jdo.drivers;
 
 import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.Statement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Properties;
@@ -98,12 +96,12 @@ public final class UUIDKeyGenerator implements KeyGenerator
 
     private final  PersistenceFactory _factory;
 
-		private        DecimalFormat      _df            = new DecimalFormat();
+    private        DecimalFormat      _df            = new DecimalFormat();
 
     private        String             _sHost         = null;
 
     private static long               _staticCounter = 0;
-    
+
     /**
      * Initialize the UUID key generator.
      */
@@ -134,7 +132,7 @@ public final class UUIDKeyGenerator implements KeyGenerator
     {
         String sUUID = null;
 
-        try 
+        try
         {
           // getting IP (fixed length: 12 character)
           if(_sHost == null)
@@ -160,15 +158,15 @@ public final class UUIDKeyGenerator implements KeyGenerator
 
           _staticCounter++;
           _df.applyPattern("00000");
-          sUUID += _df.format(_staticCounter); 
-        } 
-        catch ( Exception ex ) 
+          sUUID += _df.format(_staticCounter);
+        }
+        catch ( Exception ex )
         {
           throw new PersistenceException( Messages.format(
                     "persist.keyGenSQL", ex.toString() ), ex );
-        } 
+        }
 
-        if (sUUID == null) 
+        if (sUUID == null)
         {
           throw new PersistenceException( Messages.format(
                     "persist.keyGenOverflow", getClass().getName() ) );
@@ -179,7 +177,7 @@ public final class UUIDKeyGenerator implements KeyGenerator
 
 
     /**
-     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ? 
+     * Style of key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT ?
      */
     public final byte getStyle() {
         return BEFORE_INSERT;

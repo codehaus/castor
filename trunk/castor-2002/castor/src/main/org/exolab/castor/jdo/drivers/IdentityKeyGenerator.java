@@ -50,7 +50,7 @@ package org.exolab.castor.jdo.drivers;
 import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
-import java.sql.Statement;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -111,7 +111,7 @@ public final class IdentityKeyGenerator implements KeyGenerator
             Properties props )
             throws PersistenceException
     {
-        Statement stmt = null;
+        PreparedStatement stmt = null;
         ResultSet rs;
 
         try {
@@ -123,11 +123,11 @@ public final class IdentityKeyGenerator implements KeyGenerator
                 cstmt.execute();
                 rs = cstmt.getResultSet();
             } else if ( _fName.equals("mysql") ) {
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery( "SELECT LAST_INSERT_ID()");
+                stmt = conn.prepareStatement("SELECT LAST_INSERT_ID()");
+                rs = stmt.executeQuery();
             } else {
-                stmt = conn.createStatement();
-                rs = stmt.executeQuery( "SELECT @@identity");
+                stmt = conn.prepareStatement("SELECT @@identity");
+                rs = stmt.executeQuery();
             }
             if ( rs.next() ) {
                 int value;
