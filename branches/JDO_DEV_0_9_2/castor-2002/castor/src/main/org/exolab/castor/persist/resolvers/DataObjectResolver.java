@@ -44,13 +44,15 @@
  */
 package org.exolab.castor.persist.resolvers;
 
-
+import java.util.Iterator;
+import java.util.SortedMap;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.persist.OID;
 import org.exolab.castor.persist.AccessMode;
 import org.exolab.castor.persist.Resolver;
 import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.DataObjectAccessException;
 import org.exolab.castor.jdo.ClassNotPersistenceCapableException;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectDeletedException;
@@ -59,17 +61,78 @@ import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
 
-
+/**
+ * A DataObjectResolver
+ *
+ * @author <a href="yip@intalio.com">Thomas Yip</a>
+ */
 public class DataObjectResolver extends Resolver {
 
+    // Implementation note: 
+    // There is 5 phases of a data object
+    // 1/ it is either queried/created/updated.
+    // 2/ it is markDeleted/locked/softLocked
+    // 3/ it is preStored/preDeleted
+    // 4/ it is stored, if modified /deleted if marked for deletion 
+    // 5a/ it is revert if transaction failed
+    // 5b/ it is released/forgotten
+    // EBNF grammer for the sequence of actions of an data object 
+    // is as of the following:
+    //   BEGIN         := ( Create() | Load() | Update() )  ( FAILED | UPGRADE )
+    //   FAILED        := releaseLock() DONE 
+    //   UPGRADE       := ( [ softLock() | lock() ]*  FAILEDUPGRADE ) PERSISTENCE
+    //   FAILEDUPGRADE := PERSISTENCE
+    //   PERSISTENCE   := ( markDelete() ( FAILEDUPGRADE | COMMIT ) ) | PREPARE
+    //   PREPARE       := ( ( preStore() markDelete() ) | preStore() | markDelete() ) COMMIT
+    //   COMMIT        := [ delete() | store() ] POSTCOMMIT
+    //   POSTCOMMIT    := [ revert() ]  DONE
+    //   DONE          := *END*
+
+
+    /**
+     * The root of the EntityInfo tree that this DataObjectResolver 
+     * reponsible for.
+     */
+    protected EntityInfo     info;
+
+    /**
+     * The collection contains all ResolvingStrategy for the EntityInfo tree
+     * that this DataObjectResolver reponsible for
+     */
+    protected Collection     strategies;
+
+    /**
+     * The LockEngine that the entity of this type belongs to.
+     */
+    protected LockEngine     lockEngine;
+
+    /**
+     * The declared mode for this type
+     */
+    protected AccessMode     declaredMode;
+
+    /**
+     * The map of entityClass and data object class
+     * Keyed by entityInfo and valued by java.lang.Class
+     */
+    protected SortedMap      classMap;
+
+    /**
+     * Constructor
+     */
     public DataObjectResolver() {
     }
 
-    public Object load( TransactionContext tx, OID id, AccessMode mode, int timeout )
+    /* 
+     * Load an Object with the specified identity
+     *
+     * @param tx The TransactionContext in action
+     * @param oid The identity of the object. This should has a valid oid.identity.
+     * @param timeout The timeout value of the attempt
+     * @returns The loaded object
+     */
+    public Object load( TransactionContext tx, OID oid, AccessMode mode, int timeout )
             throws ObjectNotFoundException, PersistenceException {
-        return null;
-    }
-        // check oid
 
         // load the array of fields from LockEngine
 
@@ -86,63 +149,257 @@ public class DataObjectResolver extends Resolver {
         // get the right set of accessors, depend on the actual
         // initstated object
 
-        // iterate thur all avaliable strategies
+        // iterate thru all available strategies
 
-    public void preStore( TransactionContext tx, OID id, 
-            Object objectToBeTestForModification, int timeout )
-            throws LockNotGrantedException, PersistenceException {
+        Entity entity        = new Entity( entityInfo, oid.getIdentity() );
 
-        // check oid
+        LockEngine le        = getLockEngine( tx, oid );
 
-        // load the locked fields from LockEngine
+        AccessMode effective = declaredMode.getEffectiveMode( mode )
 
-        // get accessors
+        lockEngine.load( tx.getKey(), entity, effectiveMode, timeout );
 
-        // iterate thur all avaliable strategies
+        Object newInstance   = getNewInstance( tx, oid, entity );
+
+        // must add to transaction first to to prevent circular references.
+        tx.addObject( oid, newInstance );
+
+        // set the identities into the target object
+        setIdentity( tx, object, oid.getIdentity() );
+
+        // set the timeStamp of the data object to locker's timestamp
+        if ( object instanceof TimeStampable ) {
+            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        }
+
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.load( tx, newInstance, entity, mode, timeout );
+        }
+        return newInstance;
     }
 
-    public void store( TransactionContext tx, OID id, Object objectToBeStored )
-            throws DuplicateIdentityException, ObjectModifiedException, 
-            ObjectDeletedException, LockNotGrantedException, PersistenceException {
-    }
-
-    public void create( TransactionContext tx, OID id, Object objectToBeCreated )
+    public void create( TransactionContext tx, OID oid, Object objectToBeCreated )
             throws DuplicateIdentityException, PersistenceException {
+
+        Entity entity = new Entity();
+
+        // must add to transaction first to to prevent circular references.
+        tx.addObject( oid, objectToBeCreated );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.create( tx, objectToBeCreated, entity );
+        }
+
+        LockEngine le        = getLockEngine( tx, oid );
+
+        le.create( tx.getKey(), entity );
+
+        // iterate thru all avaliable strategies
+        itor = strategies.iterator();
+        while ( stra.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.postCreate( tx, objectToBeCreated, entity );
+        }
     }
 
-    public void update( TransactionContext tx, OID id, 
-            Object objectLoadedOutsideOfThisTransactionToBeUpdated, int timeout )
+    public void update( TransactionContext tx, OID oid, 
+            Object objectToBeUpdated, int timeout )
             throws DuplicateIdentityException, LockNotGrantedException, 
             PersistenceException {
+
+        Entity entity = new Entity();
+
+        // must add to transaction first to to prevent circular references.
+        tx.addObject( oid, objectToBeUpdated );
+
+        LockEngine le        = getLockEngine( tx, oid );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.update( tx, objectToBeUpdated, entity );
+        }
+
+        le.update( tx.getKey(), entity );
     }
 
-    public void markDelete( TransactionContext tx, OID id, Object objectToBeDeleted,
+    public void writeLock( TransactionContext tx, OID oid, Object objectToBeLocked,
+            int timeout )
+            throws PersistenceException {
+
+        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+            throw new PersistenceException(
+                      Message.message("persist.changedIdentity",
+                      oid.getJavaClass().getName(),oid.getIdentity()) );
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().lock( tx.getKey(), entity );
+    }
+
+    public void softLock( TransactionContext tx, OID oid, Object objectToBeLocked,
+            int timeout )
+            throws LockNotGrantedException {
+
+        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+            throw new PersistenceException(
+                      Message.message("persist.changedIdentity",
+                      oid.getJavaClass().getName(),oid.getIdentity()) );
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().softLock( tx.getKey(), entity );
+    }
+
+    public void markDelete( TransactionContext tx, OID oid, Object objectToBeDeleted,
             int timeout ) 
             throws ObjectNotFoundException, LockNotGrantedException, 
             PersistenceException {
+
+        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+            throw new PersistenceException(
+                      Message.message("persist.changedIdentity",
+                      oid.getJavaClass().getName(),oid.getIdentity()) );
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().reload( tx.getKey(), entity );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.markDelete( tx, objectToBeDeleted, entity );
+        }
     }
 
-    public void delete( TransactionContext tx, OID id, Object objectToBeDeleted )
+    public void preStore( TransactionContext tx, OID oid, 
+            Object objectToBeTestForModification, int timeout )
+            throws LockNotGrantedException, PersistenceException {
+
+        if ( !oid.getIdentity().equals( getIdentity( tx, object ) ) )
+            throw new PersistenceException(
+                      Message.message("persist.changedIdentity",
+                      oid.getJavaClass().getName(),oid.getIdentity()) );
+
+        // load the locked fields from LockEngine
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().reload( tx.getKey(), entity );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.preStore( tx, objectToBeTestForModification, entity );
+        }
+    }
+
+
+    public void delete( TransactionContext tx, OID oid, Object objectToBeDeleted )
             throws PersistenceException {
+
+        Entity entity = new Entity( entitiyInfo, oid.getIdentity() );
+        oid.getLockEngine().delete( tx.getKey(), entity );
     }
 
-    public void writeLock( TransactionContext tx, OID id, Object objectToBeLocked,
-            int timeout )
-            throws PersistenceException {
+    public void store( TransactionContext tx, OID oid, Object objectToBeStored )
+            throws DuplicateIdentityException, ObjectModifiedException, 
+            ObjectDeletedException, LockNotGrantedException, PersistenceException {
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().reload( tx.getKey(), entity );
+
+        // iterate thru all avaliable strategies
+        Iterator itor = strategies.iterator();
+        while ( itor.hasNext() ) {
+            Strategy strategy = (Strategy) itor.next();
+            strategy.store( tx, objectToBeStored, entity );
+        }
+
+        oid.getLockEngine().store( tx.getKey(), entity );
     }
 
-    public void softLock( TransactionContext tx, OID id, Object objectToBeLocked,
-            int timeout )
-            throws LockNotGrantedException {
+    public void revertObject( TransactionContext tx, OID oid, Object objectToBeReverted ) {
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().revertLock( tx.getKey(), entity );
+
+        // iterate thru all avaliable strategies
+        Iterator stra = strategies.iterator();
+        while ( stra.hasNext() ) {
+            Strategy stra = (Strategy) stra.next();
+            stras.revertObject( tx, objectToBeReverted, entity );
+        }
     }
 
-    public void releaseLock( TransactionContext tx, OID id, Object objectToBeUnLocked ) {
+    public void releaseLock( TransactionContext tx, OID oid, Object objectToBeUnLocked ) {
+
+        Entity entity = new Entity( entityInfo, oid.getIdentity() );
+        oid.getLockEngine().releaseLock( tx.getKey(), entity );
     }
 
-    public void revertObject( TransactionContext tx, OID id, Object objectToBeReverted ) {
+    /**
+     * Return the proper lock engine for the specified object
+     * 
+     * @param oid The object identity of the lock engine
+     */
+    protected LockEngine getLockEngine( TransactionContext tx, OID oid ) {
+        // yip: in the future, we would like to add some abstraction
+        // on how to get the right lockEngine for the right type.
+        // for example, for clustering, we might store customer with
+        // id of [0,100000) in one database and everything else in
+        // the other. In such case, we uses the id to determines which
+        // LockEngine to be used.
+        
+        // for now, we simply return the only lockEngine
+        oid.setLockEngine( le );
+        return lockEngine;
     }
 
+    /**
+     * Returns a new instance of object that compatible with the oid
+     * and the entity
+     * 
+     * @param OID the object identity of the object
+     * @param Entity the entity loaded from the data store
+     */
+    protected Object getNewInstance( TransactionContext tx, OID oid, Entity entity ) {
+        Class subClass = oid.getJavaClass();
 
+        Iterator itor = classMap.keySet().iterator();
+        while (itor.hasNext()) {
+            EntityInfo info = (EntityInfo) itor.next();
+            
+            iterateEntityClasses:
+            for ( int i = 0; i <= info.length; i++ ) {
+                if ( entityClasses[i].equals( info ) ) {
+                    subClass = classMap.get( info );
+                    break iterateEntityClasses;
+                }
+            }
+        }
+
+        if ( subClass == oid.getJavaClass() ) {
+        } else if ( oid.getJavaClass().isAssignableFrom(subClass) ) {
+        } else if ( subClass.isAssignableFrom( oid.getJavaClass() ) {
+            subClass = oid.getJavaClass();
+        } else {
+            subClass = oid.getJavaClass();
+        }
+
+        try {
+            Object result = subClass.newInstance();
+            oid.setJavaClass( subClass );
+            return result;
+        } catch ( InstantiationException ie ) {
+            throw new DataObjectAccessException( 
+            Message.message("dataaccess.instantiationFailed", subClass.getName() );
+        } catch ( IllegalAccessException iae ) {
+            throw new DataObjectAccessException(
+            Message.message("dataaccess.constructorNotAccessible", subClass.getName() );
+        }
+    }
 }
-
-
