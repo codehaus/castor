@@ -619,7 +619,7 @@ public class ClassMolder {
             int maxPrior = 0;
             for ( int i = 0; i < _fhs.length; i++ ) {
                 if ( _fhs[i].isPersistanceCapable() 
-                        && _fhs[i].getFieldClassMolder != this
+                        && _fhs[i].getFieldClassMolder() != this
                         && _fhs[i].isStored()
                         && _fhs[i].getFieldClassMolder().isKeyGeneratorUsed() ) {
                     maxPrior = Math.max( maxPrior, _fhs[i].getFieldClassMolder().getPriority()+1 );
