@@ -39,10 +39,8 @@
 
     <!-- Product has reference to ProductDetail
          many details per product  -->
-<!--
     <field name="detail" type="myapp.ProductDetail" required="true"
            collection="vector"/>
--->
   </class>
 
 
@@ -64,11 +62,9 @@
     <field name="id">
       <sql-info name="id"/>
     </field>
-<!--
     <field name="product" type="myapp.Product">
       <sql-info name="prod_id"/>
     </field>
--->
     <field name="name">
       <sql-info name="name"/>
     </field>

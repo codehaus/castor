@@ -81,7 +81,6 @@ public class Test
 
         // Must be associated with an open transaction in order to
         // use the ODMG database
-
         tx = odmg.newTransaction();
         tx.begin();
         logger.println( "Begin transaction" );
@@ -136,7 +135,7 @@ public class Test
         if ( group == null ) {
             group = new ProductGroup();
             group.id = 3;
-            group.name = "new group";
+            group.name = "a group";
             logger.println( "Creating new group: " + group );
         } else {
             logger.println( "Query result: " + group );
@@ -151,9 +150,13 @@ public class Test
         if ( product == null ) {
             product = new Product();
             product.id = 4;
-            product.name = "new product";
+            product.name = "some product";
             product.price = 55;
             product.group = group;
+            product.detail = new ProductDetail();
+            product.detail.id = 1;
+            product.detail.name = "one";
+            product.detail.product = product;
             logger.println( "Creating new product: " + product );
             db.makePersistent( product );
         } else {
@@ -170,9 +173,13 @@ public class Test
             computer = new Computer();
             computer.id = 6;
             computer.cpu = "Pentium";
-            computer.name = "new product";
+            computer.name = "MyPC";
             computer.price = 300;
             computer.group = group;
+            computer.detail = new ProductDetail();
+            computer.detail.id = 4;
+            computer.detail.name = "four";
+            computer.detail.product = computer;
             logger.println( "Creating new computer: " + computer );
             db.makePersistent( computer );
         } else {
@@ -181,6 +188,7 @@ public class Test
         
         logger.println( "Commit transaction" );
         tx.commit();
+
 
         tx = odmg.newTransaction();
         tx.begin();
