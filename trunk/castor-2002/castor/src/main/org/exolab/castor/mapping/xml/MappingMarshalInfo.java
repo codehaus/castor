@@ -91,7 +91,7 @@ public class MappingMarshalInfo implements org.exolab.castor.xml.MarshalInfo {
         desc = new SimpleMarshalDescriptor(Include.class, "vIncludeList", "include");
         desc.setDescriptorType(DescriptorType.element);
         try {
-            desc.setReadMethod(Mapping.class.getMethod("getInclude", emptyClassArgs));
+            desc.setReadMethod(Mapping.class.getMethod("getIncludes", emptyClassArgs));
             classArgs[0] = Include.class;
             desc.setWriteMethod(Mapping.class.getMethod("addInclude", classArgs));
         }

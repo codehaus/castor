@@ -98,7 +98,7 @@ public class Mapping implements java.io.Serializable {
 
     /**
     **/
-    public Include[] getInclude() {
+    public Include[] getIncludes() {
         int size = vIncludeList.size();
         Include[] mArray = new Include[size];
         for (int index = 0; index < size; index++) {
@@ -129,7 +129,7 @@ public class Mapping implements java.io.Serializable {
 
     /**
     **/
-    public java.util.Enumeration enumerateInclude() {
+    public java.util.Enumeration enumerateIncludes() {
         return vIncludeList.elements();
     } //-- java.util.Enumeration enumerateInclude() 
 
