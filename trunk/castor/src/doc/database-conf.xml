@@ -106,8 +106,11 @@
       <p>For example, to configure a PostgreSQL 7.1 DataSource, use:
          <pre><![CDATA[
   <data-source class-name="org.postgresql.PostgresqlDataSource">
-    <params server-name="host" port-number="5432" database-name="db"
-           user="user" password="secret" />
+    <param name="serverName" value="host" />
+    <param name="portNumber" value="5432" />
+    <param name="databaseName" value="db" />
+    <param name="user" value="user" />
+    <param name="password=" value="secret" />
   </data-source>]]>
          </pre></p>
 
@@ -167,8 +170,10 @@
           <td valign="top">Sybase jConnect</td>
           <td valign="top"><pre><![CDATA[
   <data-source class-name="com.sybase.jdbc2.jdbc.SybDataSource">
-    <params user="user" password="secret"
-            port-number="4100" server-name="host" />
+    <param name="user" value="user" />
+    <param name="password value="secret" />
+    <param name="portNumber" value="4100" />
+    <param name="serverName" value="host" />
   </data-source>]]></pre></td>
         </tr>
 <!-- JDBC-ODBC don't work with Castor!
@@ -194,9 +199,12 @@
         <tr>
           <td valign="top">PostgreSQL</td>
           <td valign="top"><pre><![CDATA[
-     <params server-name="host" port-number="5432"
-             database-name="db"
-             user="user" password="secret" />
+   <data-source class-name="org.postgresql.PostgresqlDataSource">
+     <param name="serverName" value="host" />
+     <param name="portNumber" value="5432" />
+     <param name="databaseName" value="db" />
+     <param name="user" value="user" />
+     <param name="password" value="secret" />
    </data-source>]]></pre></td>
         </tr>
         <tr>
