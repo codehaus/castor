@@ -1197,6 +1197,11 @@ public class main {
           org.exolab.castor.mapping.AbstractFieldHandler.
           The FieldHandler can be specified on the &lt;field&gt; element.
        </p>
+       <p>
+          For more information on writing a custom FieldHandler please
+          see the following:
+          <a href="xml-fieldhandlers.xml">XML FieldHandlers</a>.
+       </p>
        </section>
        <section title="7.3 Mapping constructor arguments">
        Since: 0.9.5
