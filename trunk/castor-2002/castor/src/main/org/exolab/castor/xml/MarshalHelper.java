@@ -180,6 +180,7 @@ public class MarshalHelper {
                     TypeInfo typeInfo = new TypeInfo(type);
                     try {
                         handler = new FieldHandlerImpl(fieldName,
+                                                       null,
                                                        method,
                                                        null, 
                                                        typeInfo);
@@ -242,6 +243,7 @@ public class MarshalHelper {
                     TypeInfo typeInfo = new TypeInfo(type);
                     try {
                         handler = new FieldHandlerImpl(fieldName,
+                                                       null,
                                                        null,
                                                        method, 
                                                        typeInfo);

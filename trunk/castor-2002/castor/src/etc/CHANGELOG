@@ -37,6 +37,26 @@ JDO:     Changed KeyGeneratorFactory interface for better perfomance:
          and no type conversions are performed after the key is generated.
          (Oleg Nitz <on@ibis.odessa.ua>)
 
+JDO:     Added support for attributes of application type and for nested
+         attributes. This is an surrogate/alternative to "container" fields,
+         the feature which is temporarily not supported in Castor.
+         Assume that you have an attribute "balance" of applicatation type
+         "Balance" which has methods "getBigDecimal" and "setBigDecimal",
+         then you can write in mapping.xml "<field name="balance.bigDecimal"..."
+         and Castor will get and set the attribute value as
+         getBalance().getBigDecimal() and getBalance().setBigDecimal(...).
+         Note, that getBalance() must not be null, while
+         getBalance().getBigDecimal() may be null. Another example of usage
+         of the this feature is attribute "address" with nested attributes
+         "country", "zipCode", etc. These attributes also may be of application
+         type or nested, e.g. "<field name="address.country.string"...".
+         (Oleg Nitz <on@ibis.odessa.ua>)
+
+JDO:     Small fix: now fields in mapping.xml may have no "sql" sub-element,
+         e.g. the field may be only for XML marshalling, other fields
+         may be persisted through JDO. (Oleg Nitz <on@ibis.odessa.ua>)
+
+
 Version 0.8.7  June 2, 2000
 ---------------------------
 
