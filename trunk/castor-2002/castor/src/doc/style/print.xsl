@@ -11,6 +11,8 @@
   <xsl:include href="document.xsl"/>
   <xsl:include href="widgets.xsl"/>
 
+  <xsl:output method="html" indent="yes"/>
+
   <!-- Match the entire document and process it into a Web page.
        The document properties and body are processed separately
        in a uniform way. The background is provided by this style
