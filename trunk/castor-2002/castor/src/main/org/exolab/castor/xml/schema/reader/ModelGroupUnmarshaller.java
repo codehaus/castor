@@ -91,6 +91,10 @@ public class ModelGroupUnmarshaller extends SaxUnmarshaller {
     **/
     private Schema _schema = null;
 
+    /**
+     * Flag to indicate if we have already encounter an <annotation>
+     */
+    private boolean foundAnnotation = false;
       //----------------/
      //- Constructors -/
     //----------------/
@@ -195,7 +199,16 @@ public class ModelGroupUnmarshaller extends SaxUnmarshaller {
             return;
         }
 
-        if (SchemaNames.isGroupName(name)) {
+       if (SchemaNames.ANNOTATION.equals(name)) {
+            if (foundAnnotation)
+                error("Only one (1) 'annotation' is allowed as a child of "+
+                    "element definitions.");
+
+            foundAnnotation = true;
+            unmarshaller = new AnnotationUnmarshaller(atts);
+        }
+
+        else if (SchemaNames.isGroupName(name)) {
             unmarshaller
                 = new GroupUnmarshaller(_schema, name, atts, getResolver());
         }
