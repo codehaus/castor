@@ -886,7 +886,8 @@ public class FieldMolder {
                       if (!methodParams[i].isPrimitive()) {
                               methodParams[i] = loadClass(methodParams[i].getName());
                       }
-                }            
+                }
+                resultMethod = newCls.getMethod( methodName, methodParams );
             } catch ( NoSuchMethodException e ) {
                 // ssa, FIXME shoudl never happen
                 e.printStackTrace();
