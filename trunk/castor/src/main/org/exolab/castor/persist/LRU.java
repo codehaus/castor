@@ -139,6 +139,13 @@ public abstract class LRU {
 	public abstract Enumeration elements();
 
     /**
+     * Remove the object identified by key from the cache.
+     *
+     * @param   key   the key that needs to be removed.
+     */
+    public abstract void expire(Object key);
+
+    /**
      * Factory method to create a LRU map of specified type.
      *
      * @param type   mechanism type
@@ -331,6 +338,23 @@ public abstract class LRU {
 		public Enumeration elements() {
 			return new ValuesEnumeration(values);
 		}
+
+               
+        /**
+         * Remove the object identified by key from the cache.
+         *
+         * @param   key   the key that needs to be removed.
+         */
+        public void expire(Object key) 
+        {
+            if ( remove(key) == null ) {
+                // System.out.println("CountLimited LRU expire: "+key+" not found");
+            }
+            else {
+                // System.out.println("CountLimited LRU expire: "+key+" removed from cache");
+            }
+            dispose(key);
+        }
 
         /**
 		 * This method is called when an object is disposed.
@@ -627,6 +651,16 @@ public abstract class LRU {
 		public Enumeration elements() {
 			return new EmptyEnumeration();
 		}
+
+        /**
+         * Remove the object identified by key from the cache.
+         *
+         * @param   key   the key that needs to be removed.
+         */
+         public void expire(Object key) {
+             dispose(key);
+         }
+  
 		/**
 		 * This method is called when an object is disposed.
 		 * Override this method if you interested in the disposed object.
@@ -765,6 +799,19 @@ public abstract class LRU {
 			return new ValuesEnumeration(map.elements());
 		}
 
+        /**
+         * Remove the object identified by key from the cache.
+         *
+         * @param   key   the key that needs to be removed.
+         */
+        public void expire(Object key) {
+            // remove key from map, object will ultimately be
+            // removed from queue when interval expires or a subsequent
+            // call to put() overwrites the reference to it in QueueItem
+            remove(key);
+            dispose(key);
+        }
+  
         /**
 		 * This method is called when an object is disposed.
 		 * Override this method if you interested in the disposed object.
@@ -1140,6 +1187,22 @@ public abstract class LRU {
 		public Enumeration elements() {
 			return map.elements();
 		}
+
+                  
+        /**
+         * Remove the object identified by key from the cache.
+         *
+         * @param   key   the key that needs to be removed.
+         */
+        public void expire(Object key) {
+            if ( remove(key) == null ) {
+                //System.out.println("Unlimited LRU expire: "+key+" not found");
+            }
+            else {
+                //System.out.println("Unlimited LRU expire: "+key+" removed from cache");
+            }
+            dispose(key);
+        }
 
         /**
 		 * This method is called when an object is disposed.

@@ -2100,6 +2100,45 @@ public abstract class TransactionContext
 
 
     /**
+     * Expire object from the cache.  Objects expired from the cache will be
+     * read from persistent storage, as opposed to being read from the
+     * cache, during subsequent load/query operations.
+     *
+     * @param engine The persistence engine
+     * @param molder The class persistence molder
+     * @param identity The object's identity
+     */
+    public synchronized void expireCache( LockEngine engine, ClassMolder molder, Object identity )
+        throws PersistenceException, LockNotGrantedException
+    {
+        ObjectEntry entry = null;
+        Object      object = null;
+        OID         oid;
+
+        if ( identity == null )
+            throw new PersistenceException("Identities can't be null!");
+
+        oid = new OID( engine, molder, identity );
+        entry = getObjectEntry( engine, oid );
+      if ( entry == null ) {
+            try {
+                // the call to engine.expireCache may result in a
+                // recursive call to this.expireCache, therefore,
+                // an entry is added to the object list to prevent
+                // infinite loops due to bi-directional references
+                entry = addObjectEntry( oid, identity );
+                if ( engine.expireCache( this, oid, _lockTimeout ) ) {
+                    engine.releaseLock( this, oid );
+                }
+              removeObjectEntry(identity);
+            } catch ( LockNotGrantedException except ) {
+                removeObjectEntry(identity);
+                throw except;
+            }
+        }
+    }
+
+    /**
      * Removes the entry for an object and returns it. The object is
      * no longer part of the transaction.
      *

@@ -2,7 +2,8 @@
 Version (CVS) 
 -------------
 
-
+JDO:    Integrated API enhancement to support cache flushing/eviction from
+        Vince Adamo [vadamo@vignette.com]. See bug 1091 for details. 
 
 JDO:    Fixed bug 1107. Actually this was fixed in version 0.9.5 by bug 1313
         (Bruce - 20030610)

@@ -159,6 +159,13 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Adamo" given="Vince" />
+    <email>vadamo@vignette.com</email>
+    <company id="Vignette" />
+    <description>Contributed API to support cache flushing/eviction.</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Arriaga" given="Santiago"/>
     <email>santiago@catnet.com.mx</email>
     <description>Added Informix and Hypersonic SQL to the list of supported databases.</description>

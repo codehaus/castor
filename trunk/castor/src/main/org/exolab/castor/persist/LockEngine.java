@@ -944,6 +944,69 @@ public final class LockEngine {
     }
 
     /**
+     * Expire object from the cache.  If the object to be expired is currently
+     * cached, then a write lock is first acquired for this object. In addition,
+     * a write lock is acquired on all objects related to, or contained within,
+     * this object.  The version of the objects represented by their locks is
+     * then marked as "expired".  Upon the release of each write lock
+     * (@see TransactionContext#expireCache), the cached version of the objects
+     * will not be placed back in the cache (@see TypeInfo#release).
+     * A subsequent read/query transaction will therefore load the values of
+     * the object from persistent storage.
+     *
+     * @param tx The transaction context
+     * @param oid The object OID
+     * @param timeout The max time to wait while acquiring a lock on the
+     *  object (specified in seconds)
+     */
+    public boolean expireCache( TransactionContext tx, OID oid, int timeout )
+        throws ClassNotPersistenceCapableException, LockNotGrantedException,
+        ObjectDeletedException, PersistenceException
+    {
+        TypeInfo   typeInfo;
+        boolean    succeed;
+        ObjectLock lock;
+ 
+        typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
+        if ( typeInfo == null )
+            throw new ClassNotPersistenceCapableException( Messages.format("persist.classNotPersistenceCapable", oid.getName() ) );
+   
+        succeed = false;
+        lock = null;
+        try {
+            if (typeInfo.isCached(oid)) {
+                lock = typeInfo.acquire( oid, tx, ObjectLock.ACTION_WRITE, timeout );
+                typeInfo.molder.expireCache(tx, lock);
+                lock.expire();
+                succeed = true;
+            }
+        } catch ( LockNotGrantedException e ) {
+            throw e;
+        } catch ( ObjectDeletedException e ) {
+            throw e;
+        } catch ( PersistenceException e ) {
+            throw e;
+        } finally {
+            if ( lock != null ) lock.confirm( tx, succeed );
+        }
+ 
+        return succeed;
+    }
+ 
+    /**
+     * Forces the cache to be expired for the object represented by
+     * ClassMolder and identity.  If identity is null then expire
+     * all objects of the type represented by ClassMolder.
+     *
+     * @param type An array of class types.
+     * @param identity An array of object identifiers.
+     */
+    public void expireCache( Class cls ) {
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get( cls.getName() );
+        if (typeInfo != null) typeInfo.expireCache();
+    }
+
+    /**
      * Returns an association between Xid and transactions contexts.
      * The association is shared between all transactions open against
      * this cache engine through the XAResource interface.
@@ -1014,6 +1077,75 @@ public final class LockEngine {
          */
         private TypeInfo( ClassMolder molder, TypeInfo base ) {
             this( molder, base.locks, base.cache );
+        }
+
+        /**
+         * Returns <code>true</code> if the object is currently cached, 
+         * participating in a lock, or in the LRU cache.
+         *
+         * @param oid  the OID of the desired lock
+         */
+        private boolean isCached( OID oid )
+        {
+            ObjectLock entry = null;
+            synchronized( locks ) {
+                entry = (ObjectLock) locks.get( oid );
+                if ( entry == null ) {
+                    entry = (ObjectLock) cache.get( oid );
+                    if ( entry != null ) {
+                        OID cacheOid = entry.getOID();
+                        // oid.getName() equals or is a superclass of cacheOid.getName()
+                        boolean isSuper;
+ 
+                        // Okay, cacheOid and oid have the same top level super class
+                        // We must check that oid has the same class as cacheOid
+                        // or oid is a superclass of cacheOid
+                        isSuper = oid.getName().equals(cacheOid.getName());
+                        if (!isSuper) {
+                            String[] superClassNames = cacheOid.getSuperClassNames();
+ 
+                            if (superClassNames != null) {
+                                for (int i = 0; i < superClassNames.length; i++) {
+                                    if (oid.getName().equals(superClassNames[i])) {
+                                        isSuper = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if (!isSuper) entry = null;
+                    }
+                }
+            }
+            if ( entry == null )
+                return false;
+            else
+                return true;
+        }
+   
+        /**
+         * Expire all objects of this class from the cache.
+         */
+        public void expireCache() {
+            ObjectLock entry = null;
+            synchronized( locks ) {
+                // mark all objects currently participating in a
+                // transaction as expired.  They will be not be added back to
+                // the LRU when the transaction's complete (@see release)
+                Iterator iter = locks.values().iterator();
+                while (iter.hasNext()) {
+                    entry = (ObjectLock)iter.next();
+                    entry.expire();
+                }
+                 
+                // remove all objects not participating in a transaction
+                // from the LRU cache.
+                Enumeration enum = cache.elements();
+                while (enum.hasMoreElements()) {
+                    entry = (ObjectLock)enum.nextElement();
+                    cache.expire(entry.getOID());
+                }
+            }
         }
 
         /**
@@ -1102,7 +1234,13 @@ public final class LockEngine {
                         // to "cache" from "locks" is actually moved.
                         if ( entry.isDisposable() ) {
                             locks.remove( oid );
-                            cache.put( oid, entry );
+                            // cache.put( oid, entry );
+                            if ( entry.isExpired() ) {
+                                cache.expire(oid);
+                                entry.expired();
+                            }
+                            else
+                                cache.put( oid, entry );
                         }
                     }
                 }
@@ -1233,6 +1371,7 @@ public final class LockEngine {
                 synchronized( locks ) {
                     entry.leave();
                     if ( entry.isDisposable() ) {
+                        cache.put( oid, entry );
                         locks.remove( oid );
                     }
                 }
@@ -1267,6 +1406,12 @@ public final class LockEngine {
                     entry.leave();
                     if ( entry.isDisposable() ) {
                         cache.put( oid, entry );
+                        if ( entry.isExpired() ) {
+                            cache.expire(oid);
+                            entry.expired();
+                        }
+                        else
+                            cache.put( oid, entry );
                         locks.remove( oid );
                     }
                 }
