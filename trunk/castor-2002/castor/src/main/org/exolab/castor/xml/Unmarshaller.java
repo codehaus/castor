@@ -48,7 +48,10 @@ package org.exolab.castor.xml;
 //-- xml related imports
 import org.xml.sax.*;
 import org.xml.sax.helpers.AttributeListImpl;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Configuration;
+import org.exolab.castor.xml.util.*;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -110,12 +113,16 @@ public class Unmarshaller {
     public Unmarshaller(Class c) {
         super();
         this._class = c;
-	    this.debug = Configuration.debug();
+        this.debug = Configuration.debug();
+        _cdResolver = new ClassDescriptorResolverImpl();
     } //-- Unmarshaller(Class)
     
-    public void setResolver(ClassDescriptorResolver cdResolver) {
-        this._cdResolver = cdResolver;
-    } //-- setResolver
+    public void setMapping( Mapping mapping )
+        throws MappingException
+    {
+        _cdResolver = new ClassDescriptorResolverImpl();
+        _cdResolver.setMappingLoader( (XMLMappingLoader) mapping.getXMLMapping() );
+    }
     
     /**
      * Turns debuging on or off. If no Log Writer has been set, then
@@ -247,24 +254,6 @@ public class Unmarshaller {
         catch(org.xml.sax.SAXException sx) {
             
             MarshalException marshalEx = new MarshalException(sx);
-            /*
-              String message = null;
-              FileLocation fileLocation = null;
-              
-              Exception ex = sx.getException();
-              if (ex != null) {
-              message = ex.getMessage();
-              if (ex instanceof org.xml.sax.SAXParseException) {
-              SAXParseException sxpe = (SAXParseException)sx;
-              fileLocation = new FileLocation();
-              fileLocation.setFilename(sxpe.getSystemId());
-              fileLocation.setLineNumber(sxpe.getLineNumber());
-              fileLocation.setColumnNumber(sxpe.getColumnNumber());
-              marshalEx.setLocation(fileLocation);
-              }
-              }
-              else message = sx.getMessage();
-            */
             if ( handler.getDocumentLocator() != null ) {
                 FileLocation location = new FileLocation();
                 location.setFilename(handler.getDocumentLocator().getSystemId());
@@ -272,13 +261,6 @@ public class Unmarshaller {
                 location.setColumnNumber(handler.getDocumentLocator().getColumnNumber());
                 marshalEx.setLocation(location);
             }
-            
-            /*
-              if (message == null) 
-              message = sx.toString();
-              
-              marshalEx.setMessage(message);
-            */
             throw marshalEx;
         }
         
