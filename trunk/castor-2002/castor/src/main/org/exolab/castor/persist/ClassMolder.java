@@ -1196,8 +1196,11 @@ public class ClassMolder {
                             tx.create( fieldEngine, fieldClassMolder, value, oid );
 
                     } else {
-                        if ( fields[i] != null )
-                            fieldClassMolder.removeRelation( tx, value, this, object );
+                        if ( fields[i] != null ) {
+                            Object deref = tx.fetch( fieldEngine, fieldClassMolder, fields[i], null );
+                            if ( deref != null )
+                                fieldClassMolder.removeRelation( tx, deref, this, object );
+                        }
 
                         if ( tx.isAutoStore() && canCreate )
                             tx.create( fieldEngine, fieldClassMolder, value, null );
@@ -1486,9 +1489,9 @@ public class ClassMolder {
                         ByteArrayOutputStream bos = new ByteArrayOutputStream();
                         ObjectOutputStream os = new ObjectOutputStream( bos );
                         os.writeObject( dependent );
-                        fields[i] = bos.toByteArray();
+                        newfields[i] = bos.toByteArray();
                     } else {
-                        fields[i] = null;
+                        newfields[i] = null;
                     }
                 } catch ( IOException e ) {
                     throw new PersistenceException( "Error during serializing dependent object", e );
