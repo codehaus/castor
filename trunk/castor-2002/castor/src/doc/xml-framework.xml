@@ -39,53 +39,63 @@
          Lets walk through a very simple example. Assume we have a simple Person
         class as follows:
 <code>
-<comment>
-/**
+import java.util.Date;
+
+<comment>/**
  * An simple person class
- */
-</comment>
+ */</comment>
 public class Person implements java.io.Serializable {
 
-   <comment>
-    /**
+   <comment>/**
      * The name of the person
-     */
-   </comment>
+     */</comment>
    private String name = null;
 
-   <comment>
-    /**
+   <comment>/**
+     * The Date of birth
+     */</comment>
+   private Date dob = null;
+
+   <comment>/**
      * Creates a Person with no name
-     */
-   </comment>
+     */</comment>
    public Person() {
       super();
    }
 
-   <comment>
-    /**
+   <comment>/**
      * Creates a Person with the given name
-     */
-   </comment>
+     */</comment>
    public Person(String name) {
       this.name  = name;
    }
 
-   <comment>
-    /**
+   <comment>/**
      * @return name of the person
-     */
-   </comment>
+     */</comment>
+   public Date getDateOfBirth() {
+      return dob;
+   }
+
+   <comment>/**
+     * @return name of the person
+     */</comment>
    public String getName() {
       return name;
    }
 
-   <comment>
-    /**
+   <comment>/**
+     * Sets the date of birth of the person
+     * @param name the name of the person
+     */</comment>
+   public void setDateOfBirth(Date dob) {
+      this.dob = dob;
+   }
+
+   <comment>/**
      * Sets the name of the person
      * @param name the name of the person
-     */
-   </comment>
+     */</comment>
    public void setName(String name) {
       this.name = name;
    }
@@ -99,7 +109,8 @@ public class Person implements java.io.Serializable {
          <code>
 
 <comment>// Create a new Person</comment>
-Person person = new Person("John Smith");
+Person person = new Person("Ryan 'Mad Dog' Madden");
+person.setDateOfBirth(new Date(1955, 8, 15));
 
 <comment>// Create a File to marshal to</comment>
 writer = new FileWriter("test.xml");
@@ -118,13 +129,40 @@ Marshaller.marshal(person, writer);
 reader = new FileReader("test.xml");
 
 <comment>// Marshal the person object</comment>
-Person person = Unmarshaller.unmarshal(Person.class, reader);
+Person person = (Person)Unmarshaller.unmarshal(Person.class, reader);
 
          </code>
       </p>
 
-    <p>Marshalling and Unmarshalling is basically that simple.</p>
+      <b><i>Marshalling and Unmarshalling is basically that simple!</i></b>
+      <p/>
+      <b>
+         Note: A common mistake when using a Mapping file is to call
+         the Marshaller or Unmarshaller as in the above example. This won't work
+         because the mapping will be ignored. The above example
+         uses the <i>static</i> methods of the marshalling framework.
+         If you are using a mapping file simply call the Marshaller or Unmarshaller
+         as follows:
+      </b>
+       <p>
+         <code>
 
+<comment>// Load Mapping</comment>
+Mapping mapping = new Mapping();
+mapping.loadMapping("mapping.xml");
+
+<comment>// Create a Reader to the file to unmarshal from</comment>
+reader = new FileReader("test.xml");
+
+<comment>// Create a new Unmarshaller</comment>
+Unmarshaller unmarshaller = new Unmarshaller(Person.class);
+unmarshaller.setMapping(mapping);
+<comment>// Unmarshal the person object</comment>
+Person person = (Person)unmarshaller.unmarshal(reader);
+
+         </code>
+
+      </p>
     </section>
 
     <section title="Using Existing Classes/Objects">
@@ -168,6 +206,55 @@ Person person = Unmarshaller.unmarshal(Person.class, reader);
         XML Class descriptors provide the marshalling framework with the information it
         needs about a class in order to be marshalled to and from XML.
         The XMLClassDescriptor <api>org.exolab.castor.xml.XMLClassDescriptor</api>.
+      </p>
+      <p>
+        XML Class Descriptors are created four main ways. Two of these are basically
+        run-time, and the other two are compile time.
+        <section title="Compile-Time Descriptors">
+           <p>
+              To use "compile-time" class descriptors, one can either implement the
+              <api>org.exolab.castor.xml.XMLClassDescriptor</api>
+              interface for each class which needs to be "described", or have
+              the <a href="sourcegen.xml">Source Code Generator</a>
+              create the proper descriptors.
+           </p>
+           <p>
+             The main advantage of compile-time descriptors is that they are
+             faster than the run-time approach.
+           </p>
+        </section>
+        <section title="Run-Time Descriptors">
+           <p>
+              To use "run-time" class descriptors, one can either simply let
+              Castor introspect the classes, a mapping file can be provided,
+              or a combination of both "default introspection" and a specified
+              mapping file may be used.
+           </p>
+          <p>
+             For "default introspection" to work the class being introspected must
+             have adequete setter/getter methods for each field of the class
+             that should be marshalled and unmarshalled. If no getter/setter
+             methods exist, Castor can handle direct field access to public
+             fields. It does not do both at the same time.
+             So if the respective class has any getter/setter methods at all, then
+             no direct field access will take place.
+           </p>
+           <p>
+              There is nothing to do to enable "default introspection". If a
+              descriptor cannot be found for a class, introspection occurs
+              automatically.
+          </p>
+           <p>
+              A mapping file may also be used to "describe" the classes which
+              are to be marshalled. The mapping is loaded before any
+              marshalling/unmarshalling takes place. See <api>
+              org.exolab.castor.mapping.Mapping</api>
+          </p>
+           <p>
+             The main advantage of run-time descriptors is that it takes very
+             little effort to get something working.
+           </p>
+        </section>
       </p>
    </section>
 
