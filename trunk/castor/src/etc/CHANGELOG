@@ -2,6 +2,12 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1445 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Added clearCache() method to CastorTestCase, and fixed a problem in test data setup in 
+       src/tests/jdo/OqlExtends.java
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1445
+       (Werner - 20040911)
+       
 XML:   Fixed bug 1666: UnmarshalState._markedList Vector is a performance 
        bottleneck. Applied patch from David Thal which replaces the
        Vector with a HashSet.
