@@ -55,6 +55,7 @@ import org.exolab.castor.xml.util.XMLFieldDescriptorImpl;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.util.Configuration;
@@ -430,8 +431,14 @@ public final class Introspector {
             //-- If the type is a collection and there is no add method, 
             //-- then we obtain a CollectionHandler
             if (isCollection && (methodSet.add == null)) {
-                typeInfo = new TypeInfo(type);
-                colHandler = typeInfo.getCollectionHandler();
+                
+                try {
+                    colHandler = CollectionHandlers.getHandler(type);
+                }
+                catch(MappingException mx) {
+                    //-- No collection handler available, 
+                    //-- proceed anyway...
+                }
                 
                 //-- Find component type
                 if (type.isArray()) {
@@ -441,7 +448,6 @@ public final class Introspector {
                         colHandler = null;
                     }
                     else type = type.getComponentType();
-                        
                 }
             }
             
@@ -550,8 +556,15 @@ public final class Introspector {
                 //-- If the type is a collection and there is no add method, 
                 //-- then we obtain a CollectionHandler
                 if (isCollection) {
-                    typeInfo = new TypeInfo(type);
-                    colHandler = typeInfo.getCollectionHandler();
+                    
+                    try {
+                        colHandler = CollectionHandlers.getHandler(type);
+                    }
+                    catch(MappingException mx) {
+                        //-- No CollectionHandler available, continue
+                        //-- without one...
+                    }
+                    
                     //-- Find component type
                     if (type.isArray()) {
                         //-- Byte arrays are handled as a special case
