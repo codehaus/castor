@@ -482,10 +482,36 @@ public final class FieldHandlerImpl
                         _handler.setValue( object, collect );
                 } else if ( _field != null ) {
                     collect = _field.get( object );
+                    if (collect == null) {
+                        // The type of the collection.
+                        Class type = _field.getType();
+                        //-- Handle Arrays, we need to declare the array with
+                        //-- the correct type. The other cases are handled in  
+                        //-- the J1CollectionHandler during the 
+                        //-- add(collect,value) call
+                        if (type.isArray()) {
+                            Class componentType = type.getComponentType();
+                            Class valueType = value.getClass();
+                            if (componentType.isPrimitive() || 
+                               ((!valueType.isArray()) && (valueType != componentType))) 
+                            {
+                                try {
+                                    collect = Array.newInstance(componentType, 0);
+                                } 
+                                catch (Exception e) {
+                                    String err = "Unable to instantiate an array of '" + 
+                                        componentType + "' : " + e;
+                                    throw new IllegalStateException(err);
+                                }
+                            }
+                        }
+                    }
                     collect = _colHandler.add( collect, value );
                     if ( collect != null )
                         _field.set( object, collect );
-                } else if ( _getMethod != null ) {
+                        
+                } 
+                else if ( _getMethod != null ) {
                     if ( _getSequence != null ) 
                         for ( int i = 0; i < _getSequence.length; i++ ) 
                             object = _getSequence[ i ].invoke( object, null );
