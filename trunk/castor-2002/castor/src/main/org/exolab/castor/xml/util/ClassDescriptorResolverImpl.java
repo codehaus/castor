@@ -247,17 +247,23 @@ public class ClassDescriptorResolverImpl
                 
         XMLClassDescriptor classDesc = null;
                 
-        if (mappingLoader != null) {
-            Enumeration enum = mappingLoader.listDescriptors();
-            while (enum.hasMoreElements()) {
-                classDesc = (XMLClassDescriptor)enum.nextElement();
-                if (xmlName.equals(classDesc.getXMLName())) {
-                    return classDesc;
-                }
-                classDesc = null;
+        Enumeration enum = null;
+        
+        if (mappingLoader != null)
+            enum = mappingLoader.listDescriptors();
+        else
+            enum = _cache.elements();
+        
+        while (enum.hasMoreElements()) {
+            classDesc = (XMLClassDescriptor)enum.nextElement();
+            if (xmlName.equals(classDesc.getXMLName())) {
+                return classDesc;
             }
+            classDesc = null;
         }
+        
         return classDesc;
+        
     } //-- resolveByXMLName
     
     /**
