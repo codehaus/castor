@@ -2175,6 +2175,18 @@ public abstract class TransactionContext
         }
     }
 
+    public boolean isCached( LockEngine engine, ClassMolder molder, Class cls, Object identity )
+    	throws PersistenceException
+	{
+    	OID         oid;
+    	
+    	if ( identity == null )
+    		throw new PersistenceException("Identities can't be null!");
+    	
+    	oid = new OID( engine, molder, identity );
+    	return engine.isCached (cls, oid);
+	}
+    
     /**
      * Removes the entry for an object and returns it. The object is
      * no longer part of the transaction.
