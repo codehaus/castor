@@ -47,8 +47,6 @@
 package org.exolab.castor.xml.util;
 
 import org.exolab.castor.xml.*;
-import org.exolab.castor.mapping.loader.Types;
-import org.exolab.castor.util.Configuration;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
@@ -56,7 +54,7 @@ import java.util.Enumeration;
 /**
  * The default implementation of the ClassDescriptorResolver interface
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
 public class ClassDescriptorResolverImpl
@@ -516,14 +514,22 @@ public class ClassDescriptorResolverImpl
                 throw (ClassNotFoundException)exception;
         }
         
-        //-- use passed in loader
-	    if ( loader != null )
-		    return loader.loadClass(className);
-		//-- use internal loader
-		else if (_loader != null)
-		    return _loader.loadClass(className);
-		//-- no loader available use Class.forName
-		return Class.forName(className);
+        try {
+            //-- use passed in loader
+    	    if ( loader != null )
+    		    return loader.loadClass(className);
+    		//-- use internal loader
+    		else if (_loader != null)
+    		    return _loader.loadClass(className);
+    		//-- no loader available use Class.forName
+    		return Class.forName(className);
+        }
+        catch(NoClassDefFoundError ncdfe) {
+        	//-- This can happen if we try to load a class with invalid case,
+            //-- for example foo instead Foo.
+            throw new ClassNotFoundException(ncdfe.getMessage());
+        }
+        
     } //-- loadClass
     
     /**
