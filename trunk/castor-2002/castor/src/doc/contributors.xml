@@ -71,6 +71,15 @@
     <description>XML enhancements.</description>
   </contributor>
 
+
+  <contributor type="Contributor">
+    <name surname="Beloff" given="Rostislav"/>
+    <email>ros@domainforfree.com</email>
+    <description>
+       Patch to prevent instropection of static methods.
+    </description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Thelen" given="Frank"/>
     <email>Frank.Thelen@poet.de</email>
