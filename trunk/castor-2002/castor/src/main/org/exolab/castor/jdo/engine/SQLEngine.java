@@ -709,7 +709,7 @@ public final class SQLEngine
                                ( (JDOClassDescriptor) clsDesc.getExtends() ).getTableName(),
                                ( (JDOFieldDescriptor) clsDesc.getExtends().getIdentity() ).getSQLName() );
             addLoadSql( (JDOClassDescriptor) clsDesc.getExtends(), expr, allFields,
-            true, queryPk, false );
+            loadPk, queryPk, false );
             loadPk = false;
             queryPk = false;
         }
