@@ -320,6 +320,9 @@ public final class SQLEngine implements Persistence {
         }
     }
 
+	public Persistence.FieldInfo[] getInfo() {
+		return _fields;
+	}
 
     /**
      * Mutator method for setting extends SQLEngine
@@ -714,7 +717,7 @@ public final class SQLEngine implements Persistence {
             count = 1;
             if ( _keyGen == null || _keyGen.getStyle() == KeyGenerator.BEFORE_INSERT ) {
                 for ( int i=0; i<_ids.length; i++ ) {
-                    System.out.print("[id"+count+":"+resultIds[i]+"    "+_ids[i].name+" ]  ");
+                    System.out.print("[id"+count+"/"+_ids.length+":"+resultIds[i]+"    "+_ids[i].name+" ]  ");
                     stmt.setObject( count, idToSQL( i, resultIds[i] ) );
                     ++count;
                 }
@@ -854,11 +857,11 @@ public final class SQLEngine implements Persistence {
                     Object[] inner = (Object[])fields[i];
                     for ( int j=0; j<_fields[i].columns.length; j++ ) {
                         if ( inner == null || inner[j] == null ) {
-                            System.out.print("["+count+":null:"+_fields[i].columns[j].name+" type: "
+                            System.out.println("["+count+":null:"+_fields[i].columns[j].name+" type: "
                             +_fields[i].columns[j].sqlType+"]");
                             stmt.setNull( count, _fields[i].columns[j].sqlType );
                         } else {
-                            System.out.print("["+count+":"+inner[j]+":"
+                            System.out.println("["+count+":"+inner[j]+":"
                                 +_fields[i].columns[j].name+" type: "+_fields[i].columns[j].sqlType+"]");
                             stmt.setObject( count, toSQL( i, j, inner[j]), _fields[i].columns[j].sqlType );
                         }
@@ -869,7 +872,7 @@ public final class SQLEngine implements Persistence {
             System.out.println("    new field to update (SQLEngine)");
 
             for ( int i=0; i< sqlIdentities.length; i++ ) {
-                System.out.print("<<id#"+_ids[i].name+":"+count+":"+sqlIdentities[i]+":type "+_ids[ i ].sqlType+">>");
+                System.out.println("<<id#"+_ids[i].name+":"+count+":"+sqlIdentities[i]+":type "+_ids[ i ].sqlType+">>");
                 stmt.setObject( count, sqlIdentities[i], _ids[i].sqlType );
                 count++;
             }
@@ -880,11 +883,11 @@ public final class SQLEngine implements Persistence {
                         Object[] inner = (Object[])original[i];
                         for ( int j=0; j<_fields[i].columns.length; j++ ) {
                             if ( inner == null || inner[j] == null ) {
-                                System.out.print("["+count+":null:"+_fields[i].columns[j].name+" type: "
+                                System.out.println("["+(i+1)+"c@"+count+":null:"+_fields[i].columns[j].name+" type: "
                                 +_fields[i].columns[j].sqlType+"]");
                                 stmt.setNull( count, _fields[i].columns[j].sqlType );
                             } else {
-                                System.out.print("["+count+":"+inner[j]+":"
+                                System.out.println("["+(i+1)+"c@"+count+":"+inner[j]+":"
                                     +_fields[i].columns[j].name+" type: "+_fields[i].columns[j].sqlType+"]");
                                 stmt.setObject( count, toSQL( i, j, inner[j]), _fields[i].columns[j].sqlType );
                             }
@@ -908,14 +911,16 @@ public final class SQLEngine implements Persistence {
                     ResultSet res = stmt.executeQuery();
                     int c = res.getMetaData().getColumnCount();
                     if ( res.next() ) {
+
                         System.out.println("A row with same id found! column count: "+c);
 
                         for ( int i=0; i<c; i++ ) {
                             if ( i > 0 ) System.out.print(", ");
-                            System.out.print(res.getString(i+1));
+                            System.out.println("["+res.getString(i+1)+"]");
                         }
                         stmt.close();
-                        System.out.println("");
+                        System.out.println("    row found in database");
+
                         throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), OID.flatten(identities)) );
                     }
                     stmt.close();
@@ -1443,7 +1448,7 @@ public final class SQLEngine implements Persistence {
         return _clsDesc.toString();
     }
 
-    static final class FieldInfo {
+    static final class FieldInfo implements Persistence.FieldInfo {
 
         final String  tableName;
 
@@ -1592,6 +1597,15 @@ public final class SQLEngine implements Persistence {
                         fh.getConvertFrom(), fh.getConvertParam() );
             }
         }
+		public boolean isComplex() {
+			return true;
+		}
+		public boolean isPersisted() {
+			return store;
+		}
+		public String getFieldName() {
+			return jdoName;
+		}
         public String toString() {
             return tableName;
         }
@@ -1618,9 +1632,7 @@ public final class SQLEngine implements Persistence {
             this.convertParam = convertParam;
         }
     }
-    static final class SQLQuery
-        implements PersistenceQuery
-    {
+    static final class SQLQuery implements PersistenceQuery {
 
 
         private PreparedStatement _stmt;
@@ -1645,6 +1657,9 @@ public final class SQLEngine implements Persistence {
 
 
         private int             _identSqlType;
+
+
+        private boolean         _resultSetDone;
 
 
         SQLQuery( SQLEngine engine, String sql, Class[] types )
@@ -1695,12 +1710,14 @@ public final class SQLEngine implements Persistence {
                     _values[ i ] = null;
                 }
                 _rs = _stmt.executeQuery();
+                _resultSetDone = false;
             } catch ( SQLException except ) {
                 if ( _stmt != null ) {
                     try {
                         _stmt.close();
                     } catch ( SQLException e2 ) { }
                 }
+                _resultSetDone = true;
                 throw new PersistenceException( Messages.format("persist.nested", except) );
             }
         }
@@ -1714,10 +1731,13 @@ public final class SQLEngine implements Persistence {
             boolean empty;
 
             try {
-                if ( _lastIdentities == null ) {
+                if ( _resultSetDone )
+                    return null;
 
+                if ( _lastIdentities == null ) {
                     if ( ! _rs.next() ) {
                         System.out.println("result set done!");
+                        _resultSetDone = true;
                         return null;
                     }
 
@@ -1741,6 +1761,7 @@ public final class SQLEngine implements Persistence {
                     //System.out.println("inside loop");
                     if ( ! _rs.next() ) {
                         _lastIdentities = null;
+                        _resultSetDone = true;
                         return null;
                     }
 
@@ -1817,7 +1838,7 @@ public final class SQLEngine implements Persistence {
                     }
                 }
 
-                if ( _rs.next() ) {
+                if ( !_resultSetDone && _rs.next() ) {
                     count = 1;
                     if ( _lastIdentities == null )
                         _lastIdentities = new Object[_engine._ids.length];
@@ -1847,11 +1868,15 @@ public final class SQLEngine implements Persistence {
                             for ( int i=0; i<_engine._ids.length; i++ ) {
                                 _lastIdentities[i] = SQLTypes.getObject( _rs, 1+i, _identSqlType );
                             }
-                        else
+                        else {
+                            _resultSetDone = true;
                             _lastIdentities = null;
+                        }
                     }
-                } else
+                } else {
                     _lastIdentities = null;
+                    _resultSetDone = true;
+                }
             } catch ( SQLException except ) {
                 throw new PersistenceException( Messages.format("persist.nested", except) );
             }
