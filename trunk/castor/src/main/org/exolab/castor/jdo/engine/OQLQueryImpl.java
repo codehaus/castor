@@ -58,6 +58,7 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.persist.TransactionContext;
+import org.exolab.castor.util.Messages;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -483,8 +484,13 @@ public class OQLQueryImpl
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
                 case ParseTreeWalker.FUNCTION:
-                    SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
-                    _results =  sqe.execute( _expr, _bindValues);
+                    try {
+                        java.sql.Connection conn = (java.sql.Connection)_dbImpl.getTransaction().getConnection(_dbEngine);
+                        SimpleQueryExecutor sqe = new SimpleQueryExecutor( _dbImpl );
+                        _results =  sqe.execute(conn, _expr, _bindValues);
+		            } catch ( QueryException except ) {
+		                throw new QueryException(Messages.message ("persist.simple.query.failed"), except);
+		            }
                     _fieldNum = 0;
             }
         } catch ( PersistenceException except ) {
