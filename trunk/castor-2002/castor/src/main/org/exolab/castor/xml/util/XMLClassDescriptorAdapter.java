@@ -107,6 +107,8 @@ public class XMLClassDescriptorAdapter
             setXMLName(xmlName);
         }
         
+        setJavaClass(classDesc.getJavaClass());
+
     } //-- XMLClassDescriptorAdapter
     
 } //-- XMLClassDescriptorAdapter
