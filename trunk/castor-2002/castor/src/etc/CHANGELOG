@@ -1,5 +1,11 @@
 Version (CVS)
 -------------
+
+XML:    Corrected a bug in the introspection of get-method so that the type defined in the 
+        mapping file need just to be assignable from the return type of the get-method and not 
+        exactly the same (usefull when dealing with interface and abstract classes).
+        (Sebastien Gignoux <gignoux@intalio.com>) 
+
 XML:    Solved a performance bug for unmarshalling of primitive type. We don't try anymore 
         to generate a Class Descriptor for primitive type as we know that not only it 
         fails but it is deadly slow (due to getMethods() call). Now, unmarhsalling speed 
@@ -17,7 +23,8 @@ XML:    Updated Schema syntax and some of the Schema Object Model to support
         the W3C XML Schema Candidate Release. (kvisco)
 
 XML:    Allow the use of uninitialized collection. Castor will instiate a new 
-        collection of the proper type when necessary. (seb)
+        collection of the proper type when necessary.
+        (Sebastien Gignoux <gignoux@intalio.com>)
 
 XML:    Added #setResolver method to Marshaller, thanks to George Stewart for
         pointing out to me that I neglected to add this method. (kvisco)
