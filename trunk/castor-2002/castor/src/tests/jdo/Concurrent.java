@@ -236,11 +236,19 @@ public class Concurrent extends CastorTestCase {
         } else {
             Thread th = new Thread() {
                 public void run() {
+		    Connection conn = null;
                     try {
-                        _conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
+			conn = _category.getJDBCConnection(); 
+                        conn.createStatement().execute( "UPDATE test_table SET value1='" + JDBCValue +
                                                          "' WHERE id=" + TestObject.DefaultId );
+			conn.close();
                     } catch (Exception ex) {
-                    }
+                    } finally {
+			try {
+			    if ( conn != null )
+				conn.close();
+			} catch ( Exception e ) {}
+		    }
                 }
             };
             th.start();
@@ -351,7 +359,7 @@ public class Concurrent extends CastorTestCase {
             throws PersistenceException, SQLException {
         if ( _db.isActive() ) _db.rollback();
         _db.close();
-        _conn.close();
+        //_conn.close();
     }
 
 }
