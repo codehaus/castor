@@ -377,7 +377,6 @@ public class ClassMolder {
         FieldMapping[] fmBase;
         FieldMapping[] fmIds;
         String[] identities;
-        boolean idfield;
 
         // start with the extended class
         base = clsMap;
@@ -395,17 +394,11 @@ public class ClassMolder {
         fmIds = new FieldMapping[identities.length];
         fmBase = base.getFieldMapping();
         for ( int i=0,j=0; i<fmBase.length; i++ ) {
-            idfield = false;
-            IDSEARCH:
             for ( int k=0; k<identities.length; k++ ) {
                 if ( fmBase[i].getName().equals( identities[k] ) ) {
-                    idfield = true;
-                    break IDSEARCH;
+                    fmIds[k] = fmBase[i];
+                    break;
                 }
-            }
-            if ( idfield ) {
-                fmIds[j] = fmBase[i];
-                j++;
             }
         }
         if ( fmDepended == null )

@@ -359,7 +359,6 @@ public abstract class MappingLoader
         String[] ids;
         ClassMapping origin = clsMap;
         Vector fieldList = new Vector();
-        Vector idList = new Vector();
 
         while (origin.getExtends() != null) {
             origin = (ClassMapping) origin.getExtends();
@@ -383,6 +382,7 @@ public abstract class MappingLoader
                 badIdentities, javaClass.getName() );
             }
 
+            identities = new FieldDescriptor[ids.length];
             // separates fields into identity fields and regular fields
             for ( int i=0; i < fields.length ; i++ ) {
                 //System.out.println("MappingLoader.createClassDesc.for:id: " + i );
@@ -390,6 +390,7 @@ public abstract class MappingLoader
                 for ( int k=0; k<ids.length; k++ ) {
                     //System.out.println(fields[i].getFieldName() + " " + ids[k] );
                     if ( fields[i].getFieldName().equals( ids[k] ) ) {
+                        identities[k] = fields[i];
                         idfield = true;
                         break;
                     }
@@ -400,51 +401,38 @@ public abstract class MappingLoader
                         ( (FieldDescriptorImpl) fields[i] ).setRequired( true );
                     if ( fields[i].getHandler() instanceof FieldHandlerImpl )
                         ( (FieldHandlerImpl) fields[i].getHandler() ).setRequired( true );
-                    idList.addElement(fields[i]);
                 } else {
                     // copy non identity field from list of fields.
                     fieldList.addElement(fields[i]);
                 }
             }
 
-            // convert idList into array
-            if (extend == null) {
-                identities = new FieldDescriptor[idList.size()];
-                idList.copyInto(identities);
-            } else {
-                // we allows identity fields to be re-defined in the extends 
-                // class mapping to override some properties of the field, 
+            if (extend != null) {
+                // we allow identity fields to be re-defined in the extends
+                // class mapping to override some properties of the field,
                 // for example, <sql name="..."/>.
                 if ( extend instanceof ClassDescriptorImpl ) {
                     ClassDescriptorImpl extendImpl = (ClassDescriptorImpl) extend;
-                    identities = new FieldDescriptor[extendImpl.getIdentities().length];
                     for (int i = 0; i < identities.length; i++) {
-                        identities[i] = extendImpl.getIdentities()[i];
-                        for (int j = 0; j < idList.size(); j++) {
-                            if (((FieldDescriptor) idList.elementAt(j)).getFieldName().equals(identities[i].getFieldName())) {
-                                identities[i] = (FieldDescriptor) idList.elementAt(j);
-                                idList.removeElementAt(j);
-                                break;
-                            }
+                        if (identities[i] == null) {
+                            identities[i] = extendImpl.getIdentities()[i];
                         }
                     }
                 } else {
                     // we leave things in the old way for the XML side
-                    if ( idList.size() == 0 )
+                    if ( identities[0] == null )
                         if ( extend.getIdentity() != null ) {
-                            idList.addElement( extend.getIdentity() );
-                            identities = new FieldDescriptor[1];
-                            idList.copyInto(identities);
+                            identities = new FieldDescriptor[] {extend.getIdentity()};
                         } else {
                             identities = new FieldDescriptor[0];
                         }
                 }
             }
-            
+
             // convert fieldList into array
             fields = new FieldDescriptor[fieldList.size()];
             fieldList.copyInto(fields);
-            
+
             // the following check only needed by JDO side, move it to JDOMappingLoader
             /*
             if ( identities == null || identities.length == 0 ) {
@@ -453,7 +441,7 @@ public abstract class MappingLoader
             }*/
 
             // do a more general test instead
-            if ( ids != null && ids.length > 0 
+            if ( ids != null && ids.length > 0
                     && (identities == null || identities.length <= 0 ) ) {
                 StringBuffer sb = new StringBuffer();
                 for ( int i=0; i < ids.length; i++ ) {
