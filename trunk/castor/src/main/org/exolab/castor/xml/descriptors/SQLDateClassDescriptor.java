@@ -86,7 +86,7 @@ public class SQLDateClassDescriptor
     /**
      * The name of the XML element.
      */
-    private static final String _xmlName = "date";
+    private static final String _xmlName = "sql-date";
 
     private static XMLFieldDescriptorImpl _contentDescriptor = null;
 
