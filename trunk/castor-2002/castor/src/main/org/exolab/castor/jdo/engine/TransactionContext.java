@@ -187,7 +187,7 @@ final class TransactionContext
 	// Create the object. This can only happen once for each object in
 	// all transactions running on the same engine, so after creation
 	// add a new entry for this object and use this object as the view
-	oid = dbEngine.create( this, obj );
+	oid = dbEngine.create( this, obj, primKey );
 	entry = addObjectEntry( obj, oid, dbEngine );
 	entry.created = true;
 	return oid;

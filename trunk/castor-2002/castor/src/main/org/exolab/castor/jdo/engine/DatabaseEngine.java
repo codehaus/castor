@@ -545,6 +545,8 @@ public final class DatabaseEngine
     void acquire( TransactionContext tx, OID oid, boolean write, int timeout )
     {
 	ObjectLock lock;
+	TypeInfo   typeInfo;
+	Object     obj;
 
 	synchronized ( tx ) {
 	    lock = getLock( oid );
@@ -554,7 +556,8 @@ public final class DatabaseEngine
 	    if ( lock == null )
 		throw new ObjectNotPersistentExceptionImpl( oid );
 
-	    lock.acquire( tx, write, timeout );
+	    obj = lock.acquire( tx, write, timeout );
+	    typeInfo = (TypeInfo) _typeInfo.get( obj.getClass() );
 	    if ( write ) {
 		try {
 		    typeInfo.engine.writeLock( tx.getConnection( this ),

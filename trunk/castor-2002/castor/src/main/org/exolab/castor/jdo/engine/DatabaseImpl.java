@@ -211,7 +211,7 @@ public final class DatabaseImpl
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	tx.create( _dbEngine, obj );
+	tx.create( _dbEngine, obj, null );
     }
 
 
@@ -247,13 +247,13 @@ public final class DatabaseImpl
 	if ( _mode == Database.OPEN_READ_ONLY )
 	    throw new DatabaseIsReadOnlyException( Messages.message( "castor.jdo.odmg.dbOpenReadOnly" ) );
 	tx = getTransaction();
-	tx.create( _dbEngine, obj );
+	tx.create( _dbEngine, obj, name );
 	objDesc = _dbEngine.getObjectDesc( obj.getClass() );
 	if ( objDesc == null )
 	    throw new ClassNotPersistenceCapableExceptionImpl( obj.getClass() );
 	binding = new NameBinding( name, obj, objDesc );
 	try {
-	    tx.create( _dbEngine, binding );
+	    tx.create( _dbEngine, binding, name );
 	} catch ( DuplicatePrimaryKeyException except ) {
 	    throw new ObjectNameNotUniqueException( name );
 	}
