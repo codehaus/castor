@@ -47,18 +47,34 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.util.Properties;
+import java.util.Hashtable;
+import java.util.Enumeration;
+// import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.Properties;
-
+import javax.sql.DataSource;
+import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import javax.sql.DataSource;
-
+import org.xml.sax.InputSource;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.SAXException;
+//import org.apache.commons.beanutils.BeanUtils;
+//import org.apache.commons.beanutils.ConversionException;
+//import org.apache.commons.beanutils.ConvertUtils;
+//import org.apache.commons.beanutils.Converter;
+//import org.apache.commons.beanutils.converters.BigDecimalConverter;
+//import org.apache.commons.beanutils.converters.BigIntegerConverter;
+//import org.apache.commons.beanutils.converters.BooleanConverter;
+//import org.apache.commons.beanutils.converters.ByteConverter;
+//import org.apache.commons.beanutils.converters.DoubleConverter;
+//import org.apache.commons.beanutils.converters.FloatConverter;
+//import org.apache.commons.beanutils.converters.IntegerConverter;
+//import org.apache.commons.beanutils.converters.LongConverter;
+//import org.apache.commons.beanutils.converters.ShortConverter;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.conf.Database;
@@ -71,8 +87,9 @@ import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.InputSource;
+import org.exolab.castor.util.Messages;
+import org.exolab.castor.xml.UnmarshalHandler;
+import org.exolab.castor.xml.Unmarshaller;
 
 
 /**
@@ -91,18 +108,15 @@ public class DatabaseRegistry
      */
     private static Log _log = LogFactory.getFactory().getInstance( DatabaseRegistry.class );
 
-
-    /**
+	/**
      * The name of the generic SQL engine, if no SQL engine specified.
      */
     public static final String  GenericEngine = "generic";
-
 
     /**
      * The JDBC URL when using a JDBC driver.
      */
     private String            _jdbcUrl;
-
 
     /**
      * The properties when using a JDBC driver.
@@ -223,6 +237,13 @@ public class DatabaseRegistry
     }
 
 
+    /**
+     * Instantiates a database instance from an im-memory JDO configuration.
+     * @param jdoConf An in-memory JDO configuration. 
+     * @param resolver An entity resolver.
+     * @param loader A class loader
+     * @throws MappingException If the database cannot be instantiated/loadeed.
+     */
     public static synchronized void loadDatabase( JdoConf jdoConf, EntityResolver resolver, ClassLoader loader)
     	throws MappingException
 	{
@@ -230,6 +251,13 @@ public class DatabaseRegistry
     	loadDatabase(databases, resolver, loader, null);
 	}
 
+    /**
+     * Instantiates a database instance from the JDO configuration file
+     * @param source {@link InputSource} pointing to the JDO configuration. 
+     * @param resolver An entity resolver.
+     * @param loader A class loader
+     * @throws MappingException If the database cannot be instantiated/loadeed.
+     */
     public static synchronized void loadDatabase( InputSource source, EntityResolver resolver, ClassLoader loader )
         throws MappingException
     {
@@ -238,6 +266,13 @@ public class DatabaseRegistry
         loadDatabase (databases, resolver, loader, source.getSystemId());
     }
     
+    /**
+     * Instantiates a database instance from a castor.jdo.conf.Database instance
+     * @param databases Database configuration instances. 
+     * @param resolver An entity resolver.
+     * @param loader A class loader
+     * @throws MappingException If the database cannot be instantiated/loadeed.
+     */
    	private static synchronized void loadDatabase(Database[] databases, EntityResolver resolver, ClassLoader loader, String baseURI)
         throws MappingException
     {
@@ -295,66 +330,23 @@ public class DatabaseRegistry
         			throw new MappingException( "jdo.missingDataSource", database.getName() );
         		}
         		
-        		if ( database.getDatabaseChoice().getDriver() != null ) {
-        			// JDO configuration file specifies a driver, use the driver
-        			// properties to create a new registry object.
-        			Properties  props;
-        			Enumeration params;
-        			Param       param;
-        			
-        			String driverName = database.getDatabaseChoice().getDriver().getClassName();
-        			if ( driverName != null ) {
-        				try {
-        					Class.forName( database.getDatabaseChoice().getDriver().getClassName() ).newInstance();
-        				} catch ( Exception except ) {
-        					throw new MappingException( except );
-        				}
-        			}
-        			if ( DriverManager.getDriver( database.getDatabaseChoice().getDriver().getUrl() ) == null )
-        				throw new MappingException( "jdo.missingDriver", database.getDatabaseChoice().getDriver().getUrl() );
-        			
-        			props = new Properties();
-        			params = database.getDatabaseChoice().getDriver().enumerateParam();
-        			while ( params.hasMoreElements() ) {
-        				param = (Param) params.nextElement();
-        				props.put( param.getName(), param.getValue() );
-        			}
-        			dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory,
-        					database.getDatabaseChoice().getDriver().getUrl(), props );
-        			_log.debug( "Using driver: " + driverName );
-        		} else if ( database.getDatabaseChoice().getDataSource() != null ) {
-        			// JDO configuration file specifies a DataSource object, use the
-        			// DataSource which was configured from the JDO configuration file
-        			// to create a new registry object.
-        			DataSource ds;
-        			
-        			ds = (DataSource) database.getDatabaseChoice().getDataSource().getParams();
-        			if ( ds == null )
-        				throw new MappingException( "jdo.missingDataSource", database.getName() );
-        			dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory, ds );
-        			_log.debug( "Using DataSource: " + database.getDatabaseChoice().getDataSource().getClassName() );
-        		} else if ( database.getDatabaseChoice().getJndi() != null ) {
-        			// JDO configuration file specifies a DataSource lookup through JNDI,
-        			// locate the DataSource object frome the JNDI namespace and use it.
-        			Object    ds;
-        			
-        			try {
-        				ds = new InitialContext().lookup( database.getDatabaseChoice().getJndi().getName() );
-        			} catch ( NameNotFoundException except ) {
-        				throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName() );
-        			} catch ( NamingException except ) {
-        				throw new MappingException( except );
-        			}
-        			if ( ! ( ds instanceof DataSource ) )
-        				throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName() );
-        			
-            		dbs = new DatabaseRegistry( database.getName(), mapping.getResolver( Mapping.JDO, factory ), factory, (DataSource) ds );
-            		_log.debug( "Using DataSource from JNDI ENC: " + database.getDatabaseChoice().getJndi().getName() );
-        		
-        		} else {
-        			throw new MappingException( "jdo.missingDataSource", database.getName() );
-        		}	
-        	
+                if ( database.getDatabaseChoice().getDriver() != null ) {
+    				// JDO configuration file specifies a driver, use the driver
+    				// properties to create a new registry object.
+                    dbs = initFromDriver(mapping, database, factory);
+    			} else if ( database.getDatabaseChoice().getDataSource() != null ) {
+    				// JDO configuration file specifies a DataSource object, use the
+    				// DataSource which was configured from the JDO configuration file
+    				// to create a new registry object.
+    				dbs = initFromDataSource(mapping, database, factory);
+    			} else if ( database.getDatabaseChoice().getJndi() != null ) {
+    				// JDO configuration file specifies a DataSource lookup through JNDI, 
+    				// locate the DataSource object frome the JNDI namespace and use it.
+    				dbs = initFromJNDI(mapping, database, factory);
+                } else {
+                    throw new MappingException( "jdo.missingDataSource", database.getName() );
+                }
+                
         		// Register the new registry object for the given database name.
         		_databases.put( database.getName(), dbs );
         	
@@ -367,7 +359,180 @@ public class DatabaseRegistry
     }
 
 
-    public Connection createConnection()
+	/**
+     * Initialize DatabaseRegistry instance using a JDBC DataSource instance. 
+     * @param mapping Mapping instance.
+     * @param database Configuration of the JDO Database element
+     * @param factory PersistenceFactory instance.
+     * @return DatabaseRegistry instance.
+     * @throws MappingException Problem related to analysing the JDO configuration.
+     */
+    public static DatabaseRegistry initFromDataSource(Mapping mapping, Database database, PersistenceFactory factory) 
+		throws MappingException 
+	{
+        DatabaseRegistry dbs;
+		DataSource dataSource;
+		
+		dataSource = loadDataSource (database);		
+		
+		dbs = new DatabaseRegistry (database.getName(), 
+									mapping.getResolver (Mapping.JDO, factory), 
+									factory,
+									dataSource);
+		
+        _log.debug( "Using DataSource: " + database.getDatabaseChoice().getDataSource().getClassName() );
+		return dbs;
+	}
+    
+    public static DataSource loadDataSource (Database database) 
+    	throws MappingException
+	{
+
+    	DataSource dataSource;
+		Param[] parameters;
+		Param param;
+		
+		String className = database.getDatabaseChoice().getDataSource().getClassName();
+		
+		try {
+			dataSource = (DataSource) Class.forName (className, true, Thread.currentThread().getContextClassLoader()).newInstance();
+		} 
+		catch (Exception e) {
+			throw new MappingException(Messages.format ("jdo.engine.classNotInstantiable", 
+									   className), e);
+		}
+
+		parameters = database.getDatabaseChoice().getDataSource().getParam();
+		
+		Unmarshaller unmarshaller = new Unmarshaller(dataSource);
+		UnmarshalHandler handler = unmarshaller.createHandler();
+		
+		try {
+			handler.startDocument();
+			handler.startElement("data-source", null);
+
+			for (int i = 0; i < parameters.length; i++) {
+			   param = (Param) parameters[i];
+			   handler.startElement(param.getName(), null);
+			   handler.characters(param.getValue().toCharArray(), 0, param.getValue().length());
+			   handler.endElement(param.getName());
+			}
+
+			handler.endElement("data-source");
+			handler.endDocument();
+		} catch (SAXException e) {
+			_log.error ("Unable to parse <data-source> element.", e);
+			throw new MappingException ("Unable to parse <data-source> element.", e);
+		}
+		
+        return dataSource;
+    }
+
+
+	/**
+     * Initialize DatabaseRegistry instance using a JDBC Driver. 
+     * @param mapping Mapping instance.
+     * @param database Configuration of the JDO Database element
+     * @param factory PersistenceFactory instance.
+     * @return DatabaseRegistry instance.
+     * @throws MappingException Problem related to analysing the JDO configuration.
+     * @throws SQLException Problem related to initialzing the JDBC driver.
+     */
+    private static DatabaseRegistry initFromDriver(Mapping mapping, Database database, PersistenceFactory factory) 
+		throws MappingException, SQLException 
+	{
+		DatabaseRegistry dbs;
+		Properties  props;
+		Enumeration params;
+		Param       param;
+
+        String driverName = database.getDatabaseChoice().getDriver().getClassName();
+		if (driverName != null ) {
+		    try {
+		        Class.forName (database.getDatabaseChoice().getDriver().getClassName()).newInstance();
+		    } 
+			catch (InstantiationException e) {
+				_log.error (Messages.format ("jdo.engine.classNotInstantiable", driverName), e);
+		        throw new MappingException(Messages.format ("jdo.engine.classNotInstantiable", driverName), e);
+			} 
+			catch (IllegalAccessException e) {
+				_log.error (Messages.format ("jdo.engine.classNotAccessable", driverName, "constructor"), e);
+		        throw new MappingException(Messages.format ("jdo.engine.classNotAccessable", driverName, "constructor"), e);
+			} 
+			catch (ClassNotFoundException e) {
+				_log.error ("Can not load class " + driverName, e);
+		        throw new MappingException("Can not load class " + driverName, e);
+			} 
+		}
+
+		if (DriverManager.getDriver (database.getDatabaseChoice().getDriver().getUrl()) == null)
+		    throw new MappingException( "jdo.missingDriver", database.getDatabaseChoice().getDriver().getUrl());
+
+		props = new Properties();
+		params = database.getDatabaseChoice().getDriver().enumerateParam();
+		while (params.hasMoreElements()) {
+		    param = (Param) params.nextElement();
+		    props.put (param.getName(), param.getValue());
+		}
+
+		dbs = new DatabaseRegistry (database.getName(), 
+									mapping.getResolver(Mapping.JDO, factory), 
+									factory,
+		                            database.getDatabaseChoice().getDriver().getUrl(), 
+									props );
+		
+        _log.debug( "Using driver: " + driverName );
+        
+		return dbs;
+
+	}
+
+
+	/**
+     * 
+     * Initialize DatabaseRegistry instance using a JDBC DataSource object bound to
+     * the JNDI ENC. 
+     * @param mapping Mapping instance.
+     * @param database Configuration of the JDO Database element
+     * @param factory PersistenceFactory instance.
+     * @return DatabaseRegistry instance.
+     * @throws MappingException Problem related to analysing the JDO configuration.
+     */
+    private static DatabaseRegistry initFromJNDI(Mapping mapping, 
+												 Database database, 
+												 PersistenceFactory factory) 
+    	throws MappingException 
+    {
+		DatabaseRegistry dbs;
+		Object    dataSource;
+
+		if (_log.isDebugEnabled()) {
+			_log.debug( "Using DataSource from JNDI ENC: " + database.getDatabaseChoice().getJndi().getName() );
+		}
+
+		try {
+			Context initialContext = new InitialContext(); 
+		    dataSource = initialContext.lookup (database.getDatabaseChoice().getJndi().getName());
+		} 
+		catch (NameNotFoundException e ) {	
+		    throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName(), e);
+		} 
+		catch (NamingException e) {
+		    throw new MappingException(e);
+		}
+		if ( !(dataSource instanceof DataSource))
+		    throw new MappingException( "jdo.jndiNameNotFound", database.getDatabaseChoice().getJndi().getName());
+
+		dbs = new DatabaseRegistry (database.getName(), 
+									mapping.getResolver(Mapping.JDO, factory ),
+ 									factory,
+		                            (DataSource) dataSource );
+		
+		return dbs;
+    }
+
+
+	public Connection createConnection()
         throws SQLException
     {
         if ( _dataSource != null ) {
@@ -375,6 +540,7 @@ public class DatabaseRegistry
         }
 
         return DriverManager.getConnection( _jdbcUrl, _jdbcProps );
+
     }
 
 
