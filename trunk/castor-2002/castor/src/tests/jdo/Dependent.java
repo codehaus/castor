@@ -221,19 +221,15 @@ public class Dependent
             // remove detail with id == 6 explicitly
             detail = (TestDetail) master.findDetail( 6 );
             master.getDetails().removeElement( detail );
-            db.remove( detail );
             // add new detail
             master.addDetail( new TestDetail( 8 ) );
             // add new detail and create it explicitely
             detail = new TestDetail( 9 );
             master.addDetail( detail );
-            db.create( detail );
             // delete, then create detail with id == 7 explicitly
             detail = (TestDetail) master.findDetail( 7 );
             master.getDetails().removeElement( detail );
-            db.remove( detail );
             master.addDetail( detail );
-            db.create( detail );
             db.commit();
             db.begin();
             master = (TestMaster) db.load( TestMaster.class, new BigDecimal( TestMaster.DefaultId ) );
