@@ -310,13 +310,13 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      *   identity already exists in persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void create( Key key, Object conn, Entity entity )
+    public void create( Key key, Entity entity )
         throws PersistenceException {
 
         if (_sqlCreate == null) {
             _sqlCreate = SQLQueryBuilder.getCreateExecutor(_factory, _connector, _log, _info);
         }
-        _sqlCreate.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, null, null, null);
+        _sqlCreate.execute(key, _lockEngine, _connector.getConnection( key ), entity.identity, entity, null, null, null);
     }
 
     private BitSet getDirtyCheckNulls(Entity original) {
@@ -363,7 +363,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void store( Key key, Object conn, Entity entity, Entity original )
+    public void store( Key key, Entity entity, Entity original )
         throws PersistenceException {
 
         BitSet dirtyCheckNulls;
@@ -388,7 +388,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
                 _sqlStoreDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, original, null, null);
+        executor.execute(key, _lockEngine, _connector.getConnection(key), entity.identity, entity, original, null, null);
     }
 
 
@@ -404,7 +404,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      * @param original The entity to delete
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Key key, Object conn, Entity original)
+    public void delete( Key key, Entity original)
         throws PersistenceException {
 
         BitSet dirtyCheckNulls;
@@ -429,7 +429,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
                 _sqlRemoveDirtyCheckMap.put(dirtyCheckNulls, executor);
             }
         }
-        executor.execute(key, _lockEngine, (Connection) conn, original.identity, null, original, null, null);
+        executor.execute(key, _lockEngine, _connector.getConnection(key), original.identity, null, original, null, null);
     }
 
 
@@ -449,13 +449,13 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      *  deleted from persistence storage
      * @throws PersistenceException A persistence error occured
      */
-    public void writeLock( Key key, Object conn, Entity entity )
+    public void writeLock( Key key, Entity entity )
         throws PersistenceException {
 
         if (_sqlLock == null) {
             _sqlLock = SQLQueryBuilder.getLookupExecutor(_factory, _connector, _log, _info, true);
         }
-        _sqlLock.execute(key, _lockEngine, (Connection) conn, entity.identity, null, null, null, null);
+        _sqlLock.execute(key, _lockEngine, _connector.getConnection(key), entity.identity, null, null, null, null);
     }
 
 
@@ -477,7 +477,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public void load( Key key, Object conn, Entity entity, AccessMode accessMode )
+    public void load( Key key, Entity entity, AccessMode accessMode )
             throws PersistenceException {
         SQLQueryExecutor executor;
 
@@ -492,7 +492,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
             }
             executor = _sqlLoad;
         }
-        executor.execute(key, _lockEngine, (Connection) conn, entity.identity, entity, null, null, null);
+        executor.execute(key, _lockEngine, _connector.getConnection(key), entity.identity, entity, null, null, null);
     }
 
     /**
@@ -508,7 +508,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
      * @param accessMode The access mode (null equals shared)
      * @throws PersistenceException A persistence error occured
      */
-    public void loadRelated( Key key, Object conn, Relation relation, AccessMode accessMode )
+    public void loadRelated( Key key, Relation relation, AccessMode accessMode )
             throws PersistenceException {
         SQLQueryExecutor executor;
         SQLRelationInfo[] oneToManyPath;
@@ -566,7 +566,7 @@ public final class SQLEngine implements Persistence, SQLConnector.ConnectorListe
             executor = SQLQueryBuilder.getSelectExecutor(_factory, _connector, _log, _info, true, oneToManyPath);
             map.put(relation.fieldInfo, executor);
         }
-        executor.execute(key, _lockEngine, (Connection) conn, identity, null, null, relation, list);
+        executor.execute(key, _lockEngine, _connector.getConnection(key), identity, null, null, relation, list);
         lrSet.remove(lr);
         lrSet.add(new LoadedRelation(oneToManyPath, identity, list));
     }
