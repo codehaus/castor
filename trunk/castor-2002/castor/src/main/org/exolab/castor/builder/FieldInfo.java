@@ -200,7 +200,7 @@ public class FieldInfo extends XMLInfo {
 
         boolean needs_has
             = ((!xsType.isEnumerated()) && jType.isPrimitive());
-        
+
         //-- create get method
         method = new JMethod(jType, "get"+mname);
         jClass.addMethod(method);
@@ -297,18 +297,18 @@ public class FieldInfo extends XMLInfo {
      * comments to.
     **/
     public void createGetterComment(JDocComment jDocComment) {
-        
+
         String fieldName = this.name;
         //-- remove '_' if necessary
         if (fieldName.indexOf('_') == 0) {
             fieldName = fieldName.substring(1);
         }
-        
+
         String at_return = "the value of field '" + fieldName + "'.";
-        
+
         String mComment = "Returns " + at_return;
         if ((_comment != null) && (_comment.length() > 0)) {
-            mComment += " The field '" + fieldName + 
+            mComment += " The field '" + fieldName +
                 "' has the following description: ";
             mComment += _comment;
         }
@@ -324,23 +324,23 @@ public class FieldInfo extends XMLInfo {
      * comments to.
     **/
     public void createSetterComment(JDocComment jDocComment) {
-        
+
         String fieldName = this.name;
         //-- remove '_' if necessary
         if (fieldName.indexOf('_') == 0) {
             fieldName = fieldName.substring(1);
         }
-        
+
         String at_param = "the value of field '" + fieldName + "'.";
-        
+
         String mComment = "Sets " + at_param;
         if ((_comment != null) && (_comment.length() > 0)) {
-            mComment += " The field '" + fieldName + 
+            mComment += " The field '" + fieldName +
                 "' has the following description: ";
             mComment += _comment;
         }
         jDocComment.appendComment(mComment);
-        
+
         JDocDescriptor paramDesc = jDocComment.getParamDescriptor(fieldName);
         if (paramDesc == null) {
             paramDesc = JDocDescriptor.createParamDesc(fieldName, null);
@@ -393,7 +393,6 @@ public class FieldInfo extends XMLInfo {
         return "get" + methodSuffix();
     } //-- getReadMethodName
 
-
     /**
      * Returns the name of the write method for this FieldInfo
      * @return the name of the write method for this FieldInfo
@@ -410,7 +409,21 @@ public class FieldInfo extends XMLInfo {
      * @param jsc the JSourceCode in which to add the source to
     **/
     public void generateInitializerCode(JSourceCode jsc) {
-        //-- do nothing by default
+        //set the default value
+        if (!getSchemaType().isPrimitive()) {
+            String value = getDefaultValue();
+            if (value == null)
+                value = getFixedValue();
+            if (value != null) {
+                 StringBuffer buffer = new StringBuffer(50);
+                 buffer.append("set");
+                 buffer.append(methodSuffix());
+                 buffer.append('(');
+                 buffer.append(value);
+                 buffer.append(");");
+                 jsc.add(buffer.toString());
+            }
+        }
     } //-- generateInitializerCode
 
 
@@ -533,6 +546,7 @@ public class FieldInfo extends XMLInfo {
     public void setFixedValue(String fixedValue) {
         this._fixed = fixedValue;
     } //-- setFixedValue
+
 
     /**
      * Sets the "static" status of this FieldInfo. Static
