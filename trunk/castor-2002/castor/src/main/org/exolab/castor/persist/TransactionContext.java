@@ -468,7 +468,7 @@ public abstract class TransactionContext
             // ssa, FIXME : Are the two following statements equivalent ?
 //            if ( ! molder.getJavaClass().isAssignableFrom( entry.object.getClass() ) )
             if ( ! molder.getJavaClass( _db.getClassLoader() ).isAssignableFrom( entry.object.getClass() ) )
-                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), identity ) );
+                throw new PersistenceException( Messages.format("persist.typeMismatch", molder.getName(), entry.object.getClass() ) );
             if ( entry.created )
                 return entry.object;
             if ( ( accessMode == AccessMode.Exclusive ||
