@@ -292,7 +292,7 @@ public class Test
 	    stmt.setInt( 1, product.id );
 	    rs = stmt.executeQuery();
 	    while ( rs.next() ) {
-		product.price = rs.getDouble( 1 );
+		product.price = (float) rs.getDouble( 1 );
 		product.name = rs.getString( 2 );
 		product.group.id = rs.getInt( 3 );
 		product.group.name = rs.getString( 4 );

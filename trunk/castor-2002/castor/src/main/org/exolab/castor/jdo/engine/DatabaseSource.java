@@ -63,7 +63,7 @@ import org.xml.sax.EntityResolver;
 import org.odmg.ODMGException;
 import org.odmg.DatabaseNotFoundException;
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.MappingException;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.MappingTable;
 import org.exolab.castor.jdo.mapping.Databases;
 import org.exolab.castor.jdo.mapping.Database;

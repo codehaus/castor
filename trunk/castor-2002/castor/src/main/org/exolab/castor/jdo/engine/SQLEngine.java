@@ -203,7 +203,7 @@ class SQLEngine
 		} else {
 		    descs = _primKey.getJDOFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
-			stmt.setObject( i + 1, descs[ i ].getValue( primKey ) );
+			descs[ i ].getValue( primKey, stmt, i + 1 );
 		    }
 		}
 		if ( stmt.executeQuery().next() )
@@ -222,7 +222,7 @@ class SQLEngine
 		    primKey = _objDesc.getPrimaryKeyField().getValue( obj );
 		    descs = _primKey.getJDOFields();
 		    for ( i = 0 ; i < descs.length ; ++i ) {
-			stmt.setObject( count + i, descs[ i ].getValue( primKey ) );
+			descs[ i ].getValue( primKey, stmt, count + i );
 		    }
 		    count += i;
 		}
@@ -290,7 +290,7 @@ class SQLEngine
 	    } else {
 		pkDescs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-		    stmt.setObject( 1 + i, pkDescs[ i ].getValue( primKey ) );
+		    pkDescs[ i ].getValue( primKey, stmt, i + 1 );
 		}
 	    }
 	    
@@ -334,7 +334,7 @@ class SQLEngine
 	    } else {
 		pkDescs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < pkDescs.length ; ++i ) {
-		    stmt.setObject( 1 + i, pkDescs[ i ].getValue( primKey ) );
+		    pkDescs[ i ].getValue( primKey, stmt, i + 1 );
 		}
 	    }
 	    
@@ -490,7 +490,7 @@ class SQLEngine
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( i = 0 ; i < descs.length ; ++i ) {
-		    stmt.setObject( count + i, descs[ i ].getValue( primKey ) );
+		    descs[ i ].getValue( primKey, stmt, count + 1 );
 		}
 	    }
 	    if ( stmt.executeUpdate() == 0 ) {
@@ -533,7 +533,7 @@ class SQLEngine
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
-		    stmt.setObject( 1 + i, descs[ i ].getValue( primKey ) );
+		    descs[ i ].getValue( primKey, stmt, i + 1 );
 		}
 	    }
 	    if ( stmt.executeUpdate() == 0 ) {
@@ -572,7 +572,7 @@ class SQLEngine
 	    } else {
 		descs = _primKey.getJDOFields();
 		for ( int i = 0 ; i < descs.length ; ++i ) {
-		    stmt.setObject( i + 1, descs[ i ].getValue( primKey ) );
+		    descs[ i ].getValue( primKey, stmt, i + 1 );
 		}
 	    }
 	    if ( ! stmt.executeQuery().next() )

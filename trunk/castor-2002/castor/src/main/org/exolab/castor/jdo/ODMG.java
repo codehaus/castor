@@ -64,7 +64,7 @@ import org.odmg.DSet;
 import org.odmg.ODMGRuntimeException;
 import org.odmg.NotImplementedException;
 import org.odmg.ObjectNotPersistentException;
-import org.exolab.castor.MappingException;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.engine.TransactionImpl;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.OQLQueryImpl;

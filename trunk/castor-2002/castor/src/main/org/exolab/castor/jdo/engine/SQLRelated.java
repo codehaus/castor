@@ -48,7 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import java.io.PrintWriter;
-import org.exolab.castor.desc.FieldDesc;
+import org.exolab.castor.mapping.FieldDesc;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.jdo.desc.RelationDesc;

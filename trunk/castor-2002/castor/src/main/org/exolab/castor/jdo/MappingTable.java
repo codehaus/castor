@@ -49,7 +49,7 @@ package org.exolab.castor.jdo;
 
 import java.util.Hashtable;
 import java.util.Enumeration;
-import org.exolab.castor.MappingException;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.mapping.Mapping;
 import org.exolab.castor.jdo.mapping.ObjectMapping;
