@@ -45,7 +45,7 @@
 
 package org.exolab.castor.xml.dtd;
 
-import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import java.io.*;
 import java.util.Enumeration;
@@ -55,9 +55,8 @@ import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.SimpleTypesFactory;
 import org.exolab.castor.xml.dtd.parser.*;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.mapping.MappingException;
 
+import org.exolab.castor.xml.schema.writer.SchemaWriter;
 
 /**
  * Class containing static top-level methods to parse and convert
@@ -81,15 +80,13 @@ public class Converter {
      * Help message is provided.
      * @throws DTDException if the input DTD document is malformed.
      * @throws SchemaException if Schema object can not be created.
-     * @throws MarshalException if an error occured during marshalling.
-     * @throws ValidationException if error occured during marshalling.
+     * @throws SAXException if an error occured during marshalling of schema object
+     * constructed from the DTD document.
      */
     public static void main (String args[]) throws IOException,
                                                    DTDException,
                                                    SchemaException,
-                                                   MarshalException,
-                                                   ValidationException,
-                                                   MappingException {
+                                                   SAXException {
         if ((args.length < 2) || (args.length > 3)) {
 
             String s = "\nUsage:\n";
@@ -144,18 +141,15 @@ public class Converter {
      * @throws DTDException if the DTD document is syntactically or semanticly
      * not correct.
      * @throws SchemaException if Schema object can not be created.
-     * @throws IOException if Castor's Marshaller object can not be created
-     * with the given <tt>writer</tt>.
-     * @throws MarshalException if an error occured during marshalling.
-     * @throws ValidationException if an error occured during marshalling.
+     * @throws IOException if there is an I/O problem with the <tt>reader</tt>
+     * or <tt>writer</tt>.
+     * @throws SAXException if an error occured during schema object marshalling.
      */
     public static void convertDTDtoSchema(Reader reader, Writer writer)
                                           throws DTDException,
                                                  SchemaException,
                                                  IOException,
-                                                 MarshalException,
-                                                 ValidationException,
-                                                 MappingException {
+                                                 SAXException {
 
        //-- parse text of DTD document
        DTDdocument dtd = parseDTD(reader);
@@ -235,50 +229,53 @@ public class Converter {
      * @throws SchemaException if Schema object can not be created.
      */
     public static Schema convertDTDObjectToSchemaObject (DTDdocument dtd)
-                         throws DTDException, SchemaException {
+                                                  throws DTDException,
+                                                  SchemaException {
 
        Schema schema = new Schema();
 
        String name = dtd.getName();
        if (name != null && !name.equals("")) schema.setName(name);
 
-       //-- convert Notation declarations
+       // convert Notation declarations
        Enumeration dtdNotations = dtd.getNotations();
        Notation notation;
 
        while (dtdNotations.hasMoreElements()) {
           notation = (Notation)dtdNotations.nextElement();
-          //-- do nothing for now as the Castor Schema object model does not
-          //-- contain notations set
+          // do nothing for now as the Castor Schema object model does not
+          // support Notation declarations
        } //-- convert Notations declarations
 
-       //-- convert General Entity declarations.
-       //-- XML Schema does not provide facilities analogous to General Entity
-       //-- declarations in XML DTD, so we convert each General Entity declaration
-       //-- to Documentation subelement of XML Schema document annotaion.
+       // convert General Entity declarations.
+       // XML Schema does not provide facilities analogous to General Entity
+       // declarations in XML DTD, so we convert each General Entity declaration
+       // to Documentation subelement of XML Schema document annotaion.
        Enumeration dtdGeneralEntities = dtd.getGeneralEntities();
-       GeneralEntity ge;
-       Annotation annotation = new Annotation();
-       Documentation documentation;
-       String text;
+       if (dtdGeneralEntities.hasMoreElements()) {
+          GeneralEntity ge;
+          Annotation annotation = new Annotation();
+          Documentation documentation;
+          String text;
 
-       while (dtdGeneralEntities.hasMoreElements()) {
-          ge = (GeneralEntity)dtdGeneralEntities.nextElement();
-          documentation = new Documentation();
+          while (dtdGeneralEntities.hasMoreElements()) {
+             ge = (GeneralEntity)dtdGeneralEntities.nextElement();
+             documentation = new Documentation();
 
-          text = "General Entity Declaration";
-          documentation.setContent(text);
-          documentation.add(ge);
-          annotation.addDocumentation(documentation);
+             text = "General Entity Declaration";
+             documentation.setContent(text);
+             documentation.add(ge);
+             annotation.addDocumentation(documentation);
+          }
+
+          schema.addAnnotation(annotation);
        }
-
-       schema.addAnnotation(annotation);
        //-- convert General Entity declarations
 
-       //-- convert Element declarations
+       // convert Element declarations
        Enumeration dtdElements = dtd.getElements();
-       Element dtdElement; //-- DTD Element declaration
-       ElementDecl schemaElement; //-- Schema Element declaration
+       Element dtdElement; // DTD Element declaration
+       ElementDecl schemaElement; // Schema Element declaration
 
        while (dtdElements.hasMoreElements()) {
           dtdElement = (Element)dtdElements.nextElement();
@@ -303,87 +300,105 @@ public class Converter {
     public static ElementDecl convertDTDElementToSchemaElement(Element dtdElement,
                                                                Schema schema)
                                                                throws DTDException,
-                                                               SchemaException {
+                                                                      SchemaException {
 
        String name = dtdElement.getName();
        if (name == null || name.equals("")) {
-          String err = "Converter: a DTD element has no name.";
+          String err = "DTD to Schema converter: a DTD element has no name.";
           throw new DTDException(err);
        }
        ElementDecl schemaElement = new ElementDecl(schema, name);
 
-       //-- start converting content of the element
-       ComplexType complexType = new ComplexType(schema);
+       // start converting content of the element
+       ComplexType complexType = schema.createComplexType();
        ContentType contentType = null;
-       Iterator mixedChildrenIterator = null;
-       String elementRef = null; //-- auxiliary
-       ElementDecl elem = null;  //-- auxiliary
+       Group group = null; // auxiliary
+       Iterator mixedChildrenIterator = null; // auxiliary
+       String elementRef = null; // auxiliary
+       ElementDecl elem = null;  // auxiliary
 
        if (dtdElement.isEmptyContent()) {
 
-          contentType = ContentType.empty;
+          // mixed="false"
+          contentType = ContentType.elemOnly;
+          //-- mixed="false"
 
        } else if (dtdElement.isAnyContent()) {
 
-          contentType = ContentType.any;
+          // mixed="true"
+          contentType = ContentType.mixed;
+          //-- mixed="true"
+
+          group = new Group();
+          group.setOrder(Order.seq);
+          group.setMinOccurs(0);
+          group.setMaxOccurs(-1);
+          Wildcard any = new Wildcard(group);
+          group.addWildcard(any);
+          complexType.addGroup(group);
 
        } else if (dtdElement.isElemOnlyContent()) {
 
+          // mixed="false"
           contentType = ContentType.elemOnly;
+          //-- mixed="false"
 
           ContentParticle dtdContent = dtdElement.getContent();
-          if (dtdContent == null) { //-- content is not specified
-             String err = "Converter: element \"" + dtdElement.getName();
-             err += "\" has unspecified content.";
+          if (dtdContent == null) { // content is not specified
+             String err = "DTD to Schema converter: element \"" + dtdElement.getName();
+             err += "\" has no content.";
              throw new DTDException(err);
           }
 
-          Object content = null;
+          Particle content = null;
           try {
              content = convertContentParticle(dtdContent, schema);
           }
           catch (DTDException e) {
-             String err = "Converter: content of element \"" + dtdElement.getName();
+             String err = "DTD to Schema converter: content of DTD element \"" + dtdElement.getName();
              err += "\", represented by a Content Particle, is malformed.";
              throw new DTDException(err);
           }
 
           if (content instanceof ElementDecl) {
-             complexType.addElementDecl((ElementDecl)content);
+             group = new Group();
+             group.setOrder(Order.seq);
+             group.addElementDecl((ElementDecl)content);
+             complexType.addGroup(group);
           } else {
              complexType.addGroup((Group)content);
           }
 
-       } else if (dtdElement.isMixedContent()) { //-- dtdElement is of "Mixed" type
+       } else if (dtdElement.isMixedContent()) {
+
+          // mixed="true"
+          contentType = ContentType.mixed;
+          //-- mixed="true"
 
           mixedChildrenIterator = dtdElement.getMixedContentChildren();
-          if (mixedChildrenIterator.hasNext()) {
-
-             contentType = ContentType.mixed;
-
-             //-- add children to content model of the complexType
+          if ((mixedChildrenIterator != null) && (mixedChildrenIterator.hasNext())) {
+             group = new Group();
+             group.setOrder(Order.choice);
+             group.setMinOccurs(0);
+             group.setMaxOccurs(-1);
              while (mixedChildrenIterator.hasNext()) {
                 elementRef = (String)mixedChildrenIterator.next();
                 elem = new ElementDecl(schema);
                 elem.setReference(elementRef);
-                complexType.addElementDecl(elem);
+                group.addElementDecl(elem);
              }
-
-          } else {
-
-             contentType = ContentType.textOnly;
-
+             complexType.addGroup(group);
           }
-       } else { //-- the type of the element has not been specified
-          String err = "Converter: type of element \"" + dtdElement.getName();
+
+       } else { // the type of the element has not been specified
+          String err = "DTD to Schema converter: content type of DTD element \"" + dtdElement.getName();
           err += "\" has not been specified.";
           throw new DTDException(err);
        }
-
        complexType.setContentType(contentType);
-       //-- finish converting content of the element
+       // finish converting content of the element
 
-       //-- start attributes convertion
+       // start attributes convertion
        Enumeration dtdAttributes = dtdElement.getAttributes();
        Attribute dtdAttribute;
        AttributeDecl schemaAttribute;
@@ -393,7 +408,7 @@ public class Converter {
           schemaAttribute = convertAttribute(dtdAttribute, schema);
           complexType.addAttributeDecl(schemaAttribute);
        }
-       //-- end attributes convertion
+       // end attributes convertion
 
        schemaElement.setType(complexType);
        return schemaElement;
@@ -416,34 +431,16 @@ public class Converter {
      * @throws SchemaException if unable to construct return content object
      * from a given ContentParticle
      */
-    public static Object convertContentParticle(ContentParticle dtdContent,
-                                                Schema schema)
+    public static Particle convertContentParticle(ContentParticle dtdContent,
+                                                  Schema schema)
                          throws DTDException, SchemaException {
 
-       Object returnValue;
+       Particle returnValue;
 
        if (dtdContent.isReferenceType()) {
 
           ElementDecl elem = new ElementDecl(schema);
           elem.setReference(dtdContent.getReference());
-
-          if (dtdContent.isOneOccurance()) {
-             elem.setMinOccurs(1);
-             elem.setMaxOccurs(1);
-          } else if (dtdContent.isOneOrMoreOccurances()) {
-             elem.setMinOccurs(1);
-             elem.setMaxOccurs(-1);
-          } else if (dtdContent.isZeroOrMoreOccurances()) {
-             elem.setMinOccurs(0);
-             elem.setMaxOccurs(-1);
-          } else if (dtdContent.isZeroOrOneOccurance()) {
-             elem.setMinOccurs(0);
-             elem.setMaxOccurs(1);
-          } else {
-             //-- a content particle always has "one occurance" default
-             //-- occurance specification
-          }
-
           returnValue = elem;
 
        } else if (dtdContent.isSeqType() || dtdContent.isChoiceType()) {
@@ -454,40 +451,40 @@ public class Converter {
 
           Enumeration children = dtdContent.getChildren();
           ContentParticle child;
-          Object contentObject;
+          Particle contentParticle;
 
           while(children.hasMoreElements()) {
              child = (ContentParticle)children.nextElement();
-             contentObject = convertContentParticle(child, schema);
+             contentParticle = convertContentParticle(child, schema);
 
-             if (contentObject instanceof ElementDecl) {
-                group.addElementDecl((ElementDecl)contentObject);
+             if (contentParticle instanceof ElementDecl) {
+                group.addElementDecl((ElementDecl)contentParticle);
              } else {
-                group.addGroup((Group)contentObject);
+                group.addGroup((Group)contentParticle);
              }
-          }
-
-          if (dtdContent.isOneOccurance()) {
-             group.setMinOccurs(1);
-             group.setMaxOccurs(1);
-          } else if (dtdContent.isOneOrMoreOccurances()) {
-             group.setMinOccurs(1);
-             group.setMaxOccurs(-1);
-          } else if (dtdContent.isZeroOrMoreOccurances()) {
-             group.setMinOccurs(0);
-             group.setMaxOccurs(-1);
-          } else if (dtdContent.isZeroOrOneOccurance()) {
-             group.setMinOccurs(0);
-             group.setMaxOccurs(1);
-          } else {
-             //-- a content particle always has "one occurance" default
-             //-- occurance specification
           }
 
           returnValue = group;
 
        } else { //-- type of input DTD Content Particle is not specified
           throw new DTDException();
+       }
+
+       if (dtdContent.isOneOccurance()) {
+          returnValue.setMinOccurs(1);
+          returnValue.setMaxOccurs(1);
+       } else if (dtdContent.isOneOrMoreOccurances()) {
+          returnValue.setMinOccurs(1);
+          returnValue.setMaxOccurs(-1);
+       } else if (dtdContent.isZeroOrMoreOccurances()) {
+          returnValue.setMinOccurs(0);
+          returnValue.setMaxOccurs(-1);
+       } else if (dtdContent.isZeroOrOneOccurance()) {
+          returnValue.setMinOccurs(0);
+          returnValue.setMaxOccurs(1);
+       } else {
+          // a content particle always has "one occurance" default
+          // occurance specification
        }
 
        return returnValue;
@@ -508,61 +505,69 @@ public class Converter {
        AttributeDecl schemaAttribute = new AttributeDecl(schema,
                                                          dtdAttribute.getName());
 
-       SimpleType type= null;
+       SimpleType type = null;
 
        if (dtdAttribute.isStringType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.STRING_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.STRING_TYPE) );
        }
        else if (dtdAttribute.isIDType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ID_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ID_TYPE) );
        }
        else if (dtdAttribute.isIDREFType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREF_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREF_TYPE) );
        }
        else if (dtdAttribute.isIDREFSType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREFS_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.IDREFS_TYPE) );
        }
        else if (dtdAttribute.isENTITYType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITY_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITY_TYPE) );
        }
        else if (dtdAttribute.isENTITIESType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITIES_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.ENTITIES_TYPE) );
        }
        else if (dtdAttribute.isNMTOKENType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKEN_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKEN_TYPE) );
        }
        else if (dtdAttribute.isNMTOKENSType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKENS_TYPE) );
+           type = schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKENS_TYPE) );
        }
        else if (dtdAttribute.isNOTATIONType())
        {
-           type= schema.getSimpleType( schema.getBuiltInTypeName(SimpleTypesFactory.NOTATION_TYPE) );
+          type = schema.createSimpleType(null,
+                            schema.getBuiltInTypeName(SimpleTypesFactory.NOTATION_TYPE),
+                                                                        "restriction");
+           Iterator values = dtdAttribute.getValues();
+           while(values.hasNext()) {
+               type.addFacet(new Facet(Facet.ENUMERATION, (String)values.next()));
+           }
+
        }
        else if (dtdAttribute.isEnumerationType())
        {
-          //-- current (08/22/2000) implementation of Schema attribute declaration
-          //-- does not provide facility for inline type definition of an attribute
-          //-- (it has only 'String typeRef' field for reference to the existing
-          //-- top-level datatype).
-          //-- do nothing for now
+          type = schema.createSimpleType(null,
+                            schema.getBuiltInTypeName(SimpleTypesFactory.NMTOKEN_TYPE),
+                                                                        "restriction");
+          Iterator values = dtdAttribute.getValues();
+          while(values.hasNext()) {
+             type.addFacet(new Facet(Facet.ENUMERATION, (String)values.next()));
+          }
        }
        else
        {
-          String err = "Converter: attribute \"" + dtdAttribute.getName();
+          String err = "DTD to Schema converter: DTD attribute \"" + dtdAttribute.getName();
           err += "\" has unspecified type.";
           throw new DTDException(err);
        }
 
-       if (type != null)
-           schemaAttribute.setSimpleType(type);
+       schemaAttribute.setSimpleType(type);
 
        if (dtdAttribute.isREQUIRED()) {
 
@@ -577,7 +582,7 @@ public class Converter {
           schemaAttribute.setValue(dtdAttribute.getDefaultValue());
           schemaAttribute.setUse(AttributeDecl.USE_FIXED);
 
-       } else { //-- DTD attribute is of "DEFAULT" type
+       } else { // DTD attribute is of "DEFAULT" type
 
           schemaAttribute.setValue(dtdAttribute.getDefaultValue());
           schemaAttribute.setUse(AttributeDecl.USE_DEFAULT);
@@ -591,27 +596,18 @@ public class Converter {
      * Marshals XML Schema to output char stream.
      * @param schema XML Schema object to marshal.
      * @param writer output char stream to marshal Schema to.
-     * @throws IOException if Castor's Marshaller object can not be created
-     * with the given <tt>writer</tt>.
-     * @throws MarshalException if an error occured during marshalling.
-     * @throws ValidationException if an error occured during marshalling.
+     * @throws IOException if there is an I/O problem
+     * with the <tt>writer</tt>.
+     * @throws SAXException if an error occured during <tt>schema</tt> marshalling.
      */
     public static void marshalSchema(Schema schema, Writer writer)
                                      throws IOException,
-                                     MarshalException,
-                                     ValidationException,
-                                     MappingException {
+                                     SAXException {
 
-       Marshaller marshaller = new Marshaller(writer);
-       marshaller.setMarshalAsDocument(true);
+       SchemaWriter.enable = true;
+       SchemaWriter sw = new SchemaWriter(writer);
+       sw.write(schema);
 
-       Mapping map = new Mapping();
-       InputStream is = map.getClass().getResourceAsStream("/org/exolab/castor/xml/dtd/SchemaMapping.xml");
-
-       map.loadMapping(new InputSource(is));
-       marshaller.setMapping(map);
-
-       marshaller.marshal(schema);
     } //-- marshalSchema
 
 } //-- Converter
