@@ -49,6 +49,7 @@ package org.exolab.castor.jdo.drivers;
 
 import org.exolab.castor.jdo.engine.JDBCSyntax;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.QueryExpression;
 
 
 /**
@@ -87,7 +88,25 @@ public final class PostgreSQLQueryExpression
 
         return sql.toString();
     }
+
+    /** 
+     * Provides an implementation of {@link QueryExpression#isLimitClauseSupported()}.
+     * @return true to indicate that this feature is supported by postgreSQL. 
+     * @see org.exolab.castor.persist.spi.QueryExpression#isLimitClauseSupported()
+     */
+    public boolean isLimitClauseSupported() {
+    	return true;
+    }
     
+    /** 
+     * Provides an default implementation of {@link QueryExpression#isOffsetClauseSupported()}. 
+     * @return true to indicate that this feature is supported by postgreSQL. 
+     * @see org.exolab.castor.persist.spi.QueryExpression#isOffsetClauseSupported()
+     */
+    public boolean isOffsetClauseSupported() {
+    	return true;
+    }
+
 
 }
 
