@@ -174,7 +174,6 @@
     <deltree dir="${build}/${archive}" />
 
     <mkdir   dir="${build}/${archive}" />
-<!--
     <mkdir   dir="${build}/${archive}/src" />
     <copydir src="${source}" dest="${build}/${archive}/src"
              defaultexcludes="true" />
@@ -190,14 +189,6 @@
     <delete  file="${dist}/${archive}-src.tar" />
     <zip     zipfile="${dist}/${archive}-src.zip" basedir="${build}"
              includes="${archive}/**" />
--->
-    <tar     tarfile="${dist}/${archive}-src.tar" basedir="."
-             includes="${source}/**,${lib}/**,*.sh,*.bat"
-             defaultexcludes="true" />
-    <gzip    src="${dist}/${archive}-src.tar" zipfile="${dist}/${archive}-src.tgz"/>
-    <zip     zipfile="${dist}/${archive}-src.zip" basedir="."
-             includes="${source}/**,${lib}/**,*.sh,*.bat"
-             defaultexcludes="true" />
 
   </target>
 
@@ -218,7 +209,7 @@
     <copydir src="${dist}" dest="${build}/${archive}"
              includes="${archive}.jar,${archive}-xml.jar" />
     <copydir src="${lib}" dest="${build}/${archive}"
-             includes="jdbc-se2.0.jar,jndi.jar,odmg-3.0.jar,jta1.0.1.jar,xerces.jar" />
+             includes="jdbc-se2.0.jar,jndi.jar,jta1.0.1.jar,xerces.jar,ldapjdk.jar" />
     <copydir src="${schema}" dest="${build}/${archive}/schema" />
     <copydir src="${build}/doc" dest="${build}/${archive}/doc" />
     <deltree dir="${build}/${archive}/doc/javadoc" />
@@ -230,6 +221,7 @@
     <tar     tarfile="${dist}/${archive}.tar" basedir="${build}"
              includes="${archive}/**" excludes="${archive}/*.tar,${archive}/*.zip" />
     <gzip    src="${dist}/${archive}.tar" zipfile="${dist}/${archive}.tgz" />
+    <delete  file="${dist}/${archive}.tar" />
 
     <zip     zipfile="${build}/${archive}/examples.zip" basedir="${source}"
              includes="examples/**" defaultexcludes="true" />
