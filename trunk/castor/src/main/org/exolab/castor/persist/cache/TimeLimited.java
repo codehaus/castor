@@ -100,16 +100,6 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 	 */  
 	// private static Timer timer = new Timer(true);
 	
-    public final static int DEFAULT_INTERVAL = 30;
-    
-    /**
-     * interval is the number of ticks an object lives before it will be disposed. 
-     */
-    private int interval;
-	private int tailtime;
-	private QueueItem head;
-	private QueueItem tail;
-	
     /**
      * Container for cached objects.
      */
@@ -120,29 +110,10 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
      */
     public TimeLimited () {
     	super();
-        init (DEFAULT_INTERVAL);
         
         _log.debug ("Successfully initialized instance of " + getClass().getName());
     }
     
-	/**
-	 * Creates an instance of TimeLimited. 
-	 *
-	 * @param interval the number of ticks an object lives before it will be disposed.
-	 */
-	public TimeLimited (int interval) {
-		init (interval);
-	}
-    
-	/**
-	 * Initializes object instance.
-	 * @param interval the number of ticks an object lives before it will be disposed.
-	 */
-	protected void init (int interval) {
-	    map = new Hashtable();
-	    timer.addTickerTask (this);
-	}
-	
     /**
      * Maps the specified <code>key</code> to the specified 
      * <code>value</code> in this Map. Neither the key nor the 
@@ -162,20 +133,20 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
     public synchronized Object put(Object key, Object value) {
         QueueItem oldItem = (QueueItem) map.get(key);
         if (oldItem != null) {
-            // TODO [SMH]: The way things are today this code-block is never reached, but should be fixed since not doing so is expensive for performance.
+            // XXX [SMH]: This code-block is never reached.
             if (_log.isDebugEnabled()) {
                 _log.trace("TimeLimitedLRU: update(" + value + ")");
             }
             Object oldObject = oldItem.value;
             oldItem.value = value;
-            oldItem.time = interval;
+            oldItem.time = getCapacity();
             return oldObject;
         } else {
             if (_log.isDebugEnabled()) {
                 _log.trace("TimeLimitedLRU: put(" + value + ")");
             }
             QueueItem newitem = new QueueItem(key, value);
-            newitem.time = interval;
+            newitem.time = getCapacity();
             map.put(key, newitem);
             return null;
         }
@@ -195,12 +166,16 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
             return ((QueueItem)o).value;
     }
 	
-    /* (non-Javadoc)
+    /**
      * @see org.exolab.castor.persist.cache.Cache#getCapacity()
      */
     public void setCapacity (int capacity) {
         super.setCapacity(capacity);
-        this.interval = interval + 1;
+        if (timer.list.contains(this)) {
+            timer.list.remove(this);
+            map.clear();
+        }
+        timer.addTickerTask(this);
     }
     
 	
@@ -347,6 +322,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
                     }
                 }
             } catch (InterruptedException e) {
+            	// just consume exception
             }
         }
     }
