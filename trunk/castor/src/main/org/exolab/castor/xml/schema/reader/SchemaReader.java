@@ -42,7 +42,7 @@
  *
  * $Id$
  */
-
+ 
 package org.exolab.castor.xml.schema.reader;
 
 import java.io.Reader;
@@ -61,6 +61,7 @@ import org.xml.sax.EntityResolver;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.SAXParseException;
+import org.xml.sax.ErrorHandler;
 
 
 import org.apache.xml.serialize.Serializer;
@@ -92,6 +93,11 @@ public class SchemaReader {
      * SAX EntityResolver
      */
     private EntityResolver _resolver = null;
+    
+    /**
+     * SAX ErrorHandler
+     */
+    private ErrorHandler _errorHandler = null;
 
 
      /**
@@ -208,7 +214,12 @@ public class SchemaReader {
             Sax2ComponentReader handler
                 = new Sax2ComponentReader(schemaUnmarshaller);
             _parser.setDocumentHandler(handler);
-            _parser.setErrorHandler(handler);
+            
+            if (_errorHandler == null)
+                _parser.setErrorHandler(handler);
+            else
+                _parser.setErrorHandler(_errorHandler);
+                
             if (_resolver != null)
                 _parser.setEntityResolver(_resolver);
             _parser.parse(_source);
@@ -234,6 +245,15 @@ public class SchemaReader {
         return _schema;
 
     } //-- read
+
+    /**
+     * Sets the ErrorHandler.
+     *
+     * @param ErrorHandler.
+    **/
+    public void setErrorHandler(ErrorHandler errorHandler) {
+        _errorHandler = errorHandler;
+    } //-- setErrorHandler
 
     /**
      * Sets whether or not post-read validation should
