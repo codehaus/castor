@@ -200,12 +200,13 @@ public interface Database
 
     /**
      * Creates a new object in persistent storage. The object will be
-     * persisted only if the transaction commits. If the object has an
-     * identity then duplicate identity check happens in this method,
-     * and the object is visible to queries in this transaction.
-     * If the identity is null, duplicate identity check occurs when
-     * the transaction completes and the object is not visible to
-     * queries until the transaction commits.
+     * persisted only if the transaction commits.
+     * <p>
+     * If the object has an identity then duplicate identity check happens
+     * in this method, and the object is visible to queries in this
+     * transaction. If the identity is null, duplicate identity check
+     * occurs when the transaction completes and the object is not
+     * visible to queries until the transaction commits.
      *
      * @param object The object to create
      * @throws TransactionNotInProgressException Method called while
@@ -245,11 +246,16 @@ public interface Database
 
 
     /**
-     * Acquire a write lock on the object. Read locks are implicitly
+     * Acquire a soft write lock on the object. Read locks are implicitly
      * available when the object is queried. A write lock is only
      * granted for objects that are created or deleted or for objects
-     * loaded in exclusive mode - this method can obtain such a lock
-     * explicitly. If the object already has a write lock in this
+     * loaded in <tt>exclusive</t> mode - this method can obtain such a
+     * lock explicitly.
+     * <p>
+     * A soft lock is acquired in memory, not in the database. To acquire
+     * a lock in the database, use the <tt>locked</tt> access mode.
+     * <p>
+     * If the object already has a write lock in this
      * transaction or a read lock in this transaction but no read lock
      * in any other transaction, a write lock is obtained. If this
      * object has a read lock in any other transaction this method
@@ -333,24 +339,6 @@ public interface Database
 
 
     /**
-     * Commits the transaction but keeps the transaction open. This
-     * has the same effect as calling {@link #commit}, but persistent
-     * objects remain persistent and all locks are retained.
-     *
-     * @throws TransactionNotInProgressException Method called while
-     *  transaction is not in progress
-     * @throws TransactionAbortedException The transaction cannot
-     *  commit and has been rolled back
-     * @deprecated Use {@link #commit} and {@link #rollback} instead;
-     *  this method cannot be implemented properly with multiple type
-     *  of locks and will not be supported in future versions of the
-     *  API
-     */
-    public void checkpoint()
-        throws TransactionNotInProgressException, TransactionAbortedException;
-
-
-    /**
      * Returns true if the database is closed.
      *
      * @return True if the database is closed
@@ -383,6 +371,16 @@ public interface Database
     public void deletePersistent( Object object )
         throws ObjectNotPersistentException, LockNotGrantedException, 
                PersistenceException;
+
+
+    /**
+     * @deprecated Use {@link #commit} and {@link #rollback} instead;
+     *  this method cannot be implemented properly with multiple type
+     *  of locks and will not be supported in future versions of the
+     *  API
+     */
+    public void checkpoint()
+        throws TransactionNotInProgressException, TransactionAbortedException;
 
 
 }
