@@ -140,6 +140,11 @@ public final class SQLServerQueryExpression
         return sql.toString();
     }
 
+    public boolean isLimitClauseSupported()
+    {
+       return true;
+    }
+
 
 }
 
