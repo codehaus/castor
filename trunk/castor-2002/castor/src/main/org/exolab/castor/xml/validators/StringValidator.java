@@ -185,10 +185,10 @@ public class StringValidator extends PatternValidator
                     temp[temp_count] = chars[i];
                     temp_count++;
                     //--skip the others
-                    int j = i+1;
-                    while (chars[j] == ' ')
-                        j++;
-                    i=j;
+                     i++;
+                     while (i<length-1 && chars[i] == ' ')
+                         i++;
+                     continue;
                 }
                 temp[temp_count] = chars[i];
                 temp_count++;
