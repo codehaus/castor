@@ -181,26 +181,33 @@ public class XMLException extends CastorException {
 
     public void printStackTrace()
     {
-        if ( _exception == null )
-            super.printStackTrace();
-        else
-            _exception.printStackTrace();
+        printStackTrace(System.err);
     }
 
     public void printStackTrace( PrintWriter printer )
     {
         if ( _exception == null )
             super.printStackTrace( printer );
-        else
+        else {
+            String message = getMessage();
+            if (message != null) {
+                printer.println(message);
+            }
             _exception.printStackTrace( printer);
+        }
     }
 
     public void printStackTrace( PrintStream printer )
     {
         if ( _exception == null )
             super.printStackTrace( printer );
-        else
+        else {
+            String message = getMessage();
+            if (message != null) {
+                printer.println(message);
+            }
             _exception.printStackTrace( printer );
+        }
     }
     
 } //-- XMLException
