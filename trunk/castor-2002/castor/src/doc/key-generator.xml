@@ -151,7 +151,7 @@
     <section title="SEQUENCE key generator">
       <p>SEQUENCE key generator can be used only with Oracle and PostgreSQL.
          It generates keys using sequences.</p>    
-      <p>The key generator has one parameter:
+      <p>The key generator has two parameters:
          <table border="1" cellpadding="4">
            <tr><td>sequence</td><td>The name of the sequence</td>
                                 <td>Optional, default="{0}_seq"</td></tr>
