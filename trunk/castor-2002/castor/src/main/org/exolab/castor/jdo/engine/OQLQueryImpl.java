@@ -77,6 +77,7 @@ import org.exolab.castor.persist.PersistenceEngine;
 import org.exolab.castor.persist.PersistenceExceptionImpl;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.FieldHandler;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.MappingException;
@@ -106,6 +107,8 @@ public class OQLQueryImpl
 
     private Class              _objClass;
 
+    private JDOClassDescriptor _clsDesc;
+
 
     private QueryExpression    _expr;
 
@@ -127,6 +130,7 @@ public class OQLQueryImpl
     private int                _fieldNum;
 
     private int                _projectionType;
+    private Vector             _pathInfo;
 
 
     OQLQueryImpl( DatabaseImpl dbImpl )
@@ -253,9 +257,11 @@ public class OQLQueryImpl
         ParseTreeWalker walker = new ParseTreeWalker(_dbEngine, parseTree);
 
         _objClass = walker.getObjClass();
+        _clsDesc = walker.getClassDescriptor();
         _expr = walker.getQueryExpression();
         _paramInfo = walker.getParamInfo();
         _projectionType = walker.getProjectionType();
+        _pathInfo = walker.getPathInfo();
 
 
         //port param info types back to the format of old bind types.
@@ -432,7 +438,13 @@ public class OQLQueryImpl
                     }
                     results = _dbImpl.getTransaction().query( _dbEngine, query, accessMode );
                     _fieldNum = 0;
-                    retVal = new OQLEnumeration( results );
+
+                    System.out.println( _projectionType );
+                    
+                    if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
+                      retVal = new OQLEnumeration( results );
+                    else
+                      retVal = new OQLEnumeration( results, _pathInfo, _clsDesc);
                     break;
                 case ParseTreeWalker.DEPENDANT_VALUE:
                 case ParseTreeWalker.AGGREGATE:
@@ -456,15 +468,31 @@ public class OQLQueryImpl
     {
 
         
-        private Object       _lastObject;
+        private Object                 _lastObject;
+
+        private Vector                 _pathInfo;
+
+        private JDOClassDescriptor     _classDescriptor;
 
 
         private org.exolab.castor.persist.QueryResults _results;
 
 
+        OQLEnumeration( org.exolab.castor.persist.QueryResults results,
+                        Vector pathInfo, JDOClassDescriptor clsDesc )
+        {
+            System.out.println( "OQLEnumeration initialized with pathInfo and class." );
+            _results = results;
+            _pathInfo = pathInfo;
+            _classDescriptor = clsDesc;
+        }
+        
+        
         OQLEnumeration( org.exolab.castor.persist.QueryResults results )
         {
             _results = results;
+            _pathInfo = null;
+            _classDescriptor = null;
         }
 
 
@@ -556,7 +584,10 @@ public class OQLQueryImpl
                 
                 result = _lastObject;
                 _lastObject = null;
-                return result;
+                if ( _pathInfo == null )
+                    return result;
+                else
+                    return followPath( result );
             }
             if ( _results == null )
                 throw new NoSuchElementException();
@@ -568,7 +599,10 @@ public class OQLQueryImpl
                         
                         result = _results.fetch();
                         if ( result != null )
-                            return result;
+                            if ( _pathInfo == null )
+                                return result;
+                            else
+                                return followPath( result );
                     } catch ( ObjectNotFoundException except ) {
                         // Object not found, deleted, etc. Just skip to next one.
                     } catch ( PersistenceException except ) {
@@ -592,8 +626,7 @@ public class OQLQueryImpl
             throw new NoSuchElementException();
         }
 
-
-        public void close()
+       public void close()
         {
             if ( _results != null ) {
                 _results.close();
@@ -612,7 +645,29 @@ public class OQLQueryImpl
         }
 
 
-    }
+        private Object followPath(Object parent) {
+            System.out.println("Following the path.");
+            //follow the path
+            JDOClassDescriptor curClassDesc = _classDescriptor;
+            Object curObject = parent;
+            for ( int i = 1; i < _pathInfo.size(); i++ ) {
+                String curFieldName = (String) _pathInfo.elementAt(i);
+                try {
+                    JDOFieldDescriptor curFieldDesc = 
+                              curClassDesc.getField( curFieldName );
+                    FieldHandler handler = curFieldDesc.getHandler();
+                    curObject = handler.getValue( curObject );
+                    curClassDesc = (JDOClassDescriptor) curFieldDesc.getClassDescriptor();
+                }
+                catch (Exception ex) {
+                    throw new NoSuchElementException( "An exception was thrown trying to access get methods to follow the path expression. " + ex.toString() );
+                }
+            }
+
+            return curObject;
+        }
+        
+     }
     
 
 }

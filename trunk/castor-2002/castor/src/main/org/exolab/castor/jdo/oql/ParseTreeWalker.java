@@ -163,6 +163,41 @@ public class ParseTreeWalker implements TokenTypes
   }
 
   /**
+   * Accessor method for _clsDesc.
+   *
+   * @return The _clsDesc member.
+   */
+  public JDOClassDescriptor getClassDescriptor() {
+    return _clsDesc;
+  }
+  
+  /**
+   * Method to get path info for the selected object.  This is the path which 
+   * will be used by the QueryResults to follow the path if the object 
+   * selected is a DEPENDANT_OBJECT or DEPENDANT_OBJECT_VALUE.  Any other
+   * projectionTypes do not need this, so null will be returned.
+   */
+  public Vector getPathInfo() {
+    switch ( _projectionType ) {
+      case DEPENDANT_OBJECT:
+      case DEPENDANT_OBJECT_VALUE:
+        ParseTreeNode projectionNode;
+        if ( _parseTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
+          projectionNode = _parseTree.getChild(1);
+        else
+          projectionNode = _parseTree.getChild(0);
+
+        if ( projectionNode.getToken().getTokenType() == KEYWORD_AS )
+          projectionNode = projectionNode.getChild(0);
+
+        return ( (Vector) _pathInfo.get( projectionNode ) );
+        
+      default:
+        return null;
+    }
+  }
+
+  /**
    * Traverses the tree checking for errors.  
    *
    * @throws QueryException if there is an error.
