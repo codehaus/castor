@@ -689,13 +689,17 @@ public class Types
         // Convertors to big decimal
         new TypeConvertorInfo( java.lang.Double.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new BigDecimal( ( (Double) obj ).doubleValue() );
+                // with way gives better precision
+                return new BigDecimal( obj.toString() );
+                //return new BigDecimal( ( (Double) obj ).doubleValue() );
             }
             public String toString() { return "Double->BigDecimal"; }
         } ),
         new TypeConvertorInfo( java.lang.Float.class, java.math.BigDecimal.class, new TypeConvertor() {
             public Object convert( Object obj, String param ) {
-                return new BigDecimal( ( (Float) obj ).floatValue() );
+                // with way gives better precision
+                return new BigDecimal( obj.toString() );
+                //return new BigDecimal( ( (Float) obj ).floatValue() );
             }
             public String toString() { return "Float->BigDecimal"; }
         } ),
