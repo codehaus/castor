@@ -110,8 +110,6 @@
 
         <li>Serializable, SQLData, DOM field types</li>
 
-        <li>Java 1.2 collection handlers</li>
-
         <li>Stored procedures</li>
       </ul>
     </section>
