@@ -47,6 +47,7 @@ package org.exolab.castor.xml.schema;
 
 import java.io.FileReader;
 import java.io.PrintWriter;
+import java.io.PrintStream;
 import java.io.InputStream;
 
 import java.util.Enumeration;
@@ -421,12 +422,12 @@ public class SimpleTypesFactory
                     _typesByCode.put(new Integer( type.getSimpleType().getTypeCode() ), type);
                 }
 	        }
-	        catch (Exception except)
-	        {
+	        catch (Exception except) {
                 //Of course, this should not happen if the config files are there.
-                System.out.println(Messages.message("schema.cantLoadBuiltInTypes")
-                    + "\n  initial exception: " + except);
-                throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
+	            String err = Messages.message("schema.cantLoadBuiltInTypes")
+                    + "; " + except;
+
+                throw new SimpleTypesFactoryException( except, err );
 	        }
         }
     } //-- loadTypeDefinitions
@@ -450,9 +451,11 @@ public class SimpleTypesFactory
         try {
             intCode= getClass().getDeclaredField(type.getCode()).getInt(null);
         }
-        catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException( Messages.message("schema.cantLoadBuiltInTypes") );
+        catch (Exception ex) {
+            
+            String error = Messages.message("schema.cantLoadBuiltInTypes")
+                + ex;
+            throw new SimpleTypesFactoryException(ex, error);
         }
 
         result.setTypeCode(intCode);
@@ -527,4 +530,89 @@ public class SimpleTypesFactory
 
 }
 
+/**
+ * A RuntimeException which allows nested exceptions.
+ *
+ * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="kvisco@intalio.com">Keith Visco</a>
+ * @version $Revision$ $Date$
+ */
+class SimpleTypesFactoryException
+    extends RuntimeException
+{
+
+    /**
+     * The exception which caused this Exception
+    **/
+    private Throwable  _exception;
+
+
+    /**
+     * Creates a new SimpleTypesFactoryException
+     *
+     * @param message the error message
+    **/
+    public SimpleTypesFactoryException( String message ) {
+        super(message);
+    } //-- SimpleTypesFactoryException
+
+
+    /**
+     * Creates a new SimpleTypesFactoryException
+     *
+     * @param exception the Exception which caused this Exception.
+    **/
+    public SimpleTypesFactoryException(Throwable exception) {
+        super(exception.toString());
+        _exception = exception;
+    } //-- SimpleTypesFactoryException
+    
+    /**
+     * Creates a new SimpleTypesFactoryException
+     *
+     * @param exception the Exception which caused this Exception.
+     * @param message the error message
+    **/
+    public SimpleTypesFactoryException(Throwable exception, String message) {
+        super( message );
+        _exception = exception;
+    } //-- SimpleTypesFactoryException
+
+
+    /**
+     * Returns the Exception which caused this Exception, or null if
+     * no nested exception exists.
+     *
+     * @return the nested Exception.
+    **/
+    public Throwable getException() {
+        return _exception;
+    } //-- getException
+
+
+    public void printStackTrace() {
+        if ( _exception == null )
+            super.printStackTrace();
+        else
+            _exception.printStackTrace();
+    } //-- printStackTrace
+
+
+    public void printStackTrace( PrintStream print ) {
+        if ( _exception == null )
+            super.printStackTrace( print );
+        else
+            _exception.printStackTrace( print );
+    } //-- printStackTrace
+
+
+    public void printStackTrace( PrintWriter print ) {
+        if ( _exception == null ) 
+            super.printStackTrace( print );
+        else
+            _exception.printStackTrace( print );
+    } //-- printStackTrace
+
+
+} //-- SimpleTypesFactoryException
 
