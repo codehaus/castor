@@ -150,10 +150,6 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
 
         _element = element;
 
-        //-- maxOccurs
-        /*attValue = atts.getValue("maxOccurs");
-        if (attValue != null)
-            _group.setMaxOccurs(toInt(attValue));*/
         /*
          * @maxOccurs
          * If maxOccurs is present, the value is either unbounded
@@ -169,7 +165,7 @@ public class GroupUnmarshaller extends SaxUnmarshaller {
         //-- minOccurs
         attValue = atts.getValue("minOccurs");
         if (attValue != null)
-            _group.setMaxOccurs(toInt(attValue));
+            _group.setMinOccurs(toInt(attValue));
 
         //-- id
         _group.setId(atts.getValue("id"));
