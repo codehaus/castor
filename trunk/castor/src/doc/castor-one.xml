@@ -276,23 +276,76 @@ design, which is important in larger projects. </p>
     </section>
 
     <section title="Lazy Loading">
-        <p>
-            Lazy loading of collection is also a new to castor 0.9. <!--The following collection types are supported: java.util.Array, java.util.Vector, java.util.Hashtable, java.util.Collection, java.util.Set and java.util.Map. -->Currently only the java.util.Collection type is supported. The elements in the collection are only loaded when the application asks for the object from the collection, using, for example, iterator.next(). The iterator in Castor’s lazy collection is optimized to return a loaded object first. Lazy loading can be applied to both one-to-many and many-to-many relationship. </p>
 
-        <p>
-            In the mapping file, lazy loading is specified in the element of the collection’s <i>&lt;field></i>, for example, 
+		<p>As of release 0.9.6, Castor has full support for lazy loading object instances referenced
+		   as part of all relation types currently supported:</p>
+		   
+		<ul>
+			<li>1:1 relations</li>
+			<li>1:m relations</li>
+			<li>M:N relations.</li>
+		</ul>
+		   
+        <section title="1:1 relations">
+        
+        	<p>As of release 0.9.6, Castor supports lazy-loading of 1:1 relations. Imagine the 
+        	   following class mapping:</p>
+
+			<code><![CDATA[
+<mapping>
+    <class name="com.xzy.Department">
+       ...
+       <field "employee" type="com.xyz.Employee" lazy="true" />
+       ...
+    </class>
+</mapping>]]></code>
+        	   
+			<p>Per definition, when an instance of Department is loaded through e.g. Database.load(),
+			   Castor will not (pre-)load the Employee instance referenced (as such reducing the size
+			   pf the initial query as well as the size of the result set returned). Only when the 
+			   Emplyoee instance is accessed through Department.getEmployee(), Castor will load 
+			   the actual object into memory from the persistence store.</p>
+			   
+			<p>This means that if the Employee instance is not accessed at all, not only will 
+			   the initial query to load the Department object have had its complexity reduced, 
+			   but no performance penalty will be incurred for the additional access to the 
+			   persistence store either.</p>
+			   
+        </section>
+    
+        <section title="1:M and M:N relations">
+    
+           <p>Lazy loading of collections is also a new to castor 0.9. As per definition, lazy 
+              loading can be applied to both one-to-many and many-to-many relationship.
+              <!--The following collection types are supported: java.util.Array, java.util.Vector, 
+              java.util.Hashtable, java.util.Collection, java.util.Set and java.util.Map. -->
+              Currently only the java.util.Collection type is supported. The elements in the 
+              collection are only loaded when the application asks for the object from the 
+              collection, using, for example, iterator.next(). The iterator in Castor’s lazy 
+              collection is optimized to return a loaded object first.</p>
+  
+           <p>In the mapping file, lazy loading is specified in the element of the collection’s 
+              <i>&lt;field></i>, for example,</p>
+           
             <pre><![CDATA[
 <mapping>
     <class name="com.xzy.Department">
        ...
-        <field name="com.xyz.Employee" lazy="true"
+        <field name="employee" type="com.xyz.Employee" lazy="true"
                collection="collection"/>
     </class>
 </mapping>]]></pre>
-            declares that the collection of type Employee in a Department is lazy loaded. </p>
 
-        <p>
-            If lazy loading is specified for a field of a class, Castor will set the field with a special collection which contains only the identities of the objects. Because of that, it requires the data object to have the method setDepartment( Collection department ) in the data object class which was not required in previous versions. </p>
+            <p>declares that the collection of type Employee in a Department is lazy loaded.</p>
+
+           <p>If lazy loading is specified for a field of a class, Castor will set the field with a 
+              special collection which contains only the identities of the objects. Because of 
+              that, it requires the data object to have the method setDepartment( Collection 
+              department) in the data object class which was not required in previous 
+              versions.</p>
+              
+           </section>
+           
      </section>
 
      <section title="Multiple columns primary keys">
