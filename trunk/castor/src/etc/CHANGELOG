@@ -2,6 +2,15 @@
 Version (CVS) 
 -------------
 
+XML:   Fixed issue with GeneralizedFieldHandler not able to handle collections.
+       Collections are now automatically iterated over during getValue() calls
+       and each item in the collection is passed into the convertUponGet method.
+       To retain the old behavior simply add a call to #setCollectionIteration
+       with a value of false in the constructor of your GeneralizedFieldHandler.
+       The behavior for setter methods is not changed since only one item at a
+       time is passed into the setter already.
+       (kvisco - 20050118)
+
 JDO:   Fixed bug 1839 using contribution from Stein M. Hugubakken [dulci@start.no]
        Added getCacheManager() to Database.java.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1839
