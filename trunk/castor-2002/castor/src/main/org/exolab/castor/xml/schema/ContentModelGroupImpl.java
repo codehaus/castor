@@ -120,11 +120,12 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
      public boolean removeElementDecl(ElementDecl elementDecl) {
         if (elementDecl == null)
             return false;
-        //remove the resolvable reference???
         int position = _contentModel.indexOf(elementDecl);
 	    if (position >= 0) {
 	        _contentModel.removeElementAt(position);
-	         return true;
+	        String key = "element:"+elementDecl.getName();
+            _resolver.removeResolvable(key);
+            return true;
 	   }
        return false;
      }
@@ -168,8 +169,13 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
             return false;
         int position = _contentModel.indexOf(group);
         if (position >= 0) {
-	        _contentModel.removeElementAt(position);
-	         return true;
+	         String name = group.getName();
+             if (name != null) {
+                 String key = "group:"+name;
+                 _resolver.removeResolvable(key);
+             }
+            _contentModel.removeElementAt(position);
+             return true;
 	   }
        return false;
      }
@@ -214,11 +220,15 @@ class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable 
             return false;
         int position = _contentModel.indexOf(group);
         if (position >= 0) {
+            String name = group.getName();
+            if (name != null) {
+                 String key = "group:"+name;
+                 _resolver.removeResolvable(key);
+             }
 	        _contentModel.removeElementAt(position);
 	         return true;
 	   }
        return false;
-        //remove the resolvable reference???
      }
 
     /**
