@@ -871,6 +871,13 @@
 
   <!-- Last names begin with T-Z -->
 
+
+  <contributor type="Feedback">
+    <name surname="Van vlerken" given="Johan"/>
+    <email>johan.vanvlerken@b-rail.be</email>
+    <description>Castor XML feedback - patch for bug 1461</description>
+  </contributor>
+
   <contributor type="Feedback">
     <name surname="Vaughan" given="Steve"/>
     <email>snmvaughan92@yahoo.com</email>
