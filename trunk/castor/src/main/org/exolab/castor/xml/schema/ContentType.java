@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -47,18 +47,21 @@ package org.exolab.castor.xml.schema;
 
 /**
  * An XML Schema ContentType
+ *
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
-**/
+ */
 public class ContentType implements java.io.Serializable {
 
 
-    public static final short ELEMENT_ONLY = 0;
-    public static final short MIXED        = 1;
-    public static final short EMPTY        = 2;
-    public static final short ANY          = 3;
-    public static final short SIMPLETYPE   = 4;
-	//need to keep it for the dtd package
+    public static final short ELEMENT_ONLY  = 0;
+    public static final short MIXED         = 1;
+    public static final short EMPTY         = 2;
+    public static final short ANY           = 3;
+    public static final short SIMPLE        = 4;
+    
+	//-- This is currently replaced by SIMPLE, leaving
+	//-- for now for the dtd package
 	public static final short TEXT_ONLY     = 5;
 
     public static final ContentType elemOnly   = new ContentType(ELEMENT_ONLY);
@@ -78,74 +81,47 @@ public class ContentType implements java.io.Serializable {
     /* Private Members */
 
     private static final String[] _names =
-    { "elementOnly", "mixed", "empty", "any", "simpleType","textOnly" };
+    { "elementOnly", "mixed", "empty", "any", "simple","textOnly" };
 
     private short _type = ELEMENT_ONLY;
     
-    /**
-     * The simpleType definition that defines this content type (if any)
-     */
-    private SimpleType _simpleType;
 
     /**
      * Creates a new ContentType.
-    **/
-    private ContentType(short type) {
+     */
+    protected ContentType(short type) {
         _type = type;
     } //-- ContentType
 
     /**
      * Returns the type of this ContentType
+     *
      * @return the type of this ContentType
-    **/
+     */
     public short getType() {
         return _type;
     } //-- getType
 
     /**
      * Returns the String representation of this ContentType
+     *
      * @return the String representation of this ContentType
-    **/
+     */
     public String toString() {
         return _names[_type];
     } //-- toString
 
-   /**
-    * Returns the simpleType that represents that contentType. Null is returned
-    * when the type of this content type is not 'simpleType'.
-    * 
-    * @return the simpleType that represents that contentType. Null is returned
-    * when the type of this content type is not 'simpleType'.
-    */
-    public SimpleType getSimpleType() {
-        return _simpleType;
-    }
-    
-    /**
-     * Sets the simpleType that represents that contentType.
-     * This method can only be called when the ContentType is of type
-     * 'simpleType'. A runtime exception is thrown if the type is different
-     * than 'simpleType'
-     * 
-     * @param simpleType the simpleType to set
-     */
-    public void setSimpleType(SimpleType simpleType) {
-        if (_type != SIMPLETYPE)
-            throw new IllegalStateException("A simpleType cannot be set on a content type that is not of type 'SimpleType'.");
-        else 
-            _simpleType = simpleType;
-    }
     /**
      * Creates a new ContentType based on the given String
      * @param contentType the type of the ContentType to create.
      * <BR />
      * <PRE>
      * The valid values are as follows:
-     *  elemOnly, textOnly, mixed, empty, any, simpleType
+     *  elemOnly, textOnly, mixed, empty, any, simple
      * </PRE>
      * @exception IllegalArgumentException when the given type is
      * not one of the possible valid values
-    **/
+     */
     public static ContentType valueOf(String contentType)
         throws IllegalArgumentException
     {
@@ -153,8 +129,8 @@ public class ContentType implements java.io.Serializable {
         else if (contentType.equals(_names[MIXED])) return mixed;
         else if (contentType.equals(_names[EMPTY])) return empty;
         else if (contentType.equals(_names[ANY])) return any;
-        else if (contentType.equals(_names[SIMPLETYPE])){
-            return new ContentType(ContentType.SIMPLETYPE);
+        else if (contentType.equals(_names[SIMPLE])){
+            return new SimpleContent();
         }
         else if (contentType.equals(_names[TEXT_ONLY])) return textOnly;
         else {
