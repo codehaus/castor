@@ -69,6 +69,9 @@ import org.exolab.castor.util.Messages;
  */
 public final class SequenceKeyGenerator implements KeyGenerator
 {
+
+    private final String seqName;
+
     /**
      * Initialize the SEQUENCE key generator.
      */
@@ -81,7 +84,9 @@ public final class SequenceKeyGenerator implements KeyGenerator
             throw new MappingException( Messages.format( "mapping.keyGenNotCompatible",
                                         getClass().getName(), fName ) );
         }
+        seqName = params.getProperty("sequence", "{0}_seq");
     }
+
 
     /**
      * @param conn An open connection within the given transaction
@@ -103,9 +108,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         try {
             stmt = conn.createStatement();
             rs = stmt.executeQuery( "SELECT nextval('" +
-                    MessageFormat.format(props.getProperty("sequence", "{0}_seq"),
-                                         new String[] {tableName}) +
-                    "')" );
+                    MessageFormat.format( seqName, new String[] {tableName}) + "')" );
 
             if ( rs.next() ) {
                 return rs.getObject( 1 );
