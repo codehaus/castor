@@ -303,8 +303,12 @@ public class SourceFactory  {
             SimpleType simpleType = (SimpleType)type;
             classInfo.setSchemaType(TypeConversion.convertType(simpleType));
             //-- handle our special case for enumerated types
-            if (simpleType.hasFacet(Facet.ENUMERATION)) {
-                createSourceCode(simpleType, sgState);
+            if (simpleType.hasFacet(Facet.ENUMERATION)) 
+			{
+				//-- Don't create source code for simple types that
+				//-- don't belong in the elements target namespace
+				if (simpleType.getSchema()==element.getSchema())
+					createSourceCode(simpleType, sgState);
             } else
             // return nothing
                 return null;
@@ -538,13 +542,11 @@ public class SourceFactory  {
     public JClass createSourceCode
         (SimpleType simpleType, SGStateInfo sgState)
     {
-
         if ( SimpleTypesFactory.isBuiltInType( simpleType.getTypeCode() ) ) {
             String err = "You cannot construct a ClassInfo for a " +
                 "built-in SimpleType.";
             throw new IllegalArgumentException(err);
         }
-
         if (sgState == null) {
             throw new IllegalArgumentException("SGStateInfo cannot be null.");
         }
@@ -568,7 +570,7 @@ public class SourceFactory  {
 
         String className   = JavaNaming.toJavaClassName(typeName);
         String packageName = sgState.packageName;
-
+		
         if (simpleType.hasFacet(Facet.ENUMERATION)) {
             enumeration = true;
             //-- XXXX Fix packageName...this is a hack I know,
