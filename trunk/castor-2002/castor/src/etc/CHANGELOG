@@ -1,6 +1,10 @@
 Version (CVS)
 -------------
 
+XML:    Changed name of xml element in the mapping.dtd to bind-xml. This change
+        won't effect any existing mappings yet, because I've added backward
+        compatibility support.
+
 JDO:    For HIGH/LOW key generator the paramater "global" has been added, it gives possibility
         to generate globally unique keys (Oleg Nitz).
 
