@@ -53,16 +53,19 @@ import java.util.Enumeration;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import org.exolab.castor.MappingException;
-import org.exolab.castor.desc.ObjectDesc;
-import org.exolab.castor.desc.FieldDesc;
-import org.exolab.castor.desc.ObjectFieldDesc;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.ObjectDesc;
+import org.exolab.castor.mapping.FieldDesc;
+import org.exolab.castor.mapping.ObjectFieldDesc;
+import org.exolab.castor.mapping.Types;
 import org.exolab.castor.jdo.desc.JDOObjectDesc;
 import org.exolab.castor.jdo.desc.JDOFieldDesc;
 import org.exolab.castor.jdo.desc.JDOContainedFieldDesc;
 import org.exolab.castor.jdo.desc.PrimaryKeyDesc;
 import org.exolab.castor.jdo.desc.Relation;
 import org.exolab.castor.jdo.desc.RelationDesc;
+import org.exolab.castor.jdo.desc.SQLTypes;
+import org.exolab.castor.jdo.desc.TypeConvertor;
 import org.exolab.castor.jdo.mapping.ObjectMapping;
 import org.exolab.castor.jdo.mapping.FieldMapping;
 import org.exolab.castor.jdo.mapping.ObjectFieldMapping;
@@ -112,7 +115,7 @@ public class MappingHelper
 	// Find the named class and make sure it has a default
 	// public constructor. If not, complain about it.
 	try {
-	    objType = loader.loadClass( objMap.getType() );
+	    objType = Types.typeFromName( loader, objMap.getType() );
 	} catch ( ClassNotFoundException except ) {
 	    throw new MappingException( "Could not locate the class " + objMap.getType() +
 					" using the class loader " + loader );
@@ -139,7 +142,8 @@ public class MappingHelper
 	while ( enum.hasMoreElements() ) {
 	    fieldMap = (FieldMapping) enum.nextElement();
 	    fieldDesc = createFieldDesc( fieldMap.getName(), fieldMap.getType(), fieldMap.getSqlName(),
-					 fieldMap.getAccessor(), loader, objType );
+					 fieldMap.getSqlType(), fieldMap.getDirty(), fieldMap.getAccessor(),
+					 loader, objType );
 	    if ( fields.put( fieldDesc.getFieldName(), fieldDesc ) != null )
 		throw new MappingException( "Duplicate fields with the same name: " +
 					    fieldDesc.getFieldName() );
@@ -150,7 +154,7 @@ public class MappingHelper
 	    FieldDesc[] contained;
 
 	    objField = (ObjectFieldMapping) enum.nextElement();
-	    fieldDesc = createFieldDesc( objField.getName(), objField.getType(), "--",
+	    fieldDesc = createFieldDesc( objField.getName(), objField.getType(), "--", null, null,
 					 objField.getAccessor(), loader, objType );
 	    contained = createContainedDescs( objField, fieldDesc, loader, objType );
 	    fieldDesc = new ObjectFieldDesc( fieldDesc, contained );
@@ -198,7 +202,7 @@ public class MappingHelper
 		    throw new MappingException( "Could not find mapping for object " +
 						objTypeName );
 	    }
-	    relField = createFieldDesc( relMap.getName(), objTypeName, "--",
+	    relField = createFieldDesc( relMap.getName(), objTypeName, "--", null, null,
 					relMap.getAccessor(), loader, objType );
 	    relField = new ObjectFieldDesc( relField, relDesc.getFields() );
 
@@ -242,16 +246,17 @@ public class MappingHelper
 
 
     public static JDOFieldDesc createFieldDesc( String fieldName, String fieldType, String sqlName,
-					     AccessorMapping accessor, ClassLoader loader,
-					     Class objType )
+						String sqlType, String dirty, AccessorMapping accessor,
+						ClassLoader loader, Class objType )
 	throws MappingException
     {
-	Class        fieldClass;
-	JDOFieldDesc fieldDesc;
+	Class         fieldClass;
+	JDOFieldDesc  fieldDesc;
+	Class         sqlClass;
 
 	if ( fieldType != null ) {
 	    try {
-		fieldClass = loader.loadClass( fieldType );
+		fieldClass = Types.typeFromName( loader, fieldType );
 	    } catch ( ClassNotFoundException except ) {
 		throw new MappingException( "Could not locate the field type " + fieldType );
 	    }
@@ -262,15 +267,21 @@ public class MappingHelper
 	if ( sqlName == null ) {
 	    sqlName = Util.javaToSqlName( fieldName );
 	}
+	if ( sqlType != null ) {
+	    sqlClass = SQLTypes.typeFromName( sqlType );
+	} else {
+	    sqlClass = null;
+	}
 	if ( accessor == null ) {
-	    fieldDesc = new JDOFieldDesc( findField( objType, fieldName, fieldClass ), sqlName );
+	    fieldDesc = new JDOFieldDesc( findField( objType, fieldName, fieldClass ), sqlName, sqlClass,
+					  "check".equals( dirty ) );
 	} else {
 	    fieldDesc = new JDOFieldDesc( fieldName, objType,
 					  findAccessor( objType, fieldName, accessor.getReader(),
 							true, fieldClass ),
 					  findAccessor( objType, fieldName, accessor.getWriter(),
 							false, fieldClass ),
-					  sqlName );
+					  sqlName, sqlClass, "check".equals( dirty ) );
 	}
 	return fieldDesc;
     }
@@ -291,8 +302,9 @@ public class MappingHelper
 	fieldDescs = new JDOFieldDesc[ fieldMaps.length ];
 	for ( i = 0 ; i < fieldMaps.length ; ++i ) {
 	    fieldDescs[ i ] = createFieldDesc( fieldMaps[ i ].getName(), fieldMaps[ i ].getType(),
-					 fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getAccessor(),
-					 loader, objType );
+					       fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getSqlType(),
+					       fieldMaps[ i ].getDirty(), fieldMaps[ i ].getAccessor(),
+					       loader, objType );
 	    fieldDescs[ i ] = new JDOContainedFieldDesc( fieldDescs[ i ], parentDesc, null );
 	}
 	return fieldDescs;
@@ -314,7 +326,8 @@ public class MappingHelper
 	fieldDescs = new JDOFieldDesc[ fieldMaps.length ];
 	for ( i = 0 ; i < fieldMaps.length ; ++i ) {
 	    fieldDescs[ i ] = createFieldDesc( fieldMaps[ i ].getName(), fieldMaps[ i ].getType(),
-					       fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getAccessor(),
+					       fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getSqlType(),
+					       fieldMaps[ i ].getDirty(), fieldMaps[ i ].getAccessor(),
 					       loader, objType );
 	    fieldDescs[ i ] = new JDOContainedFieldDesc( fieldDescs[ i ], parentDesc, null );
 	}
@@ -336,15 +349,15 @@ public class MappingHelper
 		throw new MappingException( "Field " + fieldName +
 					    " is not public, or is static/transient/final" );
 	    if ( fieldType == null ) {
-		fieldType = Util.mapFromPrimitive( field.getType() );
+		fieldType = Types.typeFromPrimitive( field.getType() );
 	    } else {
-		if ( fieldType != Util.mapFromPrimitive( field.getType() ) )
+		if ( fieldType != Types.typeFromPrimitive( field.getType() ) )
 		    throw new MappingException( "Field " + fieldName +
 						" is not of specified type " + fieldType );
 	    }
 
 	    // Make sure the field type can be represented in a single column
-	    if ( ! Util.isSingleColumn( fieldType ) && ! Util.isSerializable( fieldType ) )
+	    if ( ! Types.isSimpleType( fieldType ) && ! Types.isSerializable( fieldType ) )
 		throw new MappingException( "Field " + objType.getClass().getName() + "." + fieldName +
 					    " must be a single column type or a serializable object, otherwise use object-field" );
 
@@ -379,9 +392,9 @@ public class MappingHelper
 		method = objType.getMethod( methodName, new Class[ 0 ] );
 
 		if ( fieldType == null ) {
-		    fieldType = Util.mapFromPrimitive( method.getReturnType() );
+		    fieldType = Types.typeFromPrimitive( method.getReturnType() );
 		} else {
-		    if ( fieldType != Util.mapFromPrimitive( method.getReturnType() ) )
+		    if ( fieldType != Types.typeFromPrimitive( method.getReturnType() ) )
 			throw new MappingException( "Field accessor " + methodName +
 						    " is not of specified type " + fieldType );
 		}
@@ -403,7 +416,7 @@ public class MappingHelper
 			if ( methods[ i ].getName().equals( methodName ) &&
 			     methods[ i ].getParameterTypes().length == 1 ) {
 			    method = methods[ i ];
-			    fieldType = Util.mapFromPrimitive( methods[ i ].getParameterTypes()[ 0 ] );
+			    fieldType = Types.typeFromPrimitive( methods[ i ].getParameterTypes()[ 0 ] );
 			    break;
 			}
 		    }
@@ -417,7 +430,7 @@ public class MappingHelper
 		throw new MappingException( "Field accessor " + methodName +
 					    " is not public, or is static/abstract" );
 	    // Make sure the field type can be represented in a single column
-	    if ( ! Util.isSingleColumn( fieldType ) && ! Util.isSerializable( fieldType ) )
+	    if ( ! Types.isSimpleType( fieldType ) && ! Types.isSerializable( fieldType ) )
 		throw new MappingException( "Field must a single column type or a serializable object, otherwise use object-field" );
 	    return method;
 	} catch ( NoSuchMethodException except ) {
@@ -439,7 +452,7 @@ public class MappingHelper
 	PrimaryKeyDesc primKeyDesc;
 
 	try {
-	    objType = loader.loadClass( primKeyMap.getType() );
+	    objType = Types.typeFromName( loader, primKeyMap.getType() );
 	} catch ( ClassNotFoundException except ) {
 	    throw new MappingException( "Could not locate the primary key type " + primKeyMap.getType() );
 	}
@@ -448,7 +461,7 @@ public class MappingHelper
 	    // Primary key is single/multi column, internal to object
 	    if ( primKeyField == null )
 		throw new MappingException( "Internal error: Must specify the primary key field for an internal primary key" );
-	    if ( Util.mapFromPrimitive( primKeyField.getFieldType() ) != objType )
+	    if ( Types.typeFromPrimitive( primKeyField.getFieldType() ) != objType )
 		throw new MappingException( "Primary key type and primary key field type are not the same" );
 	    if ( primKeyField instanceof ObjectFieldDesc ) {
 		primKeyDesc = new PrimaryKeyDesc( objType, (JDOFieldDesc[]) ( (ObjectFieldDesc) primKeyField ).getContainedFields() );
@@ -459,7 +472,7 @@ public class MappingHelper
 	} else if ( primKeyMap.getSqlColumn() != null ) {
 	    // Primary key is single column, external to object
 
-	    if ( ! Util.isSingleColumn( objType ) || objType.isArray() )
+	    if ( ! Types.isSimpleType( objType ) || objType.isArray() )
 		throw new MappingException( "This type of primary key must be a primitive type" );
 	    primKeyDesc = new PrimaryKeyDesc( objType, primKeyMap.getSqlColumn().getSqlName() );
 
@@ -469,9 +482,9 @@ public class MappingHelper
 	    JDOFieldDesc[] fieldDescs;
 	    int            i;
 
-	    if ( Util.isSingleColumn( objType ) || objType.isArray() )
+	    if ( Types.isSimpleType( objType ) || objType.isArray() )
 		throw new MappingException( "This type of primary key cannot be a primitive or array" );
-	    if ( ! Util.isConstructable( objType ) )
+	    if ( ! Types.isConstructable( objType ) )
 		throw new MappingException( "Primary key class is not constructable" );
 	    fieldMaps = primKeyMap.getFields();
 	    if ( fieldMaps.length == 0 )
@@ -479,8 +492,9 @@ public class MappingHelper
 	    fieldDescs = new JDOFieldDesc[ fieldMaps.length ];
 	    for ( i = 0 ; i < fieldMaps.length ; ++i ) {
 		fieldDescs[ i ] = createFieldDesc( fieldMaps[ i ].getName(), fieldMaps[ i ].getType(),
-						   fieldMaps[ i ].getSqlName(),
-						   fieldMaps[ i ].getAccessor(), loader, objType );
+						   fieldMaps[ i ].getSqlName(), fieldMaps[ i ].getSqlType(),
+						   fieldMaps[ i ].getDirty(), fieldMaps[ i ].getAccessor(),
+						   loader, objType );
 	    }
 	    primKeyDesc = new PrimaryKeyDesc( objType, fieldDescs );
 
