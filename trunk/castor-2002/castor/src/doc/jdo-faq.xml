@@ -67,7 +67,7 @@
       return _children;
   }
          </code>
-    </p>
+        </p>
 
         <p><b>Should my JDO classes implement some special interface?</b></p>
 
@@ -151,18 +151,18 @@
         <p><b>I am getting exception "the class ... is not persistence capable...". Why?</b></p>
 
         <p>In this case as well as in many others you can get more information with the help of logging. Call</p>
-         <code>
+        <code>
   jdo.setLogWriter(Logger.getSystemLogger());
-         </code>
-    <p>and seek in the output for warnings and errors.</p>
+        </code>
+        <p>and seek in the output for warnings and errors.</p>
 
-    <p><b>I call db.remove() on the dependent object and commit, but this doesn't work...</b></p>
+        <p><b>I call db.remove() on the dependent object and commit, but this doesn't work...</b></p>
 
-    <p>You should not add/remove dependent objects directly. In order to add/remove the dependent object you should just add/remove it from the collection in the master object and call db.commit()</p>
+        <p>You should not add/remove dependent objects directly. In order to add/remove the dependent object you should just add/remove it from the collection in the master object and call db.commit()</p>
 
-    <p><b>How should I represent string/date/boolean literals in OQL query?</b></p>
+        <p><b>How should I represent string/date/boolean literals in OQL query?</b></p>
 
-    <p>It is recommended to replace literals with parameters and to set them via OQLQuery.bind(), for example:</p>
+        <p>It is recommended to replace literals with parameters and to set them via OQLQuery.bind(), for example:</p>
          <code>
   OQLQuery query = db.getOQLQuery("SELECT p FROM Person p "
         +"WHERE name LIKE $1 AND dob>$2 AND married=$3");
@@ -172,24 +172,26 @@
   query.bind(false);
          </code>
 
-    <p><b>Sometimes long transaction fails: on update() it is thrown ObjectModifiedException. Why?</b></p>
+        <p><b>Sometimes long transaction fails: on update() it is thrown ObjectModifiedException. Why?</b></p>
 
-    <p>Most probably the object that is being updated has more than 100 related objects of one class
-    and the cache size for this class is not enough. You should either increase the size of the cache
-    or change the cache type to time-limited (the default cache type is count-limited, the default size is 100),
-    for example:
+        <p>Most probably the object that is being updated has more than 100 related objects of one class
+        and the cache size for this class is not enough. You should either increase the size of the cache
+        or change the cache type to time-limited (the default cache type is count-limited, the default size is 100),
+        for example:
         <code><![CDATA[
   <class ...>
     <cache-type type="count-limited" capacity="1000"/>
     ...
   </class>
         ]]></code>
-    </p>
+        </p>
 
-    <p><b>I get "java.lang.AbstractMethodError: getBigDecimal" for numeric fields. Why?</b></p>
+        <p><b>I get "java.lang.AbstractMethodError: getBigDecimal" for numeric fields. Why?</b></p>
 
-    <p>Your JDBC driver is not JDBC 2.0 compliant, upgrade it or find another one.</p>
+        <p>Your JDBC driver is not JDBC 2.0 compliant, upgrade it or find another one.</p>
 
+
+    
     </section>
 
     <section title="Features requests">
@@ -203,11 +205,11 @@
 
         <p>Unfortunaely, the answer is no</p>
         
-        <p>In version 0.8.11, we tried to enable polymorphic collection by introducing the notation of Object Reloading. Object Reloading delegates the determination of the class to a data object. However, it is proved that reloading can only be done before any instance of the target object is returned to user, and we have no way to determine that. Outer-join all extending tables. As a result, we removed the support in version 0.9.x.</p>
+        <p>In version 0.8.11, we tried to enable polymorphic collection by introducing the notation of Object Reloading. Object Reloading delegates the determination of the class to a data object. However, it is proved that reloading can only be done before any instance of the target object is returned to user, and we have no way to determine that. As a result, we removed the support in version 0.9.x.</p>
         
         <p>In the near future, we are going to use a new mechanism to provide extends. The new mechanism loads a table with an SQL statement that outer-joins all of the extending tables with the base. The existence of an extended table row can be used to determine the class of a data object. Notice that all extended table rows of the same entity should always be stored in the same data-store. </p>
 
-        <p>In the further future, we also want to let users to define a discriminator column (or determinance field). Basing on the value of discriminator columns in the base table, the bridge layer fetches the additional information and returns the combined entity with the appropriate list of entity classes. More about discriminator field is discussed in Part II of this document.</p>
+        <p>In the further future, we also want to let users to define a discriminator column (or determinance field). Basing on the value of discriminator columns in the base table, the bridge layer fetches the additional information and returns the combined entity with the appropriate list of entity classes.</p>
 
      </section>
 
@@ -255,8 +257,8 @@
         <p><b>Which open source database is supported better?</b></p>
 
         <p>For now only with <a href="http://www.postgresql.org">PostgreSQL 7.1</a> and <a href="http://www.sapdb.org">SAP DB</a> you get a full set of Castor features. Other open source databases doesn't support select with write lock, so db-locked locking mode doesn't work properly (it works in the same way as exclusive locking mode).</p>
-	
-	<p>All other Castor features are supported with <a href="http:/www.mysql.com">MySQL</a>, <a href="http://www.interbase2000.org">Interbase</a>, <a href="http://instantdb.enhydra.org">InstantDB</a> and <a href="http://www.hypersonicsql.com">Hypersonic SQL</a>.</p>
+
+        <p>All other Castor features are supported with <a href="http:/www.mysql.com">MySQL</a>, <a href="http://www.interbase2000.org">Interbase</a>, <a href="http://instantdb.enhydra.org">InstantDB</a> and <a href="http://www.hypersonicsql.com">Hypersonic SQL</a>.</p>
     </section>
 
   </body>
