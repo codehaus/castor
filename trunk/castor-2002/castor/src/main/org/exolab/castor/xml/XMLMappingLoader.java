@@ -137,31 +137,32 @@ public class XMLMappingLoader
         throws MappingException
     {
         FieldDescriptor        fieldDesc;
-        String                 xmlName;
-        NodeType               nodeType;
+        String                 xmlName  = null;
+        NodeType               nodeType = null;
+        String                 match    = null;
         XMLFieldDescriptorImpl xmlDesc;
         
         // Create an XML field descriptor
         
-        //-- name
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
         Xml xml = fieldMap.getXml();
-        if ( xml == null || xml.getName() == null )
-            xmlName = null;
-        else
+        
+        if (xml != null) {
+            //-- xml name
             xmlName = xml.getName();
+          
+            //-- node type
+            if ( xml.getNode() != null )
+                nodeType = NodeType.getNodeType( xml.getNode() );
             
-        //-- node type
-        if ( xml == null || xml.getNode() == null )
-            nodeType = null;
-        else
-            nodeType = NodeType.getNodeType( xml.getNode() );
-            
+            //-- matches
+            match = xml.getMatch();
+        }
+        
         xmlDesc = new XMLFieldDescriptorImpl( fieldDesc, xmlName, nodeType );
         
         //-- matches
-        if ((xml != null) && (xml.getMatch() != null))
-            xmlDesc.setMatches(xml.getMatch());
+        if (match != null) xmlDesc.setMatches(match);
             
         return xmlDesc; 
     }
