@@ -1004,19 +1004,12 @@ public final class SQLEngine implements Persistence {
                 if ( !_fields[i].multi ) {
                     notNull = false;
                     if ( _fields[i].columns.length == 1 ) {
-                        Object value = toJava( i, 0, SQLTypes.getObject( rs, count++, _fields[i].columns[0].sqlType ) );
-                        if ( !rs.wasNull() )
-                            fields[i] = value;
-                        else
-                            fields[i] = null;
+                        fields[i] = toJava( i, 0, SQLTypes.getObject( rs, count++, _fields[i].columns[0].sqlType ) );
                     } else {
-                    for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = toJava( i, j, SQLTypes.getObject( rs, count++, _fields[i].columns[j].sqlType ) );
-                        if ( !rs.wasNull() ) {
-                            temp[j] = value;
-                            notNull = true;
-                            } else {
-                                temp[j] = null;
+                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
+                            temp[j] = toJava( i, j, SQLTypes.getObject( rs, count++, _fields[i].columns[j].sqlType ) );
+                            if ( temp[j] != null ) {
+                                notNull = true;
                             }
                         }
                         if ( notNull )
@@ -1028,12 +1021,9 @@ public final class SQLEngine implements Persistence {
                     ArrayList res = new ArrayList();
                     notNull = false;
                     for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                        Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
-                        if ( !rs.wasNull() ) {
-                            temp[j] = value;
+                        temp[j] = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                        if ( temp[j] != null ) {
                             notNull = true;
-                        } else {
-                                temp[j] = null;
                         }
                         count++;
                     }
@@ -1057,12 +1047,9 @@ public final class SQLEngine implements Persistence {
                         ArrayList res = (ArrayList)fields[i];
                         notNull = false;
                         for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
-                            if ( !rs.wasNull() ) {
-                                temp[j] = value;
+                            temp[j] = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                            if ( temp[j] != null ) {
                                 notNull = true;
-                            } else {
-                                temp[j] = null;
                             }
                             count++;
                         }
@@ -1730,20 +1717,13 @@ public final class SQLEngine implements Persistence {
                     if ( !_engine._fields[i].multi ) {
                         boolean notNull = false;
                         if ( _engine._fields[i].columns.length == 1 ) {
-                            Object value = _engine.toJava( i, 0, SQLTypes.getObject( _rs, count++, _engine._fields[i].columns[0].sqlType ) );
-                            if ( !_rs.wasNull() )
-                                fields[i] = value;
-                            else
-                                fields[i] = null;
+                            fields[i] = _engine.toJava( i, 0, SQLTypes.getObject( _rs, count++, _engine._fields[i].columns[0].sqlType ) );
                         } else {
                             Complex inner = (Complex) fields[i];
-                        for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
-                                Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count++, _engine._fields[i].columns[j].sqlType ) );
-                                if ( !_rs.wasNull() ) {
-                                temp[j] = value ;
+                            for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
+                                temp[j] = _engine.toJava( i, j, SQLTypes.getObject( _rs, count++, _engine._fields[i].columns[j].sqlType ) );
+                                if ( temp[j] != null ) {
                                     notNull = true;
-                                } else {
-                                    temp[j] = null;
                                 }
                             }
                             fields[i] = null;
@@ -1754,12 +1734,9 @@ public final class SQLEngine implements Persistence {
                         ArrayList res = new ArrayList();
                         boolean notNull = false;
                         for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
-                            Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
-                            if ( !_rs.wasNull() ) {
-                                temp[j] = value;
+                            temp[j] = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                            if ( temp[j] != null ) {
                                 notNull = true;
-                            } else {
-                                temp[j] = null;
                             }
                             count++;
                         }
@@ -1800,14 +1777,11 @@ public final class SQLEngine implements Persistence {
                                 ArrayList res = (ArrayList)fields[i];
                                 boolean notNull = false;
                                 for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
-                                    Object value = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
-                                    if ( !_rs.wasNull() ) {
-                                        temp[j] = value ;
+                                    temp[j] = _engine.toJava( i, j, SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                                    if ( temp[j] != null ) {
                                         notNull = true;
-                                    } else {
-                                       temp[j] = null;
-                                }
-                                count++;
+                                    }
+                                    count++;
                                 }
                                 if ( notNull ) {
                                     if ( _engine._fields[i].columns.length == 1 ) {
