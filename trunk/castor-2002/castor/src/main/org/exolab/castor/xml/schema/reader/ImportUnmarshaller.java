@@ -108,11 +108,12 @@ public class ImportUnmarshaller extends SaxUnmarshaller
 			parser.setDocumentHandler(schemaUnmarshaller);
 			parser.setErrorHandler(schemaUnmarshaller);
 		}						
+		
 		try {
-		    parser.parse(new InputSource(new URL(schemalocation).openStream()));
+		    parser.parse(new InputSource(schemalocation));
 		}
 		catch(java.io.IOException ioe) {
-		    throw new SAXException("Error reading import file '"+schemalocation+"'");
+		    throw new SAXException("Error reading import file '"+schemalocation+"': "+ ioe);
 		}	
 			
 		//-- Add schema to list of imported schemas (if not already present)
