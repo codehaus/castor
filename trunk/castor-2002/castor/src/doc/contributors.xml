@@ -51,9 +51,16 @@
   </contributor>
 
   <contributor type="Committer">
+    <name surname="Blandin" given="Arnaud"/>
+    <email>blandin@intalio.com</email>
+    <company id="intalio"/>
+    <description>XML enhancements/Bug Fixes</description>
+  </contributor>
+
+  <contributor type="Committer">
     <name surname="Maucherat" given="Remy"/>
     <email>remm@apache.org</email>
-    <company id="intalio"/>
+    <company id="apache"/>
     <description>XML enhancements, lots of testing.</description>
   </contributor>
 
@@ -146,13 +153,18 @@
       mulitple contributors of the same company
   -->
   <company id="intalio">
-    <name>Intalio Inc</name>
+    <name>Intalio, Inc.</name>
     <url>www.intalio.com</url>
   </company>
 
   <company id="coda">
     <name>CODA</name>
     <url>www.coda.com</url>
+  </company>
+
+  <company id="apache">
+    <name>Apache Software Foundation</name>
+    <url>www.apache.org</url>
   </company>
 
   <company id="poet">
