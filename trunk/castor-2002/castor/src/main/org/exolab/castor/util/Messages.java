@@ -61,7 +61,7 @@ public class Messages
 {
 
 
-    public static final String ResourceName = "org.exolab.castor.util.messages";
+    public static final String ResourceName = "org.exolab.castor.util.resources.messages";
     
 
     private static ResourceBundle   _messages;
