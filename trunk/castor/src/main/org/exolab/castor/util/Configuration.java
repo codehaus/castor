@@ -38,7 +38,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999-2003 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 1999-2004 (C) Intalio, Inc. All Rights Reserved.
  *
  * $Id$
  */
@@ -86,7 +86,7 @@ import javax.xml.parsers.ParserConfigurationException;
  * create a new configuration file in the current directory, instead
  * of modifying the global one.
  *
- * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
+ * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
@@ -141,6 +141,16 @@ public abstract class Configuration
          * </pre>
          */
         public static final String Namespaces = "org.exolab.castor.parser.namespaces";
+        
+        
+        /**
+         * Property specifying Namespace to Package Mappings
+         * <pre>
+         * org.exolab.castor.xml.nspackages
+         * </pre>
+         */
+        public static final String NamespacePackages = "org.exolab.castor.xml.nspackages";
+        
 
         /**
          * Property specifying the implementation of the naming conventions
