@@ -46,6 +46,8 @@
 
 package org.exolab.castor.xml.util;
 
+import java.lang.reflect.Array;
+
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -675,7 +677,7 @@ public class XMLClassDescriptorImpl extends Validator
                          if (desc.isMultivalued()) {
                              Object temp = handler.getValue(object);
                              //-- optimize this?
-                             if (java.lang.reflect.Array.getLength(temp) == 0) {
+                             if (Array.getLength(temp) == 0) {
                                   temp = null;
                                   continue;
                              }
@@ -881,9 +883,32 @@ public class XMLClassDescriptorImpl extends Validator
         if (fieldDesc == null)
             return false;
 
-        //2-- the fieldDescriptor is a container
+        Object tempObject;
+        //3--The descriptor is multivalued
+        if (fieldDesc.isMultivalued()) {
+            //-- check size
+            FieldValidator validator = fieldDesc.getValidator();
+            if (validator != null) {
+                if (validator.getMaxOccurs() < 0) {
+                   return true;
+                }
+                 else {
+                    // count current objects and add 1
+                    tempObject = fieldDesc.getHandler().getValue(object);
+                    int current = Array.getLength(tempObject);
+                    int newTotal = current + 1;
+                    boolean min = validator.getMinOccurs() <= newTotal ;
+                    result = ( min && (newTotal <= validator.getMaxOccurs()) );
+                 }
+            }
+            else {
+                //-- not created by source generator...assume unbounded
+                result = true;
+            }
+        }
+        //3-- the fieldDescriptor is a container
         if (fieldDesc.isContainer()) {
-            Object tempObject = fieldDesc.getHandler().getValue(object);
+            tempObject = fieldDesc.getHandler().getValue(object);
             //if the object is not yet instantiated, we return true
             if (tempObject == null)
                 result = true;
@@ -891,26 +916,7 @@ public class XMLClassDescriptorImpl extends Validator
                 result = ((XMLClassDescriptor)fieldDesc.getClassDescriptor()).canAccept(fieldName, tempObject);
         }
 
-        //3--The descriptor is multivalued
-       /* if (desc.isMultivalued()) {
-            //-- check size
-            FieldValidator validator = desc.getValidator();
-            if (validator != null) {
-                if (validator.getMaxOccurs() == UNBOUNDED) {
-                   return true;
-                }
-                 else {
-                    // count current objects and add 1
-                    current = countCollection(handler.getValue());
-                    newTotal = current + 1;
-                    return (minOccurs <= newTotal <= maxOccurs);
-                 }
-            }
-            else {
-                //-- not created by source generator...assume unbounded
-                return true;
-            }
-        }*/
+
 
         //4-- Check if the value is set or not
         else {
