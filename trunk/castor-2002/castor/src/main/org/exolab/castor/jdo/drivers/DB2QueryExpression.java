@@ -81,7 +81,12 @@ public final class DB2QueryExpression
         sql.append( JDBCSyntax.Select );
         if ( _distinct )
           sql.append( JDBCSyntax.Distinct );
-        sql.append( getColumnList() );
+
+        if ( _select == null )  
+          sql.append( getColumnList() );
+        else
+          sql.append( _select).append(" ");
+        
         sql.append( JDBCSyntax.From );
 
         // Use join syntax for all joins (LEFT OUTER and INNER).
