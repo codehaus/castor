@@ -67,7 +67,7 @@ public class SGIdRef extends FieldInfo {
         
         JMethod[] methods = new JMethod[2];
         
-        String mname = getName().substring(1);
+        String mname = methodSuffix();
         JType jType  = SGTypes.Object;
         
         //-- create get method

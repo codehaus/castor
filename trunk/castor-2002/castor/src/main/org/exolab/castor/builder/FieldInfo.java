@@ -312,7 +312,7 @@ public class FieldInfo extends XMLInfo {
     /**
      * Returns the method suffix for creating method names.
     **/
-    private String methodSuffix() {
+    protected String methodSuffix() {
         if (name.startsWith("_"))
             return JavaXMLNaming.toJavaClassName(name.substring(1));
         else
