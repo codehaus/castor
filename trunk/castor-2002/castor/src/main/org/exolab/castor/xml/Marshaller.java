@@ -455,9 +455,6 @@ public class Marshaller {
             //-- handle arrays
             if (type.isArray()) {
                 
-                System.out.print("Array: ");
-                System.out.println(type.getComponentType());
-                
                 //-- special case for byte[]
                 if (type.getComponentType() == Byte.TYPE) {
                     marshal(obj, elemDescriptor, handler);
