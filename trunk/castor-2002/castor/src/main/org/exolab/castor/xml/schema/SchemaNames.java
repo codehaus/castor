@@ -104,7 +104,7 @@ public class SchemaNames {
     public static final String MIXED            = "mixed";
 	public static final String NAME_ATTR        = "name";
     public static final String NAMESPACE        = "namespace";
-    public static final String NULLABLE_ATTR    = "nullable";
+    public static final String NILLABLE_ATTR    = "nillable";
     public static final String ORDER_ATTR       = "order";
     public static final String PROCESS_CONTENTS = "processContents";
     public static final String REF_ATTR         = "ref";
