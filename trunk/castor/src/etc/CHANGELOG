@@ -2,6 +2,11 @@
 Version (CVS) 
 -------------
 
+JDO:   Fixed bug 1700 using contribution from unknown [weitz@zimmerverpackungen.com]
+       Fixed problem with 'select count(*) ...' statement with HSQL.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1700
+       (Werner - 20040805)
+       
 JDO:   Fixed bug 1690.
        Improved exception handling for the transactionmanager package.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1690
