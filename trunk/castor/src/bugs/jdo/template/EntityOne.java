@@ -1,4 +1,4 @@
-package template.jdo;
+package jdo.template;
 
 public final class EntityOne {
     private Integer _id;

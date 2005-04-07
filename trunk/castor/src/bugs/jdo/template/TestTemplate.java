@@ -1,4 +1,4 @@
-package template.jdo;
+package jdo.template;
 
 import junit.framework.TestCase;
 
@@ -36,7 +36,7 @@ public final class TestTemplate extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        _log = LogFactory.getFactory().getInstance(TestTemplate.class);
+        _log = LogFactory.getLog(TestTemplate.class);
 
         String config = getClass().getResource(JDO_CONF_FILE).toString();
         JDOManager.loadConfiguration(config, getClass().getClassLoader());
@@ -47,6 +47,10 @@ public final class TestTemplate extends TestCase {
         super.tearDown();
     }
     
+    /**
+     * Test method.
+     * @throws Exception For any exception thrown.
+     */
     public void testQueryEntityOne() throws Exception {
         Database db = _jdo.getDatabase();
         db.begin();

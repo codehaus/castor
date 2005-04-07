@@ -5,7 +5,8 @@ public final class AllTests {
     public static Test suite() {
         TestSuite suite = new TestSuite("Test suite for all bug reports");
 
-        suite.addTestSuite(template.jdo.TestTemplate.class);
+        suite.addTestSuite(jdo.template.TestTemplate.class);
+//        suite.addTestSuite(jdo.bug1900.TestFieldWithSpace.class);
 
         return suite;
     }
