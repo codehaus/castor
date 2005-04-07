@@ -537,10 +537,14 @@ public class DatabaseImpl
             _ctx.rollback();
             throw except;
         } finally {
-             try {
-                _ctx.close();
-            } catch (Exception ex) {
-            }
+            try {
+                // TODO [SMH]: Temporary fix, see bug 1491.
+                if(_ctx.isOpen()) {
+                    _ctx.close();
+                }
+           } catch (Exception e) {
+               _log.info(e.getMessage(), e);
+           }
         }
 
         unregisterSynchronizables();
