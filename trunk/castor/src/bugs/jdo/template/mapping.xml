@@ -3,7 +3,7 @@
                            "http://castor.exolab.org/mapping.dtd">
 <mapping>
 
-  <class name="template.jdo.EntityOne" identity="id">
+  <class name="jdo.template.EntityOne" identity="id">
     <description>Entite one</description>
     <map-to table="entity1" xml="entity1" />
     <field name="id" type="integer" >
