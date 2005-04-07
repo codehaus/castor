@@ -29,6 +29,26 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1491">
+					<description>
+						Test for open transaction before closing it.
+					</description>
+					<contributor>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</contributor>
+					<submitter>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</submitter>
+					<reporter>
+						<name>Stein M. Hugubakken</name>
+						<email>dulci@start.no</email>
+					</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050407</date>
+				</bug>
 				<bug id="1860">
 					<description>
 						<b>Rename JDO2 to JDOManager.</b>

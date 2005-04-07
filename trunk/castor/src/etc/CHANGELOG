@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug 1491 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Test for open transaction before closing it.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1491
+       (Stein - 20050407)
+
 JDO:   Fixed bug 1860 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Rename JDO2 to JDOManager.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1860
