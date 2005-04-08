@@ -26,9 +26,24 @@
       </p>
 
       <p>Or, <a href="download.xml">download</a> the full source distribution
-         for a given release, or the latest daily snapshot of the CVS.
+         for a given release.
       </p>
-    </section>
+   </section>
+
+   <section title="CVS Snapshots from behind firewalls">
+	
+	  <p>For those of you behind a firewall with the CVS port non-accessible, please 
+		 download Castor from the CVS server using the HTTP interface at 
+		 <url>http://cvs.castor.codehaus.org</url> as provided by FishEye 
+		 (tm):</p>
+			
+	  <ul>
+		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.zip">zip</a></li>
+		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tgz">tgz</a></li>
+		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tbz2">tbz2</a></li>
+	  </ul>
+
+	</section>
 
     <section title="Anonymous CVS Access">
 
