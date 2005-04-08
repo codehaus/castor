@@ -68,19 +68,28 @@
 
       </section>
 
-      <section title="Daily CVS Snapshot">
-         <p>
-            For Latest CVS version use our CVS server
-            (<a href="cvs.xml">CVS Information</a>) or
-            for those of you behind a firewall with the CVS port non-accessible, feel free to
-            use the daily-snapshot here:
-         <url>http://dist.codehaus.org/castor/castor_daily_snapshot.tgz</url>
-         </p>
-    </section>
-
       <section title="Past Releases">
          You may be able to find some past releases on the HTTP Server:
          <p><url>http://dist.codehaus.org/castor/</url></p>
+      </section>
+
+      <section title="CVS Snapshots">
+		
+         <p>To obtain the latest CVS version, please use a CVS-ebabled client to 
+			access our CVS server. Instructions for doing so can be found 
+			<a href="cvs.xml">here</a>.</p>
+			
+		 <p>For those of you behind a firewall with the CVS port non-accessible, please 
+			download Castor from the CVS server using the HTTP interface at 
+			<url>http://cvs.castopr.codehaus.org</url> as provided by FishEye 
+			(tm):</p>
+			
+		 <ul>
+			<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.zip">zip</a></li>
+			<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tgz">tgz</a></li>
+			<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tbz2">tbz2</a></li>
+		 </ul>
+		 
       </section>
 
   </body>
