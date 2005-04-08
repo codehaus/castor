@@ -19,6 +19,18 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="24">
+            <title>How to submit a patch - New guidelines</title>
+            <author>Werner Guttmann</author>
+            <date>08 Apr 2005</date>
+            <time>21:22:21</time>
+            <summary>
+				This is to announce that we now provide unified instructions on 
+				how to submit a patch at <url>http://castor.codehaus.org/how-to-submit-a-bug.html</url>. 
+				To facilitate this task, we are now providing a template for Castor JDO 
+				related patches that has been added to the CVS sources already.
+            </summary>
+        </news>
         <news id="23">
             <title>Support for polymorphism - A test drive</title>
             <author>Werner Guttmann</author>

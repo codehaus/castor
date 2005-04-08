@@ -19,6 +19,19 @@
 -->	
 
 		<item>
+			<title>How to submit a patch - New guidelines</title>
+			<link>http://castor.codehaus.org/news.html#item24</link>
+			<description>
+				This is to announce that we now provide unified instructions on 
+				how to submit a patch at http://castor.codehaus.org/how-to-submit-a-bug.html. 
+				In addition, we have added a template for Castor JDO related patches
+				to the CVS sources.
+			</description>
+			<author>Werner Guttmann</author>
+			<guid isPermaLink="false">{2a847937-1b5f-90c4-5be1-347a3b84d29}</guid>
+			<pubDate>Fri, 08 Apr 2005 21:22:21 GMT</pubDate>
+		</item>
+		<item>
 			<title>Support for polymorphism - A test drive</title>
 			<link>http://castor.codehaus.org/news.html#item23</link>
 			<description>
