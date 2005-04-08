@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug 1929 using contribution from Stefan Rotman [srotman@factotummedia.nl]
+       CastorException prints "Caused by: " to System.err in all cases.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1929
+       (Ralf - 20050408)
+
 JDO:   Fixed bug 1491 using contribution from Stein M. Hugubakken [dulci@start.no]
        Test for open transaction before closing it.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1491
