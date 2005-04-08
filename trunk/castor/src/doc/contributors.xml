@@ -692,6 +692,11 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Rotman" given="Stefan" />
+    <email>srotman@factotummedia.nl</email>
+    <description>Fix bug at CastorException</description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Rousse" given="Guillaume" />

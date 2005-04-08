@@ -29,6 +29,26 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1929">
+					<description>
+						Fixed CastorException prints "Caused by: " to System.err in all cases.
+					</description>
+					<contributor>
+						<name>Stefan Rotman</name>
+						<email>srotman@factotummedia.nl</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Stefan Rotman</name>
+						<email>srotman@factotummedia.nl</email>
+					</reporter>
+					<type>Bug</type>
+					<module>All</module>
+					<date>20050408</date>
+				</bug>
 				<bug id="1491">
 					<description>
 						Test for open transaction before closing it.
