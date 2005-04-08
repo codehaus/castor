@@ -193,7 +193,7 @@ public class CastorException extends Exception {
         Throwable child = getNestedException(this);
 
         if (child != null) {
-            System.err.print("Caused by: ");
+            s.print("Caused by: ");
             child.printStackTrace(s);
         }
     }
@@ -208,7 +208,7 @@ public class CastorException extends Exception {
 
         Throwable child = getNestedException(this);
         if (child != null) {
-            System.err.print("Caused by: ");
+            w.print("Caused by: ");
             child.printStackTrace(w);
         }
     }
