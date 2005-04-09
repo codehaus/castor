@@ -842,6 +842,12 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="van der Kuil" given="Roy" />
+    <email>roy@vanderkuil.nl</email>
+    <description>Patch for bug 1730; helping others on the mailing list</description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Verlet" given="Stephane" />
     <email>stephane@mminternet.com</email>
     <description>Patch for High/Low key generator problem in multi DB environement</description>
