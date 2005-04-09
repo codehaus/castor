@@ -361,7 +361,11 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(Integer.toString(maxSize));
             jsc.append(")) {");
             jsc.indent();
-            jsc.add("throw new IndexOutOfBoundsException();");
+            jsc.add("throw new IndexOutOfBoundsException(\"");
+            jsc.append(method.getName());
+            jsc.append(" has a maximum of ");
+            jsc.append(Integer.toString(maxSize));
+            jsc.append("\");"); 
             jsc.unindent();
             jsc.add("}");
         }
@@ -394,7 +398,11 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(Integer.toString(maxSize));
             jsc.append(")) {");
             jsc.indent();
-            jsc.add("throw new IndexOutOfBoundsException();");
+            jsc.add("throw new IndexOutOfBoundsException(\"");
+            jsc.append(method.getName());
+            jsc.append(" has a maximum of ");
+            jsc.append(Integer.toString(maxSize));
+            jsc.append("\");"); 
             jsc.unindent();
             jsc.add("}");
         }
@@ -503,7 +511,12 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
-        jsc.add("throw new IndexOutOfBoundsException();");
+        jsc.add("throw new IndexOutOfBoundsException(\"");
+        jsc.append(method.getName());
+        jsc.append(": Index value '\"+index+\"' not in range [0..\"+");
+        jsc.append(getName());
+        jsc.append(".size()+ \"]");        
+        jsc.append("\");"); 
         jsc.unindent();
         jsc.add("}");
 
@@ -579,7 +592,12 @@ public class CollectionInfo extends FieldInfo {
         jsc.append(getName());
         jsc.append(".size())) {");
         jsc.indent();
-        jsc.add("throw new IndexOutOfBoundsException();");
+        jsc.add("throw new IndexOutOfBoundsException(\"");
+        jsc.append(method.getName());
+        jsc.append(": Index value '\"+index+\"' not in range [0..\"+");
+        jsc.append(getName());
+        jsc.append(".size()+ \"]");        
+        jsc.append("\");"); 
         jsc.unindent();
         jsc.add("}");
 
@@ -590,7 +608,11 @@ public class CollectionInfo extends FieldInfo {
             jsc.append(Integer.toString(maxSize));
             jsc.append(")) {");
             jsc.indent();
-            jsc.add("throw new IndexOutOfBoundsException();");
+            jsc.add("throw new IndexOutOfBoundsException(\"");
+            jsc.append(method.getName());
+            jsc.append(" has a maximum of ");
+            jsc.append(Integer.toString(maxSize));
+            jsc.append("\");"); 
             jsc.unindent();
             jsc.add("}");
         }
