@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug 1730 using contribution from Roy van der Kuil [roy@vanderkuil.nl]
+       Provide more information on error when manipulating collections
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1730
+       (Ralf - 20050408)
+
 All:   Fixed bug 1929 using contribution from Stefan Rotman [srotman@factotummedia.nl]
        CastorException prints "Caused by: " to System.err in all cases.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1929
