@@ -29,6 +29,28 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+
+            <bug id="1730">
+					<description>
+                  Committed: more information on error when manipulating collections
+					</description>
+					<contributor>
+                  <name>Roy van der Kuil</name>
+                  <email>roy@vanderkuil.nl</email>
+					</contributor>
+					<submitter>
+                  <name>Keith Visco</name>
+                  <email>keith AT kvisco DOT com</email>
+					</submitter>
+					<reporter>
+                  <name>Roy van der Kuil</name>
+                  <email>roy@vanderkuil.nl</email>
+					</reporter>
+               <type>Enhancement</type>
+               <module>XML</module>
+					<date>20050408</date>
+				</bug>
+
 				<bug id="1929">
 					<description>
 						Fixed CastorException prints "Caused by: " to System.err in all cases.
@@ -349,7 +371,7 @@
 			<bugs>
 				<bug id="1873">
 					<description>
-						Updated documentation to explain that no auto-mapping of 
+						Updated documentation to explain that no auto-mapping of
 						java.util.Date takes place; users must decide whether to
 						map a particular date field to java.sql.Date, java.sql.Time,
 						or java.sql.Timestamp.
