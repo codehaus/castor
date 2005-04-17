@@ -42,10 +42,9 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo;
 
+import org.exolab.castor.mapping.AccessMode;
 
 /**
  * A callback informs objects about changes to their state.
@@ -53,10 +52,7 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public interface Persistent
-{
-
-
+public interface Persistent {
     /**
      * Called to set the database to which this object belongs when
      * this object becomes persistent. The object may use the database
@@ -69,8 +65,7 @@ public interface Persistent
      *
      * @param db The database to which this object belongs
      */
-    public void jdoPersistent( Database db );
-
+    public void jdoPersistent(Database db);
 
     /**
      * Called to indicate the object is now transient. The object may
@@ -83,22 +78,19 @@ public interface Persistent
      */
     public void jdoTransient();
 
-
     /**
      * Called to indicate that the object has been loaded from persistent
      * storage. This method is called immediately after synchronizing an
      * object with the database.
      *
      * @param accessMode The access mode that was specified for this object
-     * either in {@link org.exolab.castor.jdo.OQLQuery#execute( short accessMode )}, or in
-     * {@link Database#load( Class type, Object identity, short accessMode )}.
+     * either in {@link org.exolab.castor.jdo.OQLQuery#execute(AccessMode accessMode)}, or in
+     * {@link Database#load(Class type, Object identity, AccessMode accessMode)}.
      * The constants are defined in {@link Database}.
      * @return the return value is discarded
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public Class jdoLoad(short accessMode)
-        throws Exception;
-
+    public Class jdoLoad(AccessMode accessMode) throws Exception;
 
     /**
      * Called to indicate that an object is to be stored in persistent
@@ -109,9 +101,7 @@ public interface Persistent
      * @param modified Is the object modified?
      * @throws Exception An exception occured, the object cannot be stored
      */
-    public void jdoStore( boolean modified )
-        throws Exception;
-
+    public void jdoStore(boolean modified) throws Exception;
 
     /**
      * Called to indicate that an object is to be created in persistent
@@ -119,35 +109,25 @@ public interface Persistent
      *
      * @param db The database in which this object will be created
      */
-    public void jdoBeforeCreate( Database db )
-        throws Exception;
-
+    public void jdoBeforeCreate(Database db) throws Exception;
 
     /**
      * Called to indicate that an object has been created in persistent
      * storage. This method is called during db.create().
      */
-    public void jdoAfterCreate()
-        throws Exception;
-
+    public void jdoAfterCreate() throws Exception;
 
     /**
      * Called to indicate that an object is to be removed from persistent
      * storage. This method is called during db.remove().
      */
-    public void jdoBeforeRemove()
-        throws Exception;
-
-
+    public void jdoBeforeRemove() throws Exception;
 
     /**
      * Called to indicate that an object has been removed from persistent
      * storage. This method is called during db.remove().
      */
-    public void jdoAfterRemove()
-        throws Exception;
-
-
+    public void jdoAfterRemove() throws Exception;
 
     /**
      * Called to indicate that an object has been included to the current
@@ -156,9 +136,7 @@ public interface Persistent
      *
      * @throws Exception An exception occured, the object cannot be stored
      */
-    public void jdoUpdate()
-        throws Exception;
-
+    public void jdoUpdate() throws Exception;
 }
 
 

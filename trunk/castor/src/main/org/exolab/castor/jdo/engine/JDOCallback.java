@@ -42,87 +42,52 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
-
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
-
 
 /**
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class JDOCallback
-    implements CallbackInterceptor
-{
-
-
-    public void using( Object object, Database db )
-    {
-        ( (Persistent) object ).jdoPersistent( db );
+public class JDOCallback implements CallbackInterceptor {
+    public void using(Object object, Database db) {
+        ((Persistent) object).jdoPersistent(db);
     }
 
-
-    public Class loaded( Object object, short accessMode )
-        throws Exception
-    {
-        return ( (Persistent) object ).jdoLoad(accessMode);
+    public Class loaded(Object object, AccessMode accessMode) throws Exception {
+        return ((Persistent) object).jdoLoad(accessMode);
     }
 
-
-    public void storing( Object object, boolean modified )
-        throws Exception
-    {
+    public void storing(Object object, boolean modified) throws Exception {
         ( (Persistent) object ).jdoStore( modified );
     }
 
-
-    public void creating( Object object, Database db )
-        throws Exception
-    {
-        ( (Persistent) object ).jdoBeforeCreate( db );
+    public void creating(Object object, Database db) throws Exception {
+        ((Persistent) object).jdoBeforeCreate(db);
     }
 
-
-    public void created( Object object )
-        throws Exception
-    {
-        ( (Persistent) object ).jdoAfterCreate();
+    public void created(Object object) throws Exception {
+        ((Persistent) object).jdoAfterCreate();
     }
 
-
-    public void removing( Object object )
-        throws Exception
-    {
-        ( (Persistent) object ).jdoBeforeRemove();
+    public void removing(Object object) throws Exception {
+        ((Persistent) object).jdoBeforeRemove();
     }
 
-
-    public void removed( Object object )
-        throws Exception
-    {
-        ( (Persistent) object ).jdoAfterRemove();
+    public void removed(Object object) throws Exception {
+        ((Persistent) object).jdoAfterRemove();
     }
 
-
-    public void releasing( Object object, boolean committed )
-    {
-        ( (Persistent) object ).jdoTransient();
+    public void releasing(Object object, boolean committed) {
+        ((Persistent) object).jdoTransient();
     }
 
-
-    public void updated( Object object )
-        throws Exception
-    {
-        ( (Persistent) object ).jdoUpdate();
+    public void updated(Object object) throws Exception {
+        ((Persistent) object).jdoUpdate();
     }
-
-
 }
-
-

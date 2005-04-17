@@ -43,9 +43,11 @@
  * $Id$
  */
 
-
 package org.exolab.castor.mapping;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * The access mode for a class. This object is used by class
@@ -63,12 +65,17 @@ package org.exolab.castor.mapping;
  * mode. A transaction may be requested to access any object as read
  * only or exclusive, but may not access exclusive objects as shared.
  *
- *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * @author <a href="ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
  */
-public class AccessMode
-{
+public class AccessMode implements Cloneable, Comparable, Serializable {
+    //-------------------------------------------------------------------------
+    
+    private static final Map    IDS = new HashMap(7);
+    private static final Map    NAMES = new HashMap(7);
+    
+    //-------------------------------------------------------------------------
 
     /**
      * Read only access. Objects can be read but are not made
@@ -76,31 +83,30 @@ public class AccessMode
      * persistent storage.
      */
     public static final AccessMode ReadOnly 
-        = new AccessMode( "read-only" );
-
+        = new AccessMode((short) 0, "read-only");
 
     /**
      * Shared access. Objects can be read by multiple concurrent
      * transactions. Equivalent to optimistic locking.
      */
     public static final AccessMode Shared 
-        = new AccessMode( "shared" );
-
+        = new AccessMode((short) 1, "shared");
 
     /**
      * Exclusive access. Objects can be access by a single transaction
      * at any given time. Equivalent to pessimistic locking.
      */
     public static final AccessMode Exclusive 
-        = new AccessMode( "exclusive" );
+        = new AccessMode((short) 2, "exclusive");
 
     /**
      * DbLocked access. Objects can be access by a single transaction
      * at any given time, and a lock is acquired in the database.
      */
     public static final AccessMode DbLocked 
-        = new AccessMode( "db-locked" );
+        = new AccessMode((short) 3, "db-locked");
 
+    //-------------------------------------------------------------------------
 
     /**
      * Returns the access mode from the name. If <tt>accessMode</tt>
@@ -110,39 +116,114 @@ public class AccessMode
      * @param accessMode The access mode name
      * @return The access mode
      */
-    public static AccessMode getAccessMode( String accessMode )
-    {
-        if ( accessMode == null )
-            return Shared;
-        if ( accessMode.equals( Shared._name ) )
-            return Shared;
-        if ( accessMode.equals( Exclusive._name ) )
-            return Exclusive;
-        if ( accessMode.equals( ReadOnly._name ) )
-            return ReadOnly;
-        if ( accessMode.equals( DbLocked._name ) )
-            return DbLocked;
-        throw new IllegalArgumentException( "Unrecognized access mode" );
+    public static AccessMode valueOf(final String accessMode) {
+        AccessMode mode = (AccessMode) NAMES.get(accessMode);
+        if (mode != null) {
+            return mode;
+        } else {
+            throw new IllegalArgumentException("Unrecognized access mode");
+        }
     }
 
+    public static AccessMode valueOf(final short accessMode) {
+        AccessMode mode = (AccessMode) IDS.get(new Short(accessMode));
+        if (mode != null) {
+            return mode;
+        } else {
+            throw new IllegalArgumentException("Unrecognized access mode");
+        }
+    }
+
+    //-------------------------------------------------------------------------
 
     /**
-     * The name of this access mode as it would appear in a
-     * mapping file.
+     * The id of this access mode as originally used at Database.load() and
+     * Query.execute().
+     */
+    private short _id;
+
+    /**
+     * The name of this access mode as it would appear in a mapping file.
      */
     private String _name;
 
+    //-------------------------------------------------------------------------
 
-    private AccessMode( String name )
-    {
+    private AccessMode(final short id, final String name) {
+        _id = id;
         _name = name;
+
+        IDS.put(new Short(id), this);
+        NAMES.put(name, this);
     }
 
+    public short getId() { return _id; }
+    public String getName() { return _name; }
 
-    public String toString()
-    {
+    //-------------------------------------------------------------------------
+
+    /**
+     * Returns the String representation of this kind.
+     *
+     * @return String representation of this kind.
+     */
+    public String toString() {
         return _name;
     }
 
+    /**
+     * Clone only returns the one and only instance of this kind.
+     *
+     * @return The original instance.
+     */
+    public Object clone() {
+        return this;
+    }
 
-} //-- AccessMode
+    /**
+     * Returns if the specified object and this are one and the same instance.
+     *
+     * @param other Object to be compared with this instance.
+     * @return <code>true</code> if other equals this else <code>false</code>.
+     */
+    public boolean equals(final Object other) {
+        return (this == other);
+    }
+
+    /**
+     * Returns the hash code of this object.
+     *
+     * @return Hash code of this object.
+     */
+    public int hashCode() {
+        return (int) _id;
+    }
+
+    /**
+     * Compares {@link #_kind} against {@link #_kind} of the specified
+     * object. So this method is inconsistent with {@link #equals}.
+     *
+     * @param other Object to be compared with this instance.
+     * @return A negative integer, zero, or a positive integer as this object
+     *         is less than, equal to, or greater than the specified object.
+     */
+    public int compareTo(final Object other) {
+        return compareTo((AccessMode) other);
+    }
+
+    public int compareTo(final AccessMode other) {
+        return _id - other._id;
+    }
+
+    /**
+     * Called during deserialization.
+     *
+     * @return The existing instance of the enum. <br>So you can use '=='
+     *         like 'equals' even if you use a deserialized Enum.
+     */
+    protected Object readResolve() {
+        return NAMES.get(_name);
+    }
+    
+    //-------------------------------------------------------------------------
+}

@@ -30,24 +30,44 @@
             <summary>Short description says all ...</summary>
 			<bugs>
 
-            <bug id="1730">
+				<bug id="1933">
 					<description>
-                  Committed: more information on error when manipulating collections
+						Refactor AccessMode.
 					</description>
 					<contributor>
-                  <name>Roy van der Kuil</name>
-                  <email>roy@vanderkuil.nl</email>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
 					</contributor>
 					<submitter>
-                  <name>Keith Visco</name>
-                  <email>keith AT kvisco DOT com</email>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
 					</submitter>
 					<reporter>
-                  <name>Roy van der Kuil</name>
-                  <email>roy@vanderkuil.nl</email>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
 					</reporter>
-               <type>Enhancement</type>
-               <module>XML</module>
+					<type>Ref.</type>
+					<module>All</module>
+					<date>20050417</date>
+				</bug>
+				<bug id="1730">
+					<description>
+						Committed: more information on error when manipulating collections
+					</description>
+					<contributor>
+						<name>Roy van der Kuil</name>
+						<email>roy@vanderkuil.nl</email>
+					</contributor>
+					<submitter>
+						<name>Keith Visco</name>
+						<email>keith AT kvisco DOT com</email>
+					</submitter>
+					<reporter>
+						<name>Roy van der Kuil</name>
+						<email>roy@vanderkuil.nl</email>
+					</reporter>
+					<type>Enhancement</type>
+					<module>XML</module>
 					<date>20050408</date>
 				</bug>
 

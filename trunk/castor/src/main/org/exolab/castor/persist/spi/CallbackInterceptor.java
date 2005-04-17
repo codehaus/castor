@@ -42,14 +42,10 @@
  *
  * $Id$
  */
-
-
-
 package org.exolab.castor.persist.spi;
 
-
 import org.exolab.castor.jdo.Database;
-
+import org.exolab.castor.mapping.AccessMode;
 
 /**
  * A callback interceptor informs objects about changes to their
@@ -59,10 +55,7 @@ import org.exolab.castor.jdo.Database;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public interface CallbackInterceptor
-{
-
-
+public interface CallbackInterceptor {
     /**
      * Called to indicate that the object has been loaded from persistent
      * storage.
@@ -72,9 +65,7 @@ public interface CallbackInterceptor
      * @param object The object
      * @throws Exception An exception occured, the object cannot be loaded
      */
-    public Class loaded( Object object, short accessMode )
-        throws Exception;
-
+    public Class loaded(Object object, AccessMode accessMode) throws Exception;
 
     /**
      * Called to indicate that an object is to be stored in persistent
@@ -84,9 +75,7 @@ public interface CallbackInterceptor
      * @param modified Is the object modified?
      * @throws Exception An exception occured, the object cannot be stored
      */
-    public void storing( Object object, boolean modified )
-        throws Exception;
-
+    public void storing(Object object, boolean modified) throws Exception;
 
     /**
      * Called to indicate that an object is to be created in persistent
@@ -95,18 +84,14 @@ public interface CallbackInterceptor
      * @param object The object
      * @param db The database in which this object will be created
      */
-    public void creating( Object object, Database db )
-        throws Exception;
-
+    public void creating(Object object, Database db) throws Exception;
 
     /**
      * Called to indicate that an object has been created.
      *
      * @param object The object
      */
-    public void created( Object object )
-        throws Exception;
-
+    public void created(Object object) throws Exception;
 
     /**
      * Called to indicate that an object is to be deleted.
@@ -116,9 +101,7 @@ public interface CallbackInterceptor
      *
      * @param object The object
      */
-    public void removing( Object object )
-        throws Exception;
-
+    public void removing(Object object) throws Exception;
 
     /**
      * Called to indicate that an object has been deleted.
@@ -127,9 +110,7 @@ public interface CallbackInterceptor
      *
      * @param object The object
      */
-    public void removed( Object object )
-        throws Exception;
-
+    public void removed(Object object) throws Exception;
 
     /**
      * Called to indicate that an object has been made transient.
@@ -141,8 +122,7 @@ public interface CallbackInterceptor
      * @param committed True if the object has been commited, false
      *  if rollback or otherwise cancelled
      */
-    public void releasing( Object object, boolean committed );
-
+    public void releasing(Object object, boolean committed);
 
     /**
      * Called to indicate that an object has been made persistent.
@@ -150,8 +130,7 @@ public interface CallbackInterceptor
      * @param object The object
      * @param db The database to which this object belongs
      */
-    public void using( Object object, Database db );
-
+    public void using(Object object, Database db);
 
     /**
      * Called to indicate that an object has been updated at the end of
@@ -159,11 +138,5 @@ public interface CallbackInterceptor
      *
      * @param object The object
      */
-    public void updated( Object object )
-        throws Exception;
-
-
+    public void updated(Object object) throws Exception;
 }
-
-
-

@@ -46,6 +46,8 @@
 
 package org.exolab.castor.jdo;
 
+import org.exolab.castor.mapping.AccessMode;
+
 
 
 
@@ -169,7 +171,6 @@ public interface Query
     public void bind( double value )
       throws IllegalArgumentException;
 
-
     /**
      * Execute the query. The query is executed returning an enumeration
      * of all the objects found. If no objects were found, the
@@ -187,14 +188,47 @@ public interface Query
      *  persistence engine
      */
     public QueryResults execute()
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
      * <b>Experimental</b>
      * This is used for cursor support
      */
-    public QueryResults execute( boolean scrollable )
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
+    public QueryResults execute(final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
+
+    /**
+     * <b>Experimental</b>
+     * <p>
+     * Execute the query. The query is executed returning an enumeration
+     * of all the objects found. If no objects were found, the
+     * enumeration will be empty.
+     * <p>
+     * After execution the parameter list is reset. New parameters can
+     * be bound and the query re-executed.
+     *
+     * @deprecated Use execute(AccessMode) instead.
+     * 
+     * @param accessMode The access mode
+     * @return Query results (zero or more objects)
+     * @throws QueryException The query expression cannot be processed,
+     *  or the query parameters are invalid
+     * @throws TransactionNotInProgressException Method called while
+     *   transaction is not in progress
+     * @throws PersistenceException An error reported by the
+     *  persistence engine
+     */
+    public QueryResults execute(final short accessMode)
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
+
+    /**
+     * <b>Experimental</b>
+     * This is used for cursor support
+     * 
+     * @deprecated Use execute(AccessMode, boolean) instead.
+     */
+    public QueryResults execute(final short accessMode, final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
      * <b>Experimental</b>
@@ -215,20 +249,18 @@ public interface Query
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public QueryResults execute( short accessMode )
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
+    public QueryResults execute(final AccessMode accessMode)
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
 
-    /*
+    /**
      * <b>Experimental</b>
      * This is used for cursor support
      */
-    public QueryResults execute( short accessMode, boolean scrollable )
-        throws QueryException, PersistenceException, TransactionNotInProgressException;
+    public QueryResults execute(final AccessMode accessMode, final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException;
 
     /**
      * Close the query and release all resources held by the query.
      */
     public void close();
-
-
 }

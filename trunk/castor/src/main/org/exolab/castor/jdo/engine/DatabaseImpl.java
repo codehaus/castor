@@ -57,7 +57,6 @@ import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
-import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
@@ -295,70 +294,46 @@ public class DatabaseImpl
     }
 
 
-    public boolean isClosed()
-    {
+    public boolean isClosed() {
         return ( _scope == null );
     }
 
-    public Object load( Class type, Object identity, Object object ) 
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException {
-
-        TransactionContext tx;
-        PersistenceInfo    info;
-
-        tx = getTransaction();
-        info = _scope.getPersistenceInfo( type );
-
-        return tx.load( info.engine, info.molder, identity, object, null );
+    public Object load(final Class type, final Object identity) 
+    throws ObjectNotFoundException, LockNotGrantedException, 
+    TransactionNotInProgressException, PersistenceException {
+        return load(type, identity, null, null);
     }
-    public Object load( Class type, Complex identity )
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException {
+
+    public Object load(final Class type, final Object identity,
+                       final Object object) 
+    throws TransactionNotInProgressException, ObjectNotFoundException,
+    LockNotGrantedException, PersistenceException {
+        return load(type, identity, object, null);
+    }
     
-        return load( type, (Object)identity, null );
+    public Object load(final Class type, final Object identity,
+                       final short accessMode)
+    throws ObjectNotFoundException, LockNotGrantedException,
+    TransactionNotInProgressException, PersistenceException {
+        AccessMode mode = AccessMode.valueOf(accessMode);
+        return load(type, identity, null, mode);
     }
 
-    public Object load( Class type, Object identity ) 
-            throws ObjectNotFoundException, LockNotGrantedException, 
-            TransactionNotInProgressException, PersistenceException {
-
-        return load( type, identity, null );
+    public Object load(final Class type, final Object identity,
+                       final AccessMode mode) 
+    throws TransactionNotInProgressException, ObjectNotFoundException,
+    LockNotGrantedException, PersistenceException {
+        return load(type, identity, null, mode);
     }
 
-    public Object load( Class type, Complex identity, short accessMode )
-            throws TransactionNotInProgressException, ObjectNotFoundException,
-            LockNotGrantedException, PersistenceException {
+    private Object load(final Class type, final Object identity,
+                        final Object object, final AccessMode mode) 
+    throws TransactionNotInProgressException, ObjectNotFoundException,
+    LockNotGrantedException, PersistenceException {
+        TransactionContext tx = getTransaction();
+        PersistenceInfo info = _scope.getPersistenceInfo(type);
 
-        return load( type, (Object)identity, accessMode );
-    }
-
-    public Object load( Class type, Object identity, short accessMode) throws ObjectNotFoundException, LockNotGrantedException, TransactionNotInProgressException, PersistenceException {
-        TransactionContext tx;
-        PersistenceInfo    info;
-        AccessMode         mode;
-
-        switch ( accessMode ) {
-        case ReadOnly:
-            mode = AccessMode.ReadOnly;
-            break;
-        case Shared:
-            mode = AccessMode.Shared;
-            break;
-        case Exclusive:
-            mode = AccessMode.Exclusive;
-            break;
-        case DbLocked:
-            mode = AccessMode.DbLocked;
-            break;
-        default:
-            throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
-        }
-
-        tx = getTransaction();
-        info = _scope.getPersistenceInfo( type );
-        
-        return tx.load( info.engine, info.molder, identity, null, mode );
+        return tx.load(info.engine, info.molder, identity, object, mode);
     }
 
     public void create( Object object )

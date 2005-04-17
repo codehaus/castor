@@ -400,51 +400,33 @@ public class OQLQueryImpl
             throw new QueryException( "Could not find an engine supporting class " + objType );
     }
 
-
     public QueryResults execute()
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute( null );
     }
 
-    public QueryResults execute(boolean scrollable)
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
+    public QueryResults execute(final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
         return execute( null, scrollable );
     }
 
-    public QueryResults execute( short accessMode )
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
-      return execute(accessMode, false);
+    public QueryResults execute(final short accessMode)
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
+        return execute(AccessMode.valueOf(accessMode), false);
     }
 
-    public QueryResults execute( short accessMode,  boolean scrollable )
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
-        switch ( accessMode ) {
-        case Database.ReadOnly:
-            return execute( AccessMode.ReadOnly, scrollable );
-        case Database.Shared:
-            return execute( AccessMode.Shared, scrollable );
-        case Database.Exclusive:
-            return execute( AccessMode.Exclusive, scrollable );
-        case Database.DbLocked:
-            return execute( AccessMode.DbLocked, scrollable );
-        default:
-            throw new IllegalArgumentException( "Value for 'accessMode' is invalid" );
-        }
+    public QueryResults execute(final short accessMode, final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
+        return execute(AccessMode.valueOf(accessMode), scrollable);
     }
 
-    private QueryResults execute( AccessMode accessMode )
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
-      return execute(accessMode, false);
+    public QueryResults execute(final AccessMode accessMode)
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
+        return execute(accessMode, false);
     }
 
-    private QueryResults execute( AccessMode accessMode, boolean scrollable )
-        throws QueryException, PersistenceException, TransactionNotInProgressException
-    {
+    public QueryResults execute(final AccessMode accessMode, final boolean scrollable)
+    throws QueryException, PersistenceException, TransactionNotInProgressException {
         org.exolab.castor.persist.QueryResults      results;
         SQLEngine         engine;
 
