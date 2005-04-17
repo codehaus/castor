@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug 1933 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Refactor AccessMode.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1933
+       (Ralf - 20050417)
+
 XML:   Fixed bug 1730 using contribution from Roy van der Kuil [roy@vanderkuil.nl]
        Provide more information on error when manipulating collections
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1730

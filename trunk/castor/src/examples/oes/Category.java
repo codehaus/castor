@@ -8,6 +8,7 @@ import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.mapping.AccessMode;
 
 
 public class Category
@@ -103,7 +104,7 @@ public class Category
     }
 
 
-    public Class jdoLoad(short accessMode)
+    public Class jdoLoad(AccessMode accessMode)
     {
         return null;
     }

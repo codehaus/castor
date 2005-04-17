@@ -5,6 +5,7 @@ import java.util.Vector;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
+import org.exolab.castor.mapping.AccessMode;
 
 
 public class Product implements Persistent, TimeStampable
@@ -139,7 +140,7 @@ public class Product implements Persistent, TimeStampable
     }
 
 
-    public Class jdoLoad(short accessMode)
+    public Class jdoLoad(AccessMode accessMode)
     {
         if ( _name.indexOf("PC") >= 0 ) {
             return Computer.class;

@@ -730,10 +730,10 @@ public abstract class TransactionContext
         try {
             if ( _callback != null ) {
                 _callback.using( object, _db );
-                _callback.loaded( object, toDatabaseAccessMode( accessMode ) );
+                _callback.loaded( object, accessMode );
             } else if ( molder.getCallback() != null ) {
                 molder.getCallback().using( object, _db );
-                molder.getCallback().loaded( object, toDatabaseAccessMode( accessMode ) );
+                molder.getCallback().loaded( object, accessMode );
             }
         } catch ( Exception except ) {
             release( object );
@@ -2290,23 +2290,6 @@ public abstract class TransactionContext
 
     public boolean isReadOnly( Object object ) {
         return (getObjectState(object) == OBJECT_STATE_READ_ONLY);
-    }
-
-    /**
-     * Converts AccessMode constant to Database short constant
-     */
-    static short toDatabaseAccessMode( AccessMode mode )
-    {
-        if ( mode == AccessMode.Shared )
-            return Database.Shared;
-        if ( mode == AccessMode.ReadOnly )
-            return Database.ReadOnly;
-        if ( mode == AccessMode.DbLocked )
-            return Database.DbLocked;
-        if ( mode == AccessMode.Exclusive )
-            return Database.Exclusive;
-        // never happens
-        return -1;
     }
 
     public Database getDatabase() {

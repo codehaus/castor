@@ -51,6 +51,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Random;
 
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -189,16 +190,16 @@ public class CacheLeakage extends CastorTestCase {
         _conn = _category.getJDBCConnection();
         _conn.setAutoCommit( false );
 
-        _cacheType = Database.Shared;
+        _cacheType = Database.Shared.getId();
         runOnce();
 
-        _cacheType = Database.Exclusive;
+        _cacheType = Database.Exclusive.getId();
         runOnce();
 
-        _cacheType = Database.DbLocked;
+        _cacheType = Database.DbLocked.getId();
         runOnce();
 
-        _cacheType = Database.ReadOnly; 
+        _cacheType = Database.ReadOnly.getId(); 
         runOnce();
 
         assertTrue( "Element leak not detected!", !_errLeak );

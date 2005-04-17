@@ -50,6 +50,8 @@ package jdo;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
+
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Query;
 import org.exolab.castor.jdo.QueryResults;
@@ -274,14 +276,15 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
     }
 
 
-    public Class jdoLoad(short accessMode)
+    public Class jdoLoad(AccessMode accessMode)
         throws Exception
     {
         Query        qry;
         QueryResults res;
 
-        if ( _parentId != null )
+        if ( _parentId != null ) {
             _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId, accessMode );
+        }
 
         qry = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE parentId=$1" );
         qry.bind( _id );

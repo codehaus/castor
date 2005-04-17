@@ -251,7 +251,7 @@ public class ClassMolder
 
         _name = clsMap.getName();
 
-        _accessMode = AccessMode.getAccessMode( clsMap.getAccess().toString() );
+        _accessMode = AccessMode.valueOf( clsMap.getAccess().toString() );
 
         _timeStampable = TimeStampable.class.isAssignableFrom( clsDesc.getJavaClass() );
 

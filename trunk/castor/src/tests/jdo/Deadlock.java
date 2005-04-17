@@ -48,6 +48,8 @@ package jdo;
 
 
 import java.util.Enumeration;
+
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -98,7 +100,7 @@ public class Deadlock extends CastorTestCase {
     /**
      * AccessMode used in the tests
      */
-    private short           _accessMode;
+    private AccessMode      _accessMode;
 
     /**
      * The java object to be synchronized on
@@ -207,7 +209,7 @@ public class Deadlock extends CastorTestCase {
     /**
      * Creates threads to test for deadlock detection behaviors.
      */
-    public void runOnce( short accessMode ) 
+    public void runOnce( AccessMode accessMode ) 
             throws PersistenceException, InterruptedException {
 
         stream.println( "Note: this test uses a 2 second delay between threads. CPU and database load might cause the test to not perform synchronously, resulting in erroneous results. Make sure that execution is not hampered by CPU/datebase load." );

@@ -56,6 +56,7 @@ import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 
@@ -227,7 +228,7 @@ public class CustomInstanceFactory extends CastorTestCase {
         CallbacksInvoked _callbacksInvoked = new CallbacksInvoked();
         CallbacksInvoked _coverage = new CallbacksInvoked();
 
-        public Class loaded( Object object, short accessMode ) throws Exception {
+        public Class loaded( Object object, AccessMode accessMode ) throws Exception {
             _callbacksInvoked.allow(CallbacksInvoked.LOADED);
             _coverage.allow(CallbacksInvoked.LOADED);
 

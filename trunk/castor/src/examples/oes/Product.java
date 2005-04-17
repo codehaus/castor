@@ -4,6 +4,7 @@ package oes;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.mapping.AccessMode;
 
 
 public class Product
@@ -158,7 +159,7 @@ public class Product
     }
 
 
-    public Class jdoLoad(short accessMode)
+    public Class jdoLoad(AccessMode accessMode)
     {
         return null;
     }

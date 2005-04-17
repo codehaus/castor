@@ -50,6 +50,7 @@ package jdo;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.ObjectModifiedException;
@@ -187,7 +188,7 @@ public class Concurrent extends CastorTestCase {
      * @param accessMode the access mode that is used in the concurrent
      *        modification tests
      */
-    private void testDirtyChecked( short accessMode )
+    private void testDirtyChecked( AccessMode accessMode )
             throws PersistenceException, SQLException {
 
         OQLQuery      oql;
@@ -293,7 +294,7 @@ public class Concurrent extends CastorTestCase {
      * @param accessMode the access mode that is used in the concurrent
      *        modification tests
      */
-    private void testDirtyIgnored( short accessMode )
+    private void testDirtyIgnored( AccessMode accessMode )
             throws PersistenceException, SQLException {
 
         OQLQuery      oql;

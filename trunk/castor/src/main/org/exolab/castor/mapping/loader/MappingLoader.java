@@ -579,7 +579,7 @@ public abstract class MappingLoader
         String hack = (clsMap.getAccess() == null)?"shared":clsMap.getAccess().toString();
         
         clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
-                                           AccessMode.getAccessMode(hack), clsMap.getVerifyConstructable() );
+                                           AccessMode.valueOf(hack), clsMap.getVerifyConstructable() );
 
         if ( clsDesc instanceof ClassDescriptorImpl )
             ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
