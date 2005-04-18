@@ -277,8 +277,8 @@
     <target name="compile.tests" depends="prepare,compile" description="Build the tests packages">
         <mkdir dir="${build}/tests"/>
         <javac srcdir="${source}/tests" destdir="${build}/tests" excludes="${testexcludes}" debug="on" deprecation="${deprecation}">
-        <classpath refid="build.classpath"/>
-    </javac>
+            <classpath refid="build.classpath"/>
+        </javac>
 
         <copy todir="${build}/tests">
             <fileset dir="${source}/tests">
@@ -286,7 +286,21 @@
             </fileset>
         </copy>
     </target>
-    <target name="tests" depends="compile.tests" description="Build the tests packages"/>
+
+    <target name="compile.bugs" depends="prepare,compile" description="Build the tests packages">
+        <mkdir dir="${build}/bugs"/>
+        <javac srcdir="${source}/bugs" destdir="${build}/bugs" debug="on" deprecation="${deprecation}">
+            <classpath refid="build.classpath"/>
+        </javac>
+
+        <copy todir="${build}/bugs">
+            <fileset dir="${source}/bugs">
+                <patternset refid="support.files" />
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="tests" depends="compile.bugs,compile.tests" description="Build the tests packages"/>
 
     <target name="-test.category.test"
         description="An internal target to test if the test.category property is set">
