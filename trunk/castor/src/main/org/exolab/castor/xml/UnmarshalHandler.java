@@ -589,29 +589,36 @@ public final class UnmarshalHandler extends MarshalFramework
                     --length;
                 }
                 
-                //-- trim trailing whitespace characters
-                while (length > 0) {
-                    boolean whitespace = false;
-                    switch(ch[start+length-1]) {
-                        case ' ':
-                        case '\r':
-                        case '\n':
-                        case '\t':
-                            whitespace = true;
-                            break;
-                        default:
-                            break;
+                if (length == 0) {
+                    //-- we also need to mark trailing whitespace removed
+                    //-- when we received only whitespace characters
+                    removedTrailingWhitespace = removedLeadingWhitespace;
+                }
+                else {
+                    //-- trim trailing whitespace characters
+                    while (length > 0) {
+                        boolean whitespace = false;
+                        switch(ch[start+length-1]) {
+                            case ' ':
+                            case '\r':
+                            case '\n':
+                            case '\t':
+                                whitespace = true;
+                                break;
+                            default:
+                                break;
+                        }
+                        if (!whitespace) break;
+                        removedTrailingWhitespace = true;
+                        --length;
                     }
-                    if (!whitespace) break;
-                    removedTrailingWhitespace = true;
-                    --length;
                 }
              }
              
              if (state.buffer == null) state.buffer = new StringBuffer();
              else {
-                //-- content exists, add a space
-                if ((!state.wsPreserve) && (length-start > 0)) {
+                //-- non-whitespace content exists, add a space
+                if ((!state.wsPreserve) && (length > 0)) {
                 	if (state.trailingWhitespaceRemoved || removedLeadingWhitespace)
                     {
                 		state.buffer.append(' ');
