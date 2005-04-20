@@ -19,6 +19,35 @@
 -->	
 
 		<item>
+			<title>Castor forums currently unavailable</title>
+			<link>http://castor.codehaus.org/news.html#item26</link>
+			<description>
+				Many of you will have recognized by now that the exolab.org 
+				domain had been voided as of last Friday. As a result of this, 
+				the Castor user forums are not available. Please accept our apologies 
+				for any inconvenience you are experiencing, and rest assured that 
+				we are working to get it back online as soon as possible.
+			</description>
+			<author>Werner Guttmann</author>
+			<guid isPermaLink="false">{2a847937-1b5f-90c4-5be1-347a3b84d29}</guid>
+			<pubDate>Fri, 20 Apr 2005 22:22:21 GMT</pubDate>
+		</item>
+		<item>
+			<title>New issue tracking tool</title>
+			<link>http://castor.codehaus.org/news.html#item25</link>
+			<description>
+				This is to announce that we finally moved our issue tracking tool from
+				http://bugzilla.exolab.org to the Codehaus (http://www.codehaus.org), 
+				migrating to Jira at the same time. We'd like to offer our apologies 
+				for any inconvenience you experienced as a result of this migration 
+				and hope that you like our new home for tracking (and resolving) issues
+				at http://jira.codehaus.org as much as we do.
+			</description>
+			<author>Werner Guttmann</author>
+			<guid isPermaLink="false">{2a847937-1b5f-90c4-5be1-347a3b84d29}</guid>
+			<pubDate>Fri, 20 Apr 2005 21:22:21 GMT</pubDate>
+		</item>
+		<item>
 			<title>How to submit a patch - New guidelines</title>
 			<link>http://castor.codehaus.org/news.html#item24</link>
 			<description>
