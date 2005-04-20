@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/cvs.xml">
+<document url="http://castor.codehaus.org/cvs.xml">
   <body>
     <title>CVS Access</title>
 
-    <section title="Bugzilla: Bug Reports and Tracking">
+    <section title="JIRA: Issue Reporting and Tracking">
 
       <p>
-         Please use our <a href="http://bugzilla.exolab.org">Bugzilla</a> server for bug reporting/tracking.
+         Please use our <a href="http://jira.codehaus.org/browse/CASTOR">JIRA</a> server for issue reporting 
+         and tracking.
       </p>
       <p>
-         Before submitting bugs, please read the
-         <a href="how-to-submit-a-bug.xml">Submitting a bug report</a>,
-         <a href="http://bugzilla.mozilla.org/page.cgi?id=etiquette.html">Bugzilla Etiguette</a> and
-         <a href="http://bugzilla.mozilla.org/bugwritinghelp.html">Bug Writing Guidelines</a> from Mozilla.org.
+         Before submitting issues, please read the
+         <a href="how-to-submit-a-bug.xml">How to submit an issue</a>,
       </p>
    </section>
 
@@ -21,8 +20,7 @@
          To get the latest, most up-to-date source code, you'll need to use CVS, please see
          <a href="#Anonymous-CVS-Access">Anonymous CVS Access</a> below. If you wish to
          simply browse the CVS for specific files or to view changes and commit logs use
-         <a href="http://cvs.castor.codehaus.org/viewrep/castor/castor">
-         FishEye access to the repository.</a>
+         <a href="http://cvs.castor.codehaus.org/viewrep/castor/castor">FishEye access to the repository.</a>
       </p>
 
       <p>Or, <a href="download.xml">download</a> the full source distribution
@@ -31,19 +29,19 @@
    </section>
 
    <section title="CVS Snapshots from behind firewalls">
-	
-	  <p>For those of you behind a firewall with the CVS port non-accessible, please 
-		 download Castor from the CVS server using the HTTP interface at 
-		 <url>http://cvs.castor.codehaus.org</url> as provided by FishEye 
-		 (tm):</p>
-			
-	  <ul>
-		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.zip">zip</a></li>
-		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tgz">tgz</a></li>
-		<li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tbz2">tbz2</a></li>
-	  </ul>
+    
+      <p>For those of you behind a firewall with the CVS port non-accessible, please 
+         download Castor from the CVS server using the HTTP interface at 
+         <url>http://cvs.castor.codehaus.org</url> as provided by FishEye 
+         (tm):</p>
+            
+      <ul>
+        <li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.zip">zip</a></li>
+        <li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tgz">tgz</a></li>
+        <li><a href="http://cvs.castor.codehaus.org/viewrep/~tarball=zip/castor/castor/castor.tbz2">tbz2</a></li>
+      </ul>
 
-	</section>
+    </section>
 
     <section title="Anonymous CVS Access">
 
@@ -100,13 +98,12 @@
 
       <p>It's perfectly ok to put your name and e-mail address in the code.</p>
 
-      <p>When sending patches, diff files with context (3 lines before, 3 lines
-         after) work best:
+      <p>When sending patches, unified diff files (3 lines before, 3 lines after) work best:
 <pre><![CDATA[
   cvs diff -u <file>]]></pre>
 againsts the up-to-date cvs version, or
 <pre><![CDATA[
-  diff -u <file>
+  diff -u <file1> <file2>
 ]]></pre></p>
 
       <p>It is very important for sending test cases along with the patch of a
@@ -123,8 +120,8 @@ againsts the up-to-date cvs version, or
          not be broken by another patch later. It becomes even more important
          if your project depends on a feature that you're contributing.</p>
 
-      <p>The last requirement for contributing code is to create a 
-      <a href="http://bugzilla.exolab.org/">Bugzilla</a> report to provide a
+      <p>The last requirement for contributing code is to create an
+      <a href="http://jira.codeahus.org/browse/CASTOR">issue</a> to provide a
       full description of the issue or enhancement. This allows the issue to 
       be fully traceable. The last thing to do is attach the diff to this report.</p>
 
