@@ -52,16 +52,17 @@
          check it out. We commit working code to the CVS immediately prior to putting
          out a release.</p>
 
-      <p>The CVS root is <tt>:pserver:anon@cvs.castor.codehaus.org:/scm/castor</tt>
+      <p>The CVS root is
+      <tt>:pserver:anon@cvs.castor.codehaus.org:/home/projects/castor/scm</tt>
          and the password should be left empty.</p>
 
       <p>To login to CVS from the command line and checkout a version of Castor
          use the following commands:</p>
 
       <pre>
-  $ cvs -d :pserver:anon@cvs.castor.codehaus.org:/scm/castor login
+  $ cvs -d :pserver:anon@cvs.castor.codehaus.org:/home/projects/castor/scm login
   password:
-  $ cvs -d :pserver:anon@cvs.castor.codehaus.org:/scm/castor checkout castor
+  $ cvs -d :pserver:anon@cvs.castor.codehaus.org:/home/projects/castor/scm checkout castor
       </pre>
 
     </section>
