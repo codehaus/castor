@@ -129,6 +129,18 @@
   </contributor>
 
   <contributor type="Committer">
+    <name surname="Fawcett" given="Andrew"/>
+    <email>Andrew.Fawcett@coda.com</email>
+    <company id="coda"/>
+    <project>XML</project>
+    <description>XML enhancements.</description>
+    <status>active</status>
+    <since>
+      <date>Apr. 2005 (again)</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
     <name surname="Yip" given="Thomas"/>
     <email>yip@intalio.com</email>
     <company id="intalio"/>
@@ -150,15 +162,6 @@
        Formally responsible for all things wrong in JDO, and all bugs in Mapping API.
        (non-active)
     </description>
-    <status>inactive</status>
-  </contributor>
-
-  <contributor type="Committer">
-    <name surname="Fawcett" given="Andrew"/>
-    <email>Andrew.Fawcett@coda.com</email>
-    <company id="coda"/>
-    <project>XML</project>
-    <description>XML enhancements.</description>
     <status>inactive</status>
   </contributor>
 
