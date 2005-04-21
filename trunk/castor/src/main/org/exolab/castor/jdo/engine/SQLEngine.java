@@ -333,13 +333,15 @@ public final class SQLEngine implements Persistence {
         _extends = engine;
     }
 
-    private Connection getSeparateConnection(Database database) throws PersistenceException {
+    private Connection getSeparateConnection(Database database) throws PersistenceException  {
         try {
             DatabaseRegistry databaseRegistry = DatabaseRegistry.getDatabaseRegistry(database.getDatabaseName());
             Connection conn = databaseRegistry.createConnection();
             conn.setAutoCommit(false);
             return conn;
         } catch (SQLException e) {
+            throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
+        } catch (MappingException e) {
             throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
         }
     }
@@ -479,7 +481,8 @@ public final class SQLEngine implements Persistence {
      *
      * Result key will be in java type.
      */
-    private Object generateKey(Database database, Object conn, PreparedStatement stmt) throws PersistenceException {
+    private Object generateKey(Database database, Object conn, PreparedStatement stmt)
+    throws PersistenceException {
         Object identity;
         Connection connection;
         Properties prop = null;

@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug 1865 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Multiple <database> problems.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1865
+       (Ralf - 20050421)
+
 All:   Fixed bug 1933 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactor AccessMode.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1933

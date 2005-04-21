@@ -487,7 +487,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * returns the database; if not, it create a new one, associates
      * it will the transaction and return the newly created Database.
      * <p>
-     * This method should be called before the invocation of {@link #getDatabase}.
+     * Method should be called before the invocation of {@link #getDatabase}.
      * <p>
      * <b>Experimental</b> maybe removed in the future releases
      *
@@ -556,29 +556,25 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                     "Called 'getDatabase' without first setting database name");
         }
 
-        if (DatabaseRegistry.getDatabaseRegistry(_dbName) == null) {
-            // use _jdoConfURI to load the JDO configuration
-            if (_jdoConfURI != null) {
-                try {
+        try {
+            if (DatabaseRegistry.getDatabaseRegistry(_dbName) == null) {
+                // use _jdoConfURI to load the JDO configuration
+                if (_jdoConfURI != null) {
                     DatabaseRegistry.loadDatabase(new InputSource(_jdoConfURI),
-                                                  _entityResolver,
-                                                  _classLoader);
-                } catch (MappingException ex) {
-                    throw new DatabaseNotFoundException(ex);
-                }
-            // alternatively, use a JdoConf instance to load the JDO configuration
-            } else if (_jdoConf != null) {
-                try {
+                            _entityResolver,
+                            _classLoader);
+                // alternatively, use a JdoConf instance to load the JDO config
+                } else if (_jdoConf != null) {
                     DatabaseRegistry.loadDatabase(_jdoConf,
-                                                  _entityResolver,
-                                                  _classLoader);
-                } catch (MappingException ex) {
-                    throw new DatabaseNotFoundException(ex);
+                            _entityResolver,
+                            _classLoader);
+                } else {
+                    throw new DatabaseNotFoundException(Messages.format(
+                            "jdo.dbNoMapping", _dbName));
                 }
-            } else {
-                throw new DatabaseNotFoundException(Messages.format(
-                        "jdo.dbNoMapping", _dbName));
             }
+        } catch (MappingException ex) {
+            throw new DatabaseNotFoundException(ex);
         }
 
         // load transaction manager factory registry configuration
@@ -659,8 +655,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
          * 
          * Scenario 2: If the user uses Castor in J2EE mode (inside of an J2EE
          * container), and wants the container to control transaction
-         * demarcation, we have both a TransactionManagerFactory (different from 
-         * LOCAL) and a TransactionManager instance.
+         * demarcation, we have both a TransactionManagerFactory (different
+         * from LOCAL) and a TransactionManager instance.
          */
         if ((_transactionManager != null) 
                 && !LocalTransactionManagerFactory.NAME.equals(

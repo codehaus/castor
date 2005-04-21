@@ -613,23 +613,23 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                     "jdo.missing.database.name"));
         }
         
-        if (DatabaseRegistry.getDatabaseRegistry(_databaseName) == null) {
-            if (_jdoConfURI == null) {
-                LOG.error("No configuration loaded for database "
-                        + _databaseName);
-                throw new DatabaseNotFoundException(Messages.format(
-                        "jdo.dbNoMapping", _databaseName));
-            }
-            
-            try {
+        try {
+            if (DatabaseRegistry.getDatabaseRegistry(_databaseName) == null) {
+                if (_jdoConfURI == null) {
+                    LOG.error("No configuration loaded for database "
+                            + _databaseName);
+                    throw new DatabaseNotFoundException(Messages.format(
+                            "jdo.dbNoMapping", _databaseName));
+                }
+                
                 DatabaseRegistry.loadDatabase(_jdoConfURI,
                                               _entityResolver,
                                               _classLoader);
-            } catch (MappingException ex) {
-                LOG.error("Problem loading database configuration", ex);
-                throw new DatabaseNotFoundException(Messages.format(
-                        "jdo.problem.loading.conf", _jdoConfURI), ex);
             }
+        } catch (MappingException ex) {
+            LOG.error("Problem loading database configuration", ex);
+            throw new DatabaseNotFoundException(Messages.format(
+                    "jdo.problem.loading.conf", _jdoConfURI), ex);
         }
         
         // load transaction manager factory registry configuration

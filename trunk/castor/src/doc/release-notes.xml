@@ -29,7 +29,26 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
-
+				<bug id="1865">
+					<description>
+						Multiple &lt;database&gt; problems.
+					</description>
+					<contributor>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Nick Stuart</name>
+						<email>nick@newtsplace.com</email>
+					</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050421</date>
+				</bug>
 				<bug id="1933">
 					<description>
 						Refactor AccessMode.

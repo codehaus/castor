@@ -51,7 +51,10 @@ import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Logger;
+import org.exolab.castor.util.Messages;
+
 import java.net.URL;
 import java.net.MalformedURLException;
 import harness.TestHarness;
@@ -221,10 +224,13 @@ public class JDOJ2EECategory extends TestHarness {
 		return _jdo;
 	}
 	
-	public Connection getJDBCConnection()
-	throws SQLException
-	{
-		return DatabaseRegistry.getDatabaseRegistry( _jdo.getDatabaseName() ).createConnection();
-	}
+    public Connection getJDBCConnection() throws SQLException {
+        String name = _jdo.getDatabaseName();
+        try {
+            return DatabaseRegistry.getDatabaseRegistry(name).createConnection();
+        } catch (MappingException ex) {
+            throw new SQLException(Messages.format("jdo.dbNoMapping", name));
+        }
+    }
 	
 }
