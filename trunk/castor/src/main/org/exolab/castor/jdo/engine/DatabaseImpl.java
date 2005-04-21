@@ -55,6 +55,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
@@ -172,8 +173,7 @@ public class DatabaseImpl
     public DatabaseImpl( String dbName, int lockTimeout, CallbackInterceptor callback,
                          InstanceFactory instanceFactory, Transaction transaction, 
                          ClassLoader classLoader, boolean autoStore )
-        throws DatabaseNotFoundException 
-    {
+    throws DatabaseNotFoundException {
         // Locate a suitable datasource and database engine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
@@ -181,7 +181,12 @@ public class DatabaseImpl
         DatabaseRegistry dbs;
 
         _autoStore = autoStore;
-        dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
+        
+        try {
+            dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
+        } catch (MappingException ex) {
+            throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
+        }
         if ( dbs == null )
             throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
         LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
