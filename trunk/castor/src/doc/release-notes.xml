@@ -29,6 +29,26 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1781">
+					<description>
+						Added JDOManager.loadConfiguration(JdoConf).
+					</description>
+					<contributor>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Ralf Joachim</name>
+						<email>ralf.joachim@syscon-world.de</email>
+					</submitter>
+					<reporter>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</reporter>
+					<type>Enh.</type>
+					<module>JDO</module>
+					<date>20050424</date>
+				</bug>
 				<bug id="1865">
 					<description>
 						Multiple &lt;database&gt; problems.
@@ -45,7 +65,7 @@
 						<name>Nick Stuart</name>
 						<email>nick@newtsplace.com</email>
 					</reporter>
-					<type>Bug</type>
+					<type>Enh.</type>
 					<module>JDO</module>
 					<date>20050421</date>
 				</bug>

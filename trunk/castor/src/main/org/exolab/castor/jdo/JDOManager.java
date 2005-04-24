@@ -66,6 +66,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
@@ -127,6 +128,7 @@ import org.xml.sax.InputSource;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
  */
 public final class JDOManager
@@ -216,6 +218,57 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         return jdoInstance;
     }
 
+    /**
+     * Load the JDOManager configuration from the specified in-memory JdoConf. In
+     * addition, custom entity resolver and class loader for the mappings can be 
+     * provided. 
+     * 
+     * @param  jdoConf  the in-memory JdoConf.
+     * @param  resolver An (optional) entity resolver to resolve cached
+     *         entities, e.g. for external mapping documents. 
+     * @param  loader   The class loader to use, null for the default
+     * @throws MappingException The mapping file is invalid, or any error
+     *         occured trying to load the JDO configuration/mapping
+     */
+    public static void loadConfiguration(final JdoConf jdoConf,
+                                         final EntityResolver resolver,
+                                         final ClassLoader loader)
+    throws MappingException {
+        DatabaseRegistry.loadDatabase(jdoConf, resolver, loader);
+        
+        _classLoader = loader;
+        _entityResolver = resolver;
+        
+        LOG.debug("Successfully loaded JDOManager form in-memory configuration");
+    }
+    
+    /**
+     * Load the JDOManager configuration from the specified in-memory JdoConf. In
+     * addition, a custom class loader for the mappings can be provided. 
+     * 
+     * @param  jdoConf  the in-memory JdoConf.
+     * @param  loader   The class loader to use, null for the default
+     * @throws MappingException The mapping file is invalid, or any error
+     *         occured trying to load the JDO configuration/mapping
+     */
+    public static void loadConfiguration(final JdoConf jdoConf,
+                                         final ClassLoader loader)
+    throws MappingException {
+        loadConfiguration(jdoConf, null, loader);
+    }
+    
+    /**
+     * Load the JDOManager configuration from the specified in-memory JdoConf.
+     * 
+     * @param  jdoConf  the in-memory JdoConf.
+     * @throws MappingException The mapping file is invalid, or any error
+     *         occured trying to load the JDO configuration/mapping
+     */
+    public static void loadConfiguration(final JdoConf jdoConf)
+    throws MappingException {
+        loadConfiguration(jdoConf, null, null);
+    }
+    
     /**
      * Load the JDOManager configuration from the specified input source using 
      * a custom class loader. In addition, a custom entity resolver can be 

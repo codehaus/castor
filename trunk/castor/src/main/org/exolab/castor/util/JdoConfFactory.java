@@ -92,6 +92,8 @@ import org.exolab.castor.jdo.conf.TransactionDemarcation;
  * jdoDbConf = JdoConfFactory.createJdoDbConf(db_name, "oracle", JdoConfFactory.createJdoDSConf(ds));
  * </code>
  *
+ * @deprecated use org.exolab.castor.jdo.util.JDOConfFactory instead.
+ *  
  * @author Martin Fuchs <martin-fuchs AT gmx DOT net>
  */
 public class JdoConfFactory
