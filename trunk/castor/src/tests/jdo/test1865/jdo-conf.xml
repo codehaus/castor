@@ -14,7 +14,7 @@
             <param name="user" value="test" />
             <param name="password" value="test" />
         </driver>
-        <mapping href="test1865/mapping.xml" />
+        <mapping href="test1865-mapping.xml" />
     </database>
 
     <transaction-demarcation mode="local" />

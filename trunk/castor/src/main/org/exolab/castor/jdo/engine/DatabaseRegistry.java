@@ -59,6 +59,7 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.DatabaseChoice;
 import org.exolab.castor.jdo.conf.Driver;
@@ -75,6 +76,7 @@ import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.UnmarshalHandler;
 import org.exolab.castor.xml.Unmarshaller;
+
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -82,6 +84,7 @@ import org.xml.sax.SAXException;
 /**
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
  */
 public final class DatabaseRegistry {
