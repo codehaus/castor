@@ -47,27 +47,34 @@
 package org.exolab.castor.util;
 
 
-import java.util.Properties;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Properties;
 import java.util.StringTokenizer;
+
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.apache.xml.serialize.Serializer;
+import org.apache.xml.serialize.OutputFormat;
+import org.apache.xml.serialize.Method;
+
+import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.XMLNaming;
+import org.exolab.castor.xml.util.DefaultNaming;
+import org.exolab.castor.util.Messages;
+
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.Method;
-import org.exolab.castor.util.Messages;
-import org.exolab.castor.xml.NodeType;
-import org.exolab.castor.xml.XMLNaming;
-import org.exolab.castor.xml.util.DefaultNaming;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 
 /**
@@ -90,8 +97,12 @@ import javax.xml.parsers.ParserConfigurationException;
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public abstract class Configuration
-{
+public abstract class Configuration {
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static final Log LOG = LogFactory.getLog(Configuration.class);
 
     /**
      * Names of properties used in the configuration file.
@@ -544,10 +555,10 @@ public abstract class Configuration
                 return saxParser.getParser();
             }
             catch(ParserConfigurationException pcx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
+                LOG.error(Messages.format("conf.configurationError", pcx));
             }
             catch(org.xml.sax.SAXException sx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+                LOG.error(Messages.format("conf.configurationError", sx));
             }
             
         }
@@ -586,9 +597,8 @@ public abstract class Configuration
                         xmlReader.setFeature( token.nextToken(), true );
                     }
                 }
-            } 
-            catch ( SAXException except ) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+            } catch (SAXException except) {
+                LOG.error(Messages.format("conf.configurationError", except));
             }
         }
         return parser;
@@ -706,12 +716,10 @@ public abstract class Configuration
             try {
                 SAXParser saxParser = factory.newSAXParser();
                 reader = saxParser.getXMLReader();
-            }
-            catch(ParserConfigurationException pcx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", pcx ) );
-            }
-            catch(org.xml.sax.SAXException sx) {
-                Logger.getSystemLogger().println( Messages.format( "conf.configurationError", sx ) );
+            } catch(ParserConfigurationException pcx) {
+                LOG.error(Messages.format("conf.configurationError", pcx));
+            } catch(org.xml.sax.SAXException sx) {
+                LOG.error(Messages.format("conf.configurationError", sx));
             }
             
         }
@@ -747,9 +755,8 @@ public abstract class Configuration
                     reader.setFeature( token.nextToken(), true );
                 }
             }
-        } 
-        catch ( SAXException except ) {
-            Logger.getSystemLogger().println( Messages.format( "conf.configurationError", except ) );
+        } catch (SAXException except) {
+            LOG.error(Messages.format("conf.configurationError", except));
         }
         return reader;
     } //-- getDefaultXMLReader
@@ -1019,9 +1026,13 @@ public abstract class Configuration
         String javaHome = null;
         try {
             javaHome = System.getProperty("java.home");
-        }
-        catch(Exception except) {
-            // Ignore probably running in an applet
+        } catch (SecurityException e) {
+            // Not a critical error, but users will need to know if they need to change their config.   
+            LOG.warn(Messages.format("conf.privilegesError", e));
+        } catch (Exception e) {
+            // As we will be trying something else later, record the error for setup purposes,
+            // but do not actually treat as a critical failure.
+            LOG.warn(Messages.format("conf.nonCriticalError", e));
         }
         
         if (javaHome != null) {
@@ -1033,13 +1044,12 @@ public abstract class Configuration
                     properties.load( new FileInputStream( file ) );
                     found = true;
                 }      
-            } 
-            catch ( IOException except ) {
-                // Do nothing
-            }
-            catch (SecurityException sx) {
-                // Most likely running under an app-server
-                // Do nothing
+            } catch (SecurityException e) {
+                // Not a critical error, but users will need to know if they need to change their config.   
+                LOG.warn(Messages.format("conf.privilegesError", e));
+            } catch (IOException e) {
+                // Report that we were unable to load the resource.
+                LOG.warn(Messages.format("conf.nonCriticalError", e));
             }
         }
         
