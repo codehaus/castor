@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1086 using contribution from Bin Liu [martin-fuchs@gmx.net]
+       Added type casts to Types.java to overcome runtime exceptions with Java 1.4.x.
+       Details: http://jira.codehaus.org/browse/CASTOR-1086
+       (Werner - 20050425)
+       
 All:   Fixed bug 1712 using contribution from Gregory Block [gblock@ctoforaday.com]
        Improved logging of exceptions related to security policy at Configuration.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1712

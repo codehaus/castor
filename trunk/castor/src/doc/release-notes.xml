@@ -29,6 +29,27 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="1086" tool="jira">
+					<description>
+						Added type casts to Types.java to overcome runtime exceptions with 
+						Java 1.4.x.
+					</description>
+					<contributor>
+						<name>Bin Liu</name>
+						<email>bliu72@yahoo.com</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</reporter>
+					<type>Bug</type>
+					<module>JDO</module>
+					<date>20050425</date>
+				</bug>
 				<bug id="1712">
 					<description>
 						Improved logging of exceptions related to security policy
