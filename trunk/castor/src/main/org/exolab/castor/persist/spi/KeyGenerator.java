@@ -66,6 +66,7 @@ import org.exolab.castor.mapping.MappingException;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
 public interface KeyGenerator
@@ -112,6 +113,16 @@ public interface KeyGenerator
             String primKeyName, Properties props )
         throws PersistenceException;
 
+
+    /**
+     * Determine if the key generator supports a given sql type.
+     *
+     * @param sqlType
+     * @return
+     * @throws MappingException
+     */
+    public void supportsSqlType( int sqlType )
+        throws MappingException;
 
     /**
      * Style of the key generator: BEFORE_INSERT, DURING_INSERT or AFTER_INSERT.

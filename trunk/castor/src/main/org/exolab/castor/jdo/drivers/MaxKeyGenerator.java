@@ -68,6 +68,7 @@ import org.exolab.castor.util.Messages;
  * MAX key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @author <a href="leonardo@itera.com.br">Leonardo Souza Mario Bueno</a>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see MaxKeyGeneratorFactory
  */
@@ -93,9 +94,17 @@ public final class MaxKeyGenerator implements KeyGenerator
     {
         _factory = factory;
         _sqlType = sqlType;
+        supportsSqlType( sqlType );
+    }
+
+    public void supportsSqlType( int sqlType )
+        throws MappingException
+    {
         if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
+        {
             throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                         getClass().getName(), new Integer( sqlType ) ) );
+        }
     }
 
     /**

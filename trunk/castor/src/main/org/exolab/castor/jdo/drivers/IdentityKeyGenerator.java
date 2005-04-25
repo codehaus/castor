@@ -67,6 +67,7 @@ import org.exolab.castor.util.Messages;
  * IDENTITY key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @author <mailto:dulci@start.no>Stein M. Hugubakken</mailto>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see IdentityKeyGeneratorFactory
  */
@@ -83,6 +84,8 @@ implements KeyGenerator
     private DefaultIdentityValue identityValue = null;
     private AbstractType type = null;
 
+    String fName = null;
+
     /**
      * Initialize the IDENTITY key generator.
      * @param factory A PersistenceFactory instance.
@@ -90,8 +93,8 @@ implements KeyGenerator
      * @throws MappingException if this key generator is not compatible with the persistance factory.
      */
     public IdentityKeyGenerator(PersistenceFactory factory, int sqlType) throws MappingException {
-        String fName = factory.getFactoryName();
-        if (!fName.equals("sybase") && 
+        fName = factory.getFactoryName();
+        if (!fName.equals("sybase") &&
         	!fName.equals("sql-server") && 
 			!fName.equals("hsql") && 
 			!fName.equals("mysql") && 
@@ -102,6 +105,15 @@ implements KeyGenerator
             	Messages.format("mapping.keyGenNotCompatible", getClass().getName(), fName));
         }
 
+        supportsSqlType( sqlType );
+
+        initIdentityValue(sqlType);
+        initType(fName);
+    }
+
+    public void supportsSqlType( int sqlType )
+        throws MappingException
+    {
         if (sqlType != Types.INTEGER &&
             sqlType != Types.NUMERIC &&
             sqlType != Types.DECIMAL &&
@@ -110,14 +122,11 @@ implements KeyGenerator
                 Messages.format("mapping.keyGenSQLType", getClass().getName(), new Integer(sqlType)));
         }
 
-        if (sqlType != Types.INTEGER && 
+        if (sqlType != Types.INTEGER &&
         	fName.equals("hsql")) {
             throw new MappingException(
                 Messages.format("mapping.keyGenSQLType", getClass().getName(), new Integer(sqlType)));
         }
-
-        initIdentityValue(sqlType);
-        initType(fName);
     }
 
     /**
