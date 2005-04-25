@@ -118,7 +118,6 @@ public interface KeyGenerator
      * Determine if the key generator supports a given sql type.
      *
      * @param sqlType
-     * @return
      * @throws MappingException
      */
     public void supportsSqlType( int sqlType )

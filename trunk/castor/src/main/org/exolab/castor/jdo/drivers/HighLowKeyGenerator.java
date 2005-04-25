@@ -169,6 +169,12 @@ public class HighLowKeyGenerator implements KeyGenerator
         _global = "true".equals( params.getProperty( GLOBAL ) );
     }
 
+    /**
+     * Determine if the key generator supports a given sql type.
+     *
+     * @param sqlType
+     * @throws MappingException
+     */
     public void supportsSqlType( int sqlType )
         throws MappingException
     {
