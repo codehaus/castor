@@ -72,12 +72,6 @@ public class Types
 {
 
     /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance (Types.class);
-    
-    /**
      * Returns the class name based on the supplied type name. The type name
      * can be a short name (e.g. int, byte) or any other Java class (e.g.
      * myapp.Product). If a short type name is used, the primitive type might
@@ -213,6 +207,8 @@ public class Types
      * checked exceptions, since object creation has been proven to work
      * when creating descriptor from mapping.
      *
+     * @param type The class type of the object instance to be constructed.
+     * @return An instance of the class type specified.
      * @throws IllegalStateException The Java object cannot be constructed
      */
     public static Object newInstance( Class type )
@@ -236,6 +232,9 @@ public class Types
      * checked exceptions, since object creation has been proven to work
      * when creating descriptor from mapping.
      *
+     * @param type The class type of the object instance to be constructed.
+     * @param args Arguments to be supplied to constructor call. 
+     * @return An instance of the class type specified.
      * @throws IllegalStateException The Java object cannot be constructed
      */
     public static Object newInstance( Class type, Object args[] )
@@ -288,6 +287,7 @@ public class Types
      * The class must be publicly available and have a default public
      * constructor.
      *
+     * @param allowAbstractOrInterface True to indicate that abstract classes of interfaces are allowed.
      * @param type The Java type
      * @return True if constructable
      */
@@ -302,7 +302,9 @@ public class Types
             if ( ( type.getConstructor( new Class[0] ).getModifiers() & Modifier.PUBLIC ) != 0 )
                 return true;
         } catch ( NoSuchMethodException except ) {
+        	// TODO [WG]: no code available
         } catch ( SecurityException except ) {
+        	// TODO [WG]: no code available
         }
         return false;
     }
@@ -388,10 +390,13 @@ public class Types
     /**
      * Returns the matching constructor for the given arguments
      *
-     * @returns the matching constructor for the given arguments
+     * @param type The class type of the object instance to be constructed.
+     * @param args Arguments to be supplied to constructor call. 
+     * @return the matching constructor for the given arguments
+     * @throws NoSuchMethodException If no constructor with the given number/types of arguments exists.
      */
     private static Constructor findConstructor(Class type, Object[] args) 
-        throws IllegalAccessException, NoSuchMethodException
+        throws NoSuchMethodException
     {
         
         Constructor[] constructors = type.getConstructors();
@@ -512,17 +517,17 @@ public class Types
         new TypeInfo( "int",         java.lang.Integer.TYPE,
                       java.lang.Integer.TYPE,    true,     new Integer( 0 ) ),
         new TypeInfo( "long",        java.lang.Long.TYPE,
-                      java.lang.Long.class,       true,     new Long( 0 ) ),
+                      java.lang.Long.class,       true,     new Long( (long) 0 ) ),
         new TypeInfo( "big-integer", null,
                       java.math.BigInteger.class, true,     BigInteger.valueOf( 0 ) ),
         new TypeInfo( "boolean",     java.lang.Boolean.TYPE,
                       java.lang.Boolean.class,    true,     Boolean.FALSE ),
         new TypeInfo( "double",      java.lang.Double.TYPE,
-                      java.lang.Double.class,     true,     new Double( 0 ) ),
+                      java.lang.Double.class,     true,     new Double( (double) 0 ) ),
         new TypeInfo( "float",       java.lang.Float.TYPE,
-                      java.lang.Float.class,      true,     new Float( 0 ) ),
+                      java.lang.Float.class,      true,     new Float( (float) 0 ) ),
         new TypeInfo( "big-decimal", null,
-                      java.math.BigDecimal.class, true,     new BigDecimal( 0 ) ),
+                      java.math.BigDecimal.class, true,     new BigDecimal( (double) 0 ) ),
         new TypeInfo( "byte",        java.lang.Byte.TYPE,
                       java.lang.Byte.class,       true,     new Byte( (byte) 0 ) ),
         new TypeInfo( "date",        null,
@@ -587,7 +592,8 @@ public class Types
 
     /**
      * A hack for JDK 1.1 Compatibility
-    **/
+     * @return A Class instance for CLOB types.
+     */
     private static final Class getClobClass() {        
         Class type = null;
         try {
