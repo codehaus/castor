@@ -69,6 +69,7 @@ import org.exolab.castor.util.Messages;
 /**
  * The parent abstract class for HIGH-LOW key generators
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see HighLowKeyGeneratorFactory
  */
@@ -137,9 +138,7 @@ public class HighLowKeyGenerator implements KeyGenerator
 
         _factory = factory;
         _sqlType = sqlType;
-        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
-            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
-                                        getClass().getName(), new Integer( sqlType ) ) );
+        supportsSqlType( sqlType );
 
         _seqTable = params.getProperty( SEQ_TABLE );
         if ( _seqTable == null ) 
@@ -168,6 +167,16 @@ public class HighLowKeyGenerator implements KeyGenerator
         _grabSizeD = new BigDecimal( _grabSizeI );
         _sameConnection = "true".equals( params.getProperty( SAME_CONNECTION ) );
         _global = "true".equals( params.getProperty( GLOBAL ) );
+    }
+
+    public void supportsSqlType( int sqlType )
+        throws MappingException
+    {
+        if ( sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
+        {
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
+        }
     }
 
     /**

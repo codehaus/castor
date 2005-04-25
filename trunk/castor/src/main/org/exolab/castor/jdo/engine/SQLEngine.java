@@ -156,6 +156,9 @@ public final class SQLEngine implements Persistence {
                 int[] tempType = ( (JDOFieldDescriptor) _clsDesc.getIdentity() ).getSQLType();
                 _keyGen = keyGenDesc.getKeyGeneratorRegistry().getKeyGenerator(
                         _factory, keyGenDesc, tempType==null? 0: tempType[0] );
+
+                // Does the key generator support the sql type specified in the mapping?
+                _keyGen.supportsSqlType( tempType[0] );
             }
         }
 

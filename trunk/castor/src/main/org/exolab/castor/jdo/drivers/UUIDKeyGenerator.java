@@ -84,6 +84,7 @@ import org.exolab.castor.util.Messages;
 /**
  * UUID key generator.
  * @author <a href="thomas.fach@publica.de">Thomas Fach</a>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see UUIDKeyGeneratorFactory
  */
@@ -107,9 +108,17 @@ public final class UUIDKeyGenerator implements KeyGenerator
     {
         _factory = factory;
         _sqlType = sqlType;
+        supportsSqlType( sqlType );
+    }
+
+    public void supportsSqlType( int sqlType )
+        throws MappingException
+    {
         if(sqlType != Types.CHAR && sqlType != Types.VARCHAR && sqlType != Types.LONGVARCHAR)
+        {
           throw new MappingException( Messages.format( "mapping.keyGenSQLType",
                                      getClass().getName(), new Integer( sqlType ) ) );
+        }
     }
 
     /**

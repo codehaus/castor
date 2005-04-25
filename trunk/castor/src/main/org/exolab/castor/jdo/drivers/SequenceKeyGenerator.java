@@ -70,6 +70,7 @@ import org.exolab.castor.util.Messages;
 /**
  * SEQUENCE key generator.
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * @author <a href="bruce DOT snyder AT gmail DOT com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  * @see SequenceKeyGeneratorFactory
  */
@@ -140,13 +141,22 @@ public final class SequenceKeyGenerator implements KeyGenerator
                                         "trigger=\"true\"", getClass().getName(), _factoryName ) );
 
         _sqlType = sqlType;
-        if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
-            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
-                                        getClass().getName(), new Integer( sqlType ) ) );
+        supportsSqlType( sqlType );
+
         try {
             _increment = Integer.parseInt(params.getProperty("increment","1"));
         } catch (NumberFormatException nfe) {
             _increment = 1;
+        }
+    }
+
+    public void supportsSqlType( int sqlType )
+        throws MappingException
+    {
+        if (sqlType != Types.INTEGER && sqlType != Types.NUMERIC && sqlType != Types.DECIMAL && sqlType != Types.BIGINT)
+        {
+            throw new MappingException( Messages.format( "mapping.keyGenSQLType",
+                                        getClass().getName(), new Integer( sqlType ) ) );
         }
     }
 
