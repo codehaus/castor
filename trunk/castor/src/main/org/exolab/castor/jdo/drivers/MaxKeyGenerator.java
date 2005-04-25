@@ -97,6 +97,12 @@ public final class MaxKeyGenerator implements KeyGenerator
         supportsSqlType( sqlType );
     }
 
+    /**
+     * Determine if the key generator supports a given sql type.
+     *
+     * @param sqlType
+     * @throws MappingException
+     */
     public void supportsSqlType( int sqlType )
         throws MappingException
     {
