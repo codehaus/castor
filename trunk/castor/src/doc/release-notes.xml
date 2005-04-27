@@ -29,6 +29,27 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
 			<bugs>
+				<bug id="880" tool="jira">
+					<description>
+				       Added java.sql.Connection getJdbcConnection() to Database interface
+					   to obtain a handle to the underlying JDBC connection.
+					</description>
+					<contributor>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</contributor>
+					<submitter>
+						<name>Werner Guttmann</name>
+						<email>werner.guttmann@gmx.net</email>
+					</submitter>
+					<reporter>
+						<name>Martin Fuchs</name>
+						<email>martin-fuchs@gmx.net</email>
+					</reporter>
+					<type>Enh</type>
+					<module>JDO</module>
+					<date>20050427</date>
+				</bug>
 				<bug id="1086" tool="jira">
 					<description>
 						Added type casts to Types.java to overcome runtime exceptions with 

@@ -46,6 +46,7 @@
 
 package org.exolab.castor.persist;
 
+import java.sql.Connection;
 import java.util.Vector;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -466,7 +467,7 @@ public abstract class TransactionContext
      * @throws PersistenceException An error occured talking to the
      *   persistence engine
      */
-    public abstract Object getConnection( LockEngine engine )
+    public abstract Connection getConnection( LockEngine engine )
         throws PersistenceException;
 
 
