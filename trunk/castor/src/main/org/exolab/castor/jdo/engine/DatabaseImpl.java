@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.StringTokenizer;
@@ -229,6 +230,7 @@ public class DatabaseImpl
     /**
      * True if user prefer all reachable object to be stored automatically.
      * False if user want only dependent object to be stored.
+     * @param autoStore True to indicate that 'autoStore' mode should be used.
      */
     public void setAutoStore( boolean autoStore ) {
         _autoStore = autoStore;
@@ -238,6 +240,7 @@ public class DatabaseImpl
      * Return if the current transaction is set to autoStore, it there is
      * transaction active. If there is no active transaction, return if
      * the next transaction will be set to autoStore.
+     * @return True if 'auto-store' mode is in use.
      */
     public boolean isAutoStore() {
         if ( _ctx != null )
@@ -259,6 +262,7 @@ public class DatabaseImpl
 
     /**                              }
      * Return the name of the database
+     * @return Name of the database.
      */                               
     public String getDatabaseName()  
     {                                
@@ -626,11 +630,14 @@ public class DatabaseImpl
 
     /**
      * Get the underlying JDBC Connection.
-     * Only for internal / advanced use !
-     * Never try to close it (is done by castor).
+     * 
+     * This is for <b>advanced</b> use only. Please make sure that you <b>never</b>
+     * close this Connection instance, as it will be closed by Castor.
+     * 
+     * @return the underlying JDBC connection, if possible
+     * @throws PersistenceException If the underlying JDBC connection cannot be obtained.
      */
-    public Object /* java.sql.Connection */ getConnection()
-            throws org.exolab.castor.jdo.PersistenceException
+    public Connection getJdbcConnection() throws PersistenceException 
     {
         return _ctx.getConnection( _scope.getLockEngine() );
     }
@@ -711,6 +718,7 @@ public class DatabaseImpl
      * 
      * @param type An array of class types.
      * @param identity An array of object identifiers.
+     * @throws PersistenceException Indicates that a problem has occured expiring objects from the cache. 
      * @deprecated Please use the new {@link org.exolab.castor.jdo.CacheManager} which can be 
      * obtained by calling {@link #getCacheManager()}.
      */

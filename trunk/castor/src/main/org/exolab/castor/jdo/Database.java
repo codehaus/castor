@@ -575,5 +575,15 @@ public interface Database
      */
     public CacheManager getCacheManager();
 
+    /**
+     * Gets the underlying JDBC connection.
+     * 
+     * This is for <b>advanced</b> use only. Please make sure that you <b>never</b>
+     * close this Connection instance, as it will be closed by Castor.
+     * 
+     * @return the underlying JDBC connection, if present; otherwise null 
+     * @throws PersistenceException If the underlying JDBC connection cannot be obtained.
+     */
+    public java.sql.Connection getJdbcConnection() throws PersistenceException;
 }
 

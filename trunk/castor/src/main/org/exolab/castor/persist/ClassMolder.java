@@ -704,7 +704,7 @@ public class ClassMolder
             if( results != null ) {
                 stamp = results.getQuery().fetch( fields, oid.getIdentity() );
             } else {
-                conn = (Connection)tx.getConnection(oid.getLockEngine());
+                conn = tx.getConnection(oid.getLockEngine());
                 stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
             }
             oid.setDbLock( accessMode == AccessMode.DbLocked );
@@ -920,7 +920,7 @@ public class ClassMolder
         }
 
         // ask Persistent to create the object into the persistence storage
-        createdId = _persistence.create(tx.getDatabase(), (Connection)tx.getConnection(oid.getLockEngine()),
+        createdId = _persistence.create(tx.getDatabase(), tx.getConnection(oid.getLockEngine()),
                 fields, ids );
 
         if ( createdId == null )
@@ -955,7 +955,7 @@ public class ClassMolder
                         Object oo = itor.next();
                         if ( tx.isPersistent( oo ) ) {
                             _fhs[i].getRelationLoader().createRelation(
-                            (Connection)tx.getConnection(oid.getLockEngine()),
+                            tx.getConnection(oid.getLockEngine()),
                             createdId, fieldClassMolder.getIdentity( tx, oo ) );
                         }
                     }
@@ -1447,7 +1447,7 @@ public class ClassMolder
                                 tx.writeLock( reldel, tx.getLockTimeout() );
 
                                 _fhs[i].getRelationLoader().deleteRelation(
-                                (Connection)tx.getConnection(oid.getLockEngine()),
+                                tx.getConnection(oid.getLockEngine()),
                                 oid.getIdentity(), id );
 
                                 fieldClassMolder.removeRelation( tx, reldel, this, object );
@@ -1468,7 +1468,7 @@ public class ClassMolder
 
                         if ( tx.isPersistent( addedField ) ) {
                             _fhs[i].getRelationLoader().createRelation(
-                            (Connection)tx.getConnection(oid.getLockEngine()),
+                            tx.getConnection(oid.getLockEngine()),
                             oid.getIdentity(), fieldClassMolder.getIdentity( tx, addedField ) );
                         } else {
                             if ( tx.isAutoStore() )
@@ -1500,7 +1500,7 @@ public class ClassMolder
                                     tx.writeLock( toBeDeleted, 0 );
 
                                     _fhs[i].getRelationLoader().deleteRelation(
-                                    (Connection)tx.getConnection(oid.getLockEngine()),
+                                    tx.getConnection(oid.getLockEngine()),
                                     oid.getIdentity(), deletedId );
 
                                     fieldClassMolder.removeRelation( tx, toBeDeleted, this, object );
@@ -1524,7 +1524,7 @@ public class ClassMolder
                             if ( toBeAdded != null ) {
                                 if ( tx.isPersistent( toBeAdded ) ) {
                                     _fhs[i].getRelationLoader().createRelation(
-                                    (Connection)tx.getConnection(oid.getLockEngine()),
+                                    tx.getConnection(oid.getLockEngine()),
                                     oid.getIdentity(), addedId );
                                 } else {
                                     if ( tx.isAutoStore() )
@@ -1836,7 +1836,7 @@ public class ClassMolder
             if ( !_timeStampable && isDependent() && fields == null  ) {
                 // allow a dependent object not implements timeStampable
                 fields = new Object[_fhs.length];
-                Connection conn = (Connection)tx.getConnection(oid.getLockEngine());
+                Connection conn = tx.getConnection(oid.getLockEngine());
                 stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
                 locker.setObject( tx, fields );
@@ -2245,7 +2245,7 @@ public class ClassMolder
                     if ( persistFields == null ) {
 
                         persistFields = new Object[extend._fhs.length];
-                        extend._persistence.load( (Connection)tx.getConnection(extend._engine),
+                        extend._persistence.load( tx.getConnection(extend._engine),
                         persistFields, identity, AccessMode.ReadOnly );
                     }
 
@@ -2261,7 +2261,7 @@ public class ClassMolder
                 }
             } else if ( extend._fhs[i].isManyToMany() ) {
                 extend._fhs[i].getRelationLoader().deleteRelation(
-                (Connection)tx.getConnection(extend._fhs[i].getFieldLockEngine()),
+                tx.getConnection(extend._fhs[i].getFieldLockEngine()),
                 identity );
             }
         }
@@ -2283,12 +2283,11 @@ public class ClassMolder
         for( int i=0; i < _fhs.length; i++ ) {
             if( _fhs[i].isManyToMany() ) {
                 _fhs[i].getRelationLoader().deleteRelation(
-                  (Connection)tx.getConnection(oid.getLockEngine()),
-                  ids);
+                  tx.getConnection(oid.getLockEngine()), ids);
             }
         }
 
-        _persistence.delete( (Connection)tx.getConnection(oid.getLockEngine()), ids );
+        _persistence.delete( tx.getConnection(oid.getLockEngine()), ids );
 
         // All field along the extend path will be deleted by transaction
         // However, everything off the path must be deleted by ClassMolder.
@@ -2437,7 +2436,7 @@ public class ClassMolder
                 // delete the relation in relation table too
                 /*
                 _fhs[i].getRelationLoader().deleteRelation(
-                (Connection)tx.getConnection(oid.getLockEngine()),
+                tx.getConnection(oid.getLockEngine()),
                 oid.getIdentity() );
                 */
 

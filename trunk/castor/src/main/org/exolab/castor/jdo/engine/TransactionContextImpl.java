@@ -230,7 +230,7 @@ final class TransactionContextImpl
     }
 
 
-    public Object getConnection( LockEngine engine ) throws PersistenceException {
+    public Connection getConnection( LockEngine engine ) throws PersistenceException {
         Connection conn;
 
         conn = (Connection) _conns.get( engine );

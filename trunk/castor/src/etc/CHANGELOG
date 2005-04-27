@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-880 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
+       Added java.sql.Connection getJdbcConnection() to Database interface.
+       Details: http://jira.codehaus.org/browse/CASTOR-880
+       (Werner - 20050427)
+       
 JDO:   Fixed bug CASTOR-1086 using contribution from Bin Liu [martin-fuchs@gmx.net]
        Added type casts to Types.java to overcome runtime exceptions with Java 1.4.x.
        Details: http://jira.codehaus.org/browse/CASTOR-1086
