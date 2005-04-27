@@ -50,7 +50,6 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseImpl;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
@@ -73,7 +72,7 @@ public class TestLimitClause extends CastorTestCase
     public TestLimitClause( TestHarness category )
     {
         super( category, "TC62", "Test limit clause" );
-        _category = (JDOCategory) category;
+        this._category = (JDOCategory) category;
     }
 
 	/**
@@ -83,7 +82,7 @@ public class TestLimitClause extends CastorTestCase
 	 */
 	public TestLimitClause(TestHarness suite, String name, String description) {
 		super(suite, name, description);
-		_category = (JDOCategory) suite;
+		this._category = (JDOCategory) suite;
 	}
 	
     /**
@@ -95,35 +94,35 @@ public class TestLimitClause extends CastorTestCase
 
     	TestObject object = null;
 
-        _db = _category.getDatabase();
+        this._db = this._category.getDatabase();
 
-        _db.begin();
+        this._db.begin();
 
-        Connection connection = (Connection) ((DatabaseImpl) _db).getConnection();
+        Connection connection = this._db.getJdbcConnection();
 
         Statement statement = connection.createStatement();
         statement.executeUpdate ("DELETE FROM test_table");
 
         statement.close();
 
-        _db.commit();
+        this._db.commit();
 
         for (int i = 1; i < 16; i++ ) {
-            _db.begin();
+            this._db.begin();
             object = new TestObject();
             object.setId (i);
             object.setValue1("val1" + i);
             object.setValue2("val2" + i);
-            _db.create (object);
-            _db.commit();
+            this._db.create (object);
+            this._db.commit();
         }
 
     }
 
     public void tearDown() throws PersistenceException
     {
-        if ( _db.isActive() ) _db.rollback();
-        _db.close();
+        if ( this._db.isActive() ) this._db.rollback();
+        this._db.close();
     }
 
 	public void testLimit()
@@ -131,8 +130,8 @@ public class TestLimitClause extends CastorTestCase
     {
         TestObject testObject = null;
 
-        _db.begin();
-        OQLQuery query = _db.getOQLQuery("select t from jdo.TestObject t order by id limit $1");
+        this._db.begin();
+        OQLQuery query = this._db.getOQLQuery("select t from jdo.TestObject t order by id limit $1");
         query.bind(LIMIT);
         QueryResults results = query.execute();
         assertNotNull (results);
@@ -144,7 +143,7 @@ public class TestLimitClause extends CastorTestCase
         }
         assertTrue(!results.hasMore());
 
-    	_db.commit();
+    	this._db.commit();
     }
 
 	public void runTest() throws Exception {
