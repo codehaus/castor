@@ -7,6 +7,12 @@ JDO:   Fixed bug CASTOR-880 using contribution from Martin Fuchs [martin-fuchs@g
        Details: http://jira.codehaus.org/browse/CASTOR-880
        (Werner - 20050427)
        
+JDO:   Fixed issue CASTOR-1081. This required the refactoring of all key
+       generators to extract the supportsSqlType() method which is now called
+       early rather than late from within the SQLEngine constructor.
+       Details: http://jira.codehaus.org/browse/CASTOR-1081
+       (Bruce - 20050425)
+
 JDO:   Fixed bug CASTOR-1086 using contribution from Bin Liu [martin-fuchs@gmx.net]
        Added type casts to Types.java to overcome runtime exceptions with Java 1.4.x.
        Details: http://jira.codehaus.org/browse/CASTOR-1086
