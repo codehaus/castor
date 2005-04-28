@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- This file contains a list of Castor contributors -->
-<document url="http://castor.exolab.org/contributors.xml">
+<document url="http://castor.codehaus.org/contributors.xml">
   <body>
     <title>Contributors</title>
     <header>
@@ -45,7 +45,7 @@
 
   <contributor type="Committer">
     <name surname="Snyder" given="Bruce"/>
-    <email> ferret@frii.com</email>
+    <email>bruce DOT snyder AT gmail DOT com</email>
     <project>JDO</project>
     <description>
         Current JDO Project Lead taking over for Thomas Yip.
@@ -59,7 +59,7 @@
     <name surname="Guttmann" given="Werner" />
     <email>werner.guttmann@gmx.net</email>
     <project>JDO</project>
-	<company id="anecon" />
+    <company id="anecon" />
     <description>
        JDO enhancements including TransactionManagerFactory API, the API for JDBC
        parameters and much more.
@@ -105,7 +105,7 @@
     <email>gblock@ctoforaday.com</email>
     <project>JDO</project>
     <status>active</status>
-	<company id="ctoforaday"/>
+    <company id="ctoforaday"/>
     <description>
        Bugfixes/enhancements, stress testing, performance testing, tester of
        unusual 'runtime' environments, (Hashbelt) cache implementations et alias.
@@ -348,7 +348,7 @@
 
   <contributor type="Contributor">
     <name surname="Causevic" given="Emir"/>
-    <email>emirc@gawab.com</email>
+    <email>emircaus@bih.net.ba</email>
     <description>Contributed patch for SapDbFactory to add the currval function.</description>
   </contributor>
 
