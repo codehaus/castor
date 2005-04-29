@@ -29,6 +29,23 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="1088" type="jira">
+                    <description>
+                        Improved the way Castor JDO logs error messages if a transaction fails.
+                    </description>
+                    <contributor>
+                        <name>Tim Telcik</name>
+                        <email>ttelcik@hbf.com.au</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Tim Telcik</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050429</date>
+                </bug>
                 <bug id="880" tool="jira">
                     <description>
                        Added java.sql.Connection getJdbcConnection() to Database interface

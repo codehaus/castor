@@ -513,11 +513,12 @@ public class DatabaseImpl
         if ( _ctx == null || ! _ctx.isOpen() )
             throw new TransactionNotInProgressException( Messages.message( "jdo.txNotInProgress" ) );
         if ( _ctx.getStatus() == Status.STATUS_MARKED_ROLLBACK )
-            throw new TransactionAbortedException( Messages.message( "jdo.txAborted" ) );
+            throw new TransactionAbortedException( Messages.message( "jdo.txRollback" ) );
         try {
             _ctx.prepare();
             _ctx.commit();
         } catch ( TransactionAbortedException except ) {
+            _log.error( Messages.format( "jdo.txAborted", except.getMessage() ), except );
             _ctx.rollback();
             throw except;
         } finally {
@@ -567,12 +568,12 @@ public class DatabaseImpl
         }
         try {
             _ctx.prepare();
-        } catch ( TransactionAbortedException except ) {
-            _log.fatal( Messages.format( "jdo.fatalException", except ) );
+        } catch ( TransactionAbortedException tae ) {
+            _log.error( Messages.format( "jdo.txAbortedMarkRollback", tae.getMessage() ), tae );        
             try {
                 _transaction.setRollbackOnly();
-            } catch ( SystemException except2 ) {
-                _log.fatal( Messages.format( "jdo.fatalException", except2 ) );
+            } catch ( SystemException se ) {
+                _log.fatal( Messages.format( "jdo.txMarkRollbackFailure", se.getMessage() ), se );
             }
             _ctx.rollback();
         }
