@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1088 using contribution from Tim Telcik [ttelcik@hbf.com.au]
+       Improved the way Castor JDO logs error messages if a transaction fails.
+       Details: http://jira.codehaus.org/browse/CASTOR-1088
+       (Werner - 20050429)
+       
 JDO:   Fixed bug CASTOR-880 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Added java.sql.Connection getJdbcConnection() to Database interface.
        Details: http://jira.codehaus.org/browse/CASTOR-880
