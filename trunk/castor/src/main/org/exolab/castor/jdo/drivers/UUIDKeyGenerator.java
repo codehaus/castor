@@ -175,7 +175,7 @@ public final class UUIDKeyGenerator implements KeyGenerator
         catch ( Exception ex )
         {
           throw new PersistenceException( Messages.format(
-                    "persist.keyGenSQL", ex.toString() ), ex );
+                    "persist.keyGenSQL", getClass().getName(), ex.toString() ), ex );
         }
 
         if (sUUID == null)

@@ -349,7 +349,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     }
                 }
                 if ( ! success )
-                    throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
+                    throw new PersistenceException( Messages.format( "persist.keyGenFailed", getClass().getName() ) );
             } catch ( SQLException ex ) {
                 if ( ! _sameConnection ) {
                     try {
@@ -359,7 +359,7 @@ public class HighLowKeyGenerator implements KeyGenerator
                     }
                 }
                 throw new PersistenceException( Messages.format(
-                        "persist.keyGenSQL", ex.toString() ), ex );
+                        "persist.keyGenSQL", getClass().getName(), ex.toString() ), ex );
             } finally {
                 if ( stmt != null ) {
                     try {
