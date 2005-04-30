@@ -43,7 +43,10 @@
 
 package org.exolab.castor.persist.cache;
 
+import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface specification for performance caches as used in Castor. Please implement 
@@ -149,5 +152,61 @@ public interface Cache {
      * @param className The class name.
      */
     public void setClassName (String className); 
-	
+
+	/**
+	 * Returns the number of key-value mappings in this map.
+	 */
+	public int size();
+
+	/**
+	 * Removes all mappings from this map.
+	 */
+	public void clear();
+
+	/**
+	 * Returns true if this map contains no key-value mappings.
+	 * @return True if this map contains no key-value mappings 
+	 */
+	public boolean isEmpty();
+
+	/**
+	 * Returns true if this map contains a mapping for the specified key
+	 * @param key A key object.
+	 * @return true if this map contains a mapping for the specified key
+	 */
+	public boolean containsKey(Object key);
+
+	/**
+	 * Returns true if this map maps one or more keys to the specified value. 
+	 * This operation will probably require time linear to the cache size for most 
+	 * implementations of the Cache interface.
+	 * @param value The object value.
+	 * @return true if this map maps one or more keys to the specified value
+	 */
+	public boolean containsValue(Object value);
+
+	/**
+	 * 
+	 * @return 
+	 */
+	public Collection values();
+
+	/**
+	 * Copies all of the mappings from the specified map to this map (optional operation). 
+	 * @param aMap The map to be copied.
+	 */
+	public void putAll(Map aMap);
+
+	/**
+	 * Returns a set view of the keys contained in this map.
+	 * @return A set view of all the keys.
+	 */
+	public Set entrySet();
+
+	/**
+	 * Returns a collection view of the values contained in this map.
+	 * @return A set view of all the value objects.
+	 */
+	public Set keySet();
+
 }

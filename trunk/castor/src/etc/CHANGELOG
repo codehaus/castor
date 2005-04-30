@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1084 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Reworked the Cache interface to be 100% compliant with java.util.Map.
+       Details: http://jira.codehaus.org/browse/CASTOR-1084
+       (Werner - 20050430)
+       
 JDO:   Fixed bug CASTOR-1088 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Improved the way Castor JDO logs error messages if a transaction fails.
        Details: http://jira.codehaus.org/browse/CASTOR-1088

@@ -43,8 +43,12 @@
 
 package org.exolab.castor.persist.cache;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -190,6 +194,69 @@ implements Cache
 	 */
 	public boolean contains(Object key) {
 		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#size()
+	 */
+	public int size() {
+		return 0;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#clear()
+	 */
+	public void clear() {
+		// nothing to clear
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#isEmpty()
+	 */
+	public boolean isEmpty() {
+		return true;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#containsKey(java.lang.Object)
+	 */
+	public boolean containsKey(Object key) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#containsValue(java.lang.Object)
+	 */
+	public boolean containsValue(Object value) {
+		return false;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#values()
+	 */
+	public Collection values() {
+		return Collections.EMPTY_LIST;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#putAll(java.util.Map)
+	 */
+	public void putAll(Map aMap) {
+		// nothing to do
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#entrySet()
+	 */
+	public Set entrySet() {
+		return Collections.EMPTY_SET;
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#keySet()
+	 */
+	public Set keySet() {
+		return Collections.EMPTY_SET;
 	}
 	
 }
