@@ -184,7 +184,7 @@ public final class MaxKeyGenerator implements KeyGenerator
             }
         } catch ( SQLException ex ) {
             throw new PersistenceException( Messages.format(
-                    "persist.keyGenSQL", ex.toString() ), ex );
+                    "persist.keyGenSQL", getClass().getName(), ex.toString() ), ex );
         } finally {
             if ( stmt != null ) {
                 try {

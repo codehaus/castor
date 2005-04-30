@@ -29,6 +29,23 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="1082" type="jira">
+                    <description>
+                        Improve the error messages related to the use of key generators.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050430</date>
+                </bug>
                 <bug id="1084" type="jira">
                     <description>
                         Reworked the Cache interface to be 100% compliant with java.util.Map.

@@ -210,7 +210,7 @@ implements KeyGenerator
     		if (rs.next()) {
     			return identityValue.getValue(rs.getInt(1));
     		} else {
-    			throw new PersistenceException(Messages.message("persist.keyGenFailed"));
+    			throw new PersistenceException(Messages.format("persist.keyGenFailed", getClass().getName()));
     		}
     	}
 
@@ -220,7 +220,7 @@ implements KeyGenerator
     			stmt = conn.prepareStatement(sql);
     			return getValue(stmt);
     		} catch (SQLException e) {
-    			throw new PersistenceException(Messages.format("persist.keyGenSQL", e.toString()));
+    			throw new PersistenceException(Messages.format("persist.keyGenSQL", getClass().getName(), e.toString()));
     		} finally {
     			if (stmt != null) {
     				try {
@@ -255,7 +255,7 @@ implements KeyGenerator
     			stmt = conn.prepareCall("{call IDENTITY()}");
     			v = getValue(stmt);
     		} catch (SQLException e) {
-    			throw new PersistenceException(Messages.format("persist.keyGenSQL", e.toString()));
+    			throw new PersistenceException(Messages.format("persist.keyGenSQL", getClass().getName(), e.toString()));
     		} finally {
     			if (stmt != null) {
     				try {

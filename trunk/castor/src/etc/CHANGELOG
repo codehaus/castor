@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+ 
+JDO:   Fixed bug CASTOR-1082 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Improve the error messages related to the use of key generators.
+       Details: http://jira.codehaus.org/browse/CASTOR-1082
+       (Werner - 20050430)
+
 JDO:   Fixed bug CASTOR-1084 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Reworked the Cache interface to be 100% compliant with java.util.Map.
        Details: http://jira.codehaus.org/browse/CASTOR-1084

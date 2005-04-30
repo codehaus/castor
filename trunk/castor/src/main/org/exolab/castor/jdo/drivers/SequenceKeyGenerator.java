@@ -226,11 +226,11 @@ public final class SequenceKeyGenerator implements KeyGenerator
                 else
                     return new BigDecimal( value );
             } else {
-                throw new PersistenceException( Messages.message( "persist.keyGenFailed" ) );
+                throw new PersistenceException( Messages.format( "persist.keyGenFailed", getClass().getName() ) );
             }
         } catch ( Exception ex ) {
             throw new PersistenceException( Messages.format(
-                    "persist.keyGenSQL", ex.toString() ) );
+                    "persist.keyGenSQL", getClass().getName(), ex.toString() ) );
         } finally {
             if ( stmt != null ) {
                 try {
