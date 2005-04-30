@@ -43,9 +43,12 @@
 
 package org.exolab.castor.persist.cache;
 
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -332,5 +335,69 @@ implements Cache
 
 	        super.setCapacity (capacity);
 		}
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#size()
+	 */
+	public int size() {
+		return mapKeyPos.size();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#clear()
+	 */
+	public void clear() {
+		mapKeyPos.clear();
+		// TODO [WG]: clear keys, values and status object arrays ? 
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#isEmpty()
+	 */
+	public boolean isEmpty() {
+		return mapKeyPos.isEmpty();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#containsKey(java.lang.Object)
+	 */
+	public boolean containsKey(Object key) {
+		return mapKeyPos.containsKey(key);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#containsValue(java.lang.Object)
+	 */
+	public boolean containsValue(Object value) {
+		return mapKeyPos.containsValue(value);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#values()
+	 */
+	public Collection values() {
+		return mapKeyPos.values();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#putAll(java.util.Map)
+	 */
+	public void putAll(Map aMap) {
+		mapKeyPos.putAll (aMap);
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#entrySet()
+	 */
+	public Set entrySet() {
+		return mapKeyPos.entrySet();
+	}
+
+	/* (non-Javadoc)
+	 * @see org.exolab.castor.persist.cache.Cache#keySet()
+	 */
+	public Set keySet() {
+		return mapKeyPos.keySet();
 	}
 }
