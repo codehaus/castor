@@ -96,8 +96,8 @@ public class WebSphere51TransactionManagerFactory
 
         try {
             webSphereTxMgrFactory = Class.forName (FACTORY_CLASS_NAME);
-            method = webSphereTxMgrFactory.getMethod(FACTORY_METHOD_NAME, null );
-            _transactionManager = (TransactionManager) method.invoke(webSphereTxMgrFactory, null );
+            method = webSphereTxMgrFactory.getMethod(FACTORY_METHOD_NAME, (Class[]) null );
+            _transactionManager = (TransactionManager) method.invoke(webSphereTxMgrFactory, (Object[]) null );
         }
         catch( ClassNotFoundException cnfe ) {
             throw new TransactionManagerAcquireException( Messages.format( 

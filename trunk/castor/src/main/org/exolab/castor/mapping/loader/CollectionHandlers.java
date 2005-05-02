@@ -256,8 +256,8 @@ public final class CollectionHandlers
                         infoClass = CollectionHandlers.class.getClassLoader().loadClass( tokenizer.nextToken() );
                     else
                         infoClass = Class.forName( tokenizer.nextToken() );
-                    method = infoClass.getMethod( "getCollectionHandlersInfo", null );
-                    info = (Info[]) method.invoke( null, null );
+                    method = infoClass.getMethod( "getCollectionHandlersInfo", (Class[]) null );
+                    info = (Info[]) method.invoke( null, (Object[]) null );
                     for ( int i = 0 ; i < info.length ; ++i )
                         allInfo.addElement( info[ i ] );
                 } catch ( Exception except ) {

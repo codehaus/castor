@@ -186,7 +186,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
         String seqName;
         String table;
 
-        seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
+        seqName = MessageFormat.format( _seqName, (Object[]) (new String[] {tableName,primKeyName}));// due to varargs in 1.5, see CASTOR-1097
         table = _factory.quoteName(tableName);
         try {
             if (_factory.getFactoryName().equals("interbase")) {
@@ -204,8 +204,8 @@ public final class SequenceKeyGenerator implements KeyGenerator
                 } else if (_triggerPresent && _factoryName.equals( "postgresql" )) {
                     Object insStmt = props.get("insertStatement");
                     Class psqlStmtClass = Class.forName("org.postgresql.Statement");
-                    Method getInsertedOID = psqlStmtClass.getMethod("getInsertedOID", null);
-                    int insertedOID = ((Integer) getInsertedOID.invoke(insStmt, null)).intValue();
+                    Method getInsertedOID = psqlStmtClass.getMethod("getInsertedOID", (Class[])null);
+                    int insertedOID = ((Integer) getInsertedOID.invoke(insStmt, (Object[])null)).intValue();
                     stmt = conn.prepareStatement("SELECT " + _factory.quoteName( primKeyName ) +
                             " FROM " + table + " WHERE OID=?");
                     stmt.setInt(1, insertedOID);
@@ -301,7 +301,7 @@ public final class SequenceKeyGenerator implements KeyGenerator
     		tableName = buffer2.toString();
         }
 
-		seqName = MessageFormat.format( _seqName, new String[] {tableName,primKeyName});
+		seqName = MessageFormat.format( _seqName, (Object[]) (new String[] {tableName,primKeyName})); // due to varargs in 1.5, see CASTOR-1097
         nextval = _factory.quoteName(seqName + ".nextval");
         lp1 = insert.indexOf( '(' );
         lp2 = insert.indexOf( '(', lp1 + 1 );

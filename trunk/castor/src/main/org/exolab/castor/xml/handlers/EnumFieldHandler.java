@@ -167,7 +167,7 @@ public class EnumFieldHandler implements FieldHandler {
         if (value != null) {
             args[0] = value.toString();
             try {
-                obj = valueOf.invoke(null, args);
+                obj = valueOf.invoke(null, (Object[]) args);
             }
             catch(java.lang.reflect.InvocationTargetException ite) {
                 Throwable toss = ite.getTargetException();

@@ -90,8 +90,8 @@ public class WebSphereTransactionManagerFactory
         try 
         {
             webSphereTxMgr = Class.forName( "com.ibm.ejs.jts.jta.JTSXA" );
-            method = webSphereTxMgr.getMethod( "getTransactionManager", null );
-            _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, null );
+            method = webSphereTxMgr.getMethod( "getTransactionManager", (Class[]) null );
+            _transactionManager = ( TransactionManager ) method.invoke( webSphereTxMgr, (Object[]) null );
         }
         catch( ClassNotFoundException cnfe ) {
             throw new TransactionManagerAcquireException( Messages.format( 

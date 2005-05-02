@@ -372,7 +372,7 @@ public class QueryAnalyser {
                     temp=null;
                     m=(Method)i.next();
                     try{
-                        temp=m.invoke(o,null);
+                        temp=m.invoke(o,(Object[])null);
                     } catch(Exception ie) {
                         temp =null;
                     }

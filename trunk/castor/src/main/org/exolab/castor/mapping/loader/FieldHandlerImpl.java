@@ -400,7 +400,7 @@ public final class FieldHandlerImpl
             else if ( _getMethod != null ) {
                 if ( _getSequence != null ) 
                     for ( int i = 0; i < _getSequence.length; i++ ) {
-                        object = _getSequence[ i ].invoke( object, null );
+                        object = _getSequence[ i ].invoke( object, (Object[]) null );
                         if ( object == null )
                             break;
                     }
@@ -409,10 +409,10 @@ public final class FieldHandlerImpl
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise, 
                 if ( object == null ||
-                          ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, null ) ).booleanValue() ) )
+                          ( _hasMethod != null && ! ( (Boolean) _hasMethod.invoke( object, (Object[]) null ) ).booleanValue() ) )
                     value = null;
                 else
-                    value = _getMethod.invoke( object, null );
+                    value = _getMethod.invoke( object, (Object[]) null );
             } else
                 value = null;
         } catch ( IllegalAccessException except ) {
@@ -484,7 +484,7 @@ public final class FieldHandlerImpl
                                 Object last;
 
                                 last = object;
-                                object = _getSequence[ i ].invoke( object, null );
+                                object = _getSequence[ i ].invoke( object, (Object[]) null );
                                 if ( object == null ) {
                                     // if the value is not null, we must instantiate
                                     // the object in the sequence
@@ -498,7 +498,7 @@ public final class FieldHandlerImpl
                             }
                         if ( object != null ) {
                             if ( value == null && _deleteMethod != null )
-                                _deleteMethod.invoke( object, null );
+                                _deleteMethod.invoke( object, (Object[]) null );
                             else
                                 setter.invoke( object, new Object[] { value == null ? _default : value } );
                         }
@@ -566,8 +566,8 @@ public final class FieldHandlerImpl
                 else if ( _getMethod != null ) {
                     if ( _getSequence != null ) 
                         for ( int i = 0; i < _getSequence.length; i++ ) 
-                            object = _getSequence[ i ].invoke( object, null );
-                    collect = _getMethod.invoke( object, null );
+                            object = _getSequence[ i ].invoke( object, (Object[]) null );
+                    collect = _getMethod.invoke( object, (Object[]) null );
 
                     // If we deal with a collection who is an array of primitive
                     // and that has not been instantiated, we have to handle the
@@ -640,13 +640,13 @@ public final class FieldHandlerImpl
                 else if ( _setMethods != null ) {
                     if ( _getSequence != null ) 
                         for ( int i = 0; i < _getSequence.length; i++ ) {
-                            object = _getSequence[ i ].invoke( object, null );
+                            object = _getSequence[ i ].invoke( object, (Object[]) null );
                             if ( object == null )
                                 break;
                         }
                     if ( object != null ) {
                         if ( _deleteMethod != null )
-                            _deleteMethod.invoke( object, null );
+                            _deleteMethod.invoke( object, (Object[]) null );
                         else {
                             Method setter = selectMethod(_setMethods, _default);
 
@@ -685,8 +685,8 @@ public final class FieldHandlerImpl
                 } else if ( _getMethod != null ) {
                     if ( _getSequence != null ) 
                         for ( int i = 0; i < _getSequence.length; i++ ) 
-                            object = _getSequence[ i ].invoke( object, null );
-                    collect = _getMethod.invoke( object, null );
+                            object = _getSequence[ i ].invoke( object, (Object[]) null );
+                    collect = _getMethod.invoke( object, (Object[]) null );
                     collect = _colHandler.clear( collect );
                     if ( collect != null ) {
                         Method setter = selectMethod(_setMethods, collect);
