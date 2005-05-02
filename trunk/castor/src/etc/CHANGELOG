@@ -3,6 +3,11 @@ Version (CVS)
 -------------
 
  
+JDO:   Fixed bug CASTOR-1097 using contribution from Emir Causevic [emircaus@bih.net.ba]
+       Added cast of null needed for some reflection methods for Java5.
+       Details: http://jira.codehaus.org/browse/CASTOR-1097
+       (Ralf - 20050502)
+
 JDO:   Fixed bug CASTOR-1098 using contribution from Emir Causevic [emircaus@bih.net.ba]
        Fixed compile error on Java5 caused by the usage of "enum" as identifier in JDO tests.
        Details: http://jira.codehaus.org/browse/CASTOR-1098

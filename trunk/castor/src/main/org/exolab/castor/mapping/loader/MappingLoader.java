@@ -933,7 +933,7 @@ public abstract class MappingLoader
                         // * getter for parent field *
                         String parentField = fieldName.substring(0, point);
                         methodName = GET_METHOD_PREFIX + capitalize( parentField );
-                        method = javaClass.getMethod( methodName, null );                        
+                        method = javaClass.getMethod( methodName, (Class[]) null );                        
                         
                         fieldName = fieldName.substring( point + 1 );
                         
@@ -1092,7 +1092,7 @@ public abstract class MappingLoader
             try {
                 Method method;
 
-                method = javaClass.getMethod( fieldMap.getCreateMethod(), null );
+                method = javaClass.getMethod( fieldMap.getCreateMethod(), (Class[]) null );
                 handler.setCreateMethod( method );
             } catch ( Exception except ) {
                 // No such/access to method
@@ -1103,7 +1103,7 @@ public abstract class MappingLoader
             try {
                 Method method;
 
-                method = javaClass.getMethod( "create" + capitalize( fieldName ), null );
+                method = javaClass.getMethod( "create" + capitalize( fieldName ), (Class[]) null );
                 handler.setCreateMethod( method );
             } catch ( Exception except ) {
             	// log.warn ("Unexpected exception", except);
@@ -1117,14 +1117,14 @@ public abstract class MappingLoader
 
             try {
                 if (fieldMap.getHasMethod() != null)
-                    hasMethod = javaClass.getMethod( fieldMap.getHasMethod(), null );
+                    hasMethod = javaClass.getMethod( fieldMap.getHasMethod(), (Class[]) null );
                 else 
-                    hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), null );
+                    hasMethod = javaClass.getMethod( "has" + capitalize( fieldName ), (Class[]) null );
                 
                 if ((hasMethod.getModifiers() & Modifier.STATIC ) != 0)
                     hasMethod = null;
                 try {
-                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), null );
+                    deleteMethod = javaClass.getMethod( "delete" + capitalize( fieldName ), (Class[]) null );
                     if (( deleteMethod.getModifiers() & Modifier.STATIC ) != 0 )
                           deleteMethod = null;
                 } 

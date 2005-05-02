@@ -261,17 +261,17 @@ public class FieldMolder {
             else if ( rf._getMethod != null ) {
                 if ( rf._getSequence != null )
                     for ( int i = 0; i < rf._getSequence.length; i++ ) {
-                        object = rf._getSequence[ i ].invoke( object, null );
+                        object = rf._getSequence[ i ].invoke( object, (Object[]) null );
                         if ( object == null )
                             break;
                     }
                 // If field has 'has' method, false means field is null
                 // and do not attempt to call getValue. Otherwise,
                 if (  object == null ||
-                        ( rf._hasMethod != null && ! ( (Boolean) rf._hasMethod.invoke( object, null ) ).booleanValue() ) )
+                        ( rf._hasMethod != null && ! ( (Boolean) rf._hasMethod.invoke( object, (Object[]) null ) ).booleanValue() ) )
                     return null;
                 else
-                    return rf._getMethod.invoke( object, null );
+                    return rf._getMethod.invoke( object, (Object[]) null );
             } else
                 return null;
         } catch ( IllegalAccessException except ) {
@@ -325,7 +325,7 @@ public class FieldMolder {
                         Object last;
 
                         last = object;
-                        object = rf._getSequence[ i ].invoke( object, null );
+                        object = rf._getSequence[ i ].invoke( object, (Object[]) null );
                         if ( object == null ) {
                             // if the value is not null, we must instantiate
                             // the object in the sequence
@@ -339,7 +339,7 @@ public class FieldMolder {
                     }
                 if ( object != null ) {
                     if ( value == null && rf._deleteMethod != null )
-                        rf._deleteMethod.invoke( object, null );
+                        rf._deleteMethod.invoke( object, (Object[]) null );
                     else
                         rf._setMethod.invoke( object, new Object[] { value == null ? _default : value } );
                 }
@@ -575,7 +575,7 @@ public class FieldMolder {
                         if (fieldMap.getType().compareTo("boolean") == 0){
                             try{
                                 methodName = METHOD_IS_PREFIX + capitalize( name.substring( 0, point ) );
-                                method = javaClass.getMethod( methodName, null );
+                                method = javaClass.getMethod( methodName, (Class[]) null );
                             } 
                             catch (NoSuchMethodException nsme) {
                                 if(_log.isDebugEnabled()) {
@@ -586,7 +586,7 @@ public class FieldMolder {
                         
                         if (method == null) {
                             methodName = METHOD_GET_PREFIX + capitalize( name.substring(0, point) );
-                            method = javaClass.getMethod( methodName, null );
+                            method = javaClass.getMethod( methodName, (Class[]) null );
                         }
                         
                         name = name.substring( point + 1 );
@@ -744,7 +744,7 @@ public class FieldMolder {
             // what exact instance to be created.
             if ( fieldMap.getCreateMethod() != null ) {
                 try {
-                    _defaultReflectService._createMethod = javaClass.getMethod( fieldMap.getCreateMethod(), null );
+                    _defaultReflectService._createMethod = javaClass.getMethod( fieldMap.getCreateMethod(), (Class[]) null );
                 } catch ( Exception except ) {
                     // No such/access to method
                     throw new MappingException( "mapping.createMethodNotFound",
@@ -754,7 +754,7 @@ public class FieldMolder {
                 try {
                     Method method;
 
-                    method = javaClass.getMethod( METHOD_CREATE_PREFIX + capitalize( fieldMap.getName() ), null );
+                    method = javaClass.getMethod( METHOD_CREATE_PREFIX + capitalize( fieldMap.getName() ), (Class[]) null );
                     _defaultReflectService._createMethod = method;
                 } catch ( Exception except ) {
                 	// no explicit exception handling
@@ -767,7 +767,7 @@ public class FieldMolder {
                 Method deleteMethod = null;
 
                 try {
-                    hasMethod = javaClass.getMethod( METHOD_HAS_PREFIX + capitalize( fieldMap.getName() ), null );
+                    hasMethod = javaClass.getMethod( METHOD_HAS_PREFIX + capitalize( fieldMap.getName() ), (Class[]) null );
                     if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
                          ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                         hasMethod = null;
@@ -775,7 +775,7 @@ public class FieldMolder {
                         if ( ( hasMethod.getModifiers() & Modifier.PUBLIC ) == 0 ||
                              ( hasMethod.getModifiers() & Modifier.STATIC ) != 0 )
                             deleteMethod = null;
-                        deleteMethod = javaClass.getMethod( METHOD_DELETE_PREFIX + capitalize( fieldMap.getName() ), null );
+                        deleteMethod = javaClass.getMethod( METHOD_DELETE_PREFIX + capitalize( fieldMap.getName() ), (Class[]) null );
                     } catch ( Exception except ) {
                     	// no explicit exception handling 
                     }

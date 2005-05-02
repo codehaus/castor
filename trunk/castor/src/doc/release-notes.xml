@@ -29,6 +29,26 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="1097" type="jira">
+                    <description>
+						Added cast of null needed for some reflection methods for Java5.
+                    </description>
+                    <contributor>
+                        <name>Emir Causevic</name>
+                        <email>emircaus@bih.net.ba</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Emir Causevic</name>
+                        <email>emircaus@bih.net.ba</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050502</date>
+                </bug>
                 <bug id="1098" type="jira">
                     <description>
 						Fixed compile error on Java5 caused by the usage of "enum"

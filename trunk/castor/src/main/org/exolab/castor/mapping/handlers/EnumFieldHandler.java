@@ -146,7 +146,7 @@ public class EnumFieldHandler extends GeneralizedFieldHandler {
         if (value != null) {
             args[0] = value.toString();
             try {
-                obj = _createMethod.invoke(null, args);
+                obj = _createMethod.invoke(null, (Object[]) args);
             }
             catch(java.lang.reflect.InvocationTargetException ite) {
                 Throwable toss = ite.getTargetException();
