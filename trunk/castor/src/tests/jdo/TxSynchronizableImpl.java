@@ -56,11 +56,11 @@ public class TxSynchronizableImpl implements TxSynchronizable {
      * @see org.exolab.castor.persist.TxSynchronizable#committed(org.exolab.castor.persist.TransactionContext)
      */
     public void committed(TransactionContext tx) {
-        Enumeration enum = tx.getObjectEntries();
-        if (enum.hasMoreElements()) {
+        Enumeration enm = tx.getObjectEntries();
+        if (enm.hasMoreElements()) {
             List syncs = TxSynchronization.synchronizables;
-            while (enum.hasMoreElements()) {
-                TransactionContext.ObjectEntry entry = (TransactionContext.ObjectEntry) enum.nextElement();
+            while (enm.hasMoreElements()) {
+                TransactionContext.ObjectEntry entry = (TransactionContext.ObjectEntry) enm.nextElement();
                 String change = "";
                 if (entry.isDeleted()) change = change + "deleted";
                 if (entry.isCreated()) change = change + "created";

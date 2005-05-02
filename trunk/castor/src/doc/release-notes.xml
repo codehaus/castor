@@ -29,6 +29,27 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="1098" type="jira">
+                    <description>
+						Fixed compile error on Java5 caused by the usage of "enum"
+						as identifier in JDO tests.
+                    </description>
+                    <contributor>
+                        <name>Emir Causevic</name>
+                        <email>emircaus@bih.net.ba</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Emir Causevic</name>
+                        <email>emircaus@bih.net.ba</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050502</date>
+                </bug>
                 <bug id="1082" type="jira">
                     <description>
                         Improve the error messages related to the use of key generators.

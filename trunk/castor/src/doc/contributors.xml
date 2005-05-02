@@ -349,7 +349,11 @@
   <contributor type="Contributor">
     <name surname="Causevic" given="Emir"/>
     <email>emircaus@bih.net.ba</email>
-    <description>Contributed patch for SapDbFactory to add the currval function.</description>
+    <description>
+        Contributed patch for SapDbFactory to add the currval function and
+		fixed compilation problems with Java5.
+    </description>
+    <status>active</status>
   </contributor>
 
   <contributor type="Contributor">

@@ -3,6 +3,11 @@ Version (CVS)
 -------------
 
  
+JDO:   Fixed bug CASTOR-1098 using contribution from Emir Causevic [emircaus@bih.net.ba]
+       Fixed compile error on Java5 caused by the usage of "enum" as identifier in JDO tests.
+       Details: http://jira.codehaus.org/browse/CASTOR-1098
+       (Ralf - 20050502)
+
 JDO:   Fixed bug CASTOR-1082 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Improve the error messages related to the use of key generators.
        Details: http://jira.codehaus.org/browse/CASTOR-1082
