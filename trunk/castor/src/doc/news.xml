@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<document url="http://castor.exolab.org/news.xml">
+<document url="http://castor.codehaus.org/news.xml">
   <properties>
     <title>Castor News</title>
     <abstract>
@@ -25,13 +25,13 @@
             <date>20 Apr 2005</date>
             <time>22:21:20</time>
             <summary>
-				Many of you will have recognized by now that the exolab.org 
-				domain had been voided as of last Friday. As a result of this, 
-				the Castor user forums are not available.
-				
-				Please accept our apologies for any inconvenience you are experiencing
-				and rest assured that we are working to get it back online as soon 
-				as possible.
+                Many of you will have recognized by now that the exolab.org 
+                domain had been voided as of last Friday. As a result of this, 
+                the Castor user forums are not available.
+                
+                Please accept our apologies for any inconvenience you are experiencing
+                and rest assured that we are working to get it back online as soon 
+                as possible.
             </summary>
         </news>
         <news id="25">
@@ -40,15 +40,14 @@
             <date>20 Apr 2005</date>
             <time>21:20:19</time>
             <summary>
-				This is to announce that we finally moved our issue tracking tool from
-				<a href="http://bugzilla.exolab.org">Exolab BugZilla</a> to the 
-				<a href="http://www.codehaus.org">Codehaus</a>, migrating to Jira
-				at the same time.<br/><br/>
-				
-				We'd like to offer our apologies for any inconvenience you experienced 
-				as a result of this migration and hope that you like our new 
-				<a href="http://jira.codehaus.org/browse/CASTOR">home for tracking 
-				(and resolving) issues</a> as much as we do.
+                This is to announce that we finally moved our issue tracking tool from
+                <a href="http://bugzilla.exolab.org">Exolab Bugzilla</a> to the 
+                <a href="http://jira.codehaus.org/browse/CASTOR">Codehaus JIRA</a>.<br/><br/>
+                
+                We'd like to offer our apologies for any inconvenience you experienced 
+                as a result of this migration and hope that you like our new 
+                <a href="http://jira.codehaus.org/browse/CASTOR">home for tracking 
+                (and resolving) issues</a> as much as we do.
             </summary>
         </news>
         <news id="24">
@@ -57,10 +56,10 @@
             <date>08 Apr 2005</date>
             <time>21:22:21</time>
             <summary>
-				This is to announce that we now provide unified instructions on 
-				how to submit a patch at <url>http://castor.codehaus.org/how-to-submit-a-bug.html</url>. 
-				To facilitate this task, we are now providing a template for Castor JDO 
-				related patches that has been added to the CVS sources already.
+                This is to announce that we now provide unified instructions on 
+                how to submit a patch at <url>http://castor.codehaus.org/how-to-submit-a-bug.html</url>. 
+                To facilitate this task, we are now providing a template for Castor JDO 
+                related patches that has been added to the CVS sources already.
             </summary>
         </news>
         <news id="23">
@@ -69,24 +68,24 @@
             <date>31 Mar 2005</date>
             <time>21:22:26</time>
             <summary>
-				One of the major short-comings of Castor JDO always has been missing support for 
-				polymorphism. After the 0.9.6 release back in Februray, which mainly focused on bug 
-				fixing, we decided to tackle this missing feature and start work for adding 
-				support for polymorphism to Castor JDO. For a complete history of the work done so 
-				far and the tests conducted, please have a look at 
-				<a href="http://bugzilla.exolab.org/show_bug.cgi?id=1881">bug 1881</a>.<br/><br/>
+                One of the major short-comings of Castor JDO always has been missing support for 
+                polymorphism. After the 0.9.6 release back in Februray, which mainly focused on bug 
+                fixing, we decided to tackle this missing feature and start work for adding 
+                support for polymorphism to Castor JDO. For a complete history of the work done so 
+                far and the tests conducted, please have a look at 
+                <a href="http://jira.codehaus.org/secure/ViewIssue.jspa?key=CASTOR-1018">bug 1881</a>.<br/><br/>
 
-				As of last week, most of the work (originally initiated by myself) has been 
-				finished, and we are now in a position where we'd like to ask you, our users, 
-				for feedback. In other words, we think that the current implementation is stable enough 
-				to make it available as described below. But as we want to get this new feature 
-				as stable as possible before heading for a new release (most likely 0.9.7, but 
-				maybe 1.0), we now need feedback from our users.<br/><br/>
+                As of last week, most of the work (originally initiated by myself) has been 
+                finished, and we are now in a position where we'd like to ask you, our users, 
+                for feedback. In other words, we think that the current implementation is stable enough 
+                to make it available as described below. But as we want to get this new feature 
+                as stable as possible before heading for a new release (most likely 0.9.7, but 
+                maybe 1.0), we now need feedback from our users.<br/><br/>
 
-				To facilitate this, I've made available binaries 
-				<a href="http://dist.codehaus.org/castor/previews/0.9.6_with_polymorphism/">here</a>. 
-				Please use the source distribution if possible, as it contains the tests mentioned above 
-				as well.
+                To facilitate this, I've made available binaries 
+                <a href="http://dist.codehaus.org/castor/previews/0.9.6_with_polymorphism/">here</a>. 
+                Please use the source distribution if possible, as it contains the tests mentioned above 
+                as well.
             </summary>
         </news>
         <news id="22">
@@ -95,41 +94,41 @@
             <date>30 Mar 2005</date>
             <time>22:23:24</time>
             <summary>
-				This is to announce that we finally moved our mailing lists to the 
-				<a href="http://www.codehaus.org">Codehaus</a>. As part of this move, we moved 
-				your subscriptions to spare you the work of having to re-subscribe. If you feel 
-				that you are subscribed to one of the mailing lists by fault, please use the 
-				below addresses to unsubscribe.<br/><br/>
+                This is to announce that we finally moved our mailing lists to the 
+                <a href="http://www.codehaus.org">Codehaus</a>. As part of this move, we moved 
+                your subscriptions to spare you the work of having to re-subscribe. If you feel 
+                that you are subscribed to one of the mailing lists by fault, please use the 
+                below addresses to unsubscribe.<br/><br/>
 
-				As of now, please use the following email addresses:<br/><br/>
+                As of now, please use the following email addresses:<br/><br/>
 
-				* User mailing list<br/><br/>
+                * User mailing list<br/><br/>
 
-				  To post a message: <a href="user@castor.codehaus.org">user@castor.codehaus.org</a><br/>
-				  To subscribe: <a href="user-subscribe@castor.codehaus.org">user-subscribe@castor.codehaus.org</a><br/>
-				  To unsubscribe: <a href="user-unsubscribe@castor.codehaus.org">user-unsubscribe@castor.codehaus.org</a><br/>
-				  Archive: <a href="http://archive.castor.codehaus.org/user">http://archive.castor.codehaus.org/user</a><br/><br/>
+                  To post a message: <a href="user@castor.codehaus.org">user@castor.codehaus.org</a><br/>
+                  To subscribe: <a href="user-subscribe@castor.codehaus.org">user-subscribe@castor.codehaus.org</a><br/>
+                  To unsubscribe: <a href="user-unsubscribe@castor.codehaus.org">user-unsubscribe@castor.codehaus.org</a><br/>
+                  Archive: <a href="http://archive.castor.codehaus.org/user">http://archive.castor.codehaus.org/user</a><br/><br/>
 
-				* Announcement mailing list<br/><br/>
+                * Announcement mailing list<br/><br/>
 
-				  To post a message: <a href="announce@castor.codehaus.org">announce@castor.codehaus.org</a><br/>
-				  To subscribe: <a href="announce-subscribe@castor.codehaus.org">announce-subscribe@castor.codehaus.org</a><br/>
-				  To unsubscribe: <a href="announce-unsubscribe@castor.codehaus.org">announce-unsubscribe@castor.codehaus.org</a><br/>
-				  Archive: <a href="http://archive.castor.codehaus.org/announce">http://archive.castor.codehaus.org/announce</a><br/><br/>
+                  To post a message: <a href="announce@castor.codehaus.org">announce@castor.codehaus.org</a><br/>
+                  To subscribe: <a href="announce-subscribe@castor.codehaus.org">announce-subscribe@castor.codehaus.org</a><br/>
+                  To unsubscribe: <a href="announce-unsubscribe@castor.codehaus.org">announce-unsubscribe@castor.codehaus.org</a><br/>
+                  Archive: <a href="http://archive.castor.codehaus.org/announce">http://archive.castor.codehaus.org/announce</a><br/><br/>
 
-				* Development mailing list<br/><br/>
+                * Development mailing list<br/><br/>
 
-				  To post a message: <a href="dev@castor.codehaus.org">dev@castor.codehaus.org</a><br/>
-				  To subscribe: <a href="dev-subscribe@castor.codehaus.org">dev-subscribe@castor.codehaus.org</a><br/>
-				  To unsubscribe: <a href="dev-unsubscribe@castor.codehaus.org">dev-unsubscribe@castor.codehaus.org</a><br/>
-				  Archive: <a href="http://archive.castor.codehaus.org/dev">http://archive.castor.codehaus.org/dev</a><br/><br/>
+                  To post a message: <a href="dev@castor.codehaus.org">dev@castor.codehaus.org</a><br/>
+                  To subscribe: <a href="dev-subscribe@castor.codehaus.org">dev-subscribe@castor.codehaus.org</a><br/>
+                  To unsubscribe: <a href="dev-unsubscribe@castor.codehaus.org">dev-unsubscribe@castor.codehaus.org</a><br/>
+                  Archive: <a href="http://archive.castor.codehaus.org/dev">http://archive.castor.codehaus.org/dev</a><br/><br/>
 
-				For a period of 14 days, we'll be monitoring the old lists at Exolab, mainly 
-				referring you to the lists mentioned above. After this period, we will turn off 
-				these lists at our discretion. As for mailing lists archives, please note that at 
-				the moment, the archives mentioned above don't hold any messages from the old 
-				lists, but we are working on a solution. As such, messages from the lists at 
-				Exolab will be available at the usual sites.
+                For a period of 14 days, we'll be monitoring the old lists at Exolab, mainly 
+                referring you to the lists mentioned above. After this period, we will turn off 
+                these lists at our discretion. As for mailing lists archives, please note that at 
+                the moment, the archives mentioned above don't hold any messages from the old 
+                lists, but we are working on a solution. As such, messages from the lists at 
+                Exolab will be available at the usual sites.
             </summary>
         </news>
         <news id="21">
@@ -138,10 +137,10 @@
             <date>11 Mar 2005</date>
             <time>21:22:23</time>
             <summary>
-				We are happy to provide an RSS feed for announcements related to Castor  
-				<a href="http://castor.codehaus.org/rss/castor-announcement.xml">here</a>. 
-				This service basically mirrors the information provided at our 
-				<a href="http://castor.codehaus.org/news.html">news page</a>.
+                We are happy to provide an RSS feed for announcements related to Castor  
+                <a href="http://castor.codehaus.org/rss/castor-announcement.xml">here</a>. 
+                This service basically mirrors the information provided at our 
+                <a href="http://castor.codehaus.org/news.html">news page</a>.
             </summary>
         </news>
         <news id="20">
@@ -151,16 +150,17 @@
             <time>22:21:20</time>
             <summary>
                 After over five years of <a href="http://www.exolab.org">Exolab</a> sponsoring Castor, 
-				the Castor team recently decided to move the entire project to a new home over at 
-				the <a href="http://www.codehaus.org">Codehaus</a>. The team would like to thank 
-				Exolab and it's parent company Intalio, Inc. for it's long-standing support of 
-				the project.<br/><br/>
-				
-				Please use the below links for access to ...<br/><br/>
-				
-				- <a href="http://castor.codehaus.org">Main documentation</a><br/>
-				- <a href="http://cvs.castor.codehaus.org">CVS Repository</a><br/>
-				- <a href="http://dist.codehaus.org/castor">Download</a>
+                the Castor team recently decided to move the entire project to
+                a <a href="http://castor.codehaus.org/">new home</a> at 
+                the <a href="http://www.codehaus.org">Codehaus</a>. The team would like to thank 
+                Exolab and it's parent company Intalio, Inc. for it's long-standing support of 
+                the project.<br/><br/>
+                
+                Please use the below links for access to ...<br/><br/>
+                
+                - <a href="http://castor.codehaus.org">Main documentation</a><br/>
+                - <a href="http://cvs.castor.codehaus.org">CVS Repository</a><br/>
+                - <a href="http://dist.codehaus.org/castor">Download</a>
             </summary>
         </news>
         <news id="19">
@@ -170,12 +170,12 @@
             <time>21:21:21</time>
             <summary>
                 Please join me to welcome Gregory Block, Martin Fuchs, Ralf Joachim and Stein 
-				as new committers for Castor JDO. I am more than happy to have them on board, as 
-				all of them have shown their dedication to the project through numerous occasions 
-				(incl. patches and willingness to spend time with myself ...).
-				
-				Details about the current and past committers (as well as contributors) 
-				can be found at <a href="http://castor.codehaus.org/contributors.html">here</a>.
+                as new committers for Castor JDO. I am more than happy to have them on board, as 
+                all of them have shown their dedication to the project through numerous occasions 
+                (incl. patches and willingness to spend time with myself ...).
+                
+                Details about the current and past committers (as well as contributors) 
+                can be found at <a href="http://castor.codehaus.org/contributors.html">here</a>.
             </summary>
         </news>
         <news id="18">
@@ -191,10 +191,10 @@
                 well. For details about the bugs fixed and features provided, please have
                 a look at the
                 <a href="release-notes.html">release notes</a>.<br/><br/>
-				
-				Please report any issues through the project's 
-				<a href="http://bugzilla.exolab.org">bug tracking site</a> and/or the 
-				mailing lists.
+                
+                Please report any issues through the project's 
+                <a href="http://jira.codehaus.org/browse/CASTOR">issue tracking system</a> and/or the 
+                mailing lists.
             </summary>
         </news>
         <news id="17">
