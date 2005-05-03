@@ -522,7 +522,7 @@ public class CollectionInfoJ2 extends CollectionInfo {
         comment.appendComment(cName);
         comment.appendComment("' by copying the given ArrayList.");
         JDocDescriptor jDesc = comment.getParamDescriptor(paramName);
-        jDesc.setDescription("the Vector to copy.");
+        jDesc.setDescription("the ArrayList to copy.");
         
         //-- create copy code
         JSourceCode jsc = method.getSourceCode();
