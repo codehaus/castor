@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+
+JDO:   Fixed bug CASTOR-954 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL statement logging.
+       Details: http://jira.codehaus.org/browse/CASTOR-954
+       (Werner - 20050430)
  
 JDO:   Fixed bug CASTOR-1097 using contribution from Emir Causevic [emircaus@bih.net.ba]
        Added cast of null needed for some reflection methods for Java5.

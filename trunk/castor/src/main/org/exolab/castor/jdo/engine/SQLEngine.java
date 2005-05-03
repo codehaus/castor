@@ -50,6 +50,7 @@ package org.exolab.castor.jdo.engine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.*;
+import org.exolab.castor.jdo.drivers.PreparedStatementProxy;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.persist.spi.*;
@@ -361,6 +362,7 @@ public final class SQLEngine implements Persistence {
     
     /**
      * Used by {@link org.exolab.castor.jdo.OQLQuery} to retrieve the class descriptor.
+     * @return the JDO class descriptor.
      */
     public JDOClassDescriptor getDescriptor()
     {
@@ -370,6 +372,8 @@ public final class SQLEngine implements Persistence {
 
     /**
      * Used by ParseTreeWalker to quote names in WHERE clause
+     * @param name A name to be quoted 
+     * @return a quoted name.
      */
     public String quoteName( String name )
     {
@@ -483,6 +487,11 @@ public final class SQLEngine implements Persistence {
      * row of object.
      *
      * Result key will be in java type.
+     * @param database Database instance
+     * @param conn JDBC Connection instance
+     * @param stmt JDBC Statement instance
+     * @return The generated key
+     * @throws PersistenceException If no key can be generated 
      */
     private Object generateKey(Database database, Object conn, PreparedStatement stmt)
     throws PersistenceException {
@@ -551,8 +560,9 @@ public final class SQLEngine implements Persistence {
             else
                 stmt = ( (Connection) conn ).prepareStatement( _sqlCreate );
              
-            if(_log.isDebugEnabled()) {
-                _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), _sqlCreate) );
+            if(_log.isDebugEnabled()){
+//                 _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), _sqlCreate) );
+                _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
             
             // Must remember that SQL column index is base one
@@ -575,6 +585,10 @@ public final class SQLEngine implements Persistence {
 
                     stmt.setObject( count++, idToSQL( 0, identity ) );
                 }
+            }
+
+            if(_log.isDebugEnabled()){
+             _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
             for ( int i = 0 ; i < _fields.length ; ++i ) {
@@ -603,6 +617,10 @@ public final class SQLEngine implements Persistence {
                     }
                 }
             }
+
+            if(_log.isDebugEnabled()){
+                _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
+               }
 
             // Generate key during INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
@@ -635,7 +653,11 @@ public final class SQLEngine implements Persistence {
             } else {
             	if(_log.isDebugEnabled()) {
                	  _log.debug (Messages.format ("jdo.creating.bound", _clsDesc.getJavaClass().getName(), stmt));
-            	}                
+            	}
+            	
+                if(_log.isDebugEnabled()){
+                    _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
+                   }
             	stmt.executeUpdate();
             }
 
@@ -725,6 +747,10 @@ public final class SQLEngine implements Persistence {
      * if isNull, replace next "=?" with " IS NULL",
      * otherwise skip next "=?",
      * move "pos" to the left.
+     * @param isNull True if =? should be replaced with 'IS NULL'
+     * @param sb StringBUffer holding the SQL statement to be modified 
+     * @param pos The current position (where to apply the replacement).
+     * @return The next position.
      */
     private int nextParameter(boolean isNull, StringBuffer sb, int pos) {
         for ( ; pos > 0; pos--) {
@@ -808,8 +834,9 @@ public final class SQLEngine implements Persistence {
                 storeStatement = getStoreStatement( original );
                 stmt = ( (Connection) conn ).prepareStatement( storeStatement );
                 
-                if(_log.isDebugEnabled()) {
-                    _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), storeStatement ) );
+                if(_log.isDebugEnabled()){
+//                    _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), storeStatement ) );
+                    _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), stmt.toString()) );
                 }
                 
                 count = 1;
@@ -898,6 +925,10 @@ public final class SQLEngine implements Persistence {
                     }
                 }
                 
+                if (_log.isDebugEnabled()) {
+                    _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), stmt.toString()) );
+                }
+
                 if ( stmt.executeUpdate() <= 0 ) { // SAP DB returns -1 here
                     // If no update was performed, the object has been previously
                     // removed from persistent storage or has been modified if
@@ -974,8 +1005,9 @@ public final class SQLEngine implements Persistence {
         try {
             stmt = ( (Connection) conn ).prepareStatement( _sqlRemove );
             
-            if(_log.isDebugEnabled()) {
-                _log.debug( Messages.format( "jdo.removing", _clsDesc.getJavaClass().getName(), _sqlRemove ) );
+            if(_log.isDebugEnabled()){
+//                _log.debug( Messages.format( "jdo.removing", _clsDesc.getJavaClass().getName(), _sqlRemove ) );
+                _log.debug( Messages.format( "jdo.removing", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
             int count = 1;
@@ -993,6 +1025,10 @@ public final class SQLEngine implements Persistence {
                     throw new PersistenceException( "Complex field expected!" );
                 stmt.setObject( count++, idToSQL( 0, identity ) );
             }
+
+            if(_log.isDebugEnabled()){
+              _log.debug( Messages.format( "jdo.removing", _clsDesc.getJavaClass().getName(), stmt.toString()) );
+          }
 
             int result = stmt.executeUpdate();
             if ( result < 1 )
@@ -1077,11 +1113,13 @@ public final class SQLEngine implements Persistence {
         boolean           notNull;
 
         try {
-            stmt = ( (Connection) conn ).prepareStatement( ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad );
+        	String sql = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
+            stmt = ( (Connection) conn ).prepareStatement(sql);
             
             if (_log.isDebugEnabled()) {
                 String generatedSQL = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
-                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), generatedSQL ) );
+//                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), generatedSQL ) );
+                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
             
             int count = 1;
@@ -1098,6 +1136,10 @@ public final class SQLEngine implements Persistence {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
                 stmt.setObject( count++, idToSQL( 0, identity ) );
+            }
+
+            if (_log.isDebugEnabled()) {
+                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
             // query the object
@@ -1685,8 +1727,12 @@ public final class SQLEngine implements Persistence {
         }
 
         /**
+         * Move to an absolute position within a ResultSet. 
          * use the jdbc 2.0 method to move to an absolute position in the
          * resultset.
+         * @param row The row to move to
+         * @return True if the move was successful.
+         * @throws PersistenceException Indicates a problem in moving to an absolute position.
          */
          public boolean absolute(int row)
             throws PersistenceException
@@ -1710,6 +1756,8 @@ public final class SQLEngine implements Persistence {
           * Uses the underlying db's cursors to move to the last row in the
           * result set, get the row number via getRow(), then move back to
           * where ever the user was positioned in the resultset.
+         * @return The size of the current result set. 
+         * @throws PersistenceException If the excution of this method failed. 
           */
          public int size()
             throws PersistenceException
