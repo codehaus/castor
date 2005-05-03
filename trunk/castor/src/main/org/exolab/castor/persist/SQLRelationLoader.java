@@ -49,6 +49,9 @@ package org.exolab.castor.persist;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.Utils;
+import org.exolab.castor.jdo.drivers.PreparedStatementProxy;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -285,16 +288,12 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-            try {
-                if ( rset != null )
-                    rset.close();
-                if ( selectStatement != null )
-                    selectStatement.close();
-                if ( insertStatement != null )
-                    insertStatement.close();
-            } catch (SQLException ex) { }
+        	Utils.closeResultSet(rset);
+        	Utils.closeStatement(selectStatement);
+        	Utils.closeStatement(insertStatement);
         }
     }
+    
     public void deleteRelation( Connection conn, Object leftValue )
             throws PersistenceException {
 
@@ -316,10 +315,7 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-            try {
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException sqle ) { }
+        	Utils.closeStatement(stmt);
         }
     }
 
@@ -354,11 +350,7 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-            try {
-                if ( stmt != null )
-                    stmt.close();
-            } catch ( SQLException sqle ) { }
-
+        	Utils.closeStatement(stmt);
         }
     }
 

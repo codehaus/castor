@@ -299,8 +299,8 @@ public class HighLowKeyGenerator implements KeyGenerator
                         // to HIGH-LOW
                         stmt.close();
                         if ( ! _global ) {
-                            stmt = conn.prepareStatement( JDBCSyntax.Select + "MAX(" +
-                                                          primKeyName + ") FROM " + tableName);
+                        	String sqlStatement = JDBCSyntax.Select + "MAX(" + primKeyName + ") FROM " + tableName;
+                            stmt = conn.prepareStatement(sqlStatement);
                             rs = stmt.executeQuery();
                         }
                         if ( _sqlType == Types.INTEGER ) {
@@ -332,9 +332,9 @@ public class HighLowKeyGenerator implements KeyGenerator
                             max = maxPK.add( _grabSizeD );
                         }
                         stmt2.close();
-                        stmt2 = conn.prepareStatement("INSERT INTO " + _seqTable +
-                                                    " (" + _seqKey + "," + _seqValue +
-                                                    ") VALUES (?, ?)");
+                        
+                        String sqlStatement = "INSERT INTO " + _seqTable + " (" + _seqKey + "," + _seqValue + ") VALUES (?, ?)";
+                        stmt2 = conn.prepareStatement(sqlStatement);
                         stmt2.setString( 1, tableName );
                         stmt2.setObject( 2, max );
                         stmt2.executeUpdate();

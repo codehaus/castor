@@ -29,6 +29,24 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="954" type="jira">
+                    <description>
+				       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL 
+					   statement logging.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050503</date>
+                </bug>
                 <bug id="1097" type="jira">
                     <description>
 						Added cast of null needed for some reflection methods for Java5.
