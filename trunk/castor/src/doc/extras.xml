@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/extras.xml">
+<document url="http://castor.codehaus.org/extras.xml">
   <body>
     <title>Castor Extra Features and 3rd Party Tools</title>
 
     <header>
        <p>
-          - <b><font color="red">New</font></b> - Alexey Efimov's <a href="#Phantom-Castor">Phantom-Castor</a>
+          - <b><font color="red">New</font></b> - Apple's <a href="#Apple WebObjects">Apple WebObjects</a>
        </p>
     </header>
 
@@ -19,6 +19,39 @@
           support, questions, or concerns.
           </b>
        </p>
+
+       <section title="Apple WebObjects">
+       <p>
+            <table border="0">
+                <tr>
+                    <td valign="top">Description:</td>
+                    <td>
+                    WebObjects is Apple's suite of tools and object-oriented
+                    frameworks for creating and deploying scalable, reusable
+                    web and Java applications for the Internet and intranets.
+                    WebObjects supports the development, deployment, and
+                    extension of standards-based web services without the need
+                    to write low-level SOAP, XML or WSDL code. Tools enable
+                    code-free generation, configuration, and testing of
+                    applications from existing data assets.
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top">Company:</td>
+                    <td>Apple</td>
+                </tr>
+                <tr>
+                    <td valign="top">URL:</td>
+                    <td>
+                        <url>
+                        http://developer.apple.com/documentation/WebObjects/Enterprise_JavaBeans/ContainerConfiguration/chapter_6_section_4.html
+                        </url>
+                    </td>
+                </tr>
+            </table>
+       </p>
+       </section>
+
        <section title="Phantom-Castor">
        <p>
             <table border="0">
@@ -341,9 +374,8 @@
     <p>
     <font color="red">
     Does your project or product make use of Castor, but it's not listed here?
+    Please tell us about it one of the <link>lists.xml</link> and we'll post it. 
     </font>
-    <a href="mailto:info@exolab.org">Send us</a> the info on it and we'll post
-    it here!
     </p>
 
         <section title="OpenEJB">
