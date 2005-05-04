@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-655 also know as bugzilla 1516. This fixes the
+       issue with using location attribute with both attributes and text 
+       nodes the same location element.
+       Details: http://jira.codehaus.org/browse/CASTOR-655
+       (kvisco - 20050503)
 
 JDO:   Fixed bug CASTOR-954 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added proxy classes for JDBC Connection and PreparedStatement to improve SQL statement logging.
@@ -100,10 +105,12 @@ JDO:   Fixed bug 1214 using contribution from Werner Guttmann [werner.guttmann@g
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1214
        (Ralf - 20050402)
 
-All:   Fixed bug 1903 using contribution from Stein M. Hugubakken [dulci@start.no]
-       Enclose debug-statements with isDebugEnabled when string-concatenation is used in the debug-call.
-       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1903
-       (Stein - 20050324)
+XML:   Fixed bug CASTOR-635, also known as bugzilla 1496. This fixes issue
+       with using the bind-xml location attribute for both elements
+       and attributes with the same location path.
+       Details: http://jira.codehaus.org/browse/CASTOR-635
+       (kvisco - 20050330)
+       
 
 JDO:   Fixed bug 1916 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        Fixed typo in transaction manager class for WAS v4 and add note that
@@ -116,6 +123,12 @@ JDO:   Fixed bug 1917 using contribution from Tim Telcik [ttelcik@hbf.com.au]
        instead of "javax.transaction.TransactionManager".
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1917
        (Ralf - 20050330)
+
+All:   Fixed bug 1903 using contribution from Stein M. Hugubakken [dulci@start.no]
+       Enclose debug-statements with isDebugEnabled when string-concatenation 
+       is used in the debug-call.
+       Details: http://bugzilla.exolab.org/show_bug.cgi?id=1903
+       (Stein - 20050324)
 
 JDO:   Fixed bug 1691 using contribution from Martin Fuchs [martin-fuchs@gmx.net]
        Extend FieldHandlerImpl to be able to handle multiple overloaded set methods.
