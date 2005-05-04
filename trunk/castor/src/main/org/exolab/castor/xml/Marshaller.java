@@ -633,15 +633,33 @@ public class Marshaller extends MarshalFramework {
 	{
 		return true;
 	}
+    
+    /**
+     * Returns the ClassDescriptorResolver for use during marshalling
+     * 
+     * @return the ClassDescriptorResolver 
+     * @see #setResolver
+     */
+    public ClassDescriptorResolver getResolver() {
+
+        if (_cdResolver == null) {
+            _cdResolver = new ClassDescriptorResolverImpl();
+        }
+        return _cdResolver;
+
+    } //-- getResolver
 
     /**
-     * Sets the ClassDescriptorResolver to use during unmarshalling
-     * @param cdr the ClassDescriptorResolver to use
-     * @see #setMapping
+     * Sets the ClassDescriptorResolver to use during marshalling
+     * 
      * <BR />
      * <B>Note:</B> This method will nullify any Mapping
      * currently being used by this Marshaller
-    **/
+     * 
+     * @param cdr the ClassDescriptorResolver to use
+     * @see #setMapping
+     * @see #getResolver
+     */
     public void setResolver( ClassDescriptorResolver cdr ) {
 
         if (cdr != null) _cdResolver = cdr;
@@ -1516,12 +1534,21 @@ public class Marshaller extends MarshalFramework {
             throw new MarshalException(sx);
         }
         
+        
+        //---------------------------------------
+        //-- process all child content, including
+        //-- text nodes + daughter elements
+        //---------------------------------------
+        
+        Stack wrappers = null;
+        
 
         //----------------------
         //-- handle text content
         //----------------------
         
         if (!isNil) {
+            
             XMLFieldDescriptor cdesc = null;
             if (!descriptor.isReference()) {
                 cdesc = classDesc.getContentDescriptor();
@@ -1534,6 +1561,67 @@ public class Marshaller extends MarshalFramework {
                 catch(IllegalStateException ise) {}
                 
                 if (obj != null) {
+                    
+                    //-- <Wrapper>
+                    //-- handle XML path
+                    String path = cdesc.getLocationPath();
+                    String currentLoc = null;
+                    
+                    if (path != null) {
+                        _attributes.clear();
+                        if (wrappers == null) {
+                            wrappers  = new Stack();
+                        }
+                        try {
+                            while (path != null) {
+                                
+                                String elemName = null;
+                                int idx = path.indexOf('/');
+                                
+                                if (idx > 0) {
+                                    elemName = path.substring(0, idx);
+                                    path = path.substring(idx+1);
+                                }
+                                else {
+                                    elemName = path;
+                                    path = null;
+                                }
+                                
+                                //-- save current location without namespace
+                                //-- information for now.
+                                if (currentLoc == null)
+                                    currentLoc = elemName;
+                                else
+                                    currentLoc = currentLoc + "/" + elemName;
+                                    
+                                String elemQName = elemName;
+                                if ((nsPrefix != null) && (nsPrefix.length() > 0)) {
+                                    elemQName = nsPrefix + ':' + elemName;
+                                }
+                                wrappers.push(new WrapperInfo(elemName, elemQName, currentLoc));
+                                
+                                
+                                _attributes.clear();
+                                if (nestedAttCount > 0) {
+                                    for (int na = 0; na < nestedAtts.length; na++) {
+                                        if (nestedAtts[na] == null) continue;
+                                        String tmpPath = nestedAtts[na].getLocationPath();
+                                        if (tmpPath.equals(currentLoc)) {
+                                            processAttribute(object, nestedAtts[na],_attributes);
+                                            nestedAtts[na] = null;
+                                            --nestedAttCount;
+                                        }
+                                    }
+                                }
+                                handler.startElement(nsURI, elemName, elemQName, _attributes);
+                            }
+                        }
+                        catch(SAXException sx) {
+                            throw new MarshalException(sx);
+                        }
+                    }
+                    //-- </Wrapper>
+                    
                     char[] chars = null;
                     //-- handle base64 content
                     Class objType = obj.getClass();
@@ -1612,7 +1700,6 @@ public class Marshaller extends MarshalFramework {
         }
 
         ++depth;
-        Stack wrappers = null;
         
         //-- marshal elements        
         for (int i = firstNonNullIdx; i < descriptors.length; i++) {
