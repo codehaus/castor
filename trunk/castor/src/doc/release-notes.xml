@@ -29,9 +29,32 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+
+                <bug id="1596" tool="jira">
+                    <description>
+                        Fixes issue with using location attribute with both
+                        attributes and text nodes the same location element.
+                    </description>
+                    <contributor>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </submitter>
+                    <reporter>
+                        <name>George ??</name>
+                        <email>george76@hotmail.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050503</date>
+                </bug>
+
                 <bug id="954" type="jira">
                     <description>
-				       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL 
+				       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL
 					   statement logging.
                     </description>
                     <contributor>
@@ -162,8 +185,8 @@
                 </bug>
                 <bug id="1081" tool="jira">
                     <description>
-                    This required the refactoring of all key generators to extract 
-                    the supportsSqlType() method which is now called early rather 
+                    This required the refactoring of all key generators to extract
+                    the supportsSqlType() method which is now called early rather
                     than late from within the SQLEngine constructor.
                     </description>
                     <contributor>
@@ -181,7 +204,7 @@
                 </bug>
                 <bug id="1086" tool="jira">
                     <description>
-                        Added type casts to Types.java to overcome runtime exceptions with 
+                        Added type casts to Types.java to overcome runtime exceptions with
                         Java 1.4.x.
                     </description>
                     <contributor>
