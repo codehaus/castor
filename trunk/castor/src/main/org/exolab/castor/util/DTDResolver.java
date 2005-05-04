@@ -201,6 +201,30 @@ public class DTDResolver
     public void setBaseURL( URL baseUrl )
     {
         _baseUrl = baseUrl;
+        
+        //-- make sure we have a document base and not
+        //-- a full URL to an actual file
+        if (baseUrl != null) {
+            String urlString = baseUrl.toExternalForm();
+            String docBase = URIUtils.getDocumentBase(urlString);
+            if (urlString.equals(docBase)) {
+                _baseUrl = baseUrl;
+            }
+            else if ((docBase != null) && (docBase.length() > 0)) {
+                try {
+                    _baseUrl = new URL(docBase);
+                }
+                catch(MalformedURLException mue) {
+                    // TODO: bubble up exception instead of
+                    // rethrowing
+                    String error = "Malformed URL: " + docBase;
+                    throw new IllegalStateException(error);
+                }
+            }
+            else {
+                _baseUrl = null;
+            }
+        }
     }
 
 
