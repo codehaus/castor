@@ -735,6 +735,40 @@ public final class UnmarshalHandler extends MarshalFramework
                 //-- should it be a fatal error?
                 message("Ignoring " + state.elementName + " no descriptor was found");
             }
+            
+            //-- handle possible location text content
+            //-- TODO: cleanup location path support.
+            //-- the following code needs to be improved as 
+            //-- for searching descriptors in this manner can
+            //-- be slow
+            StringBuffer tmpBuffer = null;
+            if (state.buffer != null) {
+                if (!isWhitespace(state.buffer)) {
+                    tmpBuffer = state.buffer;
+                    state.buffer = null;
+                }
+            }
+            if (tmpBuffer != null) {
+                UnmarshalState targetState = state;
+                String locPath = targetState.elementName;
+                while ((targetState = targetState.parent) != null) {
+                    if ((targetState.wrapper) || 
+                        (targetState.classDesc == null))
+                    {
+                        locPath = targetState.elementName + "/" + locPath;
+                        continue;
+                    }
+                    
+                    XMLFieldDescriptor tmpDesc = targetState.classDesc.getContentDescriptor();
+                    if (locPath.equals(tmpDesc.getLocationPath())) {
+                        if (targetState.buffer == null)
+                            targetState.buffer = tmpBuffer;
+                        else
+                            targetState.buffer.append(tmpBuffer.toString());
+                    }
+                }
+            }
+            
             //-- remove current namespace scoping
             _namespaces = _namespaces.getParent();
             freeState(state);
