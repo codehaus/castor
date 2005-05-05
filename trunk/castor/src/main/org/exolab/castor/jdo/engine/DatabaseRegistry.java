@@ -524,22 +524,6 @@ public final class DatabaseRegistry {
     }
 
     /**
-     * Create a JDBC connection for this DatabaseRegistry to execute SQL calls
-     * to the database.
-     * 
-     * @return The JDBC connection.
-     * @throws SQLException If a database access error occurs.
-     */
-	public Connection createConnection() throws SQLException
-    {
-        if ( _dataSource != null ) {
-            return ConnectionProxy.newConnectionProxy(_dataSource.getConnection(), getClass().getName());
-        }
-        
-        return ConnectionProxy.newConnectionProxy (DriverManager.getConnection( _jdbcUrl, _jdbcProps ), getClass().getName());
-    }
-
-	/**
      * Get the DatabaseRegistry with the given name. Will instantiated the requested
      * database if this had not been done before.
      * 
@@ -764,6 +748,23 @@ public final class DatabaseRegistry {
      */
     public DataSource getDataSource() {
         return _dataSource;
+    }
+
+    /**
+     * Create a JDBC connection for this DatabaseRegistry to execute SQL calls
+     * to the database.
+     * 
+     * @return The JDBC connection.
+     * @throws SQLException If a database access error occurs.
+     */
+    public Connection createConnection() throws SQLException {
+        if (_dataSource != null) {
+            return ConnectionProxy.newConnectionProxy(
+                    _dataSource.getConnection(), getClass().getName());
+        }
+        
+        return ConnectionProxy.newConnectionProxy(
+                DriverManager.getConnection(_jdbcUrl, _jdbcProps), getClass().getName());
     }
 
     //--------------------------------------------------------------------------
