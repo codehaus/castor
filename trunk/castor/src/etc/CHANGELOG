@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+JavaSource: Added ability to output source for Java 5 enum classes
+       (afawcett - 20050509)
+
 JavaSource: Added ability to add exceptions to JConstructor. 
        Details: http://jira.codehaus.org/browse/CASTOR-1050
        Patch Submitted by: Thomas Zooman
