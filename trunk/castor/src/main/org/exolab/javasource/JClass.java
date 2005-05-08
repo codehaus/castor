@@ -79,26 +79,26 @@ public class JClass extends JStructure {
     /**
      * The list of constructors for this JClass
      */
-    private Vector _constructors  = null;
+    protected Vector _constructors  = null;
 
 
     /**
      * The list of member variables (fields) of this JClass
      */
-    private JNamedMap _fields    = null;
+    protected JNamedMap _fields    = null;
 
 
-    private Vector _innerClasses = null;
+    protected Vector _innerClasses = null;
     
     /**
      * The list of methods of this JClass
      */
-    private Vector _methods       = null;
+    protected Vector _methods       = null;
 
     /**
      * The superclass for this JClass
      */
-    private JTypeName _superClass = null;
+    protected JTypeName _superClass = null;
     
 
     
@@ -106,7 +106,7 @@ public class JClass extends JStructure {
     /**
      * The source code for static initialization
     **/
-    private JSourceCode _staticInitializer = new JSourceCode();
+    protected JSourceCode _staticInitializer = new JSourceCode();
     
     /**
      * Creates a new JClass with the given name
