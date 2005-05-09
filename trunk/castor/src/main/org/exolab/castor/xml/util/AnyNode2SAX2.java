@@ -163,19 +163,30 @@ public class AnyNode2SAX2 {
 
         if (node.getNodeType() == AnyNode.ELEMENT) 
 		{
-            //the first sibling node of the current one
-            AnyNode siblingNode = node.getNextSibling();
-
+        	//-- node local name
             String name = node.getLocalName();
+            
+            //-- retrieve the namespaces declaration and handle them
+            AnyNode tempNode = node.getFirstNamespace();
+            String prefix = null;
+            while (tempNode != null) {
+            	prefix = tempNode.getNamespacePrefix();
+            	if (prefix == null) prefix = "";
+            	String value = tempNode.getNamespaceURI();
+            	if (value == null) value = "";               
+            	handler.startPrefixMapping(prefix, value);              
+            	if (value != null && value.length() >0)
+            		_context.addNamespace(prefix, value);
+            	tempNode = tempNode.getNextSibling();
+            }//namespaceNode
 
             //-- retrieve the attributes and handle them
             AttributesImpl atts = new AttributesImpl();
-            AnyNode tempNode = node.getFirstAttribute();
+            tempNode = node.getFirstAttribute();
             String xmlName = null;
             String value = null;
             String attUri = null;
-            String attPrefix = null;
-            
+            String attPrefix = null;            
             while (tempNode != null) {                
                 xmlName = tempNode.getLocalName();
                 String localName = xmlName;
@@ -198,23 +209,6 @@ public class AnyNode2SAX2 {
             _context = _context.createNamespaces();
             String nsPrefix = node.getNamespacePrefix();
             String nsURI = node.getNamespaceURI();
-
-             //-- retrieve the namespaces declaration and handle them
-            tempNode = node.getFirstNamespace();
-            String prefix = null;
-            while (tempNode != null) {
-                prefix = tempNode.getNamespacePrefix();
-                if (prefix == null) prefix = "";
-                value = tempNode.getNamespaceURI();
-                if (value == null) value = "";
-                
-                handler.startPrefixMapping(prefix, value);
-                
-                if (value != null && value.length() >0)
-                    _context.addNamespace(prefix, value);
-                tempNode = tempNode.getNextSibling();
-             }//namespaceNode
-
 
             String qName = null;
             //maybe the namespace is already bound to a prefix in the
