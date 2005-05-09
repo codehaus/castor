@@ -257,16 +257,42 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
                             String qName, Attributes atts)
           throws SAXException
     {
-        
-        createNodeElement(namespaceURI, localName, qName);
-        AnyNode tempNode;
-        
-        //--SAX2 Parser has not processed the namespaces
-        //--so we need to do it.
-        if (_processNamespace) 
+        AnyNode tempNode;            	
+    	
+        //--SAX2 Parser has not processed the namespaces so we need to do it.
+        if (_processNamespace)
+        {
+            //Namespace handling code to be moved once we integrate
+            //the new event API
+            /////////////////NAMESPACE HANDLING/////////////////////
             _context = _context.createNamespaces();
-        else 
-            _processNamespace = true;
+            String prefix = "";
+            int idx = qName.indexOf(':');
+            if (idx >= 0) {
+                 prefix = qName.substring(0,idx);
+            }
+            namespaceURI = _context.getNamespaceURI(prefix);
+            //--Overhead here since we process attributes twice
+            for (int i=0; i<atts.getLength(); ++i) {
+                String attrqName = atts.getQName(i);
+                String value = atts.getValue(i);
+                String nsPrefix = null;
+                //handles namespace declaration
+                if (attrqName.startsWith(XMLNS_PREFIX)) {
+                    // Extract the prefix if any
+                    nsPrefix = (attrqName.equals(XMLNS_PREFIX))?null:attrqName.substring(XMLNS_PREFIX_LENGTH);
+                    tempNode = new AnyNode(AnyNode.NAMESPACE, getLocalPart(attrqName), nsPrefix, value, null);
+                    _context.addNamespace(nsPrefix, value);
+                    _namespaces.push(tempNode);
+                    if (prefix.equals(nsPrefix))
+                        namespaceURI = value;
+                }
+            }
+            ////////////////////////END OF NAMESPACE HANDLING///////////////        	
+        }
+        
+        //create element
+        createNodeElement(namespaceURI, localName, qName);
         
         //process attributes
         for (int i=0; i<atts.getLength(); ++i) {
@@ -276,21 +302,24 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
             String value     = atts.getValue(i);
             String prefix    = null;
             
+            //-- skip namespace declarations? (handled above) 
+            if (_processNamespace )
+            	if(attqName.startsWith(XMLNS_PREFIX))
+            		continue;
+            
+            //--attribute namespace prefix?
             if ((attqName.length() != 0) && (attqName.indexOf(':') != -1 ))
                 prefix = attqName.substring(0,attqName.indexOf(':'));
                 
-            //--Namespace not yet processed?
-            if (_processNamespace && attqName.startsWith(XMLNS_PREFIX)) {
-                //handles namespace declaration
-                // Extract the prefix if any
-                prefix = (attqName.equals(XMLNS_PREFIX))?null:attqName.substring(XMLNS_PREFIX_LENGTH);
-                tempNode = new AnyNode(AnyNode.NAMESPACE, getLocalPart(attqName), prefix, value, null);
-                _context.addNamespace(prefix, value);
-                _namespaces.push(tempNode);
-            } else {
-                tempNode = new AnyNode(AnyNode.ATTRIBUTE, getLocalPart(attqName), prefix, uri, value);
-                _node.addAttribute(tempNode);
+            //--namespace not yet processed?
+            if (_processNamespace ) {
+                // attribute namespace
+            	if(prefix!=null)
+            		uri = _context.getNamespaceURI(prefix);
             }
+            //--add attribute
+            tempNode = new AnyNode(AnyNode.ATTRIBUTE, getLocalPart(attqName), prefix, uri, value);
+            _node.addAttribute(tempNode);
         }
         
         //--empty the namespace stack and add 
@@ -458,7 +487,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
     private void createNodeElement(String namespaceURI, String localName,
                                    String qName)
    {
-
+    	
         String prefix = null;
         //retrieves the prefix if any
         if (namespaceURI != null) {
