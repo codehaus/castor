@@ -29,6 +29,26 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
+                <bug id="1105" tool="jira">
+                    <description>
+                        Issues with Namespace Handling in SAX2Any and AnyNode2SAX2
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </reporter>
+                    <type>Enhancement</type>
+                    <module>XML</module>
+                    <date>20050509</date>
+                </bug>
                 <bug id="1104" tool="jira">
                     <description>
                         Added Java 5 "enum" support to Java Source API
