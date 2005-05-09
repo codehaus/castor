@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <document url="http://castor.exolab.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -29,7 +29,66 @@
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
             <bugs>
-
+                <bug id="1104" tool="jira">
+                    <description>
+                        Added Java 5 "enum" support to Java Source API
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </reporter>
+                    <type>Enhancement</type>
+                    <module>XML</module>
+                    <date>20050506</date>
+                </bug>
+                <bug id="1050" tool="jira">
+                    <description>
+                        Added ability to add exceptions to JConstructor.
+                    </description>
+                    <contributor>
+                        <name>Thomas Zooman</name>
+                        <email></email>
+                    </contributor>
+                    <submitter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Thomas Zooman</name>
+                        <email></email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050506</date>
+                </bug>
+                <bug id="1103" tool="jira">
+                    <description>
+                        Fixed bug CASTOR-1103 Generated Setters and XSD default value.
+                    </description>
+                    <contributor>
+                        <name>Roy van der Kuil</name>
+                        <email></email>
+                    </contributor>
+                    <submitter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Roy van der Kuil</name>
+                        <email></email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050506</date>
+                </bug>
                 <bug id="1596" tool="jira">
                     <description>
                         Fixes issue with using location attribute with both
