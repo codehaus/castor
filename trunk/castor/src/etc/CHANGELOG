@@ -1,6 +1,10 @@
 
 Version (CVS)
 -------------
+XML:   Fixed CASTOR-65 using contribution from Jene Jasper [jjasper@abz.nl]
+       Added patch to allow the ablity to specify to a binding file Source Generator Ant task.
+       Details: http://jira.codehaus.org/browse/CASTOR-65
+       (Bruce - 20050511)
 
 JDO:   Fixed bug CASTOR-1098 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactor CTF-JDO tests into subdirectories (part 1).
@@ -18,7 +22,7 @@ JavaSource: Added ability to output source for Java 5 enum classes
 JavaSource: Added ability to add exceptions to JConstructor. 
        Details: http://jira.codehaus.org/browse/CASTOR-1050
        Patch Submitted by: Thomas Zooman
-       (afawcett - 20050508)	 
+       (afawcett - 20050508)     
 
 XML:   Fixed bug CASTOR-1103 Generated Setters and XSD default value
        Details: http://jira.codehaus.org/browse/CASTOR-1103
@@ -124,7 +128,7 @@ All:   Fixed bug 1820 using contribution from Werner Guttmann [werner.guttmann@g
 
 JDO:   Fixed bug 1214 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem in field molder when dealing with 'set'
-	   methods with more than one signature.
+       methods with more than one signature.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1214
        (Ralf - 20050402)
 
@@ -483,7 +487,7 @@ JDO:   Fixed bug 1628.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=1628
        (Werner - 20041011)
 
-JDO:   Added the Castor Ant Task and an Ant target to the build jar.
+XML:   Added the Castor Ant Task and an Ant target to the build jar.
        Details: http://bugzilla.exolab.org/show_bug.cgi?id=885
        (Bruce - 20041007)
 
