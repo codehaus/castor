@@ -856,8 +856,9 @@ Database db = jdo.getDatabase();
     			   second in fields of type DATETIME that are mapped to java.sql.TimeStamp fields.
     			   As a result, Castor will throw ObjectModifiedExceptions during commits as Castor 
     			   internally maintains fractions of a seconds. </p> 
-    			<p>There's no immediate workaround, other than <b>manually</b> setting the fraction 
-    			   portion of the time(stamp) information to 0.</p>
+    			<p>Instead, Please use a column type that can be mapped to a long value, as Castor 
+                   internally handles conversion between java.util.Date and long values with 
+                   the required precision.</p>
     		</section>
     		
     		<section title="Use of TIMESTAMP fields &amp; NULLs in long transactions">
