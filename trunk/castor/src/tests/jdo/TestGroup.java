@@ -60,10 +60,10 @@ public class TestGroup
     private String     _value;
 
 
-    static final int       DefaultId = 4;
+    public static final int       DefaultId = 4;
 
 
-    static final String    DefaultValue = "group";
+    public static final String    DefaultValue = "group";
 
 
     public TestGroup()

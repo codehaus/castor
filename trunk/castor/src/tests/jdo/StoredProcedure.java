@@ -74,7 +74,7 @@ public class StoredProcedure extends CastorTestCase {
 
 
     public StoredProcedure( TestHarness category ) {
-        super( category, "TC48", "Stored procedure query" );
+        super( category, "TC49", "Stored procedure query" );
         _category = (JDOCategory) category;
     }
 

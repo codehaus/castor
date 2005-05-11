@@ -96,7 +96,7 @@ public class Absolute extends CastorTestCase {
 
         _db.begin();
         QueryResults enumeration;
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         while (enumeration.hasMore()) {
             _db.remove(enumeration.next());
@@ -109,7 +109,7 @@ public class Absolute extends CastorTestCase {
 
         _db.begin();
             for ( int i=0; i<25; i++ ) {
-                TestRaceNone newTRN = new TestRaceNone();
+                TestObject newTRN = new TestObject();
                 newTRN.setId(i);
                 _db.create( newTRN );
             }
@@ -124,7 +124,7 @@ public class Absolute extends CastorTestCase {
 
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         assertTrue("should have been able to move to 1", enumeration.absolute(1));
         assertTrue("should have been able to move to 5",enumeration.absolute(5));
@@ -144,7 +144,7 @@ public class Absolute extends CastorTestCase {
 
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         int next = 1;
         boolean hasMore = true;
@@ -164,7 +164,7 @@ public class Absolute extends CastorTestCase {
 
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         assertFalse("shouldn't be able to move to -50", enumeration.absolute(-50));
         assertFalse("shouldn't be able to move to 99999",enumeration.absolute(99999));
@@ -179,7 +179,7 @@ public class Absolute extends CastorTestCase {
         try {
             _db.begin();
             QueryResults enumeration;
-            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
             enumeration = oqlquery.execute(false);
             // following should fail.
             enumeration.absolute(5);
@@ -197,4 +197,3 @@ public class Absolute extends CastorTestCase {
         _db.close();
     }
 }
-

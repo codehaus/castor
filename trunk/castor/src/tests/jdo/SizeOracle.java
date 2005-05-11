@@ -76,7 +76,8 @@ public class SizeOracle extends Size
 		try
 		{
 			_db.begin();
-			OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+			OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
 			QueryResults results = oqlquery.execute(false);
 			_db.commit();
 			assertTrue(true);

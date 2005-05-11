@@ -57,7 +57,7 @@ public class KeyGenReturning extends KeyGenGeneric {
 
     public KeyGenReturning( TestHarness category ) {
 
-        super( category, "TC44" , "Key generator: RETURNING" );
+        super( category, "TC43" , "Key generator: RETURNING" );
     }
 
     public void runTest()

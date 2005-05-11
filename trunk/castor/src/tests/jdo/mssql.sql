@@ -1,3 +1,296 @@
+-- tc0x TESTS
+
+drop table tc0x_sample
+go
+create table tc0x_sample (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+)
+go
+create unique index tc0x_sample_pk on tc0x_sample ( id )
+go
+grant all on tc0x_sample to test
+go
+
+drop table tc0x_race
+go
+create table tc0x_race (
+  id      int          not null,
+  value1  int          not null
+)
+go
+create unique index tc0x_race_pk on tc0x_race ( id )
+go
+grant all on tc0x_race to test
+go
+
+
+-- tc1x TESTS
+
+drop table tc1x_sample
+go
+create table tc1x_sample (
+  id      int           not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)  null
+)
+go
+create unique index tc1x_sample_pk on tc1x_sample ( id )
+go
+grant all on tc1x_sample to test
+go
+
+drop table tc1x_persist
+go
+create table tc1x_persist (
+  id         integer         not null,
+  ctime      datetime        not null,
+  mtime      datetime        null,
+  value1     varchar(200)    not null,
+  parent_id  integer         null,
+  group_id   numeric(10,0)   not null
+)
+go
+create unique index tc1x_persist_pk on tc1x_persist ( id )
+go
+grant all on tc1x_persist to test
+go
+
+drop table tc1x_related
+go
+create table tc1x_related (
+  id          integer     not null,
+  persist_id  integer     not null
+)
+go
+create unique index tc1x_related_pk on tc1x_related ( id )
+go
+grant all on tc1x_related to test
+go
+
+drop table tc1x_group
+go
+create table tc1x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+)
+go
+create unique index tc1x_group_pk on tc1x_group ( id )
+go
+grant all on tc1x_group to test
+go
+
+drop table tc1x_handling
+go
+create table tc1x_handling (
+  id             numeric(10,0)  not null,
+  tdt            datetime       not null,
+  ttm            smalldatetime  not null,
+  int_val        integer        null,
+  float_val      float          null,
+  real_val       real           null,
+  long_val       numeric(18,0)  null,
+  char_val       char(1)        null,
+  bool_val       char(1)        null,
+  bool_is_method char(1)        null,
+  int_date       integer        null,
+  str_time       char(23)       null,
+  num_date       numeric(17,0)  null,
+  date_str       datetime       null,
+  long_date      numeric(20,0)  null
+)
+go
+create unique index tc1x_handling_pk on tc1x_handling (id)
+go
+grant all on tc1x_handling to test
+go
+
+drop table if exists tc1x_lob
+go
+create table tc1x_lob (
+  id        numeric(10,0)  not null,
+  blob_val  image          null,
+  clob_val  text           null,
+  blob_val2 image          null,
+  clob_val2 text           null,
+)
+go
+create unique index tc1x_lob_pk on tc1x_lob ( id )
+go
+grant all on tc1x_lob to test
+go
+
+drop table tc1x_conv
+go
+create table tc1x_conv (
+    id                 int         not null,
+    bool_byte          int         null,
+    bool_short         int         null,
+    bool_short_minus   int         null,
+    bool_int           int         null,
+    bool_int_minus     int         null,
+    bool_bigdec        numeric     null,
+    bool_bigdec_minus  numeric     null,
+    byte_int           int         null,
+    short_int          int         null,
+    long_int           int         null,
+    double_int         int         null,
+    float_int          float       null,
+    byte_bigdec        numeric     null,
+    short_bigdec       numeric     null,
+    int_bigdec         numeric     null,
+    float_bigdec       numeric     null,
+    double_bigdec      numeric     null,
+    short_string       varchar(20) null,
+    byte_string        varchar(20) null,
+    int_string         varchar(20) null,
+    long_string        varchar(20) null,
+    bigdec_string      varchar(20) null,
+    float_string       varchar(20) null,
+    double_string      varchar(20) null
+)
+go
+create unique index tc1x_conv_pk on tc1x_conv( id )
+go
+grant all on tc1x_conv to test
+go
+
+drop table tc1x_serial
+go
+create table tc1x_serial (
+  id      integer        not null,
+  dep     image          null
+)
+go
+create unique index tc1x_serial_pk on tc1x_serial( id )
+go
+grant all on tc1x_serial to test
+go
+
+drop table tc1x_rollback
+go
+create table tc1x_rollback (
+  id      numeric(10,0) not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200),
+  num     numeric(10,0)
+)
+go
+create unique index tc1x_rollback_pk on tc1x_rollback ( id )
+go
+grant all on tc1x_rollback to test
+go
+
+drop table tc1x_pks_person
+go
+create table tc1x_pks_person (
+  fname varchar(100)    not null,
+  lname varchar(100)    not null,
+  bday  datetime
+)
+go
+create unique index tc1x_pks_person_pk on tc1x_pks_person( fname, lname )
+go
+grant all on tc1x_pks_person to test
+go
+
+drop table tc1x_pks_employee
+go
+create table tc1x_pks_employee (
+  fname       varchar(100)  not null,
+  lname       varchar(100)  not null,
+  start_date  datetime      null
+)
+go
+create unique index tc1x_pks_employee_pk on tc1x_pks_employee( fname, lname )
+go
+grant all on tc1x_pks_employee to test
+go
+
+drop table tc1x_pks_payroll
+go
+create table tc1x_pks_payroll (
+  fname        varchar(100)  not null,
+  lname        varchar(100)  not null,
+  id           int           not null,
+  holiday      int,
+  hourly_rate  int
+)
+go
+create unique index tc1x_pks_payroll_fk on tc1x_pks_payroll( fname, lname )
+go
+create unique index tc1x_pks_payroll_pk on tc1x_pks_payroll( id )
+go
+grant all on tc1x_pks_payroll to test
+go
+
+drop table tc1x_pks_address
+go
+create table tc1x_pks_address (
+  fname   varchar(100)  not null,
+  lname   varchar(100)  not null,
+  id      int           not null,
+  street  varchar(30)   null,
+  city    varchar(30)   null,
+  state   varchar(2)    null,
+  zip     varchar(6)    null
+)
+go
+create unique index tc1x_pks_address_pk on tc1x_pks_address( id )
+go
+grant all on tc1x_pks_address to test
+go
+
+drop table tc1x_pks_contract
+go
+create table tc1x_pks_contract (
+  fname        varchar(100)  not null,
+  lname        varchar(100)  not null,
+  policy_no    int           not null,
+  contract_no  int           not null,
+  c_comment    varchar(100)  null
+)
+go
+create unique index tc1x_pks_contract_fk on tc1x_pks_contract( fname, lname )
+go
+create unique index tc1x_pks_contract_pk on tc1x_pks_contract( policy_no, contract_no )
+go
+grant all on tc1x_pks_contract to test
+go
+
+drop table tc1x_pks_category_contract
+go
+create table tc1x_pks_category_contract (
+  policy_no    int      not null,
+  contract_no  int      not null,
+  cate_id      int      not null
+)
+go
+grant all on tc1x_pks_category_contract to test
+go
+
+drop table tc1x_pks_category
+go
+create table tc1x_pks_category (
+  id    int              not null,
+  name  varchar(100)     not null
+)
+go
+create unique index tc1x_pks_category_pk on tc1x_pks_category( id )
+go
+grant all on tc1x_pks_category to test
+go
+
+
+
+
+
+
+
+
+-- UNDEFINED TESTS
+
 -- test_table
 drop table test_table
 go
@@ -268,20 +561,6 @@ go
 grant all on test_table_ex to test
 go
 
--- test_race
-drop table test_race
-go
-create table test_race
-(
-  id      int          not null,
-  value1  int          not null
-)
-go
-create unique index test_race_pk on test_race ( id )
-go
-grant all on test_race to test
-go
-
 -- test_master
 drop table test_master
 go
@@ -353,72 +632,6 @@ go
 grant all on test_group to test
 go
 
--- test_types
-drop table test_types
-go
-create table test_types (
-  id       numeric(10,0)  not null,
-  tdt      datetime       not null,
-  ttm      smalldatetime  not null,
-  int_val  integer        null,
-  float_val  float        null,
-  real_val   real         null,
-  long_val numeric(18,0)  null,
-  char_val char(1)        null,
-  bool_val char(1)        null,
-  bool_is_method char(1)  null,
-  int_date integer        null,
-  str_time char(23)       null,
-  num_date numeric(17,0)  null,
-  blob_val image          null,
-  clob_val text           null,
-  blob_val2 image         null,
-  clob_val2 text          null,
-  date_str  datetime      null
-)
-go
-create unique index test_types_pk on test_types (id)
-go
-grant all on test_types to test
-go
-
-
--- test_conv
-drop table test_conv
-go
-create table test_conv (
-    id               int     not null,
-    bool_byte        int     null,
-    bool_short       int     null,
-    bool_short_minus    int     null,
-    bool_int         int     null,
-    bool_int_minus      int     null,
-    bool_bigdec      numeric null,
-    bool_bigdec_minus   numeric null,
-    byte_int         int     null,
-    short_int        int     null,
-    long_int         int     null,
-    double_int       int     null,
-    float_int        float   null,
-    byte_bigdec      numeric null,
-    short_bigdec     numeric null,
-    int_bigdec       numeric null,
-    float_bigdec     numeric null,
-    double_bigdec    numeric null,
-    short_string     varchar(20) null,
-    byte_string      varchar(20) null,
-    int_string       varchar(20) null,
-    long_string      varchar(20) null,
-    bigdec_string    varchar(20) null,
-    float_string     varchar(20) null,
-    double_string    varchar(20) null
-)
-go
-create unique index test_conv_pk on test_conv( id )
-go
-grant all on test_conv to test
-go
-
 -- test_keygen
 drop table test_keygen
 go
@@ -482,6 +695,35 @@ go
 grant all on test_seqtable to test
 go
 
+drop table test_persistent
+go
+create table test_persistent (
+  id         integer         not null,
+  ctime      datetime        not null,
+  mtime      datetime        null,
+  value1     varchar(200)    not null,
+  parent_id  integer         null,
+  group_id   numeric(10,0)   not null
+)
+go
+create unique index test_persistent_pk on test_persistent ( id )
+go
+grant all on test_persistent to test
+go
+
+drop table test_related
+go
+create table test_related (
+  id          integer     not null,
+  persist_id  integer     not null
+)
+go
+create unique index test_related_pk on test_related ( id )
+go
+grant all on test_related to test
+go
+
+
 -- test the identity key generator
 drop table test_identity
 go
@@ -514,48 +756,6 @@ create procedure proc_check_permissions @userName varchar(200),
     SELECT id, value1, value2 FROM test_table WHERE value2 = @groupName
 go
 sp_procxmode proc_check_permissions, "anymode"
-go
-
--- test_serial
-drop table test_serial
-go
-create table test_serial (
-  id      integer        not null,
-  dep     image           null
-)
-go
-create unique index test_serial_pk on test_serial( id )
-go
-grant all on test_serial to test
-go
-
--- test_persistent
-drop table test_persistent
-go
-create table test_persistent (
-  id       integer          not null,
-  ctime    datetime         not null,
-  mtime    datetime         null,
-  value1    varchar(200)    not null,
-  parent_id integer         null,
-  group_id numeric(10,0)    not null
-)
-go
-create unique index test_persistent_pk on test_persistent ( id )
-go
-grant all on test_persistent to test
-go
-
-drop table test_related
-go
-create table test_related (
-  id          integer     not null,
-  persist_id  integer     not null
-)
-go
-create unique index test_related_pk on test_related ( id )
-go
-grant all on test_related to test
 go
 
 -- test_col

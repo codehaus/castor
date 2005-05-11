@@ -43,44 +43,39 @@
  * $Id$
  */
 
-
 package jdo;
 
-
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
-import org.exolab.castor.jdo.JDO;
+
 import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Messages;
 
-import java.net.URL;
-import java.net.MalformedURLException;
 import harness.TestHarness;
 
-
 public class JDOCategory extends TestHarness {
-
-
     private JDO      _jdo;
 
-
-    public JDOCategory( TestHarness superTest, String name, String description, Object jdo ) {
+    public JDOCategory(final TestHarness superTest, final String name,
+                       final String description, final Object jdo ) {
+        
         super( superTest, name, description );
         _jdo = (JDO) jdo;
         try {
-            new URL( _jdo.getConfiguration() );
-        } catch ( MalformedURLException e ) {
-            _jdo.setConfiguration( getClass().getResource( _jdo.getConfiguration() ).toString() );
+            new URL(_jdo.getConfiguration());
+        } catch (MalformedURLException ex) {
+            String config = _jdo.getConfiguration();
+            _jdo.setConfiguration(getClass().getResource(config).toString());
         }
     }
 
-
-    public Database getDatabase()
-        throws PersistenceException
-    {
+    public Database getDatabase() throws PersistenceException {
         return _jdo.getDatabase();
     }
 
@@ -96,6 +91,4 @@ public class JDOCategory extends TestHarness {
             throw new SQLException(Messages.format("jdo.dbNoMapping", name));
         }
     }
-
-
 }

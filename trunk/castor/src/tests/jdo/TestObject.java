@@ -63,13 +63,13 @@ public class TestObject
     private String _value2;
 
 
-    static final int       DefaultId = 3;
+    public static final int       DefaultId = 3;
 
 
-    static final String    DefaultValue1 = "one";
+    public static final String    DefaultValue1 = "one";
 
 
-    static final String    DefaultValue2 = "two";
+    public static final String    DefaultValue2 = "two";
 
 
     public TestObject()
