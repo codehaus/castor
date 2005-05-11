@@ -30,9 +30,24 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="65" type="jira">
+                    <description>Added patch to allow CastorSourceGenTask to specify a binding file.</description>
+                    <contributor>
+                        <name>Jene Jasper</name>
+                        <email>jjasper@abz.nl</email>
+                    </contributor>
+                    <submitter>
+                        <name>Jene Jasper</name>
+                        <email>jjasper@abz.nl</email>
+                    </submitter>
+                    <reporter>Jene Jasper</reporter>
+                    <type>enhancement</type>
+                    <module>Tools</module>
+                    <date>20050511</date>
+                </bug>
                 <bug id="1063" type="jira">
                     <description>
-						Refactor CTF-JDO tests into subdirectories (part 1).
+                        Refactor CTF-JDO tests into subdirectories (part 1).
                     </description>
                     <contributor>
                         <name>Ralf Joachim</name>
@@ -52,7 +67,7 @@
                 </bug>
                 <bug id="973" type="jira">
                     <description>
-				       build.xml now uses sourc generator Ant task definitio during code generation.
+                       build.xml now uses sourc generator Ant task definitio during code generation.
                     </description>
                     <contributor>
                         <name>Werner Guttmann</name>
@@ -170,8 +185,8 @@
                 </bug>
                 <bug id="954" type="jira">
                     <description>
-				       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL
-					   statement logging.
+                       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL
+                       statement logging.
                     </description>
                     <contributor>
                         <name>Werner Guttmann</name>
@@ -188,7 +203,7 @@
                 </bug>
                 <bug id="1097" type="jira">
                     <description>
-						Added cast of null needed for some reflection methods for Java5.
+                        Added cast of null needed for some reflection methods for Java5.
                     </description>
                     <contributor>
                         <name>Emir Causevic</name>
@@ -208,8 +223,8 @@
                 </bug>
                 <bug id="1098" type="jira">
                     <description>
-						Fixed compile error on Java5 caused by the usage of "enum"
-						as identifier in JDO tests.
+                        Fixed compile error on Java5 caused by the usage of "enum"
+                        as identifier in JDO tests.
                     </description>
                     <contributor>
                         <name>Emir Causevic</name>

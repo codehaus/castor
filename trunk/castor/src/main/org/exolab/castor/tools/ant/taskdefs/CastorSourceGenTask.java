@@ -98,10 +98,10 @@ public class CastorSourceGenTask extends MatchingTask {
     // Begin Source Generator parameters
     private String srcpackage;
     private String todir;
+    private String bindingfile;
     private String types;
     private String lineseparator;
     private boolean generateImportedSchemas = false;
-    private String bindingFile;
     // End Source Generator parameters
 
     private boolean verbose;
@@ -143,6 +143,10 @@ public class CastorSourceGenTask extends MatchingTask {
 
     public void setTodir(String dest) {
         this.todir = dest;
+    }
+
+    public void setBindingfile(String bindingfile) {
+        this.bindingfile = bindingfile;
     }
 
     public void setLineseparator(String ls) {
@@ -223,6 +227,11 @@ public class CastorSourceGenTask extends MatchingTask {
         sgen.setLineSeparator(lineSep);
 
         sgen.setDestDir(todir);
+
+        if (bindingfile != null) {
+            sgen.setBinding(bindingfile);
+        }
+
         sgen.setVerbose(verbose);
         sgen.setSuppressNonFatalWarnings(!warnings);
 
