@@ -80,7 +80,7 @@ public class ManyToManyKeyGen extends CastorTestCase {
      * @param category The test suite of these test cases.
      */
     public ManyToManyKeyGen( TestHarness category ) {
-        super( category, "TC31", "ManyToManyKeyGen" );
+        super( category, "TC31a", "ManyToManyKeyGen" );
         _category = (JDOCategory) category;
     }
 

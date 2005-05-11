@@ -30,6 +30,26 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="1063" type="jira">
+                    <description>
+						Refactor CTF-JDO tests into subdirectories (part 1).
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Ref.</type>
+                    <module>JDO</module>
+                    <date>20050511</date>
+                </bug>
                 <bug id="973" type="jira">
                     <description>
 				       build.xml now uses sourc generator Ant task definitio during code generation.

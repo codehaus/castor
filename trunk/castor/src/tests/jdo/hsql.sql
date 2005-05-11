@@ -1,3 +1,243 @@
+-- tc0x TESTS
+
+drop table if exists tc0x_sample;
+
+create table tc0x_sample (
+  id      int           not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)
+);
+
+create unique index tc0x_sample_pk on tc0x_sample ( id );
+
+drop table if exists tc0x_race;
+
+create table tc0x_race (
+  id      int          not null,
+  value1  int          not null
+);
+
+create unique index tc0x_race_pk on tc0x_race ( id );
+
+
+-- tc1x TESTS
+
+drop table if exists tc1x_sample;
+
+create table tc1x_sample (
+  id      int           not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200)
+);
+
+create unique index tc1x_sample_pk on tc1x_sample ( id );
+
+drop table if exists tc1x_persist;
+
+create table tc1x_persist (
+  id         integer        not null,
+  ctime      datetime       not null,
+  mtime      datetime       null,
+  value1     varchar(200)   not null,
+  parent_id  integer        null,
+  group_id   numeric(10,0)  not null
+);
+
+create unique index tc1x_persist_pk on tc1x_persist ( id );
+
+drop table if exists tc1x_related;
+
+create table tc1x_related (
+  id          integer     not null,
+  persist_id  integer     not null
+);
+
+create unique index tc1x_related_pk on tc1x_related ( id );
+
+drop table if exists tc1x_group;
+
+create table tc1x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+);
+
+create unique index tc1x_group_pk on tc1x_group ( id );
+
+drop table if exists tc1x_handling;
+
+create table tc1x_handling (
+  id              numeric(10,0)  not null,
+  tdt             datetime       not null,
+  ttm             datetime       not null,
+  int_val         integer        null,
+  float_val       float          null, 
+  real_val        real           null,
+  long_val        bigint         null,
+  char_val        char(1)        null,
+  bool_val        char(1)        null,
+  bool_is_method  char(1)        null,
+  int_date        integer        null,
+  str_time        char(23)       null,
+  num_date        bigint         null,
+  date_str        datetime       null,
+  long_date       numeric(20,0)  null
+);
+
+create unique index tc1x_handling_pk on tc1x_handling ( id );
+
+drop table if exists tc1x_lob;
+
+create table tc1x_lob (
+  id        numeric(10,0)      not null,
+  blob_val  longvarbinary      null,
+  clob_val  longvarchar        null,
+  blob_val2 longvarbinary      null,
+  clob_val2 longvarchar        null
+);
+
+create unique index tc1x_lob_pk on tc1x_lob ( id );
+
+drop table if exists tc1x_conv;
+
+create table tc1x_conv (
+    id                 int          not null,
+    bool_byte          int          null,
+    bool_short         int          null,
+    bool_short_minus   int          null,
+    bool_int           int          null,
+    bool_int_minus     int          null,
+    bool_bigdec        numeric      null,
+    bool_bigdec_minus  numeric      null,
+    byte_int           int          null,
+    short_int          int          null,
+    long_int           int          null,
+    double_int         int          null,
+    float_int          float        null,
+    byte_bigdec        numeric      null,
+    short_bigdec       numeric      null,
+    int_bigdec         numeric      null,
+    float_bigdec       numeric      null,
+    double_bigdec      numeric      null,
+    short_string       varchar(20)  null,
+    byte_string        varchar(20)  null,
+    int_string         varchar(20)  null,
+    long_string        varchar(20)  null,
+    bigdec_string      varchar(20)  null,
+    float_string       varchar(20)  null,
+    double_string      varchar(20)  null
+);
+
+create unique index tc1x_conv_pk on tc1x_conv( id );
+
+drop table if exists tc1x_serial;
+
+create table tc1x_serial (
+  id      integer        not null,
+  dep     longvarbinary  null
+);
+
+create unique index tc1x_serial_pk on tc1x_serial( id );
+
+drop table if exists tc1x_rollback;
+
+create table tc1x_rollback (
+  id      numeric(10,0) not null,
+  value1  varchar(200)  not null,
+  value2  varchar(200),
+  num     numeric(10,0)
+);
+
+create unique index tc1x_rollback_pk on tc1x_rollback ( id );
+
+drop table if exists tc1x_pks_person;
+
+create table tc1x_pks_person (
+  fname  varchar(15)    not null,
+  lname  varchar(15)    not null,
+  bday   datetime       null
+);
+
+create unique index tc1x_pks_person_pk on tc1x_pks_person( fname, lname );
+
+drop table if exists tc1x_pks_employee;
+
+create table tc1x_pks_employee (
+  fname       varchar(15)  not null,
+  lname       varchar(15)  not null,
+  start_date  datetime     null
+);
+
+create unique index tc1x_pks_employee_pk on tc1x_pks_employee( fname, lname );
+
+drop table if exists tc1x_pks_payroll;
+
+create table tc1x_pks_payroll (
+  fname        varchar(15)  not null,
+  lname        varchar(15)  not null,
+  id           int          not null,
+  holiday      int          not null,
+  hourly_rate  int          not null
+);
+
+create unique index tc1x_pks_payroll_fk on tc1x_pks_payroll( fname, lname );
+
+create unique index tc1x_pks_payroll_pk on tc1x_pks_payroll( id );
+
+drop table if exists tc1x_pks_address;
+
+create table tc1x_pks_address (
+  fname   varchar(15)  not null,
+  lname   varchar(15)  not null,
+  id      int          not null,
+  street  varchar(30)  null,
+  city    varchar(30)  null,
+  state   varchar(2)   null,
+  zip     varchar(6)   null
+);
+
+create unique index tc1x_pks_address_pk on tc1x_pks_address( id );
+
+drop table if exists tc1x_pks_contract; 
+
+create table tc1x_pks_contract (
+  fname        varchar(15)  not null,
+  lname        varchar(15)  not null,
+  policy_no    int          not null,
+  contract_no  int          not null,
+  c_comment    varchar(90)  null
+);
+
+create unique index tc1x_pks_contract_fk on tc1x_pks_contract( fname, lname );
+
+create unique index tc1x_pks_contract_pk on tc1x_pks_contract( policy_no, contract_no );
+
+drop table if exists tc1x_pks_category_contract;
+
+create table tc1x_pks_category_contract (
+  policy_no    int      not null,
+  contract_no  int      not null,
+  cate_id      int      not null
+);
+
+drop table if exists tc1x_pks_category;
+
+create table tc1x_pks_category (
+  id    int             not null,
+  name  varchar(20)     not null
+);
+
+create unique index tc1x_pks_category_pk on tc1x_pks_category( id );
+
+
+
+
+
+
+
+
+
+-- UNDEFINED TESTS
+
 drop table if exists test_table;
 
 create table test_table (
@@ -20,19 +260,6 @@ create table test_table2 (
 
 create unique index test_table2_pk
    on test_table2 ( id );
-
-
-drop table if exists test_table3;
-
-create table test_table3 (
-  id      numeric(10,0) not null,
-  value1  varchar(200)  not null,
-  value2  varchar(200),
-  number  numeric(10,0)
-);
-
-create unique index test_table3_pk
-   on test_table3 ( id );
 
 
 drop table if exists test_group_person;
@@ -178,6 +405,17 @@ create table test_table_ex (
 create unique index test_table_ex_pk on test_table_ex ( id );
 
 
+drop table if exists test_table_ex;
+
+create table test_table_ex (
+  id      int          not null,
+  value1  varchar(200) not null,
+  value2  varchar(200) null
+);
+
+create unique index test_table_ex_pk on test_table_ex ( id );
+
+
 drop table if exists test_table_extends;
 
 create table test_table_extends (
@@ -187,17 +425,6 @@ create table test_table_extends (
 );
 
 create unique index test_table_extends_pk on test_table_extends ( id );
-
-
-drop table if exists test_race;
-
-create table test_race (
-  id      int          not null,
-  value1  int          not null
-);
-
-create unique index test_race_pk on test_race ( id );
-
 
 drop table if exists test_master;
 
@@ -256,36 +483,6 @@ create unique index test_group_pk
    on test_group ( id );
 
 
-drop table if exists test_types;
-
-create table test_types (
-  id        numeric(10,0)  not null,
-  tdt       datetime       not null,
-  ttm       datetime       not null,
-  int_val   integer        null,
-  float_val float          null, 
-  real_val  real           null,
-  long_val  bigint         null,
-  char_val  char(1)        null,
-  bool_val  char(1)        null,
-  bool_is_method char(1)   null,
-  int_date  integer        null,
-  str_time  char(23)       null,
-  num_date  bigint         null,
-/*
-  blob_val  longblob       null,
-  clob_val  longtext       null,
-  blob_val2 longblob       null,
-  clob_val2 longtext       null,
-*/
-  date_str  datetime       null,
-  long_date numeric(20,0)  null
-);
-
-create unique index test_types_pk
-  on test_types ( id );
-
-
 /*
 drop table if exists list_types;
 
@@ -304,43 +501,6 @@ create table list_types (
   o_bfile MEDIUMBLOB  null
 );
 */
-
--- test_conv
-drop table if exists test_conv;
-
-create table test_conv (
-    id               int     not null,
-    bool_byte        int     null,
-    bool_short       int     null,
-    bool_short_minus    int     null,
-    bool_int         int     null,
-    bool_int_minus      int     null,
-    bool_bigdec      numeric null,
-    bool_bigdec_minus   numeric null,
-    byte_int         int     null,
-    short_int        int     null,
-    long_int         int     null,
-    double_int       int     null,
-    float_int        float   null,
-    byte_bigdec      numeric null,
-    short_bigdec     numeric null,
-    int_bigdec       numeric null,
-    float_bigdec     numeric null,
-    double_bigdec    numeric null,
-    short_string     varchar(20) null,
-    byte_string      varchar(20) null,
-    int_string       varchar(20) null,
-    long_string      varchar(20) null,
-    bigdec_string    varchar(20) null,
-    float_string     varchar(20) null,
-    double_string    varchar(20) null
-);
-
-create unique index test_conv_pk on test_conv( id );
-
--- grant all on test_conv to test;
-
-
 
 drop table if exists test_keygen;
 
@@ -507,9 +667,9 @@ create table test_nton_b (
 
 
 -- those tables should be type INNODB with mysql 4
+drop table if exists depend2;
 drop table if exists master;
 drop table if exists depend1;
-drop table if exists depend2;
 
 create table depend1(
   id int not null primary key

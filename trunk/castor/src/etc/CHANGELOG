@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1098 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Refactor CTF-JDO tests into subdirectories (part 1).
+       Details: http://jira.codehaus.org/browse/CASTOR-1063
+       (Ralf - 20050511)
+
 JDO:   Fixed bug CASTOR-973 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        build.xml now uses sourc generator Ant task definitio during code generation.
        Details: http://jira.codehaus.org/browse/CASTOR-973

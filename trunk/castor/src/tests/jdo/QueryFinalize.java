@@ -74,7 +74,7 @@ public class QueryFinalize extends CastorTestCase
      */
     public QueryFinalize( TestHarness category ) 
     {
-        super( category, "TC09", "Query garbage collected" );
+        super( category, "TC100", "Query garbage collected" );
         _category = (JDOCategory) category;
     }
 

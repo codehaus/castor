@@ -101,7 +101,8 @@ public class Size extends CastorTestCase
     {
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         while (enumeration.hasMore())
         {
@@ -115,7 +116,8 @@ public class Size extends CastorTestCase
         _db.begin();
         for ( int i=0; i<25; i++ ) 
         {
-            TestRaceNone newTRN = new TestRaceNone();
+//            TestRaceNone newTRN = new TestRaceNone();
+            TestObject newTRN = new TestObject();
             newTRN.setId(i);
             _db.create( newTRN );
         }
@@ -129,7 +131,8 @@ public class Size extends CastorTestCase
     {
         _db.begin();
         QueryResults enumeration;
-         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+         OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         assertTrue ("size should be > 0",enumeration.size() > 0);
         _db.commit();
@@ -144,7 +147,8 @@ public class Size extends CastorTestCase
     {
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         while (enumeration.hasMore())
         {
@@ -162,7 +166,8 @@ public class Size extends CastorTestCase
     {
         _db.begin();
         QueryResults enumeration;
-        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+        OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
         enumeration = oqlquery.execute(true);
         int expectedSize = enumeration.size();
         int realSize = 0;
@@ -183,7 +188,8 @@ public class Size extends CastorTestCase
         try
         {
             _db.begin();
-            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+//            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestRaceNone object" );
+            OQLQuery oqlquery = _db.getOQLQuery( "SELECT object FROM jdo.TestObject object" );
             QueryResults enumeration = oqlquery.execute(false);
             _db.commit();
             // This test fails when executed against PostgreSQL. 

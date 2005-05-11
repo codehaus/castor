@@ -98,6 +98,7 @@ public class LazyLoading extends CastorTestCase {
         stmt.executeUpdate("DELETE FROM test_pks_employee");
         stmt.executeUpdate("DELETE FROM test_pks_payroll");
         stmt.executeUpdate("DELETE FROM test_pks_address");
+        stmt.executeUpdate("DELETE FROM test_pks_category_contract");
         stmt.executeUpdate("DELETE FROM test_pks_contract");
         stmt.executeUpdate("DELETE FROM test_pks_category");
         stmt.executeUpdate("DELETE FROM test_pks_project");
