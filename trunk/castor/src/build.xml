@@ -28,7 +28,7 @@
         <property name="doc" value="${source}/doc"/>
         <property name="schema" value="${build}/schema"/>
         <property name="tests" value="${build}/tests"/>
-        <property name="gen.src" value="${basedir}/gen-src"/>
+        <property name="gen.src" value="${build}/gen-src"/>
         <property name="project.eclipse" value="${source}/tools/ide/eclipse" />
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
@@ -568,58 +568,41 @@
       </java>
    </target>
 
-    <target name="gen.jdo.conf"
-        description="Use the Source Generator to create the Java classes for jdo-conf.xsd" 
-        depends="jar,srcgen.anttask.jar">
+    <target name="gen.jdo.conf" depends="jar,srcgen.anttask.jar"
+        description="Use the Source Generator to create the Java classes for jdo-conf.xsd">
         <delete dir="${gen.src}/jdo-conf"/>
         <mkdir dir="${gen.src}/jdo-conf"/>
-        <taskdef name="castor-srcgen" 
-                 classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
+        <taskdef name="castor-srcgen" classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
                  classpathref="build.classpath"/>          
-        <castor-srcgen file="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd" 
-                       todir="${gen.src}/jdo-conf" 
-                       package="org.exolab.castor.jdo.conf" 
-                       types="j2" 
-				       lineseparator="unix"
-                       warnings="false"/>
+            <castor-srcgen file="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd" 
+                todir="${gen.src}/jdo-conf" 
+                package="org.exolab.castor.jdo.conf" 
+                lineseparator="unix"
+                types="j2" 
+                warnings="false"/>
         <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
             <src path="${gen.src}" />
             <classpath refid="build.classpath"/>
         </javac>
     </target>
 
-    <target name="gen.mapping"
-            description="Use the Source Generator to create the Java classes for mapping.xsd"
-    	    depends="jar, srcgen.anttask.jar">
+    <target name="gen.mapping" depends="jar,srcgen.anttask.jar"
+            description="Use the Source Generator to create the Java classes for mapping.xsd">
         <delete dir="${gen.src}/mapping"/>
         <mkdir dir="${gen.src}/mapping"/>
-<!--    	
-        <taskdef name="castor-srcgen" 
-                 classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
+        <taskdef name="castor-srcgen" classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
                  classpathref="build.classpath"/>          
-        <castor-srcgen file="${main}/org/exolab/castor/mapping/mapping.xsd" 
-                       todir="${gen.src}/mapping" 
-                       package="org.exolab.castor.mapping.xml" 
-                       lineseparator="unix"
-                       bindingFile="main/org/exolab/castor/mapping/mapping-binding.xml"
-                       types="j2" 
-                       warnings="false"/>
-        -->                       
-        <java classname="org.exolab.castor.builder.SourceGenerator"
-              classpathref="build.classpath">
-            <arg value="-i"/>
-            <arg value="${main}/org/exolab/castor/mapping/mapping.xsd"/>
-            <arg value="-binding-file" />
-            <arg value="${main}/org/exolab/castor/mapping/mapping-binding.xml" />
-            <arg value="-package"/>
-            <arg value="org.exolab.castor.mapping.xml"/>
-            <arg value="-dest"/>
-            <arg value="${gen.src}/mapping"/>
-            <arg value="-line-separator"/>
-            <arg value="unix"/>
-            <arg value="-types"/>
-            <arg value="j2"/>
-        </java>
+            <castor-srcgen file="${main}/org/exolab/castor/mapping/mapping.xsd" 
+                todir="${gen.src}/mapping" 
+                package="org.exolab.castor.mapping.xml" 
+                lineseparator="unix"
+                bindingfile="${main}/org/exolab/castor/mapping/mapping-binding.xml"
+                types="j2" 
+                warnings="false"/>
+        <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
+            <src path="${gen.src}" />
+            <classpath refid="build.classpath"/>
+        </javac>
     </target>
 
     <target name="gen.pvd"
