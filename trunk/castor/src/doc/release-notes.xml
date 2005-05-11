@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <document url="http://castor.exolab.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -28,7 +28,25 @@
             <date>tbd</date>
             <managed-by>Werner Guttmann</managed-by>
             <summary>Short description says all ...</summary>
+       
             <bugs>
+                <bug id="973" type="jira">
+                    <description>
+				       build.xml now uses sourc generator Ant task definitio during code generation.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh</type>
+                    <module>JDO</module>
+                    <date>20050511</date>
+                </bug>
                 <bug id="1105" tool="jira">
                     <description>
                         Issues with Namespace Handling in SAX2Any and AnyNode2SAX2
@@ -130,7 +148,6 @@
                     <module>XML</module>
                     <date>20050503</date>
                 </bug>
-
                 <bug id="954" type="jira">
                     <description>
 				       Added proxy classes for JDBC Connection and PreparedStatement to improve SQL
