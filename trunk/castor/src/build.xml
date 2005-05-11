@@ -28,7 +28,7 @@
         <property name="doc" value="${source}/doc"/>
         <property name="schema" value="${build}/schema"/>
         <property name="tests" value="${build}/tests"/>
-        <property name="gen.src" value="gen-src"/>
+        <property name="gen.src" value="${basedir}/gen-src"/>
         <property name="project.eclipse" value="${source}/tools/ide/eclipse" />
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
@@ -569,23 +569,19 @@
    </target>
 
     <target name="gen.jdo.conf"
-            description="Use the Source Generator to create the Java classes for jdo-conf.xsd">
-        <delete dir="${gen.src}"/>
-        <mkdir dir="${gen.src}"/>
-        <java classname="org.exolab.castor.builder.SourceGenerator" fork="true"
-              classpathref="build.classpath">
-            <arg value="-i"/>
-            <arg value="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd"/>
-            <arg value="-package"/>
-            <arg value="org.exolab.castor.jdo.conf"/>
-            <arg value="-dest"/>
-            <arg value="${gen.src}"/>
-            <arg value="-line-separator"/>
-            <arg value="unix"/>
-            <arg value="-types"/>
-            <arg value="j2"/>
-            <classpath refid="build.classpath"/>
-        </java>
+        description="Use the Source Generator to create the Java classes for jdo-conf.xsd" 
+        depends="jar,srcgen.anttask.jar">
+        <delete dir="${gen.src}/jdo-conf"/>
+        <mkdir dir="${gen.src}/jdo-conf"/>
+        <taskdef name="castor-srcgen" 
+                 classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
+                 classpathref="build.classpath"/>          
+        <castor-srcgen file="${main}/org/exolab/castor/jdo/conf/jdo-conf.xsd" 
+                       todir="${gen.src}/jdo-conf" 
+                       package="org.exolab.castor.jdo.conf" 
+                       types="j2" 
+				       lineseparator="unix"
+                       warnings="false"/>
         <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">
             <src path="${gen.src}" />
             <classpath refid="build.classpath"/>
@@ -593,9 +589,22 @@
     </target>
 
     <target name="gen.mapping"
-            description="Use the Source Generator to create the Java classes for mapping.xsd">
+            description="Use the Source Generator to create the Java classes for mapping.xsd"
+    	    depends="jar, srcgen.anttask.jar">
         <delete dir="${gen.src}/mapping"/>
         <mkdir dir="${gen.src}/mapping"/>
+<!--    	
+        <taskdef name="castor-srcgen" 
+                 classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
+                 classpathref="build.classpath"/>          
+        <castor-srcgen file="${main}/org/exolab/castor/mapping/mapping.xsd" 
+                       todir="${gen.src}/mapping" 
+                       package="org.exolab.castor.mapping.xml" 
+                       lineseparator="unix"
+                       bindingFile="main/org/exolab/castor/mapping/mapping-binding.xml"
+                       types="j2" 
+                       warnings="false"/>
+        -->                       
         <java classname="org.exolab.castor.builder.SourceGenerator"
               classpathref="build.classpath">
             <arg value="-i"/>

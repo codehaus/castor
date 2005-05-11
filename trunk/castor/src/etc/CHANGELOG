@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-973 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       build.xml now uses sourc generator Ant task definitio during code generation.
+       Details: http://jira.codehaus.org/browse/CASTOR-973
+       (Werner - 20050511)
+       
 JavaSource: Added ability to output source for Java 5 enum classes
        (afawcett - 20050509)
 
