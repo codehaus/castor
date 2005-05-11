@@ -19,6 +19,23 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="27">
+            <title>New Castor roadmap</title>
+            <author>Werner Guttmann</author>
+            <date>11 May 2005</date>
+            <time>20:21:20</time>
+            <summary>
+                For information about upcoming Castor releases and future development areas in general, 
+                please have a look at the 
+                <a href="http://jira.codehaus.org/browse/CASTOR?report=com.atlassian.jira.plugin.system.project:roadmap-panel">Castor 
+                roadmap</a>.<br/><br/>
+
+                As it stands right now, this will reveal that we have scheduled two releases (0.9.7
+                and 0.9.9) within the next 5 weeks, the former designated to be a maintenance release 
+                for Castor 0.9.6, the latter planned as a feature release with quite some new 
+                features and improvements to be added.
+            </summary>
+        </news>
         <news id="26">
             <title>Castor forums currently unavailable</title>
             <author>Werner Guttmann</author>
