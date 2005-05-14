@@ -59,7 +59,8 @@
             <field name="vectorOfNT" type="Testable" collection="vector" set-method="addVectorOfNT">
                 <bind-xml name="vector"/>
             </field>
-            <field name="hashtableOfNT" type="Testable" collection="hashtable" set-method="addHashtableOfNT">
+            <!-- CASTOR-1123:  This should be a Testable, not a MapItem, IMO. -->
+            <field name="hashtableOfNT" type="org.exolab.castor.mapping.MapItem" collection="hashtable" set-method="addHashtableOfNT">
                 <bind-xml name="hashtable">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
@@ -77,7 +78,8 @@
             <field name="setOfNT" type="Testable" collection="set" set-method="addSetOfNT">
                 <bind-xml name="set"/>
             </field>
-            <field name="mapOfNT" type="Testable" collection="map" set-method="addMapOfNT">
+            <!-- CASTOR-1123:  This should be a Testable, not a MapItem, IMO. -->
+            <field name="mapOfNT" type="org.exolab.castor.mapping.MapItem" collection="map" set-method="addMapOfNT">
                 <bind-xml name="map">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
