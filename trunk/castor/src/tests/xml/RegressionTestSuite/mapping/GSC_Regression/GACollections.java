@@ -8,6 +8,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
+import org.exolab.castor.mapping.MapItem;
+
 /**
  * Test getter + adder access to collection arrays.  Create some killers to ensure that they're used.
  * Add is a killer in this one.
@@ -50,9 +52,10 @@ public class GACollections {
 	public void addHashtableOfNT(Object key, Object t) { throw new RuntimeException(); }
 	public void addHashtableOfNT(String key, Testable t) { didAddHashtable = true; hashtableOfNT.put(key, t); }
 	public void addHashtableOfNT(Object o) { throw new RuntimeException(); }
-	//public void addHashtableOfNT(Testable t) { throw new RuntimeException(); }
-	// Workaround for CASTOR-1123
-	public void addHashtableOfNT(Testable t) { didAddHashtable = true; hashtableOfNT.put("test", t); }
+	// Expected API:
+    public void addHashtableOfNT(Testable t) { throw new RuntimeException(); }
+    // Actual method it wants to call if it's going to behave like it wants to:
+	public void addHashtableOfNT(MapItem m) { didAddHashtable = true; hashtableOfNT.put(m.getKey(), m.getValue()); }
 
 	public Collection getCollectionOfNT() { didGetCollection = true; return collectionOfNT; }
 	public void setCollectionOfNT(Collection c) { throw new RuntimeException(); }
@@ -69,9 +72,10 @@ public class GACollections {
 	public void addMapOfNT(Object key, Testable t) { throw new RuntimeException(); }
 	public void addMapOfNT(String key, Object t) { throw new RuntimeException(); }
 	public void addMapOfNT(Object key, Object t) { throw new RuntimeException(); }
-	//public void addMapOfNT(Testable t) { throw new RuntimeException(); }
-	// Workaround for CASTOR-1123
-	public void addMapOfNT(Testable t) { didAddMap = true; mapOfNT.put("test", t); }
+	// Expected API:
+    public void addMapOfNT(Testable t) { throw new RuntimeException(); }
+    // Actual method it wants to call if it's going to behave like it wants to:
+	public void addMapOfNT(MapItem m) { didAddMap = true; mapOfNT.put(m.getKey(), m.getValue()); }
 	
 	public void validate() {
 		// CASTOR-1124:  ADD METHODS ARE NOT CALLED.
