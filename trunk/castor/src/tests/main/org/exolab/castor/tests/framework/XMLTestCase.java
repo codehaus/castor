@@ -759,6 +759,9 @@ public abstract class XMLTestCase extends TestCase {
         Javac compiler = new Javac();
         compiler.setProject(project);
         compiler.setDestdir(destDir.getAbsoluteFile());
+        compiler.setOptimize(false);
+        compiler.setDebug(true);
+        compiler.setDebugLevel("lines,vars,source");
         Path classpath = compiler.createClasspath();
         classpath.setPath(System.getProperty("java.class.path"));
         compiler.setClasspath(classpath);
@@ -781,6 +784,9 @@ public abstract class XMLTestCase extends TestCase {
             compiler = new Javac();
             compiler.setProject(project);
             compiler.setFork(true);
+            compiler.setOptimize(false);
+            compiler.setDebug(true);
+            compiler.setDebugLevel("lines,vars,source");
             compiler.setDestdir(srcDir.getAbsoluteFile());
             Path classpath = compiler.createClasspath();
             classpath.setPath(System.getProperty("java.class.path"));
