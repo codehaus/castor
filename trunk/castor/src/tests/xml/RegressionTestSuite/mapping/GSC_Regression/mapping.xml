@@ -21,7 +21,8 @@
             <field name="vectorOfNT" type="Testable" collection="vector" direct="true">
                 <bind-xml name="vector"/>
             </field>
-            <field name="hashtableOfNT" type="Testable" collection="hashtable" direct="true">
+            <!-- CASTOR-1125:  Setting the type to type="Testable" results in AnyNode objects appearing in hashmap. -->
+            <field name="hashtableOfNT" collection="hashtable" direct="true">
                 <bind-xml name="hashtable">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
@@ -39,7 +40,8 @@
             <field name="setOfNT" type="Testable" collection="set" direct="true">
                 <bind-xml name="set"/>
             </field>
-            <field name="mapOfNT" type="Testable" collection="map" direct="true">
+            <!-- CASTOR-1125:  Setting the type to type="Testable" results in AnyNode objects appearing in hashmap. -->
+            <field name="mapOfNT" collection="map" direct="true">
                 <bind-xml name="map">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
@@ -99,7 +101,8 @@
             <field name="vectorOfNT" type="Testable" collection="vector">
                 <bind-xml name="vector"/>
             </field>
-            <field name="hashtableOfNT" type="Testable" collection="hashtable">
+            <!-- CASTOR-1125:  Setting the type to type="Testable" results in AnyNode objects appearing in hashmap. -->
+            <field name="hashtableOfNT" collection="hashtable">
                 <bind-xml name="hashtable">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
@@ -117,7 +120,8 @@
             <field name="setOfNT" type="Testable" collection="set">
                 <bind-xml name="set"/>
             </field>
-            <field name="mapOfNT" type="Testable" collection="map">
+            <!-- CASTOR-1125:  Setting the type to type="Testable" results in AnyNode objects appearing in hashmap. -->
+            <field name="mapOfNT" collection="map">
                 <bind-xml name="map">
                     <class name="org.exolab.castor.mapping.MapItem">
                       <field name="key" type="java.lang.String">
@@ -131,9 +135,11 @@
             </field>
         </class>
         <class name="Testable">
+            <!--
             <field name="thing">
                 <bind-xml name="neverpresentthing"/>
             </field>
+            -->
             <field name="readOnlyString" get-method="getReadOnlyString">
                 <bind-xml name="readOnlyString" transient="true"/>
             </field>
