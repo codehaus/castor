@@ -3,6 +3,16 @@
   <body>
     <title>Configuration, Libraries and Building Castor</title>
 
+	<section title="News">
+		<ul>
+			<li><b>Release 0.9.7:</b> Added new org.exolab.castor.persist.useProxies property to allow
+				configuration of JDBC proxy classes. If enabled, JDBC proxy classes will be used to wrap
+				<tt>java.sql.Connection</tt> and <tt>java.sql.PreparedStatement</tt>
+				instances, to allow for more detailed and complete JDBC statements to be output
+				during logging. When turned off, no logging statements will be generated at all.</li>
+		</ul>	
+	</section>
+
     <section title="The Castor configuration file">
 
       <p>Castor uses a configuration file for environmental properties that are
@@ -91,6 +101,38 @@
   #
   org.exolab.castor.jdo.defaultTimeZone=
   #org.exolab.castor.jdo.defaultTimeZone=GMT-8:00
+
+
+  #
+  # List of supported TransactionManagerFactory implementations; please expand this list
+  # to add any custom transaction manager fatories.
+  #
+  org.exolab.castor.jdo.spi.transactionManagerFactories=\
+	org.exolab.castor.jdo.transactionmanager.spi.WebSphereTransactionManagerFactory,\
+	org.exolab.castor.jdo.transactionmanager.spi.WebSphere5TransactionManagerFactory,\
+	org.exolab.castor.jdo.transactionmanager.spi.WebSphere51TransactionManagerFactory,\
+	org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory,\
+	org.exolab.castor.jdo.transactionmanager.spi.JNDIENCTransactionManagerFactory
+
+  #
+  # List of TxSynchronizeable implementations
+  #
+  #org.exolab.castor.persist.TxSynchronizable=
+
+  #
+  # List of available cache implementations; please expand this list to add
+  # any custom performance caches.
+  #
+  org.exolab.castor.jdo.cacheFactories=\
+    org.exolab.castor.persist.cache.NoCacheFactory,\
+    org.exolab.castor.persist.cache.TimeLimitedFactory,\
+    org.exolab.castor.persist.cache.CountLimitedFactory,\
+    org.exolab.castor.persist.cache.UnlimitedFactory
+
+  # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
+  # statements; false otherwise (logging will be turned off completely).
+  #
+  org.exolab.castor.perists.useProxies=true
 
 </pre>
     </section>
