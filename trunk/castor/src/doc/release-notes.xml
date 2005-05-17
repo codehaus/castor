@@ -30,6 +30,23 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="973" type="jira">
+                    <description>
+						Changed column name 'num' to 'numb', as 'num' happens to be a keyword with SAPDB.
+                    </description>
+                    <contributor>
+                        <name>Emir Causevic</name>
+                        <email>emircaus@bih.net.ba</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Emir Causevic</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050517</date>
+                </bug>
                 <bug id="65" type="jira">
                     <description>Added patch to allow CastorSourceGenTask to specify a binding file.</description>
                     <contributor>

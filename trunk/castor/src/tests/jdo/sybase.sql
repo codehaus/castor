@@ -174,7 +174,7 @@ create table tc1x_rollback (
   id      numeric(10,0) not null,
   value1  varchar(200)  not null,
   value2  varchar(200),
-  num     numeric(10,0)
+  numb     numeric(10,0)
 )
 go
 create unique index tc1x_rollback_pk on tc1x_rollback ( id )
