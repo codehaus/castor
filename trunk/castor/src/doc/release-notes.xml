@@ -30,7 +30,24 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
-                <bug id="973" type="jira">
+                <bug id="1116" type="jira">
+                    <description>
+				       Replaced Ant 1.5 with Ant 1.6.x.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050517</date>
+                </bug>
+                <bug id="1112" type="jira">
                     <description>
 				       Added documentation about JDBC proxy classes (incl. property in castor.properties).
                     </description>
