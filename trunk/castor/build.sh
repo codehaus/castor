@@ -14,7 +14,7 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=lib/ant_1.5.jar:lib/xerces-J_1.4.0.jar:build/classes/:$CLASSPATH:$JAVA_HOME/lib/tools.jar
+CLASSPATH=lib/ant-1.6.jar:lib/ant-1.6-launcher.jar:lib/xerces-J_1.4.0.jar:build/classes/:$CLASSPATH:$JAVA_HOME/lib/tools.jar
 
 for i in `ls ./lib/*.jar`
    do 
