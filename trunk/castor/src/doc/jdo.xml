@@ -10,6 +10,7 @@
 	<section title="News">
 	
 	   <ul>
+	      <li><b>Release 0.9.7:</b> Renamed JDO2 to JDOManager.</li>
 	      <li><b>Release 0.9.6:</b> Changed above sections to use the new JDO2 object to load 
 	          configuration  and create Database instances.</li>
 	   </ul>
@@ -27,13 +28,14 @@
 
       <section title="Client Application">
 
-        <p>Client applications are responsible for defining the JDO database configuration,
+        <p>Client applications are responsible for defining the JDO configuration,
            and managing the transaction explicitly. The database is by default configured through
-           a separate XML file which links to the mapping file. (Alternatively, it can be configured 
-           using the utility class <api class="org.exolab.castor.util.JdoConfFactory">JdoConfFactory</api>).</p>
+           a separate XML file which links to the mapping file. Alternatively, it can be configured 
+           using the utility class <api class="org.exolab.castor.util.JdoConfFactory">JdoConfFactory</api>.</p>
 
-		<p>In the example code I refer to the database file as <tt>database.xml</tt>, but any name can be used.
-		   See <a href="database-conf.xml">Castor JDO Database Configuration</a> for more information.</p>
+		<p>In the example code I refer to the JDO configuration file as <tt>jdo-conf.xml</tt>, but 
+		   any name can be used. See <a href="database-conf.xml">Castor JDO Configuration</a> for more 
+		   information.</p>
 
         <p><api>org.exolab.castor.jdo.JDO</api> defines the database name and properties and is used
            to open a database connection. The database configuration is loaded on demand by setting
@@ -45,9 +47,9 @@
            concurrent threads. There is little overhead involved in opening multiple <tt>Database</tt>
            objects, and a JDBC connection is acquired only per open transaction.</p>
 
-         <p>The following code snippet opens a database, performs a transaction, and closes the database,
-            as it will typically appear in client applications (for brevity, we have ommitted any required 
-            exception handling):</p>
+         <p>The following code snippet creates an instance of JDOManager for a database 'mybd', performs 
+			a transaction, and closes the database - as it will typically appear in client applications 
+			(for brevity, we have ommitted any required exception handling):</p>
              
             <code>
 DataObjects jdo;
@@ -56,7 +58,7 @@ Database db;
 <comment>// Instantiate a JDO object</comment>
 jdo = new JDOOld();
 jdo.setDatabaseName( "mydb" );
-jdo.setConfiguration( "database.xml" );
+jdo.setConfiguration( "jdo-conf.xml" );
 jdo.setClassLoader( getClass().getClassLoader() );
 
 <comment>// Obtain a new database</comment>
@@ -70,37 +72,39 @@ db.commit();
 db.close();
            </code>
 
-        <p>As of release 0.9.6, a new <b>experimental</b> JDO2 class is provided, that will 
-           eventually replace the current JDO class. We have flagged JDO2 as experimental, as its 
-           interface still might undergo minor changes.</p>
+        <p>As of release 0.9.6, a new JDOManager class is provided, that replaces the 
+		   current JDO class. Any new features will be implemented against the new JDO-
+		   Manager class only.</p>
            
-        <p>As with its predecessor, <api>org.exolab.castor.jdo.JDO2</api> defines the database name and 
-           properties and is used to open a database connection. An instance of this class is contructed 
-           with a two-step approach:</p> 
+        <p>As with its predecessor, <api>org.exolab.castor.jdo.JDOManager</api> defines the database 
+		   name and properties and is used to open a database connection. An instance of this class 
+		   is constructed with a two-step approach:</p> 
            
-        <ul>
-          <li>load the JDO configuration file through one of the static loadConfiguration() 
-              methods, e.g. <api class="org.exolab.castor.jdo.JDO2">loadConfiguration(String)</api></li>
-          <li>create an instance of the JDO engine using the factory method 
-              <api class="org.exolab.castor.jdo.JDO2">createInstance(String)</api> where you supply one 
+        <ol>
+          <li>Statically load the JDO configuration file through one of the static 
+		      <i>loadConfiguration()</i> methods, 
+			  e.g. <api class="org.exolab.castor.jdo.JDOManager">loadConfiguration(String)</api>.</li>
+          <li>Create an instance of the JDO engine using the factory method 
+              <api class="org.exolab.castor.jdo.JDOManager">createInstance(String)</api> where you supply one 
               of the database names defined in the configuration file loaded in step 1).</li>
-        </ul>
+        </ol>
         
-         <p>The following code snippet opens a database, performs a transaction, and closes the database,
-            as it will typically appear in client applications (for brevity, we have ommitted any required 
-            exception handling):</p>
+         <p>The following code fragment creates an instance of JDOManager for a database 'mybd',
+			opens a database, performs a transaction, and closes the database - as it will typically 
+			appear in client applications (for brevity, we have ommitted any required exception 
+			handling):</p>
        
          <code> 
-JDO2 jdo;
+JDOManager jdoManager;
 Database db;
  
 <comment>// load the JDO configuration file</comment>
-JDO2.loadConfiguration ("jdo-config.xml");
+JDOManager.loadConfiguration ("jdo-conf.xml");
  
-<comment>// Construct a new JDO for the database 'mydb'</comment>
-jdo = JDO2.createInstance ("mydb");
+<comment>// Construct a new JDOManager for the database 'mydb'</comment>
+jdoManager = JDOManager.createInstance ("mydb");
 <comment>// Obtain a new database</comment>
-Database db = jdo.getDatabase();
+Database db = jdoManager.getDatabase();
     
 <comment>// Begin a transaction</comment>
 db.begin();
@@ -118,22 +122,20 @@ db.close();
 
       <section title="J2EE Application">
 
-        <p><b>Note:</b> We are now working on supporting Castor inside a J2EE container. Stay
-           tuned for more information.</p>
-
         <p>J2EE applications depend on the J2EE container (Servlet, EJB, etc) to configure
            the database connection and use JNDI to look it up. This model allows the application
            deployer to configure the database properties from a central place, and gives the J2EE
            container the ability to manage distributed transactions across multiple data sources.</p>
 
-        <p>Instead of constructing a <api>org.exolab.castor.jdo.JDO</api> the application uses
-           the JNDI namespace to look it up. We recommend enlisting the <tt>JDO</tt> object under
+        <p>Instead of constructing a <api>org.exolab.castor.jdo.JDOManager</api> the application uses
+           the JNDI namespace to look it up. We recommend enlisting the <tt>JDOManager</tt> object under
            the <tt>java:comp/env/jdo</tt> namespace, compatible with the convention for listing JDBC
            resources.</p>
 
-        <p>The following code snippet uses JNDI to lookup a database, and uses <tt>UserTransaction</tt>
-           to manage the transaction:</p>
-           <code>
+        <p>The following code fragment uses JNDI to lookup a database, and uses the JTA 
+		   <tt>UserTransaction</tt> interface to manage the transaction:</p>
+           
+		<code>
 InitialContext  ctx;
 UserTransaction ut;
 Database        db;

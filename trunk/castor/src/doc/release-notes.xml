@@ -30,6 +30,23 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="1111" type="jira">
+                    <description>
+				       Changed documentation from JDO2 to JDOManager.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050517</date>
+                </bug>
                 <bug id="1116" type="jira">
                     <description>
 				       Replaced Ant 1.5 with Ant 1.6.x.
