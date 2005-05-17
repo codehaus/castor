@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1116 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Replaced Ant 1.5 with Ant 1.6.x.
+       Details: http://jira.codehaus.org/browse/CASTOR-1116
+       (Werner - 20050517)
+
 JDO:   Fixed bug CASTOR-1112 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added documentation about JDBC proxy classes (incl. property in castor.properties).
        Details: http://jira.codehaus.org/browse/CASTOR-1112
