@@ -257,7 +257,7 @@
       <sql name="value2" type="varchar" dirty="ignore"/>
     </field>
     <field name="number" type="long">
-      <sql name="num" type="numeric" />
+      <sql name="numb" type="numeric" />
     </field>
   </class>
 

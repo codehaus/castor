@@ -1,6 +1,12 @@
 
 Version (CVS)
 -------------
+
+JDO:   Fixed bug CASTOR-1120 using contribution from Emir Causevic [emircaus@bih.net.ba]
+       Changed column name 'num' to 'numb', as 'num' happens to be a keyword with SAPDB.
+       Details: http://jira.codehaus.org/browse/CASTOR-1120
+       (Werner - 20050517)
+       
 XML:   Fixed CASTOR-65 using contribution from Jene Jasper [jjasper@abz.nl]
        Added patch to allow the ablity to specify to a binding file Source Generator Ant task.
        Details: http://jira.codehaus.org/browse/CASTOR-65

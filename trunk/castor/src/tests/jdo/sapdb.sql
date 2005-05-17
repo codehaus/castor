@@ -176,7 +176,7 @@ create table tc1x_rollback (
   id      fixed(10,0)   not null,
   value1  varchar(200)  not null,
   value2  varchar(200),
-  num     fixed(10,0)
+  numb     fixed(10,0)
 )
 //
 
