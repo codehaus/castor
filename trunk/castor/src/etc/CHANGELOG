@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1112 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added documentation about JDBC proxy classes (incl. property in castor.properties).
+       Details: http://jira.codehaus.org/browse/CASTOR-1112
+       (Werner - 20050517)
+       
 JDO:   Fixed bug CASTOR-1120 using contribution from Emir Causevic [emircaus@bih.net.ba]
        Changed column name 'num' to 'numb', as 'num' happens to be a keyword with SAPDB.
        Details: http://jira.codehaus.org/browse/CASTOR-1120
