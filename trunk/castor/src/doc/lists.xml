@@ -42,7 +42,10 @@
 
          <p><b>Archives:</b></p>
          <ul>
-            <li><a href="http://archive.castor.codehaus.org/user">Archives at the Codehaus</a></li>
+            <li><a href="http://archive.castor.codehaus.org/user">The Codehaus</a></li>
+            <li><a href="http://www.mail-archive.com/user@castor.codehaus.org/">mail-archive.com</a></li>
+            <li><a href="http://marc.theaimsgroup.com/?l=castor-user&amp;r=1&amp;w=2">The Aims Group</a></li>
+            <li><a href="http://news.gmane.org/gmane.comp.java.castor.user">GMANE</a></li>
          </ul>
 
       </section>
@@ -71,7 +74,10 @@
 
          <p><b>Archives:</b></p>
          <ul>
-            <li><a href="http://archive.castor.codehaus.org/dev">Archives at the Codehaus</a></li>
+            <li><a href="http://archive.castor.codehaus.org/dev">The Codehaus</a></li>
+            <li><a href="http://www.mail-archive.com/dev@castor.codehaus.org/">mail-archive.com</a></li>
+            <li><a href="http://marc.theaimsgroup.com/?l=castor-dev&amp;r=1&amp;w=2">The Aims Group</a></li>
+            <li><a href="http://news.gmane.org/gmane.comp.java.castor.devel">GMANE</a></li>
          </ul>
 
       </section>
