@@ -19,6 +19,19 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="28">
+            <title>Werner Guttmann Promoted to Castor JDO Lead</title>
+            <author>Bruce Snyder</author>
+            <date>19 May 2005</date>
+            <time>08:04:00</time>
+            <summary>
+                After having lead Castor JDO since 2002, Bruce has decided to
+                pass the torch to Werner Guttmann. Werner has been a force on 
+                the project since he began contributing and his tireless efforts 
+                are exactly what the project needs to continue. Congratulations, 
+                Werner and keep up the great work! 
+            </summary>
+        </news>
         <news id="27">
             <title>New Castor roadmap</title>
             <author>Werner Guttmann</author>
@@ -460,13 +473,13 @@
         </news>
 
         <news id="2">
-            <title>Welcome Micka�l Guessant to the Team</title>
+            <title>Welcome Micka&#235;l Guessant to the Team</title>
             <author>Bruce Snyder</author>
             <date>24 Oct 2002</date>
             <time></time>
             <summary>
             Please welcome our newest addition to the Castor team of committers,
-            Micka�l Guessant! Micka�l is a very welcome addition to the Castor
+            Micka&#235;l Guessant! Micka&#235;l is a very welcome addition to the Castor
             JDO team.
             </summary>
         </news>
