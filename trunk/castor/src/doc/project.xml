@@ -78,7 +78,7 @@
       </navLink>
       <navLink>
         <url>cvs.xml</url>
-        <display>CVS / Bugzilla</display>
+        <display>CVS / JIRA</display>
       </navLink>
       <navLink>
         <url>support.xml</url>
