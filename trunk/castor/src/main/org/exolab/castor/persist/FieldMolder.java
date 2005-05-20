@@ -630,7 +630,7 @@ public class FieldMolder {
                 _defaultReflectService._getMethod = null;
                 
                 // if field is of type boolean, check whether is<Field>() is defined.
-                if(fieldMap.getType().compareTo("boolean") == 0) {
+                if(fieldMap.getType() != null && fieldMap.getType().compareTo("boolean") == 0) {
                 	_defaultReflectService._getMethod = 
                 		findAccessor( javaClass, METHOD_IS_PREFIX + capitalize( name ), methodClass, true );
                 }
@@ -792,6 +792,7 @@ public class FieldMolder {
 
             ds.pairFieldClass( this, _fType );
         } catch ( NullPointerException e ) {
+            _log.fatal("Caught unexpected NullPointerException: ", e);
             throw new MappingException("Unexpected Null pointer!\n"+e);
         }
         _fieldName = fieldMap.getName();
