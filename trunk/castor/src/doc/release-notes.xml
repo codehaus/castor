@@ -30,7 +30,24 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
-                <bug id="1129" type="jira">
+                <bug id="1134" type="jira">
+                    <description>
+				       Restore default behaviour when no type is specified for a field mapping
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050520</date>
+                </bug>
+                 <bug id="1129" type="jira">
                     <description>
 				       Changed column names in SQL statement of CallSql to lower-case.
                     </description>

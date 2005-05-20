@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1134 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Restore default behaviour when no type is specified for a field mapping
+       Details: http://jira.codehaus.org/browse/CASTOR-1134
+       (Werner - 20050520)
+       
 JDO:   Fixed bug CASTOR-1129 using contribution from Stein M. Hugubakken [dulci@start.no]
        Changed column names in SQL statement of CallSql to lower-case.
        Details: http://jira.codehaus.org/browse/CASTOR-1129
