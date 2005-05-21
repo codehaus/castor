@@ -30,6 +30,26 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="664" tool="jira">
+                    <description>
+                        Extra element not ignored in UnmarshalHandler.startElement although it should be ignored.
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Heri Bender</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Heri Bender</name>
+                        <email></email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050521</date>
+                </bug>
                 <bug id="1048" tool="jira">
                     <description>
                         Added support for multi-value attributes
@@ -46,7 +66,7 @@
                         <name>Andrew Fawcett</name>
                         <email>andrew dot fawcett @ coda.com</email>
                     </reporter>
-                    <type>Enhancement</type>
+                    <type>Bug</type>
                     <module>XML</module>
                     <date>20050521</date>
                 </bug>
