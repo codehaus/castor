@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1048 relating to use of mult-value attributes
+       Details: http://jira.codehaus.org/browse/CASTOR-1048
+       (afawcett - 20050521)
+
 JDO:   Fixed bug CASTOR-1134 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Restore default behaviour when no type is specified for a field mapping
        Details: http://jira.codehaus.org/browse/CASTOR-1134

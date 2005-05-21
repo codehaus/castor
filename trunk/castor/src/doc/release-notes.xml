@@ -1,4 +1,4 @@
-<?xml version="1.0"?>
+﻿<?xml version="1.0"?>
 <document url="http://castor.exolab.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -30,6 +30,26 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="1048" tool="jira">
+                    <description>
+                        Added support for multi-value attributes
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </reporter>
+                    <type>Enhancement</type>
+                    <module>XML</module>
+                    <date>20050521</date>
+                </bug>
                 <bug id="1134" type="jira">
                     <description>
 				       Restore default behaviour when no type is specified for a field mapping
