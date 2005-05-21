@@ -30,6 +30,26 @@
             <summary>Short description says all ...</summary>
        
             <bugs>
+                <bug id="938" tool="jira">
+                    <description>
+                        Anonymous groups in complex types are disambiguated unnecessarily
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew dot fawcett @ coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Hendrik Schreiber</name>
+                        <email></email>
+                    </submitter>
+                    <reporter>
+                        <name>Hendrik Schreiber</name>
+                        <email></email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050521</date>
+                </bug>
                 <bug id="664" tool="jira">
                     <description>
                         Extra element not ignored in UnmarshalHandler.startElement although it should be ignored.
@@ -40,7 +60,7 @@
                     </contributor>
                     <submitter>
                         <name>Heri Bender</name>
-                        <email>andrew dot fawcett @ coda.com</email>
+                        <email></email>
                     </submitter>
                     <reporter>
                         <name>Heri Bender</name>
