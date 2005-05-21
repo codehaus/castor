@@ -429,7 +429,7 @@ public class DescriptorSourceFactory {
 		if (any)
 			jsc.add("desc.setMatches(\"*\");");
 		//-- mark as multi or single valued for elements
-		if (isElement) {
+		if (isElement || isAttribute) {
 			jsc.add("desc.setMultivalued(" + member.isMultivalued());
 			jsc.append(");");
 		}
