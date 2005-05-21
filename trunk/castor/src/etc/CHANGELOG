@@ -55,11 +55,6 @@ JavaSource: Added ability to add exceptions to JConstructor.
        Patch Submitted by: Thomas Zooman
        (afawcett - 20050508)     
 
-XML:   Fixed bug CASTOR-1103 Generated Setters and XSD default value
-       Details: http://jira.codehaus.org/browse/CASTOR-1103
-       Patch Submitted by: Roy van der Kuil
-       (afawcett - 20050506)
-
 XML:   Fixed bug CASTOR-655 also know as bugzilla 1516. This fixes the
        issue with using location attribute with both attributes and text 
        nodes the same location element.

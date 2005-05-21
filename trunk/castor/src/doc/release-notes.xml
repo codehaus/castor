@@ -244,26 +244,6 @@
                     <module>XML</module>
                     <date>20050506</date>
                 </bug>
-                <bug id="1103" tool="jira">
-                    <description>
-                        Fixed bug CASTOR-1103 Generated Setters and XSD default value.
-                    </description>
-                    <contributor>
-                        <name>Roy van der Kuil</name>
-                        <email></email>
-                    </contributor>
-                    <submitter>
-                        <name>Andrew Fawcett</name>
-                        <email>andrew dot fawcett @ coda.com</email>
-                    </submitter>
-                    <reporter>
-                        <name>Roy van der Kuil</name>
-                        <email></email>
-                    </reporter>
-                    <type>Bug</type>
-                    <module>XML</module>
-                    <date>20050506</date>
-                </bug>
                 <bug id="1596" tool="jira">
                     <description>
                         Fixes issue with using location attribute with both
