@@ -2927,7 +2927,7 @@ public final class UnmarshalHandler extends MarshalFramework
          Object parent) throws org.xml.sax.SAXException
     {
 
-        Object value = attValue;
+        //Object value = attValue;
         while (descriptor.isContainer()) {
             FieldHandler handler = descriptor.getHandler();
             Object containerObject = handler.getValue(parent);
@@ -2990,20 +2990,47 @@ public final class UnmarshalHandler extends MarshalFramework
         if (descriptor.isConstructorArgument()) 
             return;
 
-        //-- check for proper type and do type
-        //-- conversion
-        Class type = descriptor.getFieldType();
-        if (isPrimitive(type))
-            value = toPrimitiveObject(type, attValue, descriptor);
-        //check if the value is a QName that needs to
-        //be resolved (ns:value -> {URI}value)
-        String valueType = descriptor.getSchemaType();
-        if ((valueType != null) && (valueType.equals(QNAME_NAME))) {
-                value = resolveNamespace(value);
-        }
+        //-- attribute handler
         FieldHandler handler = descriptor.getHandler();
-        if (handler != null)
-            handler.setValue(parent, value);
+        if(handler==null)
+        	return;
+        
+        //-- attribute field type
+        Class type = descriptor.getFieldType();
+        String valueType = descriptor.getSchemaType();
+        boolean isPrimative = isPrimitive(type);
+        boolean isQName = valueType!=null && valueType.equals(QNAME_NAME);
+        
+        //-- if this is an multi-value attribute
+    	StringTokenizer attrValueTokenizer = null;
+        if (descriptor.isMultivalued())
+        {
+        	attrValueTokenizer = new StringTokenizer(attValue);
+        	if(attrValueTokenizer.hasMoreTokens())
+        		attValue = attrValueTokenizer.nextToken();
+        }
+        
+        while(true)
+        {
+        	//-- value to set
+            Object value = attValue;
+	        //-- check for proper type and do type conversion
+	        if (isPrimative)
+	            value = toPrimitiveObject(type, attValue, descriptor);
+	        //-- check if the value is a QName that needs to
+	        //-- be resolved (ns:value -> {URI}value)
+	        if(isQName)
+	        	value = resolveNamespace(value);
+	        //-- set value
+	        handler.setValue(parent, value);
+	        //-- more values?
+	        if(attrValueTokenizer==null)
+	        	break;
+	        if(!attrValueTokenizer.hasMoreTokens())
+	        	break;
+	        //-- next value
+	        attValue = attrValueTokenizer.nextToken();
+        }
 
     } //-- processAttribute
 
