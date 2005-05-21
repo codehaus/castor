@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-938 anonymous groups in complex types are disambiguated unnecessarily
+       Details: http://jira.codehaus.org/browse/CASTOR-938
+       Patch Submitted: Hendrik Schreiber 
+
 XML:   Fixed bug CASTOR-664 relating to ignore elements not working
        Details: http://jira.codehaus.org/browse/CASTOR-664
        Patch Submitted: Heri Bender
