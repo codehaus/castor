@@ -160,7 +160,7 @@ public class XMLBindingComponent implements BindingComponent {
     private static GroupNaming _groupNaming = null;
     static {
         _groupNaming = new GroupNaming();
-    }
+   }
 
     /**
      * The TypeConversion to use when creating XSTypes from
@@ -694,7 +694,7 @@ public class XMLBindingComponent implements BindingComponent {
                          ((_annotated.getStructureType() == Structure.GROUP)||
                           (_annotated.getStructureType() == Structure.MODELGROUP)) ) {
 
-                        result = _groupNaming.createClassName((Group)_annotated);
+                        result = _groupNaming.createClassName((Group)_annotated, getJavaPackage());
                         if (result == null) {
                             String err = "Unable to create name for group.";
                             throw new IllegalStateException(err);
@@ -811,7 +811,7 @@ public class XMLBindingComponent implements BindingComponent {
                           (_annotated.getStructureType() == Structure.MODELGROUP)) )
                     {
 
-                        result = _groupNaming.createClassName((Group)_annotated);
+                        result = _groupNaming.createClassName((Group)_annotated, getJavaPackage());
                         if (result == null) {
                             String err = "Unable to create name for group.";
                             throw new IllegalStateException(err);
