@@ -1845,7 +1845,10 @@ public final class UnmarshalHandler extends MarshalFramework
             else if (descriptor != null) {
                 String tmpPath = descriptor.getLocationPath();
                 if (tmpPath == null) tmpPath = "";
-                if (path.equals(tmpPath)) break; //-- found
+                if (path.equals(tmpPath)) 
+                	break; //-- found
+                else
+                	descriptor = null; //-- not found, try again
             }
             else {
                 if (pathBuf == null) 
