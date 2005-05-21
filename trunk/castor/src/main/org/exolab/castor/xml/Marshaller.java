@@ -2339,19 +2339,44 @@ public class Marshaller extends MarshalFramework {
             else {
                 value = getObjectID(value);
             }
-        }
+        }        
+        //-- handle multi-value attributes
+        else if (attDescriptor.isMultivalued()) {
+            Enumeration enumeration = null;
+            if (value instanceof Enumeration) {
+                enumeration = (Enumeration)value;
+            }
+            else {
+                CollectionHandler colHandler = null;
+                try {
+                    colHandler = CollectionHandlers.getHandler(value.getClass());
+                }
+                catch(MappingException mx) {
+                    throw new MarshalException(mx);
+                }
+                enumeration = colHandler.elements(value);
+            }
+            if (enumeration.hasMoreElements()) {
+                StringBuffer sb = new StringBuffer();
+                for (int v = 0; enumeration.hasMoreElements(); v++) {
+                    if (v > 0) sb.append(' ');
+                    sb.append(enumeration.nextElement()).toString();
+                }
+                value = sb;
+            }
+            else value = null;
+        }               
         else if (value != null) {
             //-- handle base64 content
             Class objType = value.getClass();
-            if (objType.isArray() &&
-               (objType.getComponentType() == Byte.TYPE))
+            if (objType.isArray() && 
+               (objType.getComponentType() == Byte.TYPE)) 
             {
                 MimeBase64Encoder encoder = new MimeBase64Encoder();
                 encoder.translate((byte[])value);
                 value = new String(encoder.getCharArray());
             }
-        }
-        
+        }        
 
         if (value != null) {
             //check if the value is a QName that needs to
