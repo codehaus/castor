@@ -47,6 +47,7 @@
 package org.exolab.castor.mapping.loader;
 
 
+import java.util.Iterator;
 import java.util.Vector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -112,7 +113,7 @@ public final class FieldHandlerImpl
       * The method used to "incrementally" set the value of this field.  
       * This is only used if the field is a collection 
       */ 
-    private Vector		_addMethods; 
+    private Method        _addMethod; 
 
 
     /**
@@ -122,9 +123,9 @@ public final class FieldHandlerImpl
 
 
     /**
-     * The available methods to be used to set the value of this field. May be null.
+     * The method used to set the value of this field. May be null.
      */
-    private Vector		_setMethods;
+    private Method        _setMethod;
 
 
     /**
@@ -286,7 +287,7 @@ public final class FieldHandlerImpl
      *
      */
     public FieldHandlerImpl( String fieldName, Method[] getSequence, Method[] setSequence, 
-                             Method getMethod, Vector setMethods, TypeInfo typeInfo )
+                             Method getMethod, Method setMethod, TypeInfo typeInfo )
         throws MappingException
     {
         _handler = null;
@@ -301,27 +302,29 @@ public final class FieldHandlerImpl
         _getSequence = getSequence;
         _setSequence = setSequence;
 
-        if (setMethods!=null && !setMethods.isEmpty()) {
-            //-- There might be "add" methods.
-            Vector addMethods = new Vector();
-
-            for(int i=0; i<setMethods.size(); ++i) {
-                Method method = (Method) setMethods.get(i);
-
-	            if (method.getName().startsWith(ADD_PREFIX)) {
-	                Class paraType = method.getParameterTypes()[0];
-
-	                if (paraType != typeInfo.getFieldType()) {
-	                    addMethods.add(setMethods.remove(i));
-	                    --i;
-	                }
-	            }
+        if ( setMethod != null ) {
+            //-- might be an "add" method
+            if ( setMethod.getName().startsWith(ADD_PREFIX) ) {
+                Class pType = setMethod.getParameterTypes()[0];
+                if (pType != typeInfo.getFieldType() )
+                    setAddMethod (setMethod);
+                else 
+                    setWriteMethod(setMethod);
             }
-
-            setWriteMethods(setMethods);
-
-            if (!addMethods.isEmpty())
-                setAddMethods(addMethods);
+            
+//            for(Iterator iter = setMethods.iterator(); iter.hasNext(); ) {
+//                Method method = (Method) iter.next();
+//
+//	            if (method.getName().startsWith(ADD_PREFIX)) {
+//	                Class paraType = method.getParameterTypes()[0];
+//
+//	                if (paraType != typeInfo.getFieldType()) {
+//	                    addMethods.add(method);
+//	                    iter.remove();
+//	                }
+//	            }
+//            }
+            else setWriteMethod( setMethod );
         }
 
         if ( getMethod != null )
@@ -334,15 +337,10 @@ public final class FieldHandlerImpl
 
         // If the field is of a primitive type or if it is required
         // we use the default value 
-        Object def = null;
-        if ( setMethods != null )
-            for(int i=0; i<setMethods.size(); ++i)
-                if (((Method)setMethods.get(i)).getParameterTypes()[0].isPrimitive()) {
-                    def = typeInfo.getDefaultValue();
-        			break;
-    			}
-        _default = def;
-
+        if ( setMethod != null && setMethod.getParameterTypes()[0].isPrimitive() )
+            _default = typeInfo.getDefaultValue();
+        else
+            _default = null;
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
         _convertParam = typeInfo.getConvertorParam();
@@ -447,7 +445,7 @@ public final class FieldHandlerImpl
 
     public void setValue( Object object, Object value )
     {
-        if ( _colHandler == null || (_addMethods!=null && !_addMethods.isEmpty()) ) {
+        if ( _colHandler == null || _addMethod != null) {
 
             // If there is a convertor, apply conversion here.
             if ( value != null && _convertTo != null ) {
@@ -610,12 +608,8 @@ public final class FieldHandlerImpl
                     //-- the new collection is not null
                     if (tmp != null) collect = tmp;
 
-                    if ( setCollection ) {
-                        Method setter = selectMethod(_setMethods, collect);
-
-                        if (setter != null)
-                            setter.invoke( object, new Object[] { collect } );
-                    }
+                    if ( setCollection && (_setMethod != null))
+                        _setMethod.invoke( object, new Object[] { collect } );
                 }                
             } catch ( IllegalAccessException except ) {
                 // This should never happen
@@ -637,7 +631,7 @@ public final class FieldHandlerImpl
                     _handler.resetValue( object );
                 else if ( _field != null )
                     _field.set( object, _default );
-                else if ( _setMethods != null ) {
+                else if ( _setMethod != null ) {
                     if ( _getSequence != null ) 
                         for ( int i = 0; i < _getSequence.length; i++ ) {
                             object = _getSequence[ i ].invoke( object, (Object[]) null );
@@ -647,12 +641,8 @@ public final class FieldHandlerImpl
                     if ( object != null ) {
                         if ( _deleteMethod != null )
                             _deleteMethod.invoke( object, (Object[]) null );
-                        else {
-                            Method setter = selectMethod(_setMethods, _default);
-
-                            if (setter != null)
-                                setter.invoke( object, new Object[] { _default } );
-                        }
+                        else
+                            _setMethod.invoke( object, new Object[] { _default } );
                     }
                 }
                 // If the field has no set method, ignore it.
@@ -688,12 +678,8 @@ public final class FieldHandlerImpl
                             object = _getSequence[ i ].invoke( object, (Object[]) null );
                     collect = _getMethod.invoke( object, (Object[]) null );
                     collect = _colHandler.clear( collect );
-                    if ( collect != null ) {
-                        Method setter = selectMethod(_setMethods, collect);
-
-                        if (setter != null)
-                            setter.invoke( object, new Object[] { collect } );
-                    }
+                    if ( collect != null && _setMethod != null)
+                        _setMethod.invoke( object, new Object[] { collect } );
                 }                
             } catch ( IllegalAccessException except ) {
                 // This should never happen
@@ -865,22 +851,17 @@ public final class FieldHandlerImpl
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
-    public void setWriteMethods( Vector methods )
+    public void setWriteMethod( Method method )
         throws MappingException
     {
-        for(int i=0; i<methods.size(); ++i) {
-            Method method = (Method) methods.get(i);
-
-	        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
-	             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
-	            throw new MappingException( "mapping.accessorNotAccessible",
-	                                        method, method.getDeclaringClass().getName() );
-	        if ( method.getParameterTypes().length != 1 )
-	            throw new MappingException( "mapping.writeMethodNoParam",
-	                                        method, method.getDeclaringClass().getName() );
-        }
-
-        _setMethods = methods;
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _setMethod = method;
     }
 
 
@@ -889,89 +870,55 @@ public final class FieldHandlerImpl
      * Please understand how this method is used before you start
      * playing with it! :-)
      */
-    public void setAddMethods( Vector methods ) 
+    public void setAddMethod( Method method ) 
         throws MappingException
     {
-        for(int i=0; i<methods.size(); ++i) {
-            Method method = (Method) methods.get(i);
-
-	        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
-	             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
-	            throw new MappingException( "mapping.accessorNotAccessible",
-	                                        method, method.getDeclaringClass().getName() );
-	        if ( method.getParameterTypes().length != 1 )
-	            throw new MappingException( "mapping.writeMethodNoParam",
-	                                        method, method.getDeclaringClass().getName() );
-        }
-
-        _addMethods = methods;
-
-        //-- make sure the add methods are not the same as one of the set methods
-        if (_setMethods != null)
-            for(int j=0; j<_addMethods.size(); ++j)
-	            for(int i=0; i<_setMethods.size(); ++i)
-	                if (_addMethods.get(j) == _setMethods.get(i)) {
-	                    _setMethods.remove(i);
-	                    --i;
-	                }
+        if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
+             ( method.getModifiers() & Modifier.STATIC ) != 0 ) 
+            throw new MappingException( "mapping.accessorNotAccessible",
+                                        method, method.getDeclaringClass().getName() );
+        if ( method.getParameterTypes().length != 1 )
+            throw new MappingException( "mapping.writeMethodNoParam",
+                                        method, method.getDeclaringClass().getName() );
+        _addMethod = method;
+        
+        //-- make sure add method is not the same as the set method
+        if (_addMethod == _setMethod) _setMethod = null;
+        
     } //-- setAddMethod
     
     /** 
       * Selects the appropriate "write" method based on the 
-      * value. This is used to choose between the "set" and
-      * "add" methods based on the given value type. 
+      * value. This is used when there is an "add" method 
+      * and a "set" method. 
       * 
       * @return the selected write method 
-      */ 
-     private Method selectWriteMethod( Object value )
-     { 
-         if (_setMethods==null || _setMethods.isEmpty())
-             return selectMethod(_addMethods, value);
-
-          // use default value instead of null
-         if (value==null && _default!=null) 
-             value = _default; 
-
-          // search for the setter method based on the parameter type
-         Method setter = selectMethod(_setMethods, value);
-
-         if (setter != null)
-             return setter;
-
-         return selectMethod(_addMethods, value);
-	} //-- selectWriteMethod 
-
-    /**
-     * Selects the appropriate setter method based on the parameter type
-     * 
-     * @param methods vector of setter/adder methods 
-     * @param value value to assign 
-     * @return the selected setter method
-     */
-	private static Method selectMethod(Vector methods, Object value)
-	{
-	    Class valueType = value!=null? value.getClass(): null;
-
-        if (methods != null)
-	        for(int i=0; i<methods.size(); ++i) {
-	            Method method = (Method) methods.get(i);
-
-	            //-- check value's class type 
-                Class paramType = method.getParameterTypes()[0];
-
-            	// Setters with primitive types accept the corresponding class types.
-                if (paramType.isPrimitive())
-                    paramType = Types.typeFromPrimitive(paramType); 
-                else if (value == null)
-                    return method;	// null values can only be assigned to non-primitive setters.
-
-                if (paramType.isAssignableFrom(valueType))
-                    return method;	// found a matching method 
-	        }
-
-        return null;
-	}
-
+     **/ 
+     private Method selectWriteMethod( Object value ) { 
+          
+          
+         Method setter = null; 
+          
+         if (_setMethod != null) { 
+              
+             if (_addMethod == null) return _setMethod; 
+              
+             if (value == null) { 
+                 if (_default != null) value = _default; 
+                 else return _setMethod; 
+             } 
+              
+             //-- check value's class type 
+             Class paramType = _setMethod.getParameterTypes()[0]; 
+                                  
+             if (paramType.isAssignableFrom(value.getClass())) 
+                 return _setMethod; 
+         } 
+          
+         return _addMethod; 
+          
+     } //-- selectWriteMethod 
+  
     /**
      * Return true if the field is a collection.
      */
