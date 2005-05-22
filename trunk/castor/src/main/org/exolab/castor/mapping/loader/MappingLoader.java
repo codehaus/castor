@@ -1069,22 +1069,15 @@ public abstract class MappingLoader
                 fieldName = ( getMethod == null ? setMethod.getName() : getMethod.getName() );
 
             //-- create handler
-            Vector setMethods = null;
-
-            if (setMethod != null) {
-                setMethods = new Vector();
-                setMethods.add(setMethod);
-            }
-
             handler = new FieldHandlerImpl( fieldName, 
                                             getSequence, 
                                             setSequence, 
                                             getMethod, 
-                                            setMethods, 
+                                            setMethod, 
                                             typeInfoRef.typeInfo );
 
             if ((setMethod != null) && (setMethod.getName().startsWith(ADD_METHOD_PREFIX)))
-                handler.setAddMethods(setMethods);
+                handler.setAddMethod(setMethod);
         }
 
         // If there is a create method, add it to the field handler
