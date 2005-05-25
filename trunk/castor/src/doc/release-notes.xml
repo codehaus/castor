@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <document url="http://castor.exolab.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -23,12 +23,85 @@
                     <date></date>
                 </bug>
 -->
-        <release version="CVS">
-            <description>New and on-going development</description>
-            <date>tbd</date>
-            <managed-by>Werner Guttmann</managed-by>
-            <summary>Short description says all ...</summary>
-       
+	    <release version="CVS">
+	        <description>New and on-going development</description>
+    		<date>tbd</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+              Short description says all ...
+            </summary>
+			<bugs>
+                <bug id="1131" tool="jira">
+                    <description>
+                        Update project documentation.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>General</module>
+                    <date>20050525</date>
+                </bug>
+			</bugs>
+		</release>
+	    <release version="0.9.7M1">
+	        <description>Milestone release for 0.9.7</description>
+    		<date>May 25, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<h2>Download &amp; installation instructions</h2>
+
+				<p>Please note that we are providing the usual suspect (binaries, docs and
+				   sources) for this release at <a href="http://dist.codehaus.org/castor/0.9.7.">
+				   the Codehaus</a>. We recommend, though, to download the complete package,
+				   as the HTML docs at <a href="http://castor.codehaus.org">the main Castor site</a> has
+				   not been updated, and to build the documentation yourself.</p>
+
+				<h2>Changes</h2>
+
+				<h3>Support for JDBC proxy classes</h3>
+				
+				<p>Proxy classes for <code>java.sql.Connection</code> and
+				   <code>java.sql.PreparedStatement</code> instances have been added, to allow for
+				   complete and better JDBC statements to be output tothe log files. As this might impose
+				   a performance penalty at run-time, we have added a new property to the Castor
+				   property file (<code>castor.properties</code>) to allow configuration of this
+				   feature.</p>
+
+<code>				
+  # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
+  # statements; false otherwise (logging will be turned off completely).
+  #
+  org.exolab.castor.perists.xxx.yyy=true
+</code>				
+					
+				<p>When disabled, no logging of SQL statements will occur al all.</p>
+
+				<h3>Castor and Java 5</h3>
+				
+				<p>Several bugs have been fixed to allow use of Castor with a JDK 1.5. This
+				   mainly involved preventing compilation problems due to variable names et al.
+				   that were i conflict with new Java 5 naming conventions (e.g. use of enum as
+				   a varaible name).</p>
+				
+				<h2>Additions</h2>
+				
+				<h3>Addition of RSS feed for announcements</h3>
+				
+				<p>An RSS feed has been added to the project documentation to allow
+				   users to be informed about additions/changes to Castor.</p>				
+
+				<h2>Problems fixed</h2>
+				
+                <p>Since release 0.9.6, the following problem areas have been addressed.</p>
+
+            </summary>
             <bugs>
                 <bug id="938" tool="jira">
                     <description>

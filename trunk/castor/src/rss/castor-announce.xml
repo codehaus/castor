@@ -18,6 +18,16 @@
         </item>
 --> 
 
+		<item>
+			<title>0.9.7 release - 1st milestone build available</title>
+			<pubDate>Thu, 19 May 2005 23:25:00 GMT</pubDate>
+			<author>Werner Guttmann</author>
+			<link>http://castor.codehaus.org/news.html</link>
+			<description>
+				The first milestone build of Castor 0.9.7 has been made available at
+				http://dist.codehaus.org/castor/0.9.7/
+			</description>
+		</item>
         <item>
             <title>Werner Guttmann Promoted to Castor JDO Lead</title>
             <link>http://castor.codehaus.org/news.html#item28</link>
