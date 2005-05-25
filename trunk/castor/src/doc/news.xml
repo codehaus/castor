@@ -19,6 +19,24 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="29">
+            <title>Castor 0.9.7 - 1st milestone build</title>
+            <author>Werner Guttmann</author>
+            <date>May 19 2005</date>
+            <time>22:23:21</time>
+            <summary>
+                I've placed a copy of the <b>1st</b> Castor 0.9.7 milestone build at the
+                <a href="http://dist.codehaus.org/castor/0.9.7/">Codehaus</a>.<br/><br/>
+
+                This is a maintenance release for release 0.9.6 only. For details about the bugs 
+				fixed, please have a look at <a href="http://jira.codehaus.org/browse/CASTOR">the project roadmap</a>
+                and the interim version of the <a href="http://castor.codehaus.org/release-notes.html">release 
+				notes</a>.<br/><br/>
+
+                This milestone will be replaced by a second milestone within a week,
+                so please try this version and report any regression issues (where applicable).
+            </summary>
+        </news>
         <news id="28">
             <title>Werner Guttmann Promoted to Castor JDO Lead</title>
             <author>Bruce Snyder</author>
