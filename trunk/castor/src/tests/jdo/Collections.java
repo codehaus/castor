@@ -97,6 +97,8 @@ public class Collections extends CastorTestCase {
 
         runOnce( TestColHashtable.class );
 
+	runOnce( TestColAdd.class );
+
         runArray();
     }
 
