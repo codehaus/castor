@@ -31,6 +31,26 @@
               Short description says all ...
             </summary>
 			<bugs>
+                <bug id="881" tool="jira">
+                    <description>
+                        JDOManager can now handle more then one jdo-conf.
+                    </description>
+                    <contributor>
+                        <name>Nick Stuart</name>
+                        <email>nick@newtsplace.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Nick Stuart</name>
+                        <email>nick@newtsplace.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050530</date>
+                </bug>
                 <bug id="1140" tool="jira">
                     <description>Regression in set-method="" when specifying add methods in JDO</description>
                     <contributor>
@@ -45,7 +65,7 @@
                     <type>Bug</type>
                     <module>JDO</module>
                     <date>20050530</date>
-		</bug>    
+				</bug>    
                 <bug id="1131" tool="jira">
                     <description>
                         Update project documentation.

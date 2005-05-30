@@ -190,8 +190,13 @@ public final class DatabaseRegistry {
             if (resolver != null) { mapping.setEntityResolver(resolver); }
             if (baseURI != null) { mapping.setBaseURL(baseURI); }
             
-            DATABASES.put(database.getName(), new RegEntry(database, mapping));
-            
+            Object oldEntry;
+            oldEntry = DATABASES.put(database.getName(), new RegEntry(database, mapping));
+            if (oldEntry != null) {
+                LOG.warn(Messages.format("jdo.configLoadedTwice", database.getName()));
+            }
+                        
+
             if (init) { initDatabase(database.getName()); }
         }
     }
