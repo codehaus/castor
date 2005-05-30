@@ -70,7 +70,6 @@ public class JDOConfLoader {
     
     private static Log _log = LogFactory.getFactory().getInstance( JDOConfLoader.class );
 
-    private static boolean _loaded = false;
     private static JdoConf _jdoConf = null;
     
     /**
@@ -79,107 +78,83 @@ public class JDOConfLoader {
      * @param resolver An EntityResolver instance.
      * @throws MappingException If the JDO configuration cannot be loaded/unmarshalled. 
      */
-    public static synchronized void loadConfiguration (InputSource source, EntityResolver resolver) 
-        throws MappingException 
-    {
-        
-        if (!_loaded) {
-            
-            Unmarshaller       unmarshaller;
+    public static synchronized void loadConfiguration(
+            final InputSource source, final EntityResolver resolver)
+    throws MappingException {
+        Unmarshaller       unmarshaller;
 
-            unmarshaller = new Unmarshaller (JdoConf.class);
-            try {
-                
-                if (resolver == null)
-                    unmarshaller.setEntityResolver (new DTDResolver());
-                else
-                    unmarshaller.setEntityResolver (new DTDResolver (resolver));
-                    
-                _jdoConf = (JdoConf) unmarshaller.unmarshal (source);
-            }
-            catch (MarshalException e) {
-                _log.info(NOTE_096);
-                throw new MappingException (e); 
-            }
-            catch (ValidationException e) {
-                throw new MappingException (e);
-            }
+        unmarshaller = new Unmarshaller(JdoConf.class);
+        try {
             
-            _loaded = true;
-            _log.debug( "Loaded jdo conf successfully" ); 
+            if (resolver == null)
+                unmarshaller.setEntityResolver(new DTDResolver());
+            else
+                unmarshaller.setEntityResolver(new DTDResolver (resolver));
+                
+            _jdoConf = (JdoConf) unmarshaller.unmarshal (source);
         }
+        catch (MarshalException e) {
+            _log.info(NOTE_096);
+            throw new MappingException(e); 
+        }
+        catch (ValidationException e) {
+            throw new MappingException(e);
+        }
+        
+        _log.debug("Loaded jdo conf successfully"); 
     }
 
     /**
      * Loads the JDO configuration from the specified InputSource.
      * @param jdoConf An JDoConf instance representing a JDO configuration to be loaded.
      */
-    public static synchronized void loadConfiguration (JdoConf jdoConf) 
-	{
-    	
-    	if (!_loaded) {
-    		
-    		_jdoConf = jdoConf;
-    		
-    		_loaded = true;
-    		_log.debug( "Loaded jdo conf successfully" ); 
-    	}
+    public static synchronized void loadConfiguration(final JdoConf jdoConf) {
+        _jdoConf = jdoConf;
+        _log.debug( "Loaded jdo conf successfully" ); 
 	}
 
-    public static Database[] getDatabases (JdoConf jdoConf) 
-	{
+    public static Database[] getDatabases(final JdoConf jdoConf) {
     	loadConfiguration (jdoConf);
     	return _jdoConf.getDatabase();
 	}
     
-    public static Database[] getDatabases (InputSource source, EntityResolver resolver) 
-    throws MappingException 
-    {
+    public static Database[] getDatabases(
+            final InputSource source, final EntityResolver resolver) 
+    throws MappingException {
         loadConfiguration (source, resolver);
         return _jdoConf.getDatabase();
     }
     
-    public static Database getDatabase (String databaseName, InputSource source, EntityResolver resolver) 
-        throws MappingException 
-    {
+    public static Database getDatabase(final String databaseName,
+            final InputSource source, final EntityResolver resolver)
+    throws MappingException {
         Database database = null;
         loadConfiguration (source, resolver);
         Database[] databases = getDatabases (source, resolver);
         for (int i = 0; i < databases.length ;i++) {
             if (databases[i].getName().equals (databaseName)) {
-                database =databases[i];
+                database = databases[i];
             }
         }
         return database;
     }
     
-    public static TransactionDemarcation getTransactionDemarcation (InputSource source, EntityResolver resolver)
-        throws MappingException 
-    {
+    public static TransactionDemarcation getTransactionDemarcation(
+            final InputSource source, final EntityResolver resolver)
+    throws MappingException {
         loadConfiguration  (source, resolver);
         return _jdoConf.getTransactionDemarcation();
     }
     
-    public static Mapping[] getMapping (String databaseName, InputSource source, EntityResolver resolver) 
-        throws MappingException 
-    {
-        loadConfiguration  (source, resolver);
-        return getDatabase (databaseName, source, resolver).getMapping();
+    public static Mapping[] getMapping(final String databaseName,
+            final InputSource source, final EntityResolver resolver)
+    throws MappingException {
+        loadConfiguration (source, resolver);
+        return getDatabase(databaseName, source, resolver).getMapping();
     }
     
     /**
      * Deletes JDO configuration. 
      */
-    public static synchronized void deleteConfiguration () {
-        _loaded = false;
-    }
-    
-    /**
-     * Indicates whether JDO configuration has loaded successfully.
-     * @return True if JDO configuration is loaded.
-     */
-    public static synchronized boolean isLoaded() {
-        return _loaded;
-    }
-
+    public static synchronized void deleteConfiguration() { }
 }

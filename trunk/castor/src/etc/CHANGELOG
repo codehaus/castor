@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-881 using contribution from Nick Stuart [nick@newtsplace.com]
+       JDOManager can now handle more then one jdo-conf.
+       Details: http://jira.codehaus.org/browse/CASTOR-881
+       (Ralf - 20050530)
+       
 XML:   Fixed bug CASTOR-938 anonymous groups in complex types are disambiguated unnecessarily
        Details: http://jira.codehaus.org/browse/CASTOR-938
        Patch Submitted: Hendrik Schreiber 
