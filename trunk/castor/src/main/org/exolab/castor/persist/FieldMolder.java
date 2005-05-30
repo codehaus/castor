@@ -708,18 +708,10 @@ public class FieldMolder {
                 if ( fieldMap.getSetMethod() != null) {
 
                     if ( _colClass != null ) {
-                    	   _log.fatal("FUCKED: Looking for "+fieldMap.getSetMethod()+" as setter of "+_colClass);
                         _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _colClass, false );
 
-                        if (_defaultReflectService._setMethod == null) {
-                        	_log.fatal("FUCKED: Didn't find "+fieldMap.getSetMethod()+" as setter of "+_colClass);
-                        } else {
-                        	_log.fatal("FUCKED: Found "+_defaultReflectService._setMethod.toString());
-                        }
-                        
                         // find addXXX method only if lazy loading is turned off
                         if ( _defaultReflectService._setMethod == null && !fieldMap.getLazy() ) {
-                        	  _log.fatal("FUCKED:  checking against "+methodClass.toString()+", not "+declaredClass.toString());
                             _defaultReflectService._addMethod = 
                             	findAccessor( javaClass, fieldMap.getSetMethod(), declaredClass, false );
                             if ( _defaultReflectService._addMethod != null) _addable = true;
@@ -727,7 +719,6 @@ public class FieldMolder {
 
                     } else {
                         // find setXXX method
-                  	  _log.fatal("FUCKED:  colClass null; Looking for "+fieldMap.getSetMethod()+" as setter of "+methodClass);
                         _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
                     }
 
