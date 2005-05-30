@@ -611,6 +611,12 @@
     </field>
   </class>
 
+  <class name="jdo.TestColAdd" extends="jdo.TestCol">
+    <description>Modification of TestCollArrayList to test manual addThing()</description>
+    <field name="item" type="jdo.TestItem" collection="arraylist" get-method="getItems" set-method="addItem">
+    </field>
+  </class>
+
   <class name="jdo.TestColArray" extends="jdo.TestCol">
     <description>Table used for testing different collection types support</description>
     <!-- this is a dirty hack, don't follows. It only work if load always

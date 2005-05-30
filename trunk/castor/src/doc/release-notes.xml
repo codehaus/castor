@@ -31,6 +31,21 @@
               Short description says all ...
             </summary>
 			<bugs>
+                <bug id="1140" tool="jira">
+                    <description>Regression in set-method="" when specifying add methods in JDO</description>
+                    <contributor>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </submitter>
+                    <reporter>Gregory Block</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050530</date>
+		</bug>    
                 <bug id="1131" tool="jira">
                     <description>
                         Update project documentation.

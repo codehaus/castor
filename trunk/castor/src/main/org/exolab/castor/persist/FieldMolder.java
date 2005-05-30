@@ -47,22 +47,22 @@
 package org.exolab.castor.persist;
 
 
-import java.util.HashMap;
-import java.util.ArrayList;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.jdo.DataObjectAccessException;
 import org.exolab.castor.mapping.MappingException;
-import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.TypeConvertor;
+import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.types.DirtyType;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.jdo.DataObjectAccessException;
 
 
 /**
@@ -708,17 +708,26 @@ public class FieldMolder {
                 if ( fieldMap.getSetMethod() != null) {
 
                     if ( _colClass != null ) {
+                    	   _log.fatal("FUCKED: Looking for "+fieldMap.getSetMethod()+" as setter of "+_colClass);
                         _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), _colClass, false );
 
+                        if (_defaultReflectService._setMethod == null) {
+                        	_log.fatal("FUCKED: Didn't find "+fieldMap.getSetMethod()+" as setter of "+_colClass);
+                        } else {
+                        	_log.fatal("FUCKED: Found "+_defaultReflectService._setMethod.toString());
+                        }
+                        
                         // find addXXX method only if lazy loading is turned off
                         if ( _defaultReflectService._setMethod == null && !fieldMap.getLazy() ) {
+                        	  _log.fatal("FUCKED:  checking against "+methodClass.toString()+", not "+declaredClass.toString());
                             _defaultReflectService._addMethod = 
-                            	findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
+                            	findAccessor( javaClass, fieldMap.getSetMethod(), declaredClass, false );
                             if ( _defaultReflectService._addMethod != null) _addable = true;
                         }
 
                     } else {
                         // find setXXX method
+                  	  _log.fatal("FUCKED:  colClass null; Looking for "+fieldMap.getSetMethod()+" as setter of "+methodClass);
                         _defaultReflectService._setMethod = findAccessor( javaClass, fieldMap.getSetMethod(), methodClass, false );
                     }
 
@@ -846,6 +855,11 @@ public class FieldMolder {
      * Returns the named accessor. Uses reflection to return the named
      * accessor and check the return value or parameter type, if
      * specified.
+     * 
+     * TODO:  Most of this code appears to be (badly) duplicated in MappingLoader, which
+     * is probably a closer source to the true behavior of this method.  At some point in
+     * the future, this should get rationalized.
+     * 
      *
      * @param javaClass The class to which the field belongs
      * @param methodName The name of the accessor method
@@ -861,6 +875,8 @@ public class FieldMolder {
     {
         Method   method = null;
         Method[] methods;
+        Class[] parameterTypes;
+        Class fieldTypeFromPrimitive;
         int      i;
 
         try {
@@ -869,62 +885,99 @@ public class FieldMolder {
                 // method name. Look up the field and potentially check the
                 // return type.
                 method = javaClass.getMethod( methodName, new Class[ 0 ] );
+                
                 if ( fieldType == null ) {
                     fieldType = Types.typeFromPrimitive( method.getReturnType() );
-                } else if ( fieldType == java.io.Serializable.class && java.io.Serializable.class.isAssignableFrom( method.getReturnType() ) ) {
-                    // special case
-                } else if ( ! Types.typeFromPrimitive( fieldType ).isAssignableFrom( Types.typeFromPrimitive( method.getReturnType() ) ) )
-                    throw new MappingException( "mapping.accessorReturnTypeMismatch",
-                                                method, fieldType.getName() );
-            } else {
-                // Set method: look for the named method or prepend set to the
-                // method name. If the field type is know, look up a suitable
-                // method. If the fielf type is unknown, lookup the first
-                // method with that name and one parameter.
-                if ( fieldType != null ) {
-                    try {
-                        method = javaClass.getMethod( methodName, new Class[] { fieldType } );
-                    } catch ( Exception except ) {
-                    	try {
-                    	    method = javaClass.getMethod( methodName, new Class[] { Types.typeFromPrimitive( fieldType ) } );
-                    	} catch ( Exception except2 ) {
-                    		// Ignore and try if clause
-                    	}
-                    }
-                }
-                
-                // If all else fails (e.g. if the field type is an interface)
-                // scan the method list and pick the first one that matches
-                // the name and number of parameters
-                if (method == null) {
-                    methods = javaClass.getMethods();
-                    method = null;
-                    for ( i = 0 ; i < methods.length ; ++i ) {
-                        if ( methods[ i ].getName().equals( methodName ) &&
-                             methods[ i ].getParameterTypes().length == 1 ) {
-                            method = methods[ i ];
-                            break;
+                } else {
+                        fieldType = Types.typeFromPrimitive(fieldType);
+                        Class returnType = Types.typeFromPrimitive( method.getReturnType());
+                        
+                        //-- First check against whether the declared type is
+                        //-- an interface or abstract class. We also check
+                        //-- type as Serializable for CMP 1.1 compatibility.
+                        if (fieldType.isInterface() ||
+                            ((fieldType.getModifiers() & Modifier.ABSTRACT) != 0) ||
+                            (fieldType == java.io.Serializable.class))
+                        {
+                            if ( ! fieldType.isAssignableFrom( returnType ) )
+                            throw new MappingException("mapping.accessorReturnTypeMismatch",
+                                                        method, fieldType.getName() );
                         }
-                    }
-                    if ( method == null )
-                        return null;
-                }
-            }
-            
+                        else {
+                            if ( ! returnType.isAssignableFrom( fieldType ) )
+                            throw new MappingException("mapping.accessorReturnTypeMismatch",
+                                                        method, fieldType.getName() );
+                        }
+                    }      
+             } else {
+                 method = null;
+                 fieldTypeFromPrimitive = null;
 
-            
-            // Make sure method is public and not abstract/static.
-            if ( ( method.getModifiers() & Modifier.PUBLIC ) == 0 ||
-                 ( method.getModifiers() & Modifier.STATIC ) != 0 )
-                throw new MappingException( "mapping.accessorNotAccessible",
-                                            methodName, javaClass.getName() );
-            return method;
-        } catch ( MappingException except ) {
-            throw except;
-        } catch ( Exception except ) {
-        }
-        return null;
-    }
+                 // Set method: look for the named method or prepend set to the
+                 // method name. If the field type is know, look up a suitable
+                 // method. If the fielf type is unknown, lookup the first
+                 // method with that name and one parameter.
+                 if ( fieldType != null ) {
+                     fieldTypeFromPrimitive = Types.typeFromPrimitive( fieldType );
+                     try {
+                         method = javaClass.getMethod( methodName, new Class[] { fieldType } );
+                     } catch ( Exception except ) {
+                         try {
+                             method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
+                         } catch ( Exception except2 ) {
+                         	// log.warn ("Unexpected exception", except2);
+                         }
+                     }
+                 }
+                 if ( null == method ) {
+                     methods = javaClass.getMethods();
+                     method = null;
+                     for ( i = 0 ; i < methods.length ; ++i ) {
+                         if ( methods[ i ].getName().equals( methodName ) ) {
+                             parameterTypes = methods[ i ].getParameterTypes();
+                             if (parameterTypes.length != 1) continue;
+                             
+                             Class paramType = Types.typeFromPrimitive( parameterTypes[0] );
+                             
+                             //-- check straight match
+                             if ((fieldType == null) ||
+                                  paramType.isAssignableFrom( fieldTypeFromPrimitive )) 
+                             {
+                                 method = methods[ i ];
+                                 break;
+                             }
+                             //-- Check against whether the declared type is
+                             //-- an interface or abstract class. 
+                             else if (fieldType.isInterface() ||
+                                     ((fieldType.getModifiers() & Modifier.ABSTRACT) != 0))
+                             {
+                                 if (fieldTypeFromPrimitive.isAssignableFrom( paramType )) 
+                                 {
+                                     method = methods[i];
+                                     break;
+                                 }
+                                     
+                             }
+                         }
+                     }
+                     if ( method == null )
+                         return null;
+                 }
+             }
+             // Make sure method is public and not static.
+             // (note: Class.getMethod() returns only public methods).
+             //if ( ( method.getModifiers() & Modifier.ABSTRACT ) != 0 ||
+             if ( ( method.getModifiers() & Modifier.STATIC ) != 0 )
+                 throw new MappingException( "mapping.accessorNotAccessible",
+                                             methodName, javaClass.getName() );
+             return method;
+         } catch ( MappingException except ) {
+             throw except;
+         } catch ( Exception except ) {
+             //System.out.println(except.toString());
+         }
+         return null;
+     }
 
     private String capitalize( String name )
     {
