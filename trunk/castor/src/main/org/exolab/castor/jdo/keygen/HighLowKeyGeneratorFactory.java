@@ -40,32 +40,11 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
+ * $Id$
  */
 
-/**
- * ----------------------------------------------
- * UUIDKeyGenerator
- * ----------------------------------------------
- * Developed by Publica Data-Service GmbH
- *
- * Team "New Projects" are:
- * Joerg Sailer, Martin Goettler, Andreas Grimme,
- * Thorsten Prix, Norbert Fuss, Thomas Fach
- * 
- * Address:
- * Publica Data-Service GmbH
- * Steinerne Furt 72
- * 86167 Augsburg
- * Germany
- *
- * Internet: http://www.publica.de
- *
- * "live long and in prosper"
- * ----------------------------------------------
-**/
 
-
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.jdo.keygen;
 
 
 import java.util.Properties;
@@ -77,23 +56,32 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * UUID key generator factory.
- * The short name of this key generator is "UUID".
- * It uses the following alrorithm: 
- * The uuid is a combination of the IP address, the current
- * time in milliseconds since 1970 and a static counter.
- * The complete key consists of a 30 character fixed length string.
- * Brief statement:
- * The ip only exists once during runtime of castor, the
- * current time in milliseconds (updated every 55 mills) is
- * in combination to the ip pretty unique. considering a static 
- * counter will be used a database-wide unique key will be created.
- * 
- * @author <a href="thomas.fach@publica.de">Thomas Fach</a>
+ * HIGH-LOW key generator factory.
+ * The short name of this key generator is "HIGH-LOW".
+ * It uses the following alrorithm: a special sequence table must be in 
+ * the database with keeps the maximum key values. The name of the 
+ * sequence table is a mandatory parameter of the key generator, 
+ * the parameter name is "table".
+ * The name of the primary key column of the sequence table and 
+ * the name of the column in which maximum values are stored are 
+ * mandatory parameters with the names "key-column" and "value-column",
+ * respectively. The key column contains table names, so it must be of
+ * a character type (char or varchar). The value column contains primary key
+ * values, it must be of a numeric type (numeric or int).
+ * Key generator reads the maximum value X for the given table, 
+ * writes the new value (X + N) to the sequence table and during next N 
+ * calls returns values X + 1, ..., X + N without database access.
+ * Number N (which sometimes is called "grab size") is an optional
+ * parameter of the key generator, the parameter name is "grab-size",
+ * default value is "1".
+ * For example, if you want to obtain HIGH-LOW key generator with  
+ * 3 digits in the LOW part of the key, you should set "grab-size" to "1000".
+ *
+ * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see UUIDKeyGenerator
+ * @see HighLowKeyGenerator
  */
-public final class UUIDKeyGeneratorFactory implements KeyGeneratorFactory
+public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
@@ -104,14 +92,14 @@ public final class UUIDKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params, int sqlType )
             throws MappingException
     {
-        return new UUIDKeyGenerator( factory, sqlType );
+        return new HighLowKeyGenerator( factory, params, sqlType );
     }
 
     /**
-     * The short name of this key generator is "UUID"
+     * The short name of this key generator is "HIGH-LOW"
      */
     public String getName() {
-        return "UUID";
+        return "HIGH-LOW";
     }
 }
 

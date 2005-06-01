@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.jdo.keygen;
 
 
 import java.util.Properties;

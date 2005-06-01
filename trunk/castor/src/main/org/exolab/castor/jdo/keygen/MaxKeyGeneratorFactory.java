@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.jdo.keygen;
 
 
 import java.util.Properties;
@@ -56,23 +56,21 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * SEQUENCE key generator factory.
- * The short name of this key generator is "SEQUENCE".
- * It uses Oracle/PostrgeSQL SEQUENCEs
- * There are two optional parameters for this key generator:
- * 1) name is "sequence" and the default value is "{0}_seq";
- * 2) name is "returning", values: "true"/"false", default is "false".
- * The latter parameter should be used only with Oracle8i, "true" value 
- * turns on more efficient RETURNING syntax.
- * It is possible to use naming patterns like this for obtaining
- * SEQUENCE name by table name. This gives the possibility to use
- * one global key generator declaration rather than one per table.
+ * MAX key generator factory.
+ * The short name of this key generator is "MAX".
+ * It uses the following alrorithm: the maximum value of the primary
+ * key is fetched and the correspondent record is locked until the end
+ * of transaction, generator returns (max + 1).
+ * The lock guarantees that key generators of concurrent transactions
+ * will not use this key value, so DuplicateKeyException is impossible.
+ * If the table is empty, generator returns 1, no lock is put,
+ * DuplicateKeyException is possible.
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see SequenceKeyGenerator
+ * @see MaxKeyGenerator
  */
-public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
+public final class MaxKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
@@ -83,13 +81,14 @@ public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params, int sqlType )
             throws MappingException
     {
-        return new SequenceKeyGenerator( factory, params, sqlType );
+        return new MaxKeyGenerator( factory, sqlType );
     }
 
     /**
-     * The short name of this key generator is "SEQUENCE"
+     * The short name of this key generator is "MAX"
      */
     public String getName() {
-        return "SEQUENCE";
+        return "MAX";
     }
 }
+

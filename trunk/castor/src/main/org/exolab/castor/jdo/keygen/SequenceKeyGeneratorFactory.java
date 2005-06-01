@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.jdo.keygen;
 
 
 import java.util.Properties;
@@ -56,32 +56,23 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * HIGH-LOW key generator factory.
- * The short name of this key generator is "HIGH-LOW".
- * It uses the following alrorithm: a special sequence table must be in 
- * the database with keeps the maximum key values. The name of the 
- * sequence table is a mandatory parameter of the key generator, 
- * the parameter name is "table".
- * The name of the primary key column of the sequence table and 
- * the name of the column in which maximum values are stored are 
- * mandatory parameters with the names "key-column" and "value-column",
- * respectively. The key column contains table names, so it must be of
- * a character type (char or varchar). The value column contains primary key
- * values, it must be of a numeric type (numeric or int).
- * Key generator reads the maximum value X for the given table, 
- * writes the new value (X + N) to the sequence table and during next N 
- * calls returns values X + 1, ..., X + N without database access.
- * Number N (which sometimes is called "grab size") is an optional
- * parameter of the key generator, the parameter name is "grab-size",
- * default value is "1".
- * For example, if you want to obtain HIGH-LOW key generator with  
- * 3 digits in the LOW part of the key, you should set "grab-size" to "1000".
+ * SEQUENCE key generator factory.
+ * The short name of this key generator is "SEQUENCE".
+ * It uses Oracle/PostrgeSQL SEQUENCEs
+ * There are two optional parameters for this key generator:
+ * 1) name is "sequence" and the default value is "{0}_seq";
+ * 2) name is "returning", values: "true"/"false", default is "false".
+ * The latter parameter should be used only with Oracle8i, "true" value 
+ * turns on more efficient RETURNING syntax.
+ * It is possible to use naming patterns like this for obtaining
+ * SEQUENCE name by table name. This gives the possibility to use
+ * one global key generator declaration rather than one per table.
  *
  * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
  * @version $Revision$ $Date$
- * @see HighLowKeyGenerator
+ * @see SequenceKeyGenerator
  */
-public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
+public final class SequenceKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
@@ -92,14 +83,13 @@ public final class HighLowKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params, int sqlType )
             throws MappingException
     {
-        return new HighLowKeyGenerator( factory, params, sqlType );
+        return new SequenceKeyGenerator( factory, params, sqlType );
     }
 
     /**
-     * The short name of this key generator is "HIGH-LOW"
+     * The short name of this key generator is "SEQUENCE"
      */
     public String getName() {
-        return "HIGH-LOW";
+        return "SEQUENCE";
     }
 }
-

@@ -40,11 +40,32 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$
  */
 
+/**
+ * ----------------------------------------------
+ * UUIDKeyGenerator
+ * ----------------------------------------------
+ * Developed by Publica Data-Service GmbH
+ *
+ * Team "New Projects" are:
+ * Joerg Sailer, Martin Goettler, Andreas Grimme,
+ * Thorsten Prix, Norbert Fuss, Thomas Fach
+ * 
+ * Address:
+ * Publica Data-Service GmbH
+ * Steinerne Furt 72
+ * 86167 Augsburg
+ * Germany
+ *
+ * Internet: http://www.publica.de
+ *
+ * "live long and in prosper"
+ * ----------------------------------------------
+**/
 
-package org.exolab.castor.jdo.drivers;
+
+package org.exolab.castor.jdo.keygen;
 
 
 import java.util.Properties;
@@ -56,21 +77,23 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
 
 
 /**
- * MAX key generator factory.
- * The short name of this key generator is "MAX".
- * It uses the following alrorithm: the maximum value of the primary
- * key is fetched and the correspondent record is locked until the end
- * of transaction, generator returns (max + 1).
- * The lock guarantees that key generators of concurrent transactions
- * will not use this key value, so DuplicateKeyException is impossible.
- * If the table is empty, generator returns 1, no lock is put,
- * DuplicateKeyException is possible.
- *
- * @author <a href="on@ibis.odessa.ua">Oleg Nitz</a>
+ * UUID key generator factory.
+ * The short name of this key generator is "UUID".
+ * It uses the following alrorithm: 
+ * The uuid is a combination of the IP address, the current
+ * time in milliseconds since 1970 and a static counter.
+ * The complete key consists of a 30 character fixed length string.
+ * Brief statement:
+ * The ip only exists once during runtime of castor, the
+ * current time in milliseconds (updated every 55 mills) is
+ * in combination to the ip pretty unique. considering a static 
+ * counter will be used a database-wide unique key will be created.
+ * 
+ * @author <a href="thomas.fach@publica.de">Thomas Fach</a>
  * @version $Revision$ $Date$
- * @see MaxKeyGenerator
+ * @see UUIDKeyGenerator
  */
-public final class MaxKeyGeneratorFactory implements KeyGeneratorFactory
+public final class UUIDKeyGeneratorFactory implements KeyGeneratorFactory
 {
     /**
      * Produce the key generator.
@@ -81,14 +104,14 @@ public final class MaxKeyGeneratorFactory implements KeyGeneratorFactory
             Properties params, int sqlType )
             throws MappingException
     {
-        return new MaxKeyGenerator( factory, sqlType );
+        return new UUIDKeyGenerator( factory, sqlType );
     }
 
     /**
-     * The short name of this key generator is "MAX"
+     * The short name of this key generator is "UUID"
      */
     public String getName() {
-        return "MAX";
+        return "UUID";
     }
 }
 
