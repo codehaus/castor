@@ -44,7 +44,7 @@
  */
 
 
-package org.exolab.castor.jdo.drivers;
+package org.exolab.castor.jdo.keygen;
 
 
 import java.math.BigDecimal;
@@ -214,8 +214,7 @@ public final class MaxKeyGenerator implements KeyGenerator
      * Gives a possibility to patch the Castor-generated SQL statement
      * for INSERT (makes sense for DURING_INSERT key generators)
      */
-    public final String patchSQL( String insert, String primKeyName )
-            throws MappingException {
+    public final String patchSQL( String insert, String primKeyName ) {
         return insert;
     }
 
