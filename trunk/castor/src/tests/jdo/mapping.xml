@@ -613,6 +613,7 @@
 
   <class name="jdo.TestColAdd" extends="jdo.TestCol">
     <description>Modification of TestCollArrayList to test manual addThing()</description>
+    <map-to table="test_col" />
     <field name="item" type="jdo.TestItem" collection="arraylist" get-method="getItems" set-method="addItem">
     </field>
   </class>
