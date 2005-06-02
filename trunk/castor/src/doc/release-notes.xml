@@ -28,6 +28,16 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+            </summary>
+			<bugs>
+			</bugs>
+		</release>
+			
+	    <release version="0.9.7M2">
+	        <description>Milestone release for 0.9.7</description>
+    		<date>June 4, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
 				<h2>Download &amp; installation instructions</h2>
 
 				<p>Please note that we are providing the usual suspect (binaries, docs and
@@ -41,8 +51,12 @@
 				<h3>Moved key generators to jdo.keygen package</h3>
 				
 				<p>Whilst this change is non-intrusive per se, please note that you might have to 
-				   change a local castor.properties file if you happened to re-specify key generators
+				   change a local <tt>castor.properties</tt> file if you happened to re-specify key generators
 				   in there.</p>
+
+				<h3>Fixed problem with multiple &lt;database&gt; configurations</h3>
+				
+				<p>Support for multiple database configurations has been re-enabled.</p>
 				   
             </summary>
 			<bugs>
@@ -119,18 +133,18 @@
 
 				<h3>Support for JDBC proxy classes</h3>
 				
-				<p>Proxy classes for <code>java.sql.Connection</code> and
-				   <code>java.sql.PreparedStatement</code> instances have been added, to allow for
-				   complete and better JDBC statements to be output tothe log files. As this might impose
+				<p>Proxy classes for <tt>java.sql.Connection</tt> and
+				   <tt>java.sql.PreparedStatement</tt> instances have been added, to allow for
+				   complete and better JDBC statements to be output to the log files. As this might impose
 				   a performance penalty at run-time, we have added a new property to the Castor
-				   property file (<code>castor.properties</code>) to allow configuration of this
+				   property file (<tt>castor.properties</tt>) to allow configuration of this
 				   feature.</p>
 
 <code>				
   # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
   # statements; false otherwise (logging will be turned off completely).
   #
-  org.exolab.castor.perists.xxx.yyy=true
+  org.exolab.castor.persist.useProxy=true
 </code>				
 					
 				<p>When disabled, no logging of SQL statements will occur al all.</p>
@@ -139,15 +153,52 @@
 				
 				<p>Several bugs have been fixed to allow use of Castor with a JDK 1.5. This
 				   mainly involved preventing compilation problems due to variable names et al.
-				   that were i conflict with new Java 5 naming conventions (e.g. use of enum as
-				   a varaible name).</p>
+				   that were in conflict with new Java 5 naming conventions (e.g. use of enum as
+				   a variable name).</p>
+
+				<h3>Renamed JDO2 to JDOManager</h3>
+				
+				<p><tt>JDO2</tt> has been renamed to <tt>JDOManager</tt>. Please change your source 
+				   code accordingly. Please note that - going forward - any bug fixes/enhancements will 
+				   be committed against JDOManager only.</p>
+
+				<h3>Default field types</h3>
+				
+				<p>It is possible again - after disabling this feature in 0.9.6 - to not specify 
+				   a type in a field mapping. By default, a field defined as such will have a 
+				   type of 'java.lang.String'.</p>
 				
 				<h2>Additions</h2>
 				
 				<h3>Addition of RSS feed for announcements</h3>
 				
 				<p>An RSS feed has been added to the project documentation to allow
-				   users to be informed about additions/changes to Castor.</p>				
+				   users to be informed about additions/changes to Castor. This feed basically 
+				   mirrors the news items posted to <url>http://castor.codehaus.org/news.html</url></p>				
+
+				<h3>Specifying a binding file with the Source generator Ant task</h3>
+				
+                <p>Support for specifying a binding file with the Castor Source Generator Ant Task 
+				   has been added. Below is the example as provided with the 0.9.6 release notes 
+				   extended to cover the specification of a binding file:</p>
+
+                <code>
+  &lt;target name="castor:gen:src" depends="init"
+    description="Generate Java source files from XSD."&gt;
+
+    &lt;taskdef name="castor-srcgen"
+      classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask"
+      classpathref="castor.class.path" /&gt;
+    &lt;mkdir dir="${gen.src.d}" /&gt;
+    &lt;castor-srcgen file="${schema.d}/books2.xsd"
+      todir="${gen.src.d}"
+      package="com.sourcebeat.castorlive.xmodel"
+      types="j2"
+      bindingfile="custom-binding.xml"
+      warnings="false" /&gt;
+  &lt;/target&gt;
+                </code>
+
 
 				<h2>Problems fixed</h2>
 				
