@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+                        
+JDO:   Fixed bug CASTOR-1138 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Reverted addition to src/tests/jdo/Collections due to problem with missing setItem(ArrayList).
+       Details: http://jira.codehaus.org/browse/CASTOR-1147
+       (Werner - 20050607)
+       
 JDO:   Fixed bug CASTOR-1138 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Moved key generators to jdo.keygen package.
        Details: http://jira.codehaus.org/browse/CASTOR-1138
