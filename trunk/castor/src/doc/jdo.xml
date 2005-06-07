@@ -56,10 +56,10 @@ DataObjects jdo;
 Database db;
 
 <comment>// Instantiate a JDO object</comment>
-jdo = new JDOOld();
-jdo.setDatabaseName( "mydb" );
-jdo.setConfiguration( "jdo-conf.xml" );
-jdo.setClassLoader( getClass().getClassLoader() );
+jdo = new JDO();
+jdo.setDatabaseName("mydb");
+jdo.setConfiguration("jdo-conf.xml");
+jdo.setClassLoader(getClass().getClassLoader());
 
 <comment>// Obtain a new database</comment>
 db = jdo.getDatabase();
@@ -73,8 +73,8 @@ db.close();
            </code>
 
         <p>As of release 0.9.6, a new JDOManager class is provided, that replaces the 
-		   current JDO class. Any new features will be implemented against the new JDO-
-		   Manager class only.</p>
+		   current JDO class. Any new features will be implemented against the new
+		   JDOManager class only.</p>
            
         <p>As with its predecessor, <api>org.exolab.castor.jdo.JDOManager</api> defines the database 
 		   name and properties and is used to open a database connection. An instance of this class 
@@ -99,10 +99,10 @@ JDOManager jdoManager;
 Database db;
  
 <comment>// load the JDO configuration file</comment>
-JDOManager.loadConfiguration ("jdo-conf.xml");
+JDOManager.loadConfiguration("jdo-conf.xml");
  
 <comment>// Construct a new JDOManager for the database 'mydb'</comment>
-jdoManager = JDOManager.createInstance ("mydb");
+jdoManager = JDOManager.createInstance("mydb");
 <comment>// Obtain a new database</comment>
 Database db = jdoManager.getDatabase();
     
