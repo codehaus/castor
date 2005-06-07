@@ -161,6 +161,16 @@
 				<p><tt>JDO2</tt> has been renamed to <tt>JDOManager</tt>. Please change your source 
 				   code accordingly. Please note that - going forward - any bug fixes/enhancements will 
 				   be committed against JDOManager only.</p>
+				   
+				<h3>Type of access mode constants changed</h3>
+				
+				<p>The type of the access mode constants (Shared / ReadOnly / Exclusive / DbLocked)
+				   defined in Database interface has changed from <code>short</code> to
+				   <code>org.exolab.castor.mapping.AccessMode</code>. To allow you to use previous
+				   short as well as new AccessMode constants we added new incarnations of the
+				   Database.load(..) and Query.execute(..) methods. In addition we needed to change
+				   the parameter types of Persistent.jdoLoad(..) and CallbackInterceptor.loaded(..)
+				   from short to AccessMode.</p>
 
 				<h3>Default field types</h3>
 				
