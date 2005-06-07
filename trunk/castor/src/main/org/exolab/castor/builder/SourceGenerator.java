@@ -70,18 +70,23 @@ import org.exolab.castor.builder.util.ConsoleDialog;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
+import org.exolab.castor.util.NestedIOException;
 import org.exolab.castor.util.Version;
 
-import org.exolab.castor.xml.XMLException;
+import org.exolab.castor.mapping.xml.MappingRoot;
+import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.ValidationException;
+import org.exolab.castor.xml.XMLException;
 import org.xml.sax.*;
 
 //--Java IO imports
 import java.io.Reader;
 import java.io.PrintWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 
 //--Java util imports
 import java.util.Enumeration;
@@ -241,6 +246,8 @@ public class SourceGenerator
      */
     private DescriptorSourceFactory _descSourceFactory = null;
     
+    private MappingFileSourceFactory _mappingSourceFactory = null;
+    
     /**
      * The field info factory.
     **/
@@ -260,7 +267,19 @@ public class SourceGenerator
      */
     private Vector _schemasProcessed = null;
 
+    /**
+     * A flag to indicate that the mapping file should be generated
+     */
+    private boolean _generateMapping = false;
+    
+    /**
+     * The name of the mapping file to create 
+     * used with the gen-mapping flag
+     */
+    private String  _mappingFilename = "mapping.xml";
 
+    
+    
     /**
      * Creates a SourceGenerator using the default FieldInfo factory
      */
@@ -301,6 +320,7 @@ public class SourceGenerator
         
         _sourceFactory = new SourceFactory(this, _infoFactory);
         _descSourceFactory = new DescriptorSourceFactory(this);
+        _mappingSourceFactory = new MappingFileSourceFactory(this);
         
         _header = new JComment(JComment.HEADER_STYLE);
         _header.appendComment(DEFAULT_HEADER);
@@ -316,7 +336,9 @@ public class SourceGenerator
      * @param schema the XML schema to generate the Java sources for.
      * @param packageName the package for the generated source files.
     **/
-    public void generateSource(Schema schema, String packageName) {
+    public void generateSource(Schema schema, String packageName) 
+        throws IOException
+    {
         
         if (schema == null) {
             String err = "The argument 'schema' must not be null.";
@@ -347,17 +369,37 @@ public class SourceGenerator
 
         createClasses(schema, sInfo);
         
+        //-- TODO Cleanup integration :
+        if (!_createDescriptors && _generateMapping) {
+            String pkg = (packageName != null) ? packageName : "";
+            MappingRoot mapping = sInfo.getMapping(pkg);
+            if (mapping != null) {
+                FileWriter writer = new FileWriter(_mappingFilename);
+                Marshaller mars = new Marshaller(writer);
+                mars.setSuppressNamespaces(true);
+                try {
+                    mars.marshal(mapping);
+                }
+                catch(Exception ex) {
+                    throw new NestedIOException(ex);
+                }
+                writer.flush();
+                writer.close();
+            }
+        }
         //--reset the vector of schemas processed
         _schemasProcessed = null;
     } //-- generateSource
 
-     /**
+    /**
      * Creates Java Source code (Object model) for the given XML Schema
      *
      * @param source - the InputSource representing the XML schema.
      * @param packageName the package for the generated source files
-    **/
-    public void generateSource(InputSource source, String packageName) {
+     */
+    public void generateSource(InputSource source, String packageName) 
+        throws IOException
+    {
 
         //-- get default parser from Configuration
         Parser parser = null;
@@ -418,7 +460,9 @@ public class SourceGenerator
      * The caller should close the reader, since thie method will not do so.
      * @param packageName the package for the generated source files
     **/
-    public void generateSource(Reader reader, String packageName) {
+    public void generateSource(Reader reader, String packageName) 
+        throws IOException
+    {
         InputSource source = new InputSource(reader);
         generateSource(source, packageName);
     } //-- generateSource
@@ -430,7 +474,7 @@ public class SourceGenerator
      * @param packageName the package for the generated source files
     **/
     public void generateSource(String filename, String packageName)
-        throws java.io.FileNotFoundException
+        throws FileNotFoundException, IOException
     {
         //--basic cleanup
         if (filename.startsWith("./"))
@@ -526,6 +570,18 @@ public class SourceGenerator
         _generateImported = generate;
     }
     
+    /**
+     * Sets whether or not a mapping file should be generated, this
+     * is false by default. Note that this will only be used
+     * when generation of descriptors has been disabled.
+     * 
+     * @param generateMapping a flag that indicates whether or
+     * not a mapping file should be generated.
+     */
+    public void setGenerateMappingFile(boolean generateMapping) 
+    {
+        _generateMapping = generateMapping;
+    } //-- setGenerateMappingFile
 
    /**
      * Sets whether or not to implement CastorTestable
@@ -630,6 +686,11 @@ public class SourceGenerator
         //-- no descriptors flag
         desc = "Disables the generation of the Class descriptors";
         allOptions.addFlag("nodesc", "", desc, true);
+        
+        //-- no descriptors flag
+        desc = "Indicates that a mapping file should be generated";
+        allOptions.addFlag("gen-mapping", "filename", desc, true);
+        
 
         //-- source generator types name flag
         desc = "Sets the source generator types name (SGTypeFactory)";
@@ -749,6 +810,16 @@ public class SourceGenerator
             System.out.print("-- ");
             System.out.println(DISABLE_DESCRIPTORS_MSG);
 		}
+        
+        
+        if (options.getProperty("gen-mapping") != null) {
+            sgen.setGenerateMappingFile(true);
+            String filename = options.getProperty("gen-mapping");
+            if (filename.length() > 0) {
+                sgen._mappingFilename = filename;
+            }
+            System.out.print("-- generating mapping file: " + filename);
+        }
 
 		if (options.getProperty("nomarshall") != null) {
 		    sgen.setCreateMarshalMethods(false);
@@ -792,9 +863,9 @@ public class SourceGenerator
 
         try {
             sgen.generateSource(schemaFilename, packageName);
-        } catch(java.io.FileNotFoundException fne) {
-            System.out.println("unable to open XML schema file");
-            return;
+        } 
+        catch(Exception ex) {
+            ex.printStackTrace();
         }
 
     } //-- main
@@ -822,7 +893,9 @@ public class SourceGenerator
     //- Private Methods -/
     //-------------------/
 
-    private void createClasses(Schema schema, SGStateInfo sInfo) {
+    private void createClasses(Schema schema, SGStateInfo sInfo) 
+        throws IOException
+    {
 
         //-- ** print warnings for imported schemas **
 		if (!_suppressNonFatalWarnings || _generateImported)
@@ -889,14 +962,9 @@ public class SourceGenerator
         while (cdrFiles.hasMoreElements()) {
             String filename = (String) cdrFiles.nextElement();
             Properties props = sInfo.getCDRFile(filename);
-            try {
-                FileWriter writer = new FileWriter(filename);
-                props.list(new PrintWriter(writer));
-                writer.flush();
-            }
-            catch(java.io.IOException iox) {
-                // TODO report IO error
-            }
+            FileWriter writer = new FileWriter(filename);
+            props.list(new PrintWriter(writer));
+            writer.flush();
         }
 
     } //-- createClasses
@@ -1341,6 +1409,18 @@ public class SourceGenerator
                 desc.setHeader(_header);
                 desc.print(_destDir,_lineSeparator);
             }
+        }
+        //-- TODO: cleanup mapping file integration
+        else if (classInfo != null) {
+            //-- create a class mapping
+            String pkg = state.packageName;
+            if (pkg == null) pkg = "";
+            MappingRoot mapping = state.getMapping(pkg);
+            if (mapping == null) {
+                mapping = new MappingRoot();
+                state.setMapping(pkg, mapping);
+            }
+            mapping.addClassMapping(_mappingSourceFactory.createMapping(classInfo));
         }
 
     } //-- processJClass
