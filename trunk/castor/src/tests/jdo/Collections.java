@@ -97,7 +97,9 @@ public class Collections extends CastorTestCase {
 
         runOnce( TestColHashtable.class );
 
-	runOnce( TestColAdd.class );
+        // TODO[WG]: Causes problems with missing setXXX(ArrayList) method.
+        // TODO[WG]: To re-enable, please consult with http://jira.codehaus.org/browse/CASTOR-1147
+        // runOnce( TestColAdd.class );
 
         runArray();
     }

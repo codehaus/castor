@@ -60,6 +60,24 @@
 				   
             </summary>
 			<bugs>
+                <bug id="1147" tool="jira">
+                    <description>
+		                Reverted addition to src/tests/jdo/Collections due to problem with missing 
+					    setItem(ArrayList).
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>General</module>
+                    <date>20050607</date>
+                </bug>
                 <bug id="1138" tool="jira">
                     <description>
                         Moved key generators to jdo.keygen package.
