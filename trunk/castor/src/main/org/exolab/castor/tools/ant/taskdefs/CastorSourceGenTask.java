@@ -277,6 +277,9 @@ public class CastorSourceGenTask extends MatchingTask {
             log(message);
             throw new BuildException(message);
         }
+        catch(IOException iox) {
+            throw new BuildException(iox);
+        }
     }
 
     public void execute() throws BuildException {
@@ -368,7 +371,12 @@ public class CastorSourceGenTask extends MatchingTask {
                 throw new BuildException("Can't parse input file " + source.getSystemId() + ".\n" + e, e);
             }
             Schema schema = schemaUnmarshaller.getSchema();
-            generateSource(schema, packageName);
+            try {
+                generateSource(schema, packageName);
+            }
+            catch(IOException iox) {
+                throw new BuildException(iox);
+            }
         }
     }
 }
