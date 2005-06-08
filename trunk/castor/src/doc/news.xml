@@ -19,6 +19,23 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="30">
+            <title>Castor 0.9.7 - Final release</title>
+            <author>Werner Guttmann</author>
+            <date>Jun 08 2005</date>
+            <time>14:15:21</time>
+            <summary>
+                I've placed a copy of Castor 0.9.7 (final) at 
+                <a href="http://dist.codehaus.org/castor/0.9.7/">The Codehaus</a>.<br/><br/>
+
+                This is mainly a maintenance release. For details about the bugs fixed and features 
+				provided, please have a look at the <a href="release-notes.html">release notes</a>.<br/><br/>
+                
+                Please report any issues through the project's 
+                <a href="http://jira.codehaus.org/browse/CASTOR">issue tracking system</a> and/or the 
+                mailing lists.
+            </summary>
+        </news>
         <news id="29">
             <title>Castor 0.9.7 - 1st milestone build</title>
             <author>Werner Guttmann</author>
