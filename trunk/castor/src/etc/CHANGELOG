@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 0.9.7, Jun 8, 2005
+---------------------------
+
                         
 JDO:   Fixed bug CASTOR-1138 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Reverted addition to src/tests/jdo/Collections due to problem with missing setItem(ArrayList).
@@ -18,7 +21,7 @@ JDO:   Fixed bug CASTOR-881 using contribution from Nick Stuart [nick@newtsplace
        Details: http://jira.codehaus.org/browse/CASTOR-881
        (Ralf - 20050530)
 
-Version 0.9.7, May 25, 2005
+Version 0.9.7M1, May 25, 2005
 -------------------------------
 
 XML:   Fixed bug CASTOR-938 anonymous groups in complex types are disambiguated unnecessarily
