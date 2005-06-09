@@ -23,17 +23,17 @@
                     <date></date>
                 </bug>
 -->
-<!--
 	    <release version="CVS">
 	        <description>New and on-going development</description>
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				New and on-going development
             </summary>
 			<bugs>
 			</bugs>
 		</release>
--->b			
+			
 	    <release version="0.9.7">
 	        <description>Maintenance release for Castor XML and JDO</description>
     		<date>June 8, 2005</date>
