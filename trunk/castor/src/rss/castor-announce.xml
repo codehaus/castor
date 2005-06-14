@@ -19,10 +19,23 @@
 --> 
 
 		<item>
+			<title>Castor 0.9.7 released</title>
+			<pubDate>Thu, 9 Jun 2005 13:12:11 GMT</pubDate>
+			<author>Werner Guttmann</author>
+			<link>http://castor.codehaus.org/news.html#item30</link>
+			<description>
+				I've placed a copy of Castor 0.9.7 (final) at http://dist.codehaus.org/castor/0.9.7. This 
+				is mainly a maintenance release. For details about the bugs fixed and features provided, please 
+				have a look at the release notes at http://castor.codehaus.org/release-notes.html . Please report 
+				any issues through the project's issue tracking system at http://jira.codehaus.org/browse/CASTOR
+				and/or the mailing lists. 
+			</description>
+		</item>
+		<item>
 			<title>0.9.7 release - 1st milestone build available</title>
 			<pubDate>Thu, 19 May 2005 23:25:00 GMT</pubDate>
 			<author>Werner Guttmann</author>
-			<link>http://castor.codehaus.org/news.html</link>
+			<link>http://castor.codehaus.org/news.html#item29</link>
 			<description>
 				The first milestone build of Castor 0.9.7 has been made available at
 				http://dist.codehaus.org/castor/0.9.7/
