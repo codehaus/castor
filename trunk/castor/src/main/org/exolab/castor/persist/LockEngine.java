@@ -882,13 +882,8 @@ public final class LockEngine {
         ObjectLock lock;
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
-        try {
-            lock = typeInfo.assure( oid, tx, true );
-            typeInfo.molder.updateCache( tx, oid, lock, object );
-        } 
-        catch ( LockNotGrantedException e ) {
-            throw new IllegalStateException("Write Lock expected!");
-        } 
+        lock = typeInfo.assure( oid, tx, true );
+        typeInfo.molder.updateCache( tx, oid, lock, object );
     }
 
     /**
@@ -924,18 +919,9 @@ public final class LockEngine {
 
         typeInfo = (TypeInfo) _typeInfo.get( oid.getName() );
         //lock = typeInfo.locks.aquire( oid, tx );
-        try {
-            typeInfo.assure( oid, tx, true );
-            
-            typeInfo.delete( oid, tx );
-
-            typeInfo.release( oid, tx );
-        } catch ( LockNotGrantedException except ) {
-            // If this transaction has no write lock on the object,
-            // something went foul.
-            _log.fatal( Messages.format( "persist.internal", "forgetObject: " + except.toString() ) );
-            throw new IllegalStateException( except.toString() );
-        }
+        typeInfo.assure( oid, tx, true );
+        typeInfo.delete( oid, tx );
+        typeInfo.release( oid, tx );
     }
 
     /**
@@ -1342,8 +1328,7 @@ public final class LockEngine {
          *                false for read lock
          * @return The reassured ObjectLock instance.
          */
-        private ObjectLock assure( OID oid, TransactionContext tx, boolean write )
-                throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
+        private ObjectLock assure( OID oid, TransactionContext tx, boolean write ) {
 
             synchronized( locks ) {
                 ObjectLock entry = (ObjectLock) locks.get( oid );
