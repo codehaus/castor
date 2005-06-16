@@ -28,9 +28,11 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+            </summary>
+			<bugs>
                 <bug id="352" tool="jira">
                     <description>
-		                Added support for transient attribute at the <sql> element.
+		                Added support for transient attribute at the &lt;sql&gt; element.
                     </description>
                     <contributor>
                         <name>Werner Guttmann</name>
@@ -41,13 +43,31 @@
                         <email>werner.guttmann@gmx.net</email>
                     </submitter>
                     <reporter>Werner Guttmann</reporter>
-                    <type>Enh</type>
+                    <type>Enh.</type>
                     <module>General</module>
                     <date>20050615</date>
                 </bug>
-            </summary>
-			<bugs>
-Added support for transient attribute at the <sql> element.			</bugs>
+                <bug id="633" tool="jira">
+                    <description>
+		                Removed hidden catch-block in LockEngine.updateCache().
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stein M. Hugubakken</name>
+                        <email>dulci@start.no</email>
+					</reporter>
+                    <type>Ref.</type>
+                    <module>JDO</module>
+                    <date>20050614</date>
+                </bug>
+			</bugs>
 		</release>
 			
 	    <release version="0.9.7">
@@ -478,7 +498,7 @@ Added support for transient attribute at the <sql> element.			</bugs>
                         <name>Andrew Fawcett</name>
                         <email>andrew dot fawcett @ coda.com</email>
                     </reporter>
-                    <type>Enhancement</type>
+                    <type>Enh.</type>
                     <module>XML</module>
                     <date>20050509</date>
                 </bug>
