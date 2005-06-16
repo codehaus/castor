@@ -22,6 +22,10 @@
       <priority value="info" />
     </category>
 
+    <category name="ptf">
+      <priority value="info" />
+    </category>
+	
     <!-- to set the level to DEBUG for Castor, please replace above with -->
     <!--
     <category name="org.exolab.castor">
