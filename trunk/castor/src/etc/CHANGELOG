@@ -7,6 +7,11 @@ JDO:   Fixed bug CASTOR-352 using contribution from Werner Guttmann [werner.gutt
        Details: http://jira.codehaus.org/browse/CASTOR-352
        (Werner - 20050615)
 
+JDO:   Fixed bug CASTOR-633 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Removed hidden catch-block in LockEngine.updateCache().
+       Details: http://jira.codehaus.org/browse/CASTOR-352
+       (Werner - 20050614)
+
 Version 0.9.7, Jun 8, 2005
 ---------------------------
 
