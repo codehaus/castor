@@ -268,10 +268,15 @@ public class JDOMappingLoader
         // If not an SQL field, return a stock field descriptor.
         if ( fieldMap.getSql() == null )
             return super.createFieldDesc( javaClass, fieldMap );
-
+        
         // Create a JDO field descriptor
         fieldDesc = super.createFieldDesc( javaClass, fieldMap );
 
+        // if SQL mapping declares transient 
+        if ( fieldMap.getSql().getTransient()) {
+        	((FieldDescriptorImpl) fieldDesc).setTransient (true);
+        }
+        
         sqlName = fieldMap.getSql().getName();
 
         String[] sqlTypes = getSqlTypes(fieldMap);

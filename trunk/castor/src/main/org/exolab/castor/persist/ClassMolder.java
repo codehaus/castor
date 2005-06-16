@@ -294,8 +294,29 @@ public class ClassMolder
         // construct <tt>FieldModlers</tt>s for each of the fields of the base
         // class.
         FieldMapping[] fmFields = getFullFields( clsMap );
-        _fhs = new FieldMolder[fmFields.length];
-        for ( int i=0; i<_fhs.length; i++ ) {
+        int numberOfNonTransietnFieldMolders = 0;
+        for (int i = 0; i < fmFields.length; i++) {
+            boolean isFieldTransient = fmFields[i].getTransient();
+            if (fmFields[i].getSql()!= null) {
+                isFieldTransient |= fmFields[i].getSql().getTransient();
+            }
+        	if (!isFieldTransient) {
+        		numberOfNonTransietnFieldMolders += 1;
+        	}
+        }
+        _fhs = new FieldMolder[numberOfNonTransietnFieldMolders];
+        int fieldMolderNumber = 0;
+        for ( int i=0; i<fmFields.length; i++ ) {
+        	
+        	boolean isTransientField = fmFields[i].getTransient();
+            if (fmFields[i].getSql() != null) {
+                isTransientField |= fmFields[i].getSql().getTransient();
+            }
+        	
+        	if (isTransientField == true) {
+        		continue;
+        	}
+        	
             if ( fmFields[i].getSql() != null && fmFields[i].getSql().getManyTable() != null ) {
                 // the fields is not primitive
                 String manyTable = null;
@@ -375,12 +396,14 @@ public class ClassMolder
                     relatedIdSQL = manyName;
                 }
 
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i], manyTable,
+                _fhs[fieldMolderNumber] = new FieldMolder( ds, this, fmFields[i], manyTable,
                         idSQL, idType, idConvertTo, idConvertFrom, idConvertParam,
                         relatedIdSQL, relatedIdType, relatedIdConvertTo, relatedIdConvertFrom, relatedIdConvertParam );
             } else {
-                _fhs[i] = new FieldMolder( ds, this, fmFields[i] );
+                _fhs[fieldMolderNumber] = new FieldMolder( ds, this, fmFields[i] );
             }
+            
+            fieldMolderNumber += 1;
         }
 
         // ssa, FIXME : Are the two statements equivalents ?

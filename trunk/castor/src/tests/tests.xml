@@ -64,6 +64,9 @@
 
     <!-- <case class="jdo.QueryFinalize" id="TC10"/> -->
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+
+    <!-- <case class="jdo.TestTransientAttribute" id="TC84a" /> -->
+	
   </category>
 
   <category name="mssql" class="jdo.JDOCategory">
@@ -128,6 +131,9 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
 
   <category name="mysql" class="jdo.JDOCategory">
@@ -194,6 +200,9 @@
     <case class="jdo.CallSql" id="TC33"/>
     <!-- <case class="jdo.StoredProcedure" id="TC49"/> -->
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
+
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -258,6 +267,9 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
+
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
 
   <category name="postgresql" class="jdo.JDOCategory">
@@ -323,6 +335,9 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+	
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
@@ -387,6 +402,9 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
 
   <category name="sybase" class="jdo.JDOCategory">
@@ -451,11 +469,10 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+	
+    <case class="jdo.TestTransientAttribute" id="TC84a" />
+	
   </category>
-
-
-
-
 
 <!--
   <category name="j2ee" class="jdo.JDOJ2EECategory">
