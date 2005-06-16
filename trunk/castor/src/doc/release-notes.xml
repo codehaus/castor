@@ -28,10 +28,26 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
-				New and on-going development
+                <bug id="352" tool="jira">
+                    <description>
+		                Added support for transient attribute at the <sql> element.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh</type>
+                    <module>General</module>
+                    <date>20050615</date>
+                </bug>
             </summary>
 			<bugs>
-			</bugs>
+Added support for transient attribute at the <sql> element.			</bugs>
 		</release>
 			
 	    <release version="0.9.7">
