@@ -273,9 +273,11 @@ public final class SQLEngine implements Persistence {
             FieldDescriptor[] fieldDescriptors = base.getFields();
             for ( int i=0; i<fieldDescriptors.length; i++ ) {
                 // fieldDescriptors[i] is persistent in db if it is
-                // a JDOFieldDescriptor or has a ClassDescriptor
-                if ((fieldDescriptors[i] instanceof JDOFieldDescriptor) ||
-                    (fieldDescriptors[i].getClassDescriptor() != null)) {
+                // a JDOFieldDescriptor or has a ClassDescriptor and is not 
+            	// transient
+                if (((fieldDescriptors[i] instanceof JDOFieldDescriptor) ||
+                    (fieldDescriptors[i].getClassDescriptor() != null)) &&
+                    !fieldDescriptors[i].isTransient())  {
                     if ( stack.empty() ) {
                         fieldsInfo.add( new FieldInfo( clsDesc, fieldDescriptors[i], clsDesc.getTableName(), !extendField ) );
                     } else {

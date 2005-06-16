@@ -274,7 +274,13 @@ public class FieldDescriptorImpl
         _required = required;
     }
 
-
+    /**
+     * Mutator method used by {@link MappingLoader}.
+     */
+    public void setTransient (boolean isTransient) {
+    	this._transient = isTransient;
+    }
+    
     /**
      * Returns the convertor from the field type to an external type.
      *

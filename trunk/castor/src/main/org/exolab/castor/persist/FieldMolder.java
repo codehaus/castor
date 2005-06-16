@@ -132,6 +132,8 @@ public class FieldMolder {
     private Object        _default;
 
     private boolean _readonly;
+    
+    private boolean _transient;
 
     /**
      * Collection of reflection service keyed by ClassLoader instance.
@@ -223,6 +225,9 @@ public class FieldMolder {
     }
     public boolean isAddable() {
         return _addable;
+    }
+    public boolean isTransient() {
+        return _transient;
     }
     void setFieldClassMolder( ClassMolder fMold ) {
         _fMold = fMold;
@@ -491,6 +496,17 @@ public class FieldMolder {
             if ( fieldMap.getSql() != null )
                 _readonly = fieldMap.getSql().getReadonly();
 
+            // check whether complete field is declared transient
+            _transient = fieldMap.getTransient();
+            
+            if (fieldMap.getSql() != null) {
+                boolean isSQLTransient = fieldMap.getSql().getTransient();
+                if (_transient == true && isSQLTransient == false) {
+                    throw new MappingException (Messages.message("persist.transient.conflict"));
+                }
+                _transient = isSQLTransient;  
+            }
+            
             if ( fieldMap.getCollection() != null )
                 _multi = true;
 

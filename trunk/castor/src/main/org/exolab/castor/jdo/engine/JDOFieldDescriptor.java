@@ -96,8 +96,8 @@ public class JDOFieldDescriptor
         throws MappingException
     {
         super( fieldDesc );
-        if ( fieldDesc.isTransient() || fieldDesc.getHandler() == null )
-            throw new IllegalArgumentException( "Argument 'fieldDesc' is a transient field or has no handler" );
+        if ( fieldDesc.getHandler() == null )
+            throw new IllegalArgumentException( "Argument 'fieldDesc' has no handler" );
         //if ( sqlName == null )
         //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = (sqlName.length == 0 ? null : sqlName);

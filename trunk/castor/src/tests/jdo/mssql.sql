@@ -874,3 +874,52 @@ go
 grant all on test_nton_b to test
 go
 
+-- test objects for TestTransientAttribute 
+
+drop table trans_master
+go
+
+create table trans_master (
+  id        int not null,
+  name      varchar(200) not null,
+  propty1	int,
+  propty2	int,
+  propty3	int,
+  ent2		int
+)
+go
+
+drop table trans_child1
+go
+
+create table trans_child1 (
+  id        int not null,
+  descr     varchar(200) not null
+)
+go
+
+drop table trans_child2
+go
+
+create table trans_child2 (
+  id        int not null,
+  entityOneId int not null,
+  descr     varchar(200) not null
+)
+go
+
+insert into trans_master (id, name, propty1, propty2, ent2) values (1, 'entity1', 1, 2, 1)
+go
+
+insert into trans_child1 (id, descr) values (1, 'description1')
+go
+
+insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1)
+go
+
+insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1)
+go
+
+insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1)
+go
+
