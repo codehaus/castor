@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+General:   Fixed bug CASTOR-1155 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added org.castor package under src/main.
+       Details: http://jira.codehaus.org/browse/CASTOR-1155
+       (Werner - 20050617)
+
 JDO:   Fixed bug CASTOR-732 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added performance test-suite for 1:n relations of JDO.
        Details: http://jira.codehaus.org/browse/CASTOR-732

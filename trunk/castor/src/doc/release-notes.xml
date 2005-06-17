@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1155" tool="jira">
+                    <description>
+		                Added org.castor package to src/main.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050617</date>
+                </bug>
                 <bug id="732" tool="jira">
                     <description>
 		                Added performance test-suite for 1:n relations of JDO.
