@@ -121,14 +121,14 @@ public final class OID {
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, Object identity ) {
+    public OID( LockEngine engine, ClassMolder molder, Object identity ) {
         this( engine, molder, null, identity );
     }
 
     /**
      * Constructor
      */
-    OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
+    public OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
         ArrayList superClassNames = null;
 
         if ( engine == null )
@@ -187,7 +187,7 @@ public final class OID {
      *
      * @return the LockEngine of this object.
      */
-    LockEngine getLockEngine() {
+    public LockEngine getLockEngine() {
         return _engine;
     }
 
@@ -242,7 +242,7 @@ public final class OID {
      * @return True the object represented by this OID is loaded
      *  with a datbase lock
      */
-    boolean isDbLock() {
+    public boolean isDbLock() {
         return _dbLock;
     }
 

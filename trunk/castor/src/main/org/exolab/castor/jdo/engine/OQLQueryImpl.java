@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.jdo.oql.*;
 import org.exolab.castor.mapping.AccessMode;
@@ -57,7 +58,6 @@ import org.exolab.castor.persist.ClassMolder;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
-import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.Messages;
 
 import java.util.Enumeration;

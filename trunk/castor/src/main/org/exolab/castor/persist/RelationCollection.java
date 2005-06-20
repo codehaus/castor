@@ -53,6 +53,8 @@ import java.util.Map;
 import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Array;
+
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.PersistenceException;

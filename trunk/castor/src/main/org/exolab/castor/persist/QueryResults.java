@@ -48,6 +48,8 @@ package org.exolab.castor.persist;
 
 
 import javax.transaction.Status;
+
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.jdo.PersistenceException;
@@ -67,53 +69,48 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public final class QueryResults
-{
-
+public final class QueryResults {
     
     /**
      * The transaction context in which this query was executed.
      */
     private final TransactionContext _tx;
     
-    
     /**
      * The persistence engine against which this query was executed.
      */
     private final LockEngine   _engine;
     
-    
     /**
      * The executed query.
      */
-    private final PersistenceQuery     _query;
-    
+    private final PersistenceQuery _query;
     
     /**
      * The mode in which this query is running.
      */
-    private final AccessMode             _accessMode;
-    
+    private final AccessMode _accessMode;
     
     /**
      * The last identity retrieved with a call to {@link #nextIdentity}.
      */
-    private Object              _lastIdentity;
-
+    private Object _lastIdentity;
 
     /*
      * The database loading this object.
      */
-    private Database            _db;
+    private Database _db;
 
-
-    QueryResults( TransactionContext tx, LockEngine engine,
-                  PersistenceQuery query, AccessMode accessMode, Database db )
-    {
+    public QueryResults(TransactionContext tx, 
+            final LockEngine engine,
+            final PersistenceQuery query, 
+            final AccessMode accessMode, 
+            final Database db) {
         _tx = tx;
         _engine = engine;
         _query = query;
-        _accessMode =  engine.getClassMolder( _query.getResultType() ).getAccessMode( accessMode );
+        _accessMode = 
+            engine.getClassMolder(_query.getResultType()).getAccessMode(accessMode);
         _db = db;
     }
 
@@ -124,8 +121,7 @@ public final class QueryResults
      *
      * @return The query's transaction context
      */
-    public TransactionContext getTransaction()
-    {
+    public TransactionContext getTransaction() {
         return _tx;
     }
     
@@ -135,8 +131,7 @@ public final class QueryResults
      *
      * @return The query
      */
-    public PersistenceQuery getQuery()
-    {
+    public PersistenceQuery getQuery() {
         return _query;
     }
     
@@ -145,8 +140,7 @@ public final class QueryResults
      *
      * @return The type of object returned by this query
      */
-    public Class getResultType()
-    {
+    public Class getResultType() {
         return _query.getResultType();
     }
     
@@ -164,14 +158,15 @@ public final class QueryResults
      *  has been closed
      */
     public Object nextIdentity()
-        throws TransactionNotInProgressException, PersistenceException
-    {
+        throws TransactionNotInProgressException, PersistenceException {
         // Make sure transaction is still open.
-        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
+        if (_tx.getStatus() != Status.STATUS_ACTIVE) {
+            throw new TransactionNotInProgressException(
+                    Messages.message("persist.noTransaction"));
+        }
         try {
-            _lastIdentity = _query.nextIdentity( _lastIdentity );
-        } catch ( PersistenceException except ) {
+            _lastIdentity = _query.nextIdentity(_lastIdentity);
+        } catch (PersistenceException except) {
             _lastIdentity = null;
             throw except;
         }
@@ -210,23 +205,23 @@ public final class QueryResults
      */
     public Object fetch()
         throws TransactionNotInProgressException, PersistenceException,
-               ObjectNotFoundException, LockNotGrantedException
-    {
-        TransactionContext.ObjectEntry entry;
-        OID              oid;
+               ObjectNotFoundException, LockNotGrantedException {
         ClassMolder     handler;
         Object           object;
         
         // Make sure transaction is still open.
-        if ( _tx.getStatus() != Status.STATUS_ACTIVE )
-            throw new TransactionNotInProgressException( Messages.message( "persist.noTransaction" ) );
-        if ( _lastIdentity == null )
-            throw new IllegalStateException( Messages.message( "jdo.fetchNoNextIdentity" ) );
+        if (_tx.getStatus() != Status.STATUS_ACTIVE) {
+            throw new TransactionNotInProgressException(Messages
+                    .message("persist.noTransaction"));
+        }
+        if (_lastIdentity == null) {
+            throw new IllegalStateException(Messages.message("jdo.fetchNoNextIdentity"));
+        }
 
-        handler = _engine.getClassMolder( _query.getResultType() );
+        handler = _engine.getClassMolder(_query.getResultType());
 
         // load the object thur the transaction of the query
-        object = _tx.load( _engine, handler, _lastIdentity, null, _accessMode, this );
+        object = _tx.load(_engine, handler, _lastIdentity, null, _accessMode, this);
 
         return object;
 
@@ -236,21 +231,16 @@ public final class QueryResults
     /**
      * Close the query and release all resources held by the query.
      */
-    public void close()
-    {
+    public void close() {
         _query.close();
     }
     
-    public boolean absolute(int row)
-	throws PersistenceException
-    {
-	return _query.absolute(row);
+    public boolean absolute(final int row) throws PersistenceException {
+        return _query.absolute(row);
     }
     
-    public int size()
-	throws PersistenceException
-    {
-	return _query.size();
+    public int size() throws PersistenceException {
+        return _query.size();
     }
 }
 

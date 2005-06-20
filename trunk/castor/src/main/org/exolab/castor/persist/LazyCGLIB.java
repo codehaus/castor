@@ -62,23 +62,40 @@ import java.io.Serializable;
  *
  */
 public interface LazyCGLIB extends Serializable {
-	
-	/** 
-	 * Implementation of writeReplace specific to lazy loading.
-	 * @return The real object.
-	 * @throws ObjectStreamException If the replace activity failed.
-	 */
-	Object writeReplace () throws ObjectStreamException; 
-	
-	/**
-	 * Returns the Class instance for the class to be intercepted.
-	 * @return Class instance for the intercepted class.
-	 */
-	Class interceptedClass();
-	
-	/**
-	 * Returns the identity of the object (class) intercepted.
-	 * @return identity of the object (class) intercepted.
-	 */
-	Object interceptedIdentity();
+    
+    /** 
+     * Implementation of writeReplace specific to lazy loading.
+     * @return The real object.
+     * @throws ObjectStreamException If the replace activity failed.
+     */
+    Object writeReplace () throws ObjectStreamException; 
+    
+    /**
+     * Returns the Class instance for the class to be intercepted.
+     * @return Class instance for the intercepted class.
+     */
+    Class interceptedClass();
+    
+    /**
+     * Returns the identity of the object (class) intercepted.
+     * @return identity of the object (class) intercepted.
+     */
+    Object interceptedIdentity();
+    
+    /**
+     * Returns the ClassMolder of the object intercepted.
+     * @return ClassMolder of the object intercepted.
+     */
+    ClassMolder interceptedClassMolder();
+    
+    /**
+     * Returns the LockEngine of the object intercepted.
+     * @return LockEngine of the object intercepted.
+     */
+    LockEngine interceptedLockEngine();
+    
+    /**
+     * @return true if the object has been materialized; otherwise, returns false.
+     */
+    Boolean interceptedHasMaterialized();
 }

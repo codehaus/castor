@@ -47,12 +47,12 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
-import org.exolab.castor.persist.TransactionContext;
 import org.exolab.castor.util.Messages;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
