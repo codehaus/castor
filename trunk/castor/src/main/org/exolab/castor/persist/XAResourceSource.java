@@ -49,6 +49,8 @@ package org.exolab.castor.persist;
 
 import javax.transaction.xa.Xid;
 
+import org.castor.persist.TransactionContext;
+
 
 /**
  * A data source that wishes to particiate as an XA resource

@@ -49,6 +49,7 @@ package org.exolab.castor.persist;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.util.Messages;
@@ -94,7 +95,7 @@ import org.exolab.castor.util.Messages;
  * @see TransactionContext
  */
 
-final class ObjectLock implements DepositBox {
+public final class ObjectLock implements DepositBox {
 
 	/**
 	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta

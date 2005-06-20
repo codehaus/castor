@@ -45,6 +45,8 @@
 
 package org.exolab.castor.persist;
 
+import org.castor.persist.TransactionContext;
+
 
 /**
  * DepositBox is an interface for {@link ClassMolder} to access the dirty 

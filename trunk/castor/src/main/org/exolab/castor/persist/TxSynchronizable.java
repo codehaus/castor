@@ -46,6 +46,8 @@
 
 package org.exolab.castor.persist;
 
+import org.castor.persist.TransactionContext;
+
 /**
  * This interface offers some callback hooks for several different
  * stages during a transaction.

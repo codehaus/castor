@@ -76,6 +76,7 @@ import net.sf.cglib.proxy.MethodProxy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.ObjectModifiedException;
@@ -3314,6 +3315,12 @@ class SingleProxy
 			return _clazz;
 		} else if ( "interceptedIdentity".equals(methodName) ) {
 			return _identity;
+        } else if ( "interceptedClassMolder".equals(methodName)) {
+            return _classMolder;
+        } else if ( "interceptedLockEngine".equals(methodName)) {   
+            return _engine;
+        } else if ( "interceptedHasMaterialized".equals(methodName)) {
+            return Boolean.valueOf(hasMaterialized);
 		} else if ( "getClass".equals(methodName) ) {
 			return method.invoke(obj, args);
 		} else if ( "finalize".equals(methodName) ) {

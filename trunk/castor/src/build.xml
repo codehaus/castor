@@ -94,7 +94,9 @@
                                               org/exolab/castor/jdo/conf/**/*.java,
                                               org/exolab/castor/jdo/**/*.java,
                                               org/exolab/castor/persist/**/*.java,
-                                              org/exolab/castor/types/**/*.java" />
+                                              org/exolab/castor/types/**/*.java,
+    										  org/castor/util/*.java,
+											  org/castor/persist/**/*.java" />
 
     <target name="targets" description="Prints static list of available targets">
         <echo>

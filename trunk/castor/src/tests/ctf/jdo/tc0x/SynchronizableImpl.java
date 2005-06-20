@@ -46,33 +46,32 @@
 package ctf.jdo.tc0x;
 
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
-import org.exolab.castor.persist.TransactionContext;
+import org.castor.persist.TransactionContext;
 import org.exolab.castor.persist.TxSynchronizable;
 
 
 public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Enumeration enumeration = tx.getObjectEntries();
-        if (enumeration.hasMoreElements()) {
+    public void committed(TransactionContext tx) {
+        Iterator it = tx.iterateReadWriteObjectsInTransaction();
+        if (it.hasNext()) {
             List syncs = TestSynchronizable._synchronizables;
-            while (enumeration.hasMoreElements()) {
-                TransactionContext.ObjectEntry entry =
-                    (TransactionContext.ObjectEntry) enumeration.nextElement();
-                
+            while (it.hasNext()) {
+                Object object = it.next();
+                boolean isDeleted = tx.isDeleted(object);
+                boolean isCreated = tx.isCreated(object);
+                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
+                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
                 String change = "";
-                if (entry.isDeleted()) { change = change + "deleted"; }
-                if (entry.isCreated()) { change = change + "created"; }
-                if (entry.isUpdateCacheNeeded()
-                        || entry.isUpdatePersistNeeded()) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + entry.getObject().toString());
+                if (isDeleted) change = change + "deleted";
+                if (isCreated) change = change + "created";
+                if (isUpdateCacheNeeded || isUpdatePersistNeeded) change = change + "updated";
+                syncs.add(change + ":" + object.toString());
             }
         }
     }
-
     public void rolledback(final TransactionContext tx) {
         TestSynchronizable._synchronizables.add("rolledback");
     }
