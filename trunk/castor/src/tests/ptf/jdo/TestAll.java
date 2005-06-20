@@ -1,30 +1,17 @@
 package ptf.jdo;
 
-import ptf.jdo.rel1toN.TestCreate;
-import ptf.jdo.rel1toN.TestLoadBi1toN;
-import ptf.jdo.rel1toN.TestLoadBiNto1;
-import ptf.jdo.rel1toN.TestLoadLazy1toN;
-import ptf.jdo.rel1toN.TestLoadUni1toN;
-import ptf.jdo.rel1toN.TestLoadUniNto1;
-import ptf.jdo.rel1toN.TestRemove;
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Run all tests of the ptf.jdo.rel1toN package.
+ * Run all tests of the ptf.jdo package.
  */
 public class TestAll extends TestCase {
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("All ptf.jdo.rel1toN performance tests");
+        TestSuite suite = new TestSuite("All ptf.jdo performance tests");
 
-        suite.addTest(TestCreate.suite());
-        suite.addTest(TestLoadBiNto1.suite());
-        suite.addTest(TestLoadUniNto1.suite());
-        suite.addTest(TestLoadBi1toN.suite());
-        suite.addTest(TestLoadLazy1toN.suite());
-        suite.addTest(TestLoadUni1toN.suite());
-        suite.addTest(TestRemove.suite());
+        suite.addTest(ptf.jdo.rel1toN.TestAll.suite());
 
         return suite;
     }
