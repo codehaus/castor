@@ -81,9 +81,19 @@ public class Type {
         sb.append("' number='"); sb.append(_number);
         sb.append("' description='"); sb.append(_description);
         sb.append("' note='"); sb.append(_note);
-        sb.append("' createdAt='"); sb.append(df.format(_createdAt));
+        sb.append("' createdAt='"); 
+        if (_createdAt != null) {
+            sb.append(df.format(_createdAt));
+        } else {
+            sb.append(_createdAt);
+        }
         sb.append("' createdBy='"); sb.append(_createdBy);
-        sb.append("' updatedAt='"); sb.append(df.format(_updatedAt));
+        sb.append("' updatedAt='"); 
+        if (_updatedAt != null) { 
+            sb.append(df.format(_updatedAt));
+        } else {
+            sb.append(_updatedAt);
+        }
         sb.append("' updatedBy='"); sb.append(_updatedBy);
         sb.append("'/>\n");
         

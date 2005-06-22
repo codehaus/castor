@@ -89,15 +89,30 @@ public class Service {
         sb.append("' number='"); sb.append(_number);
         sb.append("' name='"); sb.append(_name);
         sb.append("' description='"); sb.append(_description);
-        sb.append("' date='"); sb.append(df.format(_date));
+        sb.append("' date='"); 
+        if (_date != null) { 
+            sb.append(df.format(_date));
+        } else {
+            sb.append(_date);
+        }
         sb.append("' flag1='"); sb.append(_flag1);
         sb.append("' flag2='"); sb.append(_flag2);
         sb.append("' flag3='"); sb.append(_flag3);
         sb.append("' flag4='"); sb.append(_flag4);
         sb.append("' note='"); sb.append(_note);
-        sb.append("' createdAt='"); sb.append(df.format(_createdAt));
+        sb.append("' createdAt='"); 
+        if (_createdAt != null) {
+            sb.append(df.format(_createdAt));
+        } else {
+            sb.append(_createdAt);
+        }
         sb.append("' createdBy='"); sb.append(_createdBy);
-        sb.append("' updatedAt='"); sb.append(df.format(_updatedAt));
+        sb.append("' updatedAt='"); 
+        if (_updatedAt != null) { 
+            sb.append(df.format(_updatedAt));
+        } else {
+            sb.append(_updatedAt);
+        }
         sb.append("' updatedBy='"); sb.append(_updatedBy);
         sb.append("'>\n");
 
