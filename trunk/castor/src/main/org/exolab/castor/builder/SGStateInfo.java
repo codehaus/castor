@@ -59,7 +59,9 @@ import org.exolab.castor.xml.schema.Schema;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.javasource.*;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Vector;
 
@@ -77,8 +79,6 @@ class SGStateInfo extends ClassInfoResolverImpl {
     public static final int NORMAL_STATUS = 0;
     public static final int STOP_STATUS = 1;
 
-    private Hashtable   _classTypes  = null;
-    
     /**
      * The in memory mapping files for each
      * package
@@ -119,7 +119,9 @@ class SGStateInfo extends ClassInfoResolverImpl {
     
     private int _status = NORMAL_STATUS;
     
-    private Hashtable _sources = null;
+    private Map _sourcesByComponent = null;
+    
+    private Map _sourcesByName = null;
     
     
     
@@ -133,13 +135,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
      */
     protected SGStateInfo(Schema schema, SourceGenerator sgen) {
         super();
-        _schema        = schema;
-        packageName    = "";
-        _classTypes    = new Hashtable();
-        _processed     = new Vector();
-        _dialog        = new ConsoleDialog();
-        _sources       = new Hashtable();
-        _sgen          = sgen;
+        _schema             = schema;
+        packageName         = "";
+        _processed          = new Vector();
+        _dialog             = new ConsoleDialog();
+        _sourcesByComponent = new HashMap();
+        _sourcesByName      = new HashMap();
+        _sgen               = sgen;
     } //-- SGStateInfo
     
     /**
@@ -150,7 +152,13 @@ class SGStateInfo extends ClassInfoResolverImpl {
      * @param classes the JClass[] to bind 
      */
     public void bindSourceCode(Annotated annotated, JClass[] classes) {
-        _sources.put(annotated, classes);
+        _sourcesByComponent.put(annotated, classes);
+        for (int i = 0; i < classes.length; i++) {
+            JClass jClass = classes[i];
+            if (jClass != null) {
+                _sourcesByName.put(jClass.getName(), jClass);
+            }
+        }
     } //-- bindSourceCode
        
     /**
@@ -178,8 +186,21 @@ class SGStateInfo extends ClassInfoResolverImpl {
      * @return the JClass array
      */
     public JClass[] getSourceCode(Annotated annotated) {
-        return (JClass[])_sources.get(annotated);
+        return (JClass[])_sourcesByComponent.get(annotated);
     } //-- getSourceCode
+    
+    /**
+     * Returns the JClass with the given name or null
+     * if no bindings have been specified for a JClass
+     * with the name.
+     * 
+     * @param className the name of the JClass
+     * @return the JClass if found
+     */
+    public JClass getSourceCode(String className) {
+        return (JClass)_sourcesByName.get(className);
+    } //-- getSourceCode
+    
     
     /**
      * Returns the Mapping file associated with 
