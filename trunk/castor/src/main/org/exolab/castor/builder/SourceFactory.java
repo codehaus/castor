@@ -363,6 +363,8 @@ public class SourceFactory {
                      XMLBindingComponent baseComponent = new XMLBindingComponent(_config);
                      baseComponent.setBinding(component.getBinding());
                      baseComponent.setView(complexType);
+                     //-- call createSourceCode to pre-process the complexType
+                     createSourceCode(baseComponent, sgState);
                      String baseClassName = null;
                      String basePackage = baseComponent.getJavaPackage();
                      //--if the base class is not in the same package
@@ -970,7 +972,17 @@ public class SourceFactory {
 			methodName+= parent.getName(true);
 
 		//-- create main marshal method
-        JMethod jMethod = new JMethod(SGTypes.Object ,methodName);
+        JClass returnType = parent;
+        while (returnType.getSuperClass() != null) {
+            JClass superClass = sgState.getSourceCode(returnType.getSuperClass());
+            if (superClass != null) {
+                returnType = superClass;
+            }
+            else {
+                break;
+            }
+        }
+        JMethod jMethod = new JMethod(returnType ,methodName);
         jMethod.getModifiers().setStatic(true);
         jMethod.addException(SGTypes.MarshalException);
         jMethod.addException(SGTypes.ValidationException);
