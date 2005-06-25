@@ -1,3 +1,18 @@
+/*
+ * Copyright 2005 Ralf Joachim
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ptf.jdo.rel1toN;
 
 import java.text.DecimalFormat;
@@ -15,6 +30,10 @@ import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 
+/**
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
+ */
 public final class TestCreate extends TestCase {
     private static final String JDO_CONF_FILE = "uni-jdo-conf.xml";
     private static final String DATABASE_NAME = "rel1toN_uni";
@@ -83,7 +102,7 @@ public final class TestCreate extends TestCase {
         QueryResults results = query.execute();
         
         int count = 0;
-        while(results.hasMore()) {
+        while (results.hasMore()) {
             Locked locked = (Locked) results.next();
             assertTrue(new Integer(1).equals(locked.getId())
                     || new Integer(2).equals(locked.getId())
@@ -133,7 +152,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " state objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " state objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
     
     public void testCreateDepartment() throws Exception {
@@ -167,7 +187,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " department objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " department objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
     
     public void testCreateReason() throws Exception {
@@ -196,7 +217,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " reason objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " reason objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
     
     public void testCreateSupplier() throws Exception {
@@ -224,7 +246,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " supplier objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " supplier objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
     
     public void testCreateType() throws Exception {
@@ -252,7 +275,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " type objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " type objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
     
     public void testCreateEquipment() throws Exception {
@@ -307,7 +331,8 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " equipment objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " equipment objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
 
     public void testCreateService() throws Exception {
@@ -347,6 +372,7 @@ public final class TestCreate extends TestCase {
         db.commit();
         db.close();
 
-        LOG.info("Created " + (count - 1) + " service objects in " + (System.currentTimeMillis() - time) + "ms.");
+        LOG.info("Created " + (count - 1) + " service objects in "
+               + (System.currentTimeMillis() - time) + "ms.");
     }
 }

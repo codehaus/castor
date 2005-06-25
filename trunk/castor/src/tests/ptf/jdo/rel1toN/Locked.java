@@ -1,9 +1,28 @@
+/*
+ * Copyright 2005 Ralf Joachim
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ptf.jdo.rel1toN;
 
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class Locked {
+/**
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
+ */
+public final class Locked {
     //-------------------------------------------------------------------------
     
     private Integer         _id;
@@ -15,28 +34,28 @@ public class Locked {
     //-------------------------------------------------------------------------
     
     public Integer getId() { return _id; }
-    public void setId(Integer id) { _id = id; }
+    public void setId(final Integer id) { _id = id; }
     
     public String getName() { return _name; }
-    public void setName(String name) { _name = name; }
+    public void setName(final String name) { _name = name; }
     
     public boolean getIn() { return _in; }
-    public void setIn(boolean in) { _in = in; }
+    public void setIn(final boolean in) { _in = in; }
     
     public boolean getOut() { return _out; }
-    public void setOut(boolean out) { _out = out; }
+    public void setOut(final boolean out) { _out = out; }
     
     public Collection getStates() { return _states; }
-    public void setStates(Collection states) {
+    public void setStates(final Collection states) {
         _states = states;
     }
-    public void addState(State state) {
+    public void addState(final State state) {
         if ((state != null) && (!_states.contains(state))) {
             _states.add(state);
             state.setLocked(this);
         }
     }
-    public void removeState(State state) {
+    public void removeState(final State state) {
         if ((state != null) && (_states.contains(state))) {
             _states.remove(state);
             state.setLocked(null);
