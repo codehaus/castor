@@ -1,3 +1,18 @@
+/*
+ * Copyright 2005 Ralf Joachim
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ptf.jdo.rel1toN;
 
 import java.text.DecimalFormat;
@@ -15,11 +30,15 @@ import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 
+/**
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
+ */
 public final class TestLoadBiNto1 extends TestCase {
     private static final String JDO_CONF_FILE = "bi-jdo-conf.xml";
     private static final String DATABASE_NAME = "rel1toN_bi";
     
-    private static final DecimalFormat df = new DecimalFormat("#,##0");
+    private static final DecimalFormat DF = new DecimalFormat("#,##0");
     
     private static final Log LOG = LogFactory.getLog(TestLoadBiNto1.class);
     private static boolean _logHeader = false;
@@ -106,11 +125,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadWriteEmpty",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadWriteCached() throws Exception {
@@ -145,11 +164,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadWriteCached",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadOnlyEmpty() throws Exception {
@@ -185,11 +204,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadOnlyEmpty",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadOnlyCached() throws Exception {
@@ -224,11 +243,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadOnlyCached",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
 
     public void testReadWriteOidEmpty() throws Exception {
@@ -241,9 +260,9 @@ public final class TestLoadBiNto1 extends TestCase {
         long begin = System.currentTimeMillis();
         
         OQLQuery query = db.getOQLQuery(
-                "CALL SQL select PTF_SERVICE.ID as ID " +
-                "from PTF_SERVICE order by PTF_SERVICE.ID " +
-                "AS ptf.jdo.rel1toN.OID");
+                "CALL SQL select PTF_SERVICE.ID as ID "
+              + "from PTF_SERVICE order by PTF_SERVICE.ID "
+              + "AS ptf.jdo.rel1toN.OID");
         QueryResults results = query.execute(Database.ReadOnly);
         
         long result = System.currentTimeMillis();
@@ -267,11 +286,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadWriteOidEmpty",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadWriteOidCached() throws Exception {
@@ -283,9 +302,9 @@ public final class TestLoadBiNto1 extends TestCase {
         long begin = System.currentTimeMillis();
         
         OQLQuery query = db.getOQLQuery(
-                "CALL SQL select PTF_SERVICE.ID as ID " +
-                "from PTF_SERVICE order by PTF_SERVICE.ID " +
-                "AS ptf.jdo.rel1toN.OID");
+                "CALL SQL select PTF_SERVICE.ID as ID "
+              + "from PTF_SERVICE order by PTF_SERVICE.ID "
+              + "AS ptf.jdo.rel1toN.OID");
         QueryResults results = query.execute(Database.ReadOnly);
         
         long result = System.currentTimeMillis();
@@ -309,11 +328,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadWriteOidCached",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadOnlyOidEmpty() throws Exception {
@@ -326,9 +345,9 @@ public final class TestLoadBiNto1 extends TestCase {
         long begin = System.currentTimeMillis();
         
         OQLQuery query = db.getOQLQuery(
-                "CALL SQL select PTF_SERVICE.ID as ID " +
-                "from PTF_SERVICE order by PTF_SERVICE.ID " +
-                "AS ptf.jdo.rel1toN.OID");
+                "CALL SQL select PTF_SERVICE.ID as ID "
+              + "from PTF_SERVICE order by PTF_SERVICE.ID "
+              + "AS ptf.jdo.rel1toN.OID");
         QueryResults results = query.execute(Database.ReadOnly);
         
         long result = System.currentTimeMillis();
@@ -352,11 +371,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadOnlyOidEmpty",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadOnlyOidCached() throws Exception {
@@ -368,9 +387,9 @@ public final class TestLoadBiNto1 extends TestCase {
         long begin = System.currentTimeMillis();
         
         OQLQuery query = db.getOQLQuery(
-                "CALL SQL select PTF_SERVICE.ID as ID " +
-                "from PTF_SERVICE order by PTF_SERVICE.ID " +
-                "AS ptf.jdo.rel1toN.OID");
+                "CALL SQL select PTF_SERVICE.ID as ID "
+              + "from PTF_SERVICE order by PTF_SERVICE.ID "
+              + "AS ptf.jdo.rel1toN.OID");
         QueryResults results = query.execute(Database.ReadOnly);
         
         long result = System.currentTimeMillis();
@@ -394,11 +413,11 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadOnlyOidCached",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
     public void testReadOnlyOidOnly() throws Exception {
@@ -410,9 +429,9 @@ public final class TestLoadBiNto1 extends TestCase {
         long begin = System.currentTimeMillis();
         
         OQLQuery query = db.getOQLQuery(
-                "CALL SQL select PTF_SERVICE.ID as ID " +
-                "from PTF_SERVICE order by PTF_SERVICE.ID " +
-                "AS ptf.jdo.rel1toN.OID");
+                "CALL SQL select PTF_SERVICE.ID as ID "
+              + "from PTF_SERVICE order by PTF_SERVICE.ID "
+              + "AS ptf.jdo.rel1toN.OID");
         QueryResults results = query.execute(Database.ReadOnly);
         
         long result = System.currentTimeMillis();
@@ -435,15 +454,16 @@ public final class TestLoadBiNto1 extends TestCase {
         long close = System.currentTimeMillis();
         
         LOG.info(format("ReadOnlyOidOnly",
-                         df.format(begin - start),
-                         df.format(result- begin),
-                         df.format(iterate - result),
-                         df.format(commit - iterate),
-                         df.format(close - commit)));
+                         DF.format(begin - start),
+                         DF.format(result - begin),
+                         DF.format(iterate - result),
+                         DF.format(commit - iterate),
+                         DF.format(close - commit)));
     }
     
-    private static String format(String head, String begin, String result,
-                                 String iterate, String commit, String close) {
+    private static String format(final String head, final String begin,
+                                 final String result, final String iterate,
+                                 final String commit, final String close) {
         
         StringBuffer sb = new StringBuffer();
         sb.append(format(head, 20, true));
@@ -455,7 +475,7 @@ public final class TestLoadBiNto1 extends TestCase {
         return sb.toString();
     }
     
-    private static String format(String str, int len, boolean after) {
+    private static String format(final String str, final int len, final boolean after) {
         StringBuffer sb = new StringBuffer();
         if (str != null) {
             sb.append(str);

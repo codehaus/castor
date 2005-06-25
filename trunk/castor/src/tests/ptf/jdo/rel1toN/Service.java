@@ -1,80 +1,99 @@
+/*
+ * Copyright 2005 Ralf Joachim
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ptf.jdo.rel1toN;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class Service {
+/**
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
+ */
+public final class Service {
     //-------------------------------------------------------------------------
     
-	private Integer			_id;
-	private Equipment	    _equipment;
-	private Integer 		_number;
-	private String 			_name;
-	private String			_description;
-	private Date			_date;
-	private boolean			_flag1;
-	private boolean 		_flag2;
-	private boolean 		_flag3;
-	private boolean 		_flag4;
-	private String			_note;
-	private Date			_createdAt;
-	private String			_createdBy;
-	private Date			_updatedAt;
-	private String			_updatedBy;
+    private Integer         _id;
+    private Equipment       _equipment;
+    private Integer         _number;
+    private String          _name;
+    private String          _description;
+    private Date            _date;
+    private boolean         _flag1;
+    private boolean         _flag2;
+    private boolean         _flag3;
+    private boolean         _flag4;
+    private String          _note;
+    private Date            _createdAt;
+    private String          _createdBy;
+    private Date            _updatedAt;
+    private String          _updatedBy;
     
     //-------------------------------------------------------------------------
-	
+
     public Integer getId() { return _id; }
-    public void setId(Integer id) { _id = id; }
+    public void setId(final Integer id) { _id = id; }
 
     public Equipment getEquipment() { return _equipment; }
-    public void setEquipment(Equipment equipment) { _equipment = equipment; }
+    public void setEquipment(final Equipment equipment) { _equipment = equipment; }
     
     public Integer getNumber() { return _number; }
-    public void setNumber(Integer number) { _number = number; }
+    public void setNumber(final Integer number) { _number = number; }
     
     public String getName() { return _name; }
-    public void setName(String name) { _name =  name; }
+    public void setName(final String name) { _name =  name; }
     
-	public String getDescription() { return _description; }
-    public void setDescription(String description) { _description = description; }
+    public String getDescription() { return _description; }
+    public void setDescription(final String description) { _description = description; }
     
     public Date getDate() { return _date; }
-    public void setDate(Date date) { _date = date; }
+    public void setDate(final Date date) { _date = date; }
     
     public boolean getFlag1() { return _flag1; }
-    public void setFlag1(boolean flag1) { _flag1 = flag1; }
+    public void setFlag1(final boolean flag1) { _flag1 = flag1; }
     
     public boolean getFlag2() { return _flag2; }
-    public void setFlag2(boolean flag2) { _flag2 = flag2; }
+    public void setFlag2(final boolean flag2) { _flag2 = flag2; }
     
     public boolean getFlag3() { return _flag3; }
-    public void setFlag3(boolean flag3) { _flag3 = flag3; }
+    public void setFlag3(final boolean flag3) { _flag3 = flag3; }
     
     public boolean getFlag4() { return _flag4; }
-    public void setFlag4(boolean flag4) { _flag4 = flag4; }
+    public void setFlag4(final boolean flag4) { _flag4 = flag4; }
     
     public String getNote() { return _note; }
-    public void setNote(String note) { _note = note; }
+    public void setNote(final String note) { _note = note; }
     
     public Date getCreatedAt() { return _createdAt; }
-    public void setCreatedAt(Date createdAt) { _createdAt = createdAt; }
+    public void setCreatedAt(final Date createdAt) { _createdAt = createdAt; }
     
     public String getCreatedBy() { return _createdBy; }
-    public void setCreatedBy(String createdBy) { _createdBy = createdBy; }
+    public void setCreatedBy(final String createdBy) { _createdBy = createdBy; }
     
-    public void setCreated(Date createdAt, String createdBy) {
+    public void setCreated(final Date createdAt, final String createdBy) {
         _createdAt = createdAt;
         _createdBy = createdBy;
     }
 
     public Date getUpdatedAt() { return _updatedAt; }
-    public void setUpdatedAt(Date updatedAt) { _updatedAt = updatedAt; }
+    public void setUpdatedAt(final Date updatedAt) { _updatedAt = updatedAt; }
     
     public String getUpdatedBy() { return _updatedBy; }
-    public void setUpdatedBy(String updatedBy) { _updatedBy = updatedBy; }
+    public void setUpdatedBy(final String updatedBy) { _updatedBy = updatedBy; }
     
-    public void setUpdated(Date updatedAt, String updatedBy) {
+    public void setUpdated(final Date updatedAt, final String updatedBy) {
         _updatedAt = updatedAt;
         _updatedBy = updatedBy;
     }

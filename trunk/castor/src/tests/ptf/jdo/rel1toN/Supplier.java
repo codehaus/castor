@@ -1,3 +1,18 @@
+/*
+ * Copyright 2005 Ralf Joachim
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package ptf.jdo.rel1toN;
 
 import java.text.SimpleDateFormat;
@@ -5,11 +20,15 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 
-public class Supplier {
+/**
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
+ */
+public final class Supplier {
     //-------------------------------------------------------------------------
     
     private Integer             _id;
-    private String 				_name;
+    private String              _name;
     private String              _description;
     private Collection          _equipments = new ArrayList();
     private String              _note;
@@ -21,25 +40,25 @@ public class Supplier {
     //-------------------------------------------------------------------------
     
     public Integer getId() { return _id; }
-    public void setId(Integer id) { _id = id; }
+    public void setId(final Integer id) { _id = id; }
 
     public String getName() { return _name; }
-    public void setName(String name) { _name = name; }
+    public void setName(final String name) { _name = name; }
     
     public String getDescription() { return _description; }
-    public void setDescription(String description) { _description = description; }
+    public void setDescription(final String description) { _description = description; }
         
     public Collection getEquipments() { return _equipments; }
-    public void setEquipments(Collection equipments) {
+    public void setEquipments(final Collection equipments) {
         _equipments = equipments;
     }
-    public void addEquipment(Equipment equipment) {
+    public void addEquipment(final Equipment equipment) {
         if ((equipment != null) && (!_equipments.contains(equipment))) {
             _equipments.add(equipment);
             equipment.setSupplier(this);
         }
     }
-    public void removeEquipment(Equipment equipment) {
+    public void removeEquipment(final Equipment equipment) {
         if ((equipment != null) && (_equipments.contains(equipment))) {
             _equipments.remove(equipment);
             equipment.setSupplier(null);
@@ -47,26 +66,26 @@ public class Supplier {
     }
 
     public String getNote() { return _note; }
-    public void setNote(String note) { _note = note; }
+    public void setNote(final String note) { _note = note; }
     
     public Date getCreatedAt() { return _createdAt; }
-    public void setCreatedAt(Date createdAt) { _createdAt = createdAt; }
+    public void setCreatedAt(final Date createdAt) { _createdAt = createdAt; }
     
     public String getCreatedBy() { return _createdBy; }
-    public void setCreatedBy(String createdBy) { _createdBy = createdBy; }
+    public void setCreatedBy(final String createdBy) { _createdBy = createdBy; }
     
-    public void setCreated(Date createdAt, String createdBy) {
+    public void setCreated(final Date createdAt, final String createdBy) {
         _createdAt = createdAt;
         _createdBy = createdBy;
     }
 
     public Date getUpdatedAt() { return _updatedAt; }
-    public void setUpdatedAt(Date updatedAt) { _updatedAt = updatedAt; }
+    public void setUpdatedAt(final Date updatedAt) { _updatedAt = updatedAt; }
     
     public String getUpdatedBy() { return _updatedBy; }
-    public void setUpdatedBy(String updatedBy) { _updatedBy = updatedBy; }
+    public void setUpdatedBy(final String updatedBy) { _updatedBy = updatedBy; }
     
-    public void setUpdated(Date updatedAt, String updatedBy) {
+    public void setUpdated(final Date updatedAt, final String updatedBy) {
         _updatedAt = updatedAt;
         _updatedBy = updatedBy;
     }
