@@ -66,7 +66,11 @@
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
 
     <!-- <case class="jdo.TestTransientAttribute" id="TC84a" /> -->
-	
+
+    <!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
   </category>
 
   <category name="mssql" class="jdo.JDOCategory">
@@ -133,7 +137,11 @@
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
-	
+
+    <!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
   </category>
 
   <category name="mysql" class="jdo.JDOCategory">
@@ -202,7 +210,11 @@
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
-	
+
+    <!-- tc9x -->
+    <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
+    <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
+    <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -269,7 +281,11 @@
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
-	
+
+    <!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
   </category>
 
   <category name="postgresql" class="jdo.JDOCategory">
@@ -337,7 +353,11 @@
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
-	
+
+    <!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
@@ -404,7 +424,11 @@
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
-	
+
+    <!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
   </category>
 
   <category name="sybase" class="jdo.JDOCategory">
@@ -472,6 +496,71 @@
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 	
+  </category>
+
+  <category name="db2" class="jdo.JDOCategory">
+    <description>JDO tests for Oracle8i</description>
+    <jdo database-name="db2" configuration="db2.xml" />
+
+    <!-- tc0x -->
+    <case id="TC01" class="ctf.jdo.tc0x.TestDuplicateKey"/>
+    <!-- <case id="TC02" class="ctf.jdo.tc0x.TestConcurrent"/> --> <!-- temp. disabled -->
+    <case id="TC03" class="ctf.jdo.tc0x.TestReadOnly"/>
+    <case id="TC04" class="ctf.jdo.tc0x.TestDeadlock"/>
+    <case id="TC05" class="ctf.jdo.tc0x.TestUpdate"/>
+    <case id="TC06" class="ctf.jdo.tc0x.TestRaceCondition"/>
+    <case id="TC07" class="ctf.jdo.tc0x.TestCacheLeakage"/>
+    <case id="TC08" class="ctf.jdo.tc0x.TestCache"/>
+    <case id="TC09" class="ctf.jdo.tc0x.TestSynchronizable"/>
+
+    <!-- tc1x -->
+    <!-- <case id="TC10" class="ctf.jdo.tc1x.TestTypeHandling"/> --> <!-- temp. disabled -->
+    <case id="TC11" class="ctf.jdo.tc1x.TestTypeLOB"/>
+    <case id="TC12" class="ctf.jdo.tc1x.TestTypeConversion"/>
+    <case id="TC13" class="ctf.jdo.tc1x.TestSerializable"/>
+    <case id="TC14" class="ctf.jdo.tc1x.TestRollbackPrimitive"/>
+    <case id="TC15" class="ctf.jdo.tc1x.TestMultiPrimKeys"/>
+    <case id="TC16" class="ctf.jdo.tc1x.TestNestedFields"/>
+    <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
+    <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
+    <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+
+    <!-- B -->
+    <case class="jdo.ManyToMany" id="TC23"/>
+    <case class="jdo.Dependent" id="TC24"/>
+    <case class="jdo.DependentKeyGen" id="TC24a"/>
+    <case class="jdo.DependentUpdate" id="TC25"/>
+    <case class="jdo.DependentKeyGenUpdate" id="TC25a"/>
+    <case class="jdo.LazyLoading" id="TC26"/>
+    <case class="jdo.Collections" id="TC28"/>
+    <case class="jdo.OqlExtends" id="TC30"/>
+    <case class="jdo.DependentOrder" id="TC31"/>
+    <case class="jdo.ManyToManyKeyGen" id="TC31a"/>
+    <case class="jdo.CircularRef" id="TC32"/>
+    <case class="jdo.CallSql" id="TC33"/>
+    <!-- <case class="jdo.CachedOid" id="TC37"/> --> <!-- temp. disabled -->
+
+    <!-- C -->
+    <case class="jdo.KeyGenGeneric" id="TC41"/>
+    <case class="jdo.KeyGenSequence" id="TC42"/>
+    <!-- <case class="jdo.KeyGenReturning" id="TC43"/> --> <!-- temp. disabled -->
+    <!-- <case class="jdo.KeyGenIdentity" id="TC44"/> -->
+    <case class="jdo.KeyGenUuid" id="TC45"/>
+    <!-- <case class="jdo.StoredProcedure" id="TC49"/> -->
+
+    <!-- D -->
+    <case class="jdo.OqlTests" id="TC61"/>
+    <!-- <case class="jdo.TestLimitClause" id="TC62"/> -->
+    <!-- <case class="jdo.TestLimitWithOffsetClause" id="TC62a"/> -->
+    <!-- <case class="jdo.Size" id="TC66"/> -->
+    <case class="jdo.SizeOracle" id="TC66a"/>
+    <case class="jdo.Absolute" id="TC67"/>
+    <!-- <case class="jdo.ExpireManyToMany" id="TC71"/> -->
+    <!-- <case class="jdo.ExpireLazyEmployee" id="TC72"/> -->
+
+	<!-- <case class="ctf.jdo.tc9x.TestPolymorphism" id="TC97" /> -->
+    <case class="jdo.QueryFinalize" id="TC100"/>
+    <case class="jdo.tc166.TestLazy1to1" id="TC166" />
   </category>
 
 <!--

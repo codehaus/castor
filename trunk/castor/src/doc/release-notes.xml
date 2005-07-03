@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="874" tool="jira">
+                    <description>
+		                Added DB2 category to src/tests/tests.xml.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050703</date>
+                </bug>
                 <bug id="1085" tool="jira">
                     <description>
 		                Complete rewrite of TransactionContext with regards to obejct tracking.

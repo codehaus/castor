@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-874 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Added DB2 category to src/tests/tests.xml.
+       Details: http://jira.codehaus.org/browse/CASTOR-874
+       (Werner - 20050703)
+       
 JDO:   Fixed bug CASTOR-1085 using contribution from Gregory Block [gblock@ctoforaday.com]
        Complete rewrite of TransactionContext with regards to obejct tracking.
        Details: http://jira.codehaus.org/browse/CASTOR-1085
