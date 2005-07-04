@@ -47,7 +47,7 @@
     <section title="Reporting Bugs and Bug Tracking">
        <p>
        If you find a bug, please file a report in our Bugzilla server at:
-       <url>http://bugzilla.exolab.org</url>
+       <url>http://jira.codehaus.org/browse/CASTOR</url>
       </p>
       <p>
          Before submitting bugs, please read the

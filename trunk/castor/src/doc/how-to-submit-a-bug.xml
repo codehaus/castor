@@ -43,7 +43,7 @@
 			  scenario.</p>
 				
 			<p>Per definition, any problem report submitted (in other words, most likely attached 
-			   to a bug report at http://bugzilla.exolab.org) by the means of a patch has to 
+			   to a bug report at http://jira.codehaus.org/browse/CASTOR) by the means of a patch has to 
 			   include the following artefacts:</p>
 				
 			<ul>

@@ -153,7 +153,7 @@
                <li>Provide a JAXB compatibility layer. (kvisco + arnaud)</li>
                <li>
                   For more items, please use
-                  <a href="http://bugzilla.exolab.org">Bugzilla</a>
+                  <a href="http://jira.codehaus.org/browse/CASTOR">Bugzilla</a>
                </li>
             </ul>
           </section>
@@ -164,7 +164,7 @@
                <li>Extensibility API.</li>
                <li>
                   For more items, please use
-                  <a href="http://bugzilla.exolab.org">Bugzilla</a>
+                  <a href="http://jira.codehaus.org/browse/CASTOR">Bugzilla</a>
                </li>
             </ul>
          </section>
@@ -178,7 +178,7 @@
                <li>Improve namespace support</li>
                <li>
                   For more items, please use
-                  <a href="http://bugzilla.exolab.org">Bugzilla</a>
+                  <a href="http://jira.codehaus.org/browse/CASTOR">Bugzilla</a>
                </li>
 
             </ul>
@@ -204,7 +204,7 @@
        </p>
        <p>
        The current tasks for the next release are being tracked in Bugzilla
-       (<a href="http://bugzilla.exolab.org">http://bugzilla.exolab.org</a>).
+       (<a href="http://jira.codehaus.org/browse/CASTOR">http://jira.codehaus.org/browse/CASTOR</a>).
        </p>
 
     </section>
