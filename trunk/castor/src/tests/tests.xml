@@ -212,9 +212,10 @@
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
     <!-- tc9x -->
-    <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
-    <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
-    <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
+	
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -558,7 +559,11 @@
     <!-- <case class="jdo.ExpireManyToMany" id="TC71"/> -->
     <!-- <case class="jdo.ExpireLazyEmployee" id="TC72"/> -->
 
-	<!-- <case class="ctf.jdo.tc9x.TestPolymorphism" id="TC97" /> -->
+	<!-- tc9x -->
+    <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
+    <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
+    <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
+	
     <case class="jdo.QueryFinalize" id="TC100"/>
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
   </category>
