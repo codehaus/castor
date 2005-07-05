@@ -40,40 +40,27 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$ 
+ * $Id$
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+/**
+ * Test object for MAX key generator.
+ */
+public class MaxObject extends AbstractKeyGenObject {
+    public static final String DEFAULT_ATTR = "attr";
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+    private String _attr;
 
-
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
+    public MaxObject() {
+        _attr = DEFAULT_ATTR;
     }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
+
+    public final void setAttr(final String attr) { _attr = attr; }
+    public final String getAttr() { return _attr; }
+
+    public String toString() {
+        return super.toString() + " / " + _attr;
     }
 }

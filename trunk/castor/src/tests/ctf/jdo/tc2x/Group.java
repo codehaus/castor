@@ -40,40 +40,33 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$ 
+ * $Id$
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+/**
+ * Test object mapping to test_group used to conduct relation the tests.
+ */
+public final class Group {
+    public static final int DEFAULT_ID = 4;
+    public static final String DEFAULT_VALUE = "group";
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+    private int _id;
+    private String _value;
 
-
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
+    public Group() {
+        _id = DEFAULT_ID;
+        _value = DEFAULT_VALUE;
     }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
+
+    public void setId(final int id) { _id = id; }
+    public int getId() { return _id; }
+
+    public void setValue1(final String value) { _value = value; }
+    public String getValue1() { return _value; }
+
+    public String toString() {
+        return _id + " / " + _value;
     }
 }

@@ -40,40 +40,28 @@
  *
  * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$ 
+ * $Id$
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+/**
+ * Test "extends" relation for IDENTITY key generator.
+ */
+public final class IdentityExtends extends IdentityObject {
+    public static final String DEFAULT_EXT = "ext";
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+    private String _ext;
 
-
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
+    public IdentityExtends() {
+        super();
+        _ext = DEFAULT_EXT;
     }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
+
+    public void setExt(final String ext) { _ext = ext; }
+    public String getExt() { return _ext; }
+
+    public String toString() {
+        return super.toString() + " / " + _ext;
     }
 }

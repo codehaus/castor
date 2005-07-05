@@ -43,37 +43,23 @@
  * $Id$ 
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+/**
+ * @table DEPEND2
+ * @key-generator MAX
+ * @depends jdo.Master
+ */
+public final class Depend2 {
+    /** @sql-name master_oid */
+    private DependMaster _master;
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+    /** @primary-key */
+    private int _id;
 
+    public int getId() { return _id; }
+    public void setId(final int id) { _id = id; }
 
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
-    }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
-    }
+    public DependMaster getMaster() { return _master; }
+    public void setMaster(final DependMaster master) { _master = master; }
 }

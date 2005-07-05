@@ -43,37 +43,39 @@
  * $Id$ 
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+import java.util.ArrayList;
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+/**
+ * @table MASTER
+ * @key-generator MAX
+ */
+public final class DependMaster {
+    /** @primary-key */
+    private int _id;
 
+    /** @sql-name depend1_oid */
+    private Depend1 _depend1;
 
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
+    /** @field-type jdo.Depend2
+     *  @many-key master_oid */
+    private ArrayList _depends2 = new ArrayList();
+
+    public int getId() { return _id; }
+    public void setId(final int id) { _id = id; }
+
+    public Depend1 getDepend1() { return _depend1; }
+    public void setDepend1(final Depend1 depend1) { _depend1 = depend1; }
+
+    public ArrayList getDepends2() { return _depends2; }
+    public void setDepends2(final ArrayList depends2) { _depends2 = depends2; }
+    public void addDepend2(final Depend2 depend2) {
+        _depends2.add(depend2);
+        depend2.setMaster(this);
     }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
+
+    public String toString() {
+        return "Master object #" + _id;
     }
 }
