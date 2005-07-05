@@ -38,42 +38,54 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
+ * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
  *
- * $Id$ 
+ * $Id$
  */
 
-package ctf.jdo.tc0x;
+package ctf.jdo.tc2x;
 
-import java.util.Iterator;
-import java.util.List;
+/**
+ * Test object mapping to test_detail2 used to conduct relation tests.
+ */
+public final class DetailKeyGen2 {
+    public static final int DEFAULT_ID = 5;
+    public static final String DEFAULT_VALUE = "value";
 
-import org.castor.persist.TransactionContext;
-import org.exolab.castor.persist.TxSynchronizable;
+    private int _id;
+    private String _value;
+    private DetailKeyGen _detail;
 
-
-public final class SynchronizableImpl implements TxSynchronizable {
-    public void committed(final TransactionContext tx) {
-        Iterator it = tx.iterateReadWriteObjectsInTransaction();
-        if (it.hasNext()) {
-            List syncs = TestSynchronizable._synchronizables;
-            while (it.hasNext()) {
-                Object object = it.next();
-                boolean isDeleted = tx.isDeleted(object);
-                boolean isCreated = tx.isCreated(object);
-                boolean isUpdateCacheNeeded = tx.isUpdateCacheNeeded(object);
-                boolean isUpdatePersistNeeded = tx.isUpdatePersistNeeded(object);
-                String change = "";
-                if (isDeleted) { change = change + "deleted"; }
-                if (isCreated) { change = change + "created"; }
-                if (isUpdateCacheNeeded || isUpdatePersistNeeded) {
-                    change = change + "updated";
-                }
-                syncs.add(change + ":" + object.toString());
-            }
-        }
+    public DetailKeyGen2(final int id) {
+        _id = id;
+        _value = DEFAULT_VALUE;
     }
-    public void rolledback(final TransactionContext tx) {
-        TestSynchronizable._synchronizables.add("rolledback");
+
+    public DetailKeyGen2() {
+        _value = DEFAULT_VALUE;
+    }
+
+    public void setId(final int id) { _id = id; }
+    public int getId() { return _id; }
+
+    public void setValue1(final String value) { _value = value; }
+    public String getValue1() { return _value; }
+
+    public void setDetail(final DetailKeyGen detail) { _detail = detail; }
+    public DetailKeyGen getDetail() { return _detail; }
+
+    public String toString() {
+        return _id + " / " + _value + " / "
+                + (_detail == null ? 0 : _detail.getId());
+    }
+
+    public int hashCode() { return _id; }
+
+    public boolean equals(final Object other) {
+        if (other == this) { return true; }
+        if (other != null && other instanceof DetailKeyGen2) {
+            return (((DetailKeyGen2) other)._id == _id);
+        }
+        return false;
     }
 }

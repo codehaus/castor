@@ -229,6 +229,151 @@ create table tc1x_pks_category (
 create unique index tc1x_pks_category_pk on tc1x_pks_category( id );
 
 
+-- tc2x TESTS
+
+drop table tc2x_master;
+
+create table tc2x_master (
+  id        numeric(10,0)  not null,
+  value1    varchar(200)   not null,
+  group_id  numeric(10,0)  null
+);
+
+create unique index tc2x_master_pk on tc2x_master ( id );
+
+drop table tc2x_detail;
+
+create table tc2x_detail (
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null,
+  value1     varchar(200)   not null
+);
+
+create unique index tc2x_detail_pk on tc2x_detail ( detail_id );
+
+drop table tc2x_detail2;
+
+create table tc2x_detail2 (
+  detail2_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail2_pk on tc2x_detail2 ( detail2_id );
+
+drop table tc2x_detail3;
+
+create table tc2x_detail3 (
+  detail3_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail3_pk on tc2x_detail3 ( detail3_id );
+
+drop table tc2x_group;
+
+create table tc2x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+);
+
+create unique index tc2x_group_pk on tc2x_group ( id );
+
+drop table tc2x_depend2;
+drop table tc2x_depend_master;
+drop table tc2x_depend1;
+
+create table tc2x_depend1 (
+  id          int not null primary key
+);
+
+create table tc2x_depend_master (
+  depend1_id  int ,
+  id          int not null primary key
+);
+
+alter table tc2x_depend_master
+  add constraint tc2x_master_depend1
+  foreign key ( depend1_id ) references tc2x_depend1 ( id );
+
+create table tc2x_depend2 (
+  master_id   int,
+  id          int not null primary key
+);
+
+alter table tc2x_depend2
+  add constraint tc2x_depend2_master
+  foreign key ( master_id ) references tc2x_depend_master ( id );
+
+drop table tc2x_keygen;
+
+create table tc2x_keygen (
+  id    int           not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_keygen_pk on tc2x_keygen ( id );
+
+drop table tc2x_keygen_ext;
+
+create table tc2x_keygen_ext (
+  id   int          not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id );
+
+drop table tc2x_uuid;
+
+create table tc2x_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_uuid_pk on tc2x_uuid ( id );
+
+drop table tc2x_uuid_ext;
+
+create table tc2x_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id );
+
+-- Note that 7.2.1 requires the following sequence to be dropped,
+-- where as 7.3 version of postgresql will drop it automatically
+drop table tc2x_identity;
+drop sequence tc2x_identity_id_seq;
+
+create table tc2x_identity (
+  id    SERIAL,
+  attr  varchar(200) not null
+);
+
+drop table tc2x_identity_ext;
+
+create table tc2x_identity_ext (
+  id   integer not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_ident_ext_pk on tc2x_identity_ext ( id );
+
+drop table tc2x_seqtable;
+
+create table tc2x_seqtable (
+  table_name  varchar(200)  not null,
+  max_id      int
+);
+
+create unique index tc2x_seqtable_pk on tc2x_seqtable ( table_name );
+
+
+
+
+
 
 
 
@@ -305,53 +450,6 @@ create table test_table_extends (
 create unique index test_table_extends_pk on test_table_extends ( id );
 
 
-drop table test_master;
-
-create table test_master (
-  id       numeric(10,0)    not null,
-  value1     varchar(200)  not null,
-  group_id numeric(10,0)  null
-);
-
-create unique index test_master_pk
-  on test_master ( id );
-
-
-drop table test_detail;
-
-create table test_detail (
-  detail_id  numeric(10,0)  not null,
-  master_id  numeric(10,0)  not null,
-  value1      varchar(200)  not null
-);
-
-create unique index test_detail_pk
-  on test_detail ( detail_id );
-
-
-drop table test_detail2;
-
-create table test_detail2 (
-  detail2_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
-);
-
-create unique index test_detail2_pk on test_detail2 ( detail2_id );
-
-
-drop table test_detail3;
-
-create table test_detail3
-(
-  detail3_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
-);
-
-create unique index test_detail3_pk on test_detail3 ( detail3_id );
-
-
 drop table test_group;
 
 create table test_group (
@@ -380,62 +478,9 @@ create table list_types (
   o_bfile oid  null
 );
 
-drop table test_keygen;
-
-create table test_keygen (
-  id    int           not null,
-  attr  varchar(200)  not null
-);
-
-create unique index test_keygen_pk
-  on test_keygen ( id );
-
-
-drop table test_keygen_ext;
-
-create table test_keygen_ext (
-  id   int          not null,
-  ext  varchar(200) not null
-);
-
-create unique index test_keygen_ext_pk on test_keygen_ext ( id );
-
-
 drop sequence test_keygen_seq;
 
 create sequence test_keygen_seq;
-
-
-drop table test_uuid;
-
-create table test_uuid (
-  id    char(30)      not null,
-  attr  varchar(200)  not null
-);
-
-create unique index test_uuid_pk
-  on test_uuid ( id );
-
-
-drop table test_uuid_ext;
-
-create table test_uuid_ext (
-  id   char(30)     not null,
-  ext  varchar(200) not null
-);
-
-create unique index test_uuid_ext_pk on test_uuid_ext ( id );
-
-
-drop table test_seqtable;
-
-create table test_seqtable (
-  table_name  varchar(200)  not null,
-  max_id      int
-);
-
-create unique index test_seqtable_pk
-  on test_seqtable ( table_name );
 
 
 drop table test_persistent;
@@ -461,30 +506,6 @@ create table test_related (
 
 create unique index test_related_pk on test_related ( id );
 
-
-drop table test_identity;
-
---
--- Note that 7.2.1 requires the following sequence to be dropped,
--- where as 7.3 version of postgresql will drop it automatically
---
-
-drop sequence test_identity_id_seq;
-
-create table test_identity (
-  id SERIAL,
-  attr varchar(200) not null
-);
-
-
-drop table test_identity_ext;
-
-create table test_identity_ext (
-  id integer not null,
-  ext varchar(200) not null
-);
-
-create unique index test_ident_ext_pk on test_identity_ext ( id );
 
 drop table test_col;
 

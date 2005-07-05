@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1110 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Refactor CTF-JDO tests into subdirectories (part 2).
+       Details: http://jira.codehaus.org/browse/CASTOR-1110
+       (Ralf - 20050616)
+
 JDO:   Fixed bug CASTOR-874 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Added DB2 category to src/tests/tests.xml.
        Details: http://jira.codehaus.org/browse/CASTOR-874

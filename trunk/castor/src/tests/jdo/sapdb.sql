@@ -285,6 +285,189 @@ create unique index tc1x_pks_category_pk on tc1x_pks_category( id )
 //
 
 
+-- tc2x TESTS
+
+drop table tc2x_master
+//
+
+create table tc2x_master (
+  id        fixed(10,0)   not null,
+  value1    varchar(200)  not null,
+  group_id  fixed(10,0)   null
+)
+//
+
+create unique index tc2x_master_pk on tc2x_master ( id )
+//
+
+drop table tc2x_detail
+//
+
+create table tc2x_detail (
+  detail_id  fixed(10,0)   not null,
+  master_id  fixed(10,0)   not null,
+  value1     varchar(200)  not null
+)
+//
+
+create unique index tc2x_detail_pk on tc2x_detail ( detail_id )
+//
+
+drop table tc2x_detail2
+//
+
+create table tc2x_detail2 (
+  detail2_id  fixed(10,0)    not null,
+  detail_id   fixed(10,0)    not null,
+  value1      varchar(200 )  not null
+)
+//
+
+create unique index tc2x_detail2_pk on tc2x_detail2 ( detail2_id )
+//
+
+drop table tc2x_detail3
+//
+
+create table tc2x_detail3 (
+  detail3_id  fixed(10,0)    not null,
+  detail_id   fixed(10,0)    not null,
+  value1      varchar(200 )  not null
+)
+//
+
+create unique index tc2x_detail3_pk on tc2x_detail3 ( detail3_id )
+//
+
+drop table tc2x_group
+//
+
+create table tc2x_group (
+  id      fixed(10,0)   not null,
+  value1  varchar(200)  not null
+)
+//
+
+create unique index tc2x_group_pk on tc2x_group ( id )
+//
+
+drop table tc2x_depend1 cascade
+//
+drop table tc2x_depend_master cascade
+//
+drop table tc2x_depend2 cascade
+//
+
+create table tc2x_depend1 (
+  id          int,
+  primary key ( id )
+)
+//
+
+create table tc2x_depend_master (
+  id          int,
+  depend1_id  int,
+  primary key ( id ),
+  foreign key tc2x_master_depend1 ( depend1_id )
+  references tc2x_depend1 ( id ) on delete cascade
+)
+//
+
+create table tc2x_depend2 (
+  id         int,
+  master_id  int,
+  primary key ( id ),
+  foreign key tc2x_depend2_master ( master_id )
+  references tc2x_depend_master ( id ) on delete cascade
+)
+//
+
+drop table tc2x_keygen
+//
+
+create table tc2x_keygen (
+  id    int           not null,
+  attr  varchar(200)  not null
+)
+//
+
+create unique index tc2x_keygen_pk on tc2x_keygen ( id )
+//
+
+drop table tc2x_keygen_ext
+//
+
+create table tc2x_keygen_ext (
+  id   int          not null,
+  ext  varchar(200) not null
+)
+//
+
+create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id )
+//
+
+drop table tc2x_uuid
+//
+
+create table tc2x_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+)
+//
+
+create unique index tc2x_uuid_pk on tc2x_uuid ( id )
+//
+
+drop table tc2x_uuid_ext
+//
+
+create table tc2x_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+)
+//
+
+create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id )
+//
+
+drop table tc2x_identity
+//
+
+create table tc2x_identity (
+  id    fixed(10,0) default serial,
+  attr  varchar(200) not null
+)
+//
+
+drop table tc2x_identity_ext
+//
+
+create table tc2x_identity_ext (
+  id   fixed(10,0) not null,
+  ext  varchar(200) not null
+)
+//
+
+create unique index tc2x_ident_ext_pk on tc2x_identity_ext ( id )
+//
+
+drop table tc2x_seqtable
+//
+
+create table tc2x_seqtable (
+  table_name  varchar(200)  not null,
+  max_id      int
+)
+//
+
+create unique index tc2x_seqtable_pk on tc2x_seqtable ( table_name )
+//
+
+
+
+
+
+
 
 
 
@@ -503,63 +686,6 @@ create unique index test_table_extends_pk on test_table_extends ( id )
 //
 
 
-drop table   test_master
-//
-
-create table test_master (
-  id       fixed(10,0)    not null,
-  value1     varchar(200)  not null,
-  group_id fixed(10,0)  null
-)
-//
-
-create unique index test_master_pk
-  on test_master ( id )
-//
-
-
-drop table   test_detail
-//
-
-create table test_detail (
-  detail_id  fixed(10,0)  not null,
-  master_id  fixed(10,0)  not null,
-  value1      varchar(200)  not null
-)
-//
-
-create unique index test_detail_pk
-  on test_detail ( detail_id )
-//
-
-
-drop table test_detail2
-//
-
-create table test_detail2 (
-  detail2_id  fixed(10,0)  not null,
-  detail_id  fixed(10,0)  not null,
-  value1      varchar(200 )  not null
-)
-//
-
-create unique index test_detail2_pk on test_detail2 ( detail2_id )
-//
-
-drop table test_detail3
-//
-
-create table test_detail3
-(
-  detail3_id  fixed(10,0)  not null,
-  detail_id  fixed(10,0)  not null,
-  value1      varchar(200 )  not null
-)
-//
-
-create unique index test_detail3_pk on test_detail3 ( detail3_id )
-//
-
 drop table   test_group
 //
 
@@ -571,59 +697,6 @@ create table test_group (
 
 create unique index test_group_pk
    on test_group ( id )
-//
-
-
-drop table   test_keygen
-//
-
-create table test_keygen (
-  id    int           not null,
-  attr  varchar(200)  not null
-)
-//
-
-create unique index test_keygen_pk
-  on test_keygen ( id )
-//
-
-
-drop table test_keygen_ext
-//
-
-create table test_keygen_ext (
-  id   int          not null,
-  ext  varchar(200) not null
-)
-//
-
-create unique index test_keygen_ext_pk on test_keygen_ext ( id )
-//
-
-
-drop table test_uuid
-//
-
-create table test_uuid (
-  id    char(30)      not null,
-  attr  varchar(200)  not null
-)
-//
-
-create unique index test_uuid_pk on test_uuid ( id )
-//
-
-
-drop table test_uuid_ext
-//
-
-create table test_uuid_ext (
-  id   char(30)     not null,
-  ext  varchar(200) not null
-)
-//
-
-create unique index test_uuid_ext_pk on test_uuid_ext ( id )
 //
 
 
@@ -648,47 +721,10 @@ create table list_types (
 
 
 
-drop table   test_seqtable
-//
-
-create table test_seqtable (
-  table_name  varchar(200)  not null,
-  max_id      int
-)
-//
-
-create unique index test_seqtable_pk
-  on test_seqtable ( table_name )
-//
-
-
 drop sequence   test_keygen_seq
 //
 
 create sequence test_keygen_seq
-//
-
-
-drop table test_identity
-//
-
-create table test_identity (
-  id fixed(10,0) default serial,
-  attr varchar(200) not null
-)
-//
-
-
-drop table test_identity_ext
-//
-
-create table test_identity_ext (
-  id fixed(10,0) not null,
-  ext varchar(200) not null
-)
-//
-
-create unique index test_ident_ext_pk on test_identity_ext ( id )
 //
 
 

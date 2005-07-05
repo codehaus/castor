@@ -81,7 +81,7 @@ public class LazyLoading extends CastorTestCase {
 
     public LazyLoading( TestHarness category ) {
 
-        super( category, "TC26", "Lazy Loading" );
+        super( category, "TC126", "Lazy Loading" );
         _category = (JDOCategory) category;
     }
 

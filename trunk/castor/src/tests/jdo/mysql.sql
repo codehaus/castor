@@ -232,6 +232,145 @@ create table tc1x_pks_category (
 create unique index tc1x_pks_category_pk on tc1x_pks_category( id );
 
 
+-- tc2x TESTS
+
+drop table if exists tc2x_master;
+
+create table tc2x_master (
+  id        numeric(10,0)  not null,
+  value1    varchar(200)   not null,
+  group_id  numeric(10,0)  null
+);
+
+create unique index tc2x_master_pk on tc2x_master ( id );
+
+drop table if exists tc2x_detail;
+
+create table tc2x_detail (
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null,
+  value1     varchar(200)   not null
+);
+
+create unique index tc2x_detail_pk on tc2x_detail ( detail_id );
+
+drop table if exists tc2x_detail2;
+
+create table tc2x_detail2 (
+  detail2_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail2_pk on tc2x_detail2 ( detail2_id );
+
+drop table if exists tc2x_detail3;
+
+create table tc2x_detail3 (
+  detail3_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail3_pk on tc2x_detail3 ( detail3_id );
+
+drop table if exists tc2x_group;
+
+create table tc2x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+);
+
+create unique index tc2x_group_pk on tc2x_group ( id );
+
+drop table if exists tc2x_depend2;
+drop table if exists tc2x_depend_master;
+drop table if exists tc2x_depend1;
+
+create table tc2x_depend1 (
+  id          int not null primary key
+);
+
+create table tc2x_depend_master (
+  id          int not null primary key,
+  depend1_id  int,
+  index tc2x_master_depend1 ( depend1_id ),
+  foreign key ( depend1_id ) references tc2x_depend1 ( id )
+);
+
+create table tc2x_depend2 (
+  id          int not null primary key,
+  master_id   int,
+  index tc2x_depend2_master ( master_id ),
+  foreign key ( master_id ) references tc2x_depend_master ( id )
+);
+
+drop table if exists tc2x_keygen;
+
+create table tc2x_keygen (
+  id    int           not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_keygen_pk on tc2x_keygen ( id );
+
+drop table if exists tc2x_keygen_ext;
+
+create table tc2x_keygen_ext (
+  id   int          not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id );
+
+drop table if exists tc2x_uuid;
+
+create table tc2x_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_uuid_pk on tc2x_uuid ( id );
+
+drop table if exists tc2x_uuid_ext;
+
+create table tc2x_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id );
+
+drop table if exists tc2x_identity;
+
+create table tc2x_identity (
+  id    integer not null primary key auto_increment,
+  attr  varchar(200) not null
+);
+
+drop table if exists tc2x_identity_ext;
+
+create table tc2x_identity_ext (
+  id   integer not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_ident_ext_pk on tc2x_identity_ext ( id );
+
+drop table if exists tc2x_seqtable;
+
+create table tc2x_seqtable (
+  table_name  varchar(200)  not null,
+  max_id      int
+);
+
+create unique index tc2x_seqtable_pk on tc2x_seqtable ( table_name );
+
+
+
+
+
+
 
 
 
@@ -406,52 +545,6 @@ create table test_table_extends (
 create unique index test_table_extends_pk on test_table_extends ( id );
 
 
-drop table if exists test_master;
-
-create table test_master (
-  id       numeric(10,0)    not null,
-  value1     varchar(200)  not null,
-  group_id numeric(10,0)  null
-);
-
-create unique index test_master_pk
-  on test_master ( id );
-
-
-drop table if exists test_detail;
-
-create table test_detail (
-  detail_id  numeric(10,0)  not null,
-  master_id  numeric(10,0)  not null,
-  value1      varchar(200)  not null
-);
-
-create unique index test_detail_pk
-  on test_detail ( detail_id );
-
-
-drop table if exists test_detail2;
-
-create table test_detail2 (
-  detail2_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
-);
-
-create unique index test_detail2_pk on test_detail2 ( detail2_id );
-
-drop table if exists test_detail3;
-
-create table test_detail3
-(
-  detail3_id  numeric(10,0)  not null,
-  detail_id  numeric(10,0)  not null,
-  value1      varchar(200 )  not null
-);
-
-create unique index test_detail3_pk on test_detail3 ( detail3_id );
-
-
 drop table if exists test_group;
 
 create table test_group (
@@ -481,59 +574,6 @@ create table list_types (
   o_bfile MEDIUMBLOB  null
 );
 
-drop table if exists test_keygen;
-
-create table test_keygen (
-  id    int           not null,
-  attr  varchar(200)  not null
-);
-
-create unique index test_keygen_pk
-  on test_keygen ( id );
-
-
-drop table if exists test_keygen_ext;
-
-create table test_keygen_ext (
-  id   int          not null,
-  ext  varchar(200) not null
-);
-
-create unique index test_keygen_ext_pk on test_keygen_ext ( id );
-
-
-drop table if exists test_uuid;
-
-create table test_uuid (
-  id    char(30)      not null,
-  attr  varchar(200)  not null
-);
-
-create unique index test_uuid_pk
-  on test_uuid ( id );
-
-
-drop table if exists test_uuid_ext;
-
-create table test_uuid_ext (
-  id   char(30)     not null,
-  ext  varchar(200) not null
-);
-
-create unique index test_uuid_ext_pk on test_uuid_ext ( id );
-
-
-drop table if exists test_seqtable;
-
-create table test_seqtable (
-  table_name  varchar(200)  not null,
-  max_id      int
-);
-
-create unique index test_seqtable_pk
-  on test_seqtable ( table_name );
-
-
 drop table if exists test_persistent;
 
 create table test_persistent (
@@ -556,24 +596,6 @@ create table test_related (
 );
 
 create unique index test_related_pk on test_related ( id );
-
-
-drop table if exists test_identity;
-
-create table test_identity (
-  id integer not null primary key auto_increment,
-  attr varchar(200) not null
-);
-
-
-drop table if exists test_identity_ext;
-
-create table test_identity_ext (
-  id integer not null,
-  ext varchar(200) not null
-);
-
-create unique index test_ident_ext_pk on test_identity_ext ( id );
 
 
 drop table if exists test_col;
