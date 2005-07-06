@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/database-conf.xml">
+<document url="http://castor.codehaus.org/database-conf.xml">
   <body>
     <title>Castor JDO Database Configuration</title>
 

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/examples.xml">
+<document url="http://castor.codehaus.org/examples.xml">
   <body>
     <title>Running The Examples</title>
 
@@ -158,7 +158,7 @@
   test.sh dsml [jndi|mozilla] <host> <root-dn> <root-pwd>
 
   jndi|mozilla  Selects whether to use the JNDI or Mozilla Directory
-	        SDK implementations
+            SDK implementations
   host          The LDAP host name (port number is optional)
   rood-dn       The root DN used for authenticating when importing
   root-pwd      The root password used for authenticating when importing
