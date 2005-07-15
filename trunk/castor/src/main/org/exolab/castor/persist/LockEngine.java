@@ -54,6 +54,7 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -326,13 +327,13 @@ public final class LockEngine {
      *  persistent capable
      * @throws ObjectDeletedWaitingForLockException The object has been deleted, but is waiting for a lock.
      */
-    public OID load( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout )
-            throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
-            ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
-        return load( tx, oid, object, suggestedAccessMode, timeout, null );
+    public OID load(TransactionContext tx, OID oid, ProposedObject proposedObject, AccessMode suggestedAccessMode, int timeout)
+    throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
+    ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
+        return load(tx, oid, proposedObject, suggestedAccessMode, timeout, null);
     }
 
-    public OID load( TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, int timeout, QueryResults results )
+    public OID load(TransactionContext tx, OID oid, ProposedObject proposedObject, AccessMode suggestedAccessMode, int timeout, QueryResults results)
             throws ObjectNotFoundException, LockNotGrantedException, PersistenceException,
             ClassNotPersistenceCapableException, ObjectDeletedWaitingForLockException {
 
@@ -364,7 +365,22 @@ public final class LockEngine {
 
             lockedOid = lock.getOID();
 
-            Object stamp = typeInfo.molder.load( tx, lockedOid, lock, object, suggestedAccessMode, results );
+            Object stamp = typeInfo.molder.load(tx, lockedOid, lock, proposedObject, suggestedAccessMode, results);
+            
+            if (proposedObject.isExpanded()) {
+                // Need to modify lock
+                OID newOID = new OID(this, proposedObject.getActualClassMolder(), oid.getIdentity());
+                
+                // Current transaction holds lock for old OID                
+                // lock.release(tx);
+                typeInfo.release(oid, tx);
+                lock = typeInfo.acquire(newOID, tx, action, timeout); 
+                lock.setObject(tx, proposedObject.getFields());
+                // Current transaction now hold lock for new OID
+                
+                lockedOid = lock.getOID();
+            }
+            
             // proposal change: lockedOid parameter is not really neccesary.
             // we can added getOID() method in DepositBox. It make code a little
             // bit clear?
@@ -378,7 +394,11 @@ public final class LockEngine {
                 oid = lockedOid;
 
             if (_log.isDebugEnabled()) {
-            	_log.debug( Messages.format( "jdo.loading.with.id", typeInfo.molder.getName(), oid.getIdentity() ) );
+                if (proposedObject.isExpanded()) {
+                    _log.debug(Messages.format("jdo.loading.with.id", proposedObject.getActualClass(), oid.getIdentity()));
+                } else {
+                    _log.debug(Messages.format("jdo.loading.with.id", typeInfo.molder.getName(), oid.getIdentity()));
+                }
             }
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist

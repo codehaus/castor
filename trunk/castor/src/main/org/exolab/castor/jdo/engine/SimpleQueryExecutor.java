@@ -49,7 +49,6 @@ package org.exolab.castor.jdo.engine;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.drivers.PreparedStatementProxy;
 import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.SqlBindParser;
 

@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1018" tool="jira">
+                    <description>
+		                Added support for polymorphism.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050715</date>
+                </bug>
                 <bug id="1110" tool="jira">
                     <description>
 		                Refactor CTF-JDO tests into subdirectories (part 2).

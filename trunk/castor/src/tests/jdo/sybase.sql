@@ -922,3 +922,326 @@ go
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1)
 go
 
+-- tc9x TESTS
+
+drop table poly_ordr
+go
+create table poly_ordr (
+  id int not null,
+  name varchar (20) not null
+)
+go
+
+drop table poly_detail
+go
+create table poly_detail (
+  id int not null,
+  category varchar (20) not null,
+  location varchar (20) not null
+)
+go
+
+drop table poly_owner
+go
+create table poly_owner (
+  id int not null,
+  name varchar (20) not null,
+  product int not null
+)
+go
+
+drop table poly_prod
+go
+create table poly_prod (
+  id        int not null,
+  name      varchar(200) not null,
+  detail	int not null
+)
+go
+
+drop table poly_computer
+go
+create table poly_computer (
+  id   int not null,
+  cpu  varchar(200) not null
+)
+go
+
+drop table poly_laptop
+go
+create table poly_laptop (
+  id   int not null,
+  weight  int not null,
+  resolution varchar(19) not null
+)
+go
+
+drop table poly_server
+go
+create table poly_server (
+  id   int not null,
+  numberOfCPUs  int not null,
+  support int not null
+)
+go
+
+drop table poly_car
+go
+create table poly_car (
+  id   int not null,
+  kw   int not null,
+  make  varchar(200) not null
+)
+go
+
+drop table poly_truck
+go
+create table poly_truck (
+  id   int not null,
+  max_weight   int not null
+)
+go
+
+drop table poly_prod_multi
+go
+create table poly_prod_multi (
+  id1        int not null,
+  id2        int not null,
+  name      varchar(200) not null,
+  detail	int not null
+)
+go
+
+drop table poly_computer_multi
+go
+create table poly_computer_multi (
+  id1   int not null,
+  id2        int not null,
+  cpu  varchar(200) not null
+)
+go
+
+drop table poly_laptop_multi
+go
+create table poly_laptop_multi (
+  id1   int not null,
+  id2        int not null,
+  weight  int not null,
+  resolution varchar(19) not null
+)
+go
+
+drop table poly_server_multi
+go
+create table poly_server_multi (
+  id1   int not null,
+  id2        int not null,
+  numberOfCPUs  int not null,
+  support int not null
+)
+go
+
+drop table poly_order_product
+go
+create table poly_order_product (
+  order_id	int not null,
+  product_id int not null
+)
+go
+
+drop table poly_table_m
+go
+create table poly_table_m (
+  id	int not null,
+  name	varchar(20) not null
+)
+go
+
+drop table poly_table_n
+go
+create table poly_table_n (
+  id	int not null,
+  name	varchar(20) not null
+)
+go
+
+drop table poly_m_n
+go
+create table poly_m_n (
+  m_id	int not null,
+  n_id int not null
+)
+go
+
+
+insert into poly_detail (id, category, location) values (1, 'category 1', 'location 1')
+go
+insert into poly_detail (id, category, location) values (2, 'category 2', 'location 2')
+go
+insert into poly_detail (id, category, location) values (3, 'category 3', 'location 3')
+go
+insert into poly_detail (id, category, location) values (4, 'category 4', 'location 4')
+go
+insert into poly_detail (id, category, location) values (5, 'category 5', 'location 5')
+go
+
+insert into poly_prod (id, name, detail) values (1, 'laptop 1', 1)
+go
+insert into poly_computer (id, cpu) values (1, 'centrino')
+go
+insert into poly_laptop (id, weight, resolution) values (1, 2800, '1280')
+go
+
+insert into poly_prod (id, name, detail) values (2, 'laptop 2', 2)
+go
+insert into poly_computer (id, cpu) values (2, 'centrino')
+go
+insert into poly_laptop (id, weight, resolution) values (2, 2700, '1024')
+go
+
+insert into poly_prod (id, name, detail) values (3, 'server 3', 3)
+go
+insert into poly_computer (id, cpu) values (3, 'pentium 4')
+go
+insert into poly_server (id, numberOfCPUs, support) values (3, 4, 3)
+go
+
+insert into poly_prod (id, name, detail) values (4, 'server 4', 4)
+go
+insert into poly_computer (id, cpu) values (4, 'pentium 4')
+go
+insert into poly_server (id, numberOfCPUs, support) values (4, 16,5)
+go
+
+insert into poly_prod (id, name, detail) values (5, 'truck 5', 5)
+go
+insert into poly_car (id, kw, make) values (5, 60, 'make 5')
+go
+insert into poly_truck (id, max_weight) values (5, 4)
+go
+
+insert into poly_prod_multi (id1, id2, name, detail) values (1, 1, 'laptop 1', 1)
+go
+insert into poly_computer_multi (id1, id2, cpu) values (1, 1, 'centrino')
+go
+insert into poly_laptop_multi (id1, id2, weight, resolution) values (1, 1, 2800, '1280')
+go
+
+insert into poly_prod_multi (id1, id2, name, detail) values (2, 2, 'laptop 2', 2)
+go
+insert into poly_computer_multi (id1, id2, cpu) values (2, 2, 'centrino')
+go
+insert into poly_laptop_multi (id1, id2, weight, resolution) values (2, 2, 2700, '1024')
+go
+
+insert into poly_prod_multi (id1, id2, name, detail) values (3, 3, 'server 3', 3)
+go
+insert into poly_computer_multi (id1, id2, cpu) values (3, 3, 'pentium 4')
+go
+insert into poly_server_multi (id1,  id2, numberOfCPUs, support) values (3, 3, 4, 3)
+go
+
+insert into poly_prod_multi (id1, id2, name, detail) values (4, 4, 'server 4', 4)
+go
+insert into poly_computer_multi (id1, id2, cpu) values (4, 4, 'pentium 4')
+go
+insert into poly_server_multi (id1, id2, numberOfCPUs, support) values (4, 4, 16,5)
+go
+
+insert into poly_owner (id, name, product) values (1, 'owner 1', 1)
+go
+
+insert into poly_ordr (id, name) values (1, 'order 1')
+go
+
+insert into poly_order_product (order_id, product_id) values (1, 1)
+go
+insert into poly_order_product (order_id, product_id) values (1, 2)
+go
+
+insert into poly_m_n (m_id, n_id) values (1, 1)
+go
+insert into poly_m_n (m_id, n_id) values (1, 2)
+go
+
+insert into poly_table_m (id, name) values (1, "m1")
+go
+insert into poly_table_m (id, name) values (2, "m2")
+go
+
+insert into poly_table_n (id, name) values (1, "n1")
+go
+insert into poly_table_n (id, name) values (2, "n2")
+go
+
+drop tabel if exists poly_base
+go
+create table poly_base (
+  id varchar(64) not null default '',
+  color varchar(64) default null,
+  primary key  (ID)
+)
+go
+
+insert into poly_base values ('100','red')
+go
+
+drop table poly_derived
+go
+create table poly_derived (
+  id varchar(64) not null default '',
+  scent varchar(64) default null,
+  primary key  (ID)
+)
+go
+insert into poly_derived values ('100','vanilla')
+go
+
+drop table poly_container
+go
+create table poly_container (
+  id varchar(64) not null default '',
+  reference varchar(64) default null,
+  primary key  (ID)
+)
+go
+insert into poly_container values ('200','100')
+go
+
+drop table poly_Product
+go
+create table poly_Product(
+  IdProd numeric(10) primary key,
+  NameProd   varchar(30) null,
+  DescProd   varchar(30) null
+)
+go
+
+drop table poly_ActProduct
+go
+create table poly_ActProduct(
+  IdAct numeric(10) primary key references Product (IdProd),
+  BestSeason varchar(30) null
+)
+go
+
+drop table poly_ComposedOffer
+go
+create table poly_ComposedOffer(
+  IdCOffer numeric(10) primary key references Product (IdProd),
+  NameCO   varchar(30) null,
+  DescCO   varchar(30) null
+)
+go
+
+drop table poly_OfferComposition
+go
+create table poly_OfferComposition(
+  Offer numeric(10),
+  Product numeric(10), 
+  constraint unique_rel unique (Offer, Product) 
+)
+go
+
+
+	

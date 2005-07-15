@@ -54,6 +54,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.persist.ProposedObject;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
@@ -248,12 +249,10 @@ final class PostgreSQLCallQuery implements PersistenceQuery
     }
 
 
-    public Object fetch(Object[] fields,Object identity) throws ObjectNotFoundException, PersistenceException
-    {
-        Object stamp = null;
-
+    public Object fetch(ProposedObject proposedObject, Object identity)
+    throws ObjectNotFoundException, PersistenceException {
+        Object[] fields = proposedObject.getFields();
         try {
-
             // Load all the fields of the object including one-one relations
             // index 0 belongs to the identity
             for ( int i = 1 ; i < _sqlTypes.length ; ++i  ) 
@@ -265,7 +264,7 @@ final class PostgreSQLCallQuery implements PersistenceQuery
         } catch ( SQLException except ) {
             throw new PersistenceException( Messages.format( "persist.nested", except ) );
         }
-        return stamp;
+        return null;
     }
 
 }

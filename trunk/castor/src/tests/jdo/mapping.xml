@@ -1,9 +1,10 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
                            "http://castor.exolab.org/mapping.dtd">
 <mapping>
-   <include href="../ctf/jdo/tc0x/mapping.xml"/>
+  <include href="../ctf/jdo/tc0x/mapping.xml"/>
   <include href="../ctf/jdo/tc1x/mapping.xml"/>
   <include href="../ctf/jdo/tc2x/mapping.xml"/>
+  <include href="../ctf/jdo/tc9x/mapping.xml"/>
   <include href="tc166/mapping.xml"/>
   
 
@@ -201,6 +202,20 @@
 
 
   <!-- Test Multiple primary Keys -->
+  <class name="jdo.TestLimit" access="shared" identity="id">
+    <description>Table used for concurrency and performance testing</description>
+    <map-to table="test_table" />
+    <field name="id" type="integer">
+      <sql name="id" type="integer" />
+    </field>
+    <field name="value1" type="string" required="true">
+      <sql name="value1" type="varchar"/>
+    </field>
+    <field name="value2" type="string">
+      <sql name="value2" type="varchar" dirty="ignore"/>
+    </field>
+  </class>
+  
   <class name="jdo.TestObject" access="shared" identity="id">
     <description>Table used for concurrency and performance testing</description>
     <map-to table="test_table" />
@@ -295,7 +310,7 @@
       <sql name="ident"/>
     </field>
     <field name="ext" type="integer" required="true">
-      <sql/>
+      <sql name="ext"/>
     </field>
     <field name="list" type="jdo.TestOqlExtends2" collection="collection"
            lazy="false">
@@ -307,7 +322,7 @@
     <description>Test Persistent interface handling</description>
     <map-to table="test_oqlext2" />
     <field name="ext" type="integer" required="true">
-      <sql/>
+      <sql name="ext"/>
     </field>
   </class>
 

@@ -47,8 +47,9 @@
 package org.exolab.castor.persist.spi;
 
 
-import org.castor.persist.TransactionContext;
+import org.castor.persist.ProposedObject;
 import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.ObjectDeletedException;
@@ -134,9 +135,9 @@ public interface Persistence
      *   persistent storage
      * @throws PersistenceException A persistence error occured
      */
-    public Object load( Object conn, Object[] fields, Object identity,
-                        AccessMode accessMode )
-        throws ObjectNotFoundException, PersistenceException;
+    public Object load(Object conn, ProposedObject proposedObject, Object identity,
+                       AccessMode accessMode)
+    throws ObjectNotFoundException, PersistenceException;
 
 
     /**
@@ -224,16 +225,31 @@ public interface Persistence
     public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
         throws QueryException;
 
-
+    /**
+     * Returns ColumnInfos for identifiers.
+     * @return An array of FieldInfo instances.
+     */
+    public Persistence.ColumnInfo[] getColumnInfoForIdentities();
     
+    /**
+     * Returns FieldInfos for fields (exclusing identifiers).
+     * @return An array of ColumnInfo instances.
+     */
 	public Persistence.FieldInfo[] getInfo();
 
+    
     public interface FieldInfo {
 		public boolean isComplex();
-
 		public boolean isPersisted();
-
 		public String getFieldName();
+    }
+    
+    public interface ColumnInfo {
+        public String getName();
+        public int getSqlType();
+        public TypeConvertor getConvertTo();
+        public TypeConvertor getConvertFrom();
+        public String getConvertParam();
     }
 }
 

@@ -228,8 +228,139 @@ create table tc1x_pks_category (
 
 create unique index tc1x_pks_cat_pk on tc1x_pks_category( id );
 
+-- tc2x TESTS
 
+drop table  tc2x_master;
 
+create table tc2x_master (
+  id        numeric(10,0)  not null,
+  value1    varchar(200)   not null,
+  group_id  numeric(10,0)  default null
+);
+
+create unique index tc2x_master_pk on tc2x_master ( id );
+
+drop table  tc2x_detail;
+
+create table tc2x_detail (
+  detail_id  numeric(10,0)  not null,
+  master_id  numeric(10,0)  not null,
+  value1     varchar(200)   not null
+);
+
+create unique index tc2x_detail_pk on tc2x_detail ( detail_id );
+
+drop table  tc2x_detail2;
+
+create table tc2x_detail2 (
+  detail2_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail2_pk on tc2x_detail2 ( detail2_id );
+
+drop table  tc2x_detail3;
+
+create table tc2x_detail3 (
+  detail3_id  numeric(10,0)  not null,
+  detail_id   numeric(10,0)  not null,
+  value1      varchar(200 )  not null
+);
+
+create unique index tc2x_detail3_pk on tc2x_detail3 ( detail3_id );
+
+drop table  tc2x_group;
+
+create table tc2x_group (
+  id      numeric(10,0)  not null,
+  value1  varchar(200)   not null
+);
+
+create unique index tc2x_group_pk on tc2x_group ( id );
+
+drop table tc2x_depend2;
+drop table tc2x_depend_master;
+drop table tc2x_depend1;
+
+create table tc2x_depend1 (
+  id          int not null primary key
+);
+
+create table tc2x_depend_master (
+  id          int not null primary key,
+  depend1_id  int,
+  index tc2x_master_depend ( depend1_id ),
+  foreign key ( depend1_id ) references tc2x_depend1 ( id )
+);
+
+create table tc2x_depend2 (
+  id          int not null primary key,
+  master_id   int,
+  index tc2x_depend_master ( master_id ),
+  foreign key ( master_id ) references tc2x_depend_master ( id )
+);
+
+drop table  tc2x_keygen;
+
+create table tc2x_keygen (
+  id    int           not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_keygen_pk on tc2x_keygen ( id );
+
+drop table  tc2x_keygen_ext;
+
+create table tc2x_keygen_ext (
+  id   int          not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_keygen_ext_pk on tc2x_keygen_ext ( id );
+
+drop table  tc2x_uuid;
+
+create table tc2x_uuid (
+  id    char(30)      not null,
+  attr  varchar(200)  not null
+);
+
+create unique index tc2x_uuid_pk on tc2x_uuid ( id );
+
+drop table  tc2x_uuid_ext;
+
+create table tc2x_uuid_ext (
+  id   char(30)     not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id );
+
+drop table  tc2x_identity;
+
+create table tc2x_identity (
+  id    integer not null primary key,
+  attr  varchar(200) not null
+);
+
+drop table  tc2x_identity_ext;
+
+create table tc2x_identity_ext (
+  id   integer not null,
+  ext  varchar(200) not null
+);
+
+create unique index tc2x_ident_ext_pk on tc2x_identity_ext ( id );
+
+drop table  tc2x_seqtable;
+
+create table tc2x_seqtable (
+  table_name  varchar(200)  not null,
+  max_id      int
+);
+
+create unique index tc2x_seqtable_pk on tc2x_seqtable ( table_name );
 
 
 
@@ -904,4 +1035,230 @@ create table lazy_11_book (
 );
 
 insert into lazy_11_book (id, name, author_id) select 1, 'test book', lazy_11_author.id from lazy_11_author;
+	
+-- tc9x TESTS
+
+drop table  poly_ordr;
+create table poly_ordr (
+  id int not null,
+  name varchar (20) not null
+);
+
+drop table  poly_detail;
+create table poly_detail (
+  id int not null,
+  category varchar (20) not null,
+  location varchar (20) not null
+);
+
+drop table  poly_owner;
+create table poly_owner (
+  id int not null,
+  name varchar (20) not null,
+  product int not null
+);
+
+drop table  poly_prod;
+create table poly_prod (
+  id        int not null,
+  name      varchar(200) not null,
+  detail	int not null
+);
+
+drop table  poly_computer;
+create table poly_computer (
+  id   int not null,
+  cpu  varchar(200) not null
+);
+
+drop table  poly_laptop;
+create table poly_laptop (
+  id   int not null,
+  weight  int not null,
+  resolution varchar(19) not null
+);
+
+drop table  poly_server;
+create table poly_server (
+  id   int not null,
+  numberOfCPUs  int not null,
+  support int not null
+);
+
+drop table  poly_car;
+create table poly_car (
+  id   int not null,
+  kw   int not null,
+  make  varchar(200) not null
+);
+
+drop table  poly_truck;
+create table poly_truck (
+  id   int not null,
+  max_weight   int not null
+);
+
+drop table  poly_prod_multi;
+create table poly_prod_multi (
+  id1        int not null,
+  id2        int not null,
+  name      varchar(200) not null,
+  detail	int not null
+);
+
+drop table  poly_computer_multi;
+create table poly_computer_multi (
+  id1   int not null,
+  id2        int not null,
+  cpu  varchar(200) not null
+);
+
+drop table  poly_laptop_multi;
+create table poly_laptop_multi (
+  id1   int not null,
+  id2        int not null,
+  weight  int not null,
+  resolution varchar(19) not null
+);
+
+drop table  poly_server_multi;
+create table poly_server_multi (
+  id1   int not null,
+  id2        int not null,
+  numberOfCPUs  int not null,
+  support int not null
+);
+
+drop table  poly_order_product;
+create table poly_order_product (
+  order_id	int not null,
+  product_id int not null
+);
+
+drop table  poly_table_m;
+create table poly_table_m (
+  id	int not null,
+  name	varchar(20) not null
+);
+
+drop table  poly_table_n;
+create table poly_table_n (
+  id	int not null,
+  name	varchar(20) not null
+);
+
+drop table  poly_m_n;
+create table poly_m_n (
+  m_id	int not null,
+  n_id int not null
+);
+
+
+insert into poly_detail (id, category, location) values (1, 'category 1', 'location 1');
+insert into poly_detail (id, category, location) values (2, 'category 2', 'location 2');
+insert into poly_detail (id, category, location) values (3, 'category 3', 'location 3');
+insert into poly_detail (id, category, location) values (4, 'category 4', 'location 4');
+insert into poly_detail (id, category, location) values (5, 'category 5', 'location 5');
+
+insert into poly_prod (id, name, detail) values (1, 'laptop 1', 1);
+insert into poly_computer (id, cpu) values (1, 'centrino');
+insert into poly_laptop (id, weight, resolution) values (1, 2800, '1280');
+
+insert into poly_prod (id, name, detail) values (2, 'laptop 2', 2);
+insert into poly_computer (id, cpu) values (2, 'centrino');
+insert into poly_laptop (id, weight, resolution) values (2, 2700, '1024');
+
+insert into poly_prod (id, name, detail) values (3, 'server 3', 3);
+insert into poly_computer (id, cpu) values (3, 'pentium 4');
+insert into poly_server (id, numberOfCPUs, support) values (3, 4, 3);
+
+insert into poly_prod (id, name, detail) values (4, 'server 4', 4);
+insert into poly_computer (id, cpu) values (4, 'pentium 4');
+insert into poly_server (id, numberOfCPUs, support) values (4, 16,5);
+
+insert into poly_prod (id, name, detail) values (5, 'truck 5', 5);
+insert into poly_car (id, kw, make) values (5, 60, 'make 5');
+insert into poly_truck (id, max_weight) values (5, 4);
+
+insert into poly_prod_multi (id1, id2, name, detail) values (1, 1, 'laptop 1', 1);
+insert into poly_computer_multi (id1, id2, cpu) values (1, 1, 'centrino');
+insert into poly_laptop_multi (id1, id2, weight, resolution) values (1, 1, 2800, '1280');
+
+insert into poly_prod_multi (id1, id2, name, detail) values (2, 2, 'laptop 2', 2);
+insert into poly_computer_multi (id1, id2, cpu) values (2, 2, 'centrino');
+insert into poly_laptop_multi (id1, id2, weight, resolution) values (2, 2, 2700, '1024');
+
+insert into poly_prod_multi (id1, id2, name, detail) values (3, 3, 'server 3', 3);
+insert into poly_computer_multi (id1, id2, cpu) values (3, 3, 'pentium 4');
+insert into poly_server_multi (id1,  id2, numberOfCPUs, support) values (3, 3, 4, 3);
+
+insert into poly_prod_multi (id1, id2, name, detail) values (4, 4, 'server 4', 4);
+insert into poly_computer_multi (id1, id2, cpu) values (4, 4, 'pentium 4');
+insert into poly_server_multi (id1, id2, numberOfCPUs, support) values (4, 4, 16,5);
+
+insert into poly_owner (id, name, product) values (1, 'owner 1', 1);
+
+insert into poly_ordr (id, name) values (1, 'order 1');
+
+insert into poly_order_product (order_id, product_id) values (1, 1);
+insert into poly_order_product (order_id, product_id) values (1, 2);
+
+insert into poly_m_n (m_id, n_id) values (1, 1);
+insert into poly_m_n (m_id, n_id) values (1, 2);
+
+insert into poly_table_m (id, name) values (1, 'm1');
+insert into poly_table_m (id, name) values (2, 'm2');
+
+insert into poly_table_n (id, name) values (1, 'n1');
+insert into poly_table_n (id, name) values (2, 'n2');
+
+DROP TABLE  poly_base;
+CREATE TABLE poly_base (
+  id varchar(64) NOT NULL default '',
+  color varchar(64) default NULL,
+  PRIMARY KEY  (ID)
+) ;
+
+INSERT INTO poly_base VALUES ('100','red');
+
+DROP TABLE  poly_derived;
+CREATE TABLE poly_derived (
+  id varchar(64) NOT NULL default '',
+  scent varchar(64) default NULL,
+  PRIMARY KEY  (ID)
+) ;
+INSERT INTO poly_derived VALUES ('100','vanilla');
+
+
+DROP TABLE  poly_container;
+CREATE TABLE poly_container (
+  id varchar(64) NOT NULL default '',
+  reference varchar(64) default NULL,
+  PRIMARY KEY  (ID)
+) ;
+INSERT INTO poly_container VALUES ('200','100');
+
+DROP TABLE  poly_Product;
+CREATE TABLE poly_Product(
+  IdProd NUMERIC(10) not null PRIMARY KEY,
+  NameProd   VARCHAR(30) default NULL,
+  DescProd   VARCHAR(30) default NULL);
+
+DROP TABLE  poly_ActProduct;
+CREATE TABLE poly_ActProduct(
+  IdAct NUMERIC(10) not null PRIMARY KEY REFERENCES poly_Product (IdProd),
+  BestSeason VARCHAR(30) default NULL);
+
+DROP TABLE  poly_ComposedOffer;
+CREATE TABLE poly_ComposedOffer(
+  IdCOffer NUMERIC(10) not null PRIMARY KEY REFERENCES poly_Product (IdProd),
+  NameCO   VARCHAR(30) default NULL,
+  DescCO   VARCHAR(30) default NULL);
+
+DROP TABLE  poly_OfferComposition;
+CREATE TABLE poly_OfferComposition(
+  Offer NUMERIC(10) not null,
+  Product NUMERIC(10) not null, 
+  CONSTRAINT unique_rel UNIQUE (Offer, Product) );
+
 	

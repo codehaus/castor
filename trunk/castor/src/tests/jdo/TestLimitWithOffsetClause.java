@@ -72,13 +72,13 @@ public class TestLimitWithOffsetClause extends TestLimitClause
 	public void testLimitWithOffset()
     throws PersistenceException
     {
-        TestObject testObject = null;
+        TestLimit testObject = null;
         
         Database db = _category.getDatabase(); 
 
         db.begin();
 
-        OQLQuery query = db.getOQLQuery("select t from jdo.TestObject t order by id limit $1 offset $2");
+        OQLQuery query = db.getOQLQuery("select t from jdo.TestLimit t order by id limit $1 offset $2");
 
         query.bind(LIMIT);
         query.bind(OFFSET);
@@ -88,7 +88,7 @@ public class TestLimitWithOffsetClause extends TestLimitClause
         /*size() not available using an Oracle DB
         assertEquals (LIMIT, results.size()); */
         for (int i = 1 + OFFSET; i <= OFFSET+LIMIT; i++) {
-            testObject = (TestObject) results.next();
+            testObject = (TestLimit) results.next();
             assertEquals(i, testObject.getId());
         }
         assertTrue(!results.hasMore());
@@ -104,7 +104,7 @@ public class TestLimitWithOffsetClause extends TestLimitClause
 		
         db.begin();
         try {
-			db.getOQLQuery("select t from jdo.TestObject t offset $1");
+			db.getOQLQuery("select t from jdo.TestLimit t offset $1");
 		} catch (OQLSyntaxException e) {
 			assertEquals ("org.exolab.castor.jdo.oql.OQLSyntaxException", e.getClass().getName());
 			return;

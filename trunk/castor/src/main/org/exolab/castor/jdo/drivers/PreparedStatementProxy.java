@@ -36,34 +36,28 @@ import org.exolab.castor.util.LocalConfiguration;
  */
 public class PreparedStatementProxy implements PreparedStatement {
 
-	/**
-	 * Commons logger.
-	 */
+	/** Commons logger. */
 	private static final Log log = LogFactory.getLog (PreparedStatementProxy.class);
 	
-	/**
-	 * PreparedStatement to be proxied.
-	 */
+    /** Has property of LocalConfiguration been read? */
+    private static boolean      _isConfigured = false;
+    
+    /** Should connections been wrapped by a proxy? */
+    private static boolean      _useProxies = false;
+    
+	/** PreparedStatement to be proxied. */
 	private PreparedStatement preparedStatement;
 	
-	/**
-	 * Connection instance associated with this PreparedStatement
-	 */
+	/** Connection instance associated with this PreparedStatement */
 	private Connection connection;
 	
-	/**
-	 * SQL Parameter mapping
-	 */
+	/** SQL Parameter mapping */
 	private Map parameters = new HashMap();
 	
-	/**
-	 * The SQL statement to be executed 
-	 */
+	/** The SQL statement to be executed  */
 	private String sqlStatement = null; 
 
-	/**
-	 * List of batch statements associated with this instance.
-	 */
+	/** List of batch statements associated with this instance. */
 	private List batchStatements = new ArrayList();
 
 	/**
@@ -73,14 +67,21 @@ public class PreparedStatementProxy implements PreparedStatement {
 	 * @param connection JDBC connection
 	 * @return Prepared statement proxy.
 	 */
-	public static PreparedStatement newPreparedStatementProxy (PreparedStatement statement, String sql, Connection connection) {
-		boolean useProxies = Boolean.getBoolean(LocalConfiguration.getInstance().getProperty("org.exolab.castor.persist.useProxies", "true"));
+	public static PreparedStatement newPreparedStatementProxy(
+            PreparedStatement statement, String sql, Connection connection) {
+        
+        if (!_isConfigured) {
+            String propertyValue = LocalConfiguration.getInstance().getProperty(
+                    "org.exolab.castor.persist.useProxies", "true");
+            _useProxies = Boolean.valueOf(propertyValue).booleanValue();
+            _isConfigured = true;
+        }
 
-		if (useProxies) {
-			return new PreparedStatementProxy (statement, sql, connection);
-		}
-		
-		return statement;
+		if (!_useProxies) {
+            return statement;
+		} else {
+            return new PreparedStatementProxy(statement, sql, connection);
+        }
 	}
 	
 	/**

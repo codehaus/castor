@@ -76,6 +76,8 @@ import net.sf.cglib.proxy.MethodProxy;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.DuplicateIdentityException;
 import org.exolab.castor.jdo.ObjectDeletedException;
@@ -487,16 +489,22 @@ public class ClassMolder
             extendFields = getFullFields( extend );
             thisFields = clsMap.getFieldMapping();
 
-            fieldList = new ArrayList(extendFields.length + thisFields.length);
+            fieldList = new ArrayList(extendFields.length + thisFields.length - identities.length);
             for (int i = 0; i < extendFields.length; i++) {
                 fieldList.add(extendFields[i]);
             }
-            for ( int i=0; i<thisFields.length; i++ ) {
-                for ( int k=0; k<identities.length; k++ ) {
-                    if ( ! thisFields[i].getName().equals( identities[k] ) ) {
-                        fieldList.add(thisFields[i]);
-                        break;
+            for (int i = 0, j = 0; i < thisFields.length; i++) {
+                idfield = false;
+                IDSEARCH:
+                for (int k = 0; k < identities.length; k++) {
+                    if (thisFields[i].getName().equals(identities[k])) {
+                        idfield = true;
+                        break IDSEARCH;
                     }
+                }
+                if (!idfield) {
+                    fieldList.add(thisFields[i]);
+                    j++;
                 }
             }
             fields = new FieldMapping[fieldList.size()];
@@ -697,16 +705,16 @@ public class ClassMolder
      * @param suggestedAccessMode the acessMode for the object
      * @return the object stamp for the object in the persistent storage
      */
-    public Object load( TransactionContext tx, OID oid, DepositBox locker,
-            Object object, AccessMode suggestedAccessMode )
-            throws ObjectNotFoundException, PersistenceException {
-            return load( tx, oid, locker, object, suggestedAccessMode, null );
+    public Object load(TransactionContext tx, OID oid, DepositBox locker,
+            ProposedObject proposedObject, AccessMode suggestedAccessMode)
+    throws ObjectNotFoundException, PersistenceException {
+        return load(tx, oid, locker, proposedObject, suggestedAccessMode, null);
     }
 
-    public Object load( TransactionContext tx, OID oid, DepositBox locker,
-            Object object, AccessMode suggestedAccessMode, QueryResults results )
-            throws ObjectNotFoundException, PersistenceException {
-
+    private Object loadFields(TransactionContext tx, OID oid, DepositBox locker,
+            ProposedObject proposedObject, AccessMode suggestedAccessMode, QueryResults results)
+    throws ObjectNotFoundException, PersistenceException {
+                   
         Connection conn;
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
@@ -717,32 +725,118 @@ public class ClassMolder
         int fieldType;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
 
-        if ( oid.getIdentity() == null )
-            throw new PersistenceException("The identities of the object to be loaded is null");
-
         // load the fields from the persistent storage if the cache is empty
         // and the accessMode is readOnly.
         fields = (Object[]) locker.getObject( tx );
+        
+        proposedObject.setFields(fields);
         if ( fields == null || accessMode == AccessMode.DbLocked ) {
             fields = new Object[_fhs.length];
+            proposedObject.setFields(fields);
             if( results != null ) {
-                stamp = results.getQuery().fetch( fields, oid.getIdentity() );
+                stamp = results.getQuery().fetch(proposedObject, oid.getIdentity());
+                fields = proposedObject.getFields();
             } else {
-                conn = tx.getConnection(oid.getLockEngine());
-                stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
+                conn = (Connection) tx.getConnection(oid.getLockEngine());
+                stamp = _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
+                fields = proposedObject.getFields();
             }
-            oid.setDbLock( accessMode == AccessMode.DbLocked );
-            locker.setObject( tx, fields );
+            
+            if (proposedObject.isExpanded()) {
+               if (_log.isDebugEnabled()) {
+                   StringBuffer sb = new StringBuffer();
+                   sb.append("Actual object has been expanded from ");
+                   sb.append(proposedObject.getProposedClass());
+                   sb.append(" to ");
+                   sb.append(proposedObject.getActualClass());
+                   sb.append(", with the field values to set as follows:\n");
+                   for (int i = 0; i < fields.length; i++) {
+                       sb.append("field ");
+                       sb.append(i + 1);
+                       sb.append(": ");
+                       sb.append(fields[i]);
+                       sb.append('\n');
+                   }
+                   _log.debug(sb);
+               }
+            } else {
+                oid.setDbLock( accessMode == AccessMode.DbLocked );
+                locker.setObject(tx, fields );
+            }            
         }
+        
+        proposedObject.setActualClassMolder(this);
 
+        
+        return stamp;
+    }
+
+    public Object load(TransactionContext tx, OID oid, DepositBox locker,
+            ProposedObject proposedObject, AccessMode suggestedAccessMode, QueryResults results)
+    throws ObjectNotFoundException, PersistenceException {
+        
+        Connection conn;
+        ClassMolder fieldClassMolder;
+        LockEngine fieldEngine;
+        Object[] fields;
+        Object ids;
+        Object stamp = null;
+        Object temp;
+        int fieldType;
+        AccessMode accessMode = getAccessMode( suggestedAccessMode );
+        
+        if ( oid.getIdentity() == null )
+            throw new PersistenceException("The identities of the object to be loaded is null");
+        
+        // obtain field values
+        stamp = loadFields(tx, oid, locker, proposedObject, suggestedAccessMode, results);
+        
+        // if the obejct has been expanded, call ClassMolder.load() recursively
+        if (proposedObject.isExpanded()) {
+            ClassMolder molder = oid.getLockEngine().getClassMolder(proposedObject.getActualClass());
+            
+            Object expandedObject = null;
+            try {
+                expandedObject = molder.newInstance(tx.getClassLoader());
+            } catch (InstantiationException e) {
+                _log.error("Cannot create instance of " + molder.getName());
+                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+            } catch (IllegalAccessException e) {
+                _log.error("Cannot create instance of " + molder.getName());
+                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+            } catch (ClassNotFoundException e) {
+                _log.error("Cannot create instance of " + molder.getName());
+                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+            }
+            
+            ProposedObject proposedExpanded = new ProposedObject();
+            proposedExpanded.setProposedClass(proposedObject.getActualClass());
+            proposedExpanded.setActualClass(proposedObject.getActualClass());
+            proposedExpanded.setObject(expandedObject);
+            proposedExpanded.setFields(proposedObject.getFields());
+            
+            // call ClassMolder.load() recursively
+            stamp = molder.load(tx, oid, locker, proposedExpanded, suggestedAccessMode, results);
+            
+            // store expanded information 
+            proposedObject.setActualClass(proposedExpanded.getActualClass());
+            proposedObject.setFields(proposedExpanded.getFields());
+            proposedObject.setObject(proposedExpanded.getObject());
+            proposedObject.setActualClassMolder(proposedExpanded.getActualClassMolder());
+            
+            return stamp;
+        }
+        
+        fields = proposedObject.getFields();
+                        
         // set the timeStamp of the data object to locker's timestamp
-        if ( object instanceof TimeStampable ) {
-            ((TimeStampable)object).jdoSetTimeStamp( locker.getTimeStamp() );
+        if (proposedObject.getObject() instanceof TimeStampable) {
+            ((TimeStampable) proposedObject.getObject()).jdoSetTimeStamp(locker.getTimeStamp());
         }
 
         // set the identities into the target object
         ids = oid.getIdentity();
-        setIdentity( tx, object, ids );
+        setIdentity(tx, proposedObject.getObject(), ids);
 
         // iterates thur all the field of the object and bind all field.
         for ( int i = 0; i < _fhs.length; i++ ) {
@@ -752,9 +846,9 @@ public class ClassMolder
                 // simply set the corresponding Persistent field value into the object
                 temp = fields[i];
                 if ( temp != null )
-                    _fhs[i].setValue( object, temp, tx.getClassLoader() );
+                    _fhs[i].setValue(proposedObject.getObject(), temp, tx.getClassLoader());
                 else
-                    _fhs[i].setValue( object, null, tx.getClassLoader() );
+                    _fhs[i].setValue(proposedObject.getObject(), null, tx.getClassLoader());
                 break;
 
             case FieldMolder.SERIALIZABLE:
@@ -767,9 +861,9 @@ public class ClassMolder
                         ByteArrayInputStream bis = new ByteArrayInputStream( bytes );
                         ObjectInputStream os = new ObjectInputStream( bis );
                         Object o = os.readObject();
-                        _fhs[i].setValue( object, o, tx.getClassLoader() );
+                        _fhs[i].setValue(proposedObject.getObject(), o, tx.getClassLoader());
                     } else {
-                        _fhs[i].setValue( object, null, tx.getClassLoader() );
+                        _fhs[i].setValue(proposedObject.getObject(), null, tx.getClassLoader());
                     }
                 } catch ( OptionalDataException e ) {
                     throw new PersistenceException( "Error while deserializing an dependent object", e );
@@ -795,16 +889,18 @@ public class ClassMolder
 						if (_fhs[i].isLazy()) {
 							temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode);
 						} else {
-							temp = tx.load(fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode);
+							ProposedObject proposedTemp = new ProposedObject();
+							temp = tx.load(fieldEngine, fieldClassMolder, fields[i], proposedTemp, suggestedAccessMode);
 						}
                     } catch (ObjectNotFoundException ex) {
                         temp = null;
                     }
-                    _fhs[i].setValue( object, temp, tx.getClassLoader() );
+                    _fhs[i].setValue(proposedObject.getObject(), temp, tx.getClassLoader());
                 } else {
-                    _fhs[i].setValue( object, null, tx.getClassLoader() );
+                    _fhs[i].setValue(proposedObject.getObject(), null, tx.getClassLoader());
                 }
                 break;
+                
             case FieldMolder.ONE_TO_MANY:
             case FieldMolder.MANY_TO_MANY:
                 // field is one-to-many and many-to-many type. All the related
@@ -819,33 +915,34 @@ public class ClassMolder
                     // field.
                     ArrayList v = (ArrayList)fields[i];
                     if ( v != null ) {
-                      // simple array type support
-                      Class collectionType = _fhs[i].getCollectionType();
-                      if (collectionType.isArray()) {
-                        Object[] value = (Object[])java.lang.reflect.Array.newInstance(
-                                collectionType.getComponentType(), v.size());
-                        for ( int j=0,l=v.size(); j<l; j++ ) {
-                          value[j] = tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
-                        }
-                        _fhs[i].setValue( object, value, tx.getClassLoader() );
-                      } else {
-                        CollectionProxy cp = CollectionProxy.create( _fhs[i], object, tx.getClassLoader() );
-                        for ( int j=0,l=v.size(); j<l; j++ ) {
-                            cp.add( v.get(j), tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode ) );
-                        }
-                        cp.close();
-                        //_fhs[i].setValue( object, cp.getCollection() );
-                      }
+                    	// simple array type support
+                    	Class collectionType = _fhs[i].getCollectionType();
+                    	if (collectionType.isArray()) {
+                    		Object[] value = (Object[]) java.lang.reflect.Array.newInstance(
+                    				collectionType.getComponentType(), v.size());
+                    		for (int j = 0, l = v.size(); j < l; j++) {
+                    			ProposedObject proposedValue = new ProposedObject ();
+                    			value[j] = tx.load(oid.getLockEngine(), fieldClassMolder, v.get(j), proposedValue, suggestedAccessMode);
+                    		}
+                    		_fhs[i].setValue(proposedObject.getObject(), value, tx.getClassLoader());
+                    	} else {
+                    		CollectionProxy cp = CollectionProxy.create(_fhs[i], proposedObject.getObject(), tx.getClassLoader());
+                    		for (int j = 0, l = v.size(); j < l; j++) {
+                    			ProposedObject proposedValue = new ProposedObject ();
+                    			cp.add(v.get(j), tx.load(oid.getLockEngine(), fieldClassMolder, v.get(j), proposedValue, suggestedAccessMode));
+                    		}
+                    		cp.close();
+                    	}
                     } else {
-                        _fhs[i].setValue( object, null, tx.getClassLoader() );
+                    	_fhs[i].setValue(proposedObject.getObject(), null, tx.getClassLoader());
                     }
                 } else {
                     // lazy loading is specified. Related object will not be loaded.
                     // A lazy collection with all the identity of the related object
                     // will constructed and set as the data object's field.
                     ArrayList list = (ArrayList) fields[i];
-                    RelationCollection relcol = new RelationCollection( tx, oid, fieldEngine, fieldClassMolder, accessMode, list );
-                    _fhs[i].setValue( object, relcol, tx.getClassLoader() );
+                    RelationCollection relcol = new RelationCollection(tx, oid, fieldEngine, fieldClassMolder, accessMode, list);
+                    _fhs[i].setValue(proposedObject.getObject(), relcol, tx.getClassLoader());
                 }
                 break;
             default:
@@ -1466,7 +1563,9 @@ public class ClassMolder
                         // must be loaded thur transaction, so that the related object
                         // is properly locked and updated before we delete it.
                         if ( !tx.isDeletedByOID( new OID( fieldEngine, fieldClassMolder, id ) ) ) {
-                            Object reldel = tx.load( fieldEngine, fieldClassMolder, id, null, null );
+                        	
+                			ProposedObject proposedValue = new ProposedObject ();
+                            Object reldel = tx.load(fieldEngine, fieldClassMolder, id, proposedValue, null);
                             if ( reldel != null && tx.isPersistent( reldel ) ) {
                                 tx.writeLock( reldel, tx.getLockTimeout() );
 
@@ -1861,7 +1960,14 @@ public class ClassMolder
                 // allow a dependent object not implements timeStampable
                 fields = new Object[_fhs.length];
                 Connection conn = tx.getConnection(oid.getLockEngine());
-                stamp = _persistence.load( conn, fields, oid.getIdentity(), accessMode );
+                
+                ProposedObject proposedObject = new ProposedObject();
+                proposedObject.setProposedClass(object.getClass());
+                proposedObject.setObject(object);
+                proposedObject.setFields(fields);
+                stamp = _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
+                fields = proposedObject.getFields();
+                
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
                 locker.setObject( tx, fields );
             }
@@ -1889,14 +1995,18 @@ public class ClassMolder
 
                             // load the cached dependent object from the data store.
                             // The loaded will be compared with the new one
-                            if ( fields[i] != null )
-                                tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
+                            if ( fields[i] != null ) {
+                    			ProposedObject proposedValue = new ProposedObject ();
+                                tx.load(fieldEngine, fieldClassMolder, fields[i], proposedValue, suggestedAccessMode);
+                            }
                         } else if ( tx.isAutoStore() ) {
                             if ( o != null && !tx.isRecorded(o) )
                                 tx.markUpdate( fieldEngine, fieldClassMolder, o, null );
 
-                            if ( fields[i] != null )
-                                tx.load( fieldEngine, fieldClassMolder, fields[i], null, suggestedAccessMode );
+                            if ( fields[i] != null ) {
+                    			ProposedObject proposedValue = new ProposedObject ();
+                                tx.load(fieldEngine, fieldClassMolder, fields[i], proposedValue, suggestedAccessMode);
+                            }
                         }
                         break;
 
@@ -1929,8 +2039,8 @@ public class ClassMolder
                                         if ( !newSetOfIds.contains( v.get(j) ) ) {
                                             // load all the dependent object in cache for modification
                                             // check at commit time.
-                                            tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
-
+                                			ProposedObject proposedValue = new ProposedObject ();
+                                            tx.load(oid.getLockEngine(), fieldClassMolder, v.get(j), proposedValue, suggestedAccessMode);
                                         }
                                     }
                                 }
@@ -1964,7 +2074,8 @@ public class ClassMolder
                                     if ( !newSetOfIds.contains( v.get(j) ) ) {
                                         // load all the dependent object in cache for modification
                                         // check at commit time.
-                                        tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                            			ProposedObject proposedValue = new ProposedObject ();
+                                        tx.load(oid.getLockEngine(), fieldClassMolder, v.get(j), proposedValue, suggestedAccessMode);
                                     }
                                 }
                             }
@@ -1997,7 +2108,8 @@ public class ClassMolder
                                     if ( !newSetOfIds.contains( v.get(j) ) ) {
                                         // load all the dependent object in cache for modification
                                         // check at commit time.
-                                        tx.load( oid.getLockEngine(), fieldClassMolder, v.get(j), null, suggestedAccessMode );
+                            			ProposedObject proposedValue = new ProposedObject ();
+                                        tx.load(oid.getLockEngine(), fieldClassMolder, v.get(j), proposedValue, suggestedAccessMode);
                                     }
                                 }
                             }
@@ -2269,8 +2381,12 @@ public class ClassMolder
                     if ( persistFields == null ) {
 
                         persistFields = new Object[extend._fhs.length];
-                        extend._persistence.load( tx.getConnection(extend._engine),
-                        persistFields, identity, AccessMode.ReadOnly );
+
+                        ProposedObject proposedObject = new ProposedObject();
+                        proposedObject.setFields(persistFields);
+                        extend._persistence.load((Connection) tx.getConnection(extend._engine),
+                                proposedObject, identity, AccessMode.ReadOnly);
+                        persistFields = proposedObject.getFields();
                     }
 
                     if ( extend._fhs[i].isMulti() ) {
@@ -3368,7 +3484,10 @@ class SingleProxy
 		if ( _log.isDebugEnabled() && _classMolder != null ) {
 			_log.debug("load object " + _classMolder.getName() + " with id " + _identity);
 		}
-		instance = _tx.load(_engine, _classMolder, _identity, _object, _accessMode);
+		ProposedObject proposedValue = new ProposedObject ();
+		proposedValue.setProposedClass(_clazz);
+		proposedValue.setObject(_object);
+		instance = _tx.load(_engine, _classMolder, _identity, proposedValue, _accessMode);
 		hasMaterialized = true;
 		return instance;
 	}

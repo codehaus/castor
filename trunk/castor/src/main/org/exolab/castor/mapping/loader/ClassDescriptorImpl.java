@@ -47,6 +47,12 @@
 package org.exolab.castor.mapping.loader;
 
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -66,9 +72,9 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 public class ClassDescriptorImpl
     implements ClassDescriptor
 {
+	private static final Log _log = LogFactory.getLog(ClassDescriptorImpl.class);
 
-
-    private ClassMapping         _map;
+    private ClassMapping               _map;
     /**
      * The Java class for this descriptor.
      */
@@ -85,10 +91,14 @@ public class ClassDescriptorImpl
      * or null if this is a top-level class.
      */
     private final ClassDescriptor     _extends;
-
+    
+    /**
+     * A collection of class descriptors that extend this class, or 
+     * an empty collection if this is a leaf class.
+     */
+    private final Collection	      _extendedBy = new LinkedList();
 
     private final ClassDescriptor     _depends;
-
 
     /**
      * The field of the identity for this class.
@@ -166,6 +176,12 @@ public class ClassDescriptorImpl
                 throw new MappingException( "mapping.classDoesNotExtend",
                                             _javaClass.getName(), extend.getJavaClass().getName() );
             _extends = extend;
+            
+            if ( _extends.getClass().getName().equals("org.exolab.castor.jdo.engine.JDOClassDescriptor") &&
+            	this.getClass().getName().equals("org.exolab.castor.jdo.engine.JDOClassDescriptor")) {
+            	((ClassDescriptorImpl) _extends).addExtendedBy(this);
+            }
+            
             if ( _extends instanceof ClassDescriptorImpl )
                 _identities = ( identities == null ? ((ClassDescriptorImpl)_extends).getIdentities() : identities );
             else
@@ -232,6 +248,27 @@ public class ClassDescriptorImpl
     public ClassDescriptor getExtends()
     {
         return _extends;
+    }
+    
+    public boolean isExtending()  {
+        return (_extends != null);
+    }
+    
+    /**
+     * Returns a collection of class descriptors that extend this class descriptor.
+     *
+     * @return A collection of class descriptors.
+     */
+    public Collection getExtendedBy() {
+    	return _extendedBy;
+    }
+    
+    public boolean isExtended() {
+        return (_extendedBy.size() > 0);
+    }
+    
+    public void addExtendedBy(ClassDescriptor classDesc) {
+    	_extendedBy.add(classDesc);
     }
 
     public ClassDescriptor getDepends() {

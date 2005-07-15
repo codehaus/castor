@@ -54,6 +54,7 @@ import java.util.ConcurrentModificationException;
 import java.util.NoSuchElementException;
 import java.lang.reflect.Array;
 
+import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -283,7 +284,8 @@ public class RelationCollection implements Collection, Lazy, TxSynchronizable {
                 throw new RuntimeException("Transaction is closed!");
 
             try {
-                o = parent._tx.load( parent._engine, parent._molder, ids, null, null );
+    			ProposedObject proposedValue = new ProposedObject ();
+                o = parent._tx.load( parent._engine, parent._molder, ids, proposedValue, null );
                 parent._loaded.put( ids, o );
                 return o;
             } catch ( LockNotGrantedException e ) {
