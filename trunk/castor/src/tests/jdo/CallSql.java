@@ -46,6 +46,8 @@
 
 package jdo;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.jdo.OQLQuery;
@@ -57,9 +59,9 @@ import harness.CastorTestCase;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-public class CallSql extends CastorTestCase 
-{
-
+public class CallSql extends CastorTestCase {
+    private static final Log _log = LogFactory.getLog(CallSql.class);
+    
     private JDOCategory    _category;
 
     private Database       _db;
@@ -104,27 +106,27 @@ public class CallSql extends CastorTestCase
         enumeration = oql.execute();
         if ( enumeration.hasMore() ) {
             object = (TestObject) enumeration.next();
-            stream.println( "Retrieved object: " + object );
+            _log.debug("Retrieved object: " + object);
             object.setValue1( TestObject.DefaultValue1 );
             object.setValue2( TestObject.DefaultValue2 );
         } else {
             object = new TestObject();
             object.setId(50);
-            stream.println( "Creating new object: " + object );
+            _log.debug("Creating new object: " + object);
             _db.create( object );
         }
         oql.close();
         _db.commit();
 
         try {
-          stream.println( "CALL SQL query" );
+          _log.debug("CALL SQL query with object part of an extend hierarchy");
           _db.begin();
-          oql = _db.getOQLQuery( "CALL SQL SELECT id, value1 , value2 FROM test_table WHERE (id = $1) AS jdo.TestObject" );
+          oql = _db.getOQLQuery("CALL SQL SELECT test_table.id,test_table.value1,test_table.value2,test_table_extends.id,test_table_extends.value3,test_table_extends.value4 FROM test_table LEFT OUTER JOIN test_table_extends ON test_table.id=test_table_extends.id WHERE (test_table.id = $1) AS jdo.TestObject");
           oql.bind( 50 );
           enumeration = oql.execute();
           if (enumeration.hasMore()) {
             object = (TestObject) enumeration.next();
-            stream.println( "Retrieved object: " + object );
+            _log.debug("Retrieved object: " + object);
           } else {
              fail( "test object not found" );
           }
@@ -135,6 +137,34 @@ public class CallSql extends CastorTestCase
         {
             fail( "Exception thrown " + e );
         }
+
+        _log.debug("CALL SQL query with simple (stand-alone) object");
+        _db.begin();
+        TestObjectEx test = new TestObjectEx();
+        test.setId(55);
+        test.setValue1("value1");
+        test.setValue2("value2");
+        _db.create(test);
+        _db.commit();
+        
+        _db.begin();
+        oql = _db.getOQLQuery("CALL SQL SELECT id, value1 , value2 FROM test_table_ex WHERE (id = $1) AS jdo.TestObjectEx");
+        oql.bind(55);
+        enumeration = oql.execute();
+        TestObjectEx objectEx = null;
+        if (enumeration.hasMore()) {
+            objectEx = (TestObjectEx) enumeration.next();
+            _log.debug("Retrieved object: " + object);
+        } else {
+            fail("test object not found");
+        }
+        oql.close();
+        _db.commit();
+        
+        _db.begin();
+        test = (TestObjectEx) _db.load(TestObjectEx.class, new Integer(55));
+        _db.remove(test);
+        _db.commit();
     }
 
     public void tearDown() throws PersistenceException 

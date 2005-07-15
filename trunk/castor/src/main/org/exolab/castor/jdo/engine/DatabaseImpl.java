@@ -54,6 +54,7 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.AccessMode;
@@ -343,7 +344,8 @@ public class DatabaseImpl
         TransactionContext tx = getTransaction();
         PersistenceInfo info = _scope.getPersistenceInfo(type);
 
-        return tx.load(info.engine, info.molder, identity, object, mode);
+        ProposedObject proposedObject = new ProposedObject();
+        return tx.load( info.engine, info.molder, identity, proposedObject, mode );
     }
 
     public void create( Object object )

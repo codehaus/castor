@@ -47,6 +47,9 @@
 package org.exolab.castor.jdo.engine;
 
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.ClassDescriptor;
@@ -73,17 +76,27 @@ public abstract class BaseFactory
      * Commons Logging</a> instance used for all logging.
      */
     private static Log _log = LogFactory.getFactory().getInstance( BaseFactory.class );
+    
+    /**
+     * Maps class descriptor to persistence engines ....
+     */
+    private Map classDescriptorToPersistence = new HashMap();
 
-
-    public Persistence getPersistence( ClassDescriptor clsDesc )
-        throws MappingException
-    {
-        if ( ! ( clsDesc instanceof JDOClassDescriptor ) )
-            return null;
+    /**
+     * @see org.exolab.castor.persist.spi.PersistenceFactory#getPersistence(org.exolab.castor.mapping.ClassDescriptor)
+     */
+    public Persistence getPersistence(final ClassDescriptor clsDesc) {
+        if (!(clsDesc instanceof JDOClassDescriptor)) { return null; }
+        
         try {
-            return new SQLEngine( (JDOClassDescriptor) clsDesc, this, null);
-        } catch ( MappingException except ) {
-            _log.fatal( Messages.format( "jdo.fatalException", except ) );
+            Persistence sqlEngine = (SQLEngine) classDescriptorToPersistence.get(clsDesc);
+            if (sqlEngine == null) {
+                sqlEngine = new SQLEngine((JDOClassDescriptor) clsDesc, this, null);
+                classDescriptorToPersistence.put(clsDesc, sqlEngine);
+            }
+            return sqlEngine;
+        } catch (MappingException except) {
+            _log.fatal(Messages.format("jdo.fatalException", except));
             return null;
         }
     }

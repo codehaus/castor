@@ -49,8 +49,10 @@ package org.exolab.castor.jdo.engine;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.castor.engine.CounterRef;
+import org.castor.persist.ProposedObject;
 import org.exolab.castor.jdo.*;
-import org.exolab.castor.jdo.drivers.PreparedStatementProxy;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.persist.spi.*;
@@ -117,7 +119,7 @@ public final class SQLEngine implements Persistence {
     private ColumnInfo[]         _ids;
 
     private SQLEngine           _extends;
-
+    
     private QueryExpression     _sqlFinder;
 
     private PersistenceFactory  _factory;
@@ -141,6 +143,16 @@ public final class SQLEngine implements Persistence {
      * at least one field that is to be persisted.
      */
     private boolean hasFieldsToPersist = false;
+
+    /**
+     * Number of ClassDescriptor that extend this one.
+     */
+    private int _numberOfExtendLevels;
+
+    /**
+     * Collection of all the ClassDescriptor that extend this one (closure)
+     */
+    private Collection _extendingClassDescriptors;
 
     SQLEngine( JDOClassDescriptor clsDesc, PersistenceFactory factory, String stampField )
         throws MappingException {
@@ -293,6 +305,10 @@ public final class SQLEngine implements Persistence {
         _fields = new FieldInfo[fieldsInfo.size()];
         fieldsInfo.copyInto( _fields );
 
+        // obtain the number of ClassDescriptor that extend this one.
+        _numberOfExtendLevels = numberOfExtendingClassDescriptors(getDescriptor());
+        _extendingClassDescriptors = getDescriptor().getExtendedBy();
+
         // iterate through all fields to check whether there is a field
         // to persist at all; in the case of extend relationships where no 
         // additional attributes are defined in the extending class, this 
@@ -327,6 +343,10 @@ public final class SQLEngine implements Persistence {
         }
     }
 
+    public Persistence.ColumnInfo[] getColumnInfoForIdentities() {
+    	return _ids;
+    }
+    
     public Persistence.FieldInfo[] getInfo() {
         return _fields;
     }
@@ -941,7 +961,7 @@ public final class SQLEngine implements Persistence {
                         
                         if(_log.isDebugEnabled()) {
                             _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), 
-                                    _sqlLoad ) );
+                                    stmt.toString() ) );
                         }
                         
                         // bind the identity to the prepareStatement
@@ -964,15 +984,20 @@ public final class SQLEngine implements Persistence {
                             for(int i = 0; i < fields.length; i++){
                                 currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
                                 
-                                if ( currentField != null &&
-                                     _fields[i].tableName.compareTo(_mapTo) == 0 && 
-                                     !original[i].equals(currentField) ) {
-                                    if (numberOfFieldsNotMatching >= 1) {
-                                        enlistFieldsNotMatching.append (", ");
+                                if (_fields[i].tableName.compareTo(_mapTo) == 0) {
+                                    if ((original[i] == null && currentField != null) ||
+                                        (currentField == null && original[i] != null) ||
+                                        (original[i] == null && currentField == null)) {
+                                        enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
+                                        enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
+                                    } else if (!original[i].equals(currentField) ) {
+                                        if (numberOfFieldsNotMatching >= 1) {
+                                            enlistFieldsNotMatching.append (", ");
+                                        }
+                                        enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
+                                        enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
+                                        numberOfFieldsNotMatching++;
                                     }
-                                    enlistFieldsNotMatching.append ("(" + _clsDesc.getJavaClass().getName() + ")." + _fields[i].columns[0].name + ": ");
-                                    enlistFieldsNotMatching.append ("[" + original[i] + "/" + currentField + "]"); 
-                                    numberOfFieldsNotMatching++;
                                 }
                             }
                             throw new ObjectModifiedException( Messages.format("persist.objectModified", _clsDesc.getJavaClass().getName(), identity, enlistFieldsNotMatching.toString()) );
@@ -1106,25 +1131,42 @@ public final class SQLEngine implements Persistence {
     }
 
 
-    public Object load( Object conn, Object[] fields, Object identity, AccessMode accessMode )
-            throws ObjectNotFoundException, PersistenceException {
-
+    /**
+     * Loads the object from persistence storage. This method will load
+     * the object fields from persistence storage based on the object's
+     * identity. This method may return a stamp which can be used at a
+     * later point to determine whether the copy of the object in
+     * persistence storage is newer than the cached copy (see {@link
+     * #store}). If <tt>lock</tt> is true the object must be
+     * locked in persistence storage to prevent concurrent updates.
+     *
+     * @param conn An open connection
+     * @param fields An Object[] to load field values into
+     * @param identity Identity of the object to load.
+     * @param accessMode The access mode (null equals shared)
+     * @return The object's stamp, or null
+     * @throws ObjectNotFoundException The object was not found in persistent storage
+     * @throws PersistenceException A persistence error occured
+     */
+    public Object load( Object conn, ProposedObject proposedObject, Object identity, AccessMode accessMode )
+    throws ObjectNotFoundException, PersistenceException {
         PreparedStatement stmt  = null;
         ResultSet         rs    = null;
         Object            stamp = null;
         boolean           notNull;
 
+                
+        Object[] fields = proposedObject.getFields();
+        
         try {
-        	String sql = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
-            stmt = ( (Connection) conn ).prepareStatement(sql);
-            
+            String sqlString = (accessMode == AccessMode.DbLocked) ? _sqlLoadLock : _sqlLoad; 
+            stmt = ((Connection) conn).prepareStatement(sqlString);
+                        
             if (_log.isDebugEnabled()) {
-                String generatedSQL = ( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad;
-//                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), generatedSQL ) );
-                _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), stmt.toString()) );
+                _log.debug( Messages.format("jdo.loading", _clsDesc.getJavaClass().getName(), stmt.toString()));
             }
             
-            int count = 1;
+            int fieldIndex = 1;
             // bind the identity of the preparedStatement
             if ( identity instanceof Complex ) {
                 Complex id = (Complex) identity;
@@ -1132,37 +1174,67 @@ public final class SQLEngine implements Persistence {
                     throw new PersistenceException( "Size of complex field mismatched! expected: "+_ids.length+" found: "+id.size() );
 
                 for ( int i=0; i<_ids.length; i++ )
-                    stmt.setObject( count++, idToSQL( i, id.get(i) ) );
-
+                    stmt.setObject(fieldIndex++, idToSQL(i, id.get(i)));
             } else {
                 if ( _ids.length != 1 )
                     throw new PersistenceException( "Complex field expected!" );
-                stmt.setObject( count++, idToSQL( 0, identity ) );
+                stmt.setObject(fieldIndex++, idToSQL(0, identity));
             }
 
             if (_log.isDebugEnabled()) {
                 _log.debug( Messages.format( "jdo.loading", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
-            // query the object
+            // execute the SQL query 
             rs = stmt.executeQuery();
             if ( ! rs.next() )
                 throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", _clsDesc.getJavaClass().getName(), identity) );
 
+            if (_extendingClassDescriptors.size() > 0) {
+                Object[] returnValues = 
+                    calculateNumberOfFields(_extendingClassDescriptors, 
+                            _ids.length, _fields.length, _numberOfExtendLevels, rs);
+                JDOClassDescriptor potentialLeafDescriptor = (JDOClassDescriptor) returnValues[0];
+            	
+                if (potentialLeafDescriptor != null &&
+                    !potentialLeafDescriptor.getJavaClass().getName().equals (getDescriptor().getJavaClass().getName())) {
+                    Object[] expandedFields = new Object[potentialLeafDescriptor.getFields().length];
+                    
+                    fields = expandedFields;
+                    proposedObject.setFields (expandedFields);
+                    proposedObject.setActualClass (potentialLeafDescriptor.getJavaClass());
+                    proposedObject.setExpanded(true);
+                }
+
+            	return null;
+            }
+            
             // Load all the fields of the object including one-one relations
-            count = 1;
+            // index to use during ResultSet.getXXX()
+            int columnIndex = 1;
+            // index in fields[] for storing result of SQLTypes.getObject()
+            fieldIndex = 1;
+            String tableName = null;
+            String tableNameOld = tableName;
             Object[] temp = new Object[10]; // assume complex field max at 10
-            for ( int i = 0 ; i < _fields.length ; ++i  ) {
+            for (int i = 0 ; i < _fields.length ; ++i ) {
+            	tableName = _fields[i].tableName;
+            	if (!tableName.equals (tableNameOld) && !_fields[i].joined) {
+            		columnIndex = columnIndex + _ids.length; 
+            	}
+            	
                 if ( !_fields[i].load )
                     continue;
 
                 if ( !_fields[i].multi ) {
                     notNull = false;
                     if ( _fields[i].columns.length == 1 ) {
-                        fields[i] = toJava( i, 0, SQLTypes.getObject( rs, count++, _fields[i].columns[0].sqlType ) );
+                        fields[i] = toJava(i, 0, SQLTypes.getObject(rs, columnIndex++, _fields[i].columns[0].sqlType));
+                        fieldIndex++;
                     } else {
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            temp[j] = toJava( i, j, SQLTypes.getObject( rs, count++, _fields[i].columns[j].sqlType ) );
+                        for (int j = 0; j < _fields[i].columns.length; j++) {
+                            temp[j] = toJava(i, j, SQLTypes.getObject(rs, columnIndex++, _fields[i].columns[j].sqlType));
+                            fieldIndex++;
                             if ( temp[j] != null ) {
                                 notNull = true;
                             }
@@ -1176,11 +1248,12 @@ public final class SQLEngine implements Persistence {
                     ArrayList res = new ArrayList();
                     notNull = false;
                     for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                        temp[j] = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
+                        temp[j] = toJava(i, j, SQLTypes.getObject(rs, columnIndex, _fields[i].columns[j].sqlType));
                         if ( temp[j] != null ) {
                             notNull = true;
                         }
-                        count++;
+                        fieldIndex++;
+                        columnIndex++;
                     }
                     if ( notNull ) {
                         if ( _fields[i].columns.length == 1 )
@@ -1190,24 +1263,36 @@ public final class SQLEngine implements Persistence {
                     }
                     fields[i] = res;
                 }
+                
+                tableNameOld = tableName;
             }
 
-            while ( rs.next() ) {
-                count = 1;
-                for ( int i = 0; i < _fields.length ; ++i  ) {
-                    if ( !_fields[i].load )
+            while (rs.next()) {
+                fieldIndex = 1;
+                columnIndex = 1;
+
+                tableName = null;
+                tableNameOld = tableName;
+
+                for (int i = 0; i < _fields.length ; ++i) {
+
+                	tableName = _fields[i].tableName;
+                	if (!tableName.equals (tableNameOld) && !_fields[i].joined) {
+                	    columnIndex = columnIndex + _ids.length;
+                	}
+                	
+                	if ( !_fields[i].load )
                         continue;
 
                     if ( _fields[i].multi ) {
                         ArrayList res = (ArrayList)fields[i];
                         notNull = false;
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            temp[j] = toJava( i, j, SQLTypes.getObject( rs, count, _fields[i].columns[j].sqlType ) );
-                            if ( temp[j] != null ) {
-                                notNull = true;
-                            }
-                            count++;
+                        for (int j = 0; j < _fields[i].columns.length; j++) {
+                            temp[j] = toJava(i, j, SQLTypes.getObject(rs, columnIndex, _fields[i].columns[j].sqlType));
+                            if (temp[j] != null) { notNull = true; }
+                            columnIndex++;
                         }
+                        fieldIndex++;
                         if ( notNull ) {
                             if ( _fields[i].columns.length == 1 ) {
                                 if ( !res.contains( temp[0] ) )
@@ -1219,29 +1304,120 @@ public final class SQLEngine implements Persistence {
                             }
                         }
                     } else {
-                        count += _fields[i].columns.length;
+                        fieldIndex++;
+                        columnIndex += _fields[i].columns.length;
                     }
+                    tableNameOld = tableName;
                 }
+                
+                proposedObject.setFields(fields);
             }
         } catch ( SQLException except ) {
             _log.fatal( Messages.format( "jdo.loadFatal", _type, (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) ), except );
-
-            throw new PersistenceException( Messages.format("persist.nested", except), except );
+            throw new PersistenceException(Messages.format("persist.nested", except), except);
         } finally {
-            try {
-                if ( rs != null ) rs.close();
-            } catch ( SQLException sqle ) {
-                _log.warn("Problem closing JDBC Connection instance", sqle);
-            }
-            try {
-                if ( stmt != null ) stmt.close();
-            } catch ( SQLException sqle ) {
-                _log.warn("Problem closing JDBC statement", sqle);
-            }
+            Utils.closeResultSet(rs);
+            Utils.closeStatement(stmt);
         }
         return stamp;
     }
+    
+    private int numberOfExtendingClassDescriptors (JDOClassDescriptor classDescriptor) {
+        int numberOfExtendLevels = 1;
+        JDOClassDescriptor currentClassDescriptor = getDescriptor();
+        while (currentClassDescriptor.getExtends() != null) {
+            currentClassDescriptor = (JDOClassDescriptor) currentClassDescriptor.getExtends();
+            numberOfExtendLevels++;
+        }
+        return numberOfExtendLevels;
+    }
 
+    private Object[] calculateNumberOfFields (Collection extendingClassDescriptors, 
+            int numberOfIdentityColumns,
+            int numberOfFields,
+            int numberOfExtendLevels, 
+            ResultSet rs)
+    throws SQLException
+    {
+        JDOClassDescriptor potentialLeafDescriptor = null;
+        int suggestedNumberOfFields = numberOfFields;
+        Collection potentialActualClassDescriptor = new LinkedList();
+        int numberOfIdentitiesToAnalyze = 0;
+        addExtendingClassDescriptors(potentialActualClassDescriptor, extendingClassDescriptors);
+        
+        JDOClassDescriptor potentialClassDescriptor = null;
+        JDOClassDescriptor potentialClassDescriptorPrevious = null;
+        int initialColumnIndex = numberOfFields + numberOfIdentityColumns * numberOfExtendLevels + 1;
+        int columnIndex = initialColumnIndex;
+        int numberOfExtendingClassDescriptors = 0;
+        for (Iterator iter = potentialActualClassDescriptor.iterator(); iter.hasNext(); ) {
+            potentialClassDescriptor = (JDOClassDescriptor) iter.next();
+            numberOfExtendingClassDescriptors += 1;
+            _log.debug ("Potential extending class descriptor: " + potentialClassDescriptor.getJavaClass().getName());
+            FieldDescriptor[] identityDescriptors = potentialClassDescriptor.getIdentities();
+            boolean isNull = true;
+            
+            for (int i = 0; i < identityDescriptors.length; i++) {
+                Object temp;
+                Object[] temps;
+                JDOFieldDescriptor jdoFieldDescriptor = (JDOFieldDescriptor) identityDescriptors[i];
+                if (jdoFieldDescriptor.getSQLName().length == 1 ) {
+                    temp = SQLTypes.getObject( rs, columnIndex++, java.sql.Types.JAVA_OBJECT);
+                    isNull = (temp == null);
+                } else {
+                    temps = new Object[jdoFieldDescriptor.getSQLName().length];
+                    for ( int j=0; j<jdoFieldDescriptor.getSQLName().length; j++ ) {
+                        temps[j] = SQLTypes.getObject( rs, columnIndex++, java.sql.Types.JAVA_OBJECT);
+                        isNull = (temps[j] == null);
+                    }
+                    temp = new Complex (jdoFieldDescriptor.getSQLName().length, temps);
+                }
+                
+                _log.debug ("Obtained value " + temp + " for additional (extending) identity " + 
+                        potentialClassDescriptor.getJavaClass().getName() + "/" + 
+                        identityDescriptors[i].getFieldName() + " at position " + 
+                        columnIndex);
+                isNull = (temp == null);
+                if (temp != null) {
+                    numberOfIdentitiesToAnalyze += 1;
+                    potentialClassDescriptorPrevious = potentialClassDescriptor;
+                }
+                
+            }
+            
+            if (!iter.hasNext() && !isNull && numberOfIdentitiesToAnalyze > 0) {
+                potentialLeafDescriptor = potentialClassDescriptor;
+                suggestedNumberOfFields += potentialClassDescriptor.getFields().length;
+            } else if (!iter.hasNext() && isNull && numberOfIdentitiesToAnalyze > 0){
+                potentialLeafDescriptor = potentialClassDescriptorPrevious; 
+                // suggestedNumberOfFields += potentialClassDescriptor.getFields().length;
+            } else {
+                FieldDescriptor[] potentialFields = 
+                    (FieldDescriptor[]) potentialClassDescriptor.getFields();
+                for (int i = 0; i < potentialFields.length; i++) {
+                    JDOFieldDescriptor jdoFieldDescriptor = (JDOFieldDescriptor) potentialFields[i];
+                    String[] columnNames = jdoFieldDescriptor.getSQLName();
+                    columnIndex = columnIndex + columnNames.length;
+                }
+                
+                // the JDOClassDescriptor we just looked at is definitely part of the extends hierarchy,
+                // and as such we need to increase the number of potential fields
+                if (!isNull) {
+                    suggestedNumberOfFields += potentialClassDescriptor.getFields().length;
+                }
+            }
+        }
+        
+        _log.debug ("In total " + numberOfIdentitiesToAnalyze + " (extending) identities analyzed.");
+        
+        if ((potentialLeafDescriptor != null) && _log.isDebugEnabled()) {
+            _log.debug ("Most likely of type " + potentialLeafDescriptor.getJavaClass().getName());
+            _log.debug ("After analysis, " + suggestedNumberOfFields + " fields need to be loaded.");
+        }
+        
+        return new Object[] {potentialLeafDescriptor, new Integer (suggestedNumberOfFields) };
+        
+    }
     
     private void buildSqlCreate () throws QueryException {
         StringBuffer sql;
@@ -1399,7 +1575,7 @@ public final class SQLEngine implements Persistence {
         
     }
     
-    private void buildFinder( JDOClassDescriptor clsDesc ) throws QueryException {
+    private void buildFinder(JDOClassDescriptor clsDesc) throws QueryException {
         QueryExpression expr;
         QueryExpression find;
 
@@ -1427,14 +1603,27 @@ public final class SQLEngine implements Persistence {
                               baseDesc.getTableName(), baseDesc.getIdentityColumnNames());
             curDesc = baseDesc;
         }
-        for ( int i=0; i<_ids.length; i++ ) {
-            find.addColumn( _mapTo, idnames[i] );
-        }
-
+        
         // join all the related/depended table
         Vector joinTables = new Vector();
-        for ( int i=0; i<_fields.length; i++ ) {
-            String alias = _fields[i].tableName;
+        String aliasOld = null;
+        String alias = null;
+        
+        for (int i = 0; i < _fields.length; i++) {
+        	if (i > 0) { aliasOld = alias; }
+            alias = _fields[i].tableName;
+            
+            // add id columns to select statement
+            if (!alias.equals(aliasOld) && !_fields[i].joined) {
+                JDOClassDescriptor classDescriptor = (JDOClassDescriptor) 
+                    _fields[i].fieldDescriptor.getContainingClassDescriptor();
+                String[] ids = classDescriptor.getIdentityColumnNames();
+            	for (int j = 0; j < ids.length; j++) {
+                	expr.addColumn(alias, ids[j]);
+                    find.addColumn(alias, ids[j]);
+            	}
+            }
+            
             if ( _fields[i].load ) {
                 if ( _fields[i].joined /*&& !joinTables.contains( _fields[i].tableName )*/ ) {
                     int offset = 0;
@@ -1458,19 +1647,92 @@ public final class SQLEngine implements Persistence {
                     expr.addColumn( alias, _fields[i].columns[j].name );
                     find.addColumn( alias, _fields[i].columns[j].name );
                 }
+                
                 expr.addTable(_fields[i].tableName, alias);
                 find.addTable(_fields[i].tableName, alias);
             }
         }
+
+        // 'join' all the extending tables 
+        curDesc = clsDesc;
+        List classDescriptorsToAdd = new LinkedList();
+        JDOClassDescriptor classDescriptor = null;
+        addExtendingClassDescriptors(classDescriptorsToAdd, curDesc.getExtendedBy());
+        
+        if (classDescriptorsToAdd.size() > 0) {
+        	for (Iterator iter = classDescriptorsToAdd.iterator(); iter.hasNext(); ) {
+        		classDescriptor = (JDOClassDescriptor) iter.next();
+        		
+        		if (_log.isDebugEnabled()) {
+                    _log.debug("Adding outer left join for " + classDescriptor.getJavaClass().getName() + 
+        				       " on table " + classDescriptor.getTableName());
+                }
+                
+                expr.addOuterJoin( _mapTo, 
+                		curDesc.getIdentityColumnNames(), 
+                		classDescriptor.getTableName(), 
+                		classDescriptor.getIdentityColumnNames());
+                find.addOuterJoin( _mapTo, 
+                		curDesc.getIdentityColumnNames(), 
+                		classDescriptor.getTableName(), 
+                		classDescriptor.getIdentityColumnNames());
+
+                Persistence persistenceEngine;
+				try {
+					persistenceEngine = _factory.getPersistence (classDescriptor);
+				} catch (MappingException e) {
+					throw new QueryException("Problem obtaining persistence engine for ClassDescriptor " + classDescriptor.getJavaClass().getName(), e);
+				}
+
+				SQLEngine.ColumnInfo[] idInfos = 
+					(SQLEngine.ColumnInfo[]) persistenceEngine.getColumnInfoForIdentities();
+                for (int i = 0; i < idInfos.length; i++) {
+                	expr.addColumn (classDescriptor.getTableName(), idInfos[i].name);
+                	find.addColumn (classDescriptor.getTableName(), idInfos[i].name);
+                }
+                
+                SQLEngine.FieldInfo[] fieldInfos = (SQLEngine.FieldInfo[]) persistenceEngine.getInfo();
+                for (int i = 0; i < fieldInfos.length; i++) {
+                	boolean hasFieldToAdd = false;
+                	SQLEngine.ColumnInfo[] columnInfos = fieldInfos[i].columns;
+                	if (classDescriptor.getTableName().equals(fieldInfos[i].tableName)) {
+                		for ( int j = 0; j < columnInfos.length; j++ ) {
+                    		expr.addColumn (classDescriptor.getTableName(), fieldInfos[i].columns[j].name);
+                    		find.addColumn (classDescriptor.getTableName(), fieldInfos[i].columns[j].name);
+                		}
+                		hasFieldToAdd = true;
+                	}
+                    
+                    if (hasFieldToAdd) {
+                    	expr.addTable(classDescriptor.getTableName());
+                    	find.addTable(classDescriptor.getTableName());
+                    }
+                }
+        	}
+        }
+
+
         _sqlLoad = expr.getStatement( false );
         _sqlLoadLock = expr.getStatement( true );
 
         _sqlFinder = find;
 
         if(_log.isDebugEnabled()) {
-            _log.debug( Messages.format( "jdo.loading", _type, _sqlLoad ) );
+            _log.debug(Messages.format("jdo.loading", _type, _sqlLoad));
+            _log.debug(Messages.format("jdo.loading.with.lock", _type, _sqlLoadLock));
+            _log.debug(Messages.format("jdo.finding", _type, _sqlFinder));
         }
         
+    }
+    
+    private void addExtendingClassDescriptors (Collection classDescriptorsToAdd, Collection extendingClassDescriptors) {
+    	JDOClassDescriptor classDescriptor = null; 
+        for (Iterator iter = extendingClassDescriptors.iterator(); iter.hasNext(); ) {
+        	classDescriptor = (JDOClassDescriptor) iter.next(); 
+        	classDescriptorsToAdd.add (classDescriptor);
+        	addExtendingClassDescriptors(classDescriptorsToAdd, classDescriptor.getExtendedBy());
+        }
+    	
     }
 
 
@@ -1497,10 +1759,18 @@ public final class SQLEngine implements Persistence {
         final String[] joinFields;
 
         ColumnInfo[] columns;
+        
+        final FieldDescriptor fieldDescriptor;
+        
+        final ClassDescriptor classDescriptor;
 
         FieldInfo( JDOClassDescriptor clsDesc, FieldDescriptor fieldDesc, String classTable, boolean ext )
                 throws MappingException{
 
+        	fieldDescriptor = fieldDesc;
+        	
+        	classDescriptor = clsDesc;
+        	
             // for readability
             final int FIELD_TYPE = 0;
 
@@ -1645,16 +1915,31 @@ public final class SQLEngine implements Persistence {
         }
     }
 
-    static final class ColumnInfo {
+    static final class ColumnInfo implements Persistence.ColumnInfo{
 
+        /**
+         * Name of the column
+         */
         final String  name;
 
+        /**
+         * SQL type of teh coplumn
+         */
         final int sqlType;
 
+        /**
+         * TypeConvertor to use when converting to the SQLType of this column.
+         */
         final TypeConvertor convertTo;
 
+        /**
+         * TypeConvertor to use when converting from the SQLType of this column.
+         */
         final TypeConvertor convertFrom;
 
+        /**
+         * Type conversion parameters
+         */
         final String convertParam;
 
         ColumnInfo( String name, int type, TypeConvertor convertTo,
@@ -1665,6 +1950,41 @@ public final class SQLEngine implements Persistence {
             this.convertFrom = convertFrom;
             this.convertParam = convertParam;
         }
+
+		/* (non-Javadoc)
+		 * @see org.exolab.castor.persist.spi.Persistence.ColumnInfo#getName()
+		 */
+		public String getName() {
+			return name;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.exolab.castor.persist.spi.Persistence.ColumnInfo#getSqlType()
+		 */
+		public int getSqlType() {
+			return sqlType;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.exolab.castor.persist.spi.Persistence.ColumnInfo#getConvertTo()
+		 */
+		public TypeConvertor getConvertTo() {
+			return convertTo;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.exolab.castor.persist.spi.Persistence.ColumnInfo#getConvertFrom()
+		 */
+		public TypeConvertor getConvertFrom() {
+			return convertFrom;
+		}
+
+		/* (non-Javadoc)
+		 * @see org.exolab.castor.persist.spi.Persistence.ColumnInfo#getConvertParam()
+		 */
+		public String getConvertParam() {
+			return convertParam;
+		}
     }
 
     static final class SQLQuery implements PersistenceQuery {
@@ -1673,7 +1993,8 @@ public final class SQLEngine implements Persistence {
 
         private ResultSet         _rs;
 
-        private final SQLEngine _engine;
+        private /*final*/ SQLEngine _engine;
+        private SQLEngine _requestedEngine;
 
         private final Class[]   _types;
 
@@ -1692,6 +2013,7 @@ public final class SQLEngine implements Persistence {
         SQLQuery( SQLEngine engine, String sql, Class[] types )
         {
             _engine = engine;
+            _requestedEngine = engine;
             _types = types;
             _values = new Object[ _types.length ];
             _sql = sql;
@@ -1749,7 +2071,7 @@ public final class SQLEngine implements Persistence {
             }
             catch (SQLException e)
             {
-               throw new PersistenceException(e.getMessage());
+               throw new PersistenceException(e.getMessage(), e);
             }
             return retval;
          }
@@ -1956,19 +2278,31 @@ public final class SQLEngine implements Persistence {
         }
 
 
-        private Object loadSingleField( int i, int count ) throws SQLException, PersistenceException
-        {
+        private Object loadSingleField(int i, CounterRef counterReference)
+        throws SQLException, PersistenceException {
+            String currentTableName = counterReference.getTableName();
+            int count = counterReference.getCounter();
             Object[] temp = new Object[_engine._fields[i].columns.length];
             boolean notNull = false;
             Object   field;
+            
+            String fieldTableName = _engine._fields[i].tableName;
+            String firstColumnOfField = _engine._fields[i].columns[0].name;
 
+            ResultSetMetaData metaData = _rs.getMetaData();
+            while (!(firstColumnOfField.equalsIgnoreCase(metaData.getColumnName(count))
+            	     && (fieldTableName.equalsIgnoreCase(metaData.getTableName(count))
+            		     || "".equals(metaData.getTableName(count))))) {
+                count++;
+            }
+            
             if ( _engine._fields[i].columns.length == 1 ) {
-                field = _engine.toJava( i, 0, SQLTypes.getObject( _rs, count++,
-                        _engine._fields[i].columns[0].sqlType ) );
+                field = _engine.toJava(i, 0, SQLTypes.getObject(_rs, count, _engine._fields[i].columns[0].sqlType));
+                count++;
             } else {
                 for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
-                    temp[j] = _engine.toJava( i, j, SQLTypes.getObject( _rs, count++,
-                              _engine._fields[i].columns[j].sqlType ) );
+                    temp[j] = _engine.toJava(i, j, SQLTypes.getObject(_rs, count, _engine._fields[i].columns[j].sqlType));
+                    count++;
                     if ( temp[j] != null ) {
                         notNull = true;
                     }
@@ -1978,15 +2312,28 @@ public final class SQLEngine implements Persistence {
                 else
                     field = null;
             }
+            counterReference.setCounter(count);
+            counterReference.setTableName(currentTableName);
             return field;
         }
 
 
-        private Object loadMultiField( int i, int count, Object field ) throws SQLException, PersistenceException
-        {
+        private Object loadMultiField(int i, CounterRef counterReference, Object field)
+        throws SQLException, PersistenceException {
+            int count = counterReference.getCounter();
             Object[]  temp = new Object[_engine._fields[i].columns.length];
             boolean notNull = false;
             ArrayList res;
+
+            String fieldTableName = _engine._fields[i].tableName;
+            String firstColumnOfField = _engine._fields[i].columns[0].name;
+            
+            ResultSetMetaData metaData = _rs.getMetaData();
+            while (!(firstColumnOfField.equalsIgnoreCase(metaData.getColumnName(count))
+                     && (fieldTableName.equalsIgnoreCase(metaData.getTableName(count))
+                         || "".equals(metaData.getTableName(count))))) {
+            	count++;
+            }
 
             if( field == null )
                 res = new ArrayList();
@@ -1994,8 +2341,7 @@ public final class SQLEngine implements Persistence {
                 res = (ArrayList) field;
 
             for ( int j=0; j<_engine._fields[i].columns.length; j++ ) {
-                temp[j] = _engine.toJava( i, j,
-                          SQLTypes.getObject( _rs, count, _engine._fields[i].columns[j].sqlType ) );
+                temp[j] = _engine.toJava(i, j, SQLTypes.getObject(_rs, count, _engine._fields[i].columns[j].sqlType));
                 if ( temp[j] != null ) {
                     notNull = true;
                 }
@@ -2011,27 +2357,41 @@ public final class SQLEngine implements Persistence {
                         res.add( com );
                 }
             }
+            counterReference.setCounter(count);
+            
             return res;
         }
 
-
-        private int loadRow( Object[] fields, boolean isFirst ) throws SQLException, PersistenceException
-        {
+        private int loadRow(Object[] fields, int numberOfFields, boolean isFirst)
+        throws SQLException, PersistenceException {
             int count = _engine._ids.length + 1;
 
-            // Load all the fields.
-            for ( int i = 0 ; i < _engine._fields.length ; ++i  ) {
-                if ( !_engine._fields[i].load )
-                    continue;
+            String tableName = null;
 
-                if ( _engine._fields[i].multi ) {
-                    fields[i] = loadMultiField( i, count, fields[i] );
-                } else if( isFirst ) {
-                    // Non-multi fields have to be done one only once, so this is skipped
-                    // if we have already read the first row.
-                    fields[i] = loadSingleField( i, count );
+            // TODO: wrong, as it could be that the first field is not part of the root class.
+            if (numberOfFields > 0) {
+                tableName = _engine._fields[0].tableName;
+                
+                // Load all the fields.
+                CounterRef counterReference = new CounterRef ();
+                counterReference.setCounter(count);
+                counterReference.setTableName(tableName);
+                
+                for ( int i = 0 ; i < numberOfFields ; ++i  ) {
+                    if (!_engine._fields[i].load) { continue; }
+                    
+                    if ( _engine._fields[i].multi ) {
+                        counterReference.setCounter(count);
+                        fields[i] = loadMultiField( i, counterReference, fields[i] );
+                        count = counterReference.getCounter(); 
+                    } else if( isFirst ) {
+                        // Non-multi fields have to be done one only once, so this is skipped
+                        // if we have already read the first row.
+                        counterReference.setCounter (count);
+                        fields[i] = loadSingleField( i, counterReference);
+                        count = counterReference.getCounter();
+                    }
                 }
-                count += _engine._fields[i].columns.length;
             }
             return count;
         }
@@ -2064,12 +2424,18 @@ public final class SQLEngine implements Persistence {
         }
 
 
-        // Fill the given fields[] with the "cached" stuff from our _fields[] .
-        public Object fetch( Object[] fields, Object identity ) throws ObjectNotFoundException, PersistenceException
-        {
+        /**
+         * @see org.exolab.castor.persist.spi.PersistenceQuery#fetch(org.exolab.castor.persist.ProposedObject, java.lang.Object)
+         */
+        public Object fetch(ProposedObject proposedObject, Object identity)
+        throws ObjectNotFoundException, PersistenceException {
+            Object[] fields = proposedObject.getFields();
+            
+            // Fill the given fields[] with the "cached" stuff from our _fields[] .
             for( int i = 0; i < _fields.length; i++ ) {
                 fields[i] = _fields[i];
             }
+            
             return null;
         }
 
@@ -2079,7 +2445,40 @@ public final class SQLEngine implements Persistence {
             // maybe we can optimize a little bit here when we have time.
             // Instead of creating new Object[] and ArrayList for each 
             // "multi field" each fetchRaw is called, we might reuse them.
-            _fields = new Object[_engine._fields.length];
+
+            SQLEngine oldEngine = null;
+            int originalFieldNumber = _requestedEngine._fields.length;
+            if (_requestedEngine.getDescriptor().isExtended()) {
+                Collection extendingClassDescriptors = _requestedEngine.getDescriptor().getExtendedBy();
+                int numberOfExtendLevels = _requestedEngine.numberOfExtendingClassDescriptors(_requestedEngine.getDescriptor());
+                JDOClassDescriptor leafDescriptor = null;
+                Object[] returnValues = null;
+                try {
+                    returnValues =_requestedEngine.calculateNumberOfFields(extendingClassDescriptors, _requestedEngine._ids.length, _requestedEngine._fields.length, numberOfExtendLevels, this._rs);
+                } catch (SQLException e) {
+                    _log.error ("Problem calculating number of concrete fields.", e);
+                    throw new PersistenceException ("Problem calculating number of concrete fields.", e);
+                }
+                
+                leafDescriptor = (JDOClassDescriptor) returnValues[0];
+                
+                if (leafDescriptor != null) {
+                    if (!leafDescriptor.getJavaClass().getName().equals(_requestedEngine.getDescriptor().getJavaClass().getName())) {
+                        originalFieldNumber = ((Integer) returnValues[1]).intValue();
+                        
+                        Persistence newEngine =null;
+                        try {
+                            newEngine = _requestedEngine._factory.getPersistence(leafDescriptor);
+                        } catch (MappingException e) {
+                            _log.error ("Problem obtaining persistence engine for " + leafDescriptor.getJavaClass().getName(), e);
+                            throw new PersistenceException ("Problem obtaining persistence engine for " + leafDescriptor.getJavaClass().getName(), e);
+                        } 
+                        _engine = (SQLEngine) newEngine;
+                    }
+                }
+            }
+            
+            _fields = new Object[originalFieldNumber];
 
             // It would prove a little difficult to fetch if we don't have any rows with data left :-)
             if ( _resultSetDone )
@@ -2102,7 +2501,7 @@ public final class SQLEngine implements Persistence {
                 // As we assume that we have called fetch() immediatly after nextIdentity(),
                 // we can be sure that it belongs to the object we want. This is probably not the
                 // safest programming style, but has to suffice currently :-)
-                loadRow( _fields, true );
+                loadRow(_fields, originalFieldNumber, true);
 
                 // We move forward in the ResultSet, until we see another identity or run out of rows.
                 while ( _rs.next() ) {
@@ -2114,7 +2513,7 @@ public final class SQLEngine implements Persistence {
                     if( identitiesEqual( wantedIdentity, currentIdentity ) ) {
 
                         // Load next row of object data from _rs into <_fields> array.
-                        loadRow( _fields, false );
+                        loadRow(_fields, originalFieldNumber, false);
 
                     } else {
                         // We are done with all the rows for our obj. and still have rows left.
@@ -2129,7 +2528,6 @@ public final class SQLEngine implements Persistence {
                 // We are done with all the rows for our obj. and don't have any rows left.
                 _resultSetDone = true;
                 _lastIdentity = null;
-
             } catch ( SQLException except ) {
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
             }

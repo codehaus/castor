@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.drivers.ConnectionProxy;
 
 import junit.framework.TestCase;
+import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -31,7 +32,7 @@ public class TestConnectionProxies extends TestCase {
     
     private static final Log log = LogFactory.getLog (TestConnectionProxies.class);
 	
-	private ConnectionProxy connectionProxy = null;
+	private Connection connectionProxy = null;
 	
 	/* (non-Javadoc)
 	 * @see junit.framework.TestCase#setUp()

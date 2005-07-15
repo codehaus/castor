@@ -92,7 +92,7 @@ public class TestLimitClause extends CastorTestCase
         throws PersistenceException, SQLException
     {
 
-    	TestObject object = null;
+    	TestLimit object = null;
 
         this._db = this._category.getDatabase();
 
@@ -109,7 +109,7 @@ public class TestLimitClause extends CastorTestCase
 
         for (int i = 1; i < 16; i++ ) {
             this._db.begin();
-            object = new TestObject();
+            object = new TestLimit();
             object.setId (i);
             object.setValue1("val1" + i);
             object.setValue2("val2" + i);
@@ -128,17 +128,17 @@ public class TestLimitClause extends CastorTestCase
 	public void testLimit()
     throws PersistenceException
     {
-        TestObject testObject = null;
+        TestLimit testObject = null;
 
         this._db.begin();
-        OQLQuery query = this._db.getOQLQuery("select t from jdo.TestObject t order by id limit $1");
+        OQLQuery query = this._db.getOQLQuery("select t from jdo.TestLimit t order by id limit $1");
         query.bind(LIMIT);
         QueryResults results = query.execute();
         assertNotNull (results);
         /*size() not available using an Oracle DB
         assertEquals (LIMIT, results.size()); */
         for (int i = 1; i <= LIMIT; i++) {
-            testObject = (TestObject) results.next();
+            testObject = (TestLimit) results.next();
             assertEquals(i, testObject.getId());
         }
         assertTrue(!results.hasMore());

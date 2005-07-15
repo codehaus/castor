@@ -22,15 +22,17 @@ import org.exolab.castor.util.LocalConfiguration;
  */
 public class ConnectionProxy implements java.sql.Connection {
 
-	/**
-	 * Default calling location, equals 'unknwon'.
-	 */
+	/** Default calling location, equals 'unknwon'. */
 	private static final String DEFAULT_CALLED_BY = "unknown";
 	
-	/**
-	 * Jakarta Common Log instance.
-	 */
+	/** Jakarta Common Log instance. */
 	private static final Log _log = LogFactory.getLog(ConnectionProxy.class);
+	
+	/** Has property of LocalConfiguration been read? */
+	private static boolean		_isConfigured = false;
+	
+	/** Should connections been wrapped by a proxy? */
+	private static boolean		_useProxies = false;
 	
 	/** 
 	 * The JDBC Connection instance to proxy.
@@ -47,15 +49,8 @@ public class ConnectionProxy implements java.sql.Connection {
 	 * @param connection The JDBC connection to proxy.
 	 * @return The JDBC connection proxy.
 	 */
-	public static Connection newConnectionProxy (Connection connection) {
-		boolean useProxies = Boolean.getBoolean(LocalConfiguration.getInstance().getProperty("org.exolab.castor.persist.useProxies", "true"));
-
-		if (useProxies) {
-			return new ConnectionProxy (connection, DEFAULT_CALLED_BY);
-		}
-		
-		return connection;
-		
+	public static Connection newConnectionProxy(Connection connection) {
+		return newConnectionProxy(connection, DEFAULT_CALLED_BY);
 	}
 
 	/**
@@ -64,8 +59,19 @@ public class ConnectionProxy implements java.sql.Connection {
 	 * @param calledBy Name of the class using creating and this proxy class. 
 	 * @return The JDBC connection proxy.
 	 */
-	public static ConnectionProxy newConnectionProxy (Connection connection, String calledBy) {
-		return new ConnectionProxy (connection, calledBy);
+	public static Connection newConnectionProxy(Connection connection, String calledBy) {
+        if (!_isConfigured) {
+            String propertyValue = LocalConfiguration.getInstance().getProperty(
+                    "org.exolab.castor.persist.useProxies", "true");
+            _useProxies = Boolean.valueOf(propertyValue).booleanValue();
+            _isConfigured = true;
+        }
+        
+		if (!_useProxies) {
+            return connection;
+        } else {
+            return new ConnectionProxy(connection, calledBy);
+        }
 	}
 
 	/**

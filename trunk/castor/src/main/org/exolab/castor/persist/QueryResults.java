@@ -49,6 +49,10 @@ package org.exolab.castor.persist;
 
 import javax.transaction.Status;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
+import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.TransactionNotInProgressException;
@@ -70,6 +74,8 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class QueryResults {
+    
+    private static final Log log = LogFactory.getLog(QueryResults.class);
     
     /**
      * The transaction context in which this query was executed.
@@ -221,8 +227,11 @@ public final class QueryResults {
         handler = _engine.getClassMolder(_query.getResultType());
 
         // load the object thur the transaction of the query
-        object = _tx.load(_engine, handler, _lastIdentity, null, _accessMode, this);
-
+        ProposedObject proposedValue = new ProposedObject();
+        proposedValue.setProposedClass(_query.getResultType());
+        object = _tx.load(_engine, handler, _lastIdentity, proposedValue, _accessMode, this);
+        if (proposedValue.isExpanded()) { object = proposedValue.getObject(); }
+        
         return object;
 
     }

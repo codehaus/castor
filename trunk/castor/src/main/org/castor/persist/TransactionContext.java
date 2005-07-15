@@ -548,10 +548,10 @@ public abstract class TransactionContext {
     public synchronized Object load(final LockEngine engine, 
             final ClassMolder molder,
             final Object identity, 
-            Object objectToBeLoaded,
+            ProposedObject proposedObject,
             final AccessMode suggestedAccessMode) 
     throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
-        return load(engine, molder, identity, objectToBeLoaded,
+        return load(engine, molder, identity, proposedObject,
                 suggestedAccessMode, null);
     }
 
@@ -571,7 +571,7 @@ public abstract class TransactionContext {
      *            The class persistence molder
      * @param identity
      *            The object's identity
-     * @param objectToBeLoaded
+     * @param proposedObject
      *            The object to fetch (single instance per transaction)
      * @param suggestedAccessMode
      *            The access mode (see {@link AccessMode}) the values in
@@ -590,7 +590,7 @@ public abstract class TransactionContext {
     public synchronized Object load(final LockEngine engine, 
             final ClassMolder molder,
             final Object identity, 
-            Object objectToBeLoaded,
+            ProposedObject proposedObject,
             final AccessMode suggestedAccessMode, 
             QueryResults results)
     throws ObjectNotFoundException, LockNotGrantedException, PersistenceException {
@@ -605,12 +605,11 @@ public abstract class TransactionContext {
 
         // Test that the object to be loaded (which we will fill in) is of an
         // appropriate type for our molder.
-        if (objectToBeLoaded != null
+        if (proposedObject.getObject() != null
                 && !molder.getJavaClass(_db.getClassLoader()).isAssignableFrom(
-                        objectToBeLoaded.getClass())) {
+                        proposedObject.getProposedClass())) {
             throw new PersistenceException(Messages.format(
-                    "persist.typeMismatch", molder.getName(), objectToBeLoaded
-                            .getClass()));
+                    "persist.typeMismatch", molder.getName(), proposedObject.getProposedClass()));
         }
 
         oid = new OID(engine, molder, identity);
@@ -627,8 +626,10 @@ public abstract class TransactionContext {
             // If the object has been loaded, but the instance sugguested to
             // be loaded into is not the same as the loaded instance,
             // error is reported.
-            if (objectToBeLoaded != null
-                    && objectToBeLoaded != objectInTransaction) {
+            
+            // TODO [WG]: could read && propsedObject != objectInTransaction
+            if (proposedObject.getObject() != null
+                    && proposedObject.getObject() != objectInTransaction) {
                 throw new PersistenceException(Messages.format(
                         "persist.multipleLoad", molder.getName(), identity));
             }
@@ -687,13 +688,13 @@ public abstract class TransactionContext {
             return objectInTransaction;
         }
 
-        // Load (or reload) the object through the persistence engine with the
-        // requested lock. This might report failure (object no longer exists),
-        // hold until a suitable lock is granted (or fail to grant), or
+        // Load (or reload, in case the object is stored in a acache) the object through the 
+        // persistence engine with the requested lock. This might report failure (object no 
+        // longer exists), hold until a suitable lock is granted (or fail to grant), or
         // report error with the persistence engine.
         try {
-            if (objectToBeLoaded != null) {
-                objectInTransaction = objectToBeLoaded;
+            if (proposedObject.getObject() != null) {
+                objectInTransaction = proposedObject.getObject();
             } else {
                 // ssa, multi classloader feature
                 // ssa, FIXME : No better way to do that ?
@@ -705,15 +706,29 @@ public abstract class TransactionContext {
                     objectInTransaction = molder.newInstance(_db
                             .getClassLoader());
                 }
+                
+                proposedObject.setProposedClass(objectInTransaction.getClass());
+                proposedObject.setActualClass(objectInTransaction.getClass());
+                proposedObject.setObject(objectInTransaction);
             }
 
             _tracker.trackObject(engine, molder, oid, objectInTransaction);
-            OID newoid = engine.load(this, oid, objectInTransaction,
+            OID newoid = engine.load(this, oid, proposedObject,
                     suggestedAccessMode, _lockTimeout, results);
-
-            // rehash the object entry, because oid might have changed!
-            _tracker.trackOIDChange(objectInTransaction, engine, oid, newoid);
-
+                    
+            if (proposedObject.isExpanded()) {
+                // Remove old OID from ObjectTracker
+                _tracker.untrackObject(objectInTransaction);
+                // Create new OID
+                OID newOID = new OID(engine, proposedObject.getActualClassMolder(), identity);
+                // Add new OID to ObjectTracker
+                _tracker.trackObject(engine, molder, oid, proposedObject.getObject());
+                objectInTransaction = proposedObject.getObject();
+            } else {
+                // rehash the object entry, because oid might have changed!
+                _tracker.trackOIDChange(objectInTransaction, engine, oid, newoid);
+            }            
+            
         } catch (ObjectNotFoundException except) {
             _tracker.untrackObject(objectInTransaction);
             throw except;

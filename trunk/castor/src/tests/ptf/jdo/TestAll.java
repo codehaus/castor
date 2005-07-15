@@ -34,5 +34,5 @@ public class TestAll extends TestCase {
         return suite;
     }
 
-    public TestAll(String name) { super(name); }
+    public TestAll(final String name) { super(name); }
 }
