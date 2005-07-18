@@ -50,7 +50,7 @@ package org.exolab.castor.jdo.engine;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.castor.engine.CounterRef;
+import org.castor.jdo.engine.CounterRef;
 import org.castor.persist.ProposedObject;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.*;
