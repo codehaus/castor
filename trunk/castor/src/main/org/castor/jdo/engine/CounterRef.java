@@ -16,7 +16,7 @@
  * $Id$
  *
  */
-package org.castor.engine;
+package org.castor.jdo.engine;
 
 /**
  * Holds information about table names and counters.
