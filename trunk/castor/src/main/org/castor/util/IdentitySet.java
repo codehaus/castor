@@ -21,8 +21,9 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 /**
- * An IdentitySet that uses reference-equality instead of object-equality. According to its
- * special function it violates some design contracts of the <code>Set</code> interface.
+ * An IdentitySet that uses reference-equality instead of object-equality. According
+ * to its special function it violates some design contracts of the <code>Set</code>
+ * interface.
  * 
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
@@ -406,7 +407,7 @@ public final class IdentitySet implements Set {
         /** Index of the current bucket. */
         private int     _index = 0; 
         
-        /** The next entry to be returned. <code>null</code> when there is no more entry. */
+        /** The next entry to be returned. <code>null</code> when there is none. */
         private Entry   _next = _buckets[0];
 
         /**
@@ -443,9 +444,9 @@ public final class IdentitySet implements Set {
         }
         
         /**
-         * This optional method has not been implemented for <code>IdentityIterator</code>
-         * instead it throws a <code>UnsupportedOperationException</code> as defined in the
-         * <code>Iterator</code> interface.
+         * This optional method is not implemented for <code>IdentityIterator</code>
+         * instead it throws a <code>UnsupportedOperationException</code> as defined
+         * in the <code>Iterator</code> interface.
          * 
          * @see java.util.Iterator#remove()
          */

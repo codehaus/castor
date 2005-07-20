@@ -20,8 +20,9 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * An IdentityMap that uses reference-equality instead of object-equality. According to its
- * special function it violates some design contracts of the <code>Map</code> interface.
+ * An IdentityMap that uses reference-equality instead of object-equality. According
+ * to its special function it violates some design contracts of the <code>Map</code>
+ * interface.
  * 
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
