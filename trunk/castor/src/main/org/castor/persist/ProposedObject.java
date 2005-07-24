@@ -12,9 +12,6 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * $Id$
- *
  */
 package org.castor.persist;
 
@@ -25,24 +22,31 @@ import org.exolab.castor.persist.ClassMolder;
  * classes, revealing what class was suggested, what class actually got loaded, etc.
  *  
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @version $Revision$ $Date$
+ * @since 0.9.9
  */
-public class ProposedObject {
-    private Class       _proposedClass = null;
+public final class ProposedObject {
+    //--------------------------------------------------------------------------
 
-    private Class       _actualClass = null;
-
-    private Object      _object = null;
-
+    /** The fields of the object in question. */
     private Object[]    _fields = null;
 
+    /** The object. */
+    private Object      _object = null;
+
+    /** True if the proposed class has been expanded. */
     private boolean     _isExpanded = false;
 
+    /** The proposed class. */
+    private Class       _proposedClass = null;
+
+    /** The actualClass. */
+    private Class       _actualClass = null;
+
+    /** The actual ClassMolder. */
     private ClassMolder _actualClassMolder = null;
 
-    /**
-     * Creates a default instance. 
-     */
-    public ProposedObject() { }
+    //--------------------------------------------------------------------------
 
     /**
      * Returns the fields of the object in question.
@@ -63,9 +67,9 @@ public class ProposedObject {
     }
 
     /**
-     * Returns teh object.
+     * Returns the object.
      * 
-     * @return Returns the object.
+     * @return The object.
      */
     public Object getObject() {
         return _object;
@@ -81,27 +85,9 @@ public class ProposedObject {
     }
 
     /**
-     * Returns the proposed Class instance
-     * 
-     * @return Returns the proposedClass.
-     */
-    public Class getProposedClass() {
-        return _proposedClass;
-    }
-
-    /**
-     * Sets the proposed Class instance.
-     * 
-     * @param proposedClass The proposedClass to set.
-     */
-    public void setProposedClass(final Class proposedClass) {
-        _proposedClass = proposedClass;
-    }
-
-    /**
      * True if the proposed class has been expanded.
      * 
-     * @return Returns the isExpanded.
+     * @return <code>true</code> if class is expanded, <code>false</code> otherwise.
      */
     public boolean isExpanded() {
         return _isExpanded;
@@ -117,9 +103,27 @@ public class ProposedObject {
     }
 
     /**
+     * Returns the proposed Class instance.
+     * 
+     * @return The proposedClass.
+     */
+    public Class getProposedClass() {
+        return _proposedClass;
+    }
+
+    /**
+     * Sets the proposed Class instance.
+     * 
+     * @param proposedClass The proposedClass to set.
+     */
+    public void setProposedClass(final Class proposedClass) {
+        _proposedClass = proposedClass;
+    }
+
+    /**
      * Returns the actual Class instance.
      * 
-     * @return Returns the actualClass.
+     * @return The actualClass.
      */
     public Class getActualClass() {
         return _actualClass;
@@ -137,16 +141,16 @@ public class ProposedObject {
     /**
      * Returns the ClassMolder associated with the actual object.
      * 
-     * @return The actual ClassMolder
+     * @return The actual ClassMolder.
      */
     public ClassMolder getActualClassMolder() {
         return _actualClassMolder;
     }
 
     /**
-     * Sets the ClassMolder associated with the actual object
+     * Sets the ClassMolder associated with the actual object.
      * 
-     * @param actualClassMolder The ClassMolder associated with the actual object
+     * @param actualClassMolder The ClassMolder associated with the actual object.
      */
     public void setActualClassMolder(final ClassMolder actualClassMolder) {
         _actualClassMolder = actualClassMolder;
@@ -170,4 +174,6 @@ public class ProposedObject {
         buffer.append(">");
         return buffer.toString();
     }
+
+    //--------------------------------------------------------------------------
 }

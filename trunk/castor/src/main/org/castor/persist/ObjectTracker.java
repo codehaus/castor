@@ -12,11 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- *
- * $Id$
- *
  */
-
 package org.castor.persist;
 
 import java.util.ArrayList;
@@ -53,51 +49,55 @@ import org.exolab.castor.util.Messages;
  * @author <a href="mailto: ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href="mailto:gblock AT ctoforaday DOT COM">Gregory Block</a>
+ * @version $Revision$ $Date$
  * @since 0.9.9
  */
 public final class ObjectTracker {
-    
-    /** Map of Object->LockEngine */
+    //--------------------------------------------------------------------------
+
+    /** Map of Object->LockEngine. */
     private final Map _objectToEngine = new IdentityMap();
     
-    /** Map of Object->ClassMolder */
+    /** Map of Object->ClassMolder. */
     private final Map _objectToMolder = new IdentityMap();
     
-    /** Map of Engine -> OID -> Object */
+    /** Map of Engine -> OID -> Object. */
     private final Map _engineToOIDToObject = new HashMap();
     
-    /** Map of Object->OID */
+    /** Map of Object->OID. */
     private final Map _objectToOID = new IdentityMap();
     
-    /** Set of all objects marked 'deleted' */
+    /** Set of all objects marked 'deleted'. */
     private final Set _deletedSet = new IdentitySet();
     
-    /** Set of all objects marked 'creating' */
+    /** Set of all objects marked 'creating'. */
     private final Set _creatingSet = new IdentitySet();
     
-    /** Set of all objects marked 'created' */
+    /** Set of all objects marked 'created'. */
     private final Set _createdSet = new IdentitySet();
     
-    /** Set of all objects for which we need to update persistence */
+    /** Set of all objects for which we need to update persistence. */
     private final Set _updatePersistNeededSet = new IdentitySet();
     
-    /** Set of all objects for which we need to update cache */
+    /** Set of all objects for which we need to update cache. */
     private final Set _updateCacheNeededSet = new IdentitySet();
     
-    /** Set of all objects marked read only in this transaction */
+    /** Set of all objects marked read only in this transaction. */
     private final Set _readOnlySet = new IdentitySet();
     
-    /** Set of all objects marked read-write in this transaction */
+    /** Set of all objects marked read-write in this transaction. */
     private final Set _readWriteSet = new IdentitySet();
     
+    //--------------------------------------------------------------------------
+
     /**
-     * Retrieve the object for a given OID
+     * Retrieve the object for a given OID.
+     * 
      * @param allowReadOnly Allow (or ignore, if false) read-only objects to be returned.
      * @return The object associated with this oid.
      */
-    public Object getObjectForOID(final LockEngine engine, 
-            final OID oid, 
-            final boolean allowReadOnly) {
+    public Object getObjectForOID(final LockEngine engine, final OID oid, 
+                                  final boolean allowReadOnly) {
         Map oidToObject = (Map) _engineToOIDToObject.get(engine);
         if (oidToObject != null) {
             Object found = oidToObject.get(oid);
@@ -466,13 +466,14 @@ public final class ObjectTracker {
      * @param object
      * @return
      */
-    private final Object supportCGLibObject(final Object object) {
+    private Object supportCGLibObject(final Object object) {
         if (object instanceof LazyCGLIB) {
             LazyCGLIB cgObject = (LazyCGLIB) object;
             
             // Test for materialization.
             if (cgObject.interceptedHasMaterialized() == Boolean.TRUE) {
-                // TODO [WG] We still might have an option for some serious optimization here if the instance has not been materialized yet.
+                // TODO [WG] We still might have an option for some serious optimization
+                // here if the instance has not been materialized yet.
                 Object identity = cgObject.interceptedIdentity();
                 ClassMolder molder = cgObject.interceptedClassMolder();
                 LockEngine engine = cgObject.interceptedLockEngine();
@@ -510,15 +511,19 @@ public final class ObjectTracker {
         return sb.toString();
     }
     
+    //--------------------------------------------------------------------------
+
     private static final class ObjectMolderPriorityComparator implements Comparator {
         private ObjectTracker _tracker;
         private boolean _reverseOrder;
+        
         public ObjectMolderPriorityComparator(
                 final ObjectTracker tracker, 
                 final boolean reverseOrder) {
             this._tracker = tracker;
             this._reverseOrder = reverseOrder;
         }
+        
         public int compare(final Object object1, final Object object2) {
             ClassMolder molder1 = _tracker.getMolderForObject(object1);
             ClassMolder molder2 = _tracker.getMolderForObject(object2);
@@ -535,15 +540,12 @@ public final class ObjectTracker {
             }
             
             if (_reverseOrder) {
-                if (pri1 < pri2) { 
-                    return 1;
-                } else {
-                    return -1;
-                }
+                return (pri1 < pri2) ? 1 : -1;
             } else {
-                if (pri1 < pri2) return -1;
-                else return 1;
+                return (pri1 < pri2) ? -1 : 1;
             }
         }
     }
+
+    //--------------------------------------------------------------------------
 }

@@ -37,6 +37,7 @@ import org.xml.sax.InputSource;
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 0.9.9
  */
 public final class DatabaseRegistry {
     //--------------------------------------------------------------------------
