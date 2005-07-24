@@ -38,6 +38,7 @@ import org.xml.sax.SAXException;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 0.9.9
  */
 public final class DataSourceConnectionFactory extends AbstractConnectionFactory {
     //--------------------------------------------------------------------------
