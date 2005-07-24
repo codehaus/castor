@@ -66,10 +66,12 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.jdo.engine.ConnectionFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
@@ -193,7 +195,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                     "jdo.missing.jdo.configuration"));
         }
         
-        if (DatabaseRegistry.getDatabaseRegistry(databaseName) == null) {
+        if (!DatabaseRegistry.isDatabaseRegistred(databaseName)) {
             throw new MappingException(Messages.format(
                     "jdo.missing.database.configuration", databaseName));
         }
@@ -652,6 +654,16 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
     
     /**
+     * Returns the ConnectionFactory for this JDOManager instance.
+     * 
+     * @return The connection factory used by this JDOManager instance.
+     * @throws MappingException If database can not be instantiated or is not configured.
+     */
+    public ConnectionFactory getConnectionFactory () throws MappingException {
+        return DatabaseRegistry.getConnectionFactory(_databaseName);
+    }
+    
+    /**
      * Opens and returns a connection to the database. If no configuration
      * exists for the named database a {@link DatabaseNotFoundException}
      * is thrown.
@@ -667,7 +679,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         }
         
         try {
-            if (DatabaseRegistry.getDatabaseRegistry(_databaseName) == null) {
+            if (!DatabaseRegistry.isDatabaseRegistred(_databaseName)) {
                 if (_jdoConfURI == null) {
                     LOG.error("No configuration loaded for database "
                             + _databaseName);

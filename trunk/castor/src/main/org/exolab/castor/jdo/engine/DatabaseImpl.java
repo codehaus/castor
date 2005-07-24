@@ -42,10 +42,7 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
-
 
 import java.sql.Connection;
 import java.util.ArrayList;
@@ -54,6 +51,10 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.castor.jdo.engine.AbstractConnectionFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
@@ -69,7 +70,6 @@ import javax.transaction.Status;
 import javax.transaction.Synchronization;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
-
 
 /**
  * An implementation of the JDO database supporting explicit transaction
@@ -177,23 +177,20 @@ public class DatabaseImpl
                          InstanceFactory instanceFactory, Transaction transaction, 
                          ClassLoader classLoader, boolean autoStore )
     throws DatabaseNotFoundException {
-        // Locate a suitable datasource and database engine
+        _autoStore = autoStore;
+        
+        // Locate a suitable ConnectionFactory and LockEngine
         // and report if not mapping registered any of the two.
         // A new ODMG engine is created each time with different
         // locking mode.
-        DatabaseRegistry dbs;
-
-        _autoStore = autoStore;
-        
+        AbstractConnectionFactory factory = null;
         try {
-            dbs = DatabaseRegistry.getDatabaseRegistry( dbName );
+            factory = DatabaseRegistry.getConnectionFactory(dbName);
         } catch (MappingException ex) {
-            throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
+            throw new DatabaseNotFoundException(Messages.format("jdo.dbNoMapping", dbName));
         }
-        if ( dbs == null )
-            throw new DatabaseNotFoundException( Messages.format( "jdo.dbNoMapping", dbName ) );
-        LockEngine[] pe = { DatabaseRegistry.getLockEngine( dbs ) };
-        _scope = new PersistenceInfoGroup( pe );
+        _scope = new PersistenceInfoGroup(new LockEngine[] { factory.getEngine() });
+        
         _callback = callback;
         _instanceFactory = instanceFactory;
         _dbName = dbName;

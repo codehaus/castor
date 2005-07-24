@@ -2,11 +2,12 @@ package jdo.bug881;
 
 import junit.framework.TestCase;
 
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 
 public class JdoConfTest extends TestCase {
     public JdoConfTest() { super("bug881"); }

@@ -2,12 +2,12 @@ package jdo.test1214;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
 
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.mapping.MappingException;
 
 import junit.framework.TestCase;

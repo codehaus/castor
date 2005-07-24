@@ -43,7 +43,6 @@
  * $Id$
  */
 
-
 package org.exolab.castor.persist;
 
 import java.util.Vector;
@@ -54,6 +53,8 @@ import java.util.Iterator;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 
@@ -72,7 +73,6 @@ import org.exolab.castor.persist.cache.*;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
-
 
 /**
  * LockEngine is a gateway for all the <tt>ClassMolder</tt>s of a persistence 
@@ -95,7 +95,17 @@ import org.exolab.castor.util.Messages;
  * application run concurrently, if the {@link Persistence} supports dirty checking,
  * like a fully complaint JDBC Relational Database, proper 
  * ObjectModifiedException will be thrown to ensure data consistency.
- *
+ * <p>
+ * IMPLEMENTATION NOTES:
+ * <p>
+ * An object may be persistent in multiple caches at any given
+ * time. There is no way to load an object from multiple caches,
+ * but an object can be loaded in one engine and then made
+ * persistent in another. The engines are totally independent and
+ * no conflicts should occur.
+ * <p>
+ * Each class hierarchy gets its own cache, so caches can be
+ * controlled on a class-by-class basis.
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @author <a href="yip@intalio.com">Thomas Yip</a>
@@ -103,28 +113,11 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class LockEngine {
-
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
     private static Log _log = LogFactory.getFactory().getInstance( LockEngine.class );
-
-
-    /**
-     * IMPLEMENTATION NOTES:
-     *
-     * An object may be persistent in multiple caches at any given
-     * time. There is no way to load an object from multiple caches,
-     * but an object can be loaded in one engine and then made
-     * persistent in another. The engines are totally independent and
-     * no conflicts should occur.
-     *
-     * Each class hierarchy gets its own cache, so caches can be
-     * controlled on a class-by-class basis.
-     *
-     */
-
 
     /**
      * Mapping of type information to object types. The object's class is used
@@ -134,36 +127,42 @@ public final class LockEngine {
      */
     private HashMap _typeInfo = new HashMap();
 
-
     /**
      * All the XA transactions running against this cache engine.
      */
     private HashMap _xaTx = new HashMap();
-
+    
+    /**
+     * The ConnectionFactory.
+     */
+    private ConnectionFactory _connectionFactory;
     
     /**
      * Used by the constructor when creating handlers to temporarily
      * hold the persistence factory for use by {@link #getClassMolder}.
      */
-    private PersistenceFactory _factory;
-
+    private PersistenceFactory _persistenceFactory;
 
     /**
      * Construct a new cache engine with the specified mapping table, 
      * persistence engine and the log interceptor.
      *
-     * @param mapResolver Provides mapping information for objects
-     *  supported by this cache
-     * @param factory Factory for creating persistence engines for each
-     *  object described in the map
-     * @throws MappingException Indicate that one of the mappings is
-     *  invalid
+     * @param  dbName       Name of database configuration.
+     * @param  mapResolver  Provides mapping information for objects
+     *                      supported by this cache
+     * @param  persistenceFactory      Factory for creating persistence engines for each
+     *                      object described in the map
+     * @throws MappingException Indicate that one of the mappings is invalid
      */
-    LockEngine( MappingResolver mapResolver, PersistenceFactory factory )
-            throws MappingException {
-
+    public LockEngine(final ConnectionFactory connectionFactory,
+                      final MappingResolver mapResolver,
+                      final PersistenceFactory persistenceFactory)
+    throws MappingException {
+        _connectionFactory = connectionFactory;
+        _persistenceFactory = persistenceFactory;
+        
         try {
-            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, factory );
+            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, _persistenceFactory );
     
             _typeInfo = new HashMap();
             Enumeration enumeration = v.elements();
@@ -267,12 +266,12 @@ public final class LockEngine {
                     throw new MappingException("Base class "+extend.getName()+" of "+molder.getName()+" not found!");
                 }
             } */
-
-            _factory = factory;
         } catch ( ClassNotFoundException e ) {
             throw new MappingException("Declared Class not found!" );
         }
     }
+    
+    public ConnectionFactory getConnectionFactory() { return _connectionFactory; }
 
     /**
      * Get classMolder which represents the given java data object class
