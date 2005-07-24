@@ -64,10 +64,11 @@ import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
@@ -557,7 +558,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         }
 
         try {
-            if (DatabaseRegistry.getDatabaseRegistry(_dbName) == null) {
+            if (!DatabaseRegistry.isDatabaseRegistred(_dbName)) {
                 // use _jdoConfURI to load the JDO configuration
                 if (_jdoConfURI != null) {
                     DatabaseRegistry.loadDatabase(new InputSource(_jdoConfURI),

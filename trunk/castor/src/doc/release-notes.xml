@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1135" tool="jira">
+                    <description>
+		                Refactor how JDBC connection factories are maintained.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050724</date>
+                </bug>
                 <bug id="1018" tool="jira">
                     <description>
 		                Added support for polymorphism.

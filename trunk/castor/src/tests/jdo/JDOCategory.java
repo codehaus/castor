@@ -50,10 +50,12 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.SQLException;
 
+import org.castor.jdo.engine.ConnectionFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDO;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Messages;
 
@@ -85,10 +87,12 @@ public class JDOCategory extends TestHarness {
 
     public Connection getJDBCConnection() throws SQLException {
         String name = _jdo.getDatabaseName();
+        ConnectionFactory factory = null;
         try {
-            return DatabaseRegistry.getDatabaseRegistry(name).createConnection();
+            factory = DatabaseRegistry.getConnectionFactory(name);
         } catch (MappingException ex) {
             throw new SQLException(Messages.format("jdo.dbNoMapping", name));
         }
+        return factory.createConnection();
     }
 }

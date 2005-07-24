@@ -56,11 +56,14 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import javax.sql.DataSource;
 import javax.naming.InitialContext;
+
 import org.xml.sax.InputSource;
+
+import org.castor.jdo.engine.DataSourceConnectionFactory;
+
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Param;
-import org.exolab.castor.jdo.engine.DatabaseRegistry;
 import org.exolab.castor.util.DTDResolver;
 
 /**
@@ -296,7 +299,7 @@ public class BatchUpdateSQL {
             // to create a new registry object.
             DataSource ds;
 
-            ds = DatabaseRegistry.loadDataSource(jdoConf.getDatabase()[0], BatchUpdateSQL.class.getClassLoader());
+            ds = DataSourceConnectionFactory.loadDataSource(jdoConf.getDatabase()[0], BatchUpdateSQL.class.getClassLoader());
             // ds = (DataSource) jdoConf.getDatabase()[0].getDatabaseChoice().getDataSource().getParams();
             if ( ds == null )
                 throw new RuntimeException( "jdo.missingDataSource" );

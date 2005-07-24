@@ -43,14 +43,13 @@
  * $Id$
  */
 
-
 package org.exolab.castor.persist;
 
+import org.castor.jdo.engine.ConnectionFactory;
 
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.persist.spi.PersistenceFactory;
-
 
 /**
  * Factory for constructing new persistence engines. Used by the APIs
@@ -62,10 +61,7 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  * @author <a href="mailto:ferret AT frii dot com">Bruce Snyder</a>
  * @version $Revision$ $Date$
  */
-public class PersistenceEngineFactory
-{
-
-
+public final class PersistenceEngineFactory {
     /**
      * Creates and returns a new persistence engine.
      *
@@ -74,11 +70,10 @@ public class PersistenceEngineFactory
      * @throws MappingException The SPI factory could not support one of
      *  object types due to a mapping errot
      */
-    public LockEngine createEngine( MappingResolver mapResolver, PersistenceFactory factory )
-        throws MappingException
-    {
-        return new LockEngine( mapResolver, factory );
+    public LockEngine createEngine(final ConnectionFactory connectionFactory, 
+                                   final MappingResolver mapResolver,
+                                   final PersistenceFactory persistenceFactory)
+    throws MappingException {
+        return new LockEngine(connectionFactory, mapResolver, persistenceFactory);
     }
-
-
 }

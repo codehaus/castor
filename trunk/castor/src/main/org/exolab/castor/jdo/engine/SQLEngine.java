@@ -42,15 +42,15 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
-
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.CounterRef;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.castor.persist.ProposedObject;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.mapping.*;
@@ -61,7 +61,6 @@ import org.exolab.castor.util.SqlBindParser;
 
 import java.sql.*;
 import java.util.*;
-
 
 /**
  * The SQL engine performs persistence of one object type against one
@@ -119,7 +118,7 @@ public final class SQLEngine implements Persistence {
     private ColumnInfo[]         _ids;
 
     private SQLEngine           _extends;
-    
+
     private QueryExpression     _sqlFinder;
 
     private PersistenceFactory  _factory;
@@ -360,14 +359,18 @@ public final class SQLEngine implements Persistence {
     }
 
     private Connection getSeparateConnection(Database database) throws PersistenceException  {
+        ConnectionFactory factory = null;
         try {
-            DatabaseRegistry databaseRegistry = DatabaseRegistry.getDatabaseRegistry(database.getDatabaseName());
-            Connection conn = databaseRegistry.createConnection();
+            factory = DatabaseRegistry.getConnectionFactory(database.getDatabaseName());
+        } catch (MappingException e) {
+            throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
+        }
+        
+        try {
+            Connection conn = factory.createConnection();
             conn.setAutoCommit(false);
             return conn;
         } catch (SQLException e) {
-            throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
-        } catch (MappingException e) {
             throw new PersistenceException(Messages.message("persist.cannotCreateSeparateConn"), e);
         }
     }

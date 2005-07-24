@@ -47,12 +47,16 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.castor.jdo.engine.ConnectionFactory;
+import org.castor.jdo.engine.DatabaseRegistry;
+
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.DbMetaInfo;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.TransactionAbortedException;
 import org.exolab.castor.persist.LockEngine;
+import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Messages;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -231,22 +235,18 @@ final class TransactionContextImpl
 
 
     public Connection getConnection( LockEngine engine ) throws PersistenceException {
-        Connection conn;
-
-        conn = (Connection) _conns.get( engine );
-        if ( conn == null ) {
+        Connection conn = (Connection) _conns.get(engine);
+        if (conn == null) {
+            // Get a new connection from the engine. Since the
+            // engine has no transaction association, we must do
+            // this sort of round trip. An attempt to have the
+            // transaction association in the engine inflates the
+            // code size in other places.
             try {
-                // Get a new connection from the engine. Since the
-                // engine has no transaction association, we must do
-                // this sort of round trip. An attempt to have the
-                // transaction association in the engine inflates the
-                // code size in other places.
-                conn = DatabaseRegistry.createConnection( engine );
-                if ( ! _globalTx ) {
-                    conn.setAutoCommit( false );
-                }
-                _conns.put( engine, conn );
-            } catch ( SQLException except ) {
+                conn = engine.getConnectionFactory().createConnection();
+                if (!_globalTx) { conn.setAutoCommit(false); }
+                _conns.put(engine, conn);
+            } catch (SQLException except) {
                 throw new PersistenceException( Messages.format("persist.nested", except), except );
             }
         }
