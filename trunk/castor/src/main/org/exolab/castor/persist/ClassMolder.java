@@ -2353,61 +2353,6 @@ public class ClassMolder
     }
 
     /**
-     * It method is called by delete to delete the extended object of the base
-     * type from the Persistence.
-     *
-     */
-    private static void deleteExtend( TransactionContext tx, ClassMolder extend, Object identity )
-            throws ObjectNotFoundException, PersistenceException {
-        // if the extend field contains dependent of field type,
-        // fields must be loaded, so that we get the foreign key
-        // of the depedent table. We may get no result. And, it
-        // is good and we don't have to process further.
-        // it will be cheaper if we go directly to SQL and load
-        // only the foreign field needed. But, it require extra
-        // method in Persistent SPI. So, maybe we rather stay
-        // with the expensive appoarch.
-
-        // if there is any depedent field of reference type, the simplest way is
-        // to load the dependent objects and delete it using tansaction.
-        // (Will ObjectNotFound throws in the loading??)
-
-        // if the extend field has many-to-many field, we must delete the
-        // relation from he relation table.
-        Object[] persistFields = null;
-        for ( int i=0; i < extend._fhs.length; i++ ) {
-            if ( extend._fhs[i].isDependent() ) {
-                try {
-                    if ( persistFields == null ) {
-
-                        persistFields = new Object[extend._fhs.length];
-
-                        ProposedObject proposedObject = new ProposedObject();
-                        proposedObject.setFields(persistFields);
-                        extend._persistence.load((Connection) tx.getConnection(extend._engine),
-                                proposedObject, identity, AccessMode.ReadOnly);
-                        persistFields = proposedObject.getFields();
-                    }
-
-                    if ( extend._fhs[i].isMulti() ) {
-                        ArrayList listOfIds = (ArrayList)persistFields[i];
-                        for ( int j=0; i < listOfIds.size(); j++ ) {
-                            extend._persistence.delete( tx.getConnection(extend._fhs[i].getFieldLockEngine()),
-                            listOfIds.get(j) );
-                        }
-                    }
-                } catch ( ObjectNotFoundException e ) {
-                    _log.warn ("Could not find object", e);
-                }
-            } else if ( extend._fhs[i].isManyToMany() ) {
-                extend._fhs[i].getRelationLoader().deleteRelation(
-                tx.getConnection(extend._fhs[i].getFieldLockEngine()),
-                identity );
-            }
-        }
-    }
-
-    /**
      * Delete an object of the base type from the persistence storage.
      * All object to be deleted by this method will be <tt>markDelete</tt>
      * before it method is called.
@@ -2443,24 +2388,11 @@ public class ClassMolder
         while ( base != null ) {
             if ( base._extendent != null )
                 for ( int i=0; i < base._extendent.size(); i++ )
-                    if ( !extendPath.contains( base._extendent.get(i) ) ) {
-                        //deleteExtend( tx, (ClassMolder)base._extendent.get(i), ids );
-                    } else {
+                    if ( extendPath.contains( base._extendent.get(i) ) ) {
                         // NB: further INVESTIGATION
                     }
 
             base = base._extends;
-        }
-
-        if ( _extendent != null ) {
-            for ( int i=0; i < _extendent.size(); i++ ) {
-                if ( !extendPath.contains( _extendent.get(i) ) ) {
-                    if(_log.isDebugEnabled()) {
-                        _log.debug ("About to call ClassMolder.deleteExtend on " + ((ClassMolder)_extendent.get(i)));
-                    }
-                    // deleteExtend( tx, (ClassMolder)_extendent.get(i), ids );
-                }
-            }
         }
 
     }
