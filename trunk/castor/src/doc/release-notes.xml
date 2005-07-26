@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="778" tool="jira">
+                    <description>
+		                Remove deleteExtend method from ClassMolder.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050725</date>
+                </bug>
                 <bug id="1135" tool="jira">
                     <description>
 		                Refactor how JDBC connection factories are maintained.
