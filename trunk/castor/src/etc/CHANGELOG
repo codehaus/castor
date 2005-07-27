@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1169 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Refactored access to caches, adding CacheEntry class and making OID and CacheEntry implement
+       java.io.Serializable.
+       Details: http://jira.codehaus.org/browse/CASTOR-1169
+       (Werner - 20050727)
+
 JDO:   Fixed bug CASTOR-778 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Remove deleteExtend method from ClassMolder.
        Details: http://jira.codehaus.org/browse/CASTOR-778
