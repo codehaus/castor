@@ -57,6 +57,7 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
+import org.castor.persist.cache.CacheEntry;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -1055,50 +1056,38 @@ public final class LockEngine {
 
 
     /**
-     * Provides information about an object of a specific type
-     * (class's full name). This information includes the object's descriptor and
-     * lifecycle interceptor requesting notification about activities
-     * that affect an object.
+     * Provides information about an object of a specific type (class's full name).
+     * This information includes the object's descriptor and lifecycle interceptor
+     * requesting notification about activities that affect an object.
      */
     private class TypeInfo {
-
-        /**
-         * The molder for this class.
-         */
+        /** The molder for this class. */
         private final ClassMolder molder;
 
-        /**
-         * The full qualified name of the Java class represented by this type info.
-         */
+        /** The full qualified name of the Java class represented by this type info. */
         private final String name;
 
-        /**
-         * The Map contains all the in-used ObjectLock of the class type,
-         * which keyed by the OID representing the object.
-         * All extends classes share the same map as the base class.
-         *
-         */
+        /** The Map contains all the in-used ObjectLock of the class type, which
+         *  keyed by the OID representing the object. All extends classes share the
+         *  same map as the base class. */
         private final HashMap locks;
         
-        /**
-         * The Map contains all the freed ObjectLock of the class type,
-         * which keyed by the OID representing the object. ObjectLock
-         * put into cache maybe disposed by LRU mechanisum.
-         * All extends classes share the same map as the base class.
-         */
+        /** The Map contains all the freed ObjectLock of the class type, which keyed
+         *  by the OID representing the object. ObjectLock put into cache maybe
+         *  disposed by LRU mechanisum. All extends classes share the same map as the
+         *  base class. */
         private final Cache cache;
 
         /**
-         * Constructor for creating base class info
+         * Constructor for creating base class info.
          *
-         * @param  molder is the classMolder of this type
-         * @param  locks is the new HashMap which will be used
-         *         for holding all the in-used ObjectLock
-         * @param  cache is the new LRU which will be used to
-         *         store and dispose freed ObjectLock
-         *
+         * @param  molder   The classMolder of this type.
+         * @param  locks    The new HashMap which will be used
+         *         for holding all the in-used ObjectLock.
+         * @param  cache    The new LRU which will be used to
+         *         store and dispose freed ObjectLock.
          */
-        private TypeInfo( ClassMolder molder, HashMap locks, Cache cache ) {
+        private TypeInfo(ClassMolder molder, HashMap locks, Cache cache) {
             this.name = molder.getName();
             this.molder = molder;
             this.locks = locks;
@@ -1106,14 +1095,14 @@ public final class LockEngine {
         }
 
         /**
-         * Constructor for creating extended class info
+         * Constructor for creating extended class info.
          * 
-         * @param  molder is the classMolder of this type
-         * @param  base is the TypeInfo of the base class of
-         *         the molder's class
+         * @param  molder   The classMolder of this type.
+         * @param  base     The TypeInfo of the base class of
+         *         the molder's class.
          */
         private TypeInfo( ClassMolder molder, TypeInfo base ) {
-            this( molder, base.locks, base.cache );
+            this(molder, base.locks, base.cache);
         }
 
         /**
@@ -1123,22 +1112,21 @@ public final class LockEngine {
          * @param oid  the OID of the desired lock
          * @return True if an object is currently cached.
          */
-        private boolean isCached( OID oid )
-        {
+        private boolean isCached(OID oid, TransactionContext tx) {
             ObjectLock entry = null;
-            synchronized( locks ) {
-                entry = (ObjectLock) locks.get( oid );
-                if ( entry == null ) {
-                    entry = (ObjectLock) cache.get( oid );
-                    if ( entry != null ) {
-                        OID cacheOid = entry.getOID();
-                        // oid.getName() equals or is a superclass of cacheOid.getName()
-                        boolean isSuper;
- 
+            synchronized (locks) {
+                entry = (ObjectLock) locks.get(oid);
+                if (entry == null) {
+                    CacheEntry cacheEntry = (CacheEntry) cache.get(oid); 
+                    if (cacheEntry != null) {
+                        entry = new ObjectLock(cacheEntry);
+                        locks.put(oid, entry);
+                        
                         // Okay, cacheOid and oid have the same top level super class
                         // We must check that oid has the same class as cacheOid
                         // or oid is a superclass of cacheOid
-                        isSuper = oid.getName().equals(cacheOid.getName());
+                        OID cacheOid = entry.getOID();
+                        boolean isSuper = oid.getName().equals(cacheOid.getName());
                         if (!isSuper) {
                             String[] superClassNames = cacheOid.getSuperClassNames();
  
@@ -1155,11 +1143,7 @@ public final class LockEngine {
                     }
                 }
             }
-            if ( entry == null ) {
-                return false;
-            }
-
-            return true;
+            return (entry != null);
         }
    
         /**
@@ -1173,7 +1157,9 @@ public final class LockEngine {
                     _log.info("In locks: " + entry);
                 }
 
-                for (Enumeration enumeration = cache.elements(); enumeration.hasMoreElements();) {
+                for (Enumeration enumeration = cache.elements();
+                     enumeration.hasMoreElements();) {
+                    
                     ObjectLock entry = (ObjectLock) enumeration.nextElement();
                     _log.info("In cache: " + entry.getOID());
                 }
@@ -1197,9 +1183,11 @@ public final class LockEngine {
                 
                 // Remove all objects not participating in a transaction
                 // from the cache.
-                for (Enumeration enumeration = cache.elements(); enumeration.hasMoreElements();) {
-                    ObjectLock objectLock = (ObjectLock) enumeration.nextElement();
-                    cache.expire(objectLock.getOID());
+                for (Enumeration enumeration = cache.elements();
+                     enumeration.hasMoreElements();) {
+                    
+                    CacheEntry cacheEntry = (CacheEntry) enumeration.nextElement();
+                    cache.expire(cacheEntry.getOID());
                 }
             }
         }
@@ -1209,78 +1197,86 @@ public final class LockEngine {
          * user must call {@link ObjectLock#confirm(TransactionContext, boolean)} 
          * exactly once.
          *
-         * @param oid  the OID of the lock
-         * @param tx   the transactionContext of the transaction to
-         *             acquire lock
-         * @param lockAction   the inital action to be performed on
-         *                     the lock
-         * @param timeout      the time limit to acquire the lock
+         * @param oid        The OID of the lock.
+         * @param tx         The context of the transaction to acquire lock.
+         * @param lockAction The inital action to be performed on the lock.
+         * @param timeout    The time limit to acquire the lock.
          * @return The object lock for the OID within this transaction context. 
          * @throws ObjectDeletedWaitingForLockException
-         * @throws LockNotGrantedException Timeout or deadlock occured attempting to acquire lock on object
-         * @throws ObjectDeletedException Object has been deleted from the persistence store.
+         * @throws LockNotGrantedException Timeout or deadlock occured attempting
+         *         to acquire lock on object
+         * @throws ObjectDeletedException Object has been deleted from the
+         *         persistence store.
          */
-        private ObjectLock acquire( OID oid, TransactionContext tx, short lockAction,
-                int timeout ) throws ObjectDeletedWaitingForLockException,
-                LockNotGrantedException, ObjectDeletedException {
+        private ObjectLock acquire(OID oid, TransactionContext tx,
+                                   short lockAction, int timeout)
+        throws ObjectDeletedWaitingForLockException,
+               LockNotGrantedException, ObjectDeletedException {
+            
             ObjectLock entry = null;
-            boolean failed = true;
             // sync on "locks" is, unfortunately, necessary if we employ
             // some LRU mechanism, especially if we allow NoCache, to avoid
             // duplicated LockEntry exist at the same time.
-            synchronized( locks ) {
-                entry = (ObjectLock) locks.get( oid );
-                if ( entry == null ) {
-                    entry = (ObjectLock) cache.remove( oid );
-                    if ( entry != null ) {
+            synchronized (locks) {
+                entry = (ObjectLock) locks.get(oid);
+                if (entry == null) {
+                    CacheEntry cachedEntry = (CacheEntry) cache.remove(oid);
+                    if (cachedEntry != null) {
+                        entry = new ObjectLock(cachedEntry);
+                        locks.put(oid, entry);
+                        
                         OID cacheOid = entry.getOID();
-
                         if (oid.getName().equals(cacheOid.getName())) {
-                          entry.setOID(oid);
-                          locks.put( oid, entry );
+                            entry.setOID(oid);
+                            locks.put(oid, entry);
                         } else {
                             entry = null;
                         }
                     }
                 }
-                if ( entry == null ) {
-                    entry = new ObjectLock( oid );
-                    locks.put( oid, entry );
+                
+                if (entry == null) {
+                    entry = new ObjectLock(oid);
+                    locks.put(oid, entry);
                 } else {
                     oid = entry.getOID();
                 }
                 entry.enter();
             }
+            
             // ObjectLock.acquire() may call Object.wait(), so a thread can not
             // been synchronized with ANY shared object before acquire().
             // So, it must be called outside synchronized( locks ) block.
+            boolean failed = true;
             try {
-                switch ( lockAction ) {
+                switch (lockAction) {
                 case ObjectLock.ACTION_READ:
-                    entry.acquireLoadLock( tx, false, timeout );
+                    entry.acquireLoadLock(tx, false, timeout);
                     break;
 
                 case ObjectLock.ACTION_WRITE:
-                    entry.acquireLoadLock( tx, true, timeout );
+                    entry.acquireLoadLock(tx, true, timeout);
                     break;
 
                 case ObjectLock.ACTION_CREATE:
-                    entry.acquireCreateLock( tx );
+                    entry.acquireCreateLock(tx);
                     break;
 
                 case ObjectLock.ACTION_UPDATE:
-                    entry.acquireUpdateLock( tx, timeout );
+                    entry.acquireUpdateLock(tx, timeout);
                     break;
 
                 default:
-                    throw new IllegalArgumentException( "lockType "+lockAction+" is undefined!"); 
+                    throw new IllegalArgumentException(
+                            "lockType " + lockAction + " is undefined!"); 
                 }
+                
                 failed = false;
                 return entry;
             } finally {
-                synchronized( locks ) {
+                synchronized (locks) {
                     entry.leave();
-                    if ( failed ) {
+                    if (failed) {
                         // The need of this block may not be too obvious.
                         // At the very moment, if it happens, current thread 
                         // failed to acquire a lock. Then, another thread just
@@ -1291,15 +1287,14 @@ public final class LockEngine {
                         // "cache" as supposed. To avoid it from happening,
                         // we ensure here that the entry which should be move 
                         // to "cache" from "locks" is actually moved.
-                        if ( entry.isDisposable() ) {
-                            locks.remove( oid );
-                            // cache.put( oid, entry );
-                            if ( entry.isExpired() ) {
+                        if (entry.isDisposable()) {
+                            locks.remove(oid);
+                            if (entry.isExpired()) {
                                 cache.expire(oid);
                                 entry.expired();
+                            } else {
+                                cache.put(oid, new CacheEntry(entry));
                             }
-                            else
-                                cache.put( oid, entry );
                         }
                     }
                 }
@@ -1308,119 +1303,132 @@ public final class LockEngine {
 
         /**
          * Upgrade the lock to write lock.
-
-         * @param  oid  the OID of the lock
-         * @param  tx   the transaction in action
-         * @param  timeout  time limit
+         * 
+         * @param  oid      The OID of the lock.
+         * @param  tx       The transaction in action.
+         * @param  timeout  Time limit.
          * @return The upgraded ObjectLock instance.
          * @throws ObjectDeletedWaitingForLockException
-         * @throws LockNotGrantedException Timeout or deadlock occured attempting to acquire lock on object
+         * @throws LockNotGrantedException Timeout or deadlock occured attempting
+         *         to acquire lock on object.
          */
-        private ObjectLock upgrade( OID oid, TransactionContext tx, int timeout ) 
-                throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
+        private ObjectLock upgrade(OID oid, TransactionContext tx, int timeout)
+        throws ObjectDeletedWaitingForLockException, LockNotGrantedException {
             ObjectLock entry = null;
-            synchronized ( locks ) {
-                entry = (ObjectLock) locks.get( oid );
-                if ( entry == null ) 
-                    throw new ObjectDeletedWaitingForLockException("Lock entry not found. Deleted?");
-                if ( !entry.hasLock( tx, false ) )
-                    throw new IllegalStateException("Transaction does not hold the any lock on "+oid+"!");    
+            synchronized (locks) {
+                entry = (ObjectLock) locks.get(oid);
+                if (entry == null) {
+                    throw new ObjectDeletedWaitingForLockException(
+                            "Lock entry not found. Deleted?");
+                }
+                if (!entry.hasLock(tx, false)) {
+                    throw new IllegalStateException(
+                            "Transaction does not hold the any lock on " + oid + "!");    
+                }
                 oid = entry.getOID();
                 entry.enter();
             }
+            
             try {
-                entry.upgrade( tx, timeout );
+                entry.upgrade(tx, timeout);
                 return entry;
             } finally {
-                synchronized ( locks ) {
+                synchronized (locks) {
                     entry.leave();
                 }
             }
         }
 
         /** 
-         * Reaasure the lock which have been successfully acquired by the
-         * transaction.
+         * Reassure the lock which have been successfully acquired by the transaction.
          *
-         * @param  oid  the OID of the lock
-         * @param  tx   the transaction in action
-         * @param  write  true if we want to upgrade or reassure a write lock
-         *                false for read lock
+         * @param  oid      The OID of the lock.
+         * @param  tx       The transaction in action.
+         * @param  write    <code>true</code> if we want to upgrade or reassure a
+         *                  write lock, <code>false</code> for read lock.
          * @return The reassured ObjectLock instance.
          */
-        private ObjectLock assure( OID oid, TransactionContext tx, boolean write ) {
-
-            synchronized( locks ) {
-                ObjectLock entry = (ObjectLock) locks.get( oid );
-                if ( entry == null ) 
-                    throw new IllegalStateException("Lock, "+oid+", doesn't exist or no lock!");
-                if ( !entry.hasLock( tx, write ) )
-                    throw new IllegalStateException("Transaction "+tx+" does not hold the "+(write?"write":"read")+" lock: "+entry+"!");
+        private ObjectLock assure(OID oid, TransactionContext tx, boolean write) {
+            synchronized (locks) {
+                ObjectLock entry = (ObjectLock) locks.get(oid);
+                if (entry == null) {
+                    throw new IllegalStateException(
+                            "Lock, " + oid + ", doesn't exist or no lock!");
+                }
+                if (!entry.hasLock(tx, write)) {
+                    throw new IllegalStateException(
+                            "Transaction " + tx + " does not hold the "
+                            + (write ? "write" : "read") + " lock: " + entry + "!");
+                }
                 return entry;
             }
         }
 
-
         /**
-         * Move the locked object from one OID to another OID for transaction
+         * Move the locked object from one OID to another OID for transaction.
          * It is to be called by after create.
          *
-         * @param orgoid  orginal OID before the object is created
-         * @param newoid  new OID after the object is created
-         * @param tx      the TransactionContext of the transaction in action
+         * @param orgoid  Orginal OID before the object is created.
+         * @param newoid  New OID after the object is created.
+         * @param tx      The TransactionContext of the transaction in action.
          * @return An ObjectLock instance whose OID has been assigned to a new value.
-         * @throws LockNotGrantedException Timeout or deadlock occured attempting to acquire lock on object
+         * @throws LockNotGrantedException Timeout or deadlock occured attempting to
+         *         acquire lock on object
          */
-        private ObjectLock rename( OID orgoid, OID newoid, TransactionContext tx ) 
-                throws LockNotGrantedException {
-
-            synchronized( locks ) {
+        private ObjectLock rename(OID orgoid, OID newoid, TransactionContext tx)
+        throws LockNotGrantedException {
+            synchronized (locks) {
                 ObjectLock entry, newentry;
-                entry = (ObjectLock) locks.get( orgoid );
-                newentry = (ObjectLock) locks.get( newoid );
+                entry = (ObjectLock) locks.get(orgoid);
+                newentry = (ObjectLock) locks.get(newoid);
 
                 // validate locks
-                if ( orgoid == newoid ) 
+                if (orgoid == newoid) {
                     throw new LockNotGrantedException("Locks are the same");
-                if ( entry == null ) 
+                }
+                if (entry == null) {
                     throw new LockNotGrantedException("Lock doesn't exist!");
-                if ( !entry.isExclusivelyOwned( tx ) ) 
-                    throw new LockNotGrantedException("Lock to be renamed is not own exclusively by transaction!");
-                if ( entry.isEntered() ) 
-                    throw new LockNotGrantedException("Lock to be renamed is being acquired by another transaction!");
-                if ( newentry != null ) 
-                    throw new LockNotGrantedException("Lock is already existed for the new oid.");
+                }
+                if (!entry.isExclusivelyOwned(tx)) {
+                    throw new LockNotGrantedException(
+                            "Lock to be renamed is not own exclusively by transaction!");
+                }
+                if (entry.isEntered()) {
+                    throw new LockNotGrantedException(
+                            "Lock to be renamed is acquired by another transaction!");
+                }
+                if (newentry != null) {
+                    throw new LockNotGrantedException(
+                            "Lock is already existed for the new oid.");
+                }
 
-                entry = (ObjectLock) locks.remove( orgoid );
-                entry.setOID( newoid );
-                locks.put( newoid, entry );
+                entry = (ObjectLock) locks.remove(orgoid);
+                entry.setOID(newoid);
+                locks.put(newoid, entry);
 
                 // copy oid status
-                newoid.setDbLock( orgoid.isDbLock() );
-                newoid.setStamp( orgoid.getStamp() );
+                newoid.setDbLock(orgoid.isDbLock());
+                newoid.setStamp(orgoid.getStamp());
 
                 return newentry;
             }
-
         }
 
         /**
-         * Delete the object lock. It's called after the object is 
-         * deleted from the persistence and the transaction committed.
+         * Delete the object lock. It's called after the object is deleted from
+         * the persistence and the transaction committed.
          *
-         * @param oid is the OID of the ObjectLock
-         * @param tx is the transactionContext of transaction in action
+         * @param oid   The OID of the ObjectLock.
+         * @param tx    The transactionContext of transaction in action.
          * @return The just-deleted ObjectLock instance.
-         *
          */
-        private ObjectLock delete( OID oid, TransactionContext tx ) {
-
+        private ObjectLock delete(OID oid, TransactionContext tx) {
             ObjectLock entry;
-            synchronized( locks ) {
-                entry = (ObjectLock) locks.get( oid );
-
-                if ( entry == null )
+            synchronized (locks) {
+                entry = (ObjectLock) locks.get(oid);
+                if (entry == null) {
                     throw new IllegalStateException("No lock to destroy!");
+                }
                 entry.enter();
             }
 
@@ -1428,49 +1436,47 @@ public final class LockEngine {
                 entry.delete(tx);
                 return entry;
             } finally {
-                synchronized( locks ) {
+                synchronized (locks) {
                     entry.leave();
-                    if ( entry.isDisposable() ) {
-                        cache.put( oid, entry );
-                        locks.remove( oid );
+                    if (entry.isDisposable()) {
+                        cache.put(oid, new CacheEntry(entry));
+                        locks.remove(oid);
                     }
                 }
             }
         }
 
         /**
-         * Release the object lock. It's called after the object is 
-         * the transaction committed.
+         * Release the object lock. It's called after the object the transaction
+         * has been committed.
          *
-         * @param oid is the OID of the ObjectLock
-         * @param tx is the transactionContext of transaction in action
+         * @param oid   The OID of the ObjectLock.
+         * @param tx    The transactionContext of transaction in action.
          * @return The just-released ObjectLock instance.
-         *
          */
-        private ObjectLock release( OID oid, TransactionContext tx ) {
+        private ObjectLock release(OID oid, TransactionContext tx) {
             ObjectLock entry = null;
-            synchronized( locks ) {
+            synchronized (locks) {
                 entry = (ObjectLock) locks.get( oid );
-
-                if ( entry == null ) 
-                    throw new IllegalStateException("No lock to release! "+oid+" for transaction "+tx);
-
+                if (entry == null) {
+                    throw new IllegalStateException(
+                            "No lock to release! " + oid + " for transaction " + tx);
+                }
                 entry.enter();
             }
+
             try {
                 entry.release(tx);
                 return entry;
             } finally {
-                synchronized( locks ) {
+                synchronized (locks) {
                     entry.leave();
-                    if ( entry.isDisposable() ) {
-                        // cache.put( oid, entry );
-                        if ( entry.isExpired() ) {
+                    if (entry.isDisposable()) {
+                        cache.put(oid, new CacheEntry(entry));
+                        if (entry.isExpired()) {
                             cache.expire(oid);
                             entry.expired();
                         }
-                        else
-                            cache.put( oid, entry );
                         locks.remove( oid );
                     }
                 }
@@ -1478,16 +1484,15 @@ public final class LockEngine {
         }
 
 		/**
-		 * Indicates whether an object with the specified identifier is curretly cached. 
-		 * @param oid Object identifier.
+		 * Indicates whether an object with the specified identifier is curretly cached.
+         *  
+		 * @param oid     The Object identifier.
 		 * @return True if the object is cached. 
 		 */
 		public boolean isCached(Object oid) {
             return cache.contains (oid);
 		}
-
     }
-
 
 	/**
 	 * Provides information about whether an object of Class cls with identity iod
@@ -1500,5 +1505,4 @@ public final class LockEngine {
         TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
         return typeInfo.isCached (oid);
 	}
-
 }

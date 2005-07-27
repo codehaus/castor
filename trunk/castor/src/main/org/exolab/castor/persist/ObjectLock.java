@@ -49,7 +49,10 @@ package org.exolab.castor.persist;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.castor.persist.TransactionContext;
+import org.castor.persist.cache.CacheEntry;
+
 import org.exolab.castor.jdo.LockNotGrantedException;
 import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.util.Messages;
@@ -179,9 +182,7 @@ public final class ObjectLock implements DepositBox {
      */
     private int                _gateCount;
 
-
     private long               _timeStamp;
-
 
     private boolean            _deleted;
 
@@ -198,21 +199,30 @@ public final class ObjectLock implements DepositBox {
      *
      * @param oid The object to create a lock for
      */
-    ObjectLock( OID oid ) {
+    public ObjectLock(OID oid) {
         _oid = oid;
 
         // give each instance of ObjectLock an id, for debug only
-        synchronized ( lock ) {
+        synchronized (lock) {
             _id = idcount;
             idcount++;
         }
+    }
+    
+    public ObjectLock(final CacheEntry entry) {
+        this(entry.getOID());
+        
+        _isExpired = false; 
+        _expiredObject = null;
+        _object = entry.getEntry();
+        _timeStamp = entry.getTimeStamp();
     }
 
 
     /**
      * Return the object's OID.
      */
-    OID getOID() {
+    public OID getOID() {
         return _oid;
     }
 
@@ -1067,7 +1077,5 @@ public final class ObjectLock implements DepositBox {
         }
 
     }
-
-
 }
 

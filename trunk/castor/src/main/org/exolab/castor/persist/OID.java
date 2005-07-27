@@ -43,100 +43,100 @@
  * $Id$
  */
 
-
 package org.exolab.castor.persist;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
- * Object identifier. An object identifier is unique within a cache
- * engine or other persistence mechanism and is used to locate object
- * based on their identity as well as assure no duplicate identities.
- * The object type and it's identity object define the OID's identity.
- * In addition the OID is used to hold the object's stamp and
- * db-lock access fields which are used to optimize dirty checking
- * within a transaction.
- *
- * @author <a href="arkin@intalio.com">Assaf Arkin</a>
+ * Object identifier. An object identifier is unique within a cache engine or
+ * other persistence mechanism and is used to locate object based on their
+ * identity as well as assure no duplicate identities. The object type and it's
+ * identity object define the OID's identity. In addition the OID is used to
+ * hold the object's stamp and db-lock access fields which are used to optimize
+ * dirty checking within a transaction.
+ * 
+ * @author <a href="arkin@intalio.com">Assaf Arkin </a>
  * @version $Revision$ $Date$
  */
-public final class OID {
-
+public final class OID implements Serializable {
 
     /**
-     * The object's identity if known, null if the object was created
-     * without an identity.
+     * The object's identity if known, null if the object was created without an
+     * identity.
      */
-    private final Object     _identity;
+    private final Object _identity;
 
     /**
      * The full qualified name of the object's type.
      */
-    private final String    _name;
+    private final String _name;
 
     /**
      * The LockEngine of the object
      */
-    private final LockEngine  _engine;
+    private final transient LockEngine _engine;
 
     /**
      * The ClassMolder of the object
      */
-    private final ClassMolder _molder;
-
+    private final transient ClassMolder _molder;
 
     /**
      * The OID of depended object
      */
-    private final OID         _depends;
+    private final OID _depends;
 
     /**
      * The object's stamp, used for efficient dirty checking.
      */
-    private Object       _stamp;
-
+    private Object _stamp;
 
     /**
      * True if the object is loaded with db-lock access.
      */
-    private boolean      _dbLock;
-
+    private boolean _dbLock;
 
     /**
      * The OID's hash code.
      */
-    private final int          _hashCode;
-
+    private final int _hashCode;
 
     /**
-     * The full qualified name of the top level class, used for equating OIDs based on commong parent.
+     * The full qualified name of the top level class, used for equating OIDs
+     * based on commong parent.
      */
     private String _topClassName;
 
     /**
-     * The full qualified names of all superclasses, used for equating OIDs based on commong parent.
+     * The full qualified names of all superclasses, used for equating OIDs
+     * based on commong parent.
      */
     private String[] _superClassNames;
 
     /**
      * Constructor
      */
-    public OID( LockEngine engine, ClassMolder molder, Object identity ) {
-        this( engine, molder, null, identity );
+    public OID(LockEngine engine, ClassMolder molder, Object identity) {
+        this(engine, molder, null, identity);
     }
 
     /**
      * Constructor
      */
-    public OID( LockEngine engine, ClassMolder molder, OID depends, Object identity ) {
+    public OID(LockEngine engine, ClassMolder molder, OID depends,
+            Object identity) {
         ArrayList superClassNames = null;
 
-        if ( engine == null )
+        if (engine == null) {
             throw new IllegalArgumentException("engine can't be null");
-        if ( molder == null )
+        }
+        if (molder == null) {
             throw new IllegalArgumentException("molder can't be null");
-        if ( identity instanceof Object[] ) {
-            IllegalArgumentException e = new IllegalArgumentException("identity can't be object array!");
+        }
+        if (identity instanceof Object[]) {
+            IllegalArgumentException e = new IllegalArgumentException(
+                    "identity can't be object array!");
             throw e;
         }
         _engine = engine;
@@ -146,11 +146,11 @@ public final class OID {
         _depends = depends;
         // OID must be unique across the engine: always use the parent
         // most class of an object, getting it from the descriptor
-        while ( molder.getExtends() != null ) {
+        while (molder.getExtends() != null) {
             if (superClassNames == null) {
                 superClassNames = new ArrayList();
             }
-            molder = (ClassMolder) molder.getExtends();
+            molder = molder.getExtends();
             superClassNames.add(molder.getName());
         }
         _topClassName = molder.getName();
@@ -160,12 +160,13 @@ public final class OID {
         }
 
         // calculate hashCode
-        _hashCode = _topClassName.hashCode() + (_identity == null? 0 : _identity.hashCode());
+        _hashCode = _topClassName.hashCode()
+                + (_identity == null ? 0 : _identity.hashCode());
     }
 
     /**
      * Get the depended object's oid
-     *
+     * 
      * @return the depended object's oid
      */
     public OID getDepends() {
@@ -174,17 +175,16 @@ public final class OID {
 
     /**
      * Get the ClassMolder of this object
-     *
+     * 
      * @return the ClassMolder of this object
-     */ 
+     */
     ClassMolder getMolder() {
         return _molder;
     }
 
-
     /**
      * Get the LockEngine of this object
-     *
+     * 
      * @return the LockEngine of this object.
      */
     public LockEngine getLockEngine() {
@@ -192,114 +192,104 @@ public final class OID {
     }
 
     /**
-     * Returns the OID's stamp. The stamp may be used to efficiently
-     * implement dirty checking. The stamp is set with a call to
-     * {@link #setStamp} when the object is loaded, created or stored
-     * in persistent storage. Not all persistence engines support the
-     * stamp mechanism.
-     *
+     * Returns the OID's stamp. The stamp may be used to efficiently implement
+     * dirty checking. The stamp is set with a call to {@link #setStamp}when
+     * the object is loaded, created or stored in persistent storage. Not all
+     * persistence engines support the stamp mechanism.
+     * 
      * @return The OID's stamp, or null
      */
     Object getStamp() {
         return _stamp;
     }
 
-
     /**
-     * Sets the OID's stamp. The stamp may be used to efficiently
-     * implement dirty checking. Not all persistence engines support
-     * the stamp mechanism.
-     *
-     * @param stamp The OID's stamp
+     * Sets the OID's stamp. The stamp may be used to efficiently implement
+     * dirty checking. Not all persistence engines support the stamp mechanism.
+     * 
+     * @param stamp
+     *            The OID's stamp
      */
-    void setStamp( Object stamp ) {
+    void setStamp(Object stamp) {
         _stamp = stamp;
     }
 
-
     /**
-     * Specifies whether the object represented by this OID has
-     * a database lock. Database locks overrides the need to perform
-     * dirty checking on the object. This status is set when the
-     * object is loaded with db-lock access, created or deleted.
-     * It is reset when the object is unlocked.
-     *
-     * @param dbLock True the object represented by this OID has
-     *  a database lock
+     * Specifies whether the object represented by this OID has a database lock.
+     * Database locks overrides the need to perform dirty checking on the
+     * object. This status is set when the object is loaded with db-lock access,
+     * created or deleted. It is reset when the object is unlocked.
+     * 
+     * @param dbLock
+     *            True the object represented by this OID has a database lock
      */
-    void setDbLock( boolean dbLock ) {
+    void setDbLock(boolean dbLock) {
         _dbLock = dbLock;
     }
 
-
     /**
-     * Returns true if the object represented by this OID has
-     * a database lock. Database locks overrides the need to perform
-     * dirty checking on the object. This status is set when the
-     * object is loaded with db-lock access, created or deleted.
-     * It is reset when the object is unlocked.
-     *
-     * @return True the object represented by this OID is loaded
-     *  with a datbase lock
+     * Returns true if the object represented by this OID has a database lock.
+     * Database locks overrides the need to perform dirty checking on the
+     * object. This status is set when the object is loaded with db-lock access,
+     * created or deleted. It is reset when the object is unlocked.
+     * 
+     * @return True the object represented by this OID is loaded with a datbase
+     *         lock
      */
     public boolean isDbLock() {
         return _dbLock;
     }
 
-
     /**
-     * Return the object's identity, if known. And identity exists for
-     * every object that was loaded within a transaction and for those
-     * objects that were created with an identity. No two objects may
-     * have the same identity in persistent storage. If the object was
-     * created without an identity this method will return null until
-     * the object is first stored and it's identity is set.
-     *
+     * Return the object's identity, if known. And identity exists for every
+     * object that was loaded within a transaction and for those objects that
+     * were created with an identity. No two objects may have the same identity
+     * in persistent storage. If the object was created without an identity this
+     * method will return null until the object is first stored and it's
+     * identity is set.
+     * 
      * @return The object's identity, or null
      */
     public Object getIdentity() {
         return _identity;
     }
 
-
     /**
-     * Return the full qualified name of the object's type. When using inheritance this is the
-     * type's full name of the top most object in the inheritance heirarchy
-     * specified in the object mapping.
-     *
+     * Return the full qualified name of the object's type. When using
+     * inheritance this is the type's full name of the top most object in the
+     * inheritance heirarchy specified in the object mapping.
+     * 
      * @return The object's type's full name
      */
     String getName() {
         return _name;
     }
 
-
     /**
      * Return the full qualified names of the object's superclasses, if any,
      * otherwise returns null.
-     *
+     * 
      * @return The object's type's superclasses full name
      */
     String[] getSuperClassNames() {
         return _superClassNames;
     }
 
-
     /**
-     * Returns true if the two OID's are identical. Two OID's are
-     * identical only if they represent the same object type and have
-     * the same identity (based on equality test). If no identity was
-     * specified for either or both objects, the objects are not
-     * identical.
+     * Returns true if the two OID's are identical. Two OID's are identical only
+     * if they represent the same object type and have the same identity (based
+     * on equality test). If no identity was specified for either or both
+     * objects, the objects are not identical.
      */
-    public boolean equals( Object obj ) {
+    public boolean equals(Object obj) {
 
         OID other;
-        if ( this == obj )
+        if (this == obj) {
             return true;
+        }
         // Equality test is based on the following rules:
-        //   Classes are identical
-        //   Identity pass equality test
+        // Classes are identical
+        // Identity pass equality test
         // There is no need to do equality test on class or
         // database engine since only the same instances imply
         // the same OID.
@@ -307,21 +297,19 @@ public final class OID {
         // have no primary identity, therefore all such objects are
         // not identical.
         other = (OID) obj;
-        // ssa, FIXME : should we replace the String.equals(String) with String == String test ?
-        return ( _topClassName.equals(other._topClassName) && _identity != null &&
-                _identity.equals( other._identity ) );
-        
+        // ssa, FIXME : should we replace the String.equals(String) with String
+        // == String test ?
+        return (_topClassName.equals(other._topClassName) && _identity != null && _identity
+                .equals(other._identity));
     }
-
 
     public String toString() {
-        return _name + "/" + ( _identity == null ? "<new>" : _identity.toString() );
+        return _name + "/"
+                + (_identity == null ? "<new>" : _identity.toString());
     }
-
 
     public int hashCode() {
         return _hashCode;
     }
-
 
 }
