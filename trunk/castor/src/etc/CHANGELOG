@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1114 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Update docs on the limit clause support for OQL.
+       Details: http://jira.codehaus.org/browse/CASTOR-1114
+       (Ralf - 20050731)
+
 JDO:   Fixed bug CASTOR-1169 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Refactored access to caches, adding CacheEntry class and making OID and CacheEntry implement
        java.io.Serializable.

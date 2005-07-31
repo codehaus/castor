@@ -948,6 +948,37 @@ public class ProductGroup
       
       <section title="Limit Clause">
       
+         <p>On a selected number of RDBMS, Castor JDO now supports the use of LIMIT/OFFSET
+			clauses.</p>
+			
+         <p>As per this release, the following RDBMS have full/partial support for this
+            feature.</p>
+
+                <table border="0" cellspacing="1" cellpadding="2" bgcolor="#990033"><tr><td>
+                    <table border="0" cellspacing="1" cellpadding="8" bgcolor="#EDEDED">
+                  <tr bgcolor="#990033" style="color:#FFFFFF">
+                            <th align="left">RDBMS</th><th>LIMIT</th><th>OFFSET</th>
+                        </tr><tr>
+                            <td>postgreSQL</td><td>Yes</td><td>Yes</td>
+                        </tr><tr>
+                            <td>mySQL</td><td>Yes</td><td>Yes</td>
+                        </tr><tr>
+                            <td>Oracle - 1)2)</td><td>Yes</td><td>Yes</td>
+                        </tr><tr>
+                            <td>HSQL</td><td>Yes</td><td>Yes</td>
+                        </tr><tr>
+                            <td>MS SQL</td><td>Yes</td><td>-</td>
+                        </tr><tr>
+                            <td>DB2</td><td>Yes</td><td>-</td>
+                        </tr>
+                    </table></td></tr>
+                </table>
+
+         <p>1) Oracle has full support for LIMIT/OFFSET clauses for release 8.1.6 and
+            later.</p>
+         <p>2) For the LIMIT/OFFSET clauses to work properly the OQL query is required
+			to include a ORDER BY clause.</p>
+
          <p>The following code fragment shows an OQL query that uses the LIMIT keyword 
             to select the first 10 ProductGroup instances.</p>
       
