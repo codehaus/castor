@@ -42,7 +42,10 @@
  *
  * $Id$
  */
-package org.exolab.castor.persist.cache;
+package utf.org.exolab.castor.persist.cache;
+
+import org.exolab.castor.persist.cache.Cache;
+import org.exolab.castor.persist.cache.CacheRegistry;
 
 import junit.framework.TestCase;
 

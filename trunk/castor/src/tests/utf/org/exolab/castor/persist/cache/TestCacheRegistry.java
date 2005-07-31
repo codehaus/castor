@@ -42,10 +42,13 @@
  *
  * $Id$
  */
-package org.exolab.castor.persist.cache;
+package utf.org.exolab.castor.persist.cache;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import org.exolab.castor.persist.cache.Cache;
+import org.exolab.castor.persist.cache.CacheRegistry;
 
 import junit.framework.TestCase;
 
@@ -75,7 +78,7 @@ public class TestCacheRegistry extends TestCase {
     
 	public void testGetCacheFactories() throws Exception  {
 		String[] cacheFactories = CacheRegistry.getCacheFactories();
-        assertEquals (5, cacheFactories.length);
+        assertEquals (4, cacheFactories.length);
 	}
     
 	public void testGetCaches() throws Exception  {
@@ -98,26 +101,22 @@ public class TestCacheRegistry extends TestCase {
         
         cache = CacheRegistry.getCache("count-limited", 3, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
-        assertEquals (3, cache.getCapacity());
+        assertEquals (30, cache.getCapacity());
         
         cache = CacheRegistry.getCache("none", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("none", cache.getCacheType());
         assertEquals (10, cache.getCapacity());
 
-        cache = CacheRegistry.getCache("custom", 15, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
-        assertEquals ("custom", cache.getCacheType());
-        assertEquals (15, cache.getCapacity());
-        
         cache = CacheRegistry.getCache("not-existing", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertNull (cache);
 
         cache = CacheRegistry.getCache("", 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
-        assertEquals (10, cache.getCapacity());
+        assertEquals (30, cache.getCapacity());
         
         cache = CacheRegistry.getCache(null, 10, "org.exolab.castor.entity.Sample", getClass().getClassLoader());
         assertEquals ("count-limited", cache.getCacheType());
-        assertEquals (10, cache.getCapacity());
+        assertEquals (30, cache.getCapacity());
     }
     
 }

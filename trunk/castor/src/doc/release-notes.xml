@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="755" tool="jira">
+                    <description>
+		                Place all JDO unit tests in a new src/tests/utf/org/exolab/castor/ tree.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Bruce Snyder</name>
+                        <email>bruce DOT snyder AT gmail DOT com</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050731</date>
+                </bug>
                 <bug id="1114" tool="jira">
                     <description>
 		                Update docs on the limit clause support for OQL.

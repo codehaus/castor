@@ -1,19 +1,20 @@
-package org.exolab.castor.jdo.transactionmanager;
+package utf.org.exolab.castor.jdo.transactionmanager;
 
 import java.io.PrintWriter;
 import java.util.Collection;
 import java.util.Properties;
 
-import junit.framework.TestCase;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistry;
 
-import org.exolab.castor.util.Logger;
+import junit.framework.TestCase;
 
 /*
  * JUnit test case for unit testing TransactionManagerFactoryRegistry.
  * @author <a href="werner.guttmann@gmx.net">Werner Guttmann</a>
  *
  */
-public class TransactionManagerFactoryRegistryTest 
+public class TestTransactionManagerFactoryRegistry 
 	extends TestCase 
 {
 
@@ -23,7 +24,7 @@ public class TransactionManagerFactoryRegistryTest
 	 * Constructor for TransactionManagerFactoryRegistryTest.
 	 * @param arg0
 	 */
-	public TransactionManagerFactoryRegistryTest(String arg0) {
+	public TestTransactionManagerFactoryRegistry(String arg0) {
 		super(arg0);
 	}
 
@@ -49,12 +50,7 @@ public class TransactionManagerFactoryRegistryTest
 		Collection factories = TransactionManagerFactoryRegistry.getTransactionManagerFactories();
 		
 		assertNotNull ("At least one transaction manager factory", factories);
-		// assertEquals ("2 transaction manager factories", 2, factories.size());
-		
-		String[] factoryNames = TransactionManagerFactoryRegistry.getTransactionManagerFactoryNames();
-		for (int i = 0; i < factoryNames.length; i++) {
-			writer.println (factoryNames[i]);
-		}
+		assertEquals ("5 transaction manager factories", 5, factories.size());
 	}
 
 	/* (non-Javadoc)
@@ -62,8 +58,6 @@ public class TransactionManagerFactoryRegistryTest
 	 */
 	protected void setUp() throws Exception {
 		super.setUp();
-		
-		writer = new Logger( System.out ).setPrefix( "test" );
 		
 		Properties params = new Properties ();
 		params.put ("jndiENC", "comp:java/transactionManager");

@@ -43,14 +43,18 @@
  * $Id$
  */
 
-
-package org.exolab.castor.jdo.oql;
+package utf.org.exolab.castor.jdo.oql;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.jdo.oql.Lexer;
+import org.exolab.castor.jdo.oql.ParseTreeNode;
+import org.exolab.castor.jdo.oql.Parser;
+import org.exolab.castor.jdo.oql.Token;
+import org.exolab.castor.jdo.oql.TokenTypes;
 
 /**
  * Test class for {@link Parser}. 
@@ -64,7 +68,7 @@ public class ParseTest implements TokenTypes {
 	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
 	 * Commons Logging</a> instance used for all logging.
 	 */
-	private static Log _log = LogFactory.getFactory().getInstance( ParseTest.class );
+	private static Log _log = LogFactory.getLog( ParseTest.class );
 	
 	public static final int NODE_TYPES = 1;
 	public static final int NODE_VALUES = 2;
@@ -120,18 +124,15 @@ public class ParseTest implements TokenTypes {
 	 * @param args Pass an OQL query string on the command line.
 	 */
 	public static void main (String args[]) {
-		
 		try {
 			Lexer lexer = new Lexer(args[0]);
 			Parser parser = new Parser(lexer);
 			ParseTreeNode theTree = parser.getParseTree();
 			_log.debug(treeToString(theTree, NODE_TYPES));
 			_log.debug (treeToString(theTree, NODE_VALUES));
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			_log.error (e.getClass().getName(), e);
 		}
-		
 	}
 	
 	/**
@@ -166,5 +167,4 @@ public class ParseTest implements TokenTypes {
 		
 		return retVal;
 	}
-	
 }
