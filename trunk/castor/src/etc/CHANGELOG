@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1173 using contribution from Gregory Block [gblock@ctoforaday.com]
+       Solved problem using JDOConfFactory and transaction demarcation specification.
+       Details: http://jira.codehaus.org/browse/CASTOR-1173
+       (Ralf - 20050801)
+
 JDO:   Fixed bug CASTOR-755 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Place all JDO unit tests in a new src/tests/utf/org/exolab/castor/ tree.
        Details: http://jira.codehaus.org/browse/CASTOR-755

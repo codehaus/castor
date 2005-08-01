@@ -30,6 +30,27 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1173" tool="jira">
+                    <description>
+		                Solved problem using JDOConfFactory and transaction demarcation
+						specification.
+                    </description>
+                    <contributor>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+					</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050801</date>
+                </bug>
                 <bug id="755" tool="jira">
                     <description>
 		                Place all JDO unit tests in a new src/tests/utf/org/exolab/castor/ tree.
