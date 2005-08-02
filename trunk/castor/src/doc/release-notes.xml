@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1183" tool="jira">
+                    <description>
+		                Allow to initialize JDOManager with a preconfigured DataSource.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050803</date>
+                </bug>
                 <bug id="1173" tool="jira">
                     <description>
 		                Solved problem using JDOConfFactory and transaction demarcation

@@ -117,7 +117,25 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
     //--------------------------------------------------------------------------
 
     /**
+     * Constructs a new DataSourceConnectionFactory with given name, engine, mapping
+     * and datasource. Factory will be ready to use without calling initialize first.
+     * 
+     * @param name       The Name of the database configuration.
+     * @param engine     The Name of the persistence factory to use.
+     * @param datasource The preconfigured datasource to use for creating connections.
+     * @param mapping    The previously loaded mapping.
+     * @throws MappingException If LockEngine could not be initialized.
+     */
+    public DataSourceConnectionFactory(final String name, final String engine,
+                                       final DataSource datasource, final Mapping mapping)
+    throws MappingException {
+        super(name, engine, mapping);
+        _dataSource = datasource;
+    }
+
+    /**
      * Constructs a new DataSourceConnectionFactory with given database and mapping.
+     * Initialize needs to be called before using the factory to create connections.
      * 
      * @param database  The database configuration.
      * @param mapping   The mapping to load.

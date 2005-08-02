@@ -53,6 +53,9 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     /** The database configuration. */
     private Database            _database;
     
+    /** The name of the database configuration. */
+    private String              _name;
+    
     /** The mapping to load. */
     private Mapping             _mapping;
     
@@ -62,13 +65,35 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     //--------------------------------------------------------------------------
 
     /**
+     * Constructs a new AbstractConnectionFactory with given name, engine and mapping.
+     * Factory will be ready to use without calling initialize first.
+     * 
+     * @param name      The Name of the database configuration.
+     * @param engine    The Name of the persistence factory to use.
+     * @param mapping   The previously loaded mapping.
+     * @throws MappingException If LockEngine could not be initialized.
+     */
+    protected AbstractConnectionFactory(final String name, final String engine,
+                                        final Mapping mapping)
+    throws MappingException {
+        _database = null;
+        _name = name;
+        _mapping = mapping;
+        
+        initializeEngine(engine);
+        _initialized = true;
+    }
+    
+    /**
      * Constructs a new AbstractConnectionFactory with given database and mapping.
+     * Initialize needs to be called before using the factory to create connections.
      * 
      * @param database  The database configuration.
      * @param mapping   The mapping to load.
      */
     protected AbstractConnectionFactory(final Database database, final Mapping mapping) {
         _database = database;
+        _name = database.getName();
         _mapping = mapping;
     }
     
@@ -85,7 +110,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
         // this request to initialize it.
         if (!_initialized) {
             initializeMapping();
-            initializeEngine();
+            initializeEngine(_database.getEngine());
             initializeFactory();
             
             _initialized = true;
@@ -122,21 +147,21 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     /**
      * Initialize LockEngine.
      * 
-     * @throws MappingException If Lockengine could not be initialized.
+     * @param engine    Name of the persistence factory to use.
+     * @throws MappingException If LockEngine could not be initialized.
      */
-    private void initializeEngine() throws MappingException {
+    private void initializeEngine(final String engine) throws MappingException {
         // Complain if no database engine was specified, otherwise get
         // a persistence factory for that database engine.
         PersistenceFactory factory;
-        if (_database.getEngine() == null) {
+        if (engine == null) {
             factory = PersistenceFactoryRegistry.getPersistenceFactory(GENERIC_ENGINE);
         } else {
-            factory = PersistenceFactoryRegistry.getPersistenceFactory(
-                    _database.getEngine());
+            factory = PersistenceFactoryRegistry.getPersistenceFactory(engine);
         }
         
         if (factory == null) {
-            String msg = Messages.format("jdo.noSuchEngine", _database.getEngine());
+            String msg = Messages.format("jdo.noSuchEngine", engine);
             LOG.error(msg);
             throw new MappingException(msg);
         }
@@ -160,6 +185,13 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
      * @return The database configuration.
      */
     public final Database getDatabase() { return _database; }
+
+    /**
+     * Get the name of the database configuration.
+     * 
+     * @return The name of the database configuration.
+     */
+    public final String getName() { return _name; }
     
     /**
      * Get the mapping to load.

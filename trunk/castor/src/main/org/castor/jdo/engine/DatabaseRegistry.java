@@ -17,6 +17,8 @@ package org.castor.jdo.engine;
 
 import java.util.Hashtable;
 
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -56,7 +58,28 @@ public final class DatabaseRegistry {
     //--------------------------------------------------------------------------
 
     /**
-     * Instantiates a database instance from an in-memory JDO configuration.
+     * Instantiates a DataSourceConnectionFactory with given name, engine, datasource
+     * and mapping.
+     * 
+     * @param name       The Name of the database configuration.
+     * @param engine     The Name of the persistence factory to use.
+     * @param datasource The preconfigured datasource to use for creating connections.
+     * @param mapping    The previously loaded mapping.
+     * @throws MappingException If LockEngine could not be initialized.
+     */
+    public static synchronized void loadDatabase(final String name, final String engine, 
+                                                 final DataSource datasource,
+                                                 final Mapping mapping)
+    throws MappingException {
+        AbstractConnectionFactory factory;
+        factory = new DataSourceConnectionFactory(name, engine, datasource, mapping);
+        if (FACTORIES.put(name, factory) != null) {
+            LOG.warn(Messages.format("jdo.configLoadedTwice", name));
+        }
+    }
+
+    /**
+     * Instantiates a ConnectionFactory from an in-memory JDO configuration.
      * 
      * @param  jdoConf  An in-memory JDO configuration. 
      * @param  resolver An entity resolver.
@@ -72,7 +95,7 @@ public final class DatabaseRegistry {
     }
 
     /**
-     * Instantiates a database instance from the JDO configuration file
+     * Instantiates a ConnectionFactory from the JDO configuration file
      * 
      * @param  source   {@link InputSource} pointing to the JDO configuration. 
      * @param  resolver An entity resolver.
@@ -138,7 +161,7 @@ public final class DatabaseRegistry {
     
     /**
      * Factory methode to create a ConnectionFactory for given database configuration
-     * and with given mapping.
+     * and given mapping.
      * 
      * @param database  The database configuration.
      * @param mapping   The mapping to load.

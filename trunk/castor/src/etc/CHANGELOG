@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1183 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Allow to initialize JDOManager with a preconfigured DataSource.
+       Details: http://jira.codehaus.org/browse/CASTOR-1183
+       (Ralf - 20050803)
+
 JDO:   Fixed bug CASTOR-1173 using contribution from Gregory Block [gblock@ctoforaday.com]
        Solved problem using JDOConfFactory and transaction demarcation specification.
        Details: http://jira.codehaus.org/browse/CASTOR-1173
