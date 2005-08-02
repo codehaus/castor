@@ -59,6 +59,7 @@ import javax.naming.Reference;
 import javax.naming.Referenceable;
 import javax.naming.StringRefAddr;
 import javax.naming.spi.ObjectFactory;
+import javax.sql.DataSource;
 import javax.transaction.Status;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
@@ -78,6 +79,7 @@ import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireExcepti
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistry;
 import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
+import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
@@ -227,6 +229,31 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
 
     /**
+     * Initialize the JDOManager configuration with given name, engine, datasource,
+     * transaction demarcation and mapping.
+     * 
+     * @param name        The Name of the database configuration.
+     * @param engine      The Name of the persistence factory to use.
+     * @param datasource  The preconfigured datasource to use for creating connections.
+     * @param demarcation The transaction demarcation to use.
+     * @param mapping     The previously loaded mapping.
+     * @throws MappingException If LockEngine could not be initialized.
+     */
+    public static void loadConfiguration(final String name, final String engine, 
+                                         final DataSource datasource,
+                                         final TransactionDemarcation demarcation,
+                                         final Mapping mapping)
+    throws MappingException {
+        DatabaseRegistry.loadDatabase(name, engine, datasource, mapping);
+        
+        _classLoader = null;
+        _entityResolver = null;
+        _globalTransactionDemarcation = demarcation;
+        
+        LOG.debug("Successfully loaded JDOManager form preconfigured datasource");
+    }
+    
+    /**  
      * Load the JDOManager configuration from the specified in-memory JdoConf. In
      * addition, custom entity resolver and class loader for the mappings can be 
      * provided. 
