@@ -1036,6 +1036,13 @@ create table lazy_11_book (
 
 insert into lazy_11_book (id, name, author_id) select 1, 'test book', lazy_11_author.id from lazy_11_author;
 	
+drop table enum_prod;
+create table enum_prod (
+  id        int not null,
+  name      varchar(200) not null,
+  kind      varchar(200) not null
+);
+
 -- tc9x TESTS
 
 drop table  poly_ordr;

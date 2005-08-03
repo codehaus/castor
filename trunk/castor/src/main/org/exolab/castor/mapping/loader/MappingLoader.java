@@ -115,7 +115,7 @@ public abstract class MappingLoader
     /**
      * Empty array of class types used for reflection
      */
-    private static final Class[] EMPTY_ARGS = new Class[0];
+    protected static final Class[] EMPTY_ARGS = new Class[0];
 
 
     /**
@@ -123,12 +123,12 @@ public abstract class MappingLoader
      * for introspection when searching for type-safe
      * enumeration style classes.
      */
-    private static final Class[] STRING_ARG = { String.class };
+    protected static final Class[] STRING_ARG = { String.class };
 
     /**
      * Factory method name for type-safe enumerations. 
     **/
-    private static final String VALUE_OF = "valueOf";
+    protected static final String VALUE_OF = "valueOf";
     
     
     //----------------------/
@@ -1349,7 +1349,7 @@ public abstract class MappingLoader
      * @return true if the given class should be treated as a primitive
      * type
     **/
-    private static boolean isPrimitive(Class type) {
+    protected static boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
 
@@ -1366,8 +1366,8 @@ public abstract class MappingLoader
      * A class used to by the createFieldHandler method in order to
      * save the reference of the TypeInfo that was used.
      */
-    class TypeInfoReference {
-        TypeInfo typeInfo = null;
+    public class TypeInfoReference {
+        public TypeInfo typeInfo = null;
     } //-- TypeInfoReference
     
     

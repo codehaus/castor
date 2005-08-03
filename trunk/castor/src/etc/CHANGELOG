@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-300 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       JDO support for typesafe enumerations.
+       Details: http://jira.codehaus.org/browse/CASTOR-300
+       (Ralf - 20050730)
+
 JDO:   Fixed bug CASTOR-1178 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added code to set identity upon registering objects with ObjectTracker.
        Details: http://jira.codehaus.org/browse/CASTOR-1178

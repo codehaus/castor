@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="300" tool="jira">
+                    <description>
+		                JDO support for typesafe enumerations.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Rhett Sutphin</name>
+                        <email>rhett-sutphin@uiowa.edu</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050730</date>
+                </bug>
                 <bug id="1178" tool="jira">
                     <description>
 		                Added code to set identity upon registering objects with ObjectTracker

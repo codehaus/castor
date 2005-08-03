@@ -880,6 +880,15 @@ go
 grant all on test_nton_b to test
 go
 
+drop table enum_prod
+go
+create table enum_prod (
+  id        int not null,
+  name      varchar(200) not null,
+  kind      varchar(200) not null
+)
+go
+
 -- test objects for TestTransientAttribute 
 
 drop table trans_master

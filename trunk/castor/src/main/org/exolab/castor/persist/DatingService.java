@@ -209,6 +209,9 @@ class DatingService {
             if ( Types.isSimpleType( resolve( typeName ) ) )
                 return true;
 
+            if ( Types.isEnumType( resolve( typeName ) ) )
+                return true;
+
             ClassMolder clsMold = (ClassMolder) clsMolders.get( typeName );
             if ( clsMold != null ) {
                 fieldMolder.setFieldClassMolder( clsMold );

@@ -700,7 +700,7 @@ public class XMLMappingLoader
      * @return true if the given class should be treated as a primitive
      * type
     **/
-    private static boolean isPrimitive(Class type) {
+    protected static boolean isPrimitive(Class type) {
 
         if (type.isPrimitive()) return true;
 

@@ -6,6 +6,7 @@
   <include href="../ctf/jdo/tc2x/mapping.xml"/>
   <include href="../ctf/jdo/tc9x/mapping.xml"/>
   <include href="tc166/mapping.xml"/>
+  <include href="tc167/mapping.xml"/>
   
 
   <!-- Mapping for TestObject to test_table

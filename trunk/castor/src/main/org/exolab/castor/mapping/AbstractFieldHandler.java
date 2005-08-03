@@ -101,7 +101,7 @@ public abstract class AbstractFieldHandler
      *
      * @param fieldDesc the FieldDescriptor to set
      */
-    protected final void setFieldDescriptor(FieldDescriptor fieldDesc) {
+    public final void setFieldDescriptor(FieldDescriptor fieldDesc) {
         _descriptor = fieldDesc;
     } //-- setFieldDescriptor
 
