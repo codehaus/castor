@@ -708,6 +708,7 @@ public abstract class TransactionContext {
                 proposedObject.setObject(objectInTransaction);
             }
 
+            molder.setIdentity(this, objectInTransaction, identity);
             _tracker.trackObject(engine, molder, oid, objectInTransaction);
             OID newoid = engine.load(this, oid, proposedObject,
                     suggestedAccessMode, _lockTimeout, results);
@@ -717,8 +718,10 @@ public abstract class TransactionContext {
                 _tracker.untrackObject(objectInTransaction);
                 // Create new OID
                 OID newOID = new OID(engine, proposedObject.getActualClassMolder(), identity);
+                proposedObject.getActualClassMolder().setIdentity(this, proposedObject.getObject(), identity);
                 // Add new OID to ObjectTracker
-                _tracker.trackObject(engine, molder, oid, proposedObject.getObject());
+                _tracker.trackObject(engine, molder, newOID, proposedObject.getObject());
+                // TODO [WG]: _tracker.trackObject(proposedObject.getActualClassMolder().getLockEngine(), proposedObject.getActualClassMolder(), newOID, proposedObject.getObject());
                 objectInTransaction = proposedObject.getObject();
             } else {
                 // rehash the object entry, because oid might have changed!

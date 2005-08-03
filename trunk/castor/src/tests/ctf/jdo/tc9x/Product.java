@@ -18,15 +18,15 @@
 package ctf.jdo.tc9x;
 
 import java.util.Collection;
-
 import org.exolab.castor.jdo.TimeStampable;
 
 public class Product implements TimeStampable {
+    
     private int _id;
     private String _name;
     private ProductDetail _detail;
     private Collection _orders;
-    private Collection _owners;
+    private Owner _owner;
     private long _timeStamp;
 
     public final int getId() { return _id; }
@@ -41,8 +41,8 @@ public class Product implements TimeStampable {
     public final Collection getOrders() { return _orders; }
     public final void setOrders(final Collection orders) { _orders = orders; }
 
-    public final Collection getOwners() { return _owners; }
-    public final void setOwners(final Collection owners) { _owners = owners; }
+    public final Owner getOwner() { return _owner; }
+    public final void setOwner(final Owner owner) { _owner = owner; }
 
     /**
      * @see org.exolab.castor.jdo.TimeStampable#jdoSetTimeStamp(long)
@@ -57,4 +57,9 @@ public class Product implements TimeStampable {
     public final long jdoGetTimeStamp() {
         return _timeStamp;
     }
+    
+    public String toString () {
+        return this.getClass().getName() + "/" + getId();
+    }
+
 }

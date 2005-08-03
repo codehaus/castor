@@ -20,6 +20,7 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -734,7 +735,9 @@ public class PreparedStatementProxy implements PreparedStatement {
 		StringBuffer buffer = new StringBuffer ();
 		StringTokenizer tokenizer = new StringTokenizer( sqlStatement, "?" );
 		String partOfStatement;
-		Iterator iter = parameters.keySet().iterator();
+        List parameterValues = new ArrayList(parameters.keySet());
+        Collections.sort(parameterValues); 
+		Iterator iter = parameterValues.iterator();
 		Object key = null;
 		while ( tokenizer.hasMoreTokens() ) {
 			partOfStatement = tokenizer.nextToken();
