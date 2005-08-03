@@ -873,6 +873,15 @@ create table depend2
 )
 //
 
+drop table enum_prod
+//
+create table enum_prod (
+  id        int not null,
+  name      varchar(200) not null,
+  kind      varchar(200) not null
+)
+//
+
 -- test objects for TestTransientAttribute 
 
 drop table trans_master

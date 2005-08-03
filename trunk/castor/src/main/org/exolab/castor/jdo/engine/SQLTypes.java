@@ -635,7 +635,7 @@ public final class SQLTypes
     }
 
 
-    private abstract static class SQLTypeConvertor implements TypeConvertor {
+    public abstract static class SQLTypeConvertor implements TypeConvertor {
 
         Class fromType;
 

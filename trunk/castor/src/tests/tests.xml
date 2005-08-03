@@ -64,6 +64,7 @@
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 	
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
@@ -145,6 +146,7 @@
 
     <!-- <case class="jdo.QueryFinalize" id="TC10"/> -->
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 
     <!-- <case class="jdo.TestTransientAttribute" id="TC84a" /> -->
 
@@ -222,6 +224,7 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
@@ -296,6 +299,7 @@
     <case class="jdo.CallSql" id="TC33"/>
     <!-- <case class="jdo.StoredProcedure" id="TC49"/> -->
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
+    <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
@@ -375,6 +379,7 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
@@ -452,6 +457,7 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
@@ -528,6 +534,7 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
@@ -605,6 +612,7 @@
 
     <case class="jdo.QueryFinalize" id="TC100"/>
     <!-- <case class="jdo.tc166.TestLazy1to1" id="TC166" /> -->
+    <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 

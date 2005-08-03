@@ -84,7 +84,7 @@ public abstract class ExtendedFieldHandler
      *
      * @param fieldDesc the FieldDescriptor to set
      */
-    protected abstract void setFieldDescriptor(FieldDescriptor fieldDesc);
+    public abstract void setFieldDescriptor(FieldDescriptor fieldDesc);
     
     //---------------------------------------/
     //- Methods inherited from FieldHandler -/

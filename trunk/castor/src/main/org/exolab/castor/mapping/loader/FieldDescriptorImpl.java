@@ -269,7 +269,7 @@ public class FieldDescriptorImpl
     /**
      * Mutator method used by {@link MappingLoader}.
      */
-    void setRequired( boolean required )
+    public void setRequired( boolean required )
     {
         _required = required;
     }

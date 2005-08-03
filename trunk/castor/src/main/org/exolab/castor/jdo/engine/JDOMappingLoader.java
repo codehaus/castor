@@ -47,8 +47,12 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.exolab.castor.jdo.engine.SQLTypes.SQLTypeConvertor;
 import org.exolab.castor.mapping.*;
+import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
+import org.exolab.castor.mapping.loader.FieldHandlerFriend;
+import org.exolab.castor.mapping.loader.FieldHandlerImpl;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
@@ -57,6 +61,9 @@ import org.exolab.castor.mapping.xml.types.DirtyType;
 import org.exolab.castor.util.Messages;
 
 import java.io.PrintWriter;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -246,7 +253,59 @@ public class JDOMappingLoader
             sqlType = _factory.adjustSqlType( sqlType );
         }
         if ( fieldType != sqlType ) {
-            convertorTo = SQLTypes.getConvertor( sqlType, fieldType );
+            try {
+                convertorTo = SQLTypes.getConvertor( sqlType, fieldType );
+            } catch (MappingException ex) {
+                boolean isTypeSafeEnum = false;
+                //-- check for type-safe enum style classes
+                if ((fieldType != null) && (!isPrimitive(fieldType))) {
+                    //-- make sure no default constructor
+                    Constructor cons = null;
+                    try {
+                        cons = fieldType.getConstructor(EMPTY_ARGS);
+                        if (!Modifier.isPublic(cons.getModifiers())) {
+                            cons = null;
+                        }
+                    }
+                    catch(NoSuchMethodException nsmx) {
+                        //-- Do nothing
+                    }
+                    try {
+                        if (cons == null) {
+                            //-- make sure a valueOf factory method
+                            //-- exists and no user specified handler exists
+                            Method method = fieldType.getMethod(VALUE_OF, STRING_ARG);
+                            Class returnType = method.getReturnType();
+                            if ((returnType != null) && fieldType.isAssignableFrom(returnType)) {
+                                int mods = method.getModifiers();
+                                if (Modifier.isStatic(mods)) {
+                                    // create individual SQLTypeConverter
+                                    convertorTo = new SQLTypeConvertor( sqlType, fieldType ) {
+                                        private Method method = null;
+                                        public Object convert( Object obj, String param ) {
+                                            try {
+                                                if (method == null)  method = toType.getMethod(VALUE_OF, STRING_ARG);
+                                                return method.invoke(toType, new Object[] { (String)obj });
+                                            } catch (Exception ex) {
+                                                return null;
+                                            }
+                                        }
+                                    } ;
+
+                                    Types.addEnumType(fieldType);
+                                    
+                                    isTypeSafeEnum = true;
+                                }
+                            }
+                        }
+                    }
+                    catch(NoSuchMethodException nsmx) {
+                        //-- Do nothing
+                    }
+                }
+                if (!isTypeSafeEnum)
+                    throw new MappingException( "mapping.noConvertor", sqlType.getName(), fieldType.getName() );
+            }
             convertorFrom = SQLTypes.getConvertor( fieldType, sqlType );
             if ( typeName != null ) {
                 convertorParam = SQLTypes.paramFromName( typeName );
@@ -260,7 +319,7 @@ public class JDOMappingLoader
     protected FieldDescriptor createFieldDesc( Class javaClass, FieldMapping fieldMap )
             throws MappingException {
 
-        FieldDescriptor  fieldDesc;
+        // FieldDescriptor  fieldDesc;
         String[]           sqlName;
         Class            sqlType;
         int[]            sType;
@@ -269,8 +328,117 @@ public class JDOMappingLoader
         if ( fieldMap.getSql() == null )
             return super.createFieldDesc( javaClass, fieldMap );
         
-        // Create a JDO field descriptor
-        fieldDesc = super.createFieldDesc( javaClass, fieldMap );
+        String fieldName = fieldMap.getName();
+        
+        // If the field type is supplied, grab it and use it to locate the
+        // field/accessor.
+        Class fieldType = null;
+        if ( fieldMap.getType() != null ) {
+            try {
+                fieldType = resolveType( fieldMap.getType() );
+            } catch ( ClassNotFoundException except ) {
+                throw new MappingException( "mapping.classNotFound", fieldMap.getType() );
+            }
+        }
+        
+        // If the field is declared as a collection, grab the collection type as
+        // well and use it to locate the field/accessor.
+        CollectionHandler colHandler = null;
+        if ( fieldMap.getCollection() != null ) {
+            Class colType = CollectionHandlers.getCollectionType( fieldMap.getCollection().toString() );
+            colHandler = CollectionHandlers.getHandler( colType );
+        }
+        
+        TypeInfo typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );
+            
+        ExtendedFieldHandler exfHandler = null;
+        FieldHandler handler = null;
+        
+        //-- check for user supplied FieldHandler
+        if (fieldMap.getHandler() != null) {
+            
+            Class handlerClass = null;
+            try {
+                handlerClass = resolveType( fieldMap.getHandler() );
+            }
+            catch (ClassNotFoundException except) {
+                throw new MappingException( "mapping.classNotFound", fieldMap.getHandler() );
+            }
+            
+            if (!FieldHandler.class.isAssignableFrom(handlerClass)) {
+                String err = "The class '" + fieldMap.getHandler() + 
+                    "' must implement " + FieldHandler.class.getName();
+                throw new MappingException(err);
+            }
+            
+            //-- get default constructor to invoke. We can't use the
+            //-- newInstance method unfortunately becaue FieldHandler
+            //-- overloads this method 
+            Constructor constructor = null;
+            try {
+                constructor = handlerClass.getConstructor(new Class[0]);
+                handler = (FieldHandler) 
+                    constructor.newInstance(new Object[0]);
+            }
+            catch(java.lang.Exception except) {
+                String err = "The class '" + handlerClass.getName() + 
+                    "' must have a default public constructor.";
+                throw new MappingException(err);
+            }
+            
+            
+            //-- ExtendedFieldHandler?
+            if (handler instanceof ExtendedFieldHandler) {
+                exfHandler = (ExtendedFieldHandler) handler;
+            }
+            
+            //-- Fix for Castor JDO from Steve Vaughan, Castor JDO
+            //-- requires FieldHandlerImpl or a ClassCastException
+            //-- will be thrown... [KV 20030131 - also make sure this new handler 
+            //-- doesn't use it's own CollectionHandler otherwise
+            //-- it'll cause unwanted calls to the getValue method during
+            //-- unmarshalling]
+            colHandler = typeInfo.getCollectionHandler();
+            typeInfo.setCollectionHandler(null);
+            handler = new FieldHandlerImpl(handler, typeInfo);
+            typeInfo.setCollectionHandler(colHandler);
+            //-- End Castor JDO fix
+            
+        } 
+        
+        boolean generalized = (exfHandler instanceof GeneralizedFieldHandler);
+        
+        //-- if generalized we need to change the fieldType to whatever
+        //-- is specified in the GeneralizedFieldHandler so that the
+        //-- correct getter/setter methods can be found
+        FieldHandler custom = handler;
+        if (generalized) {
+            fieldType = ((GeneralizedFieldHandler)exfHandler).getFieldType();
+        }
+        
+        if (generalized || (handler == null)) {
+            //-- create TypeInfoRef to get new TypeInfo from call
+            //-- to createFieldHandler
+            TypeInfoReference typeInfoRef = new TypeInfoReference();
+            typeInfoRef.typeInfo = typeInfo;
+            handler = createFieldHandler(javaClass, fieldType, fieldMap, typeInfoRef);
+            if (custom != null) {
+                ((GeneralizedFieldHandler)exfHandler).setFieldHandler(handler);
+                handler = custom;
+            }
+            else  typeInfo = typeInfoRef.typeInfo;
+        }
+                
+        FieldDescriptorImpl fieldDesc 
+            = new FieldDescriptorImpl( fieldName, typeInfo, handler,
+                fieldMap.getTransient() );
+
+        fieldDesc.setRequired(fieldMap.getRequired());
+
+        //-- If we're using an ExtendedFieldHandler we need to set the 
+        //-- FieldDescriptor
+        if (exfHandler != null)
+            ((FieldHandlerFriend)exfHandler).setFieldDescriptor(fieldDesc);
 
         // if SQL mapping declares transient 
         if ( fieldMap.getSql().getTransient()) {
@@ -334,6 +502,3 @@ public class JDOMappingLoader
     }
 
 }
-
-
-

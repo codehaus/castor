@@ -52,6 +52,7 @@ import java.lang.reflect.Modifier;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -202,6 +203,17 @@ public class Types
     }
 
 
+    private static final Vector _enums = new Vector();
+    
+    public static void addEnumType(Class type) {
+        _enums.add(type);
+    }
+    
+    public static boolean isEnumType(Class type) {
+        return _enums.contains(type);
+    }
+
+    
     /**
      * Constructs a new object from the given class. Does not generate any
      * checked exceptions, since object creation has been proven to work
