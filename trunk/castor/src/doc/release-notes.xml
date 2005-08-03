@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1178" tool="jira">
+                    <description>
+		                Added code to set identity upon registering objects with ObjectTracker
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050803</date>
+                </bug>
                 <bug id="1183" tool="jira">
                     <description>
 		                Allow to initialize JDOManager with a preconfigured DataSource.

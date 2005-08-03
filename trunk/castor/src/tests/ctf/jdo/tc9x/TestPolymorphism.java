@@ -100,6 +100,7 @@ public final class TestPolymorphism extends CastorTestCase {
         database.create(detail);
         database.commit();
         
+        
         database.begin();
         Laptop laptop = new Laptop();
         laptop.setId(10);
@@ -110,6 +111,11 @@ public final class TestPolymorphism extends CastorTestCase {
         laptop.setDetail((ProductDetail) database.load(
                 ProductDetail.class, new Integer(10)));
         database.create(laptop);
+
+        Owner owner = new Owner ();
+        owner.setId(new Integer (10));
+        owner.setName("owner 10");
+        owner.setProduct(laptop);
         database.commit();
         
         database.begin();
@@ -246,7 +252,8 @@ public final class TestPolymorphism extends CastorTestCase {
         assertEquals("laptop 12", computer.getName());
         
         database.begin();
-        database.remove(database.load(Computer.class, new Integer(12)));
+        computer = (Computer) database.load(Computer.class, new Integer(12)); 
+        database.remove(computer);
         database.remove(database.load (ProductDetail.class, new Integer(12)));
         database.remove(database.load(Order.class, new Integer(12)));
         database.commit();
@@ -359,7 +366,7 @@ public final class TestPolymorphism extends CastorTestCase {
         database.commit();
         
         assertNotNull(owner);
-        assertEquals(1, owner.getId());
+        assertEquals(1, owner.getId().intValue());
         assertEquals("owner 1", owner.getName());
         
         Product product = owner.getProduct();
@@ -401,7 +408,7 @@ public final class TestPolymorphism extends CastorTestCase {
             while (results.hasMore()) {
                 Owner owner = (Owner) results.next();
                 assertNotNull(owner);
-                assertEquals(counter, owner.getId());
+                assertEquals(counter, owner.getId().intValue());
                 
                 counter += 1;
             }

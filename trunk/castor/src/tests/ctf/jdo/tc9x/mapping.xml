@@ -14,6 +14,9 @@
     <field name="detail" type="ctf.jdo.tc9x.ProductDetail">
       <sql name="detail" />
     </field>
+    <field name="owner" type="ctf.jdo.tc9x.Owner">
+    	<sql name="owner" />
+    </field>
     <field name="orders" type="ctf.jdo.tc9x.Order" collection="collection">
       <sql name="order_id" many-table="poly_order_product" many-key="product_id" />
     </field>
