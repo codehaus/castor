@@ -131,7 +131,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
      *               <code>null</code>.
      */
     public synchronized Object put(Object key, Object value) {
-        QueueItem oldItem = (QueueItem) map.get(key);
+        QueueItem oldItem = (QueueItem) this.map.get(key);
         if (oldItem != null) {
             // XXX [SMH]: This code-block is never reached.
             if (_log.isDebugEnabled()) {
@@ -147,7 +147,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
             }
             QueueItem newitem = new QueueItem(key, value);
             newitem.time = getCapacity();
-            map.put(key, newitem);
+            this.map.put(key, newitem);
             return null;
         }
     }
@@ -159,7 +159,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
      * the key is not mapped to any value in this Map.
      */
     public synchronized Object get(Object key) {
-        Object o = map.get(key);
+        Object o = this.map.get(key);
         if ( o == null )
             return null;
         else 
@@ -173,7 +173,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
         super.setCapacity(capacity);
         if (timer.list.contains(this)) {
             timer.list.remove(this);
-            map.clear();
+            this.map.clear();
         }
         timer.addTickerTask(this);
     }
@@ -188,18 +188,19 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
      *          or <code>null</code> if the key did not have a mapping.
      */
     public synchronized Object remove(Object key) {
-        QueueItem queueItem = (QueueItem) map.remove(key);
+        QueueItem queueItem = (QueueItem) this.map.remove(key);
         if (queueItem == null) {
             if (_log.isDebugEnabled()) {
                 _log.trace("TimeLimitedLRU: not in cache ... remove(" + key + ")");
             }
             return null;
-        } else {
-            if (_log.isDebugEnabled()) {
-                _log.trace("TimeLimitedLRU: remove(" + key + ") = " + queueItem.value);
-            }
-            return queueItem.value;
         }
+        
+        if (_log.isDebugEnabled()) {
+            _log.trace("TimeLimitedLRU: remove(" + key + ") = " + queueItem.value);
+        }
+        
+        return queueItem.value;
     }
 	
 	/**
@@ -211,7 +212,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 	 * @see     java.util.Enumeration
 	 */
 	public synchronized Enumeration elements() {
-	    return new ValuesEnumeration(map.values());
+	    return new ValuesEnumeration(this.map.values());
 	}
 
 	
@@ -236,7 +237,7 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 	    if (_log.isDebugEnabled()) {
 	        _log.trace("Testing for entry for key " + key);
 	    }
-	    return map.containsKey(key);
+	    return this.map.containsKey(key);
 	}
 
 	/**
@@ -253,8 +254,8 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 	 * Called by TickThread
 	 */
 	private synchronized void tick() {
-	    if (!map.isEmpty()) {
-	        for (Iterator iter = map.values().iterator(); iter.hasNext();) {
+	    if (!this.map.isEmpty()) {
+	        for (Iterator iter = this.map.values().iterator(); iter.hasNext();) {
 	            QueueItem queueItem = (QueueItem) iter.next();
 	            Object value = queueItem.value;
 	            if (queueItem.time <= 0) {
@@ -271,13 +272,13 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
     private class ValuesEnumeration implements Enumeration {
         private Enumeration enumeration;
         private ValuesEnumeration(Collection coll) {
-            enumeration = (new Vector(coll)).elements();
+            this.enumeration = (new Vector(coll)).elements();
         }
         public boolean hasMoreElements() {
-            return enumeration.hasMoreElements();
+            return this.enumeration.hasMoreElements();
         }
         public Object nextElement() throws NoSuchElementException {
-            return ((QueueItem) enumeration.nextElement()).value;
+            return ((QueueItem) this.enumeration.nextElement()).value;
         }
     }
     
@@ -307,17 +308,17 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
             start();
         }
         void addTickerTask(TimeLimited cache) {
-            list.add(cache);
+            this.list.add(cache);
         }
         public void run() {
             try {
                 while (true) {
                     long time = System.currentTimeMillis();
-                    if (time - lastTime < tick) {
-                        sleep(tick - (time - lastTime));
+                    if (time - this.lastTime < this.tick) {
+                        sleep(this.tick - (time - this.lastTime));
                     }
-                    lastTime = System.currentTimeMillis();
-                    for (int i = 0; i < list.size(); i++) {
+                    this.lastTime = System.currentTimeMillis();
+                    for (int i = 0; i < this.list.size(); i++) {
                         ((TimeLimited) list.get(i)).tick();
                     }
                 }
@@ -331,63 +332,77 @@ public class TimeLimited extends AbstractBaseCache implements Cache {
 	 * @see org.exolab.castor.persist.cache.Cache#size()
 	 */
 	public int size() {
-		return map.size();
+		return this.map.size();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#clear()
 	 */
 	public void clear() {
-		map.clear();
+		this.map.clear();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return map.isEmpty();
+		return this.map.isEmpty();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#containsKey(java.lang.Object)
 	 */
 	public boolean containsKey(Object key) {
-		return map.containsKey (key);
+		return this.map.containsKey (key);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object value) {
-		return map.containsValue(value);
+		return this.map.containsValue(value);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#values()
 	 */
 	public Collection values() {
-		return map.values();
+		return this.map.values();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#putAll(java.util.Map)
 	 */
 	public void putAll(Map aMap) {
-		map.putAll (aMap);
+		this.map.putAll (aMap);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#entrySet()
 	 */
 	public Set entrySet() {
-		return map.entrySet();
+		return this.map.entrySet();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#keySet()
 	 */
 	public Set keySet() {
-		return map.keySet();
+		return this.map.keySet();
 	}
+    
+    /**
+     * @see org.exolab.castor.persist.cache.Cache#initialize()
+     */
+    public void initialize() {
+        // nothign to do
+    }
+
+    /**
+     * @see org.exolab.castor.persist.cache.Cache#close()
+     */
+    public void close() {
+        _log.debug ("Closing " + getCacheType() + "instance for " + getClassName());
+    }
 
 }

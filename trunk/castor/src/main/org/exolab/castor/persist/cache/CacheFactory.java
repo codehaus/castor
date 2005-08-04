@@ -43,8 +43,6 @@
  * $Id: CacheFactory.java,v 1.1.1.1 2003/03/03 07:08:25 kvisco Exp
  * $
  */
-
-
 package org.exolab.castor.persist.cache;
 
 /**
@@ -58,17 +56,15 @@ package org.exolab.castor.persist.cache;
  * @author <a href=" mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Id$
  */
-public interface CacheFactory
-{
+public interface CacheFactory {
 
     /**
      * Instantiates an instance of the given class.
-	 * @param classLoader A ClassLoader instance.
+     * @param classLoader A ClassLoader instance.
      * @return A Cache instance.
      * @throws CacheAcquireException Problem instantiating a cache instance.
      */
-    Cache getCache (ClassLoader classLoader) 
-    	throws CacheAcquireException;
+    Cache getCache(ClassLoader classLoader) throws CacheAcquireException;
 
     /**
      * Returns the short alias for this factory instance.
@@ -82,4 +78,9 @@ public interface CacheFactory
      */
     String getCacheClassName();
     
+    /**
+     * Allows for cache-specific shutdown operations and resource cleanup.
+     */
+    void shutdown();
+
 }

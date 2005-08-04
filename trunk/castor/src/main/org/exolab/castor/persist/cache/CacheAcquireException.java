@@ -56,11 +56,13 @@ import org.exolab.castor.jdo.PersistenceException;
  */
 public class CacheAcquireException extends PersistenceException {
     
+    private static final long serialVersionUID = 1L;
+    
     /**
      * Creates an instance of CacheAcquireException 
      * @param message An error message.
      */
-    public CacheAcquireException (String message) {
+    public CacheAcquireException (final String message) {
         super(message);
     }
     /**
@@ -68,7 +70,7 @@ public class CacheAcquireException extends PersistenceException {
      * @param message An error message
      * @param e The original exception that caused the problem.
      */
-    public CacheAcquireException (String message, Exception e) {
+    public CacheAcquireException (final String message, final Exception e) {
         super(message, e);
     }
 }

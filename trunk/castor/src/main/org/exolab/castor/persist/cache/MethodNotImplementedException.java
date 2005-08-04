@@ -43,49 +43,36 @@
  * $Id$
  */
 
-
 package org.exolab.castor.persist.cache;
 
+import org.exolab.castor.jdo.PersistenceException;
+
 /**
-  * Implements {@link CacheFactory} for the {@link NoCache} implementation of 
-  * {@link Cache}.
-  *
-  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
-  */
-public class NoCacheFactory extends AbstractCacheFactory implements CacheFactory
-{
-    
-    /**
-     * The name of the factory
-     */
-    private static final String NAME = "none";
+ * Exception specific to Castor JDO cache implementations. Indicates that a
+ * specific method of the {@link Cache} interface has not been implemented.
+ * 
+ * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann </a>
+ */
+public class MethodNotImplementedException extends PersistenceException {
 
     /**
-     * Full class name of the underlying cache implementation.
+     * Fenerated serialVersionUID
      */
-    private static final String CLASS_NAME = "org.exolab.castor.persist.cache.NoCache"; 
-    
+    private static final long serialVersionUID = 3546919177958142259L;
+
     /**
-     * Returns the short alias for this factory instance.
-     * @return The short alias name. 
+     * @param message
+     * @param except
      */
-    public String getName() {
-        return NAME;
-    }
-    
-    /**
-     * Returns the full class name of the underlying cache implementation.
-     * @return The full cache class name. 
-     */
-    public String getCacheClassName() {
-        return CLASS_NAME;   
+    public MethodNotImplementedException(final String message, final Throwable except) {
+        super(message, except);
     }
 
     /**
-     * Cache-specific shutdown operations and resource cleanup.
+     * @param message
      */
-    public void shutdown() {
-        // nothing to do
+    public MethodNotImplementedException(final String message) {
+        super(message);
     }
 
 }

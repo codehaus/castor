@@ -1033,6 +1033,19 @@ public final class LockEngine {
     }
 
     /**
+     * Close all caches (to allow for resource clean-up)
+     */
+    public void closeCaches() {
+        for (Iterator iter = _typeInfo.values().iterator(); iter.hasNext();) {
+            ((TypeInfo) iter.next()).closeCache();
+        }
+        
+        for (Iterator iter = CacheRegistry.getCacheFactories().iterator(); iter.hasNext(); ) {
+            ((CacheFactory) iter.next()).shutdown(); 
+        }
+    }
+
+    /**
      * Dump cached objects of specific type to output.
      * @param cls A class type.
      */
@@ -1146,6 +1159,13 @@ public final class LockEngine {
             return (entry != null);
         }
    
+        /**
+         * Life-cycle method to allow shutdown of cache instances.
+         */
+        public void closeCache() {
+            cache.close();
+        }
+        
         /**
          * Dump all objects in cache or lock to output.
          */

@@ -400,4 +400,12 @@ implements Cache
 	public Set keySet() {
 		return mapKeyPos.keySet();
 	}
+    
+    public void initialize() {
+//      nothing to do
+    }
+
+    public void close() {
+        _log.debug ("Closing " + getCacheType() + "instance for " + getClassName());
+    }
 }

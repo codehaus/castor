@@ -69,8 +69,7 @@ public class UnlimitedFactory extends AbstractCacheFactory implements CacheFacto
      * Returns the short alias for this factory instance.
      * @return The short alias name. 
      */
-    public String getName()
-    {
+    public String getName() {
         return NAME;
     }
     
@@ -81,4 +80,12 @@ public class UnlimitedFactory extends AbstractCacheFactory implements CacheFacto
     public String getCacheClassName() {
         return CLASS_NAME;   
     }
+    
+    /**
+     * Cache-specific shutdown operations and resource cleanup.
+     */
+    public void shutdown() {
+        // nothing to do
+    }
+
 }

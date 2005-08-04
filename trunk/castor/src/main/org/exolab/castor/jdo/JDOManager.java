@@ -67,6 +67,7 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
@@ -81,6 +82,7 @@ import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistr
 import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
 import org.exolab.castor.persist.spi.InstanceFactory;
 import org.exolab.castor.util.Messages;
@@ -956,6 +958,18 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         }
     }
 
+    /**
+     * Lyfe-cycle methods to close JDOManager instance and initiate resource cleanup.
+     */
+    public void close () {
+        try {
+            ConnectionFactory connectionFactory = getConnectionFactory();
+            LockEngine engine = ((AbstractConnectionFactory) connectionFactory).getEngine();
+            engine.closeCaches();
+        } catch (MappingException e) {
+            LOG.fatal ("Problem closing down caches", e);
+        }
+    }
     //--------------------------------------------------------------------------
 }
 

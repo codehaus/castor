@@ -51,20 +51,19 @@ package org.exolab.castor.persist.cache;
   *
   * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
   */
-public class CountLimitedFactory
-extends AbstractCacheFactory 
-implements CacheFactory
-{
+public class CountLimitedFactory extends AbstractCacheFactory implements
+CacheFactory {
     
     /**
      * The name of the factory
      */
     private static final String NAME = "count-limited";
-
+    
     /**
      * Full class name of the underlying cache implementation.
      */
-    private static final String CLASS_NAME = "org.exolab.castor.persist.cache.CountLimited"; 
+    private static final String CLASS_NAME = 
+        "org.exolab.castor.persist.cache.CountLimited";
     
     /**
      * Returns the short alias for this factory instance.
@@ -79,7 +78,14 @@ implements CacheFactory
      * @return The full cache class name. 
      */
     public String getCacheClassName() {
-    	return CLASS_NAME;   
+        return CLASS_NAME;
     }
-    
+
+    /**
+     * Cache-specific shutdown operations and resource cleanup.
+     */
+    public void shutdown() {
+        // nothing to do
+    }
+
 }

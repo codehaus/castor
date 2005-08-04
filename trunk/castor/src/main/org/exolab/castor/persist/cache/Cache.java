@@ -56,157 +56,190 @@ import java.util.Set;
  * @version $Revision$ $Date$
  */
 public interface Cache {
-	
-	/**
-	 * Returns the value to which the specified key is mapped in this hashtable.
-	 * @param key - a key in the hashtable.
-	 * @return the value to which the key is mapped in this hashtable; null if 
-	 * the key is not mapped to any value in this hashtable.
-	 */
-	public Object get(Object key);
-	
-	/**
-	 * Maps the specified <code>key</code> to the specified 
-	 * <code>value</code> in this hashtable. Neither the key nor the 
-	 * value can be <code>null</code>. 
-	 * <p>
-	 * The value can be retrieved by calling the <code>get</code> method 
-	 * with a key that is equal to the original key, before it is diposed
-	 * by the least-recently-used map. 
-	 * <p>
-	 * @param      key     the hashtable key.
-	 * @param      value   the value.
-	 * @return     the previous value of the specified key in this hashtable,
-	 *             or <code>null</code> if it did not have one.
-	 * @exception  NullPointerException  if the key or value is
-	 *               <code>null</code>.
-	 */
-	public Object put(Object key, Object value);
-	
-	/**
-	 * Removes the key (and its corresponding value) from this 
-	 * hashtable. This method does nothing if the key is not in the hashtable.
-	 *
-	 * @param   key   the key that needs to be removed.
-	 * @return  the value to which the key had been mapped in this hashtable,
-	 *          or <code>null</code> if the key did not have a mapping.
-	 */
-	public Object remove(Object key);
-	
-	/**
-	 * Returns an enumeration of the values in this LRU map.
-	 * Use the Enumeration methods on the returned object to fetch the elements
-	 * sequentially.
-	 *
-	 * @return  an enumeration of the values in this hashtable.
-	 * @see     java.util.Enumeration
-	 */
-	public Enumeration elements();
     
-	/**
-	 * Remove the object identified by key from the cache.
-	 *
-	 * @param   key   the key that needs to be removed.
-	 */
-	public void expire(Object key);
-	
-	/**
-	 * Indicates whether the cache holds value object mapped to the specified key.
-	 * @param key - A key identifying a value object.
-	 * @return True if the cache holds a value object for the specified key, false otherwise.
-	 */
-	public boolean contains (Object key);
+    /**
+     * Lyfe-cycle method to allow custom initialization of cache implementations
+     */
+    void initialize () throws CacheAcquireException;
     
+    /** 
+     * Life-cycle method to allow custom resource cleanup for a cache implementation 
+     */
+    void close ();
+    
+    /**
+     * Returns the value to which the specified key is mapped in this hashtable.
+     * @param key - a key in the hashtable.
+     * @return the value to which the key is mapped in this hashtable; null if 
+     * the key is not mapped to any value in this hashtable.
+     */
+    Object get(Object key);
+    
+    /**
+     * Maps the specified <code>key</code> to the specified <code>value</code>
+     * in this hashtable. Neither the key nor the value can be <code>null</code>.
+     * <p>
+     * The value can be retrieved by calling the <code>get</code> method with
+     * a key that is equal to the original key, before it is diposed by the
+     * least-recently-used map.
+     * <p>
+     * 
+     * @param key the hashtable key.
+     * @param value the value.
+     * @return the previous value of the specified key in this hashtable, or
+     *         <code>null</code> if it did not have one.
+     * @exception NullPointerException if the key or value is <code>null</code>.
+     */
+    Object put(Object key, Object value);
+
+    /**
+     * Removes the key (and its corresponding value) from this hashtable. This
+     * method does nothing if the key is not in the hashtable.
+     * 
+     * @param key the key that needs to be removed.
+     * @return the value to which the key had been mapped in this hashtable, or
+     *         <code>null</code> if the key did not have a mapping.
+     */
+    Object remove(Object key);
+
+    /**
+     * Returns an enumeration of the values in this LRU map. Use the Enumeration
+     * methods on the returned object to fetch the elements sequentially.
+     * 
+     * @return an enumeration of the values in this hashtable.
+     * @see java.util.Enumeration
+     */
+    Enumeration elements();
+
+    /**
+     * Remove the object identified by key from the cache.
+     * 
+     * @param key the key that needs to be removed.
+     */
+    void expire(Object key);
+    
+    /**
+     * Indicates whether the cache holds value object mapped to the specified
+     * key.
+     * 
+     * @param key A key identifying a value object.
+     * @return True if the cache holds a value object for the specified key,
+     *         false otherwise.
+     */
+    boolean contains(Object key);
+
     /**
      * Indicates the type of this cache.
+     * 
      * @return the cache type.
      */
-    public String getCacheType ();
-    
+    String getCacheType();
+
     /**
      * Sets the type of this cache instance.
+     * 
      * @param cacheType The type of this cache.
      */
-    public void setCacheType (String cacheType);
-	
+    void setCacheType(String cacheType);
+
     /**
      * Indicates the cache capacity.
+     * 
      * @return the cache capacity.
      */
-    public int getCapacity();
-    
+    int getCapacity();
+
     /**
      * Sets the cache capacity.
+     * 
      * @param capacity the cache capacity.
      */
-    public void setCapacity (int capacity);
+    void setCapacity(int capacity);
     
     /**
      * Indicates the class name of objects stored in this cache.
      * @return The class name.
      */
-    public String getClassName();
+    String getClassName();
     
     /**
      * Sets the class name of objects cached here.
      * @param className The class name.
      */
-    public void setClassName (String className); 
+    void setClassName (String className); 
 
-	/**
-	 * Returns the number of key-value mappings in this map.
-	 */
-	public int size();
+    /**
+     * Returns the number of key-value mappings in this map.
+     * 
+     * @throws MethodNotImplementedException
+     */
+    int size() throws MethodNotImplementedException;
 
-	/**
-	 * Removes all mappings from this map.
-	 */
-	public void clear();
+    /**
+     * Removes all mappings from this map.
+     * 
+     * @throws MethodNotImplementedException
+     */
+    void clear() throws MethodNotImplementedException;
 
-	/**
-	 * Returns true if this map contains no key-value mappings.
-	 * @return True if this map contains no key-value mappings 
-	 */
-	public boolean isEmpty();
+    /**
+     * Returns true if this map contains no key-value mappings.
+     * 
+     * @return True if this map contains no key-value mappings
+     * @throws MethodNotImplementedException
+     */
+    boolean isEmpty() throws MethodNotImplementedException;
 
-	/**
-	 * Returns true if this map contains a mapping for the specified key
-	 * @param key A key object.
-	 * @return true if this map contains a mapping for the specified key
-	 */
-	public boolean containsKey(Object key);
+    /**
+     * Returns true if this map contains a mapping for the specified key
+     * 
+     * @param key A key object.
+     * @return true if this map contains a mapping for the specified key
+     * @throws MethodNotImplementedException
+     */
+    boolean containsKey(Object key) throws MethodNotImplementedException;
 
-	/**
-	 * Returns true if this map maps one or more keys to the specified value. 
-	 * This operation will probably require time linear to the cache size for most 
-	 * implementations of the Cache interface.
-	 * @param value The object value.
-	 * @return true if this map maps one or more keys to the specified value
-	 */
-	public boolean containsValue(Object value);
+    /**
+     * Returns true if this map maps one or more keys to the specified value.
+     * This operation will probably require time linear to the cache size for
+     * most implementations of the Cache interface.
+     * 
+     * @param value The object value.
+     * @return true if this map maps one or more keys to the specified value
+     * @throws MethodNotImplementedException
+     */
+    boolean containsValue(Object value)
+            throws MethodNotImplementedException;
 
-	/**
-	 * 
-	 * @return 
-	 */
-	public Collection values();
+    /**
+     * 
+     * @return
+     * @throws MethodNotImplementedException
+     */
+    Collection values() throws MethodNotImplementedException;
 
-	/**
-	 * Copies all of the mappings from the specified map to this map (optional operation). 
-	 * @param aMap The map to be copied.
-	 */
-	public void putAll(Map aMap);
+    /**
+     * Copies all of the mappings from the specified map to this map (optional
+     * operation).
+     * 
+     * @param aMap The map to be copied.
+     */
+    void putAll(Map aMap);
 
-	/**
-	 * Returns a set view of the keys contained in this map.
-	 * @return A set view of all the keys.
-	 */
-	public Set entrySet();
+    /**
+     * Returns a set view of the keys contained in this map.
+     * 
+     * @return A set view of all the keys.
+     * @throws MethodNotImplementedException
+     */
+    Set entrySet() throws MethodNotImplementedException;
 
-	/**
-	 * Returns a collection view of the values contained in this map.
-	 * @return A set view of all the value objects.
-	 */
-	public Set keySet();
+    /**
+     * Returns a collection view of the values contained in this map.
+     * 
+     * @return A set view of all the value objects.
+     * @throws MethodNotImplementedException
+     */
+    Set keySet() throws MethodNotImplementedException;
 
 }

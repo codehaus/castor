@@ -102,7 +102,7 @@ extends AbstractBaseCache
 		if (_log.isDebugEnabled()) {
 			_log.trace ("Creating cache entry for key " + key + " with value " + value);
 		}
-		return map.put(key,value);
+		return this.map.put(key,value);
 	}
 	
 	/**
@@ -115,7 +115,7 @@ extends AbstractBaseCache
 		if (_log.isDebugEnabled()) {
 			_log.trace ("Getting cache entry for key " + key);
 		}
-		return map.get(key);
+		return this.map.get(key);
 	}
 	
 	/**
@@ -130,7 +130,7 @@ extends AbstractBaseCache
 		if (_log.isDebugEnabled()) {
 			_log.trace ("Removing cache entry for key " + key);
 		}
-		return map.remove(key);
+		return this.map.remove(key);
 	}
 	
 	/**
@@ -142,7 +142,7 @@ extends AbstractBaseCache
 	 * @see     java.util.Enumeration
 	 */
 	public Enumeration elements() {
-		return map.elements();
+		return this.map.elements();
 	}
 	
 	
@@ -191,63 +191,76 @@ extends AbstractBaseCache
 	 * @see org.exolab.castor.persist.cache.Cache#size()
 	 */
 	public int size() {
-		return map.size();
+		return this.map.size();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#clear()
 	 */
 	public void clear() {
-		map.clear();
+		this.map.clear();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#isEmpty()
 	 */
 	public boolean isEmpty() {
-		return map.isEmpty();
+		return this.map.isEmpty();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#containsKey(java.lang.Object)
 	 */
 	public boolean containsKey(Object key) {
-		return map.containsKey (key);
+		return this.map.containsKey (key);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#containsValue(java.lang.Object)
 	 */
 	public boolean containsValue(Object value) {
-		return map.containsValue(value);
+		return this.map.containsValue(value);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#values()
 	 */
 	public Collection values() {
-		return map.values();
+		return this.map.values();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#putAll(java.util.Map)
 	 */
 	public void putAll(Map aMap) {
-		map.putAll (aMap);
+		this.map.putAll (aMap);
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#entrySet()
 	 */
 	public Set entrySet() {
-		return map.entrySet();
+		return this.map.entrySet();
 	}
 
 	/* (non-Javadoc)
 	 * @see org.exolab.castor.persist.cache.Cache#keySet()
 	 */
 	public Set keySet() {
-		return map.keySet();
+		return this.map.keySet();
 	}
 	
+    /**
+     * @see org.exolab.castor.persist.cache.Cache#initialize()
+     */
+    public void initialize() {
+        // nothing to do    
+    }
+
+    /**
+     * @see org.exolab.castor.persist.cache.Cache#close()
+     */
+    public void close() {
+        _log.debug ("Closing " + getCacheType() + "instance for " + getClassName());
+    }
 }
