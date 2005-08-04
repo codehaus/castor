@@ -45,7 +45,12 @@
 
 package org.exolab.castor.persist.cache;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Enumeration;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * Base implementation of all LRU cache types. 
@@ -53,9 +58,12 @@ import java.util.Enumeration;
  * @author <a href="werner DOT guttmannt AT gmx DOT com">Werner Guttmann</a>
  */
 
-public abstract class AbstractBaseCache 
-implements Cache 
-{
+public abstract class AbstractBaseCache implements Cache {
+    
+    /**
+     * Jakarta Common logging instance
+     */
+    private static final Log LOG = LogFactory.getLog (AbstractBaseCache.class);
     
     /**
      * Type of this cache.
@@ -123,29 +131,51 @@ implements Cache
      *
      * @param   key   the key that needs to be removed.
      */
-    public abstract void expire(Object key);
-    
+    public void expire(final Object key) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Expiring cache entry for key " + key);
+        }
+        if (remove(key) == null) {
+            LOG.debug ("LRU expire: " + key + " not found");
+        } else {
+            LOG.debug ("LRU expire: " + key + " removed from cache");
+        }
+        dispose(key);
+    }
+
+    /**
+     * This method is called when an object is disposed.
+     * Override this method if you interested in the disposed object.
+     *
+     * @param o - the disposed object
+     */
+    protected void dispose(final Object obj) {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Disposing object " + obj);
+        }
+    }
     
     /**
      * Indicates whether the cache holds value object mapped to the specified key.
      * @param key - A key identifying a value object.
-     * @return True if the cache holds a value object for the specified key, false otherwise.
+     * @return True if the cache holds a value object for the specified key, false 
+     * otherwise.
      */
     public abstract boolean contains(Object key);
     
     /**
      * Indicates the type of this cache.
      * @return the cache type.
-     */	
+     */
     public String getCacheType() {
-        return _cacheType;
+        return this._cacheType;
     }
     
     /**
      * Sets the type of this cache instance.
      * @param cacheType the type of this cache.
      */
-    public void setCacheType(String cacheType) {
+    public void setCacheType(final String cacheType) {
         this._cacheType = cacheType;
     }
     
@@ -154,14 +184,14 @@ implements Cache
      * @return the cache capacity.
      */
     public int getCapacity() {
-        return _capacity;
+        return this._capacity;
     }
     
     /**
      * Sets the cache capacity.
      * @param capacity the cache capacity.
      */
-    public void setCapacity(int capacity) {
+    public void setCapacity(final int capacity) {
         this._capacity = capacity;
     }
     
@@ -171,7 +201,7 @@ implements Cache
      * @see Cache#getClassName()
      */
     public String getClassName() {
-        return _className;
+        return this._className;
     }
     
     /**
@@ -179,8 +209,80 @@ implements Cache
      * @param className The class name.
      * @see Cache#setClassName(String)
      */
-    public void setClassName (String className) {
-        _className = className;
+    public void setClassName (final String className) {
+        this._className = className;
+    }
+
+    protected Object invokeStaticMethodWithExceptions (final Class target, 
+            final String name, 
+            final Class[] argumentTypes, 
+            final Object[] arguments) 
+    throws NoSuchMethodException, IllegalAccessException, InvocationTargetException 
+    {
+        Method method;
+        // LOG.error ("Trying to find " + name + " on " + target.getName());
+        method = target.getMethod(name, argumentTypes);
+        return method.invoke (null, arguments);
     }
     
+    protected Object invokeMethodWithExceptions (final Object target, 
+            final String name, 
+            final Class[] argumentTypes, 
+            final Object[] arguments) 
+    throws NoSuchMethodException, IllegalAccessException, InvocationTargetException 
+    {
+        Method method;
+        method = target.getClass().getMethod(name, argumentTypes);
+        return method.invoke (target, arguments);
+    }
+    
+    protected Object invokeMethod (final Object target, 
+            final String name, 
+            final Class[] argumentTypes, 
+            final Object[] arguments) {
+        Method method;
+        try {
+            method = target.getClass().getMethod(name, argumentTypes);
+            return method.invoke (target, arguments);
+        } catch (SecurityException e) {
+            LOG.error ("SecurityException", e);
+            throw new IllegalStateException(e.getMessage());
+        } catch (NoSuchMethodException e) {
+            LOG.error ("NoSuchMethodException", e);
+            throw new IllegalStateException(e.getMessage()); 
+        } catch (IllegalArgumentException e) {
+            LOG.error ("IllegalArgumentException", e);
+            throw new IllegalStateException(e.getMessage()); 
+        } catch (IllegalAccessException e) {
+            LOG.error ("IllegalAccessException", e);
+            throw new IllegalStateException(e.getMessage()); 
+        } catch (InvocationTargetException e) {
+            LOG.error ("InvocationTargetException", e);
+            throw new IllegalStateException(e.getMessage()); 
+        }
+        
+    }
+    
+    protected boolean invokeMethodReturnBoolean (final Object target, 
+            final String name, 
+            final Class[] argumentTypes, 
+            final Object[] arguments) {
+        Boolean booleanValue = 
+            (Boolean) invokeMethod (target, name, argumentTypes, arguments); 
+        return booleanValue.booleanValue();
+    }
+
+    protected int invokeMethodReturnInt (final Object target, 
+            final String name, 
+            final Class[] argumentTypes,
+            final Object[] arguments) {
+        Integer integerValue = 
+            (Integer) invokeMethod (target, name, argumentTypes, arguments); 
+        return integerValue.intValue();
+    }
+
+    /**
+     * @see org.exolab.castor.persist.cache.Cache#close()
+     */
+    public abstract void close ();
 }

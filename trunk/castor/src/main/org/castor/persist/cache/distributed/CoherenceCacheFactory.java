@@ -38,32 +38,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
- *
  * $Id$
  */
 
+package org.castor.persist.cache.distributed;
 
-package org.exolab.castor.persist.cache;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.exolab.castor.persist.cache.AbstractCacheFactory;
+import org.exolab.castor.persist.cache.CacheFactory;
+
 
 /**
-  * Implements {@link CacheFactory} for the {@link NoCache} implementation of 
-  * {@link Cache}.
-  *
-  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
-  */
-public class NoCacheFactory extends AbstractCacheFactory implements CacheFactory
+* Implements {@link CacheFactory} for the {@link CoherenceCache} implementation 
+* of {@link Cache}.
+*
+* @author <a href="mailto:ttelcik@hbf.com.au">Tim Telcik</a>
+*/
+public class CoherenceCacheFactory extends AbstractCacheFactory implements CacheFactory
 {
     
     /**
      * The name of the factory
      */
-    private static final String NAME = "none";
-
+    private static final String NAME = "coherence";
+    
     /**
      * Full class name of the underlying cache implementation.
      */
-    private static final String CLASS_NAME = "org.exolab.castor.persist.cache.NoCache"; 
+    private static final String CLASS_NAME = 
+        "org.castor.persist.cache.distributed.CoherenceCache"; 
+
+    /**
+     * Name of the Coherence CacheFactory
+     */
+    private static final String TANGOSOL_CACHE_FACTORY = "com.tangosol.net.CacheFactory";
+
+    /**
+     * Logger instamnce
+     */
+    private static final Log _log = LogFactory.getLog (CoherenceCacheFactory.class);
     
     /**
      * Returns the short alias for this factory instance.
@@ -85,7 +102,17 @@ public class NoCacheFactory extends AbstractCacheFactory implements CacheFactory
      * Cache-specific shutdown operations and resource cleanup.
      */
     public void shutdown() {
-        // nothing to do
+        Class _factoryClass;
+        try {
+            _factoryClass = this.getClass().getClassLoader().loadClass(TANGOSOL_CACHE_FACTORY);
+            if (_factoryClass != null) {
+                Method method = _factoryClass.getMethod("shutdown", null);
+                method.invoke (null, null);
+            }
+        } catch (Exception e) {
+            _log.error ("Problem shutting down Coherence cluster member", e);
+        }
+        
     }
-
+    
 }

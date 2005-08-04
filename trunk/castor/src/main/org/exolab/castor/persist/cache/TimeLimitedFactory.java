@@ -63,14 +63,14 @@ public class TimeLimitedFactory extends AbstractCacheFactory implements CacheFac
     /**
      * Full class name of the underlying cache implementation.
      */
-    private static final String CLASS_NAME = "org.exolab.castor.persist.cache.TimeLimited"; 
+    private static final String CLASS_NAME = 
+        "org.exolab.castor.persist.cache.TimeLimited"; 
     
     /**
      * Returns the short alias for this factory instance.
      * @return The short alias name. 
      */
-    public String getName()
-    {
+    public String getName() {
         return NAME;
     }
     
@@ -80,6 +80,13 @@ public class TimeLimitedFactory extends AbstractCacheFactory implements CacheFac
      */
     public String getCacheClassName() {
         return CLASS_NAME;   
+    }
+
+    /**
+     * Cache-specific shutdown operations and resource cleanup.
+     */
+    public void shutdown() {
+        // nothing to do
     }
 
     

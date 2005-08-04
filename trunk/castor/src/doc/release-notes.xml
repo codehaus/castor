@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1102" tool="jira">
+                    <description>
+		                Added support for various distributed caches.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050801</date>
+                </bug>
                 <bug id="300" tool="jira">
                     <description>
 		                JDO support for typesafe enumerations.

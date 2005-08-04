@@ -56,19 +56,28 @@ import org.exolab.castor.jdo.PersistenceException;
  */
 public class InvalidCacheTypeException extends PersistenceException {
     
-	/**
+    /**
+     * Generated serialVersionUID for serialization.
+     */
+
+    private static final long serialVersionUID = 3905243420380508212L;
+
+    /**
      * Creates an instance of InvalidCacheTypeException
-	 * @param message An error message.
-	 */
-	public InvalidCacheTypeException (String message) {
-		super(message);
-	}
-	/**
+     * 
+     * @param messageAn error message.
+     */
+    public InvalidCacheTypeException(final String message) {
+        super(message);
+    }
+
+    /**
      * Creates an instance of InvalidCacheTypeException
-	 * @param message An error message
-	 * @param e The original exception that caused the problem.
-	 */
-	public InvalidCacheTypeException (String message, Exception e) {
-		super(message, e);
-	}
+     * 
+     * @param message An error message
+     * @param e The original exception that caused the problem.
+     */
+    public InvalidCacheTypeException(final String message, final Exception e) {
+        super(message, e);
+    }
 }

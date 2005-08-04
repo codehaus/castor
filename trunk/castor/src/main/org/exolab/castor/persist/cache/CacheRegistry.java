@@ -79,7 +79,7 @@ public final class CacheRegistry {
      * Property listing all available {@link Cache} implementations 
      * (<tt>org.exolab.castor.jdo.cacheImplementations</tt>).
      */
-    private static final String CACHE_IMPLEMENTATION_PROPERTY= 
+    private static final String CACHE_IMPLEMENTATION_PROPERTY = 
         "org.exolab.castor.jdo.cacheFactories";
 
     /**
@@ -98,6 +98,13 @@ public final class CacheRegistry {
     private static Hashtable  _cacheFactories;
 
     /**
+     * Creates in instance of this class. Made private to avoid extension by inheritance.
+     */
+    private CacheRegistry () {
+        // nothing to do
+    }
+
+    /**
      * Returns a {@link CacheFactory} with the specified name.
      * The factory class names are loaded from the Castor properties
      * file. Returns null if the named factory is not supported.
@@ -105,13 +112,16 @@ public final class CacheRegistry {
      * @param cacheType Cache type identifier
      * @param capacity Cache capacity.
      * @param className Class name.
-	 * @param classLoader A ClassLoader instance.
+     * @param classLoader A ClassLoader instance.
      * @return A {@link Cache} instance, null if no cache type with this name exists.
      * @throws CacheAcquireException A cache of the type specified can not be acquired.
      */
-    public static Cache getCache (String cacheType, int capacity, String className, ClassLoader classLoader) 
-    	throws CacheAcquireException
-    {
+    public static Cache getCache (
+            String cacheType, 
+            int capacity, 
+            final String className, 
+            final ClassLoader classLoader) 
+    throws CacheAcquireException {
         load();
         
         Cache cache = null;
@@ -120,8 +130,8 @@ public final class CacheRegistry {
         // in the mapping file. for such a case, we still set the default 
         // value to be "count-limited" and the default capacity to 0. 
         if (cacheType == null || cacheType == "") {
-        	cacheType = DEFAULT_CACHE_TYPE;
-        	capacity = DEFAULT_CAPACITY;
+            cacheType = DEFAULT_CACHE_TYPE;
+            capacity = DEFAULT_CAPACITY;
         }
         
         // if no capacity is specified, set it to default capacity.
@@ -136,11 +146,16 @@ public final class CacheRegistry {
             cache.setCacheType (cacheType);
             cache.setCapacity (capacity);
             cache.setClassName (className);
+            
+            cache.initialize();
         }
         
         if (_log.isDebugEnabled()) {
-            _log.debug ("Successfully instantiated '" + cache.getCacheType() + 
-                        "' cache instance [" + cache.getCapacity() + "/" + cache.getClassName() + "]");
+            if (cache != null) {
+                _log.debug ("Successfully instantiated '" + cache.getCacheType() 
+                        + "' cache instance [" + cache.getCapacity() + "/" 
+                        + cache.getClassName() + "]");
+            }
         }
         
         return cache;
@@ -154,20 +169,28 @@ public final class CacheRegistry {
      *
      * @return Names of the configured {@link Cache} implementations.
      */
-    public static String[] getCacheFactories()
-    {
+    public static String[] getCacheFactoriesNames() {
         String[]    names;
         Enumeration enumeration;
 
         load();
         names = new String[ _cacheFactories.size() ];
         enumeration = _cacheFactories.keys();
-        for ( int i = 0 ; i < names.length ; ++i ) {
-            names[ i ] = (String) enumeration.nextElement();
+        for (int i = 0; i < names.length; ++i) {
+            names[i] = (String) enumeration.nextElement();
         }
         return names;
     }
 
+    /**
+     * Returns a collection of the current configured cache factories. 
+     * @return Collection of the current configured cache factories.
+     */
+    public static Collection getCacheFactories() {
+        load();
+        return Collections.unmodifiableCollection(_cacheFactories.values());
+    }
+    
     /**
      * Returns the names of all the configured {@link Cache} instances as a 
      * Collection. The names can be used to obtain a {@link Cache} from 
@@ -175,33 +198,33 @@ public final class CacheRegistry {
      *
      * @return Names of the configured {@link Cache} implementations.
      */
-	public static Collection getCaches() {
-		load();
-		return Collections.unmodifiableCollection(_cacheFactories.keySet());
-	}
+    public static Collection getCacheNames() {
+        load();
+        return Collections.unmodifiableCollection(_cacheFactories.keySet());
+    }
 
     /**
      * Load the {@link CacheFactory} implementations from the 
      * properties file, if not loaded before.
      */
-    private static synchronized void load()
-    {
-        if ( _cacheFactories == null ) {
+    private static synchronized void load() {
+        if (_cacheFactories == null) {
             String                    prop;
             StringTokenizer           tokenizer;
             CacheFactory cacheFactory = null;
             _cacheFactories = new Hashtable();
             
-            prop = LocalConfiguration.getInstance().getProperty(CACHE_IMPLEMENTATION_PROPERTY, "");
-            tokenizer = new StringTokenizer( prop, ", " );
+            prop = LocalConfiguration.getInstance().getProperty(
+                    CACHE_IMPLEMENTATION_PROPERTY, "");
+            tokenizer = new StringTokenizer(prop, ", ");
             while (tokenizer.hasMoreTokens()) {
                 prop = tokenizer.nextToken();
                 try {
-                	Class cls = CacheRegistry.class.getClassLoader().loadClass(prop);
-                	cacheFactory = (CacheFactory) cls.newInstance();
-                	_cacheFactories.put(cacheFactory.getName(), cacheFactory);
-                } 
-                catch (Exception except) {
+                    Class cls = 
+                        CacheRegistry.class.getClassLoader().loadClass(prop);
+                    cacheFactory = (CacheFactory) cls.newInstance();
+                    _cacheFactories.put(cacheFactory.getName(), cacheFactory);
+                } catch (Exception except) {
                     _log.error ("Problem instantiating cache implementation.", except);
                 }
             }
