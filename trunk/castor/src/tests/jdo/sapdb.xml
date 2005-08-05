@@ -4,8 +4,8 @@
 <jdo-conf>                         
     <database name="sapdb" engine="sapdb" >
         <driver url="jdbc:sapdb://localhost/test" class-name="com.sap.dbtech.jdbc.DriverSapDB">
-            <param name="user" value="DBA" />
-            <param name="password" value="DBA" />
+            <param name="user" value="admin" />
+            <param name="password" value="secure" />
             <!--param name="sqlmode" value="ORACLE" /-->
         </driver>
         <mapping href="mapping.xml" />
