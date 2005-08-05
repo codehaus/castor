@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-799 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Refactored MANIFEST files and their usage within Castor.
+       Details: http://jira.codehaus.org/browse/CASTOR-799
+       (Werner - 20050805)
+
 JDO:   Fixed bug CASTOR-1102 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Added support for various distributed casches.
        Details: http://jira.codehaus.org/browse/CASTOR-1102
