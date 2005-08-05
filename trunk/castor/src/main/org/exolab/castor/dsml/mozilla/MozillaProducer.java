@@ -58,8 +58,9 @@ import netscape.ldap.LDAPSchema;
 import netscape.ldap.LDAPAttributeSchema;
 import netscape.ldap.LDAPObjectClassSchema;
 import netscape.ldap.LDAPSearchResults;
+
+import org.castor.util.Base64Encoder;
 import org.exolab.castor.dsml.Producer;
-import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.dsml.XML;
 
 
@@ -157,11 +158,7 @@ public class MozillaProducer
 			    for ( i = 0 ; i < value.length ; ++i )
 				chars[ i ] = (char) value[ i ];
 			} else {
-			    MimeBase64Encoder encoder;
-			    
-			    encoder = new MimeBase64Encoder();
-			    encoder.translate( value );
-			    chars = encoder.getCharArray();
+                chars = Base64Encoder.encode(value);
 			    attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN",
 						   XML.Entries.Attributes.Encodings.Base64 );
 			}

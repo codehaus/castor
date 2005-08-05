@@ -30,6 +30,27 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1185" tool="jira">
+                    <description>
+		                Replaced MimeBase64Encoder/Decoder with new implementation
+						Base64Encoder/Decoder.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Bruce Snyder</name>
+                        <email>bruce DOT snyder AT gmail DOT com</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20050805</date>
+                </bug>
                 <bug id="799" tool="jira">
                     <description>
 		                Refactored MANIFEST files and their usage within Castor

@@ -49,10 +49,10 @@
 package org.exolab.castor.xml;
 
 //-- Castor imports
+import org.castor.util.Base64Decoder;
 import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.ObjectFactory;
 import org.exolab.castor.util.DefaultObjectFactory;
-import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.xml.descriptors.PrimitivesClassDescriptor;
 import org.exolab.castor.xml.descriptors.StringClassDescriptor;
 import org.exolab.castor.xml.util.*;
@@ -817,10 +817,7 @@ public final class UnmarshalHandler extends MarshalFramework
                     state.object = new byte[0];
                 else {
                     //-- Base64 decoding
-                    char[] chars = str.toCharArray();
-                    MimeBase64Decoder decoder = new MimeBase64Decoder();
-                    decoder.translate(chars, 0, chars.length);
-                    state.object = decoder.getByteArray();
+                    state.object = Base64Decoder.decode(str);
                 }
             }
             else if (state.args != null) {
@@ -846,13 +843,9 @@ public final class UnmarshalHandler extends MarshalFramework
                 else {
                     Class valueType = cdesc.getFieldType();
                     //-- handle base64
-                    if (valueType.isArray() &&
-                        (valueType.getComponentType() == Byte.TYPE))
-                    {
-                        char[] chars = ((String)value).toCharArray();
-                        MimeBase64Decoder decoder = new MimeBase64Decoder();
-                        decoder.translate(chars, 0, chars.length);
-                        value = decoder.getByteArray();
+                    if (valueType.isArray()
+                            && (valueType.getComponentType() == Byte.TYPE)) {
+                        value = Base64Decoder.decode((String) value);
                     }
                 }
 
