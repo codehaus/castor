@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="799" tool="jira">
+                    <description>
+		                Refactored MANIFEST files and their usage within Castor
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050805</date>
+                </bug>
                 <bug id="1102" tool="jira">
                     <description>
 		                Added support for various distributed caches.

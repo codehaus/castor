@@ -358,20 +358,28 @@
 
     <target name="jar" depends="compile" description="Build the castor.jar and castor-xml.jar files">
         <delete file="${dist}/${archive.name}.jar"/>
+        <delete file="${dist}/${archive.name}-xml.jar"/>
+        <!-- <delete file="${dist}/${archive.name}-sourceGen.jar"/> -->
         <delete file="${classes}/MANIFEST.MF"/>
 
         <copy todir="${classes}">
-            <fileset dir="${source}/etc" includes="MANIFEST.MF,log4j.properties" />
-        </copy>
-        <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
-        <copy todir="${classes}">
-            <fileset dir="${source}/etc" includes="LICENSE,README" />
+            <fileset dir="${source}/etc" includes="LICENSE,README,log4j.properties" />
         </copy>
 
-        <jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
+    	<!-- copy and filter MANIFEST file for Castor JDO -->
+    	<copy file="${source}/etc/MANIFEST.JDO.MF" tofile="${classes}/MANIFEST.MF"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        
+    	<!-- create CASTOR JDO JAR -->
+    	<jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
              includes="LICENSE,README,org/**,log4j.properties"/>
 
-        <!-- Castor XML Only Jar -->
+    	<!-- copy and filter MANIFEST file for Castor JDO -->
+        <delete   file="${classes}/MANIFEST.MF" />
+    	<copy file="${source}/etc/MANIFEST.XML.MF" tofile="${classes}/MANIFEST.MF"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+
+        <!-- create Castor XML Only Jar -->
         <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
               includes="LICENSE,README,
               org/exolab/castor/*,
@@ -384,14 +392,18 @@
               org/exolab/castor/util/**,
               org/exolab/castor/xml/**,
               org/exolab/javasource/**"/>
-        <!--
+
+    	<!-- copy and filter MANIFEST file for Source generator -->
+<!--    	
         <delete   file="${classes}/MANIFEST.MF" />
-        <delete   file="${dist}/sourceGen.jar" />
-        <copyfile src="${source}/etc/sourceGenMANIFEST.MF" dest="${classes}/MANIFEST.MF" />
+        <copyfile src="${source}/etc/MANIFEST.SG.MF" dest="${classes}/MANIFEST.MF" />
         <replace  file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}" />
-        <jar      jarfile="${dist}/sourceGen.jar" basedir="${classes}"
+-->    	
+    	<!-- create JAR for source generator -->
+<!--    	
+        <jar      jarfile="${dist}/${archive-name}-sourceGen.jar" basedir="${classes}"
                   manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
-        -->
+-->
     </target>
 
     <target name="CTFjar" depends="compile.tests" description="Build the CTF.jar file">
