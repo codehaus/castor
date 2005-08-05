@@ -55,8 +55,9 @@ import org.xml.sax.HandlerBase;
 import netscape.ldap.LDAPEntry;
 import netscape.ldap.LDAPAttribute;
 import netscape.ldap.LDAPAttributeSet;
+
+import org.castor.util.Base64Decoder;
 import org.exolab.castor.dsml.XML;
-import org.exolab.castor.util.MimeBase64Decoder;
 import org.exolab.castor.util.Messages;
 
 
@@ -83,7 +84,7 @@ class MozillaEntryConsumer
     private StringBuffer           _value;
 
 
-    private MimeBase64Decoder  _decoder;
+    private Base64Decoder  _decoder;
 
 
     private Vector                 _entries = new Vector();
@@ -124,7 +125,7 @@ class MozillaEntryConsumer
 		throw new SAXException( Messages.format( "dsml.openingTagNotRecognized", tagName ) );
 	    if ( XML.Entries.Attributes.Encodings.Base64.equals(
 		     attr.getValue( XML.Entries.Attributes.Encoding ) ) ) {
-		_decoder = new MimeBase64Decoder();
+		_decoder = new Base64Decoder();
 	    } else {
 		_value = new StringBuffer();
 	    }
@@ -168,15 +169,11 @@ class MozillaEntryConsumer
 	}
     }
 
-
-    public void characters( char[] chars, int offset, int length )
-    {
-	if ( _decoder != null ) {
-	    _decoder.translate( chars, offset, length );
-	} else if ( _value != null ) {
-	    _value.append( chars, offset, length );
-	}
+    public void characters(final char[] chars, final int offset, final int length) {
+        if (_decoder != null) {
+            _decoder.translate(new String(chars, offset, length));
+        } else if (_value != null) {
+            _value.append(chars, offset, length);
+        }
     }
-
-
 }

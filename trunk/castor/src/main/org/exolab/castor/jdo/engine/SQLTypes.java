@@ -48,11 +48,11 @@ package org.exolab.castor.jdo.engine;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.util.Base64Decoder;
+import org.castor.util.Base64Encoder;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.util.LocalConfiguration;
-import org.exolab.castor.util.MimeBase64Decoder;
-import org.exolab.castor.util.MimeBase64Encoder;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -994,10 +994,7 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( byte[].class, java.lang.String.class ) {
             public Object convert( Object obj, String param ) {
-                MimeBase64Encoder encoder;
-                encoder = new MimeBase64Encoder();
-                encoder.translate( (byte[]) obj );
-                return new String( encoder.getCharArray() );
+                return new String(Base64Encoder.encode((byte[]) obj));
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.Boolean.class, java.lang.String.class ) {
@@ -1022,10 +1019,7 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, byte[].class ) {
             public Object convert( Object obj, String param ) {
-                MimeBase64Decoder decoder;
-                decoder = new MimeBase64Decoder();
-                decoder.translate( (String ) obj );
-                return decoder.getByteArray();
+                return Base64Decoder.decode((String ) obj);
             }
         } ),
         // Convertors to date

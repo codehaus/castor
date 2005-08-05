@@ -52,6 +52,7 @@ package org.exolab.castor.xml;
 
 
 //-- castor imports
+import org.castor.util.Base64Encoder;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.MapItem;
 import org.exolab.castor.mapping.Mapping;
@@ -71,7 +72,6 @@ import org.exolab.castor.util.Configuration;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.List;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.util.MimeBase64Encoder;
 import org.exolab.castor.util.Stack;
 
 //-- misc xml related imports
@@ -1623,17 +1623,12 @@ public class Marshaller extends MarshalFramework {
                     //-- </Wrapper>
                     
                     char[] chars = null;
-                    //-- handle base64 content
                     Class objType = obj.getClass();
-                    if (objType.isArray() &&
-                       (objType.getComponentType() == Byte.TYPE))
-                    {
-                        MimeBase64Encoder encoder = new MimeBase64Encoder();
-                        encoder.translate((byte[])obj);
-                        chars = encoder.getCharArray();
-                    }
-                    //-- all other types
-                    else {
+                    if (objType.isArray() && (objType.getComponentType() == Byte.TYPE)) {
+                        //-- handle base64 content
+                        chars = Base64Encoder.encode((byte[]) obj);
+                    } else {
+                        //-- all other types
                         String str = obj.toString();
                         if ((str != null) && (str.length() > 0)) {
                             chars = str.toCharArray();
@@ -1665,13 +1660,10 @@ public class Marshaller extends MarshalFramework {
             // special case for byte[]
             else if (byteArray) {
                 //-- Base64Encoding
-                MimeBase64Encoder encoder = new MimeBase64Encoder();
-                encoder.translate((byte[])object);
-                char[] chars = encoder.getCharArray();
+                char[] chars = Base64Encoder.encode((byte[]) object);
                 try {
                     handler.characters(chars, 0, chars.length);
-                }
-                catch(org.xml.sax.SAXException sx) {
+                } catch (org.xml.sax.SAXException sx) {
                     throw new MarshalException(sx);
                 }
             }
@@ -2369,12 +2361,8 @@ public class Marshaller extends MarshalFramework {
         else if (value != null) {
             //-- handle base64 content
             Class objType = value.getClass();
-            if (objType.isArray() && 
-               (objType.getComponentType() == Byte.TYPE)) 
-            {
-                MimeBase64Encoder encoder = new MimeBase64Encoder();
-                encoder.translate((byte[])value);
-                value = new String(encoder.getCharArray());
+            if (objType.isArray() && (objType.getComponentType() == Byte.TYPE)) {
+                value = Base64Encoder.encode((byte[]) value);
             }
         }        
 

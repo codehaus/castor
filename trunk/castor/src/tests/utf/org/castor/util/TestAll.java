@@ -31,6 +31,8 @@ public final class TestAll extends TestCase {
 
         suite.addTest(TestIdentitySet.suite());
         suite.addTest(TestIdentityMap.suite());
+        suite.addTest(TestBase64Encoder.suite());
+        suite.addTest(TestBase64Decoder.suite());
 
         return suite;
     }

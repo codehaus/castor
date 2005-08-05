@@ -55,7 +55,7 @@ import javax.naming.directory.SearchResult;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributeListImpl;
-import org.exolab.castor.util.MimeBase64Encoder;
+import org.castor.util.Base64Encoder;
 import org.exolab.castor.dsml.XML;
 import org.exolab.castor.dsml.Producer;
 import org.exolab.castor.dsml.ImportExportException;
@@ -178,11 +178,8 @@ public class JNDIProducer
                         }
                     }
 
-                    if (bytes != null)
-                    {
-                        MimeBase64Encoder encoder = new MimeBase64Encoder();
-                        encoder.translate( bytes );
-                        chars = encoder.getCharArray();
+                    if (bytes != null) {
+                        chars = Base64Encoder.encode(bytes);
                         attrList.addAttribute( XML.Entries.Attributes.Encoding, "NMTOKEN", 
                                                XML.Entries.Attributes.Encodings.Base64 );
                     }
