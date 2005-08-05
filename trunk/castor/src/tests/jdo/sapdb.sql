@@ -382,6 +382,12 @@ create table tc2x_depend2 (
 )
 //
 
+drop sequence   tc2x_keygen_seq
+//
+
+create sequence tc2x_keygen_seq
+//
+
 drop table tc2x_keygen
 //
 
@@ -721,13 +727,6 @@ create table list_types (
 
 
 
-drop sequence   test_keygen_seq
-//
-
-create sequence test_keygen_seq
-//
-
-
 drop table test_col
 //
 
@@ -913,11 +912,16 @@ create table trans_child2 (
 )
 //
 
-insert into trans_master (id, name, propty1, propty2, ent2) values (1, 'entity1', 1, 2, 1) //
-insert into trans_child1 (id, descr) values (1, 'description1') //
-insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1) //
-insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1) //
-insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1) //
+insert into trans_master (id, name, propty1, propty2, ent2) values (1, 'entity1', 1, 2, 1)
+//
+insert into trans_child1 (id, descr) values (1, 'description1')
+//
+insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1)
+//
+insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1)
+//
+insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1)
+//
 
 -- tc9x TESTS
 
@@ -1170,17 +1174,17 @@ insert into poly_m_n (m_id, n_id) values (1, 1)
 insert into poly_m_n (m_id, n_id) values (1, 2)
 //
 
-insert into poly_table_m (id, name) values (1, "m1")
+insert into poly_table_m (id, name) values (1, 'm1')
 //
-insert into poly_table_m (id, name) values (2, "m2")
-//
-
-insert into poly_table_n (id, name) values (1, "n1")
-//
-insert into poly_table_n (id, name) values (2, "n2")
+insert into poly_table_m (id, name) values (2, 'm2')
 //
 
-drop tabel if exists poly_base
+insert into poly_table_n (id, name) values (1, 'n1')
+//
+insert into poly_table_n (id, name) values (2, 'n2')
+//
+
+drop table poly_base
 //
 create table poly_base (
   id varchar(64) not null default '',
@@ -1226,7 +1230,7 @@ create table poly_Product(
 drop table poly_ActProduct
 //
 create table poly_ActProduct(
-  IdAct numeric(10) primary key references Product (IdProd),
+  IdAct numeric(10) primary key references poly_Product (IdProd),
   BestSeason varchar(30) null
 )
 //
@@ -1234,7 +1238,7 @@ create table poly_ActProduct(
 drop table poly_ComposedOffer
 //
 create table poly_ComposedOffer(
-  IdCOffer numeric(10) primary key references Product (IdProd),
+  IdCOffer numeric(10) primary key references poly_Product (IdProd),
   NameCO   varchar(30) null,
   DescCO   varchar(30) null
 )
