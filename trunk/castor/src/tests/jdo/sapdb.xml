@@ -6,8 +6,14 @@
         <driver url="jdbc:sapdb://localhost/test" class-name="com.sap.dbtech.jdbc.DriverSapDB">
             <param name="user" value="admin" />
             <param name="password" value="secure" />
-            <!--param name="sqlmode" value="ORACLE" /-->
         </driver>
+<!--
+        <data-source class-name="com.sap.dbtech.jdbcext.DataSourceSapDB">
+            <param name="url" value="jdbc:sapdb://localhost/test"/>
+            <param name="user" value="admin"/>
+            <param name="password" value="secure"/>
+        </data-source>
+-->        
         <mapping href="mapping.xml" />
     </database>
     <transaction-demarcation mode="local" />
