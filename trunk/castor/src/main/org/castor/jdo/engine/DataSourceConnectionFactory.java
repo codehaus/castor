@@ -15,6 +15,7 @@
  */
 package org.castor.jdo.engine;
 
+import java.lang.reflect.Method;
 import java.sql.Connection;
 import java.sql.SQLException;
 
@@ -30,9 +31,6 @@ import org.exolab.castor.jdo.drivers.ConnectionProxy;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.util.Messages;
-import org.exolab.castor.xml.UnmarshalHandler;
-import org.exolab.castor.xml.Unmarshaller;
-import org.xml.sax.SAXException;
 
 /**
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
@@ -80,33 +78,89 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
             LOG.error(msg, e);
             throw new MappingException(msg, e);
         }
-
+        
         parameters = database.getDatabaseChoice().getDataSource().getParam();
+        setParameters(dataSource, parameters);
         
-        Unmarshaller unmarshaller = new Unmarshaller(dataSource);
-        UnmarshalHandler handler = unmarshaller.createHandler();
+        return dataSource;
+    }
+    
+    /**
+     * Set all the parameters of the given array at the given datasource by calling
+     * one of the set methods of the datasource.
+     * 
+     * @param dataSource The datasource to set the parameters on.
+     * @param params The parameters to set on the datasource.
+     * @throws MappingException If one of the parameters could not be set.
+     */
+    public static void setParameters(final DataSource dataSource, final Param[] params)
+    throws MappingException {
+        Method[] methods = dataSource.getClass().getMethods();
         
-        try {
-            handler.startDocument();
-            handler.startElement("data-source", null);
+        for (int j = 0; j < params.length; j++) {
+            String name = buildMethodName(params[j].getName());
+            String value = params[j].getValue();
+
+            boolean success = false;
+            Exception cause = null;
             
-            for (int i = 0; i < parameters.length; i++) {
-               param = (Param) parameters[i];
-               handler.startElement(param.getName(), null);
-               handler.characters(param.getValue().toCharArray(), 0,
-                                  param.getValue().length());
-               handler.endElement(param.getName());
+            try {
+                int i = 0;
+                while (!success && (i < methods.length)) {
+                    Method method = methods[i];
+                    Class[] types = method.getParameterTypes();
+                    if ((method.getName().equals(name)) && (types.length == 1)) {
+                        if (types[0] == String.class) {
+                            method.invoke(dataSource, new Object[] {value});
+                            success = true;
+                        } else if (types[0] == int.class) {
+                            method.invoke(dataSource, new Object[] {new Integer(value)});
+                            success = true;
+                        } else if (types[0] == boolean.class) {
+                            method.invoke(dataSource, new Object[] {new Boolean(value)});
+                            success = true;
+                        }
+                    }
+                    i++;
+                }
+            } catch (Exception e) {
+                cause = e;
             }
             
-            handler.endElement("data-source");
-            handler.endDocument();
-        } catch (SAXException e) {
-            String msg = Messages.format("jdo.engine.unableToParseDataSource", className);
-            LOG.error(msg, e);
-            throw new MappingException(msg, e);
+            if (!success || (cause != null)) {
+                String msg = Messages.format("jdo.engine.datasourceParaFail",
+                                             params[j].getName(), value);
+                LOG.error(msg, cause);
+                throw new MappingException(msg, cause);
+            }
         }
-
-        return dataSource;
+    }
+    
+    /**
+     * Build the name of the method to set the parameter value of the given name. The
+     * name of the method is build by preceding given parameter name with 'set' followed
+     * by all letters of the name. In addition the first letter and all letters
+     * following a '-' sign are converted to upper case. 
+     * 
+     * @param name The name of the parameter.
+     * @return The name of the method to set the value of this parameter.
+     */
+    public static String buildMethodName(final String name) {
+        StringBuffer sb = new StringBuffer("set");
+        boolean first = true;
+        for (int i = 0; i < name.length(); i++) {
+            char chr = name.charAt(i);
+            if (first && Character.isLowerCase(chr)) {
+                sb.append(Character.toUpperCase(chr));
+                first = false;
+            } else if (Character.isLetter(chr)) {
+                sb.append(chr);
+                first = false;
+            } else if (chr == '-') {
+                first = true;
+            }
+        }
+        return sb.toString();
     }
 
     //--------------------------------------------------------------------------
