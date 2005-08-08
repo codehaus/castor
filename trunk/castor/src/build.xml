@@ -553,7 +553,8 @@
 
     <target name="cvs" depends="clean"
             description="Update the working directory from the CVS repository using the anoncvs login">
-        <cvs cvsRoot=":pserver:anoncvs@${project}.exolab.org:/cvs/${project}" dest="." package="${project}"/>
+        <cvs
+        cvsRoot=":pserver:anon@cvs.castor.codehaus.org:/home/projects/castor/scm" dest="." package="${project}"/>
     </target>
 
     <target name="oes" depends="prepare,compile" description="Call the XSDCompiler (org.exolab.castor.tools.XSDCompiler)">
