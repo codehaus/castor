@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1158" tool="jira">
+                    <description>
+						Stricter checking at type conversion from string to boolean.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Nick Stuart</name>
+                        <email>nick@newtsplace.com</email>
+					</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050808</date>
+                </bug>
                 <bug id="943" tool="jira">
                     <description>
 		                Created a test case for configuring JDO DataSource using a Properties

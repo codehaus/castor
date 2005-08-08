@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1158 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Stricter checking at type conversion from string to boolean.
+       Details: http://jira.codehaus.org/browse/CASTOR-1158
+       (Ralf - 20050808)
+
 JDO:   Fixed bug CASTOR-943 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Created a test case for configuring JDO DataSource using a Properties collection.
        Details: http://jira.codehaus.org/browse/CASTOR-943

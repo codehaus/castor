@@ -686,17 +686,21 @@ public final class SQLTypes
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.lang.String.class, java.lang.Boolean.class ) {
             public Object convert( Object obj, String param ) {
-                switch ( ( (String) obj ).length() ) {
-                    case 0: return Boolean.FALSE;
-                    case 1: char ch = ( (String) obj ).charAt( 0 );
-                        if (param == null || param.length() != 2 )
-                            return ( ch == 'T' || ch == 't'  ) ? Boolean.TRUE : Boolean.FALSE;
-                        else
-                            return ( ch == param.charAt( 1 ) ) ? Boolean.TRUE : Boolean.FALSE;
-                    case 4: return ( (String) obj ).equalsIgnoreCase( "true" ) ? Boolean.TRUE : Boolean.FALSE;
-                    case 5: return ( (String) obj ).equalsIgnoreCase( "false" ) ? Boolean.TRUE : Boolean.FALSE;
+                char t = 'T';
+                char f = 'F';
+                if ((param != null) && (param.length() == 2)) {
+                    t = Character.toUpperCase(param.charAt(1));
+                    f = Character.toUpperCase(param.charAt(0));
                 }
-                return Boolean.FALSE;
+                
+                if (((String) obj).length() == 1) {
+                    char c = Character.toUpperCase(((String) obj).charAt(0));
+                    if (c == t) { return Boolean.TRUE; }
+                    if (c == f) { return Boolean.FALSE; }
+                }
+                throw new ClassCastException("Failed to convert string '" + obj
+                        + "' to boolean because it didn't match the expected values '"
+                        + t + "'/'" + f + "' (true/false).");
             }
         } ),
         new TypeConvertorInfo( new SQLTypeConvertor( java.math.BigDecimal.class, java.lang.Boolean.class ) {
