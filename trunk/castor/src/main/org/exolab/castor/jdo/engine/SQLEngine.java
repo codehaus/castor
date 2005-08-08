@@ -853,14 +853,12 @@ public final class SQLEngine implements Persistence {
         // Only build and execute an UPDATE statement if the class to be updated has 
         // fields to persist.
         if (hasFieldsToPersist) {
-
             try {
                 
                 storeStatement = getStoreStatement( original );
                 stmt = ( (Connection) conn ).prepareStatement( storeStatement );
                 
                 if(_log.isDebugEnabled()){
-//                    _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), storeStatement ) );
                     _log.debug( Messages.format( "jdo.storing", _clsDesc.getJavaClass().getName(), stmt.toString()) );
                 }
                 
@@ -984,9 +982,8 @@ public final class SQLEngine implements Persistence {
                             
                             Object currentField = null;
                             int numberOfFieldsNotMatching = 0;
-                            for(int i = 0; i < fields.length; i++){
+                            for(int i = 0; i < _fields.length; i++){
                                 currentField = toJava(i, 0, res.getObject(_fields[i].columns[0].name));
-                                
                                 if (_fields[i].tableName.compareTo(_mapTo) == 0) {
                                     if ((original[i] == null && currentField != null) ||
                                         (currentField == null && original[i] != null) ||
