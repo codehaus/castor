@@ -728,6 +728,9 @@ public abstract class TransactionContext {
                 _tracker.trackOIDChange(objectInTransaction, engine, oid, newoid);
             }            
             
+        } catch (ClassCastException except) {
+            _tracker.untrackObject(objectInTransaction);
+            throw except;
         } catch (ObjectNotFoundException except) {
             _tracker.untrackObject(objectInTransaction);
             throw except;
