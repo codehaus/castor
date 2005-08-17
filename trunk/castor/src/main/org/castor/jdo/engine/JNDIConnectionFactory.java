@@ -26,8 +26,8 @@ import javax.sql.DataSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.DatabaseChoice;
+import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.drivers.ConnectionProxy;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -56,11 +56,13 @@ public final class JNDIConnectionFactory extends AbstractConnectionFactory {
     /**
      * Constructs a new JNDIConnectionFactory with given database and mapping.
      * 
-     * @param database  The database configuration.
+     * @param jdoConf   An in-memory jdo configuration. 
+     * @param index     Index of the database configuration inside the jdo configuration.
      * @param mapping   The mapping to load.
      */
-    public JNDIConnectionFactory(final Database database, final Mapping mapping) {
-        super(database, mapping);
+    public JNDIConnectionFactory(final JdoConf jdoConf, final int index,
+                                 final Mapping mapping) {
+        super(jdoConf, index, mapping);
     }
 
     /**

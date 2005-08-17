@@ -20,12 +20,14 @@ import java.sql.Connection;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.DatabaseChoice;
+import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.drivers.ConnectionProxy;
 import org.exolab.castor.mapping.Mapping;
@@ -178,12 +180,15 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
      * @param engine     The Name of the persistence factory to use.
      * @param datasource The preconfigured datasource to use for creating connections.
      * @param mapping    The previously loaded mapping.
+     * @param txManager  The transaction manager to use.
      * @throws MappingException If LockEngine could not be initialized.
      */
-    public DataSourceConnectionFactory(final String name, final String engine,
-                                       final DataSource datasource, final Mapping mapping)
+    public DataSourceConnectionFactory(
+            final String name, final String engine, final DataSource datasource,
+            final Mapping mapping, final TransactionManager txManager)
     throws MappingException {
-        super(name, engine, mapping);
+        super(name, engine, mapping, txManager);
+        
         _dataSource = datasource;
     }
 
@@ -191,11 +196,13 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
      * Constructs a new DataSourceConnectionFactory with given database and mapping.
      * Initialize needs to be called before using the factory to create connections.
      * 
-     * @param database  The database configuration.
+     * @param jdoConf   An in-memory jdo configuration. 
+     * @param index     Index of the database configuration inside the jdo configuration.
      * @param mapping   The mapping to load.
      */
-    public DataSourceConnectionFactory(final Database database, final Mapping mapping) {
-        super(database, mapping);
+    public DataSourceConnectionFactory(final JdoConf jdoConf, final int index,
+                                       final Mapping mapping) {
+        super(jdoConf, index, mapping);
     }
 
     /**

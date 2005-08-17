@@ -17,10 +17,14 @@ package org.castor.jdo.engine;
 
 import java.util.Enumeration;
 
+import javax.transaction.TransactionManager;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.exolab.castor.jdo.conf.Database;
+import org.exolab.castor.jdo.conf.JdoConf;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerRegistry;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.LockEngine;
@@ -50,14 +54,20 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     /** Has the factory been initialized? */
     private boolean             _initialized = false;
     
-    /** The database configuration. */
-    private Database            _database;
+    /** The jdo configuartion. */
+    private JdoConf             _jdoConf;
+    
+    /** Index of the database configuration in the jdo configuration. */
+    private int                 _index;
     
     /** The name of the database configuration. */
     private String              _name;
     
     /** The mapping to load. */
     private Mapping             _mapping;
+    
+    /** The transaction manager. */
+    private TransactionManager  _txManager;
     
     /** The LockEngine only available after initialization. */
     private LockEngine          _engine = null;
@@ -70,15 +80,19 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
      * 
      * @param name      The Name of the database configuration.
      * @param engine    The Name of the persistence factory to use.
+     * @param txManager The transaction manager to use.
      * @param mapping   The previously loaded mapping.
      * @throws MappingException If LockEngine could not be initialized.
      */
     protected AbstractConnectionFactory(final String name, final String engine,
-                                        final Mapping mapping)
+                                        final Mapping mapping,
+                                        final TransactionManager txManager)
     throws MappingException {
-        _database = null;
+        _jdoConf = null;
+        _index = -1;
         _name = name;
         _mapping = mapping;
+        _txManager = txManager;
         
         initializeEngine(engine);
         _initialized = true;
@@ -88,13 +102,17 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
      * Constructs a new AbstractConnectionFactory with given database and mapping.
      * Initialize needs to be called before using the factory to create connections.
      * 
-     * @param database  The database configuration.
+     * @param jdoConf   The jdo configuartion.
+     * @param index     Index of the database configuration in the jdo configuration.
      * @param mapping   The mapping to load.
      */
-    protected AbstractConnectionFactory(final Database database, final Mapping mapping) {
-        _database = database;
-        _name = database.getName();
+    protected AbstractConnectionFactory(final JdoConf jdoConf, final int index,
+                                        final Mapping mapping) {
+        _jdoConf = jdoConf;
+        _index = index;
+        _name = jdoConf.getDatabase(index).getName();
         _mapping = mapping;
+        _txManager = null;
     }
     
     //--------------------------------------------------------------------------
@@ -110,7 +128,8 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
         // this request to initialize it.
         if (!_initialized) {
             initializeMapping();
-            initializeEngine(_database.getEngine());
+            _txManager = TransactionManagerRegistry.getTransactionManager(_jdoConf);
+            initializeEngine(_jdoConf.getDatabase(_index).getEngine());
             initializeFactory();
             
             _initialized = true;
@@ -125,7 +144,7 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     private void initializeMapping() throws MappingException {
         try {
             // Initialize all the mappings of the database.
-            Enumeration mappings = _database.enumerateMapping();
+            Enumeration mappings = _jdoConf.getDatabase(_index).enumerateMapping();
             org.exolab.castor.jdo.conf.Mapping mapConf;
             while (mappings.hasMoreElements()) {
                 mapConf = (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement();
@@ -180,13 +199,6 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     //--------------------------------------------------------------------------
     
     /**
-     * Get the database configuration.
-     * 
-     * @return The database configuration.
-     */
-    public final Database getDatabase() { return _database; }
-
-    /**
      * Get the name of the database configuration.
      * 
      * @return The name of the database configuration.
@@ -194,11 +206,25 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
     public final String getName() { return _name; }
     
     /**
+     * Get the database configuration.
+     * 
+     * @return The database configuration.
+     */
+    public final Database getDatabase() { return _jdoConf.getDatabase(_index); }
+
+    /**
      * Get the mapping to load.
      * 
      * @return The mapping to load.
      */
     public final Mapping getMapping() { return _mapping; }
+    
+    /**
+     * Get the transaction manager.
+     * 
+     * @return The transaction manager.
+     */
+    public final TransactionManager getTransactionManager() { return _txManager; }
     
     /**
      * Get the LockEngine only available after initialization.

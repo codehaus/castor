@@ -72,14 +72,9 @@ import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
 import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistry;
-import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
+import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManager;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.LockEngine;
@@ -178,12 +173,6 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      */
     private static InputSource _source;
     
-    /**
-     * The transaction demarcation descriptor; only set when setting demarcation
-     * programmatically within an application.
-     */
-    private static TransactionDemarcation _globalTransactionDemarcation = null;
-    
     //--------------------------------------------------------------------------
 
     /**
@@ -237,20 +226,18 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * @param name        The Name of the database configuration.
      * @param engine      The Name of the persistence factory to use.
      * @param datasource  The preconfigured datasource to use for creating connections.
-     * @param demarcation The transaction demarcation to use.
      * @param mapping     The previously loaded mapping.
+     * @param txManager   The transaction manager to use.
      * @throws MappingException If LockEngine could not be initialized.
      */
-    public static void loadConfiguration(final String name, final String engine, 
-                                         final DataSource datasource,
-                                         final TransactionDemarcation demarcation,
-                                         final Mapping mapping)
+    public static void loadConfiguration(
+            final String name, final String engine, final DataSource datasource,
+            final Mapping mapping, final TransactionManager txManager)
     throws MappingException {
-        DatabaseRegistry.loadDatabase(name, engine, datasource, mapping);
+        DatabaseRegistry.loadDatabase(name, engine, datasource, mapping, txManager);
         
         _classLoader = null;
         _entityResolver = null;
-        _globalTransactionDemarcation = demarcation;
         
         LOG.debug("Successfully loaded JDOManager form preconfigured datasource");
     }
@@ -275,7 +262,6 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         
         _classLoader = loader;
         _entityResolver = resolver;
-        _globalTransactionDemarcation = jdoConf.getTransactionDemarcation();
         
         LOG.debug("Successfully loaded JDOManager form in-memory configuration");
     }
@@ -406,17 +392,6 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      */
     private String _databaseName;
 
-    /**
-     * The transaction manager factory to be used to obtain a
-     * <code>javax.jta.TransactionManager</code> instance.
-     */
-    private TransactionManagerFactory _transactionManagerFactory = null;
-
-    /**
-     * The transaction manager
-     */
-    private TransactionManager _transactionManager = null;
-
     //--------------------------------------------------------------------------
 
     /**
@@ -496,6 +471,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * <p/>
      * The standard name for this property is <tt>configuration</tt>.
      *
+     * @deprecated Will be private in one of the next releases.
+     *  
      * @param source The URL of the database configuration file as InputSource.
      */
     public void setConfiguration(final InputSource source) {
@@ -615,17 +592,19 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
 
     /**
      * Enable/disable database pooling. This option only affects JDOManager
-     * if <tt>transactionManager</tt> is set and a transaction is associated
-     * with the thread that call {@link #getDatabase}. If database pooling is
-     * enabled, JDOManager will first search in the pool to see if there is
-     * already a database for the current transaction. If found, it returns the
-     * database; if not, it create a new one, associates it will the transaction
-     * and return the newly created database.
+     * if J2EE transactions and a transaction is associated with the thread
+     * that call {@link #getDatabase}. If database pooling is enabled, JDOManager
+     * will first search in the pool to see if there is already a database for the
+     * current transaction. If found, it returns the database; if not, it create a
+     * new one, associates it will the transaction and return the newly created
+     * database.
      * <p/>
      * This method should be called before {@link #getDatabase}.
      * <p/>
      * <b>Experimental</b> maybe removed in the future releases.
      *
+     * @deprecated Will be removed in one of the next releases.
+     *  
      * @param pool true to enable database pooling
      */
     public void setDatabasePooling(final boolean pool) {
@@ -637,7 +616,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                 return;
             } else {
                 throw new IllegalStateException(
-                        "JDO Pooling started. It can not be set to false");
+                        "JDO Pooling started. It can not be set to false.");
             }
         } else if (_txDbPool == null) {
             _txDbPool = new TxDatabaseMap();
@@ -651,11 +630,13 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * <p/>
      * <b>Experimental</b> maybe removed in the further release.
      * 
+     * @deprecated Will be removed in one of the next releases.
+     *  
      * @see    #setDatabasePooling(boolean)
      * @return True if pooling is enabled for this Database instance. 
      */ 
     public boolean getDatabasePooling() {
-        return _txDbPool != null;
+        return (_txDbPool != null);
     }
 
     /**
@@ -709,170 +690,87 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      */
     public Database getDatabase() throws PersistenceException {
         if (_databaseName == null) {
-            LOG.error("getDatabase() called without specifying database name");
-            throw new IllegalStateException(Messages.message(
-                    "jdo.missing.database.name"));
+            String msg = Messages.message("jdo.missing.database.name");
+            LOG.error(msg);
+            throw new IllegalStateException(msg);
         }
-        
+
+        TransactionManager transactionManager = null;
         try {
             if (!DatabaseRegistry.isDatabaseRegistred(_databaseName)) {
                 if (_jdoConfURI == null) {
-                    LOG.error("No configuration loaded for database "
-                            + _databaseName);
-                    throw new DatabaseNotFoundException(Messages.format(
-                            "jdo.dbNoMapping", _databaseName));
+                    String msg = Messages.format("jdo.dbNoMapping", _databaseName);
+                    LOG.error(msg);
+                    throw new DatabaseNotFoundException(msg);
                 }
                 
-                DatabaseRegistry.loadDatabase(_jdoConfURI,
-                                              _entityResolver,
-                                              _classLoader);
+                DatabaseRegistry.loadDatabase(_jdoConfURI, _entityResolver, _classLoader);
             }
+            
+            AbstractConnectionFactory factory;
+            factory = DatabaseRegistry.getConnectionFactory(_databaseName);
+            transactionManager = factory.getTransactionManager();
         } catch (MappingException ex) {
-            LOG.error("Problem loading database configuration", ex);
-            throw new DatabaseNotFoundException(Messages.format(
-                    "jdo.problem.loading.conf", _jdoConfURI), ex);
+            String msg = Messages.format("jdo.problem.loading.conf", _jdoConfURI);
+            LOG.error(msg, ex);
+            throw new DatabaseNotFoundException(msg, ex);
         }
         
-        String transactionMode = null;
-        
-        if (_globalTransactionDemarcation != null) {
-            // We have been provided a JdoConf with one hardwired in.
-            // In all likelihood, we're not interested in source-reading, as
-            // we probably haven't got one.
-            // Let's extract the name to use.
-            String mode = _globalTransactionDemarcation.getMode();
-            org.exolab.castor.jdo.conf.TransactionManager manager =
-                _globalTransactionDemarcation.getTransactionManager();
-            if (manager != null) {
-                transactionMode = manager.getName();
-            } else if (mode.equalsIgnoreCase(LocalTransactionManagerFactory.NAME)) {
-                transactionMode = LocalTransactionManagerFactory.NAME;
-            } else {
-                LOG.error("Missing configuration for TransactionManager");
-                throw new PersistenceException(Messages.message(
-                        "jdo.problem.missingTransactionConfiguration"));
-            }
+        if (transactionManager instanceof LocalTransactionManager) {
+            // We are in LOCAL mode and need only to return a new database instance.
+            return new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
+                                    _instanceFactory, null, _classLoader, _autoStore);
         } else {
-            // load transaction manager factory registry configuration.
+            // We are in J2EE mode and need a valid Transaction.
+            Transaction tx = null;
+            int status = -1;
             try {
-                TransactionManagerFactoryRegistry.load(_jdoConfURI,
-                                                       _entityResolver);
-            } catch (TransactionManagerAcquireException ex) {
-                LOG.error("Failed to initalize TransactionManagerFactory", ex);
-                throw new PersistenceException(Messages.message(
-                        "jdo.problem.initializingTransactionManagerFactory"), ex); 
+                tx = transactionManager.getTransaction();
+                if (tx != null) { status = tx.getStatus(); }
+            } catch (Exception ex) { // SystemException
+                // Failed to get transaction from transaction manager or failed to get
+                // status information from transaction.
+                String msg = Messages.message("jdo.manager.failCreateTransaction");
+                LOG.error(msg, ex);
+                throw new PersistenceException(msg, ex);
+            }
+            
+            if ((tx == null) || (status != Status.STATUS_ACTIVE)) {
+                String msg = Messages.message("jdo.manager.failGetTransaction");
+                LOG.error(msg);
+                throw new PersistenceException(msg);
             }
 
-            if (_transactionManagerFactory == null) {
-                try {
-                    TransactionDemarcation demarcation;
-                    String mode;
-                    org.exolab.castor.jdo.conf.TransactionManager manager;
-                    
-                    demarcation = JDOConfLoader.getTransactionDemarcation(
-                            _jdoConfURI, _entityResolver);
-                    mode = demarcation.getMode();
-                    manager = demarcation.getTransactionManager();
-                                    
-                    if (manager != null) {
-                        transactionMode = manager.getName();
-                    } else if (mode.equals(LocalTransactionManagerFactory.NAME)) {
-                        transactionMode = LocalTransactionManagerFactory.NAME;
-                    } else {
-                        LOG.error("Missing configuration for TransactionManager");
-                        throw new PersistenceException(Messages.message(
-                                "jdo.problem.missingTransactionConfiguration"));
-                    }
-                } catch (MappingException ex) {
-                    LOG.error("No valid mode for TransactionManager", ex);
-                    throw new PersistenceException(Messages.message(
-                            "jdo.problem.noValidTransactionMode"), ex);
-                }
+            // If we have a database pool that contains a database for this transaction
+            // we can reuse this one.
+            if ((_txDbPool != null) && (_txDbPool.containsTx(tx))) {
+                return _txDbPool.get(tx);
             }
-        }
-                 
-        /*
-         * Try to obtain the specified<code>TransactionManagerFactory</code>
-         * instance from the registry.
-         * 
-         * If the returned TransactionManagerFactory instance is null,
-         * return an exception to indicate that we cannot live without a
-         * valid TransactionManagerFactory instance and that the user
-         * should change the configuration.
-         */
-         _transactionManagerFactory = TransactionManagerFactoryRegistry
-                 .getTransactionManagerFactory(transactionMode);
-    
-        if (_transactionManagerFactory == null) {
-            LOG.error("Missing TransactionManagerFactory");
-            throw new DatabaseNotFoundException(Messages.format(
-                    "jdo.transaction.missingTransactionManagerFactory",
-                    transactionMode));
-        }
 
-        /*
-         * Try to obtain a <code>javax.jta.TransactionManager>/code> from
-         * the factory.
-         */
-        try {
-            _transactionManager = _transactionManagerFactory
-                    .getTransactionManager();
-            
-        } catch (TransactionManagerAcquireException ex) {
-            LOG.error("Unable to acquire TransactionManager", ex);
-            throw new DatabaseNotFoundException(Messages.format(
-                    "jdo.transaction.unableToAcquireTransactionManager", 
-                    _transactionManagerFactory.getName()), ex);
-        }
-        
-        /* At this point, we MUST have a valid TransactionManagerFactory, and 
-         * dependent on its type (LOCAL or not), we MIGHT have a valid
-         * <code>javax.jta.TransactionManager</code> instance.
-         * 
-         * Scenario 1: If the user uses Castor in standalone mode (outside of an
-         * J2EE container), we have a TransactionManagerFactory instance only,
-         * but no TransactionManager instance.
-         * 
-         * Scenario 2: If the user uses Castor in J2EE mode (inside of an J2EE
-         * container), and wants the container to control transaction
-         * demarcation, we have both a TransactionManagerFactory and a
-         * TransactionManager instance.
-         */
-        if ((_transactionManager != null)
-                && !LocalTransactionManagerFactory.NAME.equals(
-                        _transactionManagerFactory.getName())) {
-            
-            Transaction        tx;
-            DatabaseImpl       dbImpl;
+            // In all other cases we need to create a new database instance.
+            DatabaseImpl dbImpl;
+            dbImpl = new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
+                                      _instanceFactory, tx, _classLoader, _autoStore);
 
+            // We have to register the database at the transaction next.
             try {
-                tx = _transactionManager.getTransaction();
-                if ((_txDbPool != null) && (_txDbPool.containsTx(tx))) {
-                    return _txDbPool.get(tx);
-                }
-
-                if ((tx != null) && (tx.getStatus() == Status.STATUS_ACTIVE)) {
-                    dbImpl = new DatabaseImpl(_databaseName, _lockTimeout, 
-                                              _callbackInterceptor, 
-                                              _instanceFactory, tx,
-                                              _classLoader, _autoStore);
-
-                    if (_txDbPool != null) {
-                        _txDbPool.put(tx, dbImpl);
-                    }
-
-                    tx.registerSynchronization(dbImpl);
-                    return dbImpl;
-                }
-             } catch (Exception ex) {
-                 // NamingException, SystemException, RollbackException
-                 LOG.error("Failed to create LocalTransactionManager", ex);
+                tx.registerSynchronization(dbImpl);
+            } catch (Exception ex) { // RollbackException, SystemException
+                // Failed to register database at transaction manager for
+                // synchronization.
+                String msg = Messages.message("jdo.manager.failRegisterTransaction");
+                LOG.error(msg, ex);
+                throw new PersistenceException(msg, ex);
             }
+
+            // If we have a database pool we put the new database into this pool.
+            if (_txDbPool != null) {
+                _txDbPool.put(tx, dbImpl);
+            }
+            
+            // Now we have managed to create a valid database with transaction.
+            return dbImpl;
         }
-        
-        return new DatabaseImpl(_databaseName, _lockTimeout, 
-                                _callbackInterceptor, _instanceFactory, null,
-                                _classLoader, _autoStore);
     }
     
     /**
@@ -963,8 +861,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      */
     public void close () {
         try {
-            ConnectionFactory connectionFactory = getConnectionFactory();
-            LockEngine engine = ((AbstractConnectionFactory) connectionFactory).getEngine();
+            ConnectionFactory factory = getConnectionFactory();
+            LockEngine engine = ((AbstractConnectionFactory) factory).getEngine();
             engine.closeCaches();
         } catch (MappingException e) {
             LOG.fatal ("Problem closing down caches", e);

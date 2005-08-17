@@ -1,49 +1,18 @@
-/**
- * Redistribution and use of this software and associated documentation
- * ("Software"), with or without modification, are permitted provided
- * that the following conditions are met:
+/*
+ * Copyright 2005 Bruce Snyder, Werner Guttmann, Ralf Joachim
  *
- * 1. Redistributions of source code must retain copyright
- *    statements and notices.  Redistributions must also contain a
- *    copy of this document.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * 2. Redistributions in binary form must reproduce the
- *    above copyright notice, this list of conditions and the
- *    following disclaimer in the documentation and/or other
- *    materials provided with the distribution.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * 3. The name "Exolab" must not be used to endorse or promote
- *    products derived from this Software without prior written
- *    permission of Intalio, Inc.  For written permission,
- *    please contact info@exolab.org.
- *
- * 4. Products derived from this Software may not be called "Exolab"
- *    nor may "Exolab" appear in their names without prior written
- *    permission of Intalio, Inc. Exolab is a registered
- *    trademark of Intalio, Inc.
- *
- * 5. Due credit should be given to the Exolab Project
- *    (http://www.exolab.org/).
- *
- * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
- * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Copyright 2001 (C) Intalio, Inc. All Rights Reserved.
- *
- * $Id$
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
-
 package org.exolab.castor.jdo.transactionmanager;
 
 import org.exolab.castor.core.exceptions.CastorException;
@@ -54,20 +23,31 @@ import org.exolab.castor.core.exceptions.CastorException;
  *
  * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
- * @version $Id$
+ * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
  */
-public class TransactionManagerAcquireException
-    extends CastorException 
-{
+public final class TransactionManagerAcquireException extends CastorException {
+    //--------------------------------------------------------------------------
 
-	public TransactionManagerAcquireException( String message, Throwable except ) 
-    {
-        super( message, except );
+    /**
+     * Creates a new TransactionManagerAcquireException with the given message.
+     * 
+     * @param message the message for this Exception
+     */
+    public TransactionManagerAcquireException(final String message) {
+        super (message);
     }
 
-    public TransactionManagerAcquireException( String message ) 
-    {
-        super( message );
+    /**
+     * Creates a new TransactionManagerAcquireException with the given message and cause.
+     * 
+     * @param message The message for this exception.
+     * @param cause A Throwable instance.
+     */
+    public TransactionManagerAcquireException(final String message,
+                                              final Throwable cause) {
+        super(message, cause);
     }
-    
+
+    //--------------------------------------------------------------------------
 }

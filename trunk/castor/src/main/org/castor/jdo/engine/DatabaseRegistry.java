@@ -18,18 +18,23 @@ package org.castor.jdo.engine;
 import java.util.Hashtable;
 
 import javax.sql.DataSource;
+import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 
 import org.exolab.castor.jdo.conf.Database;
+import org.exolab.castor.jdo.conf.DatabaseChoice;
 import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.util.DTDResolver;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Unmarshaller;
+import org.exolab.castor.xml.ValidationException;
 
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
@@ -44,6 +49,11 @@ import org.xml.sax.InputSource;
 public final class DatabaseRegistry {
     //--------------------------------------------------------------------------
 
+    /** Temporary note to check for the changed jdo-conf syntax. */
+    private static final String NOTE_096 =
+        "NOTE: JDO configuration syntax has changed with castor 0.9.6, "
+      + "please see http://castor.codehaus.org/release-notes.html for details";
+  
     /** Property telling if database should be initialized when loading. */
     private static final String INITIALIZE_AT_LOAD = 
         "org.exolab.castor.jdo.DatabaseInitializeAtLoad";
@@ -65,14 +75,16 @@ public final class DatabaseRegistry {
      * @param engine     The Name of the persistence factory to use.
      * @param datasource The preconfigured datasource to use for creating connections.
      * @param mapping    The previously loaded mapping.
+     * @param txManager  The transaction manager to use.
      * @throws MappingException If LockEngine could not be initialized.
      */
-    public static synchronized void loadDatabase(final String name, final String engine, 
-                                                 final DataSource datasource,
-                                                 final Mapping mapping)
+    public static synchronized void loadDatabase(
+            final String name, final String engine, final DataSource datasource,
+            final Mapping mapping, final TransactionManager txManager)
     throws MappingException {
-        AbstractConnectionFactory factory;
-        factory = new DataSourceConnectionFactory(name, engine, datasource, mapping);
+        AbstractConnectionFactory factory = new DataSourceConnectionFactory(
+                name, engine, datasource, mapping, txManager);
+        
         if (FACTORIES.put(name, factory) != null) {
             LOG.warn(Messages.format("jdo.configLoadedTwice", name));
         }
@@ -81,7 +93,7 @@ public final class DatabaseRegistry {
     /**
      * Instantiates a ConnectionFactory from an in-memory JDO configuration.
      * 
-     * @param  jdoConf  An in-memory JDO configuration. 
+     * @param  jdoConf  An in-memory jdo configuration. 
      * @param  resolver An entity resolver.
      * @param  loader   A class loader
      * @throws MappingException If the database cannot be instantiated/loadeed.
@@ -90,8 +102,7 @@ public final class DatabaseRegistry {
                                                  final EntityResolver resolver,
                                                  final ClassLoader loader)
     throws MappingException {
-        Database[] databases = JDOConfLoader.getDatabases(jdoConf);
-        loadDatabase(databases, resolver, loader, null);
+        loadDatabase(jdoConf, resolver, loader, null);
     }
 
     /**
@@ -107,8 +118,22 @@ public final class DatabaseRegistry {
                                                  final ClassLoader loader)
     throws MappingException {
         // Load the JDO configuration file from the specified input source.
-        Database[] databases = JDOConfLoader.getDatabases(source, resolver);
-        loadDatabase(databases, resolver, loader, source.getSystemId());
+        JdoConf jdoConf = null;
+        
+        Unmarshaller unmarshaller = new Unmarshaller(JdoConf.class);
+        try {
+            unmarshaller.setEntityResolver(new DTDResolver(resolver));
+            jdoConf = (JdoConf) unmarshaller.unmarshal(source);
+        } catch (MarshalException e) {
+            LOG.info(NOTE_096);
+            throw new MappingException(e); 
+        } catch (ValidationException e) {
+            throw new MappingException(e);
+        }
+        
+        LOG.debug("Loaded jdo conf successfully"); 
+
+        loadDatabase(jdoConf, resolver, loader, source.getSystemId());
     }
     
     /**
@@ -119,13 +144,13 @@ public final class DatabaseRegistry {
      * to <code>false</code> it will instantiate all databases only when they are
      * needed.
      * 
-     * @param  databases    Database configuration instances. 
+     * @param  jdoConf      An in-memory jdo configuration. 
      * @param  resolver     An entity resolver.
      * @param  loader       A class loader
      * @param  baseURI      The base URL for the mapping
      * @throws MappingException If the database cannot be instantiated/loadeed.
      */
-    private static synchronized void loadDatabase(final Database[] databases,
+    private static synchronized void loadDatabase(final JdoConf jdoConf,
                                                   final EntityResolver resolver,
                                                   final ClassLoader loader,
                                                   final String baseURI)
@@ -138,23 +163,21 @@ public final class DatabaseRegistry {
         
         // Load the JDO configuration file from the specified input source.
         // databases = JDOConfLoader.getDatabases(baseURI, resolver);
-        Database database;
-        Mapping mapping;
+        Database[] databases = jdoConf.getDatabase();
         AbstractConnectionFactory factory;
         for (int i = 0; i < databases.length; i++) {
-            database = databases[i];
-
             // Load the mapping file from the URL specified in the database
             // configuration file, relative to the configuration file.
             // Fail if cannot load the mapping for whatever reason.
-            mapping = new Mapping(loader);
+            Mapping mapping = new Mapping(loader);
             if (resolver != null) { mapping.setEntityResolver(resolver); }
             if (baseURI != null) { mapping.setBaseURL(baseURI); }
             
-            factory = DatabaseRegistry.createFactory(database, mapping);
+            factory = DatabaseRegistry.createFactory(jdoConf, i, mapping);
             if (init) { factory.initialize(); }
-            if (FACTORIES.put(database.getName(), factory) != null) {
-                LOG.warn(Messages.format("jdo.configLoadedTwice", database.getName()));
+            String name = databases[i].getName();
+            if (FACTORIES.put(name, factory) != null) {
+                LOG.warn(Messages.format("jdo.configLoadedTwice", name));
             }
         }
     }
@@ -163,37 +186,41 @@ public final class DatabaseRegistry {
      * Factory methode to create a ConnectionFactory for given database configuration
      * and given mapping.
      * 
-     * @param database  The database configuration.
+     * @param jdoConf   An in-memory jdo configuration. 
+     * @param index     Index of the database configuration inside the jdo configuration.
      * @param mapping   The mapping to load.
      * @return The ConnectionFactory.
      * @throws MappingException If the database cannot be instantiated/loadeed.
      */
-    private static AbstractConnectionFactory createFactory(final Database database,
-                                                           final Mapping mapping)
+    private static AbstractConnectionFactory createFactory(
+            final JdoConf jdoConf, final int index, final Mapping mapping)
     throws MappingException {
         AbstractConnectionFactory factory;
         
-        if (database.getDatabaseChoice() == null) {
-            String msg = Messages.format("jdo.missingDataSource", database.getName());
+        DatabaseChoice choice = jdoConf.getDatabase(index).getDatabaseChoice();
+        if (choice == null) {
+            String name = jdoConf.getDatabase(index).getName();
+            String msg = Messages.format("jdo.missingDataSource", name);
             LOG.error(msg);
             throw new MappingException(msg);
         }
         
-        if (database.getDatabaseChoice().getDriver() != null) {
+        if (choice.getDriver() != null) {
             // JDO configuration file specifies a driver, use the driver
             // properties to create a new registry object.
-            factory = new DriverConnectionFactory(database, mapping);
-        } else if (database.getDatabaseChoice().getDataSource() != null) {
+            factory = new DriverConnectionFactory(jdoConf, index, mapping);
+        } else if (choice.getDataSource() != null) {
             // JDO configuration file specifies a DataSource object, use the
             // DataSource which was configured from the JDO configuration file
             // to create a new registry object.
-            factory = new DataSourceConnectionFactory(database, mapping);
-        } else if (database.getDatabaseChoice().getJndi() != null) {
+            factory = new DataSourceConnectionFactory(jdoConf, index, mapping);
+        } else if (choice.getJndi() != null) {
             // JDO configuration file specifies a DataSource lookup through JNDI, 
             // locate the DataSource object frome the JNDI namespace and use it.
-            factory = new JNDIConnectionFactory(database, mapping);
+            factory = new JNDIConnectionFactory(jdoConf, index, mapping);
         } else {
-            String msg = Messages.format("jdo.missingDataSource", database.getName());
+            String name = jdoConf.getDatabase(index).getName();
+            String msg = Messages.format("jdo.missingDataSource", name);
             LOG.error(msg);
             throw new MappingException(msg);
         }
@@ -251,9 +278,6 @@ public final class DatabaseRegistry {
      */
     public static void clear() {
         FACTORIES.clear();
-
-        // reset the JDO configuration data to re-enable loadConfiguration()
-        JDOConfLoader.deleteConfiguration();
     }
     
     //--------------------------------------------------------------------------

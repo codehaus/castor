@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1179 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Refactored how transaction managers are maintained.
+       Details: http://jira.codehaus.org/browse/CASTOR-1179
+       (Ralf - 20050817)
+
 JDO:   Fixed bug CASTOR-1158 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Stricter checking at type conversion from string to boolean.
        Details: http://jira.codehaus.org/browse/CASTOR-1158
