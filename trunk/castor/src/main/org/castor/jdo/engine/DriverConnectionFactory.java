@@ -23,9 +23,9 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.jdo.conf.Database;
 import org.exolab.castor.jdo.conf.DatabaseChoice;
 import org.exolab.castor.jdo.conf.Driver;
+import org.exolab.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.drivers.ConnectionProxy;
 import org.exolab.castor.mapping.Mapping;
@@ -58,11 +58,13 @@ public final class DriverConnectionFactory extends AbstractConnectionFactory {
     /**
      * Constructs a new DriverConnectionFactory with given database and mapping.
      * 
-     * @param database  The database configuration.
+     * @param jdoConf   An in-memory jdo configuration. 
+     * @param index     Index of the database configuration inside the jdo configuration.
      * @param mapping   The mapping to load.
      */
-    public DriverConnectionFactory(final Database database, final Mapping mapping) {
-        super(database, mapping);
+    public DriverConnectionFactory(final JdoConf jdoConf, final int index,
+                                   final Mapping mapping) {
+        super(jdoConf, index, mapping);
     }
 
     /**

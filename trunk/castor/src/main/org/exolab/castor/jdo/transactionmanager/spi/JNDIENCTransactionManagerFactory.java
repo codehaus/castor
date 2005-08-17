@@ -1,59 +1,33 @@
-/**
- * Redistribution and use of this software and associated documentation
- * ("Software"), with or without modification, are permitted provided
- * that the following conditions are met:
+/*
+ * Copyright 2005 Bruce Snyder, Werner Guttmann, Ralf Joachim
  *
- * 1. Redistributions of source code must retain copyright
- *    statements and notices.  Redistributions must also contain a
- *    copy of this document.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * 2. Redistributions in binary form must reproduce the
- *    above copyright notice, this list of conditions and the
- *    following disclaimer in the documentation and/or other
- *    materials provided with the distribution.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * 3. The name "Exolab" must not be used to endorse or promote
- *    products derived from this Software without prior written
- *    permission of Intalio, Inc.  For written permission,
- *    please contact info@exolab.org.
- *
- * 4. Products derived from this Software may not be called "Exolab"
- *    nor may "Exolab" appear in their names without prior written
- *    permission of Intalio, Inc. Exolab is a registered
- *    trademark of Intalio, Inc.
- *
- * 5. Due credit should be given to the Exolab Project
- *    (http://www.exolab.org/).
- *
- * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
- * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Copyright 1999 (C) Intalio, Inc. All Rights Reserved.
- *
- * $Id$
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
-
 package org.exolab.castor.jdo.transactionmanager.spi;
 
+import java.util.Enumeration;
+import java.util.Properties;
 
-import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NoInitialContextException;
 import javax.transaction.TransactionManager;
 
+import org.exolab.castor.jdo.conf.JdoConf;
+import org.exolab.castor.jdo.conf.Param;
+import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
+import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -63,70 +37,65 @@ import org.exolab.castor.util.Messages;
  * Implements {link org.exolab.castor.jdo.transactionmanager.
  * TransactionManagerFactory}.
  *
- * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>, <a href=" mailto:
- * werner.guttmann@gmx.net">Werner Guttmann</a>
+ * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
+ * @author <a href=" mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
+ * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
+ * @version $Revision$ $Date$
  */
-public class JNDIENCTransactionManagerFactory 
-    extends BaseTransactionManagerFactory
-{
-    
-    /**
-     * The <tt>javax.transaction.TransactionManager</tt> that Castor will use.
-     */
-    private TransactionManager _transactionManager;
+public final class JNDIENCTransactionManagerFactory implements TransactionManagerFactory {
+    //--------------------------------------------------------------------------
 
+    /** Default JNDI binding for <tt>javax.transaction.TransactionManager</tt>
+     *  instance. */
+    private static final String TRANSACTION_MANAGER_NAME = "java:comp/TransactionManager";
 
-    /**
-     * The name of the factory
-     */
-    private final String _name = "jndi";
-    
-    /**
-     * Default JNDI binding for <tt>javax.transaction.TransactionManager</tt>
-     * instance.
-     */
-    private final String TRANSACTION_MANAGER_NAME = "java:comp/TransactionManager";
+    /** The name of the factory. */
+    private static final String NAME = "jndi";
 
+    //--------------------------------------------------------------------------
 
     /**
-     * Acquires the appropriate TransactionManager.
+     * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory#getName()
      */
-    public TransactionManager getTransactionManager() 
-        throws TransactionManagerAcquireException
-    {
-        Context context = null;
+    public String getName() { return NAME; }
+
+    /**
+     * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory
+     *      #getTransactionManager(org.exolab.castor.jdo.conf.JdoConf)
+     */
+    public TransactionManager getTransactionManager(final JdoConf jdoConf)
+    throws TransactionManagerAcquireException {
+        Properties properties = new Properties();
+        TransactionDemarcation demarcation = jdoConf.getTransactionDemarcation();
+        Enumeration parameters = demarcation.getTransactionManager().enumerateParam();
+        while (parameters.hasMoreElements()) {
+            Param param = (Param) parameters.nextElement();
+            properties.put(param.getName(), param.getValue());
+        }
+
+        TransactionManager transactionManager;
         Object objectFound = null;
-
-        try 
-        {
-            context = new InitialContext();
-            
-            String jndiENC = params.getProperty("jndiEnc", TRANSACTION_MANAGER_NAME );
-            objectFound = context.lookup(jndiENC);
-            _transactionManager = (TransactionManager) objectFound;  
-        } 
-        catch (ClassCastException e) {
-        	throw new TransactionManagerAcquireException (Messages.format (
-        		"jdo.transaction.unableToCastToTransactionManager", objectFound.getClass().getName()), e); 
-        }
-        catch (NoInitialContextException e) {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
-        } 
-        catch (NameNotFoundException e) {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
-        }
-        catch (Exception e) {
-            throw new TransactionManagerAcquireException( Messages.format( 
-                "jdo.transaction.unableToAcquireTransactionManager", e.getMessage()), e);
+        String jndiENC = properties.getProperty("jndiEnc", TRANSACTION_MANAGER_NAME);
+        try {
+            objectFound = new InitialContext().lookup(jndiENC);
+            transactionManager = (TransactionManager) objectFound;  
+        } catch (ClassCastException ex) {
+            throw new TransactionManagerAcquireException(Messages.format(
+                "jdo.transaction.failToCastToManager",
+                objectFound.getClass().getName()), ex); 
+        } catch (NoInitialContextException ex) {
+            throw new TransactionManagerAcquireException(Messages.format(
+                "jdo.transaction.failToGetManager", jndiENC), ex);
+        } catch (NameNotFoundException ex) {
+            throw new TransactionManagerAcquireException(Messages.format(
+                "jdo.transaction.failToGetManager", jndiENC), ex);
+        } catch (Exception ex) {
+            throw new TransactionManagerAcquireException(Messages.format(
+                "jdo.transaction.failToGetManager", jndiENC), ex);
         }
 
-        return _transactionManager;
+        return transactionManager;
     }
 
-    public String getName()
-    {
-        return _name;
-    }
+    //--------------------------------------------------------------------------
 }

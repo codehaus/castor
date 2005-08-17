@@ -64,16 +64,14 @@ import javax.transaction.TransactionManager;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
 import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
-import org.exolab.castor.jdo.engine.JDOConfLoader;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactoryRegistry;
+import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManager;
 import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
@@ -566,86 +564,21 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                             _classLoader);
                 // alternatively, use a JdoConf instance to load the JDO config
                 } else if (_jdoConf != null) {
-                    DatabaseRegistry.loadDatabase(_jdoConf,
-                            _entityResolver,
-                            _classLoader);
+                    DatabaseRegistry.loadDatabase(_jdoConf, _entityResolver,
+                                                  _classLoader);
                 } else {
                     throw new DatabaseNotFoundException(Messages.format(
                             "jdo.dbNoMapping", _dbName));
                 }
             }
+
+            AbstractConnectionFactory factory;
+            factory = DatabaseRegistry.getConnectionFactory(_dbName);
+            _transactionManager = factory.getTransactionManager();
         } catch (MappingException ex) {
             throw new DatabaseNotFoundException(ex);
         }
 
-        // load transaction manager factory registry configuration
-        try {
-            TransactionManagerFactoryRegistry.load(
-                    new InputSource(_jdoConfURI), _entityResolver);
-        } catch (TransactionManagerAcquireException ex) {
-            throw new PersistenceException(Messages.message(
-                    "jdo.problem.initializingTransactionManagerFactory"), ex); 
-        }
-
-        if (_transactionManagerFactory == null) {
-            String transactionMode = null;
-            try {
-                TransactionDemarcation demarcation;
-                String mode;
-                org.exolab.castor.jdo.conf.TransactionManager manager;
-                
-                demarcation = JDOConfLoader.getTransactionDemarcation(
-                        new InputSource(_jdoConfURI), _entityResolver);
-                     
-                mode = demarcation.getMode();
-                manager = demarcation.getTransactionManager();
-                                
-                if (manager != null) {
-                    transactionMode = manager.getName();
-                } else if (LocalTransactionManagerFactory.NAME.equals(mode)) {
-                    transactionMode = LocalTransactionManagerFactory.NAME;
-                } else {
-                    throw new PersistenceException(Messages.message(
-                            "jdo.problem.missingTransactionConfiguration"));
-                }
-                    
-            } catch (MappingException ex) {
-                throw new PersistenceException(Messages.message(
-                        "jdo.problem.noValidTransactionMode"), ex);
-            }
-                 
-            /*
-             * Try to obtain the specified<code>TransactionManagerFactory</code>
-             * instance from the registry.
-             * 
-             * If the returned TransactionManagerFactory instance is null,
-             * return an exception to indicate that we cannot live without a
-             * valid TransactionManagerFactory instance and that the user should
-             * change her configuration.
-             */
-             _transactionManagerFactory = TransactionManagerFactoryRegistry
-                     .getTransactionManagerFactory(transactionMode);
-        
-            if (_transactionManagerFactory == null) {
-                throw new DatabaseNotFoundException(Messages.format(
-                        "jdo.transaction.missingTransactionManagerFactory",
-                        transactionMode));
-            }
-
-            /*
-             * Try to obtain a <code>javax.jta.TransactionManager>/code> from
-             * the factory.
-             */
-            try {
-                _transactionManager = _transactionManagerFactory
-                        .getTransactionManager();
-            } catch (TransactionManagerAcquireException ex) {
-                throw new DatabaseNotFoundException(Messages.format(
-                        "jdo.transaction.unableToAcquireTransactionManager",
-                        _transactionManagerFactory.getName(), ex));
-            }
-        }
-        
         /* At this point, we MUST have a instance of TransactionManagerFactory,
          * and dependent on its type (LOCAL or not), we MIGHT have a valid
          * <code>javax.jta.TransactionManager</code> instance.
@@ -659,7 +592,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
          * demarcation, we have both a TransactionManagerFactory (different
          * from LOCAL) and a TransactionManager instance.
          */
-        if ((_transactionManager != null) 
+        if (!(_transactionManager instanceof LocalTransactionManager) 
                 && !LocalTransactionManagerFactory.NAME.equals(
                         _transactionManagerFactory.getName())) {
             

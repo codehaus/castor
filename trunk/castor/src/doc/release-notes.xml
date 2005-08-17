@@ -30,6 +30,26 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1179" tool="jira">
+                    <description>
+						Refactored how transaction managers are maintained.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+					</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050817</date>
+                </bug>
                 <bug id="1158" tool="jira">
                     <description>
 						Stricter checking at type conversion from string to boolean.
