@@ -648,6 +648,7 @@
     <target name="prepare-eclipse-complete" depends="prepare-eclipse-base"
             description="Copy Eclipse project files to the root directory">
         <copy file="${project.eclipse}/classpath.template.complete" tofile="${basedir}/.classpath" overwrite="true"/>
+        <copy file="${project.eclipse}/checkstyle.template" tofile="${basedir}/.checkstyle" overwrite="true"/>
     </target>
 
 </project>
