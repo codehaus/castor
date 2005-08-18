@@ -30,6 +30,28 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1132" tool="jira">
+                    <description>
+                       Added additional check for various built-in types
+                       when deciding whether or not to use the parent classes namespace
+                       if no local namespace has been defined.
+                    </description>
+                    <contributor>
+                        <name>Michael Westbay</name>
+                        <email>westbay AT users DOT sourceforge DOT net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Michael Westbay</name>
+                        <email>westbay AT users DOT sourceforge DOT net</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20050817</date>
+                </bug>
                 <bug id="1179" tool="jira">
                     <description>
 						Refactored how transaction managers are maintained.
@@ -50,6 +72,7 @@
                     <module>JDO</module>
                     <date>20050817</date>
                 </bug>
+
                 <bug id="1158" tool="jira">
                     <description>
 						Stricter checking at type conversion from string to boolean.
@@ -286,7 +309,7 @@
                 </bug>
                 <bug id="1169" tool="jira">
                     <description>
-		                Refactored access to caches, adding CacheEntry class and making OID and 
+		                Refactored access to caches, adding CacheEntry class and making OID and
 		                CacheEntry implement java.io.Serializable.
                     </description>
                     <contributor>
@@ -486,7 +509,7 @@
                 </bug>
 			</bugs>
 		</release>
-			
+
 	    <release version="0.9.7">
 	        <description>Maintenance release for Castor XML and JDO</description>
     		<date>June 8, 2005</date>
@@ -494,26 +517,26 @@
             <summary>
 				<h2>Download &amp; installation instructions</h2>
 
-                <p>This is the final 0.9.7. release, mainly a maintenance release. We are currently 
+                <p>This is the final 0.9.7. release, mainly a maintenance release. We are currently
 				   planning the next release which will be Castor 0.9.9, a feature release.</p>
 
 				<h2>Changes</h2>
 
 				<h3>Moved key generators to jdo.keygen package</h3>
-				
-				<p>Whilst this change is non-intrusive per se, please note that you might have to 
+
+				<p>Whilst this change is non-intrusive per se, please note that you might have to
 				   change a local <tt>castor.properties</tt> file if you happened to re-specify key generators
 				   in there.</p>
 
 				<h3>Fixed problem with multiple &lt;database&gt; configurations</h3>
-				
+
 				<p>Support for multiple database configurations has been re-enabled.</p>
-				   
+
             </summary>
 			<bugs>
                 <bug id="1147" tool="jira">
                     <description>
-		                Reverted addition to src/tests/jdo/Collections due to problem with missing 
+		                Reverted addition to src/tests/jdo/Collections due to problem with missing
 					    setItem(ArrayList).
                     </description>
                     <contributor>
@@ -601,7 +624,7 @@
 				<h2>Changes</h2>
 
 				<h3>Support for JDBC proxy classes</h3>
-				
+
 				<p>Proxy classes for <tt>java.sql.Connection</tt> and
 				   <tt>java.sql.PreparedStatement</tt> instances have been added, to allow for
 				   complete and better JDBC statements to be output to the log files. As this might impose
@@ -609,30 +632,30 @@
 				   property file (<tt>castor.properties</tt>) to allow configuration of this
 				   feature.</p>
 
-<code>				
+<code>
   # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
   # statements; false otherwise (logging will be turned off completely).
   #
   org.exolab.castor.persist.useProxy=true
-</code>				
-					
+</code>
+
 				<p>When disabled, no logging of SQL statements will occur al all.</p>
 
 				<h3>Castor and Java 5</h3>
-				
+
 				<p>Several bugs have been fixed to allow use of Castor with a JDK 1.5. This
 				   mainly involved preventing compilation problems due to variable names et al.
 				   that were in conflict with new Java 5 naming conventions (e.g. use of enum as
 				   a variable name).</p>
 
 				<h3>Renamed JDO2 to JDOManager</h3>
-				
-				<p><tt>JDO2</tt> has been renamed to <tt>JDOManager</tt>. Please change your source 
-				   code accordingly. Please note that - going forward - any bug fixes/enhancements will 
+
+				<p><tt>JDO2</tt> has been renamed to <tt>JDOManager</tt>. Please change your source
+				   code accordingly. Please note that - going forward - any bug fixes/enhancements will
 				   be committed against JDOManager only.</p>
-				   
+
 				<h3>Type of access mode constants changed</h3>
-				
+
 				<p>The type of the access mode constants (Shared / ReadOnly / Exclusive / DbLocked)
 				   defined in Database interface has changed from <code>short</code> to
 				   <code>org.exolab.castor.mapping.AccessMode</code>. To allow you to use previous
@@ -642,23 +665,23 @@
 				   from short to AccessMode.</p>
 
 				<h3>Default field types</h3>
-				
-				<p>It is possible again - after disabling this feature in 0.9.6 - to not specify 
-				   a type in a field mapping. By default, a field defined as such will have a 
+
+				<p>It is possible again - after disabling this feature in 0.9.6 - to not specify
+				   a type in a field mapping. By default, a field defined as such will have a
 				   type of 'java.lang.String'.</p>
-				
+
 				<h2>Additions</h2>
-				
+
 				<h3>Addition of RSS feed for announcements</h3>
-				
+
 				<p>An RSS feed has been added to the project documentation to allow
-				   users to be informed about additions/changes to Castor. This feed basically 
-				   mirrors the news items posted to <url>http://castor.codehaus.org/news.html</url></p>				
+				   users to be informed about additions/changes to Castor. This feed basically
+				   mirrors the news items posted to <url>http://castor.codehaus.org/news.html</url></p>
 
 				<h3>Specifying a binding file with the Source generator Ant task</h3>
-				
-                <p>Support for specifying a binding file with the Castor Source Generator Ant Task 
-				   has been added. Below is the example as provided with the 0.9.6 release notes 
+
+                <p>Support for specifying a binding file with the Castor Source Generator Ant Task
+				   has been added. Below is the example as provided with the 0.9.6 release notes
 				   extended to cover the specification of a binding file:</p>
 
                 <code>
@@ -680,7 +703,7 @@
 
 
 				<h2>Problems fixed</h2>
-				
+
                 <p>Since release 0.9.6, the following problem areas have been addressed.</p>
 
             </summary>
@@ -2294,12 +2317,12 @@
                     the JDO "database" instance will fall outside the current transaction/thread,
                     resulting in the error message "No transaction in progress for the current
                     thread". For example:</p>
-    
+
                 <code>
 JDO myJdo = new JDO();
 myJdo.setDatabasePooling( true );
                 </code>
-    
+
                 <p><b>Note:</b> At the moment, only the JNDI transaction manager factory
                    supports such an attribute. In this context, the jndiEnc attribute can be
                    used to specify what JNDI ENC to use to lookup the transaction manager as
