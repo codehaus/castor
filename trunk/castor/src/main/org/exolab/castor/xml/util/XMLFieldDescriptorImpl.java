@@ -60,6 +60,7 @@ import org.exolab.castor.xml.FieldValidator;
 import org.exolab.castor.xml.NodeType;
 import org.exolab.castor.xml.XMLClassDescriptor;
 import org.exolab.castor.xml.XMLFieldDescriptor;
+import org.exolab.castor.xml.descriptors.CoreDescriptors;
 import org.exolab.castor.xml.handlers.DateFieldHandler;
 
 import java.util.ArrayList;
@@ -559,7 +560,8 @@ public class XMLFieldDescriptorImpl
             (_contClsDescriptor != null) &&
             _useParentClassNamespace)
         {
-            if (isPrimitive(_fieldType) && (_nodeType == NodeType.Element))
+            if ((_nodeType == NodeType.Element) &&
+                (isPrimitive(_fieldType) || (isBuiltInType(_fieldType))))
             {
                 if (_contClsDescriptor instanceof XMLClassDescriptor) {
                     return ((XMLClassDescriptor)_contClsDescriptor).getNameSpaceURI();
@@ -1205,8 +1207,27 @@ public class XMLFieldDescriptorImpl
         if ((type == Boolean.class) || (type == Character.class))
             return true;
 
+        //-- Any class which extends Number should be 
+        //-- treated as a primitive
         return (type.getSuperclass() == Number.class);
+        
     } //-- isPrimitive
+    
+    /**
+     * Return true if the given class is a "built-in" type. A built-in
+     * type is one in which Castor provides the default descriptor
+     * for.
+     * 
+     * @param type the class to check
+     * 
+     * @return true if the given class is a built-in type.
+     */
+    private boolean isBuiltInType(Class type) {
+        if (type == null) return false;
+        //-- All built-in Java types, such as java.util.Date,
+        //-- java.sql.Date, various Collection classes, etc.
+        return (CoreDescriptors.getDescriptor(type) != null);
+    } //-- isBuiltInType
 
 } //-- XMLFieldDescriptor
 
