@@ -2,6 +2,13 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1132 using contributions from Michael Westbay and
+       Keith Visco. Added additional check for various built-in types
+       when deciding whether or not to use the parent classes namespace
+       if no local namespace has been defined.
+       Details: http://jira.codehaus.org/browse/CASTOR-1132
+       (kvisco - 20050817)
+
 JDO:   Fixed bug CASTOR-1179 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactored how transaction managers are maintained.
        Details: http://jira.codehaus.org/browse/CASTOR-1179
