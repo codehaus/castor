@@ -869,6 +869,15 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Westbay" given="Michael"/>
+    <email>westbay@users.sourceforge.net</email>
+    <description>
+        Patch for bug CASTOR-1132 (JIRA)
+    </description>
+  </contributor>
+
+
+  <contributor type="Contributor">
     <name surname="Wise" given="Nic"/>
     <email>nicw@xerxes.co.nz</email>
     <description>Contributed SEQUENCE key generator for Interbase.</description>
