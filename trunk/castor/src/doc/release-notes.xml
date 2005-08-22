@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1151" tool="jira">
+                    <description>
+		                Completely refactored ClassMolder, introducing strategy objects for field resolution.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20050821</date>
+                </bug>
                 <bug id="1132" tool="jira">
                     <description>
                        Added additional check for various built-in types

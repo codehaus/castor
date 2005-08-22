@@ -163,7 +163,7 @@ public final class LockEngine {
         _persistenceFactory = persistenceFactory;
         
         try {
-            Vector v = ClassMolder.resolve( (MappingLoader) mapResolver, this, _persistenceFactory );
+            Vector v = ClassMolderHelper.resolve( (MappingLoader) mapResolver, this, _persistenceFactory );
     
             _typeInfo = new HashMap();
             Enumeration enumeration = v.elements();

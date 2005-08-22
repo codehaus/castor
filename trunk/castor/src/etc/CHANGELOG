@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1151 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Completely refactored ClassMolder, introducing strategy objects for field resolution.
+       Details: http://jira.codehaus.org/browse/CASTOR-1151
+       (Werner - 20050821)
+       
 XML:   Fixed bug CASTOR-1132 using contributions from Michael Westbay and
        Keith Visco. Added additional check for various built-in types
        when deciding whether or not to use the parent classes namespace
