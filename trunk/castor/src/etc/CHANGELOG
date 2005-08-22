@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-920 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Changed argument handling code.
+       Details: http://jira.codehaus.org/browse/CASTOR-920
+       (Werner - 20050822)
+       
 JDO:   Fixed bug CASTOR-1151 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Completely refactored ClassMolder, introducing strategy objects for field resolution.
        Details: http://jira.codehaus.org/browse/CASTOR-1151

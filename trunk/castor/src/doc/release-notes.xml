@@ -30,6 +30,23 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="920" tool="jira">
+                    <description>
+		                Changed argument handling code.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050822</date>
+                </bug>
                 <bug id="1151" tool="jira">
                     <description>
 		                Completely refactored ClassMolder, introducing strategy objects for field resolution.
