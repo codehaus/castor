@@ -429,8 +429,9 @@ public final class SQLTypes
 
 
     public static void setObject( PreparedStatement stmt, int index, Object value, int sqlType )
-            throws SQLException
+        throws SQLException
     {
+        try {
         if (value == null) {
             stmt.setNull( index, sqlType );
         } else {
@@ -462,6 +463,11 @@ public final class SQLTypes
                 stmt.setObject(index, value, sqlType);
                 break;
             }
+        }
+        }
+        catch (SQLException e) {
+            log.error ("Unexpected SQL exception: ", e);
+            
         }
     }
 

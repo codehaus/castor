@@ -124,6 +124,8 @@ class DatingService {
                 if ( targetCm == null )
                     throw new MappingException("Field element, \""+pair.key+"\"  not found!");
                 initiateFm.setFieldClassMolder( targetCm );
+                
+                // initiateFm.getEnclosingClassMolder().resetResolver (initiateFm);
             }
         }
 
@@ -215,6 +217,7 @@ class DatingService {
             ClassMolder clsMold = (ClassMolder) clsMolders.get( typeName );
             if ( clsMold != null ) {
                 fieldMolder.setFieldClassMolder( clsMold );
+                // fieldMolder.getEnclosingClassMolder().resetResolver(fieldMolder);
                 return true;
             }
 
