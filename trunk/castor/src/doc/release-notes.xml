@@ -30,6 +30,27 @@
             <summary>
             </summary>
 			<bugs>
+                <bug id="1203" tool="jira">
+                    <description>
+                        Calculation of priority to execute create and delete statements at commit returns
+                        wrong results when no keygen is used or class depends/extends another.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+					</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050823</date>
+                </bug>
                 <bug id="920" tool="jira">
                     <description>
 		                Changed argument handling code.
@@ -106,7 +127,6 @@
                     <module>JDO</module>
                     <date>20050817</date>
                 </bug>
-
                 <bug id="1158" tool="jira">
                     <description>
 						Stricter checking at type conversion from string to boolean.

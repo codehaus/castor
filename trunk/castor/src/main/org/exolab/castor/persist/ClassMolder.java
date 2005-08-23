@@ -462,28 +462,31 @@ public class ClassMolder
      * This method should only be called after DatingService is closed.
      */
     public int getPriority() {
-        if ( _priority == -2 ) {
-          // circular reference detected, do not loop
-          return 0;
-        } else if ( _priority < 0 ) {
+        if (_priority == -2) {
+            // circular reference detected, do not loop
+            return 0;
+        } else if (_priority < 0) {
             // mark current Molder to avoid infinite loop with circular reference
             _priority = -2;
             int maxPrior = 0;
-            for ( int i = 0; i < _fhs.length; i++ ) {
-                if ( _fhs[i].isPersistanceCapable()
-                        && _fhs[i].getFieldClassMolder() != this
-                        && _fhs[i].isStored()
-                        && _fhs[i].getFieldClassMolder().isKeyGeneratorUsed() ) {
-                    maxPrior = Math.max( maxPrior, _fhs[i].getFieldClassMolder().getPriority()+1 );
+            for (int i = 0; i < _fhs.length; i++) {
+                if (_fhs[i].isPersistanceCapable()
+                        && (_fhs[i].getFieldClassMolder() != this)
+                        && _fhs[i].isStored()  ) {
+                    int refPrior = _fhs[i].getFieldClassMolder().getPriority() + 1;
+                    maxPrior = Math.max(maxPrior, refPrior);
                 }
-                /* should an "if case" for add _ids[i].isForeginKey() in the future */
+                /* should and "if case" for add _ids[i].isForeginKey() in the future */
+            }
+
+            /* adjust priority if there are dependent classes */
+            if (_depends != null) {
+                maxPrior = Math.max(maxPrior, _depends.getPriority() + 1);
             }
 
             /* adjust priority if there are extendent classes */
-            if (_extendent != null) {
-              for (int i=0;i<_extendent.size();i++) {
-                maxPrior = Math.max(maxPrior, ((ClassMolder)_extendent.get(i)).getPriority());
-              }
+            if (_extends != null) {
+                  maxPrior = Math.max(maxPrior, _extends.getPriority() + 1);
             }
 
             _priority  = maxPrior;

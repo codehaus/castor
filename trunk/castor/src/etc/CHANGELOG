@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1203 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Calculation of priority to execute create and delete statements at commit returns
+       wrong results when no keygen is used or class depends/extends another.
+       Details: http://jira.codehaus.org/browse/CASTOR-1203
+       (Ralf - 20050823)
+
 JDO:   Fixed bug CASTOR-920 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Changed argument handling code.
        Details: http://jira.codehaus.org/browse/CASTOR-920
