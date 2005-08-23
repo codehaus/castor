@@ -20,6 +20,7 @@
         <property name="source" value="src"/>
         <property name="main" value="${source}/main"/>
         <property name="etc" value="${source}/etc"/>
+        <property name="check" value="check"/>
         <property name="build" value="build"/>
         <property name="build-doc" value="build/doc"/>
         <property name="classes" value="${build}/classes"/>
@@ -113,6 +114,8 @@
                              (JAR, source, doc, tarball) in the dist directory
             main             Builds the main packages (including debugging info)
             tests            (shorthand for compile.tests)
+            checkstyle.jdo   Check code conventions of Castor JDO packages
+            checkstyle.tests Check code conventions of the test packages
             compile.xml      Compile the Castor XML packages
             compile.jdo      Compile the Castor JDO packages
             compile.examples Builds the example packages (including debugging info)
@@ -171,11 +174,67 @@
         <echo message="Using ${user.home}/castor-build.properties" />
     </target>
 
-    <target name="clean" description="Removes the build, dist and schema dirs">
+    <target name="clean" description="Removes the build, check, dist and schema dirs">
         <delete dir="${build}"/>
+        <delete dir="${check}"/>
         <delete dir="${dist}"/>
         <delete dir="${schema}"/>
         <delete dir="${gen.src}"/>
+    </target>
+	
+    <taskdef resource="checkstyletask.properties"
+             classpath="lib/build/checkstyle-all-3.5.jar"/>
+	
+    <target name="checkstyle.jdo" depends="jar"
+	        description="Check coding conventions of Castor JDO packages">
+    	<mkdir dir="${check}"/>
+    	<checkstyle config="src/tools/checkstyle/castor-source-checks.xml"
+    		        maxWarnings="0"
+    	            failOnViolation="false"
+    	            failureProperty="checkstyle.failure"
+                    classpath="${dist}/${archive.name}.jar">
+    		<fileset dir="${main}">
+    			<include name="org/castor/**/*.java"/>
+    			<exclude name="org/castor/persist/TransactionContext.java"/>
+    			<include name="org/exolab/castor/jdo/JDO.java"/>
+    			<include name="org/exolab/castor/jdo/JDOManager.java"/>
+    			<include name="org/exolab/castor/jdo/util/*.java"/>
+    		</fileset>
+    		<formatter type="xml" toFile="${check}/checkstyle.jdo.xml"/>
+        </checkstyle>
+		<antcall target="checkstyle.jdo.results"/>
+    </target>
+
+    <target name="checkstyle.jdo.results" if="checkstyle.failure">
+    	<available file="${check}/checkstyle.jdo.xml" property="checkstyle.executed"/>
+    	<fail message="You need to run the target checkstyle first."
+    	      unless="checkstyle.executed"/>
+		<fail message="Some java files violate checkstyle rules."/>
+    </target>
+
+    <target name="checkstyle.tests" depends="compile.tests,jar"
+	        description="Check code conventions of the test packages">
+    	<mkdir dir="${check}"/>
+    	<checkstyle config="src/tools/checkstyle/castor-test-checks.xml"
+    		        maxWarnings="0"
+    	            failOnViolation="false"
+    	            failureProperty="checkstyle.failure"
+                    classpath="${dist}/${archive.name}.jar">
+    		<fileset dir="${source}/tests">
+    			<include name="ctf/**/*.java"/>
+    			<include name="ptf/**/*.java"/>
+    			<include name="utf/**/*.java"/>
+    		</fileset>
+    		<formatter type="xml" toFile="${check}/checkstyle.tests.xml"/>
+        </checkstyle>
+		<antcall target="checkstyle.tests.results"/>
+    </target>
+
+    <target name="checkstyle.tests.results" if="checkstyle.failure">
+    	<available file="${check}/checkstyle.tests.xml" property="checkstyle.executed"/>
+    	<fail message="You need to run the target checkstyle first."
+    	      unless="checkstyle.executed"/>
+		<fail message="Some java files violate checkstyle rules."/>
     </target>
 
     <target name="compile"
