@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+ALL:   Fixed bug CASTOR-999 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added ant targets to to check code conventions with checkstyle.
+       Details: http://jira.codehaus.org/browse/CASTOR-999
+       (Ralf - 20050823)
+
 JDO:   Fixed bug CASTOR-1203 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Calculation of priority to execute create and delete statements at commit returns
        wrong results when no keygen is used or class depends/extends another.
