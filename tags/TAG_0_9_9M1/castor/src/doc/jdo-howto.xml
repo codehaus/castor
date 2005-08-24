@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/jdo-howto.xml">
+  <body>
+    <section title="Castor JDO - Hwo Tos">
+
+      <section title="Introduction">
+
+        <p>This is a collection of How-tos. The Castor project is actively seeking 
+           additional How-to contributors to expand this collection. For information 
+           on how to do that, please see How to write a How-to.</p>
+        
+      </section>
+	
+		<section title="Documentation">
+		
+		    <ul>
+		        <li>How to Author a How-To</li>
+		        <li>How to Author an FAQ</li>
+		        <li>How to Author a Code Snippet</li>
+		        <li>How to Author Core Documentation</li>
+		    </ul>
+		    
+		</section>
+		
+		
+		<section title="Contribution">
+	        <ul>
+                <li><a href="how-to-submit-a-bug.html">How to submit a bug report</a></li>
+	            <li>How to Prepare a Patch</li>
+	            <li>How to Contribute a Patch via Jira</li>
+	        </ul>
+		</section>
+        
+        <section title="OQL">
+            <ul>
+                <li>TBD</li>
+            </ul>
+        </section>
+
+        <section title="Core fatures">
+            <ul>
+                <li><a href="how-to-use-a-cache.html">How to use a cache</a></li>
+            </ul>
+        </section>
+        
+        <section title="Database specifica">
+            <ul>
+                <li>How to connect to a Apache Derby instance in network server mode</li>
+            </ul>
+        </section>
+        
+	 </section>
+  </body>
+</document>
