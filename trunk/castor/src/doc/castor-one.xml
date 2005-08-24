@@ -88,9 +88,10 @@ design, which is important in larger projects. </p>
            <a href="design-persist.html#Persistence">Design: Persistence</a>), the cache is released. 
            Starting from Castor 0.8.6, performance cache is implemented and developer can specify the 
            mechanism and capacity of performance cache for each persistence capable type. Options includes 
-           'none', 'count-limited', 'time-limited' and 'unlimited'. Performance cache is write-through, 
-           because all changes to objects of a transaction should be persisted at commit time 
-           without delay.</p>
+           'none', 'count-limited', 'time-limited' and 'unlimited'. Starting from Castor 0.9.9, the cache 
+           types 'coherence', 'jcs', 'jcache' and 'fkcache' have been added as explaind below. Performance 
+           cache is write-through, because all changes to objects of a transaction should be persisted 
+           at commit time without delay.</p>
 
         <p>Performance caches enhance the application performance by reducing the number of read 
            operations against the persistence storage, by storing and reusing the last read or 
@@ -110,7 +111,7 @@ design, which is important in larger projects. </p>
             <pre><![CDATA[
 <!ATTLIST cache-type
     type ( none | count-limited
-          | time-limited | unlimited ) "count-limited"
+          | time-limited | unlimited | coherence | fkcache | jcache | jcs ) "count-limited"
     capacity NMTOKEN #IMPLIED>]]>
             </pre>
         </p>
@@ -134,12 +135,78 @@ design, which is important in larger projects. </p>
         
         <p><b>NOTE:</b> As of release 0.9.6, Castor allows for the addition of user-defined cache 
            implementations. Instructions can be found <a href="jdo-caching.html">here</a></p>
+
+        <p><b>NOTE:</b> As of release 0.9.9, four new cache types have been added to Castor, three
+            of them open source and one commercial:</p>
+            
+        <table>
+            <tr>
+                <th>name</th>
+                <th>Vendor</th>
+                <th>Version</th>
+            </tr>
+            <tr>
+                <td>coherence</td>
+                <td><url href="http://www.tangosol.com/coherence.jsp">Tangosol Coherence</url></td>
+                <td>2.5</td>
+            </tr>
+            <tr>
+                <td>jcs</td>
+                <td><url href="http://jakarta.apache.org/jcs">JCS</url></td>
+                <td>???</td>
+            </tr>
+            <tr>
+                <td>jcache</td>
+                <td><url href="http://jcache.sourceforge.net/">JCache</url></td>
+                <td>???</td>
+            </tr>
+            <tr>
+                <td>fkcache</td>
+                <td><url href="http://jcache.sourceforge.net/">FKCache</url></td>
+                <td>1.0-beta6</td>
+            </tr>
+        </table>
            
+        <p>As some of these cache providers allow for allow you to use it in a <b>distributed</b> 
+           mode, this allows Castor JDO to be used in a clustered (multi-JVM) environment. Please see
+           the section below for short summayr fo this feature.</p>
+        
         <p>For problems related to the use of performance caches, please consult with the relevant 
            entries in the <a href="jdo-faq.html#Castor and performance caches">JDO F.A.Q.</a>.</p>
         
-    </section>
+        <section title="Caching and clustered environments">
+    
+            <p>All of the cache providers added with release 0.9.9 are distributed caches per se or can be 
+            configured to operate in such a mode. This effectively allows Castor JDO to be used in a 
+            clustered J2EE (multi-JVM) environment, where Castor JDO runs on each of the cluster instances,
+            and where cache state is automatically snychronized between these instances.</p>
+            
+            <p>In such an environment, Castor JDO wil make use of the underlying cache provider 
+            to replicate/distribute the content of a specific cache between the various 
+            JDOManager instances. Through the distribution mechanism of the cache provider, a client
+            of a Castor JDO instance on one JVM will see any updates made to domain objects performed 
+            against any other JVM/JDO instance.</p>
+    
+            <p>The following class mapping, for example, ... </p>
+            
+                <code-panel><![CDATA[
+<mapping>
+    <class name="com.xyz.MyOtherObject">
+        <cache-type type="coherence" />
+        <field name= ... >
+               ...
+        </field>
+    </class>
+</mapping>]]>
+                </code-panel>
+    
+                <p>defines that for all objects of type <tt>com.xyz.MyOtherObject</tt> Tangosol's 
+                <i>Coherence</i> cache provider should be used.</p>
+            
+        </section>
 
+    </section>
+    
     <section title="Dependent and related relationships">
         <p>
             Castor distinguishes the relationship of two objects as dependent or related, and maintains the life cycle independently for the two types of relationships. Starting from Castor 0.9, the developer can explicitly define a dependent relationship in the mapping file. </p>
