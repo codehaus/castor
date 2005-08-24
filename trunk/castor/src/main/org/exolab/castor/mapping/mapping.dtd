@@ -80,7 +80,7 @@
  -->
 <!ELEMENT cache-type EMPTY>
 <!ATTLIST cache-type
-    type           ( none | count-limited | time-limited | unlimited ) "count-limited"
+    type           ( none | count-limited | time-limited | unlimited | coherence | fkcache | jcache | jcs ) "count-limited"
     capacity       NMTOKEN  #IMPLIED>
 
 <!--
