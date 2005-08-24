@@ -628,7 +628,9 @@
 
   <xsl:template match="release">
     <br/>
-    <h2>Release <xsl:value-of select="@version" /></h2>
+    <hr/>
+	<h1>Release <xsl:value-of select="@version"/></h1>
+    <hr/>
     <table width="100%" border="0" cellspacing="1" cellpadding="2">
       <tr>
         <td>Description:</td><td><xsl:value-of select="description"/></td>
