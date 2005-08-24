@@ -29,7 +29,130 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
             </summary>
+        </release>
+	    <release version="0.9.9M1">
+	        <description>Milestone release for 0.9.9</description>
+    		<date>Aug 24, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<h2>Download &amp; installation instructions</h2>
+
+				<p>Please note that we are providing the usual suspects (binaries, docs and
+				   sources) for this release at <a href="http://dist.codehaus.org/castor/0.9.9.">
+				   the Codehaus</a>. We recommend, though, to download the complete package,
+				   as the HTML docs at <a href="http://castor.codehaus.org">the main Castor site</a> has
+				   not been updated, and to build the documentation yourself.</p>
+
+				<h2>Changes</h2>
+
+				<h3>Support for polymorphism</h3>
+                
+                <p>Support for polymorphism has been completely rewritten, allowing you
+                   to load objects that are part of an extend relationship by their base 
+                   types, with Castor JDO returning the actual (leaf) classes.</p>
+                   
+                <p>With the following class hierarchy ...</p>
+                
+                <ul>
+                    <li>Server extends Computer</li>
+                    <li>Laptop extends Computer</li>
+                    <li>Computer extends Product</li>
+                </ul>
+                
+                <p>it will be possible to execute OQL queries as follows:</p>
+                
+                <code>
+SELECT product FROM Product product
+                </code>
+                
+                <p>and Castor JDO will return the actual <tt>Laptop</tt> and
+                   <tt>Server</tt> instances. For a complete set of code examples,
+                   please review <tt>src/tests/ctf/jdo/tc9x/TestPolymorphism.java</tt>.</p>
+                
+				<h3>Updated MANIFEST files</h3>
+                
+                <p>Both castor-0.x.y.jar and castor-0.x.y-xml.jar now carry an updated
+                   and up-to-date MANIFEST file.</p>
+
+				<h2>New features</h2>
+
+                <h3>Support for Derby</h3>
+
+                <p>Support for <a href="http://db.apache.org/derby">Apache Derby</a> 
+                   (starting with release 10.1.1.0) has been added. For initial information 
+                   about configuration of Castor JDO for the use with Apache Derby, 
+                   please see <tt>src/tests/jdo/derby.xml</tt>.</p>
+                   
+                <p>Known issues:<br/>
+                   <ul>
+                      <li>No support for LIMIT clause</li>
+                      <li>No support for identity key generator (temporarily)</li>
+                      <li>No support for SELECT .. FOR UPDATE statements.</li>
+                   </ul>
+                </p>
+
+                <h3>Added support for distributed caches</h3>
+
+                <p>As of this release, four new cache types have been added:</p>
+                
+                <p>
+                    <ol>
+                        <li>Tangosol Coherence (coherence)</li>
+                        <li>JCache (jcache)</li>
+                        <li>FKCache (fkcache)</li>
+                        <li>JCS (jcs)</li>
+                    </ol>
+                </p>
+                
+                <p>As some of these cache implementations allow you to use it in a 
+                   distributed mode, this allows Castor JDO to be used in a clustered 
+                   (multi-JVM) environment. In such an environment, Castor JDO
+                   wil make use of the underlying cache provider to replicate/distribute
+                   the cache content between the various JDOManager instances.</p>
+                   
+                <h3>Support for transient attribute for &lt;sql&gt; mappings</h3>
+                
+                <p>Support for the <tt>transient</tt> attribute has been added to 
+                   the &lt;sql&gt; element has been added. This allows you to define a 
+                   field mapping as follows:</p>
+                   
+                <code>
+&lt;field name="prop1" type="string"&gt;
+   &lt;sql name="prop_1" <font color="red">transient="true"</font> /&gt;
+   &lt;bind-xml name="property1" /&gt;
+&lt;/field&gt;
+                </code>
+                
+                <p>allowing you to include a field for XML un-/marshalling, but exclude 
+                    it from persistence.</p>
+
+                <h3>Performance improvements</h3>
+                
+                <p>Several code areas of Castor JDO have been severly refactored or rewritten 
+                   from scratch, leading to some significantly improved runtime performance. This 
+                   includes amongst others a reduced execution time when dealing with a large 
+                   number of entities loaded as part of a single transaction, etc. </p>
+
+                   
+            </summary>
 			<bugs>
+                <bug id="1204" tool="jira">
+                    <description>
+		                Added release notes for 0.9.9M1.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Bug</type>
+                    <module>General</module>
+                    <date>20050823</date>
+                </bug>
                 <bug id="999" tool="jira">
                     <description>
                         Added ant targets to to check code conventions with checkstyle.
