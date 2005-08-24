@@ -494,7 +494,7 @@
             classpathref="build.classpath" includes="**.xml" excludes="style/**,project.xml"
             processor="org.exolab.adaptx.util.JakartaAntAdapter">
          </style>
-        <style basedir="${howto}" destdir="${build-howto}" style="${doc}/style/exolab.xsl"
+        <style basedir="${howto}" destdir="${build}/doc" style="${doc}/style/exolab.xsl"
             classpathref="build.classpath" includes="**.xml" excludes="style/**,project.xml"
             processor="org.exolab.adaptx.util.JakartaAntAdapter">
          </style>

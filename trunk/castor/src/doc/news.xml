@@ -141,7 +141,7 @@
             <time>21:22:21</time>
             <summary>
                 This is to announce that we now provide unified instructions on 
-                how to submit a patch at <url>http://castor.codehaus.org/howto/how-to-submit-a-bug.html</url>. 
+                how to submit a patch at <url>http://castor.codehaus.org/how-to-submit-a-bug.html</url>. 
                 To facilitate this task, we are now providing a template for Castor JDO 
                 related patches that has been added to the CVS sources already.
             </summary>
