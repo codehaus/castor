@@ -153,13 +153,15 @@ design, which is important in larger projects. </p>
             <tr>
                 <td>jcs</td>
                 <td><url href="http://jakarta.apache.org/jcs">JCS</url></td>
-                <td>???</td>
+                <td>1.2.5</td>
             </tr>
+<!--            
             <tr>
                 <td>jcache</td>
                 <td><url href="http://jcache.sourceforge.net/">JCache</url></td>
                 <td>???</td>
             </tr>
+-->            
             <tr>
                 <td>fkcache</td>
                 <td><url href="http://jcache.sourceforge.net/">FKCache</url></td>
