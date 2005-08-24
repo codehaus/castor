@@ -2,6 +2,14 @@
 Version (CVS)
 -------------
 
+Version 0.9.9M1, Aug 24, 2005
+-------------------------------
+
+JDO:   Fixed bug CASTOR-1204 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Added release notes for 0.9.9M1.
+       Details: http://jira.codehaus.org/browse/CASTOR-1204
+       (Werner - 20050823)
+       
 ALL:   Fixed bug CASTOR-999 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added ant targets to to check code conventions with checkstyle.
        Details: http://jira.codehaus.org/browse/CASTOR-999

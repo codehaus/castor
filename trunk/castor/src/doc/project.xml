@@ -143,6 +143,10 @@
         <display>JDO FAQ</display>
       </navLink>
       <navLink>
+        <url>jdo-howto.xml</url>
+        <display>JDO How-Tos</display>
+      </navLink>
+      <navLink>
         <url>castor-one.xml</url>
         <display>Other Features</display>
       </navLink>

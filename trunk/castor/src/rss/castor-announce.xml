@@ -19,6 +19,16 @@
 --> 
 
 		<item>
+			<title>0.9.9 release - 1st milestone build available</title>
+			<pubDate>Wed, 24 Aug 2005 23:23:32 GMT</pubDate>
+			<author>Werner Guttmann</author>
+			<link>http://castor.codehaus.org/news.html#item31</link>
+			<description>
+				The first milestone build of Castor 0.9.9 has been made available at
+				http://dist.codehaus.org/castor/0.9.9/
+			</description>
+		</item>
+		<item>
 			<title>Castor 0.9.7 released</title>
 			<pubDate>Thu, 9 Jun 2005 13:12:11 GMT</pubDate>
 			<author>Werner Guttmann</author>

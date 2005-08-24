@@ -19,6 +19,25 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="31">
+            <title>Castor 0.9.9 - 1st milestone build</title>
+            <author>Werner Guttmann</author>
+            <date>Aug 24 2005</date>
+            <time>23:23:32</time>
+            <summary>
+                I've placed a copy of the <b>1st</b> Castor 0.9.9 milestone build at the
+                <a href="http://dist.codehaus.org/castor/0.9.9/">Codehaus</a>.<br/><br/>
+
+                This is a major feature release. For details about the features added and the bugs 
+				fixed, please have a look at <a href="http://jira.codehaus.org/browse/CASTOR">the 
+                project roadmap</a> and the interim version of the 
+                <a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+                <br/><br/>
+
+                This milestone will be replaced by a second milestone within a week,
+                so please try this version and report any regression issues (where applicable).
+            </summary>
+        </news>
         <news id="30">
             <title>Castor 0.9.7 - Final release</title>
             <author>Werner Guttmann</author>
@@ -122,7 +141,7 @@
             <time>21:22:21</time>
             <summary>
                 This is to announce that we now provide unified instructions on 
-                how to submit a patch at <url>http://castor.codehaus.org/how-to-submit-a-bug.html</url>. 
+                how to submit a patch at <url>http://castor.codehaus.org/howto/how-to-submit-a-bug.html</url>. 
                 To facilitate this task, we are now providing a template for Castor JDO 
                 related patches that has been added to the CVS sources already.
             </summary>
