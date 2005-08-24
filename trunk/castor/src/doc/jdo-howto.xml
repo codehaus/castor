@@ -36,6 +36,12 @@
                 <li>TBD</li>
             </ul>
         </section>
+
+        <section title="Core fatures">
+            <ul>
+                <li><a href="how-to-use-a-cache.html">How to use a cache</a></li>
+            </ul>
+        </section>
         
         <section title="Database specifica">
             <ul>
