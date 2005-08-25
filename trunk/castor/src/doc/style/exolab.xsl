@@ -733,7 +733,7 @@
 					  <xsl:when test="@tool = 'jira'">
 						  <xsl:choose>
 							 <xsl:when test="@id > 0">
-								<a href="http:/jira.codehaus.org/browse/CASTOR-{@id}"><xsl:value-of select="@id" /></a>
+								<a href="http://jira.codehaus.org/browse/CASTOR-{@id}"><xsl:value-of select="@id" /></a>
 							 </xsl:when>
 							 <xsl:otherwise>
 								<xsl:value-of select="@id"/>
