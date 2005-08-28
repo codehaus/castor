@@ -42,6 +42,24 @@
                 <li><a href="how-to-use-a-cache.html">How to use a cache</a></li>
             </ul>
         </section>
+
+        <section title="Caches">
+            <ul>
+                <li><a href="how-to-create-custom-cache.html">How create a custom cache provider</a></li>
+            </ul>
+        </section>
+        
+        <section title="Connection pooling">
+            <ul>
+                <li><a href="how-to-use-jakarta-dbcp.html">How to use Jakarta DBCP with Castor</a></li>
+            </ul>
+        </section>
+
+        <section title="Use of Castor in J22 applications">
+            <ul>
+                <li><a href="how-to-use-castor-with-distributed-transactions.html">How to use Castor with distributed transaction</a></li>
+            </ul>
+        </section>
         
         <section title="Database specifica">
             <ul>
