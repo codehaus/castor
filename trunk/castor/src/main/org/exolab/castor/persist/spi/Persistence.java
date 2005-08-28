@@ -232,7 +232,7 @@ public interface Persistence
     public Persistence.ColumnInfo[] getColumnInfoForIdentities();
     
     /**
-     * Returns FieldInfos for fields (exclusing identifiers).
+     * Returns FieldInfos for fields (excluding identifiers).
      * @return An array of ColumnInfo instances.
      */
 	public Persistence.FieldInfo[] getInfo();
