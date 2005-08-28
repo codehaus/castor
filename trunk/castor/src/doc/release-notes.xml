@@ -29,6 +29,8 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
             </summary>
+            <bugs>
+            </bugs>
         </release>
 	    <release version="0.9.9M1">
 	        <description>Milestone release for 0.9.9</description>
