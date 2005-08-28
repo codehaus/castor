@@ -403,7 +403,11 @@
         <td>
           <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#ededed">
             <tr>
-              <td><pre style="font-size:9pt"><xsl:apply-templates/></pre></td>
+              <td>
+                <span class="bodyBlack">
+                    <pre><xsl:apply-templates/></pre>
+                </span>
+              </td>
             </tr>
           </table>
         </td>
