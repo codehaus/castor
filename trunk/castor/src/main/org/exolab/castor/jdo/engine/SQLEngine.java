@@ -556,9 +556,11 @@ public final class SQLEngine implements Persistence {
         }
     }
 
-
-    public Object create( Database database, Object conn, Object[] fields, Object identity )
-            throws DuplicateIdentityException, PersistenceException {
+    /* (non-Javadoc)
+     * @see org.exolab.castor.persist.spi.Persistence#create(org.exolab.castor.jdo.Database, java.lang.Object, java.lang.Object[], java.lang.Object)
+     */
+    public Object create(final Database database, final Object conn, final Object[] fields, Object identity)
+    throws DuplicateIdentityException, PersistenceException {
 
         PreparedStatement stmt = null;
         int               count;
@@ -616,36 +618,11 @@ public final class SQLEngine implements Persistence {
              _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
-            for ( int i = 0 ; i < _fields.length ; ++i ) {
-                if ( _fields[ i ].store ) {
-                    if ( fields[i] == null ) {
-                        for ( int j=0; j < _fields[i].columns.length; j++ )
-                            stmt.setNull( count++, _fields[i].columns[j].sqlType );
-
-                    } else if ( fields[i] instanceof Complex ) {
-                        Complex complex = (Complex)fields[i];
-                        if ( complex.size() != _fields[i].columns.length )
-                            throw new PersistenceException( "Size of complex field mismatch!" );
-
-                        for ( int j=0; j<_fields[i].columns.length; j++ ) {
-                            Object value = ( complex == null ? null : complex.get(j) );
-                            SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
-                        }
-                    } else {
-                        if ( _fields[i].columns.length != 1 )
-                            throw new PersistenceException( "Complex field expected! ");
-
-                        if(_log.isDebugEnabled()) {
-                            _log.debug( "Storing field: " + _fields[i] );
-                        }
-                        SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
-                    }
-                }
-            }
+            bindFields(fields, stmt, count);
 
             if(_log.isDebugEnabled()){
                 _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
-               }
+            }
 
             // Generate key during INSERT
             if ( _keyGen != null && _keyGen.getStyle() == KeyGenerator.DURING_INSERT ) {
@@ -676,13 +653,9 @@ public final class SQLEngine implements Persistence {
                     identity = cstmt.getObject( count );
                 identity = idToJava( 0, identity );
             } else {
-            	if(_log.isDebugEnabled()) {
-               	  _log.debug (Messages.format ("jdo.creating.bound", _clsDesc.getJavaClass().getName(), stmt));
-            	}
-            	
                 if(_log.isDebugEnabled()){
                     _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
-                   }
+                }
             	stmt.executeUpdate();
             }
 
@@ -695,8 +668,10 @@ public final class SQLEngine implements Persistence {
 
             return identity;
 
-        } catch ( SQLException except ) {
-            _log.fatal( Messages.format( "jdo.storeFatal",  _type,  _sqlCreate ), except );
+        } catch (SQLException except) {
+        	if (_log.isInfoEnabled()) {
+        		_log.info( Messages.format( "jdo.storeFatal",  _type,  _sqlCreate ), except );
+        	}
 
             // [oleg] Check for duplicate key based on X/Open error code
             // Bad way: all validation exceptions are reported as DuplicateKey
@@ -766,6 +741,41 @@ public final class SQLEngine implements Persistence {
             throw new PersistenceException( Messages.format("persist.nested", except), except );
         }
     }
+
+	/**
+	 * Bind non-identity fields to prepared statement.
+	 * @param fields Field to bind.
+	 * @param stmt PreparedStatement instance.
+	 * @param count Field counter
+	 * @throws SQLException If the fields cannot be bound successfully.
+	 * @throws PersistenceException
+	 */
+	private void bindFields(final Object[] fields, final PreparedStatement stmt, int count) 
+	throws SQLException, PersistenceException {
+		for ( int i = 0 ; i < _fields.length ; ++i ) {
+		    if ( _fields[ i ].store ) {
+		        if ( fields[i] == null ) {
+		            for ( int j=0; j < _fields[i].columns.length; j++ )
+		                stmt.setNull( count++, _fields[i].columns[j].sqlType );
+
+		        } else if ( fields[i] instanceof Complex ) {
+		            Complex complex = (Complex)fields[i];
+		            if ( complex.size() != _fields[i].columns.length )
+		                throw new PersistenceException( "Size of complex field mismatch!" );
+
+		            for ( int j=0; j<_fields[i].columns.length; j++ ) {
+		                Object value = ( complex == null ? null : complex.get(j) );
+		                SQLTypes.setObject( stmt, count++, toSQL( i, j, value), _fields[i].columns[j].sqlType );
+		            }
+		        } else {
+		            if ( _fields[i].columns.length != 1 )
+		                throw new PersistenceException( "Complex field expected! ");
+
+		            SQLTypes.setObject( stmt, count++, toSQL( i, 0, fields[i]), _fields[i].columns[0].sqlType );
+		        }
+		    }
+		}
+	}
 
 
     /**
