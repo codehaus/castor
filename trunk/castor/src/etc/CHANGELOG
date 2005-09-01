@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1071 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Added marketplace section.
+       Details: http://jira.codehaus.org/browse/CASTOR-1071
+       (Werner - 20050901)
+
 Version 0.9.9M1, Aug 24, 2005
 -------------------------------
 

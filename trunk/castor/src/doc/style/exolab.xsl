@@ -572,6 +572,79 @@
     </xsl:for-each>
   </xsl:template>
 
+  <xsl:template match="companies">
+      <xsl:variable name="color-epsilon" select="'#ffffff'"/>
+      <p><span class="bodyGrey"><b><xsl:value-of select="name"/></b></span></p>
+      <p><span class="bodyGrey"><xsl:value-of select="description"/></span></p>
+    <table cellpadding="4" cellspacing="2" width="90%">
+        <xsl:for-each select="company">
+            <h3><xsl:value-of select="name"/></h3>
+            <xsl:variable name="name" select="name"/>
+            <xsl:variable name="url" select="url"/>
+            <xsl:variable name="description" select="description"/>
+            <tr valign="top">
+                <td bgcolor="{$color-epsilon}">
+                    <span class="bodyGrey">
+                        <b>Name</b>
+                    </span>
+                </td>
+                <td>
+                    <span class="bodyGrey">
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:apply-templates select="url"/>
+                            </xsl:attribute>
+                            <xsl:value-of select="name"/>
+                        </a>
+                    </span>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td bgcolor="{$color-epsilon}">
+                    <span class="bodyGrey">
+                        <b>Contact</b>
+                    </span>
+                </td>
+                <xsl:apply-templates select="contact"/>
+            </tr>
+            <tr valign="top">
+                <td bgcolor="{$color-epsilon}">
+                    <span class="bodyGrey">
+                        <b>URL</b>
+                    </span>
+                </td>
+                <td>
+                    <span class="bodyGrey">
+                        <xsl:value-of select="url"/>
+                    </span>
+                </td>
+            </tr>
+            <tr valign="top">
+                <td bgcolor="{$color-epsilon}">
+                    <span class="bodyGrey">
+                        <b>Description</b>
+                    </span>
+                </td>
+                <td>
+                    <span class="bodyGrey">
+                        <xsl:value-of select="description"/>
+                    </span>
+                </td>
+            </tr>
+        </xsl:for-each>
+    </table>
+  </xsl:template>
+  
+    <xsl:template match="contact">
+        <td>
+            <span class="bodyGrey">
+                <xsl:value-of select="name"/><br/> 
+                email: <xsl:value-of select="email"/><br/>
+                phone: <xsl:value-of select="phone"/> 
+            </span>
+        </td>
+    </xsl:template>
+
   <xsl:template match="contributor/email">
      <xsl:call-template name="munge-email">
          <xsl:with-param name="value" select="."/>
