@@ -243,6 +243,10 @@
         <display>Contributors</display>
       </navLink>
       <navLink>
+        <url>marketplace.xml</url>
+        <display>Marketplace</display>
+      </navLink>
+      <navLink>
         <url>status.xml</url>
         <display>Status, Todo</display>
       </navLink>

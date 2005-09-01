@@ -30,6 +30,23 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1071" tool="jira">
+                    <description>
+		                Added marketplace section
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Werner Guttmann</reporter>
+                    <type>Enh</type>
+                    <module>General</module>
+                    <date>20050901</date>
+                </bug>
             </bugs>
         </release>
 	    <release version="0.9.9M1">

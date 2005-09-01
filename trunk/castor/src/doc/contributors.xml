@@ -1,11 +1,45 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <!-- This file contains a list of Castor contributors -->
 <document url="http://castor.codehaus.org/contributors.xml">
+  <properties>
+    <title>People who have supported the Castor project</title>
+    <abstract>
+       General information about the people that have supported the 
+	   Castor project over the time.
+    </abstract>
+    <status>Final</status>
+  </properties>
   <body>
-    <title>Contributors</title>
+    <title>Committers, contributors et alias</title>
     <header>
 
-<contributors>
+		<p>This page lists all people who have gone the extra mile and 
+		   supported Castor in one way or the other, including committers, 
+		   contributors, people who have contributed to the projedt's 
+		   documentation and people who advanced the project by providing us 
+		   with valuable feedback.</p>
+		   
+		<p>If you would like to get involved, the first step is to join the 
+		   <a href="lists.html">mailing lists</a>.</p> 
+
+		<p>We kindly ask to not send us emails privately (e.g. asking for 
+           support). We are non-paid volunteers who help out with the project and 
+           we do not necessarily have the time or energy to help people on an 
+           individual basis.</p>
+           
+		<p>Instead, we have setup <url href="lists.html">mailing lists</url> which 
+           often contain hundreds of individuals. The benefit of using mailing lists 
+           over private communication is that it is a shared resource, where others 
+           can also learn from your messages (whether problem description, advice, 
+		   or common mistakes), and as a community we all grow together.</p>
+		   
+		<p>In addition, use use of mailing lists enables us to maintain
+		   searchable <a href="http://archive.castor.codehaus.org">archives</a> 
+		   of these mailing lists, that cover a vast range of questions and 
+		   answers related to the use of Castor. We simply cannot overstate 
+		   the importance of such archives.</p>
+
+		<contributors>
 
   <!-- PLEASE KEEP THIS FILE ASSORTED ACCORDING TO SECTIONS -->
 
@@ -61,8 +95,8 @@
     <project>JDO</project>
     <company id="anecon" />
     <description>
-       JDO enhancements including TransactionManagerFactory API, the API for JDBC
-       parameters and much more.
+       JDO enhancements including distributed caches, TransactionManagerFactory API, the 
+       API for JDBC parameters and much more.
     </description>
     <status>active</status>
     <since>
@@ -1277,6 +1311,7 @@
     to the development and stability.
   </type>
 
-</contributors>
-</header>
-</body></document>
+	  </contributors>
+	</header>
+  </body>
+</document>
