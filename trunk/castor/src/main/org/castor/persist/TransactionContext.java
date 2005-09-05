@@ -714,15 +714,45 @@ public abstract class TransactionContext {
                     suggestedAccessMode, _lockTimeout, results);
                     
             if (proposedObject.isExpanded()) {
+            	
                 // Remove old OID from ObjectTracker
                 _tracker.untrackObject(objectInTransaction);
+                
                 // Create new OID
-                OID newOID = new OID(engine, proposedObject.getActualClassMolder(), identity);
-                proposedObject.getActualClassMolder().setIdentity(this, proposedObject.getObject(), identity);
+                ClassMolder actualClassMolder = engine.getClassMolder(proposedObject.getActualClass());
+                OID actualOID = new OID(engine, actualClassMolder, identity);
+                actualClassMolder.setIdentity(this, proposedObject.getObject(), identity);
+
+                // Create instance of 'expanded object'
+                Object expandedObject = null;
+                try {
+                    expandedObject = actualClassMolder.newInstance(getClassLoader());
+                } catch (InstantiationException e) {
+                    _log.error("Cannot create instance of " + molder.getName());
+                    throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+                } catch (IllegalAccessException e) {
+                    _log.error("Cannot create instance of " + molder.getName());
+                    throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+                } catch (ClassNotFoundException e) {
+                    _log.error("Cannot create instance of " + molder.getName());
+                    throw new PersistenceException ("Cannot craete instance of " + molder.getName());
+                }
+
                 // Add new OID to ObjectTracker
-                _tracker.trackObject(engine, molder, newOID, proposedObject.getObject());
-                // TODO [WG]: _tracker.trackObject(proposedObject.getActualClassMolder().getLockEngine(), proposedObject.getActualClassMolder(), newOID, proposedObject.getObject());
-                objectInTransaction = proposedObject.getObject();
+                _tracker.trackObject(engine, molder, actualOID, expandedObject);
+                
+                ProposedObject proposedExpanded = new ProposedObject();
+                proposedExpanded.setProposedClass(proposedObject.getActualClass());
+                proposedExpanded.setActualClass(proposedObject.getActualClass());
+                proposedExpanded.setObject(expandedObject);
+                proposedExpanded.setFields(proposedObject.getFields());
+                proposedExpanded.setObjectLockObjectToBeIgnored(true);
+
+                // reload 'expanded object' using correct ClassMolder
+                OID onceAgainOID = engine.load(this, actualOID, proposedExpanded,
+                        suggestedAccessMode, _lockTimeout, results);
+
+                objectInTransaction = proposedExpanded.getObject();
             } else {
                 // rehash the object entry, because oid might have changed!
                 _tracker.trackOIDChange(objectInTransaction, engine, oid, newoid);

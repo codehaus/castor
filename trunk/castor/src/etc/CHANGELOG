@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1195 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Fixed problem with class resolution during loading polymorphic objects.
+       Details: http://jira.codehaus.org/browse/CASTOR-1195
+       (Werner - 20050905)
+
 All:   Fixed bug CASTOR-1071 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Added marketplace section.
        Details: http://jira.codehaus.org/browse/CASTOR-1071

@@ -517,7 +517,7 @@ public class ClassMolder
         Connection conn;
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
-        Object[] fields;
+        Object[] fields = null;
         Object ids;
         Object stamp = null;
         Object temp;
@@ -526,7 +526,11 @@ public class ClassMolder
 
         // load the fields from the persistent storage if the cache is empty
         // and the accessMode is readOnly.
-        fields = (Object[]) locker.getObject( tx );
+        
+        // do not look at ObjectLock's field values if being told to ignore them
+        if (!proposedObject.isObjectLockObjectToBeIgnored()) {
+        	fields = (Object[]) locker.getObject( tx );
+        }
         
         proposedObject.setFields(fields);
         if ( fields == null || accessMode == AccessMode.DbLocked ) {
@@ -558,10 +562,11 @@ public class ClassMolder
                    }
                    _log.debug(sb);
                }
-            } else {
-                oid.setDbLock( accessMode == AccessMode.DbLocked );
-                locker.setObject(tx, fields );
-            }            
+            }
+            
+            oid.setDbLock( accessMode == AccessMode.DbLocked );
+            locker.setObject(tx, fields );
+            
         }
         
         proposedObject.setActualClassMolder(this);
@@ -592,39 +597,8 @@ public class ClassMolder
         // obtain field values
         stamp = loadFields(tx, oid, locker, proposedObject, suggestedAccessMode, results);
         
-        // if the object has been expanded, call ClassMolder.load() recursively
+        // if the object has been expanded, return early
         if (proposedObject.isExpanded()) {
-            ClassMolder molder = oid.getLockEngine().getClassMolder(proposedObject.getActualClass());
-            
-            Object expandedObject = null;
-            try {
-                expandedObject = molder.newInstance(tx.getClassLoader());
-            } catch (InstantiationException e) {
-                _log.error("Cannot create instance of " + molder.getName());
-                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
-            } catch (IllegalAccessException e) {
-                _log.error("Cannot create instance of " + molder.getName());
-                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
-            } catch (ClassNotFoundException e) {
-                _log.error("Cannot create instance of " + molder.getName());
-                throw new PersistenceException ("Cannot craete instance of " + molder.getName());
-            }
-            
-            ProposedObject proposedExpanded = new ProposedObject();
-            proposedExpanded.setProposedClass(proposedObject.getActualClass());
-            proposedExpanded.setActualClass(proposedObject.getActualClass());
-            proposedExpanded.setObject(expandedObject);
-            proposedExpanded.setFields(proposedObject.getFields());
-            
-            // call ClassMolder.load() recursively
-            stamp = molder.load(tx, oid, locker, proposedExpanded, suggestedAccessMode, results);
-            
-            // store expanded information 
-            proposedObject.setActualClass(proposedExpanded.getActualClass());
-            proposedObject.setFields(proposedExpanded.getFields());
-            proposedObject.setObject(proposedExpanded.getObject());
-            proposedObject.setActualClassMolder(proposedExpanded.getActualClassMolder());
-            
             return stamp;
         }
         
