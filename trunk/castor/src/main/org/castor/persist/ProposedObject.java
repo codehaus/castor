@@ -45,6 +45,9 @@ public final class ProposedObject {
 
     /** The actual ClassMolder. */
     private ClassMolder _actualClassMolder = null;
+    
+    /** True if object stored in ObjectLock shoul dbe ignored. */
+    private boolean _objectLockObjectToBeIgnored = false;
 
     //--------------------------------------------------------------------------
 
@@ -174,6 +177,14 @@ public final class ProposedObject {
         buffer.append(">");
         return buffer.toString();
     }
+
+	public boolean isObjectLockObjectToBeIgnored() {
+		return _objectLockObjectToBeIgnored;
+	}
+
+	public void setObjectLockObjectToBeIgnored(boolean lockObjectToBeIgnored) {
+		_objectLockObjectToBeIgnored = lockObjectToBeIgnored;
+	}
 
     //--------------------------------------------------------------------------
 }

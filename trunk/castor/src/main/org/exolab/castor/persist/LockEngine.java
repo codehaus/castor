@@ -366,19 +366,12 @@ public final class LockEngine {
             lockedOid = lock.getOID();
 
             Object stamp = typeInfo.molder.load(tx, lockedOid, lock, proposedObject, suggestedAccessMode, results);
-            
+
+			// if object has been expanded, return early            
             if (proposedObject.isExpanded()) {
-                // Need to modify lock
-                OID newOID = new OID(this, proposedObject.getActualClassMolder(), oid.getIdentity());
-                
                 // Current transaction holds lock for old OID                
-                // lock.release(tx);
                 typeInfo.release(oid, tx);
-                lock = typeInfo.acquire(newOID, tx, action, timeout); 
-                lock.setObject(tx, proposedObject.getFields());
-                // Current transaction now hold lock for new OID
-                
-                lockedOid = lock.getOID();
+                return oid;
             }
             
             // proposal change: lockedOid parameter is not really neccesary.
