@@ -49,7 +49,7 @@ public class Test1214 extends TestCase {
         Database db = jdo.getDatabase();
         db.begin();
 
-        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntEntity.class.getName() + " e");
+        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntEntity.class.getName() + " e WHERE is_defined(property)");
         QueryResults results = query.execute();
         IntEntity testEntity = null;
         while (results.hasMore()) {
@@ -69,7 +69,7 @@ public class Test1214 extends TestCase {
         Database db = jdo.getDatabase();
         db.begin();
         
-        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntAndDoubleEntity.class.getName() + " e");
+        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntAndDoubleEntity.class.getName() + " e WHERE is_defined(property)");
         QueryResults results = query.execute();
         IntAndDoubleEntity testEntity = null;
         while (results.hasMore()) {
@@ -89,7 +89,7 @@ public class Test1214 extends TestCase {
         Database db = jdo.getDatabase();
         db.begin();
         
-        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntAndIntegerEntity.class.getName() + " e");
+        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntAndIntegerEntity.class.getName() + " e WHERE is_defined(property)");
         QueryResults results = query.execute();
         IntAndIntegerEntity testEntity = null;
         while (results.hasMore()) {
@@ -109,7 +109,7 @@ public class Test1214 extends TestCase {
         Database db = jdo.getDatabase();
         db.begin();
         
-        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntegerEntity.class.getName() + " e");
+        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntegerEntity.class.getName() + " e WHERE is_defined(property)");
         QueryResults results = query.execute();
         IntegerEntity testEntity = null;
         while (results.hasMore()) {
@@ -129,7 +129,7 @@ public class Test1214 extends TestCase {
         Database db = jdo.getDatabase();
         db.begin();
         
-        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntegerAndDoubleEntity.class.getName() + " e");
+        OQLQuery query = db.getOQLQuery("SELECT e FROM " + IntegerAndDoubleEntity.class.getName() + " e WHERE is_defined(property)");
         QueryResults results = query.execute();
         IntegerAndDoubleEntity testEntity = null;
         while (results.hasMore()) {
@@ -138,6 +138,22 @@ public class Test1214 extends TestCase {
         }
         
         db.commit();
+        
+        jdo = null;
+    }
+    
+    public void testLoadNullIntAndIntegerEntities() throws Exception {
+        JDOManager.loadConfiguration(getClass().getResource("jdo-conf-int-and-integer.xml").toString());
+        JDOManager jdo = JDOManager.createInstance("test1214-int-and-integer");
+        
+        Database db = jdo.getDatabase();
+        
+        db.begin();
+        IntAndIntegerEntity iEnt = (IntAndIntegerEntity)db.load(IntAndIntegerEntity.class,new Integer(5));
+        db.commit();
+        
+        assertNull(iEnt.getProperty());
+        assertTrue(iEnt.getId() == 5);
         
         jdo = null;
     }
