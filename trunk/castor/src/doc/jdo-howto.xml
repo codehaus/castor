@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document url="http://castor.codehaus.org/jdo-howto.xml">
   <body>
-    <section title="Castor JDO - Hwo Tos">
+    <section title="Castor JDO - How To's">
 
       <section title="Introduction">
 
@@ -40,6 +40,7 @@
         <section title="Core fatures">
             <ul>
                 <li><a href="how-to-use-a-cache.html">How to use a cache</a></li>
+                <li><a href="how-to-map-enums.html">How to map enums</a></li>
             </ul>
         </section>
 
@@ -55,7 +56,7 @@
             </ul>
         </section>
 
-        <section title="Use of Castor in J22 applications">
+        <section title="Use of Castor in J2EE applications">
             <ul>
                 <li><a href="how-to-use-castor-with-distributed-transactions.html">How to use Castor with distributed transaction</a></li>
             </ul>
