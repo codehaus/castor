@@ -12,12 +12,6 @@
     <header>
     </header>
 
-	<section title="Overview">
-
-        <p></p>
-        
-    </section>
-    
     <section title="Intended Audience">
 
         <p>Anyone who wants to enable caching for classes already mapped with Castor JDO.</p>
