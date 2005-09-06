@@ -910,6 +910,15 @@
     </description>
   </contributor>
 
+  <contributor type="Contributor">
+    <name surname="Wichoski" given="Clóvis"/>
+    <email>clovis.wichoski@gmail.com</email>
+    <company id="supridatta"/>
+    <description>
+        Contributed patch for SapDbQueryExpression and CASTOR-1207 (JIRA).
+        Also improved coverage of CTF tests for SapDB.
+    </description>
+  </contributor>
 
   <contributor type="Contributor">
     <name surname="Wise" given="Nic"/>
@@ -1120,12 +1129,6 @@
   </contributor>
 
   <contributor type="Feedback">
-    <name surname="Wichoski" given="Clóvis"/>
-    <email></email>
-    <description>Patch for SapDbQueryExpression</description>
-  </contributor>
-
-  <contributor type="Feedback">
     <name surname="Zamler" given="Eldad"/>
     <email>eldad314@netvision.net.il</email>
     <description>Found and reported bugs in ClassMolder, ObjectLock and SQLEngine</description>
@@ -1269,6 +1272,11 @@
   <company id="sun">
     <name>Sun Microsystems</name>
     <url>www.sun.com</url>
+  </company>
+
+  <company id="supridatta">
+     <name>Supridatta</name>
+     <url>www.supridatta.com.br/index.html</url>
   </company>
 
   <company id="syscon">

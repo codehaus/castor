@@ -926,13 +926,16 @@ public class FieldMolder {
                  // method with that name and one parameter.
                  if ( fieldType != null ) {
                      fieldTypeFromPrimitive = Types.typeFromPrimitive( fieldType );
+                     // first check for setter with reference type (e.g. setXxx(Integer))
                      try {
-                         method = javaClass.getMethod( methodName, new Class[] { fieldType } );
+                    	 method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
                      } catch ( Exception except ) {
+                         // if setter for reference type could not be found
+                         // try to find one for primitive type (e.g. setXxx(int))
                          try {
-                             method = javaClass.getMethod( methodName, new Class[] { fieldTypeFromPrimitive } );
+                        	 method = javaClass.getMethod( methodName, new Class[] { fieldType } );
                          } catch ( Exception except2 ) {
-                         	// log.warn ("Unexpected exception", except2);
+                         	 // log.warn ("Unexpected exception", except2);
                          }
                      }
                  }

@@ -2,7 +2,13 @@
 Version (CVS)
 -------------
 
-All:   Fixed bug CASTOR-1195 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+JDO:   Fixed bug CASTOR-1207 using contribution from Clovis Wichosky[clovis.wichoski@gmail.com]
+       Prefer to use setter with reference type before setter with primitive
+       type if multiple setters are available.
+       Details: http://jira.codehaus.org/browse/CASTOR-1207
+       (Ralf - 20050907)
+
+JDO:   Fixed bug CASTOR-1195 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Fixed problem with class resolution during loading polymorphic objects.
        Details: http://jira.codehaus.org/browse/CASTOR-1195
        (Werner - 20050905)
