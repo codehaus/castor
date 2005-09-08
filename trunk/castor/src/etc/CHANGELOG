@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1195 using contribution from Nick Stuart[nicholas.stuart@gmail.com]
+       Integrated original test case provided into Castor CTF.
+       Details: http://jira.codehaus.org/browse/CASTOR-1195
+       (Werner - 20050908)
+       
 JDO:   Fixed bug CASTOR-1207 using contribution from Clovis Wichosky[clovis.wichoski@gmail.com]
        Prefer to use setter with reference type before setter with primitive
        type if multiple setters are available.

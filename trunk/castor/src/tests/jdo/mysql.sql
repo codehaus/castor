@@ -1003,3 +1003,33 @@ CREATE TABLE poly_OfferComposition(
   Product NUMERIC(10), 
   CONSTRAINT unique_rel UNIQUE (Offer, Product) );
 
+-- tables required for TestPolymorphismDependedndObject
+
+DROP TABLE IF EXISTS poly_extend_object;
+CREATE TABLE poly_extend_object (
+  id            int NOT NULL default '0',
+  description2  varchar(50) NOT NULL default '',
+  PRIMARY KEY (id)
+);
+
+INSERT INTO poly_extend_object VALUES (1, 'This is the extended object.');
+
+DROP TABLE IF EXISTS poly_base_object;
+CREATE TABLE poly_base_object (
+  id           int NOT NULL default '0',
+  description  varchar(50) NOT NULL default '',
+  saved        char(1) default '0',
+  PRIMARY KEY (id)
+);
+
+INSERT INTO poly_base_object VALUES (1, 'This is the test object.', '0');
+
+DROP TABLE IF EXISTS poly_depend_object;
+CREATE TABLE poly_depend_object (
+  id           int NOT NULL default '0',
+  parentId           int NOT NULL default '0',
+  description  varchar(50) NOT NULL default '',
+  PRIMARY KEY (id)
+);
+
+INSERT INTO poly_depend_object VALUES(1, 1, 'This is a description');
