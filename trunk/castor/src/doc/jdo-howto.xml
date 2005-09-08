@@ -41,6 +41,7 @@
             <ul>
                 <li><a href="how-to-use-a-cache.html">How to use a cache</a></li>
                 <li><a href="how-to-map-enums.html">How to map enums</a></li>
+                <li><a href="how-to-connection-proxies.html">How to log SQL statements</a></li>
             </ul>
         </section>
 
