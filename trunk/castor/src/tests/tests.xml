@@ -69,6 +69,7 @@
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
+    <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/>
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
@@ -153,6 +154,7 @@
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
+    <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/>
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
@@ -231,6 +233,7 @@
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
+    <!-- <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/> -->
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
@@ -306,6 +309,7 @@
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
+    <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/>
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
@@ -386,6 +390,7 @@
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
+    <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/>
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
@@ -464,6 +469,7 @@
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
+    <!-- <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/> -->
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
@@ -541,6 +547,7 @@
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
+    <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/>
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
@@ -619,6 +626,7 @@
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
+    <!-- <case id="TC96" class="ctf.jdo.tc9x.TestPolymorphismDependendObjects"/> -->
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->

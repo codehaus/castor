@@ -413,5 +413,51 @@
       <sql name="max_weight" type="integer" />
     </field>
   </class>
+
+    <!-- mappings required for TestPolymorphismDependendObject -->  
+  <key-generator name="IDENTITY"/>
+	
+    <class name="ctf.jdo.tc9x.BaseObject" identity="id">
+        <cache-type type="unlimited"/>
+        <map-to table="poly_base_object" />
+        <field name="id" type="integer">
+            <sql name="id" type="integer"/>
+        </field>
+        <field name="description" type="string">
+            <sql name="description" type="varchar"/>
+        </field>
+        <field name="saved" type="boolean">
+          <sql name="saved" type="char[01]" />
+        </field>
+    </class>
+    
+    <class name="ctf.jdo.tc9x.ExtendedObject" identity="id" extends="ctf.jdo.tc9x.BaseObject">
+        <cache-type type="unlimited"/>
+        <map-to table="poly_extend_object" />
+        <field name="id" type="integer">
+            <sql name="id" type="integer"/>
+        </field>
+        <field name="description2" type="string">
+            <sql name="description2" type="varchar"/>
+        </field>
+        <field name="dependent" type="ctf.jdo.tc9x.DependentObject">
+            <sql many-key="parentId"/>
+        </field>
+    </class>
+    
+    <class name="ctf.jdo.tc9x.DependentObject" identity="id" depends="ctf.jdo.tc9x.ExtendedObject" key-generator="IDENTITY">
+        <cache-type type="unlimited"/>
+        <map-to table="poly_depend_object"/>
+        <field name="id" type="integer">
+            <sql name="id" type="integer"/>
+        </field>
+        <field name="parent" type="ctf.jdo.tc9x.ExtendedObject">
+            <sql name="parentId"/>
+        </field>
+        <field name="description" type="string">
+            <sql name="description" type="varchar"/>
+        </field>
+    </class>
+  
 </mapping>
 

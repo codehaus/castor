@@ -30,6 +30,23 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1195" tool="jira">
+                    <description>
+		                Integrated original test case provided into Castor CTF.
+                    </description>
+                    <contributor>
+                        <name>Nicholas Stuart</name>
+                        <email>nicholas.stuart@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Nicholas Stuart</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050908</date>
+                </bug>
                 <bug id="1207" tool="jira">
                     <description>
                         Prefer to use setter with reference type before setter with primitive
