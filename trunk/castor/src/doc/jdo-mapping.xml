@@ -356,11 +356,10 @@
 
           <li><b>required:</b> If true, the field is not optional.</li>
 
-          <!--
-          <li><b>transient:</b> If true, this field will be ignored during the
-          marshalling. This is usefull in when used with the auto-complete
-          option.</li>
-          -->
+          <li><b>transient:</b> If true, the field will be ignored during persistence (and 
+          XML un-/marshalling). If you want this field to be ignored during any 
+          persistence-related operations only, please use the 'transient' attribute at the 
+          &lt;sql&gt; level.</li>
 
           <li><b>direct:</b> If true, Castor expects a public variable in the object
           and will modify it directly.</li>
@@ -394,6 +393,7 @@
               type        NMTOKENS  #IMPLIED
               many-key    NMTOKENS  #IMPLIED
               many-table  NMTOKEN   #IMPLIED
+              transient   ( true | false )    "false"
               read-only   ( true | false )    "false"
               dirty       ( check | ignore )  "check">
   
@@ -425,6 +425,10 @@
             <li><b>read-only:</b> If true, the column in the relational database
             table will only be read, not updated or deleted.</li>
   
+            <li><b>transient (as of 0.9.9):</b> If true, the field will be ignored during persistence 
+            only. If you want this field to be ignored during XML un-/marshalling as well, 
+            please use the 'transient' attribute at the &lt;field&gt; level.</li>
+          
             <li><b>dirty:</b> If the value is 'ignore', the field will not be checked
             against the database for modification.</li>
           </ul>
