@@ -46,7 +46,8 @@
 
         <section title="Caches">
             <ul>
-                <li><a href="how-to-create-custom-cache.html">How create a custom cache provider</a></li>
+                <li><a href="how-to-create-custom-cache.html">How to create a custom cache provider</a></li>
+                <li><a href="how-to-use-castor-in-a-j2ee-cluster.html">How to use Castor in a J2EE cluster</a></li>
             </ul>
         </section>
         
