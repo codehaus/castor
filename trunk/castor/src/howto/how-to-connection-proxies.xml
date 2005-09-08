@@ -76,6 +76,7 @@
 
         <ul>
             <li><a href="conf-lib.html">Configuration of Castor</a></li>
+            <li><a href="http://jakarta.apache.org/commons/logging/">Jakarta Common Logging</a></li>
         </ul>
         
     </section>
