@@ -13,6 +13,13 @@
 	<MarshallingTest>
       <!-- Root_Object></Root_Object -->
       <UnitTestCase>
+         <Configuration>
+            <Marshal>
+               <Call-method name="setUseXSITypeAtRoot">
+                  <Value type="boolean">true</Value>
+               </Call-method>
+            </Marshal>
+         </Configuration>
          <Name>Test01</Name>
          <Input>input.xml</Input>
          <GoldFile>input.xml</GoldFile>
