@@ -16,30 +16,19 @@
          external driver wrappers to implement a pooling mechanism.
          Some drivers, such as Oracle, provides a pooling mechanism in
          the driver.  For those that do not, there are tools such as
-         <a
-         href="http://sourceforge.net/projects/poolman/">PoolMan</a>,
-         <a
-         href="http://sourceforge.net/projects/proxool/">Proxool</a>
-         and Jakarta's <a
-         href="http://jakarta.apache.org/commons/dbcp.html">DBCP</a>
+         <a href="http://sourceforge.net/projects/proxool/">Proxool</a> and 
+		 Jakarta's <a href="http://jakarta.apache.org/commons/dbcp.html">DBCP</a>
          project.</p>
 
-      <p>Although PoolMan is no longer being maintained, it is still
-         one of the best open-source JDBC poolers that can turn almost
-         any JDBC driver into a pooled data source.  The last released
-         version that is recommended is version 2.0.4, as the 2.1
-         version was still in development when the project stopped.
-         Here, I'll go over the various usage of the PostgreSQL driver
+      <p>Here, I'll go over the various usage of the PostgreSQL driver
          with Castor.  We start with the most basic configurations
          that do not use any pooling, to those with pooling via
-         PoolMan. I'll include how to configure the upcoming
-         pooling version of the PostgreSQL JDBC driver ths will be
-         usable with PostgreSQL 7.3 and later, how to setup a Tomcat JNDI
-         context that Castor can use to get a pooled JDBC
-         connection.</p>
-         
-      <p>Finally, I'll explain how to configure a BasicDataSource from the
-         DBCP package using the &lt;data-source&gt; element.</p>
+         DBCP. I'll include how to configure the pooling version of the 
+		 PostgreSQL JDBC driver ths will be usable with PostgreSQL 7.3 and 
+		 later, how to setup a Tomcat JNDI context that Castor can use to get 
+		 a pooled JDBC connection. Finally, I'll explain how to configure a 
+		 <tt>BasicDataSource</tt> from the DBCP package using the 
+		 &lt;data-source&gt; element.</p>
 
       </section>
 
@@ -77,6 +66,7 @@
 
     </section>
 
+<!--
     <section title="PoolMan Configuration">
 
     <p>Now, the standard PostgresqlDataSource is not a pooling data
@@ -131,7 +121,7 @@
         Castor does not care from where it gets the connection from.</p>
 
      </section>
-     
+-->     
      <section title="Pooling and JDBC DataSources">
      
      	<section title="PostgreSQL 7.3 and later">
@@ -141,11 +131,11 @@
         	   includes a beta version of the driver with this functionality.
                Here is the 'current' configuration needed for the upcoming 7.3
                release of PostgreSQL. (Unless they change it.) Note that in this
-               pooling mechanism currently lacks some features of PoolMan, such
-               as timing out idle connections and removing failed connections
-               from the pool.  In this case, we can create the following
-               data-source entry in the jdo-conf.xml file to provide for our
-               connections with Castor.</p>
+               pooling mechanism currently lacks some features of standrd pooling 
+			   packages such as DBCP, such as timing out idle connections and removing 
+			   failed connections from the pool.  In this case, we can create the 
+			   following  data-source entry in the jdo-conf.xml file to provide 
+			   for our connections with Castor.</p>
 
 <code-panel>        
 <code><![CDATA[
