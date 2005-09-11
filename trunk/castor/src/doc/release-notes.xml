@@ -30,6 +30,23 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1210" tool="jira">
+                    <description>
+		                Removed references to Poolman from documentation on pooling.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>Unknown</reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050907</date>
+                </bug>
                 <bug id="1195" tool="jira">
                     <description>
 		                Integrated original test case provided into Castor CTF.
