@@ -254,10 +254,14 @@ public class DescriptorSourceFactory {
 		jsc.add("desc = (org.exolab.castor.xml.util.XMLFieldDescriptorImpl) getFieldDescriptor(\"");
 		jsc.append(member.getNodeName());
 		jsc.append("\"");
+        jsc.append(", nsURI");        
 		if (member.getNodeType() == FieldInfo.ELEMENT_TYPE)
 			jsc.append(", org.exolab.castor.xml.NodeType.Element);");
 		else if (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE)
 			jsc.append(", org.exolab.castor.xml.NodeType.Attribute);");
+        else {
+            jsc.append("org.exolab.castor.xml.NodeType.Text);");
+        }
 		//--modify the validation code
 		validationCode(member, jsc);
 	}
