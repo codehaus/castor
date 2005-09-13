@@ -19,6 +19,23 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="32">
+            <title>Castor 0.9.9 - 2nd milestone build</title>
+            <author>Werner Guttmann</author>
+            <date>Sep 13 2005</date>
+            <time>23:23:32</time>
+            <summary>
+                I've placed a copy of the <b>2nd</b> Castor 0.9.9 milestone build at the
+                <a href="http://dist.codehaus.org/castor/0.9.9/">Codehaus</a>.<br/><br/>
+
+                This is a bug fix release only. For details about the bugs fixed since the last 
+                release candidate, please have a look at 
+                <a href="http://jira.codehaus.org/browse/CASTOR">the project roadmap</a> and 
+                the interim version of the 
+                <a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+                <br/><br/>
+            </summary>
+        </news>
         <news id="31">
             <title>Castor 0.9.9 - 1st milestone build</title>
             <author>Werner Guttmann</author>
