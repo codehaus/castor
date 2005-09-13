@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 0.9.9M2, Sep 13, 2005
+-------------------------------
+
 JDO:   Fixed bug CASTOR-1210 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Removed references to Poolman from documentation on pooling.
        Details: http://jira.codehaus.org/browse/CASTOR-1210
