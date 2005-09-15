@@ -1186,7 +1186,11 @@ public class ClassMolder
         setIdentity( tx, object, oid.getIdentity() );
 
         for ( int i=0; i < _fhs.length; i++ ) {
-            _resolvers[i].revertObject(tx, oid, object, fields[i]);
+        	if (fields != null) {
+        		_resolvers[i].revertObject(tx, oid, object, fields[i]);
+        	} else {
+        		_resolvers[i].revertObject(tx, oid, object, null);
+        	}
         }
     }
 
