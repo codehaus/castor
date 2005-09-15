@@ -460,10 +460,7 @@
        
           <p>The following fragment shows the Java class declaration for the Product class:</p>
        
-          <table border="1" cellpadding="4">
-             <tr>
-                <td BGCOLOR="#CCCCCC">
-                   <code>
+          <code-panel>
 package myapp;
 
 public class Product 
@@ -492,20 +489,11 @@ public class Product
     public ProductGroup getProductGroup() { ... }
 
     public void setProductGroup( ProductGroup aProductGroup ) { ... }
-}
-               </code>
-            </td>
-         </tr>
-      </table>
+}</code-panel>
 
       <p>The following fragment shows the Java class declaration for the ProductGroup class:</p>
       
-      <table border="1" cellpadding="4">
-              <tr>
-                <td BGCOLOR="#CCCCCC">
-                    <code>
-
-
+      <code-panel>
 public class ProductGroup
 {
 
@@ -521,11 +509,8 @@ public class ProductGroup
 
     public void setName( String name ) { ... }
 
-}
-                  </code>
-               </td>
-            </tr>
-         </table>
+}</code-panel>
+
       </section>
         
        <section title="DDL">
@@ -535,52 +520,31 @@ public class ProductGroup
         
           <p><b>PROD</b>:</p>
           
-          <table border="1" cellpadding="4">
-             <tr>
-                <td BGCOLOR="#CCCCCC">
-                   <code>
+          <code-panel>
 create table prod 
 (
   id        int           not null,
   name      varchar(200)  not null,
   price     numeric(18,2) not null,
   group_id  int           not null
-);
-                   </code>
-                </td>
-             </tr>
-          </table>
+);</code-panel>
 
           <p><b>PROD_GROUP</b>:</p>
           
-          <table border="1" cellpadding="4">
-             <tr>
-                <td BGCOLOR="#CCCCCC">
-                   <code>
+          <code-panel>
 create table prod_group (
   id        int           not null,
   name      varchar(200)  not null
-);
-                   </code>
-                </td>
-             </tr>
-          </table>
+);</code-panel>
           
           <p><b>PROD_DETAIL</b>:</p>
           
-          <table border="1" cellpadding="4">
-             <tr>
-                <td BGCOLOR="#CCCCCC">
-                   <code>
+          <code-panel>
 create table prod_detail (
   id        int           not null,
   prod_id   int           not null,
   name      varchar(200)  not null
-);
-                   </code>
-                </td>
-             </tr>
-          </table>
+);</code-panel>
           
        </section>
        
@@ -588,10 +552,7 @@ create table prod_detail (
 
         <p>The following code fragment shows the object mapping for the ProductGroup class:</p>
            
-        <table border="1" cellpadding="4">
-            <tr>
-                <td BGCOLOR="#CCCCCC">
-                    <code>
+        <code-panel>
 &lt;?xml version="1.0"?>
 &lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
                          "http://castor.exolab.org/mapping.dtd">
@@ -613,27 +574,17 @@ create table prod_detail (
     
   &lt;/class>
 
-&lt;/mapping>
-                    </code>
-                  </td>
-              </tr>
-        </table>
+&lt;/mapping></code-panel>
 
        <p>As a result of that declaration, Castor JDO would create the following SQL statements
           for creating, deleting, loading and updating instances of ProductGroup:</p>
           
-       <table border="1" cellpadding="4">
-         <tr>
-           <td BGCOLOR="#CCCCCC">
-             <code>
+       <code-panel>
 create: INSERT INTO prod_group (id, name) VALUES (?,?)
 delete: DELETE FROM prod_group WHERE id=?
 load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
 update: UPDATE prod_group SET name=? WHERE id=?
-             </code>
-           </td>
-         </tr>
-       </table>
+       </code-panel>
           
        <section title="Read-only fields">
 
@@ -641,7 +592,6 @@ update: UPDATE prod_group SET name=? WHERE id=?
              field <i>name</i> needs to be changed to:</p>
 
           <code-panel>
-             <code>
   &lt;class name="myapp.ProductGroup" identity="id"&gt;
   
     ...    
@@ -649,32 +599,25 @@ update: UPDATE prod_group SET name=? WHERE id=?
       &lt;sql name="name" type="char" <font color="red">read-only="true"</font> /&gt;
     &lt;/field&gt;
     
-  &lt;/class>
-             </code>
-          </code-panel>
+  &lt;/class></code-panel>
          
           <p>As a result of that declaration, Castor JDO creates the following SQL statements
             for creating, deleting, loading and updating instances of ProductGroup:</p>
           
-          <code-panel> 
-             <code>
+          <code-panel>
 create: INSERT INTO prod_group (id) VALUES (?)
 delete: DELETE FROM prod_group WHERE id=?
 load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
-update: <i>no statement will be generated</i>
-             </code>
-          </code-panel> 
+update: <i>no statement will be generated</i></code-panel> 
          
        </section>
 
-<!--
        <section title="Transient fields">
 
           <p>To declare the <i>name</i> field <b>transient</b> with regards to persistence, above field 
              definition for the field <i>name</i> needs to be changed to:</p>
 
           <code-panel>
-             <code>
   &lt;class name="myapp.ProductGroup" identity="id"&gt;
   
     ...    
@@ -682,13 +625,9 @@ update: <i>no statement will be generated</i>
       &lt;sql name="name" type="char" <font color="red">transient="true"</font> /&gt;
     &lt;/field&gt;
     
-  &lt;/class>
-             </code>
-          </code-panel>
+  &lt;/class></code-panel>
 
        </section>
-    
--->
           
        <section title="1:1 relation">
 
@@ -698,7 +637,6 @@ update: <i>no statement will be generated</i>
              ProductGroup:</p>
 
           <code-panel>
-             <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -731,9 +669,7 @@ update: <i>no statement will be generated</i>
         &lt;/field&gt;
 
     &lt;/class&gt;
-    ...
-             </code>
-          </code-panel>
+    ...</code-panel>
        </section>
        
           <section title="1:M relation">
@@ -743,7 +679,6 @@ update: <i>no statement will be generated</i>
                 ProductDetails:</p>
                 
              <code-panel>
-                <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -774,16 +709,13 @@ update: <i>no statement will be generated</i>
                 many-table="category_prod" many-key="prod_id" /&gt;
         &lt;/field&gt;
     &lt;/class&gt;
-    ...
-                </code>
-             </code-panel>
+    ...</code-panel>
              
              <p>The following code fragment shows the corresponding mapping entry for the 
                 ProductDetail class that defines the second leg of the 1:M relation
                 between Product and ProductDetail.</p>
                 
              <code-panel>
-                <code>
   ...
   &lt;class name="myapp.ProductDetail" identity="id" depends="myapp.Product" &gt;
 
@@ -804,9 +736,7 @@ update: <i>no statement will be generated</i>
     &lt;/field&gt;</font>
 
   %lt;/class&gt;
-  ...
-                </code>
-             </code-panel>
+  ...</code-panel>
  
           </section>
        
@@ -817,7 +747,6 @@ update: <i>no statement will be generated</i>
                 product categories:</p>
                 
              <code-panel>
-                <code>
     ...
     &lt;class name="myapp.Product" identity="id"&gt;
 
@@ -849,16 +778,13 @@ update: <i>no statement will be generated</i>
         &lt;/field&gt;</font>
         
     &lt;/class&gt;
-    ...
-                </code>
-             </code-panel>
+    ...</code-panel>
              
              <p>The following code fragment shows the corresponding mapping entry for the 
                 ProductCategory class that defines the second leg of the M:N relation
                 between Product and Category.</p>
 
              <code-panel>
-                <code>
   ...
   &lt;class name="myapp.Category" identity="id"&gt;
   
@@ -884,9 +810,7 @@ update: <i>no statement will be generated</i>
     &lt;/field&gt;</font>
     
   &lt;/class&gt;
-  ...
-                </code>
-             </code-panel>
+  ...</code-panel>
           </section>
 
        </section>

@@ -143,6 +143,10 @@
         <display>JDO FAQ</display>
       </navLink>
       <navLink>
+        <url>jdo-examples.xml</url>
+        <display>JDO Examples</display>
+      </navLink>
+      <navLink>
         <url>jdo-howto.xml</url>
         <display>JDO How-Tos</display>
       </navLink>
