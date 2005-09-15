@@ -79,36 +79,36 @@
         <p><b>NOTE:</b> As of release 0.9.9, four new cache types have been added to Castor, three
             of them open source and one commercial:</p>
             
-        <table>
-            <tr>
+        <ctable>
+            <cheader>
                 <th>name</th>
                 <th>Vendor</th>
                 <th>Version</th>
-            </tr>
-            <tr>
+            </cheader>
+            <crow>
                 <td>coherence</td>
                 <td><url href="http://www.tangosol.com/coherence.jsp">Tangosol Coherence</url></td>
                 <td>2.5</td>
-            </tr>
-            <tr>
+            </crow>
+            <crow>
                 <td>jcs</td>
                 <td><url href="http://jakarta.apache.org/jcs">JCS</url></td>
                 <td>1.2.5</td>
-            </tr>
-<!--            
-            <tr>
+            </crow>
+<!--
+            <crow>
                 <td>jcache</td>
                 <td><url href="http://jcache.sourceforge.net/">JCache</url></td>
                 <td>???</td>
-            </tr>
+            </crow>
 -->            
-            <tr>
+            <crow>
                 <td>fkcache</td>
                 <td><url href="http://jcache.sourceforge.net/">FKCache</url></td>
                 <td>1.0-beta6</td>
-            </tr>
-        </table>
-           
+            </crow>
+        </ctable>
+        
         <p>As some of these cache providers allow for allow you to use it in a <b>distributed</b> 
            mode, this allows Castor JDO to be used in a clustered (multi-JVM) environment. Please see
            the section below for short summayr fo this feature.</p>

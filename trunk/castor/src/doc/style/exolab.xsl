@@ -864,6 +864,41 @@
         </tr>
       </table>
   </xsl:template>
+  
+  <xsl:template match="ctable">
+     <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
+        <tr>
+           <td>
+              <table border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
+                 <caption style="font-weight:bold">
+                    <xsl:value-of select="@caption" />
+                 </caption>
+                 <tr bgcolor="#7270c2">
+                     <xsl:apply-templates select="cheader" />
+                 </tr>
+                 <xsl:apply-templates select="crow" />
+              </table>
+           </td>
+        </tr>
+     </table>
+    
+  </xsl:template>
+  
+  <xsl:template match="cheader">
+    <xsl:copy-of select="." />
+  </xsl:template>
+
+  <xsl:template match="crow">
+    <tr>
+        <xsl:if test="(position() mod 2) = 0">
+           <xsl:attribute name="bgcolor">#FFFFFF</xsl:attribute>
+        </xsl:if>
+        <xsl:if test="(position() mod 2) = 1">
+           <xsl:attribute name="bgcolor">#DDDDDD</xsl:attribute>
+        </xsl:if>
+        <xsl:copy-of select="." />
+    </tr>
+  </xsl:template>
 
 </xsl:stylesheet>
 
