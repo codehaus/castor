@@ -193,6 +193,10 @@
         <url>postgresql-blobs.xml</url>
         <display>LOBs</display>
       </navLink>
+      <navLink>
+        <url>jdo-best-practice.xml</url>
+        <display>Best practice</display>
+      </navLink>
     </section>
 
     <section name="More">
