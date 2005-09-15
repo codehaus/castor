@@ -124,7 +124,7 @@
     <section name="JDO">
       <navLink>
         <url>jdo-introduction.xml</url>
-        <display>Intro/Features</display>
+        <display>Introduction</display>
       </navLink>
       <navLink>
         <url>jdo.xml</url>
