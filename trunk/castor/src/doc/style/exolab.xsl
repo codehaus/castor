@@ -401,7 +401,7 @@
     <table width="100%" border="0" cellspacing="1" cellpadding="1" bgcolor="#7270c2">
       <tr>
         <td>
-          <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#ededed">
+          <table width="100%" border="0" cellspacing="1" cellpadding="4" bgcolor="#dddddd">
             <tr>
               <td>
                 <span class="bodyBlack">
