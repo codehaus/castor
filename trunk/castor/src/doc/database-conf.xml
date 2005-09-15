@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <document url="http://castor.codehaus.org/database-conf.xml">
+  <properties>
+    <title>Castor JDO Configuration</title>
+    <abstract>
+       General information about configuring Castor JDO
+    </abstract>
+    <status>Final</status>
+  </properties>
   <body>
-    <title>Castor JDO Database Configuration</title>
+    <title>Castor JDO - Configuration</title>
 
     <section title="News">
   
@@ -23,10 +30,10 @@
          is by using a configuration file. It specifies the means to obtain a connection
          to the database server, the mapping between Java classes and tables
          in that database server, and the service provider to use for talking
-         to that server (For a more flexible way without configuration files see
+         to that server (For a more flexible, programmatic way without configuration files see
          section <a href="#JDOConfFactory">JDOConfFactory</a>).</p>
 
-      <p>The application will access the database by its given name
+      <p>The application will access the database(s) by its given name
          (<tt>database/name</tt>) and will be able to persist all objects specified
          in the included mapping file(s).</p>
 
@@ -34,27 +41,41 @@
          database server. Different database servers vary in the SQL syntax and
          capabilites they support, and this attribute names the service provider to use.</p>
 
-      <p>The following names are supported in Castor 1.0:
-         <table border="1" cellpadding="4">
-           <tr><td>db2</td><td>DB/2</td></tr>
-           <tr><td>generic</td><td>Generic JDBC support</td></tr>
-           <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
-           <tr><td>informix</td><td>Informix</td></tr>
-           <tr><td>instantdb</td><td>InstantDB</td></tr>
-           <tr><td>interbase</td><td>Interbase</td></tr>
-           <tr><td>mysql</td><td>MySQL</td></tr>
-           <tr><td>oracle</td><td>Oracle 7 - Oracle 9i</td></tr>
-           <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
-           <tr><td>sapdb</td><td>SAP DB</td></tr>
-           <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
-           <tr><td>sybase</td><td>Sybase 11</td></tr>
+      <p>The following names are supported in Castor:<br/>
+         <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
+            <tr>
+               <td>
+                  <table border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
+                     <caption style="font-weight:bold">
+                        Supported persistence engines
+                     </caption>
+                     <tr bgcolor="#7270c2">
+                        <th align="left">engine name</th>
+                        <th align="left">RDBMS</th>
+                     </tr>
+                     <tr><td>db2</td><td>DB/2</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>generic</td><td>Generic JDBC support</td></tr>
+                     <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>informix</td><td>Informix</td></tr>
+                     <tr><td>instantdb</td><td>InstantDB</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>interbase</td><td>Interbase</td></tr>
+                     <tr><td>mysql</td><td>MySQL</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>oracle</td><td>Oracle 7 - Oracle 9i</td></tr>
+                     <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>sapdb</td><td>SAP DB</td></tr>
+                     <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>sybase</td><td>Sybase 11</td></tr>
+                  </table>
+               </td>
+            </tr>
          </table></p>
+
       <p><small>Note: Castor doesn't work with JDBC-ODBC bridge from Sun.
                 In particular, MS Access is not supported.
                 </small></p>
 
       <p>The means to acquire a database connection is specified in one of three
-         ways: as a JDBC 2.0 driver URL, as a JDBC 2.0 DataSource, or as a DataSource
+         ways: as a JDBC driver URL, as a JDBC DataSource, or as a DataSource
          to lookup through JNDI. When Castor is used inside a J2EE application server
          it is recommended to use JNDI lookup (see the <tt>jndi</tt> element),
          allowing the application server to manage connection pooling and distributed
@@ -72,11 +93,11 @@
          configuration and mapping files are obtained from the application JAR and
          reside in the same classpath.</p>
 
-      <p>The <tt>driver</tt> element specifies the JDBC 2.0 driver for obtaining
+      <p>The <tt>driver</tt> element specifies the JDBC driver for obtaining
          new connections to the database server. The driver is obtained from the JDBC
          <tt>DriverManager</tt> and must be located in the class path. The JDBC URL
          locates the driver and provides the access properties. Additional properties
-         may be specified using the <tt>param</tt> element (e.g. buffer size, network
+         may be specified using <tt>param</tt> elements (e.g. buffer size, network
          protocol, etc).</p>
 
       <p>Use the <tt>class-name</tt> attribute to specify the driver class for
@@ -85,15 +106,20 @@
          <tt>Class.forName()</tt>, etc.</p>
       
       <p>For example, to configure an Oracle 8 thin driver, use:
-         <pre><![CDATA[
-  <driver class-name="oracle.jdbc.driver.OracleDriver"
-          url="jdbc:oracle:thin:@host:port:SID">
-    <param name="user" value="scott" />
-    <param name="password" value="tiger" />
-  </driver>]]>
-         </pre></p>
+         <code-panel><![CDATA[
+  <jdo-conf>         
+     <database name="ebiz" engine="oracle">
+        <driver class-name="oracle.jdbc.driver.OracleDriver"
+                url="jdbc:oracle:thin:@host:port:SID">
+           <param name="user" value="scott" />
+           <param name="password" value="tiger" />
+        </driver>
+        ...
+     </database>
+     ...
+  </jdo-conf>]]></code-panel></p>
 
-      <p>The <tt>data-source</tt> element specifies the JDBC 2.0 DataSource for
+      <p>The <tt>data-source</tt> element specifies the JDBC DataSource for
          obtaining new connections to the database server. DataSources are defined
          in the JDBC 2.0 standard extension API which is included with Castor, and
          implement the interface <tt>javax.sql.DataSource</tt>.</p>
@@ -104,18 +130,23 @@
          and depends on the DataSource being used.</p>
 
       <p>For example, to configure a PostgreSQL 7.1 DataSource, use:
-         <pre><![CDATA[
-  <data-source class-name="org.postgresql.PostgresqlDataSource">
-    <param name="serverName" value="host" />
-    <param name="portNumber" value="5432" />
-    <param name="databaseName" value="db" />
-    <param name="user" value="user" />
-    <param name="password=" value="secret" />
-  </data-source>]]>
-         </pre></p>
+         <code-panel><![CDATA[
+  <jdo-conf>
+     <database name="ebiz" engine="oracle">
+        <data-source class-name="org.postgresql.PostgresqlDataSource">
+           <param name="serverName" value="host" />
+           <param name="portNumber" value="5432" />
+           <param name="databaseName" value="db" />
+           <param name="user" value="user" />
+           <param name="password=" value="secret" />
+        </data-source>
+        ...
+     </database>
+     ...
+  </jdo-conf>]]></code-panel></p>
 
-      <p>The <tt>jndi</tt> element specifies the JDBC 2.0 DataSource for obtaining
-         new connections to the database server through JNDI lookup. The JNDI environment
+      <p>The <tt>jndi</tt> element specifies the JDBC DataSource for obtaining
+         new connections to the database server through a JNDI lookup. The JNDI environment
          naming context (ENC) is used to obtain a suitable DataSource..</p>
 
       <p>When running inside a J2EE application server, this is the preferred method
@@ -124,40 +155,141 @@
          transactions.</p>
 
       <p>For example, to specify a J2EE DataSource, use:
-         <pre><![CDATA[
-  <jndi name="java:comp/env/jdbc/mydb" />]]>
-         </pre></p>
+         <code-panel><![CDATA[
+  <jdo-conf>
+     <database name="ebiz" engine="oracle">
+        <jndi name="java:comp/env/jdbc/mydb" />
+     </database>
+     ...
+  </jdo-conf>]]></code-panel></p>
 
     </section>
 
+    <section title="Transaction demarcation">
+
+        <p>As opposed to release pre 0.9.6, transaction demarcation is now configured 
+           in the JDO configuration file. As such, the user has to specify which transaction
+           demarcation to use. Transactions when used with Castor JDO can either be <b>local</b> 
+           or <b>global</b>, and you instruct Castor to use a specific mode by supplying 
+           a <tt>&lt;transaction-demarcation&gt;</tt> element.</p>
+
+        <section title="Local Mode">
+            
+            <p>When using Castor JDO stand-alone and you want Castor to control
+               transaction demarcation, please use the 
+               <tt>&lt;transaction-demarcation&gt;</tt> element as follows:</p>
+
+            <code><![CDATA[
+    <transaction-demarcation mode="local" />]]></code>
+
+        </section>
+
+        <section title="Global Mode">
+            
+            <p>When running inside a J2EE application server, and you want to use
+               global (XA) transactions, please make use the 
+               <tt>&lt;transaction-demarcation&gt;</tt> element as follows:</p>
+
+            <code><![CDATA[
+<transaction-demarcation mode="global">
+   <transaction-manager name="jndi" />
+</transaction-demarcation>]]></code>
+
+            <p>In this mode, the <tt>&lt;transaction-manager&gt;</tt> element specifies the
+               transaction manager that is used by your J2EE container to control these 
+               transactions.</p>
+
+            <p>The following transaction managers are supported in Castor:</p>
+
+         <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
+            <tr>
+               <td>
+                  <table border="0" cellspacing="0" cellpadding="6" bgcolor="#ededed">
+                     <caption style="font-weight:bold">
+                        Supported transaction managers
+                     </caption>
+                     <tr bgcolor="#7270c2">
+                        <th align="left">Name</th>
+                        <th align="left">Description</th>
+                     </tr>
+                        <tr>
+                            <td>jndi</td><td>TM looked up in the JNDI ENC</td>
+                        </tr>
+                        <tr>
+                            <td>websphere</td><td>IBM WebSphere 4 and previous releases</td>
+                        </tr>
+                        <tr>
+                            <td>websphere5</td><td>IBM WebSphere 5</td>
+                        </tr>
+                        <tr>
+                            <td>websphere51</td><td>IBM WebSphere 5.1</td>
+                        </tr>
+                    </table>
+                 </td>
+              </tr>
+           </table>
+
+            <p>In addition to specifying the transaction manager name, it is possible
+               to pass arbitrary name/value pairs to the transaction manager instance.</p>
+
+            <p><b>Note:</b>It should also be noted that "database pooling" must be enabled
+                for the JDO instance when using the WAS v4 and v5 transaction managers, or
+                the JDO "database" instance will fall outside the current transaction/thread,
+                resulting in the error message "No transaction in progress for the current
+                thread". For example:</p>
+
+            <code-panel><![CDATA[
+JDO myJdo = new JDO();
+myJdo.setDatabasePooling( true );
+            ]]></code-panel>
+
+            <p><b>Note:</b> At the moment, only the JNDI transaction manager factory
+               supports such an attribute. In this context, the jndiEnc attribute can be
+               used to specify what JNDI ENC to use to lookup the transaction manager as
+               shown below:</p>
+
+            <code-panel><![CDATA[
+  <transaction-demarcation mode="global">
+    <transaction-manager name="jndi">
+      <param name="jndiEnc" value="java:comp/env/TransactionManager" />
+    </transaction-manager>
+  </transaction-demarcation>]]></code-panel>
+        
+        </section>
+
+    </section>
+    
     <section title="Sample Configuration File">
 
       <p>The following configuration file uses an Oracle 8 thin JDBC driver and
          three mapping files:
-         <pre><![CDATA[
-  <database name="ebiz" engine="oracle">
-    <driver class-name="oracle.jdbc.driver.OracleDriver"
-            url="jdbc:oracle:thin:@machine:post:SID">
-      <param name="user" value="scott" />
-      <param name="password" value="tiger" />
-    </driver>
-    <mapping href="products.xml" />
-    <mapping href="orders.xml" />
-    <mapping href="customers.xml" />
-  </database>]]>
-         </pre></p>
+         <code-panel><![CDATA[
+  <jdo-conf>
+     <database name="ebiz" engine="oracle">
+        <driver class-name="oracle.jdbc.driver.OracleDriver"
+                url="jdbc:oracle:thin:@machine:post:SID">
+           <param name="user" value="scott" />
+           <param name="password" value="tiger" />
+        </driver>
+        <mapping href="products.xml" />
+        <mapping href="orders.xml" />
+        <mapping href="customers.xml" />
+     </database>
+     <transaction-demarcation mode="local" />
+  </jdo-conf>]]></code-panel></p>
 
       <p>The following configuration file uses a connection obtained from the
          J2EE application server and a single mapping file:
-         <pre><![CDATA[
-  <database name="ebiz" engine="oracle">
-    <jndi name="java:comp/env/jdbc/mydb" />
-    <mapping href="ebiz.xml" />
-  </database>]]>
-         </pre></p>
+         <code-panel><![CDATA[
+  <jdo-conf>
+     <database name="ebiz" engine="oracle">
+        <jndi name="java:comp/env/jdbc/mydb" />
+        <mapping href="ebiz.xml" />
+     </database>
+     <transaction-demarcation mode="global" />
+  </jdo-conf>]]></code-panel></p>
 
     </section>
-
 
     <section title="Configuration For Various Databases">
 
@@ -192,6 +324,15 @@
           <td valign="top"><pre><![CDATA[
   <driver class-name="oracle.jdbc.driver.OracleDriver"
           url="jdbc:oracle:thin:@host:post:SID">
+    <param name="user" value="scott" />
+    <param name="password" value="tiger" />
+  </driver>]]></pre></td>
+        </tr>
+        <tr>
+          <td valign="top">mySQL JDBC Driver</td>
+          <td valign="top"><pre><![CDATA[
+  <driver class-name="com.mysql.jdbc.Driver"
+          url="jdbc:mysql:/localhost:2206/test">
     <param name="user" value="scott" />
     <param name="password" value="tiger" />
   </driver>]]></pre></td>
@@ -232,19 +373,19 @@
 
     <p>For validation, the configuration file should include the following
        document type definition. For DTD validation use:
-      <pre><![CDATA[
+      <code-panel><![CDATA[
   <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
                             "http://castor.exolab.org/jdo-conf.dtd">
-      ]]></pre>
+      ]]></code-panel>
       For XML Schema validation use:
-      <pre><![CDATA[
+      <code-panel><![CDATA[
   <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN"
                              "http://castor.exolab.org/jdo-conf.xsd">
-      ]]></pre>
+      ]]></code-panel>
       The Castor namespace URI is <tt>http://castor.exolab.org/</tt>.</p>
 
       <p>The Castor JDO database configuration DTD is:
-         <pre><![CDATA[
+         <code-panel><![CDATA[
   <!ELEMENT jdo-conf ( database+, transaction-demarcation )>
 
   <!ELEMENT database ( ( driver | data-source | jndi )?,
@@ -284,7 +425,7 @@
             name  CDATA #REQUIRED
             value CDATA #REQUIRED>
 
-      ]]></pre></p>
+      ]]></code-panel></p>
 
 
     </section>
