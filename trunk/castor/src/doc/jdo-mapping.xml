@@ -136,7 +136,7 @@
           extended Java object is not referenced in the mapping file.</li>
 
           <li><b>depends:</b> For more information on this field, please see
-          <a href="castor-one.html#Dependent-and-related-relationships">
+          <a href="jdo-other-features.html#Dependent-and-related-relationships">
           Dependent and related relationships</a>.</li>
 
           <li><b>identity:</b> For more information on this field, please see
@@ -156,7 +156,7 @@
 
              <li><b>&lt;cache-type></b>: For more information on this field please see
              <a href="long-transact.html#Bounded-dirty-checking">Bounded Dirty Checking</a>
-             and <a href="castor-one.html#LRU-Cache">LRU Cache</a>.</li>
+             and <a href="jdo-other-features.html#LRU-Cache">LRU Cache</a>.</li>
 
              <li><b>&lt;map-to></b>: Used to tell Castor the name of the relational
              table to which to map.</li>

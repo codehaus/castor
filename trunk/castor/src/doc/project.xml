@@ -155,7 +155,7 @@
         <display>JDO How-Tos</display>
       </navLink>
       <navLink>
-        <url>castor-one.xml</url>
+        <url>jdo-other-features.xml</url>
         <display>Other Features</display>
       </navLink>
     </section>

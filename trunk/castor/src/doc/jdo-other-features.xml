@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.codehaus.org/castor-one.xml">
+<document url="http://castor.codehaus.org/jdo-other-features.xml">
+  <properties>
+    <title>Castor JDO - Advanced features</title>
+    <abstract>
+       Castor JDO - Advanced features
+    </abstract>
+    <status>Final</status>
+  </properties>
   <body>
-    <title>Using new features in castor 0.9 (Beta)</title>
+    <title>Castor JDO - Advanced features</title>
 
     <header>
       <p>Reference: <api package="org.exolab.castor.jdo">The Java Data Objects API</api></p>
@@ -10,7 +17,7 @@
     <section title="Introduction">
         
         <p>As explained at <a href="jdo-introduction.html">the introduction to Castor JDO</a>,
-           Castor has support for many non-basic features such as caching, depend relations, 
+           Castor has support for many advanced features such as caching, depend relations, 
            inheritance, polymorphism, etc. The below sections detail these features, as their
            understanding is required to use Castor JDO in a performant and secure way.</p>
     </section>
