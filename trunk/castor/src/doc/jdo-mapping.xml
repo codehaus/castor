@@ -2,10 +2,11 @@
   <properties>
     <title>Castor JDO Mapping</title>
     <author email="ferret@frii.com">Bruce Snyder</author>
+    <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
     <abstract>
-    Outlines the use the Castor XML Mapping with regard to Castor JDO.
+        Outlines the use the Castor XML Mapping with regard to Castor JDO.
     </abstract>
-    <status>Draft</status>
+    <status>Final</status>
   </properties>
 
   <body>

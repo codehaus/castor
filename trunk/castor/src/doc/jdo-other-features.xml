@@ -2,6 +2,7 @@
 <document url="http://castor.codehaus.org/jdo-other-features.xml">
   <properties>
     <title>Castor JDO - Advanced features</title>
+    <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
     <abstract>
        Castor JDO - Advanced features
     </abstract>

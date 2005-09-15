@@ -2,6 +2,7 @@
 <document url="http://castor.exolab.org/jdo-examples.xml">
   <properties>
     <title>Castor JDO examples</title>
+    <author email="werner DOT guttmann AT gmx DOT net">Werner Guttmann</author>
     <abstract>
        Castor JDO code samples
     </abstract>
