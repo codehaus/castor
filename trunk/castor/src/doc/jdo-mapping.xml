@@ -232,33 +232,37 @@
           of the 'type' attribute. The value of the type attribute can be a fully qualified Java
           object like 'java.lang.String' or one of the allowed aliases:</p>
 
-      <table border="1" cellpadding="4">
-            <tr><th>short name</th><th>Primitive type?</th><th>Java Class</th></tr>
-            <tr><td>big-decimal</td><td>N</td><td>java.math.BigDecimal</td></tr>
-            <tr><td>big-integer</td><td>Y</td><td>java.math.BigInteger</td></tr>
-            <tr><td>boolean</td><td>Y</td><td>java.lang.Boolean.TYPE</td></tr>
-            <tr><td>byte</td><td>Y</td><td>java.lang.Byte.TYPE</td></tr>
-            <tr><td>bytes</td><td>N</td><td>byte[]</td></tr>
-            <tr><td>char</td><td>Y</td><td>java.lang.Character.TYPE</td></tr>
-            <tr><td>chars</td><td>N</td><td>char[]</td></tr>
-            <tr><td>clob</td><td>N</td><td>java.sql.Clob</td></tr>
-            <tr><td>date</td><td>N</td><td>java.util.Date</td></tr>
-            <tr><td>double</td><td>Y</td><td>java.lang.Double.TYPE</td></tr>
-            <tr><td>float</td><td>Y</td><td>java.lang.Float.TYPE</td></tr>
-            <tr><td>int</td><td>Y</td><td>java.lang.Integer.TYPE</td></tr>
-            <tr><td>integer</td><td>Y</td><td>java.lang.Integer</td></tr>
-            <tr><td>locale</td><td>N</td><td>java.util.Locale</td></tr>
-            <tr><td>long</td><td>Y</td><td>java.lang.Long.TYPE</td></tr>
-            <tr><td>other</td><td>N</td><td>java.lang.Object</td></tr>
-            <tr><td>serializable</td><td>Y</td><td>java.io.Serializable</td></tr>
-            <tr><td>short</td><td>Y</td><td>java.lang.Short.TYPE</td></tr>
-            <tr><td>sqldate</td><td>Y</td><td>java.sql.Date</td></tr>
-            <tr><td>sqltime</td><td>Y</td><td>java.sql.Date</td></tr>
-            <tr><td>string</td><td>N</td><td>java.lang.String</td></tr>
-            <tr><td>strings</td><td>N</td><td>String[]</td></tr>                
-            <tr><td>stream</td><td>N</td><td>java.io.InputStream</td></tr>
-            <tr><td>timestamp</td><td>N</td><td>java.sql.Timestamp</td></tr>
-          </table>
+      <ctable>
+        <cheader>
+           <th>short name</th>
+           <th>Primitive type?</th>
+           <th>Java Class</th>
+        </cheader>        
+        <crow><td>big-decimal</td><td>N</td><td>java.math.BigDecimal</td></crow>
+        <crow><td>big-integer</td><td>Y</td><td>java.math.BigInteger</td></crow>
+        <crow><td>boolean</td><td>Y</td><td>java.lang.Boolean.TYPE</td></crow>
+        <crow><td>byte</td><td>Y</td><td>java.lang.Byte.TYPE</td></crow>
+        <crow><td>bytes</td><td>N</td><td>byte[]</td></crow>
+        <crow><td>char</td><td>Y</td><td>java.lang.Character.TYPE</td></crow>
+        <crow><td>chars</td><td>N</td><td>char[]</td></crow>
+        <crow><td>clob</td><td>N</td><td>java.sql.Clob</td></crow>
+        <crow><td>date</td><td>N</td><td>java.util.Date</td></crow>
+        <crow><td>double</td><td>Y</td><td>java.lang.Double.TYPE</td></crow>
+        <crow><td>float</td><td>Y</td><td>java.lang.Float.TYPE</td></crow>
+        <crow><td>int</td><td>Y</td><td>java.lang.Integer.TYPE</td></crow>
+        <crow><td>integer</td><td>Y</td><td>java.lang.Integer</td></crow>
+        <crow><td>locale</td><td>N</td><td>java.util.Locale</td></crow>
+        <crow><td>long</td><td>Y</td><td>java.lang.Long.TYPE</td></crow>
+        <crow><td>other</td><td>N</td><td>java.lang.Object</td></crow>
+        <crow><td>serializable</td><td>Y</td><td>java.io.Serializable</td></crow>
+        <crow><td>short</td><td>Y</td><td>java.lang.Short.TYPE</td></crow>
+        <crow><td>sqldate</td><td>Y</td><td>java.sql.Date</td></crow>
+        <crow><td>sqltime</td><td>Y</td><td>java.sql.Date</td></crow>
+        <crow><td>string</td><td>N</td><td>java.lang.String</td></crow>
+        <crow><td>strings</td><td>N</td><td>String[]</td></crow>                
+        <crow><td>stream</td><td>N</td><td>java.io.InputStream</td></crow>
+        <crow><td>timestamp</td><td>N</td><td>java.sql.Timestamp</td></crow>
+      </ctable>
 
 
       <p>Castor will try to cast the data in the mapping file to the proper Java 
@@ -268,17 +272,21 @@
           <li><p><b>If there is a collection attribute</b>, the items in the following table can be
           used:</p>
 
-            <table border="1" cellpadding="4">
-              <tr><th>name</th><th>type</th><th>default implementation</th></tr>
-              <tr><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td></tr>
-              <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td></tr>
-              <tr><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td></tr>
-              <tr><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td></tr>
-              <tr><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td></tr>
-              <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></tr>
-              <tr><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td></tr>
-              <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></tr>
-            </table>
+            <ctable>
+                <cheader>
+                   <th>name</th>
+                   <th>type</th>
+                   <th>default implementation</th>
+                </cheader>
+              <crow><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td></crow>
+              <crow><td>enumerate</td><td>java.util.Enumeration</td><td>-</td></crow>
+              <crow><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td></crow>
+              <crow><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td></crow>
+              <crow><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td></crow>
+              <crow><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></crow>
+              <crow><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td></crow>
+              <crow><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></crow>
+            </ctable>
 
             <p>The type of the object inside the collection is the 'type' attribute. The 'default
               implementation' is the type used if the object holding the collection is found
@@ -447,373 +455,6 @@
           </p>
 
       </section>
-
-    </section>
-
-
-    <section title="Examples">
-
-       <p>Here are examples of object mappings and the corresponding Java objects and
-          DDL for the database table.</p>
-
-       <section title="Java class files">
-       
-          <p>The following fragment shows the Java class declaration for the Product class:</p>
-       
-          <code-panel>
-package myapp;
-
-public class Product 
-{
-    private int       _id;
-
-    private String    _name; 
-
-    private float     _price; 
-
-    private ProductGroup _group;
-
-
-    public int getId() { ... }
-
-    public void setId( int anId ) { ... }
-
-    public String getName() { ... }
-
-    public void setName( String aName ) { ... }
-
-    public float getPrice() { ... }
-
-    public void setPrice( float aPrice ) { ... }
-
-    public ProductGroup getProductGroup() { ... }
-
-    public void setProductGroup( ProductGroup aProductGroup ) { ... }
-}</code-panel>
-
-      <p>The following fragment shows the Java class declaration for the ProductGroup class:</p>
-      
-      <code-panel>
-public class ProductGroup
-{
-
-    private int       _id;
-
-    private String    _name;
-
-    public int getId() { ... }
-
-    public void setId( int id ) { ... }
-
-    public String getName() { ... }
-
-    public void setName( String name ) { ... }
-
-}</code-panel>
-
-      </section>
-        
-       <section title="DDL">
-       
-          <p>The following sections show the DDL for the relational database tables 
-             PROD, PROD_GROUP and PROD_DETAIL:</p>
-        
-          <p><b>PROD</b>:</p>
-          
-          <code-panel>
-create table prod 
-(
-  id        int           not null,
-  name      varchar(200)  not null,
-  price     numeric(18,2) not null,
-  group_id  int           not null
-);</code-panel>
-
-          <p><b>PROD_GROUP</b>:</p>
-          
-          <code-panel>
-create table prod_group (
-  id        int           not null,
-  name      varchar(200)  not null
-);</code-panel>
-          
-          <p><b>PROD_DETAIL</b>:</p>
-          
-          <code-panel>
-create table prod_detail (
-  id        int           not null,
-  prod_id   int           not null,
-  name      varchar(200)  not null
-);</code-panel>
-          
-       </section>
-       
-       <section title="Object Mappings">
-
-        <p>The following code fragment shows the object mapping for the ProductGroup class:</p>
-           
-        <code-panel>
-&lt;?xml version="1.0"?>
-&lt;!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
-                         "http://castor.exolab.org/mapping.dtd">
-&lt;mapping>
-
-  &lt;class name="myapp.ProductGroup" identity="id"&gt;
-  
-    &lt;description&gt;Product group&lt;/description&gt;
-    
-    &lt;map-to table="prod_group" xml="group" /&gt;
-    
-    &lt;field name="id" type="integer" &gt;
-      &lt;sql name="id" type="integer"/&gt;
-    &lt;/field&gt;
-    
-    &lt;field name="name" type="string"&gt;
-      &lt;sql name="name" type="char" /&gt;
-    &lt;/field&gt;
-    
-  &lt;/class>
-
-&lt;/mapping></code-panel>
-
-       <p>As a result of that declaration, Castor JDO would create the following SQL statements
-          for creating, deleting, loading and updating instances of ProductGroup:</p>
-          
-       <code-panel>
-create: INSERT INTO prod_group (id, name) VALUES (?,?)
-delete: DELETE FROM prod_group WHERE id=?
-load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
-update: UPDATE prod_group SET name=? WHERE id=?
-       </code-panel>
-          
-       <section title="Read-only fields">
-
-          <p>To declare the <i>name</i> field <b>read-only</b>, above field definition for the 
-             field <i>name</i> needs to be changed to:</p>
-
-          <code-panel>
-  &lt;class name="myapp.ProductGroup" identity="id"&gt;
-  
-    ...    
-    &lt;field name="name" type="string"&gt;
-      &lt;sql name="name" type="char" <font color="red">read-only="true"</font> /&gt;
-    &lt;/field&gt;
-    
-  &lt;/class></code-panel>
-         
-          <p>As a result of that declaration, Castor JDO creates the following SQL statements
-            for creating, deleting, loading and updating instances of ProductGroup:</p>
-          
-          <code-panel>
-create: INSERT INTO prod_group (id) VALUES (?)
-delete: DELETE FROM prod_group WHERE id=?
-load:   SELECT prod_group.id, prod_group.name FROM prod_group WHERE prod_group.id=?;
-update: <i>no statement will be generated</i></code-panel> 
-         
-       </section>
-
-       <section title="Transient fields">
-
-          <p>To declare the <i>name</i> field <b>transient</b> with regards to persistence, above field 
-             definition for the field <i>name</i> needs to be changed to:</p>
-
-          <code-panel>
-  &lt;class name="myapp.ProductGroup" identity="id"&gt;
-  
-    ...    
-    &lt;field name="name" type="string" &gt;
-      &lt;sql name="name" type="char" <font color="red">transient="true"</font> /&gt;
-    &lt;/field&gt;
-    
-  &lt;/class></code-panel>
-
-       </section>
-          
-       <section title="1:1 relation">
-
-          <p>The following code fragment shows the mapping file for the Product class. 
-             Apart from the simple field declarations, this includes a simple 1:1 relation between 
-             Product and ProductGroup, where every product instance is associated with a 
-             ProductGroup:</p>
-
-          <code-panel>
-    ...
-    &lt;class name="myapp.Product" identity="id"&gt;
-
-        &lt;map-to table="prod" /&gt;
-
-        &lt;field name="id" type="integer">
-            &lt;sql name="id" type="integer" />
-        &lt;/field>
-
-        &lt;field name="name" type="string">
-            &lt;sql name="name" type="char" />
-        &lt;/field>
-
-        &lt;field name="price" type="float">
-            &lt;sql name="price" type="numeric" />
-        &lt;/field>
-
-        <font color="red">&lt;field name="group" type="myapp.ProductGroup" &gt;
-            &lt;sql name="group_id" /&gt;
-        &lt;/field&gt;</font>
-        
-        &lt;field name="details" type="myapp.ProductDetail"
-               collection="vector"&gt;
-           &lt;sql many-key="prod_id"/&gt;
-        &lt;/field&gt;
-        
-        &lt;field name="categories" type="myapp.Category" collection="vector"&gt;
-           &lt;sql name="category_id"
-                many-table="category_prod" many-key="prod_id" /&gt;
-        &lt;/field&gt;
-
-    &lt;/class&gt;
-    ...</code-panel>
-       </section>
-       
-          <section title="1:M relation">
-             <p>The following code fragment shows (again) the mapping file for the Product class. 
-                The field definition highlighted shows how to declare a 1:M relation between 
-                Product and ProductDetail, where every product instance is made up of many 
-                ProductDetails:</p>
-                
-             <code-panel>
-    ...
-    &lt;class name="myapp.Product" identity="id"&gt;
-
-        &lt;map-to table="prod" /&gt;
-
-        &lt;field name="id" type="integer">
-            &lt;sql name="id" type="integer" />
-        &lt;/field>
-
-        &lt;field name="name" type="string">
-            &lt;sql name="name" type="char" />
-        &lt;/field>
-
-        &lt;field name="price" type="float">
-            &lt;sql name="price" type="numeric" />
-        &lt;/field>
-
-        &lt;field name="group" type="myapp.ProductGroup" &gt;
-            &lt;sql name="group_id" /&gt;
-        &lt;/field&gt;
-        
-        <font color="red">&lt;field name="details" type="myapp.ProductDetail" <font color="red">collection="vector"</font>&gt;
-           &lt;sql many-key="prod_id"/&gt;
-        &lt;/field&gt;</font>
-
-        &lt;field name="categories" type="myapp.Category" collection="vector"&gt;
-           &lt;sql name="category_id"
-                many-table="category_prod" many-key="prod_id" /&gt;
-        &lt;/field&gt;
-    &lt;/class&gt;
-    ...</code-panel>
-             
-             <p>The following code fragment shows the corresponding mapping entry for the 
-                ProductDetail class that defines the second leg of the 1:M relation
-                between Product and ProductDetail.</p>
-                
-             <code-panel>
-  ...
-  &lt;class name="myapp.ProductDetail" identity="id" depends="myapp.Product" &gt;
-
-    &lt;description&gt;Product detail&lt;/description&gt;
-
-    &lt;map-to table="prod_detail" xml="detail" /&gt;
-
-    &lt;field name="id" type="integer"&gt;
-      &lt;sql name="id" type="integer"/&gt;
-    &lt;/field&gt;
-
-    &lt;field name="name" type="string"&gt;
-      &lt;sql name="name" type="char"/&gt;
-    &lt;/field&gt;
-
-    <font color="red">&lt;field name="product" type="myapp.Product"&gt;
-      &lt;sql name="prod_id" /&gt;
-    &lt;/field&gt;</font>
-
-  %lt;/class&gt;
-  ...</code-panel>
- 
-          </section>
-       
-          <section title="M:N relation">
-             <p>The following code fragment shows (again) the mapping file for the Product class. 
-                The field definition highlighted shows how to declare a M:N relation between 
-                Product and ProductCategory, where many products can be mapped to many 
-                product categories:</p>
-                
-             <code-panel>
-    ...
-    &lt;class name="myapp.Product" identity="id"&gt;
-
-        &lt;map-to table="prod" /&gt;
-
-        &lt;field name="id" type="integer">
-            &lt;sql name="id" type="integer" />
-        &lt;/field>
-
-        &lt;field name="name" type="string">
-            &lt;sql name="name" type="char" />
-        &lt;/field>
-
-        &lt;field name="price" type="float">
-            &lt;sql name="price" type="numeric" />
-        &lt;/field>
-
-        &lt;field name="group" type="myapp.ProductGroup" &gt;
-            &lt;sql name="group_id" /&gt;
-        &lt;/field&gt;
-        
-        &lt;field name="details" type="myapp.ProductDetail" collection="vector"&gt;
-           &lt;sql many-key="prod_id">/&gt;
-        &lt;/field&gt;
-
-        <font color="red">&lt;field name="categories" type="myapp.Category" collection="vector"&gt;
-           &lt;sql name="category_id"
-                many-table="category_prod" many-key="prod_id" /&gt;
-        &lt;/field&gt;</font>
-        
-    &lt;/class&gt;
-    ...</code-panel>
-             
-             <p>The following code fragment shows the corresponding mapping entry for the 
-                ProductCategory class that defines the second leg of the M:N relation
-                between Product and Category.</p>
-
-             <code-panel>
-  ...
-  &lt;class name="myapp.Category" identity="id"&gt;
-  
-    &lt;description&gt;
-        A product category, any number of products can belong to
-        the same category, a product can belong to any number of
-        categories
-    &lt;/description&gt;
-    
-    &lt;map-to table="category" xml="category" /&gt;
-    
-    &lt;field name="id" type="integer"&gt;
-      &lt;sql name="id" type="integer"/&gt;
-    &lt;/field&gt;
-    
-    &lt;field name="name" type="string"&gt;
-      &lt;sql name="name" type="char"/&gt;
-    &lt;/field&gt;
-    
-    <font color="red">&lt;field name="products" type="myapp.Product" collection="vector"&gt;
-      &lt;sql name="prod_id"
-           many-table="category_prod" many-key="category_id" /&gt;
-    &lt;/field&gt;</font>
-    
-  &lt;/class&gt;
-  ...</code-panel>
-          </section>
-
-       </section>
 
     </section>
 
