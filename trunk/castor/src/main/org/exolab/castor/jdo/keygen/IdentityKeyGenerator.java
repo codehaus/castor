@@ -100,7 +100,8 @@ implements KeyGenerator
 			!fName.equals("mysql") && 
             !fName.equals("informix") &&
             !fName.equals("sapdb") &&
-            !fName.equals("db2")) {
+            !fName.equals("db2") && 
+            !fName.equals("derby")) {
             throw new MappingException(
             	Messages.format("mapping.keyGenNotCompatible", getClass().getName(), fName));
         }
@@ -133,6 +134,12 @@ implements KeyGenerator
             throw new MappingException(
                 Messages.format("mapping.keyGenSQLType", getClass().getName(), new Integer(sqlType)));
         }
+
+        if (sqlType != Types.NUMERIC &&
+            	fName.equals("derby")) {
+                throw new MappingException(
+                    Messages.format("mapping.keyGenSQLType", getClass().getName(), new Integer(sqlType)));
+            }
     }
 
     /**
@@ -182,6 +189,8 @@ implements KeyGenerator
             type = new DB2Type();
         } else if (fName.equals("sapdb")) {
             type = new SapDbType();
+        } else if (fName.equals("derby")) {
+            type = new DerbyType();
         } else {
             type = new DefaultType();
         }
@@ -286,6 +295,12 @@ implements KeyGenerator
     private class SapDbType extends AbstractType {
         Object getValue(Connection conn, String tableName) throws PersistenceException {
             return getValue("SELECT " +  tableName + ".currval" +  " FROM " + tableName, conn);
+        }
+    }
+    
+    private class DerbyType extends AbstractType {
+        Object getValue(Connection conn, String tableName) throws PersistenceException {
+            return getValue("SELECT IDENTITY_VAL_LOCAL() FROM " + tableName, conn);
         }
     }
     
