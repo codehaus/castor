@@ -10,20 +10,6 @@
   <body>
     <title>Castor JDO - Configuration</title>
 
-    <section title="News">
-  
-       <ul>
-           <li><b>Release 0.9.6</b>: Changed section about the jdo-conf.dtd to bring it in-line with the
-               changed syntax requirements. Please note that the new root element is named 
-               'jdo-conf', a 'transaction-demarcation' element is required and that for parameter 
-               specification only 'param' elements are used.</li>
-           <li>Added a new section about the use of 
-               <a href="#JDOConfFactory">JDOConfFactory</a> to specify a database
-               configuration without the need to write XML configuration files.</li>
-       </ul>
-
-	</section>
-
     <section title="The Castor configuration file">
 
       <p>The default way to configure how Castor interacts with a specific database system 
@@ -41,38 +27,37 @@
          database server. Different database servers vary in the SQL syntax and
          capabilites they support, and this attribute names the service provider to use.</p>
 
-      <p>The following names are supported in Castor:<br/>
-         <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
-            <tr>
-               <td>
-                  <table border="0" cellspacing="1" cellpadding="8" bgcolor="#ededed">
-                     <caption style="font-weight:bold">
-                        Supported persistence engines
-                     </caption>
-                     <tr bgcolor="#7270c2">
-                        <th align="left">engine name</th>
-                        <th align="left">RDBMS</th>
-                     </tr>
-                     <tr><td>db2</td><td>DB/2</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>generic</td><td>Generic JDBC support</td></tr>
-                     <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>informix</td><td>Informix</td></tr>
-                     <tr><td>instantdb</td><td>InstantDB</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>interbase</td><td>Interbase</td></tr>
-                     <tr><td>mysql</td><td>MySQL</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>oracle</td><td>Oracle 7 - Oracle 9i</td></tr>
-                     <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>sapdb</td><td>SAP DB</td></tr>
-                     <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>sybase</td><td>Sybase 11</td></tr>
-                  </table>
-               </td>
-            </tr>
-         </table></p>
+      <p>The following names are supported in Castor:</p>
+	  
+      <table border="0" cellspacing="1" cellpadding="2" bgcolor="#7270c2">
+         <tr>
+            <td>
+               <table border="0" cellspacing="0" cellpadding="6" bgcolor="#ededed">
+                  <tr bgcolor="#7270c2" style="color:#000000">
+                     <th align="left">engine name</th>
+                     <th align="left">RDBMS</th>
+                  </tr>
+                  <tr bgcolor="#DEDEDE"><td>db2</td><td>DB/2</td></tr>
+                  <tr><td>derby</td><td>Derby</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>generic</td><td>Generic JDBC support</td></tr>
+                  <tr><td>hsql</td><td>Hypersonic SQL</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>informix</td><td>Informix</td></tr>
+                  <tr><td>instantdb</td><td>InstantDB</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>interbase</td><td>Interbase</td></tr>
+                  <tr><td>mysql</td><td>MySQL</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>oracle</td><td>Oracle 7 - Oracle 9i</td></tr>
+                  <tr><td>postgresql</td><td>PostgreSQL 7.1</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>sapdb</td><td>SAP DB / MaxDB</td></tr>
+                  <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
+                  <tr bgcolor="#DEDEDE"><td>sybase</td><td>Sybase 11</td></tr>
+               </table>
+            </td>
+         </tr>
+      </table>
 
       <p><small>Note: Castor doesn't work with JDBC-ODBC bridge from Sun.
                 In particular, MS Access is not supported.
-                </small></p>
+      </small></p>
 
       <p>The means to acquire a database connection is specified in one of three
          ways: as a JDBC driver URL, as a JDBC DataSource, or as a DataSource
@@ -179,8 +164,8 @@
                transaction demarcation, please use the 
                <tt>&lt;transaction-demarcation&gt;</tt> element as follows:</p>
 
-            <code><![CDATA[
-    <transaction-demarcation mode="local" />]]></code>
+            <code-panel><![CDATA[
+<transaction-demarcation mode="local" />]]></code-panel>
 
         </section>
 
@@ -190,10 +175,10 @@
                global (XA) transactions, please make use the 
                <tt>&lt;transaction-demarcation&gt;</tt> element as follows:</p>
 
-            <code><![CDATA[
+            <code-panel><![CDATA[
 <transaction-demarcation mode="global">
    <transaction-manager name="jndi" />
-</transaction-demarcation>]]></code>
+</transaction-demarcation>]]></code-panel>
 
             <p>In this mode, the <tt>&lt;transaction-manager&gt;</tt> element specifies the
                transaction manager that is used by your J2EE container to control these 
@@ -205,29 +190,18 @@
             <tr>
                <td>
                   <table border="0" cellspacing="0" cellpadding="6" bgcolor="#ededed">
-                     <caption style="font-weight:bold">
-                        Supported transaction managers
-                     </caption>
-                     <tr bgcolor="#7270c2">
+                     <tr bgcolor="#7270c2" style="color:#000000">
                         <th align="left">Name</th>
                         <th align="left">Description</th>
                      </tr>
-                        <tr>
-                            <td>jndi</td><td>TM looked up in the JNDI ENC</td>
-                        </tr>
-                        <tr>
-                            <td>websphere</td><td>IBM WebSphere 4 and previous releases</td>
-                        </tr>
-                        <tr>
-                            <td>websphere5</td><td>IBM WebSphere 5</td>
-                        </tr>
-                        <tr>
-                            <td>websphere51</td><td>IBM WebSphere 5.1</td>
-                        </tr>
-                    </table>
-                 </td>
-              </tr>
-           </table>
+                     <tr><td>jndi</td><td>TM looked up in the JNDI ENC</td></tr>
+                     <tr><td>websphere</td><td>IBM WebSphere 4 and previous releases</td></tr>
+                     <tr><td>websphere5</td><td>IBM WebSphere 5</td></tr>
+                     <tr><td>websphere51</td><td>IBM WebSphere 5.1</td></tr>
+                  </table>
+               </td>
+            </tr>
+         </table>
 
             <p>In addition to specifying the transaction manager name, it is possible
                to pass arbitrary name/value pairs to the transaction manager instance.</p>
@@ -250,9 +224,9 @@ myJdo.setDatabasePooling( true );
 
             <code-panel><![CDATA[
   <transaction-demarcation mode="global">
-    <transaction-manager name="jndi">
-      <param name="jndiEnc" value="java:comp/env/TransactionManager" />
-    </transaction-manager>
+     <transaction-manager name="jndi">
+        <param name="jndiEnc" value="java:comp/env/TransactionManager"/>
+     </transaction-manager>
   </transaction-demarcation>]]></code-panel>
         
         </section>
@@ -268,14 +242,14 @@ myJdo.setDatabasePooling( true );
      <database name="ebiz" engine="oracle">
         <driver class-name="oracle.jdbc.driver.OracleDriver"
                 url="jdbc:oracle:thin:@machine:post:SID">
-           <param name="user" value="scott" />
-           <param name="password" value="tiger" />
+           <param name="user" value="scott"/>
+           <param name="password" value="tiger"/>
         </driver>
-        <mapping href="products.xml" />
-        <mapping href="orders.xml" />
-        <mapping href="customers.xml" />
+        <mapping href="products.xml"/>
+        <mapping href="orders.xml"/>
+        <mapping href="customers.xml"/>
      </database>
-     <transaction-demarcation mode="local" />
+     <transaction-demarcation mode="local"/>
   </jdo-conf>]]></code-panel></p>
 
       <p>The following configuration file uses a connection obtained from the
@@ -283,10 +257,14 @@ myJdo.setDatabasePooling( true );
          <code-panel><![CDATA[
   <jdo-conf>
      <database name="ebiz" engine="oracle">
-        <jndi name="java:comp/env/jdbc/mydb" />
-        <mapping href="ebiz.xml" />
+        <jndi name="java:comp/env/jdbc/mydb"/>
+        <mapping href="ebiz.xml"/>
      </database>
-     <transaction-demarcation mode="global" />
+     <transaction-demarcation mode="global">
+        <transaction-manager name="jndi">
+           <param name="jndiEnc" value="java:comp/env/TransactionManager"/>
+        </transaction-manager>
+     </transaction-demarcation>
   </jdo-conf>]]></code-panel></p>
 
     </section>
@@ -308,17 +286,6 @@ myJdo.setDatabasePooling( true );
     <param name="serverName" value="host" />
   </data-source>]]></pre></td>
         </tr>
-<!-- JDBC-ODBC don't work with Castor!
-        <tr>
-          <td valign="top">JDBC-ODBC (Access, SQL Server)</td>
-          <td valign="top"><pre><![CDATA[
-  <driver class-name="sun.jdbc.odbc.JdbcOdbcDriver" 
-          url="jdbc:odbc:db">
-    <param name="user" value="user"/>
-    <param name="password" value="secret"/>
-  </driver>]]></pre></td>
-        </tr>
--->
         <tr>
           <td valign="top">Oracle Thin Driver</td>
           <td valign="top"><pre><![CDATA[
@@ -436,13 +403,13 @@ myJdo.setDatabasePooling( true );
       <p>Many applications need to connect to a database using varying
          user accounts or database instances. To accomplish this, the utility
          class <api class="org.exolab.castor.jdo.util.JDOConfFactory">JDOConfFactory</api>
-         and a JDOManager.loadConfiguration() overload accepting an <api>org.exolab.castor.jdo.conf.JdoConf</api>
-         instance has been added to Castor.</p>
+         and a JDOManager.loadConfiguration(org.exolab.castor.jdo.conf.JdoConf) method
+		 has been added to Castor.</p>
          
       <p>The following code snippet shows an example how to create a JDO configuration without 
          the use of a default XML-based database configuration file:</p>
          
-      <code>
+      <code-panel>
   private static final String DRIVER = "oracle.jdbc.driver.OracleDriver";
   private static final String CONNECT = "jdbc:oracle:thin:localhost:1521:SID";
   private static final String USERNAME = "scott";
@@ -471,12 +438,12 @@ myJdo.setDatabasePooling( true );
   
   <comment>// Obtain a new database</comment>
   Database db = jdoManager.getDatabase();
-       </code>
+       </code-panel>
 
        <p>As an alternative to using a org.exolab.castor.jdo.conf.Driver,
           you can also configure Castor to use a JDBC 2.0 DataSource:</p>
 
-       <code>
+       <code-panel>
   private static final String DS = "oracle.jdbc.pool.OracleConnectionCacheImpl";
   private static final String CONNECT = "jdbc:oracle:thin:localhost:1521:SID";
   private static final String USERNAME = "scott";
@@ -511,7 +478,7 @@ myJdo.setDatabasePooling( true );
   
   <comment>// Obtain a new database</comment>
   Database db = jdoManager.getDatabase();
-       </code>
+       </code-panel>
 
     </section>
 

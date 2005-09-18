@@ -14,53 +14,44 @@
 
     <section title="Introduction">
 
-      <p>
-      The Castor mapping file also provides a mechanism for binding a Java
-      object model to a relational database model. This is usually referred to
-      as object-to-relational mapping (O/R mapping). O/R mapping bridges the gap
-      between an object model and a relational model.
-      </p>
+      <p>The Castor mapping file also provides a mechanism for binding a Java
+         object model to a relational database model. This is usually referred to
+         as object-to-relational mapping (O/R mapping). O/R mapping bridges the gap
+         between an object model and a relational model.</p>
 
-      <p>
-      The mapping file provides a description of the Java object model to
-      Castor JDO. Via Castor XML, Castor JDO uses the information in the mapping
-      file to map Java objects to relational database tables. The
-      following is a high-level example of a mapping file:
-      </p>
+      <p>The mapping file provides a description of the Java object model to
+         Castor JDO. Via Castor XML, Castor JDO uses the information in the mapping
+         file to map Java objects to relational database tables. The
+         following is a high-level example of a mapping file:</p>
 
-      <code>
-      &lt;mapping>
-          &lt;class ... >
-              &lt;map-to ... />
-              &lt;field ... >
-                  &lt;sql ... />
-              &lt;/field>
-              ...
-          &lt;/class>
-      &lt;/mapping>
-      </code>
+      <code-panel><![CDATA[
+  <mapping>
+      <class ... >
+          <map-to ... />
+          <field ... >
+              <sql ... />
+          </field>
+          ...
+      </class>
+  </mapping>]]></code-panel>
 
-      <p>
-      Each Java object is represented by a &lt;class> element composed of attributes,
-      a &lt;map-to> element and &lt;field> elements. The &lt;map-to> element
-      contains a reference to the relational table to which the Java object maps.
-      Each &lt;field> element represents either a public class variable or a the
-      variable's accessor/mutator methods (depending upon the mapping info). Each
-      &lt;field> element is composed of attributes and one &lt;sql> element.
-      The &lt;sql> element represents the field in the relational table to which
-      the &lt;field> element maps.
-      </p>
+      <p>Each Java object is represented by a &lt;class> element composed of attributes,
+         a &lt;map-to> element and &lt;field> elements. The &lt;map-to> element
+         contains a reference to the relational table to which the Java object maps.
+         Each &lt;field> element represents either a public class variable or a the
+         variable's accessor/mutator methods (depending upon the mapping info). Each
+         &lt;field> element is composed of attributes and one &lt;sql> element.
+         The &lt;sql> element represents the field in the relational table to which
+         the &lt;field> element maps.</p>
 
-      <p>
-      It is possible to use the mapping file and Castor's default behavior in
-      conjunction. When Castor handles an object but is unable to locate
-      information about it in the mapping file, it will rely upon its default
-      behavior. Castor makes use of the Java programming language
-      <a href="http://java.sun.com/j2se/1.4.1/docs/api/java/lang/reflect/package-summary.html">
-      Reflection API</a> to introspect the Java objects to determine the methods
-      to use. This is the reason some attributes are not required in the mapping
-      file.
-      </p>
+      <p>It is possible to use the mapping file and Castor's default behavior in
+         conjunction. When Castor handles an object but is unable to locate
+         information about it in the mapping file, it will rely upon its default
+         behavior. Castor makes use of the Java programming language
+         <a href="http://java.sun.com/j2se/1.4.1/docs/api/java/lang/reflect/package-summary.html">
+         Reflection API</a> to introspect the Java objects to determine the methods
+         to use. This is the reason some attributes are not required in the mapping
+         file.</p>
 
     </section>
 
