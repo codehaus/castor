@@ -107,6 +107,7 @@
             
             <ul>
             <li>DB2</li>
+            <li>Derby</li>
             <li>Generic DBMS</li>
             <li>Hypersonic SQL</li>
             <li>Informix</li>
@@ -115,7 +116,7 @@
             <li>MySQL</li>
             <li>Oracle</li>
             <li>PostgreSQL</li>
-            <li>SAP DB</li>
+            <li>SAP DB / MaxDB</li>
             <li>SQLServer</li>
             <li>Sybase</li>
             </ul>

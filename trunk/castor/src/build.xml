@@ -44,6 +44,7 @@
         <property name="apipackagenames" value="
             org.exolab.castor.types,
             org.exolab.castor.jdo,
+            org.exolab.castor.jdo.util,
             org.exolab.castor.xml,
             org.exolab.castor.dsml,
             org.exolab.castor.mapping,

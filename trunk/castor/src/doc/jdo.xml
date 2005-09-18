@@ -21,7 +21,7 @@
         <p>Client applications are responsible for defining the JDO configuration, and managing 
            the transaction explicitly. The database is by default configured through a separate
            XML file which links to the mapping file. Alternatively, it can be configured using the
-           utility class <api class="org.exolab.castor.util.JdoConfFactory">JdoConfFactory</api>.</p>
+           utility class <api class="org.exolab.castor.jdo.util.JDOConfFactory">JDOConfFactory</api>.</p>
 
 		<p>In the example code I refer to the JDO configuration file as <tt>jdo-conf.xml</tt>, but 
 		   any name can be used. See <a href="database-conf.xml">Castor JDO Configuration</a> for more 
