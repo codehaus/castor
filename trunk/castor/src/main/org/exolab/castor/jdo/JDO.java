@@ -592,10 +592,7 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
          * demarcation, we have both a TransactionManagerFactory (different
          * from LOCAL) and a TransactionManager instance.
          */
-        if (!(_transactionManager instanceof LocalTransactionManager) 
-                && !LocalTransactionManagerFactory.NAME.equals(
-                        _transactionManagerFactory.getName())) {
-            
+        if (!(_transactionManager instanceof LocalTransactionManager)) {
             Transaction        transaction;
             DatabaseImpl       dbImpl;
 
