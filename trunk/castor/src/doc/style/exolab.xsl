@@ -578,27 +578,19 @@
       <p><span class="bodyGrey"><xsl:value-of select="description"/></span></p>
     <table cellpadding="4" cellspacing="2" width="90%">
         <xsl:for-each select="company">
-            <h3><xsl:value-of select="name"/></h3>
             <xsl:variable name="name" select="name"/>
             <xsl:variable name="url" select="url"/>
             <xsl:variable name="description" select="description"/>
-            <tr valign="top">
-                <td bgcolor="{$color-epsilon}">
-                    <span class="bodyGrey">
-                        <b>Name</b>
-                    </span>
-                </td>
-                <td>
-                    <span class="bodyGrey">
-                        <a>
-                            <xsl:attribute name="href">
-                                <xsl:apply-templates select="url"/>
-                            </xsl:attribute>
-                            <xsl:value-of select="name"/>
-                        </a>
-                    </span>
-                </td>
-            </tr>
+			<tr><td colspan="2">
+				<h3>
+                     <a>
+                         <xsl:attribute name="href">
+                             <xsl:apply-templates select="url"/>
+                         </xsl:attribute>
+                         <xsl:value-of select="name"/>
+                     </a>
+				</h3>
+			</td></tr>
             <tr valign="top">
                 <td bgcolor="{$color-epsilon}">
                     <span class="bodyGrey">
