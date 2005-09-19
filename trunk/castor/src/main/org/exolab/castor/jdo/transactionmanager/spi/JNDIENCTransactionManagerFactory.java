@@ -94,6 +94,11 @@ public final class JNDIENCTransactionManagerFactory implements TransactionManage
                 "jdo.transaction.failToGetManager", jndiENC), ex);
         }
 
+        if (transactionManager==null) {
+            throw new TransactionManagerAcquireException(Messages.format(
+                    "jdo.transaction.failToGetManager", jndiENC));
+        }
+        
         return transactionManager;
     }
 
