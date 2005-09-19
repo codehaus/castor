@@ -74,10 +74,10 @@ public final class TransactionManagerRegistry {
             // should change the configuration.
             String mode = null;
             TransactionDemarcation demarcation = jdoConf.getTransactionDemarcation();
-            if (demarcation.getTransactionManager() != null) {
-                mode = demarcation.getTransactionManager().getName();
-            } else if (LOCAL_TX_NAME.equals(demarcation.getMode())) {
+            if (LOCAL_TX_NAME.equals(demarcation.getMode())) {
                 mode = LOCAL_TX_NAME;
+            } else if (demarcation.getTransactionManager() != null) {
+                mode = demarcation.getTransactionManager().getName();
             } else {
                 String msg = Messages.message("jdo.transaction.missingConfiguration");
                 LOG.error(msg);
