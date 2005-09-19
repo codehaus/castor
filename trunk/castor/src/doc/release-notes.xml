@@ -49,6 +49,26 @@
                    the following problem areas have been addressed.</p>
             </summary>
             <bugs>
+                <bug id="1215" tool="jira">
+                    <description>
+		                Fixed JDO.getDatabase()NullPointerException.
+                    </description>
+                    <contributor>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Jeremy Whitlock</name>
+                        <email>jcscoobyrs@gmail.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20050919</date>
+                </bug>
                 <bug id="1210" tool="jira">
                     <description>
 		                Removed references to Poolman from documentation on pooling.
