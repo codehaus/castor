@@ -48,12 +48,10 @@
 	<section title="Use of Castor in other open source projects">
 		
 		<p>This section identifies various (mainly) open source projects where 
-		   Castor is used and/pr that offer tight integration with Castor or
+		   Castor is used and/or that offer tight integration with Castor or
 		   parts thereof.</p>
 		   
-		<section title="Apache Cocoon">
-			
-			<p><a href="http://cocoon.apache.org">Project home</a></p>
+        <h3><a href="http://cocoon.apache.org">Apache Cocoon</a></h3>
 			
 			<p>Apache Cocoon is a web publishing framework built around the 
 			   concepts of separation of concerns and component-based web 
@@ -65,9 +63,8 @@
 			   XML and inserts it as a stream of SAX events into a Cocoon 
 			   pipeline.</p>
 
-			<p>Further information on the integration of Apche Cocoon and
+			<p>Further information on the integration of Apache Cocoon and
 			   Castor can be found <a href="projects.xml">here</a>.</p>
-		</section>
 		
 	</section>
 	<section title="Companies and their commercial offerings">
@@ -76,7 +73,7 @@
         
 		<company id="anecon">
 			<name>Anecon Softwaredesign und Beratung Ltd.</name>
-			<url>www.anecon.com</url>
+			<url>http://www.anecon.com</url>
 			<contact>
 				<name>Werner Guttmann</name>
 				<email>werner.guttmann@anecon.com</email>
@@ -93,7 +90,7 @@
 		</company>
 
 		<company id="codo">
-			<name>Andrew Fawcett</name>
+			<name>CODA: Financial Intelligence</name>
 			<url>http://www.coda.com</url>
 			<contact>
 				<name>Andrew Fawcett</name>
@@ -126,17 +123,17 @@
 		</company>
 
 		<company id="syscon">
-			<name>Syscon Ingenieurb?ro f?r Me?- und Datentechnik GmbH</name>
-			<url>www.syscon-world.de</url>
+			<name>Syscon Ingenieurbüro für Meß- und Datentechnik GmbH</name>
+			<url>http://www.syscon-world.de</url>
 			<contact>
 				<name>Ralf Joachim</name>
 				<email>ralf.joachim@syscon-world.de</email>
-				<phone></phone>
+				<phone>+49 7071 369098</phone>
 				<description>CEO, Technical architect</description>
 			</contact>
 			<description>
 				Syscon is primarily concerned with the developement of custom-build/purpose-build
-				software solutions and the design of database systemssince its foundation in 1996.
+				software solutions and the design of database systems since its foundation in 1996.
 				For 4 years we have been developing Java applications in enterprise environment.
 				For these applications, we frequently use our own client/server framework side by
 				side with open source projects such as the data binding framework Castor, where
