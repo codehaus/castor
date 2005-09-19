@@ -2297,14 +2297,25 @@ public final class SQLEngine implements Persistence {
             Object   field;
             
             String fieldTableName = _engine._fields[i].tableName;
-            String firstColumnOfField = _engine._fields[i].columns[0].name;
-
+            String fieldColumnName = _engine._fields[i].columns[0].name;
+            String fieldName = fieldTableName + "." + fieldColumnName;
+            
             ResultSetMetaData metaData = _rs.getMetaData();
-            while (!(firstColumnOfField.equalsIgnoreCase(metaData.getColumnName(count))
-            	     && (fieldTableName.equalsIgnoreCase(metaData.getTableName(count))
-            		     || "".equals(metaData.getTableName(count))))) {
-                count++;
-            }
+            while (true) {
+                String metaTableName = metaData.getTableName(count);
+                String metaColumnName = metaData.getColumnName(count);
+               if (fieldColumnName.equalsIgnoreCase(metaColumnName)) {
+                   if (fieldTableName.equalsIgnoreCase(metaTableName)) {
+                       break;
+                   } else if ("".equals(metaTableName)) {
+                       break;
+                   }
+               } else if (fieldName.equalsIgnoreCase(metaColumnName)) {
+                   break;
+               }
+
+               count++;
+           }
             
             if ( _engine._fields[i].columns.length == 1 ) {
                 field = _engine.toJava(i, 0, SQLTypes.getObject(_rs, count, _engine._fields[i].columns[0].sqlType));
