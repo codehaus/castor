@@ -10,7 +10,7 @@
        Describes how to use the Source Code Generator, and what
        is currently supported.
     </abstract>
-    <status>Preliminary Draft</status>
+    <status>Draft</status>
   </properties>
 
 
@@ -58,6 +58,34 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
 
     </section>
 
+    <section title="Castor source generator Ant task">
+
+        <p>An alternative to using the command line as shown in the previous section,
+           the Castor Source Generator Ant Task can be used to call the source
+           generator for class generation. Below is an example of how to use this task
+           from within an Ant target definition named 'castor:gen:src':</p>
+
+        <code-panel>
+  &lt;target name="castor:gen:src" depends="init"
+             description="Generate Java source files from XSD."&gt;
+
+    &lt;taskdef name="castor-srcgen"
+                classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask"
+                classpathref="castor.class.path" /&gt;
+    &lt;mkdir dir="generated" /&gt;
+    &lt;castor-srcgen file="src/schema/sample.xsd"
+                      todir="generated-source"
+                      package="org.castor.example.schema"
+                      types="j2"
+                      warnings="false" /&gt;
+  &lt;/target&gt;
+        </code-panel>
+
+        <p>The only requirement is that the castor-&lt;version&gt;-srcgen-ant-task.jar 
+           must be on the CLASSPATH.</p>
+        
+    </section>
+    
     <section title="Source Generator Options">
       <tip>For additional information about the Source Generator and
           options, You can download the
