@@ -223,13 +223,12 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
             <p>To enable bound properties uncomment the appropriate line in the
                "org/exolab/castor/builder/castorbuilder.properties" file:
                <code-panel>
-    # To enable bound properties uncomment the following line. Please
-    # note that currently *all* fields will be treated as bound properties
-    # when enabled. This will change in the future when we introduce
-    # fine grained control over each class and it's properties.
-    #
-    #org.exolab.castor.builder.boundproperties=true
-               </code-panel>
+# To enable bound properties uncomment the following line. Please
+# note that currently *all* fields will be treated as bound properties
+# when enabled. This will change in the future when we introduce
+# fine grained control over each class and it's properties.
+#
+#org.exolab.castor.builder.boundproperties=true</code-panel>
                <p>
                   When enabled, <b>all</b> properties will be treated as bound properties.
                   For each class that is generated a <b>setPropertyChangeListener</b>
@@ -296,11 +295,10 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
             <p>
               To change the "method" of class creation simple edit the
                 <b>castorbuilder.properties</b> file:
-              <code>
-    # Java class mapping of &lt;xsd:element&gt;'s and &lt;xsd:complexType&gt;'s
-    #
-    #org.exolab.castor.builder.javaclassmapping=element
-             </code>
+              <code-panel>
+# Java class mapping of &lt;xsd:element&gt;'s and &lt;xsd:complexType&gt;'s
+#
+#org.exolab.castor.builder.javaclassmapping=element</code-panel>
             </p>
          </section>
 
@@ -312,11 +310,10 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
             </p>
             <p> To set up the super class, edit the castorbuilder.properties file :
             <code-panel>
-    # This property allows one to specify the super class of *all*
-    # generated classes
-    #
-    #org.exolab.castor.builder.superclass=com.xyz.BaseObject
-            </code-panel>
+# This property allows one to specify the super class of *all*
+# generated classes
+#
+#org.exolab.castor.builder.superclass=com.xyz.BaseObject</code-panel>
             </p>
         </section>
 
@@ -332,13 +329,12 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
                 correct imports during code generation for the primary schema.
             </p>
             <p> To allow the mapping between namespaces and Java packages , edit the castorbuilder.properties file :
-            <code>
-	 # XML namespace mapping to Java packages
-         #
-         #org.exolab.castor.builder.nspackages=\
-               http://www.xyz.com/schemas/project=com.xyz.schemas.project,\
-               http://www.xyz.com/schemas/person=com.xyz.schemas.person
-            </code>
+            <code-panel>
+# XML namespace mapping to Java packages
+#
+#org.exolab.castor.builder.nspackages=\
+   http://www.xyz.com/schemas/project=com.xyz.schemas.project,\
+   http://www.xyz.com/schemas/person=com.xyz.schemas.person</code-panel>
             </p>
         </section>
 
@@ -351,12 +347,10 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
             <p>Note: hashcode() is not currently overriden.</p>
             <p> To generate the equals() method , edit the castorbuilder.properties file :
             <code-panel>
-	# Set to true if you want to generate the equals method
-	# for each generated class.
-	# false by default
-	#org.exolab.castor.builder.equalsmethod=true
-
-            </code-panel>
+# Set to true if you want to generate the equals method
+# for each generated class.
+# false by default
+#org.exolab.castor.builder.equalsmethod=true</code-panel>
             </p>
         </section>
 
@@ -377,11 +371,10 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
 	     </p>
  	     <p>To enable this property, edit the castor builder.properties file:
         <code-panel>
-	 # Set to true if you want to use Object Wrappers instead
-	 # of primitives (e.g Float instead of float).
-	 # false by default.
-	 #org.exolab.castor.builder.primitivetowrapper=false
-        </code-panel>
+# Set to true if you want to use Object Wrappers instead
+# of primitives (e.g Float instead of float).
+# false by default.
+#org.exolab.castor.builder.primitivetowrapper=false</code-panel>
 	     </p>
 	</section>
 
@@ -412,8 +405,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
      attributeBinding,
      complexTypeBinding,
      groupBinding)
-&lt;/binding>
-          </code-panel>
+&lt;/binding></code-panel>
           <p>The binding element is the root element and contains the binding information. The attribute <code>defaultBindingType</code> controls the
           <a href="#Class-Creation/Mapping">Class creation type</a></p>
           <tip>
@@ -426,8 +418,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
       <section title="&lt;include> element">
          <code-panel>
 &lt;include
-    URI = xsd:anyURI/>
-         </code-panel>
+    URI = xsd:anyURI/></code-panel>
           <ul>
              <li><b>URI:</b>The URI of the binding file to include.</li>
           </ul>
@@ -440,9 +431,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
 &lt;package>
     name = xsd:string
     (namespace|schemaLocation) = xsd:string>
-&lt;/package>
-
-         </code-panel>
+&lt;/package></code-panel>
           <ul>
              <li><b>name:</b>A fully qualified java package name.</li>
              <li><b>namespace:</b>An XML namespace that will be mapped to the package name defined by the <i>name</i> element.</li>
@@ -464,8 +453,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
 
 &lt;elementName|complexTypeName|modelGroupName>
     (prefix?, suffix?) = xsd:string
-&lt;/elementName|complexTypeName|modelGroupName>
-         </code-panel>
+&lt;/elementName|complexTypeName|modelGroupName></code-panel>
          <ul>
             <li><b>prefix:</b>The prefix to add to the names of the generated classes.</li>
             <li><b>suffix:</b>The suffix to append to the the names of the generated classes</li>
@@ -487,8 +475,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
      attributeBinding*,
      complexTypeBinding*,
      groupBinding*)
-&lt;/elementBinding|attributeBinding|complexTypeBinding|groupBinding>
-         </code-panel>
+&lt;/elementBinding|attributeBinding|complexTypeBinding|groupBinding></code-panel>
          <ul>
             <li><b>name:</b>The name of the XML schema component for which we are defining a binding.</li>
          </ul>
@@ -512,19 +499,16 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
          <p>For instance, the following
          binding definition will be equivalent and will identify the element 'foo' defined in the top-level complexType 'fooType'.</p>
 
-         <pre>
-            &lt;elementBinding name="complexType:fooType/foo>
-               &lt;member name="MyFoo" handler="mypackage.myHandler"/>
-            &lt;/elementBinding>
-         </pre>
+         <code-panel>
+&lt;elementBinding name="complexType:fooType/foo>
+   &lt;member name="MyFoo" handler="mypackage.myHandler"/>
+&lt;/elementBinding>
 
-         <pre>
-            &lt;complexTypeBinding name="fooType">
-               &lt;elementBinding name="foo>
-                  &lt;member name="MyFoo" handler="mypackage.myHandler"/>
-            &lt;/elementBinding>
-            &lt;complexTypeBinding>
-         </pre>
+&lt;complexTypeBinding name="fooType">
+   &lt;elementBinding name="foo>
+      &lt;member name="MyFoo" handler="mypackage.myHandler"/>
+   &lt;/elementBinding>
+&lt;complexTypeBinding></code-panel>
        </section>
 
        <section title="&lt;java-class> element">
@@ -537,8 +521,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
     equals? = xsd:boolean
     bound? = xsd:boolean >
     (implements*,extends?)
-&lt;/java-class>
-         </code-panel>
+&lt;/java-class></code-panel>
          <ul>
             <li><b>name:</b>The name of the class that will be generated.</li>
             <li><b>package:</b>The package of the class to be generated. if set, this option overrides the mapping defined in the &lt;package/> element.</li>
@@ -555,8 +538,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
          <code-panel>
 &lt;interface>
     name = xsd:string
-&lt;/interface>
-         </code-panel>
+&lt;/interface></code-panel>
          <ul>
             <li><b>name:</b>The name of the interface that will be generated.</li>
          </ul>
@@ -573,8 +555,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
   wrapper? = xsd:boolean
   handler? = xsd:string
   collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map)
-  validator? = xsd:string/>
-         </code-panel>
+  validator? = xsd:string/></code-panel>
          <ul>
             <li><b>name:</b>The name of the class member that will be generated.</li>
             <li><b>java-type:</b>the fully qualified name of the java type.</li>
@@ -596,9 +577,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
                   <code-panel>
  &lt;enumBinding>
     (enumClassName|enumMemberName)
- &lt;/enumBinding>
-
-                  </code-panel>
+ &lt;/enumBinding></code-panel>
              <p>This element will allow more control on the type safe enumerations generated to represent an XML Schema simpleType enumeration</p>
           </li>
           <li>
