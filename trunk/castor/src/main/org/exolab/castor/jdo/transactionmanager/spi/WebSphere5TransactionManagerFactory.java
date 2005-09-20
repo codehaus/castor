@@ -20,7 +20,7 @@ package org.exolab.castor.jdo.transactionmanager.spi;
  * this J2EE container.
  *
  * @author <a href="mailto:ferret DOT frii DOT com">Bruce Snyder</a>
- * @author <a href="mailto:werner.guttmann@gmx.net">Werner Guttmann</a>
+ * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
  */
