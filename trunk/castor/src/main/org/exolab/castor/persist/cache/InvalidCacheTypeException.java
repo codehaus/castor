@@ -50,7 +50,7 @@ import org.exolab.castor.jdo.PersistenceException;
 /**
  * Exception that indicates that an invalid cache type has been specified.
  * 
- * @author <a href="werner.guttmann@gmx.net">Werner Guttmann</a>
+ * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @version $Revision$ $Date$
  *
  */
