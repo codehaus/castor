@@ -5,7 +5,7 @@
     <abstract>
        Castor JDO - Best practice
     </abstract>
-    <status>Final</status>
+    <status>Draft</status>
   </properties>
   <body>
     <title>Castor JDO - Best practice</title>
@@ -14,11 +14,17 @@
 
     <section title="Introduction">
 
-    <p>I know that Gregory Block (another castor commiter) is using castor in a high-volume 
-       application. Even if I would call my appliaction a low-volume one, I also had to resolve 
-       application. There are also some performance bottlenecks we are aware of and are working 
-       to solve them at our next refactoring steps of castor. For some of them we have working 
-       patches or workarounds available.</p>
+    <p>There's many users of Castor JDO out there, who (want to) use Castor JDO in 
+       in high-volume applications. To fine-tune Castor for such environment, it is 
+       necessary to understand many of the product features in detail and to be able to
+       balance their use according to the application needs. Even though many of these
+       features are detailed in various places, people have frequently been asking 
+       for a 'best practise' document, a document that brings together these technical 
+       topics (in one place) and presents them as a set of easy-to-use recipes.</p>.
+       
+    <p>Please be aware that this document is <i>under construction</i>, but still we 
+       believe that - even when in its conception phase - it provides valuable
+       information to users of Castor JDO.</p>
 
     </section>
     
