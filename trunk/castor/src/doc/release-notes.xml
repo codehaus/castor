@@ -32,23 +32,42 @@
             <bugs>
             </bugs>
         </release>
-	    <release version="0.9.9M2">
-	        <description>2nd Milestone release for 0.9.9</description>
-    		<date>Sep 13, 2005</date>
+	    <release version="0.9.9">
+	        <description>Maintenance release for Castor XML and JDO</description>
+    		<date>September 22, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
 				<h2>Download &amp; installation instructions</h2>
 
+                <p>This is the final 0.9.9 release, a feature release for Castor JDO and XML.</p>
+
 				<p>Please note that we are providing the usual suspects (binaries, docs and
 				   sources) for this release at <a href="http://dist.codehaus.org/castor/0.9.9.">
-				   the Codehaus</a>. We recommend, though, to download the complete package,
-				   as the HTML docs at <a href="http://castor.codehaus.org">the main Castor site</a> has
-				   not been updated, and to build the documentation yourself.</p>
+				   the Codehaus</a>.</p>
+				   
 
-                <p>Preparations for the final release have started. Since the last release candidate,
-                   the following problem areas have been addressed.</p>
+				<p>We are currently planning for a <b>Castor 1.0</b> release in about 8+ weeks, 
+				which we mainly see as a bug fix release and a one-time opportunity 
+				to get the HTML documentation into a better shape .. ;-).</p>
+				   
+				<p>Please note that we have - in addition to the features added and bugs fixed
+				   as documented with 0.9.9M1 and 0.9.9M2 - started to makes substantial changes
+				   to the project documentation as follows:</p>
+				   
+				<p>
+					<ul>
+						<li>Addition of the first Castor JDO HOW-TO pages</li>
+						<li>Addition of an initial (hence draft) Castor JDO best practice
+							document</li>
+						<li>Addition of a Castor JDO feature page</li>
+					</ul>
+				</p>
+				
+				<p>As mentioned above, these pages are work in progress and shall be expanded
+				   for the upcoming 1.0 release.</p>
+				   
             </summary>
-            <bugs>
+			<bugs>
                 <bug id="1215" tool="jira">
                     <description>
 		                Fixed JDO.getDatabase()NullPointerException.
@@ -69,6 +88,25 @@
                     <module>JDO</module>
                     <date>20050919</date>
                 </bug>
+			</bugs>
+		</release>
+	    <release version="0.9.9M2">
+	        <description>2nd Milestone release for 0.9.9</description>
+    		<date>Sep 13, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
+				<h2>Download &amp; installation instructions</h2>
+
+				<p>Please note that we are providing the usual suspects (binaries, docs and
+				   sources) for this release at <a href="http://dist.codehaus.org/castor/0.9.9.">
+				   the Codehaus</a>. We recommend, though, to download the complete package,
+				   as the HTML docs at <a href="http://castor.codehaus.org">the main Castor site</a> has
+				   not been updated, and to build the documentation yourself.</p>
+
+                <p>Preparations for the final release have started. Since the last release candidate,
+                   the following problem areas have been addressed.</p>
+            </summary>
+            <bugs>
                 <bug id="1210" tool="jira">
                     <description>
 		                Removed references to Poolman from documentation on pooling.
