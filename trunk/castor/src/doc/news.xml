@@ -19,6 +19,29 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="33">
+            <title>Castor 0.9.9 - <b>Final</b> release</title>
+            <author>Werner Guttmann</author>
+            <date>Sep 22 2005</date>
+            <time>10:11:12</time>
+            <summary>
+                I've placed a copy of the <b>final</b> Castor 0.9.9 release at the
+                <a href="http://dist.codehaus.org/castor/0.9.9/">Codehaus</a>.<br/><br/>
+
+                This is a major feature release. For details about the features added and the bugs 
+				fixed, please have a look at the 
+                <a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+					
+				We are currently planning for a <b>Castor 1.0</b> release in about 8+ weeks, 
+				which we mainly see as a bug fix release and a one-time opportunity 
+				to get the HTML documentation into a better shape .. ;-). Please have a look 
+				at <a href="http://jira.codehaus.org/browse/CASTOR">the project roadmap</a> for
+				details.<br/><br/>
+
+                Please report any issues at <a href="http://jira.codehaus.org/browse/CASTOR">the 
+				Castor Jira site</a>.
+            </summary>
+        </news>
         <news id="32">
             <title>Castor 0.9.9 - 2nd milestone build</title>
             <author>Werner Guttmann</author>
