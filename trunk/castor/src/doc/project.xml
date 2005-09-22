@@ -155,10 +155,6 @@
         <display>JDO How-Tos</display>
       </navLink>
       <navLink>
-        <url>jdo-best-practice.xml</url>
-        <display>JDO Best Pract.</display>
-      </navLink>
-      <navLink>
         <url>jdo-other-features.xml</url>
         <display>Other Features</display>
       </navLink>
