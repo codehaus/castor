@@ -371,7 +371,27 @@
             </p>
             </section>
 
+	        <section title="How to enable XML validation with Castor XML">
+	        
+	        	<p>To enable XML validation at the parser level, please add properties to your 
+	        	   <tt>castor.properties</tt> file as follows:</p>
+	        	   
+	        	<code>
+	org.exolab.castor.parser.namespaces=true
+	org.exolab.castor.sax.features=http://xml.org/sax/features/validation,\
+	                               http://apache.org/xml/features/validation/schema,\
+	                               http://apache.org/xml/features/validation/schema-full-checking
+	        	</code>
+	        	
+	            <p>Please note that the example given relies on the use of Apache Xerces, hence the 
+	               <tt>apache.org</tt> properties; similar options should exist for other parsers.</p>
+	           
+	        </section>
+
         </section>
+        
+        
+        
     </section>
 
   </body>
