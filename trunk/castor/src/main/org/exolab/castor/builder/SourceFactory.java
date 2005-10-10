@@ -803,14 +803,10 @@ public class SourceFactory {
 		parent.addImport("java.beans.PropertyChangeListener");
 
         //-- add vector to hold listeners
-        String vName = "propertyChangeListeners";
-        JField field = new JField(SGTypes.Vector, vName);
-        field.getModifiers().makePrivate();
+        String vName = "propertyChangeSupport";
+        JField field = new JField(SGTypes.PropertyChangeSupport, vName);
+        field.getModifiers().makePrivate();     
         parent.addField(field);
-
-
-        JSourceCode jsc = parent.getConstructor(0).getSourceCode();
-        jsc.add("propertyChangeListeners = new Vector();");
 
         //---------------------------------/
         //- notifyPropertyChangeListeners -/
@@ -841,27 +837,15 @@ public class SourceFactory {
         jdDesc.setDescription("the new value of the property.");
 
         parent.addMethod(jMethod);
-        jsc = jMethod.getSourceCode();
+        JSourceCode jsc = jMethod.getSourceCode();
         //--fix for bug 1026
         jsc.add("if (");
         jsc.append(vName);
         jsc.append(" == null) return;");
         
-        jsc.add("java.beans.PropertyChangeEvent event = new ");
-        jsc.append("java.beans.PropertyChangeEvent");
-        jsc.append("(this, fieldName, oldValue, newValue);");
-        jsc.add("");
-        jsc.add("for (int i = 0; i < ");
-        jsc.append(vName);
-        jsc.append(".size(); i++) {");
-        jsc.indent();
-        jsc.add("((java.beans.PropertyChangeListener) ");
-        jsc.append(vName);
-        jsc.append(".elementAt(i)).");
-        jsc.append("propertyChange(event);");
-        jsc.unindent();
-        jsc.add("}");
-
+        jsc.add(vName);
+        jsc.append(".firePropertyChange(fieldName,oldValue,newValue);");
+        
         //-----------------------------/
         //- addPropertyChangeListener -/
         //-----------------------------/
@@ -882,14 +866,21 @@ public class SourceFactory {
         parent.addMethod(jMethod);
 
         jsc = jMethod.getSourceCode();
+        
+
+        jsc.add("if (");
+        jsc.append(vName);
+        jsc.append(" == null) {");
+        jsc.addIndented(vName+" = new java.beans.PropertyChangeSupport(this);");
+        jsc.add("}");
         jsc.add(vName);
-        jsc.append(".addElement(pcl);");
+        jsc.append(".addPropertyChangeListener(pcl);");
 
         //--------------------------------/
         //- removePropertyChangeListener -/
         //--------------------------------/
 
-        jMethod = new JMethod(JType.Boolean,"removePropertyChangeListener");
+        jMethod = new JMethod(JType.Boolean, "removePropertyChangeListener");
 
         desc = "Removes the given PropertyChangeListener "+
             "from this classes list of ProperyChangeListeners.";
@@ -902,15 +893,16 @@ public class SourceFactory {
         jdDesc = jdc.getParamDescriptor("pcl");
         jdDesc.setDescription(desc);
 
-        desc = "true if the given PropertyChangeListener was removed.";
-        jdc.addDescriptor(JDocDescriptor.createReturnDesc(desc));
-
         parent.addMethod(jMethod);
 
         jsc = jMethod.getSourceCode();
-        jsc.add("return ");
+        jsc.add("if (");
         jsc.append(vName);
-        jsc.append(".removeElement(pcl);");
+        jsc.append(" == null) return false;");
+        
+        jsc.add(vName);
+        jsc.append(".removePropertyChangeListener(pcl);");
+        jsc.add("return true;");
 
     } //-- createPropertyChangeMethods
 
