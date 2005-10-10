@@ -50,6 +50,8 @@
 
 package org.exolab.castor.builder;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.builder.binding.ExtendedBinding;
 import org.exolab.castor.builder.binding.XMLBindingComponent;
 import org.exolab.castor.builder.types.XSClass;
@@ -110,6 +112,13 @@ public class SourceFactory {
     private static final String CLASS_KEYWORD       = "class";
     
     private static final String ITEM_NAME = "Item";
+    
+    /**
+     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     * Commons Logging</a> instance used for all logging.
+     */
+    private static final Log _log = LogFactory.getFactory().getInstance(SourceFactory.class);
+    
 
     /**
      * The type factory.
@@ -1422,7 +1431,9 @@ public class SourceFactory {
                 SimpleType baseType = (SimpleType)temp.getBaseType();
                 XSType xsType = _typeConversion.convertType(temp, state.packageName);
                 FieldInfo fieldInfo = null;
-                if ((baseType != null)) {
+                if ((baseType != null) && 
+                     extendsSimpleType(state.jClass, baseType, state)) 
+                {
                     if (xsType.isEnumerated()) {
                         fieldInfo = memberFactory.createFieldInfoForContent(xsType);
                         fieldInfo.setBound(false);
@@ -2081,6 +2092,30 @@ public class SourceFactory {
         fieldInfo.generateInitializerCode(scInitializer);
 
     } //-- handleField
+    
+    /**
+     * Returns true if the given JClass extends the class represented
+     * by the given SimpleType.
+     * 
+     * @param jClass the JClass to check
+     * @param type the SimpleType to check against
+     * @param state the FactoryState 
+     * 
+     * @return true if the given JClass extends the class associated
+     * with the given SimpleType, otherwise false.
+     */
+    private boolean extendsSimpleType
+        (JClass jClass, SimpleType type, FactoryState state) 
+    {
+        String superClassName = jClass.getSuperClass();
+        if (superClassName != null) {
+            ClassInfo cInfo = state.resolve(type);
+            if (cInfo != null) {
+               return superClassName.equals(cInfo.getJClass().getName()); 
+            }
+        }
+        return false;
+    } //-- extendsSimpleType
 
     /**
      * Escapes special characters in the given String so that it can
