@@ -45,6 +45,7 @@
 
 package org.exolab.castor.builder;
 
+
 import org.exolab.javasource.*;
 
 
@@ -111,5 +112,6 @@ public class SGTypes {
     public static final JClass Stack         = new JClass("java.util.Stack");
     public static final JClass Vector        = new JClass("java.util.Vector");
 
-
+    //-- java.beans
+    public static final JClass PropertyChangeSupport = new JClass("java.beans.PropertyChangeSupport");
 } //-- SGTypes
