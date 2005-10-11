@@ -2,6 +2,10 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1152 PropertyChangeListeners for bound properties should not be serialized
+       Details: http://jira.codehaus.org/browse/CASTOR-1152
+       (Andrew Fawcett - 20051010)
+
 Version 0.9.9, Sep 22, 2005
 -------------------------------
 
@@ -9,10 +13,6 @@ JDO:   Fixed bug CASTOR-1215 using contribution from Gregory Block[gblock@ctofor
        Fixed JDO.getDatabase()NullPointerException.
        Details: http://jira.codehaus.org/browse/CASTOR-1215
        (Ralf - 20050919)
-
-XML:   Fixed bug CASTOR-1152 PropertyChangeListeners for bound properties should not be serialized
-       Details: http://jira.codehaus.org/browse/CASTOR-1152
-       (Andrew Fawcett - 20051010)
 
 Version 0.9.9M2, Sep 13, 2005
 -------------------------------
