@@ -1,4 +1,4 @@
-﻿<?xml version="1.0"?>
+<?xml version="1.0"?>
 <document url="http://castor.org/release-notes.xml">
   <body>
     <title>Release notes</title>
@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1152" tool="jira">
+                    <description>
+		                PropertyChangeListeners for bound properties should not be serialized.
+                    </description>
+                    <contributor>
+                        <name>Andrew Fawcett</name>
+                        <email>andrew.fawcett@coda.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>David Green</name>
+                        <email></email>
+                    </submitter>
+                    <reporter>
+                        <name>David Green</name>
+                        <email></email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051010</date>
+                </bug>
             </bugs>
         </release>
 	    <release version="0.9.9">
@@ -87,26 +107,6 @@
                     <type>Bug</type>
                     <module>JDO</module>
                     <date>20050919</date>
-                </bug>
-                <bug id="1152" tool="jira">
-                    <description>
-		                PropertyChangeListeners for bound properties should not be serialized.
-                    </description>
-                    <contributor>
-                        <name>Andrew Fawcett</name>
-                        <email>andrew.fawcett@coda.com</email>
-                    </contributor>
-                    <submitter>
-                        <name>David Green</name>
-                        <email></email>
-                    </submitter>
-                    <reporter>
-                        <name>David Green</name>
-                        <email></email>
-				    </reporter>
-                    <type>Bug</type>
-                    <module>XML</module>
-                    <date>20051010</date>
                 </bug>
 			</bugs>
 		</release>
