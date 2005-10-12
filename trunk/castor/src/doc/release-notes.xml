@@ -30,6 +30,46 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1216" tool="jira">
+                    <description>
+		                Generated java source files won't compile.
+                    </description>
+                    <contributor>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Bill Leng</name>
+                        <email>wleng@metatomix.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051011</date>
+                </bug>
+                <bug id="1153" tool="jira">
+                    <description>
+		                Unable to generate binding using SourceGen.
+                    </description>
+                    <contributor>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Keith Visco</name>
+                        <email>keith AT kvisco DOT com</email>
+                    </submitter>
+                    <reporter>
+                        <name>Neil Taylor</name>
+                        <email>neiltaylor@mac.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051010</date>
+                </bug>
                 <bug id="1152" tool="jira">
                     <description>
 		                PropertyChangeListeners for bound properties should not be serialized.

@@ -2,6 +2,14 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1216 Generated java source files won't compile.
+       Details: http://jira.codehaus.org/browse/CASTOR-1216
+       (Keith Visco - 20051011)
+
+XML:   Fixed bug CASTOR-1153 Unable to generate binding using SourceGen.
+       Details: http://jira.codehaus.org/browse/CASTOR-1153
+       (Keith Visco - 20051010)
+
 XML:   Fixed bug CASTOR-1152 PropertyChangeListeners for bound properties should not be serialized
        Details: http://jira.codehaus.org/browse/CASTOR-1152
        (Andrew Fawcett - 20051010)
