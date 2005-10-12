@@ -4,7 +4,7 @@
   <properties>
     <title>People who have supported the Castor project</title>
     <abstract>
-       General information about the people that have supported the 
+       General information about the people that have supported the
 	   Castor project over the time.
     </abstract>
     <status>Final</status>
@@ -13,30 +13,30 @@
     <title>Committers, contributors et alias</title>
     <header>
 
-		<p>This page lists all people who have gone the extra mile and 
-		   supported Castor in one way or the other, including committers, 
-		   contributors, people who have contributed to the projedt's 
-		   documentation and people who advanced the project by providing us 
+		<p>This page lists all people who have gone the extra mile and
+		   supported Castor in one way or the other, including committers,
+		   contributors, people who have contributed to the projedt's
+		   documentation and people who advanced the project by providing us
 		   with valuable feedback.</p>
-		   
-		<p>If you would like to get involved, the first step is to join the 
-		   <a href="lists.html">mailing lists</a>.</p> 
 
-		<p>We kindly ask to not send us emails privately (e.g. asking for 
-           support). We are non-paid volunteers who help out with the project and 
-           we do not necessarily have the time or energy to help people on an 
+		<p>If you would like to get involved, the first step is to join the
+		   <a href="lists.html">mailing lists</a>.</p>
+
+		<p>We kindly ask to not send us emails privately (e.g. asking for
+           support). We are non-paid volunteers who help out with the project and
+           we do not necessarily have the time or energy to help people on an
            individual basis.</p>
-           
-		<p>Instead, we have setup <url href="lists.html">mailing lists</url> which 
-           often contain hundreds of individuals. The benefit of using mailing lists 
-           over private communication is that it is a shared resource, where others 
-           can also learn from your messages (whether problem description, advice, 
+
+		<p>Instead, we have setup <url href="lists.html">mailing lists</url> which
+           often contain hundreds of individuals. The benefit of using mailing lists
+           over private communication is that it is a shared resource, where others
+           can also learn from your messages (whether problem description, advice,
 		   or common mistakes), and as a community we all grow together.</p>
-		   
+
 		<p>In addition, use use of mailing lists enables us to maintain
-		   searchable <a href="http://archive.castor.codehaus.org">archives</a> 
-		   of these mailing lists, that cover a vast range of questions and 
-		   answers related to the use of Castor. We simply cannot overstate 
+		   searchable <a href="http://archive.castor.codehaus.org">archives</a>
+		   of these mailing lists, that cover a vast range of questions and
+		   answers related to the use of Castor. We simply cannot overstate
 		   the importance of such archives.</p>
 
 		<contributors>
@@ -95,7 +95,7 @@
     <project>JDO</project>
     <company id="anecon" />
     <description>
-       JDO enhancements including distributed caches, TransactionManagerFactory API, the 
+       JDO enhancements including distributed caches, TransactionManagerFactory API, the
        API for JDBC parameters and much more.
     </description>
     <status>active</status>
@@ -755,6 +755,15 @@
    </description>
   </contributor>
 
+
+  <contributor type="Contributor">
+    <name surname="Salwinski" given="Lukasz"/>
+    <email>lukasz@mbi.ucla.edu</email>
+    <description>
+       Helped tracked down issue causing bug CASTOR-1216
+    </description>
+  </contributor>
+
   <contributor type="Contributor">
     <name surname="Shea" given="Gary"/>
     <email>shea@gtsdesign.com</email>
@@ -792,7 +801,9 @@
   <contributor type="Contributor">
     <name surname="Small" given="Matt"/>
     <email>msmall@clickability.com</email>
-    <description>Some patches for Castor XML Schema Writer</description>
+    <description>Some patches for Castor XML Schema Writer,
+       tracked down issue for bug CASTOR-1216
+    </description>
   </contributor>
 
   <contributor type="Contributor">
@@ -1033,6 +1044,13 @@
     <email>robertlaferla@comcast.net</email>
     <description>Castor XML feedback</description>
   </contributor>
+
+  <contributor type="Feedback">
+    <name surname="Leng" given="Bill"/>
+    <email>wleng@metatomix.com</email>
+    <description>Bug Reports / Castor XML feedback</description>
+  </contributor>
+
 
   <!-- Last names begin with M-P -->
 
