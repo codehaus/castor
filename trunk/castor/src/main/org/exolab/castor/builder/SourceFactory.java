@@ -365,6 +365,7 @@ public class SourceFactory {
                 creatingForAnElement =
                    (component.getAnnotated().getStructureType() == Structure.ELEMENT);
                 ComplexType complexType = (ComplexType)type;
+                
                 if (complexType.isTopLevel() && creatingForAnElement) {
                      //--move the view and keep the structure
                      Annotated saved = component.getAnnotated();
@@ -972,10 +973,24 @@ public class SourceFactory {
 		if (sgState.getSourceGenerator().mappingSchemaType2Java())
 			methodName+= parent.getName(true);
 
-		//-- create main marshal method
+		//-- create main unmarshal method
+        
+        //-- search for proper superclass
         JClass returnType = parent;
         while (returnType.getSuperClass() != null) {
-            JClass superClass = sgState.getSourceCode(returnType.getSuperClass());
+            String superClassName = returnType.getSuperClass();
+            JClass superClass = sgState.getSourceCode(superClassName);
+            
+            if ((superClass == null) && (superClassName.indexOf('.') < 0)) 
+            {
+                String pkgName = returnType.getPackageName();
+                if ((pkgName != null) && (pkgName.length() > 0)) 
+                {
+                    superClassName = pkgName + "." + superClassName;
+                    superClass = sgState.getSourceCode(superClassName);
+                }
+            }
+            
             if (superClass != null) {
                 returnType = superClass;
             }
@@ -992,7 +1007,7 @@ public class SourceFactory {
 
         JSourceCode jsc = jMethod.getSourceCode();
         jsc.add("return (");
-        jsc.append(parent.getName());
+        jsc.append(returnType.getName());
         jsc.append(") Unmarshaller.unmarshal(");
         jsc.append(parent.getName());
         jsc.append(".class, reader);");
