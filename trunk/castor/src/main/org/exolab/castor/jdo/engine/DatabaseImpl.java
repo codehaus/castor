@@ -640,7 +640,13 @@ public class DatabaseImpl
      */
     public Connection getJdbcConnection() throws PersistenceException 
     {
-        return _ctx.getConnection( _scope.getLockEngine() );
+        if (_transaction == null) {
+        	if (_ctx == null || !_ctx.isOpen()) {
+                String message = Messages.message("jdo.dbTxNotInProgress.jdbc");
+        		throw new PersistenceException (message);
+        	}
+        }
+        return _ctx.getConnection(_scope.getLockEngine());
     }
 
     /**

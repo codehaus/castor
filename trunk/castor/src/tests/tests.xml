@@ -73,6 +73,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+
   </category>
 
   <category name="hsql" class="jdo.JDOCategory">
@@ -158,6 +161,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="mssql" class="jdo.JDOCategory">
@@ -237,6 +243,9 @@
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="mysql" class="jdo.JDOCategory">
@@ -313,6 +322,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="oracle" class="jdo.JDOCategory">
@@ -394,6 +406,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="postgresql" class="jdo.JDOCategory">
@@ -473,6 +488,9 @@
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="sapdb" class="jdo.JDOCategory">
@@ -551,6 +569,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="sybase" class="jdo.JDOCategory">
@@ -630,6 +651,9 @@
     <!-- <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/> -->
     <!-- <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/> -->
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
   <category name="derby" class="jdo.JDOCategory">
@@ -710,6 +734,9 @@
     <case id="TC97" class="ctf.jdo.tc9x.TestPolymorphism"/>
     <case id="TC98" class="ctf.jdo.tc9x.TestPolymorphismInAThreadedEnvironment"/>
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
+	
+	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	
   </category>
 
 <!--

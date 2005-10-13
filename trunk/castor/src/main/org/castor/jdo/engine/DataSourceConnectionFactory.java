@@ -118,6 +118,9 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
                         } else if (types[0] == int.class) {
                             method.invoke(dataSource, new Object[] {new Integer(value)});
                             success = true;
+                        } else if (types[0] == long.class) {
+                            method.invoke(dataSource, new Object[] {new Long(value)});
+                            success = true;
                         } else if (types[0] == boolean.class) {
                             method.invoke(dataSource, new Object[] {new Boolean(value)});
                             success = true;
