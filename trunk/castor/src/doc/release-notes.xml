@@ -30,6 +30,27 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1231" tool="jira">
+                    <description>
+		                Fixed problem with SQL generated for OQL queries where only id fields 
+						are present.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Minh Tran-LeJeremy Whitlock</name>
+                        <email>tranle@gmail.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051013</date>
+                </bug>
                 <bug id="1216" tool="jira">
                     <description>
 		                Generated java source files won't compile.
