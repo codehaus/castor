@@ -30,7 +30,28 @@
             <summary>
             </summary>
             <bugs>
-                <bug id="1231" tool="jira">
+                <bug id="1224" tool="jira">
+                    <description>
+		                Fixed problem with obtaining JDBC connection when no transaction 
+						in progress.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Brian Schlining</name>
+                        <email>bschlining@gmail.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051013</date>
+                </bug>
+                 <bug id="1231" tool="jira">
                     <description>
 		                Fixed problem with SQL generated for OQL queries where only id fields 
 						are present.

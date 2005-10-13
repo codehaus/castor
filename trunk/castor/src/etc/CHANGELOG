@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1224 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Fixed problem with obtaining JDBC connection when no transaction in progress.
+       Details: http://jira.codehaus.org/browse/CASTOR-1224
+       (Werner - 20051013)
+
 JDO:   Fixed bug CASTOR-1231 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Fixed problem with SQL generated for OQL queries where only id fields are present.
        Details: http://jira.codehaus.org/browse/CASTOR-1231
