@@ -1720,6 +1720,14 @@ public final class SQLEngine implements Persistence {
                 }
         	}
         }
+        
+        // add table information if the class in question does not have any non-identity 
+        // fields
+        if (getInfo().length == 0) {
+            for ( int i=0; i<_ids.length; i++ ) {
+                find.addColumn( _mapTo, _ids[i].name);
+            }
+        }
 
 
         _sqlLoad = expr.getStatement( false );
