@@ -1,5 +1,5 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
-                           "http://castor.exolab.org/mapping.dtd">
+                           "http://castor.org/mapping.dtd">
 
 <mapping>
 	<class name="ptf.jdo.rel1toN.OID" identity="id">

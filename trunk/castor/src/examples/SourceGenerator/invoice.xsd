@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
-		targetNamespace="http://castor.exolab.org/Test/Invoice">
+		targetNamespace="http://castor.org/Test/Invoice">
 
    <xsd:annotation>
       <xsd:documentation>

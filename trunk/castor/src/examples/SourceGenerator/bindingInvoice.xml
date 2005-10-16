@@ -9,7 +9,7 @@
      <!--define the {namespace,package} binding -->
      <cbf:package>
           <cbf:name>test</cbf:name>
-          <cbf:namespace>http://castor.exolab.org/Test/Invoice</cbf:namespace>
+          <cbf:namespace>http://castor.org/Test/Invoice</cbf:namespace>
      </cbf:package>
      
      

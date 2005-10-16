@@ -944,7 +944,7 @@ Database db = jdo.getDatabase();
        <section title="How do I configure the JDO mapping to use the lazy loading feature for 1:1 relations?">
 
            <p>Let us convert one of the classes from the 
-              <a href="http://castor.exolab.org/examples.html">JDO examples</a> to use 
+              <a href="http://castor.org/examples.html">JDO examples</a> to use 
               lazy-loading.</p>
 
            <p>In the example model, every Product belongs to one ProductGroup. This is 
@@ -1005,7 +1005,7 @@ Database db = jdo.getDatabase();
        
        <section title="How do I configure the JDO mapping to use the lazy loading feature for 1:m and M:N relations?">
            <p>
-           Let us convert one of the classes from the <a href="http://castor.exolab.org/examples.html">
+           Let us convert one of the classes from the <a href="http://castor.org/examples.html">
            JDO examples</a> to use lazy-loading.
            </p>
 
@@ -1099,7 +1099,7 @@ Database db = jdo.getDatabase();
            will hold the related objects. At the very highest level, you need 
            to provide a set method that accepts a java.util.Collection for the 
            field in question. This is demonstrated by changing the 
-           <a href="http://castor.exolab.org/examples.html">JDO examples</a> below.
+           <a href="http://castor.org/examples.html">JDO examples</a> below.
            </p>
 
            <p>

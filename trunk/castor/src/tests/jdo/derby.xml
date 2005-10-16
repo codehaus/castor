@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-conf.xsd"> 
+                           "http://castor.org/jdo-conf.xsd"> 
 
 <jdo-conf>
     <database name="derby" engine="derby" >
