@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                           "http://castor.exolab.org/jdo-conf.dtd">
+                           "http://castor.org/jdo-conf.dtd">
 <!-- Database file for Sybase 11 - requires jConnect 5.2 -->
 <jdo-conf>
    <database name="sybase" engine="sybase" >

@@ -77,7 +77,7 @@
         <code-panel><![CDATA[
   <?xml version="1.0"?>
   <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN"
-                           "http://castor.exolab.org/mapping.dtd">
+                           "http://castor.org/mapping.dtd">
 
   <mapping>
      <description>Description of the mapping&lt;/description>

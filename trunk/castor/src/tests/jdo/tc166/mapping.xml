@@ -1,5 +1,5 @@
 <!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
-                           "http://castor.exolab.org/mapping.dtd">
+                           "http://castor.org/mapping.dtd">
 <mapping>
   <class name="jdo.tc166.Lazy1to1Parent" identity="id">
     <map-to table="lazy_11_par" />

@@ -2751,7 +2751,7 @@ public class Product {
 &lt;?xml version="1.0"?&gt;
 &lt;!DOCTYPE jdo-conf PUBLIC
     "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-    "http://castor.exolab.org/jdo-conf.dtd"&gt;
+    "http://castor.org/jdo-conf.dtd"&gt;
 
 &lt;jdo-conf&gt;
     &lt;database name="test" engine="mysql" &gt;

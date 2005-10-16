@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<document url="http://castor.exolab.org/tutorial/how-to-create-a-custom-cache.xml">
+<document url="http://castor.org/tutorial/how-to-create-a-custom-cache.xml">
   <properties>
     <title>How to use Jakarta's DBCP for connection pooling</title>
     <abstract>

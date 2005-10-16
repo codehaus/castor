@@ -342,14 +342,14 @@ myJdo.setDatabasePooling( true );
        document type definition. For DTD validation use:
       <code-panel><![CDATA[
   <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                            "http://castor.exolab.org/jdo-conf.dtd">
+                            "http://castor.org/jdo-conf.dtd">
       ]]></code-panel>
       For XML Schema validation use:
       <code-panel><![CDATA[
   <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN"
-                             "http://castor.exolab.org/jdo-conf.xsd">
+                             "http://castor.org/jdo-conf.xsd">
       ]]></code-panel>
-      The Castor namespace URI is <tt>http://castor.exolab.org/</tt>.</p>
+      The Castor namespace URI is <tt>http://castor.org/</tt>.</p>
 
       <p>The Castor JDO database configuration DTD is:
          <code-panel><![CDATA[

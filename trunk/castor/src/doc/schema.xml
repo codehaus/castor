@@ -7,45 +7,45 @@
       <table border="1" cellpadding="4">
         <tr>
           <td>Castor Namespace</td>
-          <td nowrap="nowrap"><tt>http://castor.exolab.org</tt></td>
+          <td nowrap="nowrap"><tt>http://castor.org</tt></td>
         </tr>
         <tr>
           <td>Mapping DTD</td>
           <td>
             <tt>-//EXOLAB/Castor Object Mapping DTD Version 1.0//EN</tt><br/>
-            <a href="mapping.dtd"><tt>http://castor.exolab.org/mapping.dtd</tt></a>
+            <a href="mapping.dtd"><tt>http://castor.org/mapping.dtd</tt></a>
           </td>
         </tr>
         <tr>
           <td>Mapping XML Schema</td>
           <td>
             <tt>-//EXOLAB/Castor Object Mapping Schema Version 1.0//EN</tt><br/>
-            <a href="mapping.xsd"><tt>http://castor.exolab.org/mapping.xsd</tt></a>
+            <a href="mapping.xsd"><tt>http://castor.org/mapping.xsd</tt></a>
           </td>
         </tr>
         <tr>
           <td>JDO Configuration DTD</td>
           <td>
             <tt>-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN</tt><br/>
-            <a href="jdo-conf.dtd"><tt>http://castor.exolab.org/jdo-conf.dtd</tt></a>
+            <a href="jdo-conf.dtd"><tt>http://castor.org/jdo-conf.dtd</tt></a>
           </td>
         </tr>
         <tr>
           <td>JDO Configuration Schema</td>
           <td>
             <tt>-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN</tt><br/>
-            <a href="jdo-conf.xsd"><tt>http://castor.exolab.org/jdo-conf.xsd</tt></a>
+            <a href="jdo-conf.xsd"><tt>http://castor.org/jdo-conf.xsd</tt></a>
           </td>
         </tr>
         <tr>
           <td>SourceGenerator Binding file Namespace</td>
-          <td><tt>http://castor.exolab.org/SourceGenerator/Binding</tt></td>
+          <td><tt>http://castor.org/SourceGenerator/Binding</tt></td>
         </tr>
         <tr>
           <td>Source Generator Binding File</td>
           <td>
             <tt> -//EXOLAB/Castor Binding Schema Version 1.0//EN</tt><br/>
-            <a href="binding.xsd"><tt>http://castor.exolab.org/binding.xsd</tt></a>
+            <a href="binding.xsd"><tt>http://castor.org/binding.xsd</tt></a>
           </td>
         </tr>
         <tr>
