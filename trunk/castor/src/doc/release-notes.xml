@@ -28,8 +28,58 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>New features</h2>
+				
+				<h3>Added support for JOTM as transaction manager</h3>
+				
+				<p>Added support for JOTM as transaction co-ordinator. As a result, the 
+				   following transaction managers are supported.</p>
+				   
+                <ctable>
+					<cheader>
+						<th align="left">Name</th><th align="left">Description</th>
+					</cheader>
+					<crow>
+						<td>jndi</td><td>TM looked up in the JNDI ENC</td>
+					</crow>
+					<crow>
+						<td>websphere</td><td>IBM WebSphere 4 and previous releases</td>
+					</crow>
+					<crow>
+						<td>websphere5</td><td>IBM WebSphere 5</td>
+					</crow>
+					<crow>
+						<td>websphere51</td><td>IBM WebSphere 5.1</td>
+					</crow>
+					<crow>
+						<td>jotm</td><td>Java Object Transaction Monitor</td>
+					</crow>
+                </ctable>
+
+				<h2>Bugs</h2>
+				
             </summary>
             <bugs>
+                <bug id="1223" tool="jira">
+                    <description>
+		                Added TransactionManagerFactory for JOTM.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+				    </reporter>
+                    <type>New feature</type>
+                    <module>JDO</module>
+                    <date>20051020</date>
+                </bug>
                 <bug id="1220" tool="jira">
                     <description>
 		                Added config entries for http://castor.org/* to DTDResolver.

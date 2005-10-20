@@ -198,6 +198,7 @@
                      <tr><td>websphere</td><td>IBM WebSphere 4 and previous releases</td></tr>
                      <tr><td>websphere5</td><td>IBM WebSphere 5</td></tr>
                      <tr><td>websphere51</td><td>IBM WebSphere 5.1</td></tr>
+                     <tr><td>jotm</td><td>JOTM</td></tr>
                   </table>
                </td>
             </tr>
