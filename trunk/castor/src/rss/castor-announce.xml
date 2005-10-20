@@ -19,6 +19,20 @@
 --> 
 
 		<item>
+			<title>0.9.9.1 release available</title>
+			<pubDate>Fri, 21 Oct 2005 10:11:12 GMT</pubDate>
+			<author>Werner Guttmann</author>
+			<link>http://castor.codehaus.org/news.html#item34</link>
+			<description>
+				The Castor 0.9.9.1 release has been made available at
+				http://dist.codehaus.org/castor/0.9.9.1/
+
+                This is a maintenance release. For details about the features added 
+				and the bugs fixed, please have a look at the release notes at 
+                http://castor.codehaus.org/release-notes.html.
+			</description>
+		</item>
+		<item>
 			<title>0.9.9 release - Final release available</title>
 			<pubDate>Wed, 22 Sep 2005 10:11:12 GMT</pubDate>
 			<author>Werner Guttmann</author>
