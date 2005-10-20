@@ -388,6 +388,27 @@
 	           
 	        </section>
 
+	        <section title="Why is mapping ignored when using a FieldHandlerFactory">
+	        
+	        	<p>When using a custom FieldHandlerFactory as in the following example</p>
+				
+				<code-panel>
+Mapping mapping = ... ;
+FieldHandlerFactoyt factory = ...;
+Marshaller m = new Marshaller(writer);  
+ClassDescriptorResolverImpl cdr = new ClassDescriptorResolverImpl();  
+cdr.getIntrospector().addFieldHandlerFactory(factory);
+m.setResolver(cdr);
+<b>marshaller.setMapping(mapping)</b>;</code-panel>
+	        	 
+				<p>please make sure that you set the mapping file <b>after</b> you set the
+				   ClassDescriptorResolver. You will note the following in the Javadoc for
+				   <javadoc>org.exolab.castor.xml.Marshaller.html#setResolver(org.exolab.castor.xml.ClassDescriptorResolver)</javadoc>:</p>
+
+				<code><B>Note:</B> This method will nullify any Mapping currently being used by this Marshaller</code>
+      
+	        </section>
+
         </section>
         
         
