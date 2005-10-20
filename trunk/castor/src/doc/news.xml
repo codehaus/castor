@@ -19,6 +19,22 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="34">
+            <title>Castor 0.9.9.1 released</title>
+            <author>Werner Guttmann</author>
+            <date>Oct 21 2005</date>
+            <time>10:11:12</time>
+            <summary>
+                I've placed a copy of the Castor 0.9.9.1 release at the
+                <a href="http://dist.codehaus.org/castor/0.9.9.1/">Codehaus</a>.<br/><br/>
+
+                This is a maintenance release. For details about the features added and the bugs 
+				fixed, please have a look at the 
+                <a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+					
+				We are still planning for a <b>Castor 1.0</b> release in about 8+ weeks.
+            </summary>
+        </news>
         <news id="33">
             <title>Castor 0.9.9 - <b>Final</b> release</title>
             <author>Werner Guttmann</author>

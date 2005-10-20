@@ -28,6 +28,15 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+			</summary>
+			<bugs>
+			</bugs>
+		</release>
+	    <release version="0.9.9.1">
+	        <description>Maintenance release for Castor XML and JDO</description>
+    		<date>September 22, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+			<summary>
 				<h2>New features</h2>
 				
 				<h3>Added support for JOTM as transaction manager</h3>
@@ -58,6 +67,18 @@
 
 				<h2>Bugs</h2>
 				
+				<h3>Improved 'caching' of Castor DTDs/XML Schemas</h3>
+				
+				<p>Added code to DTDResolver so that any URL/URIs against http://castor.org/... will
+				   be resolved against (local) files from within the Castor JAR(s).</p>
+				   
+				<h3>Problem obtaining underlying JDBC connections</h3>
+				
+				<p>Fixed a problem with obtaining the underlying JDBC connection used by Castor 
+				   internally when there was no valud transaction. The code has been changed so that 
+				   a <i>PersistenceException</i> will be thrown to indicate the lack of a valid 
+				   transaction.</p>
+				   
             </summary>
             <bugs>
                 <bug id="1223" tool="jira">
@@ -205,7 +226,7 @@
             </bugs>
         </release>
 	    <release version="0.9.9">
-	        <description>Maintenance release for Castor XML and JDO</description>
+	        <description>Feature release for Castor XML and JDO</description>
     		<date>September 22, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>

@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 0.9.9.1, Oct 21, 2005
+-------------------------------
+
 JDO:   Fixed bug CASTOR-1223 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Added TransactionManagerFactory for JOTM.
        Details: http://jira.codehaus.org/browse/CASTOR-1223
