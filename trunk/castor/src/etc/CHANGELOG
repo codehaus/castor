@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1220 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
+       Added config entries for http://castor.org/* to DTDResolver.
+       Details: http://jira.codehaus.org/browse/CASTOR-1220
+       (Werner - 20051013)
+       
 JDO:   Fixed bug CASTOR-1224 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Fixed problem with obtaining JDBC connection when no transaction in progress.
        Details: http://jira.codehaus.org/browse/CASTOR-1224

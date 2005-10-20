@@ -30,6 +30,26 @@
             <summary>
             </summary>
             <bugs>
+                <bug id="1220" tool="jira">
+                    <description>
+		                Added config entries for http://castor.org/* to DTDResolver.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051013</date>
+                </bug>
                 <bug id="1224" tool="jira">
                     <description>
 		                Fixed problem with obtaining JDBC connection when no transaction 
