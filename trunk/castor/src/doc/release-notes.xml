@@ -81,6 +81,26 @@
 				   
             </summary>
             <bugs>
+                <bug id="1256" tool="jira">
+                    <description>
+		                Added non-trivial sample for usage of binding file
+                    </description>
+                    <contributor>
+                        <name>Martin Graney</name>
+                        <email>martin.graney@leanapps.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Martin Graney</name>
+                        <email>martin.graney@leanapps.com</email>
+				    </reporter>
+                    <type>Addition</type>
+                    <module>XML</module>
+                    <date>20051103</date>
+                </bug>
                 <bug id="1223" tool="jira">
                     <description>
 		                Added TransactionManagerFactory for JOTM.

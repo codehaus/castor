@@ -5,6 +5,13 @@ Version (CVS)
 Version 0.9.9.1, Oct 21, 2005
 -------------------------------
 
+Added non-trivial sample for usage of binding file
+
+JDO:   Fixed bug CASTOR-1256 using contribution from  Martin Graney[martin.graney@leanapps.com]
+       Added non-trivial sample for usage of binding file
+       Details: http://jira.codehaus.org/browse/CASTOR-1256
+       (Werner - 20051103)
+       
 JDO:   Fixed bug CASTOR-1223 using contribution from Werner Guttmann[werner.guttmann@gmx.net]
        Added TransactionManagerFactory for JOTM.
        Details: http://jira.codehaus.org/browse/CASTOR-1223
