@@ -81,6 +81,27 @@
 				   
             </summary>
             <bugs>
+
+                <bug id="1254" tool="jira">
+                    <description>
+		                Added support for distinct keyword in count() functions.
+                    </description>
+                    <contributor>
+                        <name>Sean</name>
+                        <email>aoyong.liang@1cm.com.cn</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Sean</name>
+                        <email>aoyong.liang@1cm.com.cn</email>
+				    </reporter>
+                    <type>New feature</type>
+                    <module>JDO</module>
+                    <date>20051103</date>
+                </bug>
                 <bug id="1256" tool="jira">
                     <description>
 		                Added non-trivial sample for usage of binding file

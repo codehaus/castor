@@ -103,6 +103,7 @@ public class OqlTests extends CastorTestCase {
         populateDatabase();
 
 		testBasicSelect();
+        testSelectWithFunctions();
     }
 
     /*
@@ -289,6 +290,25 @@ public class OqlTests extends CastorTestCase {
 	}
 
     /*
+     * test received result set
+     */
+    public void tryFunctionQuery(OQLQuery query, int count_expected) throws PersistenceException
+    {
+        QueryResults res = query.execute();
+        Long functionValue = null;
+
+        try {
+            if (res.hasMore()) {
+                functionValue = (Long) res.next();
+            }
+        } finally {
+            res.close();
+        }
+
+        assertEquals("number of objects found", count_expected, functionValue.longValue());
+    }
+
+    /*
      * Test the ORDER BY clause.
      */
     public void testOrderBy()
@@ -317,8 +337,19 @@ public class OqlTests extends CastorTestCase {
     /*
      * Test SQL functions (e.g. count(), max(), first(), last(), avg(), etc.).
      */
-    public void testSelectWithFunctions()
-    {}
+    public void testSelectWithFunctions() throws PersistenceException 
+    {
+        _db.begin();
+
+         // obtain number of TestObject instances
+        OQLQuery query = _db.getOQLQuery("SELECT count(x.id) FROM jdo.TestObject x");
+        tryFunctionQuery(query, 20);
+
+        // obtain distinct number of TestObject instances
+        query = _db.getOQLQuery("SELECT count(distinct x.id) FROM jdo.TestObject x");
+        tryFunctionQuery(query, 20);
+
+    }
 
     /*
      * @todo Truncate the database

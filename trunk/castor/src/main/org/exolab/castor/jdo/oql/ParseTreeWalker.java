@@ -528,6 +528,8 @@ public class ParseTreeWalker implements TokenTypes
           if ( projection.getChild(0).getToken().getTokenType() == TIMES )
             //count(*)
             break;
+          else if (projection.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT )
+            checkProjection( projection.getChild(1), false, false );
           else
             //can call count on object types -- recurse over child
             checkProjection( projection.getChild(0), false, false );
@@ -1227,6 +1229,8 @@ public class ParseTreeWalker implements TokenTypes
       case KEYWORD_COUNT:
         if ( exprTree.getChild(0).getToken().getTokenType() == TIMES )
           return " COUNT(*) ";
+        else if (exprTree.getChild(0).getToken().getTokenType() == KEYWORD_DISTINCT)
+          return " COUNT(DISTINCT " + getSQLExpr(exprTree.getChild(1)) + ") ";
         else
           return " COUNT(" + getSQLExpr(exprTree.getChild(0)) +") ";
       case KEYWORD_SUM:
