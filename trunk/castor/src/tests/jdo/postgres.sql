@@ -935,7 +935,7 @@ insert into poly_table_m (id, name) values (2, "m2");
 insert into poly_table_n (id, name) values (1, "n1");
 insert into poly_table_n (id, name) values (2, "n2");
 
-drop tabel if exists poly_base;
+drop table if exists poly_base;
 create table poly_base (
   id varchar(64) not null default '',
   color varchar(64) default null,
