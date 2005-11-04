@@ -7,6 +7,11 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+JDO:   Fixed bug CASTOR-1254 using contribution from Sean [aoyong.liang@1cm.com.cn]
+       Added support for distinct keyword in count() functions.
+       Details: http://jira.codehaus.org/browse/CASTOR-1254
+       (Werner - 20051103)
+
 JDO:   Fixed bug CASTOR-1256 using contribution from  Martin Graney[martin.graney@leanapps.com]
        Added non-trivial sample for usage of binding file
        Details: http://jira.codehaus.org/browse/CASTOR-1256

@@ -867,6 +867,10 @@ public class Parser implements TokenTypes {
         
         if ( _curToken.getTokenType() == TIMES )
           retNode.addChild( match( TIMES ) );
+        else if ( _curToken.getTokenType() == KEYWORD_DISTINCT) {
+          retNode.addChild(match(KEYWORD_DISTINCT));
+          retNode.addChild( expr() );
+        }
         else
           retNode.addChild( expr() );
           
