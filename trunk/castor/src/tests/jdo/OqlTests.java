@@ -72,6 +72,8 @@ public class OqlTests extends CastorTestCase {
 
 	protected static final int MIN_ID = 10;
 	protected static final int MAX_ID = 29;
+    protected static final int MIN_EXTENDS_ID = 30;
+    protected static final int MAX_EXTENDS_ID = 49;
 
 
     public OqlTests( TestHarness category ) 
@@ -101,8 +103,9 @@ public class OqlTests extends CastorTestCase {
         // the database for each test. We're just selecting the data we're not
         // manipulating it. 
         populateDatabase();
-
 		testBasicSelect();
+        
+        populateDatabaseExtends();
         testSelectWithFunctions();
     }
 
@@ -137,6 +140,45 @@ public class OqlTests extends CastorTestCase {
 
 	    _db.commit();
 	}
+
+    /*
+     * This method will truncate everything from the database and then
+     * repopulate it. It needs to be generic enough to work across databases
+     * so I would prefer to use straight JDBC calls. 
+     */
+    public void populateDatabaseExtends() throws PersistenceException
+    {
+         // delete all from TEST_TABLE
+        _db.begin();
+        OQLQuery query = _db.getOQLQuery("select x from jdo.TestObject x");
+        QueryResults res = query.execute();
+        try {
+            while(res.hasMore())
+                _db.remove(res.next());
+        } finally {
+            res.close();
+        }
+        _db.commit();
+
+         // fill TEST_TABLE
+        _db.begin();
+
+        for(int i=MIN_ID; i<=MAX_ID; ++i) {
+            TestObject obj = new TestObject();
+            obj.setId(i);
+            obj.setValue1(TestObject.DefaultValue1 + " " + Integer.toString(i));
+            _db.create(obj);
+        }
+
+        for(int i=MIN_EXTENDS_ID; i<=MAX_EXTENDS_ID; ++i) {
+            TestObjectExtends ext = new TestObjectExtends();
+            ext.setId(i);
+            ext.setValue1(TestObject.DefaultValue1 + " " + Integer.toString(i));
+            _db.create(ext);
+        }
+
+        _db.commit();
+    }
 
     /*
      * Test many different variations of the basic SELECT statement.
@@ -343,12 +385,15 @@ public class OqlTests extends CastorTestCase {
 
          // obtain number of TestObject instances
         OQLQuery query = _db.getOQLQuery("SELECT count(x.id) FROM jdo.TestObject x");
-        tryFunctionQuery(query, 20);
+        tryFunctionQuery(query, 40);
 
         // obtain distinct number of TestObject instances
         query = _db.getOQLQuery("SELECT count(distinct x.id) FROM jdo.TestObject x");
-        tryFunctionQuery(query, 20);
+        tryFunctionQuery(query, 40);
 
+        // obtain number of TestObjectExtends instances
+        query = _db.getOQLQuery("SELECT count(x.id) FROM jdo.TestObjectExtends x");
+        tryFunctionQuery(query, 20);
     }
 
     /*

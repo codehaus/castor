@@ -7,6 +7,11 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+JDO:   Fixed bug CASTOR-1253 using contribution from Sean [aoyong.liang@1cm.com.cn]
+       Fixed problem with with using count() in OQL queries that involve extend relations.
+       Details: http://jira.codehaus.org/browse/CASTOR-1253
+       (Werner - 20051105)
+       
 JDO:   Fixed bug CASTOR-1254 using contribution from Sean [aoyong.liang@1cm.com.cn]
        Added support for distinct keyword in count() functions.
        Details: http://jira.codehaus.org/browse/CASTOR-1254
