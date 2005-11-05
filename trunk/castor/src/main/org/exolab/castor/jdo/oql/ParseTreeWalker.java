@@ -992,6 +992,25 @@ public class ParseTreeWalker implements TokenTypes
       selectPart = _parseTree.getChild(0);
 
     _queryExpr.addTable( _clsDesc.getTableName() );
+
+    // add table names and joins for all base classes
+    JDOClassDescriptor oldDesc = _clsDesc;
+    JDOClassDescriptor tempDesc = (JDOClassDescriptor) _clsDesc.getExtends();
+    while (tempDesc != null) {
+        String tableName = tempDesc.getTableName();
+        _queryExpr.addTable(tableName);
+        
+        JDOFieldDescriptor leftField = (JDOFieldDescriptor) oldDesc.getIdentity();
+        JDOFieldDescriptor rightField = (JDOFieldDescriptor) tempDesc.getIdentity();
+        
+        _queryExpr.addInnerJoin(oldDesc.getTableName(),
+                leftField.getSQLName(),
+                tempDesc.getTableName(),
+                rightField.getSQLName());
+
+        oldDesc = tempDesc;
+        tempDesc = (JDOClassDescriptor) tempDesc.getExtends();
+    }
     _queryExpr.addSelect( getSQLExpr( selectPart ) );
 
   }
