@@ -90,7 +90,8 @@
                                               org/exolab/castor/types/**/*.java,
                                               org/exolab/castor/util/**/*.java,
                                               org/exolab/castor/xml/**/*.java,
-                                              org/exolab/javasource/**/*.java" />
+                                              org/exolab/javasource/**/*.java,
+                                              org/castor/util/*.java" />
 
     <property name="castor.jdo.files" value="**/org/exolab/castor/dsml/**/*.java,
                                               org/exolab/castor/dtx/**/*.java,

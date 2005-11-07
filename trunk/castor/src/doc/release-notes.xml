@@ -81,7 +81,27 @@
 				   
             </summary>
             <bugs>
-
+                <bug id="1249" tool="jira">
+                    <description>
+		                Included new implementations of Base64Encoder/-Decoder with
+						castor-0.9.9-xml.jar.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051107</date>
+                </bug>
                 <bug id="1253" tool="jira">
                     <description>
 		                Fixed problem with with using count() in OQL queries that 
