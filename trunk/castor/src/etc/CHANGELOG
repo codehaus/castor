@@ -7,6 +7,11 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+XML:   Fixed bug CASTOR-1249 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
+       Included new implementations of Base64Encoder/-Decoder with castor-0.9.9-xml.jar.
+       Details: http://jira.codehaus.org/browse/CASTOR-1249
+       (Ralf - 20051107)
+       
 JDO:   Fixed bug CASTOR-1253 using contribution from Sean [aoyong.liang@1cm.com.cn]
        Fixed problem with with using count() in OQL queries that involve extend relations.
        Details: http://jira.codehaus.org/browse/CASTOR-1253
