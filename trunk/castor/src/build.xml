@@ -82,26 +82,30 @@
         <exclude name="**/RegressionTestSuite/**" />
     </patternset>
 
-    <property name="castor.xml.files" value="**/org/exolab/castor/*,
-                                              org/exolab/castor/builder/**/*.java,
-                                              org/exolab/castor/mapping/**/*.java,
-                                              org/exolab/castor/net/**/*.java,
-                                              org/exolab/castor/tools/**/*.java,
-                                              org/exolab/castor/types/**/*.java,
-                                              org/exolab/castor/util/**/*.java,
-                                              org/exolab/castor/xml/**/*.java,
-                                              org/exolab/javasource/**/*.java,
-                                              org/castor/util/*.java" />
+    <property name="castor.commons.files"
+		      value="org/castor/util/*.java"/>
+	
+    <property name="castor.xml.files"
+		      value="**/org/exolab/castor/*,
+                     org/exolab/castor/builder/**/*.java,
+                     org/exolab/castor/mapping/**/*.java,
+                     org/exolab/castor/net/**/*.java,
+                     org/exolab/castor/tools/**/*.java,
+                     org/exolab/castor/types/**/*.java,
+                     org/exolab/castor/util/**/*.java,
+                     org/exolab/castor/xml/**/*.java,
+                     org/exolab/javasource/**/*.java"/>
 
-    <property name="castor.jdo.files" value="**/org/exolab/castor/dsml/**/*.java,
-                                              org/exolab/castor/dtx/**/*.java,
-                                              org/exolab/castor/gui/**/*.java,
-                                              org/exolab/castor/jdo/conf/**/*.java,
-                                              org/exolab/castor/jdo/**/*.java,
-                                              org/exolab/castor/persist/**/*.java,
-                                              org/exolab/castor/types/**/*.java,
-    										  org/castor/util/*.java,
-											  org/castor/persist/**/*.java" />
+    <property name="castor.jdo.files"
+		      value="**/org/exolab/castor/dsml/**/*.java,
+                     org/exolab/castor/dtx/**/*.java,
+                     org/exolab/castor/gui/**/*.java,
+                     org/exolab/castor/jdo/conf/**/*.java,
+                     org/exolab/castor/jdo/**/*.java,
+                     org/exolab/castor/persist/**/*.java,
+                     org/exolab/castor/types/**/*.java,
+                     org/castor/jdo/**/*.java,
+                     org/castor/persist/**/*.java" />
 
     <target name="targets" description="Prints static list of available targets">
         <echo>
@@ -120,6 +124,7 @@
             tests            (shorthand for compile.tests)
             checkstyle.jdo   Check code conventions of Castor JDO packages
             checkstyle.tests Check code conventions of the test packages
+            compile.commons  Compile the Castor COMONS packages
             compile.xml      Compile the Castor XML packages
             compile.jdo      Compile the Castor JDO packages
             compile.examples Builds the example packages (including debugging info)
@@ -246,7 +251,16 @@
         <antcall target="compile.jdo" />
     </target>
 
-    <target name="compile.xml" depends="prepare"
+    <target name="compile.commons" depends="prepare"
+            description="Compile the Castor COMMONS packages">
+        <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}"
+               debug="on" deprecation="${deprecation}"
+               includes="${castor.commons.files}">
+            <classpath refid="build.classpath"/>
+        </javac>
+    </target>
+
+    <target name="compile.xml" depends="prepare,compile.commons"
             description="Compile the Castor XML packages">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}"
                debug="on" deprecation="${deprecation}"
@@ -260,7 +274,7 @@
         </copy>
     </target>
 
-    <target name="compile.jdo" depends="prepare,compile.xml"
+    <target name="compile.jdo" depends="prepare,compile.commons,compile.xml"
             description="Compile the Castor JDO packages">
         <javac srcdir="${main}" destdir="${classes}" excludes="${excludes}"
                debug="on" deprecation="${deprecation}"
@@ -419,7 +433,8 @@
                         org/exolab/castor/util/Version.class" />
     </target>
 
-    <target name="jar" depends="compile" description="Build the castor.jar and castor-xml.jar files">
+    <target name="jar" depends="compile"
+		    description="Build the castor.jar and castor-xml.jar files">
         <delete file="${dist}/${archive.name}.jar"/>
         <delete file="${dist}/${archive.name}-xml.jar"/>
         <!-- <delete file="${dist}/${archive.name}-sourceGen.jar"/> -->
@@ -445,6 +460,7 @@
         <!-- create Castor XML Only Jar -->
         <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
               includes="LICENSE,README,
+              org/castor/util/*,
               org/exolab/castor/*,
               org/exolab/castor/builder/**,
               org/exolab/castor/core/**,
@@ -455,6 +471,11 @@
               org/exolab/castor/util/**,
               org/exolab/castor/xml/**,
               org/exolab/javasource/**"/>
+
+        <!-- create Castor COMMONS Only Jar -->
+        <jar jarfile="${dist}/${archive.name}-commons.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
+              includes="LICENSE,README,
+              org/castor/util/*"/>
 
     	<!-- copy and filter MANIFEST file for Source generator -->
 <!--    	
