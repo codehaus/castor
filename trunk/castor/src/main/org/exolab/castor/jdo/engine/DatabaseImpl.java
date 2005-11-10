@@ -403,13 +403,16 @@ public class DatabaseImpl
         return false;
     }
 
-    public Object getIdentity(Object object)
-    {
-        if ( _scope == null )
+    /* (non-Javadoc)
+     * @see org.exolab.castor.jdo.Database#getIdentity(java.lang.Object)
+     */
+    public Object getIdentity(final Object object) throws ClassNotPersistenceCapableException {
+        if ( _scope == null ) {
             throw new IllegalStateException( Messages.message( "jdo.dbClosed" ) );
-        if ( _ctx != null && _ctx.isOpen()  )
-            return _ctx.getIdentity( object );
-        return null;
+        }
+
+        PersistenceInfo info = _scope.getPersistenceInfo(object.getClass());
+        return info.molder.getActualIdentity(_classLoader, object);
     }
 
 
