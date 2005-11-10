@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Stein M. Hugubakken
+ * Copyright 2005 Stein M. Hugubakken, Ralf Joachim
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,11 +23,15 @@ import java.sql.Statement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.TransactionNotInProgressException;
 import org.exolab.castor.util.Messages;
 
 /**
  * Common static methods for Castor JDO
  * 
+ * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @author <a href="mailto:dulci AT start DOT no">Stein M. Hugubakken</a>
  * @version $Revision$ $Date$
  * @since 0.9.9.1
@@ -87,6 +91,39 @@ public final class JDOUtils {
                 stmt.close();
             } catch (SQLException e) {
                 LOG.warn(Messages.message("persist.stClosingFailed"), e);
+            }
+        }
+    }
+
+    /**
+     * Closes the Database without throwing exceptions. An active transaction will
+     * silently rolled back. Warnings are added to the log if any exception occures.
+     *
+     * @param db The database to close.
+     */
+    public static void closeDatabase(final Database db) {
+        if ((db != null) && !db.isClosed()) {
+            synchronized (db) {
+                if (db.isActive()) {
+                    // if transction is still active it will be rolled back.
+                    try {
+                        db.rollback();
+                    } catch (TransactionNotInProgressException e) {
+                        // this should never happen but anyway we log it
+                        LOG.warn("Failed to rollback an active transaction.", e);
+                    }
+                } 
+                
+                if (!db.isClosed()) {
+                    // database is not closed but should be commited or rolled back now,
+                    // so we can close it now. 
+                    try {
+                        db.close();
+                    } catch (PersistenceException e) {
+                        // this should never happen but anyway we log it
+                        LOG.warn("Failed to close an open database.", e);
+                    }
+                }
             }
         }
     }
