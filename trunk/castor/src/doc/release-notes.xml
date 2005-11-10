@@ -65,6 +65,12 @@
 					</crow>
                 </ctable>
 
+				<h3>Added helper method to close database</h3>
+				
+				<p>Added org.castor.jdo.util.JDOUtils.closeDatabase() method to close
+				   an open database instance without throwing exceptions. Any active
+				   transaction will be silently rolled back.</p>
+				   
 				<h2>Bugs</h2>
 				
 				<h3>Improved 'caching' of Castor DTDs/XML Schemas</h3>
@@ -81,6 +87,26 @@
 				   
             </summary>
             <bugs>
+                <bug id="1260" tool="jira">
+                    <description>
+		                Added org.castor.jdo.util.JDOUtils.closeDatabase() helper method.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+				    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051110</date>
+                </bug>
                 <bug id="1259" tool="jira">
                     <description>
 		                Refactored org.exolab.castor.jdo.Utils into org.castor.jdo.util.JDOUtils.
