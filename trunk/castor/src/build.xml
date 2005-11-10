@@ -452,7 +452,7 @@
     	<jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
              includes="LICENSE,README,org/**,log4j.properties"/>
 
-    	<!-- copy and filter MANIFEST file for Castor JDO -->
+    	<!-- copy and filter MANIFEST file for Castor XML -->
         <delete   file="${classes}/MANIFEST.MF" />
     	<copy file="${source}/etc/MANIFEST.XML.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
@@ -471,6 +471,11 @@
               org/exolab/castor/util/**,
               org/exolab/castor/xml/**,
               org/exolab/javasource/**"/>
+
+    	<!-- copy and filter MANIFEST file for Castor COMMONS -->
+        <delete file="${classes}/MANIFEST.MF" />
+    	<copy file="${source}/etc/MANIFEST.COMMONS.MF" tofile="${classes}/MANIFEST.MF"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
 
         <!-- create Castor COMMONS Only Jar -->
         <jar jarfile="${dist}/${archive.name}-commons.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
