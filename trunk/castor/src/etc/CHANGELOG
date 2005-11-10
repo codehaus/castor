@@ -7,6 +7,11 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+JDO:   Fixed bug CASTOR-1259 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
+       Refactored org.exolab.castor.jdo.Utils into org.castor.jdo.util.JDOUtils.
+       Details: http://jira.codehaus.org/browse/CASTOR-1259
+       (Ralf - 20051110)
+       
 XML:   Fixed bug CASTOR-1249 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
        Included new implementations of Base64Encoder/-Decoder with castor-0.9.9-xml.jar.
        Details: http://jira.codehaus.org/browse/CASTOR-1249
