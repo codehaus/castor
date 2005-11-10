@@ -65,11 +65,24 @@
 					</crow>
                 </ctable>
 
-				<h3>Added helper method to close database</h3>
+                <h3>Improved Database.getIdentity(Object)</h3>
 				
-				<p>Added org.castor.jdo.util.JDOUtils.closeDatabase() method to close
-				   an open database instance without throwing exceptions. Any active
-				   transaction will be silently rolled back.</p>
+                <p>The new implementation of the Database.getIdentity(Object) does not rely on the
+                   object being loaded in the same transaction anymore. It is even not required to
+                   have an active transaction. The identity will now be determined by calling the
+                   getters of the fields defined as identities in the mapping. If a mapping for the
+                   objects class could not be found a ClassNotPersistenceCapableException will be
+                   thrown. Null is only returned if the objects identity is null.</p>
+				   
+                <p><b>Note:</b>Care should be take if you previously used the null return of
+                   Database.getIdentity(Object) to determine if the object has been loaded in
+                   the current transaction before.</p>
+				   
+                <h3>Added helper method to close database</h3>
+				
+                <p>Added org.castor.jdo.util.JDOUtils.closeDatabase() method to close an open
+                   database instance without throwing exceptions. Any active transaction will be
+                   silently rolled back.</p>
 				   
 				<h2>Bugs</h2>
 				
@@ -87,9 +100,30 @@
 				   
             </summary>
             <bugs>
+                <bug id="1239" tool="jira">
+                    <description>
+                        Improved Database.getIdentity(Object) to be able to resolve identity without
+						relying on the object been loaded from the database in the same transaction.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Henk van Voorthujsen</name>
+                        <email>voorth@xs4all.nl</email>
+				    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051110</date>
+                </bug>
                 <bug id="1260" tool="jira">
                     <description>
-		                Added org.castor.jdo.util.JDOUtils.closeDatabase() helper method.
+                        Added org.castor.jdo.util.JDOUtils.closeDatabase() helper method.
                     </description>
                     <contributor>
                         <name>Ralf Joachim</name>
@@ -109,7 +143,7 @@
                 </bug>
                 <bug id="1259" tool="jira">
                     <description>
-		                Refactored org.exolab.castor.jdo.Utils into org.castor.jdo.util.JDOUtils.
+                        Refactored org.exolab.castor.jdo.Utils into org.castor.jdo.util.JDOUtils.
                     </description>
                     <contributor>
                         <name>Ralf Joachim</name>

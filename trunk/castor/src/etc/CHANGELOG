@@ -7,6 +7,12 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+JDO:   Fixed bug CASTOR-1239 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
+       Improved Database.getIdentity(Object) to be able to resolve identity without
+       relying on the object been loaded from the database in the same transaction.
+       Details: http://jira.codehaus.org/browse/CASTOR-1239
+       (Ralf - 20051110)
+       
 JDO:   Fixed bug CASTOR-1260 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
        Added org.castor.jdo.util.JDOUtils.closeDatabase() helper method.
        Details: http://jira.codehaus.org/browse/CASTOR-1260

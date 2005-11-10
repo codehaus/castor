@@ -548,17 +548,21 @@ public interface Database
 
 
     /**
-     * Returns the object's identity. If the identity was determined when
-     * the object was created, or if the object was retrieved, that identity
-     * is returned. If the identity has been modified, this will not be
-     * reflected until the transaction commits. Null is returned if the
-     * identity is null, the object does not have any identity, or the
-     * object is not persistent.
-     *
-     * @param object The object
-     * @return The object's identity, or null
+     * Returns the object's identity. The identity will be determined by calling the
+     * getters of the fields defined as identities in the mapping. If a mapping for
+     * the objects class could not be found a ClassNotPersistenceCapableException
+     * will be thrown. Null is only returned if the objects identity is null. It is
+     * not required to have an active transaction when using this method.
+     * <p>
+     * <b>Note:</b> Prior to 0.9.9.1 release of castor the identity could only be
+     * determined if the object took part in the transaction. If this was not the case,
+     * the previous implementation also returned null.
+     * 
+     * @param object The object.
+     * @return The object's identity, or null.
+     * @throws ClassNotPersistenceCapableException The class is not persistent capable.
      */
-    public Object getIdentity( Object object );
+    public Object getIdentity(Object object) throws ClassNotPersistenceCapableException;
 
     
     /** 

@@ -1960,25 +1960,6 @@ public abstract class TransactionContext {
     }
 
     /**
-     * Returns the object's identity. If the identity was determined when the
-     * object was created, or if the object was retrieved, that identity is
-     * returned. If the identity has been modified, this will not be reflected
-     * until the transaction commits. Null is returned if the identity is null,
-     * the object does not have any identity, or the object is not persistent.
-     * 
-     * @param object
-     *            The object
-     * @return The object's identity, or null
-     */
-    public Object getIdentity(final Object object) {
-        OID oid = _tracker.getOIDForObject(object);
-        if (oid != null) {
-            return oid.getIdentity();
-        }
-        return null;
-    }
-
-    /**
      * Returns the status of this transaction.
      */
     public int getStatus() {
