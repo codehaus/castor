@@ -57,6 +57,8 @@ import org.exolab.castor.util.Messages;
 /**
  * Common static methods for Castor JDO
  * 
+ * @deprecated Use org.castor.jdo.util.JDOUtils instead. 
+ *
  * @author <a href="mailto:dulci@start.no">Stein M. Hugubakken</a>
  * @version $Revision$ $Date$
  */
