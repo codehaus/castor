@@ -437,40 +437,44 @@
 		    description="Build the castor.jar and castor-xml.jar files">
         <delete file="${dist}/${archive.name}.jar"/>
         <delete file="${dist}/${archive.name}-xml.jar"/>
+        <delete file="${dist}/${archive.name}-commons.jar"/>
         <!-- <delete file="${dist}/${archive.name}-sourceGen.jar"/> -->
-        <delete file="${classes}/MANIFEST.MF"/>
 
         <copy todir="${classes}">
-            <fileset dir="${source}/etc" includes="LICENSE,README,log4j.properties" />
+            <fileset dir="${source}/etc" includes="LICENSE,LICENSE.APACHE2,README,log4j.properties" />
         </copy>
 
     	<!-- copy and filter MANIFEST file for Castor JDO -->
+        <delete file="${classes}/MANIFEST.MF"/>
     	<copy file="${source}/etc/MANIFEST.JDO.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
         
     	<!-- create CASTOR JDO JAR -->
-    	<jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
-             includes="LICENSE,README,org/**,log4j.properties"/>
+    	<jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}"
+             manifest="${classes}/MANIFEST.MF"
+             includes="LICENSE,LICENSE.APACHE2,README,
+			           org/**,log4j.properties"/>
 
     	<!-- copy and filter MANIFEST file for Castor XML -->
-        <delete   file="${classes}/MANIFEST.MF" />
+        <delete file="${classes}/MANIFEST.MF" />
     	<copy file="${source}/etc/MANIFEST.XML.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
 
         <!-- create Castor XML Only Jar -->
-        <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
-              includes="LICENSE,README,
-              org/castor/util/*,
-              org/exolab/castor/*,
-              org/exolab/castor/builder/**,
-              org/exolab/castor/core/**,
-              org/exolab/castor/mapping/**,
-              org/exolab/castor/net/**,
-              org/exolab/castor/tools/**,
-              org/exolab/castor/types/**,
-              org/exolab/castor/util/**,
-              org/exolab/castor/xml/**,
-              org/exolab/javasource/**"/>
+        <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}"
+             manifest="${classes}/MANIFEST.MF"
+             includes="LICENSE,LICENSE.APACHE2,README,
+                       org/castor/util/**,
+                       org/exolab/castor/*,
+                       org/exolab/castor/builder/**,
+                       org/exolab/castor/core/**,
+                       org/exolab/castor/mapping/**,
+                       org/exolab/castor/net/**,
+                       org/exolab/castor/tools/**,
+                       org/exolab/castor/types/**,
+                       org/exolab/castor/util/**,
+                       org/exolab/castor/xml/**,
+                       org/exolab/javasource/**"/>
 
     	<!-- copy and filter MANIFEST file for Castor COMMONS -->
         <delete file="${classes}/MANIFEST.MF" />
@@ -478,9 +482,10 @@
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
 
         <!-- create Castor COMMONS Only Jar -->
-        <jar jarfile="${dist}/${archive.name}-commons.jar" basedir="${classes}" manifest="${classes}/MANIFEST.MF"
-              includes="LICENSE,README,
-              org/castor/util/*"/>
+        <jar jarfile="${dist}/${archive.name}-commons.jar" basedir="${classes}"
+             manifest="${classes}/MANIFEST.MF"
+             includes="LICENSE.APACHE2,README,
+                       org/castor/util/**"/>
 
     	<!-- copy and filter MANIFEST file for Source generator -->
 <!--    	
@@ -490,8 +495,9 @@
 -->    	
     	<!-- create JAR for source generator -->
 <!--    	
-        <jar      jarfile="${dist}/${archive-name}-sourceGen.jar" basedir="${classes}"
-                  manifest="${classes}/MANIFEST.MF" includes="LICENSE,README" />
+        <jar jarfile="${dist}/${archive-name}-sourceGen.jar" basedir="${classes}"
+             manifest="${classes}/MANIFEST.MF"
+	         includes="LICENSE,README"/>
 -->
     </target>
 
