@@ -100,6 +100,27 @@
 				   
             </summary>
             <bugs>
+                <bug id="1247" tool="jira">
+                    <description>
+		                Fixed problem with releasing object lock due to a 
+                        LockNotGrantedException.
+                    </description>
+                    <contributor>
+                        <name>Vish Madan</name>
+                        <email>vishal.madan@wipro.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Vish Madan</name>
+                        <email>vishal.madan@wipro.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051112</date>
+                </bug>
                 <bug id="1239" tool="jira">
                     <description>
                         Improved Database.getIdentity(Object) to be able to resolve identity without

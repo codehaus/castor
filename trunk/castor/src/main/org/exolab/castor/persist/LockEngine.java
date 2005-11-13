@@ -396,6 +396,11 @@ public final class LockEngine {
         } catch ( ObjectDeletedWaitingForLockException except ) {
             // This is equivalent to object does not exist
             throw new ObjectNotFoundException( Messages.format("persist.objectNotFound", oid.getName(), oid.getIdentity()));
+        } catch (LockNotGrantedException e) {
+            if (lock != null) {
+                lock.release(tx);
+            }
+            throw e;
         } finally {
             if ( lock != null ) lock.confirm( tx, succeed );
         }
