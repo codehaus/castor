@@ -99,6 +99,26 @@
 				   transaction.</p>
 				   
             </summary>
+                <bug id="1241" tool="jira">
+                    <description>
+                        Improved documentation about locking modes.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Vish Madan</name>
+                        <email>vishal.madan@wipro.com</email>
+				    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051113</date>
+                </bug>
             <bugs>
                 <bug id="1247" tool="jira">
                     <description>

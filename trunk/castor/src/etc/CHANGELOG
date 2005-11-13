@@ -7,6 +7,11 @@ Version 0.9.9.1, Oct 21, 2005
 
 Added non-trivial sample for usage of binding file
 
+JDO:   Fixed bug CASTOR-1241 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
+       Improved documentation about locking modes.
+       Details: http://jira.codehaus.org/browse/CASTOR-1241
+       (Ralf - 20051113)
+       
 JDO:   Fixed bug CASTOR-1247 using contribution from Vishal Madan [vishal.madan@wipro.com]
        Fixed problem with releasing object lock due to a LockNotGrantedException.
        Details: http://jira.codehaus.org/browse/CASTOR-1247
