@@ -157,12 +157,30 @@
            a write lock, and a write lock will not be granted if there is any read lock on the
            object.</p>
 
-        <p>If a transaction requires a read lock on an object which is write-locked by another
-           transaction, or requires a write lock on an object which is read-locked by another
-           transaction, the transaction will block until the lock is released, or the lock
-           timeout has elapsed. The lock timeout is a property of the transaction and is
-           specified in seconds. A <javadoc>org.exolab.castor.persist.LockNotGrantedException</javadoc>
-           is thrown if the lock could not be acquired within the specified timeout.</p>
+        <p>If an object is loaded read-only, a read lock is acquired at the begin of the load operation
+           and realeased when the load is finished. Someone now could ask why do you acquire a read
+           lock at all if it only lasts during the load operation. For an explanation we have to take a
+           look on what happens if an object is loaded. Loading one object from database may cause
+           castor to load a whole tree of objects with relations to each other. In the background
+           castor may performs various queries to load all related objects. For this object tree to
+           be consistent and reflect the persistent state of all the objects in the database at one
+           point in time we need to lock all objects involved in all load operations to prevent any
+           involved object to be write locked and changed by another transaction. If the load operation
+           is finished these read locks are not required anymore. On the other hand, read locks are
+           acquired to prevent an object already locked in the write mode from getting the read lock.</p>
+
+        <p>Write locks are acquired at the begin of the load operation similar then read locks. But in
+           contrast to read locks, write locks are hold until the transaction is commited or rolled
+           back. Holding the write lock until the end of the transaction is required as the changes
+           to the objects, that could happen anytime between begin and end of the transaction, are only
+           persisted if the transaction successfully commits.</p>
+
+        <p>If a transaction requires a read lock on an object which is write locked by another
+           transaction, or requires a write lock on an object which is read or write locked by another
+           transaction, the transaction will block until the lock is released, or the lock timeout has
+           elapsed. The lock timeout is a property of the transaction and is specified in seconds. A
+           <javadoc>org.exolab.castor.persist.LockNotGrantedException</javadoc> is thrown if the lock
+           could not be acquired within the specified timeout.</p>
 
         <p>This locking mechanism can lead to the possibility of a deadlock. The object lock
            mechanism provides automatic deadlock detection by tracking blocked transactions,
