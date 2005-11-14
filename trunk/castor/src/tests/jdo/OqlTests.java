@@ -47,6 +47,10 @@
 package jdo;
 
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
@@ -92,7 +96,7 @@ public class OqlTests extends CastorTestCase {
      * @todo Populate the database
      */
     public void runTest()
-       throws PersistenceException 
+       throws Exception 
     {
         // The following statement only prints in -verbose mode
         stream.println( "Not yet implemented" );
@@ -146,29 +150,28 @@ public class OqlTests extends CastorTestCase {
      * repopulate it. It needs to be generic enough to work across databases
      * so I would prefer to use straight JDBC calls. 
      */
-    public void populateDatabaseExtends() throws PersistenceException
+    public void populateDatabaseExtends() throws Exception
     {
-         // delete all from TEST_TABLE
         _db.begin();
-        OQLQuery query = _db.getOQLQuery("select x from jdo.TestObject x");
-        QueryResults res = query.execute();
-        try {
-            while(res.hasMore())
-                _db.remove(res.next());
-        } finally {
-            res.close();
-        }
+        Connection connection = _db.getJdbcConnection();
+        Statement statement = connection.createStatement();
+        statement.execute("delete from test_table_extends");
+
+        connection = _db.getJdbcConnection();
+        statement = connection.createStatement();
+        statement.execute("delete from test_table");
         _db.commit();
-
-         // fill TEST_TABLE
+        
         _db.begin();
-
         for(int i=MIN_ID; i<=MAX_ID; ++i) {
             TestObject obj = new TestObject();
             obj.setId(i);
             obj.setValue1(TestObject.DefaultValue1 + " " + Integer.toString(i));
             _db.create(obj);
         }
+        _db.commit();
+        
+        _db.begin();
 
         for(int i=MIN_EXTENDS_ID; i<=MAX_EXTENDS_ID; ++i) {
             TestObjectExtends ext = new TestObjectExtends();
