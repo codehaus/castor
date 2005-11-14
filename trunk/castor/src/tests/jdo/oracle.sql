@@ -318,6 +318,10 @@ create table tc2x_keygen (
 
 create unique index tc2x_keygen_pk on tc2x_keygen ( id );
 
+drop sequence tc2x_keygen_seq;
+
+create sequence tc2x_keygen_seq;
+
 drop table tc2x_keygen_ext;
 
 create table tc2x_keygen_ext (
@@ -677,13 +681,6 @@ create unique index test_group_pk
    on test_group ( id );
 
 -- grant all on test_group to test;
-
-
-drop sequence   test_keygen_seq;
-
-create sequence test_keygen_seq;
-
--- grant all on test_keygen_seq to test;
 
 
 -- test_col
@@ -1203,8 +1200,8 @@ create table poly_OfferComposition(
 
 DROP TABLE poly_extend_object;
 CREATE TABLE poly_extend_object (
-  id            int NOT NULL default '0',
-  description2  varchar(50) NOT NULL default '',
+  id            int NOT NULL,
+  description2  varchar(50) NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -1212,8 +1209,8 @@ INSERT INTO poly_extend_object VALUES (1, 'This is the extended object.');
 
 DROP TABLE poly_base_object;
 CREATE TABLE poly_base_object (
-  id           int NOT NULL default '0',
-  description  varchar(50) NOT NULL default '',
+  id           int NOT NULL,
+  description  varchar(50) NOT NULL,
   saved        char(1) default '0',
   PRIMARY KEY (id)
 );
@@ -1222,9 +1219,9 @@ INSERT INTO poly_base_object VALUES (1, 'This is the test object.', '0');
 
 DROP TABLE poly_depend_object;
 CREATE TABLE poly_depend_object (
-  id           int NOT NULL default '0',
-  parentId           int NOT NULL default '0',
-  description  varchar(50) NOT NULL default '',
+  id           int NOT NULL,
+  parentId           int NOT NULL,
+  description  varchar(50) NOT NULL,
   PRIMARY KEY (id)
 );
 
