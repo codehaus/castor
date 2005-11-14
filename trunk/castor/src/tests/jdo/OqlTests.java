@@ -46,9 +46,8 @@
 
 package jdo;
 
-
+import java.math.BigDecimal;
 import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.Statement;
 
 import org.exolab.castor.jdo.Database;
@@ -118,21 +117,18 @@ public class OqlTests extends CastorTestCase {
      * repopulate it. It needs to be generic enough to work across databases
      * so I would prefer to use straight JDBC calls. 
      */
-    public void populateDatabase() throws PersistenceException
+    public void populateDatabase() throws Exception
     {
-	     // delete all from TEST_TABLE
-	    _db.begin();
-		OQLQuery query = _db.getOQLQuery("select x from jdo.TestObject x");
-		QueryResults res = query.execute();
-		try {
-			while(res.hasMore())
-				_db.remove(res.next());
-		} finally {
-			res.close();
-		}
-	    _db.commit();
+        _db.begin();
+        Connection connection = _db.getJdbcConnection();
+        Statement statement = connection.createStatement();
+        statement.execute("delete from test_table_extends");
 
-	     // fill TEST_TABLE
+        connection = _db.getJdbcConnection();
+        statement = connection.createStatement();
+        statement.execute("delete from test_table");
+        _db.commit();
+        
 	    _db.begin();
 
 		for(int i=MIN_ID; i<=MAX_ID; ++i) {
@@ -340,17 +336,22 @@ public class OqlTests extends CastorTestCase {
     public void tryFunctionQuery(OQLQuery query, int count_expected) throws PersistenceException
     {
         QueryResults res = query.execute();
-        Long functionValue = null;
+        long functionValue = 0;
 
         try {
             if (res.hasMore()) {
-                functionValue = (Long) res.next();
+                Object obj = res.next();
+                if (obj instanceof Long) {
+                    functionValue = ((Long) obj).longValue();
+                } else if (obj instanceof BigDecimal) {
+                    functionValue = ((BigDecimal) obj).longValue();
+                }
             }
         } finally {
             res.close();
         }
 
-        assertEquals("number of objects found", count_expected, functionValue.longValue());
+        assertEquals("number of objects found", count_expected, functionValue);
     }
 
     /*
