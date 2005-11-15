@@ -75,8 +75,8 @@
 			<name>ANECON Software Design und Beratung Ltd.</name>
 			<url><a href="http://www.anecon.com">http://www.anecon.com</a></url>
 			<contact>
-				<name><a href="mailto:werner.guttmann@anecon.com">Werner Guttmann</a></name>
-				<!-- <email><a href="mailto:werner.guttmann@anecon.com">Werner Guttmann</a></email> -->
+				<name>Werner Guttmann</name>
+				<email><a href="mailto:werner.guttmann@anecon.com">werner.guttmann@anecon.com</a></email>
 				<phone>+43 1 409 59 90 </phone>
 				<description>Technical architect, Castor JDO technical lead</description>
 			</contact>
