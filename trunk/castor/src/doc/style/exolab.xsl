@@ -607,7 +607,7 @@
                 </td>
                 <td>
                     <span class="bodyGrey">
-                        <xsl:value-of select="url"/>
+                        <xsl:copy-of select="url"/>
                     </span>
                 </td>
             </tr>
@@ -630,8 +630,8 @@
     <xsl:template match="contact">
         <td>
             <span class="bodyGrey">
-                <xsl:value-of select="name"/><br/> 
-                email: <xsl:value-of select="email"/><br/>
+                <xsl:copy-of select="name"/><br/> 
+                email: <xsl:copy-of select="email"/><br/>
                 phone: <xsl:value-of select="phone"/> 
             </span>
         </td>
