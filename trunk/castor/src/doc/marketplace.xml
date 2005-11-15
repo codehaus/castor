@@ -72,16 +72,16 @@
       <companies>
         
 		<company id="anecon">
-			<name>Anecon Softwaredesign und Beratung Ltd.</name>
-			<url>http://www.anecon.com</url>
+			<name>ANECON Software Design und Beratung Ltd.</name>
+			<url><a href="http://www.anecon.com">http://www.anecon.com</a></url>
 			<contact>
-				<name>Werner Guttmann</name>
-				<email>werner.guttmann@anecon.com</email>
-				<phone></phone>
+				<name><a href="mailto:werner.guttmann@anecon.com">Werner Guttmann</a></name>
+				<!-- <email><a href="mailto:werner.guttmann@anecon.com">Werner Guttmann</a></email> -->
+				<phone>+43 1 409 59 90 </phone>
 				<description>Technical architect, Castor JDO technical lead</description>
 			</contact>
 			<description>
-				Anecon offers expertise in the area of J2EE applications, with 
+				ANECON offers expertise in the area of J2EE applications, with 
                 a strong emphasis on the integration of persistence frameworks, object/relational 
                 mapping tools and XML data binding frameworks in general and Castor JDO and 
 				XML in particular; it supports clients in their focus to integrate such 
