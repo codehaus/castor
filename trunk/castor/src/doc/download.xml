@@ -30,7 +30,7 @@
     <section title="Latest Stable Release">
       <ul><b>Lastest Released Version: Castor $VERSION$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
-        <li>The Castor Commons JAR<br/>
+        <li><b>NEW *** </b> The Castor Commons JAR <b>*** NEW</b><br/>
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-commons.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
