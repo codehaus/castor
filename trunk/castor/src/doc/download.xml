@@ -18,9 +18,21 @@
    </section>
 -->
 
+	<section title="News">
+	
+		<p>As of release 0.9.9.1, a new JAR file with the suffix '-commons' has been 
+		   introduced, which holds classes required by all other JARs (XML, JDO). Please 
+		   make sure that you include this new JAR in your class path together with the
+		   other JAR(s).</p>
+		
+	</section>
+
     <section title="Latest Stable Release">
       <ul><b>Lastest Released Version: Castor $VERSION$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
+        <li>The Castor Commons JAR<br/>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-commons.jar</url>
+            <br/>&#xA0;</li>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$.jar</url>
             <br/>&#xA0;</li>
