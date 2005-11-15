@@ -34,7 +34,7 @@
 		</release>
 	    <release version="0.9.9.1">
 	        <description>Maintenance release for Castor XML and JDO</description>
-    		<date>September 22, 2005</date>
+    		<date>November 15, 2005</date>
     		<managed-by>Werner Guttmann</managed-by>
 			<summary>
 				<h2>New features</h2>
