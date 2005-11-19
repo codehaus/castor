@@ -50,7 +50,7 @@ import java.net.URL;
 import java.util.*;
 import java.sql.*;
 import org.xml.sax.*;
-import org.exolab.castor.jdo.conf.*;
+import org.castor.jdo.conf.*;
 import org.exolab.castor.persist.*;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.xml.*;
@@ -268,7 +268,7 @@ public class DTXEngine {
     Connection getConnection() throws DTXException {
 	if (_conn == null) {
 	    DataSource datasource = _database.getDatabaseChoice().getDataSource();
-	    org.exolab.castor.jdo.conf.Driver driver = _database.getDatabaseChoice().getDriver();
+	    org.castor.jdo.conf.Driver driver = _database.getDatabaseChoice().getDriver();
 
 	    if (datasource != null) {
 		// FIXME: lame

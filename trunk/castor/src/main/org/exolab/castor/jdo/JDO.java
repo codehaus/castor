@@ -67,12 +67,11 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
-import org.exolab.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManager;
-import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.CallbackInterceptor;

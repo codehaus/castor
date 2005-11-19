@@ -1,17 +1,18 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
 
-package org.exolab.castor.jdo.conf;
+package org.castor.jdo.conf;
 
   //---------------------------------/
  //- Imported classes and packages -/
 //---------------------------------/
 
 import java.util.ArrayList;
+
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -40,7 +41,7 @@ public class Database implements java.io.Serializable {
     /**
      * Field _databaseChoice
      */
-    private org.exolab.castor.jdo.conf.DatabaseChoice _databaseChoice;
+    private org.castor.jdo.conf.DatabaseChoice _databaseChoice;
 
     /**
      * Field _mappingList
@@ -52,11 +53,12 @@ public class Database implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public Database() {
+    public Database() 
+     {
         super();
         setEngine("generic");
         _mappingList = new ArrayList();
-    } //-- org.exolab.castor.jdo.conf.Database()
+    } //-- org.castor.jdo.conf.Database()
 
 
       //-----------/
@@ -66,28 +68,33 @@ public class Database implements java.io.Serializable {
     /**
      * Method addMapping
      * 
+     * 
+     * 
      * @param vMapping
      */
-    public void addMapping(org.exolab.castor.jdo.conf.Mapping vMapping)
+    public void addMapping(org.castor.jdo.conf.Mapping vMapping)
         throws java.lang.IndexOutOfBoundsException
     {
         _mappingList.add(vMapping);
-    } //-- void addMapping(org.exolab.castor.jdo.conf.Mapping) 
+    } //-- void addMapping(org.castor.jdo.conf.Mapping) 
 
     /**
      * Method addMapping
      * 
+     * 
+     * 
      * @param index
      * @param vMapping
      */
-    public void addMapping(int index, org.exolab.castor.jdo.conf.Mapping vMapping)
+    public void addMapping(int index, org.castor.jdo.conf.Mapping vMapping)
         throws java.lang.IndexOutOfBoundsException
     {
         _mappingList.add(index, vMapping);
-    } //-- void addMapping(int, org.exolab.castor.jdo.conf.Mapping) 
+    } //-- void addMapping(int, org.castor.jdo.conf.Mapping) 
 
     /**
      * Method clearMapping
+     * 
      */
     public void clearMapping()
     {
@@ -96,6 +103,10 @@ public class Database implements java.io.Serializable {
 
     /**
      * Method enumerateMapping
+     * 
+     * 
+     * 
+     * @return Enumeration
      */
     public java.util.Enumeration enumerateMapping()
     {
@@ -105,16 +116,18 @@ public class Database implements java.io.Serializable {
     /**
      * Returns the value of field 'databaseChoice'.
      * 
+     * @return DatabaseChoice
      * @return the value of field 'databaseChoice'.
      */
-    public org.exolab.castor.jdo.conf.DatabaseChoice getDatabaseChoice()
+    public org.castor.jdo.conf.DatabaseChoice getDatabaseChoice()
     {
         return this._databaseChoice;
-    } //-- org.exolab.castor.jdo.conf.DatabaseChoice getDatabaseChoice() 
+    } //-- org.castor.jdo.conf.DatabaseChoice getDatabaseChoice() 
 
     /**
      * Returns the value of field 'engine'.
      * 
+     * @return String
      * @return the value of field 'engine'.
      */
     public java.lang.String getEngine()
@@ -125,9 +138,12 @@ public class Database implements java.io.Serializable {
     /**
      * Method getMapping
      * 
+     * 
+     * 
      * @param index
+     * @return Mapping
      */
-    public org.exolab.castor.jdo.conf.Mapping getMapping(int index)
+    public org.castor.jdo.conf.Mapping getMapping(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -135,24 +151,32 @@ public class Database implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (org.exolab.castor.jdo.conf.Mapping) _mappingList.get(index);
-    } //-- org.exolab.castor.jdo.conf.Mapping getMapping(int) 
+        return (org.castor.jdo.conf.Mapping) _mappingList.get(index);
+    } //-- org.castor.jdo.conf.Mapping getMapping(int) 
 
     /**
      * Method getMapping
+     * 
+     * 
+     * 
+     * @return Mapping
      */
-    public org.exolab.castor.jdo.conf.Mapping[] getMapping()
+    public org.castor.jdo.conf.Mapping[] getMapping()
     {
         int size = _mappingList.size();
-        org.exolab.castor.jdo.conf.Mapping[] mArray = new org.exolab.castor.jdo.conf.Mapping[size];
+        org.castor.jdo.conf.Mapping[] mArray = new org.castor.jdo.conf.Mapping[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (org.exolab.castor.jdo.conf.Mapping) _mappingList.get(index);
+            mArray[index] = (org.castor.jdo.conf.Mapping) _mappingList.get(index);
         }
         return mArray;
-    } //-- org.exolab.castor.jdo.conf.Mapping[] getMapping() 
+    } //-- org.castor.jdo.conf.Mapping[] getMapping() 
 
     /**
      * Method getMappingCount
+     * 
+     * 
+     * 
+     * @return int
      */
     public int getMappingCount()
     {
@@ -162,6 +186,7 @@ public class Database implements java.io.Serializable {
     /**
      * Returns the value of field 'name'.
      * 
+     * @return String
      * @return the value of field 'name'.
      */
     public java.lang.String getName()
@@ -171,6 +196,10 @@ public class Database implements java.io.Serializable {
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -186,6 +215,8 @@ public class Database implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -197,6 +228,8 @@ public class Database implements java.io.Serializable {
 
     /**
      * Method marshal
+     * 
+     * 
      * 
      * @param handler
      */
@@ -210,23 +243,26 @@ public class Database implements java.io.Serializable {
     /**
      * Method removeMapping
      * 
+     * 
+     * 
      * @param vMapping
+     * @return boolean
      */
-    public boolean removeMapping(org.exolab.castor.jdo.conf.Mapping vMapping)
+    public boolean removeMapping(org.castor.jdo.conf.Mapping vMapping)
     {
         boolean removed = _mappingList.remove(vMapping);
         return removed;
-    } //-- boolean removeMapping(org.exolab.castor.jdo.conf.Mapping) 
+    } //-- boolean removeMapping(org.castor.jdo.conf.Mapping) 
 
     /**
      * Sets the value of field 'databaseChoice'.
      * 
      * @param databaseChoice the value of field 'databaseChoice'.
      */
-    public void setDatabaseChoice(org.exolab.castor.jdo.conf.DatabaseChoice databaseChoice)
+    public void setDatabaseChoice(org.castor.jdo.conf.DatabaseChoice databaseChoice)
     {
         this._databaseChoice = databaseChoice;
-    } //-- void setDatabaseChoice(org.exolab.castor.jdo.conf.DatabaseChoice) 
+    } //-- void setDatabaseChoice(org.castor.jdo.conf.DatabaseChoice) 
 
     /**
      * Sets the value of field 'engine'.
@@ -241,10 +277,12 @@ public class Database implements java.io.Serializable {
     /**
      * Method setMapping
      * 
+     * 
+     * 
      * @param index
      * @param vMapping
      */
-    public void setMapping(int index, org.exolab.castor.jdo.conf.Mapping vMapping)
+    public void setMapping(int index, org.castor.jdo.conf.Mapping vMapping)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -252,21 +290,23 @@ public class Database implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _mappingList.set(index, vMapping);
-    } //-- void setMapping(int, org.exolab.castor.jdo.conf.Mapping) 
+    } //-- void setMapping(int, org.castor.jdo.conf.Mapping) 
 
     /**
      * Method setMapping
      * 
+     * 
+     * 
      * @param mappingArray
      */
-    public void setMapping(org.exolab.castor.jdo.conf.Mapping[] mappingArray)
+    public void setMapping(org.castor.jdo.conf.Mapping[] mappingArray)
     {
         //-- copy array
         _mappingList.clear();
         for (int i = 0; i < mappingArray.length; i++) {
             _mappingList.add(mappingArray[i]);
         }
-    } //-- void setMapping(org.exolab.castor.jdo.conf.Mapping) 
+    } //-- void setMapping(org.castor.jdo.conf.Mapping) 
 
     /**
      * Sets the value of field 'name'.
@@ -281,16 +321,20 @@ public class Database implements java.io.Serializable {
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return Database
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.castor.jdo.conf.Database unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.jdo.conf.Database) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.Database.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+        return (org.castor.jdo.conf.Database) Unmarshaller.unmarshal(org.castor.jdo.conf.Database.class, reader);
+    } //-- org.castor.jdo.conf.Database unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException

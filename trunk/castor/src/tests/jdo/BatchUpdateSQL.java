@@ -62,8 +62,8 @@ import org.xml.sax.InputSource;
 import org.castor.jdo.engine.DataSourceConnectionFactory;
 
 import org.exolab.castor.xml.Unmarshaller;
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.Param;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Param;
 import org.exolab.castor.util.DTDResolver;
 
 /**

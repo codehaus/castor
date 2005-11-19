@@ -22,8 +22,8 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.jdo.conf.Database;
-import org.exolab.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Database;
+import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerRegistry;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -145,9 +145,9 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
         try {
             // Initialize all the mappings of the database.
             Enumeration mappings = _jdoConf.getDatabase(_index).enumerateMapping();
-            org.exolab.castor.jdo.conf.Mapping mapConf;
+            org.castor.jdo.conf.Mapping mapConf;
             while (mappings.hasMoreElements()) {
-                mapConf = (org.exolab.castor.jdo.conf.Mapping) mappings.nextElement();
+                mapConf = (org.castor.jdo.conf.Mapping) mappings.nextElement();
                 if (LOG.isDebugEnabled()) {
                     LOG.debug("Loading the mapping descriptor: " + mapConf.getHref());
                 }

@@ -25,10 +25,10 @@ import javax.transaction.TransactionManager;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.jdo.conf.Database;
-import org.exolab.castor.jdo.conf.DatabaseChoice;
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.Param;
+import org.castor.jdo.conf.Database;
+import org.castor.jdo.conf.DatabaseChoice;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Param;
 import org.exolab.castor.jdo.drivers.ConnectionProxy;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;

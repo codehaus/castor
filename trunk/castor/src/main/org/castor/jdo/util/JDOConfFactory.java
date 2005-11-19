@@ -1,61 +1,31 @@
 /*
- * Redistribution and use of this software and associated documentation
- * ("Software"), with or without modification, are permitted provided
- * that the following conditions are met:
+ * Copyright 2005 Martin Fuchs, Ralf Joachim
  *
- * 1. Redistributions of source code must retain copyright
- *    statements and notices. Redistributions must also contain a
- *    copy of this document.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * 2. Redistributions in binary form must reproduce the
- *    above copyright notice, this list of conditions and the
- *    following disclaimer in the documentation and/or other
- *    materials provided with the distribution.
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * 3. The name "Exolab" must not be used to endorse or promote
- *    products derived from this Software without prior written
- *    permission of Intalio, Inc.  For written permission,
- *    please contact info@exolab.org.
- *
- * 4. Products derived from this Software may not be called "Exolab"
- *    nor may "Exolab" appear in their names without prior written
- *    permission of Intalio, Inc. Exolab is a registered
- *    trademark of Intalio, Inc.
- *
- * 5. Due credit should be given to the Exolab Project
- *    (http://www.exolab.org/).
- *
- * THIS SOFTWARE IS PROVIDED BY INTALIO, INC. AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESSED OR IMPLIED WARRANTIES, INCLUDING, BUT
- * NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- * FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL
- * INTALIO, INC. OR ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
- * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
- * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
- * OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * Copyright 2004 (C) Intalio, Inc. All Rights Reserved.
- *
- * $Id$
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-
-package org.exolab.castor.jdo.util;
+package org.castor.jdo.util;
 
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.exolab.castor.jdo.conf.Database;
-import org.exolab.castor.jdo.conf.DatabaseChoice;
-import org.exolab.castor.jdo.conf.DataSource;
-import org.exolab.castor.jdo.conf.Driver;
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.Mapping;
-import org.exolab.castor.jdo.conf.Param;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
+import org.castor.jdo.conf.Database;
+import org.castor.jdo.conf.DatabaseChoice;
+import org.castor.jdo.conf.DataSource;
+import org.castor.jdo.conf.Driver;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Mapping;
+import org.castor.jdo.conf.Param;
+import org.castor.jdo.conf.TransactionDemarcation;
 
 /**
  * Factory to create JDO configurations without the need of a database configuration
@@ -65,15 +35,15 @@ import org.exolab.castor.jdo.conf.TransactionDemarcation;
  * 
  * <code>
  *    // create driver configuration
- *    org.exolab.castor.jdo.conf.Driver driverConf =
+ *    org.castor.jdo.conf.Driver driverConf =
  *        JDOConfFactory.createDriver(DRIVER, CONNECT, USERNAME, PASSWORD);
  *      
  *    // create mapping configuration
- *    org.exolab.castor.jdo.conf.Mapping mappingConf =
+ *    org.castor.jdo.conf.Mapping mappingConf =
  *        JDOConfFactory.createMapping(getClass().getResource(MAPPING).toString());
  *
  *    // create database configuration
- *    org.exolab.castor.jdo.conf.Database dbConf =
+ *    org.castor.jdo.conf.Database dbConf =
  *        JDOConfFactory.createDatabase(DATABASE, ENGINE, driverConf, mappingConf);
  *      
  *    // create and load jdo configuration
@@ -83,6 +53,7 @@ import org.exolab.castor.jdo.conf.TransactionDemarcation;
  * @author <a href="mailto:martin-fuchs AT gmx DOT net">Martin Fuchs</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 0.9.9.1
  */
 public final class JDOConfFactory {
     //--------------------------------------------------------------------------

@@ -17,7 +17,7 @@ package org.exolab.castor.jdo.transactionmanager;
 
 import javax.transaction.TransactionManager;
 
-import org.exolab.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.JdoConf;
 
 /**
  * A factory for properly acquiring <tt>javax.transaction.TransactionManager</tt> 
