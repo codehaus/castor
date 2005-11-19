@@ -99,6 +99,7 @@
 				   transaction.</p>
 				   
             </summary>
+            <bugs>
                 <bug id="1241" tool="jira">
                     <description>
                         Improved documentation about locking modes.
@@ -119,7 +120,6 @@
                     <module>JDO</module>
                     <date>20051113</date>
                 </bug>
-            <bugs>
                 <bug id="1247" tool="jira">
                     <description>
 		                Fixed problem with releasing object lock due to a 
