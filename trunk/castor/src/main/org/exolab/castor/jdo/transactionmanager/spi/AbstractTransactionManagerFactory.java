@@ -20,7 +20,7 @@ import java.lang.reflect.Method;
 
 import javax.transaction.TransactionManager;
 
-import org.exolab.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.util.Messages;

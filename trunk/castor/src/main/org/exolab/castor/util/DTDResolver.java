@@ -156,20 +156,20 @@ public class DTDResolver implements EntityResolver {
                     "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN",
                     "http://castor.exolab.org/jdo-conf.dtd",
                     "castor.exolab.org", "castor",
-                    "/org/exolab/castor/jdo/conf/jdo-conf.dtd"),
+                    "/org/castor/jdo/conf/jdo-conf.dtd"),
             new DTDInfo(
                     "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN",
                     "http://castor.exolab.org/jdo-conf.xsd",
                     "castor.exolab.org", "castor",
-                    "/org/exolab/castor/jdo/conf/jdo-conf.xsd"),
+                    "/org/castor/jdo/conf/jdo-conf.xsd"),
             new DTDInfo(
                     "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN",
                     "http://castor.org/jdo-conf.dtd", "castor.org", "castor",
-                    "/org/exolab/castor/jdo/conf/jdo-conf.dtd"),
+                    "/org/castor/jdo/conf/jdo-conf.dtd"),
             new DTDInfo(
                     "-//EXOLAB/Castor JDO Configuration Schema Version 1.0//EN",
                     "http://castor.org/jdo-conf.xsd", "castor.org", "castor",
-                    "/org/exolab/castor/jdo/conf/jdo-conf.xsd"),
+                    "/org/castor/jdo/conf/jdo-conf.xsd"),
             // Resolving for XML Schema DTDs
             new DTDInfo(
                     "-//W3C//DTD XMLSCHEMA 19991216//EN",

@@ -1,17 +1,18 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.2</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
 
-package org.exolab.castor.jdo.conf;
+package org.castor.jdo.conf;
 
   //---------------------------------/
  //- Imported classes and packages -/
 //---------------------------------/
 
 import java.util.ArrayList;
+
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 
@@ -42,10 +43,11 @@ public class DataSource implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public DataSource() {
+    public DataSource() 
+     {
         super();
         _paramList = new ArrayList();
-    } //-- org.exolab.castor.jdo.conf.DataSource()
+    } //-- org.castor.jdo.conf.DataSource()
 
 
       //-----------/
@@ -55,28 +57,33 @@ public class DataSource implements java.io.Serializable {
     /**
      * Method addParam
      * 
+     * 
+     * 
      * @param vParam
      */
-    public void addParam(org.exolab.castor.jdo.conf.Param vParam)
+    public void addParam(org.castor.jdo.conf.Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
         _paramList.add(vParam);
-    } //-- void addParam(org.exolab.castor.jdo.conf.Param) 
+    } //-- void addParam(org.castor.jdo.conf.Param) 
 
     /**
      * Method addParam
      * 
+     * 
+     * 
      * @param index
      * @param vParam
      */
-    public void addParam(int index, org.exolab.castor.jdo.conf.Param vParam)
+    public void addParam(int index, org.castor.jdo.conf.Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
         _paramList.add(index, vParam);
-    } //-- void addParam(int, org.exolab.castor.jdo.conf.Param) 
+    } //-- void addParam(int, org.castor.jdo.conf.Param) 
 
     /**
      * Method clearParam
+     * 
      */
     public void clearParam()
     {
@@ -85,6 +92,10 @@ public class DataSource implements java.io.Serializable {
 
     /**
      * Method enumerateParam
+     * 
+     * 
+     * 
+     * @return Enumeration
      */
     public java.util.Enumeration enumerateParam()
     {
@@ -94,6 +105,7 @@ public class DataSource implements java.io.Serializable {
     /**
      * Returns the value of field 'className'.
      * 
+     * @return String
      * @return the value of field 'className'.
      */
     public java.lang.String getClassName()
@@ -104,9 +116,12 @@ public class DataSource implements java.io.Serializable {
     /**
      * Method getParam
      * 
+     * 
+     * 
      * @param index
+     * @return Param
      */
-    public org.exolab.castor.jdo.conf.Param getParam(int index)
+    public org.castor.jdo.conf.Param getParam(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -114,24 +129,32 @@ public class DataSource implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (org.exolab.castor.jdo.conf.Param) _paramList.get(index);
-    } //-- org.exolab.castor.jdo.conf.Param getParam(int) 
+        return (org.castor.jdo.conf.Param) _paramList.get(index);
+    } //-- org.castor.jdo.conf.Param getParam(int) 
 
     /**
      * Method getParam
+     * 
+     * 
+     * 
+     * @return Param
      */
-    public org.exolab.castor.jdo.conf.Param[] getParam()
+    public org.castor.jdo.conf.Param[] getParam()
     {
         int size = _paramList.size();
-        org.exolab.castor.jdo.conf.Param[] mArray = new org.exolab.castor.jdo.conf.Param[size];
+        org.castor.jdo.conf.Param[] mArray = new org.castor.jdo.conf.Param[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (org.exolab.castor.jdo.conf.Param) _paramList.get(index);
+            mArray[index] = (org.castor.jdo.conf.Param) _paramList.get(index);
         }
         return mArray;
-    } //-- org.exolab.castor.jdo.conf.Param[] getParam() 
+    } //-- org.castor.jdo.conf.Param[] getParam() 
 
     /**
      * Method getParamCount
+     * 
+     * 
+     * 
+     * @return int
      */
     public int getParamCount()
     {
@@ -140,6 +163,10 @@ public class DataSource implements java.io.Serializable {
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -155,6 +182,8 @@ public class DataSource implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -166,6 +195,8 @@ public class DataSource implements java.io.Serializable {
 
     /**
      * Method marshal
+     * 
+     * 
      * 
      * @param handler
      */
@@ -179,13 +210,16 @@ public class DataSource implements java.io.Serializable {
     /**
      * Method removeParam
      * 
+     * 
+     * 
      * @param vParam
+     * @return boolean
      */
-    public boolean removeParam(org.exolab.castor.jdo.conf.Param vParam)
+    public boolean removeParam(org.castor.jdo.conf.Param vParam)
     {
         boolean removed = _paramList.remove(vParam);
         return removed;
-    } //-- boolean removeParam(org.exolab.castor.jdo.conf.Param) 
+    } //-- boolean removeParam(org.castor.jdo.conf.Param) 
 
     /**
      * Sets the value of field 'className'.
@@ -200,10 +234,12 @@ public class DataSource implements java.io.Serializable {
     /**
      * Method setParam
      * 
+     * 
+     * 
      * @param index
      * @param vParam
      */
-    public void setParam(int index, org.exolab.castor.jdo.conf.Param vParam)
+    public void setParam(int index, org.castor.jdo.conf.Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -211,35 +247,41 @@ public class DataSource implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         _paramList.set(index, vParam);
-    } //-- void setParam(int, org.exolab.castor.jdo.conf.Param) 
+    } //-- void setParam(int, org.castor.jdo.conf.Param) 
 
     /**
      * Method setParam
      * 
+     * 
+     * 
      * @param paramArray
      */
-    public void setParam(org.exolab.castor.jdo.conf.Param[] paramArray)
+    public void setParam(org.castor.jdo.conf.Param[] paramArray)
     {
         //-- copy array
         _paramList.clear();
         for (int i = 0; i < paramArray.length; i++) {
             _paramList.add(paramArray[i]);
         }
-    } //-- void setParam(org.exolab.castor.jdo.conf.Param) 
+    } //-- void setParam(org.castor.jdo.conf.Param) 
 
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return DataSource
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.castor.jdo.conf.DataSource unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.jdo.conf.DataSource) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.DataSource.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+        return (org.castor.jdo.conf.DataSource) Unmarshaller.unmarshal(org.castor.jdo.conf.DataSource.class, reader);
+    } //-- org.castor.jdo.conf.DataSource unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException

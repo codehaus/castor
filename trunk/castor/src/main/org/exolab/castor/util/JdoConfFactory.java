@@ -48,14 +48,14 @@ package org.exolab.castor.util;
 import java.util.Enumeration;
 import java.util.Properties;
 
-import org.exolab.castor.jdo.conf.DataSource;
-import org.exolab.castor.jdo.conf.Database;
-import org.exolab.castor.jdo.conf.DatabaseChoice;
-import org.exolab.castor.jdo.conf.Driver;
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.Mapping;
-import org.exolab.castor.jdo.conf.Param;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
+import org.castor.jdo.conf.DataSource;
+import org.castor.jdo.conf.Database;
+import org.castor.jdo.conf.DatabaseChoice;
+import org.castor.jdo.conf.Driver;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Mapping;
+import org.castor.jdo.conf.Param;
+import org.castor.jdo.conf.TransactionDemarcation;
 
 
 /**
@@ -92,7 +92,7 @@ import org.exolab.castor.jdo.conf.TransactionDemarcation;
  * jdoDbConf = JdoConfFactory.createJdoDbConf(db_name, "oracle", JdoConfFactory.createJdoDSConf(ds));
  * </code>
  *
- * @deprecated use org.exolab.castor.jdo.util.JDOConfFactory instead.
+ * @deprecated use org.castor.jdo.util.JDOConfFactory instead.
  *  
  * @author Martin Fuchs <martin-fuchs AT gmx DOT net>
  */

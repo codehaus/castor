@@ -17,7 +17,7 @@ package org.exolab.castor.jdo.transactionmanager.spi;
 
 import javax.transaction.TransactionManager;
 
-import org.exolab.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 

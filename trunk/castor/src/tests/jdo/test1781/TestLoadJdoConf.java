@@ -11,8 +11,8 @@ import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.util.JDOConfFactory;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.util.JDOConfFactory;
 
 public final class TestLoadJdoConf extends TestCase {
     private static final Log LOG = LogFactory.getLog(TestLoadJdoConf.class);;
@@ -43,15 +43,15 @@ public final class TestLoadJdoConf extends TestCase {
         String MAPPING = "test1781-mapping.xml";
         
         // create driver configuration
-        org.exolab.castor.jdo.conf.Driver driverConf =
+        org.castor.jdo.conf.Driver driverConf =
             JDOConfFactory.createDriver(DRIVER, CONNECT, USERNAME, PASSWORD);
         
         // create mapping configuration
-        org.exolab.castor.jdo.conf.Mapping mappingConf =
+        org.castor.jdo.conf.Mapping mappingConf =
             JDOConfFactory.createMapping(getClass().getResource(MAPPING).toString());
 
         // create database configuration
-        org.exolab.castor.jdo.conf.Database dbConf =
+        org.castor.jdo.conf.Database dbConf =
             JDOConfFactory.createDatabase(DATABASE, ENGINE, driverConf, mappingConf);
         
         // test configuration
@@ -76,15 +76,15 @@ public final class TestLoadJdoConf extends TestCase {
         props.put("max-active", "10");
         
         // create driver configuration
-        org.exolab.castor.jdo.conf.DataSource datasourceConf =
+        org.castor.jdo.conf.DataSource datasourceConf =
             JDOConfFactory.createDataSource(DATASOURCE, props);
         
         // create mapping configuration
-        org.exolab.castor.jdo.conf.Mapping mappingConf =
+        org.castor.jdo.conf.Mapping mappingConf =
             JDOConfFactory.createMapping(getClass().getResource(MAPPING).toString());
 
         // create database configuration
-        org.exolab.castor.jdo.conf.Database dbConf =
+        org.castor.jdo.conf.Database dbConf =
             JDOConfFactory.createDatabase(DATABASE, ENGINE, datasourceConf, mappingConf);
         
         // test configuration

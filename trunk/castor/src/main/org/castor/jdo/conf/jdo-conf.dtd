@@ -1,17 +1,17 @@
 <!--
-
     The Castor JDO database configuration file DTD
 
     <!DOCTYPE jdo-conf PUBLIC "-//EXOLAB/Castor JDO Configuration DTD Version 1.0//EN"
-                               "http://castor.exolab.org/jdo-conf.dtd">
+                               "http://castor.org/jdo-conf.dtd">
 
     Note: This DTD is under evolution and subject to change.
-
  -->
 
-
 <!ELEMENT jdo-conf ( database+, transaction-demarcation ) >
+<!ATTLIST jdo-conf
+          name CDATA "jdo-conf">
 
+		  
 <!--
     The database configuration specifies the means to obtain a connection
     to the database server, the mapping between Java classes and tables
@@ -43,34 +43,25 @@
 
     The following names are supported in Castor 1.0:
 
-    generic     Generic JDBC engine
-    oracle      Oracle 7 and Oracle 8
-    sybase      Sybase 11 and SQL Anywhere
-    sql-server  Microsoft SQL Server
-    postgresql  PostgreSQL 6.5 and 7
+    db2          DB/2
+    derby        Derby
+    generic      Generic JDBC support
+    hsql         Hypersonic SQL
+    informix     Informix
+    instantdb    InstantDB
+    interbase    Interbase
+    mysql        MySQL
+    oracle       Oracle 7 - Oracle 9i
+    postgresql   PostgreSQL 7.1
+    sapdb        SAP DB / MaxDB
+    sql-server   Microsoft SQL Server
+    sybase       Sybase 11
  -->
 
-<!ELEMENT database ( ( driver | data-source | jndi )?,
-                     mapping+ )>
+<!ELEMENT database ( ( driver | data-source | jndi )?, mapping+ )>
 <!ATTLIST database
-          name ID      #REQUIRED
+          name   ID    #REQUIRED
           engine CDATA "generic">
-
-
-<!--
-    Includes class mapping from the specified mapping file.
-
-    The href attribute may be an absolute URL (typically a file: URL)
-    or a name relative to the base URL of the database configuration
-    file (typically in the same path).
-
-    Relative URLs also work if the database configuration and mapping
-    files are obtained from the application JAR or classpath.
- -->
-
-<!ELEMENT mapping EMPTY>
-<!ATTLIST mapping
-          href CDATA #REQUIRED>
 
 
 <!--
@@ -102,12 +93,7 @@
 <!ELEMENT driver ( param* )>
 <!ATTLIST driver
           url        CDATA #REQUIRED
-          class-name CDATA #IMPLIED>
-
-<!ELEMENT param EMPTY>
-<!ATTLIST param
-          name  CDATA #REQUIRED
-          value CDATA #REQUIRED>
+          class-name CDATA #REQUIRED>
 
 
 <!--
@@ -118,16 +104,15 @@
 
     The DataSource implementation class name is specified in the
     class-name attribute and configured through Bean-like accessor
-    methods specified in the param element.
-
-    The DTD for the param element is undefined and depends on the
-    DataSource being used.
+    methods specified by the param elements.
 
     For example, to configure a PostgreSQL 7.0 DataSource, use:
 
     <data-source class-name="org.postgresql.PostgresqlDataSource">
-      <param host="host" database="db"
-             user="user" password="secret" />
+      <param name="host" value="host" />
+      <param name="database" value="db" />
+      <param name="user" value="user" />
+      <param name="password" value="secret" />
     </data-source>
 
     When running Castor inside a J2EE application server, it is
@@ -160,8 +145,25 @@
 
 
 <!--
+    Includes class mapping from the specified mapping file.
+
+    The href attribute may be an absolute URL (typically a file: URL)
+    or a name relative to the base URL of the database configuration
+    file (typically in the same path).
+
+    Relative URLs also work if the database configuration and mapping
+    files are obtained from the application JAR or classpath.
+ -->
+
+<!ELEMENT mapping EMPTY>
+<!ATTLIST mapping
+          href CDATA #REQUIRED>
+
+
+<!--
     Specifies the transaction demarcation mode to use. This can either be 
-    'local' or 'global'.
+    'local' or 'global'. It defaults to 'local' if transaction demarcation
+	is not specified.
 
     When running inside a J2EE application server, and you want to use 
     container managed transactions, please make sure you use this 
@@ -175,8 +177,8 @@
     transaction demarcation, please use this element as follows:
 
        <transaction-demarcation mode="local" />
-    
-     -->
+ -->
+ 
 <!ELEMENT transaction-demarcation ( transaction-manager? )>
 <!ATTLIST transaction-demarcation
           mode CDATA #REQUIRED>
@@ -188,9 +190,11 @@
 
     The following transaction manager (tm) names are supported in Castor:
 
-    jndi					TM looked up in the JNDI ENC.
-    websphere		WebSphere 4 and previous releases.
-    websphere5	WebSphere 5.
+    jndi         TM looked up in the JNDI ENC.
+	jotm         JOTM
+    websphere    WebSphere 4 and previous releases.
+    websphere5   WebSphere 5.
+    websphere51  WebSphere 5.1.
 
 	In addition to specifying the transaction manager name, it is possible 
 	to pass arbitrary name/value pairs to the transaction manager instance. This
@@ -202,8 +206,18 @@
             <param name="jndiEnc" value="java:comp/env/TransactionManager" />
           </transaction-manager>
        </transaction-demarcation>
-    
-     -->
+ -->
+ 
 <!ELEMENT transaction-manager ( param* )>
 <!ATTLIST transaction-manager
           name CDATA #REQUIRED>
+
+<!--
+    Specifies parameters to be passed to JDBC driver, JDBC datasource or
+	transaction manager dependend on where they have been specified.
+ -->
+ 
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+          name  CDATA #REQUIRED
+          value CDATA #REQUIRED>

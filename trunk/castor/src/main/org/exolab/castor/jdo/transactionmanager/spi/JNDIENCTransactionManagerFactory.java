@@ -23,9 +23,9 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NoInitialContextException;
 import javax.transaction.TransactionManager;
 
-import org.exolab.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.conf.Param;
-import org.exolab.castor.jdo.conf.TransactionDemarcation;
+import org.castor.jdo.conf.JdoConf;
+import org.castor.jdo.conf.Param;
+import org.castor.jdo.conf.TransactionDemarcation;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
 import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.util.Messages;

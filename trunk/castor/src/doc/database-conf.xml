@@ -239,7 +239,7 @@ myJdo.setDatabasePooling( true );
       <p>The following configuration file uses an Oracle 8 thin JDBC driver and
          three mapping files:
          <code-panel><![CDATA[
-  <jdo-conf>
+  <jdo-conf name="order-system">
      <database name="ebiz" engine="oracle">
         <driver class-name="oracle.jdbc.driver.OracleDriver"
                 url="jdbc:oracle:thin:@machine:post:SID">
@@ -356,8 +356,10 @@ myJdo.setDatabasePooling( true );
          <code-panel><![CDATA[
   <!ELEMENT jdo-conf ( database+, transaction-demarcation )>
 
-  <!ELEMENT database ( ( driver | data-source | jndi )?,
-                       mapping+ )>
+  <!ATTLIST jdo-conf
+            name CDATA "jdo-conf">
+
+  <!ELEMENT database ( ( driver | data-source | jndi )?, mapping+ )>
                        
   <!ATTLIST database
             name ID      #REQUIRED
@@ -370,7 +372,7 @@ myJdo.setDatabasePooling( true );
   <!ELEMENT driver ( param* )>
   <!ATTLIST driver
             url        CDATA #REQUIRED
-            class-name CDATA #IMPLIED>
+            class-name CDATA #REQUIRED>
 
   <!ELEMENT data-source ( param* )>
   <!ATTLIST data-source
@@ -420,15 +422,15 @@ myJdo.setDatabasePooling( true );
   private static final String ENGINE = "oracle";
   
   <comment>// create driver configuration</comment>
-  org.exolab.castor.jdo.conf.Driver driverConf =
+  org.castor.jdo.conf.Driver driverConf =
       JDOConfFactory.createDriver(DRIVER, CONNECT, USERNAME, PASSWORD);
       
   <comment>// create mapping configuration</comment>
-  org.exolab.castor.jdo.conf.Mapping mappingConf =
+  org.castor.jdo.conf.Mapping mappingConf =
       JDOConfFactory.createMapping(getClass().getResource(MAPPING).toString());
 
   <comment>// create database configuration</comment>
-  org.exolab.castor.jdo.conf.Database dbConf =
+  org.castor.jdo.conf.Database dbConf =
       JDOConfFactory.createDatabase(DATABASE, ENGINE, driverConf, mappingConf);
      
   <comment>// create and load jdo configuration</comment>
@@ -460,15 +462,15 @@ myJdo.setDatabasePooling( true );
   props.put("password", PASSWORD);
             
   <comment>// create datasource configuration</comment>
-  org.exolab.castor.jdo.conf.DataSource dsConf =
+  org.castor.jdo.conf.DataSource dsConf =
       JDOConfFactory.createDataSource(DS, props);
               
   <comment>// create mapping configuration</comment>
-  org.exolab.castor.jdo.conf.Mapping mappingConf =
+  org.castor.jdo.conf.Mapping mappingConf =
       JDOConfFactory.createMapping(getClass().getResource(MAPPING).toString());
         
   <comment>// create database configuration</comment>
-  org.exolab.castor.jdo.conf.Database dbConf =
+  org.castor.jdo.conf.Database dbConf =
       JDOConfFactory.createDatabase(DATABASE, ENGINE, dsConf, mappingConf);
   
   <comment>// create and load jdo configuration</comment>

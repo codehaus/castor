@@ -1,11 +1,11 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
 
-package org.exolab.castor.jdo.conf;
+package org.castor.jdo.conf;
 
   //---------------------------------/
  //- Imported classes and packages -/
@@ -15,11 +15,11 @@ import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 
 /**
- * Class TransactionDemarcation.
+ * Class Mapping.
  * 
  * @version $Revision$ $Date$
  */
-public class TransactionDemarcation implements java.io.Serializable {
+public class Mapping implements java.io.Serializable {
 
 
       //--------------------------/
@@ -27,23 +27,19 @@ public class TransactionDemarcation implements java.io.Serializable {
     //--------------------------/
 
     /**
-     * Field _mode
+     * Field _href
      */
-    private java.lang.String _mode;
-
-    /**
-     * Field _transactionManager
-     */
-    private org.exolab.castor.jdo.conf.TransactionManager _transactionManager;
+    private java.lang.String _href;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public TransactionDemarcation() {
+    public Mapping() 
+     {
         super();
-    } //-- org.exolab.castor.jdo.conf.TransactionDemarcation()
+    } //-- org.castor.jdo.conf.Mapping()
 
 
       //-----------/
@@ -51,27 +47,22 @@ public class TransactionDemarcation implements java.io.Serializable {
     //-----------/
 
     /**
-     * Returns the value of field 'mode'.
+     * Returns the value of field 'href'.
      * 
-     * @return the value of field 'mode'.
+     * @return String
+     * @return the value of field 'href'.
      */
-    public java.lang.String getMode()
+    public java.lang.String getHref()
     {
-        return this._mode;
-    } //-- java.lang.String getMode() 
-
-    /**
-     * Returns the value of field 'transactionManager'.
-     * 
-     * @return the value of field 'transactionManager'.
-     */
-    public org.exolab.castor.jdo.conf.TransactionManager getTransactionManager()
-    {
-        return this._transactionManager;
-    } //-- org.exolab.castor.jdo.conf.TransactionManager getTransactionManager() 
+        return this._href;
+    } //-- java.lang.String getHref() 
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -87,6 +78,8 @@ public class TransactionDemarcation implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -99,6 +92,8 @@ public class TransactionDemarcation implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param handler
      */
     public void marshal(org.xml.sax.ContentHandler handler)
@@ -109,39 +104,32 @@ public class TransactionDemarcation implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Sets the value of field 'mode'.
+     * Sets the value of field 'href'.
      * 
-     * @param mode the value of field 'mode'.
+     * @param href the value of field 'href'.
      */
-    public void setMode(java.lang.String mode)
+    public void setHref(java.lang.String href)
     {
-        this._mode = mode;
-    } //-- void setMode(java.lang.String) 
-
-    /**
-     * Sets the value of field 'transactionManager'.
-     * 
-     * @param transactionManager the value of field
-     * 'transactionManager'.
-     */
-    public void setTransactionManager(org.exolab.castor.jdo.conf.TransactionManager transactionManager)
-    {
-        this._transactionManager = transactionManager;
-    } //-- void setTransactionManager(org.exolab.castor.jdo.conf.TransactionManager) 
+        this._href = href;
+    } //-- void setHref(java.lang.String) 
 
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return Mapping
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.castor.jdo.conf.Mapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.jdo.conf.TransactionDemarcation) Unmarshaller.unmarshal(org.exolab.castor.jdo.conf.TransactionDemarcation.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+        return (org.castor.jdo.conf.Mapping) Unmarshaller.unmarshal(org.castor.jdo.conf.Mapping.class, reader);
+    } //-- org.castor.jdo.conf.Mapping unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
