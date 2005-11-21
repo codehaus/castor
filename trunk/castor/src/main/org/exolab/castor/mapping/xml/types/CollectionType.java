@@ -106,6 +106,16 @@ public class CollectionType implements java.io.Serializable {
     **/
     public static final CollectionType ENUMERATE = new CollectionType(ENUMERATE_TYPE, "enumerate");
 
+    /**
+     * The set type
+    **/
+    public static final int SORTED_SET_TYPE = 8;
+
+    /**
+     * The instance of the set type
+    **/
+    public static final CollectionType SORTED_SET = new CollectionType(SORTED_SET_TYPE, "sortedset");
+    
     private static java.util.Hashtable _memberTable = init();
 
     private int type = -1;
@@ -149,6 +159,7 @@ public class CollectionType implements java.io.Serializable {
         members.put("set", SET);
         members.put("map", MAP);
         members.put("enumerate", ENUMERATE);
+        members.put("sortedset", SORTED_SET);
         return members;
     } //-- java.util.Hashtable init() 
 

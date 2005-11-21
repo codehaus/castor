@@ -839,6 +839,17 @@ create unique index test_item_pk on test_item( iid );
 
 -- grant all on test_item to test;
 
+drop table test_comp_item;
+
+create table test_comp_item (
+  iid       integer         not null,
+  id      integer         not null
+);
+
+create unique index test_comp_item_pk on test_comp_item( iid );
+
+-- grant all on test_comp_item to test;
+
 
 -- test_persistent
 drop table test_persistent;

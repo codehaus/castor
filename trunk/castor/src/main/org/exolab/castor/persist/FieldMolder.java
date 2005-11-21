@@ -83,6 +83,7 @@ public class FieldMolder {
     private static final String COLLECTION_TYPE_SET = "set";
     private static final String COLLECTION_TYPE_HASHMAP = "hashmap";
     private static final String COLLECTION_TYPE_HASHSET = "hashset";
+    private static final String COLLECTION_TYPE_SORTED_SET = "sortedset";
     
 	private static final String FIELD_TYPE_SERIALIZABLE = "serializable";
 	
@@ -433,7 +434,8 @@ public class FieldMolder {
           new CollectionInfo( COLLECTION_TYPE_SET, java.util.Set.class ),
           new CollectionInfo( COLLECTION_TYPE_HASHSET, java.util.HashSet.class ),
           new CollectionInfo( COLLECTION_TYPE_MAP, java.util.Map.class ),
-          new CollectionInfo( COLLECTION_TYPE_ARRAY, Object[].class ) };
+          new CollectionInfo( COLLECTION_TYPE_ARRAY, Object[].class ),
+          new CollectionInfo( COLLECTION_TYPE_SORTED_SET, java.util.SortedSet.class )};
 
           //( array | vector | hashtable | collection | set | map )
 

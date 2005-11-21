@@ -441,6 +441,7 @@ public class myclass {
               <tr><td>collection</td><td>java.util.Collection</td><td>java.util.Arraylist </td></tr>
               <tr><td>set</td><td>java.util.Set</td><td>java.util.Hashset</td></tr>
               <tr><td>map</td><td>java.util.Map</td><td>java.util.Hashmap</td></tr>
+              <tr><td>sortedset</td><td>java.util.SortedSet</td><td>java.util.TreeSet</td></tr>
             </table>
 
             <p>The type of the object inside the collection is &lt;type_attribute>. The 'default

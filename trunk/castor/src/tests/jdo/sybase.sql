@@ -823,6 +823,19 @@ go
 grant all on test_item to test
 go
 
+drop table test_comp_item
+go
+create table test_comp_item (
+  iid       integer         not null,
+  id      integer         not null
+)
+go
+create unique index test_comp_item_pk on test_comp_item( iid )
+go
+grant all on test_comp_item to test
+go
+
+
 -- list_types
 drop table list_types
 go

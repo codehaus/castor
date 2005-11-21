@@ -184,6 +184,7 @@
                		 <xsd:enumeration value="odmg"/>
                      <xsd:enumeration value="set"/>
                      <xsd:enumeration value="map"/>
+                     <xsd:enumeration value="sortedset"/>
                  </xsd:restriction>
 	         </xsd:simpleType> 
 	     </xsd:attribute>        

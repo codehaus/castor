@@ -107,6 +107,7 @@
                <xsd:enumeration value="set"/>
                <xsd:enumeration value="map"/>
                <xsd:enumeration value="enumerate"/>
+               <xsd:enumeration value="sortedset"/>
             </xsd:restriction>
          </xsd:simpleType>
       </xsd:attribute>
