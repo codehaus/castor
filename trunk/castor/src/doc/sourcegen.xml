@@ -554,7 +554,7 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
   java-type? = xsd:string
   wrapper? = xsd:boolean
   handler? = xsd:string
-  collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map)
+  collection? = (array|vector|arraylist|hashtable|collection|odmg|set|map|sortedset)
   validator? = xsd:string/></code-panel>
          <ul>
             <li><b>name:</b>The name of the class member that will be generated.</li>

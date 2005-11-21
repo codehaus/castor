@@ -352,6 +352,18 @@
     </field>
   </class>
 
+  <class name="jdo.TestComparableItem" identity="id">
+    <description>Table used for testing SortedSet collection type support</description>
+    <cache-type type="none" />
+    <map-to table="test_comp_item" />
+    <field name="id" type="integer">
+      <sql name="iid" type="integer" />
+    </field>
+    <field name="testCol" type="jdo.TestCol" >
+      <sql name="id" />
+    </field>
+  </class>
+
   <class name="jdo.TestColArrayList" extends="jdo.TestCol">
     <description>Table used for testing different collection types support</description>
     <!-- this is a dirty hack, don't follows. It only work if load always
@@ -426,6 +438,15 @@
          done by db.load( MyClass.class, id ). -->
     <map-to table="test_col" />
     <field name="item" type="jdo.TestItem" collection="set">
+    </field>
+  </class>
+
+  <class name="jdo.TestColSortedSet" extends="jdo.TestCol">
+    <description>Table used for testing different collection types support</description>
+    <!-- this is a dirty hack, don't follows. It only work if load always 
+         done by db.load( MyClass.class, id ). -->
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestComparableItem" collection="sortedset">
     </field>
   </class>
 

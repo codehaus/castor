@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.Vector;
 
 import org.exolab.castor.persist.FieldMolder;
@@ -61,6 +63,8 @@ public abstract class CollectionProxy {
             return new MapProxy(fieldMolder, object, classLoader, new HashMap());
         } else if (cls == Map.class) {
             return new MapProxy(fieldMolder, object, classLoader, new HashMap());
+        } else if (cls == SortedSet.class) {
+            return new ColProxy(fieldMolder, object, classLoader, new TreeSet());
         } else {
             throw new IllegalArgumentException(
                     "Collection Proxy doesn't exist for this type : " + cls);

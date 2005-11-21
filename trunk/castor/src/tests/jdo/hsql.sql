@@ -636,6 +636,15 @@ create table test_item (
 
 create unique index test_item_pk on test_item( iid );
 
+drop table if exists test_comp_item;
+
+create table test_comp_item (
+  iid       integer         not null,
+  id      integer         not null
+);
+
+create unique index test_comp_item_pk on test_comp_item( iid );
+
 
 drop table if exists test_oqlext;
 

@@ -197,7 +197,7 @@
             set-method     NMTOKEN  #IMPLIED
             create-method  NMTOKEN  #IMPLIED
             collection     ( array | enumerate | collection | set | 
-                             arraylist | vector | map | hashtable )  #IMPLIED>]]></code-panel>
+                             arraylist | vector | map | hashtable | sortedset )  #IMPLIED>]]></code-panel>
 
         <p>The &lt;field> element is used to describe a property of a Java object. It provides:</p>
         <ul>
@@ -280,6 +280,7 @@
                      <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></tr>
                      <tr bgcolor="#DEDEDE"><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td></tr>
                      <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>sortedset</td><td>java.util.SortedSet</td><td>java.util.TreeSet</td></tr>
                   </table>
                </td>
             </tr>

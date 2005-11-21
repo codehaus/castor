@@ -97,11 +97,16 @@ public class Collections extends CastorTestCase {
 
         runOnce( TestColHashtable.class );
 
+        runSortedSet( TestColSortedSet.class );
+
+
         // TODO[WG]: Causes problems with missing setXXX(ArrayList) method.
         // TODO[WG]: To re-enable, please consult with http://jira.codehaus.org/browse/CASTOR-1147
         // runOnce( TestColAdd.class );
 
         runArray();
+        
+        
     }
 
     public void runOnce( Class masterClass ) 
@@ -115,6 +120,7 @@ public class Collections extends CastorTestCase {
         // delete everything
         _conn.createStatement().executeUpdate( "DELETE FROM test_col" );
         _conn.createStatement().executeUpdate( "DELETE FROM test_item" );
+        _conn.createStatement().executeUpdate( "DELETE FROM test_comp_item" );
         _conn.commit();
 
         // create new TestCol object with elements
@@ -186,6 +192,92 @@ public class Collections extends CastorTestCase {
             fail( "Related add/remove rollback failed!" + testCol );
 
         // shoud test for update too
+    } 
+
+    public void runSortedSet( Class masterClass ) 
+    throws PersistenceException, SQLException, Exception {
+    	
+    	String masterName = masterClass.getName();
+    	
+    	stream.println( "Running..." );
+    	stream.println( "" );
+    	
+//  	delete everything
+    	_conn.createStatement().executeUpdate( "DELETE FROM test_col" );
+    	_conn.createStatement().executeUpdate( "DELETE FROM test_item" );
+    	_conn.createStatement().executeUpdate( "DELETE FROM test_comp_item" );
+    	_conn.commit();
+    	
+//  	create new TestCol object with elements
+    	_db.begin();
+    	TestColSortedSet testCol = (TestColSortedSet) masterClass.newInstance();
+    	testCol.setId( 1 );
+    	_db.create( testCol );
+    	for ( int i=0; i < 5; i++ ) {
+    		TestComparableItem newItem = new TestComparableItem( 100+i );
+    		testCol.addItem( newItem );
+    		_db.create( newItem );
+    	}
+    	_db.commit();
+    	
+//  	test if object created properly
+    	_db.begin();
+    	testCol = (TestColSortedSet) _db.load( masterClass, new Integer(1) );
+    	if ( testCol == null )
+    		fail( "Object creation failed!" );
+    	
+    	int size = testCol.itemSize();
+    	if ( size != 5 ||
+    			!testCol.containsItem( new TestComparableItem( 100 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 101 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 102 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 103 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 104 ) ) )
+    		fail( "Related objects creation failed!" );
+    	
+    	testCol.removeItem( new TestComparableItem( 100 ) );
+    	testCol.removeItem( new TestComparableItem( 103 ) );
+    	TestComparableItem newItem = new TestComparableItem( 106 );
+    	testCol.addItem( newItem );
+    	_db.create( newItem );
+    	newItem = new TestComparableItem( 107 );
+    	testCol.addItem( newItem );
+    	_db.create( newItem );
+    	_db.commit();
+    	
+//  	test if add and remove work properly.
+    	_db.begin();
+    	testCol = (TestColSortedSet) _db.load( masterClass, new Integer(1) );
+    	if ( testCol == null )
+    		fail( "Object add/remove failed! " + testCol );
+    	
+    	if ( testCol.itemSize() != 5 ||
+    			!testCol.containsItem( new TestComparableItem( 106 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 101 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 102 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 107 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 104 ) ) )
+    		fail( "Related add/remove failed!" + testCol );
+    	
+//  	test if add and remove rollback properly.
+    	testCol.removeItem( new TestComparableItem( 102 ) );
+    	testCol.removeItem( new TestComparableItem( 104 ) );
+    	newItem = new TestComparableItem( 108 );
+    	testCol.addItem( newItem );
+    	newItem = new TestComparableItem( 109 );
+    	testCol.addItem( newItem );
+    	_db.create( newItem );
+    	_db.rollback();
+    	
+    	if ( testCol.itemSize() != 5 ||
+    			!testCol.containsItem( new TestComparableItem( 106 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 101 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 102 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 107 ) ) ||
+    			!testCol.containsItem( new TestComparableItem( 104 ) ) )
+    		fail( "Related add/remove rollback failed!" + testCol );
+    	
+//  	shoud test for update too
     } 
 
     /**
