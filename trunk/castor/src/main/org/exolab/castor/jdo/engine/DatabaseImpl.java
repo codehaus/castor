@@ -55,6 +55,8 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
 
+import org.castor.persist.GlobalTransactionContext;
+import org.castor.persist.LocalTransactionContext;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
@@ -200,14 +202,15 @@ public class DatabaseImpl
 	
 		if (_transaction != null) {
 			try {
-            	_ctx = new TransactionContextImpl(this , true , transaction );
-			}
-			catch ( javax.transaction.SystemException se ) {
-				throw new DatabaseNotFoundException( se );
+            	_ctx = new GlobalTransactionContext(this);
+                _ctx.setStatus(transaction.getStatus());
+			} catch (javax.transaction.SystemException se) {
+				throw new DatabaseNotFoundException(se);
 			}
 		} else {
-            _ctx = new TransactionContextImpl(this, false );
+            _ctx = new LocalTransactionContext(this);
         }
+        
         _ctx.setLockTimeout(_lockTimeout);
         _ctx.setAutoStore(_autoStore);
         _ctx.setCallback(_callback);
@@ -494,8 +497,7 @@ public class DatabaseImpl
         if ( _ctx != null && _ctx.isOpen() )
             throw new PersistenceException( Messages.message( "jdo.txInProgress" ) );
 
-        //_ctx = new TransactionContextImpl( this, false );
-        ((TransactionContextImpl) _ctx).setStatusActive();
+        _ctx.setStatus(Status.STATUS_ACTIVE);
         _ctx.setLockTimeout( _lockTimeout );
         _ctx.setAutoStore( _autoStore );
         _ctx.setCallback( _callback );

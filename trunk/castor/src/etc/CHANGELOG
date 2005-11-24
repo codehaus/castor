@@ -2,8 +2,13 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-766 using contribution from Stein M. Hugubakken[dulci@start.no]
+       Refactored TransactionContext into an interface and global/local implementations.
+       Details: http://jira.codehaus.org/browse/CASTOR-766
+       (Ralf - 20051124)
+       
 JDO:   Fixed bug CASTOR-1264 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
-       Resolve problem with keygenerator RETURNING.
+       Resolved problem with keygenerator RETURNING.
        Details: http://jira.codehaus.org/browse/CASTOR-1264
        (Ralf - 20051124)
        
