@@ -445,7 +445,7 @@
         </field>
     </class>
     
-    <class name="ctf.jdo.tc9x.DependentObject" identity="id" depends="ctf.jdo.tc9x.ExtendedObject" key-generator="IDENTITY">
+    <class name="ctf.jdo.tc9x.DependentObject" identity="id" depends="ctf.jdo.tc9x.ExtendedObject">
         <cache-type type="unlimited"/>
         <map-to table="poly_depend_object"/>
         <field name="id" type="integer">
