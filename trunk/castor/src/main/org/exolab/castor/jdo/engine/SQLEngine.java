@@ -44,23 +44,51 @@
  */
 package org.exolab.castor.jdo.engine;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Stack;
+import java.util.Vector;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.jdo.engine.CounterRef;
 import org.castor.jdo.engine.DatabaseRegistry;
-
+import org.castor.jdo.util.JDOUtils;
 import org.castor.persist.ProposedObject;
-import org.exolab.castor.jdo.*;
-import org.exolab.castor.mapping.*;
+
+import org.exolab.castor.jdo.Database;
+import org.exolab.castor.jdo.DuplicateIdentityException;
+import org.exolab.castor.jdo.ObjectDeletedException;
+import org.exolab.castor.jdo.ObjectModifiedException;
+import org.exolab.castor.jdo.ObjectNotFoundException;
+import org.exolab.castor.jdo.PersistenceException;
+import org.exolab.castor.jdo.QueryException;
+import org.exolab.castor.mapping.AccessMode;
+import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.FieldHandlerImpl;
-import org.exolab.castor.persist.spi.*;
+import org.exolab.castor.persist.spi.Complex;
+import org.exolab.castor.persist.spi.KeyGenerator;
+import org.exolab.castor.persist.spi.Persistence;
+import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.persist.spi.PersistenceQuery;
+import org.exolab.castor.persist.spi.QueryExpression;
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.util.SqlBindParser;
-
-import java.sql.*;
-import java.util.*;
 
 /**
  * The SQL engine performs persistence of one object type against one
@@ -123,13 +151,9 @@ public final class SQLEngine implements Persistence {
 
     private PersistenceFactory  _factory;
 
-    private String              log;
-
     private String              _type;
 
     private String              _mapTo;
-
-    private String              _extTable;
 
     private JDOClassDescriptor   _clsDesc;
 
@@ -224,9 +248,6 @@ public final class SQLEngine implements Persistence {
             base = (JDOClassDescriptor) base.getExtends();
             stack.push( base );
             // do we need to add loop detection?
-        }
-        if ( base != clsDesc ) {
-            _extTable = base.getTableName();
         }
 
         // now base is either the base of extended class, or
@@ -618,7 +639,7 @@ public final class SQLEngine implements Persistence {
              _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
             }
 
-            bindFields(fields, stmt, count);
+            count = bindFields(fields, stmt, count);
 
             if(_log.isDebugEnabled()){
                 _log.debug( Messages.format( "jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()) );
@@ -750,7 +771,7 @@ public final class SQLEngine implements Persistence {
 	 * @throws SQLException If the fields cannot be bound successfully.
 	 * @throws PersistenceException
 	 */
-	private void bindFields(final Object[] fields, final PreparedStatement stmt, int count) 
+	private int bindFields(final Object[] fields, final PreparedStatement stmt, int count) 
 	throws SQLException, PersistenceException {
 		for ( int i = 0 ; i < _fields.length ; ++i ) {
 		    if ( _fields[ i ].store ) {
@@ -775,6 +796,7 @@ public final class SQLEngine implements Persistence {
 		        }
 		    }
 		}
+        return count;
 	}
 
 
@@ -1326,8 +1348,8 @@ public final class SQLEngine implements Persistence {
             _log.fatal( Messages.format( "jdo.loadFatal", _type, (( accessMode == AccessMode.DbLocked ) ? _sqlLoadLock : _sqlLoad ) ), except );
             throw new PersistenceException(Messages.format("persist.nested", except), except);
         } finally {
-            Utils.closeResultSet(rs);
-            Utils.closeStatement(stmt);
+            JDOUtils.closeResultSet(rs);
+            JDOUtils.closeStatement(stmt);
         }
         return stamp;
     }
@@ -1597,7 +1619,6 @@ public final class SQLEngine implements Persistence {
         //fields.copyInto( _fields );
 
         // get id columns' names
-        String[] idnames = _clsDesc.getIdentityColumnNames();
         for ( int i=0; i<_ids.length; i++ ) {
             expr.addParameter( _mapTo, _ids[i].name, QueryExpression.OpEquals );
         }
@@ -2475,7 +2496,6 @@ public final class SQLEngine implements Persistence {
             // Instead of creating new Object[] and ArrayList for each 
             // "multi field" each fetchRaw is called, we might reuse them.
 
-            SQLEngine oldEngine = null;
             int originalFieldNumber = _requestedEngine._fields.length;
             if (_requestedEngine.getDescriptor().isExtended()) {
                 Collection extendingClassDescriptors = _requestedEngine.getDescriptor().getExtendedBy();
