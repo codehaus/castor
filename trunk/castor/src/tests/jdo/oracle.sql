@@ -711,7 +711,7 @@ drop table test_comp_item;
 
 create table test_comp_item (
   iid       integer         not null,
-  id      integer         not null
+  id      integer
 );
 
 create unique index test_comp_item_pk on test_comp_item( iid );
@@ -1160,7 +1160,7 @@ insert into poly_table_n (id, name) values (2, 'n2');
 
 drop table poly_base;
 create table poly_base (
-  id varchar(64) not null,
+  id varchar(64) default '' not null,
   color varchar(64) default null,
   primary key  (ID)
 ) ;
@@ -1169,7 +1169,7 @@ insert into poly_base values ('100','red');
 
 drop table poly_derived;
 create table poly_derived (
-  id varchar(64) not null,
+  id varchar(64) default '' NOT NULL,
   scent varchar(64) default null,
   primary key  (ID)
 ) ;
@@ -1178,7 +1178,7 @@ insert into poly_derived values ('100','vanilla');
 
 drop table poly_container;
 create table poly_container (
-  id varchar(64) not null,
+  id varchar(64) default '' NOT NULL,
   reference varchar(64) default null,
   primary key  (ID)
 ) ;
@@ -1211,8 +1211,8 @@ create table poly_OfferComposition(
 
 DROP TABLE poly_extend_object;
 CREATE TABLE poly_extend_object (
-  id            int NOT NULL,
-  description2  varchar(50) NOT NULL,
+  id            int default 0 NOT NULL,
+  description2  varchar(50) default '' NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -1220,8 +1220,8 @@ INSERT INTO poly_extend_object VALUES (1, 'This is the extended object.');
 
 DROP TABLE poly_base_object;
 CREATE TABLE poly_base_object (
-  id           int NOT NULL,
-  description  varchar(50) NOT NULL,
+  id           int default 0 NOT NULL,
+  description  varchar(50) default '' NOT NULL,
   saved        char(1) default '0',
   PRIMARY KEY (id)
 );
@@ -1230,9 +1230,9 @@ INSERT INTO poly_base_object VALUES (1, 'This is the test object.', '0');
 
 DROP TABLE poly_depend_object;
 CREATE TABLE poly_depend_object (
-  id           int NOT NULL,
-  parentId           int NOT NULL,
-  description  varchar(50) NOT NULL,
+  id           int default 0 NOT NULL,
+  parentId           int default 0 NOT NULL,
+  description  varchar(50) default '' NOT NULL,
   PRIMARY KEY (id)
 );
 
