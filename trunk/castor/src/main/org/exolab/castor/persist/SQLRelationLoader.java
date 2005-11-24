@@ -49,8 +49,7 @@ package org.exolab.castor.persist;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.Utils;
-import org.exolab.castor.jdo.drivers.PreparedStatementProxy;
+import org.castor.jdo.util.JDOUtils;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -288,9 +287,9 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-        	Utils.closeResultSet(rset);
-        	Utils.closeStatement(selectStatement);
-        	Utils.closeStatement(insertStatement);
+        	JDOUtils.closeResultSet(rset);
+        	JDOUtils.closeStatement(selectStatement);
+        	JDOUtils.closeStatement(insertStatement);
         }
     }
     
@@ -315,7 +314,7 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-        	Utils.closeStatement(stmt);
+        	JDOUtils.closeStatement(stmt);
         }
     }
 
@@ -350,7 +349,7 @@ public class SQLRelationLoader {
             e.printStackTrace();
             throw new PersistenceException( e.toString() );
         } finally {
-        	Utils.closeStatement(stmt);
+        	JDOUtils.closeStatement(stmt);
         }
     }
 

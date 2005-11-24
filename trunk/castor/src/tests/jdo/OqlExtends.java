@@ -42,10 +42,7 @@
  *
  * $Id$
  */
-
-
 package jdo;
-
 
 import harness.CastorTestCase;
 import harness.TestHarness;
@@ -54,12 +51,12 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Date;
 
+import org.castor.jdo.util.JDOUtils;
+
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
-import org.exolab.castor.jdo.Utils;
-
 
 /**
  */
@@ -90,7 +87,7 @@ public class OqlExtends extends CastorTestCase {
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
-        	Utils.closeConnection (conn);
+        	JDOUtils.closeConnection (conn);
         }
     }
 
