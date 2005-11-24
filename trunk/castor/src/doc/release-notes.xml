@@ -38,6 +38,26 @@
                    will be used in future to distinguish between different configurations.</p>
 			</summary>
 			<bugs>
+                <bug id="1264" tool="jira">
+                    <description>
+                        Resolve problem with keygenerator RETURNING.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Helene Wiebe</name>
+                        <email>helene.wiebe@t-systems.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051124</date>
+                </bug>
                 <bug id="1233" tool="jira">
                     <description>
 		                Added support for collections of type java.util.SortedSet.
@@ -54,7 +74,7 @@
                         <name>Werner Guttmann</name>
                         <email>werner.guttmann@gmx.net</email>
 				    </reporter>
-                    <type>New feature</type>
+                    <type>Enh.</type>
                     <module>All</module>
                     <date>20051021</date>
                 </bug>

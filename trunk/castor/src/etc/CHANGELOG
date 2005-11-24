@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1264 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
+       Resolve problem with keygenerator RETURNING.
+       Details: http://jira.codehaus.org/browse/CASTOR-1264
+       (Ralf - 20051124)
+       
 JDO:   Fixed bug CASTOR-1233 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added support for collections of type java.util.SortedSet.
        Details: http://jira.codehaus.org/browse/CASTOR-1233
