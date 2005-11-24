@@ -38,9 +38,30 @@
                    will be used in future to distinguish between different configurations.</p>
 			</summary>
 			<bugs>
+                <bug id="766" tool="jira">
+                    <description>
+                        Refactored TransactionContext into an interface and global/local
+                        implementations.
+                    </description>
+                    <contributor>
+                        <name>Stein M. Hugubakken</name>
+                        <email>dulci@start.no</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stein M. Hugubakken</name>
+                        <email>dulci@start.no</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051124</date>
+                </bug>
                 <bug id="1264" tool="jira">
                     <description>
-                        Resolve problem with keygenerator RETURNING.
+                        Resolved problem with keygenerator RETURNING.
                     </description>
                     <contributor>
                         <name>Ralf Joachim</name>
