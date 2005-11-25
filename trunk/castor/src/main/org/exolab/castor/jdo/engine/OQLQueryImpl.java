@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.engine;
 
 
+import org.castor.jdo.engine.SQLTypeConverters;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.jdo.oql.*;
@@ -159,7 +160,7 @@ public class OQLQueryImpl
                     // First convert the actual value to the field value
                     if ( fieldClass != valueClass ) {
                         try {
-                            TypeConvertor tc = SQLTypes.getConvertor( valueClass, fieldClass );
+                            TypeConvertor tc = SQLTypeConverters.getConvertor( valueClass, fieldClass );
                             value = tc.convert( value, null );
                         } catch ( MappingException e ) {
                             throw new IllegalArgumentException( "Query parameter "

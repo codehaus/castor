@@ -367,39 +367,6 @@ public class Types
 
 
     /**
-     * Transforms short date format pattern into full format pattern
-     * for SimpleDateFormat (e.g., "YMD" to "yyyyMMdd").
-     *
-     * @param pattern The short pattern
-     * @return The full pattern
-     */
-    public static String getFullDatePattern( String pattern )
-    {
-        StringBuffer sb;
-        int len;
-
-        if ( pattern == null || pattern.length() == 0 )
-            return "yyyyMMdd";
-        
-        sb = new StringBuffer();
-        len = pattern.length();
-        
-        for ( int i = 0; i < len; i++ ) {
-            switch ( pattern.charAt( i ) ) {
-            case 'y': case 'Y': sb.append( "yyyy" ); break;
-            case 'M':           sb.append( "MM" ); break;
-            case 'd': case 'D': sb.append( "dd" ); break;
-            case 'h': case 'H': sb.append( "HH" ); break;
-            case 'm':           sb.append( "mm" ); break;
-            case 's':           sb.append( "ss" ); break;
-            case 'S':           sb.append( "SSS" ); break;
-            }
-        }
-        
-        return sb.toString();
-    }
-
-    /**
      * Returns the matching constructor for the given arguments
      *
      * @param type The class type of the object instance to be constructed.

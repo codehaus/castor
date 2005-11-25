@@ -38,6 +38,26 @@
                    will be used in future to distinguish between different configurations.</p>
 			</summary>
 			<bugs>
+                <bug id="1171" tool="jira">
+                    <description>
+                        Refactored SQLTypes into SQLTypeInfos and SQLTypeConverters.
+                    </description>
+                    <contributor>
+                        <name>Stein M. Hugubakken</name>
+                        <email>dulci@start.no</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stein M. Hugubakken</name>
+                        <email>dulci@start.no</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051126</date>
+                </bug>
                 <bug id="1265" tool="jira">
                     <description>
 		                Fixed problem with OQL queries and CALL SQL statements

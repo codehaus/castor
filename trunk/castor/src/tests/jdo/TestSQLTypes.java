@@ -52,8 +52,8 @@ import java.text.SimpleDateFormat;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.engine.SQLTypeConverters;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 
@@ -89,7 +89,7 @@ public class TestSQLTypes
         DateFormat format = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss.SSS");
         Timestamp timeStamp = new Timestamp (new java.util.Date().getTime());
         log.debug ("time stamp = " + format.format (timeStamp));
-        TypeConvertor convertor = SQLTypes.getConvertor(Timestamp.class, java.util.Date.class);
+        TypeConvertor convertor = SQLTypeConverters.getConvertor(Timestamp.class, java.util.Date.class);
         java.util.Date date = (java.util.Date) convertor.convert(timeStamp, null);
         log.debug("date = " + format.format(date));
         
@@ -106,7 +106,7 @@ public class TestSQLTypes
         DateFormat format = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss.SSS");
         java.util.Date date = new java.util.Date();
         log.debug("date = " + format.format(date));
-        TypeConvertor convertor = SQLTypes.getConvertor(java.util.Date.class, Timestamp.class);
+        TypeConvertor convertor = SQLTypeConverters.getConvertor(java.util.Date.class, Timestamp.class);
         Timestamp timeStamp = (Timestamp) convertor.convert(date, null);
         log.debug ("time stamp = " + format.format (timeStamp));
         

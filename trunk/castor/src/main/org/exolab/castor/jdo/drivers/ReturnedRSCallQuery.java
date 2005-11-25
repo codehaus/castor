@@ -42,10 +42,7 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.drivers;
-
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -54,11 +51,13 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import org.castor.jdo.engine.SQLTypeInfos;
 import org.castor.persist.ProposedObject;
+
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryException;
-import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.spi.Complex;
 import org.exolab.castor.persist.spi.PersistenceQuery;
@@ -189,7 +188,7 @@ final class ReturnedRSCallQuery implements PersistenceQuery
             if ( _lastIdentity == null ) {
                 if ( ! _rs.next() )
                     return null;
-                _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
+                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
                 return new Complex( _lastIdentity );
             }
 
@@ -198,7 +197,7 @@ final class ReturnedRSCallQuery implements PersistenceQuery
                     _lastIdentity = null;
                     return null;
                 }
-                _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
+                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
             }
             return new Complex( _lastIdentity );
         } catch ( SQLException except ) {
@@ -236,9 +235,9 @@ final class ReturnedRSCallQuery implements PersistenceQuery
             // Load all the fields of the object including one-one relations
             // index 0 belongs to the identity
             for ( int i = 1 ; i < _sqlTypes.length ; ++i  ) 
-                fields[ i - 1 ] = SQLTypes.getObject( _rs, i + 1, _sqlTypes[ i ] );
+                fields[ i - 1 ] = SQLTypeInfos.getValue( _rs, i + 1, _sqlTypes[ i ] );
             if ( _rs.next() ) 
-                _lastIdentity = SQLTypes.getObject( _rs, 1, _sqlTypes[ 0 ] );
+                _lastIdentity = SQLTypeInfos.getValue( _rs, 1, _sqlTypes[ 0 ] );
             else
                 _lastIdentity = null;
         } catch ( SQLException except ) {

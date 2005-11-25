@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1171 using contribution from Stein M. Hugubakken[dulci@start.no]
+       Refactored SQLTypes into SQLTypeInfos and SQLTypeConverters.
+       Details: http://jira.codehaus.org/browse/CASTOR-1171
+       (Ralf - 20051126)
+       
 JDO:   Fixed bug CASTOR-1265 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem with OQL queries using SQL CALL statement
        Details: http://jira.codehaus.org/browse/CASTOR-1265

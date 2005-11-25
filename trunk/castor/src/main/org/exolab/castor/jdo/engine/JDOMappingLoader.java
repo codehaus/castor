@@ -42,12 +42,11 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
 
-
-import org.exolab.castor.jdo.engine.SQLTypes.SQLTypeConvertor;
+import org.castor.jdo.engine.SQLTypeInfos;
+import org.castor.jdo.engine.SQLTypeConverters;
+import org.castor.jdo.engine.SQLTypeConverters.Convertor;
 import org.exolab.castor.mapping.*;
 import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.FieldDescriptorImpl;
@@ -76,9 +75,46 @@ import java.util.Properties;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class JDOMappingLoader
-    extends MappingLoader
-{
+public class JDOMappingLoader extends MappingLoader {
+    //-----------------------------------------------------------------------------------
+
+    /** Separators between type name and parameter, e.g. "char[01]". */
+    private static final char LEFT_PARAM_SEPARATOR = '[';
+
+    /** Separators after parameter, e.g. "char[01]". */
+    private static final char RIGHT_PARAM_SEPARATOR = ']';
+
+    /**
+     * Extracts parameter for type convertor from the SQL type definition of the
+     * form "SQL_TYPE_NAME[PARAMETER]". If the type is not parameterized, returns
+     * null.
+     *
+     * @param sqlTypeDef SQL type definition (e.g. char[01]).
+     * @return Parameter (e.g. "01") or null if not parameterized.
+     */
+    public static String definition2param(final String sqlTypeDef) {
+        int left = sqlTypeDef.indexOf(LEFT_PARAM_SEPARATOR);
+        int right = sqlTypeDef.indexOf(RIGHT_PARAM_SEPARATOR);
+        if (right < 0) { right = sqlTypeDef.length(); }
+        if (left < 0) { return null; }
+        return sqlTypeDef.substring(left + 1, right);
+    }
+
+    /**
+     * Extracts SQL type name from the the SQL type definition of the form
+     * "SQL_TYPE_NAME[PARAMETER]".
+     *
+     * @param sqlTypeDef SQL type definition (e.g. char[01]).
+     * @return SQL type name (e.g. "char").
+     */
+    public static String definition2type(final String sqlTypeDef) {
+        int sep = sqlTypeDef.indexOf(LEFT_PARAM_SEPARATOR);
+        if (sep < 0) { return sqlTypeDef; }
+        return sqlTypeDef.substring(0, sep);
+    }
+
+    //-----------------------------------------------------------------------------------
+
 
 
     /**
@@ -245,7 +281,7 @@ public class JDOMappingLoader
         if ( fieldMap.getSql() != null && sqlTypes.length > 0 ) {
             //--TO Check
             typeName = sqlTypes[0];
-            sqlType = SQLTypes.typeFromName( typeName );
+            sqlType = SQLTypeInfos.sqlTypeName2javaType( definition2type(typeName) );
         } else {
             sqlType = fieldType;
         }
@@ -254,7 +290,7 @@ public class JDOMappingLoader
         }
         if ( fieldType != sqlType ) {
             try {
-                convertorTo = SQLTypes.getConvertor( sqlType, fieldType );
+                convertorTo = SQLTypeConverters.getConvertor( sqlType, fieldType );
             } catch (MappingException ex) {
                 boolean isTypeSafeEnum = false;
                 //-- check for type-safe enum style classes
@@ -280,12 +316,12 @@ public class JDOMappingLoader
                                 int mods = method.getModifiers();
                                 if (Modifier.isStatic(mods)) {
                                     // create individual SQLTypeConverter
-                                    convertorTo = new SQLTypeConvertor( sqlType, fieldType ) {
+                                    convertorTo = new Convertor( sqlType, fieldType ) {
                                         private Method method = null;
                                         public Object convert( Object obj, String param ) {
                                             try {
-                                                if (method == null)  method = toType.getMethod(VALUE_OF, STRING_ARG);
-                                                return method.invoke(toType, new Object[] { (String)obj });
+                                                if (method == null)  method = toType().getMethod(VALUE_OF, STRING_ARG);
+                                                return method.invoke(toType(), new Object[] { (String)obj });
                                             } catch (Exception ex) {
                                                 return null;
                                             }
@@ -306,9 +342,9 @@ public class JDOMappingLoader
                 if (!isTypeSafeEnum)
                     throw new MappingException( "mapping.noConvertor", sqlType.getName(), fieldType.getName() );
             }
-            convertorFrom = SQLTypes.getConvertor( fieldType, sqlType );
+            convertorFrom = SQLTypeConverters.getConvertor( fieldType, sqlType );
             if ( typeName != null ) {
-                convertorParam = SQLTypes.paramFromName( typeName );
+                convertorParam = definition2param(typeName);
             }
         }
         return new TypeInfo( fieldType, convertorTo, convertorFrom, convertorParam,
@@ -453,16 +489,16 @@ public class JDOMappingLoader
         if ( len > 0 ) {
             sType = new int[len];
             for ( int i=0; i < len; i++ ) {
-                sqlType = SQLTypes.typeFromName( sqlTypes[i] );
+                sqlType = SQLTypeInfos.sqlTypeName2javaType( definition2type(sqlTypes[i]) );
                 if ( _factory != null )
                     sqlType = _factory.adjustSqlType( sqlType );
-                sType[i] = SQLTypes.getSQLType( sqlType );
+                sType[i] = SQLTypeInfos.javaType2sqlTypeNum( sqlType );
             }
         } else {
             sqlType = fieldDesc.getFieldType();
             if ( _factory != null )
                 sqlType = _factory.adjustSqlType( sqlType );
-            sType = new int[] {SQLTypes.getSQLType(sqlType)};
+            sType = new int[] {SQLTypeInfos.javaType2sqlTypeNum(sqlType)};
         }
 
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sType,
