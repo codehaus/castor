@@ -38,6 +38,26 @@
                    will be used in future to distinguish between different configurations.</p>
 			</summary>
 			<bugs>
+                <bug id="1265" tool="jira">
+                    <description>
+		                Fixed problem with OQL queries and CALL SQL statements
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Sean</name>
+                        <email>mailto:xiaoyong.liang@1cm.com.cn</email>
+				    </reporter>
+                    <type>Bug.</type>
+                    <module>JDO</module>
+                    <date>20051125</date>
+                </bug>
                 <bug id="766" tool="jira">
                     <description>
                         Refactored TransactionContext into an interface and global/local

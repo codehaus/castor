@@ -440,7 +440,7 @@ public final class SQLEngine implements Persistence {
             _log.debug( Messages.format( "jdo.createSql", sql ) );
         }
         
-        return new SQLQuery( this, sql, types );
+        return new SQLQuery( this, sql, types, false );
     }
 
 
@@ -462,7 +462,7 @@ public final class SQLEngine implements Persistence {
                 _log.debug (Messages.format ("jdo.directSQL", sql));
             }
             
-            return new SQLQuery( this, sql, types );
+            return new SQLQuery( this, sql, types, true );
 		}
 
         if (_log.isDebugEnabled()) {
@@ -2048,8 +2048,21 @@ public final class SQLEngine implements Persistence {
         private boolean         _resultSetDone;
 
         private Object[]        _fields;
+        
+        /**
+         * Indicates whether the SQL query executed is issued as part of a SQL 
+         * CALL statement or not. 
+         */
+        private boolean _isCallSql = false;
 
-        SQLQuery( SQLEngine engine, String sql, Class[] types )
+        /**
+         * Creates an instance of SQLQuery.
+         * @param engine SQLEngine instance
+         * @param sql The SQL statement to execute
+         * @param types Types of the class used.
+         * @param isCallSql true if the SQL is issued as part of a CALL SQL statement.
+         */
+        SQLQuery(SQLEngine engine, String sql, Class[] types, boolean isCallSql)
         {
             _engine = engine;
             _requestedEngine = engine;
@@ -2060,6 +2073,8 @@ public final class SQLEngine implements Persistence {
             for (int i = 0; i < _identSqlType.length; i++) {
                 _identSqlType[i] = ((JDOFieldDescriptor) _engine._clsDesc.getIdentities()[i]).getSQLType()[0];
             }
+            
+            _isCallSql = isCallSql;
         }
 
 
@@ -2334,11 +2349,16 @@ public final class SQLEngine implements Persistence {
                 String metaTableName = metaData.getTableName(count);
                 String metaColumnName = metaData.getColumnName(count);
                if (fieldColumnName.equalsIgnoreCase(metaColumnName)) {
-                   if (fieldTableName.equalsIgnoreCase(metaTableName)) {
-                       break;
-                   } else if ("".equals(metaTableName)) {
-                       break;
-                   }
+            	   if (!_isCallSql) {
+            		   if (fieldTableName.equalsIgnoreCase(metaTableName)) {
+            			   break;
+            		   } else if ("".equals(metaTableName)) {
+            			   break;
+            		   }
+					} else {
+						// if we are running as a result of a CALL SQL statement, let's relax our checks.
+						break;
+            	   }
                } else if (fieldName.equalsIgnoreCase(metaColumnName)) {
                    break;
                }
