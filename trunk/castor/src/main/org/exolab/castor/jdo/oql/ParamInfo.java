@@ -46,9 +46,9 @@
 
 package org.exolab.castor.jdo.oql;
 
+import org.castor.jdo.engine.SQLTypeInfos;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
-import org.exolab.castor.jdo.engine.SQLTypes;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
 
@@ -139,7 +139,7 @@ public class ParamInfo {
     if (desc != null) {
         _fieldType = desc.getFieldType();
         try {
-            _sqlType = SQLTypes.typeFromSQLType(desc.getSQLType()[0]);
+            _sqlType = SQLTypeInfos.sqlTypeNum2javaType(desc.getSQLType()[0]);
         } catch (Exception ex) {
             throw new QueryException( "Can't determine SQL class: " + ex );
         }
