@@ -171,7 +171,6 @@ public final class TestIdentitySet extends TestCase {
         
         for (int i = 0; i < 100; i++) {
             Object key = new Integer(i);
-            Object value = "value " + i;
             keys.add(key);
             set.add(key);
         }

@@ -65,10 +65,6 @@ public final class TestBase64Decoder extends TestCase {
         return suite;
     }
 
-    public static Test suite(final boolean quick) {
-        return suite();
-    }
-
     public TestBase64Decoder(final String name) { super(name); }
 
     public void testAllBytes() {
