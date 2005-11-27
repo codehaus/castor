@@ -17,8 +17,6 @@ package utf.org.castor.util;
 
 import org.castor.util.Base64Encoder;
 
-import java.io.ObjectOutputStream;
-
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
@@ -58,9 +56,6 @@ public final class TestBase64Encoder extends TestCase {
             "8A==", "8Q==", "8g==", "8w==", "9A==", "9Q==", "9g==", "9w==",
             "+A==", "+Q==", "+g==", "+w==", "/A==", "/Q==", "/g==", "/w==" };
 
-    private Base64Encoder _enc = null;
-    private ObjectOutputStream _oout = null;
-
     public static Test suite() {
         TestSuite suite = new TestSuite("Base64Encoder Tests");
 
@@ -68,10 +63,6 @@ public final class TestBase64Encoder extends TestCase {
         suite.addTest(new TestBase64Encoder("testPadding"));
 
         return suite;
-    }
-
-    public static Test suite(final boolean quick) {
-        return suite();
     }
 
     public TestBase64Encoder(final String name) { super(name); }
