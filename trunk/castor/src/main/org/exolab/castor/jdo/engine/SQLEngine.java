@@ -52,9 +52,11 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.Vector;
@@ -1243,8 +1245,10 @@ public final class SQLEngine implements Persistence {
             }
             
             // Load all the fields of the object including one-one relations
-            // index to use during ResultSet.getXXX()
-            int columnIndex = 1;
+            // index to use during ResultSet.getXXX(); don't forget to ignore 
+            // the identity columns
+            int columnIndex = _ids.length + 1;
+            
             // index in fields[] for storing result of SQLTypes.getObject()
             fieldIndex = 1;
             String tableName = null;
@@ -1252,7 +1256,7 @@ public final class SQLEngine implements Persistence {
             Object[] temp = new Object[10]; // assume complex field max at 10
             for (int i = 0 ; i < _fields.length ; ++i ) {
             	tableName = _fields[i].tableName;
-            	if (!tableName.equals (tableNameOld) && !_fields[i].joined) {
+            	if (i > 0 && !tableName.equals (tableNameOld) && !_fields[i].joined) {
             		columnIndex = columnIndex + _ids.length; 
             	}
             	
@@ -1302,7 +1306,7 @@ public final class SQLEngine implements Persistence {
 
             while (rs.next()) {
                 fieldIndex = 1;
-                columnIndex = 1;
+                columnIndex = _ids.length + 1;
 
                 tableName = null;
                 tableNameOld = tableName;
@@ -1310,7 +1314,7 @@ public final class SQLEngine implements Persistence {
                 for (int i = 0; i < _fields.length ; ++i) {
 
                 	tableName = _fields[i].tableName;
-                	if (!tableName.equals (tableNameOld) && !_fields[i].joined) {
+                	if (i > 0 && !tableName.equals (tableNameOld) && !_fields[i].joined) {
                 	    columnIndex = columnIndex + _ids.length;
                 	}
                 	
@@ -1618,6 +1622,8 @@ public final class SQLEngine implements Persistence {
 
         //_fields = new FieldInfo[ fields.size() ];
         //fields.copyInto( _fields );
+        
+        Map identitiesUsedForTable = new HashMap();
 
         // get id columns' names
         for ( int i=0; i<_ids.length; i++ ) {
@@ -1644,6 +1650,16 @@ public final class SQLEngine implements Persistence {
         for (int i = 0; i < _fields.length; i++) {
         	if (i > 0) { aliasOld = alias; }
             alias = _fields[i].tableName;
+
+            // add id fields for root table if first field points to a separate table
+            if (i == 0 && _fields[i].joined) {
+                String[] ids = _clsDesc.getIdentityColumnNames();
+                for (int j = 0; j < ids.length; j++) {
+                    expr.addColumn(_clsDesc.getTableName(), ids[j]);
+                    find.addColumn(_clsDesc.getTableName(), ids[j]);
+                }
+                identitiesUsedForTable.put(_clsDesc.getTableName(), new Boolean(true));
+            }
             
             // add id columns to select statement
             if (!alias.equals(aliasOld) && !_fields[i].joined) {
@@ -1651,11 +1667,14 @@ public final class SQLEngine implements Persistence {
                     _fields[i].fieldDescriptor.getContainingClassDescriptor();
                 String[] ids = classDescriptor.getIdentityColumnNames();
             	for (int j = 0; j < ids.length; j++) {
-                	expr.addColumn(alias, ids[j]);
-                    find.addColumn(alias, ids[j]);
+                    boolean isTableNameAlreadyAdded = identitiesUsedForTable.containsKey(classDescriptor.getTableName()); 
+                    if (!isTableNameAlreadyAdded) {
+                        expr.addColumn(alias, ids[j]);
+                        find.addColumn(alias, ids[j]);
+                    }
             	}
             }
-            
+
             if ( _fields[i].load ) {
                 if ( _fields[i].joined /*&& !joinTables.contains( _fields[i].tableName )*/ ) {
                     int offset = 0;
@@ -2400,10 +2419,15 @@ public final class SQLEngine implements Persistence {
             String firstColumnOfField = _engine._fields[i].columns[0].name;
             
             ResultSetMetaData metaData = _rs.getMetaData();
-            while (!(firstColumnOfField.equalsIgnoreCase(metaData.getColumnName(count))
-                     && (fieldTableName.equalsIgnoreCase(metaData.getTableName(count))
-                         || "".equals(metaData.getTableName(count))))) {
+            String columnNamePerMetaData = metaData.getColumnName(count);
+            String tableNamePerMetaData = metaData.getTableName(count);
+            
+            while (!(firstColumnOfField.equalsIgnoreCase(columnNamePerMetaData)
+                     && (fieldTableName.equalsIgnoreCase(tableNamePerMetaData)
+                         || "".equals(tableNamePerMetaData)))) {
             	count++;
+                columnNamePerMetaData = metaData.getColumnName(count);
+                tableNamePerMetaData = metaData.getTableName(count);
             }
 
             if( field == null )
@@ -2435,6 +2459,8 @@ public final class SQLEngine implements Persistence {
 
         private int loadRow(Object[] fields, int numberOfFields, boolean isFirst)
         throws SQLException, PersistenceException {
+            
+            // skip the identity columns first; in other words, look at field columns only
             int count = _engine._ids.length + 1;
 
             String tableName = null;

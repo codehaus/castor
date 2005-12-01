@@ -38,6 +38,28 @@
                    will be used in future to distinguish between different configurations.</p>
 			</summary>
 			<bugs>
+
+                <bug id="1271" tool="jira">
+                    <description>
+		                Fixed problem with special mappings that have a 'foreign' relation as first 
+						field mapping.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Sean</name>
+                        <email>mailto:xiaoyong.liang@1cm.com.cn</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20051201</date>
+                </bug>
                 <bug id="1171" tool="jira">
                     <description>
                         Refactored SQLTypes into SQLTypeInfos and SQLTypeConverters.

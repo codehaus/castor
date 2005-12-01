@@ -592,4 +592,31 @@
   </class>
   <!-- key generator definitions -->
 
+	<!-- TC129 -->
+    <class identity="id" name="jdo.Container">
+		<map-to table="container"/>
+		<field name="id" type="integer">
+			<sql name="id" type="integer"/>
+		</field>
+		<field name="prop" type="jdo.ContainerItem" collection="arraylist">
+            <sql many-key="item" />
+		</field>
+		<field name="name" type="string">
+			<sql name="name" type="varchar"/>
+		</field>
+	</class>
+
+    <class identity="id" name="jdo.ContainerItem">
+		<map-to table="container_item"/>
+		<field name="id" type="integer">
+			<sql name="id" type="integer"/>
+		</field>
+		<field name="item" type="jdo.Container">
+			<sql name="item"/>
+		</field>
+		<field name="value" type="string">
+			<sql name="value" type="varchar"/>
+		</field>
+	</class>
+	
 </mapping>
