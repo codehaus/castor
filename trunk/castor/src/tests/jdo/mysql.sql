@@ -1042,3 +1042,37 @@ CREATE TABLE poly_depend_object (
 );
 
 INSERT INTO poly_depend_object VALUES(1, 1, 'This is a description');
+
+# TC129 
+
+DROP TABLE IF EXISTS container;
+CREATE TABLE container (
+  id int(11) unsigned NOT NULL auto_increment,
+  name varchar(200) NULL,
+  prop int(11) unsigned default NULL,
+  PRIMARY KEY  (id)
+);
+
+INSERT INTO container (id, name, prop) VALUES 
+  (1,'Container 1',1),
+  (2,'Container 2',2),
+  (3,'Container 3',3),
+  (4,'Container 4',4);
+
+DROP TABLE IF EXISTS container_item;
+CREATE TABLE container_item (
+  id int(11) unsigned NOT NULL auto_increment,
+  item int(11) unsigned default NULL,
+  value varchar(200) NULL,
+  PRIMARY KEY  (id)
+);
+
+INSERT INTO container_item (id, item, value) VALUES 
+  (1,1,'Container item 1'),
+  (2,2,'Container item 2'),
+  (3,3,'Container item 3'),
+  (4,4,'Container item 4'),
+  (5,1,'Container item 5'),
+  (6,2,'Container item 6'),
+  (7,3,'Container item 7'),
+  (8,4,'Container item 8');
