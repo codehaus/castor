@@ -54,10 +54,14 @@ import java.util.Iterator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.cache.Cache;
+import org.castor.cache.CacheAcquireException;
+import org.castor.cache.CacheFactory;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.cache.CacheEntry;
+import org.castor.persist.cache.CacheRegistry;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -70,7 +74,6 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.MappingResolver;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
-import org.exolab.castor.persist.cache.*;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.util.Messages;
@@ -189,7 +192,7 @@ public final class LockEngine {
                         // create new Cache instance for the base type
                         Cache cache = null;
                         try {
-                        	cache = CacheRegistry.getCache (molder.getCacheType(), molder.getCacheParam(), molder.getName(), mapResolver.getClassLoader());
+                        	cache = CacheRegistry.getCache (molder.getCacheType(), molder.getName(), molder.getCacheParam(), mapResolver.getClassLoader());
                         } 
                         catch (CacheAcquireException e) {
                             _log.error (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
@@ -1175,10 +1178,8 @@ public final class LockEngine {
                     _log.info("In locks: " + entry);
                 }
 
-                for (Enumeration enumeration = cache.elements();
-                     enumeration.hasMoreElements();) {
-                    
-                    ObjectLock entry = (ObjectLock) enumeration.nextElement();
+                for (Iterator iter = cache.values().iterator(); iter.hasNext();) {
+                    ObjectLock entry = (ObjectLock) iter.next();
                     _log.info("In cache: " + entry.getOID());
                 }
             }
@@ -1199,14 +1200,8 @@ public final class LockEngine {
                     iter.remove();
                 }
                 
-                // Remove all objects not participating in a transaction
-                // from the cache.
-                for (Enumeration enumeration = cache.elements();
-                     enumeration.hasMoreElements();) {
-                    
-                    CacheEntry cacheEntry = (CacheEntry) enumeration.nextElement();
-                    cache.expire(cacheEntry.getOID());
-                }
+                // Remove all objects not participating in a transaction from the cache.
+                cache.clear();
             }
         }
 
@@ -1508,7 +1503,7 @@ public final class LockEngine {
 		 * @return True if the object is cached. 
 		 */
 		public boolean isCached(Object oid) {
-            return cache.contains (oid);
+            return cache.containsKey(oid);
 		}
     }
 

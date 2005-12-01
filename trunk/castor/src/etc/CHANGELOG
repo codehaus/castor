@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1230 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Refactored cache to implement java.util.Map interface into new org.castor.cache package.
+       Details: http://jira.codehaus.org/browse/CASTOR-1230
+       (Ralf - 20051201)
+
 JDO:   Fixed bug CASTOR-1271 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem with special mappings that have a 'foreign' relation as first field mapping.
        Details: http://jira.codehaus.org/browse/CASTOR-1271

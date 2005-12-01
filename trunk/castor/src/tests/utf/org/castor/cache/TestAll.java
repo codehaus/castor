@@ -13,25 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utf.org.castor;
+package utf.org.castor.cache;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Run all tests of the org.castor package.
+ * Run all tests of the org.castor.cache package.
  * 
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
 public final class TestAll extends TestCase {
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("All org.castor tests");
+        TestSuite suite = new TestSuite("All org.castor.cache tests");
 
-        suite.addTest(utf.org.castor.util.TestAll.suite());
-        suite.addTest(utf.org.castor.cache.TestAll.suite());
-        suite.addTest(utf.org.castor.persist.TestAll.suite());
+        suite.addTest(TestCacheAcquireException.suite());
+        suite.addTest(TestAbstractBaseCache.suite());
+        suite.addTest(TestDebuggingCacheProxy.suite());
+        suite.addTest(TestAbstractCacheFactory.suite());
+
+        suite.addTest(utf.org.castor.cache.distributed.TestAll.suite());
+        suite.addTest(utf.org.castor.cache.simple.TestAll.suite());
 
         return suite;
     }
