@@ -124,11 +124,15 @@
   # List of available cache implementations; please expand this list to add
   # any custom performance caches.
   #
-  org.exolab.castor.jdo.cacheFactories=\
-    org.exolab.castor.persist.cache.NoCacheFactory,\
-    org.exolab.castor.persist.cache.TimeLimitedFactory,\
-    org.exolab.castor.persist.cache.CountLimitedFactory,\
-    org.exolab.castor.persist.cache.UnlimitedFactory
+  org.castor.jdo.cacheFactories=\
+    org.castor.cache.simple.NoCacheFactory,\
+    org.castor.cache.simple.TimeLimitedFactory,\
+    org.castor.cache.simple.CountLimitedFactory,\
+    org.castor.cache.simple.UnlimitedFactory,\
+    org.castor.cache.distributed.FKCacheFactory,\
+    org.castor.cache.distributed.JcsCacheFactory,\
+    org.castor.cache.distributed.JCacheFactory,\
+    org.castor.cache.distributed.CoherenceCacheFactory
 
   # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
   # statements; false otherwise (logging will be turned off completely).

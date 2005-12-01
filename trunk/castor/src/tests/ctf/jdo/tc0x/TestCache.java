@@ -46,6 +46,7 @@
 package ctf.jdo.tc0x;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import harness.CastorTestCase;
@@ -54,7 +55,8 @@ import harness.TestHarness;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.exolab.castor.persist.cache.TimeLimited;
+import org.castor.cache.CacheAcquireException; 
+import org.castor.cache.simple.TimeLimited;
 
 public final class TestCache extends CastorTestCase {
     /**
@@ -78,7 +80,7 @@ public final class TestCache extends CastorTestCase {
         super(category, "TC08", "Cache expiry measure");
     }
 
-    public void runTest() {
+    public void runTest() throws CacheAcquireException {
         testTimeLimitedExpiring();
     }
 
@@ -87,7 +89,7 @@ public final class TestCache extends CastorTestCase {
      * timestamp. This timestamp will be examined, when the entry is removed
      * from the cache.
      */
-    private void testTimeLimitedExpiring() {
+    private void testTimeLimitedExpiring() throws CacheAcquireException {
         List expiredTooFast = new ArrayList();
         TimeLimitedTest cache = new TimeLimitedTest(EXPIRE_SEC, expiredTooFast);
         try {
@@ -119,13 +121,21 @@ public final class TestCache extends CastorTestCase {
     class TimeLimitedTest extends TimeLimited {
         private List _expiredTooFast;
 
-        TimeLimitedTest(final int interval, final List expiredTooFast) {
+        TimeLimitedTest(final int interval, final List expiredTooFast)
+        throws CacheAcquireException {
             super();
-            setCapacity(interval);
+            
+            HashMap params = new HashMap();
+            params.put(TimeLimited.PARAM_NAME, "dummy");
+            params.put(TimeLimited.PARAM_TTL, new Integer(interval));
+            initialize(params);
+
             this._expiredTooFast = expiredTooFast;
         }
 
-        protected void dispose(final Object obj) {
+        public Object remove(final Object key) {
+            Object obj = super.remove(key);
+
             long now = System.currentTimeMillis();
             CacheEntry entry = (CacheEntry) obj;
             long diff = Math.abs(now - entry.getTimestamp());
@@ -140,6 +150,8 @@ public final class TestCache extends CastorTestCase {
                 LOG.debug("Entry " + entry.getId() + " expired after "
                         + diff + " millis");
             }
+            
+            return obj;
         }
     }
 

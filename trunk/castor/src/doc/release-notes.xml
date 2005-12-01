@@ -36,9 +36,63 @@
                    <b>org.exolab.castor.jdo.util</b> to <b>org.castor.jdo.util</b> package.
                    In addition we allowed to specify a name attribute on the jdo-conf tag that
                    will be used in future to distinguish between different configurations.</p>
+
+                <h3>Refactored cache into new org.castor.cache package</h3>
+                
+                <p>Take care to adjust your custom castor.properties file to reflect
+                   the changed packages of CacheFactories.</p>
+                   
+                <code>
+# 
+# Cache implementations
+# 
+org.castor.jdo.cacheFactories=\
+  org.castor.cache.simple.NoCacheFactory,\
+  org.castor.cache.simple.TimeLimitedFactory,\
+  org.castor.cache.simple.CountLimitedFactory,\
+  org.castor.cache.simple.UnlimitedFactory,\
+  org.castor.cache.distributed.FKCacheFactory,\
+  org.castor.cache.distributed.JcsCacheFactory,\
+  org.castor.cache.distributed.JCacheFactory,\
+  org.castor.cache.distributed.CoherenceCacheFactory
+                </code>
+				
+                <h3>Added debugging of cache access</h3>
+                
+                <p>By setting the property <b>org.castor.jdo.cacheDebug</b> to
+                   <b>true</b> you are able to get debug messages for every cache
+                   access in the configured log.</p>
+                   
+                <code>
+#
+# True if proxy class should be used to debug access to cache
+# (default: false).
+#  
+#org.castor.jdo.cacheDebug=false
+                </code>
 			</summary>
 			<bugs>
-
+                <bug id="1230" tool="jira">
+                    <description>
+                        Refactored cache to implement java.util.Map interface into
+                        new org.castor.cache package.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051201</date>
+                </bug>
                 <bug id="1271" tool="jira">
                     <description>
 		                Fixed problem with special mappings that have a 'foreign' relation as first 

@@ -115,6 +115,18 @@ public final class OID implements Serializable {
     private String[] _superClassNames;
 
     /**
+     * Private default constructor invoced through reflection for testing only.
+     */
+    private OID() {
+        _identity = null;
+        _name = null;
+        _engine = null;
+        _molder = null;
+        _depends = null;
+        _hashCode = 0;
+    }
+
+    /**
      * Constructor
      */
     public OID(LockEngine engine, ClassMolder molder, Object identity) {

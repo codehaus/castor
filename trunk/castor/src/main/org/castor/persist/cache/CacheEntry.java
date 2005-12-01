@@ -29,6 +29,9 @@ import org.exolab.castor.persist.OID;
 public final class CacheEntry implements java.io.Serializable {
     //--------------------------------------------------------------------------
 
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5165311222436920871L;
+
     /** OID of the entry to be cached. */
     private OID _oid;
 
@@ -39,6 +42,12 @@ public final class CacheEntry implements java.io.Serializable {
     private long _timeStamp = TimeStampable.NO_TIMESTAMP;
 
     //--------------------------------------------------------------------------
+
+    /**
+     * Private default constructor invoced through reflection for testing only.
+     */
+    private CacheEntry() { }
+
 
     /**
      * Construct a CacheEntry from the given ObjectLock.

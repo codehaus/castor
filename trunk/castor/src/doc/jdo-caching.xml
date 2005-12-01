@@ -4,7 +4,7 @@
     <title>Caching</title>
 
     <header>
-      <p>Reference: <api package="org.exolab.castor.persist.cache">API documentation</api></p>
+      <p>Reference: <api package="org.castor.cache">API documentation</api></p>
     </header>
 
     <section title="News">
@@ -25,7 +25,7 @@
           eliminates the number of operations against the persistence storage.</p>
     
        <p>The main component of this package is the interface 
-          <api class="org.exolab.castor.persist.cache.Cache">Cache</api>, which declares 
+          <api class="org.castor.cache.Cache">Cache</api>, which declares 
           the external functionality of a performance cache. Existing (and future) cache implementations
           have to implement this interface, which is closely modelled after java.util.Map.</p>
 
@@ -42,11 +42,15 @@
 # 
 # Cache implementations
 # 
-org.exolab.castor.jdo.cacheFactories=\
-  org.exolab.castor.persist.cache.NoCacheFactory,\
-  org.exolab.castor.persist.cache.TimeLimitedFactory,\
-  org.exolab.castor.persist.cache.CountLimitedFactory,\
-  org.exolab.castor.persist.cache.UnlimitedFactory
+org.castor.jdo.cacheFactories=\
+  org.castor.cache.simple.NoCacheFactory,\
+  org.castor.cache.simple.TimeLimitedFactory,\
+  org.castor.cache.simple.CountLimitedFactory,\
+  org.castor.cache.simple.UnlimitedFactory,\
+  org.castor.cache.distributed.FKCacheFactory,\
+  org.castor.cache.distributed.JcsCacheFactory,\
+  org.castor.cache.distributed.JCacheFactory,\
+  org.castor.cache.distributed.CoherenceCacheFactory
           </code>
        </code-panel>
 
@@ -58,35 +62,39 @@ org.exolab.castor.jdo.cacheFactories=\
 # 
 # Cache implementations
 # 
-org.exolab.castor.jdo.cacheFactories=\
-  org.exolab.castor.persist.cache.NoCacheFactory,\
-  org.exolab.castor.persist.cache.TimeLimitedFactory,\
-  org.exolab.castor.persist.cache.CountLimitedFactory,\
-  org.exolab.castor.persist.cache.UnlimitedFactory,\
+org.castor.jdo.cacheFactories=\
+  org.castor.cache.simple.NoCacheFactory,\
+  org.castor.cache.simple.TimeLimitedFactory,\
+  org.castor.cache.simple.CountLimitedFactory,\
+  org.castor.cache.simple.UnlimitedFactory,\
+  org.castor.cache.distributed.FKCacheFactory,\
+  org.castor.cache.distributed.JcsCacheFactory,\
+  org.castor.cache.distributed.JCacheFactory,\
+  org.castor.cache.distributed.CoherenceCacheFactory,\
   <b>org.whatever.somewhere.nevermind.CustomCache</b>
           </code>
        </code-panel>
        
        <p>In addition, you will have to provide the implementations of 
-          <api class="org.exolab.castor.persist.cache.Cache">Cache</api> and 
-          <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api>
+          <api class="org.castor.cache.Cache">Cache</api> and 
+          <api class="org.castor.cache.CacheFactory">CacheFactory</api>
           for your new cache instance.</p>
           
        <section title="CacheFactory implementation">
           
           <p>For this, please add an implementation 
-             of <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> and 
+             of <api class="org.castor.cache.CacheFactory">CacheFactory</api> and 
              make sure that you provide valid values for the two properties <i>name</i> and 
              <i>className</i>.</p>    
        
           <p>To assist users in this task, a 
-             <api class="org.exolab.castor.persist.cache.AbstractCacheFactory">AbstractCacheFactory</api> 
+             <api class="org.castor.cache.AbstractCacheFactory">AbstractCacheFactory</api> 
              class has been supplied, which users should derive their custom 
-             <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> instances 
+             <api class="org.castor.cache.CacheFactory">CacheFactory</api> instances 
              from, if they wish so. Please consult existing 
-             <api class="org.exolab.castor.persist.cache.CacheFactory">CacheFactory</api> implementations 
-             such as <api class="org.exolab.castor.persist.cache.TimeLimitedFactory">TimeLimitedFactory</api>} or 
-             <api class="org.exolab.castor.persist.cache.CountLimitedFactory">CountLimitedFactory</api> 
+             <api class="org.castor.cache.CacheFactory">CacheFactory</api> implementations 
+             such as <api class="org.castor.cache.simple.TimeLimitedFactory">TimeLimitedFactory</api>} or 
+             <api class="org.castor.cache.simple.CountLimitedFactory">CountLimitedFactory</api> 
              for code samples.</p>    
 
           <code-panel>
@@ -111,7 +119,6 @@ org.exolab.castor.jdo.cacheFactories=\
      * @return The short alias name. 
      */
     <b>public String getName()</b> {
-    {
         return NAME;
     }
     
@@ -135,13 +142,13 @@ org.exolab.castor.jdo.cacheFactories=\
              of <api class="org.exolab.castor.persist.cache.Cache">Cache</api>.</p>    
        
           <p>To assist users in this task, a 
-             <api class="org.exolab.castor.persist.cache.AbstractBaseCache">AbstractBaseCache</api> 
+             <api class="org.castor.cache.AbstractBaseCache">AbstractBaseCache</api> 
              class has been supplied, which users should derive their custom 
-             <api class="org.exolab.castor.persist.cache.Cache">Cache</api> instances 
+             <api class="org.castor.cache.Cache">Cache</api> instances 
              from, if they wish so. Please consult existing 
-             <api class="org.exolab.castor.persist.cache.Cache">Cache</api> implementations 
-             such as <api class="org.exolab.castor.persist.cache.TimeLimited">TimeLimited</api>} or 
-             <api class="org.exolab.castor.persist.cache.CountLimited">CountLimited</api> 
+             <api class="org.castor.cache.Cache">Cache</api> implementations 
+             such as <api class="org.castor.cache.simple.TimeLimited">TimeLimited</api>} or 
+             <api class="org.castor.cache.simple.CountLimited">CountLimited</api> 
              for code samples.</p>
           <code-panel>
              <code>
