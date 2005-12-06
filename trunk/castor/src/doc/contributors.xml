@@ -369,6 +369,14 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Brosius" given="Dave"/>
+    <email>dbrosius@qis.net</email>
+    <description>
+        Submitted small improvements to build.bat and various java files.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Bueno" given="Leonardo"/>
     <email>leonardo@itera.com.br</email>
     <description>Contributed MySQL driver.</description>

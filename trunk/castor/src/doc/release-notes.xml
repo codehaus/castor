@@ -84,6 +84,26 @@ org.castor.jdo.cacheFactories=\
                 </code>
 			</summary>
 			<bugs>
+                <bug id="1278" tool="jira">
+                    <description>
+                        Allowed java to be on a path with spaces.
+                    </description>
+                    <contributor>
+                        <name>Dave Brosius</name>
+                        <email>dbrosius@qis.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Dave Brosius</name>
+                        <email>dbrosius@qis.net</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20051206</date>
+                </bug>
                 <bug id="1230" tool="jira">
                     <description>
                         Refactored cache to implement java.util.Map interface into
