@@ -430,8 +430,8 @@ public class Test
             classMap = mappingRoot.getClassMapping( i );
             _log.debug( "Class name: " + classMap.getName() );
 
-            int fieldCount = classMap.getFieldMappingCount();
-            fieldMaps = classMap.getFieldMapping();
+            int fieldCount = classMap.getClassChoice().getFieldMappingCount();
+            fieldMaps = classMap.getClassChoice().getFieldMapping();
 
             _log.debug( "fieldMaps.length: " + fieldMaps.length );
 
