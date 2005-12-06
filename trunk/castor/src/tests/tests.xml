@@ -62,6 +62,7 @@
     <case class="jdo.QueryFinalize" id="TC100"/>
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
@@ -128,6 +129,7 @@
     <!-- tc3x -->
     <!-- <case id="tempTC126" class="jdo.LazyLoading"/> -->        <!-- was TC26 -->
     <!-- <case id="tempTC128" class="jdo.Collections"/> -->        <!-- was TC28 -->
+	<!--  <case id="TC128a" class="jdo.TestSortedContainer" /> -->
 	<!-- <case id="TC129" class="jdo.TestSpecialCollections" /> -->
     <!-- <case id="tempTC123" class="jdo.ManyToMany"/> -->         <!-- was TC23 -->
 
@@ -210,6 +212,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
     
@@ -293,6 +296,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
     <case class="jdo.ManyToManyKeyGen" id="TC31a"/>
@@ -373,6 +377,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
 	
@@ -459,6 +464,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
 	
@@ -541,6 +547,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
 
@@ -623,6 +630,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case id="tempTC123" class="jdo.ManyToMany"/>                <!-- was TC23 -->
 
@@ -709,6 +717,7 @@
     <!-- tc3x -->
     <case id="tempTC126" class="jdo.LazyLoading"/>               <!-- was TC26 -->
     <case id="tempTC128" class="jdo.Collections"/>               <!-- was TC28 -->
+	<case id="TC128a" class="jdo.TestSortedContainer" />
 	<case id="TC129" class="jdo.TestSpecialCollections" />
     <case class="jdo.ManyToManyKeyGen" id="TC31a"/>
     <!-- <case class="jdo.CircularRef" id="TC32"/> -->

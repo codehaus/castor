@@ -137,6 +137,12 @@ public interface FieldDescriptor
      * @return The field handler
      */
     public FieldHandler getHandler();
+    
+    /**
+     * Returns the name of a class that implements the java.util.Comparator interface.
+     * @return the name of a class that implements the java.util.Comparator interface
+     */
+    public String getComparator();
 
 
 }

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.9.3.9+</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -14,13 +14,14 @@ package org.exolab.castor.mapping.xml.types;
 import java.io.Serializable;
 import java.util.Enumeration;
 import java.util.Hashtable;
-import org.exolab.castor.xml.*;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 
 /**
- * 
+ * Class BindXmlAutoNamingType.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class BindXmlAutoNamingType implements java.io.Serializable {
 
 
@@ -30,28 +31,37 @@ public class BindXmlAutoNamingType implements java.io.Serializable {
 
     /**
      * The deriveByClass type
-    **/
+     */
     public static final int DERIVEBYCLASS_TYPE = 0;
 
     /**
      * The instance of the deriveByClass type
-    **/
+     */
     public static final BindXmlAutoNamingType DERIVEBYCLASS = new BindXmlAutoNamingType(DERIVEBYCLASS_TYPE, "deriveByClass");
 
     /**
      * The deriveByField type
-    **/
+     */
     public static final int DERIVEBYFIELD_TYPE = 1;
 
     /**
      * The instance of the deriveByField type
-    **/
+     */
     public static final BindXmlAutoNamingType DERIVEBYFIELD = new BindXmlAutoNamingType(DERIVEBYFIELD_TYPE, "deriveByField");
 
+    /**
+     * Field _memberTable
+     */
     private static java.util.Hashtable _memberTable = init();
 
+    /**
+     * Field type
+     */
     private int type = -1;
 
+    /**
+     * Field stringValue
+     */
     private java.lang.String stringValue = null;
 
 
@@ -59,7 +69,8 @@ public class BindXmlAutoNamingType implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    private BindXmlAutoNamingType(int type, java.lang.String value) {
+    private BindXmlAutoNamingType(int type, java.lang.String value) 
+     {
         super();
         this.type = type;
         this.stringValue = value;
@@ -71,24 +82,37 @@ public class BindXmlAutoNamingType implements java.io.Serializable {
     //-----------/
 
     /**
+     * Method enumerate
+     * 
      * Returns an enumeration of all possible instances of
      * BindXmlAutoNamingType
-    **/
+     * 
+     * @return Enumeration
+     */
     public static java.util.Enumeration enumerate()
     {
         return _memberTable.elements();
     } //-- java.util.Enumeration enumerate() 
 
     /**
+     * Method getType
+     * 
      * Returns the type of this BindXmlAutoNamingType
-    **/
+     * 
+     * @return int
+     */
     public int getType()
     {
         return this.type;
     } //-- int getType() 
 
     /**
-    **/
+     * Method init
+     * 
+     * 
+     * 
+     * @return Hashtable
+     */
     private static java.util.Hashtable init()
     {
         Hashtable members = new Hashtable();
@@ -98,20 +122,41 @@ public class BindXmlAutoNamingType implements java.io.Serializable {
     } //-- java.util.Hashtable init() 
 
     /**
+     * Method readResolve
+     * 
+     *  will be called during deserialization to replace the
+     * deserialized object with the correct constant instance.
+     * <br/>
+     * 
+     * @return Object
+     */
+    private java.lang.Object readResolve()
+    {
+        return valueOf(this.stringValue);
+    } //-- java.lang.Object readResolve() 
+
+    /**
+     * Method toString
+     * 
      * Returns the String representation of this
      * BindXmlAutoNamingType
-    **/
+     * 
+     * @return String
+     */
     public java.lang.String toString()
     {
         return this.stringValue;
     } //-- java.lang.String toString() 
 
     /**
+     * Method valueOf
+     * 
      * Returns a new BindXmlAutoNamingType based on the given
      * String value.
      * 
      * @param string
-    **/
+     * @return BindXmlAutoNamingType
+     */
     public static org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType valueOf(java.lang.String string)
     {
         java.lang.Object obj = null;

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -53,7 +53,8 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
      //- Constructors -/
     //----------------/
 
-    public PropertyTypeDescriptor() {
+    public PropertyTypeDescriptor() 
+     {
         super();
         nsURI = "http://castor.exolab.org/";
         xmlName = "propertyType";
@@ -61,7 +62,7 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
         //-- set grouping compositor
         setCompositorAsSequence();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
-        org.exolab.castor.xml.XMLFieldHandler              handler        = null;
+        org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
@@ -70,7 +71,7 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
         //-- _name
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", org.exolab.castor.xml.NodeType.Element);
         desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -91,7 +92,7 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
         desc.setRequired(true);
         desc.setMultivalued(false);
@@ -109,7 +110,7 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
         //-- _value
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_value", "value", org.exolab.castor.xml.NodeType.Element);
         desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -130,7 +131,7 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
         desc.setRequired(true);
         desc.setMultivalued(false);
@@ -154,6 +155,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getAccessMode
+     * 
+     * 
+     * 
+     * @return AccessMode
      */
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
@@ -162,6 +167,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getExtends
+     * 
+     * 
+     * 
+     * @return ClassDescriptor
      */
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
@@ -170,6 +179,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getIdentity
+     * 
+     * 
+     * 
+     * @return FieldDescriptor
      */
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
@@ -178,6 +191,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getJavaClass
+     * 
+     * 
+     * 
+     * @return Class
      */
     public java.lang.Class getJavaClass()
     {
@@ -186,6 +203,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getNameSpacePrefix
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpacePrefix()
     {
@@ -194,6 +215,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getNameSpaceURI
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpaceURI()
     {
@@ -202,6 +227,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getValidator
+     * 
+     * 
+     * 
+     * @return TypeValidator
      */
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
@@ -210,6 +239,10 @@ public class PropertyTypeDescriptor extends org.exolab.castor.xml.util.XMLClassD
 
     /**
      * Method getXMLName
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getXMLName()
     {

@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -53,19 +53,20 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
      //- Constructors -/
     //----------------/
 
-    public CacheTypeMappingDescriptor() {
+    public CacheTypeMappingDescriptor() 
+     {
         super();
         nsURI = "http://castor.exolab.org/";
         xmlName = "cache-type";
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
-        org.exolab.castor.xml.XMLFieldHandler              handler        = null;
+        org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
         //-- _type
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -86,8 +87,9 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _type
@@ -100,7 +102,7 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
         desc.setValidator(fieldValidator);
         //-- _capacity
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Integer.TYPE, "_capacity", "capacity", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -128,8 +130,9 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _capacity
@@ -150,6 +153,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getAccessMode
+     * 
+     * 
+     * 
+     * @return AccessMode
      */
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
@@ -158,6 +165,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getExtends
+     * 
+     * 
+     * 
+     * @return ClassDescriptor
      */
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
@@ -166,6 +177,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getIdentity
+     * 
+     * 
+     * 
+     * @return FieldDescriptor
      */
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
@@ -174,6 +189,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getJavaClass
+     * 
+     * 
+     * 
+     * @return Class
      */
     public java.lang.Class getJavaClass()
     {
@@ -182,6 +201,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getNameSpacePrefix
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpacePrefix()
     {
@@ -190,6 +213,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getNameSpaceURI
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpaceURI()
     {
@@ -198,6 +225,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getValidator
+     * 
+     * 
+     * 
+     * @return TypeValidator
      */
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
@@ -206,6 +237,10 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
 
     /**
      * Method getXMLName
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getXMLName()
     {

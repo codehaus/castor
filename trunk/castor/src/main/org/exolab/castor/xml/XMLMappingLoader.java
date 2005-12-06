@@ -69,7 +69,7 @@ import org.exolab.castor.mapping.xml.BindXml;
 import org.exolab.castor.mapping.xml.MapTo;
 import org.exolab.castor.mapping.xml.Property;
 import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
-import org.exolab.castor.mapping.xml.types.CollectionType;
+import org.exolab.castor.mapping.xml.types.FieldMappingCollectionType;
 import org.exolab.castor.util.LocalConfiguration;
 
 import org.exolab.castor.xml.handlers.ContainerFieldHandler;
@@ -204,7 +204,7 @@ public class XMLMappingLoader
 
         if (clsMap.getAutoComplete()) {
             if ((clsMap.getMapTo() == null) &&
-                (clsMap.getFieldMappingCount() == 0) &&
+                (clsMap.getClassChoice().getFieldMappingCount() == 0) &&
                 (clsMap.getIdentityCount() == 0))
             {
                 //-- if we make it here we simply try
@@ -348,7 +348,7 @@ public class XMLMappingLoader
     {
         
         FieldDescriptor        fieldDesc;
-        CollectionType         colType  = fieldMap.getCollection();
+        FieldMappingCollectionType         colType  = fieldMap.getCollection();
         String                 xmlName  = null;
         NodeType               nodeType = null;
         String                 match    = null;
@@ -358,8 +358,8 @@ public class XMLMappingLoader
 
         //-- handle special case for HashMap/Hashtable
         if ((fieldMap.getType() == null) && (colType != null)) {
-            if ((colType == CollectionType.HASHTABLE) ||
-                (colType == CollectionType.MAP)) 
+            if ((colType == FieldMappingCollectionType.HASHTABLE) ||
+                (colType == FieldMappingCollectionType.MAP)) 
             {
                 fieldMap.setType(MapItem.class.getName());
             }
@@ -514,14 +514,14 @@ public class XMLMappingLoader
             Class type = fieldDesc.getFieldType();
             if (CollectionHandlers.hasHandler(type)) {
                 String typeName = CollectionHandlers.getCollectionName(type);
-                colType = CollectionType.valueOf(typeName);
+                colType = FieldMappingCollectionType.valueOf(typeName);
             }
         }
         
         //-- isMapped item
         if (colType != null) {    
-            if ((colType == CollectionType.HASHTABLE) ||
-                (colType == CollectionType.MAP))
+            if ((colType == FieldMappingCollectionType.HASHTABLE) ||
+                (colType == FieldMappingCollectionType.MAP))
             {
                 //-- Make sure user is not using an addMethod
                 //-- before setting the mapped field to true.

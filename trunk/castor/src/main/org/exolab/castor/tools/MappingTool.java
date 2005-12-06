@@ -59,8 +59,8 @@ import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.MapTo;
-import org.exolab.castor.mapping.xml.types.CollectionType;
 import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
+import org.exolab.castor.mapping.xml.types.FieldMappingCollectionType;
 import org.exolab.castor.util.CommandLineOptions;
 import org.exolab.castor.xml.JavaNaming;
 import org.exolab.castor.xml.Marshaller;
@@ -397,23 +397,23 @@ public class MappingTool
                 
                 //-- try to guess collection type
                 if (isArray) {
-                    fieldMap.setCollection(CollectionType.ARRAY);
+                    fieldMap.setCollection(FieldMappingCollectionType.ARRAY);
                 }
                 else {
                     //-- if the fieldType is the collection, then set appropriate
                     //-- collection type 
                     String colName = CollectionHandlers.getCollectionName(fieldType);
                     if (colName != null) {
-                        fieldMap.setCollection(CollectionType.valueOf(colName));
+                        fieldMap.setCollection(FieldMappingCollectionType.valueOf(colName));
                         fieldType = Object.class;
                     }
                     //-- help maintain compatibility with generated
                     //-- descriptors
                     else if (_mappingLoader.returnsArray(cls, fieldName, fieldType)) {
-                        fieldMap.setCollection( CollectionType.ARRAY );
+                        fieldMap.setCollection( FieldMappingCollectionType.ARRAY );
                     }
                     else {
-                        fieldMap.setCollection( CollectionType.ENUMERATE );
+                        fieldMap.setCollection( FieldMappingCollectionType.ENUMERATE );
                     }
                 }
             }
@@ -426,7 +426,7 @@ public class MappingTool
             fieldMap.setBindXml( new BindXml() );
             fieldMap.getBindXml().setName( ( (XMLFieldDescriptor) fdesc ).getXMLName() );
             fieldMap.getBindXml().setNode( BindXmlNodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
-            classMap.addFieldMapping( fieldMap );
+            classMap.getClassChoice().addFieldMapping( fieldMap );
             
             if (deep) {
                 if ( _mappings.get(fieldType) != null) continue;

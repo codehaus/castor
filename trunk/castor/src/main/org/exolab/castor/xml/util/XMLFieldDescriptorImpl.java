@@ -239,6 +239,11 @@ public class XMLFieldDescriptorImpl
      * @see _xmlName
      */
     private String _xmlPath    = null;
+    
+    /**
+     * The java.util.Comparator instance to be used with SortedSets.
+     */
+    private String _comparator;
 
     
     //----------------/
@@ -1228,6 +1233,10 @@ public class XMLFieldDescriptorImpl
         //-- java.sql.Date, various Collection classes, etc.
         return (CoreDescriptors.getDescriptor(type) != null);
     } //-- isBuiltInType
+
+    public String getComparator() {
+        return _comparator;
+    }
 
 } //-- XMLFieldDescriptor
 

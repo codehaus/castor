@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,18 +11,21 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class Include.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class Include implements java.io.Serializable {
 
 
@@ -30,6 +33,9 @@ public class Include implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _href
+     */
     private java.lang.String _href;
 
 
@@ -37,7 +43,8 @@ public class Include implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public Include() {
+    public Include() 
+     {
         super();
     } //-- org.exolab.castor.mapping.xml.Include()
 
@@ -47,14 +54,23 @@ public class Include implements java.io.Serializable {
     //-----------/
 
     /**
-    **/
+     * Returns the value of field 'href'.
+     * 
+     * @return String
+     * @return the value of field 'href'.
+     */
     public java.lang.String getHref()
     {
         return this._href;
     } //-- java.lang.String getHref() 
 
     /**
-    **/
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -67,9 +83,12 @@ public class Include implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -78,29 +97,37 @@ public class Include implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
+     * Sets the value of field 'href'.
      * 
-     * @param _href
-    **/
-    public void setHref(java.lang.String _href)
+     * @param href the value of field 'href'.
+     */
+    public void setHref(java.lang.String href)
     {
-        this._href = _href;
+        this._href = href;
     } //-- void setHref(java.lang.String) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return Include
+     */
     public static org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -108,11 +135,13 @@ public class Include implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.Include unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

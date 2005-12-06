@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -53,7 +53,8 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
      //- Constructors -/
     //----------------/
 
-    public BindXmlDescriptor() {
+    public BindXmlDescriptor() 
+     {
         super();
         nsURI = "http://castor.exolab.org/";
         xmlName = "bind-xml";
@@ -61,14 +62,14 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- set grouping compositor
         setCompositorAsSequence();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
-        org.exolab.castor.xml.XMLFieldHandler              handler        = null;
+        org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
         //-- initialize attribute descriptors
         
         //-- _name
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_name", "name", org.exolab.castor.xml.NodeType.Attribute);
         desc.setSchemaType("QName");
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -89,8 +90,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _name
@@ -100,7 +102,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _type
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_type", "type", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -121,8 +123,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _type
@@ -134,7 +137,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _autoNaming
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType.class, "_autoNaming", "auto-naming", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -155,9 +158,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
-        desc.setHandler( new org.exolab.castor.xml.handlers.EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType.class, handler));
+        };
+        handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType.class, handler);
         desc.setImmutable(true);
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _autoNaming
@@ -168,7 +173,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- _location
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_location", "location", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -189,8 +194,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _location
@@ -204,7 +210,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         //-- _matches
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_matches", "matches", org.exolab.castor.xml.NodeType.Attribute);
         desc.setImmutable(true);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -225,8 +231,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _matches
@@ -239,7 +246,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _reference
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_reference", "reference", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -267,8 +274,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _reference
@@ -280,7 +288,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _node
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.types.BindXmlNodeType.class, "_node", "node", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -301,9 +309,11 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
-        desc.setHandler( new org.exolab.castor.xml.handlers.EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlNodeType.class, handler));
+        };
+        handler = new org.exolab.castor.xml.handlers.EnumFieldHandler(org.exolab.castor.mapping.xml.types.BindXmlNodeType.class, handler);
         desc.setImmutable(true);
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _node
@@ -313,7 +323,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _QNamePrefix
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.String.class, "_QNamePrefix", "QName-prefix", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -334,8 +344,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new java.lang.String();
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _QNamePrefix
@@ -347,7 +358,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         desc.setValidator(fieldValidator);
         //-- _transient
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_transient", "transient", org.exolab.castor.xml.NodeType.Attribute);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -375,8 +386,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return null;
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
         //-- validation code for: _transient
@@ -390,7 +402,7 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         
         //-- _classMapping
         desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.ClassMapping.class, "_classMapping", "class", org.exolab.castor.xml.NodeType.Element);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -411,8 +423,9 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             public java.lang.Object newInstance( java.lang.Object parent ) {
                 return new org.exolab.castor.mapping.xml.ClassMapping();
             }
-        } );
+        };
         desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
         desc.setMultivalued(false);
         addFieldDescriptor(desc);
         
@@ -422,8 +435,8 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
         }
         desc.setValidator(fieldValidator);
         //-- _propertyList
-        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(Property.class, "_propertyList", "property", org.exolab.castor.xml.NodeType.Element);
-        handler = (new org.exolab.castor.xml.XMLFieldHandler() {
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.Property.class, "_propertyList", "property", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
             public java.lang.Object getValue( java.lang.Object object ) 
                 throws IllegalStateException
             {
@@ -435,16 +448,16 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
             {
                 try {
                     BindXml target = (BindXml) object;
-                    target.addProperty( (Property) value);
+                    target.addProperty( (org.exolab.castor.mapping.xml.Property) value);
                 }
                 catch (java.lang.Exception ex) {
                     throw new IllegalStateException(ex.toString());
                 }
             }
             public java.lang.Object newInstance( java.lang.Object parent ) {
-                return new Property();
+                return new org.exolab.castor.mapping.xml.Property();
             }
-        } );
+        };
         desc.setHandler(handler);
         desc.setMultivalued(true);
         addFieldDescriptor(desc);
@@ -464,6 +477,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getAccessMode
+     * 
+     * 
+     * 
+     * @return AccessMode
      */
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
@@ -472,6 +489,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getExtends
+     * 
+     * 
+     * 
+     * @return ClassDescriptor
      */
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
@@ -480,6 +501,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getIdentity
+     * 
+     * 
+     * 
+     * @return FieldDescriptor
      */
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
@@ -488,6 +513,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getJavaClass
+     * 
+     * 
+     * 
+     * @return Class
      */
     public java.lang.Class getJavaClass()
     {
@@ -496,6 +525,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getNameSpacePrefix
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpacePrefix()
     {
@@ -504,6 +537,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getNameSpaceURI
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpaceURI()
     {
@@ -512,6 +549,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getValidator
+     * 
+     * 
+     * 
+     * @return TypeValidator
      */
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
@@ -520,6 +561,10 @@ public class BindXmlDescriptor extends org.exolab.castor.xml.util.XMLClassDescri
 
     /**
      * Method getXMLName
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getXMLName()
     {

@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,21 +11,24 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
-import org.exolab.castor.mapping.xml.types.AccessType;
-import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.xml.types.ClassMappingAccessType;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class ClassMapping.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class ClassMapping implements java.io.Serializable {
 
 
@@ -33,53 +36,86 @@ public class ClassMapping implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _name
+     */
     private java.lang.String _name;
 
+    /**
+     * Field _extends
+     */
     private java.lang.Object _extends;
 
+    /**
+     * Field _depends
+     */
     private java.lang.Object _depends;
 
-    private java.util.Vector _identity;
+    /**
+     * Field _identity
+     */
+    private java.util.ArrayList _identity;
 
-    private java.lang.String _timestamp;
+    /**
+     * Field _access
+     */
+    private org.exolab.castor.mapping.xml.types.ClassMappingAccessType _access = org.exolab.castor.mapping.xml.types.ClassMappingAccessType.valueOf("shared");
 
-    private org.exolab.castor.mapping.xml.types.AccessType _access = org.exolab.castor.mapping.xml.types.AccessType.valueOf("shared");
-
+    /**
+     * Field _keyGenerator
+     */
     private java.lang.String _keyGenerator;
 
+    /**
+     * Field _autoComplete
+     */
     private boolean _autoComplete = false;
 
     /**
      * keeps track of state for field: _autoComplete
-    **/
+     */
     private boolean _has_autoComplete;
 
-    private java.lang.String _description;
-
-    private CacheTypeMapping _cacheTypeMapping;
-
-    private MapTo _mapTo;
-
-    private java.util.Vector _fieldMappingList;
-
-    private java.util.Vector _containerList;
-
-
     /**
-     * A flag which allows by-passing Castor's check for
-     * whether or not a class has a default constructor
+     * Field _verifyConstructable
      */
     private boolean _verifyConstructable = true;
-    
+
+    /**
+     * keeps track of state for field: _verifyConstructable
+     */
+    private boolean _has_verifyConstructable;
+
+    /**
+     * Field _description
+     */
+    private java.lang.String _description;
+
+    /**
+     * Field _cacheTypeMapping
+     */
+    private org.exolab.castor.mapping.xml.CacheTypeMapping _cacheTypeMapping;
+
+    /**
+     * Field _mapTo
+     */
+    private org.exolab.castor.mapping.xml.MapTo _mapTo;
+
+    /**
+     * Field _classChoice
+     */
+    private org.exolab.castor.mapping.xml.ClassChoice _classChoice;
+
+
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public ClassMapping() {
+    public ClassMapping() 
+     {
         super();
-        _identity = new Vector();
-        _fieldMappingList = new Vector();
-        _containerList = new Vector();
+        _identity = new ArrayList();
+        setAccess(org.exolab.castor.mapping.xml.types.ClassMappingAccessType.valueOf("shared"));
     } //-- org.exolab.castor.mapping.xml.ClassMapping()
 
 
@@ -88,177 +124,156 @@ public class ClassMapping implements java.io.Serializable {
     //-----------/
 
     /**
+     * Method addIdentity
      * 
-     * @param vContainer
-    **/
-    public void addContainer(Container vContainer)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        _containerList.addElement(vContainer);
-    } //-- void addContainer(Container) 
-
-    /**
      * 
-     * @param vFieldMapping
-    **/
-    public void addFieldMapping(FieldMapping vFieldMapping)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        _fieldMappingList.addElement(vFieldMapping);
-    } //-- void addFieldMapping(FieldMapping) 
-
-    /**
      * 
      * @param vIdentity
-    **/
+     */
     public void addIdentity(java.lang.String vIdentity)
         throws java.lang.IndexOutOfBoundsException
     {
-        _identity.addElement(vIdentity);
+        _identity.add(vIdentity);
     } //-- void addIdentity(java.lang.String) 
 
     /**
-    **/
+     * Method addIdentity
+     * 
+     * 
+     * 
+     * @param index
+     * @param vIdentity
+     */
+    public void addIdentity(int index, java.lang.String vIdentity)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _identity.add(index, vIdentity);
+    } //-- void addIdentity(int, java.lang.String) 
+
+    /**
+     * Method clearIdentity
+     * 
+     */
+    public void clearIdentity()
+    {
+        _identity.clear();
+    } //-- void clearIdentity() 
+
+    /**
+     * Method deleteAutoComplete
+     * 
+     */
     public void deleteAutoComplete()
     {
         this._has_autoComplete= false;
     } //-- void deleteAutoComplete() 
 
     /**
-    **/
-    public java.util.Enumeration enumerateContainer()
+     * Method deleteVerifyConstructable
+     * 
+     */
+    public void deleteVerifyConstructable()
     {
-        return _containerList.elements();
-    } //-- java.util.Enumeration enumerateContainer() 
+        this._has_verifyConstructable= false;
+    } //-- void deleteVerifyConstructable() 
 
     /**
-    **/
-    public java.util.Enumeration enumerateFieldMapping()
-    {
-        return _fieldMappingList.elements();
-    } //-- java.util.Enumeration enumerateFieldMapping() 
-
-    /**
-    **/
+     * Method enumerateIdentity
+     * 
+     * 
+     * 
+     * @return Enumeration
+     */
     public java.util.Enumeration enumerateIdentity()
     {
-        return _identity.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_identity.iterator());
     } //-- java.util.Enumeration enumerateIdentity() 
 
     /**
-    **/
-    public org.exolab.castor.mapping.xml.types.AccessType getAccess()
+     * Returns the value of field 'access'.
+     * 
+     * @return ClassMappingAccessType
+     * @return the value of field 'access'.
+     */
+    public org.exolab.castor.mapping.xml.types.ClassMappingAccessType getAccess()
     {
         return this._access;
-    } //-- org.exolab.castor.mapping.xml.types.AccessType getAccess() 
+    } //-- org.exolab.castor.mapping.xml.types.ClassMappingAccessType getAccess() 
 
     /**
-    **/
+     * Returns the value of field 'autoComplete'.
+     * 
+     * @return boolean
+     * @return the value of field 'autoComplete'.
+     */
     public boolean getAutoComplete()
     {
         return this._autoComplete;
     } //-- boolean getAutoComplete() 
 
     /**
-    **/
-    public CacheTypeMapping getCacheTypeMapping()
+     * Returns the value of field 'cacheTypeMapping'.
+     * 
+     * @return CacheTypeMapping
+     * @return the value of field 'cacheTypeMapping'.
+     */
+    public org.exolab.castor.mapping.xml.CacheTypeMapping getCacheTypeMapping()
     {
         return this._cacheTypeMapping;
-    } //-- CacheTypeMapping getCacheTypeMapping() 
+    } //-- org.exolab.castor.mapping.xml.CacheTypeMapping getCacheTypeMapping() 
 
     /**
+     * Returns the value of field 'classChoice'.
      * 
-     * @param index
-    **/
-    public Container getContainer(int index)
-        throws java.lang.IndexOutOfBoundsException
+     * @return ClassChoice
+     * @return the value of field 'classChoice'.
+     */
+    public org.exolab.castor.mapping.xml.ClassChoice getClassChoice()
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _containerList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (Container) _containerList.elementAt(index);
-    } //-- Container getContainer(int) 
+        return this._classChoice;
+    } //-- org.exolab.castor.mapping.xml.ClassChoice getClassChoice() 
 
     /**
-    **/
-    public Container[] getContainer()
-    {
-        int size = _containerList.size();
-        Container[] mArray = new Container[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (Container) _containerList.elementAt(index);
-        }
-        return mArray;
-    } //-- Container[] getContainer() 
-
-    /**
-    **/
-    public int getContainerCount()
-    {
-        return _containerList.size();
-    } //-- int getContainerCount() 
-
-    /**
-    **/
+     * Returns the value of field 'depends'.
+     * 
+     * @return Object
+     * @return the value of field 'depends'.
+     */
     public java.lang.Object getDepends()
     {
         return this._depends;
     } //-- java.lang.Object getDepends() 
 
     /**
-    **/
+     * Returns the value of field 'description'.
+     * 
+     * @return String
+     * @return the value of field 'description'.
+     */
     public java.lang.String getDescription()
     {
         return this._description;
     } //-- java.lang.String getDescription() 
 
     /**
-    **/
+     * Returns the value of field 'extends'.
+     * 
+     * @return Object
+     * @return the value of field 'extends'.
+     */
     public java.lang.Object getExtends()
     {
         return this._extends;
     } //-- java.lang.Object getExtends() 
 
     /**
+     * Method getIdentity
+     * 
+     * 
      * 
      * @param index
-    **/
-    public FieldMapping getFieldMapping(int index)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > _fieldMappingList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        
-        return (FieldMapping) _fieldMappingList.elementAt(index);
-    } //-- FieldMapping getFieldMapping(int) 
-
-    /**
-    **/
-    public FieldMapping[] getFieldMapping()
-    {
-        int size = _fieldMappingList.size();
-        FieldMapping[] mArray = new FieldMapping[size];
-        for (int index = 0; index < size; index++) {
-            mArray[index] = (FieldMapping) _fieldMappingList.elementAt(index);
-        }
-        return mArray;
-    } //-- FieldMapping[] getFieldMapping() 
-
-    /**
-    **/
-    public int getFieldMappingCount()
-    {
-        return _fieldMappingList.size();
-    } //-- int getFieldMappingCount() 
-
-    /**
-     * 
-     * @param index
-    **/
+     * @return String
+     */
     public java.lang.String getIdentity(int index)
         throws java.lang.IndexOutOfBoundsException
     {
@@ -267,73 +282,113 @@ public class ClassMapping implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (String)_identity.elementAt(index);
+        return (String)_identity.get(index);
     } //-- java.lang.String getIdentity(int) 
 
     /**
-    **/
+     * Method getIdentity
+     * 
+     * 
+     * 
+     * @return String
+     */
     public java.lang.String[] getIdentity()
     {
         int size = _identity.size();
-        java.lang.String[] mArray = new String[size];
+        java.lang.String[] mArray = new java.lang.String[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (String)_identity.elementAt(index);
+            mArray[index] = (String)_identity.get(index);
         }
         return mArray;
     } //-- java.lang.String[] getIdentity() 
 
     /**
-    **/
+     * Method getIdentityCount
+     * 
+     * 
+     * 
+     * @return int
+     */
     public int getIdentityCount()
     {
         return _identity.size();
     } //-- int getIdentityCount() 
 
-
     /**
-    **/
+     * Returns the value of field 'keyGenerator'.
+     * 
+     * @return String
+     * @return the value of field 'keyGenerator'.
+     */
     public java.lang.String getKeyGenerator()
     {
         return this._keyGenerator;
     } //-- java.lang.String getKeyGenerator() 
 
     /**
-    **/
-    public MapTo getMapTo()
+     * Returns the value of field 'mapTo'.
+     * 
+     * @return MapTo
+     * @return the value of field 'mapTo'.
+     */
+    public org.exolab.castor.mapping.xml.MapTo getMapTo()
     {
         return this._mapTo;
-    } //-- MapTo getMapTo() 
+    } //-- org.exolab.castor.mapping.xml.MapTo getMapTo() 
 
     /**
-    **/
+     * Returns the value of field 'name'.
+     * 
+     * @return String
+     * @return the value of field 'name'.
+     */
     public java.lang.String getName()
     {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
-    **/
-    public java.lang.String getTimestamp()
-    {
-        return this._timestamp;
-    } //-- java.lang.String getTimestamp() 
-
-    /**
-    **/
+     * Returns the value of field 'verifyConstructable'.
+     * 
+     * @return boolean
+     * @return the value of field 'verifyConstructable'.
+     */
     public boolean getVerifyConstructable()
     {
-        return _verifyConstructable;
+        return this._verifyConstructable;
     } //-- boolean getVerifyConstructable() 
-    
+
     /**
-    **/
+     * Method hasAutoComplete
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean hasAutoComplete()
     {
         return this._has_autoComplete;
     } //-- boolean hasAutoComplete() 
 
     /**
-    **/
+     * Method hasVerifyConstructable
+     * 
+     * 
+     * 
+     * @return boolean
+     */
+    public boolean hasVerifyConstructable()
+    {
+        return this._has_verifyConstructable;
+    } //-- boolean hasVerifyConstructable() 
+
+    /**
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -346,9 +401,12 @@ public class ClassMapping implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -357,259 +415,189 @@ public class ClassMapping implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-    **/
-    public void removeAllContainer()
-    {
-        _containerList.removeAllElements();
-    } //-- void removeAllContainer() 
-
-    /**
-    **/
-    public void removeAllFieldMapping()
-    {
-        _fieldMappingList.removeAllElements();
-    } //-- void removeAllFieldMapping() 
-
-    /**
-    **/
-    public void removeAllIdentity()
-    {
-        _identity.removeAllElements();
-    } //-- void removeAllIdentity() 
-
-    /**
+     * Method removeIdentity
      * 
-     * @param index
-    **/
-    public Container removeContainer(int index)
+     * 
+     * 
+     * @param vIdentity
+     * @return boolean
+     */
+    public boolean removeIdentity(java.lang.String vIdentity)
     {
-        Object obj = _containerList.elementAt(index);
-        _containerList.removeElementAt(index);
-        return (Container) obj;
-    } //-- Container removeContainer(int) 
+        boolean removed = _identity.remove(vIdentity);
+        return removed;
+    } //-- boolean removeIdentity(java.lang.String) 
 
     /**
+     * Sets the value of field 'access'.
      * 
-     * @param index
-    **/
-    public FieldMapping removeFieldMapping(int index)
+     * @param access the value of field 'access'.
+     */
+    public void setAccess(org.exolab.castor.mapping.xml.types.ClassMappingAccessType access)
     {
-        Object obj = _fieldMappingList.elementAt(index);
-        _fieldMappingList.removeElementAt(index);
-        return (FieldMapping) obj;
-    } //-- FieldMapping removeFieldMapping(int) 
+        this._access = access;
+    } //-- void setAccess(org.exolab.castor.mapping.xml.types.ClassMappingAccessType) 
 
     /**
+     * Sets the value of field 'autoComplete'.
      * 
-     * @param index
-    **/
-    public java.lang.String removeIdentity(int index)
+     * @param autoComplete the value of field 'autoComplete'.
+     */
+    public void setAutoComplete(boolean autoComplete)
     {
-        Object obj = _identity.elementAt(index);
-        _identity.removeElementAt(index);
-        return (String)obj;
-    } //-- java.lang.String removeIdentity(int) 
-
-    /**
-     * 
-     * @param _access
-    **/
-    public void setAccess(org.exolab.castor.mapping.xml.types.AccessType _access)
-    {
-        this._access = _access;
-    } //-- void setAccess(org.exolab.castor.mapping.xml.types.AccessType) 
-
-    /**
-     * 
-     * @param _autoComplete
-    **/
-    public void setAutoComplete(boolean _autoComplete)
-    {
-        this._autoComplete = _autoComplete;
+        this._autoComplete = autoComplete;
         this._has_autoComplete = true;
     } //-- void setAutoComplete(boolean) 
 
     /**
+     * Sets the value of field 'cacheTypeMapping'.
      * 
-     * @param _cacheTypeMapping
-    **/
-    public void setCacheTypeMapping(CacheTypeMapping _cacheTypeMapping)
+     * @param cacheTypeMapping the value of field 'cacheTypeMapping'
+     */
+    public void setCacheTypeMapping(org.exolab.castor.mapping.xml.CacheTypeMapping cacheTypeMapping)
     {
-        this._cacheTypeMapping = _cacheTypeMapping;
-    } //-- void setCacheTypeMapping(CacheTypeMapping) 
+        this._cacheTypeMapping = cacheTypeMapping;
+    } //-- void setCacheTypeMapping(org.exolab.castor.mapping.xml.CacheTypeMapping) 
 
     /**
+     * Sets the value of field 'classChoice'.
      * 
-     * @param vContainer
-     * @param index
-    **/
-    public void setContainer(Container vContainer, int index)
-        throws java.lang.IndexOutOfBoundsException
+     * @param classChoice the value of field 'classChoice'.
+     */
+    public void setClassChoice(org.exolab.castor.mapping.xml.ClassChoice classChoice)
     {
-        //-- check bounds for index
-        if ((index < 0) || (index > _containerList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        _containerList.setElementAt(vContainer, index);
-    } //-- void setContainer(Container, int) 
+        this._classChoice = classChoice;
+    } //-- void setClassChoice(org.exolab.castor.mapping.xml.ClassChoice) 
 
     /**
+     * Sets the value of field 'depends'.
      * 
-     * @param containerArray
-    **/
-    public void setContainer(Container[] containerArray)
+     * @param depends the value of field 'depends'.
+     */
+    public void setDepends(java.lang.Object depends)
     {
-        //-- copy array
-        _containerList.removeAllElements();
-        for (int i = 0; i < containerArray.length; i++) {
-            _containerList.addElement(containerArray[i]);
-        }
-    } //-- void setContainer(Container) 
-
-    /**
-     * 
-     * @param _depends
-    **/
-    public void setDepends(java.lang.Object _depends)
-    {
-        this._depends = _depends;
+        this._depends = depends;
     } //-- void setDepends(java.lang.Object) 
 
     /**
+     * Sets the value of field 'description'.
      * 
-     * @param _description
-    **/
-    public void setDescription(java.lang.String _description)
+     * @param description the value of field 'description'.
+     */
+    public void setDescription(java.lang.String description)
     {
-        this._description = _description;
+        this._description = description;
     } //-- void setDescription(java.lang.String) 
 
     /**
+     * Sets the value of field 'extends'.
      * 
      * @param _extends
-    **/
+     * @param extends the value of field 'extends'.
+     */
     public void setExtends(java.lang.Object _extends)
     {
         this._extends = _extends;
     } //-- void setExtends(java.lang.Object) 
 
     /**
+     * Method setIdentity
      * 
-     * @param vFieldMapping
+     * 
+     * 
      * @param index
-    **/
-    public void setFieldMapping(FieldMapping vFieldMapping, int index)
-        throws java.lang.IndexOutOfBoundsException
-    {
-        //-- check bounds for index
-        if ((index < 0) || (index > _fieldMappingList.size())) {
-            throw new IndexOutOfBoundsException();
-        }
-        _fieldMappingList.setElementAt(vFieldMapping, index);
-    } //-- void setFieldMapping(FieldMapping, int) 
-
-    /**
-     * 
-     * @param fieldMappingArray
-    **/
-    public void setFieldMapping(FieldMapping[] fieldMappingArray)
-    {
-        //-- copy array
-        _fieldMappingList.removeAllElements();
-        for (int i = 0; i < fieldMappingArray.length; i++) {
-            _fieldMappingList.addElement(fieldMappingArray[i]);
-        }
-    } //-- void setFieldMapping(FieldMapping) 
-
-    /**
-     * 
      * @param vIdentity
-     * @param index
-    **/
-    public void setIdentity(java.lang.String vIdentity, int index)
+     */
+    public void setIdentity(int index, java.lang.String vIdentity)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _identity.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _identity.setElementAt(vIdentity, index);
-    } //-- void setIdentity(java.lang.String, int) 
+        _identity.set(index, vIdentity);
+    } //-- void setIdentity(int, java.lang.String) 
 
     /**
+     * Method setIdentity
+     * 
+     * 
      * 
      * @param identityArray
-    **/
+     */
     public void setIdentity(java.lang.String[] identityArray)
     {
         //-- copy array
-        _identity.removeAllElements();
+        _identity.clear();
         for (int i = 0; i < identityArray.length; i++) {
-            _identity.addElement(identityArray[i]);
+            _identity.add(identityArray[i]);
         }
     } //-- void setIdentity(java.lang.String) 
 
     /**
+     * Sets the value of field 'keyGenerator'.
      * 
-     * @param _keyGenerator
-    **/
-    public void setKeyGenerator(java.lang.String _keyGenerator)
+     * @param keyGenerator the value of field 'keyGenerator'.
+     */
+    public void setKeyGenerator(java.lang.String keyGenerator)
     {
-        this._keyGenerator = _keyGenerator;
+        this._keyGenerator = keyGenerator;
     } //-- void setKeyGenerator(java.lang.String) 
 
     /**
+     * Sets the value of field 'mapTo'.
      * 
-     * @param _mapTo
-    **/
-    public void setMapTo(MapTo _mapTo)
+     * @param mapTo the value of field 'mapTo'.
+     */
+    public void setMapTo(org.exolab.castor.mapping.xml.MapTo mapTo)
     {
-        this._mapTo = _mapTo;
-    } //-- void setMapTo(MapTo) 
+        this._mapTo = mapTo;
+    } //-- void setMapTo(org.exolab.castor.mapping.xml.MapTo) 
 
     /**
+     * Sets the value of field 'name'.
      * 
-     * @param _name
-    **/
-    public void setName(java.lang.String _name)
+     * @param name the value of field 'name'.
+     */
+    public void setName(java.lang.String name)
     {
-        this._name = _name;
+        this._name = name;
     } //-- void setName(java.lang.String) 
 
     /**
+     * Sets the value of field 'verifyConstructable'.
      * 
-     * @param _timestamp
-    **/
-    public void setTimestamp(java.lang.String _timestamp)
+     * @param verifyConstructable the value of field
+     * 'verifyConstructable'.
+     */
+    public void setVerifyConstructable(boolean verifyConstructable)
     {
-        this._timestamp = _timestamp;
-    } //-- void setTimestamp(java.lang.String) 
-    
-    
-    /**
-     * 
-     * @param verify
-    **/
-    public void setVerifyConstructable(boolean verify)
-    {
-        this._verifyConstructable = verify;
+        this._verifyConstructable = verifyConstructable;
+        this._has_verifyConstructable = true;
     } //-- void setVerifyConstructable(boolean) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return ClassMapping
+     */
     public static org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -617,11 +605,13 @@ public class ClassMapping implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.ClassMapping unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

@@ -238,7 +238,7 @@ public final class ClassMolderHelper {
             }
             identities = origin.getIdentity();
             extendFields = getFullFields(extend);
-            thisFields = clsMap.getFieldMapping();
+            thisFields = clsMap.getClassChoice().getFieldMapping();
 
             fieldList = new ArrayList(extendFields.length + thisFields.length
                     - identities.length);
@@ -268,7 +268,7 @@ public final class ClassMolderHelper {
             }
 
             // return array of fieldmapping without the id field
-            thisFields = clsMap.getFieldMapping();
+            thisFields = clsMap.getClassChoice().getFieldMapping();
             fields = new FieldMapping[thisFields.length - identities.length];
 
             for (int i = 0, j = 0; i < thisFields.length; i++) {
@@ -320,7 +320,7 @@ public final class ClassMolderHelper {
         }
 
         fmIds = new FieldMapping[identities.length];
-        fmBase = base.getFieldMapping();
+        fmBase = base.getClassChoice().getFieldMapping();
         for (int i = 0; i < fmBase.length; i++) {
             for (int k = 0; k < identities.length; k++) {
                 if (fmBase[i].getName().equals(identities[k])) {

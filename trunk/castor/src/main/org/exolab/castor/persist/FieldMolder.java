@@ -53,6 +53,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,7 +62,7 @@ import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.FieldMapping;
-import org.exolab.castor.mapping.xml.types.DirtyType;
+import org.exolab.castor.mapping.xml.types.SqlDirtyType;
 import org.exolab.castor.util.Messages;
 
 
@@ -134,7 +135,16 @@ public class FieldMolder {
 
     private boolean _readonly;
     
+    /**
+     * Indicates whether this field has been flagged as transient, i.e. not to be considered 
+     * during any persistence operations.
+     */
     private boolean _transient;
+    
+    /**
+     * Specifies the jav.autil.Comparator instance to use with a SortedSet collection.
+     */
+    private String _comparator;
 
     /**
      * Collection of reflection service keyed by ClassLoader instance.
@@ -155,6 +165,14 @@ public class FieldMolder {
     public String getName()
     {
         return _fieldName;
+    }
+    
+    /**
+     * Returns the java.util.Comparator instance to be used with SortedSets; null, if not specified.
+     * @return the java.util.Comparator instance to be used with SortedSets
+     */
+    public String getComparator() {
+        return _comparator;
     }
 
     /*
@@ -479,7 +497,7 @@ public class FieldMolder {
 
             if ( fieldMap.getSql() == null
                     || fieldMap.getSql().getDirty() == null
-                    || ! fieldMap.getSql().getDirty().equals(DirtyType.IGNORE) ) {
+                    || ! fieldMap.getSql().getDirty().equals(SqlDirtyType.IGNORE) ) {
                 _check = true;
             }
 
@@ -496,8 +514,13 @@ public class FieldMolder {
                 _store = true;
 
             if ( fieldMap.getSql() != null )
-                _readonly = fieldMap.getSql().getReadonly();
+                _readonly = fieldMap.getSql().getReadOnly();
 
+            // check if comparator is specified, and if so, use it
+            if (fieldMap.getComparator() != null) {
+                _comparator = fieldMap.getComparator();
+            }
+            
             // check whether complete field is declared transient
             _transient = fieldMap.getTransient();
             
@@ -527,6 +550,10 @@ public class FieldMolder {
               } else {
                 _colClass = getCollectionType(fieldMap.getCollection().toString(),
                                               _lazy);
+                
+                if (_colClass != SortedSet.class && _comparator != null) {
+                    throw new MappingException (Messages.message("mapping.wrong.use.of.comparator"));                
+                }
               }
               _store = false;
             }

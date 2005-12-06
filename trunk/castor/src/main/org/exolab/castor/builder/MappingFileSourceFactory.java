@@ -228,7 +228,7 @@ public class MappingFileSourceFactory {
 
 		//-- create field mapping
         FieldMapping fieldMap = new FieldMapping();
-        classMapping.addFieldMapping(fieldMap);
+        classMapping.getClassChoice().addFieldMapping(fieldMap);
         String fieldName = member.getName();
         if (fieldName.charAt(0) == '_') {
             fieldName = fieldName.substring(1);

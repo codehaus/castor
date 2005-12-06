@@ -101,6 +101,55 @@ public class JDOFieldDescriptor
         //if ( sqlName == null )
         //    throw new IllegalArgumentException( "Argument 'sqlName' is null" );
         _sqlName = (sqlName.length == 0 ? null : sqlName);
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         _dirtyCheck = dirtyCheck;
         _manyTable = manyTable;
         _manyKey = (manyKey.length>0? manyKey : null);

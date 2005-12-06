@@ -138,6 +138,9 @@ public class DelegateFieldDescriptor
         return _desc.getClassDescriptor();
     }
 
+    public String getComparator() {
+        return _desc.getComparator();
+    }
 
 }
 

@@ -111,6 +111,7 @@
             </xsd:restriction>
          </xsd:simpleType>
       </xsd:attribute>
+      <xsd:attribute name="comparator"    type="xsd:string"   use="optional"/>
     </xsd:complexType>
   </xsd:element>
 

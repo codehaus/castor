@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -21,7 +21,7 @@ import org.exolab.castor.xml.validators.*;
  * 
  * @version $Revision$ $Date$
  */
-public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTypeDescriptor {
+public class PropertyDescriptor extends PropertyTypeDescriptor {
 
 
       //--------------------------/
@@ -53,9 +53,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
      //- Constructors -/
     //----------------/
 
-    public PropertyDescriptor() {
+    public PropertyDescriptor() 
+     {
         super();
-        setExtendsWithoutFlatten(new org.exolab.castor.mapping.xml.PropertyTypeDescriptor());
+        setExtendsWithoutFlatten(new PropertyTypeDescriptor());
         xmlName = "property";
     } //-- org.exolab.castor.mapping.xml.PropertyDescriptor()
 
@@ -66,6 +67,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getAccessMode
+     * 
+     * 
+     * 
+     * @return AccessMode
      */
     public org.exolab.castor.mapping.AccessMode getAccessMode()
     {
@@ -74,6 +79,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getExtends
+     * 
+     * 
+     * 
+     * @return ClassDescriptor
      */
     public org.exolab.castor.mapping.ClassDescriptor getExtends()
     {
@@ -82,6 +91,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getIdentity
+     * 
+     * 
+     * 
+     * @return FieldDescriptor
      */
     public org.exolab.castor.mapping.FieldDescriptor getIdentity()
     {
@@ -92,6 +105,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getJavaClass
+     * 
+     * 
+     * 
+     * @return Class
      */
     public java.lang.Class getJavaClass()
     {
@@ -100,6 +117,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getNameSpacePrefix
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpacePrefix()
     {
@@ -108,6 +129,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getNameSpaceURI
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getNameSpaceURI()
     {
@@ -116,6 +141,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getValidator
+     * 
+     * 
+     * 
+     * @return TypeValidator
      */
     public org.exolab.castor.xml.TypeValidator getValidator()
     {
@@ -124,6 +153,10 @@ public class PropertyDescriptor extends org.exolab.castor.mapping.xml.PropertyTy
 
     /**
      * Method getXMLName
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String getXMLName()
     {

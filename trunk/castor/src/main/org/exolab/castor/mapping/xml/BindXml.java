@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -15,8 +15,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
 import org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType;
 import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
 import org.exolab.castor.xml.MarshalException;
@@ -114,23 +114,24 @@ public class BindXml implements java.io.Serializable {
     private boolean _has_transient;
 
     /**
-     * Field _clazz
+     * Field _classMapping
      */
     private org.exolab.castor.mapping.xml.ClassMapping _classMapping;
 
     /**
      * Field _propertyList
      */
-    private java.util.Vector _propertyList;
+    private java.util.ArrayList _propertyList;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public BindXml() {
+    public BindXml() 
+     {
         super();
-        _propertyList = new Vector();
+        _propertyList = new ArrayList();
     } //-- org.exolab.castor.mapping.xml.BindXml()
 
 
@@ -141,28 +142,42 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method addProperty
      * 
+     * 
+     * 
      * @param vProperty
      */
-    public void addProperty(Property vProperty)
+    public void addProperty(org.exolab.castor.mapping.xml.Property vProperty)
         throws java.lang.IndexOutOfBoundsException
     {
-        _propertyList.addElement(vProperty);
-    } //-- void addProperty(Property) 
+        _propertyList.add(vProperty);
+    } //-- void addProperty(org.exolab.castor.mapping.xml.Property) 
 
     /**
      * Method addProperty
      * 
+     * 
+     * 
      * @param index
      * @param vProperty
      */
-    public void addProperty(int index, Property vProperty)
+    public void addProperty(int index, org.exolab.castor.mapping.xml.Property vProperty)
         throws java.lang.IndexOutOfBoundsException
     {
-        _propertyList.insertElementAt(vProperty, index);
-    } //-- void addProperty(int, Property) 
+        _propertyList.add(index, vProperty);
+    } //-- void addProperty(int, org.exolab.castor.mapping.xml.Property) 
+
+    /**
+     * Method clearProperty
+     * 
+     */
+    public void clearProperty()
+    {
+        _propertyList.clear();
+    } //-- void clearProperty() 
 
     /**
      * Method deleteReference
+     * 
      */
     public void deleteReference()
     {
@@ -171,6 +186,7 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Method deleteTransient
+     * 
      */
     public void deleteTransient()
     {
@@ -179,10 +195,14 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Method enumerateProperty
+     * 
+     * 
+     * 
+     * @return Enumeration
      */
     public java.util.Enumeration enumerateProperty()
     {
-        return _propertyList.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_propertyList.iterator());
     } //-- java.util.Enumeration enumerateProperty() 
 
     /**
@@ -200,6 +220,7 @@ public class BindXml implements java.io.Serializable {
      *  name is used as the XML name.
      *  
      * 
+     * @return BindXmlAutoNamingType
      * @return the value of field 'autoNaming'.
      */
     public org.exolab.castor.mapping.xml.types.BindXmlAutoNamingType getAutoNaming()
@@ -210,6 +231,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'classMapping'.
      * 
+     * @return ClassMapping
      * @return the value of field 'classMapping'.
      */
     public org.exolab.castor.mapping.xml.ClassMapping getClassMapping()
@@ -225,6 +247,7 @@ public class BindXml implements java.io.Serializable {
      *  where names are separated by "/".
      *  
      * 
+     * @return String
      * @return the value of field 'location'.
      */
     public java.lang.String getLocation()
@@ -235,6 +258,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'matches'.
      * 
+     * @return String
      * @return the value of field 'matches'.
      */
     public java.lang.String getMatches()
@@ -249,6 +273,7 @@ public class BindXml implements java.io.Serializable {
      *  field associated with the 'bind-xml' element.
      *  
      * 
+     * @return String
      * @return the value of field 'name'.
      */
     public java.lang.String getName()
@@ -259,6 +284,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'node'.
      * 
+     * @return BindXmlNodeType
      * @return the value of field 'node'.
      */
     public org.exolab.castor.mapping.xml.types.BindXmlNodeType getNode()
@@ -269,9 +295,12 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method getProperty
      * 
+     * 
+     * 
      * @param index
+     * @return Property
      */
-    public Property getProperty(int index)
+    public org.exolab.castor.mapping.xml.Property getProperty(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -279,24 +308,32 @@ public class BindXml implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (Property) _propertyList.elementAt(index);
-    } //-- Property getProperty(int) 
+        return (org.exolab.castor.mapping.xml.Property) _propertyList.get(index);
+    } //-- org.exolab.castor.mapping.xml.Property getProperty(int) 
 
     /**
      * Method getProperty
+     * 
+     * 
+     * 
+     * @return Property
      */
-    public Property[] getProperty()
+    public org.exolab.castor.mapping.xml.Property[] getProperty()
     {
         int size = _propertyList.size();
-        Property[] mArray = new Property[size];
+        org.exolab.castor.mapping.xml.Property[] mArray = new org.exolab.castor.mapping.xml.Property[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (Property) _propertyList.elementAt(index);
+            mArray[index] = (org.exolab.castor.mapping.xml.Property) _propertyList.get(index);
         }
         return mArray;
-    } //-- Property[] getProperty() 
+    } //-- org.exolab.castor.mapping.xml.Property[] getProperty() 
 
     /**
      * Method getPropertyCount
+     * 
+     * 
+     * 
+     * @return int
      */
     public int getPropertyCount()
     {
@@ -306,6 +343,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'QNamePrefix'.
      * 
+     * @return String
      * @return the value of field 'QNamePrefix'.
      */
     public java.lang.String getQNamePrefix()
@@ -316,6 +354,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'reference'.
      * 
+     * @return boolean
      * @return the value of field 'reference'.
      */
     public boolean getReference()
@@ -326,6 +365,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'transient'.
      * 
+     * @return boolean
      * @return the value of field 'transient'.
      */
     public boolean getTransient()
@@ -336,6 +376,7 @@ public class BindXml implements java.io.Serializable {
     /**
      * Returns the value of field 'type'.
      * 
+     * @return String
      * @return the value of field 'type'.
      */
     public java.lang.String getType()
@@ -345,6 +386,10 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Method hasReference
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean hasReference()
     {
@@ -353,6 +398,10 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Method hasTransient
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean hasTransient()
     {
@@ -361,6 +410,10 @@ public class BindXml implements java.io.Serializable {
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -376,6 +429,8 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -388,6 +443,8 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param handler
      */
     public void marshal(org.xml.sax.ContentHandler handler)
@@ -398,24 +455,18 @@ public class BindXml implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Method removeAllProperty
-     */
-    public void removeAllProperty()
-    {
-        _propertyList.removeAllElements();
-    } //-- void removeAllProperty() 
-
-    /**
      * Method removeProperty
      * 
-     * @param index
+     * 
+     * 
+     * @param vProperty
+     * @return boolean
      */
-    public Property removeProperty(int index)
+    public boolean removeProperty(org.exolab.castor.mapping.xml.Property vProperty)
     {
-        java.lang.Object obj = _propertyList.elementAt(index);
-        _propertyList.removeElementAt(index);
-        return (Property) obj;
-    } //-- Property removeProperty(int) 
+        boolean removed = _propertyList.remove(vProperty);
+        return removed;
+    } //-- boolean removeProperty(org.exolab.castor.mapping.xml.Property) 
 
     /**
      * Sets the value of field 'autoNaming'. The field 'autoNaming'
@@ -501,32 +552,36 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method setProperty
      * 
+     * 
+     * 
      * @param index
      * @param vProperty
      */
-    public void setProperty(int index, Property vProperty)
+    public void setProperty(int index, org.exolab.castor.mapping.xml.Property vProperty)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _propertyList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _propertyList.setElementAt(vProperty, index);
-    } //-- void setProperty(int, Property) 
+        _propertyList.set(index, vProperty);
+    } //-- void setProperty(int, org.exolab.castor.mapping.xml.Property) 
 
     /**
      * Method setProperty
      * 
+     * 
+     * 
      * @param propertyArray
      */
-    public void setProperty(Property[] propertyArray)
+    public void setProperty(org.exolab.castor.mapping.xml.Property[] propertyArray)
     {
         //-- copy array
-        _propertyList.removeAllElements();
+        _propertyList.clear();
         for (int i = 0; i < propertyArray.length; i++) {
-            _propertyList.addElement(propertyArray[i]);
+            _propertyList.add(propertyArray[i]);
         }
-    } //-- void setProperty(Property) 
+    } //-- void setProperty(org.exolab.castor.mapping.xml.Property) 
 
     /**
      * Sets the value of field 'QNamePrefix'.
@@ -574,16 +629,20 @@ public class BindXml implements java.io.Serializable {
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return BindXml
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.BindXml) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.BindXml.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+    } //-- org.exolab.castor.mapping.xml.BindXml unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
