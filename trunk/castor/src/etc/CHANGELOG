@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1278 using contribution from Dave Brosius[dbrosius@qis.net]
+       Allowed java to be on a path with spaces.
+       Details: http://jira.codehaus.org/browse/CASTOR-1278
+       (Ralf - 20051206)
+       
 JDO:   Fixed bug CASTOR-1230 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactored cache to implement java.util.Map interface into new org.castor.cache package.
        Details: http://jira.codehaus.org/browse/CASTOR-1230
