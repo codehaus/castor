@@ -495,7 +495,7 @@ public class SimpleTypesFactory
             }
             else {
                 //sets the information linked with the pseudo facet
-                if (new RealType().getClass().isInstance(result))
+                if (RealType.class.isInstance(result))
                 {
                     RealType realResult= (RealType)result;
                     if      (prop.getName().equals("minM")) realResult.setMinMantissa( Long.parseLong(prop.getValue()) );

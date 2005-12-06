@@ -267,7 +267,7 @@ public class IntegerValidator extends PatternValidator
         }
 
         if (_totalDigits != -1) {
-            int length = new Integer(i).toString().length();
+            int length = Integer.toString(i).length();
             if ( length > _totalDigits ) {
                 String err = i + " doesn't have the correct number of digits, it must be less than or equal to "+_totalDigits;
                 throw new ValidationException(err);

@@ -177,13 +177,8 @@ public class XMLClassDescriptorAdapter
             if ((identities != null) && (identities.length > 1)) {
                 int size = fields.length + identities.length;
                 FieldDescriptor[] newFields = new FieldDescriptor[size];
-                int idx = 0;
-                for ( ; idx < fields.length; idx++) {
-                    newFields[idx] = fields[idx];
-                }
-                for (int i = 0; i < identities.length; i++) {
-                    newFields[idx++] = identities[i];
-                }
+                System.arraycopy(fields, 0, newFields, 0, fields.length);
+                System.arraycopy(identities, 0, newFields, fields.length, identities.length);
                 fields = newFields;
             }
         }

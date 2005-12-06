@@ -380,7 +380,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
         //create a Text Node
         String temp = new String(ch, start, length);
         //skip whitespaces
-        if (isWhitespace(temp) & !_character)
+        if (isWhitespace(temp) && !_character)
             return;
         else {
             AnyNode tempNode = new AnyNode(AnyNode.TEXT, null, null, null, temp);
