@@ -218,7 +218,7 @@ public class JDOMappingLoader extends MappingLoader {
         CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
         if ( cacheMapping != null )
             jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
-                    keyGenDesc, cacheMapping.getType().toString(), cacheMapping.getCapacity() );
+                    keyGenDesc, cacheMapping.getType(), cacheMapping.getCapacity() );
         else
             jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
                     keyGenDesc, null, 0 );

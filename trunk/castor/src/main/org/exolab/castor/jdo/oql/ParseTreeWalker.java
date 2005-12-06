@@ -1362,7 +1362,7 @@ public class ParseTreeWalker implements TokenTypes
         //char replace function should really be somewhere else
         //first change \" to "
         sb = new StringBuffer();
-        String copy = new String(exprTree.getToken().getTokenValue());
+        String copy = exprTree.getToken().getTokenValue();
 
         int pos = copy.indexOf("\\\"", 1);
         while ( pos != -1 ) {

@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1279 using contribution from Dave Brosius[dbrosius@qis.net]
+       Removed some unnecessary object constructions and removed manual array copy.
+       Details: http://jira.codehaus.org/browse/CASTOR-1279
+       (Ralf - 20051206)
+       
 All:   Fixed bug CASTOR-1278 using contribution from Dave Brosius[dbrosius@qis.net]
        Allowed java to be on a path with spaces.
        Details: http://jira.codehaus.org/browse/CASTOR-1278

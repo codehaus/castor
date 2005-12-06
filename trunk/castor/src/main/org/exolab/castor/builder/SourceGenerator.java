@@ -440,9 +440,9 @@ public class SourceGenerator
                 SAXParseException spe = (SAXParseException)except;
                 _dialog.notify("SAXParseException: " + spe);
                 _dialog.notify(" - occured at line ");
-                _dialog.notify(new Integer(spe.getLineNumber()).toString());
+                _dialog.notify(Integer.toString(spe.getLineNumber()));
                 _dialog.notify(", column ");
-                _dialog.notify(new Integer(spe.getColumnNumber()).toString());
+                _dialog.notify(Integer.toString(spe.getColumnNumber()));
             }
             else except.printStackTrace();
             return;
