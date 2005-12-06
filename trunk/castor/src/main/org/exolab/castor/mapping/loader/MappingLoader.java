@@ -458,7 +458,7 @@ public abstract class MappingLoader
         // Get field descriptors first. Note: order must be preserved for fields,
         // but not for relations or container fields. Add all the container fields
         // in there.
-        FieldMapping[] fm = clsMap.getFieldMapping();
+        FieldMapping[] fm = clsMap.getClassChoice().getFieldMapping();
         fields = createFieldDescs( javaClass, fm );
 
         // Make sure there are no two fields with the same name.
@@ -825,7 +825,7 @@ public abstract class MappingLoader
                 
         FieldDescriptorImpl fieldDesc 
             = new FieldDescriptorImpl( fieldName, typeInfo, handler,
-                fieldMap.getTransient() );
+                fieldMap.getTransient(), fieldMap.getComparator() );
 
         fieldDesc.setRequired(fieldMap.getRequired());
 

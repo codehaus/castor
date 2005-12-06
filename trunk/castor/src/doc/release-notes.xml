@@ -29,7 +29,19 @@
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
                 <h2>New features</h2>
+				
+				<h3>Support for collections of type 'SortedSet' (incl. use of Comparator)</h3>
+				
+				Support has been added for the new collection type 'sortedset'. This allows users
+				of Castor (XML and JDO) to use collections of type <tt>java.util.SortedSet</tt> to allow
+				for automatic ordering of the collection upon e.g. insertion of the data.
+				
+				User can either specify a <tt>java.util.Comparator</tt> instance using the <i>comparator</i>
+				attribute on the field mapping, or make the entities storred within the <tt>SortedSet</tt> 
+				implement <tt>java.util.Comparable</tt>.
                     
+				<h2>Changes</h2>
+				
                 <h3>Moved JDO configuration from org.exolab.castor to org.castor package</h3>
 				
                 <p>With this refactoring JDOConfFactory has also been moved from

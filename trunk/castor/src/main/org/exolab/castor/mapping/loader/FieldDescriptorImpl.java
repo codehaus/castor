@@ -122,6 +122,12 @@ public class FieldDescriptorImpl
      * The type convertor parameter.
      */
     private String               _convertorParam;
+    
+    /**
+     * Name of a class that implements the {@see java.util.Comparator} interface.
+     * To be used together with the "sortedSet" collection type.
+     */
+    private String _comparator;
 
     /**
      * Constructs a new field descriptor.
@@ -132,7 +138,7 @@ public class FieldDescriptorImpl
      * @param trans True if the field is transient
      */
     public FieldDescriptorImpl( String fieldName, TypeInfo typeInfo,
-                FieldHandler handler, boolean trans )
+                FieldHandler handler, boolean trans, String comparator)
         throws MappingException
     {
         if ( fieldName == null )
@@ -146,6 +152,7 @@ public class FieldDescriptorImpl
         _multi = ( typeInfo.getCollectionHandler() != null );
         _convertor = typeInfo.getConvertorFrom();
         _convertorParam = typeInfo.getConvertorParam();
+        _comparator = comparator;
     }
 
 
@@ -163,6 +170,7 @@ public class FieldDescriptorImpl
         this._required = fieldDesc.isRequired();
         this._clsDesc = fieldDesc.getClassDescriptor();
         this._multi = fieldDesc.isMultivalued();
+        this._comparator = fieldDesc.getComparator();
     }
 
     /**
@@ -308,6 +316,23 @@ public class FieldDescriptorImpl
         return _fieldName + "(" + _fieldType.getName() + ")";
     }
 
+    /**
+     * @inheritDoc
+     * @see org.exolab.castor.mapping.FieldDescriptor#getComparator()
+     */
+    public String getComparator() {
+        return _comparator;
+    }
 
+    /**
+     * Sets the name of a class that implements the java.util.Comparator interface.
+     * @param comparator Name of a class that implements the java.util.Comparator interface.
+     */
+    void setComparator(String comparator) {
+        this._comparator = comparator;
+        
+    }
+
+    
 }
 

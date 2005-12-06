@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,18 +11,21 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class MapTo.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class MapTo implements java.io.Serializable {
 
 
@@ -30,16 +33,34 @@ public class MapTo implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _table
+     */
     private java.lang.String _table;
 
+    /**
+     * Field _xml
+     */
     private java.lang.String _xml;
 
+    /**
+     * Field _nsUri
+     */
     private java.lang.String _nsUri;
 
+    /**
+     * Field _nsPrefix
+     */
     private java.lang.String _nsPrefix;
 
+    /**
+     * Field _ldapDn
+     */
     private java.lang.String _ldapDn;
 
+    /**
+     * Field _ldapOc
+     */
     private java.lang.String _ldapOc;
 
 
@@ -47,7 +68,8 @@ public class MapTo implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public MapTo() {
+    public MapTo() 
+     {
         super();
     } //-- org.exolab.castor.mapping.xml.MapTo()
 
@@ -57,49 +79,78 @@ public class MapTo implements java.io.Serializable {
     //-----------/
 
     /**
-    **/
+     * Returns the value of field 'ldapDn'.
+     * 
+     * @return String
+     * @return the value of field 'ldapDn'.
+     */
     public java.lang.String getLdapDn()
     {
         return this._ldapDn;
     } //-- java.lang.String getLdapDn() 
 
     /**
-    **/
+     * Returns the value of field 'ldapOc'.
+     * 
+     * @return String
+     * @return the value of field 'ldapOc'.
+     */
     public java.lang.String getLdapOc()
     {
         return this._ldapOc;
     } //-- java.lang.String getLdapOc() 
 
     /**
-    **/
+     * Returns the value of field 'nsPrefix'.
+     * 
+     * @return String
+     * @return the value of field 'nsPrefix'.
+     */
     public java.lang.String getNsPrefix()
     {
         return this._nsPrefix;
     } //-- java.lang.String getNsPrefix() 
 
     /**
-    **/
+     * Returns the value of field 'nsUri'.
+     * 
+     * @return String
+     * @return the value of field 'nsUri'.
+     */
     public java.lang.String getNsUri()
     {
         return this._nsUri;
     } //-- java.lang.String getNsUri() 
 
     /**
-    **/
+     * Returns the value of field 'table'.
+     * 
+     * @return String
+     * @return the value of field 'table'.
+     */
     public java.lang.String getTable()
     {
         return this._table;
     } //-- java.lang.String getTable() 
 
     /**
-    **/
+     * Returns the value of field 'xml'.
+     * 
+     * @return String
+     * @return the value of field 'xml'.
+     */
     public java.lang.String getXml()
     {
         return this._xml;
     } //-- java.lang.String getXml() 
 
     /**
-    **/
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -112,9 +163,12 @@ public class MapTo implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -123,74 +177,87 @@ public class MapTo implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
+     * Sets the value of field 'ldapDn'.
      * 
-     * @param _ldapDn
-    **/
-    public void setLdapDn(java.lang.String _ldapDn)
+     * @param ldapDn the value of field 'ldapDn'.
+     */
+    public void setLdapDn(java.lang.String ldapDn)
     {
-        this._ldapDn = _ldapDn;
+        this._ldapDn = ldapDn;
     } //-- void setLdapDn(java.lang.String) 
 
     /**
+     * Sets the value of field 'ldapOc'.
      * 
-     * @param _ldapOc
-    **/
-    public void setLdapOc(java.lang.String _ldapOc)
+     * @param ldapOc the value of field 'ldapOc'.
+     */
+    public void setLdapOc(java.lang.String ldapOc)
     {
-        this._ldapOc = _ldapOc;
+        this._ldapOc = ldapOc;
     } //-- void setLdapOc(java.lang.String) 
 
     /**
+     * Sets the value of field 'nsPrefix'.
      * 
-     * @param _nsPrefix
-    **/
-    public void setNsPrefix(java.lang.String _nsPrefix)
+     * @param nsPrefix the value of field 'nsPrefix'.
+     */
+    public void setNsPrefix(java.lang.String nsPrefix)
     {
-        this._nsPrefix = _nsPrefix;
+        this._nsPrefix = nsPrefix;
     } //-- void setNsPrefix(java.lang.String) 
 
     /**
+     * Sets the value of field 'nsUri'.
      * 
-     * @param _nsUri
-    **/
-    public void setNsUri(java.lang.String _nsUri)
+     * @param nsUri the value of field 'nsUri'.
+     */
+    public void setNsUri(java.lang.String nsUri)
     {
-        this._nsUri = _nsUri;
+        this._nsUri = nsUri;
     } //-- void setNsUri(java.lang.String) 
 
     /**
+     * Sets the value of field 'table'.
      * 
-     * @param _table
-    **/
-    public void setTable(java.lang.String _table)
+     * @param table the value of field 'table'.
+     */
+    public void setTable(java.lang.String table)
     {
-        this._table = _table;
+        this._table = table;
     } //-- void setTable(java.lang.String) 
 
     /**
+     * Sets the value of field 'xml'.
      * 
-     * @param _xml
-    **/
-    public void setXml(java.lang.String _xml)
+     * @param xml the value of field 'xml'.
+     */
+    public void setXml(java.lang.String xml)
     {
-        this._xml = _xml;
+        this._xml = xml;
     } //-- void setXml(java.lang.String) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return MapTo
+     */
     public static org.exolab.castor.mapping.xml.MapTo unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -198,11 +265,13 @@ public class MapTo implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.MapTo unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

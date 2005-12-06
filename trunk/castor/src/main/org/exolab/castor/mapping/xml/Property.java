@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -26,7 +26,7 @@ import org.xml.sax.ContentHandler;
  * 
  * @version $Revision$ $Date$
  */
-public class Property extends org.exolab.castor.mapping.xml.PropertyType 
+public class Property extends PropertyType 
 implements java.io.Serializable
 {
 
@@ -35,7 +35,8 @@ implements java.io.Serializable
      //- Constructors -/
     //----------------/
 
-    public Property() {
+    public Property() 
+     {
         super();
     } //-- org.exolab.castor.mapping.xml.Property()
 
@@ -46,6 +47,10 @@ implements java.io.Serializable
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -61,6 +66,8 @@ implements java.io.Serializable
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -72,6 +79,8 @@ implements java.io.Serializable
 
     /**
      * Method marshal
+     * 
+     * 
      * 
      * @param handler
      */
@@ -85,16 +94,20 @@ implements java.io.Serializable
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return PropertyType
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.exolab.castor.mapping.xml.PropertyType unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
-        return (org.exolab.castor.mapping.xml.Property) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Property.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+        return (org.exolab.castor.mapping.xml.PropertyType) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.Property.class, reader);
+    } //-- org.exolab.castor.mapping.xml.PropertyType unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException

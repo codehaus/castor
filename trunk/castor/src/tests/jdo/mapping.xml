@@ -618,5 +618,31 @@
 			<sql name="value" type="varchar"/>
 		</field>
 	</class>
+
+      <class name="jdo.SortedContainer" identity="id">
+        <map-to table="sorted_container" />
+        <field name="id" type="integer" >
+          <sql name="id" type="integer"/>
+        </field>
+        <field name="name" type="string">
+          <sql name="name" type="char" />
+        </field>
+        <field name="twos" type="jdo.SortedContainerItem" collection="sortedset" comparator="jdo.CustomComparator">
+            <sql many-key="id_1" />
+        </field>
+      </class>
+    
+      <class name="jdo.SortedContainerItem" identity="id">
+        <map-to table="sorted_item" />
+        <field name="id" type="integer" >
+          <sql name="id" type="integer"/>
+        </field>
+        <field name="id1" type="integer" >
+          <sql name="id_1" type="integer"/>
+        </field>
+        <field name="name" type="string">
+          <sql name="name" type="char" />
+        </field>
+      </class>
 	
 </mapping>

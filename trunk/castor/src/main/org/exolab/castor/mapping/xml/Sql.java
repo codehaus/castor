@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.4.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -15,9 +15,9 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
-import org.exolab.castor.mapping.xml.types.DirtyType;
+import org.exolab.castor.mapping.xml.types.SqlDirtyType;
 import org.exolab.castor.xml.MarshalException;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
@@ -39,7 +39,7 @@ public class Sql implements java.io.Serializable {
     /**
      * Field _name
      */
-    private java.util.Vector _name;
+    private java.util.ArrayList _name;
 
     /**
      * Field _type
@@ -54,17 +54,17 @@ public class Sql implements java.io.Serializable {
     /**
      * Field _manyKey
      */
-    private java.util.Vector _manyKey;
+    private java.util.ArrayList _manyKey;
 
     /**
-     * Field _readonly
+     * Field _readOnly
      */
-    private boolean _readonly = false;
+    private boolean _readOnly = false;
 
     /**
-     * keeps track of state for field: _readonly
+     * keeps track of state for field: _readOnly
      */
-    private boolean _has_readonly;
+    private boolean _has_readOnly;
 
     /**
      * Field _transient
@@ -79,18 +79,19 @@ public class Sql implements java.io.Serializable {
     /**
      * Field _dirty
      */
-    private org.exolab.castor.mapping.xml.types.DirtyType _dirty = org.exolab.castor.mapping.xml.types.DirtyType.valueOf("check");
+    private org.exolab.castor.mapping.xml.types.SqlDirtyType _dirty = org.exolab.castor.mapping.xml.types.SqlDirtyType.valueOf("check");
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public Sql() {
+    public Sql() 
+     {
         super();
-        _name = new Vector();
-        _manyKey = new Vector();
-        setDirty(org.exolab.castor.mapping.xml.types.DirtyType.valueOf("check"));
+        _name = new ArrayList();
+        _manyKey = new ArrayList();
+        setDirty(org.exolab.castor.mapping.xml.types.SqlDirtyType.valueOf("check"));
     } //-- org.exolab.castor.mapping.xml.Sql()
 
 
@@ -101,16 +102,20 @@ public class Sql implements java.io.Serializable {
     /**
      * Method addManyKey
      * 
+     * 
+     * 
      * @param vManyKey
      */
     public void addManyKey(java.lang.String vManyKey)
         throws java.lang.IndexOutOfBoundsException
     {
-        _manyKey.addElement(vManyKey);
+        _manyKey.add(vManyKey);
     } //-- void addManyKey(java.lang.String) 
 
     /**
      * Method addManyKey
+     * 
+     * 
      * 
      * @param index
      * @param vManyKey
@@ -118,22 +123,26 @@ public class Sql implements java.io.Serializable {
     public void addManyKey(int index, java.lang.String vManyKey)
         throws java.lang.IndexOutOfBoundsException
     {
-        _manyKey.insertElementAt(vManyKey, index);
+        _manyKey.add(index, vManyKey);
     } //-- void addManyKey(int, java.lang.String) 
 
     /**
      * Method addName
+     * 
+     * 
      * 
      * @param vName
      */
     public void addName(java.lang.String vName)
         throws java.lang.IndexOutOfBoundsException
     {
-        _name.addElement(vName);
+        _name.add(vName);
     } //-- void addName(java.lang.String) 
 
     /**
      * Method addName
+     * 
+     * 
      * 
      * @param index
      * @param vName
@@ -141,19 +150,39 @@ public class Sql implements java.io.Serializable {
     public void addName(int index, java.lang.String vName)
         throws java.lang.IndexOutOfBoundsException
     {
-        _name.insertElementAt(vName, index);
+        _name.add(index, vName);
     } //-- void addName(int, java.lang.String) 
 
     /**
-     * Method deleteReadonly
+     * Method clearManyKey
+     * 
      */
-    public void deleteReadonly()
+    public void clearManyKey()
     {
-        this._has_readonly= false;
-    } //-- void deleteReadonly() 
+        _manyKey.clear();
+    } //-- void clearManyKey() 
+
+    /**
+     * Method clearName
+     * 
+     */
+    public void clearName()
+    {
+        _name.clear();
+    } //-- void clearName() 
+
+    /**
+     * Method deleteReadOnly
+     * 
+     */
+    public void deleteReadOnly()
+    {
+        this._has_readOnly= false;
+    } //-- void deleteReadOnly() 
 
     /**
      * Method deleteTransient
+     * 
      */
     public void deleteTransient()
     {
@@ -162,34 +191,46 @@ public class Sql implements java.io.Serializable {
 
     /**
      * Method enumerateManyKey
+     * 
+     * 
+     * 
+     * @return Enumeration
      */
     public java.util.Enumeration enumerateManyKey()
     {
-        return _manyKey.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_manyKey.iterator());
     } //-- java.util.Enumeration enumerateManyKey() 
 
     /**
      * Method enumerateName
+     * 
+     * 
+     * 
+     * @return Enumeration
      */
     public java.util.Enumeration enumerateName()
     {
-        return _name.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_name.iterator());
     } //-- java.util.Enumeration enumerateName() 
 
     /**
      * Returns the value of field 'dirty'.
      * 
+     * @return SqlDirtyType
      * @return the value of field 'dirty'.
      */
-    public org.exolab.castor.mapping.xml.types.DirtyType getDirty()
+    public org.exolab.castor.mapping.xml.types.SqlDirtyType getDirty()
     {
         return this._dirty;
-    } //-- org.exolab.castor.mapping.xml.types.DirtyType getDirty() 
+    } //-- org.exolab.castor.mapping.xml.types.SqlDirtyType getDirty() 
 
     /**
      * Method getManyKey
      * 
+     * 
+     * 
      * @param index
+     * @return String
      */
     public java.lang.String getManyKey(int index)
         throws java.lang.IndexOutOfBoundsException
@@ -199,24 +240,32 @@ public class Sql implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (String)_manyKey.elementAt(index);
+        return (String)_manyKey.get(index);
     } //-- java.lang.String getManyKey(int) 
 
     /**
      * Method getManyKey
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String[] getManyKey()
     {
         int size = _manyKey.size();
         java.lang.String[] mArray = new java.lang.String[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (String)_manyKey.elementAt(index);
+            mArray[index] = (String)_manyKey.get(index);
         }
         return mArray;
     } //-- java.lang.String[] getManyKey() 
 
     /**
      * Method getManyKeyCount
+     * 
+     * 
+     * 
+     * @return int
      */
     public int getManyKeyCount()
     {
@@ -226,6 +275,7 @@ public class Sql implements java.io.Serializable {
     /**
      * Returns the value of field 'manyTable'.
      * 
+     * @return String
      * @return the value of field 'manyTable'.
      */
     public java.lang.String getManyTable()
@@ -236,7 +286,10 @@ public class Sql implements java.io.Serializable {
     /**
      * Method getName
      * 
+     * 
+     * 
      * @param index
+     * @return String
      */
     public java.lang.String getName(int index)
         throws java.lang.IndexOutOfBoundsException
@@ -246,24 +299,32 @@ public class Sql implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (String)_name.elementAt(index);
+        return (String)_name.get(index);
     } //-- java.lang.String getName(int) 
 
     /**
      * Method getName
+     * 
+     * 
+     * 
+     * @return String
      */
     public java.lang.String[] getName()
     {
         int size = _name.size();
         java.lang.String[] mArray = new java.lang.String[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (String)_name.elementAt(index);
+            mArray[index] = (String)_name.get(index);
         }
         return mArray;
     } //-- java.lang.String[] getName() 
 
     /**
      * Method getNameCount
+     * 
+     * 
+     * 
+     * @return int
      */
     public int getNameCount()
     {
@@ -271,18 +332,20 @@ public class Sql implements java.io.Serializable {
     } //-- int getNameCount() 
 
     /**
-     * Returns the value of field 'readonly'.
+     * Returns the value of field 'readOnly'.
      * 
-     * @return the value of field 'readonly'.
+     * @return boolean
+     * @return the value of field 'readOnly'.
      */
-    public boolean getReadonly()
+    public boolean getReadOnly()
     {
-        return this._readonly;
-    } //-- boolean getReadonly() 
+        return this._readOnly;
+    } //-- boolean getReadOnly() 
 
     /**
      * Returns the value of field 'transient'.
      * 
+     * @return boolean
      * @return the value of field 'transient'.
      */
     public boolean getTransient()
@@ -293,6 +356,7 @@ public class Sql implements java.io.Serializable {
     /**
      * Returns the value of field 'type'.
      * 
+     * @return String
      * @return the value of field 'type'.
      */
     public java.lang.String getType()
@@ -301,15 +365,23 @@ public class Sql implements java.io.Serializable {
     } //-- java.lang.String getType() 
 
     /**
-     * Method hasReadonly
+     * Method hasReadOnly
+     * 
+     * 
+     * 
+     * @return boolean
      */
-    public boolean hasReadonly()
+    public boolean hasReadOnly()
     {
-        return this._has_readonly;
-    } //-- boolean hasReadonly() 
+        return this._has_readOnly;
+    } //-- boolean hasReadOnly() 
 
     /**
      * Method hasTransient
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean hasTransient()
     {
@@ -318,6 +390,10 @@ public class Sql implements java.io.Serializable {
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -333,6 +409,8 @@ public class Sql implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -345,6 +423,8 @@ public class Sql implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param handler
      */
     public void marshal(org.xml.sax.ContentHandler handler)
@@ -355,57 +435,47 @@ public class Sql implements java.io.Serializable {
     } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-     * Method removeAllManyKey
-     */
-    public void removeAllManyKey()
-    {
-        _manyKey.removeAllElements();
-    } //-- void removeAllManyKey() 
-
-    /**
-     * Method removeAllName
-     */
-    public void removeAllName()
-    {
-        _name.removeAllElements();
-    } //-- void removeAllName() 
-
-    /**
      * Method removeManyKey
      * 
-     * @param index
+     * 
+     * 
+     * @param vManyKey
+     * @return boolean
      */
-    public java.lang.String removeManyKey(int index)
+    public boolean removeManyKey(java.lang.String vManyKey)
     {
-        java.lang.Object obj = _manyKey.elementAt(index);
-        _manyKey.removeElementAt(index);
-        return (String)obj;
-    } //-- java.lang.String removeManyKey(int) 
+        boolean removed = _manyKey.remove(vManyKey);
+        return removed;
+    } //-- boolean removeManyKey(java.lang.String) 
 
     /**
      * Method removeName
      * 
-     * @param index
+     * 
+     * 
+     * @param vName
+     * @return boolean
      */
-    public java.lang.String removeName(int index)
+    public boolean removeName(java.lang.String vName)
     {
-        java.lang.Object obj = _name.elementAt(index);
-        _name.removeElementAt(index);
-        return (String)obj;
-    } //-- java.lang.String removeName(int) 
+        boolean removed = _name.remove(vName);
+        return removed;
+    } //-- boolean removeName(java.lang.String) 
 
     /**
      * Sets the value of field 'dirty'.
      * 
      * @param dirty the value of field 'dirty'.
      */
-    public void setDirty(org.exolab.castor.mapping.xml.types.DirtyType dirty)
+    public void setDirty(org.exolab.castor.mapping.xml.types.SqlDirtyType dirty)
     {
         this._dirty = dirty;
-    } //-- void setDirty(org.exolab.castor.mapping.xml.types.DirtyType) 
+    } //-- void setDirty(org.exolab.castor.mapping.xml.types.SqlDirtyType) 
 
     /**
      * Method setManyKey
+     * 
+     * 
      * 
      * @param index
      * @param vManyKey
@@ -417,20 +487,22 @@ public class Sql implements java.io.Serializable {
         if ((index < 0) || (index > _manyKey.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _manyKey.setElementAt(vManyKey, index);
+        _manyKey.set(index, vManyKey);
     } //-- void setManyKey(int, java.lang.String) 
 
     /**
      * Method setManyKey
+     * 
+     * 
      * 
      * @param manyKeyArray
      */
     public void setManyKey(java.lang.String[] manyKeyArray)
     {
         //-- copy array
-        _manyKey.removeAllElements();
+        _manyKey.clear();
         for (int i = 0; i < manyKeyArray.length; i++) {
-            _manyKey.addElement(manyKeyArray[i]);
+            _manyKey.add(manyKeyArray[i]);
         }
     } //-- void setManyKey(java.lang.String) 
 
@@ -447,6 +519,8 @@ public class Sql implements java.io.Serializable {
     /**
      * Method setName
      * 
+     * 
+     * 
      * @param index
      * @param vName
      */
@@ -457,33 +531,35 @@ public class Sql implements java.io.Serializable {
         if ((index < 0) || (index > _name.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _name.setElementAt(vName, index);
+        _name.set(index, vName);
     } //-- void setName(int, java.lang.String) 
 
     /**
      * Method setName
+     * 
+     * 
      * 
      * @param nameArray
      */
     public void setName(java.lang.String[] nameArray)
     {
         //-- copy array
-        _name.removeAllElements();
+        _name.clear();
         for (int i = 0; i < nameArray.length; i++) {
-            _name.addElement(nameArray[i]);
+            _name.add(nameArray[i]);
         }
     } //-- void setName(java.lang.String) 
 
     /**
-     * Sets the value of field 'readonly'.
+     * Sets the value of field 'readOnly'.
      * 
-     * @param readonly the value of field 'readonly'.
+     * @param readOnly the value of field 'readOnly'.
      */
-    public void setReadonly(boolean readonly)
+    public void setReadOnly(boolean readOnly)
     {
-        this._readonly = readonly;
-        this._has_readonly = true;
-    } //-- void setReadonly(boolean) 
+        this._readOnly = readOnly;
+        this._has_readOnly = true;
+    } //-- void setReadOnly(boolean) 
 
     /**
      * Sets the value of field 'transient'.
@@ -510,7 +586,10 @@ public class Sql implements java.io.Serializable {
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return Sql
      */
     public static org.exolab.castor.mapping.xml.Sql unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
@@ -520,6 +599,7 @@ public class Sql implements java.io.Serializable {
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException

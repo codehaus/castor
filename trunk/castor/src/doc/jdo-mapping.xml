@@ -197,7 +197,8 @@
             set-method     NMTOKEN  #IMPLIED
             create-method  NMTOKEN  #IMPLIED
             collection     ( array | enumerate | collection | set | 
-                             arraylist | vector | map | hashtable | sortedset )  #IMPLIED>]]></code-panel>
+                             arraylist | vector | map | hashtable | sortedset )  #IMPLIED
+            comparator     NMTOKEN  #IMPLIED>]]></code-panel>
 
         <p>The &lt;field> element is used to describe a property of a Java object. It provides:</p>
         <ul>
@@ -369,6 +370,15 @@
              one of its fields, it is necessary to specify which collection type Castor will 
              use to handle them. The type specified is used to define the type of the 
              content inside the collection.</li>
+
+          <li><b>comparator:</b> If the collection type equals 'sortedset', it is possible
+            to specify a <api>java.util.Comparator</api> instance that will be used with
+            the <api>java.util.SortedSet</api> (implementation) to specify a custom
+            sort order. Please use this attribute to specify the class name of the 
+            Comparator instance to be used. Alternatively, it is possible to not 
+            specify a Comparator instance and have the Java objects stored in the 
+            SortedSet implement <api>java.util.Comparable</api> to specify the 
+            sort order.</li>
 
           <li><b>get-method:</b> An optional name of the accessor method Castor should 
              use. If this attribute is not set, Castor will try to guess the name with the

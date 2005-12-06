@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,20 +11,23 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class MappingRoot.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class MappingRoot implements java.io.Serializable {
 
 
@@ -32,24 +35,37 @@ public class MappingRoot implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _description
+     */
     private java.lang.String _description;
 
-    private java.util.Vector _includeList;
+    /**
+     * Field _includeList
+     */
+    private java.util.ArrayList _includeList;
 
-    private java.util.Vector _classMappingList;
+    /**
+     * Field _classMappingList
+     */
+    private java.util.ArrayList _classMappingList;
 
-    private java.util.Vector _keyGeneratorDefList;
+    /**
+     * Field _keyGeneratorDefList
+     */
+    private java.util.ArrayList _keyGeneratorDefList;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public MappingRoot() {
+    public MappingRoot() 
+     {
         super();
-        _includeList = new Vector();
-        _classMappingList = new Vector();
-        _keyGeneratorDefList = new Vector();
+        _includeList = new ArrayList();
+        _classMappingList = new ArrayList();
+        _keyGeneratorDefList = new ArrayList();
     } //-- org.exolab.castor.mapping.xml.MappingRoot()
 
 
@@ -58,61 +74,158 @@ public class MappingRoot implements java.io.Serializable {
     //-----------/
 
     /**
+     * Method addClassMapping
+     * 
+     * 
      * 
      * @param vClassMapping
-    **/
-    public void addClassMapping(ClassMapping vClassMapping)
+     */
+    public void addClassMapping(org.exolab.castor.mapping.xml.ClassMapping vClassMapping)
         throws java.lang.IndexOutOfBoundsException
     {
-        _classMappingList.addElement(vClassMapping);
-    } //-- void addClassMapping(ClassMapping) 
+        _classMappingList.add(vClassMapping);
+    } //-- void addClassMapping(org.exolab.castor.mapping.xml.ClassMapping) 
 
     /**
+     * Method addClassMapping
+     * 
+     * 
+     * 
+     * @param index
+     * @param vClassMapping
+     */
+    public void addClassMapping(int index, org.exolab.castor.mapping.xml.ClassMapping vClassMapping)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _classMappingList.add(index, vClassMapping);
+    } //-- void addClassMapping(int, org.exolab.castor.mapping.xml.ClassMapping) 
+
+    /**
+     * Method addInclude
+     * 
+     * 
      * 
      * @param vInclude
-    **/
-    public void addInclude(Include vInclude)
+     */
+    public void addInclude(org.exolab.castor.mapping.xml.Include vInclude)
         throws java.lang.IndexOutOfBoundsException
     {
-        _includeList.addElement(vInclude);
-    } //-- void addInclude(Include) 
+        _includeList.add(vInclude);
+    } //-- void addInclude(org.exolab.castor.mapping.xml.Include) 
 
     /**
+     * Method addInclude
+     * 
+     * 
+     * 
+     * @param index
+     * @param vInclude
+     */
+    public void addInclude(int index, org.exolab.castor.mapping.xml.Include vInclude)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _includeList.add(index, vInclude);
+    } //-- void addInclude(int, org.exolab.castor.mapping.xml.Include) 
+
+    /**
+     * Method addKeyGeneratorDef
+     * 
+     * 
      * 
      * @param vKeyGeneratorDef
-    **/
-    public void addKeyGeneratorDef(KeyGeneratorDef vKeyGeneratorDef)
+     */
+    public void addKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef vKeyGeneratorDef)
         throws java.lang.IndexOutOfBoundsException
     {
-        _keyGeneratorDefList.addElement(vKeyGeneratorDef);
-    } //-- void addKeyGeneratorDef(KeyGeneratorDef) 
+        _keyGeneratorDefList.add(vKeyGeneratorDef);
+    } //-- void addKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef) 
 
     /**
-    **/
+     * Method addKeyGeneratorDef
+     * 
+     * 
+     * 
+     * @param index
+     * @param vKeyGeneratorDef
+     */
+    public void addKeyGeneratorDef(int index, org.exolab.castor.mapping.xml.KeyGeneratorDef vKeyGeneratorDef)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _keyGeneratorDefList.add(index, vKeyGeneratorDef);
+    } //-- void addKeyGeneratorDef(int, org.exolab.castor.mapping.xml.KeyGeneratorDef) 
+
+    /**
+     * Method clearClassMapping
+     * 
+     */
+    public void clearClassMapping()
+    {
+        _classMappingList.clear();
+    } //-- void clearClassMapping() 
+
+    /**
+     * Method clearInclude
+     * 
+     */
+    public void clearInclude()
+    {
+        _includeList.clear();
+    } //-- void clearInclude() 
+
+    /**
+     * Method clearKeyGeneratorDef
+     * 
+     */
+    public void clearKeyGeneratorDef()
+    {
+        _keyGeneratorDefList.clear();
+    } //-- void clearKeyGeneratorDef() 
+
+    /**
+     * Method enumerateClassMapping
+     * 
+     * 
+     * 
+     * @return Enumeration
+     */
     public java.util.Enumeration enumerateClassMapping()
     {
-        return _classMappingList.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_classMappingList.iterator());
     } //-- java.util.Enumeration enumerateClassMapping() 
 
     /**
-    **/
+     * Method enumerateInclude
+     * 
+     * 
+     * 
+     * @return Enumeration
+     */
     public java.util.Enumeration enumerateInclude()
     {
-        return _includeList.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_includeList.iterator());
     } //-- java.util.Enumeration enumerateInclude() 
 
     /**
-    **/
+     * Method enumerateKeyGeneratorDef
+     * 
+     * 
+     * 
+     * @return Enumeration
+     */
     public java.util.Enumeration enumerateKeyGeneratorDef()
     {
-        return _keyGeneratorDefList.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_keyGeneratorDefList.iterator());
     } //-- java.util.Enumeration enumerateKeyGeneratorDef() 
 
     /**
+     * Method getClassMapping
+     * 
+     * 
      * 
      * @param index
-    **/
-    public ClassMapping getClassMapping(int index)
+     * @return ClassMapping
+     */
+    public org.exolab.castor.mapping.xml.ClassMapping getClassMapping(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -120,40 +233,58 @@ public class MappingRoot implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (ClassMapping) _classMappingList.elementAt(index);
-    } //-- ClassMapping getClassMapping(int) 
+        return (org.exolab.castor.mapping.xml.ClassMapping) _classMappingList.get(index);
+    } //-- org.exolab.castor.mapping.xml.ClassMapping getClassMapping(int) 
 
     /**
-    **/
-    public ClassMapping[] getClassMapping()
+     * Method getClassMapping
+     * 
+     * 
+     * 
+     * @return ClassMapping
+     */
+    public org.exolab.castor.mapping.xml.ClassMapping[] getClassMapping()
     {
         int size = _classMappingList.size();
-        ClassMapping[] mArray = new ClassMapping[size];
+        org.exolab.castor.mapping.xml.ClassMapping[] mArray = new org.exolab.castor.mapping.xml.ClassMapping[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (ClassMapping) _classMappingList.elementAt(index);
+            mArray[index] = (org.exolab.castor.mapping.xml.ClassMapping) _classMappingList.get(index);
         }
         return mArray;
-    } //-- ClassMapping[] getClassMapping() 
+    } //-- org.exolab.castor.mapping.xml.ClassMapping[] getClassMapping() 
 
     /**
-    **/
+     * Method getClassMappingCount
+     * 
+     * 
+     * 
+     * @return int
+     */
     public int getClassMappingCount()
     {
         return _classMappingList.size();
     } //-- int getClassMappingCount() 
 
     /**
-    **/
+     * Returns the value of field 'description'.
+     * 
+     * @return String
+     * @return the value of field 'description'.
+     */
     public java.lang.String getDescription()
     {
         return this._description;
     } //-- java.lang.String getDescription() 
 
     /**
+     * Method getInclude
+     * 
+     * 
      * 
      * @param index
-    **/
-    public Include getInclude(int index)
+     * @return Include
+     */
+    public org.exolab.castor.mapping.xml.Include getInclude(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -161,33 +292,47 @@ public class MappingRoot implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (Include) _includeList.elementAt(index);
-    } //-- Include getInclude(int) 
+        return (org.exolab.castor.mapping.xml.Include) _includeList.get(index);
+    } //-- org.exolab.castor.mapping.xml.Include getInclude(int) 
 
     /**
-    **/
-    public Include[] getInclude()
+     * Method getInclude
+     * 
+     * 
+     * 
+     * @return Include
+     */
+    public org.exolab.castor.mapping.xml.Include[] getInclude()
     {
         int size = _includeList.size();
-        Include[] mArray = new Include[size];
+        org.exolab.castor.mapping.xml.Include[] mArray = new org.exolab.castor.mapping.xml.Include[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (Include) _includeList.elementAt(index);
+            mArray[index] = (org.exolab.castor.mapping.xml.Include) _includeList.get(index);
         }
         return mArray;
-    } //-- Include[] getInclude() 
+    } //-- org.exolab.castor.mapping.xml.Include[] getInclude() 
 
     /**
-    **/
+     * Method getIncludeCount
+     * 
+     * 
+     * 
+     * @return int
+     */
     public int getIncludeCount()
     {
         return _includeList.size();
     } //-- int getIncludeCount() 
 
     /**
+     * Method getKeyGeneratorDef
+     * 
+     * 
      * 
      * @param index
-    **/
-    public KeyGeneratorDef getKeyGeneratorDef(int index)
+     * @return KeyGeneratorDef
+     */
+    public org.exolab.castor.mapping.xml.KeyGeneratorDef getKeyGeneratorDef(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -195,30 +340,45 @@ public class MappingRoot implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (KeyGeneratorDef) _keyGeneratorDefList.elementAt(index);
-    } //-- KeyGeneratorDef getKeyGeneratorDef(int) 
+        return (org.exolab.castor.mapping.xml.KeyGeneratorDef) _keyGeneratorDefList.get(index);
+    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef getKeyGeneratorDef(int) 
 
     /**
-    **/
-    public KeyGeneratorDef[] getKeyGeneratorDef()
+     * Method getKeyGeneratorDef
+     * 
+     * 
+     * 
+     * @return KeyGeneratorDef
+     */
+    public org.exolab.castor.mapping.xml.KeyGeneratorDef[] getKeyGeneratorDef()
     {
         int size = _keyGeneratorDefList.size();
-        KeyGeneratorDef[] mArray = new KeyGeneratorDef[size];
+        org.exolab.castor.mapping.xml.KeyGeneratorDef[] mArray = new org.exolab.castor.mapping.xml.KeyGeneratorDef[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (KeyGeneratorDef) _keyGeneratorDefList.elementAt(index);
+            mArray[index] = (org.exolab.castor.mapping.xml.KeyGeneratorDef) _keyGeneratorDefList.get(index);
         }
         return mArray;
-    } //-- KeyGeneratorDef[] getKeyGeneratorDef() 
+    } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef[] getKeyGeneratorDef() 
 
     /**
-    **/
+     * Method getKeyGeneratorDefCount
+     * 
+     * 
+     * 
+     * @return int
+     */
     public int getKeyGeneratorDefCount()
     {
         return _keyGeneratorDefList.size();
     } //-- int getKeyGeneratorDefCount() 
 
     /**
-    **/
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -231,9 +391,12 @@ public class MappingRoot implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -242,167 +405,181 @@ public class MappingRoot implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-    **/
-    public void removeAllClassMapping()
-    {
-        _classMappingList.removeAllElements();
-    } //-- void removeAllClassMapping() 
-
-    /**
-    **/
-    public void removeAllInclude()
-    {
-        _includeList.removeAllElements();
-    } //-- void removeAllInclude() 
-
-    /**
-    **/
-    public void removeAllKeyGeneratorDef()
-    {
-        _keyGeneratorDefList.removeAllElements();
-    } //-- void removeAllKeyGeneratorDef() 
-
-    /**
+     * Method removeClassMapping
      * 
-     * @param index
-    **/
-    public ClassMapping removeClassMapping(int index)
-    {
-        Object obj = _classMappingList.elementAt(index);
-        _classMappingList.removeElementAt(index);
-        return (ClassMapping) obj;
-    } //-- ClassMapping removeClassMapping(int) 
-
-    /**
      * 
-     * @param index
-    **/
-    public Include removeInclude(int index)
-    {
-        Object obj = _includeList.elementAt(index);
-        _includeList.removeElementAt(index);
-        return (Include) obj;
-    } //-- Include removeInclude(int) 
-
-    /**
-     * 
-     * @param index
-    **/
-    public KeyGeneratorDef removeKeyGeneratorDef(int index)
-    {
-        Object obj = _keyGeneratorDefList.elementAt(index);
-        _keyGeneratorDefList.removeElementAt(index);
-        return (KeyGeneratorDef) obj;
-    } //-- KeyGeneratorDef removeKeyGeneratorDef(int) 
-
-    /**
      * 
      * @param vClassMapping
+     * @return boolean
+     */
+    public boolean removeClassMapping(org.exolab.castor.mapping.xml.ClassMapping vClassMapping)
+    {
+        boolean removed = _classMappingList.remove(vClassMapping);
+        return removed;
+    } //-- boolean removeClassMapping(org.exolab.castor.mapping.xml.ClassMapping) 
+
+    /**
+     * Method removeInclude
+     * 
+     * 
+     * 
+     * @param vInclude
+     * @return boolean
+     */
+    public boolean removeInclude(org.exolab.castor.mapping.xml.Include vInclude)
+    {
+        boolean removed = _includeList.remove(vInclude);
+        return removed;
+    } //-- boolean removeInclude(org.exolab.castor.mapping.xml.Include) 
+
+    /**
+     * Method removeKeyGeneratorDef
+     * 
+     * 
+     * 
+     * @param vKeyGeneratorDef
+     * @return boolean
+     */
+    public boolean removeKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef vKeyGeneratorDef)
+    {
+        boolean removed = _keyGeneratorDefList.remove(vKeyGeneratorDef);
+        return removed;
+    } //-- boolean removeKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef) 
+
+    /**
+     * Method setClassMapping
+     * 
+     * 
+     * 
      * @param index
-    **/
-    public void setClassMapping(ClassMapping vClassMapping, int index)
+     * @param vClassMapping
+     */
+    public void setClassMapping(int index, org.exolab.castor.mapping.xml.ClassMapping vClassMapping)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _classMappingList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _classMappingList.setElementAt(vClassMapping, index);
-    } //-- void setClassMapping(ClassMapping, int) 
+        _classMappingList.set(index, vClassMapping);
+    } //-- void setClassMapping(int, org.exolab.castor.mapping.xml.ClassMapping) 
 
     /**
+     * Method setClassMapping
+     * 
+     * 
      * 
      * @param classMappingArray
-    **/
-    public void setClassMapping(ClassMapping[] classMappingArray)
+     */
+    public void setClassMapping(org.exolab.castor.mapping.xml.ClassMapping[] classMappingArray)
     {
         //-- copy array
-        _classMappingList.removeAllElements();
+        _classMappingList.clear();
         for (int i = 0; i < classMappingArray.length; i++) {
-            _classMappingList.addElement(classMappingArray[i]);
+            _classMappingList.add(classMappingArray[i]);
         }
-    } //-- void setClassMapping(ClassMapping) 
+    } //-- void setClassMapping(org.exolab.castor.mapping.xml.ClassMapping) 
 
     /**
+     * Sets the value of field 'description'.
      * 
-     * @param _description
-    **/
-    public void setDescription(java.lang.String _description)
+     * @param description the value of field 'description'.
+     */
+    public void setDescription(java.lang.String description)
     {
-        this._description = _description;
+        this._description = description;
     } //-- void setDescription(java.lang.String) 
 
     /**
+     * Method setInclude
      * 
-     * @param vInclude
+     * 
+     * 
      * @param index
-    **/
-    public void setInclude(Include vInclude, int index)
+     * @param vInclude
+     */
+    public void setInclude(int index, org.exolab.castor.mapping.xml.Include vInclude)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _includeList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _includeList.setElementAt(vInclude, index);
-    } //-- void setInclude(Include, int) 
+        _includeList.set(index, vInclude);
+    } //-- void setInclude(int, org.exolab.castor.mapping.xml.Include) 
 
     /**
+     * Method setInclude
+     * 
+     * 
      * 
      * @param includeArray
-    **/
-    public void setInclude(Include[] includeArray)
+     */
+    public void setInclude(org.exolab.castor.mapping.xml.Include[] includeArray)
     {
         //-- copy array
-        _includeList.removeAllElements();
+        _includeList.clear();
         for (int i = 0; i < includeArray.length; i++) {
-            _includeList.addElement(includeArray[i]);
+            _includeList.add(includeArray[i]);
         }
-    } //-- void setInclude(Include) 
+    } //-- void setInclude(org.exolab.castor.mapping.xml.Include) 
 
     /**
+     * Method setKeyGeneratorDef
      * 
-     * @param vKeyGeneratorDef
+     * 
+     * 
      * @param index
-    **/
-    public void setKeyGeneratorDef(KeyGeneratorDef vKeyGeneratorDef, int index)
+     * @param vKeyGeneratorDef
+     */
+    public void setKeyGeneratorDef(int index, org.exolab.castor.mapping.xml.KeyGeneratorDef vKeyGeneratorDef)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _keyGeneratorDefList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _keyGeneratorDefList.setElementAt(vKeyGeneratorDef, index);
-    } //-- void setKeyGeneratorDef(KeyGeneratorDef, int) 
+        _keyGeneratorDefList.set(index, vKeyGeneratorDef);
+    } //-- void setKeyGeneratorDef(int, org.exolab.castor.mapping.xml.KeyGeneratorDef) 
 
     /**
+     * Method setKeyGeneratorDef
+     * 
+     * 
      * 
      * @param keyGeneratorDefArray
-    **/
-    public void setKeyGeneratorDef(KeyGeneratorDef[] keyGeneratorDefArray)
+     */
+    public void setKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef[] keyGeneratorDefArray)
     {
         //-- copy array
-        _keyGeneratorDefList.removeAllElements();
+        _keyGeneratorDefList.clear();
         for (int i = 0; i < keyGeneratorDefArray.length; i++) {
-            _keyGeneratorDefList.addElement(keyGeneratorDefArray[i]);
+            _keyGeneratorDefList.add(keyGeneratorDefArray[i]);
         }
-    } //-- void setKeyGeneratorDef(KeyGeneratorDef) 
+    } //-- void setKeyGeneratorDef(org.exolab.castor.mapping.xml.KeyGeneratorDef) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return MappingRoot
+     */
     public static org.exolab.castor.mapping.xml.MappingRoot unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -410,11 +587,13 @@ public class MappingRoot implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.MappingRoot unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

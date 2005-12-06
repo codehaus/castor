@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.5.3</a>, using an XML
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -53,7 +53,8 @@ public class CacheTypeMapping implements java.io.Serializable {
      //- Constructors -/
     //----------------/
 
-    public CacheTypeMapping() {
+    public CacheTypeMapping() 
+     {
         super();
         setType("count-limited");
     } //-- org.exolab.castor.mapping.xml.CacheTypeMapping()
@@ -65,6 +66,7 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
      * Method deleteCapacity
+     * 
      */
     public void deleteCapacity()
     {
@@ -74,6 +76,7 @@ public class CacheTypeMapping implements java.io.Serializable {
     /**
      * Returns the value of field 'capacity'.
      * 
+     * @return int
      * @return the value of field 'capacity'.
      */
     public int getCapacity()
@@ -84,6 +87,7 @@ public class CacheTypeMapping implements java.io.Serializable {
     /**
      * Returns the value of field 'type'.
      * 
+     * @return String
      * @return the value of field 'type'.
      */
     public java.lang.String getType()
@@ -93,6 +97,10 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
      * Method hasCapacity
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean hasCapacity()
     {
@@ -101,6 +109,10 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
      * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
      */
     public boolean isValid()
     {
@@ -116,6 +128,8 @@ public class CacheTypeMapping implements java.io.Serializable {
     /**
      * Method marshal
      * 
+     * 
+     * 
      * @param out
      */
     public void marshal(java.io.Writer out)
@@ -127,6 +141,8 @@ public class CacheTypeMapping implements java.io.Serializable {
 
     /**
      * Method marshal
+     * 
+     * 
      * 
      * @param handler
      */
@@ -161,16 +177,20 @@ public class CacheTypeMapping implements java.io.Serializable {
     /**
      * Method unmarshal
      * 
+     * 
+     * 
      * @param reader
+     * @return CacheTypeMapping
      */
-    public static java.lang.Object unmarshal(java.io.Reader reader)
+    public static org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         return (org.exolab.castor.mapping.xml.CacheTypeMapping) Unmarshaller.unmarshal(org.exolab.castor.mapping.xml.CacheTypeMapping.class, reader);
-    } //-- java.lang.Object unmarshal(java.io.Reader) 
+    } //-- org.exolab.castor.mapping.xml.CacheTypeMapping unmarshal(java.io.Reader) 
 
     /**
      * Method validate
+     * 
      */
     public void validate()
         throws org.exolab.castor.xml.ValidationException

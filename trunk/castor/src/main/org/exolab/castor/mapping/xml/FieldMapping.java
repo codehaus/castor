@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,19 +11,22 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
-import org.exolab.castor.mapping.xml.types.CollectionType;
-import org.exolab.castor.xml.*;
+import org.exolab.castor.mapping.xml.types.FieldMappingCollectionType;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class FieldMapping.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class FieldMapping implements java.io.Serializable {
 
 
@@ -31,72 +34,133 @@ public class FieldMapping implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _name
+     */
     private java.lang.String _name;
 
+    /**
+     * Field _type
+     */
     private java.lang.String _type;
 
+    /**
+     * Field _required
+     */
     private boolean _required = false;
 
     /**
      * keeps track of state for field: _required
-    **/
+     */
     private boolean _has_required;
 
+    /**
+     * Field _transient
+     */
     private boolean _transient = false;
 
     /**
      * keeps track of state for field: _transient
-    **/
+     */
     private boolean _has_transient;
 
+    /**
+     * Field _direct
+     */
     private boolean _direct = false;
 
     /**
      * keeps track of state for field: _direct
-    **/
+     */
     private boolean _has_direct;
 
+    /**
+     * Field _lazy
+     */
     private boolean _lazy = false;
 
     /**
      * keeps track of state for field: _lazy
-    **/
+     */
     private boolean _has_lazy;
 
-
-    private boolean _container = false;
+    /**
+     * Field _container
+     */
+    private boolean _container;
 
     /**
      * keeps track of state for field: _container
-    **/
+     */
     private boolean _has_container;
 
-    private java.lang.String _handler = null;
-
+    /**
+     * Field _getMethod
+     */
     private java.lang.String _getMethod;
-    
+
+    /**
+     * Field _hasMethod
+     */
     private java.lang.String _hasMethod;
 
+    /**
+     * Field _setMethod
+     */
     private java.lang.String _setMethod;
 
+    /**
+     * Field _createMethod
+     */
     private java.lang.String _createMethod;
 
-    private org.exolab.castor.mapping.xml.types.CollectionType _collection;
+    /**
+     * Field _handler
+     */
+    private java.lang.String _handler;
 
+    /**
+     * Field _collection
+     */
+    private org.exolab.castor.mapping.xml.types.FieldMappingCollectionType _collection;
+
+    /**
+     * Field _comparator
+     */
+    private java.lang.String _comparator;
+
+    /**
+     * Field _description
+     */
     private java.lang.String _description;
 
-    private Sql _sql;
+    /**
+     * Field _sql
+     */
+    private org.exolab.castor.mapping.xml.Sql _sql;
 
-    private BindXml _bindXml;
+    /**
+     * The 'bind-xml' element is used for specifying XML specific
+     * databinding
+     *  properties and behavior for a specific field. 'bind-xml'
+     * may only appear
+     *  as a child of a 'field' element.
+     *  
+     */
+    private org.exolab.castor.mapping.xml.BindXml _bindXml;
 
-    private Ldap _ldap;
+    /**
+     * Field _ldap
+     */
+    private org.exolab.castor.mapping.xml.Ldap _ldap;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public FieldMapping() {
+    public FieldMapping() 
+     {
         super();
     } //-- org.exolab.castor.mapping.xml.FieldMapping()
 
@@ -106,197 +170,321 @@ public class FieldMapping implements java.io.Serializable {
     //-----------/
 
     /**
-    **/
-    public void deleteDirect()
-    {
-        this._has_direct= false;
-    } //-- void deleteDirect() 
-
-    /**
-    **/
-    public void deleteLazy()
-    {
-        this._has_lazy= false;
-    } //-- void deleteLazy() 
-
-    /**
-    **/
+     * Method deleteContainer
+     * 
+     */
     public void deleteContainer()
     {
         this._has_container= false;
     } //-- void deleteContainer() 
 
     /**
-    **/
+     * Method deleteDirect
+     * 
+     */
+    public void deleteDirect()
+    {
+        this._has_direct= false;
+    } //-- void deleteDirect() 
+
+    /**
+     * Method deleteLazy
+     * 
+     */
+    public void deleteLazy()
+    {
+        this._has_lazy= false;
+    } //-- void deleteLazy() 
+
+    /**
+     * Method deleteRequired
+     * 
+     */
     public void deleteRequired()
     {
         this._has_required= false;
     } //-- void deleteRequired() 
 
     /**
-    **/
+     * Method deleteTransient
+     * 
+     */
     public void deleteTransient()
     {
         this._has_transient= false;
     } //-- void deleteTransient() 
 
     /**
-    **/
-    public BindXml getBindXml()
+     * Returns the value of field 'bindXml'. The field 'bindXml'
+     * has the following description: The 'bind-xml' element is
+     * used for specifying XML specific databinding
+     *  properties and behavior for a specific field. 'bind-xml'
+     * may only appear
+     *  as a child of a 'field' element.
+     *  
+     * 
+     * @return BindXml
+     * @return the value of field 'bindXml'.
+     */
+    public org.exolab.castor.mapping.xml.BindXml getBindXml()
     {
         return this._bindXml;
-    } //-- BindXml getBindXml() 
+    } //-- org.exolab.castor.mapping.xml.BindXml getBindXml() 
 
     /**
-    **/
-    public org.exolab.castor.mapping.xml.types.CollectionType getCollection()
+     * Returns the value of field 'collection'.
+     * 
+     * @return FieldMappingCollectionType
+     * @return the value of field 'collection'.
+     */
+    public org.exolab.castor.mapping.xml.types.FieldMappingCollectionType getCollection()
     {
         return this._collection;
-    } //-- org.exolab.castor.mapping.xml.types.CollectionType getCollection() 
+    } //-- org.exolab.castor.mapping.xml.types.FieldMappingCollectionType getCollection() 
 
     /**
-    **/
-    public java.lang.String getCreateMethod()
+     * Returns the value of field 'comparator'.
+     * 
+     * @return String
+     * @return the value of field 'comparator'.
+     */
+    public java.lang.String getComparator()
     {
-        return this._createMethod;
-    } //-- java.lang.String getCreateMethod() 
+        return this._comparator;
+    } //-- java.lang.String getComparator() 
 
     /**
-    **/
-    public java.lang.String getDescription()
-    {
-        return this._description;
-    } //-- java.lang.String getDescription() 
-
-    /**
-    **/
-    public boolean getDirect()
-    {
-        return this._direct;
-    } //-- boolean getDirect() 
-
-    /**
-    **/
-    public java.lang.String getGetMethod()
-    {
-        return this._getMethod;
-    } //-- java.lang.String getGetMethod() 
-
-    
-    /**
-    **/
-    public java.lang.String getHandler()
-    {
-        return this._handler;
-    } //-- java.lang.String getHandler() 
-    
-    /**
-    **/
-    public java.lang.String getHasMethod()
-    {
-        return this._hasMethod;
-    } //-- java.lang.String getHasMethod() 
-    
-    /**
-    **/
-    public boolean getLazy()
-    {
-        return this._lazy;
-    } //-- boolean getLazy() 
-
-    /**
-    **/
+     * Returns the value of field 'container'.
+     * 
+     * @return boolean
+     * @return the value of field 'container'.
+     */
     public boolean getContainer()
     {
         return this._container;
     } //-- boolean getContainer() 
 
     /**
-    **/
-    public Ldap getLdap()
+     * Returns the value of field 'createMethod'.
+     * 
+     * @return String
+     * @return the value of field 'createMethod'.
+     */
+    public java.lang.String getCreateMethod()
     {
-        return this._ldap;
-    } //-- Ldap getLdap() 
+        return this._createMethod;
+    } //-- java.lang.String getCreateMethod() 
 
     /**
-    **/
+     * Returns the value of field 'description'.
+     * 
+     * @return String
+     * @return the value of field 'description'.
+     */
+    public java.lang.String getDescription()
+    {
+        return this._description;
+    } //-- java.lang.String getDescription() 
+
+    /**
+     * Returns the value of field 'direct'.
+     * 
+     * @return boolean
+     * @return the value of field 'direct'.
+     */
+    public boolean getDirect()
+    {
+        return this._direct;
+    } //-- boolean getDirect() 
+
+    /**
+     * Returns the value of field 'getMethod'.
+     * 
+     * @return String
+     * @return the value of field 'getMethod'.
+     */
+    public java.lang.String getGetMethod()
+    {
+        return this._getMethod;
+    } //-- java.lang.String getGetMethod() 
+
+    /**
+     * Returns the value of field 'handler'.
+     * 
+     * @return String
+     * @return the value of field 'handler'.
+     */
+    public java.lang.String getHandler()
+    {
+        return this._handler;
+    } //-- java.lang.String getHandler() 
+
+    /**
+     * Returns the value of field 'hasMethod'.
+     * 
+     * @return String
+     * @return the value of field 'hasMethod'.
+     */
+    public java.lang.String getHasMethod()
+    {
+        return this._hasMethod;
+    } //-- java.lang.String getHasMethod() 
+
+    /**
+     * Returns the value of field 'lazy'.
+     * 
+     * @return boolean
+     * @return the value of field 'lazy'.
+     */
+    public boolean getLazy()
+    {
+        return this._lazy;
+    } //-- boolean getLazy() 
+
+    /**
+     * Returns the value of field 'ldap'.
+     * 
+     * @return Ldap
+     * @return the value of field 'ldap'.
+     */
+    public org.exolab.castor.mapping.xml.Ldap getLdap()
+    {
+        return this._ldap;
+    } //-- org.exolab.castor.mapping.xml.Ldap getLdap() 
+
+    /**
+     * Returns the value of field 'name'.
+     * 
+     * @return String
+     * @return the value of field 'name'.
+     */
     public java.lang.String getName()
     {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
-    **/
+     * Returns the value of field 'required'.
+     * 
+     * @return boolean
+     * @return the value of field 'required'.
+     */
     public boolean getRequired()
     {
         return this._required;
     } //-- boolean getRequired() 
 
     /**
-    **/
+     * Returns the value of field 'setMethod'.
+     * 
+     * @return String
+     * @return the value of field 'setMethod'.
+     */
     public java.lang.String getSetMethod()
     {
         return this._setMethod;
     } //-- java.lang.String getSetMethod() 
 
     /**
-    **/
-    public Sql getSql()
+     * Returns the value of field 'sql'.
+     * 
+     * @return Sql
+     * @return the value of field 'sql'.
+     */
+    public org.exolab.castor.mapping.xml.Sql getSql()
     {
         return this._sql;
-    } //-- Sql getSql() 
+    } //-- org.exolab.castor.mapping.xml.Sql getSql() 
 
     /**
-    **/
+     * Returns the value of field 'transient'.
+     * 
+     * @return boolean
+     * @return the value of field 'transient'.
+     */
     public boolean getTransient()
     {
         return this._transient;
     } //-- boolean getTransient() 
 
     /**
-    **/
+     * Returns the value of field 'type'.
+     * 
+     * @return String
+     * @return the value of field 'type'.
+     */
     public java.lang.String getType()
     {
         return this._type;
     } //-- java.lang.String getType() 
 
     /**
-    **/
-    public boolean hasDirect()
-    {
-        return this._has_direct;
-    } //-- boolean hasDirect() 
-
-    /**
-    **/
-    public boolean hasLazy()
-    {
-        return this._has_lazy;
-    } //-- boolean hasLazy() 
-
-    /**
-    **/
+     * Method hasContainer
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean hasContainer()
     {
         return this._has_container;
     } //-- boolean hasContainer() 
 
     /**
-    **/
+     * Method hasDirect
+     * 
+     * 
+     * 
+     * @return boolean
+     */
+    public boolean hasDirect()
+    {
+        return this._has_direct;
+    } //-- boolean hasDirect() 
+
+    /**
+     * Method hasLazy
+     * 
+     * 
+     * 
+     * @return boolean
+     */
+    public boolean hasLazy()
+    {
+        return this._has_lazy;
+    } //-- boolean hasLazy() 
+
+    /**
+     * Method hasRequired
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean hasRequired()
     {
         return this._has_required;
     } //-- boolean hasRequired() 
 
     /**
-    **/
+     * Method hasTransient
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean hasTransient()
     {
         return this._has_transient;
     } //-- boolean hasTransient() 
 
     /**
-    **/
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -309,9 +497,12 @@ public class FieldMapping implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -320,159 +511,195 @@ public class FieldMapping implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
+     * Sets the value of field 'bindXml'. The field 'bindXml' has
+     * the following description: The 'bind-xml' element is used
+     * for specifying XML specific databinding
+     *  properties and behavior for a specific field. 'bind-xml'
+     * may only appear
+     *  as a child of a 'field' element.
+     *  
      * 
-     * @param _bindXml
-    **/
-    public void setBindXml(BindXml _bindXml)
+     * @param bindXml the value of field 'bindXml'.
+     */
+    public void setBindXml(org.exolab.castor.mapping.xml.BindXml bindXml)
     {
-        this._bindXml = _bindXml;
-    } //-- void setBindXml(BindXml) 
+        this._bindXml = bindXml;
+    } //-- void setBindXml(org.exolab.castor.mapping.xml.BindXml) 
 
     /**
+     * Sets the value of field 'collection'.
      * 
-     * @param _collection
-    **/
-    public void setCollection(org.exolab.castor.mapping.xml.types.CollectionType _collection)
+     * @param collection the value of field 'collection'.
+     */
+    public void setCollection(org.exolab.castor.mapping.xml.types.FieldMappingCollectionType collection)
     {
-        this._collection = _collection;
-    } //-- void setCollection(org.exolab.castor.mapping.xml.types.CollectionType) 
+        this._collection = collection;
+    } //-- void setCollection(org.exolab.castor.mapping.xml.types.FieldMappingCollectionType) 
 
     /**
+     * Sets the value of field 'comparator'.
      * 
-     * @param _createMethod
-    **/
-    public void setCreateMethod(java.lang.String _createMethod)
+     * @param comparator the value of field 'comparator'.
+     */
+    public void setComparator(java.lang.String comparator)
     {
-        this._createMethod = _createMethod;
-    } //-- void setCreateMethod(java.lang.String) 
+        this._comparator = comparator;
+    } //-- void setComparator(java.lang.String) 
 
     /**
+     * Sets the value of field 'container'.
      * 
-     * @param _description
-    **/
-    public void setDescription(java.lang.String _description)
+     * @param container the value of field 'container'.
+     */
+    public void setContainer(boolean container)
     {
-        this._description = _description;
-    } //-- void setDescription(java.lang.String) 
-
-    /**
-     * 
-     * @param _direct
-    **/
-    public void setDirect(boolean _direct)
-    {
-        this._direct = _direct;
-        this._has_direct = true;
-    } //-- void setDirect(boolean) 
-
-    /**
-     * 
-     * @param _getMethod
-    **/
-    public void setGetMethod(java.lang.String _getMethod)
-    {
-        this._getMethod = _getMethod;
-    } //-- void setGetMethod(java.lang.String) 
-
-    /**
-     * 
-     * @param _handler
-    **/
-    public void setHandler(java.lang.String _handler)
-    {
-        this._handler = _handler;
-    } //-- void setHandler(java.lang.String) 
-
-    /**
-     * 
-     * @param _hasMethod
-    **/
-    public void setHasMethod(java.lang.String _hasMethod)
-    {
-        this._hasMethod = _hasMethod;
-    } //-- void setHasMethod(java.lang.String) 
-    
-    /**
-     * 
-     * @param _lazy
-    **/
-    public void setLazy(boolean _lazy)
-    {
-        this._lazy = _lazy;
-        this._has_lazy = true;
-    } //-- void setLazy(boolean) 
-
-    /**
-     * 
-     * @param _container
-    **/
-    public void setContainer(boolean _container)
-    {
-        this._container = _container;
+        this._container = container;
         this._has_container = true;
     } //-- void setContainer(boolean) 
 
     /**
+     * Sets the value of field 'createMethod'.
      * 
-     * @param _ldap
-    **/
-    public void setLdap(Ldap _ldap)
+     * @param createMethod the value of field 'createMethod'.
+     */
+    public void setCreateMethod(java.lang.String createMethod)
     {
-        this._ldap = _ldap;
-    } //-- void setLdap(Ldap) 
+        this._createMethod = createMethod;
+    } //-- void setCreateMethod(java.lang.String) 
 
     /**
+     * Sets the value of field 'description'.
      * 
-     * @param _name
-    **/
-    public void setName(java.lang.String _name)
+     * @param description the value of field 'description'.
+     */
+    public void setDescription(java.lang.String description)
     {
-        this._name = _name;
+        this._description = description;
+    } //-- void setDescription(java.lang.String) 
+
+    /**
+     * Sets the value of field 'direct'.
+     * 
+     * @param direct the value of field 'direct'.
+     */
+    public void setDirect(boolean direct)
+    {
+        this._direct = direct;
+        this._has_direct = true;
+    } //-- void setDirect(boolean) 
+
+    /**
+     * Sets the value of field 'getMethod'.
+     * 
+     * @param getMethod the value of field 'getMethod'.
+     */
+    public void setGetMethod(java.lang.String getMethod)
+    {
+        this._getMethod = getMethod;
+    } //-- void setGetMethod(java.lang.String) 
+
+    /**
+     * Sets the value of field 'handler'.
+     * 
+     * @param handler the value of field 'handler'.
+     */
+    public void setHandler(java.lang.String handler)
+    {
+        this._handler = handler;
+    } //-- void setHandler(java.lang.String) 
+
+    /**
+     * Sets the value of field 'hasMethod'.
+     * 
+     * @param hasMethod the value of field 'hasMethod'.
+     */
+    public void setHasMethod(java.lang.String hasMethod)
+    {
+        this._hasMethod = hasMethod;
+    } //-- void setHasMethod(java.lang.String) 
+
+    /**
+     * Sets the value of field 'lazy'.
+     * 
+     * @param lazy the value of field 'lazy'.
+     */
+    public void setLazy(boolean lazy)
+    {
+        this._lazy = lazy;
+        this._has_lazy = true;
+    } //-- void setLazy(boolean) 
+
+    /**
+     * Sets the value of field 'ldap'.
+     * 
+     * @param ldap the value of field 'ldap'.
+     */
+    public void setLdap(org.exolab.castor.mapping.xml.Ldap ldap)
+    {
+        this._ldap = ldap;
+    } //-- void setLdap(org.exolab.castor.mapping.xml.Ldap) 
+
+    /**
+     * Sets the value of field 'name'.
+     * 
+     * @param name the value of field 'name'.
+     */
+    public void setName(java.lang.String name)
+    {
+        this._name = name;
     } //-- void setName(java.lang.String) 
 
     /**
+     * Sets the value of field 'required'.
      * 
-     * @param _required
-    **/
-    public void setRequired(boolean _required)
+     * @param required the value of field 'required'.
+     */
+    public void setRequired(boolean required)
     {
-        this._required = _required;
+        this._required = required;
         this._has_required = true;
     } //-- void setRequired(boolean) 
 
     /**
+     * Sets the value of field 'setMethod'.
      * 
-     * @param _setMethod
-    **/
-    public void setSetMethod(java.lang.String _setMethod)
+     * @param setMethod the value of field 'setMethod'.
+     */
+    public void setSetMethod(java.lang.String setMethod)
     {
-        this._setMethod = _setMethod;
+        this._setMethod = setMethod;
     } //-- void setSetMethod(java.lang.String) 
 
     /**
+     * Sets the value of field 'sql'.
      * 
-     * @param _sql
-    **/
-    public void setSql(Sql _sql)
+     * @param sql the value of field 'sql'.
+     */
+    public void setSql(org.exolab.castor.mapping.xml.Sql sql)
     {
-        this._sql = _sql;
-    } //-- void setSql(Sql) 
+        this._sql = sql;
+    } //-- void setSql(org.exolab.castor.mapping.xml.Sql) 
 
     /**
+     * Sets the value of field 'transient'.
      * 
      * @param _transient
-    **/
+     * @param transient the value of field 'transient'.
+     */
     public void setTransient(boolean _transient)
     {
         this._transient = _transient;
@@ -480,18 +707,23 @@ public class FieldMapping implements java.io.Serializable {
     } //-- void setTransient(boolean) 
 
     /**
+     * Sets the value of field 'type'.
      * 
-     * @param _type
-    **/
-    public void setType(java.lang.String _type)
+     * @param type the value of field 'type'.
+     */
+    public void setType(java.lang.String type)
     {
-        this._type = _type;
+        this._type = type;
     } //-- void setType(java.lang.String) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return FieldMapping
+     */
     public static org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -499,11 +731,13 @@ public class FieldMapping implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.FieldMapping unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

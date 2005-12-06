@@ -19,6 +19,7 @@ package org.castor.persist.proxy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -28,6 +29,8 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.persist.FieldMolder;
 
 /**
@@ -35,6 +38,8 @@ import org.exolab.castor.persist.FieldMolder;
  */
 public abstract class CollectionProxy {
 
+    private static final Log LOG = LogFactory.getLog(CollectionProxy.class);
+    
     public abstract Object getCollection();
 
     public abstract void add(Object key, Object value);
@@ -64,7 +69,29 @@ public abstract class CollectionProxy {
         } else if (cls == Map.class) {
             return new MapProxy(fieldMolder, object, classLoader, new HashMap());
         } else if (cls == SortedSet.class) {
-            return new ColProxy(fieldMolder, object, classLoader, new TreeSet());
+            String comparatorClassName = fieldMolder.getComparator();
+            if (comparatorClassName != null) {
+                Comparator comparator;
+                try {
+                    if (classLoader != null) {
+                        comparator = (Comparator) classLoader.loadClass(comparatorClassName).newInstance();
+                    } else {
+                        comparator = (Comparator) Class.forName(comparatorClassName).newInstance();
+                    }
+                } catch (InstantiationException e) {
+                    LOG.error ("Problem instantiating instance of " + comparatorClassName);
+                    throw new IllegalArgumentException("Problem instantiating instance of " + comparatorClassName);
+                } catch (IllegalAccessException e) {
+                    LOG.error ("Problem accessing constructor of " + comparatorClassName);
+                    throw new IllegalArgumentException("Problem accessing constructor of " + comparatorClassName);
+                } catch (ClassNotFoundException e) {
+                    LOG.error ("Problem loading class for " + comparatorClassName);
+                    throw new IllegalArgumentException("Problem instantiating instance of " + comparatorClassName);
+                }
+                return new ColProxy(fieldMolder, object, classLoader, new TreeSet(comparator));
+            } else {
+                return new ColProxy(fieldMolder, object, classLoader, new TreeSet());
+            }
         } else {
             throw new IllegalArgumentException(
                     "Collection Proxy doesn't exist for this type : " + cls);

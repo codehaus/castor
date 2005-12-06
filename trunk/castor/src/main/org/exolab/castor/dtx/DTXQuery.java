@@ -564,7 +564,7 @@ public class DTXQuery {
 
 	String table = mapTo.getTable();
 
-        FieldMapping[] fields = clsMapping.getFieldMapping();
+        FieldMapping[] fields = clsMapping.getClassChoice().getFieldMapping();
 	FieldMapping identity = null;
 
         String identityName = clsMapping.getIdentity(0);
@@ -626,7 +626,7 @@ public class DTXQuery {
 		    // We have a one-to-many relationship with a sub object.
 		    // get those objects, too.
 
-                    FieldMapping[] relFields = relMapping.getFieldMapping();
+                    FieldMapping[] relFields = relMapping.getClassChoice().getFieldMapping();
 		    MapTo relMapTo = relMapping.getMapTo();
 
 		    if (relMapTo == null) {
@@ -749,7 +749,7 @@ public class DTXQuery {
             name = name.substring(name.indexOf(".") + 1);
 	}
 
-        FieldMapping[] fields = clsMapping.getFieldMapping();
+        FieldMapping[] fields = clsMapping.getClassChoice().getFieldMapping();
 	FieldMapping field = null;
 
         for (int i = 0; i < fields.length; ++i) {

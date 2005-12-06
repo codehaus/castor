@@ -1,7 +1,7 @@
 /*
  * This class was automatically generated with 
- * <a href="http://castor.exolab.org">Castor 0.8.12</a>, using an
- * XML Schema.
+ * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * Schema.
  * $Id$
  */
 
@@ -11,20 +11,23 @@ package org.exolab.castor.mapping.xml;
  //- Imported classes and packages -/
 //---------------------------------/
 
+import java.io.IOException;
 import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.Vector;
-import org.exolab.castor.xml.*;
 import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.Marshaller;
+import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.ValidationException;
-import org.xml.sax.DocumentHandler;
+import org.xml.sax.ContentHandler;
 
 /**
+ * Class KeyGeneratorDef.
  * 
  * @version $Revision$ $Date$
-**/
+ */
 public class KeyGeneratorDef implements java.io.Serializable {
 
 
@@ -32,20 +35,30 @@ public class KeyGeneratorDef implements java.io.Serializable {
      //- Class/Member Variables -/
     //--------------------------/
 
+    /**
+     * Field _name
+     */
     private java.lang.String _name;
 
+    /**
+     * Field _alias
+     */
     private java.lang.String _alias;
 
-    private java.util.Vector _paramList;
+    /**
+     * Field _paramList
+     */
+    private java.util.ArrayList _paramList;
 
 
       //----------------/
      //- Constructors -/
     //----------------/
 
-    public KeyGeneratorDef() {
+    public KeyGeneratorDef() 
+     {
         super();
-        _paramList = new Vector();
+        _paramList = new ArrayList();
     } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef()
 
 
@@ -54,41 +67,84 @@ public class KeyGeneratorDef implements java.io.Serializable {
     //-----------/
 
     /**
+     * Method addParam
+     * 
+     * 
      * 
      * @param vParam
-    **/
-    public void addParam(Param vParam)
+     */
+    public void addParam(org.exolab.castor.mapping.xml.Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
-        _paramList.addElement(vParam);
-    } //-- void addParam(Param) 
+        _paramList.add(vParam);
+    } //-- void addParam(org.exolab.castor.mapping.xml.Param) 
 
     /**
-    **/
+     * Method addParam
+     * 
+     * 
+     * 
+     * @param index
+     * @param vParam
+     */
+    public void addParam(int index, org.exolab.castor.mapping.xml.Param vParam)
+        throws java.lang.IndexOutOfBoundsException
+    {
+        _paramList.add(index, vParam);
+    } //-- void addParam(int, org.exolab.castor.mapping.xml.Param) 
+
+    /**
+     * Method clearParam
+     * 
+     */
+    public void clearParam()
+    {
+        _paramList.clear();
+    } //-- void clearParam() 
+
+    /**
+     * Method enumerateParam
+     * 
+     * 
+     * 
+     * @return Enumeration
+     */
     public java.util.Enumeration enumerateParam()
     {
-        return _paramList.elements();
+        return new org.exolab.castor.util.IteratorEnumeration(_paramList.iterator());
     } //-- java.util.Enumeration enumerateParam() 
 
     /**
-    **/
+     * Returns the value of field 'alias'.
+     * 
+     * @return String
+     * @return the value of field 'alias'.
+     */
     public java.lang.String getAlias()
     {
         return this._alias;
     } //-- java.lang.String getAlias() 
 
     /**
-    **/
+     * Returns the value of field 'name'.
+     * 
+     * @return String
+     * @return the value of field 'name'.
+     */
     public java.lang.String getName()
     {
         return this._name;
     } //-- java.lang.String getName() 
 
     /**
+     * Method getParam
+     * 
+     * 
      * 
      * @param index
-    **/
-    public Param getParam(int index)
+     * @return Param
+     */
+    public org.exolab.castor.mapping.xml.Param getParam(int index)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
@@ -96,30 +152,45 @@ public class KeyGeneratorDef implements java.io.Serializable {
             throw new IndexOutOfBoundsException();
         }
         
-        return (Param) _paramList.elementAt(index);
-    } //-- Param getParam(int) 
+        return (org.exolab.castor.mapping.xml.Param) _paramList.get(index);
+    } //-- org.exolab.castor.mapping.xml.Param getParam(int) 
 
     /**
-    **/
-    public Param[] getParam()
+     * Method getParam
+     * 
+     * 
+     * 
+     * @return Param
+     */
+    public org.exolab.castor.mapping.xml.Param[] getParam()
     {
         int size = _paramList.size();
-        Param[] mArray = new Param[size];
+        org.exolab.castor.mapping.xml.Param[] mArray = new org.exolab.castor.mapping.xml.Param[size];
         for (int index = 0; index < size; index++) {
-            mArray[index] = (Param) _paramList.elementAt(index);
+            mArray[index] = (org.exolab.castor.mapping.xml.Param) _paramList.get(index);
         }
         return mArray;
-    } //-- Param[] getParam() 
+    } //-- org.exolab.castor.mapping.xml.Param[] getParam() 
 
     /**
-    **/
+     * Method getParamCount
+     * 
+     * 
+     * 
+     * @return int
+     */
     public int getParamCount()
     {
         return _paramList.size();
     } //-- int getParamCount() 
 
     /**
-    **/
+     * Method isValid
+     * 
+     * 
+     * 
+     * @return boolean
+     */
     public boolean isValid()
     {
         try {
@@ -132,9 +203,12 @@ public class KeyGeneratorDef implements java.io.Serializable {
     } //-- boolean isValid() 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param out
-    **/
+     */
     public void marshal(java.io.Writer out)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -143,84 +217,95 @@ public class KeyGeneratorDef implements java.io.Serializable {
     } //-- void marshal(java.io.Writer) 
 
     /**
+     * Method marshal
+     * 
+     * 
      * 
      * @param handler
-    **/
-    public void marshal(org.xml.sax.DocumentHandler handler)
-        throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
+     */
+    public void marshal(org.xml.sax.ContentHandler handler)
+        throws java.io.IOException, org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
         
         Marshaller.marshal(this, handler);
-    } //-- void marshal(org.xml.sax.DocumentHandler) 
+    } //-- void marshal(org.xml.sax.ContentHandler) 
 
     /**
-    **/
-    public void removeAllParam()
-    {
-        _paramList.removeAllElements();
-    } //-- void removeAllParam() 
-
-    /**
+     * Method removeParam
      * 
-     * @param index
-    **/
-    public Param removeParam(int index)
+     * 
+     * 
+     * @param vParam
+     * @return boolean
+     */
+    public boolean removeParam(org.exolab.castor.mapping.xml.Param vParam)
     {
-        Object obj = _paramList.elementAt(index);
-        _paramList.removeElementAt(index);
-        return (Param) obj;
-    } //-- Param removeParam(int) 
+        boolean removed = _paramList.remove(vParam);
+        return removed;
+    } //-- boolean removeParam(org.exolab.castor.mapping.xml.Param) 
 
     /**
+     * Sets the value of field 'alias'.
      * 
-     * @param _alias
-    **/
-    public void setAlias(java.lang.String _alias)
+     * @param alias the value of field 'alias'.
+     */
+    public void setAlias(java.lang.String alias)
     {
-        this._alias = _alias;
+        this._alias = alias;
     } //-- void setAlias(java.lang.String) 
 
     /**
+     * Sets the value of field 'name'.
      * 
-     * @param _name
-    **/
-    public void setName(java.lang.String _name)
+     * @param name the value of field 'name'.
+     */
+    public void setName(java.lang.String name)
     {
-        this._name = _name;
+        this._name = name;
     } //-- void setName(java.lang.String) 
 
     /**
+     * Method setParam
      * 
-     * @param vParam
+     * 
+     * 
      * @param index
-    **/
-    public void setParam(Param vParam, int index)
+     * @param vParam
+     */
+    public void setParam(int index, org.exolab.castor.mapping.xml.Param vParam)
         throws java.lang.IndexOutOfBoundsException
     {
         //-- check bounds for index
         if ((index < 0) || (index > _paramList.size())) {
             throw new IndexOutOfBoundsException();
         }
-        _paramList.setElementAt(vParam, index);
-    } //-- void setParam(Param, int) 
+        _paramList.set(index, vParam);
+    } //-- void setParam(int, org.exolab.castor.mapping.xml.Param) 
 
     /**
+     * Method setParam
+     * 
+     * 
      * 
      * @param paramArray
-    **/
-    public void setParam(Param[] paramArray)
+     */
+    public void setParam(org.exolab.castor.mapping.xml.Param[] paramArray)
     {
         //-- copy array
-        _paramList.removeAllElements();
+        _paramList.clear();
         for (int i = 0; i < paramArray.length; i++) {
-            _paramList.addElement(paramArray[i]);
+            _paramList.add(paramArray[i]);
         }
-    } //-- void setParam(Param) 
+    } //-- void setParam(org.exolab.castor.mapping.xml.Param) 
 
     /**
+     * Method unmarshal
+     * 
+     * 
      * 
      * @param reader
-    **/
+     * @return KeyGeneratorDef
+     */
     public static org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader reader)
         throws org.exolab.castor.xml.MarshalException, org.exolab.castor.xml.ValidationException
     {
@@ -228,11 +313,13 @@ public class KeyGeneratorDef implements java.io.Serializable {
     } //-- org.exolab.castor.mapping.xml.KeyGeneratorDef unmarshal(java.io.Reader) 
 
     /**
-    **/
+     * Method validate
+     * 
+     */
     public void validate()
         throws org.exolab.castor.xml.ValidationException
     {
-        Validator validator = new Validator();
+        org.exolab.castor.xml.Validator validator = new org.exolab.castor.xml.Validator();
         validator.validate(this);
     } //-- void validate() 
 

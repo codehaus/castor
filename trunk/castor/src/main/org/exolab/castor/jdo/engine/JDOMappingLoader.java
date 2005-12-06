@@ -56,7 +56,7 @@ import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.TypeInfo;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.*;
-import org.exolab.castor.mapping.xml.types.DirtyType;
+import org.exolab.castor.mapping.xml.types.SqlDirtyType;
 import org.exolab.castor.util.Messages;
 
 import java.io.PrintWriter;
@@ -466,8 +466,8 @@ public class JDOMappingLoader extends MappingLoader {
         }
                 
         FieldDescriptorImpl fieldDesc 
-            = new FieldDescriptorImpl( fieldName, typeInfo, handler,
-                fieldMap.getTransient() );
+            = new FieldDescriptorImpl(fieldName, typeInfo, handler,
+                fieldMap.getTransient(), fieldMap.getComparator());
 
         fieldDesc.setRequired(fieldMap.getRequired());
 
@@ -502,10 +502,10 @@ public class JDOMappingLoader extends MappingLoader {
         }
 
         return new JDOFieldDescriptor( (FieldDescriptorImpl) fieldDesc, sqlName, sType,
-            ! DirtyType.IGNORE.equals( fieldMap.getSql().getDirty() ),
+            !SqlDirtyType.IGNORE.equals( fieldMap.getSql().getDirty() ),
             fieldMap.getSql().getManyTable(),
             fieldMap.getSql().getManyKey(),
-            fieldMap.getSql().getReadonly() );
+            fieldMap.getSql().getReadOnly() );
     }
 
     public void loadMapping( MappingRoot mapping, Object param )
