@@ -25,7 +25,6 @@ import harness.CastorTestCase;
 import harness.TestHarness;
 
 import jdo.JDOCategory;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.ObjectNotFoundException;
@@ -72,6 +71,8 @@ public final class TestPolymorphism extends CastorTestCase {
         testQueryLaptops();
         testQueryServers();
         testQueryProducts();
+        testOQLQueryWithParameter();
+//        testOQLQueryWithoutParameter();
     }
 
     public void testLoadLaptop() throws Exception {
@@ -537,4 +538,42 @@ public final class TestPolymorphism extends CastorTestCase {
         
         database.close();
     }
+    
+    public void testOQLQueryWithParameter () throws Exception {
+        Database database = _category.getDatabase();
+        
+        database.begin();
+        OQLQuery query = database.getOQLQuery("SELECT count(laptop.id) FROM " 
+        		+ Laptop.class.getName() + " laptop WHERE laptop.resolution = $1");
+        query.bind("1024");
+        QueryResults results = query.execute();
+        
+        if (results.hasMore()) {
+        	Long count = (Long) results.next();
+        	assertNotNull (count);
+        	assertEquals (1, count.intValue());
+        }
+        
+        database.commit();
+        
+        database.close();
+    }
+//    public void testOQLQueryWithoutParameter () throws Exception {
+//        Database database = _category.getDatabase();
+//        
+//        database.begin();
+//        OQLQuery query = database.getOQLQuery("SELECT count(laptop.id) FROM " 
+//        		+ Laptop.class.getName() + " laptop WHERE laptop.resolution = '1024'");
+//        QueryResults results = query.execute();
+//        
+//        if (results.hasMore()) {
+//        	Long count = (Long) results.next();
+//        	assertNotNull (count);
+//        	assertEquals (1, count.intValue());
+//        }
+//
+//        database.commit();
+//        
+//        database.close();
+//    }
 }
