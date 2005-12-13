@@ -54,16 +54,16 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class QueryException
-    extends PersistenceException
-{
-    public QueryException( String message )
-    {
-        super( message );
-    }
-    public QueryException( String message, Throwable t) {
-    		super(message, t);
-    }
+public class QueryException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8880099810750905570L;
 
+    public QueryException(final String message) {
+        super(message);
+    }
+    
+    public QueryException(final String message, final Throwable t) {
+        super(message, t);
+    }
 }
 

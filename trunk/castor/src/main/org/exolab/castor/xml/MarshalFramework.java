@@ -440,7 +440,6 @@ abstract class MarshalFramework {
         private XMLFieldDescriptor[] _attributes = null;
         private XMLFieldDescriptor[] _elements   = null;
         private FieldDescriptor[]    _fields     = null;
-        private XMLFieldDescriptor[] _nested     = null;
         
         /**
          * Creates a new InternalXMLClassDescriptor for the given

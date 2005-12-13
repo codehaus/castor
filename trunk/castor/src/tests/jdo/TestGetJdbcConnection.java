@@ -46,24 +46,15 @@
 
 package jdo;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.QueryResults;
 
 import harness.TestHarness;
 import harness.CastorTestCase;
 
 import java.sql.Connection;
-import java.sql.SQLException;
 
-public class TestGetJdbcConnection extends CastorTestCase 
-{
-
-    private static final Log _log = LogFactory.getLog (TestGetJdbcConnection.class);
-    
+public class TestGetJdbcConnection extends CastorTestCase {
     private JDOCategory    _category;
 
     private Database       _db;
@@ -107,7 +98,7 @@ public class TestGetJdbcConnection extends CastorTestCase
 
     private void testGetJdbcConnectionWithoutActiveTransaction() throws Exception {
         try {
-            Connection connection = _db.getJdbcConnection();
+            _db.getJdbcConnection();
             fail("Should have received PersistenceException (no active transaction)");
         } catch (PersistenceException e) {
             assertEquals ("No transaction in progress for the current thread. Please start a transaction before trying to obtain the JDBC connection", e.getMessage());

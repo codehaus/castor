@@ -64,8 +64,10 @@ import org.exolab.castor.xml.ValidationException;
  * @version $Revision$ $Date$
  **/
 public class RedefineSchema extends Annotated {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7095458840388436859L;
 
-	/**
+    /**
 	 * The original schema that is imported in the 
 	 * parent schema
 	 */

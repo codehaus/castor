@@ -26,7 +26,6 @@ import org.exolab.castor.jdo.TimeStampable;
 public final class ComposedProduct extends Product1893 implements TimeStampable {
     private String _name;
     private Vector _subProducts = new Vector();
-    private long _timeStamp;
 
     public String getExtraName() { return _name; }
     public void setExtraName(final String name) { _name = name; }

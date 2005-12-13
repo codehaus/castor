@@ -45,15 +45,14 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents timeDuration
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class DurationType extends AtomicType
-{
+public class DurationType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 6278260639621816644L;
 }
 
 

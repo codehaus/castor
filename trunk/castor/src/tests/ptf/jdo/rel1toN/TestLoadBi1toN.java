@@ -47,9 +47,6 @@ public final class TestLoadBi1toN extends TestCase {
     
     private JDOManager _jdo = null;
     
-    private String[]   _tests = new String[8]; 
-    private long[][]   _times = new long[8][5];
-
     public static Test suite() throws Exception {
         String config = TestLoadBi1toN.class.getResource(JDO_CONF_FILE).toString();
         JDOManager.loadConfiguration(config, TestLoadBi1toN.class.getClassLoader());
@@ -440,8 +437,7 @@ public final class TestLoadBi1toN extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            OID oid = (OID) results.next();
-
+            results.next();
             count++;
         }
         
@@ -483,7 +479,7 @@ public final class TestLoadBi1toN extends TestCase {
         Collection services = equipment.getServices();
         Iterator iter = services.iterator();
         while (iter.hasNext()) {
-            Service service = (Service) iter.next();
+            iter.next();
         }
     }
     

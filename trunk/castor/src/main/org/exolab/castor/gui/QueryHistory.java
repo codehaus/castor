@@ -50,6 +50,9 @@ import java.util.Vector;
 
 
 public class QueryHistory implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 235997211123063614L;
+
     private  Vector querys = new Vector();
     private int currentPos=0;
     private  int maxsize=20;

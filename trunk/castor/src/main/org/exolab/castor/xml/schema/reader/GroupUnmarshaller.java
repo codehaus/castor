@@ -71,11 +71,6 @@ public class GroupUnmarshaller extends ComponentReader {
      //- Static Class Variables -/
     //--------------------------/
 
-    private static final int ALL         = 1;
-    private static final int CHOICE      = 2;
-    private static final int MODEL_GROUP = 3;
-    private static final int SEQUENCE    = 4;
-
     /**
      * The value of the maximum occurance wild card
      */

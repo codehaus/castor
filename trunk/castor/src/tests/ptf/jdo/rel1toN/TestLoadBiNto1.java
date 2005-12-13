@@ -45,9 +45,6 @@ public final class TestLoadBiNto1 extends TestCase {
     
     private JDOManager _jdo = null;
     
-    private String[]   _tests = new String[8]; 
-    private long[][]   _times = new long[8][5];
-
     public static Test suite() throws Exception {
         String config = TestLoadBiNto1.class.getResource(JDO_CONF_FILE).toString();
         JDOManager.loadConfiguration(config, TestLoadBiNto1.class.getClassLoader());
@@ -109,8 +106,7 @@ public final class TestLoadBiNto1 extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            Object object = results.next();
-
+            results.next();
             count++;
         }
         
@@ -148,8 +144,7 @@ public final class TestLoadBiNto1 extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            Object object = results.next();
-
+            results.next();
             count++;
         }
         
@@ -188,8 +183,7 @@ public final class TestLoadBiNto1 extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            Object object = results.next();
-
+            results.next();
             count++;
         }
         
@@ -227,8 +221,7 @@ public final class TestLoadBiNto1 extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            Object object = results.next();
-
+            results.next();
             count++;
         }
         
@@ -270,8 +263,7 @@ public final class TestLoadBiNto1 extends TestCase {
         int count = 0;
         while (results.hasMore()) {
             OID oid = (OID) results.next();
-            Object object = db.load(Service.class, oid.getId());
-
+            db.load(Service.class, oid.getId());
             count++;
         }
         
@@ -312,8 +304,7 @@ public final class TestLoadBiNto1 extends TestCase {
         int count = 0;
         while (results.hasMore()) {
             OID oid = (OID) results.next();
-            Object object = db.load(Service.class, oid.getId());
-
+            db.load(Service.class, oid.getId());
             count++;
         }
         
@@ -355,8 +346,7 @@ public final class TestLoadBiNto1 extends TestCase {
         int count = 0;
         while (results.hasMore()) {
             OID oid = (OID) results.next();
-            Object object = db.load(Service.class, oid.getId(), Database.ReadOnly);
-
+            db.load(Service.class, oid.getId(), Database.ReadOnly);
             count++;
         }
         
@@ -397,8 +387,7 @@ public final class TestLoadBiNto1 extends TestCase {
         int count = 0;
         while (results.hasMore()) {
             OID oid = (OID) results.next();
-            Object object = db.load(Service.class, oid.getId(), Database.ReadOnly);
-
+            db.load(Service.class, oid.getId(), Database.ReadOnly);
             count++;
         }
         
@@ -438,8 +427,7 @@ public final class TestLoadBiNto1 extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            OID oid = (OID) results.next();
-
+            results.next();
             count++;
         }
         

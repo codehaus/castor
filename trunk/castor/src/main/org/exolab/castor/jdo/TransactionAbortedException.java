@@ -54,19 +54,16 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class TransactionAbortedException
-    extends PersistenceException
-{
+public class TransactionAbortedException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8889273719776531668L;
 
-    public TransactionAbortedException( String message )
-    {
-        super( message );
+    public TransactionAbortedException(final String message) {
+        super(message);
     }
 
-    public TransactionAbortedException( String message, Throwable except )
-    {
-        super( message, except );
+    public TransactionAbortedException(final String message, final Throwable except) {
+        super(message, except);
     }
-
 }
 

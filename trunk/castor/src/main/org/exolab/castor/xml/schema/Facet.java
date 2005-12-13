@@ -53,6 +53,8 @@ import org.exolab.castor.xml.ValidationException;
  * @version $Revision$ $Date$
 **/
 public class Facet extends Annotated {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7821829275720939922L;
 
     public static final String ENUMERATION      = "enumeration";
     public static final String LENGTH           = "length";

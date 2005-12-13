@@ -74,11 +74,6 @@ public class URIUtils {
     private static final String URL_PATH_SEP_STR = "/";
 
     /**
-     * The Device separator for an URI
-     */
-    private static final char DEVICE_SEP = '|';
-
-    /**
      * The current directory designator
      */
     private static final String CURRENT_DIR_OP = ".";
@@ -88,12 +83,6 @@ public class URIUtils {
      */
     private static final String PARENT_DIR_OP  = "..";
     
-    /**
-     * Used when checking for "." or ".." in a path
-     */
-    private static final String DOT_SLASH = "./";
-    
-
 	/**
 	 * Returns an InputStream for the file represented by the href
 	 * argument

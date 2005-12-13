@@ -120,6 +120,9 @@ public class QueryAnalyser {
     }
 
     private class MainFrame extends JFrame {
+        /** SerialVersionUID */
+        private static final long serialVersionUID = 3524368558606642742L;
+
         QueryHistory qhistory = new QueryHistory();
         Mapping mapping = new Mapping();
 

@@ -68,16 +68,9 @@ public class DescriptorJClass extends JClass {
         = new JClass("org.exolab.castor.mapping.FieldDescriptor");
 
     //-- org.exolab.castor.xml
-    private static JClass _XMLFieldDescriptorImplClass
-        = new JClass("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
-
-
     private static JClass _XMLFieldDescriptorClass
         = new JClass("org.exolab.castor.xml.XMLFieldDescriptor");
 
-
-    private static JType xfdArrayClass =
-        _XMLFieldDescriptorClass.createArray();
 
     private static JType _TypeValidatorClass
         = new JClass("org.exolab.castor.xml.TypeValidator");
@@ -86,7 +79,6 @@ public class DescriptorJClass extends JClass {
     //-- methods defined by org.exolab.castor.xml.XMLClassDescriptor
     private JMethod _getNameSpacePrefix      = null;
     private JMethod _getNameSpaceURI         = null;
-    private JMethod _getValidator            = null;
     private JMethod _getXMLName              = null;
 
     //-- methods defined by org.exolab.castor.mapping.ClassDescriptor
@@ -186,7 +178,6 @@ public class DescriptorJClass extends JClass {
         jsc = method.getSourceCode();
         jsc.add("return this;");
         addMethod(method);
-        _getValidator = method;
 
         //-- create getXMLName method
         method = new JMethod(SGTypes.String, "getXMLName");

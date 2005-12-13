@@ -80,10 +80,6 @@ public class SchemaUnmarshaller extends ComponentReader {
      //- Member Variables -/
     //--------------------/
 
-    private static final String XMLNS        = "xmlns";
-    private static final String XMLNS_PREFIX = "xmlns:";
-    private static final String XML_PREFIX   = "xml";
-    
     /**
      * is this an included schema?
      */

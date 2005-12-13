@@ -52,21 +52,19 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class DatabaseNotFoundException
-    extends PersistenceException
-{
-    public DatabaseNotFoundException( String message )
-    {
-        super( message );
+public class DatabaseNotFoundException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 4192500303396449687L;
+
+    public DatabaseNotFoundException(final String message) {
+        super(message);
     }
 
-    public DatabaseNotFoundException( Throwable except )
-    {
-        super( except.getMessage(), except);
+    public DatabaseNotFoundException(final Throwable except) {
+        super(except.getMessage(), except);
     }
 
-    public DatabaseNotFoundException( String message, Throwable except )
-    {
+    public DatabaseNotFoundException(final String message, final Throwable except) {
         super( message, except);
     }
 }

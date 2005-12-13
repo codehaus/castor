@@ -57,8 +57,9 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class IdentityField extends Annotated {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1385357135959672473L;
+
     /**
      * Identity Field id (optional)
     **/

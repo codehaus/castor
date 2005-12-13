@@ -73,6 +73,8 @@ import java.text.SimpleDateFormat;
  * @version $Revision$
 **/
 public class RecurringDuration extends RecurringDurationBase{
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6037158412155942249L;
 
     /** The date format used by the toDate() method */
     private static final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";

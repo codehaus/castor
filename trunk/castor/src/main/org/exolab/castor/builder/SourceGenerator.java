@@ -142,13 +142,6 @@ public class SourceGenerator
         APP_URI + "\">" + APP_NAME + " " + VERSION +
         "</a>, using an XML Schema.\n$" + "Id"+"$";
 
-    private static final String ELEMENT_VALUE = "element";
-	private static final String TYPE_VALUE = "type";
-
-    private static final int    ELEMENT_BINDING = 0;
-    private static final int    TYPE_BINDING    = 1;
-
-    private static final String MAPPING_FILE = ".castor.xml";
     private static final String CDR_FILE = ".castor.cdr";
     
     //-------------------------/
@@ -223,18 +216,6 @@ public class SourceGenerator
     **/
     private boolean _createDescriptors = true;
 
-    /**
-	 * A flag indicating whether or not to generate XML marshalling
-	 * framework specific methods.
-	 */
-	private boolean _createMarshall  = true;
-
-   /**
-	* A flag indicating whether or not to implement
-	* org.exolab.castor.tests.framework.CastorTestable
-	*/
-	private boolean _testable  = false;
-    
     /**
      * A flag indicating whether or not to generate sources 
      * for imported XML Schemas.

@@ -54,20 +54,15 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class LockNotGrantedException
-    extends PersistenceException
-{
+public class LockNotGrantedException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2630541411648246369L;
 
-
-    public LockNotGrantedException( String message )
-    {
-        super ( message );
+    public LockNotGrantedException(final String message) {
+        super(message);
     }
 
-    public LockNotGrantedException( String message, Throwable exception )
-    {
-        super ( message, exception );
+    public LockNotGrantedException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-
 }

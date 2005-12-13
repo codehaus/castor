@@ -60,6 +60,8 @@ import org.exolab.castor.xml.ValidationException;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  */
 public class Wildcard extends Particle {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2747251897459951684L;
 
     /**
      * The vector where we store the list of namespaces
@@ -94,12 +96,6 @@ public class Wildcard extends Particle {
      * (strict by default)
      */
      private String _processContents;
-
-    /**
-     * the id for this wildcard
-     */
-    private String _id  = null;
-
 
     /**
      * The wildcard is embedded in a complexType
@@ -273,9 +269,7 @@ public class Wildcard extends Particle {
      * Sets the ID for this Group
      * @param id the ID for this Group
      */
-    public void setId(String id) {
-        _id = id;
-    } //-- setId
+    public void setId(final String id) { }
 
 
     /**

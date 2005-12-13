@@ -56,14 +56,15 @@ import org.exolab.castor.jdo.QueryException;
  * @version $Revision$ $Date$
  */
 public class NoMoreTokensException extends QueryException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7113903143107673799L;
 
-	public NoMoreTokensException() {
+    public NoMoreTokensException() {
 		super( "There are no more tokens available from the lexer." );
 	}
 
 	public NoMoreTokensException( String message ) {
     super( message );
   }
-	
 }
 

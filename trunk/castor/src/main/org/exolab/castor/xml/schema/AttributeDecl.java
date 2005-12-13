@@ -56,7 +56,8 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public final class AttributeDecl extends Annotated {
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8720345516857919305L;
 
     /**
      * The use attribute value for optional

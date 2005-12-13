@@ -53,8 +53,10 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-class SimpleTypeReference extends SimpleType
-{
+class SimpleTypeReference extends SimpleType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 1020507618887404978L;
+
     /**
      * The referred type (stored in the schema)
      */

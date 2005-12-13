@@ -43,43 +43,33 @@
  * $Id$
  */
 
-
 package jdo;
-
 
 import java.util.Collection;
 import java.util.ArrayList;
 
-
 /**
  * Test object mapping to test_oqlext used for Oql test.
  */
-public class TestOqlExtends extends TestPersistent
-{
-
+public class TestOqlExtends extends TestPersistent {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5458281563382200756L;
 
     private int  _ext;
 
     private Collection _list = new ArrayList();
 
-
-    public TestOqlExtends()
-    {
+    public TestOqlExtends() {
         super();
     }
 
-
-    public void setExt( int ext )
-    {
+    public void setExt(final int ext) {
         _ext = ext;
     }
 
-
-    public int getExt()
-    {
+    public int getExt() {
         return _ext;
     }
-
 
     public Collection getList() {
         return _list;
@@ -89,10 +79,7 @@ public class TestOqlExtends extends TestPersistent
         _list = list;
     }
     
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + " / " + _ext;
     }
-
-
 }

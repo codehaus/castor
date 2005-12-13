@@ -59,13 +59,11 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ValidityException
-    extends Exception
-{
-
+public class ValidityException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 6928906878046428690L;
 
     private Exception  _except;
-
 
     public ValidityException( String message )
     {

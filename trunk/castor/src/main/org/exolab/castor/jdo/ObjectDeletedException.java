@@ -7,19 +7,15 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectDeletedException
-    extends ObjectNotPersistentException
-{
-    
-    public ObjectDeletedException( String message )
-    {
-        super( message );
+public class ObjectDeletedException extends ObjectNotPersistentException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5294966338473275287L;
+
+    public ObjectDeletedException(final String message) {
+        super(message);
     }
 
-    public ObjectDeletedException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public ObjectDeletedException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-    
 } 

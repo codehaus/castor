@@ -61,10 +61,12 @@ import java.util.TimeZone;
  */
 
 public class GYear extends GYearMonth {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8977039151222106864L;
 
-   /**
-    * The gYear format
-    */
+    /**
+     * The gYear format
+     */
     private static final String YEAR_FORMAT = "yyyy";
 
     private static final String BAD_GYEAR = "Bad gYear format: ";

@@ -71,11 +71,6 @@ public class Main extends TestHarness {
     private String testBranchs;
 
     /**
-     * Indicates all the test cases run in verbose mode
-     */
-    private boolean verbose;
-
-    /**
      * Indicates we only display information of test case, 
      * but not running them.
      */

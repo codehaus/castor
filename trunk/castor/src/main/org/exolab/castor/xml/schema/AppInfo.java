@@ -54,8 +54,9 @@ package org.exolab.castor.xml.schema;
  * @see AnnotationItem
  */
 public class AppInfo extends AnnotationItem {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8678983924238645714L;
+
     /**
      * Creates a new AppInfo
      */

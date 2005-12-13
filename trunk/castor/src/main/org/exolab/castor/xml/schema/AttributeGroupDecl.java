@@ -57,6 +57,8 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public final class AttributeGroupDecl extends AttributeGroup {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5401452412514803353L;
 
     /**
      * Error message for a null argument

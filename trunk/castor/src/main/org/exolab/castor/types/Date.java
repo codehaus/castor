@@ -67,6 +67,8 @@ import java.util.TimeZone;
  */
 
 public class Date extends DateTimeBase{
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1634875709019365137L;
 
     /**
      * Flag indicating that we are still looking for a year

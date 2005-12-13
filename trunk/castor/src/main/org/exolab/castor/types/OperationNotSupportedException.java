@@ -46,15 +46,15 @@
  
  package org.exolab.castor.types;
  
- public class OperationNotSupportedException 
-    extends RuntimeException
- {
-    
+ public class OperationNotSupportedException  extends RuntimeException {
+     /** SerialVersionUID */
+    private static final long serialVersionUID = 7426855587564117483L;
+
     public OperationNotSupportedException() {
         super();
     }
-    public OperationNotSupportedException(String message) {
+    
+    public OperationNotSupportedException(final String message) {
         super(message);
     }
-
- }
+}

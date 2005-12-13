@@ -70,13 +70,9 @@ public class SQLRelationLoader {
 
     private int[] leftType;
 
-    private TypeConvertor[] leftTo;
-
     private TypeConvertor[] leftFrom;
 
     private String[] leftParam;
-
-    private TypeConvertor[] rightTo;
 
     private TypeConvertor[] rightFrom;
 
@@ -113,10 +109,8 @@ public class SQLRelationLoader {
             String[] otherKey, int[] otherKeyType,
             TypeConvertor[] ridTo, TypeConvertor[] ridFrom, String[] ridParam ) {
 
-        leftTo = idTo;
         leftFrom = idFrom;
         leftParam = idParam;
-        rightTo = ridTo;
         rightFrom = ridFrom;
         rightParam = ridParam;
 

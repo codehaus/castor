@@ -43,9 +43,7 @@
  * $Id$
  */
 
-
 package jdo;
-
 
 import java.util.Date;
 import java.util.Enumeration;
@@ -57,162 +55,115 @@ import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.mapping.AccessMode;
 
-
 /**
  * Test object mapping to test_persistent used for Persistent test.
  */
-public class TestPersistent implements Persistent, TimeStampable, java.io.Serializable
-{
-
+public class TestPersistent implements Persistent, TimeStampable, java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 861059599755591225L;
 
     public static final int       DefaultId = 7;
 
-
     public static final String    DefaultValue = "persistent";
-
 
     private int            _id;
 
-
     private String         _value;
-
 
     private Date           _creationTime;
 
-
     private Date           _modificationTime;
-
 
     private Integer        _parentId;
 
-
     private TestPersistent _parent;
-
 
     private Vector         _children;
 
-
     private Vector         _origChildren;
-
 
     private TestGroup      _group;
 
-
     private TestPersistRelated _related;
-
 
     private TestPersistRelated _origRelated;
 
-
     private transient Database _db;
-
 
     private long           _timeStamp;
 
-
-    public TestPersistent()
-    {
+    public TestPersistent() {
         this( DefaultId );
     }
 
-
-    public TestPersistent( int id )
-    {
+    public TestPersistent(final int id) {
         _id = id;
         _value = DefaultValue;
         _children = new Vector();
     }
 
 
-    public void setId( int id )
-    {
+    public void setId(final int id) {
         _id = id;
     }
 
-
-    public int getId()
-    {
+    public int getId() {
         return _id;
     }
 
-
-    public void setParentId( Integer parentId )
-    {
+    public void setParentId(final Integer parentId) {
         _parentId = parentId;
     }
 
-
-    public Integer getParentId()
-    {
+    public Integer getParentId() {
         return _parentId;
     }
 
 
-    public void setValue1( String value )
-    {
+    public void setValue1(final String value) {
         _value = value;
     }
 
-
-    public String getValue1()
-    {
+    public String getValue1() {
         return _value;
     }
 
-
-    public void setCreationTime( Date creationTime )
-    {
+    public void setCreationTime(final Date creationTime) {
         _creationTime = creationTime;
     }
 
-
-    public Date getCreationTime()
-    {
+    public Date getCreationTime() {
         return _creationTime;
     }
 
-
-    public void setModificationTime( Date modificationTime )
-    {
+    public void setModificationTime(final Date modificationTime) {
         _modificationTime = modificationTime;
     }
 
-
-    public Date getModificationTime()
-    {
+    public Date getModificationTime() {
         return _modificationTime;
     }
 
-
-    public void setParent( TestPersistent parent )
-    {
+    public void setParent(final TestPersistent parent) {
         _parent = parent;
         _parentId = ( _parent == null ? null : new Integer( _parent._id ) );
     }
 
-
-    public TestPersistent getParent()
-    {
+    public TestPersistent getParent() {
         return _parent;
     }
 
-
-    public void addChild( TestPersistent child )
-    {
+    public void addChild(final TestPersistent child) {
         _children.addElement( child );
         child.setParent( this );
         child.setGroup( _group );
     }
 
-
-    public Vector getChildren()
-    {
+    public Vector getChildren() {
         return _children;
     }
 
-
-    public TestPersistent findChild(int id)
-    {
+    public TestPersistent findChild(final int id) {
         Enumeration enumeration;
         TestPersistent child;
 
@@ -226,9 +177,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         return null;
     }
 
-
-    public void setGroup( TestGroup group )
-    {
+    public void setGroup(final TestGroup group) {
         TestPersistent child;
 
         if (_group == group) {
@@ -241,74 +190,61 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         }
     }
 
-
-    public TestGroup getGroup()
-    {
+    public TestGroup getGroup() {
         return _group;
     }
 
-
-    public void setRelated( TestPersistRelated related )
-    {
+    public void setRelated(final TestPersistRelated related) {
         _related = related;
         if (related != null) {
             related.setPersistent(this);
         }
     }
 
-
-    public TestPersistRelated getRelated()
-    {
+    public TestPersistRelated getRelated() {
         return _related;
     }
 
-
-    public void jdoPersistent( Database db )
-    {
+    public void jdoPersistent(final Database db) {
         _db = db;
     }
 
-
-    public void jdoTransient()
-    {
+    public void jdoTransient() {
         _db = null;
     }
 
-
-    public Class jdoLoad(AccessMode accessMode)
-        throws Exception
-    {
+    public Class jdoLoad(final AccessMode accessMode) throws Exception {
         Query        qry;
         QueryResults res;
 
-        if ( _parentId != null )
+        if (_parentId != null) {
             _parent = (TestPersistent) _db.load( TestPersistent.class, _parentId, accessMode );
+        }
 
         qry = _db.getOQLQuery( "SELECT p FROM jdo.TestPersistent p WHERE parentId=$1" );
         qry.bind( _id );
         res = qry.execute();
-        while ( res.hasMore() )
+        while (res.hasMore()) {
             _children.addElement( res.next() );
+        }
         _origChildren = (Vector) _children.clone();
         _origRelated = _related;
         return null;
     }
 
-
-    public void jdoStore( boolean modified )
-        throws Exception
-    {
+    public void jdoStore(final boolean modified) throws Exception {
         TestPersistent child;
 
-        if ( modified )
+        if (modified) {
             _modificationTime = new Date();
+        }
 
-        for ( Enumeration enumeration = _children.elements(); enumeration.hasMoreElements(); ) {
+        for (Enumeration enumeration = _children.elements(); enumeration.hasMoreElements();) {
             child = (TestPersistent) enumeration.nextElement();
             if ( ! vectorContainsChild( _origChildren, child ) )
                 _db.create( child );
         }
-        for ( Enumeration enumeration = _origChildren.elements(); enumeration.hasMoreElements(); ) {
+        for (Enumeration enumeration = _origChildren.elements(); enumeration.hasMoreElements();) {
             child = (TestPersistent) enumeration.nextElement();
             if ( ! vectorContainsChild( _children, child ) )
                 _db.remove( child );
@@ -322,24 +258,19 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         _origRelated = _related;
     }
 
-
-    public void jdoUpdate()
-        throws Exception
-    {
-        TestPersistent child;
-
-        for ( Enumeration enumeration = _origChildren.elements(); enumeration.hasMoreElements(); )
+    public void jdoUpdate() throws Exception {
+        for (Enumeration enumeration = _origChildren.elements(); enumeration.hasMoreElements();) {
             _db.update( enumeration.nextElement() );
+        }
         if (_origRelated != null) {
             _db.update(_origRelated);
         }
     }
 
-
-    public static boolean vectorContainsChild(Vector v, TestPersistent child) {
+    public static boolean vectorContainsChild(final Vector v, final TestPersistent child) {
         TestPersistent ch;
 
-        for ( Enumeration enumeration = v.elements(); enumeration.hasMoreElements(); ) {
+        for (Enumeration enumeration = v.elements(); enumeration.hasMoreElements();) {
             ch = (TestPersistent) enumeration.nextElement();
             if ( ch.getId() == child.getId() )
                 return true;
@@ -347,10 +278,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         return false;
     }
 
-
-    public void jdoBeforeCreate( Database db )
-        throws Exception
-    {
+    public void jdoBeforeCreate(final Database db) throws Exception {
         Object grp = null;
 
         if ( _group == null ) {
@@ -366,10 +294,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         _creationTime = new Date();
     }
 
-
-    public void jdoAfterCreate()
-        throws Exception
-    {
+    public void jdoAfterCreate() throws Exception {
         for ( Enumeration enumeration = _children.elements(); enumeration.hasMoreElements(); )
             _db.create( enumeration.nextElement() );
         _origChildren = (Vector) _children.clone();
@@ -379,10 +304,7 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         _origRelated = _related;
     }
 
-
-    public void jdoBeforeRemove()
-        throws Exception
-    {
+    public void jdoBeforeRemove() throws Exception {
         for ( Enumeration enumeration = _children.elements(); enumeration.hasMoreElements(); )
             _db.remove( enumeration.nextElement() );
         if (_related != null) {
@@ -390,27 +312,17 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
         }
     }
 
+    public void jdoAfterRemove() throws Exception { }
 
-    public void jdoAfterRemove()
-        throws Exception
-    {
-    }
-
-
-    public long jdoGetTimeStamp()
-    {
+    public long jdoGetTimeStamp() {
         return _timeStamp;
     }
 
-
-    public void jdoSetTimeStamp( long timeStamp )
-    {
+    public void jdoSetTimeStamp(final long timeStamp) {
         _timeStamp = timeStamp;
     }
 
-
-    public String toString()
-    {
+    public String toString() {
         String children = "";
 
         for ( int i = 0 ; i < _children.size() ; ++i ) {
@@ -422,6 +334,4 @@ public class TestPersistent implements Persistent, TimeStampable, java.io.Serial
                 ":" + ( _group != null ? new Integer( _group.getId() ) : null ) + 
                 ") { " + children + " }";
     }
-
-
 }

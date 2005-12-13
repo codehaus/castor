@@ -2,9 +2,6 @@ package jdo.template;
 
 import junit.framework.TestCase;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
@@ -13,8 +10,6 @@ import org.exolab.castor.jdo.QueryResults;
 public final class TestTemplate extends TestCase {
     private static final String JDO_CONF_FILE = "jdo-conf.xml";
     private static final String DATABASE_NAME = "bugTemplate";
-    
-    private static Log _log = null;
     
     private JDOManager _jdo = null;
 
@@ -36,8 +31,6 @@ public final class TestTemplate extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        _log = LogFactory.getLog(TestTemplate.class);
-
         String config = getClass().getResource(JDO_CONF_FILE).toString();
         JDOManager.loadConfiguration(config, getClass().getClassLoader());
         _jdo = JDOManager.createInstance(DATABASE_NAME);

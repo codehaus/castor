@@ -56,10 +56,9 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class Group extends Particle
-    implements ContentModelGroup, Referable
-{
-
+public class Group extends Particle implements ContentModelGroup, Referable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 3133443973681261845L;
 
     /**
      * the implementation of ContentModelGroup
@@ -70,11 +69,6 @@ public class Group extends Particle
      * The name of this Group
     **/
     private String    name       = null;
-
-    /**
-     *
-    **/
-    private boolean   export     = false;
 
     /**
      * The Compositor for the Group

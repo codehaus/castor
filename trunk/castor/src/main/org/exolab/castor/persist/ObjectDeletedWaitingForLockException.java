@@ -58,9 +58,9 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectDeletedWaitingForLockException
-    extends LockNotGrantedException
-{
+public class ObjectDeletedWaitingForLockException extends LockNotGrantedException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 1774245493143153091L;
 
 
     ObjectDeletedWaitingForLockException()

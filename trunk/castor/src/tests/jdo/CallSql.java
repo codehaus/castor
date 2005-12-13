@@ -56,7 +56,6 @@ import org.exolab.castor.jdo.PersistenceException;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
 public class CallSql extends CastorTestCase {
@@ -65,8 +64,6 @@ public class CallSql extends CastorTestCase {
     private JDOCategory    _category;
 
     private Database       _db;
-
-    private Connection     _conn;
 
     /**
      * Constructor
@@ -154,7 +151,7 @@ public class CallSql extends CastorTestCase {
         TestObjectEx objectEx = null;
         if (enumeration.hasMore()) {
             objectEx = (TestObjectEx) enumeration.next();
-            _log.debug("Retrieved object: " + object);
+            _log.debug("Retrieved object: " + objectEx);
         } else {
             fail("test object not found");
         }

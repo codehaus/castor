@@ -53,8 +53,10 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-class DeferredSimpleType extends SimpleType
-{
+class DeferredSimpleType extends SimpleType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 1335439479275580848L;
+
     /**
      * An instance of ListType or of a class derived from AtomicType
      * created the first time getType is called from the information contained

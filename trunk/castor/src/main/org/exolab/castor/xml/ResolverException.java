@@ -53,6 +53,8 @@ package org.exolab.castor.xml;
  * @version $REVISION$ $DATE$
  */
 public class ResolverException extends XMLException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8800218775708296399L;
 
     /**
      * 

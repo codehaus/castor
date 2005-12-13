@@ -57,8 +57,10 @@ import org.exolab.castor.jdo.Persistent;
 import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.mapping.AccessMode;
 
-public final class PersistentObject
-implements Persistent, TimeStampable, Serializable {
+public final class PersistentObject implements Persistent, TimeStampable, Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2190482779395735049L;
+    
     public static final int       DEFAULT_ID = 7;
     public static final String    DEFAULT_VALUE = "persistent";
 
@@ -217,7 +219,6 @@ implements Persistent, TimeStampable, Serializable {
 
     public void jdoUpdate() throws Exception {
         Enumeration enumeration = _origChildren.elements();
-        PersistentObject child;
         while (enumeration.hasMoreElements()) {
             _db.update(enumeration.nextElement());
         }

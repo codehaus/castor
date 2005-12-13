@@ -48,9 +48,6 @@ package org.exolab.castor.jdo.oql;
 
 import java.util.Hashtable;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 /**
  * Seperates an input string of OQL into a stream of {@link Token}s. 
  *
@@ -58,13 +55,6 @@ import org.apache.commons.logging.LogFactory;
  * @version $Revision$ $Date$
  */
 public class Lexer implements TokenTypes {
-
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance (Lexer.class);
-    
     String _queryString;
     int _pos;
     Hashtable keywords;

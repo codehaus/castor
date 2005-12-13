@@ -100,7 +100,6 @@ public final class TestInstanceFactory extends CastorTestCase {
         _db  = _category.getDatabase();
 
         OQLQuery oql;
-        TimeStampableObject object;
         QueryResults qres;
 
         LOG.debug("Delete everything");
@@ -117,9 +116,7 @@ public final class TestInstanceFactory extends CastorTestCase {
     }
 
     public void runTest() throws PersistenceException {
-        OQLQuery                oql;
         TimeStampableObject     object;
-        QueryResults            qres;
         CallbacksInvoked        cbi = new CallbacksInvoked();
 
         cbi.allow(CallbacksInvoked.CREATING);
@@ -222,7 +219,6 @@ public final class TestInstanceFactory extends CastorTestCase {
         if (_db.isActive()) { _db.rollback(); }
 
         OQLQuery                oql;
-        TimeStampableObject object;
         QueryResults            qres;
 
         LOG.debug("Delete everything");
@@ -329,6 +325,9 @@ public final class TestInstanceFactory extends CastorTestCase {
     }
 
     class CallbacksInvoked implements java.io.Externalizable {
+        /** SerialVersionUID */
+        private static final long serialVersionUID = -2946772385247299812L;
+        
         public static final int LOADED      = 0;        
         public static final int STORING     = 1;
         public static final int CREATING    = 2;    

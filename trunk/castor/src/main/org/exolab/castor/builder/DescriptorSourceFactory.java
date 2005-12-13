@@ -63,34 +63,12 @@ import org.exolab.castor.builder.types.*;
  */
 public class DescriptorSourceFactory {
 
-	//-- org.exolab.castor.mapping
-	private static JClass _ClassDescriptorClass =
-		new JClass("org.exolab.castor.mapping.ClassDescriptor");
-
-	private static JClass _FieldDescriptorClass =
-		new JClass("org.exolab.castor.mapping.FieldDescriptor");
-
     /**
      * GeneralizedFieldHandler
      */
     private static final JClass GENERALIZED_FIELD_HANDLER_CLASS =
         new JClass("org.exolab.castor.mapping.GeneralizedFieldHandler");
     
-	//-- org.exolab.castor.xml
-	private static JClass fdImplClass =
-		new JClass("org.exolab.castor.xml.util.XMLFieldDescriptorImpl");
-
-	private static JClass fdClass =
-		new JClass("org.exolab.castor.xml.XMLFieldDescriptor");
-
-	private static JType fdArrayClass = fdClass.createArray();
-
-	private static JClass gvrClass =
-		new JClass("org.exolab.castor.xml.GroupValidationRule");
-
-	private static JClass vrClass =
-		new JClass("org.exolab.castor.xml.ValidationRule");
-
 	private static final String DESCRIPTOR_NAME = "Descriptor";
 	private static final String FIELD_VALIDATOR_NAME = "fieldValidator";
 

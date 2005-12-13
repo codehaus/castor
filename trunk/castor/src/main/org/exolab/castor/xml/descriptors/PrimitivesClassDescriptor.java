@@ -45,8 +45,6 @@
 
 package org.exolab.castor.xml.descriptors;
 
-
-
 /**
  * The default primitives class descriptor, this is only
  * used when unmarshalling a primitive as the "root" object
@@ -54,21 +52,12 @@ package org.exolab.castor.xml.descriptors;
  * @author <a href="mailto:kvisco-at-intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class PrimitivesClassDescriptor
-    extends StringClassDescriptor
-{
-
-
-    private Class _type = null;
-    
-
+public class PrimitivesClassDescriptor extends StringClassDescriptor {
     public PrimitivesClassDescriptor() {
         this(null);
     } //-- PrimitivesClassDescriptor()
 
-    public PrimitivesClassDescriptor(Class type) {
+    public PrimitivesClassDescriptor(final Class type) {
         super();
-        _type = type;
     } //-- PrimitivesClassDescriptor()
-
 } //-- class: PrimitivesClassDescriptor

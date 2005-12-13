@@ -62,10 +62,12 @@ import java.util.TimeZone;
  */
 
 public class GMonth extends GMonthDay {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1950758441188466762L;
 
-   /**
-    * The GMOnth format
-    */
+    /**
+     * The GMOnth format
+     */
     private static final String MONTH_FORMAT = "--MM--";
 
     private static final String BAD_GMONTH = "Bad gMonth format: ";

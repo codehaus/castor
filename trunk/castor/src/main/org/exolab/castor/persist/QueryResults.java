@@ -49,9 +49,6 @@ package org.exolab.castor.persist;
 
 import javax.transaction.Status;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.Database;
@@ -74,9 +71,6 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class QueryResults {
-    
-    private static final Log log = LogFactory.getLog(QueryResults.class);
-    
     /**
      * The transaction context in which this query was executed.
      */
@@ -102,11 +96,6 @@ public final class QueryResults {
      */
     private Object _lastIdentity;
 
-    /*
-     * The database loading this object.
-     */
-    private Database _db;
-
     public QueryResults(TransactionContext tx, 
             final LockEngine engine,
             final PersistenceQuery query, 
@@ -117,7 +106,6 @@ public final class QueryResults {
         _query = query;
         _accessMode = 
             engine.getClassMolder(_query.getResultType()).getAccessMode(accessMode);
-        _db = db;
     }
 
 

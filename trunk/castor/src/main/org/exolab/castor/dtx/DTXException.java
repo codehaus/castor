@@ -57,8 +57,11 @@ import java.io.PrintStream;
  */
 
 public class DTXException extends Exception {
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -3419863291873007258L;
+
     private Exception _except = null;
+
     private String _message = null;
 
     /**
@@ -66,9 +69,8 @@ public class DTXException extends Exception {
      *
      * @param except The nested exception.
      */
-
     public DTXException(Exception except) {
-	_except = except;
+        _except = except;
     }
 
     /**
@@ -78,7 +80,7 @@ public class DTXException extends Exception {
      */
 
     public DTXException(String message) {
-	_message = message;
+        _message = message;
     }
 
     /**
@@ -88,13 +90,13 @@ public class DTXException extends Exception {
      */
 
     public String getMessage() {
-	String _msg = null;
-	if (_message != null) {
-	    _msg = _message;
-	} else if (_except != null) {
-	    _msg = "Nested exception (" + _except.getClass().getName() + "):" + _except.getMessage();
-	}
-	return _msg;
+    	String _msg = null;
+    	if (_message != null) {
+    	    _msg = _message;
+    	} else if (_except != null) {
+    	    _msg = "Nested exception (" + _except.getClass().getName() + "):" + _except.getMessage();
+    	}
+    	return _msg;
     }
 
     /**
@@ -104,21 +106,20 @@ public class DTXException extends Exception {
      */
 
     public Exception getNestedException() {
-	return _except;
+    	return _except;
     }
 
     public void printStackTrace(PrintWriter out) {
-	if (_except != null) {
-	    _except.printStackTrace(out);
-	}
-	super.printStackTrace(out);
+    	if (_except != null) {
+    	    _except.printStackTrace(out);
+    	}
+    	super.printStackTrace(out);
     }
 
     public void printStackTrace(PrintStream out) {
-	if (_except != null) {
-	    _except.printStackTrace(out);
-	}
-	super.printStackTrace(out);
+    	if (_except != null) {
+    	    _except.printStackTrace(out);
+    	}
+    	super.printStackTrace(out);
     }
-		
 }

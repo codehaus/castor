@@ -88,12 +88,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  * @see UUIDKeyGeneratorFactory
  */
-public final class UUIDKeyGenerator implements KeyGenerator
-{
-    private final  int                _sqlType;
-
-    private final  PersistenceFactory _factory;
-
+public final class UUIDKeyGenerator implements KeyGenerator {
     private        DecimalFormat      _df            = new DecimalFormat();
 
     private        String             _sHost         = null;
@@ -104,10 +99,7 @@ public final class UUIDKeyGenerator implements KeyGenerator
      * Initialize the UUID key generator.
      */
     public UUIDKeyGenerator( PersistenceFactory factory, int sqlType )
-            throws MappingException
-    {
-        _factory = factory;
-        _sqlType = sqlType;
+    throws MappingException {
         supportsSqlType( sqlType );
     }
 

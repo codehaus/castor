@@ -62,13 +62,11 @@ import org.exolab.castor.xml.Marshaller;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class Test
-    extends XMLServlet
-{
-
+public class Test extends XMLServlet {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 1415509713723598792L;
 
     public static final String DatabaseFile = "/servlet/database.xml";
-    
 
     public void service( HttpServletRequest request, XMLServletResponse response )
         throws ServletException

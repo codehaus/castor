@@ -56,19 +56,15 @@ import org.exolab.castor.jdo.QueryResults;
 import harness.TestHarness;
 import harness.CastorTestCase;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 
-public class TestTransientAttribute extends CastorTestCase 
-{
+public class TestTransientAttribute extends CastorTestCase {
 
     private static final Log _log = LogFactory.getLog (TestTransientAttribute.class);
     
     private JDOCategory    _category;
 
     private Database       _db;
-
-    private Connection     _conn;
 
     /**
      * Constructor

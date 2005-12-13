@@ -54,9 +54,6 @@ import harness.TestHarness;
 
 import jdo.JDOCategory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
@@ -64,12 +61,6 @@ import org.exolab.castor.jdo.QueryResults;
 import org.exolab.castor.util.LocalConfiguration;
 
 public final class TestSynchronizable extends CastorTestCase {
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static final Log LOG = LogFactory.getLog(TestSynchronizable.class);
-    
     /**
      * Property listing all the available {@link TxSynchronizable}
      * implementations (<tt>org.exolab.castor.persit.TxSynchronizable</tt>).

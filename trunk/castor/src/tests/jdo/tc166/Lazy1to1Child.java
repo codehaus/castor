@@ -3,7 +3,10 @@ package jdo.tc166;
 import java.io.Serializable;
 
 public class Lazy1to1Child implements Serializable {
-	private Integer id;
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5819064191424599043L;
+    
+    private Integer id;
 	private String description;
 	
     public Integer getId() { return id; }

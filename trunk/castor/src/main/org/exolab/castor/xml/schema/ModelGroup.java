@@ -57,7 +57,8 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public class ModelGroup extends Group {
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2057934322265672413L;
 
     /**
      * the name of the ModelGroup referenced

@@ -66,7 +66,8 @@ import java.util.TimeZone;
  */
 
 public class Time extends DateTimeBase {
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8268707778437931489L;
 
     /** The Time Format used by the toDate() method */
     private static final String TIME_FORMAT_MILLI = "HH:mm:ss.SSS";

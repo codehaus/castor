@@ -23,9 +23,6 @@ import harness.TestHarness;
 
 import jdo.JDOCategory;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
 
 /**
@@ -33,17 +30,7 @@ import org.exolab.castor.jdo.Database;
  * database.
  */
 public final class TestPolymorphismMany2Many extends CastorTestCase {
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static final Log LOG = LogFactory.getLog(TestPolymorphismMany2Many.class);
-    
-    private static final String    NEW_VALUE = "new value";
-
     private JDOCategory    _category;
-
-    private Database       _db;
 
     /**
      * Constructor

@@ -62,10 +62,12 @@ import java.util.TimeZone;
  */
 
 public class GDay extends GMonthDay {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8571596440117087631L;
 
-   /**
-    * The gDay format
-    */
+    /**
+     * The gDay format
+     */
     private static final String DAY_FORMAT = "---dd";
 
     private static final String BAD_GDAY = "Bad gDay format: ";

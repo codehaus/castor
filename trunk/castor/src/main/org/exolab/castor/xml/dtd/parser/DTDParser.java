@@ -2284,11 +2284,9 @@ public class DTDParser implements DTDParserConstants {
 
   public DTDParserTokenManager token_source;
   public Token token, jj_nt;
-  private int jj_ntk;
   private Token jj_scanpos, jj_lastpos;
   private int jj_la;
   public boolean lookingAhead = false;
-  private boolean jj_semLA;
   private int jj_gen;
   final private int[] jj_la1 = new int[0];
   final private int[] jj_la1_0 = {};
@@ -2301,7 +2299,6 @@ public class DTDParser implements DTDParserConstants {
   public DTDParser(CharStream stream) {
     token_source = new DTDParserTokenManager(stream);
     token = new Token();
-    jj_ntk = -1;
     jj_gen = 0;
     for (int i = 0; i < 0; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
@@ -2310,7 +2307,6 @@ public class DTDParser implements DTDParserConstants {
   public void ReInit(CharStream stream) {
     token_source.ReInit(stream);
     token = new Token();
-    jj_ntk = -1;
     jj_gen = 0;
     for (int i = 0; i < 0; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
@@ -2319,7 +2315,6 @@ public class DTDParser implements DTDParserConstants {
   public DTDParser(DTDParserTokenManager tm) {
     token_source = tm;
     token = new Token();
-    jj_ntk = -1;
     jj_gen = 0;
     for (int i = 0; i < 0; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
@@ -2328,7 +2323,6 @@ public class DTDParser implements DTDParserConstants {
   public void ReInit(DTDParserTokenManager tm) {
     token_source = tm;
     token = new Token();
-    jj_ntk = -1;
     jj_gen = 0;
     for (int i = 0; i < 0; i++) jj_la1[i] = -1;
     for (int i = 0; i < jj_2_rtns.length; i++) jj_2_rtns[i] = new JJCalls();
@@ -2338,7 +2332,6 @@ public class DTDParser implements DTDParserConstants {
     Token oldToken;
     if ((oldToken = token).next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
     if (token.kind == kind) {
       jj_gen++;
       if (++jj_gc > 100) {
@@ -2380,7 +2373,6 @@ public class DTDParser implements DTDParserConstants {
   final public Token getNextToken() {
     if (token.next != null) token = token.next;
     else token = token.next = token_source.getNextToken();
-    jj_ntk = -1;
     jj_gen++;
     return token;
   }
@@ -2396,9 +2388,9 @@ public class DTDParser implements DTDParserConstants {
 
   final private int jj_ntk() {
     if ((jj_nt=token.next) == null)
-      return (jj_ntk = (token.next=token_source.getNextToken()).kind);
+      return ((token.next=token_source.getNextToken()).kind);
     else
-      return (jj_ntk = jj_nt.kind);
+      return (jj_nt.kind);
   }
 
   private java.util.Vector jj_expentries = new java.util.Vector();

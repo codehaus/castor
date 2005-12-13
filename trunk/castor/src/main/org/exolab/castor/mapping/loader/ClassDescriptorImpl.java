@@ -48,11 +48,8 @@ package org.exolab.castor.mapping.loader;
 
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedList;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.mapping.ValidityException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
@@ -69,11 +66,7 @@ import org.exolab.castor.mapping.xml.ClassMapping;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ClassDescriptorImpl
-    implements ClassDescriptor
-{
-	private static final Log _log = LogFactory.getLog(ClassDescriptorImpl.class);
-
+public class ClassDescriptorImpl implements ClassDescriptor {
     private ClassMapping               _map;
     /**
      * The Java class for this descriptor.

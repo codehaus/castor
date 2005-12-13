@@ -54,20 +54,16 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectNotFoundException
-    extends PersistenceException
-{
+public class ObjectNotFoundException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8122627187057596546L;
 
-    public ObjectNotFoundException( String message )
-    {
-        super( message );
+    public ObjectNotFoundException(final String message) {
+        super(message);
     }
 
-    public ObjectNotFoundException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public ObjectNotFoundException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-
 }
 

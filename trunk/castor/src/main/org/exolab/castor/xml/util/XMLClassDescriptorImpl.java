@@ -122,12 +122,6 @@ public class XMLClassDescriptorImpl extends Validator
     private Class _class = null;
 
     /**
-     * The class name of the Class this marshal info describes.
-     * Used when _class == null, or for String expressions
-     */
-    private String _className = null;
-
-    /**
      * A variable to keep track of the number of container fields
      */
      private int _containerCount = 0;

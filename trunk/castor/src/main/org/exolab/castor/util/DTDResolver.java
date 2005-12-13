@@ -99,16 +99,6 @@ public class DTDResolver implements EntityResolver {
         private final String resource;
 
         /**
-         * The namespace URI. Null if unknown.
-         */
-        private final String namespace;
-
-        /**
-         * The default namespace prefix.
-         */
-        private final String prefix;
-
-        /**
          * Creates an instance of DTDInfo.
          *
          * @param publicId public id
@@ -125,9 +115,6 @@ public class DTDResolver implements EntityResolver {
             this.publicId = publicId;
             this.systemId = systemId;
             this.resource = resource;
-            this.namespace = namespace;
-            this.prefix = prefix;
-
         }
     }
 

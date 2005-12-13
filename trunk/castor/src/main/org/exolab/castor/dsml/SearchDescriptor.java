@@ -64,10 +64,9 @@ import org.exolab.castor.util.Messages;
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class SearchDescriptor
-    extends HandlerBase
-    implements Serializable
-{
+public class SearchDescriptor extends HandlerBase implements Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6614367393322175115L;
 
 
     public static class Scope

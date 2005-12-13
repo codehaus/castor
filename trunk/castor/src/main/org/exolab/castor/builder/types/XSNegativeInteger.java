@@ -51,13 +51,6 @@ package org.exolab.castor.builder.types;
  * @version $Revision$ $Date$
 **/
 public final class XSNegativeInteger extends XSInteger {
-
-
-    /**
-     * The maximum value for this type
-    **/
-    private int maxIncl = -1;
-
     public XSNegativeInteger() {
         super();
         super.setMaxInclusive(-1);

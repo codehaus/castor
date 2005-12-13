@@ -56,8 +56,9 @@ import org.exolab.castor.xml.validators.ValidationUtils;
  * @version $Revision$ $Date$
 **/
 public class KeyRef extends IdentityConstraint {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7342572522733089648L;
+
     /**
      * The refer for the KeyRef, (ie. the name of key being refered to).
     **/

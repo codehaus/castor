@@ -59,7 +59,8 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
  */
 class ContentModelGroupImpl implements ContentModelGroup , java.io.Serializable {
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2477271185972337873L;
 
     private Vector _contentModel = null;
     private transient ScopableResolver _resolver = null;

@@ -51,10 +51,8 @@ import org.exolab.castor.xml.Namespaces;
 import org.exolab.castor.xml.XMLException;
 import org.exolab.castor.xml.schema.Annotation;
 import org.exolab.castor.xml.schema.AttributeDecl;
-import org.exolab.castor.xml.schema.AttributeGroup;
 import org.exolab.castor.xml.schema.AttributeGroupReference;
 import org.exolab.castor.xml.schema.ComplexType;
-import org.exolab.castor.xml.schema.ContentType;
 import org.exolab.castor.xml.schema.Group;
 import org.exolab.castor.xml.schema.ModelGroup;
 import org.exolab.castor.xml.schema.Resolver;
@@ -95,7 +93,6 @@ public class ExtensionUnmarshaller extends ComponentReader {
     private Schema      _schema      = null;
 
     private boolean foundAnnotation  = false;
-    private boolean foundAnyAttribute = false;
     private boolean foundAttributes  = false;
     private boolean foundModelGroup  = false;
 
@@ -211,7 +208,6 @@ public class ExtensionUnmarshaller extends ComponentReader {
 
           //-- <anyAttribute>
         if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
-           foundAnyAttribute = true;
             unmarshaller
                  = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
         }

@@ -200,23 +200,6 @@ public class BuilderConfiguration {
     
     private Properties _localProps = null;
     
-    /**
-     * A boolean indicated whether or not the properties have been loaded
-     */
-    private boolean _loaded = false;
-    
-
-    private boolean _warnOnOverwrite = true;
-	private boolean _suppressNonFatalWarnings = false;
-
-    /**
-     * Determines whether or not to print extra messages
-    **/
-    private boolean _verbose         = false;
-
-    private String  _destDir = null;
-
-
 	/**
 	 * Namespace URL to Java package mapping
 	 */

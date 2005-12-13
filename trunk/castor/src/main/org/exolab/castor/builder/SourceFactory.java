@@ -50,8 +50,6 @@
 
 package org.exolab.castor.builder;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.builder.binding.ExtendedBinding;
 import org.exolab.castor.builder.binding.XMLBindingComponent;
 import org.exolab.castor.builder.types.XSClass;
@@ -113,13 +111,6 @@ public class SourceFactory {
     
     private static final String ITEM_NAME = "Item";
     
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static final Log _log = LogFactory.getFactory().getInstance(SourceFactory.class);
-    
-
     /**
      * The type factory.
     **/

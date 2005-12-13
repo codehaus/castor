@@ -76,11 +76,6 @@ public final class XMLInstance2SchemaHandler
     //--------------------/
     
     /**
-     * The Sax locator
-    **/
-    private Locator _locator = null;
-    
-    /**
      * The schema we are creating
     **/
     private Schema _schema = null;
@@ -372,9 +367,7 @@ public final class XMLInstance2SchemaHandler
 
     } //-- processingInstruction
     
-    public void setDocumentLocator(Locator locator) {
-        this._locator = locator;
-    } //-- setDocumentLocator
+    public void setDocumentLocator(final Locator locator) { }
     
     public void startDocument()
         throws org.xml.sax.SAXException

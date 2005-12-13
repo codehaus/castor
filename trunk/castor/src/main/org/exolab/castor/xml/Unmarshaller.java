@@ -163,8 +163,6 @@ public class Unmarshaller {
      */
     private UnmarshalListener _unmarshalListener = null;
 
-    private boolean _useXMLReader = true;
-    
     /**
      * The flag indicating whether or not to validate during
      * unmarshalling

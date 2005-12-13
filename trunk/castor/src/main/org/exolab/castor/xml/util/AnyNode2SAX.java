@@ -85,12 +85,6 @@ public class AnyNode2SAX implements EventProducer {
      */
     private Namespaces _context;
 
-    /**
-     * The namespace declaration String
-     */
-    private static final String XMLNS_PREFIX  = "xmlns";
-
-
     public AnyNode2SAX() {
 		_elements = new HashSet();
 	}

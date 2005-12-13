@@ -43,43 +43,24 @@
  * $Id$
  */
 
-
 package harness;
-
 
 import java.util.Vector;
 import java.util.Enumeration;
 import java.lang.reflect.Constructor;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import junit.framework.TestSuite;
 
-public class Category
-{
-
-    /**
-     * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-     * Commons Logging</a> instance used for all logging.
-     */
-    private static Log _log = LogFactory.getFactory().getInstance( Category.class );
-
-
+public class Category {
     private String  _name;
-
 
     private String  _description;
 
-
     private String  _className;
-
 
     private Vector  _cases = new Vector();
 
-
     private Object  _object;
-
 
     public void setName( String name )
     {

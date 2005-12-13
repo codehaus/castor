@@ -80,6 +80,8 @@ import java.io.StringWriter;
  * @todo Full handling of namespaces
  */
 public final class AnyNode implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -4104117996051705975L;
 
     /**
      * The prefix for XML namespace

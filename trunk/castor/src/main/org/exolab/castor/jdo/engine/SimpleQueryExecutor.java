@@ -67,11 +67,7 @@ import java.util.NoSuchElementException;
  * @author <a href="mailto:nissim@nksystems.com">Nissim Karpenstein</a>
  * @version $Revision$ $Date$
  */
-public class SimpleQueryExecutor 
-{
-
-  private DatabaseImpl _dbImpl;
-
+public class SimpleQueryExecutor {
   private PreparedStatement _stmt = null;
   private ResultSet _rset = null;
 
@@ -80,9 +76,7 @@ public class SimpleQueryExecutor
    *
    * @param dbImpl the Database Implementation, used to get the connection
    */
-  public SimpleQueryExecutor(DatabaseImpl dbImpl) {
-    _dbImpl = dbImpl;
-  }
+  public SimpleQueryExecutor(DatabaseImpl dbImpl) { }
 
   /**
    * Executes a simple query and returns the results.  The query must not

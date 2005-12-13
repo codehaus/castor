@@ -135,9 +135,7 @@ public class SchemaWriter {
 
     private static final String ATTR_NAME   = "name";
     private static final String ATTR_TYPE   = "type";
-    private static final String ATTR_VALUE  = "value";
 
-    private static final String VALUE_FALSE = "false";
     private static final String VALUE_TRUE  = "true";
 
 

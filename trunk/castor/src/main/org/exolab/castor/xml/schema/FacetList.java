@@ -57,6 +57,8 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
 **/
 public class FacetList implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 3855871093270831240L;
 
     /**
      * The list of facets

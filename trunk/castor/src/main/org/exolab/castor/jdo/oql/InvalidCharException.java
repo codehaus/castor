@@ -56,8 +56,10 @@ import org.exolab.castor.jdo.QueryException;
  * @version $Revision$ $Date$
  */
 public class InvalidCharException extends QueryException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6610485595861733951L;
 
-	public InvalidCharException( String message ) {
+    public InvalidCharException( String message ) {
 		super( message );
 	}
 

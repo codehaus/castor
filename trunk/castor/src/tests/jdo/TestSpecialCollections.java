@@ -3,17 +3,10 @@ package jdo;
 import harness.CastorTestCase;
 import harness.TestHarness;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
-import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.QueryResults;
@@ -24,9 +17,6 @@ import org.exolab.castor.jdo.QueryResults;
  * a field type.
  */
 public class TestSpecialCollections extends CastorTestCase {
-    
-    private static Log _log = null;
-
     private JDOCategory _category;
 
     public TestSpecialCollections(TestHarness category) {
@@ -34,9 +24,7 @@ public class TestSpecialCollections extends CastorTestCase {
         _category = (JDOCategory) category;
     }
 
-    public void setUp() throws PersistenceException, SQLException {
-        _log = LogFactory.getLog(TestSpecialCollections.class);
-    }
+    public void setUp() throws PersistenceException, SQLException { }
 
     public void runTest() throws Exception {
         testQueryEntityOne();

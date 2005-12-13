@@ -53,7 +53,9 @@ import org.exolab.castor.xml.*;
  * @version $Revision$ $Date$
 **/
 public class UnknownDef extends Structure {
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8695003871138156676L;
+
     /**
      * Creates a new UnknownDef
     **/

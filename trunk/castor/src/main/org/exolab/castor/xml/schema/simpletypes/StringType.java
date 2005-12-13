@@ -45,8 +45,6 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents the XML Schema string type.
  * This class should be the base class for all the types derived from XML Schema
@@ -55,6 +53,8 @@ import org.exolab.castor.xml.schema.Schema;
  * @version $Revision$
 **/
 public class StringType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8077759890021781094L;
 }
 
 

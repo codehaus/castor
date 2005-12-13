@@ -89,17 +89,11 @@ import java.util.StringTokenizer;
  * @version $Revision$ $Date$
  */
 public final class UnmarshalHandler extends MarshalFramework
-    implements ContentHandler, DocumentHandler, ErrorHandler
-{
-
+implements ContentHandler, DocumentHandler, ErrorHandler {
 
     //---------------------------/
     //- Private Class Variables -/
     //---------------------------/
-
-    private static final Class[]  EMPTY_CLASS_ARGS  = new Class[0];
-    private static final Object[] EMPTY_OBJECT_ARGS = new Object[0];
-    private static final String   EMPTY_STRING      = "";
 
     /**
      * The error message when no class descriptor has been found

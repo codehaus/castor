@@ -45,8 +45,6 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents "real numbers" (float, double and user types derived from them)
  * Those numbers are of the form m x 2^e
@@ -60,8 +58,10 @@ import org.exolab.castor.xml.schema.Schema;
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class RealType extends AtomicType
-{
+public class RealType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 3968578511223258942L;
+    
     private long _minMantissa;
     private long _maxMantissa;
     private long _minExponent;
@@ -76,7 +76,6 @@ public class RealType extends AtomicType
     public long getMaxMantissa()                    { return _maxMantissa; }
     public long getMinExponent()                    { return _minExponent; }
     public long getMaxExponent()                    { return _maxExponent; }
-
 }
 
 

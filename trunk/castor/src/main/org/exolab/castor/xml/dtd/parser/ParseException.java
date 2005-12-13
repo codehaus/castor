@@ -59,6 +59,8 @@ package org.exolab.castor.xml.dtd.parser;
  * @version Version 0.7pre6
  */
 public class ParseException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 5798523224831508600L;
 
   /**
    * This constructor is used by the method "generateParseException"

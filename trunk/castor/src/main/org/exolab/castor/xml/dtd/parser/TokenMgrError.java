@@ -53,11 +53,13 @@ package org.exolab.castor.xml.dtd.parser;
  * @author Generated automatically by <b>JavaCC</b>
  * @version Version 0.7pre2
  */
-public class TokenMgrError extends Error
-{
-   /*
-    * Ordinals for various reasons why an Error of this type can be thrown.
-    */
+public class TokenMgrError extends Error {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 5390945290273323564L;
+
+    /*
+     * Ordinals for various reasons why an Error of this type can be thrown.
+     */
 
    /**
     * Lexical error occured.
