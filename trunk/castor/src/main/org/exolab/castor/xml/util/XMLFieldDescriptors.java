@@ -62,8 +62,6 @@ public class XMLFieldDescriptors {
 
     private XMLFieldDescriptor[] elements;
 
-    private int initialSize = DEFAULT_SIZE;
-
     /**
      * The next available location in the elements array
     **/
@@ -82,7 +80,6 @@ public class XMLFieldDescriptors {
      * @param size the initial size of the internal collection.
      */
     public XMLFieldDescriptors(int size) {
-        initialSize = size;
         elements = new XMLFieldDescriptor[size];
     } //-- XMLFieldDescriptors
 

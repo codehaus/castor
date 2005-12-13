@@ -53,9 +53,9 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class SimpleContent extends ContentType 
-    implements java.io.Serializable 
-{
+public class SimpleContent extends ContentType implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 6406889524623062413L;
 
     /**
      * The associated parent Schema 

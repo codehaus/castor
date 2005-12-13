@@ -54,19 +54,15 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectNotPersistentException
-    extends PersistenceException
-{
+public class ObjectNotPersistentException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -4100652878712046846L;
 
-    public ObjectNotPersistentException( String message )
-    {
-        super( message );
+    public ObjectNotPersistentException(final String message) {
+        super(message);
     }
 
-    public ObjectNotPersistentException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public ObjectNotPersistentException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-    
 }

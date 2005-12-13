@@ -54,18 +54,17 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class TransactionNotInProgressException
-    extends PersistenceException
-{
+public class TransactionNotInProgressException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -4649652767565295120L;
 
-    public TransactionNotInProgressException( String message )
-    {
-        super( message );
+    public TransactionNotInProgressException(final String message) {
+        super(message);
     }
 
-    public TransactionNotInProgressException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public TransactionNotInProgressException(
+            final String message, final Throwable exception) {
+        
+        super(message, exception);
     }
-
 }

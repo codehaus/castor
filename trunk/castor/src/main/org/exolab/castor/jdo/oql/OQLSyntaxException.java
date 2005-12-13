@@ -58,7 +58,10 @@ import org.exolab.castor.jdo.QueryException;
  * @version $Revision$ $Date$
  */
 public class OQLSyntaxException extends QueryException {
-	public OQLSyntaxException( String message ) {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5399388898997962305L;
+
+    public OQLSyntaxException( String message ) {
 		super( message );
 	}
     public OQLSyntaxException( String message, Throwable except ) 

@@ -45,17 +45,14 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Facet;
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents the decimal type and those derived from it (integer, short...)
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class DecimalType extends AtomicType
-{
-
+public class DecimalType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5292080472364200642L;
 }
 
 

@@ -65,11 +65,9 @@ import org.exolab.castor.util.Messages;
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ImportDescriptor
-    extends HandlerBase
-    implements Serializable
-{
-
+public class ImportDescriptor extends HandlerBase implements Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 197365948293655041L;
 
     public static class Policy
     {

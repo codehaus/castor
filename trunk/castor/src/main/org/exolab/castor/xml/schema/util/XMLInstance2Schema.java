@@ -72,10 +72,6 @@ import org.apache.xml.serialize.Serializer;
 **/
 public class XMLInstance2Schema {
     
-    private InputSource _source = null;
-
-    private Schema      _schema  = null;
-    
     private Order       _defaultGroup = Order.seq;
     
     /**

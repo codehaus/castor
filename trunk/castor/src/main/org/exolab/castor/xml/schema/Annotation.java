@@ -56,8 +56,9 @@ import java.util.Vector;
  * @version $Revision$ $Date$ 
 **/
 public class Annotation extends Structure {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2838816224303555598L;
+
     /**
      * List of <appinfo> objects
     **/

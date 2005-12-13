@@ -52,6 +52,9 @@ import java.util.Arrays;
  * Test object to be serialized when storing in database.
  */
 public final class SerializableObject implements Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 967532244296334192L;
+    
     private String  _string;
     private int[]   _ints;
     

@@ -56,9 +56,9 @@ import java.util.Vector;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ElementDecl extends Particle
-    implements Referable
-{
+public class ElementDecl extends Particle implements Referable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7804351635137964219L;
 
    //-------------------/
    //- Class Variables -/

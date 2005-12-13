@@ -76,8 +76,7 @@ import org.xml.sax.InputSource;
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision$ $Date$
 **/
-public class SimpleTypesFactory
-{
+public class SimpleTypesFactory {
 
     //Type Codes:
 
@@ -577,9 +576,9 @@ public class SimpleTypesFactory
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-class SimpleTypesFactoryException
-    extends RuntimeException
-{
+class SimpleTypesFactoryException extends RuntimeException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7343397006284999081L;
 
     /**
      * The exception which caused this Exception

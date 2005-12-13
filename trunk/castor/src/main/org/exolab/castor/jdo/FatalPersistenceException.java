@@ -56,21 +56,17 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class FatalPersistenceException
-    extends PersistenceException {
+public class FatalPersistenceException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1790155244161250371L;
 
-
-    public FatalPersistenceException( String message )
-    {
-        super( message );
+    public FatalPersistenceException(final String message) {
+        super(message);
     }
 
-    public FatalPersistenceException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public FatalPersistenceException(final  String message, final Throwable exception) {
+        super(message, exception);
     }
-
-
 }
 
 

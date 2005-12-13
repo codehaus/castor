@@ -47,8 +47,6 @@
 package org.exolab.castor.mapping.loader;
 
 
-import java.util.Iterator;
-import java.util.Vector;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -171,13 +169,6 @@ public final class FieldHandlerImpl
 
 
     /**
-     * Returns true if the field is required. Required fields cannot
-     * be null on output.
-     */
-    private boolean        _required;
-
-
-    /**
      * Convertor to apply when setting the value of the field. Converts from
      * the value to the field type. Null if no convertor is required.
      */
@@ -222,7 +213,6 @@ public final class FieldHandlerImpl
         _fieldName = handler.toString();
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _immutable = typeInfo.isImmutable();
-        _required = typeInfo.isRequired();
         _default = typeInfo.getDefaultValue();
         _convertTo = typeInfo.getConvertorTo();
         _convertFrom = typeInfo.getConvertorFrom();
@@ -253,7 +243,6 @@ public final class FieldHandlerImpl
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _fieldName = field.getName() + "(" + field.getType().getName() + ")";
         _immutable = typeInfo.isImmutable();
-        _required = typeInfo.isRequired();
         // If the field is of a primitive type or if it is required
         // we use the default value
         if ( _field.getType().isPrimitive() )
@@ -333,7 +322,6 @@ public final class FieldHandlerImpl
         _fieldType = Types.typeFromPrimitive( typeInfo.getFieldType() );
         _fieldName = fieldName + "(" + _fieldType.getName() + ")";
         _immutable = typeInfo.isImmutable();
-        _required = typeInfo.isRequired();
 
         // If the field is of a primitive type or if it is required
         // we use the default value 
@@ -749,10 +737,7 @@ public final class FieldHandlerImpl
     /**
      * Mutator method used by {@link MappingLoader}.
      */
-    void setRequired( boolean required )
-    {
-        _required = required;
-    }
+    void setRequired(final boolean required) { }
 
     /**
      * Sets the TypeConvertor used during calls to getValue

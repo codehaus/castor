@@ -54,18 +54,17 @@ package org.exolab.castor.jdo;
  * @author <a href="gignoux@intalio.com">Sebastien Gignoux</a>
  * @version $Revision$ $Date$
  */
-public class DataObjectAccessException
-    extends RuntimeException 
-{
+public class DataObjectAccessException extends RuntimeException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6741547483776196810L;
 
-    public DataObjectAccessException( String message, Throwable except ) {
-        super( message /*, except */);
+    public DataObjectAccessException(final String message, final Throwable except) {
+        super(message /*, except */);
     }
 
-    public DataObjectAccessException( String message ) {
-        super( message );
+    public DataObjectAccessException(String message) {
+        super(message);
     }
-
 }
 
 

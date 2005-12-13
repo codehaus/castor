@@ -45,16 +45,14 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Facet;
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents types derived from binary
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class BinaryType extends AtomicType
-{
+public class BinaryType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 369229235823885435L;
 }
 
 

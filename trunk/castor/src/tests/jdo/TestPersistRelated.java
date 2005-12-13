@@ -43,78 +43,55 @@
  * $Id$
  */
 
-
 package jdo;
 
 import org.exolab.castor.jdo.TimeStampable;
 
-public class TestPersistRelated implements TimeStampable, java.io.Serializable
-{
-
+public class TestPersistRelated implements TimeStampable, java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6408619974569022386L;
 
     private int        _id;
 
-
     private TestPersistent _persistent;
-
 
     private long           _timeStamp;
 
     static final int       DefaultId = 5;
 
-
-    public TestPersistRelated( int id )
-    {
+    public TestPersistRelated(final int id) {
         _id = id;
     }
 
-
-    public TestPersistRelated()
-    {
+    public TestPersistRelated() {
         _id = DefaultId;
     }
 
-
-    public void setId( int id )
-    {
+    public void setId(final int id) {
         _id = id;
     }
 
-
-    public int getId()
-    {
+    public int getId() {
         return _id;
     }
 
-
-    public void setPersistent( TestPersistent persistent )
-    {
+    public void setPersistent(final TestPersistent persistent) {
         _persistent = persistent;
     }
 
-
-    public TestPersistent getPersistent()
-    {
+    public TestPersistent getPersistent() {
         return _persistent;
     }
 
-
-    public long jdoGetTimeStamp()
-    {
+    public long jdoGetTimeStamp() {
         return _timeStamp;
     }
 
-
-    public void jdoSetTimeStamp( long timeStamp )
-    {
+    public void jdoSetTimeStamp(final long timeStamp) {
         _timeStamp = timeStamp;
     }
 
-
-    public String toString()
-    {
+    public String toString() {
         return _id + " / " + (_persistent==null?0:_persistent.getId());
     }
-
-
 }

@@ -60,6 +60,8 @@ package org.exolab.castor.types;
  */
 
 public class TimeInstant extends RecurringDuration {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5261713908033956150L;
 
     public TimeInstant() {
         super("P0Y","P0Y");

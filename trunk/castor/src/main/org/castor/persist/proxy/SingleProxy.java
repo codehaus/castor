@@ -35,9 +35,10 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class SingleProxy 
-    implements MethodInterceptor, Serializable {
-    
+public class SingleProxy implements MethodInterceptor, Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1498354553937679053L;
+
     private static Log _log = LogFactory.getFactory().getInstance(SingleProxy.class);
     
     TransactionContext _tx;

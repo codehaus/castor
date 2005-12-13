@@ -61,6 +61,8 @@ import java.util.Enumeration;
  * @version $Revision$ $Date$
  */
 public class Schema extends Annotated {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8130246250710502508L;
 
     //-----------------------------/
     //- Class Fields / Constants  -/

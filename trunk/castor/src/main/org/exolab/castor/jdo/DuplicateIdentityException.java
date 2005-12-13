@@ -55,20 +55,16 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class DuplicateIdentityException
-    extends PersistenceException
-{
-    
-    public DuplicateIdentityException( String message )
-    {
-        super( message );
+public class DuplicateIdentityException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2342174728260237572L;
+
+    public DuplicateIdentityException(final String message) {
+        super(message);
     }
 
-    public DuplicateIdentityException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public DuplicateIdentityException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-
 }
 

@@ -54,20 +54,16 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ObjectModifiedException
-    extends TransactionAbortedException
-{
+public class ObjectModifiedException extends TransactionAbortedException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8642522064664513348L;
 
-    public ObjectModifiedException( String message )
-    {
-        super( message );
+    public ObjectModifiedException(final String message) {
+        super(message);
     }
 
-    public ObjectModifiedException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public ObjectModifiedException(final String message, final Throwable exception) {
+        super(message, exception);
     }
-
-    
 }
 

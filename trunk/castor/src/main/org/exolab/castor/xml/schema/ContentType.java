@@ -52,7 +52,8 @@ package org.exolab.castor.xml.schema;
  * @version $Revision$ $Date$
  */
 public class ContentType implements java.io.Serializable {
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2985958570376322773L;
 
     public static final short ELEMENT_ONLY  = 0;
     public static final short MIXED         = 1;

@@ -62,9 +62,9 @@ import java.text.ParseException;
  * @author <a href="mailto:blandin@intalio.com">Arnaud Blandin</a>
  * @version $Revision$ $Date$
  **/
-public class Duration
-    implements java.io.Serializable
-{
+public class Duration implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6475091654291323029L;
 
     /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;

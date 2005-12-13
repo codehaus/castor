@@ -72,6 +72,9 @@ import java.util.Map;
 public class AccessMode implements Cloneable, Comparable, Serializable {
     //-------------------------------------------------------------------------
     
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7113303922354626951L;
+
     private static final Map    IDS = new HashMap(7);
     private static final Map    NAMES = new HashMap(7);
     

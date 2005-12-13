@@ -61,6 +61,9 @@ import java.util.ArrayList;
  */
 public final class OID implements Serializable {
 
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 419512942519592363L;
+
     /**
      * The object's identity if known, null if the object was created without an
      * identity.

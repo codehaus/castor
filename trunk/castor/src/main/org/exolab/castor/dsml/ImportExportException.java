@@ -48,31 +48,21 @@ package org.exolab.castor.dsml;
 
 
 /**
- *
- *
  * @author <a href="mailto:arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ImportExportException
-    extends Exception
-{
-
+public class ImportExportException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6003260515410305829L;
 
     private Exception  _except;
 
-
-    public ImportExportException( Exception except )
-    {
-	super( "Nested exception: " + except.toString() );
-	_except = except;
+    public ImportExportException(final Exception except) {
+    	super( "Nested exception: " + except.toString() );
+    	_except = except;
     }
 
-
-    public Exception getException()
-    {
-	return _except;
+    public Exception getException() {
+        return _except;
     }
-
-
-
 }

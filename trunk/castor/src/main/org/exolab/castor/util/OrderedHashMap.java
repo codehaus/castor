@@ -40,6 +40,8 @@ import java.util.Set;
  * @revision $Revision$ $Date$
  */
 public class OrderedHashMap extends HashMap {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1648679783713336948L;
 
     /**
      * Ordered list of contained values

@@ -91,10 +91,8 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
     private ComplexType _complexType = null;
 
     private Schema      _schema           = null;
-    private String      _id               = null;
     private boolean     foundAnnotation   = false;
     private boolean     foundAttribute    = false;
-    private boolean     foundAnyAttribute = false;
     private boolean     foundAttributeGroup = false;
 	private boolean     foundModelGroup     = false;
 
@@ -117,8 +115,6 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
 
         _complexType.setDerivationMethod(SchemaNames.RESTRICTION);
         _complexType.setRestriction(true);
-
-        _id   = atts.getValue(SchemaNames.ID_ATTR);
 
         //-- base
         String base = atts.getValue(SchemaNames.BASE_ATTR);
@@ -257,7 +253,6 @@ public class ComplexContentRestrictionUnmarshaller extends ComponentReader {
 		}
 		   //-- <anyAttribute>
         else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
-           foundAnyAttribute = true;
             unmarshaller
                  = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
         }

@@ -62,9 +62,9 @@ import java.io.PrintStream;
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class MappingRuntimeException
-    extends IllegalStateException
-{
+public class MappingRuntimeException extends IllegalStateException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 238861866150334375L;
 
     /**
      * The exception which caused this Exception

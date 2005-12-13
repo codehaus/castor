@@ -124,9 +124,6 @@ public final class TestCacheLeakage extends CastorTestCase {
     /** The java class of the target data objects */
     private Class _classType;
 
-    /** The class name of the target data objects */
-    private String _className;
-
     /** The cache type used in the current test */
     private int _cacheType;
 
@@ -198,19 +195,15 @@ public final class TestCacheLeakage extends CastorTestCase {
         switch (_cacheType) {
         case COUNT_LIMITED:
             _classType = ctf.jdo.tc0x.RaceCount.class;
-            _className = _classType.getName();
             break;
         case TIME_LIMITED:
             _classType = ctf.jdo.tc0x.RaceTime.class;
-            _className = _classType.getName();
             break;
         case NO_CACHE:
             _classType = ctf.jdo.tc0x.RaceNone.class;
-            _className = _classType.getName();
             break;
         case UNLIMITED:
             _classType = ctf.jdo.tc0x.RaceUnlimited.class;
-            _className = _classType.getName();
             break;
         default:
             LOG.error("Unknown cache type");
@@ -251,7 +244,6 @@ public final class TestCacheLeakage extends CastorTestCase {
      * not affect by stress.
      */
     private class ReadThread extends Thread {
-        private TestCacheLeakage    _parent;
         private CreateDeleteThread  _other;
         private Database            _db;
         private int                 _trials;
@@ -262,7 +254,6 @@ public final class TestCacheLeakage extends CastorTestCase {
                    final CreateDeleteThread other,
                    final JDOCategory category, final int trials)
         throws PersistenceException {
-            _parent = parent;
             _other = other;
             _db = category.getDatabase();
             _trials = trials;
@@ -339,7 +330,6 @@ public final class TestCacheLeakage extends CastorTestCase {
      * the concurrent engine of Castor JDO.
      */
     private class CreateDeleteThread extends Thread {
-        private TestCacheLeakage    _parent;
         private Database            _db;
         private int                 _cachetype;
         private int                 _trials;
@@ -350,7 +340,6 @@ public final class TestCacheLeakage extends CastorTestCase {
                                    final JDOCategory category,
                                    final int cachetype, final int trials)
         throws PersistenceException {
-            _parent = parent;
             this._db = category.getDatabase();
             _cachetype = cachetype;
             _trials = trials;

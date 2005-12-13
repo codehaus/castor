@@ -55,8 +55,9 @@ import org.exolab.castor.xml.ValidationException;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public final class AnyType extends XMLType
-{
+public final class AnyType extends XMLType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7670252205849057981L;
 
     /**
      * The name of this type

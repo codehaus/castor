@@ -57,8 +57,6 @@ public class XSListJ2 extends XSList {
     private static final JType jType
         = new JClass("java.util.ArrayList");
 
-    private String value = null;
-
     public XSListJ2(XSType contentType) {
         super(contentType);
         this.contentType = contentType;

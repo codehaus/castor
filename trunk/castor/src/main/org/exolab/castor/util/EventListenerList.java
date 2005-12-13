@@ -150,7 +150,9 @@ import java.util.EventListener;
  * @version $Revision$ $Date$
  */
 public class EventListenerList implements Serializable {
-  
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 4472874989562384564L;
+
   /**
    * A null array to be shared by all empty listener lists
    */

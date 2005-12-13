@@ -70,8 +70,6 @@ public final class TestUpdate extends CastorTestCase {
 
     private Database       _db;
 
-    private Connection     _conn;
-
     /**
      * Constructor
      *

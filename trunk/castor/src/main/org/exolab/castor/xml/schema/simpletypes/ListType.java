@@ -59,19 +59,15 @@ import org.exolab.castor.xml.schema.Structure;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Id$
 **/
-public class ListType extends SimpleType
-{
-    
-    /**
-     * The local annotation for this ListType
-    **/
+public class ListType extends SimpleType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 5907869367277661845L;
+
+    /** The local annotation for this ListType. */
     private Annotation _annotation = null;
     
-    /**
-     *  The SimpleType the list is based on.
-    **/
+    /** The SimpleType the list is based on. */
     private SimpleType _itemType= null;
-
 
     private boolean _hasReference = false;
     
@@ -79,10 +75,8 @@ public class ListType extends SimpleType
      * Creates a new ListType.
      *
      * @param schema the Schema for this ListType (Cannot be null)
-    **/
-    public ListType(Schema schema) 
-        throws SchemaException
-    {
+     */
+    public ListType(final Schema schema) throws SchemaException {
         super();
         
         if (schema == null) {
@@ -93,12 +87,11 @@ public class ListType extends SimpleType
         super.setSchema(schema);
     } //-- ListType
 
-
     /** 
      * Returns the simpleType for the items of this ListType.
      *
      * @return the simpleType for the items of this ListType.
-    **/
+     */
     public SimpleType getItemType() {
         if (_hasReference) {
             SimpleType simpleType = resolveReference(_itemType);
@@ -112,13 +105,12 @@ public class ListType extends SimpleType
         return _itemType; 
     } //-- getItemType
 
-
     /**
      * Returns the annotation which appears local to this Union, or
      * null if no local annotation has been set.
      *
      * @return the annotation which is local to this Union. 
-    **/
+     */
     public Annotation getLocalAnnotation() {
         return _annotation;
     } //-- getLocalAnnotation
@@ -126,7 +118,7 @@ public class ListType extends SimpleType
     /**
      * Returns the type of this Schema Structure
      * @return the type of this Schema Structure
-    **/
+     */
     public short getStructureType() {
         return Structure.SIMPLE_TYPE; //-- should be changed to LIST
     } //-- getStructureType
@@ -136,7 +128,7 @@ public class ListType extends SimpleType
      * item that instances of this list holds).
      *
      * @param type the SimpleType for this ListType.
-    **/
+     */
     public void setItemType(SimpleType type) {
         _itemType = type; 
         _hasReference = false;
@@ -153,7 +145,7 @@ public class ListType extends SimpleType
      * item that instances of this list holds).
      *
      * @param typeName the name of the SimpleType for this ListType.
-    **/
+     */
     public void setItemType(String typeName) {
         if (typeName == null) {
             _itemType = null;
@@ -172,7 +164,7 @@ public class ListType extends SimpleType
      * Sets an annotation which is local to this Union.
      *
      * @param annotation the local annotation to set for this Union.
-    **/
+     */
     public void setLocalAnnotation(Annotation annotation) {
         _annotation = annotation;
     } //-- setLocalAnnotation
@@ -183,14 +175,13 @@ public class ListType extends SimpleType
      * changed.
      *
      * @param the schema that this Union belongs to.
-    **/
+     */
     public void setSchema(Schema schema) {
         if (schema != getSchema()) {
             String err = "The Schema of an Union cannot be changed.";
             throw new IllegalStateException(err);
         }
     } //-- void setSchema
-
 } //-- ListType
 
 

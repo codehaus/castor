@@ -4,9 +4,6 @@ import junit.framework.TestCase;
 
 import java.util.Properties;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 import org.exolab.castor.jdo.Database;
 import org.exolab.castor.jdo.JDOManager;
 import org.exolab.castor.jdo.OQLQuery;
@@ -15,8 +12,6 @@ import org.castor.jdo.conf.JdoConf;
 import org.castor.jdo.util.JDOConfFactory;
 
 public final class TestLoadJdoConf extends TestCase {
-    private static final Log LOG = LogFactory.getLog(TestLoadJdoConf.class);;
-    
     public TestLoadJdoConf() {
         super();
     }

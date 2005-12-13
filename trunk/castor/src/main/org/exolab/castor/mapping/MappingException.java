@@ -59,54 +59,39 @@ import org.exolab.castor.util.Messages;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class MappingException
-    extends Exception
-{
-
+public class MappingException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 841446747748696044L;
 
     private Exception  _except;
 
-
-    public MappingException( String message )
-    {
+    public MappingException( String message ) {
         super( Messages.message( message ) );
     }
-
     
-    public MappingException( String message, Exception e )
-    {
+    public MappingException( String message, Exception e ) {
         super( Messages.message( message ) );
         setException (e);
     }
 
-
-    public MappingException( String message, Object arg1 )
-    {
+    public MappingException( String message, Object arg1 ) {
         super( Messages.format( message, arg1 ) );
     }
 
-
-    public MappingException( String message, Object arg1, Object arg2 )
-    {
+    public MappingException( String message, Object arg1, Object arg2 ) {
         super( Messages.format( message, arg1, arg2 ) );
     }
 
-
-    public MappingException( String message, Object arg1, Object arg2, Object arg3 )
-    {
+    public MappingException( String message, Object arg1, Object arg2, Object arg3 ) {
         super( Messages.format( message, arg1, arg2, arg3 ) );
     }
 
-
-    public MappingException( Exception except )
-    {
+    public MappingException( Exception except ) {
         super( Messages.format( "mapping.nested", except.toString() ) );
         _except = except;
     }
 
-
-    public Exception getException()
-    {
+    public Exception getException() {
         return _except;
     }
 
@@ -114,32 +99,25 @@ public class MappingException
     	_except = e;
     }
 
-    public void printStackTrace()
-    {
+    public void printStackTrace() {
         if ( _except == null )
             super.printStackTrace();
         else
             _except.printStackTrace();
     }
 
-
-    public void printStackTrace( PrintStream print )
-    {
+    public void printStackTrace( PrintStream print ) {
         if ( _except == null )
             super.printStackTrace( print );
         else
             _except.printStackTrace( print );
     }
 
-
-    public void printStackTrace( PrintWriter print )
-    {
+    public void printStackTrace( PrintWriter print ) {
         if ( _except == null ) 
             super.printStackTrace( print );
         else
             _except.printStackTrace( print );
     }
-
-
 }
 

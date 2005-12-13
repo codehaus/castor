@@ -267,12 +267,6 @@ public abstract class Configuration {
     static final String TRUE_VALUE  = "true";
     static final String ON_VALUE    = "on";
 
-
-    /**
-     * The default properties loaded from the castor jar / classpath
-     */
-    private static Properties _jarProps = null;
-     
 	/**
      * The default properties loaded from the configuration file.
      */

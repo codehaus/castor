@@ -47,13 +47,14 @@ package org.exolab.castor.xml.schema.simpletypes;
 
 import org.exolab.castor.xml.schema.SimpleType;
 
-
 /**
  * The ur-type definition
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
 public class UrType extends SimpleType {
+    /** SerialVersion UID */
+    private static final long serialVersionUID = 1900080808918191023L;
     
     private static final String _name = "anySimpleType";
     
@@ -61,7 +62,6 @@ public class UrType extends SimpleType {
         super();
         setName(_name);
     }
-    
 } //-- UrType
 
 

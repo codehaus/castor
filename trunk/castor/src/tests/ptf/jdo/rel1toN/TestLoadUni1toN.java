@@ -46,9 +46,6 @@ public final class TestLoadUni1toN extends TestCase {
     
     private JDOManager      _jdo = null;
     
-    private String[]        _tests = new String[8]; 
-    private long[][]        _times = new long[8][5];
-
     private DatabaseImpl    _db = null;
     private OQLQuery        _queryState = null;
     private OQLQuery        _queryStateOID = null;
@@ -467,8 +464,7 @@ public final class TestLoadUni1toN extends TestCase {
         
         int count = 0;
         while (results.hasMore()) {
-            OID oid = (OID) results.next();
-
+            results.next();
             count++;
         }
         
@@ -566,7 +562,7 @@ public final class TestLoadUni1toN extends TestCase {
         QueryResults results = _queryService.execute(mode);
         
         while (results.hasMore()) {
-            Service service = (Service) results.next();
+            results.next();
         }
     }
     
@@ -577,7 +573,7 @@ public final class TestLoadUni1toN extends TestCase {
         
         while (results.hasMore()) {
             OID oid = (OID) results.next();
-            Service service = (Service) _db.load(Service.class, oid.getId(), mode);
+            _db.load(Service.class, oid.getId(), mode);
         }
     }
     

@@ -60,22 +60,19 @@ import org.xml.sax.SAXParseException;
 
 import org.exolab.castor.util.Stack;
 import org.exolab.castor.xml.Namespaces;
+
 /**
  * This class is a SAX Content Handler that
  * build an AnyNode from a stream of SAX events (either SAX1 for compatibility or SAX2)
  * @author <a href="blandin@intalio.com>Arnaud Blandin</a>
  * @version $Revision$ $Date$
  */
-public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
-{
-
+public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler {
    /**
     * Prefix used by namespace declaration.
     */
     private final static String XMLNS_PREFIX        = "xmlns";
     private final static int    XMLNS_PREFIX_LENGTH = XMLNS_PREFIX.length() + 1; // prefix + ':'
-    private final static String XMLNS_NAMESPACE     = "http://www.w3.org/2000/xmlns/";
-
 
     /**
      * The starting node.
@@ -107,11 +104,6 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
      * value.
      */
     private boolean _processNamespace = true;
-
-    /**
-     * The locator
-     */
-    private Locator _locator;
 
     /**
      * A flag that indicates we are in a character section.
@@ -149,9 +141,7 @@ public class SAX2ANY implements ContentHandler, DocumentHandler, ErrorHandler
      * Sets the document locator of the current parsed inputsource
      * @param locator the Locator of the current parsed inputsource
      */
-    public void setDocumentLocator(Locator locator) {
-        _locator = locator;
-    }
+    public void setDocumentLocator(final Locator locator) { }
 
     //----------------- NOT IMPLEMENTED --------------
     //we don't need to implement these methods since

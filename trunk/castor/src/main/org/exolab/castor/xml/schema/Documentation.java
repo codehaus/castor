@@ -53,8 +53,8 @@ package org.exolab.castor.xml.schema;
  * @see AnnotationItem
  */
 public class Documentation extends AnnotationItem {
-
-
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -2388810468832309970L;
 
     /**
      * Creates a new Documentation

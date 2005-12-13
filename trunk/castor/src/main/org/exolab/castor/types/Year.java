@@ -62,8 +62,10 @@ import java.text.SimpleDateFormat;
  */
 
 public class Year extends TimePeriod {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8485456751196062574L;
 
-      /** Set to true and recompile to include debugging code in class. */
+    /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;
 
     /** The month format used by the toDate() method */

@@ -38,7 +38,9 @@ package org.exolab.castor.util;
  * @see java.util.List
  * @see java.util.Collection
 **/
-public class List implements Cloneable , java.io.Serializable {
+public class List implements Cloneable, java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 3116347649564356199L;
 
     private int DEFAULT_SIZE = 17;
 

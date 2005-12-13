@@ -58,7 +58,9 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
  */
 public class MarshalException extends XMLException {
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1648679783713336948L;
+
     //------------------/
     //- error messages -/
     //------------------/

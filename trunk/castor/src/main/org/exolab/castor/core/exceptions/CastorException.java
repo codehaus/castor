@@ -55,10 +55,10 @@ import java.io.PrintWriter;
  * @version $Revision$ $Date$
  */
 public class CastorException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -5963804406955523505L;
 
-    /**
-     * The cause for this exception
-     */
+    /** The cause for this exception. */
     private Throwable cause;
 
     /**
@@ -104,7 +104,6 @@ public class CastorException extends Exception {
         this.cause = cause;
         return this;
     }
-
     
     /**
      * Match the JDK 1.4 Throwable version of getCause() on JDK<1.4 systems.

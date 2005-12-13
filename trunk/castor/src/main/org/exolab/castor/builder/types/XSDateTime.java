@@ -61,8 +61,6 @@ public final class XSDateTime extends XSType {
     private static final JType jType
         = new JClass("java.util.Date");
 
-    private String value = null;
-
     public XSDateTime() {
         super(XSType.DATETIME_TYPE);
     } //-- XSNMToken

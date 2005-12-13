@@ -54,10 +54,9 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class ComplexType extends XMLType
-   implements ContentModelGroup, Referable
-{
-
+public class ComplexType extends XMLType implements ContentModelGroup, Referable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 5348120259072084658L;
 
     /**
      * The abstract flag for this ComplexType

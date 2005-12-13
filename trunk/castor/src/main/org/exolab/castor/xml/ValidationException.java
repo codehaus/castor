@@ -51,6 +51,9 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
 **/
 public class ValidationException extends XMLException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2220902174700444631L;
+
     /**
      * The location for this Exception
      */

@@ -89,7 +89,6 @@ public class AttributeGroupUnmarshaller extends ComponentReader {
     private boolean allowAnnotation   = true;
     private boolean foundAnyAttribute = false;
     private boolean isRef             = false;
-    private boolean requireName       = false;
 
     private Schema _schema = null;
 

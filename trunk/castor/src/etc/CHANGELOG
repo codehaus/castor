@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-719 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added serialVersionUID to serializable classes.
+       Details: http://jira.codehaus.org/browse/CASTOR-719
+       (Ralf - 20051213)
+       
 All:   Fixed bug CASTOR-1279 using contribution from Dave Brosius[dbrosius@qis.net]
        Removed some unnecessary object constructions and removed manual array copy.
        Details: http://jira.codehaus.org/browse/CASTOR-1279

@@ -55,9 +55,12 @@ import org.exolab.castor.core.exceptions.CastorException;
  * @version $Revision$ $Date$
 **/
 public class XMLException extends CastorException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7512918645754995146L;
+
     /**
      * The location for this Exception
-    **/
+     */
     private Location  _location   = null;
 
     /**

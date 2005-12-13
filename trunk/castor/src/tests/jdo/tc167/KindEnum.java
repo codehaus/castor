@@ -5,9 +5,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public final class KindEnum
-implements Cloneable, Comparable, Serializable {
+public final class KindEnum implements Cloneable, Comparable, Serializable {
     //------------------------------------------------------------------------
+
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -4999799304409658395L;
 
     private static final Map            KINDS = new HashMap();
 

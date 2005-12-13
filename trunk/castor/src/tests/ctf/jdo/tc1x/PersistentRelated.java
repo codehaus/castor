@@ -47,8 +47,10 @@ package ctf.jdo.tc1x;
 
 import org.exolab.castor.jdo.TimeStampable;
 
-public final class PersistentRelated
-implements TimeStampable, java.io.Serializable {
+public final class PersistentRelated implements TimeStampable, java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6470077375784314255L;
+
     public static final int       DEFAULT_ID = 5;
 
     private int              _id;

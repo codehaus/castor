@@ -80,8 +80,6 @@ public  class XSDecimal extends XSType
     private static final JType jType
         = new JClass("java.math.BigDecimal");
 
-    private String value = null;
-
     public XSDecimal() {
         super(XSType.DECIMAL_TYPE);
     } //-- XSNMToken

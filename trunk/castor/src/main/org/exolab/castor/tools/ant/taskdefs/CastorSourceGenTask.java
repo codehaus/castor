@@ -101,12 +101,10 @@ public class CastorSourceGenTask extends MatchingTask {
     private String bindingfile;
     private String types;
     private String lineseparator;
-    private boolean generateImportedSchemas = false;
     // End Source Generator parameters
 
     private boolean verbose;
     private boolean warnings = true;
-    private boolean overwrite = false;
     private boolean nodesc;
     private boolean nomarshall;
     private boolean testable;

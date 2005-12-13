@@ -68,7 +68,6 @@ public class ModelGroupUnmarshaller extends ComponentReader {
      //- Static Class Variables -/
     //--------------------------/
 
-    private static final int MODEL_GROUP = 1;
     /**
      * The value of the maximum occurance wild card
      */

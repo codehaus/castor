@@ -53,10 +53,10 @@ import org.exolab.castor.xml.XMLException;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class SchemaException extends 
-    org.exolab.castor.xml.XMLException 
-{
-    
+public class SchemaException extends org.exolab.castor.xml.XMLException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7814714272702298809L;
+
     /**
      * Creates a new SchemaException with no message
      * or nested Exception.

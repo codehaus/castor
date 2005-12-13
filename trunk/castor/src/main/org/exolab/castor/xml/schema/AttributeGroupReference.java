@@ -56,9 +56,9 @@ import java.util.Enumeration;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public final class AttributeGroupReference
-    extends AttributeGroup
-{
+public final class AttributeGroupReference extends AttributeGroup {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -6283626049554689747L;
 
     /**
      * Error message for a null argument

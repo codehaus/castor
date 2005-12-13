@@ -51,8 +51,9 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
 **/
 public class CastorException extends Exception {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1648679783713336948L;
+
     /**
      * The error code for this Exception
     **/

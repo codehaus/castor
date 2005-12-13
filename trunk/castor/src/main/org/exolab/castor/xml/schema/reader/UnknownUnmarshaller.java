@@ -63,18 +63,6 @@ public class UnknownUnmarshaller extends ComponentReader {
     //--------------------/
 
     /**
-     * The current ComponentReader
-    **/
-    private ComponentReader unmarshaller;
-    
-    /**
-     * The current branch depth
-    **/
-    private int depth = 0;
-        
-    private CharacterUnmarshaller charUnmarshaller = null;
-    
-    /**
      * The name of the element we are "unmarshalling"
     **/
     String name;

@@ -47,10 +47,8 @@
 package org.exolab.castor.xml.util;
 
 
-import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.FieldDescriptor;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
 
 import org.exolab.castor.util.LocalConfiguration;
@@ -63,14 +61,7 @@ import org.exolab.castor.xml.*;
  * @author <a href="kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public class XMLClassDescriptorAdapter 
-    extends XMLClassDescriptorImpl
-{
-    
-    
-    private XMLClassDescriptor delegate = null;
-    
-    
+public class XMLClassDescriptorAdapter extends XMLClassDescriptorImpl {
     /**
      * Creates a new XMLClassDescriptorAdapter using the
      * given ClassDescriptor

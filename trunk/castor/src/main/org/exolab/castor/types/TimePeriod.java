@@ -64,6 +64,8 @@ import java.util.StringTokenizer;
  * @see RecurringDuration
  */
 public class TimePeriod extends RecurringDuration{
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7057026912711829943L;
 
     /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;

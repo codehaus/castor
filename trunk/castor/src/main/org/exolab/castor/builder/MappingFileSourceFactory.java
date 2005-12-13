@@ -61,13 +61,6 @@ import org.exolab.castor.mapping.xml.types.BindXmlNodeType;
  * @version $Revision$ $Date$
  */
 public class MappingFileSourceFactory {
-
-    
-    /**
-     * The BuilderConfiguration instance
-     */
-    private BuilderConfiguration _config = null;
-    
     /**
      * Creates a new MappingFileSourceFactory with the given 
      * configuration
@@ -80,7 +73,6 @@ public class MappingFileSourceFactory {
             String err = "The argument 'config' must not be null.";
             throw new IllegalArgumentException(err);
         }
-        _config = config;
     } //-- MappingFileSourceFactory
     
 	/**

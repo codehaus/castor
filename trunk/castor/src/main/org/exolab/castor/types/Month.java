@@ -65,6 +65,8 @@ import java.util.SimpleTimeZone;
  */
 
 public class Month extends TimePeriod {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 8102039626686892932L;
 
     /** Set to true and recompile to include debugging code in class. */
     private static final boolean DEBUG = false;

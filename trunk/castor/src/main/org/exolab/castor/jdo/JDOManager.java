@@ -136,6 +136,9 @@ public final class JDOManager
 implements DataObjects, Referenceable, ObjectFactory, Serializable {
     //--------------------------------------------------------------------------
 
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -7108469291509131893L;
+
     /**
      * The default lock timeout (specified in seconds).
      */

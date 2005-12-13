@@ -58,17 +58,19 @@ import java.io.PrintWriter;
  * @version $Revision$
  */
 public final class URIException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 4230299234562430190L;
 
     /**
      * nested exception, may be null.
-    **/
+     **/
     private Exception _exception = null;
 
     /**
      * Creates a new URIException
      *
      * @param message the explaination for this exception
-    **/
+     **/
     public URIException( String message ) {
         super( message );
     } //-- URIException
@@ -79,7 +81,7 @@ public final class URIException extends Exception {
      * @param message the explaination for this exception
      * @param exception, an optional nested exception, most
      * likely, the exception which caused this exception.
-    **/
+     **/
     public URIException( String message, Exception exception ) {
         super( message );
         if ( exception instanceof URIException )
@@ -94,7 +96,7 @@ public final class URIException extends Exception {
      *
      * @param exception the exception which caused this exception.
      * Note: to use this constructor exception must not be null.
-    **/
+     **/
     public URIException( Exception exception ) {
         this( exception.getMessage() , exception );
     } //-- URIException
@@ -106,7 +108,7 @@ public final class URIException extends Exception {
      *
      * @return the nested exception, or null if no exception
      * exists
-    **/
+     **/
     public Exception getException() {
         return _exception;
     } //-- getException
@@ -134,8 +136,6 @@ public final class URIException extends Exception {
         else
             super.printStackTrace(s);
     } //-- printStackTrace
-
-
 } //-- URIException
 
 

@@ -54,7 +54,7 @@ public final class TypeLOB {
     private long            _id;
     private byte[]          _blob;
     private String          _clob;
-    private InputStream     _blob2;
+//    private InputStream     _blob2;
     private Clob            _clob2;
 
     public void setId(final long id) { _id = id; }

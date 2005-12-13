@@ -64,8 +64,6 @@ public class NameValidator extends StringValidator {
 
     private short type = NCNAME;
 
-    private boolean required = false;
-
     /**
      * Creates a new NameValidator with the default validation
      * set to NCName
@@ -87,9 +85,7 @@ public class NameValidator extends StringValidator {
      * Sets whether or not a String is required (non null)
      * @param required the flag indicating whether Strings are required
     **/
-    public void setRequired(boolean required) {
-        this.required = required;
-    } //-- setRequired
+    public void setRequired(final boolean required) { }
 
     public void validate(String value, ValidationContext context)
         throws ValidationException

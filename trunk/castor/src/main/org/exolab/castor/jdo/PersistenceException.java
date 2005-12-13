@@ -57,16 +57,15 @@ import org.exolab.castor.core.exceptions.CastorException;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class PersistenceException
-    extends CastorException
-{
-    public PersistenceException( String message, Throwable except )
-    {
-        super( message, except );
+public class PersistenceException extends CastorException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -214432393524952756L;
+
+    public PersistenceException(final String message, final Throwable except) {
+        super(message, except);
     }
 
-    public PersistenceException( String message )
-    {
-        super( message );
+    public PersistenceException(final String message) {
+        super(message);
     }
 }

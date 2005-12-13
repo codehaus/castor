@@ -45,13 +45,12 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class AnyURIType extends AtomicType
-{
+public class AnyURIType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2322360019220182755L;
 }

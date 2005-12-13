@@ -88,12 +88,6 @@ public class AnyNode2SAX2 {
      */
     private Namespaces _context;
 
-    /**
-     * The namespace declaration String
-     */
-    private static final String XMLNS_PREFIX  = "xmlns";
-
-
     public AnyNode2SAX2() {
 		_elements = new HashSet();
 	}

@@ -84,6 +84,26 @@ org.castor.jdo.cacheFactories=\
                 </code>
 			</summary>
 			<bugs>
+                <bug id="719" tool="jira">
+                    <description>
+                        Added serialVersionUID to serializable classes.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Gregory Block</name>
+                        <email>gblock@ctoforaday.com</email>
+                    </reporter>
+                    <type>Bug</type>
+                    <module>All</module>
+                    <date>20051213</date>
+                </bug>
                 <bug id="1279" tool="jira">
                     <description>
                         Removed some unnecessary object constructions

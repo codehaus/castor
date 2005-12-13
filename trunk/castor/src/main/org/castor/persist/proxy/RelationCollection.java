@@ -63,16 +63,6 @@ public class RelationCollection implements Collection, Lazy, TxSynchronizable {
      */
     private ClassMolder _molder;
 
-    /**
-     * AccessMode of the elements.
-     */
-    private AccessMode _accessMode;
-
-    /**
-     * The oid of related object of all the elements.
-     */
-    private OID _oid;
-
     /* Vector of identity */
     private ArrayList _ids;
 
@@ -104,10 +94,8 @@ public class RelationCollection implements Collection, Lazy, TxSynchronizable {
             final LockEngine engine, final ClassMolder molder,
             final AccessMode amode, ArrayList ids) {
         _tx = tx;
-        _oid = enclosing;
         _molder = molder;
         _engine = engine;
-        _accessMode = amode;
         if (ids == null) {
             ids = new ArrayList();
         }

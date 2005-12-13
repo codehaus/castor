@@ -56,8 +56,9 @@ import org.exolab.castor.xml.validators.ValidationUtils;
  * @version $Revision$ $Date$
 **/
 public class Key extends IdentityConstraint {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -3998837864243593902L;
+
     /**
      * Creates a new Key Identity-Constraint.
      *

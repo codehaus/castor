@@ -125,12 +125,6 @@ public class Marshaller extends MarshalFramework {
     private static final String SERIALIZER_NOT_SAX_CAPABLE
         = "conf.serializerNotSaxCapable";
 
-
-    /**
-     * The namespace declaration String
-    **/
-    private static final String XMLNS  = "xmlns";
-
     /**
      * Namespace declaration for xml schema instance
     **/
@@ -202,11 +196,6 @@ public class Marshaller extends MarshalFramework {
     private ContentHandler  _handler      = null;
 
     /**
-     * The print writer used for logging
-    **/
-    private PrintWriter _logWriter = null;
-
-    /**
      * Castor configuration
      */
     private Configuration _config = null;
@@ -232,13 +221,6 @@ public class Marshaller extends MarshalFramework {
      * The XMLNaming instance being used.
     **/
     private XMLNaming _naming = null;
-
-    /**
-     * A handle to the DOM node being marshalled. This
-     * will be null a DOM node was not passed in
-     * as an argument to a marshal method.
-    **/
-	private Node _node = null;
 
 	/**
 	 * Insert NameSpace prefix declarations at the root node
@@ -385,7 +367,6 @@ public class Marshaller extends MarshalFramework {
 	{
         if ( node == null )
             throw new IllegalArgumentException( "Argument 'node' is null." );
-		_node = node;
 		_handler = new DocumentHandlerAdapter(new SAX2DOMHandler( node ));
 
         // call internal initializer
@@ -2053,9 +2034,7 @@ public class Marshaller extends MarshalFramework {
      * Sets the PrintWriter used for logging
      * @param printWriter the PrintWriter to use for logging
     **/
-    public void setLogWriter(PrintWriter printWriter) {
-        this._logWriter = printWriter;
-    } //-- setLogWriter
+    public void setLogWriter(final PrintWriter printWriter) { }
 
     /**
      * Sets the encoding for the serializer. Note that this method

@@ -56,13 +56,13 @@ import java.io.PrintWriter;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
  * @version $Revision$ $Date$
 **/
-public class NestedIOException 
-    extends java.io.IOException 
-{
-    
+public class NestedIOException extends java.io.IOException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -4698274786487914369L;
+
     /**
      * A nested exception
-    **/
+     */
     private Exception _exception  = null;
     
     /**

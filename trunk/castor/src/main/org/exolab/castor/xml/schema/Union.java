@@ -58,8 +58,9 @@ import java.util.Vector;
  * @version $Revision$ $Date$
 **/
 public class Union extends SimpleType {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -1389185884142578168L;
+
     /**
      * The local annotation for this Union
     **/

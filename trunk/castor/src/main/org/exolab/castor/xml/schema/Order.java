@@ -50,6 +50,8 @@ package org.exolab.castor.xml.schema;
  * @author <a href="mailto:kvisco@intalio.com">Keith Visco</a>
 **/
 public final class Order implements java.io.Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -218491941838731735L;
 
     public static final short ALL      = 0;
     public static final short SEQUENCE = 1;

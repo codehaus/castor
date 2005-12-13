@@ -53,8 +53,10 @@ import org.exolab.castor.xml.ValidationException;
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-class TypeReference extends XMLType
-{
+class TypeReference extends XMLType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = -8707313918028332092L;
+    
     /**
      * The referred type (stored in the schema)
      */

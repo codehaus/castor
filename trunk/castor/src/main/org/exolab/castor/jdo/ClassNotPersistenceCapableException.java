@@ -54,20 +54,18 @@ package org.exolab.castor.jdo;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class ClassNotPersistenceCapableException
-    extends PersistenceException
-{
-    
-    public ClassNotPersistenceCapableException( String message )
-    {
-        super( message );
+public class ClassNotPersistenceCapableException extends PersistenceException {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 5245544645253972901L;
+
+    public ClassNotPersistenceCapableException(final String message) {
+        super(message);
     }
 
-    public ClassNotPersistenceCapableException( String message, Throwable exception )
-    {
-        super( message, exception );
+    public ClassNotPersistenceCapableException(
+            final String message, final Throwable exception) {
+        
+        super(message, exception);
     }
-
-    
 }
 

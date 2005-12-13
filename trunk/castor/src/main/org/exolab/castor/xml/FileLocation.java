@@ -53,8 +53,9 @@ package org.exolab.castor.xml;
  * @version $Revision$ $Date$
  */
 public class FileLocation implements Location, java.io.Serializable {
-    
-    
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 7112551880124131785L;
+
     private final static String NOT_AVAILABLE = "[not available]";
     
     private String _filename = null;

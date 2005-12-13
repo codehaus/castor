@@ -29,6 +29,9 @@ import org.exolab.castor.core.exceptions.CastorException;
 public final class TransactionManagerAcquireException extends CastorException {
     //--------------------------------------------------------------------------
 
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 3417402065443514850L;
+
     /**
      * Creates a new TransactionManagerAcquireException with the given message.
      * 

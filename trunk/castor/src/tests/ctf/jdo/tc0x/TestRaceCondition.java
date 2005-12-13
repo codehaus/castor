@@ -212,8 +212,7 @@ public final class TestRaceCondition extends CastorTestCase {
         RaceThread[] ts = new RaceThread[NUM_OF_RACING_THREADS];
 
         for (int i = 0; i < ts.length; i++) {
-            ts[i] = new RaceThread(this, _dbForRace[i], controls,
-                                   cachetype, NUM_OF_TRIALS);
+            ts[i] = new RaceThread(this, _dbForRace[i], controls, NUM_OF_TRIALS);
             ts[i].start();
         }
 
@@ -276,20 +275,17 @@ public final class TestRaceCondition extends CastorTestCase {
         private TestRaceCondition   _parent;
         private Database            _db;
         private RaceSync[]          _race;
-        private int                 _cachetype;
         private int                 _trials;
         private Random              _random;
         private boolean             _isDone;
         private Exception           _fatal;
 
         RaceThread(final TestRaceCondition parent, final Database db,
-                   final RaceSync[] race, final int cachetype,
-                   final int trials) {
+                   final RaceSync[] race, final int trials) {
             
             _parent      = parent;
             _db          = db;
             _race         = race;
-            _cachetype   = cachetype;
             _trials      = trials;
             _random      = new Random();
         }
@@ -464,6 +460,9 @@ public final class TestRaceCondition extends CastorTestCase {
     }
     
     private class NoSuchElementException extends Exception {
+        /** SerialVersionUID */
+        private static final long serialVersionUID = 7043305244386685929L;
+
         NoSuchElementException(final String name) {
             super(name);
         }

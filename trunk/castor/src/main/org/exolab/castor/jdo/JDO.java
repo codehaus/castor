@@ -70,7 +70,6 @@ import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManager;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
@@ -128,6 +127,9 @@ import org.xml.sax.InputSource;
  */
 public final class JDO
 implements DataObjects, Referenceable, ObjectFactory, Serializable {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 2816194621638396008L;
+
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
@@ -189,12 +191,6 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
      * Description of this database.
      */
     private String _description = "Castor JDO";
-
-    /**
-     * The transaction manager factory to be used to obtain a
-     * <code>javax.jta.TransactionManager</code> instance.
-     */
-    private TransactionManagerFactory _transactionManagerFactory = null;
 
     /**
      * The transaction manager

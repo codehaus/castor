@@ -66,8 +66,6 @@ public class EnumFieldHandler implements FieldHandler {
 
     private static final Class[] STRING_ARGS = new Class[] { String.class };
 
-    private Class _enumType = null;
-
     private Method valueOf  = null;
 
     private FieldHandler handler = null;
@@ -95,8 +93,6 @@ public class EnumFieldHandler implements FieldHandler {
                 "constructor of EnumMarshalDescriptor cannot be null.";
             throw new IllegalArgumentException(err);
         }
-
-        this._enumType = type;
 
         Method method = null;
         try {

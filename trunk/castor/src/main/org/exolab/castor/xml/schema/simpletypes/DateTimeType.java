@@ -45,16 +45,14 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Facet;
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents date/time XML SChema types
  * @author <a href="mailto:berry@intalio.com">Arnaud Blandin</a>
  * @version $Revision:
 **/
-public class DateTimeType extends AtomicType
-{
+public class DateTimeType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 799183446555870630L;
 }
 
 

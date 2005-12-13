@@ -56,10 +56,8 @@ import org.w3c.dom.*;
  *
  * @author <a href="mailto:andrew.fawcett@coda.com">Andrew Fawcett</a>
  */
-public class SAX2DOMHandler extends HandlerBase
-{
+public class SAX2DOMHandler extends HandlerBase {
 	private Node _document;
-	private Node _parent;
 	private Stack _parents = new Stack();
 										
 	public SAX2DOMHandler(Node node)

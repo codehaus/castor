@@ -45,16 +45,15 @@
 
 package org.exolab.castor.xml.schema.simpletypes;
 
-import org.exolab.castor.xml.schema.Schema;
-
 /**
  * Represents the boolean type
  *
  * @author <a href="mailto:berry@intalio.com">Arnaud Berry</a>
  * @version $Revision:
 **/
-public class BooleanType extends AtomicType
-{
+public class BooleanType extends AtomicType {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 4964075389839351348L;
 }
 
 

@@ -61,6 +61,8 @@ import java.lang.Exception;
  * @version $Revision$ $Date$
  */
 public class DTDException extends Exception {
+    /** SerialVersionUID */
+    private static final long serialVersionUID = 4760130120041855808L;
 
     public DTDException() {
         super();

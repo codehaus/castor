@@ -66,8 +66,6 @@ public class XSList extends XSType {
     private static final JType jType
         = new JClass("java.util.Vector");
 
-    private String value = null;
-
     public XSList(XSType contentType) {
         super(XSType.COLLECTION);
         this.contentType = contentType;
