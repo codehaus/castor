@@ -109,7 +109,7 @@
     <email>martin-fuchs@gmx.net</email>
     <company id="mentopolis"/>
     <project>JDO</project>
-    <status>active</status>
+    <status>inactive</status>
     <description>
        JDO bug fixes and enhancements including JdoConfFactory;
        test cases; Oracle questions
@@ -138,7 +138,7 @@
     <name surname="Block" given="Gregory" />
     <email>gblock@ctoforaday.com</email>
     <project>JDO</project>
-    <status>active</status>
+    <status>inactive</status>
     <company id="ctoforaday"/>
     <description>
        Bugfixes/enhancements, stress testing, performance testing, tester of
