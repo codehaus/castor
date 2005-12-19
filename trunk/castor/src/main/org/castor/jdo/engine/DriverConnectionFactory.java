@@ -71,7 +71,6 @@ public final class DriverConnectionFactory extends AbstractConnectionFactory {
      * @see org.castor.jdo.engine.AbstractConnectionFactory#initializeFactory()
      */
     protected void initializeFactory() throws MappingException {
-        DatabaseRegistry dbs;
         Enumeration params;
         Param       param;
         

@@ -13,26 +13,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utf.org.castor;
+package utf.org.castor.transactionmanager;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Run all tests of the org.castor package.
+ * Run all tests of the org.castor.transactionmanager package.
  * 
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
 public final class TestAll extends TestCase {
     public static Test suite() throws Exception {
-        TestSuite suite = new TestSuite("All org.castor tests");
+        TestSuite suite = new TestSuite("All org.castor.transactionmanager tests");
 
-        suite.addTest(utf.org.castor.util.TestAll.suite());
-        suite.addTest(utf.org.castor.cache.TestAll.suite());
-        suite.addTest(utf.org.castor.persist.TestAll.suite());
-        suite.addTest(utf.org.castor.transactionmanager.TestAll.suite());
+        suite.addTest(TestTransactionManagerAcquireException.suite());
+
+        suite.addTest(TestLocalTransactionManager.suite());
+        
+        suite.addTest(TestLocalTransactionManagerFactory.suite());
+        suite.addTest(TestJNDIENCTransactionManagerFactory.suite());
+        suite.addTest(TestJOTMTransactionManagerFactory.suite());
+        suite.addTest(TestAbstractTransactionManagerFactory.suite());
+        suite.addTest(TestWebSphereTransactionManagerFactory.suite());
+        suite.addTest(TestWebSphere5TransactionManagerFactory.suite());
+        suite.addTest(TestWebSphere51TransactionManagerFactory.suite());
+
+        suite.addTest(TestTransactionManagerFactoryRegistry.suite());
+        suite.addTest(TestTransactionManagerRegistry.suite());
 
         return suite;
     }

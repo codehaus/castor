@@ -373,7 +373,7 @@ public final class TestTimeLimited extends TestCase {
         assertTrue(cache.containsKey("g"));
         assertTrue(cache.containsKey("h"));
 
-        Thread.sleep(800);
+        Thread.sleep(900);
         
         assertEquals(7, cache.size());
         assertTrue(cache.containsKey("b"));

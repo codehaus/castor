@@ -70,7 +70,7 @@ import org.castor.jdo.engine.DatabaseRegistry;
 import org.castor.jdo.conf.JdoConf;
 import org.exolab.castor.jdo.engine.DatabaseImpl;
 import org.exolab.castor.jdo.engine.TxDatabaseMap;
-import org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManager;
+import org.castor.transactionmanager.LocalTransactionManager;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.OutputLogInterceptor;
 import org.exolab.castor.persist.spi.CallbackInterceptor;
