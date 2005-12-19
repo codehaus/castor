@@ -13,11 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exolab.castor.jdo.transactionmanager;
+package org.castor.transactionmanager;
 
+import java.util.Properties;
 import javax.transaction.TransactionManager;
-
-import org.castor.jdo.conf.JdoConf;
 
 /**
  * A factory for properly acquiring <tt>javax.transaction.TransactionManager</tt> 
@@ -28,6 +27,7 @@ import org.castor.jdo.conf.JdoConf;
  * @author <a href=" mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
 public interface TransactionManagerFactory {
     //--------------------------------------------------------------------------
@@ -41,15 +41,14 @@ public interface TransactionManagerFactory {
 
     /**
      * Acquires the appropriate <tt>javax.transaction.TransactionManager</tt> with the
-     * parameters from the given jdo configuration.
+     * given properties.
      * 
-     * @param jdoConf   The jdo configuration holding the parameters to set on the
-     *                  transaction manager.
+     * @param properties The properties passed to the transaction manager.
      * @return The transaction manager.
-     * @throws TransactionManagerAcquireException If any failure occures when loading
+     * @throws TransactionManagerAcquireException If any failure occured when loading
      *         the transaction manager.
      */
-    TransactionManager getTransactionManager(final JdoConf jdoConf) 
+    TransactionManager getTransactionManager(final Properties properties) 
     throws TransactionManagerAcquireException;
 
     //--------------------------------------------------------------------------

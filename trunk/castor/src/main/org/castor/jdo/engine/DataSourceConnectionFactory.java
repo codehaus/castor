@@ -63,7 +63,6 @@ public final class DataSourceConnectionFactory extends AbstractConnectionFactory
     throws MappingException {
         DataSource dataSource;
         Param[] parameters;
-        Param param;
 
         DatabaseChoice dbChoice = database.getDatabaseChoice();
         String className = dbChoice.getDataSource().getClassName();

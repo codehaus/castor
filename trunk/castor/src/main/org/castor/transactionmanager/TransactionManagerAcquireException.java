@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exolab.castor.jdo.transactionmanager;
-
-import org.exolab.castor.core.exceptions.CastorException;
+package org.castor.transactionmanager;
 
 /**
  * An exception encapsulating an exception that occurs during the operation 
@@ -25,12 +23,13 @@ import org.exolab.castor.core.exceptions.CastorException;
  * @author <a href="mailto:Werner.Guttmann@morganstanley.com">Werner Guttmann</a>
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
-public final class TransactionManagerAcquireException extends CastorException {
+public final class TransactionManagerAcquireException extends Exception {
     //--------------------------------------------------------------------------
 
-    /** SerialVersionUID */
-    private static final long serialVersionUID = 3417402065443514850L;
+    /** SerialVersionUID. */
+    private static final long serialVersionUID = -4473907453496999735L;
 
     /**
      * Creates a new TransactionManagerAcquireException with the given message.
@@ -47,8 +46,8 @@ public final class TransactionManagerAcquireException extends CastorException {
      * @param message The message for this exception.
      * @param cause A Throwable instance.
      */
-    public TransactionManagerAcquireException(final String message,
-                                              final Throwable cause) {
+    public TransactionManagerAcquireException(
+            final String message, final Throwable cause) {
         super(message, cause);
     }
 

@@ -82,8 +82,59 @@ org.castor.jdo.cacheFactories=\
 #  
 #org.castor.jdo.cacheDebug=false
                 </code>
+
+                <h3>Moved transaction manager from org.exolab.castor to org.castor package</h3>
+				
+                <p>Take care to adjust your custom castor.properties file to reflect
+                   the changed packages of TransactionManagerFactories.</p>
+                   
+                <code>
+# 
+# TransactionManagerFactory implementations
+# 
+org.castor.transactionmanager.Factories=\
+  org.castor.transactionmanager.WebSphereTransactionManagerFactory,\
+  org.castor.transactionmanager.WebSphere5TransactionManagerFactory,\
+  org.castor.transactionmanager.WebSphere51TransactionManagerFactory,\
+  org.castor.transactionmanager.LocalTransactionManagerFactory,\
+  org.castor.transactionmanager.JNDIENCTransactionManagerFactory,\
+  org.castor.transactionmanager.JOTMTransactionManagerFactory
+                </code>
+                
+                <p>In addition a new property has been introduced that allows to
+                   configure if the transaction manager shell be acquired instantly when
+                   he is registered or lazy when it is needed for the first time.</p>
+                
+                <code>
+#
+# Shell the TransactionManager be initialized at registration or lazily when
+# requested for the first time? Defaults to false.
+#
+org.castor.transactionmanager.InitializeAtRegistration=false
+                </code>
 			</summary>
 			<bugs>
+                <bug id="1274" tool="jira">
+                    <description>
+                        Made TransactionManagerRegistry non static and moved it
+                        to org.castor.transactionmanager package.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051219</date>
+                </bug>
                 <bug id="719" tool="jira">
                     <description>
                         Added serialVersionUID to serializable classes.

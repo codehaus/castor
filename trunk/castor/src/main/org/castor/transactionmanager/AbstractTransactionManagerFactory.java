@@ -13,26 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exolab.castor.jdo.transactionmanager.spi;
+package org.castor.transactionmanager;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
+import java.util.Properties;
 import javax.transaction.TransactionManager;
 
-import org.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
-import org.exolab.castor.util.Messages;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 /**
  * An abstract factory for acquiring transactions from this J2EE container.
  *
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
 public abstract class AbstractTransactionManagerFactory
 implements TransactionManagerFactory {
+    //--------------------------------------------------------------------------
+
+    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
+     *  Commons Logging</a> instance used for all logging. */
+    private static final Log LOG = LogFactory.getLog(
+            AbstractTransactionManagerFactory.class);
+    
     //--------------------------------------------------------------------------
 
     /**
@@ -53,7 +58,7 @@ implements TransactionManagerFactory {
      * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory
      *      #getTransactionManager(org.exolab.castor.jdo.conf.JdoConf)
      */
-    public final TransactionManager getTransactionManager(final JdoConf jdoConf)
+    public final TransactionManager getTransactionManager(final Properties properties)
     throws TransactionManagerAcquireException {
         TransactionManager transactionManager;
         try {
@@ -61,19 +66,20 @@ implements TransactionManagerFactory {
             Method method = factory.getMethod(getFactoryMethodName(), (Class[]) null);
             Object obj = method.invoke(factory, (Object[]) null);
             transactionManager = (TransactionManager) obj;
-        } catch (ClassNotFoundException ex) {
-            throw new TransactionManagerAcquireException(Messages.format(
-                "jdo.transaction.failToGetManager", getFactoryClassName()), ex);
-        } catch (IllegalAccessException ex) {
-            throw new TransactionManagerAcquireException(Messages.format(
-                "jdo.transaction.failToGetManager", getFactoryClassName()), ex);
-        } catch (InvocationTargetException ex) {
-            throw new TransactionManagerAcquireException(Messages.format(
-                "jdo.transaction.failToGetManager", getFactoryClassName()), ex);
-        } catch (NoSuchMethodException ex) {
-            throw new TransactionManagerAcquireException(Messages.format(
-                "jdo.transaction.failToGetManager", getFactoryClassName()), ex);
+        } catch (Exception ex) {
+            String msg = "Unable to acquire instance of "
+                       + "javax.transaction.TransactionManager: " + getName();
+            LOG.error(msg);
+            throw new TransactionManagerAcquireException(msg, ex);
         }
+        
+        if (transactionManager == null) {
+            String msg = "Unable to acquire instance of "
+                       + "javax.transaction.TransactionManager: " + getName();
+            LOG.error(msg);
+            throw new TransactionManagerAcquireException(msg);
+        }
+        
         return transactionManager;
     }
 

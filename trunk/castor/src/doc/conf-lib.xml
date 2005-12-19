@@ -103,22 +103,16 @@
   org.exolab.castor.jdo.defaultTimeZone=
   #org.exolab.castor.jdo.defaultTimeZone=GMT-8:00
 
-
-  #
-  # List of supported TransactionManagerFactory implementations; please expand this list
-  # to add any custom transaction manager fatories.
-  #
-  org.exolab.castor.jdo.spi.transactionManagerFactories=\
-	org.exolab.castor.jdo.transactionmanager.spi.WebSphereTransactionManagerFactory,\
-	org.exolab.castor.jdo.transactionmanager.spi.WebSphere5TransactionManagerFactory,\
-	org.exolab.castor.jdo.transactionmanager.spi.WebSphere51TransactionManagerFactory,\
-	org.exolab.castor.jdo.transactionmanager.spi.LocalTransactionManagerFactory,\
-	org.exolab.castor.jdo.transactionmanager.spi.JNDIENCTransactionManagerFactory
-
   #
   # List of TxSynchronizeable implementations
   #
   #org.exolab.castor.persist.TxSynchronizable=
+
+  #
+  # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
+  # statements; false otherwise (logging will be turned off completely).
+  #
+  org.exolab.castor.perists.useProxies=true
 
   #
   # List of available cache implementations; please expand this list to add
@@ -134,11 +128,30 @@
     org.castor.cache.distributed.JCacheFactory,\
     org.castor.cache.distributed.CoherenceCacheFactory
 
-  # True if JDBC proxy classes should be used to enable more detailed logging output of SQL
-  # statements; false otherwise (logging will be turned off completely).
   #
-  org.exolab.castor.perists.useProxies=true
+  # True if proxy class should be used to debug access to cache
+  # (default: false).
+  #  
+  org.castor.jdo.cacheDebug=false
 
+  #
+  # List of supported TransactionManagerFactory implementations; please expand
+  # this list to add any custom transaction manager fatories.
+  #
+  org.castor.transactionmanager.Factories=\
+    org.castor.transactionmanager.LocalTransactionManagerFactory,\
+    org.castor.transactionmanager.JNDIENCTransactionManagerFactory,\
+    org.castor.transactionmanager.JOTMTransactionManagerFactory,\
+    org.castor.transactionmanager.WebSphereTransactionManagerFactory,\
+    org.castor.transactionmanager.WebSphere5TransactionManagerFactory,\
+    org.castor.transactionmanager.WebSphere51TransactionManagerFactory
+    
+  #
+  # Shell the TransactionManager be initialized at registration or lazily when
+  # requested for the first time? Defaults to false.
+  #
+  org.castor.transactionmanager.InitializeAtRegistration=false
+  
 </pre>
     </section>
 

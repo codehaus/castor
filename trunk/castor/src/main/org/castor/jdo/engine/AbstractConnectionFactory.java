@@ -16,6 +16,7 @@
 package org.castor.jdo.engine;
 
 import java.util.Enumeration;
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
 
@@ -24,13 +25,17 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.conf.Database;
 import org.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerRegistry;
+import org.castor.jdo.util.JDOConfAdapter;
+import org.castor.transactionmanager.TransactionManagerAcquireException;
+import org.castor.transactionmanager.TransactionManagerRegistry;
+
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.persist.LockEngine;
 import org.exolab.castor.persist.PersistenceEngineFactory;
 import org.exolab.castor.persist.PersistenceFactoryRegistry;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -128,7 +133,21 @@ public abstract class AbstractConnectionFactory implements ConnectionFactory {
         // this request to initialize it.
         if (!_initialized) {
             initializeMapping();
-            _txManager = TransactionManagerRegistry.getTransactionManager(_jdoConf);
+            
+            JDOConfAdapter adapt = new JDOConfAdapter(_jdoConf);
+            String name = adapt.getName();
+            String txm = adapt.getTransactionManager();
+            Properties prop = adapt.getTransactionManagerParameters();
+            
+            LocalConfiguration conf = LocalConfiguration.getInstance();
+            TransactionManagerRegistry txr = new TransactionManagerRegistry(conf);
+            try {
+                txr.registerTransactionManager(name, txm, prop);
+                _txManager = txr.getTransactionManager(name);
+            } catch (TransactionManagerAcquireException ex) {
+                throw new MappingException(ex);
+            }
+            
             initializeEngine(_jdoConf.getDatabase(_index).getEngine());
             initializeFactory();
             

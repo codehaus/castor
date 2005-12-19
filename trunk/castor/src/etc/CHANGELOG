@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1274 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Made TransactionManagerRegistry non static and moved it to org.castor.transactionmanager package.
+       Details: http://jira.codehaus.org/browse/CASTOR-1274
+       (Ralf - 20051219)
+       
 All:   Fixed bug CASTOR-719 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added serialVersionUID to serializable classes.
        Details: http://jira.codehaus.org/browse/CASTOR-719

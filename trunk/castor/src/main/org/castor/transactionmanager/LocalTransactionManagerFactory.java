@@ -13,13 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exolab.castor.jdo.transactionmanager.spi;
+package org.castor.transactionmanager;
+
+import java.util.Properties;
 
 import javax.transaction.TransactionManager;
-
-import org.castor.jdo.conf.JdoConf;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerAcquireException;
-import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
 
 /**
  * Default transaction manager when Castor is used in standalone mode,
@@ -29,6 +27,7 @@ import org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * since 1.0
  */
 public final class LocalTransactionManagerFactory implements TransactionManagerFactory {
     //--------------------------------------------------------------------------
@@ -42,16 +41,15 @@ public final class LocalTransactionManagerFactory implements TransactionManagerF
     //--------------------------------------------------------------------------
 
     /**
-     * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory#getName()
+     * @see org.castor.transactionmanager.TransactionManagerFactory#getName()
      */
     public String getName() { return NAME; }
 
     /**
-     * @see org.exolab.castor.jdo.transactionmanager.TransactionManagerFactory
-     *      #getTransactionManager(org.exolab.castor.jdo.conf.JdoConf)
+     * @see org.castor.transactionmanager.TransactionManagerFactory
+     *      #getTransactionManager(java.util.Properties)
      */
-    public TransactionManager getTransactionManager(final JdoConf jdoConf)
-    throws TransactionManagerAcquireException {
+    public TransactionManager getTransactionManager(final Properties properties) {
         return MANAGER;
     }
     

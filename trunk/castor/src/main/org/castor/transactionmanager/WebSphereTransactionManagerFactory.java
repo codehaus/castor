@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.exolab.castor.jdo.transactionmanager.spi;
+package org.castor.transactionmanager;
 
 /**
- * An IBM Websphere 5.1 specific factory for acquiring transactions from 
- * this J2EE container.
+ * An IBM Websphere 4 and prior specific factory for acquiring transactions
+ * from this particular J2EE container.
  *
  * @author <a href="mailto:ferret AT frii DOT com">Bruce Snyder</a>
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href=" mailto:ralf.joachim@syscon-world.de">Ralf Joachim</a>
  * @version $Revision$ $Date$
+ * @since 1.0
  */
-public final class WebSphere51TransactionManagerFactory
+public final class WebSphereTransactionManagerFactory
 extends AbstractTransactionManagerFactory {
     //--------------------------------------------------------------------------
 
     /** Name of the IBM Websphere specific transaction manager factory class. */
-    private static final String FACTORY_CLASS_NAME =
-        "com.ibm.ws.Transaction.TransactionManagerFactory";
-
+    public static final String FACTORY_CLASS_NAME =
+        "com.ibm.ejs.jts.jta.JTSXA";
+    
     /** Name of the method that is used upon the factory to have a TransactionManager
      *  instance created. */
-    private static final String FACTORY_METHOD_NAME = "getTransactionManager";
+    public static final String FACTORY_METHOD_NAME = "getTransactionManager";
     
     /** The name of the factory. */
-    private static final String NAME = "websphere51";
+    public static final String NAME = "websphere";
 
     //--------------------------------------------------------------------------
 
