@@ -28,6 +28,13 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+			</summary>
+		</release>
+	    <release version="1.0M1">
+	        <description>Milestone release for Castor XML and JDO</description>
+    		<date>December 22, 2005</date>
+    		<managed-by>Werner Guttmann</managed-by>
+			<summary>
                 <h2>New features</h2>
 				
 				<h3>Support for collections of type 'SortedSet' (incl. use of Comparator)</h3>

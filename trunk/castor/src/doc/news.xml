@@ -19,6 +19,23 @@
               <span class="newsTitle">Latest Release</span><br/><br/>
               <span class="newsSummary"-->
 
+        <news id="35">
+            <title>Castor 1.0M1 released</title>
+            <author>Werner Guttmann</author>
+            <date>Dec 22 2005</date>
+            <time>10:11:12</time>
+            <summary>
+                I've placed a copy of the Castor 1.0M1 release at the
+                <a href="http://dist.codehaus.org/castor/1.0/">Codehaus</a>.<br/><br/>
+
+                This is milestone build for the upcoming 1.0 release, as has no correlation 
+				to Christmas at all .. ;-). For details about the features added and the 
+				bugs fixed, please have a look at the 
+				<a href="http://castor.codehaus.org/release-notes.html">release notes</a>.
+					
+				We are still planning for a final <b>Castor 1.0</b> release in January 2006.
+            </summary>
+        </news>
         <news id="34">
             <title>Castor 0.9.9.1 released</title>
             <author>Werner Guttmann</author>
