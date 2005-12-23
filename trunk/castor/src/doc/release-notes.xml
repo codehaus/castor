@@ -39,13 +39,14 @@
 				
 				<h3>Support for collections of type 'SortedSet' (incl. use of Comparator)</h3>
 				
-				Support has been added for the new collection type 'sortedset'. This allows users
+				<p>Support has been added for the new collection type 'sortedset'. This allows users
 				of Castor (XML and JDO) to use collections of type <tt>java.util.SortedSet</tt> to allow
-				for automatic ordering of the collection upon e.g. insertion of the data.
+				for automatic ordering of the collection upon e.g. insertion of the data.</p>
 				
-				User can either specify a <tt>java.util.Comparator</tt> instance using the <i>comparator</i>
-				attribute on the field mapping, or make the entities storred within the <tt>SortedSet</tt> 
-				implement <tt>java.util.Comparable</tt>.
+				<p>User can either specify a <tt>java.util.Comparator</tt
+                > instance using the <i>comparator</i>
+				attribute on the field mapping, or make the entities stored within the <tt>SortedSet</tt> 
+				implement <tt>java.util.Comparable</tt>.</p>
                     
 				<h2>Changes</h2>
 				
