@@ -204,6 +204,26 @@ org.castor.transactionmanager.InitializeAtRegistration=false
                     <module>All</module>
                     <date>20051206</date>
                 </bug>
+                <bug id="1240" tool="jira">
+                    <description>
+		                Added support for specifying a java.util.Comparator instance for sortedset collections.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20051206</date>
+                </bug>
                 <bug id="1230" tool="jira">
                     <description>
                         Refactored cache to implement java.util.Map interface into
