@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1218 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Moved all script/batch files to new bin directory.
+       Details: http://jira.codehaus.org/browse/CASTOR-1218
+       (Werner - 20051228)
+
 Version 1.0M1, Dec 22, 2005
 -------------------------------
 

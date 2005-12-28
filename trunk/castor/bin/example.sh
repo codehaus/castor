@@ -14,11 +14,13 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=$CLASSPATH:./build/classes:./build/tests
-CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
-CLASSPATH=`echo lib/tests/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=../build/classes:../build/examples:$CLASSPATH
+CLASSPATH=`echo ../lib/*.jar | tr ' ' ':'`:$CLASSPATH
 
-$JAVA -cp $CLASSPATH Main -execute $1 $2 $3 $4 $5 $6
-
+if [ -z $1 ] ; then
+  echo "Usage: example <pkg>";
+  exit;
+fi
+$JAVA -cp $CLASSPATH $1.Test $2 $3 $4 $5 $6
 
 
