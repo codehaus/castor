@@ -25,6 +25,11 @@ All:   Fixed bug CASTOR-1278 using contribution from Dave Brosius[dbrosius@qis.n
        Details: http://jira.codehaus.org/browse/CASTOR-1278
        (Ralf - 20051206)
        
+JDO:   Fixed bug CASTOR-1240 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added support for specifying a java.util.Comparator instance for sortedset collections
+       Details: http://jira.codehaus.org/browse/CASTOR-1240
+       (Werner - 20051206)
+       
 JDO:   Fixed bug CASTOR-1230 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Refactored cache to implement java.util.Map interface into new org.castor.cache package.
        Details: http://jira.codehaus.org/browse/CASTOR-1230
