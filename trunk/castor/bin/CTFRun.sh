@@ -14,11 +14,11 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=$CLASSPATH:./build/classes:./build/tests
-CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=$CLASSPATH:../build/classes:../build/tests
+CLASSPATH=`echo ../lib/*.jar | tr ' ' ':'`:$CLASSPATH
 
 # Remove the output of the previous test
-rm -rf ./build/tests/output/
+rm -rf ../build/tests/output/
 
 # run the test
 $JAVA -cp $CLASSPATH org.exolab.castor.tests.framework.CastorTestSuiteRunner $*

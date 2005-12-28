@@ -14,9 +14,9 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CP=$JAVA_HOME/lib/tools.jar:src/etc:build/classes/:$CLASSPATH
+CP=$JAVA_HOME/lib/tools.jar:../src/etc:../build/classes/:$CLASSPATH
 
-for i in `ls ./lib/*.jar`
+for i in `ls ../lib/*.jar`
    do 
        CP=$CP:$i
    done

@@ -14,12 +14,12 @@ fi
 
 JAVA=$JAVA_HOME/bin/java
 
-CLASSPATH=$CLASSPATH:./build/classes:./build/tests:./build/examples
-CLASSPATH=`echo lib/*.jar | tr ' ' ':'`:$CLASSPATH
+CLASSPATH=$CLASSPATH:../build/classes:../build/tests:../build/examples
+CLASSPATH=`echo ../lib/*.jar | tr ' ' ':'`:$CLASSPATH
 
 if [ -z "$2" ] ; then
   echo "Usage: ./oqlquery.sh <DatabaseName> <DatabaseConfig>"
-  echo "Example: ./oqlquery.sh test file:build/examples/jdo/database.xml"
+  echo "Example: ./oqlquery.sh test file:../build/examples/jdo/database.xml"
   exit 1
 fi
 
