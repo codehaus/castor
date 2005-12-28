@@ -159,29 +159,34 @@
 
       <p>JARs required to build Castor and dependencies for various packages
          are contained in the <tt>lib</tt> directory. JARs required for
-         distribution are marked with bold text:</p>
+         distribution are marked with <b>bold text</b>:</p>
 
-         <table cellpadding="4" border="1">
-           <tr><td>ant.jar</td><td>The Ant build tool</td></tr>
-           <tr><td><b>jdbc-se2.0.jar</b></td><td>JDBC 2.0 standard extension (JDO)</td></tr>
-           <tr><td><b>jndi.jar</b></td><td>The JNDI API (DSML/JNDI)</td></tr>
-           <tr><td><b>jta1.0.1.jar</b></td><td>The JTA API (transactions)</td></tr>
-           <tr><td>jtf-0.1.jar</td><td>The Java Testing Framework</td></tr>
-           <tr><td><b>ldapjdk.jar</b></td><td>Mozilla Directory SDK (DSML/MDS)</td></tr>
-           <tr><td>ldapsp.jar</td><td>JNDI LDAP service provider from Mozilla</td></tr>
-           <tr><td>postgresql-6.3.jar</td><td>PostgreSQL 6.3 driver with DataSource
-                                              support (used in default example)</td></tr>
-           <tr><td>servlet.jar</td><td>Used by the Servlet examples</td></tr>
-           <tr><td><b>xerces.jar</b></td><td>Xerces XML library</td></tr>
-           <tr><td>xslp.jar</td><td>XSL processor, used for documentation</td></tr>
-         </table>
+         <ctable cellpadding="4" border="1">
+           <crow><td>ant-1.6.jar</td><td>The Ant build tool</td></crow>
+           <crow><td>ant-1.6-launcher.jar</td><td>The Ant launcher tool</td></crow>
+           <crow><td><b>cglib-full-2.0.2.jar</b></td><td>CGLIB (Castor JDO only)</td></crow>
+           <crow><td><b>commons-logging.jar</b></td><td>Jakarta Commons Loggin</td></crow>
+           <crow><td><b>jdbc-se2.0.jar</b></td><td>JDBC 2.0 standard extension (JDO)</td></crow>
+           <crow><td><b>jndi_1.2.1.jar</b></td><td>The JNDI API (DSML/JNDI)</td></crow>
+           <crow><td><b>jta1.0.1.jar</b></td><td>The JTA API (transactions) (Castor JDO only)</td></crow>
+           <crow><td>jtf-0.1.jar</td><td>The Java Testing Framework</td></crow>
+           <crow><td>junit_3.8.1.jar</td><td>JUnit testing framework (for CTF suites)</td></crow>
+           <crow><td><b>ldapjdk.jar</b></td><td>Mozilla Directory SDK (DSML/MDS)</td></crow>
+           <crow><td>ldapsp.jar</td><td>JNDI LDAP service provider from Mozilla</td></crow>
+           <crow><td><b>log4j-1.2.8.jar</b></td><td>Log4J</td></crow>
+           <crow><td>postgresql-6.3.jar</td><td>PostgreSQL 6.3 driver with DataSource
+                                              support (used in default example)</td></crow>
+           <crow><td>servlet.jar</td><td>Used by the Servlet examples</td></crow>
+           <crow><td><b>xerces-J_1.4.0.jar</b></td><td>Xerces XML library</td></crow>
+           <crow><td>adaptx-0.9.13.jar</td><td>XSL(T) processor, used for building documentation</td></crow>
+         </ctable>
          
          <p>and optionally</p>
          
-         <table cellpadding="4" border="1">
-           <tr><td>jakarta-oro-2.0.5.jar</td><td>Support for regular expressions</td></tr>
-           <tr><td>jakarta-regexp-1.1.jar</td><td>Support for regular expressions</td></tr>
-         </table>
+         <ctable cellpadding="4" border="1">
+           <crow><td>jakarta-oro-2.0.5.jar</td><td>Support for regular expressions</td></crow>
+           <crow><td>jakarta-regexp-1.1.jar</td><td>Support for regular expressions</td></crow>
+         </ctable>
          
          <p>The last two JAR files are required when using patterns with XML Schema type 
             definitions.</p>
@@ -231,26 +236,26 @@
    <section title="Building Castor">
 
      <p>Castor uses Ant as the build environment. To build Castor from the
-        source run <tt>build.sh</tt> or <tt>build.bat</tt> in the Castor root
+        source run <tt>bin/build.sh</tt> or <tt>bin\build.bat</tt> in the Castor root
         directory with one (or any) of the following targets:</p>
 
-         <table cellpadding="4" border="1">
-           <tr><td>targets</td><td>Lists the build targets</td></tr>
-           <tr><td>clean</td><td>Cleans the build and distribution directories</td></tr>
-           <tr><td>all</td><td>Cleans and builds all the packages and examples</td></tr>
-           <tr><td>release</td><td>Cleans and builds all the release packages
-                                  (JAR, source, doc, tarball) in the dist directory</td></tr>
-           <tr><td>main</td><td>Builds the main packages (including debugging info)</td></tr>
-           <tr><td>examples</td><td>Builds the example packages (including debugging info)</td></tr>
-           <tr><td>tests</td><td>Builds the test packages (including debugging info)</td></tr>
-           <tr><td>jar</td><td>Builds the binary JAR in the dist directory</td></tr>
-           <tr><td>doc</td><td>Builds the documentation</td></tr>
-           <tr><td>api</td><td>Builds the API JavaDocs</td></tr>
-           <tr><td>javadoc</td><td>Builds the full JavaDocs</td></tr>
-           <tr><td>source</td><td>Builds the source tarball in the dist directory</td></tr>
-           <tr><td>tarball</td><td>Builds the binary distribution in the dist directory</td></tr>
-           <tr><td>cvs</td><td>Update the sources from the CVS</td></tr>
-         </table>
+         <ctable cellpadding="4" border="1">
+           <crow><td>targets</td><td>Lists the build targets</td></crow>
+           <crow><td>clean</td><td>Cleans the build and distribution directories</td></crow>
+           <crow><td>all</td><td>Cleans and builds all the packages and examples</td></crow>
+           <crow><td>release</td><td>Cleans and builds all the release packages
+                                  (JAR, source, doc, tarball) in the dist directory</td></crow>
+           <crow><td>main</td><td>Builds the main packages (including debugging info)</td></crow>
+           <crow><td>examples</td><td>Builds the example packages (including debugging info)</td></crow>
+           <crow><td>tests</td><td>Builds the test packages (including debugging info)</td></crow>
+           <crow><td>jar</td><td>Builds the binary JAR in the dist directory</td></crow>
+           <crow><td>doc</td><td>Builds the documentation</td></crow>
+           <crow><td>api</td><td>Builds the API JavaDocs</td></crow>
+           <crow><td>javadoc</td><td>Builds the full JavaDocs</td></crow>
+           <crow><td>source</td><td>Builds the source tarball in the dist directory</td></crow>
+           <crow><td>tarball</td><td>Builds the binary distribution in the dist directory</td></crow>
+           <crow><td>cvs</td><td>Update the sources from the CVS</td></crow>
+         </ctable>
 
      <p>The tarball will includes the Castor JAR, all dependent library
         JARs, readme and license files, and all DTDs and XML schemas in
@@ -258,24 +263,25 @@
 
    </section>
 
-   <section title="Directory Structure">
+    <section title="Directory Structure">
 
-         <table cellpadding="4" border="1">
-           <tr><td>src/main</td><td>The source base for all the Castor modules</td></tr>
-           <tr><td>src/doc</td><td>Documentation (in XML form)</td></tr>
-           <tr><td>src/schema</td><td>DTD and XML schema for Castor mapping files</td></tr>
-           <tr><td>src/examples</td><td>Examples for the various packages</td></tr>
-           <tr><td>src/tests</td><td>Test cases for the various packages</td></tr>
-           <tr><td>src/etc</td><td>Additional files that are not part of the code base</td></tr>
-           <tr><td>lib</td><td>JARs required to build Castor and distributable JARs</td></tr>
-           <tr><td>build/classes</td><td>When using Ant the Java classes are build in this directory</td></tr>
-           <tr><td>build/doc</td><td>When using Ant the HTML documentation is build in this directory</td></tr>
-           <tr><td>build/examples</td><td>When using the examples are build in this directory</td></tr>
-           <tr><td>build/test</td><td>When using the test cases are build in this directory</td></tr>
-           <tr><td>dist</td><td>The distribution directory</td></tr>
-         </table>
-
-   </section>
+         <ctable border="1">
+           <crow><td>bin</td><td>Script/batch files required for building Castor, running samples, CTF et alias</td></crow>
+           <crow><td>src/main</td><td>The source base for all the Castor modules</td></crow>
+           <crow><td>src/doc</td><td>Documentation (in XML form)</td></crow>
+           <crow><td>src/schema</td><td>DTD and XML schema for Castor mapping files</td></crow>
+           <crow><td>src/examples</td><td>Examples for the various packages</td></crow>
+           <crow><td>src/tests</td><td>Test cases for the various packages</td></crow>
+           <crow><td>src/etc</td><td>Additional files that are not part of the code base</td></crow>
+           <crow><td>lib</td><td>JARs required to build Castor and distributable JARs</td></crow>
+           <crow><td>build/classes</td><td>When using Ant the Java classes are build in this directory</td></crow>
+           <crow><td>build/doc</td><td>When using Ant the HTML documentation is build in this directory</td></crow>
+           <crow><td>build/examples</td><td>When using the examples are build in this directory</td></crow>
+           <crow><td>build/test</td><td>When using the test cases are build in this directory</td></crow>
+           <crow><td>dist</td><td>The distribution directory</td></crow>
+         </ctable>
+         
+    </section>
 
   </body>
 </document>
