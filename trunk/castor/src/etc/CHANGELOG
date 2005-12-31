@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1289 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem with generated ClassChoice instances.
+       Details: http://jira.codehaus.org/browse/CASTOR-1289
+       (Ralf - 20051231)
+
 JDO:   Fixed bug CASTOR-1218 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Moved all script/batch files to new bin directory.
        Details: http://jira.codehaus.org/browse/CASTOR-1218

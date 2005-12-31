@@ -549,9 +549,9 @@ public abstract class XMLTestCase extends TestCase {
                     return;
                 }
              }
-             fail("Unable to process the test case:"+ex);
              if (_printStack)
-                ex.printStackTrace(System.out);
+                 ex.printStackTrace(System.out);
+             fail("Unable to process the test case:"+ex);
         }
     }
 
