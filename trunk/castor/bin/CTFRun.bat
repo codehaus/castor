@@ -5,7 +5,7 @@ set OLDCP=%CLASSPATH%
 set CLASSPATH=..\build\classes;..\build\tests;%JAVA_HOME%\lib\tools.jar
 set cp=%CLASSPATH%
 for %%i in (..\lib\*.jar) do call cp.bat %%i
-rmdir /q /s .\build\tests\output>nul
+rmdir /q /s ..\build\tests\output>nul
 echo %CP%
 
 if "%1"=="" goto noargs
