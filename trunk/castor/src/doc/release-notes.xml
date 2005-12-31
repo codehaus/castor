@@ -479,6 +479,26 @@ org.castor.transactionmanager.InitializeAtRegistration=false
 				   
             </summary>
             <bugs>
+                <bug id="1024" tool="jira">
+                    <description>
+                        Fixed issue where whitespace have been deleted by Unmarshaller.
+                    </description>
+                    <contributor>
+                        <name>Ross Virostko</name>
+                        <email>rvirostko@cox.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Peter Wyngaard</name>
+                        <email>peter@wyngaard.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051230</date>
+                </bug>
                 <bug id="1241" tool="jira">
                     <description>
                         Improved documentation about locking modes.
