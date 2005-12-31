@@ -204,7 +204,8 @@ public class XMLMappingLoader
 
         if (clsMap.getAutoComplete()) {
             if ((clsMap.getMapTo() == null) &&
-                (clsMap.getClassChoice().getFieldMappingCount() == 0) &&
+                ((clsMap.getClassChoice() == null) ||
+                 (clsMap.getClassChoice().getFieldMappingCount() == 0)) &&
                 (clsMap.getIdentityCount() == 0))
             {
                 //-- if we make it here we simply try

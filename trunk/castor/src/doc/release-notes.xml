@@ -30,6 +30,26 @@
             <summary>
 			</summary>
             <bugs>
+                <bug id="1289" tool="jira">
+                    <description>
+		                Fixed problem with generated ClassChoice instances.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20051231</date>
+                </bug>
                 <bug id="1218" tool="jira">
                     <description>
 		                Moved all script/batch files to new bin directory.
