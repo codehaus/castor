@@ -80,6 +80,11 @@ Version 0.9.9.1, Nov 15, 2005
 
 Added non-trivial sample for usage of binding file
 
+XML:   Bug CASTOR-1024 has been fixed by some other changes.
+       Fixed issue where whitespace have been deleted by Unmarshaller.
+       Details: http://jira.codehaus.org/browse/CASTOR-1024
+       (Ralf - 20051230)
+       
 JDO:   Fixed bug CASTOR-1241 using contribution from Ralf Joachim[ralf.joachim@syscon-world.de]
        Improved documentation about locking modes.
        Details: http://jira.codehaus.org/browse/CASTOR-1241
