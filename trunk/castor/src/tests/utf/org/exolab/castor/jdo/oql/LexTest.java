@@ -51,7 +51,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.jdo.oql.Lexer;
 import org.exolab.castor.jdo.oql.Token;
-import org.exolab.castor.jdo.oql.TokenTypes;
+import org.exolab.castor.jdo.oql.TokenType;
 
 /**
  * Test class for {@link Lexer}. 
@@ -59,7 +59,7 @@ import org.exolab.castor.jdo.oql.TokenTypes;
  * @author  <a href="nissim@nksystems.com">Nissim Karpenstein</a>
  * @version $Revision$ $Date$
  */
-public class LexTest implements TokenTypes {
+public class LexTest {
     /**
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
@@ -74,47 +74,53 @@ public class LexTest implements TokenTypes {
      */
     public static void main (String args[]) {
         Hashtable tokenTypes = new Hashtable();
-        tokenTypes.put(new Integer(END_OF_QUERY), "END_OF_QUERY");
-        tokenTypes.put(new Integer(KEYWORD_SELECT), "KEYWORD_SELECT");
-        tokenTypes.put(new Integer(IDENTIFIER), "IDENTIFIER");
-        tokenTypes.put(new Integer(KEYWORD_AS), "KEYWORD_AS");
-        tokenTypes.put(new Integer(COLON), "COLON");
-        tokenTypes.put(new Integer(KEYWORD_FROM), "KEYWORD_FROM");
-        tokenTypes.put(new Integer(KEYWORD_IN), "KEYWORD_IN");
-        tokenTypes.put(new Integer(KEYWORD_WHERE), "KEYWORD_WHERE");
-        tokenTypes.put(new Integer(KEYWORD_OR), "KEYWORD_OR");
-        tokenTypes.put(new Integer(KEYWORD_AND), "KEYWORD_AND");
-        tokenTypes.put(new Integer(EQUAL), "EQUAL"); // 10
-        tokenTypes.put(new Integer(NOT_EQUAL), "NOT_EQUAL");
-        tokenTypes.put(new Integer(KEYWORD_LIKE), "KEYWORD_LIKE");
-        tokenTypes.put(new Integer(LT), "LT");
-        tokenTypes.put(new Integer(LTE), "LTE");
-        tokenTypes.put(new Integer(GT), "GT");
-        tokenTypes.put(new Integer(GTE), "GTE");
-        tokenTypes.put(new Integer(PLUS), "PLUS");
-        tokenTypes.put(new Integer(MINUS), "MINUS");
-        tokenTypes.put(new Integer(CONCAT), "CONCAT");
-        tokenTypes.put(new Integer(TIMES), "TIMES"); // 20
-        tokenTypes.put(new Integer(DIVIDE), "DIVIDE");
-        tokenTypes.put(new Integer(KEYWORD_MOD), "KEYWORD_MOD");
-        tokenTypes.put(new Integer(KEYWORD_ABS), "KEYWORD_ABS");
-        tokenTypes.put(new Integer(KEYWORD_NOT), "KEYWORD_NOT");
-        tokenTypes.put(new Integer(LPAREN), "LPAREN");
-        tokenTypes.put(new Integer(RPAREN), "RPAREN");
-        tokenTypes.put(new Integer(DOLLAR), "DOLLAR");
-        tokenTypes.put(new Integer(KEYWORD_NIL), "KEYWORD_NIL");
-        tokenTypes.put(new Integer(KEYWORD_UNDEFINED), "KEYWORD_UNDEFINED");
-        tokenTypes.put(new Integer(BOOLEAN_LITERAL), "BOOLEAN_LITERAL");
-        tokenTypes.put(new Integer(LONG_LITERAL), "LONG_LITERAL");
-        tokenTypes.put(new Integer(DOUBLE_LITERAL), "DOUBLE_LITERAL"); // 30
-        tokenTypes.put(new Integer(CHAR_LITERAL), "CHAR_LITERAL");
-        tokenTypes.put(new Integer(STRING_LITERAL), "STRING_LITERAL");
-        tokenTypes.put(new Integer(DATE_LITERAL), "DATE_LITERAL");
-        tokenTypes.put(new Integer(TIME_LITERAL), "TIME_LITERAL");
-        tokenTypes.put(new Integer(TIMESTAMP_LITERAL), "TIMESTAMP_LITERAL");
-        tokenTypes.put(new Integer(KEYWORD_BETWEEN), "KEYWORD_BETWEEN");
+        tokenTypes.put(new Integer(TokenType.END_OF_QUERY), "END_OF_QUERY");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_SELECT), "KEYWORD_SELECT");
+        tokenTypes.put(new Integer(TokenType.IDENTIFIER), "IDENTIFIER");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_AS), "KEYWORD_AS");
+        tokenTypes.put(new Integer(TokenType.COLON), "COLON");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_FROM), "KEYWORD_FROM");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_IN), "KEYWORD_IN");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_WHERE), "KEYWORD_WHERE");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_OR), "KEYWORD_OR");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_AND), "KEYWORD_AND");
+        tokenTypes.put(new Integer(TokenType.EQUAL), "EQUAL"); // 10
+        tokenTypes.put(new Integer(TokenType.NOT_EQUAL), "NOT_EQUAL");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_LIKE), "KEYWORD_LIKE");
+        tokenTypes.put(new Integer(TokenType.LT), "LT");
+        tokenTypes.put(new Integer(TokenType.LTE), "LTE");
+        tokenTypes.put(new Integer(TokenType.GT), "GT");
+        tokenTypes.put(new Integer(TokenType.GTE), "GTE");
+        tokenTypes.put(new Integer(TokenType.PLUS), "PLUS");
+        tokenTypes.put(new Integer(TokenType.MINUS), "MINUS");
+        tokenTypes.put(new Integer(TokenType.CONCAT), "CONCAT");
+        tokenTypes.put(new Integer(TokenType.TIMES), "TIMES"); // 20
+        tokenTypes.put(new Integer(TokenType.DIVIDE), "DIVIDE");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_MOD), "KEYWORD_MOD");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_ABS), "KEYWORD_ABS");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_NOT), "KEYWORD_NOT");
+        tokenTypes.put(new Integer(TokenType.LPAREN), "LPAREN");
+        tokenTypes.put(new Integer(TokenType.RPAREN), "RPAREN");
+        tokenTypes.put(new Integer(TokenType.DOLLAR), "DOLLAR");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_NIL), "KEYWORD_NIL");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_UNDEFINED), "KEYWORD_UNDEFINED");
+        tokenTypes.put(new Integer(TokenType.BOOLEAN_LITERAL), "BOOLEAN_LITERAL");
+        tokenTypes.put(new Integer(TokenType.LONG_LITERAL), "LONG_LITERAL");
+        tokenTypes.put(new Integer(TokenType.DOUBLE_LITERAL), "DOUBLE_LITERAL"); // 30
+        tokenTypes.put(new Integer(TokenType.CHAR_LITERAL), "CHAR_LITERAL");
+        tokenTypes.put(new Integer(TokenType.STRING_LITERAL), "STRING_LITERAL");
+        tokenTypes.put(new Integer(TokenType.DATE_LITERAL), "DATE_LITERAL");
+        tokenTypes.put(new Integer(TokenType.TIME_LITERAL), "TIME_LITERAL");
+        tokenTypes.put(new Integer(TokenType.TIMESTAMP_LITERAL), "TIMESTAMP_LITERAL");
+        tokenTypes.put(new Integer(TokenType.KEYWORD_BETWEEN), "KEYWORD_BETWEEN");
 
-        Lexer lexer = new Lexer(args[0]);
+        Lexer lexer;
+        if (args.length != 0) {
+            lexer = new Lexer(args[0]);
+        } else {
+            lexer = new Lexer("select o from Product o where o.xyz=$1 order by o.id");
+        }
+        
         while (lexer.hasMoreTokens()) {
             try {
                 Token theToken = lexer.nextToken();

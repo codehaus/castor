@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-551 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Removed exception-dependency in Parser and Lexer including some code improvements.
+       Details: http://jira.codehaus.org/browse/CASTOR-551
+       (Ralf - 20060104)
+
 XML:   Fixed bug CASTOR-1289 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed problem with generated ClassChoice instances.
        Details: http://jira.codehaus.org/browse/CASTOR-1289

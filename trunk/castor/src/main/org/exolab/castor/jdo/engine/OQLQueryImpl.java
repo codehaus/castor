@@ -109,7 +109,7 @@ public class OQLQueryImpl
     private int                _fieldNum;
 
     private int                _projectionType;
-    private Vector             _pathInfo;
+    private Vector             _projectionInfo;
 
     private PersistenceQuery   _query;
 
@@ -253,7 +253,7 @@ public class OQLQueryImpl
         _expr = walker.getQueryExpression();
         _paramInfo = walker.getParamInfo();
         _projectionType = walker.getProjectionType();
-        _pathInfo = walker.getPathInfo();
+        _projectionInfo = walker.getProjectionInfo();
 
         // create the types array and fill it
         _bindTypes = new Class[_paramInfo.size()];
@@ -461,7 +461,7 @@ public class OQLQueryImpl
                     if ( _projectionType == ParseTreeWalker.PARENT_OBJECT )
                       _results = new OQLEnumeration( results );
                     else
-                      _results = new OQLEnumeration( results, _pathInfo, _clsDesc);
+                      _results = new OQLEnumeration( results, _projectionInfo, _clsDesc);
                     break;
 
                 case ParseTreeWalker.DEPENDANT_VALUE:
