@@ -30,6 +30,26 @@
             <summary>
 			</summary>
             <bugs>
+                <bug id="1298" tool="jira">
+                    <description>
+		                Added ReadWriteLock's and ConcurrentHashMap from Doug Lea.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>All</module>
+                    <date>20060105</date>
+                </bug>
                 <bug id="551" tool="jira">
                     <description>
 		                Removed exception-dependency in Parser and Lexer
