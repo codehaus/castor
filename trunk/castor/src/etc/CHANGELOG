@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+All:   Fixed bug CASTOR-1298 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Added ReadWriteLock's and ConcurrentHashMap from Doug Lea.
+       Details: http://jira.codehaus.org/browse/CASTOR-1298
+       (Ralf - 20060105)
+
 JDO:   Fixed bug CASTOR-551 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Removed exception-dependency in Parser and Lexer including some code improvements.
        Details: http://jira.codehaus.org/browse/CASTOR-551
