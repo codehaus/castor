@@ -118,7 +118,7 @@
   # List of available cache implementations; please expand this list to add
   # any custom performance caches.
   #
-  org.castor.jdo.cacheFactories=\
+  org.castor.cache.Factories=\
     org.castor.cache.simple.NoCacheFactory,\
     org.castor.cache.simple.TimeLimitedFactory,\
     org.castor.cache.simple.CountLimitedFactory,\
@@ -127,12 +127,6 @@
     org.castor.cache.distributed.JcsCacheFactory,\
     org.castor.cache.distributed.JCacheFactory,\
     org.castor.cache.distributed.CoherenceCacheFactory
-
-  #
-  # True if proxy class should be used to debug access to cache
-  # (default: false).
-  #  
-  org.castor.jdo.cacheDebug=false
 
   #
   # List of supported TransactionManagerFactory implementations; please expand

@@ -57,11 +57,11 @@ import org.apache.commons.logging.LogFactory;
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
 import org.castor.cache.CacheFactory;
+import org.castor.cache.CacheFactoryRegistry;
 import org.castor.jdo.engine.ConnectionFactory;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.cache.CacheEntry;
-import org.castor.persist.cache.CacheRegistry;
 
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.LockNotGrantedException;
@@ -76,6 +76,7 @@ import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
+import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
 /**
@@ -122,6 +123,8 @@ public final class LockEngine {
      * Commons Logging</a> instance used for all logging.
      */
     private static Log _log = LogFactory.getFactory().getInstance( LockEngine.class );
+    
+    private static CacheFactoryRegistry _cacheFactoryRegistry;
 
     /**
      * Mapping of type information to object types. The object's class is used
@@ -162,6 +165,11 @@ public final class LockEngine {
                       final MappingResolver mapResolver,
                       final PersistenceFactory persistenceFactory)
     throws MappingException {
+        if (_cacheFactoryRegistry == null) {
+            LocalConfiguration config = LocalConfiguration.getInstance();
+            _cacheFactoryRegistry = new CacheFactoryRegistry(config);
+        }
+        
         _connectionFactory = connectionFactory;
         _persistenceFactory = persistenceFactory;
         
@@ -192,7 +200,7 @@ public final class LockEngine {
                         // create new Cache instance for the base type
                         Cache cache = null;
                         try {
-                        	cache = CacheRegistry.getCache (molder.getCacheType(), molder.getName(), molder.getCacheParam(), mapResolver.getClassLoader());
+                        	cache = _cacheFactoryRegistry.getCache(molder.getCacheType(), molder.getName(), molder.getCacheParam(), mapResolver.getClassLoader());
                         } 
                         catch (CacheAcquireException e) {
                             _log.error (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
@@ -1041,7 +1049,7 @@ public final class LockEngine {
             ((TypeInfo) iter.next()).closeCache();
         }
         
-        for (Iterator iter = CacheRegistry.getCacheFactories().iterator(); iter.hasNext(); ) {
+        for (Iterator iter = _cacheFactoryRegistry.getCacheFactories().iterator(); iter.hasNext(); ) {
             ((CacheFactory) iter.next()).shutdown(); 
         }
     }

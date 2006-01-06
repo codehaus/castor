@@ -64,7 +64,7 @@ public final class TestTimeLimitedFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new TimeLimitedFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof TimeLimited);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of TimeLimited from factroy");

@@ -46,8 +46,8 @@
 package ctf.jdo.tc0x;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Properties;
 
 import harness.CastorTestCase;
 import harness.TestHarness;
@@ -125,7 +125,7 @@ public final class TestCache extends CastorTestCase {
         throws CacheAcquireException {
             super();
             
-            HashMap params = new HashMap();
+            Properties params = new Properties();
             params.put(TimeLimited.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, new Integer(interval));
             initialize(params);

@@ -64,7 +64,7 @@ public final class TestFKCacheFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new FKCacheFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof FKCache);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of FKCache from factroy");

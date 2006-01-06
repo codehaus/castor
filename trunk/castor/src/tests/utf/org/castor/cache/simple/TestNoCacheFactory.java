@@ -64,7 +64,7 @@ public final class TestNoCacheFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new NoCacheFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof NoCache);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of NoCache from factroy");

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package utf.org.castor.persist.cache;
+package utf.org.castor.cache;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -27,6 +28,7 @@ import org.apache.log4j.Logger;
 
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
+import org.castor.cache.CacheFactoryRegistry;
 import org.castor.cache.distributed.CoherenceCache;
 import org.castor.cache.distributed.CoherenceCacheFactory;
 import org.castor.cache.distributed.FKCache;
@@ -43,7 +45,8 @@ import org.castor.cache.simple.TimeLimited;
 import org.castor.cache.simple.TimeLimitedFactory;
 import org.castor.cache.simple.Unlimited;
 import org.castor.cache.simple.UnlimitedFactory;
-import org.castor.persist.cache.CacheRegistry;
+
+import org.exolab.castor.util.LocalConfiguration;
 
 /**
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
@@ -51,28 +54,59 @@ import org.castor.persist.cache.CacheRegistry;
  * @version $Revision$ $Date$
  * @since 1.0
  */
-public final class TestCacheRegistry extends TestCase {
+public final class TestCacheFactoryRegistry extends TestCase {
     private static final boolean DISABLE_LOGGING = true;
     
+    private CacheFactoryRegistry _registry;
+    
     public static Test suite() {
-        TestSuite suite = new TestSuite("CacheRegistry Tests");
+        TestSuite suite = new TestSuite("CacheFactoryRegistry Tests");
 
-        suite.addTest(new TestCacheRegistry("testUseDebugProxy"));
-        suite.addTest(new TestCacheRegistry("testGetCacheNames"));
-        suite.addTest(new TestCacheRegistry("testGetCacheFactories"));
-        suite.addTest(new TestCacheRegistry("testGetCache"));
+        suite.addTest(new TestCacheFactoryRegistry("testConstructor"));
+        suite.addTest(new TestCacheFactoryRegistry("testGetCacheNames"));
+        suite.addTest(new TestCacheFactoryRegistry("testGetCacheFactories"));
+        suite.addTest(new TestCacheFactoryRegistry("testIsDebugEnabled"));
+        suite.addTest(new TestCacheFactoryRegistry("testGetCache"));
 
         return suite;
     }
 
-    public TestCacheRegistry(final String name) { super(name); }
+    public TestCacheFactoryRegistry(final String name) { super(name); }
 
-    public void testUseDebugProxy() {
-        assertFalse(CacheRegistry.useDebugProxy());
+    public void testConstructor() {
+        Logger logger = Logger.getLogger(CacheFactoryRegistry.class);
+        Level level = logger.getLevel();
+
+        assertEquals("org.castor.cache.Factories", CacheFactoryRegistry.PROP_FACTORY);
+        assertEquals(CountLimited.TYPE, CacheFactoryRegistry.DEFAULT_TYPE);
+        
+        LocalConfiguration config = LocalConfiguration.getInstance();
+        String memF = config.getProperty(CacheFactoryRegistry.PROP_FACTORY, "");
+        
+        config.getProperties().remove(CacheFactoryRegistry.PROP_FACTORY);
+        new CacheFactoryRegistry(config);
+        
+        config.getProperties().setProperty(CacheFactoryRegistry.PROP_FACTORY, "");
+        new CacheFactoryRegistry(config);
+        
+        config.getProperties().setProperty(CacheFactoryRegistry.PROP_FACTORY,
+                UnlimitedFactory.class.getName());
+        new CacheFactoryRegistry(config);
+        
+        if (DISABLE_LOGGING) { logger.setLevel(Level.FATAL); }
+
+        config.getProperties().setProperty(CacheFactoryRegistry.PROP_FACTORY,
+                "org.castor.cache.simple.UnknownFactory");
+        new CacheFactoryRegistry(config);
+        
+        logger.setLevel(level);
+
+        config.getProperties().setProperty(CacheFactoryRegistry.PROP_FACTORY, memF);
     }
 
     public void testGetCacheNames() {
-        Collection col = CacheRegistry.getCacheNames();
+        LocalConfiguration config = LocalConfiguration.getInstance();
+        Collection col = new CacheFactoryRegistry(config).getCacheNames();
         assertEquals(8, col.size());
         assertTrue(col.contains(CountLimited.TYPE));
         assertTrue(col.contains(NoCache.TYPE));
@@ -85,7 +119,8 @@ public final class TestCacheRegistry extends TestCase {
     }
 
     public void testGetCacheFactories() {
-        Collection col = CacheRegistry.getCacheFactories();
+        LocalConfiguration config = LocalConfiguration.getInstance();
+        Collection col = new CacheFactoryRegistry(config).getCacheFactories();
         assertEquals(8, col.size());
         assertTrue(containsInstanceOf(col, CountLimitedFactory.class));
         assertTrue(containsInstanceOf(col, NoCacheFactory.class));
@@ -106,9 +141,30 @@ public final class TestCacheRegistry extends TestCase {
         return false;
     }
 
-    public void testGetCache() throws CacheAcquireException {
-        Logger logger = Logger.getLogger(CacheRegistry.class);
+    public void testIsDebugEnabled() {
+        Logger logger = Logger.getLogger(Cache.class);
         Level level = logger.getLevel();
+        
+        LocalConfiguration config = LocalConfiguration.getInstance();
+        CacheFactoryRegistry reg = null;
+        
+        logger.setLevel(Level.FATAL);
+        reg = new CacheFactoryRegistry(config);
+        assertFalse(reg.isDebugEnabled());
+
+        logger.setLevel(Level.DEBUG);
+        reg = new CacheFactoryRegistry(config);
+        assertTrue(reg.isDebugEnabled());
+
+        logger.setLevel(level);
+    }
+    
+    public void testGetCache() throws CacheAcquireException {
+        Logger logger = Logger.getLogger(CacheFactoryRegistry.class);
+        Level level = logger.getLevel();
+        
+        LocalConfiguration config = LocalConfiguration.getInstance();
+        _registry = new CacheFactoryRegistry(config);
         
         Cache cache = null;
         
@@ -177,7 +233,12 @@ public final class TestCacheRegistry extends TestCase {
     
     private Cache getCache(final String type, final int capacity)
     throws CacheAcquireException {
-        return CacheRegistry.getCache(type, "dummy", capacity,
-                                      getClass().getClassLoader());
+        Properties props = new Properties();
+        props.put(Cache.PARAM_NAME, "dummy");
+        props.put(Cache.PARAM_DEBUG, Cache.DEFAULT_DEBUG);
+        props.put(CountLimited.PARAM_CAPACITY, new Integer(capacity));
+        props.put(TimeLimited.PARAM_TTL, new Integer(capacity));
+
+        return _registry.getCache(type, props, getClass().getClassLoader());
     }
 }

@@ -23,6 +23,7 @@ import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.castor.cache.AbstractBaseCache;
@@ -81,7 +82,7 @@ public final class CountLimited extends AbstractBaseCache {
     /**
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
-    public void initialize(final Map params) throws CacheAcquireException {
+    public void initialize(final Properties params) throws CacheAcquireException {
         super.initialize(params);
         
         Object param = params.get(PARAM_CAPACITY);

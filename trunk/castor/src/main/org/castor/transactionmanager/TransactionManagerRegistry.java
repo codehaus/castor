@@ -127,7 +127,7 @@ public final class TransactionManagerRegistry {
     //--------------------------------------------------------------------------
 
     /**
-     * Construct an instance of TransactionManagerRegistry that loads uses given
+     * Construct an instance of TransactionManagerRegistry that uses given
      * LocalConfiguration to get required configuration properties.
      * 
      * @param config The LocalConfiguration.

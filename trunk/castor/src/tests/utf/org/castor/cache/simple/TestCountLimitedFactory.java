@@ -64,7 +64,7 @@ public final class TestCountLimitedFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new CountLimitedFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof CountLimited);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of CountLimited from factroy");

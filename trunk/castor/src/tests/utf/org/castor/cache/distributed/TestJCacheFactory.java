@@ -64,7 +64,7 @@ public final class TestJCacheFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new JCacheFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof JCache);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of JCache from factroy");

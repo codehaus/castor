@@ -15,7 +15,7 @@
  */
 package utf.org.castor.cache.distributed;
 
-import java.util.HashMap;
+import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -72,7 +72,7 @@ public final class TestCoherenceCache extends TestCase {
         CoherenceCache c = new CoherenceCache();
         int counter = DistributedCacheFactoryMock.getCounter();
         
-        HashMap params = new HashMap();
+        Properties params = new Properties();
         params.put(Cache.PARAM_NAME, "dummy coherence cache");
         
         if (DISABLE_LOGGING) { logger.setLevel(Level.FATAL); }
@@ -108,7 +108,7 @@ public final class TestCoherenceCache extends TestCase {
         c.close();
         assertEquals(counter, DistributedCacheMock.getCounter());
         
-        HashMap params = new HashMap();
+        Properties params = new Properties();
         params.put(Cache.PARAM_NAME, "dummy coherence cache");
         
         try {

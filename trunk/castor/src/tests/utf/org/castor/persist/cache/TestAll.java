@@ -31,7 +31,6 @@ public final class TestAll extends TestCase {
         TestSuite suite = new TestSuite("All org.castor.persist.cache tests");
 
         suite.addTest(TestCacheEntry.suite());
-        suite.addTest(TestCacheRegistry.suite());
         
         return suite;
     }
