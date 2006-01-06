@@ -18,6 +18,7 @@
 package org.castor.cache;
 
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * Interface specification for performance caches as used in Castor. Please implement 
@@ -37,6 +38,12 @@ public interface Cache extends Map {
     /** Default cache name to be used. */
     String DEFAULT_NAME = "";
     
+    /** Mapped initialization parameter: debug */
+    String PARAM_DEBUG = "debug";
+    
+    /** Default is debugging switched off. */
+    String DEFAULT_DEBUG = "false";
+    
     //--------------------------------------------------------------------------
     // operations for life-cycle management of cache
     
@@ -46,7 +53,7 @@ public interface Cache extends Map {
      * @param params Parameters to initialize the cache (e.g. name, capacity).
      * @throws CacheAcquireException If cache can not be initialized.
      */
-    void initialize(Map params) throws CacheAcquireException;
+    void initialize(Properties params) throws CacheAcquireException;
     
     /** 
      * Life-cycle method to allow custom resource cleanup for a cache implementation.

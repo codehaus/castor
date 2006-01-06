@@ -69,7 +69,7 @@ public final class TestCoherenceCacheFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new CoherenceCacheFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof CoherenceCache);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of CoherenceCache from factroy");

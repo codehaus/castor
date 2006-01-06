@@ -17,7 +17,7 @@
  */
 package org.castor.cache;
 
-import java.util.Map;
+import java.util.Properties;
 
 /**
  * Base implementation of all LRU cache types. 
@@ -40,7 +40,7 @@ public abstract class AbstractBaseCache implements Cache {
     /**
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
-    public void initialize(final Map params) throws CacheAcquireException {
+    public void initialize(final Properties params) throws CacheAcquireException {
         Object param = params.get(Cache.PARAM_NAME);
         if (param instanceof String) { _cacheName = (String) param; }
     }

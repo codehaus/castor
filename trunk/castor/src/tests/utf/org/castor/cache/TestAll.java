@@ -38,6 +38,8 @@ public final class TestAll extends TestCase {
         suite.addTest(utf.org.castor.cache.distributed.TestAll.suite());
         suite.addTest(utf.org.castor.cache.simple.TestAll.suite());
 
+        suite.addTest(TestCacheFactoryRegistry.suite());
+
         return suite;
     }
 

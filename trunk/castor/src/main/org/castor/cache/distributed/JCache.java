@@ -18,6 +18,7 @@
 package org.castor.cache.distributed;
 
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -57,7 +58,7 @@ public final class JCache extends AbstractDistributedCache {
     /**
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
-    public void initialize(final Map params) throws CacheAcquireException {
+    public void initialize(final Properties params) throws CacheAcquireException {
         initialize(IMPLEMENTATION, params);
     }
 
@@ -70,7 +71,7 @@ public final class JCache extends AbstractDistributedCache {
      * @param params Parameters to initialize the cache (e.g. name, capacity).
      * @throws CacheAcquireException If cache can not be initialized.
      */
-    public void initialize(final String implementation, final Map params)
+    public void initialize(final String implementation, final Properties params)
     throws CacheAcquireException {
         super.initialize(params);
 

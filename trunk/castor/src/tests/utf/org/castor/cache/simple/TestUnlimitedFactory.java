@@ -64,7 +64,7 @@ public final class TestUnlimitedFactory extends TestCase {
     public void testGetCache() {
         CacheFactory cf = new UnlimitedFactory();
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof Unlimited);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of Unlimited from factroy");

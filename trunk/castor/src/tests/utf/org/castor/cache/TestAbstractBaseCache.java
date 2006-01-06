@@ -15,7 +15,7 @@
  */
 package utf.org.castor.cache;
 
-import java.util.HashMap;
+import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -54,12 +54,12 @@ public final class TestAbstractBaseCache extends TestCase {
     }
     
     public void testInitialize() {
-        HashMap params;
+        Properties params;
         
         assertEquals("", _cache.getName());
         
         try {
-            params = new HashMap();
+            params = new Properties();
             params.put("foobar", "wrong parameter name");
 
             _cache.initialize(params);
@@ -69,7 +69,7 @@ public final class TestAbstractBaseCache extends TestCase {
         }
         
         try {
-            params = new HashMap();
+            params = new Properties();
             params.put(Cache.PARAM_NAME, new Integer(1234));
 
             _cache.initialize(params);
@@ -79,7 +79,7 @@ public final class TestAbstractBaseCache extends TestCase {
         }
         
         try {
-            params = new HashMap();
+            params = new Properties();
             params.put(Cache.PARAM_NAME, "this should be ok");
 
             _cache.initialize(params);

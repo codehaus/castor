@@ -16,6 +16,7 @@
 package utf.org.castor.cache.distributed;
 
 import java.util.HashMap;
+import java.util.Properties;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -79,7 +80,7 @@ public final class TestJcsCache extends TestCase {
         JcsCache c = new JcsCache();
         int counter = DistributedCacheFactoryMock.getCounter();
         
-        HashMap params = new HashMap();
+        Properties params = new Properties();
         params.put(Cache.PARAM_NAME, "dummy jcs cache");
         
         if (DISABLE_LOGGING) { logger.setLevel(Level.FATAL); }
@@ -113,7 +114,7 @@ public final class TestJcsCache extends TestCase {
     private Cache initialize() {
         JcsCache c = new JcsCache();
 
-        HashMap params = new HashMap();
+        Properties params = new Properties();
         params.put(Cache.PARAM_NAME, "dummy jcs cache");
 
         try {

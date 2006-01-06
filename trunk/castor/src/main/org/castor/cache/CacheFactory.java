@@ -36,11 +36,10 @@ public interface CacheFactory {
      * for using the given classloader.
      * 
      * @param classLoader A ClassLoader instance.
-     * @param debug Should debugging be turned on for the cache?
      * @return A Cache instance.
      * @throws CacheAcquireException Problem instantiating a cache instance.
      */
-    Cache getCache(ClassLoader classLoader, boolean debug) throws CacheAcquireException;
+    Cache getCache(ClassLoader classLoader) throws CacheAcquireException;
 
     /**
      * Returns the short alias cache type for this factory instance.

@@ -16,8 +16,9 @@
 package utf.org.castor.cache.simple;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -73,7 +74,7 @@ public final class TestCountLimited extends TestCase {
         assertEquals(30, ((CountLimited) cache).getCapacity());
         assertEquals(CountLimited.DEFAULT_NAME, cache.getName());
         
-        Map params = new HashMap();
+        Properties params = new Properties();
         params.put(CountLimited.PARAM_NAME, "dummy1");
         cache.initialize(params);
         assertEquals(30, ((CountLimited) cache).getCapacity());
@@ -118,7 +119,7 @@ public final class TestCountLimited extends TestCase {
         Cache cache = new CountLimited();
 
         try {
-            Map params = new HashMap();
+            Properties params = new Properties();
             params.put(CountLimited.PARAM_NAME, "dummy");
             params.put(CountLimited.PARAM_CAPACITY, new Integer(10));
             cache.initialize(params);
@@ -283,7 +284,7 @@ public final class TestCountLimited extends TestCase {
         Cache cache = new CountLimited();
 
         try {
-            Map params = new HashMap();
+            Properties params = new Properties();
             params.put(CountLimited.PARAM_NAME, "dummy");
             params.put(CountLimited.PARAM_CAPACITY, new Integer(3));
             cache.initialize(params);

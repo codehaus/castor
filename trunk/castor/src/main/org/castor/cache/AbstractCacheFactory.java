@@ -17,8 +17,6 @@
  */
 package org.castor.cache;
 
-import java.lang.reflect.InvocationTargetException;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -42,37 +40,20 @@ public abstract class AbstractCacheFactory implements CacheFactory {
     /**
      * @see org.castor.cache.CacheFactory#getCache(java.lang.ClassLoader)
      */
-    public final Cache getCache(final ClassLoader classLoader, final boolean debug)
+    public final Cache getCache(final ClassLoader classLoader)
     throws CacheAcquireException {
-        ClassLoader ldr = classLoader;
-        if (ldr == null) { ldr = Thread.currentThread().getContextClassLoader(); }
+        ClassLoader loader = classLoader;
+        if (loader == null) { loader = Thread.currentThread().getContextClassLoader(); }
         
         Cache cache = null;
         try {
-            cache = (Cache) Class.forName(getCacheClassName(), true, ldr).newInstance();
-            
-            if (debug) {
-                Class cls = Class.forName(DebuggingCacheProxy.class.getName(), true, ldr);
-                Class[] types = new Class[] {Cache.class};
-                Object[] params = new Object[] {cache};
-                cache = (Cache) cls.getConstructor(types).newInstance(params);
-            }
+            cache = (Cache) loader.loadClass(getCacheClassName()).newInstance();
         } catch (ClassNotFoundException cnfe) {
             String msg = Messages.format("jdo.engine.classNotFound",
                     getCacheClassName());
             LOG.error(msg, cnfe);
             throw new CacheAcquireException(msg, cnfe);
         } catch (IllegalAccessException iae) {
-            String msg = Messages.format("jdo.engine.classIllegalAccess",
-                    getCacheClassName());
-            LOG.error(msg, iae);
-            throw new CacheAcquireException(msg, iae);
-        } catch (NoSuchMethodException iae) {
-            String msg = Messages.format("jdo.engine.classIllegalAccess",
-                    getCacheClassName());
-            LOG.error(msg, iae);
-            throw new CacheAcquireException(msg, iae);
-        } catch (InvocationTargetException iae) {
             String msg = Messages.format("jdo.engine.classIllegalAccess",
                     getCacheClassName());
             LOG.error(msg, iae);

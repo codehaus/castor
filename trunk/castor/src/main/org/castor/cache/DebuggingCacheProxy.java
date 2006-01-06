@@ -20,6 +20,7 @@ package org.castor.cache;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -37,7 +38,7 @@ public final class DebuggingCacheProxy implements Cache {
     
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
      *  Logging </a> instance used for all logging. */
-    private static final Log LOG = LogFactory.getLog(DebuggingCacheProxy.class);
+    private static final Log LOG = LogFactory.getLog(Cache.class);
 
     /** The wrapped cache. */
     private Cache _cache;
@@ -57,7 +58,7 @@ public final class DebuggingCacheProxy implements Cache {
     /**
      * @see org.castor.cache.Cache#initialize(java.util.Map)
      */
-    public void initialize(final Map params) throws CacheAcquireException {
+    public void initialize(final Properties params) throws CacheAcquireException {
         _cache.initialize(params);
         LOG.debug(getType() + ".initialize() [" + getName() + "]");
     }

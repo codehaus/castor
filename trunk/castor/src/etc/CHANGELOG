@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1280 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Made CacheRegistry non static.
+       Details: http://jira.codehaus.org/browse/CASTOR-1280
+       (Ralf - 20060106)
+
 All:   Fixed bug CASTOR-1298 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Added ReadWriteLock's and ConcurrentHashMap from Doug Lea.
        Details: http://jira.codehaus.org/browse/CASTOR-1298

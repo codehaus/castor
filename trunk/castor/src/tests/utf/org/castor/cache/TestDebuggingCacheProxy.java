@@ -18,6 +18,7 @@ package utf.org.castor.cache;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -73,13 +74,13 @@ public final class TestDebuggingCacheProxy extends TestCase {
     }
     
     public void testInitialize() {
-        HashMap params;
+        Properties params;
         
         assertEquals("", _cache.getName());
         assertEquals("dummy type", _cache.getType());
         
         try {
-            params = new HashMap();
+            params = new Properties();
             params.put(Cache.PARAM_NAME, "dummy cache");
 
             _cache.initialize(params);

@@ -59,7 +59,7 @@
 # 
 # Cache implementations
 # 
-org.castor.jdo.cacheFactories=\
+org.castor.cache.Factories=\
   org.castor.cache.simple.NoCacheFactory,\
   org.castor.cache.simple.TimeLimitedFactory,\
   org.castor.cache.simple.CountLimitedFactory,\
@@ -77,7 +77,7 @@ org.castor.jdo.cacheFactories=\
 # 
 # Cache implementations
 # 
-org.castor.jdo.cacheFactories=\
+org.castor.cache.Factories=\
   org.castor.cache.simple.NoCacheFactory,\
   org.castor.cache.simple.TimeLimitedFactory,\
   org.castor.cache.simple.CountLimitedFactory,\

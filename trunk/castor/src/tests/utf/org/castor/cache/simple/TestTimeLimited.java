@@ -18,6 +18,7 @@ package utf.org.castor.cache.simple;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import junit.framework.Test;
@@ -73,7 +74,7 @@ public final class TestTimeLimited extends TestCase {
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals(TimeLimited.DEFAULT_NAME, cache.getName());
         
-        Map params = new HashMap();
+        Properties params = new Properties();
         params.put(TimeLimited.PARAM_NAME, "dummy1");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
@@ -118,7 +119,7 @@ public final class TestTimeLimited extends TestCase {
         Cache cache = new TimeLimited();
 
         try {
-            Map params = new HashMap();
+            Properties params = new Properties();
             params.put(TimeLimited.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, new Integer(10));
             cache.initialize(params);
@@ -283,7 +284,7 @@ public final class TestTimeLimited extends TestCase {
         Cache cache = new TimeLimited();
 
         try {
-            Map params = new TimeLimited();
+            Properties params = new Properties();
             params.put(TimeLimited.PARAM_NAME, "dummy");
             params.put(TimeLimited.PARAM_TTL, new Integer(5));
             cache.initialize(params);
@@ -373,7 +374,7 @@ public final class TestTimeLimited extends TestCase {
         assertTrue(cache.containsKey("g"));
         assertTrue(cache.containsKey("h"));
 
-        Thread.sleep(900);
+        Thread.sleep(950);
         
         assertEquals(7, cache.size());
         assertTrue(cache.containsKey("b"));

@@ -28,8 +28,63 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Changes</h2>
+				
+                <h3>Refactored cache into new org.castor.cache package</h3>
+                
+                <p>Take care to adjust your custom castor.properties file to reflect
+                   the changed packages of CacheFactories.</p>
+                   
+                <code>
+# 
+# Cache implementations
+# 
+org.castor.cache.Factories=\
+  org.castor.cache.simple.NoCacheFactory,\
+  org.castor.cache.simple.TimeLimitedFactory,\
+  org.castor.cache.simple.CountLimitedFactory,\
+  org.castor.cache.simple.UnlimitedFactory,\
+  org.castor.cache.distributed.FKCacheFactory,\
+  org.castor.cache.distributed.JcsCacheFactory,\
+  org.castor.cache.distributed.JCacheFactory,\
+  org.castor.cache.distributed.CoherenceCacheFactory
+                </code>
+				
+                <p>Note: By also moving CacheFactoryRegistry to org.castor.cache
+                   package the property has been renamed from 1.0M1 a second time.</p>
+
+                <h3>Added debugging of cache access</h3>
+                
+                <p>If logging level for <b>org.castor.cache.Cache</b> is set to debug
+                   each cache created through the CacheRegistry will be wrapped by a
+                   DebuggingCacheProxy that outputs debug messages on every cache access
+                   into the configured log.</p>
+
+                <p>Note: By also moving CacheFactoryRegistry to org.castor.cache
+                   package we changed the way debugging is enabled from a seperate
+                   property at 1.0M1 to configuration by the logging level at 1.0M2.</p>
 			</summary>
             <bugs>
+                <bug id="1280" tool="jira">
+                    <description>
+		                Made CacheRegistry non static.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060106</date>
+                </bug>
                 <bug id="1298" tool="jira">
                     <description>
 		                Added ReadWriteLock's and ConcurrentHashMap from Doug Lea.

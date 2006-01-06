@@ -26,7 +26,6 @@ import org.castor.cache.AbstractCacheFactory;
 import org.castor.cache.Cache;
 import org.castor.cache.CacheAcquireException;
 import org.castor.cache.CacheFactory;
-import org.castor.cache.DebuggingCacheProxy;
 
 /**
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
@@ -54,22 +53,15 @@ public final class TestAbstractCacheFactory extends TestCase {
         CacheFactory cf = new CacheFactoryMock();
         
         try {
-            Cache c = cf.getCache(null, false);
+            Cache c = cf.getCache(null);
             assertTrue(c instanceof CacheMock);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of CacheMock from factroy");
         }
         
         try {
-            Cache c = cf.getCache(this.getClass().getClassLoader(), false);
+            Cache c = cf.getCache(this.getClass().getClassLoader());
             assertTrue(c instanceof CacheMock);
-        } catch (CacheAcquireException ex) {
-            fail("Failed to get instance of CacheMock from factroy");
-        }
-        
-        try {
-            Cache c = cf.getCache(null, true);
-            assertTrue(c instanceof DebuggingCacheProxy);
         } catch (CacheAcquireException ex) {
             fail("Failed to get instance of CacheMock from factroy");
         }
@@ -78,7 +70,7 @@ public final class TestAbstractCacheFactory extends TestCase {
 
         try {
             ((CacheFactoryMock) cf).setCacheClassName("org.castor.cache.UnknownCache");
-            cf.getCache(null, false);
+            cf.getCache(null);
             fail("Should have failed to get instance of CacheMock from factroy");
         } catch (CacheAcquireException ex) {
             assertNotNull(ex.getMessage());
