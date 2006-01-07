@@ -275,7 +275,11 @@
 
   <xsd:element name="cache-type">
      <xsd:complexType>
+        <xsd:sequence>
+           <xsd:element ref="param" minOccurs="0" maxOccurs="unbounded" />
+        </xsd:sequence>
         <xsd:attribute name="type" type="xsd:string" use="optional" default="count-limited" />
+        <xsd:attribute name="debug" type="xsd:boolean" use="optional" default="false"/>
         <xsd:attribute name="capacity" type="xsd:integer" use="optional"/>
     </xsd:complexType>
   </xsd:element>

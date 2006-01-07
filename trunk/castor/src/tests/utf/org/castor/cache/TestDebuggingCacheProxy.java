@@ -65,8 +65,13 @@ public final class TestDebuggingCacheProxy extends TestCase {
 
     public TestDebuggingCacheProxy(final String name) { super(name); }
 
-    protected void setUp() {
+    protected void setUp() throws Exception {
+        Properties params = new Properties();
+        params.put(Cache.PARAM_NAME, "dummy cache");
+
         _cache = new DebuggingCacheProxy(new CacheMock());
+        _cache.initialize(params);
+
     }
 
     protected void tearDown() {
@@ -74,25 +79,26 @@ public final class TestDebuggingCacheProxy extends TestCase {
     }
     
     public void testInitialize() {
+        Cache cache = new DebuggingCacheProxy(new CacheMock());
+        
+        assertEquals("", cache.getName());
+        assertEquals("dummy type", cache.getType());
+        
         Properties params;
-        
-        assertEquals("", _cache.getName());
-        assertEquals("dummy type", _cache.getType());
-        
         try {
             params = new Properties();
             params.put(Cache.PARAM_NAME, "dummy cache");
 
-            _cache.initialize(params);
-            assertEquals("dummy cache", _cache.getName());
-            assertEquals("dummy type", _cache.getType());
+            cache.initialize(params);
+            assertEquals("dummy cache", cache.getName());
+            assertEquals("dummy type", cache.getType());
         } catch (CacheAcquireException ex) {
             fail("Failed at initialize of AbstractBaseCache");
         }
         
-        _cache.close();
-        assertEquals("dummy cache", _cache.getName());
-        assertEquals("dummy type", _cache.getType());
+        cache.close();
+        assertEquals("dummy cache", cache.getName());
+        assertEquals("dummy type", cache.getType());
     }
 
     public void testContainsKey() {

@@ -50,35 +50,68 @@
            tries to update an object that has been disposed from the dirty checking cache, 
            an ObjectModifedException will be thrown.</p>
 
-        <p>The DTD declaration is as the following:
-            <code-panel><![CDATA[
+        <p>The DTD declaration is as follows:
+           <code-panel><![CDATA[
+<!ELEMENT cache-type  ( param* )>
 <!ATTLIST cache-type
-    type ( none | count-limited
-          | time-limited | unlimited | coherence | fkcache | jcache | jcs ) "count-limited"
-    capacity NMTOKEN #IMPLIED>]]></code-panel>
-        </p>
+    type           ( none | count-limited | time-limited | unlimited |
+                     coherence | fkcache | jcache | jcs ) "count-limited"
+    debug          (true|false) "false"
+    capacity       NMTOKEN  #IMPLIED>
 
-        <p>For example,
-            <code-panel><![CDATA[
-<mapping>
-    <class name="com.xyz.MyObject">
-        <cache-type type="time-limited" capacity="30"/>
-        <field name= ... >
-               ...
-        </field>
-    </class>
-</mapping>]]></code-panel>
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+          name   NMTOKEN  #REQUIRED
+          value  NMTOKEN  #REQUIRED>]]></code-panel></p>
+          
+        <p>With release 1.0 of Castor the DTD has changed but it is backward compatible
+           to the old one and allows to enable debugging of cache access for a specific
+           class as well as passing individual configuration parameters to each cache
+           instance. Only <b>count-limited</b> and <b>time-limited</b> of the current
+           cache types support parameters. Parameter names are case sensitive and are
+           silently ignored if they are unknown to a cache type.</p>
+                   
+        <p>It need to be noted that there are 3 parameter names that are reserved for
+           internal use. If you specify a parameter with one of the names: <b>type</b>,
+           <b>name</b> or <b>debug</b> their value will silently be overwritten with
+           another one used internally.</p>
+                
+        <p>A <b>count-limited</b> least-recently-used cache (LRU) for 500 objects can be
+           specified by:
+           <code-panel><![CDATA[
+<cache-type type="count-limited" capacity="500"/>]]></code-panel>
+           or
+           <code-panel><![CDATA[
+<cache-type type="count-limited"/>
+    <param name="capacity" value="500"/>
+</cache-type>]]></code-panel>
+           If both, the capacity attribute and parameter with name="capacity" is
+           specified, the parameter value takes precedence over the attribute value.</p>
+                
+        <p>A <b>time-limited</b> first-in-first-out cache (FIFO) that expires objects
+           after 15 minutes can be specified by:
+           <code-panel><![CDATA[
+<cache-type type="time-limited" capacity="900"/>]]></code-panel>
+           or
+           <code-panel><![CDATA[
+<cache-type type="time-limited"/>
+    <param name="ttl" value="900"/>
+</cache-type>]]></code-panel>
+           If both, the capacity attribute and parameter with name="ttl" is specified,
+           the parameter value takes precedence over the attribute value.</p>
+                   
+        <p>The <b>debug</b> attribute can be used to enable debugging for objects
+           of a single class. In addition to setting this attribut to <b>true</b> you
+           also need to set logging level of <b>org.castor.cache.Cache</b> to debug.</p>
 
-            defines the time-limited least-recently-used algorithm as the caching algorithm for <i>com.xyz.MyObject</i> class and the cache will be disposed of if it is not used within 30 seconds. (Note that the time-limit ticks after all transaction involved with the objects complete, but not start after it is loaded.) </p>
-
-        <p><b>NOTE:</b> The default cache-type is <tt>count-limited</tt> with a capacity of 100. This will 
+        <p><b>NOTE:</b> The default cache-type is <tt>count-limited</tt> with a capacity of 30. This will 
            be used when no cache-type is specified in the mapping for a class.</p>
         
         <p><b>NOTE:</b> As of release 0.9.6, Castor allows for the addition of user-defined cache 
            implementations. Instructions can be found <a href="jdo-caching.html">here</a></p>
 
         <p><b>NOTE:</b> As of release 0.9.9, four new cache types have been added to Castor, three
-            of them open source and one commercial:</p>
+            of them open source and one commercial.</p>
             
         <ctable>
             <cheader>

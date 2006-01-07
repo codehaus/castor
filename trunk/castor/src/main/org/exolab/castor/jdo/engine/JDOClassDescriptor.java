@@ -42,15 +42,20 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.jdo.engine;
 
+import java.util.Properties;
 
+import org.castor.cache.Cache;
+import org.castor.cache.simple.CountLimited;
+import org.castor.cache.simple.TimeLimited;
+import org.exolab.castor.jdo.TimeStampable;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
-
+import org.exolab.castor.mapping.xml.CacheTypeMapping;
+import org.exolab.castor.mapping.xml.Param;
+import org.exolab.castor.util.Messages;
 
 /**
  * JDO class descriptors. Extends {@link ClassDescriptor} to include the
@@ -62,108 +67,88 @@ import org.exolab.castor.mapping.loader.ClassDescriptorImpl;
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
  */
-public class JDOClassDescriptor
-    extends ClassDescriptorImpl
-{
+public class JDOClassDescriptor extends ClassDescriptorImpl {
+    /** The name of the SQL table. */
+    private final String  _tableName;
 
+    /** The names of columns that the identity consists of. */
+    private final String[] _idnames;
 
-    /**
-     * The name of the SQL table.
-     */
-    private String  _tableName;
-
-    /**
-     * The ClassDescriptor of the class which this class depends on.
-     */
-    private ClassDescriptor _depends;
-
-    /**
-     * The key generator specified for this class.
-     */
+    /** The key generator specified for this class. */
     private final KeyGeneratorDescriptor _keyGenDesc;
 
-    /**
-     * The preferred mechanism for caching instance of this class
-     */
-    private final String _cacheType;
-
-    /**
-     * The preferred mechanism for caching instance of this class
-     */
-    private final int _cacheParam;
-
-
-    /**
-     * The names of columns that the identity consists of
-     */
-    private String[] _idnames;
-
-    public JDOClassDescriptor( ClassDescriptor clsDesc, String tableName,
-            KeyGeneratorDescriptor keyGenDesc, String cacheType, int cacheParam )
-            throws MappingException {
-
-        super( clsDesc.getJavaClass(), clsDesc.getFields(),
-               (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getIdentities():null),
-               clsDesc.getExtends(),
-               (clsDesc instanceof ClassDescriptorImpl? ((ClassDescriptorImpl)clsDesc).getDepends(): null), 
-               clsDesc.getAccessMode() );
-        if ( tableName == null )
-            throw new IllegalArgumentException( "Argument 'tableName' is null" );
-        if ( getIdentity() == null )
-            throw new MappingException( "mapping.noIdentity", getJavaClass().getName() );
-        if ( ! ( getIdentity() instanceof JDOFieldDescriptor ) )
-            throw new IllegalArgumentException( "Identity field must be of type JDOFieldDescriptor" );
-        if ( getExtends() != null && ! ( getExtends() instanceof JDOClassDescriptor ) )
-            throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
-
-        _tableName = tableName;
-        _keyGenDesc = keyGenDesc;
-        _cacheType = cacheType;
-        _cacheParam = cacheParam;
-        if ( clsDesc instanceof ClassDescriptorImpl ) {
-            _depends = ((ClassDescriptorImpl)clsDesc).getDepends();
+    /** The properties defining cache type and parameters. */
+    private final Properties _cacheParams = new Properties();
+    
+    public JDOClassDescriptor(final ClassDescriptor clsDesc,
+            final KeyGeneratorDescriptor keyGenDesc)
+    throws MappingException {
+        super((ClassDescriptorImpl) clsDesc);
+        
+        _tableName = getMapping().getMapTo().getTable();
+        if (_tableName == null) {
+            throw new IllegalArgumentException("Argument 'tableName' is null");
         }
+        
+        if (getIdentity() == null) {
+            throw new MappingException("mapping.noIdentity", getJavaClass().getName());
+        }
+        
+        if (!(getIdentity() instanceof JDOFieldDescriptor)) {
+            throw new IllegalArgumentException("Identity field must be of type JDOFieldDescriptor");
+        }
+        
+        if ((getExtends() != null) && !(getExtends() instanceof JDOClassDescriptor)) {
+            throw new IllegalArgumentException( "Extended class does not have a JDO descriptor" );
+        }
+        
         _idnames = new String[_identities.length];
         for (int i = 0; i < _idnames.length; i++) {
         	String[] sqlNames = ((JDOFieldDescriptor) _identities[i]).getSQLName();
         	if (sqlNames == null) {
-        		throw new MappingException( "mapping.noSqlName", _identities[i].getFieldName(), getJavaClass().getName() );
+        		throw new MappingException("mapping.noSqlName", _identities[i].getFieldName(), getJavaClass().getName());
         	}
         	_idnames[i] = sqlNames[0];
         }
-    }
 
+        _keyGenDesc = keyGenDesc;
+
+        CacheTypeMapping cacheMapping = getMapping().getCacheTypeMapping();
+        if (cacheMapping != null) {
+            String capacity = Integer.toString(cacheMapping.getCapacity());
+            _cacheParams.put(CountLimited.PARAM_CAPACITY, capacity);
+            _cacheParams.put(TimeLimited.PARAM_TTL, capacity);
+            
+            Param[] params = cacheMapping.getParam();
+            for (int i = 0; i < params.length; i++) {
+                _cacheParams.put(params[i].getName(), params[i].getValue());
+            }
+
+            String debug = Boolean.toString(cacheMapping.getDebug());
+            _cacheParams.put(Cache.PARAM_DEBUG, debug);
+
+            String type = cacheMapping.getType();
+            if ((TimeStampable.class.isAssignableFrom(getJavaClass()))
+                    && (type != null) && (type.equalsIgnoreCase("none"))) {
+                throw new MappingException(Messages.format("persist.wrongCacheTypeSpecified", getMapping().getName()));
+            }
+            _cacheParams.put(Cache.PARAM_TYPE, type);
+        }
+        
+        _cacheParams.put(Cache.PARAM_NAME, getMapping().getName());
+    }
 
     /**
      * Returns the table name to which this object maps.
      *
      * @return Table name
      */
-    public String getTableName()
-    {
+    public String getTableName() {
         return _tableName;
     }
 
-    public ClassDescriptor getDepends() {
-        return _depends;
-    }
-
-    /**
-     * Returns the preferred mechanism for caching instance of this class
-     *
-     * @return a String represent the cache type
-     */
-    public String getCacheType() {
-        return _cacheType;
-    }
-
-    /**
-     * Returns the preferred mechanism for caching instance of this class
-     *
-     * @return an int represent the param
-     */
-    public int getCacheParam() {
-        return _cacheParam;
+    public Properties getCacheParams() {
+        return _cacheParams;
     }
 
     /**
@@ -173,38 +158,36 @@ public class JDOClassDescriptor
      * @param name The name of the field to return
      * @return The field if it exists, otherwise null.
      */
-    public JDOFieldDescriptor getField(String name) 
-    {
+    public JDOFieldDescriptor getField(String name) {
         JDOFieldDescriptor field = null;
-        for ( int i = 0 ; i < _fields.length ; ++i ) {
-            if ( _fields[ i ] instanceof JDOFieldDescriptor &&
-                 _fields[ i ].getFieldName().equals( name ) ) {
-                field = (JDOFieldDescriptor) _fields[ i ];
+        for (int i = 0 ; i < _fields.length ; ++i) {
+            if ((_fields[i] instanceof JDOFieldDescriptor)
+                    && (_fields[i].getFieldName().equals(name))) {
+                
+                field = (JDOFieldDescriptor) _fields[i];
                 break;
             }
         }
         
-        if ( field == null ) {
-          for ( int i = 0 ; i < _identities.length ; ++i ) {
-            if ( _identities[ i ] instanceof JDOFieldDescriptor &&
-                 _identities[ i ].getFieldName().equals( name ) ) {
-                field = (JDOFieldDescriptor) _identities[ i ];
-            }
+        if (field == null) {
+            for (int i = 0 ; i < _identities.length ; ++i) {
+                if ((_identities[i] instanceof JDOFieldDescriptor)
+                        && (_identities[i].getFieldName().equals(name))) {
+                    
+                    field = (JDOFieldDescriptor) _identities[i];
+                }
             }
         }
 
         return field;
-
     }
-
 
     /**
      * Returns the key generator specified for this class.
      *
      * @return The key generator descriptor
      */
-    public KeyGeneratorDescriptor getKeyGeneratorDescriptor()
-    {
+    public KeyGeneratorDescriptor getKeyGeneratorDescriptor() {
         return _keyGenDesc;
     }
 
@@ -215,13 +198,7 @@ public class JDOClassDescriptor
         return _idnames;
     }
 
-
-    public String toString()
-    {
+    public String toString() {
         return super.toString() + " AS " + _tableName;
     }
-
-
 }
-
-

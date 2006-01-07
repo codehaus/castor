@@ -53,18 +53,107 @@ org.castor.cache.Factories=\
                 <p>Note: By also moving CacheFactoryRegistry to org.castor.cache
                    package the property has been renamed from 1.0M1 a second time.</p>
 
+                <h3>Changed syntax of cache definition in mapping</h3>
+                
+                <p>The DTD declaration is as follows:
+                   <code-panel><![CDATA[
+<!ELEMENT cache-type  ( param* )>
+<!ATTLIST cache-type
+    type           ( none | count-limited | time-limited | unlimited |
+                     coherence | fkcache | jcache | jcs ) "count-limited"
+    debug          (true|false) "false"
+    capacity       NMTOKEN  #IMPLIED>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+          name   NMTOKEN  #REQUIRED
+          value  NMTOKEN  #REQUIRED>]]></code-panel></p>
+          
+                <p>The new syntax is still backward compatible to the old one but allows
+                   to enable debugging of cache access for a specific class as well as
+                   passing individual configuration parameters to each cache instance.
+                   Only <b>count-limited</b> and <b>time-limited</b> of the current cache
+                   types support parameters. Parameter names are case sensitive and are
+                   silently ignored if they are unknown to a cache type.</p>
+                   
+                <p>It need to be noted that there are 3 parameter names that are reserved
+                   for internal use. If you specify a parameter with one of the names:
+                   <b>type</b>, <b>name</b> or <b>debug</b> their value will silently be
+                   overwritten with another one used internally.</p>
+                
+                <p>A <b>count-limited</b> least-recently-used cache (LRU) for 500 objects
+                   can be specified by:
+                   <code-panel><![CDATA[
+<cache-type type="count-limited" capacity="500"/>]]></code-panel>
+                   or
+                   <code-panel><![CDATA[
+<cache-type type="count-limited"/>
+    <param name="capacity" value="500"/>
+</cache-type>]]></code-panel>
+                   If both, the capacity attribute and parameter with name="capacity" is
+                   specified, the parameter value takes precedence over the attribute
+                   value.</p>
+                
+                <p>A <b>time-limited</b> first-in-first-out cache (FIFO) that expires
+                   objects after 15 minutes can be specified by:
+                   <code-panel><![CDATA[
+<cache-type type="time-limited" capacity="900"/>]]></code-panel>
+                   or
+                   <code-panel><![CDATA[
+<cache-type type="time-limited"/>
+    <param name="ttl" value="900"/>
+</cache-type>]]></code-panel>
+                   If both, the capacity attribute and parameter with name="ttl" is
+                   specified, the parameter value takes precedence over the attribute
+                   value.</p>
+                   
+                <p>The <b>debug</b> attribute can be used to enable debugging for objects
+                   of a single class only, as described below.</p>
+                
                 <h3>Added debugging of cache access</h3>
                 
-                <p>If logging level for <b>org.castor.cache.Cache</b> is set to debug
-                   each cache created through the CacheRegistry will be wrapped by a
-                   DebuggingCacheProxy that outputs debug messages on every cache access
-                   into the configured log.</p>
-
-                <p>Note: By also moving CacheFactoryRegistry to org.castor.cache
-                   package we changed the way debugging is enabled from a seperate
-                   property at 1.0M1 to configuration by the logging level at 1.0M2.</p>
+                <p>If you like to get debug messages for every access to cache independend
+                   of the caches type or the class of the object that is accessed you
+                   only need to set logging level of <b>org.castor.cache</b> to debug.
+                   As this may lead to lots of debug messages, you are not interested
+                   in, there are 2 options to reduce the number of the messages.</p>
+                   
+                <p>If you are interested in all accesses to a specific cache type you set
+                   the logging level of this implementation to debug.</p>
+                   
+                <p>To get debug messages of accesses to objects of a specific class
+                   there are 2 things you need to do. To be able to get debug messages at
+                   all you need to set logging level of <b>org.castor.cache.Cache</b> to
+                   debug first. Then you only need to set the debug attribute of the class
+                   you are interested in to <b>true</b> in the mapping.</p>
+                
+                <p>Note: By allowing to pass individual configuration properties from
+                   mapping to cache we again changed the way debugging is enabled. The
+                   property in castor.properties file from relaese 1.0M1 is no longer
+                   supported.</p>
 			</summary>
             <bugs>
+                <bug id="1299" tool="jira">
+                    <description>
+		                Allowed to specify individual parameters for cache initialization
+                        in mapping.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060107</date>
+                </bug>
                 <bug id="1280" tool="jira">
                     <description>
 		                Made CacheRegistry non static.

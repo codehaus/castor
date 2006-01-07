@@ -78,9 +78,10 @@
 <!--
     Specifies the cache type and capacity used for this class
  -->
-<!ELEMENT cache-type EMPTY>
+<!ELEMENT cache-type  ( param* )>
 <!ATTLIST cache-type
     type           ( none | count-limited | time-limited | unlimited | coherence | fkcache | jcache | jcs ) "count-limited"
+    debug          (true|false) "false"
     capacity       NMTOKEN  #IMPLIED>
 
 <!--

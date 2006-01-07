@@ -200,11 +200,13 @@ public final class LockEngine {
                         // create new Cache instance for the base type
                         Cache cache = null;
                         try {
-                        	cache = _cacheFactoryRegistry.getCache(molder.getCacheType(), molder.getName(), molder.getCacheParam(), mapResolver.getClassLoader());
-                        } 
-                        catch (CacheAcquireException e) {
-                            _log.error (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
-                            throw new MappingException (Messages.format ("persist.cacheCreationFailed", molder.getCacheType()), e);
+                            cache = _cacheFactoryRegistry.getCache(
+                                    molder.getCacheParams(),
+                                    mapResolver.getClassLoader());
+                        } catch (CacheAcquireException e) {
+                            String msg = Messages.message("persist.cacheCreationFailed");
+                            _log.error(msg, e);
+                            throw new MappingException(msg, e);
                         }
                         TypeInfo info = new TypeInfo( molder, new HashMap(), cache ); 
                         _typeInfo.put( molder.getName(), info );
@@ -1127,47 +1129,6 @@ public final class LockEngine {
             this(molder, base.locks, base.cache);
         }
 
-        /**
-         * Returns <code>true</code> if the object is currently cached, 
-         * participating in a lock, or in the LRU cache.
-         *
-         * @param oid  the OID of the desired lock
-         * @return True if an object is currently cached.
-         */
-        private boolean isCached(OID oid, TransactionContext tx) {
-            ObjectLock entry = null;
-            synchronized (locks) {
-                entry = (ObjectLock) locks.get(oid);
-                if (entry == null) {
-                    CacheEntry cacheEntry = (CacheEntry) cache.get(oid); 
-                    if (cacheEntry != null) {
-                        entry = new ObjectLock(cacheEntry);
-                        locks.put(oid, entry);
-                        
-                        // Okay, cacheOid and oid have the same top level super class
-                        // We must check that oid has the same class as cacheOid
-                        // or oid is a superclass of cacheOid
-                        OID cacheOid = entry.getOID();
-                        boolean isSuper = oid.getName().equals(cacheOid.getName());
-                        if (!isSuper) {
-                            String[] superClassNames = cacheOid.getSuperClassNames();
- 
-                            if (superClassNames != null) {
-                                for (int i = 0; i < superClassNames.length; i++) {
-                                    if (oid.getName().equals(superClassNames[i])) {
-                                        isSuper = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        if (!isSuper) entry = null;
-                    }
-                }
-            }
-            return (entry != null);
-        }
-   
         /**
          * Life-cycle method to allow shutdown of cache instances.
          */

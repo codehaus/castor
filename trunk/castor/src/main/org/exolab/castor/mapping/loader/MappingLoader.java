@@ -59,9 +59,6 @@ import java.util.Hashtable;
 import java.util.Vector;
 import java.util.Enumeration;
 
-//import org.apache.commons.logging.Log;
-//import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.mapping.ClassDescriptor;
 import org.exolab.castor.mapping.CollectionHandler;
 import org.exolab.castor.mapping.ExtendedFieldHandler;
@@ -87,29 +84,20 @@ import org.exolab.castor.util.Messages;
  * @author <a href="keith AT kvisco DOT com">Keith Visco</a>
  * @version $Revision$ $Date$
  */
-public abstract class MappingLoader
-    implements MappingResolver
-{
-
-	/**
-	 * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
-	 * Commons Logging</a> instance used for all logging.
-	 */
-	//private static Log log = LogFactory.getFactory().getInstance(MappingLoader.class);
-	
+public abstract class MappingLoader implements MappingResolver {
     /**
      * The prefix for the "add" method
-    **/
+     */
     private static final String ADD_METHOD_PREFIX = "add";
 
     /**
      * The standard prefix for the getter method
-    **/
+     */
     private static final String GET_METHOD_PREFIX = "get";
     
     /**
      * The prefix for the "is" method for booleans
-    **/
+     */
     private static final String IS_METHOD_PREFIX = "is";
     
     /**
@@ -127,14 +115,12 @@ public abstract class MappingLoader
 
     /**
      * Factory method name for type-safe enumerations. 
-    **/
+     */
     protected static final String VALUE_OF = "valueOf";
-    
     
     //----------------------/
     //- Instance Variables -/
     //----------------------/
-    
     
     /**
      * A flag indicating whether or not mappings can be redefined.
@@ -165,7 +151,7 @@ public abstract class MappingLoader
     private ClassLoader _loader;
 
 
-    public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl( Class.class );
+    public static final ClassDescriptor NoDescriptor = new ClassDescriptorImpl(Class.class);
 
     /**
      * Constructs a new mapping helper. This constructor is used by
@@ -577,48 +563,11 @@ public abstract class MappingLoader
                         javaClass.getName() );
             }
         }
-
-
         
         // Create the class descriptor.
-        String hack = (clsMap.getAccess() == null)?"shared":clsMap.getAccess().toString();
-        
-        clsDesc = new ClassDescriptorImpl( javaClass, fields, identities, extend, depend,
-                                           AccessMode.valueOf(hack), clsMap.getVerifyConstructable() );
-
-        if ( clsDesc instanceof ClassDescriptorImpl )
-            ((ClassDescriptorImpl)clsDesc).setMapping( clsMap );
+        clsDesc = new ClassDescriptorImpl(clsMap, javaClass, fields, identities, extend, depend);
 
         return clsDesc;
-    }
-
-    // expect a string which seperated by normalized delimitator
-    private String[] breakApart( String strings, char delimit ) {
-        if ( strings == null )
-            return new String[0];
-        Vector v = new Vector();
-        int start = 0;
-        int count = 0;
-        while ( count < strings.length() ) {
-            if ( strings.charAt( count ) == delimit ) {
-                if ( start < (count - 1) ) {
-                    //System.out.println( "("+strings.substring( start, count )+")" );
-                    v.addElement( strings.substring( start, count ) );
-                    count++;
-                    start = count;
-                    continue;
-                }
-            }
-            count++;
-        }
-        if ( start < (count - 1) ) {
-            //System.out.println( "("+strings.substring( start, count )+")" );
-            v.addElement( strings.substring( start, count ) );
-        }
-
-        String[] result = new String[v.size()];
-        v.copyInto( result );
-        return result;
     }
 
     /**

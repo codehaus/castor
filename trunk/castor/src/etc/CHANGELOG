@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1299 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Allowed to specify individual parameters for cache initialization in mapping.
+       Details: http://jira.codehaus.org/browse/CASTOR-1280
+       (Ralf - 20060107)
+
 JDO:   Fixed bug CASTOR-1280 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Made CacheRegistry non static.
        Details: http://jira.codehaus.org/browse/CASTOR-1280

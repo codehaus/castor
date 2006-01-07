@@ -20,9 +20,32 @@ package org.castor.cache;
 import java.util.Map;
 import java.util.Properties;
 
+import org.castor.cache.simple.CountLimited;
+
 /**
  * Interface specification for performance caches as used in Castor. Please implement 
- * this interface if you wish to provide your own cache implementation. 
+ * this interface if you wish to provide your own cache implementation.
+ * <p>
+ * At initialization each cache implementation gets passed a properties map containing
+ * key/value pairs. Apart of 3 reserved standard properties, individual once can be
+ * used to configure the cache behavier. The standard properties are:
+ * <p>
+ * <b>type</b> which is evaluated by the CacheFactoryRegistry and defines the requested
+ * cache type. If not set <b>count-limited</b> cahce will be used as default.
+ * <br>
+ * <b>debug</b> is also evaluated by the CacheFactoryRegistry and defines if the cache
+ * instance will be wrapped by a DebuggingCacheProxy to log debug messages at every
+ * access to the cache. If not set no debugging will take place.
+ * <br>
+ * <b>name</b> is used by AbstractBaseCache to set the name of the cache instance. At
+ * the moment every cache type available extends this AbstractBaseCache. The name does
+ * not influence internal behavier of the cache but is usefull to identify from which
+ * cache instance debug messages are coming from. By default castor uses the classname
+ * of the cached objects as name for the cache. If not present the name will be empty.
+ * <p>
+ * For a description of the individual properties you should have a look at the javadoc
+ * of the different cache types. It needs to be noted that only string keys and values
+ * are allowed.
  * 
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @author <a href="mailto:ralf DOT joachim AT syscon-world DOT de">Ralf Joachim</a>
@@ -31,6 +54,12 @@ import java.util.Properties;
  */
 public interface Cache extends Map {
     //--------------------------------------------------------------------------
+    
+    /** Mapped initialization parameter: type */
+    String PARAM_TYPE = "type";
+    
+    /** Default cache type to be used. */
+    String DEFAULT_TYPE = CountLimited.TYPE;
     
     /** Mapped initialization parameter: name */
     String PARAM_NAME = "name";

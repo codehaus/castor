@@ -82,21 +82,21 @@ public final class TestTimeLimited extends TestCase {
         
         params.clear();
         params.put(TimeLimited.PARAM_NAME, "dummy2");
-        params.put(TimeLimited.PARAM_TTL, new Integer(-10));
+        params.put(TimeLimited.PARAM_TTL, "-10");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals("dummy2", cache.getName());
         
         params.clear();
         params.put(TimeLimited.PARAM_NAME, "dummy3");
-        params.put(TimeLimited.PARAM_TTL, new Integer(0));
+        params.put(TimeLimited.PARAM_TTL, "0");
         cache.initialize(params);
         assertEquals(30, ((TimeLimited) cache).getTTL());
         assertEquals("dummy3", cache.getName());
         
         params.clear();
         params.put(TimeLimited.PARAM_NAME, "dummy4");
-        params.put(TimeLimited.PARAM_TTL, new Integer(10));
+        params.put(TimeLimited.PARAM_TTL, "10");
         cache.initialize(params);
         assertEquals(10, ((TimeLimited) cache).getTTL());
         assertEquals("dummy4", cache.getName());
@@ -286,7 +286,7 @@ public final class TestTimeLimited extends TestCase {
         try {
             Properties params = new Properties();
             params.put(TimeLimited.PARAM_NAME, "dummy");
-            params.put(TimeLimited.PARAM_TTL, new Integer(5));
+            params.put(TimeLimited.PARAM_TTL, "5");
             cache.initialize(params);
         } catch (CacheAcquireException ex) {
             fail("Unexpected CacheAcquireException at initialization.");
@@ -394,7 +394,7 @@ public final class TestTimeLimited extends TestCase {
         assertTrue(cache.containsKey("g"));
         assertTrue(cache.containsKey("h"));
 
-        Thread.sleep(1000);
+        Thread.sleep(1100);
         
         assertEquals(3, cache.size());
         assertTrue(cache.containsKey("f"));

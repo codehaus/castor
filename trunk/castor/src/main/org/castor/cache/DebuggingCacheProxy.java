@@ -36,13 +36,13 @@ import org.apache.commons.logging.LogFactory;
 public final class DebuggingCacheProxy implements Cache {
     //--------------------------------------------------------------------------
     
-    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
-     *  Logging </a> instance used for all logging. */
-    private static final Log LOG = LogFactory.getLog(Cache.class);
-
     /** The wrapped cache. */
     private Cache _cache;
     
+    /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta Commons
+     *  Logging </a> instance used for all logging. */
+    private Log _log;
+
     //--------------------------------------------------------------------------
 
     /**
@@ -60,14 +60,15 @@ public final class DebuggingCacheProxy implements Cache {
      */
     public void initialize(final Properties params) throws CacheAcquireException {
         _cache.initialize(params);
-        LOG.debug(getType() + ".initialize() [" + getName() + "]");
+        _log = LogFactory.getLog(_cache.getClass());
+        _log.debug(getType() + ".initialize() [" + getName() + "]");
     }
     
     /**
      * @see org.castor.cache.Cache#close()
      */
     public void close() {
-        LOG.debug(getType() + ".close() [" + getName() + "]");
+        _log.debug(getType() + ".close() [" + getName() + "]");
         _cache.close();
     }
     
@@ -91,7 +92,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see org.castor.cache.Cache#expire(java.lang.Object)
      */
     public void expire(final Object key) {
-        LOG.debug(getType() + ".expire(" + key + ") [" + getName() + "]");
+        _log.debug(getType() + ".expire(" + key + ") [" + getName() + "]");
         _cache.expire(key);
     }
     
@@ -99,7 +100,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see org.castor.cache.Cache#expireAll()
      */
     public void expireAll() {
-        LOG.debug(getType() + ".expireAll() [" + getName() + "]");
+        _log.debug(getType() + ".expireAll() [" + getName() + "]");
         _cache.expireAll();
     }
 
@@ -110,7 +111,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#size()
      */
     public int size() {
-        LOG.debug(getType() + ".size() [" + getName() + "]");
+        _log.debug(getType() + ".size() [" + getName() + "]");
         return _cache.size();
     }
 
@@ -118,7 +119,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#isEmpty()
      */
     public boolean isEmpty() {
-        LOG.debug(getType() + ".isEmpty() [" + getName() + "]");
+        _log.debug(getType() + ".isEmpty() [" + getName() + "]");
         return _cache.isEmpty();
     }
 
@@ -126,7 +127,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#containsKey(java.lang.Object)
      */
     public boolean containsKey(final Object key) {
-        LOG.debug(getType() + ".containsKey(" + key + ") [" + getName() + "]");
+        _log.debug(getType() + ".containsKey(" + key + ") [" + getName() + "]");
         return _cache.containsKey(key);
     }
 
@@ -134,7 +135,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#containsValue(java.lang.Object)
      */
     public boolean containsValue(final Object value) {
-        LOG.debug(getType() + ".containsValue(" + value + ") [" + getName() + "]");
+        _log.debug(getType() + ".containsValue(" + value + ") [" + getName() + "]");
         return _cache.containsValue(value);
     }
 
@@ -142,7 +143,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#get(java.lang.Object)
      */
     public Object get(final Object key) {
-        LOG.debug(getType() + ".get(" + key + ") [" + getName() + "]");
+        _log.debug(getType() + ".get(" + key + ") [" + getName() + "]");
         return _cache.get(key);
     }
     
@@ -153,7 +154,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#put(java.lang.Object, java.lang.Object)
      */
     public Object put(final Object key, final Object value) {
-        LOG.debug(getType() + ".put(" + key + ", " + value + ") [" + getName() + "]");
+        _log.debug(getType() + ".put(" + key + ", " + value + ") [" + getName() + "]");
         return _cache.put(key, value);
     }
 
@@ -161,7 +162,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#remove(java.lang.Object)
      */
     public Object remove(final Object key) {
-        LOG.debug(getType() + ".remove(" + key + ") [" + getName() + "]");
+        _log.debug(getType() + ".remove(" + key + ") [" + getName() + "]");
         return _cache.remove(key);
     }
 
@@ -172,7 +173,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#putAll(java.util.Map)
      */
     public void putAll(final Map map) {
-        LOG.debug(getType() + ".putAll(" + map + ") [" + getName() + "]");
+        _log.debug(getType() + ".putAll(" + map + ") [" + getName() + "]");
         _cache.putAll(map);
     }
 
@@ -180,7 +181,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#clear()
      */
     public void clear() {
-        LOG.debug(getType() + ".clear() [" + getName() + "]");
+        _log.debug(getType() + ".clear() [" + getName() + "]");
         _cache.clear();
     }
 
@@ -191,7 +192,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#keySet()
      */
     public Set keySet() {
-        LOG.debug(getType() + ".keySet() [" + getName() + "]");
+        _log.debug(getType() + ".keySet() [" + getName() + "]");
         return _cache.keySet();
     }
 
@@ -199,7 +200,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#values()
      */
     public Collection values() {
-        LOG.debug(getType() + ".values() [" + getName() + "]");
+        _log.debug(getType() + ".values() [" + getName() + "]");
         return _cache.values();
     }
 
@@ -207,7 +208,7 @@ public final class DebuggingCacheProxy implements Cache {
      * @see java.util.Map#entrySet()
      */
     public Set entrySet() {
-        LOG.debug(getType() + ".entrySet() [" + getName() + "]");
+        _log.debug(getType() + ".entrySet() [" + getName() + "]");
         return _cache.entrySet();
     }
 
