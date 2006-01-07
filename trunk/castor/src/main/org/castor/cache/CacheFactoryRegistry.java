@@ -27,8 +27,6 @@ import java.util.StringTokenizer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.castor.cache.simple.CountLimited;
-import org.castor.cache.simple.TimeLimited;
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
 
@@ -52,15 +50,9 @@ public final class CacheFactoryRegistry {
      *  (<tt>org.castor.cache.Factories</tt>). */
     public static final String PROP_FACTORY = "org.castor.cache.Factories";
 
-    /** Default cache type to be used. */
-    public static final String DEFAULT_TYPE = CountLimited.TYPE;
-    
     /** Association between {@link Cache} name and factory implementation. */
     private Hashtable  _cacheFactories = new Hashtable();
     
-    /** Should debugging be turned on for the cache? */
-    private boolean _debug;
-
     //--------------------------------------------------------------------------
 
     /**
@@ -84,71 +76,43 @@ public final class CacheFactoryRegistry {
                 LOG.error("Problem instantiating cache implementation: " + classname, ex);
             }
         }
-        
-        _debug = LogFactory.getLog(Cache.class).isDebugEnabled();
     }
 
     //--------------------------------------------------------------------------
 
     /**
-     * Returns a {@link Cache} instance of the specified type, with the specified name
-     * and if applicable capacity. Throws a CacheAcquireException if the named factory
-     * is not supported.
+     * Returns a {@link Cache} instance with the specified properties.
+     * <p>
+     * The type of the returned cache is taken from the <b>type</b> property. If not
+     * specified a <b>count-limited</b> cache will be returned. If the type of the
+     * cache specified is unknown a CacheAcquireException will be thrown.
+     * <p>
+     * If the given properties contain a <b>debug</b> property set to <b>true</p> or if
+     * debugging for the selected cache type is enabled, the returned cache will be
+     * wrapped by a DebuggingCacheProxy. This proxy will output debug messages to the
+     * log if logging for the Cache interface is enabled through the logging system.
      *
-     * @param type Cache type identifier
-     * @param name Class name.
-     * @param capacity Cache capacity.
-     * @param classLoader A ClassLoader instance.
-     * @return A {@link Cache} instance.
-     * @throws CacheAcquireException A cache of the type specified can not be acquired.
-     */
-    public Cache getCache(
-            final String type, final String name, 
-            final int capacity, final ClassLoader classLoader) 
-    throws CacheAcquireException {
-        
-        // Initialize named parameters.
-        Properties props = new Properties();
-        // Add name for all cache types.
-        props.put(Cache.PARAM_NAME, name);
-        // Individual debugging is disabled by default.
-        props.put(Cache.PARAM_DEBUG, Cache.DEFAULT_DEBUG);
-        // Add capacity for CountLimited.
-        props.put(CountLimited.PARAM_CAPACITY, new Integer(capacity));
-        // Also add capacity as TTL for TimeLimited.
-        props.put(TimeLimited.PARAM_TTL, new Integer(capacity));
-        
-        return getCache(type, props, classLoader);
-    }
-    
-    /**
-     * Returns a {@link Cache} instance of the specified type, with the specified
-     * properties. Throws a CacheAcquireException if the named factory is not supported.
-     *
-     * @param type Cache type identifier
      * @param props Properties to initialize the cache with.
      * @param classLoader A ClassLoader instance.
      * @return A {@link Cache} instance.
      * @throws CacheAcquireException A cache of the type specified can not be acquired.
      */
-    public Cache getCache(
-            final String type, final Properties props, final ClassLoader classLoader) 
+    public Cache getCache(final Properties props, final ClassLoader classLoader) 
     throws CacheAcquireException {
-        // Assume that a user does not have to specify a cache type in the mapping
-        // file. For such a case, we still set the default value to be "count-limited".
-        String cacheType = type;
-        if (cacheType == null || "".equals(cacheType)) { cacheType = DEFAULT_TYPE; }
-        
+        String cacheType = props.getProperty(Cache.PARAM_TYPE, Cache.DEFAULT_TYPE);
         CacheFactory cacheFactory = (CacheFactory) _cacheFactories.get(cacheType);
         if (cacheFactory == null) {
-            LOG.error("Unknown cache type '" + type + "'");
-            throw new CacheAcquireException("Unknown cache type '" + type + "'");
+            LOG.error("Unknown cache type '" + cacheType + "'");
+            throw new CacheAcquireException("Unknown cache type '" + cacheType + "'");
         }
         
         Cache cache = cacheFactory.getCache(classLoader);
         
-        String debug = props.getProperty(Cache.PARAM_DEBUG, Cache.DEFAULT_DEBUG);
-        if (_debug || Boolean.valueOf(debug).booleanValue()) {
+        String prop = props.getProperty(Cache.PARAM_DEBUG, Cache.DEFAULT_DEBUG);
+        boolean objectDebug = Boolean.valueOf(prop).booleanValue();
+        boolean cacheDebug = LogFactory.getLog(Cache.class).isDebugEnabled();
+        boolean cacheTypeDebug = LogFactory.getLog(cache.getClass()).isDebugEnabled();
+        if (cacheTypeDebug || (cacheDebug && objectDebug)) {
             try {
                 ClassLoader loader = CacheFactoryRegistry.class.getClassLoader();
                 Class cls = loader.loadClass(DebuggingCacheProxy.class.getName());
@@ -186,7 +150,7 @@ public final class CacheFactoryRegistry {
         cache.initialize(props);
         
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Successfully instantiated '" + type + "' cache: "
+            LOG.debug("Successfully instantiated '" + cacheType + "' cache: "
                     + props.get(Cache.PARAM_NAME));
         }
         
@@ -211,15 +175,5 @@ public final class CacheFactoryRegistry {
         return Collections.unmodifiableCollection(_cacheFactories.keySet());
     }
     
-    /**
-     * Is debugging for Cache enabled through logging system.
-     * 
-     * @return <code>true</code> if debugging is enabled, <code>false</code>
-     *         otherwise.
-     */
-    public boolean isDebugEnabled() {
-        return _debug;
-    }
-
     //--------------------------------------------------------------------------
 }

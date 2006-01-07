@@ -32,9 +32,12 @@ import org.castor.cache.AbstractBaseCache;
 import org.castor.cache.CacheAcquireException;
 
 /**
- * TimeLimited is a time limted least-recently-inserted <tt>Map</tt>.
+ * TimeLimited is a time limted first-in-first-out <tt>Map</tt>. Every object
+ * being put in the Map will live until the timeout expired.
  * <p>
- * Every object being put in the Map will live until the timeout expired. 
+ * The expiration time is passed to the cache at initialization by the individual
+ * cache property <b>ttl</b> which defines the timeout of every object in the cache in
+ * seconds. If not specified a timeout of 30 seconds will be used.
  *
  * @author <a href="mailto:yip AT intalio DOT com">Thomas Yip</a>
  * @author <a href="mailto:dulci AT start DOT no">Stein M. Hugubakken</a> 
@@ -85,10 +88,12 @@ public class TimeLimited extends AbstractBaseCache {
     public void initialize(final Properties params) throws CacheAcquireException {
         super.initialize(params);
         
-        Object param = params.get(PARAM_TTL);
-        if (param instanceof Integer) {
-            int ttl = ((Integer) param).intValue();
-            if (ttl > 0) { _ttl = ttl; }
+        String param = params.getProperty(PARAM_TTL);
+        try {
+            if (param != null) { _ttl = Integer.parseInt(param); }
+            if (_ttl <= 0) { _ttl = DEFAULT_TTL; }
+        } catch (NumberFormatException ex) {
+            _ttl = DEFAULT_TTL;
         }
 
         if (TIMER._list.contains(this)) {

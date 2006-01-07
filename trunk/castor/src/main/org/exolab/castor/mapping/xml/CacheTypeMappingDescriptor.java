@@ -1,6 +1,6 @@
 /*
  * This class was automatically generated with 
- * <a href="http://www.castor.org">Castor 0.9.9.1</a>, using an XML
+ * <a href="http://www.castor.org">Castor 1.0M1</a>, using an XML
  * Schema.
  * $Id$
  */
@@ -58,6 +58,9 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
         super();
         nsURI = "http://castor.exolab.org/";
         xmlName = "cache-type";
+        
+        //-- set grouping compositor
+        setCompositorAsSequence();
         org.exolab.castor.xml.util.XMLFieldDescriptorImpl  desc           = null;
         org.exolab.castor.mapping.FieldHandler             handler        = null;
         org.exolab.castor.xml.FieldValidator               fieldValidator = null;
@@ -97,6 +100,48 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
         { //-- local scope
             StringValidator typeValidator = new StringValidator();
             typeValidator.setWhiteSpace("preserve");
+            fieldValidator.setValidator(typeValidator);
+        }
+        desc.setValidator(fieldValidator);
+        //-- _debug
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(java.lang.Boolean.TYPE, "_debug", "debug", org.exolab.castor.xml.NodeType.Attribute);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                CacheTypeMapping target = (CacheTypeMapping) object;
+                if(!target.hasDebug())
+                    return null;
+                return (target.getDebug() ? java.lang.Boolean.TRUE : java.lang.Boolean.FALSE);
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    CacheTypeMapping target = (CacheTypeMapping) object;
+                    // if null, use delete method for optional primitives 
+                    if (value == null) {
+                        target.deleteDebug();
+                        return;
+                    }
+                    target.setDebug( ((java.lang.Boolean)value).booleanValue());
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return null;
+            }
+        };
+        desc.setHandler(handler);
+        desc.setMultivalued(false);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _debug
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        { //-- local scope
+            BooleanValidator typeValidator = new BooleanValidator();
             fieldValidator.setValidator(typeValidator);
         }
         desc.setValidator(fieldValidator);
@@ -144,6 +189,41 @@ public class CacheTypeMappingDescriptor extends org.exolab.castor.xml.util.XMLCl
         desc.setValidator(fieldValidator);
         //-- initialize element descriptors
         
+        //-- _paramList
+        desc = new org.exolab.castor.xml.util.XMLFieldDescriptorImpl(org.exolab.castor.mapping.xml.Param.class, "_paramList", "param", org.exolab.castor.xml.NodeType.Element);
+        handler = new org.exolab.castor.xml.XMLFieldHandler() {
+            public java.lang.Object getValue( java.lang.Object object ) 
+                throws IllegalStateException
+            {
+                CacheTypeMapping target = (CacheTypeMapping) object;
+                return target.getParam();
+            }
+            public void setValue( java.lang.Object object, java.lang.Object value) 
+                throws IllegalStateException, IllegalArgumentException
+            {
+                try {
+                    CacheTypeMapping target = (CacheTypeMapping) object;
+                    target.addParam( (org.exolab.castor.mapping.xml.Param) value);
+                }
+                catch (java.lang.Exception ex) {
+                    throw new IllegalStateException(ex.toString());
+                }
+            }
+            public java.lang.Object newInstance( java.lang.Object parent ) {
+                return new org.exolab.castor.mapping.xml.Param();
+            }
+        };
+        desc.setHandler(handler);
+        desc.setNameSpaceURI("http://castor.exolab.org/");
+        desc.setMultivalued(true);
+        addFieldDescriptor(desc);
+        
+        //-- validation code for: _paramList
+        fieldValidator = new org.exolab.castor.xml.FieldValidator();
+        fieldValidator.setMinOccurs(0);
+        { //-- local scope
+        }
+        desc.setValidator(fieldValidator);
     } //-- org.exolab.castor.mapping.xml.CacheTypeMappingDescriptor()
 
 

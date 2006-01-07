@@ -148,46 +148,46 @@ public class JDOMappingLoader extends MappingLoader {
     private KeyGeneratorRegistry _keyGenReg = new KeyGeneratorRegistry();
 
 
-    public JDOMappingLoader( ClassLoader loader, PrintWriter logWriter )
-    {
-        super( loader, logWriter );
+    public JDOMappingLoader(ClassLoader loader, PrintWriter logWriter) {
+        super(loader, logWriter);
     }
 
-
-    protected ClassDescriptor createDescriptor( ClassMapping clsMap )
-        throws MappingException
-    {
-        ClassDescriptor   clsDesc;
-        String            keyGenName;
+    protected ClassDescriptor createDescriptor(final ClassMapping clsMap)
+    throws MappingException {
+        ClassDescriptor clsDesc;
+        String keyGenName;
         KeyGeneratorDescriptor keyGenDesc;
 
         // If no SQL information for class, ignore it. JDO only
         // supports JDO class descriptors.
-        if ( clsMap.getMapTo() == null || clsMap.getMapTo().getTable() == null )
+        if ((clsMap.getMapTo() == null) || (clsMap.getMapTo().getTable() == null)) {
             return JDOMappingLoader.NoDescriptor;
+        }
 
         // See if we have a compiled descriptor.
-        clsDesc = loadClassDescriptor( clsMap.getName() );
-        if ( clsDesc != null && clsDesc instanceof JDOClassDescriptor )
+        clsDesc = loadClassDescriptor(clsMap.getName());
+        if ((clsDesc != null) && (clsDesc instanceof JDOClassDescriptor)) {
             return clsDesc;
+        }
 
         // Use super class to create class descriptor. Field descriptors will be
         // generated only for supported fields, see createFieldDesc later on.
         // This class may only extend a JDO class, otherwise no mapping will be
         // found for the parent.
-        clsDesc = super.createDescriptor( clsMap );
+        clsDesc = super.createDescriptor(clsMap);
 
         // JDO descriptor must include an identity field, the identity field
         // is either a field, or a container field containing only JDO fields.
         // If the identity field is not a JDO field, it will be cleaned later
         // on (we need the descriptor for relations mapping).
-        if ( clsDesc.getIdentity() == null )
-            throw new MappingException( "mapping.noIdentity", clsDesc.getJavaClass().getName() );
+        if (clsDesc.getIdentity() == null) {
+            throw new MappingException("mapping.noIdentity", clsDesc.getJavaClass().getName());
+        }
 
         // create a key generator descriptor
         keyGenName = clsMap.getKeyGenerator();
         keyGenDesc = null;
-        if ( keyGenName != null ) {
+        if (keyGenName != null) {
             String keyGenFactoryName;
             KeyGeneratorDef keyGenDef;
             Enumeration enumeration;
@@ -195,36 +195,26 @@ public class JDOMappingLoader extends MappingLoader {
 
             // first search among declared key generators
             // and resolve alias
-            keyGenDef = (KeyGeneratorDef) _keyGenDefs.get( keyGenName );
+            keyGenDef = (KeyGeneratorDef) _keyGenDefs.get(keyGenName);
             params = new Properties();
             keyGenFactoryName = keyGenName;
-            if ( keyGenDef != null ) {
+            if (keyGenDef != null) {
                 keyGenFactoryName = keyGenDef.getName();
                 enumeration = keyGenDef.enumerateParam();
-                while ( enumeration.hasMoreElements() ) {
+                while (enumeration.hasMoreElements()) {
                     Param par = (Param) enumeration.nextElement();
-                    params.put( par.getName(), par.getValue() );
+                    params.put(par.getName(), par.getValue());
                 }
             }
             keyGenDesc = (KeyGeneratorDescriptor) _keyGenDescs.get(keyGenName);
-            if ( keyGenDesc == null ) {
-                keyGenDesc = new KeyGeneratorDescriptor( keyGenName,
-                        keyGenFactoryName, params, _keyGenReg );
+            if (keyGenDesc == null) {
+                keyGenDesc = new KeyGeneratorDescriptor(keyGenName,
+                        keyGenFactoryName, params, _keyGenReg);
                 _keyGenDescs.put(keyGenName, keyGenDesc);
             }
         }
 
-        JDOClassDescriptor jd;
-        CacheTypeMapping cacheMapping = clsMap.getCacheTypeMapping();
-        if ( cacheMapping != null )
-            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
-                    keyGenDesc, cacheMapping.getType(), cacheMapping.getCapacity() );
-        else
-            jd = new JDOClassDescriptor( clsDesc, clsMap.getMapTo().getTable(),
-                    keyGenDesc, null, 0 );
-
-        jd.setMapping( clsMap );
-        return jd;
+        return new JDOClassDescriptor(clsDesc, keyGenDesc);
     }
 
     /**

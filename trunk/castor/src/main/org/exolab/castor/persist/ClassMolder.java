@@ -48,8 +48,8 @@ package org.exolab.castor.persist;
 
 
 import java.sql.Connection;
-import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.Vector;
 
 import org.apache.commons.logging.Log;
@@ -179,15 +179,9 @@ public class ClassMolder
     private CallbackInterceptor _callback;
 
     /**
-     * The LRU mechanism to be used for caching freed instance of the base class.
+     * The parameters to be used for caching freed instance of the base class.
      */
-    private String _cachetype;
-
-    /**
-     * The LRU parameter(or capcity) to be used for caching freed instance of the
-     * base class.
-     */
-    private int _cacheparam;
+    private Properties _cacheParams;
 
     /**
      * Is a key kenerator used for the base class?
@@ -262,16 +256,9 @@ public class ClassMolder
             ds.pairExtends( this, ext.getName() );
         }
 
-        if ( clsDesc instanceof JDOClassDescriptor ) {
-            if ( ((JDOClassDescriptor) clsDesc).getCacheType() != null ) {
-                _cachetype = ((JDOClassDescriptor) clsDesc).getCacheType();
-                _cacheparam = ((JDOClassDescriptor) clsDesc).getCacheParam();
-            }
-            _isKeyGenUsed = ( ( (JDOClassDescriptor) clsDesc ).getKeyGeneratorDescriptor() != null );
-            
-            if ((_timeStampable) && (_cachetype != null) && (_cachetype.equalsIgnoreCase ("none"))) {
-                throw new MappingException (Messages.format("persist.wrongCacheTypeSpecified", _name));
-            }
+        if (clsDesc instanceof JDOClassDescriptor) {
+            _cacheParams = ((JDOClassDescriptor) clsDesc).getCacheParams();
+            _isKeyGenUsed = (((JDOClassDescriptor) clsDesc).getKeyGeneratorDescriptor() != null);
         }
 
         // construct <tt>FieldModler</tt>s for each of the identity fields of
@@ -515,13 +502,8 @@ public class ClassMolder
     throws ObjectNotFoundException, PersistenceException {
                    
         Connection conn;
-        ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         Object[] fields = null;
-        Object ids;
         Object stamp = null;
-        Object temp;
-        int fieldType;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
 
         // load the fields from the persistent storage if the cache is empty
@@ -579,13 +561,9 @@ public class ClassMolder
             ProposedObject proposedObject, AccessMode suggestedAccessMode, QueryResults results)
     throws ObjectNotFoundException, PersistenceException {
         
-        Connection conn;
-        ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         Object[] fields;
         Object ids;
         Object stamp = null;
-        Object temp;
         int fieldType;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
         
@@ -643,14 +621,9 @@ public class ClassMolder
     public Object create( TransactionContext tx, OID oid, DepositBox locker, Object object )
             throws DuplicateIdentityException, PersistenceException {
 
-        ClassMolder fieldClassMolder;
-        ArrayList fids;
         Object[] fields;
         Object createdId;
         Object ids;
-        Object fid;
-        Object o;
-
         int fieldType;
 
         resetResolvers();
@@ -753,14 +726,8 @@ public class ClassMolder
     public boolean preStore( TransactionContext tx, OID oid, DepositBox locker, Object object, int timeout )
             throws PersistenceException {
 
-        ClassMolder fieldClassMolder;
-        LockEngine fieldEngine;
         Object[] newfields;
         Object[] fields;
-        Object value;
-        Iterator itor;
-        ArrayList orgFields;
-        int fieldType;
 
         if ( oid.getIdentity() == null )
             throw new PersistenceException("The identity of the object to be stored is null");
@@ -810,11 +777,8 @@ public class ClassMolder
             throws DuplicateIdentityException, PersistenceException,
             ObjectModifiedException, ObjectDeletedException {
 
-        ClassMolder fieldClassMolder;
         Object[] newfields;
         Object[] fields;
-        Object value;
-        int fieldType;
 
         if ( oid.getIdentity() == null )
             throw new PersistenceException("The identities of the object to be stored is null");
@@ -852,7 +816,6 @@ public class ClassMolder
         ClassMolder fieldClassMolder;
         LockEngine fieldEngine;
         Object[] fields;
-        Object stamp;
         int fieldType;
         Object o;
         AccessMode accessMode = getAccessMode( suggestedAccessMode );
@@ -894,7 +857,7 @@ public class ClassMolder
                 proposedObject.setProposedClass(object.getClass());
                 proposedObject.setObject(object);
                 proposedObject.setFields(fields);
-                stamp = _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
+                _persistence.load(conn, proposedObject, oid.getIdentity(), accessMode);
                 fields = proposedObject.getFields();
                 
                 oid.setDbLock( accessMode == AccessMode.DbLocked );
@@ -1457,19 +1420,9 @@ public class ClassMolder
     public LockEngine getLockEngine() {
         return _engine;
     }
-    /**
-     * Return the preferred LRU cache mechanism for caching object of this type
-     *
-     */
-    public String getCacheType() {
-        return _cachetype;
-    }
-    /**
-     * Return the preferred LRU cache capacity for caching object of this type
-     *
-     */
-    public int getCacheParam() {
-        return _cacheparam;
+
+    public Properties getCacheParams() {
+        return _cacheParams;
     }
 
     /**

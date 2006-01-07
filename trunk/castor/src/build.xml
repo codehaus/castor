@@ -710,10 +710,10 @@
         <taskdef name="castor-srcgen" classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
                  classpathref="build.classpath"/>          
             <castor-srcgen file="${main}/org/exolab/castor/mapping/mapping.xsd" 
-                todir="${gen.src}/mapping" 
+                todir="../${gen.src}/mapping" 
                 package="org.exolab.castor.mapping.xml" 
                 lineseparator="unix"
-                bindingfile="${main}/org/exolab/castor/mapping/mapping-binding.xml"
+                bindingfile="../${main}/org/exolab/castor/mapping/mapping-binding.xml"
                 types="j2" 
                 warnings="false"/>
         <javac destdir="${classes}" excludes="${excludes}" debug="${main.opt.debug}" deprecation="off" optimize="on">

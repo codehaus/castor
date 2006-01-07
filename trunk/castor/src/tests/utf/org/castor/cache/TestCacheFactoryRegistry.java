@@ -65,7 +65,6 @@ public final class TestCacheFactoryRegistry extends TestCase {
         suite.addTest(new TestCacheFactoryRegistry("testConstructor"));
         suite.addTest(new TestCacheFactoryRegistry("testGetCacheNames"));
         suite.addTest(new TestCacheFactoryRegistry("testGetCacheFactories"));
-        suite.addTest(new TestCacheFactoryRegistry("testIsDebugEnabled"));
         suite.addTest(new TestCacheFactoryRegistry("testGetCache"));
 
         return suite;
@@ -78,7 +77,6 @@ public final class TestCacheFactoryRegistry extends TestCase {
         Level level = logger.getLevel();
 
         assertEquals("org.castor.cache.Factories", CacheFactoryRegistry.PROP_FACTORY);
-        assertEquals(CountLimited.TYPE, CacheFactoryRegistry.DEFAULT_TYPE);
         
         LocalConfiguration config = LocalConfiguration.getInstance();
         String memF = config.getProperty(CacheFactoryRegistry.PROP_FACTORY, "");
@@ -141,24 +139,6 @@ public final class TestCacheFactoryRegistry extends TestCase {
         return false;
     }
 
-    public void testIsDebugEnabled() {
-        Logger logger = Logger.getLogger(Cache.class);
-        Level level = logger.getLevel();
-        
-        LocalConfiguration config = LocalConfiguration.getInstance();
-        CacheFactoryRegistry reg = null;
-        
-        logger.setLevel(Level.FATAL);
-        reg = new CacheFactoryRegistry(config);
-        assertFalse(reg.isDebugEnabled());
-
-        logger.setLevel(Level.DEBUG);
-        reg = new CacheFactoryRegistry(config);
-        assertTrue(reg.isDebugEnabled());
-
-        logger.setLevel(level);
-    }
-    
     public void testGetCache() throws CacheAcquireException {
         Logger logger = Logger.getLogger(CacheFactoryRegistry.class);
         Level level = logger.getLevel();
@@ -178,16 +158,6 @@ public final class TestCacheFactoryRegistry extends TestCase {
         }
 
         logger.setLevel(level);
-        
-        cache = getCache("", 10); 
-        assertEquals("count-limited", cache.getType());
-        assertTrue(cache instanceof CountLimited);
-        assertEquals(10, ((CountLimited) cache).getCapacity());
-        
-        cache = getCache(null, 20); 
-        assertEquals("count-limited", cache.getType());
-        assertTrue(cache instanceof CountLimited);
-        assertEquals(20, ((CountLimited) cache).getCapacity());
         
         cache = getCache("count-limited", 3); 
         assertEquals("count-limited", cache.getType());
@@ -234,11 +204,12 @@ public final class TestCacheFactoryRegistry extends TestCase {
     private Cache getCache(final String type, final int capacity)
     throws CacheAcquireException {
         Properties props = new Properties();
+        props.put(Cache.PARAM_TYPE, type);
         props.put(Cache.PARAM_NAME, "dummy");
         props.put(Cache.PARAM_DEBUG, Cache.DEFAULT_DEBUG);
-        props.put(CountLimited.PARAM_CAPACITY, new Integer(capacity));
-        props.put(TimeLimited.PARAM_TTL, new Integer(capacity));
+        props.put(CountLimited.PARAM_CAPACITY, Integer.toString(capacity));
+        props.put(TimeLimited.PARAM_TTL, Integer.toString(capacity));
 
-        return _registry.getCache(type, props, getClass().getClassLoader());
+        return _registry.getCache(props, getClass().getClassLoader());
     }
 }

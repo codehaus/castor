@@ -30,10 +30,13 @@ import org.castor.cache.AbstractBaseCache;
 import org.castor.cache.CacheAcquireException;
 
 /**
- * CountLimited is a count limted least-recently-used <tt>Map</tt>.
+ * CountLimited is a count limted least-recently-used <tt>Map</tt>. Every object being
+ * put in the Map will live until the map is full. If the map is full, the least recently
+ * used object will be disposed. 
  * <p>
- * Every object being put in the Map will live until the map is full. If the map
- * is full, a least-recently-used object will be disposed. 
+ * The capacity is passed to the cache at initialization by the individual cache property
+ * <b>capacity</b> which defines the maximum number of objects the cache can hold. If not
+ * specified a default capacity of 30 objects will be used.
  *
  * @author <a href="mailto:tyip AT leafsoft DOT com">Thomas Yip</a>
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
@@ -85,12 +88,14 @@ public final class CountLimited extends AbstractBaseCache {
     public void initialize(final Properties params) throws CacheAcquireException {
         super.initialize(params);
         
-        Object param = params.get(PARAM_CAPACITY);
-        if (param instanceof Integer) {
-            int capacity = ((Integer) param).intValue();
-            if (capacity > 0) { _capacity = capacity; }
+        String param = params.getProperty(PARAM_CAPACITY);
+        try {
+            if (param != null) { _capacity = Integer.parseInt(param); }
+            if (_capacity <= 0) { _capacity = DEFAULT_CAPACITY; }
+        } catch (NumberFormatException ex) {
+            _capacity = DEFAULT_CAPACITY;
         }
-        
+
         _mapKeyPos = new Hashtable(_capacity);
         _keys = new Object[_capacity];
         _values = new Object[_capacity];
