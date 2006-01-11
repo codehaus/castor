@@ -97,7 +97,7 @@ import org.exolab.castor.persist.PersistenceInfoGroup;
  *
  * @author <a href="arkin@intalio.com">Assaf Arkin</a>
  * @version $Revision$ $Date$
- * @see JDO#getDatabase()
+ * @see JDOManager#getDatabase()
  * @see Query
  */
 public interface Database

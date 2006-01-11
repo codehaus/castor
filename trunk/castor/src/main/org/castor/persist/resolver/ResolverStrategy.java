@@ -21,10 +21,6 @@ import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectDeletedException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -48,7 +44,7 @@ public interface ResolverStrategy {
      * @return  the identity of the object
      */
     Object create(TransactionContext tx, Object object)
-    throws DuplicateIdentityException, PersistenceException;
+    throws PersistenceException;
     
 
     /**
@@ -63,7 +59,7 @@ public interface ResolverStrategy {
      */
     Object postCreate(TransactionContext tx, OID oid, Object object,
             Object field, Object createdId) 
-    throws DuplicateIdentityException, PersistenceException;
+    throws PersistenceException;
     
     /**
      * Walk the object model and mark object that should be created.
@@ -74,7 +70,7 @@ public interface ResolverStrategy {
      * @return true if there's objects that should be created
      */
     boolean markCreate (TransactionContext tx, OID oid, Object object)
-    throws DuplicateIdentityException, PersistenceException;
+    throws PersistenceException;
     
     /**
      * Check the object for modification. If dpendent object is dereferenced, it
@@ -107,8 +103,7 @@ public interface ResolverStrategy {
      * @param field The field value as returned by the SQLEngine
      */
     Object store(TransactionContext tx, Object object, Object field)
-    throws DuplicateIdentityException, PersistenceException,
-            ObjectModifiedException, ObjectDeletedException;
+    throws PersistenceException;
     
     /**
      * Update the object which loaded or created in the other transaction to
@@ -123,7 +118,7 @@ public interface ResolverStrategy {
      */
     void update(TransactionContext tx, OID oid, Object object, 
             AccessMode suggestedAccessMode, Object field)
-    throws PersistenceException, ObjectModifiedException;
+    throws PersistenceException;
     
     /**
      * Update the dirty checking cache. This method is called after a transaction 
@@ -147,7 +142,7 @@ public interface ResolverStrategy {
      * @exception PersistenceException If it is not possible to successfully complete this method.
      */
     void markDelete(TransactionContext tx, Object object, Object field)
-    throws ObjectNotFoundException, PersistenceException;
+    throws PersistenceException;
     
     /**
      * Revert the object back to the state of begining of the transaction
@@ -186,7 +181,7 @@ public interface ResolverStrategy {
      */
     void load(TransactionContext tx, OID oid, ProposedObject proposedObject, 
             AccessMode suggestedAccessMode, Object field)
-    throws ObjectNotFoundException, PersistenceException;
+    throws PersistenceException;
 
 
     /**

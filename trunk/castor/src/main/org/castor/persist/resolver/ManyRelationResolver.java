@@ -26,9 +26,6 @@ import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.CollectionProxy;
 import org.castor.persist.proxy.RelationCollection;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -57,11 +54,6 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     protected FieldMolder _fieldMolder;
     
-    /**
-     * ???
-     */
-    protected boolean _debug;
-    
     /** 
      * Creates an instance of ManyRelationResolver
      * @param classMolder Associated {@link ClassMolder}
@@ -70,9 +62,8 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     public ManyRelationResolver(final ClassMolder classMolder,
             final FieldMolder fieldMolder, final boolean debug) {
-        this._classMolder = classMolder;
-        this._fieldMolder = fieldMolder;
-        this._debug = debug;
+        _classMolder = classMolder;
+        _fieldMolder = fieldMolder;
     }
     
     /**
@@ -80,7 +71,7 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      *      #create(org.castor.persist.TransactionContext,
      *      java.lang.Object)
      */
-    public Object create(final TransactionContext tx, final Object object) {
+    public final Object create(final TransactionContext tx, final Object object) {
         Object field = null;
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         Object o = _fieldMolder.getValue(object, tx.getClassLoader());
@@ -97,7 +88,7 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     public abstract boolean markCreate(final TransactionContext tx, final OID oid,
             final Object object) 
-    throws DuplicateIdentityException, PersistenceException;
+    throws PersistenceException;
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#preStore(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, int, java.lang.Object)
@@ -110,7 +101,7 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#store(org.castor.persist.TransactionContext, java.lang.Object, java.lang.Object)
      */
-    public Object store(final TransactionContext tx, final Object object,
+    public final Object store(final TransactionContext tx, final Object object,
             final Object field) {
         // nothing to do ....
         return null;
@@ -121,13 +112,12 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     public abstract void update(final TransactionContext tx, final OID oid,
             final Object object, final AccessMode suggestedAccessMode,
-            final Object field) throws PersistenceException,
-            ObjectModifiedException;
+            final Object field) throws PersistenceException;
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#updateCache(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object)
      */
-    public Object updateCache(final TransactionContext tx, final OID oid,
+    public final Object updateCache(final TransactionContext tx, final OID oid,
             final Object object) {
         Object field = null;
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
@@ -151,12 +141,12 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
      */
     public abstract void markDelete(final TransactionContext tx,
             final Object object, final Object field)
-    throws ObjectNotFoundException, PersistenceException;
+    throws PersistenceException;
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#revertObject(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, java.lang.Object)
      */
-    public void revertObject(final TransactionContext tx, final OID oid,
+    public final void revertObject(final TransactionContext tx, final OID oid,
             final Object object, final Object field)
     throws PersistenceException {
         Object o = field;
@@ -212,7 +202,7 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#expireCache(org.castor.persist.TransactionContext, java.lang.Object)
      */
-    public void expireCache(final TransactionContext tx, final Object field)
+    public final void expireCache(final TransactionContext tx, final Object field)
     throws PersistenceException {
         // field is one-to-many and many-to-many type. All the related
         // objects will be expired
@@ -231,10 +221,10 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#load(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, org.castor.persist.ProposedObject, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
-    public void load(final TransactionContext tx, final OID oid,
+    public final void load(final TransactionContext tx, final OID oid,
             final ProposedObject proposedObject,
             final AccessMode suggestedAccessMode, final Object field)
-    throws ObjectNotFoundException, PersistenceException {
+    throws PersistenceException {
         // field is one-to-many and many-to-many type. All the related
         // object will be loaded and put in a Collection. And, the
         // collection will be set as the field.
@@ -294,12 +284,12 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
     public abstract Object postCreate(final TransactionContext tx,
             final OID oid, final Object object, final Object field,
             final Object createdId)
-    throws DuplicateIdentityException, PersistenceException;
+    throws PersistenceException;
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#removeRelation(org.castor.persist.TransactionContext, java.lang.Object, org.exolab.castor.persist.ClassMolder, java.lang.Object)
      */
-    public UpdateAndRemovedFlags removeRelation(final TransactionContext tx,
+    public final UpdateAndRemovedFlags removeRelation(final TransactionContext tx,
             final Object object, final ClassMolder relatedMolder,
             final Object relatedObject) {
         UpdateAndRemovedFlags flags = new UpdateAndRemovedFlags();
@@ -335,5 +325,4 @@ public abstract class ManyRelationResolver implements ResolverStrategy {
         }
         return flags;
     }
-
 }

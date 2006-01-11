@@ -388,10 +388,9 @@ public class DatabaseImpl
                TransactionNotInProgressException, PersistenceException
     {
         TransactionContext tx;
-        PersistenceInfo info;
         
         tx = getTransaction();
-        info = _scope.getPersistenceInfo( object.getClass() );
+        _scope.getPersistenceInfo( object.getClass() );
 
         tx.delete( object );
     }

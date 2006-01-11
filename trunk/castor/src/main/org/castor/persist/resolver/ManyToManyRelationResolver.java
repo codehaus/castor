@@ -25,9 +25,6 @@ import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.RelationCollection;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -43,7 +40,7 @@ import org.exolab.castor.persist.OID;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @since 0.9.9
  */
-public class ManyToManyRelationResolver extends ManyRelationResolver {
+public final class ManyToManyRelationResolver extends ManyRelationResolver {
     
     /**
      * Creates an instance of ManyToManyRelationResolver
@@ -63,7 +60,7 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
      */
     public boolean markCreate(final TransactionContext tx, final OID oid,
             final Object object)
-    throws DuplicateIdentityException, PersistenceException {
+    throws PersistenceException {
         boolean updateCache = false;
         // create relation if the relation table
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
@@ -91,7 +88,7 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
      */
     public void markDelete(final TransactionContext tx, final Object object,
             final Object field)
-    throws ObjectNotFoundException, PersistenceException {
+    throws PersistenceException {
         // delete the relation in relation table too
         /*
          * _fhs[i].getRelationLoader().deleteRelation(
@@ -240,8 +237,8 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
                             fieldClassMolder.removeRelation(tx, toBeDeleted,
                                     this._classMolder, object);
                         }
-                    } else {
-                        // what to do if it happens?
+//                    } else {
+//                        // what to do if it happens?
                     }
                 }
             }
@@ -270,8 +267,8 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
                                 }
                             }
                         }
-                    } else {
-                        // what to do if it happens?
+//                    } else {
+//                        // what to do if it happens?
                     }
                 }
             }
@@ -288,7 +285,7 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
     public void update(final TransactionContext tx, final OID oid,
             final Object object, final AccessMode suggestedAccessMode,
             final Object field)
-    throws PersistenceException, ObjectModifiedException {
+    throws PersistenceException {
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
         if (tx.isAutoStore()) {
@@ -340,7 +337,7 @@ public class ManyToManyRelationResolver extends ManyRelationResolver {
      */
     public Object postCreate(final TransactionContext tx, final OID oid,
             final Object object, Object field, final Object createdId) 
-        throws DuplicateIdentityException, PersistenceException {
+        throws PersistenceException {
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         Object o = _fieldMolder.getValue(object, tx.getClassLoader());
         if (o != null) {

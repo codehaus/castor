@@ -178,13 +178,13 @@ public final class ProposedObject {
         return buffer.toString();
     }
 
-	public boolean isObjectLockObjectToBeIgnored() {
-		return _objectLockObjectToBeIgnored;
-	}
+    public boolean isObjectLockObjectToBeIgnored() {
+        return _objectLockObjectToBeIgnored;
+    }
 
-	public void setObjectLockObjectToBeIgnored(boolean lockObjectToBeIgnored) {
-		_objectLockObjectToBeIgnored = lockObjectToBeIgnored;
-	}
+    public void setObjectLockObjectToBeIgnored(final boolean lockObjectToBeIgnored) {
+        _objectLockObjectToBeIgnored = lockObjectToBeIgnored;
+    }
 
     //--------------------------------------------------------------------------
 }

@@ -25,7 +25,6 @@ import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.SingleProxy;
 import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
@@ -41,23 +40,23 @@ import org.exolab.castor.persist.OID;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @since 0.9.9
  */
-public class PersistanceCapableRelationResolver implements ResolverStrategy {
+public final class PersistanceCapableRelationResolver implements ResolverStrategy {
 
     /**
      * Class molder of the enclosing class.
      */
-    private ClassMolder classMolder;
+    private ClassMolder _classMolder;
 
     /**
      * Field molder for the field to be resolved.
      */
-    private FieldMolder fieldMolder;
+    private FieldMolder _fieldMolder;
    
     /**
      * Indicates whether debug mode is active
      */
     //TODO [WG]: Investigate about its use ....
-    private boolean debug;
+    private boolean _debug;
     
     /**
      * Creates an instance of this resolver class.
@@ -65,28 +64,28 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
      * @param fieldMolder Field Molder
      * @param debug True if debug mode is on.
      */
-    public PersistanceCapableRelationResolver (ClassMolder classMolder, FieldMolder fieldMolder, boolean debug) {
-        this.classMolder = classMolder;
-        this.fieldMolder = fieldMolder;
-        this.debug = debug;
+    public PersistanceCapableRelationResolver (final ClassMolder classMolder,
+            final FieldMolder fieldMolder, final boolean debug) {
+        _classMolder = classMolder;
+        _fieldMolder = fieldMolder;
+        _debug = debug;
     }
     
     /**
      * Common Log instance.
      */
-    private static final Log _log = LogFactory.getLog (PersistanceCapableRelationResolver.class);
+    private static final Log LOG = LogFactory.getLog (PersistanceCapableRelationResolver.class);
     
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#create(org.castor.persist.TransactionContext, java.lang.Object)
      */
-    public Object create(TransactionContext tx, Object object) 
-    {
+    public Object create(final TransactionContext tx, final Object object) {
         Object field = null;
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        Object o = fieldMolder.getValue( object, tx.getClassLoader() );
-        if ( o != null ) {
-            Object fid = fieldClassMolder.getIdentity( tx, o );
-            if ( fid != null ) {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (o != null) {
+            Object fid = fieldClassMolder.getIdentity(tx, o);
+            if (fid != null) {
                 field = fid;
             }
         }
@@ -96,33 +95,33 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#markCreate(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object)
      */
-    public boolean markCreate(TransactionContext tx, OID oid, Object object) 
-        throws DuplicateIdentityException, PersistenceException 
-    {
+    public boolean markCreate(final TransactionContext tx, final OID oid, final Object object)
+    throws PersistenceException {
         // create dependent object if exists
         boolean updateCache = false;
         
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
-        Object o = fieldMolder.getValue( object, tx.getClassLoader() );
-        if ( o != null ) {
-            if ( fieldMolder.isDependent() ) {
-                if ( !tx.isRecorded( o ) ) {
-                    tx.markCreate( fieldEngine, fieldClassMolder, o, oid );
-                    if ( !fieldMolder.isStored() && fieldClassMolder.isKeyGenUsed() ) {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (o != null) {
+            if (_fieldMolder.isDependent()) {
+                if (!tx.isRecorded(o)) {
+                    tx.markCreate(fieldEngine, fieldClassMolder, o, oid);
+                    if (!_fieldMolder.isStored() && fieldClassMolder.isKeyGenUsed()) {
                         updateCache = true;
                     }
                 } else {
                     // fail-fast principle: if the object depend on another object,
                     // throw exception
-                    if ( !tx.isDepended( oid, o ) )
+                    if (!tx.isDepended(oid, o)) {
                         throw new PersistenceException(
-                        "Dependent object may not change its master. Object: "+o+" new master: "+oid);
+                                "Dependent object may not change its master. Object: " + o + " new master: " + oid);
+                    }
                 }
-            } else if ( tx.isAutoStore() ) {
-                if ( !tx.isRecorded( o ) ) {
-                    tx.markCreate( fieldEngine, fieldClassMolder, o, null );
-                    if ( !fieldMolder.isStored() && fieldClassMolder.isKeyGenUsed() ) {
+            } else if (tx.isAutoStore()) {
+                if (!tx.isRecorded(o)) {
+                    tx.markCreate(fieldEngine, fieldClassMolder, o, null);
+                    if (!_fieldMolder.isStored() && fieldClassMolder.isKeyGenUsed()) {
                         updateCache = true;
                     }
                 }
@@ -135,17 +134,17 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#preStore(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, int, java.lang.Object)
      */
-    public UpdateFlags preStore(TransactionContext tx, OID oid, Object object, int timeout, Object field) 
-        throws PersistenceException 
-    {
+    public UpdateFlags preStore(final TransactionContext tx, final OID oid,
+            final Object object, final int timeout, final Object field)
+    throws PersistenceException {
         UpdateFlags flags = new UpdateFlags();
         
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
-        Object value = fieldMolder.getValue( object, tx.getClassLoader() );
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object value = _fieldMolder.getValue(object, tx.getClassLoader());
         Object newField = null;
-        if ( value != null ) {
-        	newField = fieldClassMolder.getIdentity( tx, value );
+        if (value != null) {
+            newField = fieldClassMolder.getIdentity(tx, value);
             flags.setNewField(newField);
         }
 
@@ -174,66 +173,72 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
         //       if old is not null
         //          removeRelation
         //       if new is not null
-        if ( ClassMolderHelper.isEquals( field, newField ) ) {
-        	
-//        	 TODO [WG]: can anybody please explain to me the meaning of the next two lines.
-        	if ( !debug )
-                return flags;
+        if (ClassMolderHelper.isEquals(field, newField)) {
 
-            if ( field == null )
-                return flags; // do the next field if both are null
+            //TODO [WG]: can anybody please explain to me the meaning of the next two lines.
+            if (!_debug) { return flags; }
+            if (field == null) { return flags; } // do the next field if both are null
 
-            if ( value != null && tx.isDeleted(value) ) {
-                _log.warn ("Deleted object found!");
-                if ( fieldMolder.isStored() && fieldMolder.isCheckDirty() )
+            if ((value != null) && tx.isDeleted(value)) {
+                LOG.warn ("Deleted object found!");
+                if (_fieldMolder.isStored() && _fieldMolder.isCheckDirty()) {
                     flags.setUpdatePersist(true);
+                }
                 flags.setUpdateCache(true);
-                fieldMolder.setValue( object, null, tx.getClassLoader() );
+                _fieldMolder.setValue(object, null, tx.getClassLoader());
                 return flags;
             }
 
-            if ( tx.isAutoStore() || fieldMolder.isDependent() )
-                if ( value != tx.fetch( fieldEngine, fieldClassMolder, field, null ) )
+            if (tx.isAutoStore() || _fieldMolder.isDependent()) {
+                if (value != tx.fetch(fieldEngine, fieldClassMolder, field, null)) {
                     throw new DuplicateIdentityException("");
+                }
+            }
         } else {
-            if ( fieldMolder.isStored() && fieldMolder.isCheckDirty() )
+            if (_fieldMolder.isStored() && _fieldMolder.isCheckDirty()) {
                 flags.setUpdatePersist(true);
+            }
             flags.setUpdateCache(true);
 
-            if ( fieldMolder.isDependent() ) {
-                if ( field != null ) {
-                    Object reldel = tx.fetch( fieldEngine, fieldClassMolder, field, null );
-                    if ( reldel != null )
-                        tx.delete( reldel );
+            if (_fieldMolder.isDependent()) {
+                if (field != null) {
+                    Object reldel = tx.fetch(fieldEngine, fieldClassMolder, field, null);
+                    if (reldel != null) {
+                        tx.delete(reldel);
+                    }
                 }
 
-                if ( value != null && !tx.isRecorded( value ) ) {
-                    tx.markCreate( fieldEngine, fieldClassMolder, value, oid );
+                if ((value != null) && !tx.isRecorded(value)) {
+                    tx.markCreate(fieldEngine, fieldClassMolder, value, oid);
                 }
 
-            } else if ( tx.isAutoStore() ) {
-                if ( field != null ) {
-                    Object deref = tx.fetch( fieldEngine, fieldClassMolder, field, null );
-                    if ( deref != null )
-                        fieldClassMolder.removeRelation( tx, deref, this.classMolder, object );
+            } else if (tx.isAutoStore()) {
+                if (field != null) {
+                    Object deref = tx.fetch(fieldEngine, fieldClassMolder, field, null);
+                    if (deref != null) {
+                        fieldClassMolder.removeRelation(tx, deref, this._classMolder, object);
+                    }
                 }
 
-                if ( value != null && !tx.isRecorded( value ) )
-                    tx.markCreate( fieldEngine, fieldClassMolder, value, null );
+                if ((value != null) && !tx.isRecorded(value)) {
+                    tx.markCreate(fieldEngine, fieldClassMolder, value, null);
+                }
             } else {
-                if ( field != null ) {
-                    Object deref = tx.fetch( fieldEngine, fieldClassMolder, field, null );
-                    if ( deref != null )
-                        fieldClassMolder.removeRelation( tx, deref, this.classMolder, object );
+                if (field != null) {
+                    Object deref = tx.fetch(fieldEngine, fieldClassMolder, field, null);
+                    if (deref != null) {
+                        fieldClassMolder.removeRelation(tx, deref, this._classMolder, object);
+                    }
                 }
 
                 // yip: user're pretty easily to run into cache
                 // integrity problem here, if user forgot to create
                 // "value" explicitly. Let's put error message here
-                if ( value != null && !tx.isRecorded( value ) )
+                if ((value != null) && !tx.isRecorded(value)) {
                     throw new PersistenceException(
-                    "Object, "+object+", links to another object, "+value
-                    +" that is not loaded/updated/created in this transaction");
+                            "Object, " + object + ", links to another object, " + value
+                            + " that is not loaded/updated/created in this transaction");
+                }
             }
         }
         
@@ -243,14 +248,14 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#store(org.castor.persist.TransactionContext, java.lang.Object, java.lang.Object)
      */
-    public Object store(TransactionContext tx, Object object, Object field) 
-    {
+    public Object store(final TransactionContext tx, final Object object, final Object field) {
         Object newField = null;
-        if ( fieldMolder.isStored() ) {
-            ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-            Object value = fieldMolder.getValue( object, tx.getClassLoader() );
-            if ( value != null )
-                newField = fieldClassMolder.getIdentity( tx, value );
+        if (_fieldMolder.isStored()) {
+            ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+            Object value = _fieldMolder.getValue(object, tx.getClassLoader());
+            if (value != null) {
+                newField = fieldClassMolder.getIdentity(tx, value);
+            }
         }
         return newField;
     }
@@ -258,31 +263,32 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#update(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
-    public void update(TransactionContext tx, OID oid, Object object, AccessMode suggestedAccessMode, Object field)
-    throws PersistenceException, ObjectModifiedException 
-    {
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
-        Object o = fieldMolder.getValue( object, tx.getClassLoader() );
-        if ( fieldMolder.isDependent() ) {
+    public void update(final TransactionContext tx, final OID oid, final Object object, final AccessMode suggestedAccessMode, final Object field)
+    throws PersistenceException {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+        Object o = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (_fieldMolder.isDependent()) {
             // depedent class won't have persistenceInfo in LockEngine
             // must look at fieldMolder for it
 
-            if ( o != null && !tx.isRecorded(o) )
-                tx.markUpdate( fieldEngine, fieldClassMolder, o, oid );
+            if ((o != null) && !tx.isRecorded(o)) {
+                tx.markUpdate(fieldEngine, fieldClassMolder, o, oid);
+            }
 
             // load the cached dependent object from the data store.
             // The loaded will be compared with the new one
-            if ( field != null ) {
-    			ProposedObject proposedValue = new ProposedObject ();
+            if (field != null) {
+                ProposedObject proposedValue = new ProposedObject ();
                 tx.load(fieldEngine, fieldClassMolder, field, proposedValue, suggestedAccessMode);
             }
-        } else if ( tx.isAutoStore() ) {
-            if ( o != null && !tx.isRecorded(o) )
-                tx.markUpdate( fieldEngine, fieldClassMolder, o, null );
+        } else if (tx.isAutoStore()) {
+            if ((o != null) && !tx.isRecorded(o)) {
+                tx.markUpdate(fieldEngine, fieldClassMolder, o, null);
+            }
 
-            if ( field != null ) {
-    			ProposedObject proposedValue = new ProposedObject ();
+            if (field != null) {
+                ProposedObject proposedValue = new ProposedObject ();
                 tx.load(fieldEngine, fieldClassMolder, field, proposedValue, suggestedAccessMode);
             }
         }
@@ -291,13 +297,13 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#updateCache(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object)
      */
-    public Object updateCache(TransactionContext tx, OID oid, Object object) {
+    public Object updateCache(final TransactionContext tx, final OID oid, final Object object) {
         Object field = null;
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        Object value = fieldMolder.getValue( object, tx.getClassLoader() );
-        if ( value != null ) {
-            Object fid = fieldClassMolder.getIdentity( tx, value );
-            if ( fid != null ) {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        Object value = _fieldMolder.getValue(object, tx.getClassLoader());
+        if (value != null) {
+            Object fid = fieldClassMolder.getIdentity(tx, value);
+            if (fid != null) {
                 field = fid;
             }
         } else {
@@ -309,33 +315,34 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#markDelete(org.castor.persist.TransactionContext, java.lang.Object, java.lang.Object)
      */
-    public void markDelete(TransactionContext tx, Object object, Object field) 
-        throws ObjectNotFoundException, PersistenceException 
-    {
+    public void markDelete(final TransactionContext tx, final Object object, final Object field)
+    throws PersistenceException {
             // persistanceCapable include many_to_one
-            ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-            LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
-            if ( fieldMolder.isDependent() ) {
+            ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+            LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+            if (_fieldMolder.isDependent()) {
                 Object fid = field;
                 Object fetched = null;
-                if ( fid != null ) {
-                    fetched = tx.fetch( fieldEngine, fieldClassMolder, fid, null );
-                    if ( fetched != null )
-                        tx.delete( fetched );
+                if (fid != null) {
+                    fetched = tx.fetch(fieldEngine, fieldClassMolder, fid, null);
+                    if (fetched != null) {
+                        tx.delete(fetched);
+                    }
                 }
 
-                Object fobject = fieldMolder.getValue( object, tx.getClassLoader() );
-                if ( fobject != null && tx.isPersistent( fobject ) ) {
-                    tx.delete( fobject );
+                Object fobject = _fieldMolder.getValue(object, tx.getClassLoader());
+                if ((fobject != null) && tx.isPersistent(fobject)) {
+                    tx.delete(fobject);
                 }
             } else {
                 // delete the object from the other side of the relation
                 Object fid = field;
                 Object fetched = null;
-                if ( fid != null ) {
-                    fetched = tx.fetch( fieldEngine, fieldClassMolder, field, null );
-                    if ( fetched != null )
-                        fieldClassMolder.removeRelation( tx, fetched, this.classMolder, object );
+                if (fid != null) {
+                    fetched = tx.fetch(fieldEngine, fieldClassMolder, field, null);
+                    if (fetched != null) {
+                        fieldClassMolder.removeRelation(tx, fetched, this._classMolder, object);
+                    }
                 }
             }
     }
@@ -343,76 +350,74 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#revertObject(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, java.lang.Object)
      */
-    public void revertObject(TransactionContext tx, OID oid, Object object, Object field) 
-        throws PersistenceException 
-    {
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
+    public void revertObject(final TransactionContext tx, final OID oid, final Object object, final Object field)
+    throws PersistenceException {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
         
         Object value;
 
-        if ( field != null ) {
-            value = tx.fetch( fieldEngine, fieldClassMolder, field, null );
-            fieldMolder.setValue( object, value, tx.getClassLoader() );
+        if (field != null) {
+            value = tx.fetch(fieldEngine, fieldClassMolder, field, null);
+            _fieldMolder.setValue(object, value, tx.getClassLoader());
         } else {
-            fieldMolder.setValue( object, null, tx.getClassLoader() );
+            _fieldMolder.setValue(object, null, tx.getClassLoader());
         }
     }
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#expireCache(org.castor.persist.TransactionContext, java.lang.Object)
      */
-    public void expireCache(TransactionContext tx, Object field)
-        throws PersistenceException 
-    {
+    public void expireCache(final TransactionContext tx, final Object field)
+    throws PersistenceException {
         // field is not primitive type. Related object will be expired
-    	 
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
 
-        if ( field != null ) {
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
+
+        if (field != null) {
             // use the corresponding Persistent fields as the identity
-            tx.expireCache(fieldEngine, fieldClassMolder, field );
+            tx.expireCache(fieldEngine, fieldClassMolder, field);
         }
     }
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#load(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, org.castor.persist.ProposedObject, org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
-    public void load(TransactionContext tx, OID oid, ProposedObject proposedObject, AccessMode suggestedAccessMode, Object field)
-            throws ObjectNotFoundException, PersistenceException {
+    public void load(final TransactionContext tx, final OID oid, final ProposedObject proposedObject, final AccessMode suggestedAccessMode, final Object field)
+    throws PersistenceException {
         // field is not primitive type. Related object will be loaded
         // thru the transaction in action if needed.
 
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
-        LockEngine fieldEngine = fieldMolder.getFieldLockEngine();
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
+        LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
 
-        if ( field != null ) {
+        if (field != null) {
             // use the corresponding Persistent fields as the identity,
             // and we ask transactionContext in action to load it.
-        	Object temp;
+            Object temp;
             try {
-				// should I use lazy loading for this object?
-				if (fieldMolder.isLazy()) {
-					temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, field, null, suggestedAccessMode);
-				} else {
-					ProposedObject proposedTemp = new ProposedObject();
-					temp = tx.load(fieldEngine, fieldClassMolder, field, proposedTemp, suggestedAccessMode);
-				}
+                // should I use lazy loading for this object?
+                if (_fieldMolder.isLazy()) {
+                    temp = SingleProxy.getProxy(tx, fieldEngine, fieldClassMolder, field, null, suggestedAccessMode);
+                } else {
+                    ProposedObject proposedTemp = new ProposedObject();
+                    temp = tx.load(fieldEngine, fieldClassMolder, field, proposedTemp, suggestedAccessMode);
+                }
             } catch (ObjectNotFoundException ex) {
                 temp = null;
             }
-            fieldMolder.setValue(proposedObject.getObject(), temp, tx.getClassLoader());
+            _fieldMolder.setValue(proposedObject.getObject(), temp, tx.getClassLoader());
         } else {
-            fieldMolder.setValue(proposedObject.getObject(), null, tx.getClassLoader());
+            _fieldMolder.setValue(proposedObject.getObject(), null, tx.getClassLoader());
         }
     }
 
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#postCreate(org.castor.persist.TransactionContext, org.exolab.castor.persist.OID, java.lang.Object, java.lang.Object, java.lang.Object)
      */
-    public Object postCreate(TransactionContext tx, OID oid, Object object,
-            Object field, Object createdId) {
+    public Object postCreate(final TransactionContext tx, final OID oid, final Object object,
+            final Object field, final Object createdId) {
         return field;
     }
 
@@ -420,26 +425,24 @@ public class PersistanceCapableRelationResolver implements ResolverStrategy {
     /* (non-Javadoc)
      * @see org.castor.persist.resolver.ResolverStrategy#removeRelation(org.castor.persist.TransactionContext, java.lang.Object, org.exolab.castor.persist.ClassMolder, java.lang.Object)
      */
-    public UpdateAndRemovedFlags removeRelation( TransactionContext tx, Object object,
-            ClassMolder relatedMolder, Object relatedObject )  {
+    public UpdateAndRemovedFlags removeRelation(final TransactionContext tx, final Object object,
+            final ClassMolder relatedMolder, final Object relatedObject)  {
         // de-reference the object
         UpdateAndRemovedFlags flags = new UpdateAndRemovedFlags();
-        ClassMolder fieldClassMolder = fieldMolder.getFieldClassMolder();
+        ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         
         ClassMolder relatedBaseMolder = relatedMolder;
-        while ( fieldClassMolder != relatedBaseMolder && relatedBaseMolder != null ) {
+        while ((fieldClassMolder != relatedBaseMolder) && (relatedBaseMolder != null)) {
             relatedBaseMolder = relatedBaseMolder.getExtends();
         }
-        if ( fieldClassMolder == relatedBaseMolder ) {
-            Object related = fieldMolder.getValue( object, tx.getClassLoader() );
-            if ( related == relatedObject ) {
-                fieldMolder.setValue( object, null, tx.getClassLoader() );
+        if (fieldClassMolder == relatedBaseMolder) {
+            Object related = _fieldMolder.getValue(object, tx.getClassLoader());
+            if (related == relatedObject) {
+                _fieldMolder.setValue(object, null, tx.getClassLoader());
                 flags.setUpdateCache(true);
                 flags.setUpdatePersist(true);
                 flags.setRemoved(true);
             }
-            // |
-            
         }
         return flags;
     }

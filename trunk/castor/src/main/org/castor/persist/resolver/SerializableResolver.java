@@ -28,7 +28,6 @@ import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
 import org.castor.persist.UpdateFlags;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -42,7 +41,7 @@ import org.exolab.castor.persist.OID;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @since 0.9.9
  */
-public class SerializableResolver implements ResolverStrategy {
+public final class SerializableResolver implements ResolverStrategy {
 
     /**
      * Associated {@link FieldMolder}.
@@ -268,7 +267,7 @@ public class SerializableResolver implements ResolverStrategy {
     public void load(final TransactionContext tx, final OID oid,
             final ProposedObject proposedObject,
             final AccessMode suggestedAccessMode, final Object field)
-    throws ObjectNotFoundException, PersistenceException {
+    throws PersistenceException {
         // deserialize byte[] into java object
         try {
             byte[] bytes = (byte[]) field;

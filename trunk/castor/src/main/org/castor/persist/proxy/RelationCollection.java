@@ -46,7 +46,7 @@ import org.exolab.castor.jdo.PersistenceException;
  *
  * @author <a href="mailto:yip@intalio.com">Thomas Yip</a>
  */
-public class RelationCollection implements Collection, Lazy, TxSynchronizable {
+public final class RelationCollection implements Collection, Lazy, TxSynchronizable {
 
     /**
      * Transaction to fetch an element on the fly if needed.
@@ -92,14 +92,11 @@ public class RelationCollection implements Collection, Lazy, TxSynchronizable {
      */
     public RelationCollection(final TransactionContext tx, final OID enclosing,
             final LockEngine engine, final ClassMolder molder,
-            final AccessMode amode, ArrayList ids) {
+            final AccessMode amode, final ArrayList ids) {
         _tx = tx;
         _molder = molder;
         _engine = engine;
-        if (ids == null) {
-            ids = new ArrayList();
-        }
-        _ids = ids;
+        _ids = (ids != null) ? ids : new ArrayList();
         _size = _ids.size();
         _deleted = new ArrayList();
         _added = new ArrayList();
