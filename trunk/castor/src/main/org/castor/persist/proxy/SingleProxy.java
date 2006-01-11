@@ -35,21 +35,21 @@ import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
-public class SingleProxy implements MethodInterceptor, Serializable {
+public final class SingleProxy implements MethodInterceptor, Serializable {
     /** SerialVersionUID */
     private static final long serialVersionUID = -1498354553937679053L;
 
     private static Log _log = LogFactory.getFactory().getInstance(SingleProxy.class);
     
-    TransactionContext _tx;
-    LockEngine _engine;
-    ClassMolder _classMolder;
-    Class _clazz;
-    Object _identity;
-    Object _object;
-    AccessMode _accessMode;
+    private TransactionContext _tx;
+    private LockEngine _engine;
+    private ClassMolder _classMolder;
+    private Class _clazz;
+    private Object _identity;
+    private Object _object;
+    private AccessMode _accessMode;
     
-    boolean _hasMaterialized = false;
+    private boolean _hasMaterialized = false;
     
     /**
      * Creates an instance of SingleProxy.
@@ -207,8 +207,7 @@ public class SingleProxy implements MethodInterceptor, Serializable {
      * @throws ObjectNotFoundException
      * @throws PersistenceException
      */
-    private Object loadOnly() 
-    throws ObjectNotFoundException, PersistenceException {
+    private Object loadOnly() throws PersistenceException {
         Object instance = null;
         if (_log.isDebugEnabled() && _classMolder != null) {
             _log.debug("load object " + _classMolder.getName() + " with id "

@@ -25,9 +25,6 @@ import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateFlags;
 import org.castor.persist.proxy.RelationCollection;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectModifiedException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.mapping.AccessMode;
 import org.exolab.castor.persist.ClassMolder;
@@ -41,7 +38,7 @@ import org.exolab.castor.persist.OID;
  * @author <a href="mailto:werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
  * @since 0.9.9
  */
-public class OneToManyRelationResolver extends ManyRelationResolver {
+public final class OneToManyRelationResolver extends ManyRelationResolver {
     
     /**
      * Creates an instance of OneToMany
@@ -61,7 +58,7 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
      */
     public boolean markCreate(final TransactionContext tx, final OID oid,
             final Object object)
-    throws DuplicateIdentityException, PersistenceException {
+    throws PersistenceException {
         boolean updateCache = false;
         // create dependent objects if exists
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
@@ -107,7 +104,7 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
      */
     public void markDelete(final TransactionContext tx, final Object object,
             final Object field) 
-    throws ObjectNotFoundException, PersistenceException {
+    throws PersistenceException {
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
         // markDelete mix with prestore
@@ -174,7 +171,7 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
      *      org.exolab.castor.persist.OID, java.lang.Object, int,
      *      java.lang.Object)
      */
-    public final UpdateFlags preStore(final TransactionContext tx, final OID oid,
+    public UpdateFlags preStore(final TransactionContext tx, final OID oid,
             final Object object, final int timeout, final Object field)
     throws PersistenceException {
         UpdateFlags flags = new UpdateFlags();
@@ -203,10 +200,10 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
                         fieldClassMolder.removeRelation(tx, reldel,
                                 this._classMolder, object);
                     }
-                } else {
-                    // should i notify user that the object does not exist?
-                    // user can't delete dependent object himself. So, must
-                    // error.
+//                } else {
+//                    // should i notify user that the object does not exist?
+//                    // user can't delete dependent object himself. So, must
+//                    // error.
                 }
             }
 
@@ -225,11 +222,11 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
                     if (!tx.isRecorded(addedValue)) {
                         tx.markCreate(fieldEngine, fieldClassMolder,
                                 addedValue, oid);
-                    } else {
-                        // should i notify user that the object does not exist?
-                        // user can't create dependent object himself. So, must
-                        // be
-                        // an error.
+//                    } else {
+//                        // should i notify user that the object does not exist?
+//                        // user can't create dependent object himself. So, must
+//                        // be
+//                        // an error.
                     }
                 } else if (tx.isAutoStore()) {
                     if (!tx.isRecorded(addedValue)) {
@@ -268,8 +265,8 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
                             fieldClassMolder.removeRelation(tx, toBeDeleted,
                                     this._classMolder, object);
                         }
-                    } else {
-                        // what to do if it happens?
+//                    } else {
+//                        // what to do if it happens?
                     }
                 }
             }
@@ -288,8 +285,8 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
                         if (toBeAdded != null) {
                             tx.markCreate(fieldEngine, fieldClassMolder,
                                     toBeAdded, oid);
-                        } else {
-                            // what to do if it happens?
+//                        } else {
+//                            // what to do if it happens?
                         }
                     }
                 } else if (tx.isAutoStore()) {
@@ -317,10 +314,10 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
      *      org.exolab.castor.persist.OID, java.lang.Object,
      *      org.exolab.castor.mapping.AccessMode, java.lang.Object)
      */
-    public final void update(final TransactionContext tx, final OID oid,
+    public void update(final TransactionContext tx, final OID oid,
             final Object object, final AccessMode suggestedAccessMode,
             final Object field)
-    throws PersistenceException, ObjectModifiedException {
+    throws PersistenceException {
         ClassMolder fieldClassMolder = _fieldMolder.getFieldClassMolder();
         LockEngine fieldEngine = _fieldMolder.getFieldLockEngine();
         if (_fieldMolder.isDependent()) {
@@ -341,11 +338,9 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
                             tx.markUpdate(fieldEngine, fieldClassMolder,
                                     element, oid);
                         }
-                    } else {
-                        /*
-                         * if ( !tx.isRecorded( element ) ) tx.markCreate(
-                         * fieldEngine, fieldClassMolder, element, oid );
-                         */
+//                    } else {
+//                        // if ( !tx.isRecorded( element ) ) tx.markCreate(
+//                        // fieldEngine, fieldClassMolder, element, oid );
                     }
                 }
                 if (v != null) {
@@ -416,7 +411,7 @@ public class OneToManyRelationResolver extends ManyRelationResolver {
      *      java.lang.Object, org.exolab.castor.mapping.AccessMode,
      *      java.lang.Object)
      */
-    public final Object postCreate(final TransactionContext tx, final OID oid,
+    public Object postCreate(final TransactionContext tx, final OID oid,
             final Object object, final Object field, 
             final Object createdId) {
         return field;

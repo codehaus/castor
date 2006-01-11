@@ -39,7 +39,7 @@ import org.exolab.castor.persist.OID;
  * To change the template for this generated type comment go to
  * Window - Preferences - Java - Code Generation - Code and Comments
  */
-public class PrimitiveResolver implements ResolverStrategy {
+public final class PrimitiveResolver implements ResolverStrategy {
 
     private FieldMolder _fieldMolder;
 

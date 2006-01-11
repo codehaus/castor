@@ -583,7 +583,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                 proposedExpanded.setObjectLockObjectToBeIgnored(true);
 
                 // reload 'expanded object' using correct ClassMolder
-                OID onceAgainOID = engine.load(this, actualOID, proposedExpanded,
+                engine.load(this, actualOID, proposedExpanded,
                         suggestedAccessMode, _lockTimeout, results);
 
                 objectInTransaction = proposedExpanded.getObject();
@@ -1187,8 +1187,7 @@ public abstract class AbstractTransactionContext implements TransactionContext {
                             && (!_tracker.isCreating(object))) {
                         LockEngine engine = _tracker
                                 .getLockEngineForObject(object);
-                        ClassMolder molder = _tracker
-                                .getMolderForObject(object);
+                        //_tracker.getMolderForObject(object);
                         OID oid = _tracker.getOIDForObject(object);
 
                         OID newoid = engine.preStore(this, oid, object,
