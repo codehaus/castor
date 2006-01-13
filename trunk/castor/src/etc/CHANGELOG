@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1272 using contribution from Kevin Taylor [code@obtiva.com]
+       Added support for List interface during marshalling.
+       Details: http://jira.codehaus.org/browse/CASTOR-1272
+       (Werner - 20060113)
+
 JDO:   Fixed bug CASTOR-1299 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Allowed to specify individual parameters for cache initialization in mapping.
        Details: http://jira.codehaus.org/browse/CASTOR-1280

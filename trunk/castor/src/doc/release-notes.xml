@@ -28,6 +28,10 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+                <h2>Additions</h2>
+                
+                <p>Added support for <tt>java.util.List</tt> as collection type for Castor XML.</p>
+                
 				<h2>Changes</h2>
 				
                 <h3>Refactored cache into new org.castor.cache package</h3>
@@ -133,6 +137,27 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+
+                <bug id="1272" tool="jira">
+                    <description>
+		                Added support for List interface during marshalling of collections 
+                    </description>
+                    <contributor>
+                        <name>Kevin Taylor</name>
+                        <email>code@obtiva.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Kevin Taylor</name>
+                        <email>code@obtiva.com</email>
+				    </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060113</date>
+                </bug>
                 <bug id="1299" tool="jira">
                     <description>
 		                Allowed to specify individual parameters for cache initialization
