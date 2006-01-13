@@ -49,6 +49,7 @@ package org.exolab.castor.mapping.loader;
 
 import java.util.Enumeration;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.ArrayList;
@@ -82,6 +83,39 @@ public final class J2CollectionHandlers
      * List of all the default collection handlers.
      */
     private static CollectionHandlers.Info[] _colHandlers = new CollectionHandlers.Info[] {
+       new CollectionHandlers.Info("list", List.class, false, new CollectionHandler() {
+          public Object add(Object collection, final Object object) {
+             if (collection == null) {
+                 collection = new ArrayList();
+                 ((Collection) collection).add(object);
+                 return collection;
+             } else {
+                 ((Collection) collection).add(object);
+                 return null;
+             }
+          }
+          public Enumeration elements(final Object collection) {
+              if (collection == null) {
+                  return new CollectionHandlers.EmptyEnumerator();
+              }
+              return new IteratorEnumerator(((Collection) collection).iterator());
+          }
+          public int size(final Object collection) {
+             if (collection == null) {
+                return 0;
+             }
+             return ((Collection) collection).size();
+          }
+          public Object clear(final Object collection) {
+             if (collection != null) {
+                ((Collection) collection).clear();
+             }
+             return null;
+          }
+          public String toString() {
+             return "List";
+          }
+       } ),
         new CollectionHandlers.Info( "arraylist", ArrayList.class, false, new CollectionHandler() {
             public Object add( Object collection, Object object ) {
                 if ( collection == null ) {
