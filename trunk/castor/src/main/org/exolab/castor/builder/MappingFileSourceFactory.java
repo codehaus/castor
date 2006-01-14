@@ -49,6 +49,7 @@ import org.exolab.javasource.JClass;
 import org.exolab.javasource.JType;
 import org.exolab.castor.builder.types.*;
 import org.exolab.castor.mapping.xml.BindXml;
+import org.exolab.castor.mapping.xml.ClassChoice;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MapTo;
@@ -205,9 +206,7 @@ public class MappingFileSourceFactory {
         
 		XSType xsType = member.getSchemaType();
 		boolean any = false;
-		boolean isElement = (member.getNodeType() == FieldInfo.ELEMENT_TYPE);
-		boolean isAttribute =
-			(member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
+		boolean isAttribute = (member.getNodeType() == FieldInfo.ATTRIBUTE_TYPE);
 		boolean isText = (member.getNodeType() == FieldInfo.TEXT_TYPE);
 
 		//-- a hack, I know, I will change later (kv)
@@ -218,9 +217,13 @@ public class MappingFileSourceFactory {
 			//Attributes can handle COLLECTION type for NMTOKENS or IDREFS for instance
 			xsType = ((CollectionInfo) member).getContent().getSchemaType();
 
+        //-- create class choice on demand
+        ClassChoice classChoice = classMapping.getClassChoice();
+        if (classChoice == null) { classChoice = new ClassChoice(); }
+        
 		//-- create field mapping
         FieldMapping fieldMap = new FieldMapping();
-        classMapping.getClassChoice().addFieldMapping(fieldMap);
+        classChoice.addFieldMapping(fieldMap);
         String fieldName = member.getName();
         if (fieldName.charAt(0) == '_') {
             fieldName = fieldName.substring(1);

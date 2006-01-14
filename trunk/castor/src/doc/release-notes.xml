@@ -137,7 +137,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
-
+                <bug id="1300" tool="jira">
+                    <description>
+		                Fixed NPE in SourceCodeGenerator.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Jason Boutwell</name>
+                        <email>jason.boutwell@comcast.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060114</date>
+                </bug>
                 <bug id="1272" tool="jira">
                     <description>
 		                Added support for List interface during marshalling of collections 

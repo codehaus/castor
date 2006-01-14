@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1300 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed NPE in SourceCodeGenerator.
+       Details: http://jira.codehaus.org/browse/CASTOR-1300
+       (Ralf - 20060114)
+
 XML:   Fixed bug CASTOR-1272 using contribution from Kevin Taylor [code@obtiva.com]
        Added support for List interface during marshalling.
        Details: http://jira.codehaus.org/browse/CASTOR-1272
@@ -9,7 +14,7 @@ XML:   Fixed bug CASTOR-1272 using contribution from Kevin Taylor [code@obtiva.c
 
 JDO:   Fixed bug CASTOR-1299 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Allowed to specify individual parameters for cache initialization in mapping.
-       Details: http://jira.codehaus.org/browse/CASTOR-1280
+       Details: http://jira.codehaus.org/browse/CASTOR-1299
        (Ralf - 20060107)
 
 JDO:   Fixed bug CASTOR-1280 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
