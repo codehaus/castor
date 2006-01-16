@@ -116,6 +116,10 @@
         <display>XML FAQ</display>
       </navLink>
       <navLink>
+        <url>xml-howto.xml</url>
+        <display>XML HOW-TOs</display>
+      </navLink>
+      <navLink>
         <url>xml-fieldhandlers.xml</url>
         <display>Custom Handlers</display>
       </navLink>
@@ -152,7 +156,7 @@
       </navLink>
       <navLink>
         <url>jdo-howto.xml</url>
-        <display>JDO How-Tos</display>
+        <display>JDO HOW-TOs</display>
       </navLink>
       <navLink>
         <url>jdo-other-features.xml</url>

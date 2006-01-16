@@ -54,14 +54,11 @@ import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.simpletypes.ListType;
 import org.exolab.castor.xml.util.AnyNode2SAX;
 import org.exolab.castor.xml.Namespaces;
+import org.exolab.castor.xml.Serializer;
 
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributeListImpl;
-
-import org.apache.xml.serialize.Serializer;
-
-
 
 /**
  * A class for serializing Schema models

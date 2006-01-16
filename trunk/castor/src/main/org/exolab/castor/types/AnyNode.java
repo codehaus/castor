@@ -51,9 +51,8 @@ package org.exolab.castor.types;
 
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Stack;
+import org.exolab.castor.xml.Serializer;
 import org.exolab.castor.xml.util.AnyNode2SAX;
-
-import org.apache.xml.serialize.Serializer;
 
 import java.io.StringWriter;
 

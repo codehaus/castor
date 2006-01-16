@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<document url="http://castor.codehaus.org/xml-howto.xml">
+  <body>
+    <section title="Castor XML - HOW TO's">
+
+      <section title="Introduction">
+
+        <p>This is a collection of HOW-TOs. The Castor project is actively seeking 
+           additional HOW-To contributors to expand this collection. For information 
+           on how to do that, please see 'How to write a How-to'.</p>
+        
+      </section>
+	
+		<section title="Documentation">
+		
+		    <ul>
+		        <li><font color="lightgrey">How to Author a How-To</font></li>
+		        <li><font color="lightgrey">How to Author an FAQ</font></li>
+		        <li><font color="lightgrey">How to Author a Code Snippet</font></li>
+		        <li><font color="lightgrey">How to Author Core Documentation</font></li>
+		    </ul>
+		    
+		</section>
+		
+		
+		<section title="Contribution">
+	        <ul>
+                <li><font color="lightgrey">How to submit a bug report</font></li>
+	            <li><font color="lightgrey">How to Prepare a Patch</font></li>
+	            <li><font color="lightgrey">How to Contribute a Patch via Jira</font></li>
+	        </ul>
+		</section>
+        
+        <section title="Others">
+            <ul>
+                <li><a href="how-to-implement-custom-serializer.html">How to implement a custom serializer</a></li>
+            </ul>
+        </section>
+        
+	 </section>
+  </body>
+</document>

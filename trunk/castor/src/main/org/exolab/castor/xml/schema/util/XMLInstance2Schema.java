@@ -57,12 +57,8 @@ import org.exolab.castor.xml.schema.*;
 import org.exolab.castor.xml.schema.writer.SchemaWriter;
 import org.exolab.castor.util.NestedIOException;
 
-import org.xml.sax.SAXException;
 import org.xml.sax.InputSource;
 import org.xml.sax.Parser;
-
-
-import org.apache.xml.serialize.Serializer;
 
 /**
  * A class for reading XML Schemas

@@ -42,10 +42,7 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.util;
-
 
 import java.io.OutputStream;
 import java.io.Writer;
@@ -62,12 +59,11 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.Method;
-
 import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.OutputFormat;
+import org.exolab.castor.xml.Serializer;
 import org.exolab.castor.xml.XMLNaming;
+import org.exolab.castor.xml.XMLSerializerFactory;
 import org.exolab.castor.xml.util.DefaultNaming;
 import org.exolab.castor.util.Messages;
 
@@ -75,7 +71,6 @@ import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
-
 
 /**
  * Provides default configuration for Castor components from the
@@ -110,14 +105,6 @@ public abstract class Configuration {
     public static class Property
     {
 
-        /**
-         * Property specifying the class name of the XML serializer to use.
-         * <pre>
-         * org.exolab.castor.serializer
-         * </pre>
-         */
-        public static final String Serializer = "org.exolab.castor.serializer";
-        
         /**
          * Property specifying the type of node to use for
          * primitive values, either "element" or "attribute"
@@ -241,7 +228,15 @@ public abstract class Configuration {
          * @since 0.9.5.3
          */
         public static final String SaveMapKeys = "org.exolab.castor.xml.saveMapKeys";
-        
+
+        /**
+         * Property specifying what factoyr to use for dealing with XML serializers 
+         * <pre>
+         * org.exolab.castor.xml.serializer.factory
+         * </pre>
+         * @since 1.0
+         */
+		public static final String SERIALIZER_FACTORY = "org.exolab.castor.xml.serializer.factory";
         
         /**
          * The name of the configuration file.
@@ -252,6 +247,9 @@ public abstract class Configuration {
         public static final String FileName = "castor.properties";
 
         static final String ResourceName = "/org/exolab/castor/castor.properties";
+        
+        static final String DEFAULT_SERIALIZER_FACTORY = "org.exolab.castor.xml.XercesXMLSerializerFactory";
+
 
     } //-- class: Property
 
@@ -822,24 +820,9 @@ public abstract class Configuration {
      * @return A suitable serializer
      * @see #getSerializer()
      */
-    public static Serializer getDefaultSerializer()
-    {
-        String     prop;
-        Serializer serializer;
-
-        prop = getDefault().getProperty( Property.Serializer );
-        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
-            // If no parser class was specified, we default to Xerces.
-            serializer = new org.apache.xml.serialize.XMLSerializer();
-        } else {
-            try {
-                serializer = (Serializer) Class.forName( prop ).newInstance();
-            } catch ( Exception except ) {
-                throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
-                                                             prop, except ) );
-            }
-        }
-        serializer.setOutputFormat( getDefaultOutputFormat() );
+    public static Serializer getDefaultSerializer() {
+        Serializer serializer = getSerializerFactory(getDefault()).getSerializer();
+        serializer.setOutputFormat(getDefaultOutputFormat());
         return serializer;
     }
 
@@ -862,14 +845,15 @@ public abstract class Configuration {
     public static OutputFormat getDefaultOutputFormat() {
 
         boolean indent = false;
+        
         String prop = getDefault().getProperty( Property.Indent, "" );
 
         //-- get default indentation
         indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
                    prop.equalsIgnoreCase( ON_VALUE ) );
 
-        OutputFormat format = new OutputFormat();
-        format.setMethod(Method.XML);
+        OutputFormat format = getSerializerFactory(getDefault()).getOutputFormat();
+        format.setMethod(OutputFormat.XML);
         format.setIndenting(indent);
         
         // There is a bad interaction between the indentation and the
@@ -1095,5 +1079,26 @@ public abstract class Configuration {
         Class regExpEvalClass = null;
         
     } //-- class: ConfigValues
+	
+	/**
+	 * Returns the currently configured XMLSerializerFactory instance.
+	 * @param props Property set to use.
+	 * @return XMLSerializerFactory to use by Castor
+	 */
+	static protected XMLSerializerFactory getSerializerFactory(Properties props) {
+    	XMLSerializerFactory serializerFactory;
+        String serializerFactoryName = 
+        	props.getProperty(Property.SERIALIZER_FACTORY, Property.DEFAULT_SERIALIZER_FACTORY);
+        
+        try {
+            serializerFactory = (XMLSerializerFactory) 
+            Class.forName(serializerFactoryName).newInstance();
+        } catch (Exception except) {
+            throw new RuntimeException(
+                    Messages.format("conf.failedInstantiateSerializerFactory", 
+                            serializerFactoryName, except));
+        }
+        return serializerFactory;
+	}
 
 } //-- Configuration
