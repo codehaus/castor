@@ -79,8 +79,6 @@ import org.xml.sax.*;
 import org.xml.sax.helpers.AttributesImpl;
 
 import org.w3c.dom.Node;
-import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
 
 import java.io.IOException;
 import java.io.PrintWriter;

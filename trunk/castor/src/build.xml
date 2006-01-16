@@ -29,6 +29,7 @@
         <property name="lib" value="lib"/>
         <property name="doc" value="${source}/doc"/>
         <property name="howto" value="${source}/howto"/>
+	    <property name="xml-howto" value="${source}/xml-howto"/>
         <property name="schema" value="${build}/schema"/>
         <property name="tests" value="${build}/tests"/>
         <property name="gen.src" value="${build}/gen-src"/>
@@ -532,6 +533,10 @@
             processor="org.exolab.adaptx.util.JakartaAntAdapter">
          </style>
         <style basedir="${howto}" destdir="${build}/doc" style="${doc}/style/exolab.xsl"
+            classpathref="build.classpath" includes="**.xml" excludes="style/**,project.xml"
+            processor="org.exolab.adaptx.util.JakartaAntAdapter">
+         </style>
+        <style basedir="${xml-howto}" destdir="${build}/doc" style="${doc}/style/exolab.xsl"
             classpathref="build.classpath" includes="**.xml" excludes="style/**,project.xml"
             processor="org.exolab.adaptx.util.JakartaAntAdapter">
          </style>

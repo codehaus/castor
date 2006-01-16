@@ -5,19 +5,19 @@
 
       <section title="Introduction">
 
-        <p>This is a collection of How-tos. The Castor project is actively seeking 
-           additional How-to contributors to expand this collection. For information 
-           on how to do that, please see How to write a How-to.</p>
+        <p>This is a collection of HOW-To. The Castor project is actively seeking 
+           additional HOW-TO contributors to expand this collection. For information 
+           on how to do that, please see 'How to write a HOW-TO'.</p>
         
       </section>
 	
 		<section title="Documentation">
 		
 		    <ul>
-		        <li>How to Author a How-To</li>
-		        <li>How to Author an FAQ</li>
-		        <li>How to Author a Code Snippet</li>
-		        <li>How to Author Core Documentation</li>
+		        <li><font color="lightgrey">How to Author a HOW-TO</font></li>
+		        <li><font color="lightgrey">How to Author an FAQ</font></li>
+		        <li><font color="lightgrey">How to Author a Code Snippet</font></li>
+		        <li><font color="lightgrey">How to Author Core Documentation</font></li>
 		    </ul>
 		    
 		</section>
@@ -26,8 +26,8 @@
 		<section title="Contribution">
 	        <ul>
                 <li><a href="how-to-submit-a-bug.html">How to submit a bug report</a></li>
-	            <li>How to Prepare a Patch</li>
-	            <li>How to Contribute a Patch via Jira</li>
+	            <li><font color="lightgrey">How to Prepare a Patch</font></li>
+	            <li><font color="lightgrey">How to Contribute a Patch via Jira</font></li>
 	        </ul>
 		</section>
         

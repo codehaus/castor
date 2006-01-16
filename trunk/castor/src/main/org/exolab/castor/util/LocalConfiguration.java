@@ -42,10 +42,7 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.util;
-
 
 import java.util.Properties;
 import java.io.OutputStream;
@@ -58,23 +55,26 @@ import java.io.IOException;
 import java.util.StringTokenizer;
 import java.util.Hashtable;
 import java.net.URL;
+
 import org.xml.sax.SAXException;
 import org.xml.sax.DocumentHandler;
 import org.xml.sax.Parser;
 import org.xml.sax.XMLReader;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.apache.xml.serialize.Serializer;
-import org.apache.xml.serialize.OutputFormat;
-import org.apache.xml.serialize.Method;
+
 import org.exolab.castor.util.Messages;
 import org.exolab.castor.xml.NodeType;
+import org.exolab.castor.xml.OutputFormat;
+import org.exolab.castor.xml.Serializer;
 import org.exolab.castor.xml.XMLNaming;
+import org.exolab.castor.xml.XMLSerializerFactory;
 import org.exolab.castor.xml.util.DefaultNaming;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
-
 
 /**
  * Provides default configuration for Castor components from the
@@ -524,27 +524,12 @@ public final class LocalConfiguration extends Configuration {
      *
      * @return A suitable serializer
      */
-    public Serializer getSerializer()
-    {
-        String     prop;
-        Serializer serializer;
-
-        prop = _props.getProperty( Property.Serializer );
-        if ( prop == null || prop.equalsIgnoreCase( "xerces" ) ) {
-            // If no parser class was specified, we default to Xerces.
-            serializer = new org.apache.xml.serialize.XMLSerializer();
-        } else {
-            try {
-                serializer = (Serializer) Class.forName( prop ).newInstance();
-            } catch ( Exception except ) {
-                throw new RuntimeException( Messages.format( "conf.failedInstantiateSerializer",
-                                                             prop, except ) );
-            }
-        }
-        serializer.setOutputFormat( getOutputFormat() );
+    public Serializer getSerializer() {
+        Serializer serializer = getSerializerFactory(_props).getSerializer();
+        serializer.setOutputFormat(getOutputFormat());
         return serializer;
     }
-
+    
     /**
      * Returns the default OutputFormat for use with a Serializer.
      *
@@ -553,14 +538,15 @@ public final class LocalConfiguration extends Configuration {
     public OutputFormat getOutputFormat() {
 
         boolean indent = false;
+        
         String prop = _props.getProperty( Property.Indent, "" );
 
         //-- get default indentation
         indent = ( prop.equalsIgnoreCase( TRUE_VALUE ) ||
                    prop.equalsIgnoreCase( ON_VALUE ) );
 
-        OutputFormat format = new OutputFormat();
-        format.setMethod(Method.XML);
+        OutputFormat format = getSerializerFactory(_props).getOutputFormat();
+        format.setMethod(OutputFormat.XML);
         format.setIndenting(indent);
         
         // There is a bad interaction between the indentation and the

@@ -43,10 +43,16 @@
  * $Id$
  */
 
- package org.exolab.castor.util;
+package org.exolab.castor.util;
 
- import org.apache.xerces.utils.regex.RegularExpression;
- import org.apache.xerces.utils.regex.ParseException;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+//import org.apache.xerces.utils.regex.RegularExpression;
+//import org.apache.xerces.utils.regex.ParseException;
  
  /**
   * An implementation of the XercesRegExpEvaluator that uses the
@@ -66,20 +72,42 @@ http://xml.apache.org/xerces-j/apiDocs/org/apache/xerces/utils/regex/RegularExpr
  public class XercesRegExpEvaluator 
     implements RegExpEvaluator
 {
-    
+    private static final Log LOG = LogFactory.getLog(XercesRegExpEvaluator.class);
+     
     private static final String BOL = "^";
     private static final String EOL = "$";
+    
+    private static final String CLASS_NAME = "org.apache.xerces.utils.regex.RegularExpression";
     
     /**
      * The Regular expression
     **/
-    RegularExpression _regexp = null;
-    
+    // RegularExpression _regexp = null;
+    Object _regexp = null;
+
+    private Constructor _constructor;
+
     /**
      * Creates a new XercesRegExpEvaluator
     **/
     public XercesRegExpEvaluator() {
         super();
+        
+        Class regexpClass;
+        try {
+            regexpClass = Class.forName(CLASS_NAME);
+            _constructor = regexpClass.getConstructor( new Class[] { String.class } );
+        } catch (ClassNotFoundException e) {
+            LOG.error("Problem loading class " + CLASS_NAME, e);
+            throw new IllegalAccessError("Problem loading class " + CLASS_NAME + ": " + e.getMessage());
+        } catch (SecurityException e) {
+            LOG.error("Problem accessing constructor of class " + CLASS_NAME, e);
+            throw new IllegalAccessError("Problem accessnig constructor of class " + CLASS_NAME + ": " + e.getMessage());
+        } catch (NoSuchMethodException e) {
+            LOG.error("Problem locating constructor of class " + CLASS_NAME, e);
+            throw new IllegalAccessError("class " + CLASS_NAME + ": " + e.getMessage());
+        }
+
     } //-- XercesRegExpEvaluator
     
     /**
@@ -92,20 +120,18 @@ http://xml.apache.org/xerces-j/apiDocs/org/apache/xerces/utils/regex/RegularExpr
         
         if (rexpr != null) {
             try {
-                //-- patch and compile expression
-                _regexp = new RegularExpression(BOL + rexpr + EOL);
-            }
-            catch(ParseException ex) {
-                String err = "XercesRegExpp Syntax error: ";
-                err += ex.getMessage();
-                err += " ; error occured with the following "+
-                    "regular expression: " + rexpr;
-                
+                _regexp = _constructor.newInstance(new Object[] { BOL + rexpr + EOL } );
+            } catch (Exception e) {
+                LOG.error("Problem invoking constructor on " + CLASS_NAME, e);
+                String err = "XercesRegExp Syntax error: "
+                    + e.getMessage()
+                    + " ; error occured with the following "
+                    + "regular expression: " + rexpr;
                 throw new IllegalArgumentException(err);
             }
-        }
-        else
+        } else {
             _regexp = null;
+        }
     } //-- setExpression
     
     /**
@@ -119,7 +145,24 @@ http://xml.apache.org/xerces-j/apiDocs/org/apache/xerces/utils/regex/RegularExpr
     **/
     public boolean matches(String value)
     {
-        if (_regexp != null) return _regexp.matches(value);
+        if (_regexp != null) {
+            // return _regexp.matches(value); 
+            Method method;
+            try {
+                method = _regexp.getClass().getMethod("matches", new Class[] { String.class } );
+                return ((Boolean) method.invoke(_regexp, new Object[] { value } )).booleanValue();
+            } catch (SecurityException e) {
+                LOG.error("Security problem accessing matches(String) method of class " + CLASS_NAME, e);
+            } catch (NoSuchMethodException e) {
+                LOG.error("Method matches(String) of class " + CLASS_NAME + " could not be found.", e);
+            } catch (IllegalArgumentException e) {
+                LOG.error("Invalid argument provided to method matches(String) of class " + CLASS_NAME, e);
+            } catch (IllegalAccessException e) {
+                LOG.error("Illegal acces to method matches(String) of class " + CLASS_NAME, e);
+            } catch (InvocationTargetException e) {
+                LOG.error("Invalid invocation of method matches(String) of class " + CLASS_NAME, e);
+            }
+        }
         return true;
     } //-- matches
     
