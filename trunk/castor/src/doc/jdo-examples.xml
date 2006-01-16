@@ -371,8 +371,112 @@ update: <i>no statement will be generated</i></code-panel>
 
        </section>
 
-    </section>
+	    <section title="Extend relation &amp; polymorphism">
+	    
+	    	 <p>As of release 0.9.9, Castor supports polymorphic queries on extend hierarchies. To highlights
+	    	    this new feature, let's add two new classes to what we have currently.</p>
+	    	   
+	    	 <code-panel>
+package myapp;
 
+public class <font color="red">Computer extends Product</font>
+{
+    private int       _id;
+
+    private String    _make; 
+
+    public int getId() { ... }
+
+    public void setId( int anId ) { ... }
+
+    public String getmake() { ... }
+
+    public void setMake( String aMake ) { ... }
+
+}
+
+public class <font color="red">Car extends Product</font>
+{
+    private int       _id;
+
+    private Date    _registeredIn; 
+
+    public int getId() { ... }
+
+    public void setId( int anId ) { ... }
+
+    public Date getRegisteredIn() { ... }
+
+    public void setRegisteredIn( Date aRegisteredIn ) { ... }
+}</code-panel>
+
+             <p>Based upon the mapping defined for the <tt>Product</tt> class as shown above, the 
+                following code fragment shows the mapping for Computer and Car classes.</p>
+
+             <code-panel>
+    &lt;class name="myapp.Computer" <font color="red">extends="myapp.Product"</font> identity="id"&gt;
+
+        &lt;map-to table="comp" /&gt;
+
+        &lt;field name="id" type="integer">
+            &lt;sql name="id" type="integer" />
+        &lt;/field>
+
+        &lt;field name="make" type="string">
+            &lt;sql name="make" type="char" />
+        &lt;/field>
+        
+    &lt;/class&gt;
+    
+    &lt;class name="myapp.Car" <font color="red">extends="myapp.Product"</font> identity="id"&gt;
+
+        &lt;map-to table="car" /&gt;
+
+        &lt;field name="id" type="integer">
+            &lt;sql name="id" type="integer" />
+        &lt;/field>
+
+        &lt;field name="registeredIn" type="date">
+            &lt;sql name="regIn" type="long" />
+        &lt;/field>
+        
+    &lt;/class&gt;</code-panel>
+	    
+	    	<p>Based upon this mapping, it is possible to execute the following OQL queries against 
+	    	   this class model.</p>
+	    	   
+	    	<code-panel>
+OQLQuery query = d.getOQLQuery("SELECT c FROM <b>myapp.Computer</b> c");
+	    	</code-panel>
+	    	
+	    	<p>to return all computers.</p>
+
+	    	<code-panel>
+OQLQuery query = d.getOQLQuery("SELECT c FROM myapp.Computer c WHERE c.make = $");
+	    	</code-panel>
+	    	
+	    	<p>to return all computers of a particular make.</p>
+
+	    	<code-panel>
+OQLQuery query = d.getOQLQuery("SELECT p FROM <b>myapp.Product</b> p");
+	    	</code-panel>
+	    	
+	    	<p>to return all products (where Castor will return the actual object instances, i.e. a Computer
+	    	   instance if the object returned by the query is of type <tt>Computer</tt>, or a <tt>Car</tt>
+	    	   instance if the object returned by the query is of type <tt>Car</tt>).</p>
+
+	    	<code-panel>
+OQLQuery query = d.getOQLQuery("SELECT p FROM myapp.Product p WHERE p.group.name = $");
+	    	</code-panel>
+	    	
+	    	<p>to return all products that belong to the specified product group (where Castor will 
+	    	   return the actual object instances, i.e. a Computer instance if the object returned by 
+	    	   the query is of type <tt>Computer</tt>, or a <tt>Car</tt>
+	    	   instance if the object returned by the query is of type <tt>Car</tt>).</p>
+	    	
+	    </section>
+
+    </section>
 
     </body>
 </document>
