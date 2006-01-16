@@ -50,10 +50,24 @@
   <!--
       PLEASE KEEP THIS SECTION (COMMITTERS) SORTED BY ORDER OF WHO COMMITS
       MOST FREQUENTLY. Quesitons are sent more often to those people at the top
-      of this list. Of course we keep Assaf at the very top since he was the
-      orginal author of Castor JDO.
-   -->
+      of this list.   -->
 
+
+  <contributor type="Committer">
+    <name surname="Guttmann" given="Werner" />
+    <email>werner.guttmann@gmx.net</email>
+    <project>JDO</project>
+    <company id="anecon" />
+    <description>
+       Current Castor JDO project lead; JDO enhancements including distributed caches, 
+       TransactionManagerFactory API, support for polymorphism, Spring integration,
+       the API for JDBC parameters and much more.
+    </description>
+    <status>active</status>
+    <since>
+      <date>Oct. 2003</date>
+    </since>
+  </contributor>
 
   <contributor type="Committer">
     <name surname="Visco" given="Keith"/>
@@ -68,13 +82,30 @@
   </contributor>
 
   <contributor type="Committer">
-    <name surname="Blandin" given="Arnaud"/>
-    <email>blandin@intalio.com</email>
-    <company id="intalio"/>
+     <name surname="Joachim" given="Ralf" />
+     <email>ralf.joachim@syscon-world.de</email>
+     <project>JDO</project>
+     <company id="syscon"/>
+     <description>
+        JDO bug fixes and enhancements for type convertion; addition of test
+        cases and documentation.
+     </description>
+    <status>active</status>
+    <since>
+      <date>Dec. 2004</date>
+    </since>
+  </contributor>
+
+  <contributor type="Committer">
+    <name surname="Fawcett" given="Andrew"/>
+    <email>Andrew.Fawcett@coda.com</email>
+    <company id="coda"/>
     <project>XML</project>
-    <description>Responsible for all the boring stuff that Keith doesn't want to do anymore.
-    Causes immense stress for the other contributors. Introduces bad franglish into the documentation.</description>
-    <status>inactive</status>
+    <description>XML enhancements.</description>
+    <status>active</status>
+    <since>
+      <date>Apr. 2005 (again)</date>
+    </since>
   </contributor>
 
   <contributor type="Committer">
@@ -82,26 +113,10 @@
     <email>bruce DOT snyder AT gmail DOT com</email>
     <project>JDO</project>
     <description>
-        Current JDO Project Lead taking over for Thomas Yip.
-        Currently reponsible for all things wrong in Castor JDO.
-        Enhancements, bug fixes, documention, etc.
+        Enhancements, bug fixes, documention, etc. (JDO project lead 
+        from 0.9 to 0.9.5)
     </description>
     <status>active</status>
-  </contributor>
-
-  <contributor type="Committer">
-    <name surname="Guttmann" given="Werner" />
-    <email>werner.guttmann@gmx.net</email>
-    <project>JDO</project>
-    <company id="anecon" />
-    <description>
-       JDO enhancements including distributed caches, TransactionManagerFactory API, the
-       API for JDBC parameters and much more.
-    </description>
-    <status>active</status>
-    <since>
-      <date>Oct. 2003</date>
-    </since>
   </contributor>
 
   <contributor type="Committer">
@@ -114,21 +129,6 @@
        JDO bug fixes and enhancements including JdoConfFactory;
        test cases; Oracle questions
     </description>
-    <since>
-      <date>Dec. 2004</date>
-    </since>
-  </contributor>
-
-  <contributor type="Committer">
-     <name surname="Joachim" given="Ralf" />
-     <email>ralf.joachim@syscon-world.de</email>
-     <project>JDO</project>
-     <company id="syscon"/>
-     <description>
-        JDO bug fixes and enhancements for type convertion; addition of test
-        cases and documentation.
-     </description>
-    <status>active</status>
     <since>
       <date>Dec. 2004</date>
     </since>
@@ -163,15 +163,13 @@
   </contributor>
 
   <contributor type="Committer">
-    <name surname="Fawcett" given="Andrew"/>
-    <email>Andrew.Fawcett@coda.com</email>
-    <company id="coda"/>
+    <name surname="Blandin" given="Arnaud"/>
+    <email>blandin@intalio.com</email>
+    <company id="intalio"/>
     <project>XML</project>
-    <description>XML enhancements.</description>
-    <status>active</status>
-    <since>
-      <date>Apr. 2005 (again)</date>
-    </since>
+    <description>Responsible for all the boring stuff that Keith doesn't want to do anymore.
+    Causes immense stress for the other contributors. Introduces bad franglish into the documentation.</description>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
