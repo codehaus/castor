@@ -6,7 +6,7 @@
     <abstract>
        Castor JDO code samples
     </abstract>
-    <status>Final</status>
+    <status>In progress</status>
   </properties>
   <body>
     <title>Castor JDO code samples</title>
@@ -410,13 +410,33 @@ public class <font color="red">Car extends Product</font>
     public void setRegisteredIn( Date aRegisteredIn ) { ... }
 }</code-panel>
 
+          <p>The corresponding DDL statements for the relational database tables 
+             COMP and CAR would look as follows:</p>
+        
+          <p><b>COMP</b>:</p>
+          
+          <code-panel>
+create table prod 
+(
+  id        int           not null,
+  make      varchar(200)  not null
+);</code-panel>
+
+          <p><b>CAR</b>:</p>
+          
+          <code-panel>
+create table prod_group (
+  id        int           not null,
+  regIn     int           not null
+);</code-panel>
+
              <p>Based upon the mapping defined for the <tt>Product</tt> class as shown above, the 
-                following code fragment shows the mapping for Computer and Car classes.</p>
+          %      following code fragment shows the mapping for Computer and Car classes.</p>
 
              <code-panel>
     &lt;class name="myapp.Computer" <font color="red">extends="myapp.Product"</font> identity="id"&gt;
 
-        &lt;map-to table="comp" /&gt;
+        &lt;map-to table="COMP" /&gt;
 
         &lt;field name="id" type="integer">
             &lt;sql name="id" type="integer" />
@@ -430,7 +450,7 @@ public class <font color="red">Car extends Product</font>
     
     &lt;class name="myapp.Car" <font color="red">extends="myapp.Product"</font> identity="id"&gt;
 
-        &lt;map-to table="car" /&gt;
+        &lt;map-to table="CAR" /&gt;
 
         &lt;field name="id" type="integer">
             &lt;sql name="id" type="integer" />
@@ -474,6 +494,14 @@ OQLQuery query = d.getOQLQuery("SELECT p FROM myapp.Product p WHERE p.group.name
 	    	   the query is of type <tt>Computer</tt>, or a <tt>Car</tt>
 	    	   instance if the object returned by the query is of type <tt>Car</tt>).</p>
 	    	
+	    </section>
+	    
+	    <section title="OQL samples">
+	    
+	    	<p>Based upon above definitions, here's a few OQL sample queries highlightig various 
+	    	   artefacts of the OQL support of Castor JDO.</p>
+	    	   
+	    	<p><b>TBD</b></p>
 	    </section>
 
     </section>
