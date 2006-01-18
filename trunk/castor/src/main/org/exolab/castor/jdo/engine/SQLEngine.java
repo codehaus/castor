@@ -1655,13 +1655,14 @@ public final class SQLEngine implements Persistence {
             if (i == 0 && _fields[i].joined) {
                 String[] ids = _clsDesc.getIdentityColumnNames();
                 for (int j = 0; j < ids.length; j++) {
-                    expr.addColumn(_clsDesc.getTableName(), ids[j]);
-                    find.addColumn(_clsDesc.getTableName(), ids[j]);
+                    expr.addColumn(curDesc.getTableName(), ids[j]);
+                    find.addColumn(curDesc.getTableName(), ids[j]);
                 }
-                identitiesUsedForTable.put(_clsDesc.getTableName(), new Boolean(true));
+                identitiesUsedForTable.put(curDesc.getTableName(), new Boolean(true));
             }
             
             // add id columns to select statement
+            // TODO does not work if first (non-identity) field mapping is not a plain field
             if (!alias.equals(aliasOld) && !_fields[i].joined) {
                 JDOClassDescriptor classDescriptor = (JDOClassDescriptor) 
                     _fields[i].fieldDescriptor.getContainingClassDescriptor();

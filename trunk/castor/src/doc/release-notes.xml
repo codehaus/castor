@@ -162,6 +162,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1292" tool="jira">
+                    <description>
+		                Fixed problem with SQL generated for classes that are part of an extend hierarchy.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Lorenzo Dematte</name>
+                        <email>dematte@ieee.org</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060118</date>
+                </bug>
                 <bug id="1273" tool="jira">
                     <description>
 		                Removed compile &amp; runtime dependencies for Apache Xerces.
@@ -180,7 +200,7 @@ org.castor.cache.Factories=\
                    </reporter>
                     <type>Bug</type>
                     <module>XML</module>
-                    <date>20050108</date>
+                    <date>20060108</date>
                 </bug>
                 <bug id="1300" tool="jira">
                     <description>
