@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1292 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem with SQL generated for classes that are part of an extend hierarchy.
+       Details: http://jira.codehaus.org/browse/CASTOR-1292
+       (Werner - 20060118)
+
 XML:   Fixed bug CASTOR-1273 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Removed compile & runtime dependencies for Apache Xerces.
        Details: http://jira.codehaus.org/browse/CASTOR-1273
