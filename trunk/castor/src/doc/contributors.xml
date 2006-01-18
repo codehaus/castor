@@ -87,8 +87,8 @@
      <project>JDO</project>
      <company id="syscon"/>
      <description>
-        JDO bug fixes and enhancements for type convertion; addition of test
-        cases and documentation.
+        Various bug fixes, enhancements and refactorings at almost all
+		parts of JDO including major refactoring of JDO test framework.
      </description>
     <status>active</status>
     <since>
@@ -102,7 +102,7 @@
     <company id="coda"/>
     <project>XML</project>
     <description>XML enhancements.</description>
-    <status>active</status>
+    <status>inactive</status>
     <since>
       <date>Apr. 2005 (again)</date>
     </since>
@@ -116,7 +116,7 @@
         Enhancements, bug fixes, documention, etc. (JDO project lead 
         from 0.9 to 0.9.5)
     </description>
-    <status>active</status>
+    <status>inactive</status>
   </contributor>
 
   <contributor type="Committer">
@@ -156,7 +156,7 @@
     <description>
        Performance enhancements, core refactoring  and much more.
     </description>
-    <status>active</status>
+    <status>inactive</status>
     <since>
       <date>Dec. 2004</date>
     </since>
