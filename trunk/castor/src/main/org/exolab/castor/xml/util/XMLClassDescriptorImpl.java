@@ -1144,6 +1144,16 @@ public class XMLClassDescriptorImpl extends Validator
                 //-- able to instantiate primitive types
             }
         }
+        else if (type.getSuperclass() == Number.class) {
+            return ((Number)value).intValue() == 0;
+        }
+        else if (type == Boolean.class) {
+            return value.equals(Boolean.FALSE);
+        }
+        else if (type == Character.class) {
+            return ((Character)value).charValue() == '\0';
+        }
+        
         return false;        
     } //-- isDefaultPrimitiveValue
     
