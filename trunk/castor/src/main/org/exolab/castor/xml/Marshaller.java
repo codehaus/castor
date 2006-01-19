@@ -943,6 +943,7 @@ public class Marshaller extends MarshalFramework {
         }
 
         if (classDesc == null) {
+            
             //-- check for primitive or String, we need to use
             //-- the special #isPrimitive method of this class
             //-- so that we can check for the primitive wrapper
@@ -1034,9 +1035,8 @@ public class Marshaller extends MarshalFramework {
                                 //-- from the xml name
                                 classDesc = getClassDescriptor(_class);                                
                                 if (classDesc != null) {
-                                    String tmpName1 = classDesc.getXMLName();
-                                    String tmpName2 = _naming.toXMLName(_class.getName());
-                                    if (tmpName2.equals(tmpName1))
+                                    String tmpName = classDesc.getXMLName();
+                                    if (name.equals(tmpName))
                                         saveType = false;
                                 }
                             }
@@ -1115,7 +1115,6 @@ public class Marshaller extends MarshalFramework {
                 saveType = false;
         }
         
-
         //-- Suppress 'xsi:type' attributes when Castor is able to infer
         //-- the correct type during unmarshalling
         if (saveType) {
