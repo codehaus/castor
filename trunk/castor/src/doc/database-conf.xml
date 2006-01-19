@@ -205,18 +205,7 @@
 
             <p>In addition to specifying the transaction manager name, it is possible
                to pass arbitrary name/value pairs to the transaction manager instance.</p>
-<!--
-            <p><b>Note:</b>It should also be noted that "database pooling" must be enabled
-                for the JDO instance when using the WAS v4 and v5 transaction managers, or
-                the JDO "database" instance will fall outside the current transaction/thread,
-                resulting in the error message "No transaction in progress for the current
-                thread". For example:</p>
 
-            <code-panel><![CDATA[
-JDO myJdo = new JDO();
-myJdo.setDatabasePooling( true );
-            ]]></code-panel>
--->
             <p><b>Note:</b> At the moment, only the JNDI transaction manager factory
                supports such an attribute. In this context, the jndiEnc attribute can be
                used to specify what JNDI ENC to use to lookup the transaction manager as

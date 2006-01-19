@@ -110,6 +110,24 @@ db.close();
       </section>
       
      </section>
+	 
+	 <section title="Tips">
+		
+		<ul>
+			<li>When using Castor JDO in a J2EE environment, Castor allows you to enable
+				a special Database instance pooling support. This option is configured via
+				the <api>org.exolab.castor.jdo.JDOManager'setDatabasePooling(boolean)</api>
+				method; by default, it is turned off. This option only affects JDOManager 
+				if J2EE transactions are used and if a transaction is associated with the 
+				thread that calls {@link #getDatabase}.<br/> If database pooling is enabled, 
+				JDOManager will first search in this special pool to see if there is already a 
+				<api>org.exolab.castor.jdo.Database</api> instance for the current transaction. If 
+				found, it returns this <api>org.exolab.castor.jdo.Database</api>
+				instance; if not, it creates a new one, associates it will the transaction 
+				and returns the newly created <api>org.exolab.castor.jdo.Database</api> instance.<br/>
+				Please makes ure that you call this method before calling {@link #getDatabase}.</li>
+		</ul>
+	 </section>
 
      <section title="References">
         <ul>

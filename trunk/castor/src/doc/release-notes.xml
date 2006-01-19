@@ -162,6 +162,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+               <bug id="1301" tool="jira">
+                    <description>
+		                De-deprecated getDatabasePooling() and setDatabasePooling(boolean) methods.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Raúl Sanz de Acedo Pérez</name>
+                        <email>rsanz@cein.es</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060119</date>
+                </bug>
                 <bug id="1292" tool="jira">
                     <description>
 		                Fixed problem with SQL generated for classes that are part of an extend hierarchy.
