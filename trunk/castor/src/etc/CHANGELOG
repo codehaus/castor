@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1267 using contribution from Bill Leng [wleng@metatomix.com]
+       Fixed bug in SourceGenerator that caused xsd:enumeration values
+       for NMTOKENS and integer being created with wrong type.
+       Details: http://jira.codehaus.org/browse/CASTOR-1267
+       (Ralf - 20060121)
+
 JDO:   Fixed bug CASTOR-1303 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Code cleanup at SQLEngine.
        Details: http://jira.codehaus.org/browse/CASTOR-1303

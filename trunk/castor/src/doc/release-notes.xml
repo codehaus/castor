@@ -162,6 +162,27 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1267" tool="jira">
+                    <description>
+		                Fixed bug in SourceGenerator that caused xsd:enumeration values
+                        for NMTOKENS and integer being created with wrong type.
+                    </description>
+                    <contributor>
+                        <name>Bill Leng</name>
+                        <email>wleng@metatomix.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Bill Leng</name>
+                        <email>wleng@metatomix.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060121</date>
+                </bug>
                 <bug id="1303" tool="jira">
                     <description>
 		                Code cleanup at SQLEngine.
