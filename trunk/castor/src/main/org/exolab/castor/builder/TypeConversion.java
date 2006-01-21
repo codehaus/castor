@@ -134,14 +134,14 @@ public class TypeConversion {
                 return new XSClass(SGTypes.Object);
             }
             return convertType(common, useWrapper,packageName);
-        }
-        else if (base == null) {
-            String className
-                = JavaNaming.toJavaClassName(simpleType.getName());
+        } else if (base == null) {
+            String className = JavaNaming.toJavaClassName(simpleType.getName());
             xsType = new XSClass(new JClass(className));
-        }
-        else {
-            switch ( base.getTypeCode() ) {
+        } else {
+            xsType = findXSType(simpleType, packageName);
+            if (xsType != null) { return xsType; }
+
+            switch (base.getTypeCode()) {
 
                 //-- ID
                 case SimpleTypesFactory.ID_TYPE:
@@ -556,6 +556,44 @@ public class TypeConversion {
         return common;
     } //-- findCommonType
 
+    private XSType findXSType(final SimpleType simpleType, final String packageName) {
+        if(!simpleType.hasFacet(Facet.ENUMERATION)) {
+            return null;
+        }
+
+        XSType xsType = null;
+        String typeName = simpleType.getName();
+
+        //-- anonymous type
+        if (typeName == null) {
+            Structure parent = simpleType.getParent();
+            if (parent instanceof ElementDecl) {
+                typeName = ((ElementDecl)parent).getName();
+            } else if (parent instanceof AttributeDecl) {
+                typeName = ((AttributeDecl)parent).getName();
+            }
+            typeName = typeName + "Type";
+        }
+        
+        String className = JavaNaming.toJavaClassName(typeName);
+
+        String typePackageName = packageName;
+        if (typePackageName == null) {
+            String ns = simpleType.getSchema().getTargetNamespace();
+            typePackageName = _config.lookupPackageByNamespace(ns);
+        }
+        if ((typePackageName != null) && (typePackageName.length() > 0)) {
+            typePackageName = typePackageName  + '.' + TYPES_PACKAGE;
+        } else {
+            typePackageName = TYPES_PACKAGE;
+        }
+
+        className = typePackageName  + '.' + className;
+        xsType = new XSClass(new JClass(className));
+        xsType.setAsEnumerated(true);
+
+        return xsType;
+    }
 
     /**
      * Compares the two SimpleTypes. The common ancestor of
