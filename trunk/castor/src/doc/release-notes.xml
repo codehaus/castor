@@ -162,6 +162,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1303" tool="jira">
+                    <description>
+		                Code cleanup at SQLEngine.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060121</date>
+                </bug>
                <bug id="1301" tool="jira">
                     <description>
 		                De-deprecated getDatabasePooling() and setDatabasePooling(boolean) methods.

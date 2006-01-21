@@ -42,22 +42,13 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.persist.spi;
-
 
 import org.castor.persist.ProposedObject;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.mapping.TypeConvertor;
-import org.exolab.castor.jdo.DuplicateIdentityException;
-import org.exolab.castor.jdo.ObjectNotFoundException;
-import org.exolab.castor.jdo.ObjectDeletedException;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.PersistenceException;
-import org.exolab.castor.jdo.ObjectModifiedException;
 import org.exolab.castor.jdo.Database;
-
 
 /**
  * The persistence engine implements this interface in order to allow
@@ -92,10 +83,7 @@ import org.exolab.castor.jdo.Database;
  * @see TransactionContext
  * @see PersistenceQuery
  */
-public interface Persistence
-{
-
-
+public interface Persistence {
     /**
      * Creates a new object in persistence storage. Called for an
      * object that was created during the transaction when the identity
@@ -109,13 +97,12 @@ public interface Persistence
      * @param fields The fields to store
      * @param identity The object's identity
      * @return The object's identity
-     * @throws DuplicateIdentityException An object with the same
-     *   identity already exists in persistent storage
-     * @throws PersistenceException A persistence error occured
+     * @throws PersistenceException An object with the same identity already
+     *         exists in persistent storage or any other persistence error
+     *         occured.
      */
-    public Object create( Database database, Object conn, Object[] fields, Object identity )
-        throws DuplicateIdentityException, PersistenceException;
-
+    public Object create(Database database, Object conn, Object[] fields, Object identity)
+    throws PersistenceException;
 
     /**
      * Loads the object from persistence storage. This method will load
@@ -131,14 +118,12 @@ public interface Persistence
      * @param identity object's identity
      * @param accessMode The access mode (null equals shared)
      * @return The object's stamp, or null
-     * @throws ObjectNotFoundException The object was not found in
-     *   persistent storage
-     * @throws PersistenceException A persistence error occured
+     * @throws PersistenceException The object was not found in persistent
+     *         storage or any other persistence error occured.
      */
     public Object load(Object conn, ProposedObject proposedObject, Object identity,
                        AccessMode accessMode)
-    throws ObjectNotFoundException, PersistenceException;
-
+    throws PersistenceException;
 
     /**
      * Stores the object in persistent storage, given the object fields
@@ -164,16 +149,14 @@ public interface Persistence
      * @param original The original fields, or null
      * @param stamp The object's stamp, or null
      * @return The object's stamp, or null
-     * @throws ObjectModifiedException The object has been modified
-     *  in persistence storage since it was last loaded
-     * @throws ObjectDeletedException Indicates the object has been
-     *  deleted from persistence storage
-     * @throws PersistenceException A persistence error occured
+     * @throws PersistenceException The object has been modified in
+     *         persistence storage since it was last loaded or has been
+     *         deleted from persitence storage or any other persistence
+     *         error occored.
      */
-    public Object store( Object conn, Object[] fields, Object identity,
-                         Object[] original, Object stamp )
-        throws ObjectModifiedException, ObjectDeletedException, PersistenceException;
-
+    public Object store(Object conn, Object[] fields, Object identity,
+                        Object[] original, Object stamp)
+    throws PersistenceException;
 
     /**
      * Deletes the object from persistent storage, given the object'
@@ -186,28 +169,8 @@ public interface Persistence
      * @param identity The object's identity
      * @throws PersistenceException A persistence error occured
      */
-    public void delete( Object conn, Object identity )
-        throws PersistenceException;
-    
-
-    /**
-     * Obtains a write lock on the object. This method is called in
-     * order to lock the object and prevent concurrent access from
-     * other transactions. The object is known to have been loaded
-     * before either in this or another transaction. This method is
-     * used to assure that updates or deletion of the object will
-     * succeed when the transaction completes, without attempting to
-     * reload the object.
-     *
-     * @param conn An open connection
-     * @param identity The object's identity
-     * @throws ObjectDeletedException Indicates the object has been
-     *  deleted from persistence storage
-     * @throws PersistenceException A persistence error occured
-     */
-    public void writeLock( Object conn, Object identity )
-        throws ObjectDeletedException, PersistenceException;
-    
+    public void delete(Object conn, Object identity)
+    throws PersistenceException;
 
     /**
      * Creates and returns a new query object. The query object is
@@ -222,34 +185,8 @@ public interface Persistence
      * @return A new query object that can be executed
      * @throws QueryException The query is invalid
      */
-    public PersistenceQuery createQuery( QueryExpression query, Class[] types, AccessMode accessMode )
-        throws QueryException;
-
-    /**
-     * Returns ColumnInfos for identifiers.
-     * @return An array of FieldInfo instances.
-     */
-    public Persistence.ColumnInfo[] getColumnInfoForIdentities();
-    
-    /**
-     * Returns FieldInfos for fields (excluding identifiers).
-     * @return An array of ColumnInfo instances.
-     */
-	public Persistence.FieldInfo[] getInfo();
-
-    
-    public interface FieldInfo {
-		public boolean isComplex();
-		public boolean isPersisted();
-		public String getFieldName();
-    }
-    
-    public interface ColumnInfo {
-        public String getName();
-        public int getSqlType();
-        public TypeConvertor getConvertTo();
-        public TypeConvertor getConvertFrom();
-        public String getConvertParam();
-    }
+    public PersistenceQuery createQuery(QueryExpression query, Class[] types,
+                                        AccessMode accessMode)
+    throws QueryException;
 }
 
