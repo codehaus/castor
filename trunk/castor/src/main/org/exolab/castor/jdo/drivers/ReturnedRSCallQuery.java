@@ -156,7 +156,7 @@ final class ReturnedRSCallQuery implements PersistenceQuery
       execute(conn, accessMode);
     }
 
-    public void execute( Object conn, AccessMode accessMode )
+    private void execute( Object conn, AccessMode accessMode )
         throws QueryException, PersistenceException
     {
         _lastIdentity = null;

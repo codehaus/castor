@@ -42,17 +42,12 @@
  *
  * $Id$
  */
-
-
 package org.exolab.castor.persist.spi;
-
 
 import org.castor.persist.ProposedObject;
 import org.exolab.castor.mapping.AccessMode;
-import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.PersistenceException;
 import org.exolab.castor.jdo.ObjectNotFoundException;
-
 
 /**
  * The persistence engine implements this interface in order to allow
@@ -75,28 +70,7 @@ import org.exolab.castor.jdo.ObjectNotFoundException;
  * @version $Revision$ $Date$
  * @see Persistence
  */
-public interface PersistenceQuery
-{
-
-
-    /**
-     * Returns the number of parameters required for this query.
-     *
-     * @return Number of query parameters
-     */
-    public int getParameterCount();
-
-
-    /**
-     * Returns the type of a parameter required by this query. May
-     * return null if the type is unknown.
-     *
-     * @param index The parameter index
-     * @return Type of parameter, or null
-     */
-    public Class getParameterType( int index );
-
-
+public interface PersistenceQuery {
     /**
      * Sets the value of a paramter. Will complain if the parameter
      * is not of the specified type.
@@ -104,8 +78,7 @@ public interface PersistenceQuery
      * @param index The parameter index
      * @param value The parameter value
      */
-    public void setParameter( int index, Object value );
-
+    public void setParameter(int index, Object value);
 
     /**
      * Returns the type of object returned by this query.
@@ -113,7 +86,6 @@ public interface PersistenceQuery
      * @return The type of object returned by this query
      */
     public Class getResultType();
-
 
     /**
      * Execute the query with the give connection and lock type.
@@ -124,25 +96,12 @@ public interface PersistenceQuery
      *
      * @param conn An open connection
      * @param accessMode The access mode (null equals shared)
-     * @throws QueryException An invalid query
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
-     */
-    public void execute( Object conn, AccessMode accessMode )
-        throws QueryException, PersistenceException;
-
-    /**
-     * same as above, but parameterized for scrollable resultsets.
-     * @param conn An open connection
-     * @param accessMode The access mode (null equals shared)
      * @param scrollable The db cursor mode.
-     * @throws QueryException An invalid query
-     * @throws PersistenceException An error reported by the
-     *  persistence engine
+     * @throws PersistenceException An invalid query or an error reported
+     *         by the persistence engine.
      */
-    public void execute( Object conn, AccessMode accessMode, boolean scrollable )
-        throws QueryException, PersistenceException;
-
+    public void execute(Object conn, AccessMode accessMode, boolean scrollable)
+    throws PersistenceException;
 
     /**
      * Returns the identity of the next object to be returned.
@@ -157,9 +116,8 @@ public interface PersistenceQuery
      * @throws PersistenceException An error reported by the
      *  persistence engine
      */
-    public Object nextIdentity( Object identity )
-        throws PersistenceException;
-    
+    public Object nextIdentity(Object identity)
+    throws PersistenceException;
 
     /**
      * Loades the object. This method must be called immediately
@@ -179,14 +137,12 @@ public interface PersistenceQuery
      * @param fields The fields to load into
      * @param identity The object's identity
      * @return The object's stamp, or null
-     * @throws ObjectNotFoundException The object was not found in
-     *   persistent storage
-     * @throws PersistenceException A persistence error occured
+     * @throws PersistenceException The object was not found in
+     *         persistent storage or any other persistence error occured.
      * @see Persistence#load
      */
     public Object fetch(ProposedObject proposedObject, Object identity)
-    throws ObjectNotFoundException, PersistenceException;
-
+    throws PersistenceException;
 
     /**
      * Close the query and release all resources held by the query.
@@ -194,20 +150,18 @@ public interface PersistenceQuery
     public void close();
     
     /**
-     * moves the result of the query to the absolute position in the
-     * resultset
+     * Moves the result of the query to the absolute position in the
+     * resultset.
+     * 
      * @param row The row to move to
      * @throws PersistenceException A persistence error occured
      */
     public boolean absolute(int row)
-      throws PersistenceException;
+    throws PersistenceException;
 
     /**
-     * finds the size of the resulting resultset from the query.
+     * Finds the size of the resulting resultset from the query.
      */
     public int size()
-      throws PersistenceException;
-
-
+    throws PersistenceException;
 }
-
