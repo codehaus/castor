@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1268 using contribution from Trygve Laugstol [trygvis@codehaus.org]
+       Replaced incorrect use of URL.toString() with URL.toExternalForm().
+       Details: http://jira.codehaus.org/browse/CASTOR-1268
+
+       (Ralf - 20060121)
 JDO:   Fixed bug CASTOR-379 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Improved exception handling by chaining original exception.
        Details: http://jira.codehaus.org/browse/CASTOR-379

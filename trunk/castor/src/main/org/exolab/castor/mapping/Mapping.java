@@ -427,14 +427,14 @@ public class Mapping
         try {
             if ( _resolver.getBaseURL() == null )
                 _resolver.setBaseURL( url );
-            source = _resolver.resolveEntity( null, url.toString() );
+            source = _resolver.resolveEntity( null, url.toExternalForm() );
             if ( source == null ) {
-                source = new InputSource( url.toString() );
+                source = new InputSource( url.toExternalForm() );
                 source.setByteStream( url.openStream() );
             } else
-                source.setSystemId( url.toString() );
+                source.setSystemId( url.toExternalForm() );
             if ( _logWriter != null )
-                _logWriter.println( Messages.format( "mapping.loadingFrom", url.toString() ) );
+                _logWriter.println( Messages.format( "mapping.loadingFrom", url.toExternalForm() ) );
             loadMappingInternal( source );
         } catch ( SAXException except ) {
             throw new MappingException( except );

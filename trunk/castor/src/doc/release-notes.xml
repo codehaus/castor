@@ -162,7 +162,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
-
+                <bug id="1268" tool="jira">
+                    <description>
+		                Replaced incorrect use of URL.toString() with URL.toExternalForm().
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Trygve Laugstol</name>
+                        <email>trygvis@codehaus.org</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060124</date>
+                </bug>
                <bug id="379" tool="jira">
                     <description>
 		                Improved exception handling by chaining original exception.
