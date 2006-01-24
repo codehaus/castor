@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-379 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Improved exception handling by chaining original exception.
+       Details: http://jira.codehaus.org/browse/CASTOR-379
+       (Werner - 20060124)
+
 XML:   Fixed bug CASTOR-1267 using contribution from Bill Leng [wleng@metatomix.com]
        Fixed bug in SourceGenerator that caused xsd:enumeration values
        for NMTOKENS and integer being created with wrong type.

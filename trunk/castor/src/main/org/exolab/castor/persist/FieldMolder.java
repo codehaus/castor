@@ -304,7 +304,7 @@ public class FieldMolder {
         } catch ( InvocationTargetException except ) {
             // This should never happen
             throw new DataObjectAccessException( Messages.format( "mapping.schemaChangeInvocation",
-                                                              toString(), except ) );
+                                                              toString(), except ), except );
         }
     }
 
