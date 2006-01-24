@@ -162,6 +162,27 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+
+               <bug id="379" tool="jira">
+                    <description>
+		                Improved exception handling by chaining original exception.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Nicolas Marchildon</name>
+                        <email>nicolas@marchildon.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060124</date>
+                </bug>
                 <bug id="1267" tool="jira">
                     <description>
 		                Fixed bug in SourceGenerator that caused xsd:enumeration values
