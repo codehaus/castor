@@ -22,7 +22,7 @@
 		<p>If you would like to get involved, the first step is to join the
 		   <a href="lists.html">mailing lists</a>.</p>
 
-		<p>We kindly ask to not send us emails privately (e.g. asking for
+		<p>We kindly ask to <b>not send us emails privately</b> (e.g. asking for
            support). We are non-paid volunteers who help out with the project and
            we do not necessarily have the time or energy to help people on an
            individual basis.</p>
@@ -33,7 +33,7 @@
            can also learn from your messages (whether problem description, advice,
 		   or common mistakes), and as a community we all grow together.</p>
 
-		<p>In addition, use use of mailing lists enables us to maintain
+		<p>In addition, use of mailing lists enables us to maintain
 		   searchable <a href="http://archive.castor.codehaus.org">archives</a>
 		   of these mailing lists, that cover a vast range of questions and
 		   answers related to the use of Castor. We simply cannot overstate
