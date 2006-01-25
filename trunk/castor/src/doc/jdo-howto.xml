@@ -28,6 +28,7 @@
                 <li><a href="how-to-submit-a-bug.html">How to submit a bug report</a></li>
 	            <li><font color="lightgrey">How to Prepare a Patch</font></li>
 	            <li><font color="lightgrey">How to Contribute a Patch via Jira</font></li>
+                <li><a href="how-to-run-jdo-ctf-suite.html">How to run Castor JDO's test suite</a></li>
 	        </ul>
 		</section>
         
