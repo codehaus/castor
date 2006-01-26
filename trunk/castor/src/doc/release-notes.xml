@@ -162,6 +162,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1304" tool="jira">
+                    <description>
+		                Fixed some errors in some XML files.
+                    </description>
+                    <contributor>
+                        <name>Clovis Wichosky</name>
+                        <email>clovis.wichoski@gmail.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Clovis Wichosky</name>
+                        <email>clovis.wichoski@gmail.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>All</module>
+                    <date>20060127</date>
+                </bug>
                 <bug id="1268" tool="jira">
                     <description>
 		                Replaced incorrect use of URL.toString() with URL.toExternalForm().
