@@ -21,7 +21,7 @@
     <field name="type" type="string">
       <sql-info name="type" />
     </field>
-    <field name="objectId" type="string"/>
+    <field name="objectId" type="string">
       <sql-info name="obj_id" />
     </field>
   </class>
