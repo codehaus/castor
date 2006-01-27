@@ -31,6 +31,12 @@
 	        </ul>
 		</section>
         
+        <section title="Validation">
+            <ul>
+                <li><a href="how-to-enable-xml-validation.html">How to use XML validation</a></li>
+            </ul>
+        </section>
+        
         <section title="Others">
             <ul>
                 <li><a href="how-to-implement-custom-serializer.html">How to implement a custom serializer</a></li>

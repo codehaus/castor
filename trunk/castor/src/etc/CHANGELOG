@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1282 using contribution from Stephen Bash [bash@ll.mit.edu]
+       Added HOW-TO document for enabling XML parser validation.
+       Details: http://jira.codehaus.org/browse/CASTOR-1282
+       (Werner - 20060127)
+
 JDO:   Fixed bug CASTOR-1139 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added Database.isLocked(Class, Object) method.
        Details: http://jira.codehaus.org/browse/CASTOR-1139
