@@ -170,6 +170,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1282" tool="jira">
+                    <description>
+		                Added HOW-TO document for enabling XML parser validation.
+                    </description>
+                    <contributor>
+                        <name>Stephen Bash</name>
+                        <email>bash@ll.mit.edu</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stephen Bash</name>
+                        <email>bash@ll.mit.edu</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>Enh.</module>
+                    <date>20060127</date>
+                </bug>
                 <bug id="1139" tool="jira">
                     <description>
 		                Added Database.isLocked(Class, Object) method.
