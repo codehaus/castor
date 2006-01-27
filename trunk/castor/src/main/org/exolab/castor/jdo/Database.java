@@ -521,7 +521,15 @@ public interface Database
      */
     public boolean isClosed();
 
-
+    /**
+     * Returns true if the specified object is currently locked.
+     * @param cls Class instance.
+     * @param identity Object identity.
+     * @return True if the object specified is locked; false otherwise.
+     * @see org.exolab.castor.jdo.Database#isLocked(java.lang.Class, java.lang.Object)
+     */
+    public boolean isLocked (Class cls, Object identity);
+    
     /**
      * Closes the database. If a client transaction is in progress the
      * transaction will be rolled back and an exception thrown.

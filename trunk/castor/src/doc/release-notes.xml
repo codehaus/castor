@@ -30,8 +30,16 @@
             <summary>
                 <h2>Additions</h2>
                 
+                <h3>Support for <tt>java.util:list as collection type</tt></h3>
+                
                 <p>Added support for <tt>java.util.List</tt> as collection type for Castor XML.</p>
                 
+                <h3>Added isLocked (CLass, Object) method to Database interface</h3>
+                
+                <p>This new method allows to check, whether a particular object (as identified
+                   by the object identity and the object class) is currently
+                   locked with Castor JDO.</p>
+                   
 				<h2>Changes</h2>
 				
                 <p>As a result of this refactoring, we had to change the way a XMLSerializer
@@ -162,6 +170,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1139" tool="jira">
+                    <description>
+		                Added Database.isLocked(Class, Object) method.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Andre Teubner</name>
+                        <email>andre.teubner@web.de</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060127</date>
+                </bug>
                 <bug id="1304" tool="jira">
                     <description>
 		                Fixed some errors in some XML files.

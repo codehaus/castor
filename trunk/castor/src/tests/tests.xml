@@ -77,6 +77,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 
   </category>
 
@@ -167,6 +168,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -251,6 +253,7 @@
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -332,6 +335,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -418,6 +422,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -502,6 +507,7 @@
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -585,6 +591,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -669,6 +676,7 @@
     <!-- <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/> -->
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
@@ -753,6 +761,7 @@
     <case id="TC99" class="ctf.jdo.tc9x.TestPolymorphismMany2Many"/>
 	
 	<case class="jdo.TestGetJdbcConnection" id="TC202" />
+	<case class="jdo.IsLockedTest" id="TC247" />
 	
   </category>
 
