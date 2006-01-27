@@ -308,8 +308,25 @@ public class DatabaseImpl
     public boolean isClosed() {
         return ( _scope == null );
     }
+    
+    /**
+     * Returns true if the specified object is currently locked.
+     * @param cls Class instance.
+     * @param identity Object identity.
+     * @return True if the object specified is locked; false otherwise.
+     * @see org.exolab.castor.jdo.Database#isLocked(java.lang.Class, java.lang.Object)
+     */
+    public boolean isLocked(Class cls, Object identity) {
+        if (_scope == null) {
+            throw new IllegalStateException(Messages.message("jdo.dbClosed"));
+        }
+        if (_ctx != null && _ctx.isOpen()) {
+            return _ctx.isLocked(cls, identity, _scope.getLockEngine());
+        }
+        return false;
+	}
 
-    public Object load(final Class type, final Object identity) 
+	public Object load(final Class type, final Object identity) 
     throws ObjectNotFoundException, LockNotGrantedException, 
     TransactionNotInProgressException, PersistenceException {
         return load(type, identity, null, null);

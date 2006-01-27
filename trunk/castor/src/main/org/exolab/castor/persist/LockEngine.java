@@ -1474,17 +1474,33 @@ public final class LockEngine {
 		public boolean isCached(Object oid) {
             return cache.containsKey(oid);
 		}
+        
+        /**
+         * Indicates whether an object with the specified OID is currently locked.
+         * 
+         * @param oid Object identifier.
+         * @return True if the object is locked.
+         */
+        public boolean isLocked(OID oid)
+        {
+            return locks.containsKey(oid);
+        }
     }
 
 	/**
-	 * Provides information about whether an object of Class cls with identity iod
-	 * is currently cached.
-	 * @param cls Class type.
-	 * @param oid Object identity
-	 * @return True if the specified object is in the cache.  
-	 */
+     * Provides information about whether an object of Class cls with identity iod is currently cached.
+     * 
+     * @param cls Class type.
+     * @param oid Object identity
+     * @return True if the specified object is in the cache.
+     */
 	public boolean isCached(Class cls, Object oid) {
         TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
         return typeInfo.isCached (oid);
+	}
+
+	public boolean isLocked(Class cls, OID oid) {
+        TypeInfo typeInfo = (TypeInfo) _typeInfo.get(cls.getName());
+        return typeInfo.isLocked (oid);
 	}
 }
