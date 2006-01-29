@@ -48,6 +48,7 @@ package org.exolab.castor.jdo.engine;
 
 
 import org.castor.jdo.engine.SQLTypeConverters;
+import org.castor.jdo.util.ClassLoadingUtils;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.jdo.*;
 import org.exolab.castor.jdo.oql.*;
@@ -389,10 +390,7 @@ public class OQLQueryImpl
             throw new QueryException( "Missing object name" );
         }
         try {
-            if ( _dbImpl.getClassLoader() == null )
-                _objClass = Class.forName( objType );
-            else
-                _objClass = _dbImpl.getClassLoader().loadClass( objType );
+            _objClass = ClassLoadingUtils.loadClass(_dbImpl.getClassLoader(), objType);
         } catch ( ClassNotFoundException except ) {
             throw new QueryException( "Could not find class " + objType );
         }

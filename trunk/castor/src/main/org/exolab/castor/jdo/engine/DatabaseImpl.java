@@ -54,6 +54,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.castor.jdo.engine.AbstractConnectionFactory;
 import org.castor.jdo.engine.DatabaseRegistry;
+import org.castor.jdo.util.ClassLoadingUtils;
 
 import org.castor.persist.GlobalTransactionContext;
 import org.castor.persist.LocalTransactionContext;
@@ -685,11 +686,7 @@ public class DatabaseImpl
     			syncName = tokenizer.nextToken();
     			try {
                 	Class cls = null;
-                	if (_classLoader != null) {
-                		cls = _classLoader.loadClass( syncName );
-                	} else {
-                		cls = Class.forName( syncName );
-                	}
+                    cls = ClassLoadingUtils.loadClass(_classLoader, syncName);
     				TxSynchronizable sync = (TxSynchronizable)cls.newInstance();
     				if ( sync != null ) _synchronizables.add(sync);
     			} catch ( Exception except ) {

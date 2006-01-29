@@ -55,6 +55,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import org.castor.jdo.util.ClassLoadingUtils;
 import org.castor.persist.ProposedObject;
 import org.castor.persist.TransactionContext;
 import org.castor.persist.UpdateAndRemovedFlags;
@@ -1184,10 +1185,9 @@ public class ClassMolder
     public Object newInstance(ClassLoader loader) 
     	throws InstantiationException, IllegalAccessException, ClassNotFoundException 
 	{
-        if (loader != null)
-            return loader.loadClass(_name).newInstance();
-
-        return Class.forName(_name).newInstance();
+        Class aClass = null;
+        aClass = ClassLoadingUtils.loadClass(loader, _name);
+        return aClass.newInstance();
     }
 
     /**
@@ -1345,7 +1345,7 @@ public class ClassMolder
     public Class getJavaClass( ClassLoader loader ) {
         Class result = null;
         try {
-            result = ( loader != null) ? loader.loadClass(_name) : Class.forName(_name);
+            result = ClassLoadingUtils.loadClass(loader, _name);
         } catch ( ClassNotFoundException e ) {
             _log.error("Unable to load base class of " + getName(), e);
         }
@@ -1364,10 +1364,7 @@ public class ClassMolder
         ClassLoader loader = cls.getClassLoader();
         Class molderClass = null;
         try {
-            if ( loader != null )
-                molderClass = loader.loadClass( _name );
-            else
-                molderClass = Class.forName( _name );
+            molderClass = ClassLoadingUtils.loadClass(loader, _name);
         } catch ( ClassNotFoundException e ) {
             return false;
         }

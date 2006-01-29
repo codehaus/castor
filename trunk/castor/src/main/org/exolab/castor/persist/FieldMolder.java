@@ -57,6 +57,7 @@ import java.util.SortedSet;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.util.ClassLoadingUtils;
 import org.exolab.castor.jdo.DataObjectAccessException;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.TypeConvertor;
@@ -1178,10 +1179,7 @@ public class FieldMolder {
         {
             Class resultClass = null;
             try {
-                if ( null != _loader )
-                    resultClass  = _loader.loadClass( name );
-                else
-                    resultClass = Class.forName( name );
+                resultClass = ClassLoadingUtils.loadClass(_loader, name);
             } catch (ClassNotFoundException e) {
                 // ssa, FIXME : should never happen
                 e.printStackTrace();
