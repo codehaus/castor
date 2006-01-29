@@ -47,6 +47,7 @@
 package org.exolab.castor.jdo.oql;
 
 import org.castor.jdo.engine.SQLTypeInfos;
+import org.castor.jdo.util.ClassLoadingUtils;
 import org.exolab.castor.jdo.QueryException;
 import org.exolab.castor.jdo.engine.JDOFieldDescriptor;
 import org.exolab.castor.mapping.TypeConvertor;
@@ -69,7 +70,11 @@ public class ParamInfo {
 
   private Class _sqlType;
   
-  private ClassLoader _classLoader;
+  /**
+   * ClassLOader instance to be used for loading a class; null, if default class loader 
+   * should be used.
+   */
+private ClassLoader _classLoader;
 
   /**
    * Convertor that converts from the parameter type to SQL type of the parameter,
@@ -104,11 +109,7 @@ public class ParamInfo {
     Class userClass = null;
     Class systemClass = null;
     try {
-        if (_classLoader == null) {
-            systemClass = Class.forName (systemType);
-        } else {
-            systemClass = _classLoader.loadClass (systemType); 
-        }
+        systemClass = ClassLoadingUtils.loadClass (_classLoader, systemType);
     }
     catch (Exception e) {
       throw new QueryException( "Error: Could not find system defined class: " + systemType );
@@ -167,11 +168,7 @@ public class ParamInfo {
     if ( ! systemType.equals(_systemType) ) {
       Class systemClass = null;
       try {
-          if (_classLoader == null) {
-              systemClass = Class.forName (systemType);
-          } else {
-              systemClass = _classLoader.loadClass (systemType);
-          }
+          systemClass = ClassLoadingUtils.loadClass (_classLoader, systemType);
       }
       catch (Exception e) {
         throw new QueryException( "Error: Could notfind system defined class: " + systemType );
@@ -180,11 +177,7 @@ public class ParamInfo {
       if ( ! userDefinedType.equals("") ) {
         Class userClass = null;
         try {
-            if (_classLoader == null) {
-                userClass = Class.forName(_userDefinedType);
-            } else {
-                userClass = _classLoader.loadClass (_userDefinedType);
-            }
+            userClass = ClassLoadingUtils.loadClass(_classLoader, _userDefinedType);
         }
         catch (Exception e) {
           throw new QueryException( "The class " + userClass + " could not be found." );
@@ -195,6 +188,7 @@ public class ParamInfo {
 
       }
     }
+    
   }
 
   /**

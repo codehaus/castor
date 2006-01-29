@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-785 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Move class loading code for Castor JDO to a single utility class.
+       Details: http://jira.codehaus.org/browse/CASTOR-785
+       (Werner - 20060129)
+
 XML:   Fixed bug CASTOR-1282 using contribution from Stephen Bash [bash@ll.mit.edu]
        Added HOW-TO document for enabling XML parser validation.
        Details: http://jira.codehaus.org/browse/CASTOR-1282

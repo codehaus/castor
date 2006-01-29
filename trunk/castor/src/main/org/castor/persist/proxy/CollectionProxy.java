@@ -31,6 +31,7 @@ import java.util.Vector;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.castor.jdo.util.ClassLoadingUtils;
 import org.exolab.castor.persist.FieldMolder;
 
 /**
@@ -73,11 +74,8 @@ public abstract class CollectionProxy {
             if (comparatorClassName != null) {
                 Comparator comparator;
                 try {
-                    if (classLoader != null) {
-                        comparator = (Comparator) classLoader.loadClass(comparatorClassName).newInstance();
-                    } else {
-                        comparator = (Comparator) Class.forName(comparatorClassName).newInstance();
-                    }
+                    comparator = (Comparator) 
+                        ClassLoadingUtils.loadClass(classLoader, comparatorClassName).newInstance();
                 } catch (InstantiationException e) {
                     LOG.error ("Problem instantiating instance of " + comparatorClassName);
                     throw new IllegalArgumentException("Problem instantiating instance of " + comparatorClassName);
