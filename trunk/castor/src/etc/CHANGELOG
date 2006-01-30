@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1308 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed NullPointerException in MappingTool.
+       Details: http://jira.codehaus.org/browse/CASTOR-1308
+       (Ralf - 20060130)
+
 JDO:   Fixed bug CASTOR-785 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Move class loading code for Castor JDO to a single utility class.
        Details: http://jira.codehaus.org/browse/CASTOR-785
