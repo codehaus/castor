@@ -179,6 +179,9 @@ public class SourceGenerator
         
     private static final String GENERATE_IMPORT_MSG 
         = "Imported XML Schemas will be processed automatically.";
+    
+    private static final String CASE_INSENSITIVE_MSG = 
+        "The generated classes will use a case insensitive method for looking up enumerated type values.";
           
 
     /**
@@ -489,6 +492,19 @@ public class SourceGenerator
             _sourceFactory.setSAX1(sax1);
 
     }
+    
+    /**
+     * Set to true if enumerated type lookups should be performed in a case
+     * insensitive manner.
+     *
+     * @param caseInsensitive when true, enumerated type lookups will be 
+     *        performed in a case insensitive manner.
+     */
+    public void setCaseInsensitive(final boolean caseInsensitive) {
+        if (_sourceFactory != null) {
+            _sourceFactory.setCaseInsensitive(caseInsensitive);
+        }
+    }
 
     public void setSuppressNonFatalWarnings(boolean suppress) {
         _warnOnOverwrite = (!suppress);
@@ -699,6 +715,10 @@ public class SourceGenerator
         //-- Generates sources for imported XML Schemas
         desc = "Generates sources for imported XML schemas";
         allOptions.addFlag("generateImportedSchemas","",desc,true);
+        
+        //-- Sets enumerated type to use a case insensitive lookup
+        desc = "Sets enumerated types to use a case insensitive lookup";
+        allOptions.addFlag("case-insensitive", "", desc);
 
         //-- Process the specified command line options
         Properties options = allOptions.getOptions(args);
@@ -818,6 +838,12 @@ public class SourceGenerator
             sgen.setSAX1(true);
             System.out.print("-- ");
             System.out.println(SAX1_MSG);
+        }
+        
+        if (options.getProperty("case-insensitive") != null) {
+            sgen.setCaseInsensitive(true);
+            System.out.print("-- ");
+            System.out.println(CASE_INSENSITIVE_MSG);
         }
 
         if (options.getProperty("binding-file") != null) {

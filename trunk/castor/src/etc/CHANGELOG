@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1288 using contribution from Will McKinley [willowmck@yahoo.com]
+       Allowed case insensitive lookups for enumerated type values.
+       Details: http://jira.codehaus.org/browse/CASTOR-1288
+       (Ralf - 20060130)
+
 XML:   Fixed bug CASTOR-1308 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Fixed NullPointerException in MappingTool.
        Details: http://jira.codehaus.org/browse/CASTOR-1308

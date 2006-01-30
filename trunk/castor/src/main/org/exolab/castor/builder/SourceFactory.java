@@ -146,6 +146,12 @@ public class SourceFactory {
     * A flag indicating that SAX1 should be used when generating the source.
     */
     private boolean _sax1 = false;
+    
+    /**
+     * A flag indicating that enumerated types should be constructed to perform
+     * case insensitive lookups based on the values.
+     */
+    private boolean _caseInsensitive = false;
 
     /**
      * The BuilderConfiguration instance
@@ -245,6 +251,16 @@ public class SourceFactory {
     */
     public void setSAX1(boolean sax1) {
         _sax1 = sax1;
+    }
+    
+    /**
+     * Set to true if enumerated type lookups should be performed in a case 
+     * insensitive manner.
+     *
+     * @param caseInsensitive when true 
+     */
+    public void setCaseInsensitive(final boolean caseInsensitive) {
+        _caseInsensitive = caseInsensitive;
     }
 
     //------------------/
@@ -1696,7 +1712,13 @@ public class SourceFactory {
         jsc = mValueOf.getSourceCode();
         jsc.add("java.lang.Object obj = null;");
         jsc.add("if (string != null) ");
-        jsc.append("obj = _memberTable.get(string);");
+        
+        if (_caseInsensitive) {
+            jsc.append("obj = _memberTable.get(string.toLowerCase());");
+        } else {
+            jsc.append("obj = _memberTable.get(string);");
+        }
+        
         jsc.add("if (obj == null) {");
         jsc.indent();
         jsc.add("String err = \"'\" + string + \"' is not a valid ");
@@ -1814,7 +1836,11 @@ public class SourceFactory {
                 jsc = mInit.getSourceCode();
                 jsc.add("members.put(\"");
                 jsc.append(escapeValue(value));
-                jsc.append("\", ");
+                if (_caseInsensitive) {
+                    jsc.append("\".toLowerCase(), ");
+                } else {
+                    jsc.append("\", ");
+                }
                 jsc.append(objName);
                 jsc.append(");");
             }
