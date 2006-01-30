@@ -582,7 +582,7 @@
     <name surname="Martin" given="Margaret"/>
     <email>mmartin@vignette.com</email>
     <description>
-    Contributions to the mailing list to help others in the community; contributed a workaround for the lack of self-referential relationships.
+        Contributions to the mailing list to help others in the community; contributed a workaround for the lack of self-referential relationships.
     </description>
   </contributor>
 
@@ -596,6 +596,14 @@
     <name surname="Mauch" given="Thorsten"/>
     <email>mauch@imkenberg.de</email>
     <description>OQL Query tool, bug fixing for OQL.</description>
+  </contributor>
+
+  <contributor type="Contributor">
+     <name surname="McKinley" given="Will"/>
+     <email>willowmck@yahoo.com</email>
+     <description>
+        Provided a patch to source generator that allows case insensitive lookups for enumerated type values.
+     </description>
   </contributor>
 
   <contributor type="Contributor">

@@ -40,6 +40,12 @@
                    by the object identity and the object class) is currently
                    locked with Castor JDO.</p>
                    
+                <h3>Allowed case insensitive lookups of enumerated type values</h3>
+                
+                <p>With 'case-insensitive' commandline option of source generator you are
+                   now able to instruct Castor to use case insensitive lookups for
+                   enumerated type values.</p>
+                   
 				<h2>Changes</h2>
 				
                 <p>As a result of this refactoring, we had to change the way a XMLSerializer
@@ -170,6 +176,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1288" tool="jira">
+                    <description>
+		                Allowed case insensitive lookups for enumerated type values.
+                    </description>
+                    <contributor>
+                        <name>Will McKinley</name>
+                        <email>willowmck@yahoo.com</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Will McKinley</name>
+                        <email>willowmck@yahoo.com</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>XML</module>
+                    <date>20060130</date>
+                </bug>
                 <bug id="1308" tool="jira">
                     <description>
 		                Fixed NullPointerException in MappingTool.

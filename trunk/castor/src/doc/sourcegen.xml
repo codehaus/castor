@@ -192,6 +192,13 @@ java org.exolab.castor.builder.SourceGenerator -i foo-schema.xsd \
                 </td>
                <td>Optional</td>
              </tr>
+             <tr>
+               <td align="center">case-insensitive</td><td><br/></td>
+               <td>
+                  The generated classes will use a case insensitive method for looking up enumerated type values.
+                </td>
+               <td>Optional</td>
+             </tr>
           </table>
 
          <section title="Collection Types">
