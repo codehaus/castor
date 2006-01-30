@@ -55,6 +55,7 @@ import org.exolab.castor.mapping.loader.CollectionHandlers;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.loader.Types;
 import org.exolab.castor.mapping.xml.BindXml;
+import org.exolab.castor.mapping.xml.ClassChoice;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
 import org.exolab.castor.mapping.xml.MappingRoot;
@@ -78,7 +79,6 @@ import java.util.Hashtable;
 import java.util.Enumeration;
 import java.util.Properties;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 
 /**
  * A tool which uses the introspector to automatically
@@ -272,9 +272,6 @@ public class MappingTool
         if (cls == null) 
             throw new MappingException("Cannot introspect a null class.");
             
-        ClassMapping clsMap;
-        Method[]     methods;
-
         if ( _mappings.get( cls ) != null )
             return;
             
@@ -426,6 +423,9 @@ public class MappingTool
             fieldMap.setBindXml( new BindXml() );
             fieldMap.getBindXml().setName( ( (XMLFieldDescriptor) fdesc ).getXMLName() );
             fieldMap.getBindXml().setNode( BindXmlNodeType.valueOf( ((XMLFieldDescriptor) fields[ i ]).getNodeType().toString() ) );
+            if (classMap.getClassChoice() == null) {
+                classMap.setClassChoice(new ClassChoice());
+            }
             classMap.getClassChoice().addFieldMapping( fieldMap );
             
             if (deep) {

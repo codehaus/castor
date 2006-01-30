@@ -170,6 +170,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1308" tool="jira">
+                    <description>
+		                Fixed NullPointerException in MappingTool.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Mike Wannamaker</name>
+                        <email>mike.wannamaker@kingston.hummingbird.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060130</date>
+                </bug>
                 <bug id="785" tool="jira">
                     <description>
 		                Move class loading code for Castor JDO to a single utility class
