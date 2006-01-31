@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-903 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added documentation about Castor JDO Persistence interface.
+       Details: http://jira.codehaus.org/browse/CASTOR-903
+       (Werner - 20060131)
+
 XML:   Fixed bug CASTOR-1288 using contribution from Will McKinley [willowmck@yahoo.com]
        Allowed case insensitive lookups for enumerated type values.
        Details: http://jira.codehaus.org/browse/CASTOR-1288

@@ -389,14 +389,14 @@
         	<p>As of release 0.9.6, Castor supports lazy-loading of 1:1 relations. Imagine the 
         	   following class mapping:</p>
 
-			<code><![CDATA[
+			<code-panel><![CDATA[
 <mapping>
     <class name="com.xzy.Department">
        ...
        <field "employee" type="com.xyz.Employee" lazy="true" />
        ...
     </class>
-</mapping>]]></code>
+</mapping>]]></code-panel>
         	   
 			<p>Per definition, when an instance of Department is loaded through e.g. Database.load(),
 			   Castor will not (pre-)load the Employee instance referenced (as such reducing the size
@@ -479,6 +479,66 @@
            data integrity and performance. Well chosen primary keys are usually single (not 
            multiple) column numeric or character fields for the reasons outlined above, as well as 
            performance, as joining operations are faster for single column primary keys. </p>
+      </section>
+      
+      <section title="Callback interface for persistent operations">
+        
+         <p>For the various persistence operations as available through the 
+            <api class="org.exolab.castor.jdo.Database">Database</api> 
+            interface, Castor JDO provides a callback interface that informs the 
+            implementing class on events taking place related to selected
+            persistence operations.</p>
+            
+         <p>Once your entity class implements the 
+            <api class="org.exolab.castor.jdo.Persistence">Persistence</api> interface, 
+            you'll have to provide implementations for the following methods (with their
+            respective semantics described next to them):</p>
+            
+         <ctable>
+            <cheader>
+                <th>Method</th>
+                <th>Description</th>
+            </cheader>
+            <crow>
+                <td>jdoAfterCreate()</td>
+                <td>Indicates that an object has been created in persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoAfterRemove()</td>
+                <td>Indicates that an object has been removed from persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoBeforeCreate()</td>
+                <td>Indicates that an object is to be created in persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoBeforeRemove()</td>
+                <td>Indicates that an object is to be removed from persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoLoad()</td>
+                <td>Indicates that the object has been loaded from persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoPersistent(Database)</td>
+                <td>Sets the database to which this object belongs when this object becomes persistent.</td>
+            </crow>
+            <crow>
+                <td>jdoStore()</td>
+                <td>Indicates that an object is to be stored in persistent storage.</td>
+            </crow>
+            <crow>
+                <td>jdoTransient()</td>
+                <td>Indicates the object is now transient.</td>
+            </crow>
+            <crow>
+                <td>jdoUpdate()</td>
+                <td>Indicates that an object has been included to the current transaction by 
+                    means of db.update() method (in other words, at the end of a 
+                    "long" transaction).</td>
+            </crow>
+         </ctable>
+        
       </section>
 
    </body>

@@ -40,6 +40,11 @@
                    by the object identity and the object class) is currently
                    locked with Castor JDO.</p>
                    
+                <h3>Added documentation about Castor JDO Persistence interface</h3>
+                
+                <p>Added a section about the various methods available on the Persistence 
+                   interface to the HTML docs.</p>
+                   
                 <h3>Allowed case insensitive lookups of enumerated type values</h3>
                 
                 <p>With 'case-insensitive' commandline option of source generator you are
@@ -176,6 +181,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="903" tool="jira">
+                    <description>
+		                Added documentation about Castor JDO Persistence interface.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060131</date>
+                </bug>
                 <bug id="1288" tool="jira">
                     <description>
 		                Allowed case insensitive lookups for enumerated type values.
