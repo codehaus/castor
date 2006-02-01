@@ -101,7 +101,8 @@ implements KeyGenerator
             !fName.equals("informix") &&
             !fName.equals("sapdb") &&
             !fName.equals("db2") && 
-            !fName.equals("derby")) {
+            !fName.equals("derby") &&
+            !fName.equals("pointbase")) {
             throw new MappingException(
             	Messages.format("mapping.keyGenNotCompatible", getClass().getName(), fName));
         }
