@@ -55,6 +55,7 @@
                   <tr bgcolor="#DEDEDE"><td>sapdb</td><td>SAP DB / MaxDB</td></tr>
                   <tr><td>sql-server</td><td>Microsoft SQL Server</td></tr>
                   <tr bgcolor="#DEDEDE"><td>sybase</td><td>Sybase 11</td></tr>
+                  <tr><td>pointbase</td><td>Borland Pointbase</td></tr>
                </table>
             </td>
          </tr>

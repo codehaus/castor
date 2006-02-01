@@ -345,6 +345,8 @@ public class OqlTests extends CastorTestCase {
                     functionValue = ((Long) obj).longValue();
                 } else if (obj instanceof BigDecimal) {
                     functionValue = ((BigDecimal) obj).longValue();
+                } else if (obj instanceof Integer) {
+                    functionValue = ((Integer) obj).longValue();
                 }
             }
         } finally {

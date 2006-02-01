@@ -549,7 +549,13 @@ public final class TestPolymorphism extends CastorTestCase {
         QueryResults results = query.execute();
         
         if (results.hasMore()) {
-        	Long count = (Long) results.next();
+            Object obj = results.next();
+            Long count = null;
+            if (obj instanceof Long) {
+                count = (Long) obj;
+            } else if (obj instanceof Integer) {
+                count = new Long(((Integer) obj).intValue());
+            }
         	assertNotNull (count);
         	assertEquals (1, count.intValue());
         }

@@ -33,6 +33,13 @@
                 <h3>Support for <tt>java.util:list as collection type</tt></h3>
                 
                 <p>Added support for <tt>java.util.List</tt> as collection type for Castor XML.</p>
+
+                <h3>Support for Borland Pointbase</h3>
+
+                <p>Support for Borland's Pointbase has been added. For initial information 
+                   about configuration of Castor JDO for the use with Borland's Pointbase, 
+                   please see <tt>src/tests/jdo/pointbse.xml</tt>.</p>
+                   
                 
                 <h3>Added isLocked (CLass, Object) method to Database interface</h3>
                 
@@ -181,146 +188,6 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
-                <bug id="903" tool="jira">
-                    <description>
-		                Added documentation about Castor JDO Persistence interface.
-                    </description>
-                    <contributor>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </contributor>
-                    <submitter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </submitter>
-                    <reporter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                   </reporter>
-                    <type>Bug</type>
-                    <module>JDO</module>
-                    <date>20060131</date>
-                </bug>
-                <bug id="1288" tool="jira">
-                    <description>
-		                Allowed case insensitive lookups for enumerated type values.
-                    </description>
-                    <contributor>
-                        <name>Will McKinley</name>
-                        <email>willowmck@yahoo.com</email>
-                    </contributor>
-                    <submitter>
-                        <name>Ralf Joachim</name>
-                        <email>ralf.joachim@syscon-world.de</email>
-                    </submitter>
-                    <reporter>
-                        <name>Will McKinley</name>
-                        <email>willowmck@yahoo.com</email>
-                   </reporter>
-                    <type>Enh.</type>
-                    <module>XML</module>
-                    <date>20060130</date>
-                </bug>
-                <bug id="1308" tool="jira">
-                    <description>
-		                Fixed NullPointerException in MappingTool.
-                    </description>
-                    <contributor>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </contributor>
-                    <submitter>
-                        <name>Ralf Joachim</name>
-                        <email>ralf.joachim@syscon-world.de</email>
-                    </submitter>
-                    <reporter>
-                        <name>Mike Wannamaker</name>
-                        <email>mike.wannamaker@kingston.hummingbird.com</email>
-                   </reporter>
-                    <type>Bug</type>
-                    <module>XML</module>
-                    <date>20060130</date>
-                </bug>
-                <bug id="785" tool="jira">
-                    <description>
-		                Move class loading code for Castor JDO to a single utility class
-                    </description>
-                    <contributor>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </contributor>
-                    <submitter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </submitter>
-                    <reporter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </reporter>
-                    <type>Bug</type>
-                    <module>JDO</module>
-                    <date>20060129</date>
-                </bug>
-                <bug id="1282" tool="jira">
-                    <description>
-		                Added HOW-TO document for enabling XML parser validation.
-                    </description>
-                    <contributor>
-                        <name>Stephen Bash</name>
-                        <email>bash@ll.mit.edu</email>
-                    </contributor>
-                    <submitter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </submitter>
-                    <reporter>
-                        <name>Stephen Bash</name>
-                        <email>bash@ll.mit.edu</email>
-                   </reporter>
-                    <type>Bug</type>
-                    <module>Enh.</module>
-                    <date>20060127</date>
-                </bug>
-                <bug id="1139" tool="jira">
-                    <description>
-		                Added Database.isLocked(Class, Object) method.
-                    </description>
-                    <contributor>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </contributor>
-                    <submitter>
-                        <name>Werner Guttmann</name>
-                        <email>werner.guttmann@gmx.net</email>
-                    </submitter>
-                    <reporter>
-                        <name>Andre Teubner</name>
-                        <email>andre.teubner@web.de</email>
-                   </reporter>
-                    <type>Bug</type>
-                    <module>JDO</module>
-                    <date>20060127</date>
-                </bug>
-                <bug id="1304" tool="jira">
-                    <description>
-		                Fixed some errors in some XML files.
-                    </description>
-                    <contributor>
-                        <name>Clovis Wichosky</name>
-                        <email>clovis.wichoski@gmail.com</email>
-                    </contributor>
-                    <submitter>
-                        <name>Ralf Joachim</name>
-                        <email>ralf.joachim@syscon-world.de</email>
-                    </submitter>
-                    <reporter>
-                        <name>Clovis Wichosky</name>
-                        <email>clovis.wichoski@gmail.com</email>
-                   </reporter>
-                    <type>Bug</type>
-                    <module>All</module>
-                    <date>20060127</date>
-                </bug>
                 <bug id="1268" tool="jira">
                     <description>
 		                Replaced incorrect use of URL.toString() with URL.toExternalForm().
