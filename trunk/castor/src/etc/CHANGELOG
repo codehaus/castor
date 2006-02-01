@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1238 using contribution from Ulrich Post [Ulrich.Post@softwareag.com]
+       Allowed restricting an complexType with complexContent to complexType with simpleContent.
+       Details: http://jira.codehaus.org/browse/CASTOR-1238
+       (Ralf - 20060202)
+
 JDO:   Fixed bug CASTOR-903 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added documentation about Castor JDO Persistence interface.
        Details: http://jira.codehaus.org/browse/CASTOR-903

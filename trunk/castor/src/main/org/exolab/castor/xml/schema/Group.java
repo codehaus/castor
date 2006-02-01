@@ -487,4 +487,54 @@ public class Group extends Particle implements ContentModelGroup, Referable {
         _parent = parent;
     } //-- setParent
 
+    /**
+     * @return true if this Particle is emptiable
+     */
+    public boolean isEmptiable()
+    {
+      if (getMinOccurs() == 0)
+      {
+        return true;
+      }
+      
+      boolean result = false;
+      switch (this.getOrder().getType())
+      {
+      case Order.CHOICE:
+        {
+          result = false;
+          Enumeration enum = this.enumerate(); 
+          while (enum.hasMoreElements())
+          {
+            Particle p = (Particle) enum.nextElement();
+            if (p.isEmptiable())
+            {
+              result = true;
+              break;
+            }
+          }
+        }
+        break;
+        
+      case Order.ALL:
+      case Order.SEQUENCE:
+        {
+          result = true;
+          Enumeration enum = this.enumerate(); 
+          while (enum.hasMoreElements())
+          {
+            Particle p = (Particle) enum.nextElement();
+            if (!p.isEmptiable())
+            {
+              result = false;
+              break;
+            }
+          }
+        }
+        break;
+      }        
+      return result;
+
+    }
+
 } //-- Group

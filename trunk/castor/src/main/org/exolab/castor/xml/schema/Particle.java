@@ -137,4 +137,16 @@ public abstract class Particle extends Annotated {
         _minOccurs = minOccurs;
     } //-- setMinOccurs
 
+    /**
+     * @return true if this Particle is emptiable
+     */
+    public boolean isEmptiable()
+    {
+      if (getMinOccurs() == 0)
+      {
+        return true;
+      }
+      return false;
+    }
+
 } //-- CMParticle

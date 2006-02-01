@@ -97,6 +97,7 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
     private boolean     foundAnnotation   = false;
     private boolean     foundSimpleType   = false;
 	private boolean     foundFacets       = false;
+    private boolean     foundAnyAttribute = false;
 	private boolean     foundAttribute    = false;
     private boolean     foundAttributeGroup = false;
 
@@ -155,17 +156,27 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
                 ComplexType temp = (ComplexType) baseType;
                 
                 if ( ! temp.isSimpleContent() ) {
-                    String err ="complexType: ";
-                    String name = _complexType.getName();
-                    if (name != null) {
-                        err += name;
-                    } else {
-                        err += "#anonymous-complexType#";
+                    // UPO - base type may have complex content if
+                    // 1. content model is emptiable
+                    // 2. it has mixed content
+                    // See bug report http://jira.codehaus.org/browse/CASTOR-1238
+                    if ( (temp.getContentType().getType() == ContentType.MIXED)  &&  temp.isEmptiable() ) {
+                      // OK
                     }
+                    else {
+                      String err ="complexType: ";
+                      String name = _complexType.getName();
+                      if (name != null) {
+                          err += name;
+                      } else {
+                          err += "#anonymous-complexType#";
+                      }
                     
-                    err += "In a simpleContent when using restriction the base type"+
-                        " must be a complexType whose base is a simpleType.";
-                    throw new IllegalStateException(err);
+                      err += ": In a simpleContent when using restriction the base type"+
+                          " must be a complexType with a simple content model or it must" +
+                          " be a complex content model which is mixed and emptiable.";
+                      throw new IllegalStateException(err);
+                    }
                 }
                 else {
 				    //retrieve the base type of this complexType
@@ -297,6 +308,7 @@ public class SimpleContentRestrictionUnmarshaller extends ComponentReader {
 		}
         //-- <anyAttribute>
         else if (SchemaNames.ANY_ATTRIBUTE.equals(name)) {
+           foundAnyAttribute = true;
             unmarshaller
                  = new WildcardUnmarshaller(_complexType, _schema, name, atts, getResolver());
         }
