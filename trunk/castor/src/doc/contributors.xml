@@ -692,6 +692,14 @@
   </contributor>
 
   <contributor type="Contributor">
+    <name surname="Post" given="Ulrich"/>
+    <email>Ulrich.Post@softwareag.com</email>
+    <description>
+        Allowed restricting an complexType with complexContent to complexType with simpleContent.
+    </description>
+  </contributor>
+
+  <contributor type="Contributor">
     <name surname="Purnhagen" given="Ralf" />
     <email>purnhar@gmx.net</email>
     <description>A patch to JDO which fixed a ClassNotFoundException ocurring in a multiple ClassLoader environment</description>

@@ -897,5 +897,40 @@ public class ComplexType extends XMLType implements ContentModelGroup, Referable
         _parent = parent;
     } //-- setParent
 
+    /**
+     * @return
+     */
+    public boolean isEmptiable()
+    {
+      switch (getParticleCount()) 
+      {
+      case 0:
+        return true;
+      case 1:
+        Particle p = getParticle(0);
+        if (p.isEmptiable())
+        {
+          if ( (_baseType != null)  &&  !isRestricted() )
+          {
+            // derived by extension
+            XMLType baseType = getBaseType();
+            if (     (baseType != null)  
+                 &&  baseType.isComplexType()
+                 &&  ((ComplexType)baseType).isEmptiable() )
+            {
+              return true;
+            }
+          }
+          else
+          {
+            // derived by restriction (explicit or shorthand from xs:anyType
+            return true;
+          }
+        }
+        break;
+      }
+      return false;
+    }
+
 
 } //-- Complextype
