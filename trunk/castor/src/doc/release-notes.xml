@@ -188,6 +188,26 @@ org.castor.cache.Factories=\
                    supported.</p>
 			</summary>
             <bugs>
+                <bug id="1305" tool="jira">
+                    <description>
+		                Added support for Borland Pointbase to Castor JDO.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>John</name>
+                        <email>jgreene@cwjamaica.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060201</date>
+                </bug>
                 <bug id="1238" tool="jira">
                     <description>
 		                Allowed restricting an complexType with complexContent to
