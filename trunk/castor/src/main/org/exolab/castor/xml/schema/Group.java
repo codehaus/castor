@@ -503,10 +503,10 @@ public class Group extends Particle implements ContentModelGroup, Referable {
       case Order.CHOICE:
         {
           result = false;
-          Enumeration enum = this.enumerate(); 
-          while (enum.hasMoreElements())
+          Enumeration enumerate = this.enumerate(); 
+          while (enumerate.hasMoreElements())
           {
-            Particle p = (Particle) enum.nextElement();
+            Particle p = (Particle) enumerate.nextElement();
             if (p.isEmptiable())
             {
               result = true;
@@ -520,10 +520,10 @@ public class Group extends Particle implements ContentModelGroup, Referable {
       case Order.SEQUENCE:
         {
           result = true;
-          Enumeration enum = this.enumerate(); 
-          while (enum.hasMoreElements())
+          Enumeration enumerate = this.enumerate(); 
+          while (enumerate.hasMoreElements())
           {
-            Particle p = (Particle) enum.nextElement();
+            Particle p = (Particle) enumerate.nextElement();
             if (!p.isEmptiable())
             {
               result = false;
