@@ -11,7 +11,7 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   targetNamespace="http://castor.org/JDO"
   xmlns="http://castor.org/JDO"
-  version="$$VERSION$$">
+  version="$$VERSION$$$RELEASE$">
 
   <xsd:annotation>
     <xsd:documentation>

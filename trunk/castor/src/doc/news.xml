@@ -494,10 +494,10 @@
             <release />
             <title>Current Release</title>
             <author>Keith Visco</author>
-            <date>$RELEASE_DATE$</date>
+            <date>10 Apr 2004</date>
             <time></time>
             <summary>
-                Version $VERSION$ is now <a href="download.xml">available for download</a>.
+                Version 0.9.5.3 is now <a href="download.xml">available for download</a>.
 
                 <!-- Release Candidate Info  ** use when doing interim releases -->
                 <!--

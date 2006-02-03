@@ -294,6 +294,12 @@
             <include name="**/*.properties" />
             <include name="**/*.dtd" />
         </replace>
+        <replace dir="${classes}" token="$$RELEASE$$" value="${release}">
+            <include name="**/*.xsd" />
+            <include name="**/*.xml" />
+            <include name="**/*.properties" />
+            <include name="**/*.dtd" />
+        </replace>
     </target>
 
     <target name="all" depends="clean,compile,compile.examples,compile.tests"
@@ -450,6 +456,7 @@
         <delete file="${classes}/MANIFEST.MF"/>
     	<copy file="${source}/etc/MANIFEST.JDO.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
         
     	<!-- create CASTOR JDO JAR -->
     	<jar jarfile="${dist}/${archive.name}.jar" basedir="${classes}"
@@ -461,6 +468,7 @@
         <delete file="${classes}/MANIFEST.MF" />
     	<copy file="${source}/etc/MANIFEST.XML.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
 
         <!-- create Castor XML Only Jar -->
         <jar jarfile="${dist}/${archive.name}-xml.jar" basedir="${classes}"
@@ -482,6 +490,7 @@
         <delete file="${classes}/MANIFEST.MF" />
     	<copy file="${source}/etc/MANIFEST.COMMONS.MF" tofile="${classes}/MANIFEST.MF"/>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
 
         <!-- create Castor COMMONS Only Jar -->
         <jar jarfile="${dist}/${archive.name}-commons.jar" basedir="${classes}"
@@ -496,6 +505,7 @@
         <delete   file="${classes}/MANIFEST.MF" />
         <copyfile src="${source}/etc/MANIFEST.SG.MF" dest="${classes}/MANIFEST.MF" />
         <replace  file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}" />
+        <replace file="${classes}/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
 -->    	
     	<!-- create JAR for source generator -->
 <!--    	
@@ -511,6 +521,7 @@
             <fileset dir="${source}/etc" includes="MANIFEST.MF" />
         </copy>
         <replace file="${classes}/MANIFEST.MF" token="$$VERSION$$" value="${version}"/>
+        <replace file="${classes}/MANIFEST.MF" token="$$RELEASE$$" value="${release}"/>
         <copy todir="${classes}">
             <fileset dir="${source}/etc" includes="LICENSE,README" />
         </copy>
@@ -562,6 +573,10 @@
          </copy>
 
         <replace dir="${build-doc}" token="$$VERSION$$" value="${version}">
+           <include name="index.html"/>
+           <include name="download.html" />
+        </replace>
+        <replace dir="${build-doc}" token="$$RELEASE$$" value="${release}">
            <include name="index.html"/>
            <include name="download.html" />
         </replace>
