@@ -37,7 +37,7 @@
         <property file="${etc}/VERSION"/>
         <property name="deprecation" value="false"/>
         <property name="main.opt.debug" value="true"/>
-        <property name="archive.name" value="${project}-${version}"/>
+        <property name="archive.name" value="${project}-${version}${release}"/>
         <property name="srcgen.ant.task.name" value="${project}-${version}-srcgen-ant-task"/>
         <property name="exampleexcludes" value="SourceGenerator/*,**/dax/**"/>
         <property name="excludes" value="**/package.html,**/dax/**,**/dax/engine/**"/>
@@ -632,21 +632,22 @@
         <delete file="${dist}/${archive.name}-src.tgz"/>
         <delete file="${dist}/${archive.name}-src.zip"/>
         <delete dir="${build}/${archive.name}"/>
+    	
         <mkdir dir="${build}/${archive.name}"/>
         <mkdir dir="${build}/${archive.name}/src"/>
-        <!-- <copydir src="${source}" dest="${build}/${archive.name}/src" defaultexcludes="true"/> -->
-        <copy todir="${build}/${archive.name}/src">
-        <fileset dir="${source}" />
-    </copy>
         <mkdir dir="${build}/${archive.name}/lib"/>
+    	<mkdir dir="${build}/${archive.name}/bin"/>
 
+    	<!-- <copydir src="${source}" dest="${build}/${archive.name}/src" defaultexcludes="true"/> -->
+        <copy todir="${build}/${archive.name}/src">
+        	<fileset dir="${source}" />
+    	</copy>
         <copy todir="${build}/${archive.name}/lib">
-        <fileset dir="${lib}" excludes="jconn2.jar"/>
-    </copy>
-
-        <copy todir="${build}/${archive.name}">
-        <fileset dir="." includes="*.sh,*.bat"/>
-    </copy>
+        	<fileset dir="${lib}" excludes="jconn2.jar"/>
+    	</copy>
+        <copy todir="${build}/${archive.name}/bin">
+        	<fileset dir="./bin" includes="*.sh,*.bat"/>
+    	</copy>
 
         <tar includes="${archive.name}/**" basedir="${build}" tarfile="${dist}/${archive.name}-src.tar"/>
         <gzip src="${dist}/${archive.name}-src.tar" zipfile="${dist}/${archive.name}-src.tgz"/>
