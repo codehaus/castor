@@ -580,11 +580,19 @@
            <include name="index.html"/>
            <include name="download.html" />
         </replace>
+        <replace dir="${build-doc}" token="$$RELEASE_DATE$$" value="${release_date}">
+           <include name="index.html"/>
+           <include name="download.html" />
+        </replace>
         <replace dir="${build-doc}" token="$$STABLE_VERSION$$" value="${stable_version}">
            <include name="index.html"/>
            <include name="download.html" />
         </replace>
         <replace dir="${build-doc}" token="$$STABLE_RELEASE$$" value="${stable_release}">
+           <include name="index.html"/>
+           <include name="download.html" />
+        </replace>
+        <replace dir="${build-doc}" token="$$STABLE_RELEASE_DATE$$" value="${stable_release_date}">
            <include name="index.html"/>
            <include name="download.html" />
         </replace>

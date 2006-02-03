@@ -31,9 +31,12 @@
            they do not need Castor's XML and/or JDO part.</p>
 		
 	</section>
+	
+	<section title="Releases">
 
     <section title="Latest Stable Release">
-      <ul><b>Lastest Released Version: Castor $STABLE_VERSION$ $STABLE_RELEASE$</b>
+      <ul><b>Lastest Released Version: Castor $STABLE_VERSION$ $STABLE_RELEASE$</b><br/>
+		<b>Release date: $STABLE_RELEASE_DATE$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
         <li><b>NEW *** </b> The Castor Commons JAR <b>*** NEW</b><br/>
             <url>http://dist.codehaus.org/castor/$STABLE_VERSION$/castor-$STABLE_VERSION$$STABLE_RELEASE$-commons.jar</url>
@@ -86,8 +89,10 @@
       </section>
 
     <section title="Latest Milestone Release">
-      <ul><b>Lastest Released Version: Castor $VERSION$ $RELEASE$</b>
+      <ul><b>Lastest Milestone Version: Castor $VERSION$ $RELEASE$</b><br/>
+		<b>Release date: $RELEASE_DATE$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
+		
         <li><b>NEW *** </b> The Castor Commons JAR <b>*** NEW</b><br/>
             <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-commons.jar</url>
             <br/>&#xA0;</li>
@@ -114,6 +119,20 @@
             <br/>&#xA0;</li>
       </ul>
 
+<!--	  
+	  <ctable>
+			<crow>
+				<td><url title="The Castor Commons JAR">http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-commons.jar</url></td>
+			</crow>
+			<crow>
+				<td><url title="The Castor JAR (XML, JDO, DAX)">http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$.jar</url></td>
+			</crow>
+			<crow>
+				<td><url title="The Castor JAR (XML only)">http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-xml.jar</url></td>
+			</crow>
+	  </ctable>
+-->	  
+
       </section>
 
       <section title="Past Releases">
@@ -121,15 +140,18 @@
          <p><url>http://dist.codehaus.org/castor/</url></p>
       </section>
 
+		
+	</section>
+
       <section title="CVS Snapshots">
 		
-         <p>To obtain the latest CVS version, please use a CVS-ebabled client to 
+         <p>To obtain the latest CVS version, please use a CVS-enabled client to 
 			access our CVS server. Instructions for doing so can be found 
 			<a href="cvs.xml">here</a>.</p>
 			
 		 <p>For those of you behind a firewall with the CVS port non-accessible, please 
 			download Castor from the CVS server using the HTTP interface at 
-			<url>http://cvs.castopr.codehaus.org</url> as provided by FishEye 
+			<url>http://cvs.castor.codehaus.org</url> as provided by FishEye 
 			(tm):</p>
 			
 		 <ul>
