@@ -379,7 +379,14 @@
   </xsl:template>
 
   <xsl:template match="url">
-    <a href="{.}"><xsl:copy-of select="."/></a>
+    <xsl:choose>
+      <xsl:when test="@title">
+        <a href="{.}"><xsl:value-of select="@title"/></a>
+	  </xsl:when>
+	  <xsl:otherwise>
+        <a href="{.}"><xsl:copy-of select="."/></a>
+	  </xsl:otherwise>
+	</xsl:choose>
   </xsl:template>
 
   <xsl:template match="email">
@@ -888,7 +895,10 @@
         <xsl:if test="(position() mod 2) = 1">
            <xsl:attribute name="bgcolor">#DDDDDD</xsl:attribute>
         </xsl:if>
+		<xsl:apply-templates/>
+<!--		
         <xsl:copy-of select="." />
+-->		
     </tr>
   </xsl:template>
 
