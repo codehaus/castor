@@ -2,6 +2,9 @@
 Version (CVS)
 -------------
 
+Version 1.0M2, Feb 03, 2006
+-------------------------------
+
 XML:   Fixed bug CASTOR-1238 using contribution from Ulrich Post [Ulrich.Post@softwareag.com]
        Allowed restricting an complexType with complexContent to complexType with simpleContent.
        Details: http://jira.codehaus.org/browse/CASTOR-1238

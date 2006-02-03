@@ -19,6 +19,20 @@
 --> 
 
 		<item>
+			<title>1.0M2 release available</title>
+			<pubDate>Fri, 03 Feb 2006 11:12:13 GMT</pubDate>
+			<author>Werner Guttmann</author>
+			<link>http://castor.codehaus.org/news.html#item36</link>
+			<description>
+				The Castor 1.0M2 release has been made available at
+				http://dist.codehaus.org/castor/1.0/
+
+                This is a milestone build for the upcoming 1.0 release. For details about the 
+				features added and the bugs fixed, please have a look at the release notes at 
+				http://castor.codehaus.org/release-notes.html.
+			</description>
+		</item>
+		<item>
 			<title>1.0M1 release available</title>
 			<pubDate>Thu, 22 Dec 2005 10:11:12 GMT</pubDate>
 			<author>Werner Guttmann</author>

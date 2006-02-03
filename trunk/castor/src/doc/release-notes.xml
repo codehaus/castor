@@ -28,6 +28,15 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+			</summary>
+			<bugs>
+			</bugs>
+		</release>
+	    <release version="1.0M2">
+	        <description>2nd milestone release for Castor 1.0</description>
+    		<date>Febraury 03, 2006</date>
+    		<managed-by>Werner Guttmann</managed-by>
+            <summary>
                 <h2>Additions</h2>
                 
                 <h3>Support for <tt>java.util:list as collection type</tt></h3>
