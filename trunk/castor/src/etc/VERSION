@@ -2,6 +2,8 @@ name=Castor
 project=castor
 version=1.0
 release=M2
+stable_version=0.9.9.1
+stable_release=
 release_date=03 Feb 2006
 copyright=Intalio Inc. (C) 1999-2004. All rights reserved  http://www.intalio.com
 
