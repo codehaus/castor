@@ -33,31 +33,31 @@
 	</section>
 
     <section title="Latest Stable Release">
-      <ul><b>Lastest Released Version: Castor $VERSION$</b>
+      <ul><b>Lastest Released Version: Castor $VERSION$ $RELEASE$</b>
         <li><a href="release-notes.xml">What changed?</a></li>
         <li><b>NEW *** </b> The Castor Commons JAR <b>*** NEW</b><br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-commons.jar</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-commons.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JAR (XML, JDO, DAX)<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$.jar</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JAR (XML only)<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-xml.jar</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-xml.jar</url>
             <br/>&#xA0;</li>
         <li>The Castor JARs, docs, DTDs, command line tools and examples<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$.tgz</url><br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$.zip</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$.zip</url>
             <br/>&#xA0;</li>
         <li>Full documentation including all JavaDocs and specs (big)<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-doc.tgz</url><br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-doc.zip</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-doc.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-doc.zip</url>
             <br/>&#xA0;</li>
         <li>Full CVS snapshot: all sources, docs, libraries (big)<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-src.tgz</url><br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-src.zip</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-src.tgz</url><br/>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-src.zip</url>
             <br/>&#xA0;</li>
         <li>Ant task definition for the source generator<br/>
-            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$-srcgen-ant-task.jar</url>
+            <url>http://dist.codehaus.org/castor/$VERSION$/castor-$VERSION$$RELEASE$-srcgen-ant-task.jar</url>
             <br/>&#xA0;</li>
       </ul>
 
