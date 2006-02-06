@@ -250,7 +250,16 @@ public abstract class Configuration {
         
         static final String DEFAULT_SERIALIZER_FACTORY = "org.exolab.castor.xml.XercesXMLSerializerFactory";
 
-
+        /**
+         * Property specifying whether JDBC 3.0-specific features should be used, 
+         * such ase.g. the use of Statement.getGeneratedKeys() 
+         * <pre>
+         * org.castor.jdo.use.jdbc30
+         * </pre>
+         * @since 1.0M3
+         */
+        public static final String PROPERTY_USE_JDBC30 = "org.castor.jdo.use.jdbc30";
+        
     } //-- class: Property
 
 

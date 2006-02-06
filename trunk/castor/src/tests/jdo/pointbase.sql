@@ -1,5 +1,3 @@
-connect 'jdbc:derby://127.0.0.1/tests;create=true;user=test;password=test';
-
 -- tc0x TESTS
 
 drop table tc0x_sample;
@@ -337,20 +335,19 @@ create table tc2x_uuid_ext (
 
 create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id );
 
-drop table  tc2x_identity;
-
+drop table tc2x_identity;
 create table tc2x_identity (
-  id    integer not null primary key generated always as identity,
+  id    integer identity not null primary key ,
   attr  varchar(200) not null
 );
 
 drop table  tc2x_identity_ext;
-
 create table tc2x_identity_ext (
-  id   integer not null primary key generated always as identity,
+  id   integer identity not null primary key,
   ext  varchar(200) not null
 );
 
+drop index tc2x_identity_ext.tc2x_ident_ext_pk;
 create unique index tc2x_ident_ext_pk on tc2x_identity_ext ( id );
 
 drop table  tc2x_seqtable;

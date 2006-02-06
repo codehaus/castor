@@ -21,6 +21,10 @@
     <category name="org.castor">
       <priority value="info" />
     </category>
+
+    <category name="org.castor.cache">
+      <priority value="info" />
+    </category>
     
     <category name="org.exolab.castor">
       <priority value="info" />
