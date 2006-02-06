@@ -729,7 +729,7 @@
         <taskdef name="castor-srcgen" classname="org.exolab.castor.tools.ant.taskdefs.CastorSourceGenTask" 
                  classpathref="build.classpath"/>          
             <castor-srcgen file="${main}/org/castor/jdo/conf/jdo-conf.xsd" 
-                todir="${gen.src}/jdo-conf" 
+                todir="../${gen.src}/jdo-conf" 
                 package="org.castor.jdo.conf" 
                 lineseparator="unix"
                 types="j2" 
