@@ -17,6 +17,7 @@
  */
 package org.exolab.castor.jdo.engine;
 
+import java.math.BigDecimal;
 import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -24,6 +25,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,7 +61,10 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 import org.exolab.castor.persist.spi.PersistenceQuery;
 import org.exolab.castor.persist.spi.QueryExpression;
+import org.exolab.castor.util.Configuration;
+import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Messages;
+import org.exolab.castor.util.Configuration.Property;
 
 /**
  * The SQL engine performs persistence of one object type against one
@@ -77,6 +82,7 @@ import org.exolab.castor.util.Messages;
  * @version $Revision$ $Date$
  */
 public final class SQLEngine implements Persistence {
+    
     /** The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      *  Commons Logging</a> instance used for all logging. */
     private static final Log LOG = LogFactory.getLog( SQLEngine.class );
@@ -117,6 +123,8 @@ public final class SQLEngine implements Persistence {
     private final JDOClassDescriptor    _clsDesc;
 
     private KeyGenerator                _keyGen;
+
+    private boolean useJDBC30 = false;
 
     /** Indicates whether there is a field to persist at all; in the case of 
      *  EXTEND relationships where no additional attributes are defined in the 
@@ -259,7 +267,9 @@ public final class SQLEngine implements Persistence {
         if(LOG.isDebugEnabled()) {
             LOG.debug("hasFieldsToPersist = " + _hasFieldsToPersist);
         }
-        
+
+        useJDBC30 = Boolean.valueOf(LocalConfiguration.getInstance().getProperty(Property.PROPERTY_USE_JDBC30, "false")).booleanValue();
+
         try {
             buildSqlPKLookup();
             // _log.debug ("pkLookup = " + _pkLookup);
@@ -431,7 +441,7 @@ public final class SQLEngine implements Persistence {
     }
 
     /**
-     * Use the specified keygenerator to gengerate a key for this
+     * Use the specified keygenerator to generate a key for this
      * row of object.
      *
      * Result key will be in java type.
@@ -512,7 +522,12 @@ public final class SQLEngine implements Persistence {
             if ((_keyGen != null) && (_keyGen.getStyle() == KeyGenerator.DURING_INSERT)) {
                 stmt = ((Connection) conn).prepareCall(_sqlCreate);
             } else {
-                stmt = ((Connection) conn).prepareStatement(_sqlCreate);
+                
+                if (useJDBC30) {
+                    stmt = ((Connection) conn).prepareStatement(_sqlCreate, PreparedStatement.RETURN_GENERATED_KEYS);
+                } else {
+                    stmt = ((Connection) conn).prepareStatement(_sqlCreate);
+                }
             }
              
             if (LOG.isDebugEnabled()) {
@@ -587,14 +602,43 @@ public final class SQLEngine implements Persistence {
                 if (LOG.isDebugEnabled()) {
                     LOG.debug(Messages.format("jdo.creating", _clsDesc.getJavaClass().getName(), stmt.toString()));
                 }
-            	stmt.executeUpdate();
+
+                stmt.executeUpdate();
+
+                if (useJDBC30 && identity == null) {
+                    ResultSet keySet = stmt.getGeneratedKeys();
+                    int i = 1;
+                    int sqlType;
+                    List keys = new LinkedList();
+                    while (keySet.next()) {
+                        sqlType = _ids[i-1].getSqlType();
+                        Object temp;
+                        if (sqlType == java.sql.Types.INTEGER) {
+                             temp = new Integer(keySet.getInt(i));
+                        } else if (sqlType == java.sql.Types.NUMERIC) {
+                            temp = keySet.getBigDecimal(i);
+                        } else {
+                            temp = keySet.getObject(i);
+                        }
+
+                        keys.add(temp);
+                        i++;
+                    }
+                    if (keys.size() > 1) {
+                        identity = keys.toArray();
+                    } else {
+                        identity = idToJava(0, keys.iterator().next());
+                    }
+                }
             }
 
             stmt.close();
 
             // Generate key after INSERT
             if ((_keyGen != null) && (_keyGen.getStyle() == KeyGenerator.AFTER_INSERT)) {
-                identity = generateKey(database, conn, stmt);
+                if (!useJDBC30) {
+                    identity = generateKey(database, conn, stmt);
+                }
             }
 
             return identity;

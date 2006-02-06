@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1310 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added identity key generator support for Borland Pointbase to Castor JDO.
+       Details: http://jira.codehaus.org/browse/CASTOR-1310
+       (Werner - 20060206)
+
 Version 1.0M2, Feb 03, 2006
 -------------------------------
 
