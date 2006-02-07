@@ -68,6 +68,9 @@
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
     <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 	
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -163,6 +166,9 @@
 
     <!-- <case class="jdo.TestTransientAttribute" id="TC84a" /> -->
 
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -252,6 +258,9 @@
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -338,9 +347,8 @@
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
-    <!-- tc8x -->
-    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
-    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
 
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
@@ -433,6 +441,9 @@
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -522,6 +533,9 @@
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -609,6 +623,9 @@
     <case class="jdo.tc167.TestEnum" id="TC167"/>
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
 
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
@@ -699,6 +716,9 @@
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
+
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
     <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
@@ -788,6 +808,9 @@
     <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
 
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
@@ -880,6 +903,9 @@
     <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc7x -->
+    <case id="TC75" class="ctf.jdo.tc7x.TestSelfReferentialExtend"/>
 
     <!-- tc8x -->
     <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>

@@ -1435,6 +1435,9 @@ public final class SQLEngine implements Persistence {
         for (int i = 0; i < _ids.length; i++) {
             expr.addParameter(_mapTo, _ids[i].getName(), QueryExpression.OpEquals);
         }
+        
+        // memorize the tables which have already been included as part of a (outer) join 
+        Vector joinTables = new Vector();
 
         // join all the extended table
         JDOClassDescriptor curDesc = clsDesc;
@@ -1445,11 +1448,11 @@ public final class SQLEngine implements Persistence {
                               baseDesc.getTableName(), baseDesc.getIdentityColumnNames());
             find.addInnerJoin(curDesc.getTableName(), curDesc.getIdentityColumnNames(),
                               baseDesc.getTableName(), baseDesc.getIdentityColumnNames());
+            joinTables.add(baseDesc.getTableName());
             curDesc = baseDesc;
         }
         
         // join all the related/depended table
-        Vector joinTables = new Vector();
         String aliasOld = null;
         String alias = null;
         

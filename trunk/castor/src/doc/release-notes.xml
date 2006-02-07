@@ -56,6 +56,27 @@
 				during the insert operation.
 			</summary>
 			<bugs>
+                <bug id="475" tool="jira">
+                    <description>
+				       Fixed problem with wrongly generated SQL with self-referential objects that are part of 
+				       an extend hierarchy.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Andreas Arrgard</name>
+                        <email>andreas.arrgard@octagroup.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060207</date>
+                </bug>
                 <bug id="1128" tool="jira">
                     <description>
 		                Fixed problem related to the use of 'depend' relations and identity
