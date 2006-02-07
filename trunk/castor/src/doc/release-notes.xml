@@ -28,6 +28,17 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Requirements</h2>
+
+				<h3>Introduced <font color="red">Java 1.4</font>font> as a dependecy</h3>
+				
+				<p>As we have started to add some features that more or less depend on features made
+				   available with Java 1.4 (only), such as the JDBC 3.0 API enhancements, we have
+				   made Java 1.4 a key requiremnt for the upcoming Castor 1.0 release.</p>
+				   
+				<p>This decision is a result of a discussion on the mailing lists a couple of months 
+				   ago, where nobody was voicing any objections.</p>
+				
 				<h2>Additions</h2>
 				
 				<h3>Added support for postgreSQL to identity key generator</h3>
