@@ -175,6 +175,21 @@ public final class PersistanceCapableRelationResolver implements ResolverStrateg
         //       if new is not null
         if (ClassMolderHelper.isEquals(field, newField)) {
 
+            /*
+             * Let's deal with a situation where there's no dependent object (field == null),
+             * a 'new' dependent object has been set (value != null), but as we are using a key
+             * generator on this newly set object, calling fieldClassMolder.getIdentity() will return
+             * null (and hence newField == null). In this case, we still have to mark this new object for 
+             * creation and instruct Castor to update the cache(s) as well
+             */
+            if (field == null && value != null &&  _fieldMolder.isDependent() && !tx.isRecorded(value)) {
+                if (_fieldMolder.isStored() && _fieldMolder.isCheckDirty()) {
+                    flags.setUpdatePersist(true);
+                }
+                flags.setUpdateCache(true);
+                tx.markCreate(fieldEngine, fieldClassMolder, value, oid);
+            }
+            
             //TODO [WG]: can anybody please explain to me the meaning of the next two lines.
             if (!_debug) { return flags; }
             if (field == null) { return flags; } // do the next field if both are null

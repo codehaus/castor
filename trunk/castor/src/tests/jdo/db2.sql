@@ -1054,6 +1054,39 @@ create table enum_prod (
   kind      varchar(200) not null
 );
 
+-- tc8x
+
+DROP TABLE tc8x_test_depends_ns;
+CREATE TABLE tc8x_test_depends_ns (
+  id int(11) NOT NULL,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  constraint prim_id primary key (id)
+);
+
+DROP TABLE tc8x_test_master_ns;
+CREATE TABLE tc8x_test_master_ns (
+  id int(11) NOT NULL,
+  descrip varchar(50) NOT NULL default '',
+  constraint prim_id primary key (id)
+);
+
+DROP TABLE tc8x_test_depends_ns_nokg;
+CREATE TABLE tc8x_test_depends_ns_nokg (
+  id int(11) NOT NULL,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  constraint prim_id primary key (id)
+);
+
+DROP TABLE tc8x_test_master_ns_nokg;
+CREATE TABLE tc8x_test_master_ns_nokg (
+  id int(11) NOT NULL,
+  descrip varchar(50) NOT NULL default '',
+  constraint prim_id primary key (id)
+);
+
+
 -- tc9x TESTS
 
 drop table  poly_ordr;

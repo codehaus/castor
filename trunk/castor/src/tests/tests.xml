@@ -68,6 +68,10 @@
     <case class="jdo.tc166.TestLazy1to1" id="TC166" />
     <!-- <case class="jdo.tc167.TestEnum" id="TC167" /> -->
 	
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
@@ -159,6 +163,10 @@
 
     <!-- <case class="jdo.TestTransientAttribute" id="TC84a" /> -->
 
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
@@ -244,6 +252,10 @@
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
@@ -325,6 +337,14 @@
     <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
 
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
@@ -413,6 +433,10 @@
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/>
@@ -498,6 +522,10 @@
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
@@ -581,6 +609,10 @@
     <case class="jdo.tc167.TestEnum" id="TC167"/>
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
 
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
@@ -667,6 +699,10 @@
 	
     <case class="jdo.TestTransientAttribute" id="TC84a" />
 
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
+
     <!-- tc9x -->
     <!-- <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/> -->
     <!-- <case id="TC95" class="ctf.jdo.tc9x.TestPolymorphismWithKeyGen"/> -->
@@ -752,6 +788,10 @@
     <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
 
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>
@@ -840,6 +880,10 @@
     <case class="jdo.tc167.TestEnum" id="TC167" />
 
     <case class="jdo.TestTransientAttribute" id="TC84a" />
+
+    <!-- tc8x -->
+    <case id="TC81" class="ctf.jdo.tc8x.TestDepends"/>
+    <case id="TC82" class="ctf.jdo.tc8x.TestDependsNoKeyGen"/>
 
     <!-- tc9x -->
     <case id="TC94" class="ctf.jdo.tc9x.TestPolymorphismWithUpdates"/>

@@ -102,6 +102,7 @@ implements KeyGenerator
             !fName.equals("sapdb") &&
             !fName.equals("db2") && 
             !fName.equals("derby") &&
+            !fName.equals("postgresql") &&
             !fName.equals("pointbase")) {
             throw new MappingException(
             	Messages.format("mapping.keyGenNotCompatible", getClass().getName(), fName));
@@ -192,6 +193,8 @@ implements KeyGenerator
             type = new SapDbType();
         } else if (fName.equals("derby")) {
             type = new DerbyType();
+        } else if (fName.equals("postgresql")) {
+            type = new PostgresqlType();
         } else {
             type = new DefaultType();
         }
@@ -302,6 +305,12 @@ implements KeyGenerator
     private class DerbyType extends AbstractType {
         Object getValue(Connection conn, String tableName) throws PersistenceException {
             return getValue("SELECT IDENTITY_VAL_LOCAL() FROM " + tableName, conn);
+        }
+    }
+    
+    private class PostgresqlType extends AbstractType {
+        Object getValue(Connection conn, String tableName) throws PersistenceException {
+            return getValue("SELECT currval ('" +  tableName + "_id_seq')", conn);
         }
     }
     
