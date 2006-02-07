@@ -988,6 +988,49 @@ go
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1)
 go
 
+-- tc8x
+
+DROP TABLE tc8x_test_depends_ns
+go
+CREATE TABLE tc8x_test_depends_ns (
+  id int(11) NOT NULL,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY master_id (master_id)
+)
+go
+
+DROP TABLE tc8x_test_master_ns
+go
+CREATE TABLE tc8x_test_master_ns (
+  id int(11) NOT NULL,
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id)
+)
+go
+
+DROP TABLE tc8x_test_depends_ns_nokg
+go
+CREATE TABLE tc8x_test_depends_ns_nokg (
+  id int(11) NOT NULL,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY master_id (master_id)
+)
+go
+
+DROP TABLE tc8x_test_master_ns_nokg
+go
+CREATE TABLE tc8x_test_master_ns_nokg (
+  id int(11) NOT NULL,
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id)
+)
+go
+
+
 -- tc9x TESTS
 
 drop table poly_ordr

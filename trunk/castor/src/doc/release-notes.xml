@@ -28,8 +28,45 @@
     		<date>tbd</date>
     		<managed-by>Werner Guttmann</managed-by>
             <summary>
+				<h2>Additions</h2>
+				
+				<h3>Added support for postgreSQL to identity key generator</h3>
+				
+				<p>Added support for the postgreSQL column type 'SERIAL' to the 
+				   identity key generator. With this change, it's now possible to use
+				   the identity key generator with postgreSQL on columns with type 
+				   'SERIAL'. Castor internally will issue a call to</p>
+				   
+				<code-panel>
+   SELECT currval('&lt;table_name&gt;_id_seq')			
+				</code-panel>
+				
+				to automatically retrieve the value assigned due to 'SERIAL' column 
+				during the insert operation.
 			</summary>
 			<bugs>
+                <bug id="1128" tool="jira">
+                    <description>
+		                Fixed problem related to the use of 'depend' relations and identity
+						key generators. At the same time, support for postgreSQL has been 
+						added to the identity key generator.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Nick Stuart</name>
+                        <email>nicholas.stuart@gmail.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060203</date>
+                </bug>
 			</bugs>
 		</release>
 	    <release version="1.0M2">

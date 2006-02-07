@@ -315,6 +315,10 @@ create table tc2x_keygen (
 
 create unique index tc2x_keygen_pk on tc2x_keygen ( id );
 
+drop sequence tc2x_keygen_seq;
+
+create sequence tc2x_keygen_seq;
+
 drop table tc2x_keygen_ext;
 
 create table tc2x_keygen_ext (
@@ -345,7 +349,7 @@ create unique index tc2x_uuid_ext_pk on tc2x_uuid_ext ( id );
 -- Note that 7.2.1 requires the following sequence to be dropped,
 -- where as 7.3 version of postgresql will drop it automatically
 drop table tc2x_identity;
-drop sequence tc2x_identity_id_seq;
+-- drop sequence tc2x_identity_id_seq;
 
 create table tc2x_identity (
   id    SERIAL,
@@ -763,6 +767,41 @@ insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1);
 insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1);
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1);
 
+-- tc8x
+
+-- TODO: how to go about identity column
+drop table tc8x_test_depends_ns;
+create table tc8x_test_depends_ns (
+  id SERIAL,
+  master_id int NOT NULL,
+  descrip varchar(50) NOT NULL,
+  constraint prim_depends_id primary key (id)
+);
+
+-- TODO: how to go about identity column
+drop table tc8x_test_master_ns;
+create table tc8x_test_master_ns (
+  id SERIAL,
+  descrip varchar(50) NOT NULL,
+  constraint prim_master_id primary key (id)
+);
+
+drop table tc8x_test_depends_ns_nokg;
+create table tc8x_test_depends_ns_nokg (
+  id int NOT NULL,
+  master_id int NOT NULL,
+  descrip varchar(50) NOT NULL,
+  constraint prim_depends_nopk_id primary key (id)
+);
+
+drop table tc8x_test_master_ns_nokg;
+create table tc8x_test_master_ns_nokg (
+  id int NOT NULL,
+  descrip varchar(50) NOT NULL,
+  constraint prim_master_nopk_id primary key (id)
+);
+
+
 -- tc9x TESTS
 
 drop table poly_ordr;
@@ -938,16 +977,16 @@ insert into poly_order_product (order_id, product_id) values (1, 2);
 insert into poly_m_n (m_id, n_id) values (1, 1);
 insert into poly_m_n (m_id, n_id) values (1, 2);
 
-insert into poly_table_m (id, name) values (1, "m1");
-insert into poly_table_m (id, name) values (2, "m2");
+insert into poly_table_m (id, name) values (1, 'm1');
+insert into poly_table_m (id, name) values (2, 'm2');
 
-insert into poly_table_n (id, name) values (1, "n1");
-insert into poly_table_n (id, name) values (2, "n2");
+insert into poly_table_n (id, name) values (1, 'n1');
+insert into poly_table_n (id, name) values (2, 'n2');
 
-drop table if exists poly_base;
+drop table poly_base;
 create table poly_base (
-  id varchar(64) not null default '',
-  color varchar(64) default null,
+  id varchar(64) not null,
+  color varchar(64) null,
   primary key  (ID)
 ) ;
 
@@ -955,8 +994,8 @@ insert into poly_base values ('100','red');
 
 drop table poly_derived;
 create table poly_derived (
-  id varchar(64) not null default '',
-  scent varchar(64) default null,
+  id varchar(64) not null,
+  scent varchar(64) null,
   primary key  (ID)
 );
 insert into poly_derived values ('100','vanilla');
@@ -964,8 +1003,8 @@ insert into poly_derived values ('100','vanilla');
 
 drop table poly_container;
 create table poly_container (
-  id varchar(64) not null default '',
-  reference varchar(64) default null,
+  id varchar(64) not null,
+  reference varchar(64) null,
   primary key  (ID)
 );
 insert into poly_container values ('200','100');
@@ -979,13 +1018,14 @@ create table poly_Product(
 
 drop table poly_ActProduct;
 create table poly_ActProduct(
-  IdAct numeric(10) primary key references Product (IdProd),
+  IdAct numeric(10) primary key,
   BestSeason varchar(30) null
 );
 
+
 drop table poly_ComposedOffer;
 create table poly_ComposedOffer(
-  IdCOffer numeric(10) primary key references Product (IdProd),
+  IdCOffer numeric(10) primary key,
   NameCO   varchar(30) null,
   DescCO   varchar(30) null
 );
@@ -1001,8 +1041,8 @@ create table poly_OfferComposition(
 
 DROP TABLE poly_extend_object;
 CREATE TABLE poly_extend_object (
-  id            int NOT NULL default '0',
-  description2  varchar(50) NOT NULL default '',
+  id            int NOT NULL ,
+  description2  varchar(50) NOT NULL,
   PRIMARY KEY (id)
 );
 
@@ -1010,9 +1050,9 @@ INSERT INTO poly_extend_object VALUES (1, 'This is the extended object.');
 
 DROP TABLE poly_base_object;
 CREATE TABLE poly_base_object (
-  id           int NOT NULL default '0',
-  description  varchar(50) NOT NULL default '',
-  saved        char(1) default '0',
+  id           int NOT NULL ,
+  description  varchar(50) NOT NULL,
+  saved        char(1),
   PRIMARY KEY (id)
 );
 
@@ -1020,49 +1060,47 @@ INSERT INTO poly_base_object VALUES (1, 'This is the test object.', '0');
 
 DROP TABLE poly_depend_object;
 CREATE TABLE poly_depend_object (
-  id           int NOT NULL default '0',
-  parentId           int NOT NULL default '0',
-  description  varchar(50) NOT NULL default '',
+  id           int NOT NULL,
+  parentId     int NOT NULL,
+  description  varchar(50) NOT NULL,
   PRIMARY KEY (id)
 );
 
 INSERT INTO poly_depend_object VALUES(1, 1, 'This is a description');
 
-# TC129 
+-- TC129 
 
 DROP TABLE container;
 CREATE TABLE container (
-  id int NOT NULL ,
+  id int NOT NULL,
   name varchar(200) NULL,
-  prop int default NULL,
+  prop int NULL,
   PRIMARY KEY (id)
 );
 
-INSERT INTO container (id, name, prop) VALUES 
-  (1,'Container 1',1),
-  (2,'Container 2',2),
-  (3,'Container 3',3),
-  (4,'Container 4',4);
+INSERT INTO container (id, name, prop) VALUES (1,'Container 1',1);
+INSERT INTO container (id, name, prop) VALUES (2,'Container 2',2);
+INSERT INTO container (id, name, prop) VALUES (3,'Container 3',3);
+INSERT INTO container (id, name, prop) VALUES (4,'Container 4',4);
 
 DROP TABLE container_item;
 CREATE TABLE container_item (
   id int NOT NULL,
-  item int default DEFAULT NULL,
-  value varchar(200) DEFAULT NULL,
+  item int default NULL,
+  value varchar(200) NULL,
   PRIMARY KEY (id)
 );
 
-INSERT INTO container_item (id, item, value) VALUES 
-  (1,1,'Container item 1'),
-  (2,2,'Container item 2'),
-  (3,3,'Container item 3'),
-  (4,4,'Container item 4'),
-  (5,1,'Container item 5'),
-  (6,2,'Container item 6'),
-  (7,3,'Container item 7'),
-  (8,4,'Container item 8');
+INSERT INTO container_item (id, item, value) VALUES (1,1,'Container item 1');
+INSERT INTO container_item (id, item, value) VALUES (2,2,'Container item 2');
+INSERT INTO container_item (id, item, value) VALUES (3,3,'Container item 3');
+INSERT INTO container_item (id, item, value) VALUES (4,4,'Container item 4');
+INSERT INTO container_item (id, item, value) VALUES (5,1,'Container item 5');
+INSERT INTO container_item (id, item, value) VALUES (6,2,'Container item 6');
+INSERT INTO container_item (id, item, value) VALUES (7,3,'Container item 7');
+INSERT INTO container_item (id, item, value) VALUES (8,4,'Container item 8');
 	
-# TC128a
+-- TC128a
 
 drop table sorted_container;
 create table sorted_container (

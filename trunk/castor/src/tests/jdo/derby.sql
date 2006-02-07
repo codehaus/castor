@@ -1083,6 +1083,42 @@ insert into trans_child2 (id, descr, entityOneId) values (1, 'description1', 1);
 insert into trans_child2 (id, descr, entityOneId) values (2, 'description2', 1);
 insert into trans_child2 (id, descr, entityOneId) values (3, 'description3', 1);
 
+-- tc8x
+
+DROP TABLE tc8x_test_depends_ns;
+CREATE TABLE tc8x_test_depends_ns (
+  id int(11) NOT NULL key generated always as identity,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY master_id (master_id)
+);
+
+DROP TABLE tc8x_test_master_ns;
+CREATE TABLE tc8x_test_master_ns (
+  id int(11) NOT NULL key generated always as identity,
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id)
+);
+
+DROP TABLE tc8x_test_depends_ns_nokg;
+CREATE TABLE tc8x_test_depends_ns_nokg (
+  id int(11) NOT NULL,
+  master_id int(11) NOT NULL default '0',
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id),
+  KEY master_id (master_id)
+);
+
+
+DROP TABLE tc8x_test_master_ns_nokg;
+CREATE TABLE tc8x_test_master_ns_nokg (
+  id int(11) NOT NULL,
+  descrip varchar(50) NOT NULL default '',
+  PRIMARY KEY  (id)
+);
+
+
 -- tc9x TESTS
 
 drop table  poly_ordr;

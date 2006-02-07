@@ -2,6 +2,13 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1128 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem related to the use of 'depend' relations and identity
+       key generators. At the same time, support for postgreSQL has been
+       added to the identity key generator.
+       Details: http://jira.codehaus.org/browse/CASTOR-1128
+       (Werner - 20060207)
+       
 JDO:   Fixed bug CASTOR-1310 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added identity key generator support for Borland Pointbase to Castor JDO.
        Details: http://jira.codehaus.org/browse/CASTOR-1310
