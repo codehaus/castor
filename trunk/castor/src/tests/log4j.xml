@@ -22,7 +22,7 @@
       <priority value="info" />
     </category>
 
-    <category name="org.castor.cache">
+    <category name="org.castor.cache.simple">
       <priority value="info" />
     </category>
     

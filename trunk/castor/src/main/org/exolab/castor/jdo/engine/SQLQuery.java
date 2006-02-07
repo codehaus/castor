@@ -384,7 +384,8 @@ public final class SQLQuery implements PersistenceQuery {
         
         while (!(firstColumnOfField.equalsIgnoreCase(columnNamePerMetaData)
                  && (fieldTableName.equalsIgnoreCase(tableNamePerMetaData)
-                     || "".equals(tableNamePerMetaData)))) {
+                         || tableNamePerMetaData.startsWith(fieldTableName)
+                         || "".equals(tableNamePerMetaData)))) {
             count++;
             columnNamePerMetaData = metaData.getColumnName(count);
             tableNamePerMetaData = metaData.getTableName(count);
