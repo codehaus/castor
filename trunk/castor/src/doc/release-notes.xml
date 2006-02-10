@@ -30,7 +30,7 @@
             <summary>
 				<h2>Requirements</h2>
 
-				<h3>Introduced <font color="red">Java 1.4</font>font> as a dependecy</h3>
+				<h3>Introduced <font color="red">Java 1.4</font> as a dependecy</h3>
 				
 				<p>As we have started to add some features that more or less depend on features made
 				   available with Java 1.4 (only), such as the JDBC 3.0 API enhancements, we have
@@ -52,10 +52,43 @@
    SELECT currval('&lt;table_name&gt;_id_seq')			
 				</code-panel>
 				
-				to automatically retrieve the value assigned due to 'SERIAL' column 
-				during the insert operation.
+				<p>to automatically retrieve the value assigned due to 'SERIAL' column 
+				   during the insert operation.</p>
+
+				<h3>Added collection type 'iterator' (java.util.Iterator) to Castor JDO</h3>
+                
+                <p>It is now possible to define a one-to-many relation with a collection
+                   type of 'iterator'. This allows the access of custom collection classes
+                   that are not supported through the standard collection types through
+                   Castor JDO.</p>
+                   
+                <code-panel>
+   &lt;field name="children" type="some.domain.custom.Class" collection="iterator"&gt;
+      &lt;sql ... /&gt;
+   &lt;/field&gt;                    
+                </code-panel>
 			</summary>
 			<bugs>
+                <bug id="1315" tool="jira">
+                    <description>
+				       Added Castor JDO collection type 'iterator' (java.util.Iterator).
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060210</date>
+                </bug>
                 <bug id="1316" tool="jira">
                     <description>
 				       Added SQL statement logging support for JDBC CallableStatements

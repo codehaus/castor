@@ -85,28 +85,20 @@ public class Collections extends CastorTestCase {
     public void runTest() 
             throws PersistenceException, SQLException, Exception {
 
-        runOnce( TestColCollection.class );
-
-        runOnce( TestColArrayList.class );
-
-        runOnce( TestColVector.class );
-
-        runOnce( TestColSet.class );
-        
-        runOnce( TestColMap.class );
-
-        runOnce( TestColHashtable.class );
-
-        runSortedSet( TestColSortedSet.class );
-
+        runOnce(TestColCollection.class);
+        runOnce(TestColArrayList.class);
+        runOnce(TestColVector.class);
+        runOnce(TestColSet.class);
+        runOnce(TestColMap.class);
+        runOnce(TestColHashtable.class);
+        runSortedSet(TestColSortedSet.class);
+        runOnce(TestColIterator.class);
 
         // TODO[WG]: Causes problems with missing setXXX(ArrayList) method.
         // TODO[WG]: To re-enable, please consult with http://jira.codehaus.org/browse/CASTOR-1147
         // runOnce( TestColAdd.class );
 
         runArray();
-        
-        
     }
 
     public void runOnce( Class masterClass ) 

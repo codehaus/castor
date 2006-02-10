@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1315 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Added Castor JDO collection type 'iterator' (java.util.Iterator).
+       Details: http://jira.codehaus.org/browse/CASTOR-1315
+       (Werner - 20060210)
+
 JDO:   Fixed bug CASTOR-1316 using contribution from Raúl Sanz de Acedo Pérez [rsanz@cein.es]
        Added SQL statement logging support for JDBC CallableStatements.
        Details: http://jira.codehaus.org/browse/CASTOR-1316

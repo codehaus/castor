@@ -373,6 +373,13 @@ public class JDOMappingLoader extends MappingLoader {
         if ( fieldMap.getCollection() != null ) {
             Class colType = CollectionHandlers.getCollectionType( fieldMap.getCollection().toString() );
             colHandler = CollectionHandlers.getHandler( colType );
+            
+            if (colType.getName().equals("java.util.Iterator")
+                    && fieldMap.getLazy() == true) 
+            {
+                String err = "Lazy loading not supported for collection type 'iterator'";
+                throw new MappingException(err);
+            }
         }
         
         TypeInfo typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );

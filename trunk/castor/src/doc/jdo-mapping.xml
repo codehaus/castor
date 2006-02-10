@@ -11,7 +11,16 @@
 
   <body>
     <title>Castor JDO Mapping</title>
+    
+    <section title="News">
 
+       <p><b>Release 1.0 M3</b>:<br/>
+          <ul>
+             <li>Added collection type 'iterator'.</li>
+          </ul>
+       </p>
+    </section>
+    
     <section title="Introduction">
 
       <p>The Castor mapping file also provides a mechanism for binding a Java
@@ -197,7 +206,7 @@
             set-method     NMTOKEN  #IMPLIED
             create-method  NMTOKEN  #IMPLIED
             collection     ( array | enumerate | collection | set | 
-                             arraylist | vector | map | hashtable | sortedset )  #IMPLIED
+                             arraylist | vector | map | hashtable | sortedset | iterator )  #IMPLIED
             comparator     NMTOKEN  #IMPLIED>]]></code-panel>
 
         <p>The &lt;field> element is used to describe a property of a Java object. It provides:</p>
@@ -272,16 +281,18 @@
                         <th align="left">name</th>
                         <th align="left">type</th>
                         <th align="left">default implementation</th>
+                        <th align="left">added in<br/>release</th>
                      </tr>
-                     <tr bgcolor="#DEDEDE"><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td></tr>
-                     <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td></tr>
-                     <tr><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td></tr>
-                     <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td></tr>
-                     <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td></tr>
-                     <tr bgcolor="#DEDEDE"><td>sortedset</td><td>java.util.SortedSet</td><td>java.util.TreeSet</td></tr>
+                     <tr bgcolor="#DEDEDE"><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td><td></td></tr>
+                     <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td><td></td></tr>
+                     <tr bgcolor="#DEDEDE"><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td><td></td></tr>
+                     <tr><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td><td></td></tr>
+                     <tr bgcolor="#DEDEDE"><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td><td></td></tr>
+                     <tr><td>vector</td><td>java.util.Vector</td><td>java.util.Vector</td><td></td></tr>
+                     <tr bgcolor="#DEDEDE"><td>map</td><td>java.util.Map</td><td>java.util.HashMap</td><td></td></tr>
+                     <tr><td>hashtable</td><td>java.util.Hashtable</td><td>java.util.Hashtable</td><td></td></tr>
+                     <tr bgcolor="#DEDEDE"><td>sortedset</td><td>java.util.SortedSet</td><td>java.util.TreeSet</td><td>1.0 M2</td></tr>
+                     <tr><td>iterator</td><td>java.util.Iterator</td><td> n/a </td><td><font color="red">1.0 M3</font></td></tr>
                   </table>
                </td>
             </tr>
@@ -297,6 +308,9 @@
         <p>It is necessary to use a collection when the content model of the element expects more 
            than one element of the specified type. This is how the 'to-many' portion of a relationship 
            is described.</p>
+           
+        <p><b>Note</b>: It is not possible to use a collection of type 'iterator' with lazy
+            loading enabled.</p>
 
 
         <p><b>2. Determine the signature of the method</b></p>
