@@ -98,87 +98,81 @@ public class DatabaseImpl
      * The <a href="http://jakarta.apache.org/commons/logging/">Jakarta
      * Commons Logging</a> instance used for all logging.
      */
-    private static Log _log = LogFactory.getFactory().getInstance( DatabaseImpl.class );
+    private static Log _log = LogFactory.getFactory().getInstance(DatabaseImpl.class);
 
 
     /**
      * The database engine used to access the underlying SQL database.
      */
-    //protected LockEngine   _dbEngine;
-    protected PersistenceInfoGroup     _scope;
-
+    protected PersistenceInfoGroup _scope;
 
     /**
      * The transaction context is this database was accessed with an
      * {@link javax.transaction.xa.XAResource}.
      */
-    protected TransactionContext       _ctx;
-
+    protected TransactionContext _ctx;
 
     /**
      * List of TxSynchronizeable implementations that should all be
      * informed about changes after commit of transactions. 
      */
-    private ArrayList                  _synchronizables;
-
+    private ArrayList _synchronizables;
 
     /**
-     * The lock timeout for this database. Zero for immediate
-     * timeout, an infinite value for no timeout. The timeout is
-     * specified in seconds.
+     * The lock timeout for this database. Zero for immediate timeout, 
+     * an infinite value for no timeout. The timeout is specified in
+     * seconds.
      */
-    private int                        _lockTimeout;
-
+    private int _lockTimeout;
 
     /**
      * The default callback interceptor for transaction
      */
-    private CallbackInterceptor        _callback;
+    private CallbackInterceptor _callback;
 
     /**
      * The instance factory to that creates new instances of data object
      */
-    private InstanceFactory            _instanceFactory;
+    private InstanceFactory _instanceFactory;
 
     /**
      * The name of this database.
      */
-    private String                     _dbName;
-
-
-    /**
-     * True if the transaction is listed as synchronized and
-     * subordinate to this transaction.
-     */
-    private Transaction                _transaction;
-
+    private String _dbName;
 
     /**
-     * True if user prefer all reachable object to be stored automatically.
-     * False if user want only dependent object to be stored.
+     * True if the transaction is listed as synchronized and subordinate to this transaction.
      */
-    private boolean                    _autoStore;
+    private Transaction _transaction;
 
+    /**
+     * True if user prefer all reachable object to be stored automatically. False if user want only dependent object to be stored.
+     */
+    private boolean _autoStore;
 
     /**
      * The class loader for application classes (may be null).
      */
-    private ClassLoader                _classLoader;
-
+    private ClassLoader _classLoader;
 
     /**
      * The transaction to database map
      */
-    private TxDatabaseMap              _txMap;
+    private TxDatabaseMap _txMap;
     
     /**
-	 * {@link CacheManager} instance.
-	 */
+     * {@link CacheManager} instance.
+     */
     private CacheManager cacheManager;
+    
+    /**
+     * JDOmanager instance that created this Database instance
+     */
+    boolean _isPoolInUseForGlobalTransactions = false;
 
     public DatabaseImpl( String dbName, int lockTimeout, CallbackInterceptor callback,
                          InstanceFactory instanceFactory, Transaction transaction, 
-                         ClassLoader classLoader, boolean autoStore )
+                         ClassLoader classLoader, boolean autoStore, boolean isPoolInUseForGlobalTransactions)
     throws DatabaseNotFoundException {
         _autoStore = autoStore;
         
@@ -198,7 +192,8 @@ public class DatabaseImpl
         _instanceFactory = instanceFactory;
         _dbName = dbName;
         _lockTimeout = lockTimeout;
-
+        
+        _isPoolInUseForGlobalTransactions = isPoolInUseForGlobalTransactions;
         _transaction = transaction;
 	
 		if (_transaction != null) {
@@ -472,7 +467,7 @@ public class DatabaseImpl
 	/**
      * Overrides Object.finalize().
 	 * 
-	 * Outputs a warning message to teh logs if the current DatabaseImpl 
+	 * Outputs a warning message to the logs if the current DatabaseImpl 
 	 * instance still has valid scope. In this condition - a condition that 
 	 * ideally should not occur at all - we close the instance as well to 
 	 * free up resources.
@@ -482,11 +477,14 @@ public class DatabaseImpl
 	protected void finalize() throws Throwable {
 		if (_scope != null) {
 			
-			// retrieve SQL bound to this Database instance
-			OQLQuery oqlQuery = getOQLQuery(); 
-			String sql = ((OQLQueryImpl) oqlQuery).getSQL(); 
-			
-			_log.warn(Messages.format("jdo.finalize_close", this.toString(), _dbName, sql));
+			if (_ctx instanceof LocalTransactionContext ||
+                (_ctx instanceof GlobalTransactionContext && !_isPoolInUseForGlobalTransactions)) {
+				// retrieve SQL bound to this Database instance
+				OQLQuery oqlQuery = getOQLQuery(); 
+				String sql = ((OQLQueryImpl) oqlQuery).getSQL(); 
+				
+				_log.warn(Messages.format("jdo.finalize_close", this.toString(), _dbName, sql));
+			}
 			close();
 		}
 	}

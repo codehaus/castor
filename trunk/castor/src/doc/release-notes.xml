@@ -56,6 +56,27 @@
 				during the insert operation.
 			</summary>
 			<bugs>
+                <bug id="1317" tool="jira">
+                    <description>
+				       Prevented DatabaseImpl.finalize() from logging when used with global transactions and
+                       database pooling enabled.	
+                    </description>
+                    <contributor>
+                        <name>Raúl Sanz de Acedo Pérez</name>
+                        <email>rsanz@cein.es</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Raúl Sanz de Acedo Pérez</name>
+                        <email>rsanz@cein.es</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060210</date>
+                </bug>
                 <bug id="475" tool="jira">
                     <description>
 				       Fixed problem with wrongly generated SQL with self-referential objects that are part of 

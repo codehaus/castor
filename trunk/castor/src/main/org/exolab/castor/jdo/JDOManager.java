@@ -724,7 +724,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         if (transactionManager instanceof LocalTransactionManager) {
             // We are in LOCAL mode and need only to return a new database instance.
             return new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
-                                    _instanceFactory, null, _classLoader, _autoStore);
+                                    _instanceFactory, null, _classLoader, _autoStore, 
+                                    getDatabasePooling());
         } else {
             // We are in J2EE mode and need a valid Transaction.
             Transaction tx = null;
@@ -755,7 +756,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
             // In all other cases we need to create a new database instance.
             DatabaseImpl dbImpl;
             dbImpl = new DatabaseImpl(_databaseName, _lockTimeout, _callbackInterceptor,
-                                      _instanceFactory, tx, _classLoader, _autoStore);
+                                      _instanceFactory, tx, _classLoader, _autoStore, 
+                                      getDatabasePooling());
 
             // We have to register the database at the transaction next.
             try {

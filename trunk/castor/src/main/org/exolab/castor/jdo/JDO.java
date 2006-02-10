@@ -602,8 +602,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
                     
                     dbImpl = new DatabaseImpl(_dbName, _lockTimeout, _callback,
                             _instanceFactory, transaction, _classLoader,
-                            _autoStore);
-                    
+                            _autoStore, getDatabasePooling());
+                                        
                     if (_txDbPool != null) {
                         _txDbPool.put(transaction, dbImpl);
                     }
@@ -620,7 +620,8 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
         }
         
         return new DatabaseImpl(_dbName, _lockTimeout, _callback,
-                _instanceFactory, null, _classLoader, _autoStore);
+                _instanceFactory, null, _classLoader, _autoStore,
+                getDatabasePooling());
     }
 
     /**
