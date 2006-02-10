@@ -1,6 +1,6 @@
 /*
+ * Copyright 2005 Werner Guttmann
  * 
- * Copyright 2005 Werner Guttmann, 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -26,16 +26,13 @@ import org.exolab.castor.persist.spi.QueryExpression;
  * @version $Revision$ $Date$
  * @since 1.0M2
  */
-public final class PointbaseFactory
-    extends GenericFactory
-{
+public final class PointbaseFactory extends GenericFactory {
 
     /**
      * Returns the factory name for this factory. 
      * @see org.exolab.castor.persist.spi.PersistenceFactory#getFactoryName()
      */
-    public String getFactoryName()
-    {
+    public String getFactoryName() {
         return "pointbase";
     }
 
@@ -43,12 +40,9 @@ public final class PointbaseFactory
      * @inheritDoc
      * @see org.exolab.castor.persist.spi.PersistenceFactory#getQueryExpression()
      */
-    public QueryExpression getQueryExpression()
-    {
-        return new PointbaseQueryExpression( this );
+    public QueryExpression getQueryExpression() {
+        return new PointbaseQueryExpression(this);
     }
-
-
 }
 
 

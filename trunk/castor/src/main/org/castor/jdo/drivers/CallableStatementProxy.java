@@ -44,19 +44,22 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.util.LocalConfiguration;
 import org.exolab.castor.util.Configuration.Property;
 
 /**
  * Proxy class for JDBC CallableStatement class, to allow information gathering
  * for the purpose of SQL statement logging.
+ * 
  * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @version $Revision$ $Date$
  * @since 1.0M3
  */
-public class CallableStatementProxy implements CallableStatement {
+public final class CallableStatementProxy implements CallableStatement {
 
     /** Commons logger. */
-    private static final Log log = LogFactory.getLog(CallableStatementProxy.class);
+    private static final Log LOG = LogFactory.getLog(CallableStatementProxy.class);
 
     /** Has property of LocalConfiguration been read? */
     private static boolean _isConfigured = false;
@@ -65,28 +68,31 @@ public class CallableStatementProxy implements CallableStatement {
     private static boolean _useProxies = false;
 
     /** CallableStatement to be proxied. */
-    private CallableStatement callableStatement;
+    private CallableStatement _callableStatement;
 
-    /** Connection instance associated with this CallableStatement */
-    private Connection connection;
+    /** Connection instance associated with this CallableStatement. */
+    private Connection _connection;
 
-    /** SQL Parameter mapping */
-    private Map parameters = new HashMap();
+    /** SQL Parameter mapping. */
+    private Map _parameters = new HashMap();
 
-    /** The SQL statement to be executed  */
-    private String sqlStatement = null;
+    /** The SQL statement to be executed.  */
+    private String _sqlStatement = null;
 
     /** List of batch statements associated with this instance. */
-    private List batchStatements = new ArrayList();
+    private List _batchStatements = new ArrayList();
 
     /**
      * Factory method for creating a CallableStamentProxy
-    * @param statement Callable statement to be proxied.
+     * 
+     * @param statement Callable statement to be proxied.
      * @param sql SQL string.
-     * @param connection JDBC connection
+     * @param connection JDBC connection.
      * @return Callable statement proxy.
      */
-    public static CallableStatement newCallableStatementProxy(CallableStatement statement, String sql, Connection connection) {
+    public static CallableStatement newCallableStatementProxy(
+            final CallableStatement statement, final String sql,
+            final Connection connection) {
 
         if (!_isConfigured) {
             String propertyValue = LocalConfiguration.getInstance().getProperty(
@@ -104,725 +110,617 @@ public class CallableStatementProxy implements CallableStatement {
 
     /**
      * Creates an instance of this class.
+     * 
      * @param statement Callable statement to be proxied.
      * @param sql SQL string.
-     * @param connection JDBC connection
+     * @param connection JDBC connection.
      */
-    private CallableStatementProxy(CallableStatement statement, String sql, Connection connection) {
+    private CallableStatementProxy(final CallableStatement statement,
+            final String sql, final Connection connection) {
 
-        if (log.isDebugEnabled()) {
-            log.debug("Creating callable statement proxy for SQL statement " + sql);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating callable statement proxy for SQL statement " + sql);
         }
 
-        this.callableStatement = statement;
-        this.sqlStatement = sql;
-        this.connection = connection;
+        _callableStatement = statement;
+        _sqlStatement = sql;
+        _connection = connection;
     }
 
     /**
-     * @see PreparedStatement#addBatch()
+     * @see java.sql.PreparedStatement#addBatch()
      */
     public void addBatch() throws SQLException {
-        callableStatement.addBatch();
+        _callableStatement.addBatch();
     }
 
     /**
-     * @see PreparedStatement#addBatch(String)
+     * @see java.sql.Statement#addBatch(java.lang.String)
      */
-    public void addBatch(String arg0) throws SQLException {
-        batchStatements.add(arg0);
-        callableStatement.addBatch(arg0);
+    public void addBatch(final String arg0) throws SQLException {
+        _batchStatements.add(arg0);
+        _callableStatement.addBatch(arg0);
     }
 
     /**
-     * @see PreparedStatement#cancel()
+     * @see java.sql.Statement#cancel()
      */
     public void cancel() throws SQLException {
-        callableStatement.cancel();
+        _callableStatement.cancel();
     }
 
     /**
-     * @see PreparedStatement#clearBatch()
+     * @see java.sql.Statement#clearBatch()
      */
     public void clearBatch() throws SQLException {
-        batchStatements.clear();
-        callableStatement.clearBatch();
+        _batchStatements.clear();
+        _callableStatement.clearBatch();
     }
 
     /**
      * @see PreparedStatement#clearParameters()
      */
     public void clearParameters() throws SQLException {
-        parameters.clear();
-        callableStatement.clearParameters();
+        _parameters.clear();
+        _callableStatement.clearParameters();
     }
 
     /**
-     * @see PreparedStatement#clearWarnings()
+     * @see java.sql.Statement#clearWarnings()
      */
     public void clearWarnings() throws SQLException {
-        callableStatement.clearWarnings();
+        _callableStatement.clearWarnings();
     }
 
     /**
-     * @see PreparedStatement#close()
+     * @see java.sql.Statement#close()
      */
     public void close() throws SQLException {
-        callableStatement.close();
+        _callableStatement.close();
     }
 
-    /*
+    /**
      * @see java.lang.Object#equals(java.lang.Object)
      */
-    public boolean equals(Object arg0) {
-        return callableStatement.equals(arg0);
+    public boolean equals(final Object arg0) {
+        return _callableStatement.equals(arg0);
     }
 
     /**
-     * @see PreparedStatement#execute()
+     * @see java.sql.PreparedStatement#execute()
      */
     public boolean execute() throws SQLException {
-        return callableStatement.execute();
+        return _callableStatement.execute();
     }
 
-
     /**
-     * @param arg0
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#execute(java.lang.String)
      */
-    public boolean execute(String arg0) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.execute(arg0);
+    public boolean execute(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.execute(arg0);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#execute(java.lang.String, int)
      */
-    public boolean execute(String arg0, int arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.execute(arg0, arg1);
+    public boolean execute(final String arg0, final int arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.execute(arg0, arg1);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#execute(java.lang.String, int[])
      */
-    public boolean execute(String arg0, int[] arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.execute(arg0, arg1);
+    public boolean execute(final String arg0, final int[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.execute(arg0, arg1);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
      */
-    public boolean execute(String arg0, String[] arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.execute(arg0, arg1);
+    public boolean execute(final String arg0, final String[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.execute(arg0, arg1);
     }
 
     /**
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeBatch()
      */
     public int[] executeBatch() throws SQLException {
-        return callableStatement.executeBatch();
+        return _callableStatement.executeBatch();
     }
 
     /**
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.PreparedStatement#executeQuery()
      */
     public ResultSet executeQuery() throws SQLException {
-        return callableStatement.executeQuery();
+        return _callableStatement.executeQuery();
     }
 
     /**
-     * @param arg0
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeQuery(java.lang.String)
      */
-    public ResultSet executeQuery(String arg0) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.executeQuery(arg0);
+    public ResultSet executeQuery(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.executeQuery(arg0);
     }
 
     /**
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.PreparedStatement#executeUpdate()
      */
     public int executeUpdate() throws SQLException {
-        return callableStatement.executeUpdate();
+        return _callableStatement.executeUpdate();
     }
 
     /**
-     * @param arg0
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeUpdate(java.lang.String)
      */
-    public int executeUpdate(String arg0) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.executeUpdate(arg0);
+    public int executeUpdate(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.executeUpdate(arg0);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeUpdate(java.lang.String, int)
      */
-    public int executeUpdate(String arg0, int arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.executeUpdate(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int executeUpdate(String arg0, int[] arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.executeUpdate(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int executeUpdate(String arg0, String[] arg1) throws SQLException {
-        sqlStatement = arg0;
-        return callableStatement.executeUpdate(arg0, arg1);
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public Connection getConnection() throws SQLException {
-        //return callableStatement.getConnection();
-        return connection;
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getFetchDirection() throws SQLException {
-        return callableStatement.getFetchDirection();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getFetchSize() throws SQLException {
-        return callableStatement.getFetchSize();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public ResultSet getGeneratedKeys() throws SQLException {
-        return callableStatement.getGeneratedKeys();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getMaxFieldSize() throws SQLException {
-        return callableStatement.getMaxFieldSize();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getMaxRows() throws SQLException {
-        return callableStatement.getMaxRows();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public ResultSetMetaData getMetaData() throws SQLException {
-        return callableStatement.getMetaData();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public boolean getMoreResults() throws SQLException {
-        return callableStatement.getMoreResults();
-    }
-
-    /**
-     * @param arg0
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public boolean getMoreResults(int arg0) throws SQLException {
-        return callableStatement.getMoreResults(arg0);
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public ParameterMetaData getParameterMetaData() throws SQLException {
-        return callableStatement.getParameterMetaData();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getQueryTimeout() throws SQLException {
-        return callableStatement.getQueryTimeout();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public ResultSet getResultSet() throws SQLException {
-        return callableStatement.getResultSet();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getResultSetConcurrency() throws SQLException {
-        return callableStatement.getResultSetConcurrency();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getResultSetHoldability() throws SQLException {
-        return callableStatement.getResultSetHoldability();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getResultSetType() throws SQLException {
-        return callableStatement.getResultSetType();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public int getUpdateCount() throws SQLException {
-        return callableStatement.getUpdateCount();
-    }
-
-    /**
-     * @return
-     * @throws java.sql.SQLException
-     */
-    public SQLWarning getWarnings() throws SQLException {
-        return callableStatement.getWarnings();
-    }
-
-    /* (non-Javadoc)
-     * @see java.lang.Object#hashCode()
-     */
-    public int hashCode() {
-        return callableStatement.hashCode();
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setArray(int arg0, Array arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setArray(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
-     */
-    public void setAsciiStream(int arg0, InputStream arg1, int arg2) throws SQLException {
-        callableStatement.setAsciiStream(arg0, arg1, arg2);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setBigDecimal(int arg0, BigDecimal arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setBigDecimal(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
-     */
-    public void setBinaryStream(int arg0, InputStream arg1, int arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setBinaryStream(arg0, arg1, arg2);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setBlob(int arg0, Blob arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setBlob(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setBoolean(int arg0, boolean arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Boolean(arg1));
-        callableStatement.setBoolean(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setByte(int arg0, byte arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Byte(arg1));
-        callableStatement.setByte(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setBytes(int arg0, byte[] arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setBytes(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
-     */
-    public void setCharacterStream(int arg0, Reader arg1, int arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setCharacterStream(arg0, arg1, arg2);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setClob(int arg0, Clob arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setClob(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setCursorName(String arg0) throws SQLException {
-        callableStatement.setCursorName(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setDate(int arg0, Date arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setDate(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
-     */
-    public void setDate(int arg0, Date arg1, Calendar arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setDate(arg0, arg1, arg2);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setDouble(int arg0, double arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Double(arg1));
-        callableStatement.setDouble(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setEscapeProcessing(boolean arg0) throws SQLException {
-        callableStatement.setEscapeProcessing(arg0);
-    }
-
-    /**
-    * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setFetchDirection(int arg0) throws SQLException {
-        callableStatement.setFetchDirection(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setFetchSize(int arg0) throws SQLException {
-        callableStatement.setFetchSize(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setFloat(int arg0, float arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Float(arg1));
-        callableStatement.setFloat(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setInt(int arg0, int arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Integer(arg1));
-        callableStatement.setInt(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setLong(int arg0, long arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Long(arg1));
-        callableStatement.setLong(arg0, arg1);
-    }
-
-    /**
-     * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setMaxFieldSize(int arg0) throws SQLException {
-        callableStatement.setMaxFieldSize(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @throws java.sql.SQLException
-     */
-    public void setMaxRows(int arg0) throws SQLException {
-        callableStatement.setMaxRows(arg0);
-    }
-
-    /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
-     */
-    public void setNull(int arg0, int arg1) throws SQLException {
-        parameters.put(new Integer(arg0), "null");
-        callableStatement.setNull(arg0, arg1);
+    public int executeUpdate(final String arg0, final int arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.executeUpdate(arg0, arg1);
     }
     
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeUpdate(java.lang.String, int[])
      */
-    public void setNull(int arg0, int arg1, String arg2) throws SQLException {
-        parameters.put(new Integer(arg0), "null");
-        callableStatement.setNull(arg0, arg1, arg2);
+    public int executeUpdate(final String arg0, final int[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.executeUpdate(arg0, arg1);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#executeUpdate(java.lang.String, java.lang.String[])
      */
-    public void setObject(int arg0, Object arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setObject(arg0, arg1);
+    public int executeUpdate(final String arg0, final String[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _callableStatement.executeUpdate(arg0, arg1);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getConnection()
      */
-    public void setObject(int arg0, Object arg1, int arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setObject(arg0, arg1, arg2);
+    public Connection getConnection() throws SQLException {
+        //return callableStatement.getConnection();
+        return _connection;
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @param arg3
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getFetchDirection()
      */
-    public void setObject(int arg0, Object arg1, int arg2, int arg3) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setObject(arg0, arg1, arg2, arg3);
+    public int getFetchDirection() throws SQLException {
+        return _callableStatement.getFetchDirection();
     }
 
     /**
-     * @param arg0
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getFetchSize()
      */
-    public void setQueryTimeout(int arg0) throws SQLException {
-        callableStatement.setQueryTimeout(arg0);
+    public int getFetchSize() throws SQLException {
+        return _callableStatement.getFetchSize();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getGeneratedKeys()
      */
-    public void setRef(int arg0, Ref arg1) throws SQLException {
-        callableStatement.setRef(arg0, arg1);
+    public ResultSet getGeneratedKeys() throws SQLException {
+        return _callableStatement.getGeneratedKeys();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getMaxFieldSize()
      */
-    public void setShort(int arg0, short arg1) throws SQLException {
-        parameters.put(new Integer(arg0), new Short(arg1));
-        callableStatement.setShort(arg0, arg1);
+    public int getMaxFieldSize() throws SQLException {
+        return _callableStatement.getMaxFieldSize();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getMaxRows()
      */
-    public void setString(int arg0, String arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setString(arg0, arg1);
+    public int getMaxRows() throws SQLException {
+        return _callableStatement.getMaxRows();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.PreparedStatement#getMetaData()
      */
-    public void setTime(int arg0, Time arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setTime(arg0, arg1);
+    public ResultSetMetaData getMetaData() throws SQLException {
+        return _callableStatement.getMetaData();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getMoreResults()
      */
-    public void setTime(int arg0, Time arg1, Calendar arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setTime(arg0, arg1, arg2);
+    public boolean getMoreResults() throws SQLException {
+        return _callableStatement.getMoreResults();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getMoreResults(int)
      */
-    public void setTimestamp(int arg0, Timestamp arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setTimestamp(arg0, arg1);
+    public boolean getMoreResults(final int arg0) throws SQLException {
+        return _callableStatement.getMoreResults(arg0);
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
+     * @see java.sql.PreparedStatement#getParameterMetaData()
      */
-    public void setTimestamp(int arg0, Timestamp arg1, Calendar arg2) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setTimestamp(arg0, arg1, arg2);
+    public ParameterMetaData getParameterMetaData() throws SQLException {
+        return _callableStatement.getParameterMetaData();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @param arg2
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getQueryTimeout()
      */
-    public void setUnicodeStream(int arg0, InputStream arg1, int arg2) throws SQLException {
-        callableStatement.setUnicodeStream(arg0, arg1, arg2);
+    public int getQueryTimeout() throws SQLException {
+        return _callableStatement.getQueryTimeout();
     }
 
     /**
-     * @param arg0
-     * @param arg1
-     * @throws java.sql.SQLException
+     * @see java.sql.Statement#getResultSet()
      */
-    public void setURL(int arg0, URL arg1) throws SQLException {
-        parameters.put(new Integer(arg0), arg1);
-        callableStatement.setURL(arg0, arg1);
+    public ResultSet getResultSet() throws SQLException {
+        return _callableStatement.getResultSet();
     }
 
-    /* (non-Javadoc)
+    /**
+     * @see java.sql.Statement#getResultSetConcurrency()
+     */
+    public int getResultSetConcurrency() throws SQLException {
+        return _callableStatement.getResultSetConcurrency();
+    }
+    
+    /**
+     * @see java.sql.Statement#getResultSetHoldability()
+     */
+    public int getResultSetHoldability() throws SQLException {
+        return _callableStatement.getResultSetHoldability();
+    }
+
+    /**
+     * @see java.sql.Statement#getResultSetType()
+     */
+    public int getResultSetType() throws SQLException {
+        return _callableStatement.getResultSetType();
+    }
+
+    /**
+     * @see java.sql.Statement#getUpdateCount()
+     */
+    public int getUpdateCount() throws SQLException {
+        return _callableStatement.getUpdateCount();
+    }
+
+    /**
+     * @see java.sql.Statement#getWarnings()
+     */
+    public SQLWarning getWarnings() throws SQLException {
+        return _callableStatement.getWarnings();
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return _callableStatement.hashCode();
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
+     */
+    public void setArray(final int arg0, final Array arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setArray(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream, int)
+     */
+    public void setAsciiStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _callableStatement.setAsciiStream(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setBigDecimal(int, java.math.BigDecimal)
+     */
+    public void setBigDecimal(final int arg0, final BigDecimal arg1)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setBigDecimal(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream, int)
+     */
+    public void setBinaryStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setBinaryStream(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
+     */
+    public void setBlob(final int arg0, final Blob arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setBlob(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setBoolean(int, boolean)
+     */
+    public void setBoolean(final int arg0, final boolean arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Boolean(arg1));
+        _callableStatement.setBoolean(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setByte(int, byte)
+     */
+    public void setByte(final int arg0, final byte arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Byte(arg1));
+        _callableStatement.setByte(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setBytes(int, byte[])
+     */
+    public void setBytes(final int arg0, final byte[] arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setBytes(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader, int)
+     */
+    public void setCharacterStream(final int arg0, final Reader arg1, final int arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setCharacterStream(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
+     */
+    public void setClob(final int arg0, final Clob arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setClob(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.Statement#setCursorName(java.lang.String)
+     */
+    public void setCursorName(final String arg0) throws SQLException {
+        _callableStatement.setCursorName(arg0);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
+     */
+    public void setDate(final int arg0, final Date arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setDate(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setDate(int, java.sql.Date, java.util.Calendar)
+     */
+    public void setDate(final int arg0, final Date arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setDate(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setDouble(int, double)
+     */
+    public void setDouble(final int arg0, final double arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Double(arg1));
+        _callableStatement.setDouble(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.Statement#setEscapeProcessing(boolean)
+     */
+    public void setEscapeProcessing(final boolean arg0) throws SQLException {
+        _callableStatement.setEscapeProcessing(arg0);
+    }
+
+    /**
+     * @see java.sql.Statement#setFetchDirection(int)
+     */
+    public void setFetchDirection(final int arg0) throws SQLException {
+        _callableStatement.setFetchDirection(arg0);
+    }
+
+    /**
+     * @see java.sql.Statement#setFetchSize(int)
+     */
+    public void setFetchSize(final int arg0) throws SQLException {
+        _callableStatement.setFetchSize(arg0);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setFloat(int, float)
+     */
+    public void setFloat(final int arg0, final float arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Float(arg1));
+        _callableStatement.setFloat(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setInt(int, int)
+     */
+    public void setInt(final int arg0, final int arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Integer(arg1));
+        _callableStatement.setInt(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setLong(int, long)
+     */
+    public void setLong(final int arg0, final long arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Long(arg1));
+        _callableStatement.setLong(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.Statement#setMaxFieldSize(int)
+     */
+    public void setMaxFieldSize(final int arg0) throws SQLException {
+        _callableStatement.setMaxFieldSize(arg0);
+    }
+
+    /**
+     * @see java.sql.Statement#setMaxRows(int)
+     */
+    public void setMaxRows(final int arg0) throws SQLException {
+        _callableStatement.setMaxRows(arg0);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setNull(int, int)
+     */
+    public void setNull(final int arg0, final int arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), "null");
+        _callableStatement.setNull(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setNull(int, int, java.lang.String)
+     */
+    public void setNull(final int arg0, final int arg1, final String arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), "null");
+        _callableStatement.setNull(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object)
+     */
+    public void setObject(final int arg0, final Object arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setObject(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int)
+     */
+    public void setObject(final int arg0, final Object arg1, final int arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setObject(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int, int)
+     */
+    public void setObject(final int arg0, final Object arg1,
+            final int arg2, final int arg3) throws SQLException {
+        
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setObject(arg0, arg1, arg2, arg3);
+    }
+
+    /**
+     * @see java.sql.Statement#setQueryTimeout(int)
+     */
+    public void setQueryTimeout(final int arg0) throws SQLException {
+        _callableStatement.setQueryTimeout(arg0);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setRef(int, java.sql.Ref)
+     */
+    public void setRef(final int arg0, final Ref arg1) throws SQLException {
+        _callableStatement.setRef(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setShort(int, short)
+     */
+    public void setShort(final int arg0, final short arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), new Short(arg1));
+        _callableStatement.setShort(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setString(int, java.lang.String)
+     */
+    public void setString(final int arg0, final String arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setString(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
+     */
+    public void setTime(final int arg0, final Time arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setTime(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setTime(int, java.sql.Time, java.util.Calendar)
+     */
+    public void setTime(final int arg0, final Time arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setTime(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp)
+     */
+    public void setTimestamp(final int arg0, final Timestamp arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setTimestamp(arg0, arg1);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement
+     *      #setTimestamp(int, java.sql.Timestamp, java.util.Calendar)
+     */
+    public void setTimestamp(final int arg0, final Timestamp arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setTimestamp(arg0, arg1, arg2);
+    }
+
+    /**
+     * @deprecated
+     * @see java.sql.PreparedStatement#setUnicodeStream(int, java.io.InputStream, int)
+     */
+    public void setUnicodeStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _callableStatement.setUnicodeStream(arg0, arg1, arg2);
+    }
+
+    /**
+     * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
+     */
+    public void setURL(final int arg0, final URL arg1) throws SQLException {
+        _parameters.put(new Integer(arg0), arg1);
+        _callableStatement.setURL(arg0, arg1);
+    }
+
+    /**
      * @see java.lang.Object#toString()
      */
     public String toString() {
         StringBuffer buffer = new StringBuffer();
-        StringTokenizer tokenizer = new StringTokenizer(sqlStatement, "?");
+        StringTokenizer tokenizer = new StringTokenizer(_sqlStatement, "?");
         String partOfStatement;
-        List parameterValues = new ArrayList(parameters.keySet());
+        List parameterValues = new ArrayList(_parameters.keySet());
         Collections.sort(parameterValues);
         Iterator iter = parameterValues.iterator();
         Object key = null;
@@ -831,7 +729,7 @@ public class CallableStatementProxy implements CallableStatement {
             if (iter.hasNext()) {
                 key = iter.next();
                 buffer.append(partOfStatement);
-                buffer.append("'" + parameters.get(key).toString() + "'");
+                buffer.append("'" + _parameters.get(key).toString() + "'");
             } else {
                 buffer.append(partOfStatement);
                 buffer.append("?");
@@ -840,824 +738,624 @@ public class CallableStatementProxy implements CallableStatement {
         return buffer.toString();
     }
 
+    //----------------------------------------------------------------------
     // CallableStatement interface
+    
     /**
-     *
-     * @param parameterIndex int
-     * @param sqlType int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#registerOutParameter(int, int)
      */
-    public void registerOutParameter(int parameterIndex, int sqlType) throws SQLException {
-        callableStatement.registerOutParameter(parameterIndex, sqlType);
+    public void registerOutParameter(final int parameterIndex, final int sqlType)
+    throws SQLException {
+        _callableStatement.registerOutParameter(parameterIndex, sqlType);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @param sqlType int
-     * @param scale int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#registerOutParameter(int, int, int)
      */
-    public void registerOutParameter(int parameterIndex, int sqlType, int scale) throws SQLException {
-        callableStatement.registerOutParameter(parameterIndex, sqlType, scale);
+    public void registerOutParameter(final int parameterIndex, 
+            final int sqlType, final int scale) throws SQLException {
+        
+        _callableStatement.registerOutParameter(parameterIndex, sqlType, scale);
     }
 
     /**
-     *
-     * @throws SQLException
-     * @return boolean
+     * @see java.sql.CallableStatement#wasNull()
      */
     public boolean wasNull() throws SQLException {
-        return callableStatement.wasNull();
+        return _callableStatement.wasNull();
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return String
+     * @see java.sql.CallableStatement#getString(int)
      */
-    public String getString(int parameterIndex) throws SQLException {
-        return callableStatement.getString(parameterIndex);
+    public String getString(final int parameterIndex) throws SQLException {
+        return _callableStatement.getString(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return boolean
+     * @see java.sql.CallableStatement#getBoolean(int)
      */
-    public boolean getBoolean(int parameterIndex) throws SQLException {
-        return callableStatement.getBoolean(parameterIndex);
+    public boolean getBoolean(final int parameterIndex) throws SQLException {
+        return _callableStatement.getBoolean(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return byte
+     * @see java.sql.CallableStatement#getByte(int)
      */
-    public byte getByte(int parameterIndex) throws SQLException {
-        return callableStatement.getByte(parameterIndex);
+    public byte getByte(final int parameterIndex) throws SQLException {
+        return _callableStatement.getByte(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return short
+     * @see java.sql.CallableStatement#getShort(int)
      */
-    public short getShort(int parameterIndex) throws SQLException {
-        return callableStatement.getShort(parameterIndex);
+    public short getShort(final int parameterIndex) throws SQLException {
+        return _callableStatement.getShort(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return int
+     * @see java.sql.CallableStatement#getInt(int)
      */
-    public int getInt(int parameterIndex) throws SQLException {
-        return callableStatement.getInt(parameterIndex);
+    public int getInt(final int parameterIndex) throws SQLException {
+        return _callableStatement.getInt(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return long
+     * @see java.sql.CallableStatement#getLong(int)
      */
-    public long getLong(int parameterIndex) throws SQLException {
-        return callableStatement.getLong(parameterIndex);
+    public long getLong(final int parameterIndex) throws SQLException {
+        return _callableStatement.getLong(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return float
+     * @see java.sql.CallableStatement#getFloat(int)
      */
-    public float getFloat(int parameterIndex) throws SQLException {
-        return callableStatement.getFloat(parameterIndex);
+    public float getFloat(final int parameterIndex) throws SQLException {
+        return _callableStatement.getFloat(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return double
+     * @see java.sql.CallableStatement#getDouble(int)
      */
-    public double getDouble(int parameterIndex) throws SQLException {
-        return callableStatement.getDouble(parameterIndex);
+    public double getDouble(final int parameterIndex) throws SQLException {
+        return _callableStatement.getDouble(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @param scale int
-     * @throws SQLException
-     * @return BigDecimal
+     * @deprecated
+     * @see java.sql.CallableStatement#getBigDecimal(int, int)
      */
-    public BigDecimal getBigDecimal(int parameterIndex, int scale) throws SQLException {
-        return callableStatement.getBigDecimal(parameterIndex, scale);
+    public BigDecimal getBigDecimal(final int parameterIndex, final int scale)
+    throws SQLException {
+        return _callableStatement.getBigDecimal(parameterIndex, scale);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return byte[]
+     * @see java.sql.CallableStatement#getBytes(int)
      */
-    public byte[] getBytes(int parameterIndex) throws SQLException {
-        return callableStatement.getBytes(parameterIndex);
+    public byte[] getBytes(final int parameterIndex) throws SQLException {
+        return _callableStatement.getBytes(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return Date
+     * @see java.sql.CallableStatement#getDate(int)
      */
-    public java.sql.Date getDate(int parameterIndex) throws SQLException {
-        return callableStatement.getDate(parameterIndex);
+    public Date getDate(final int parameterIndex) throws SQLException {
+        return _callableStatement.getDate(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return Time
+     * @see java.sql.CallableStatement#getTime(int)
      */
-    public java.sql.Time getTime(int parameterIndex) throws SQLException {
-        return callableStatement.getTime(parameterIndex);
+    public Time getTime(final int parameterIndex) throws SQLException {
+        return _callableStatement.getTime(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return Timestamp
+     * @see java.sql.CallableStatement#getTimestamp(int)
      */
-    public java.sql.Timestamp getTimestamp(int parameterIndex) throws SQLException {
-        return callableStatement.getTimestamp(parameterIndex);
+    public Timestamp getTimestamp(final int parameterIndex) throws SQLException {
+        return _callableStatement.getTimestamp(parameterIndex);
     }
 
     //----------------------------------------------------------------------
-    // Advanced features:
+    // Advanced features
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return Object
+     * @see java.sql.CallableStatement#getObject(int)
      */
-    public Object getObject(int parameterIndex) throws SQLException {
-        return callableStatement.getObject(parameterIndex);
+    public Object getObject(final int parameterIndex) throws SQLException {
+        return _callableStatement.getObject(parameterIndex);
     }
 
-    //--------------------------JDBC 2.0-----------------------------
+    //----------------------------------------------------------------------
+    // JDBC 2.0
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return BigDecimal
+     * @see java.sql.CallableStatement#getBigDecimal(int)
      */
-    public BigDecimal getBigDecimal(int parameterIndex) throws SQLException {
-        return callableStatement.getBigDecimal(parameterIndex);
+    public BigDecimal getBigDecimal(final int parameterIndex) throws SQLException {
+        return _callableStatement.getBigDecimal(parameterIndex);
     }
 
     /**
-     *
-     * @param i int
-     * @param map Map
-     * @throws SQLException
-     * @return Object
+     * @see java.sql.CallableStatement#getObject(int, java.util.Map)
      */
-    public Object getObject(int i, java.util.Map map) throws SQLException {
-        return callableStatement.getObject(i, map);
+    public Object getObject(final int i, final Map map) throws SQLException {
+        return _callableStatement.getObject(i, map);
     }
 
     /**
-     *
-     * @param i int
-     * @throws SQLException
-     * @return Ref
+     * @see java.sql.CallableStatement#getRef(int)
      */
-    public Ref getRef(int i) throws SQLException {
-        return callableStatement.getRef(i);
+    public Ref getRef(final int i) throws SQLException {
+        return _callableStatement.getRef(i);
     }
 
     /**
-     *
-     * @param i int
-     * @throws SQLException
-     * @return Blob
+     * @see java.sql.CallableStatement#getBlob(int)
      */
-    public Blob getBlob(int i) throws SQLException {
-        return callableStatement.getBlob(i);
+    public Blob getBlob(final int i) throws SQLException {
+        return _callableStatement.getBlob(i);
     }
 
     /**
-     *
-     * @param i int
-     * @throws SQLException
-     * @return Clob
+     * @see java.sql.CallableStatement#getClob(int)
      */
-    public Clob getClob(int i) throws SQLException {
-        return callableStatement.getClob(i);
+    public Clob getClob(final int i) throws SQLException {
+        return _callableStatement.getClob(i);
     }
 
     /**
-     *
-     * @param i int
-     * @throws SQLException
-     * @return Array
+     * @see java.sql.CallableStatement#getArray(int)
      */
-    public Array getArray(int i) throws SQLException {
-        return callableStatement.getArray(i);
+    public Array getArray(final int i) throws SQLException {
+        return _callableStatement.getArray(i);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Date
+     * @see java.sql.CallableStatement#getDate(int, java.util.Calendar)
      */
-    public java.sql.Date getDate(int parameterIndex, Calendar cal) throws SQLException {
-        return callableStatement.getDate(parameterIndex, cal);
+    public Date getDate(final int parameterIndex, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getDate(parameterIndex, cal);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Time
+     * @see java.sql.CallableStatement#getTime(int, java.util.Calendar)
      */
-    public java.sql.Time getTime(int parameterIndex, Calendar cal) throws SQLException {
-        return callableStatement.getTime(parameterIndex, cal);
+    public Time getTime(final int parameterIndex, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getTime(parameterIndex, cal);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Timestamp
+     * @see java.sql.CallableStatement#getTimestamp(int, java.util.Calendar)
      */
-    public java.sql.Timestamp getTimestamp(int parameterIndex, Calendar cal) throws SQLException {
-        return callableStatement.getTimestamp(parameterIndex, cal);
+    public Timestamp getTimestamp(final int parameterIndex, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getTimestamp(parameterIndex, cal);
     }
 
     /**
-     *
-     * @param paramIndex int
-     * @param sqlType int
-     * @param typeName String
-     * @throws SQLException
+     * @see java.sql.CallableStatement#registerOutParameter(int, int, java.lang.String)
      */
-    public void registerOutParameter(int paramIndex, int sqlType, String typeName) throws SQLException {
-        callableStatement.registerOutParameter(paramIndex, sqlType, typeName);
+    public void registerOutParameter(final int paramIndex,
+            final int sqlType, final String typeName) throws SQLException {
+        
+        _callableStatement.registerOutParameter(paramIndex, sqlType, typeName);
     }
 
     //--------------------------JDBC 3.0-----------------------------
 
     /**
-     *
-     * @param parameterName String
-     * @param sqlType int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#registerOutParameter(java.lang.String, int)
      */
-    public void registerOutParameter(String parameterName, int sqlType) throws SQLException {
-        callableStatement.registerOutParameter(parameterName, sqlType);
+    public void registerOutParameter(final String parameterName, final int sqlType)
+    throws SQLException {
+        _callableStatement.registerOutParameter(parameterName, sqlType);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param sqlType int
-     * @param scale int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#registerOutParameter(java.lang.String, int, int)
      */
-    public void registerOutParameter(String parameterName, int sqlType, int scale) throws SQLException {
-        callableStatement.registerOutParameter(parameterName, sqlType, scale);
+    public void registerOutParameter(final String parameterName,
+            final int sqlType, final int scale) throws SQLException {
+        _callableStatement.registerOutParameter(parameterName, sqlType, scale);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param sqlType int
-     * @param typeName String
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #registerOutParameter(java.lang.String, int, java.lang.String)
      */
-    public void registerOutParameter(String parameterName, int sqlType, String typeName) throws SQLException {
-        callableStatement.registerOutParameter(parameterName, sqlType, typeName);
+    public void registerOutParameter(final String parameterName,
+            final int sqlType, final String typeName) throws SQLException {
+        _callableStatement.registerOutParameter(parameterName, sqlType, typeName);
     }
 
     /**
-     *
-     * @param parameterIndex int
-     * @throws SQLException
-     * @return URL
+     * @see java.sql.CallableStatement#getURL(int)
      */
-    public java.net.URL getURL(int parameterIndex) throws SQLException {
-        return callableStatement.getURL(parameterIndex);
+    public URL getURL(final int parameterIndex) throws SQLException {
+        return _callableStatement.getURL(parameterIndex);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param val URL
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setURL(java.lang.String, java.net.URL)
      */
-    public void setURL(String parameterName, java.net.URL val) throws SQLException {
-        callableStatement.setURL(parameterName, val);
+    public void setURL(final String parameterName, final URL val) throws SQLException {
+        _callableStatement.setURL(parameterName, val);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param sqlType int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setNull(java.lang.String, int)
      */
-    public void setNull(String parameterName, int sqlType) throws SQLException {
-        callableStatement.setNull(parameterName, sqlType);
+    public void setNull(final String parameterName, final int sqlType)
+    throws SQLException {
+        _callableStatement.setNull(parameterName, sqlType);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x boolean
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setBoolean(java.lang.String, boolean)
      */
-    public void setBoolean(String parameterName, boolean x) throws SQLException {
-        callableStatement.setBoolean(parameterName, x);
+    public void setBoolean(final String parameterName, final boolean x)
+    throws SQLException {
+        _callableStatement.setBoolean(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x byte
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setByte(java.lang.String, byte)
      */
-    public void setByte(String parameterName, byte x) throws SQLException {
-        callableStatement.setByte(parameterName, x);
+    public void setByte(final String parameterName, final byte x)
+    throws SQLException {
+        _callableStatement.setByte(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x short
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setShort(java.lang.String, short)
      */
-    public void setShort(String parameterName, short x) throws SQLException {
-        callableStatement.setShort(parameterName, x);
+    public void setShort(final String parameterName, final short x)
+    throws SQLException {
+        _callableStatement.setShort(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setInt(java.lang.String, int)
      */
-    public void setInt(String parameterName, int x) throws SQLException {
-        callableStatement.setInt(parameterName, x);
+    public void setInt(final String parameterName, final int x)
+    throws SQLException {
+        _callableStatement.setInt(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x long
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setLong(java.lang.String, long)
      */
-    public void setLong(String parameterName, long x) throws SQLException {
-        callableStatement.setLong(parameterName, x);
+    public void setLong(final String parameterName, final long x)
+    throws SQLException {
+        _callableStatement.setLong(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x float
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setFloat(java.lang.String, float)
      */
-    public void setFloat(String parameterName, float x) throws SQLException {
-        callableStatement.setFloat(parameterName, x);
+    public void setFloat(final String parameterName, final float x)
+    throws SQLException {
+        _callableStatement.setFloat(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x double
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setDouble(java.lang.String, double)
      */
-    public void setDouble(String parameterName, double x) throws SQLException {
-        callableStatement.setDouble(parameterName, x);
+    public void setDouble(final String parameterName, final double x)
+    throws SQLException {
+        _callableStatement.setDouble(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x BigDecimal
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setBigDecimal(java.lang.String, java.math.BigDecimal)
      */
-    public void setBigDecimal(String parameterName, BigDecimal x) throws SQLException {
-        callableStatement.setBigDecimal(parameterName, x);
+    public void setBigDecimal(final String parameterName, final BigDecimal x)
+    throws SQLException {
+        _callableStatement.setBigDecimal(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x String
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setString(java.lang.String, java.lang.String)
      */
-    public void setString(String parameterName, String x) throws SQLException {
-        callableStatement.setString(parameterName, x);
+    public void setString(final String parameterName, final String x)
+    throws SQLException {
+        _callableStatement.setString(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x byte[]
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setBytes(java.lang.String, byte[])
      */
-    public void setBytes(String parameterName, byte x[]) throws SQLException {
-        callableStatement.setBytes(parameterName, x);
+    public void setBytes(final String parameterName, final byte[] x)
+    throws SQLException {
+        _callableStatement.setBytes(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Date
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setDate(java.lang.String, java.sql.Date)
      */
-    public void setDate(String parameterName, java.sql.Date x) throws SQLException {
-        callableStatement.setDate(parameterName, x);
+    public void setDate(final String parameterName, final Date x)
+    throws SQLException {
+        _callableStatement.setDate(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Time
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setTime(java.lang.String, java.sql.Time)
      */
-    public void setTime(String parameterName, java.sql.Time x) throws SQLException {
-        callableStatement.setTime(parameterName, x);
+    public void setTime(final String parameterName, final Time x) throws SQLException {
+        _callableStatement.setTime(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Timestamp
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setTimestamp(java.lang.String, java.sql.Timestamp)
      */
-    public void setTimestamp(String parameterName, java.sql.Timestamp x) throws SQLException {
-        callableStatement.setTimestamp(parameterName, x);
+    public void setTimestamp(final String parameterName, final Timestamp x)
+    throws SQLException {
+        _callableStatement.setTimestamp(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x InputStream
-     * @param length int
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setAsciiStream(java.lang.String, java.io.InputStream, int)
      */
-    public void setAsciiStream(String parameterName, java.io.InputStream x, int length) throws SQLException {
-        callableStatement.setAsciiStream(parameterName, x, length);
+    public void setAsciiStream(final String parameterName,
+            final InputStream x, final int length) throws SQLException {
+        
+        _callableStatement.setAsciiStream(parameterName, x, length);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x InputStream
-     * @param length int
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setBinaryStream(java.lang.String, java.io.InputStream, int)
      */
-    public void setBinaryStream(String parameterName, java.io.InputStream x, int length) throws SQLException {
-        callableStatement.setBinaryStream(parameterName, x, length);
+    public void setBinaryStream(final String parameterName,
+            final InputStream x, final int length) throws SQLException {
+        
+        _callableStatement.setBinaryStream(parameterName, x, length);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Object
-     * @param targetSqlType int
-     * @param scale int
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setObject(java.lang.String, java.lang.Object, int, int)
      */
-    public void setObject(String parameterName, Object x, int targetSqlType, int scale) throws SQLException {
-        callableStatement.setObject(parameterName, x, targetSqlType, scale);
+    public void setObject(final String parameterName, final Object x,
+            final int targetSqlType, final int scale) throws SQLException {
+        
+        _callableStatement.setObject(parameterName, x, targetSqlType, scale);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Object
-     * @param targetSqlType int
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setObject(java.lang.String, java.lang.Object, int)
      */
-    public void setObject(String parameterName, Object x, int targetSqlType) throws SQLException {
-        callableStatement.setObject(parameterName, x, targetSqlType);
+    public void setObject(final String parameterName,
+            final Object x, final int targetSqlType) throws SQLException {
+        
+        _callableStatement.setObject(parameterName, x, targetSqlType);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Object
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setObject(java.lang.String, java.lang.Object)
      */
-    public void setObject(String parameterName, Object x) throws SQLException {
-        callableStatement.setObject(parameterName, x);
+    public void setObject(final String parameterName, final Object x)
+    throws SQLException {
+        _callableStatement.setObject(parameterName, x);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param reader Reader
-     * @param length int
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setCharacterStream(java.lang.String, java.io.Reader, int)
      */
-    public void setCharacterStream(String parameterName, java.io.Reader reader, int length) throws SQLException {
-        callableStatement.setCharacterStream(parameterName, reader, length);
+    public void setCharacterStream(final String parameterName,
+            final Reader reader, final int length) throws SQLException {
+        
+        _callableStatement.setCharacterStream(parameterName, reader, length);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Date
-     * @param cal Calendar
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setDate(java.lang.String, java.sql.Date, java.util.Calendar)
      */
-    public void setDate(String parameterName, java.sql.Date x, Calendar cal) throws SQLException {
-        callableStatement.setDate(parameterName, x, cal);
+    public void setDate(final String parameterName, final Date x, final Calendar cal)
+    throws SQLException {
+        _callableStatement.setDate(parameterName, x, cal);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Time
-     * @param cal Calendar
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setTime(java.lang.String, java.sql.Time, java.util.Calendar)
      */
-    public void setTime(String parameterName, java.sql.Time x, Calendar cal) throws SQLException {
-        callableStatement.setTime(parameterName, x, cal);
+    public void setTime(final String parameterName, final Time x, final Calendar cal)
+    throws SQLException {
+        _callableStatement.setTime(parameterName, x, cal);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param x Timestamp
-     * @param cal Calendar
-     * @throws SQLException
+     * @see java.sql.CallableStatement
+     *      #setTimestamp(java.lang.String, java.sql.Timestamp, java.util.Calendar)
      */
-    public void setTimestamp(String parameterName, java.sql.Timestamp x, Calendar cal) throws SQLException {
-        callableStatement.setTimestamp(parameterName, x, cal);
+    public void setTimestamp(final String parameterName,
+            final Timestamp x, final Calendar cal) throws SQLException {
+        
+        _callableStatement.setTimestamp(parameterName, x, cal);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param sqlType int
-     * @param typeName String
-     * @throws SQLException
+     * @see java.sql.CallableStatement#setNull(java.lang.String, int, java.lang.String)
      */
-    public void setNull(String parameterName, int sqlType, String typeName) throws SQLException {
-        callableStatement.setNull(parameterName, sqlType, typeName);
+    public void setNull(final String parameterName,
+            final int sqlType, final String typeName) throws SQLException {
+        
+        _callableStatement.setNull(parameterName, sqlType, typeName);
     }
 
     /**
-    *
-     * @param parameterName String
-     * @throws SQLException
-     * @return String
+     * @see java.sql.CallableStatement#getString(java.lang.String)
      */
-    public String getString(String parameterName) throws SQLException {
-        return callableStatement.getString(parameterName);
+    public String getString(final String parameterName) throws SQLException {
+        return _callableStatement.getString(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return boolean
+     * @see java.sql.CallableStatement#getBoolean(java.lang.String)
      */
-    public boolean getBoolean(String parameterName) throws SQLException {
-        return callableStatement.getBoolean(parameterName);
+    public boolean getBoolean(final String parameterName) throws SQLException {
+        return _callableStatement.getBoolean(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return byte
+     * @see java.sql.CallableStatement#getByte(java.lang.String)
      */
-    public byte getByte(String parameterName) throws SQLException {
-        return callableStatement.getByte(parameterName);
+    public byte getByte(final String parameterName) throws SQLException {
+        return _callableStatement.getByte(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return short
+     * @see java.sql.CallableStatement#getShort(java.lang.String)
      */
-    public short getShort(String parameterName) throws SQLException {
-        return callableStatement.getShort(parameterName);
-   }
-
-   /**
-    *
-     * @param parameterName String
-     * @throws SQLException
-     * @return int
-     */
-    public int getInt(String parameterName) throws SQLException {
-       return callableStatement.getInt(parameterName);
+    public short getShort(final String parameterName) throws SQLException {
+        return _callableStatement.getShort(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return long
+     * @see java.sql.CallableStatement#getInt(java.lang.String)
      */
-    public long getLong(String parameterName) throws SQLException {
-        return callableStatement.getLong(parameterName);
+    public int getInt(final String parameterName) throws SQLException {
+       return _callableStatement.getInt(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return float
+     * @see java.sql.CallableStatement#getLong(java.lang.String)
      */
-    public float getFloat(String parameterName) throws SQLException {
-        return callableStatement.getFloat(parameterName);
+    public long getLong(final String parameterName) throws SQLException {
+        return _callableStatement.getLong(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return double
+     * @see java.sql.CallableStatement#getFloat(java.lang.String)
      */
-    public double getDouble(String parameterName) throws SQLException {
-        return callableStatement.getDouble(parameterName);
+    public float getFloat(final String parameterName) throws SQLException {
+        return _callableStatement.getFloat(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return byte[]
+     * @see java.sql.CallableStatement#getDouble(java.lang.String)
      */
-    public byte[] getBytes(String parameterName) throws SQLException {
-       return callableStatement.getBytes(parameterName);
+    public double getDouble(final String parameterName) throws SQLException {
+        return _callableStatement.getDouble(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Date
+     * @see java.sql.CallableStatement#getBytes(java.lang.String)
      */
-    public java.sql.Date getDate(String parameterName) throws SQLException {
-        return callableStatement.getDate(parameterName);
+    public byte[] getBytes(final String parameterName) throws SQLException {
+       return _callableStatement.getBytes(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Time
+     * @see java.sql.CallableStatement#getDate(java.lang.String)
      */
-    public java.sql.Time getTime(String parameterName) throws SQLException {
-        return callableStatement.getTime(parameterName);
+    public Date getDate(final String parameterName) throws SQLException {
+        return _callableStatement.getDate(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Timestamp
+     * @see java.sql.CallableStatement#getTime(java.lang.String)
      */
-    public java.sql.Timestamp getTimestamp(String parameterName) throws SQLException {
-        return callableStatement.getTimestamp(parameterName);
+    public Time getTime(final String parameterName) throws SQLException {
+        return _callableStatement.getTime(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Object
-    */
-    public Object getObject(String parameterName) throws SQLException {
-        return callableStatement.getObject(parameterName);
-   }
-
-    /**
-    *
-     * @param parameterName String
-     * @throws SQLException
-     * @return BigDecimal
+     * @see java.sql.CallableStatement#getTimestamp(java.lang.String)
      */
-    public BigDecimal getBigDecimal(String parameterName) throws SQLException {
-        return callableStatement.getBigDecimal(parameterName);
+    public Timestamp getTimestamp(final String parameterName) throws SQLException {
+        return _callableStatement.getTimestamp(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param map Map
-     * @throws SQLException
-     * @return Object
+     * @see java.sql.CallableStatement#getObject(java.lang.String)
      */
-    public Object getObject(String parameterName, java.util.Map map) throws SQLException {
-        return callableStatement.getObject(parameterName, map);
+    public Object getObject(final String parameterName) throws SQLException {
+        return _callableStatement.getObject(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Ref
+     * @see java.sql.CallableStatement#getBigDecimal(java.lang.String)
      */
-    public Ref getRef(String parameterName) throws SQLException {
-        return callableStatement.getRef(parameterName);
+    public BigDecimal getBigDecimal(final String parameterName) throws SQLException {
+        return _callableStatement.getBigDecimal(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Blob
+     * @see java.sql.CallableStatement#getObject(java.lang.String, java.util.Map)
      */
-    public Blob getBlob(String parameterName) throws SQLException {
-        return callableStatement.getBlob(parameterName);
+    public Object getObject(final String parameterName, final Map map)
+    throws SQLException {
+        return _callableStatement.getObject(parameterName, map);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Clob
+     * @see java.sql.CallableStatement#getRef(java.lang.String)
      */
-    public Clob getClob(String parameterName) throws SQLException {
-        return callableStatement.getClob(parameterName);
+    public Ref getRef(final String parameterName) throws SQLException {
+        return _callableStatement.getRef(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return Array
+     * @see java.sql.CallableStatement#getBlob(java.lang.String)
      */
-    public Array getArray(String parameterName) throws SQLException {
-        return callableStatement.getArray(parameterName);
+    public Blob getBlob(final String parameterName) throws SQLException {
+        return _callableStatement.getBlob(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Date
+     * @see java.sql.CallableStatement#getClob(java.lang.String)
      */
-    public java.sql.Date getDate(String parameterName, Calendar cal) throws SQLException {
-        return callableStatement.getDate(parameterName, cal);
+    public Clob getClob(final String parameterName) throws SQLException {
+        return _callableStatement.getClob(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Time
+     * @see java.sql.CallableStatement#getArray(java.lang.String)
      */
-    public java.sql.Time getTime(String parameterName, Calendar cal) throws SQLException {
-        return callableStatement.getTime(parameterName, cal);
+    public Array getArray(final String parameterName) throws SQLException {
+        return _callableStatement.getArray(parameterName);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @param cal Calendar
-     * @throws SQLException
-     * @return Timestamp
+     * @see java.sql.CallableStatement#getDate(java.lang.String, java.util.Calendar)
      */
-    public java.sql.Timestamp getTimestamp(String parameterName, Calendar cal) throws SQLException {
-        return callableStatement.getTimestamp(parameterName, cal);
+    public Date getDate(final String parameterName, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getDate(parameterName, cal);
     }
 
     /**
-     *
-     * @param parameterName String
-     * @throws SQLException
-     * @return URL
+     * @see java.sql.CallableStatement#getTime(java.lang.String, java.util.Calendar)
      */
-    public java.net.URL getURL(String parameterName) throws SQLException {
-        return callableStatement.getURL(parameterName);
+    public Time getTime(final String parameterName, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getTime(parameterName, cal);
+    }
+
+    /**
+     * @see java.sql.CallableStatement#getTimestamp(java.lang.String, java.util.Calendar)
+     */
+    public Timestamp getTimestamp(final String parameterName, final Calendar cal)
+    throws SQLException {
+        return _callableStatement.getTimestamp(parameterName, cal);
+    }
+
+    /**
+     * @see java.sql.CallableStatement#getURL(java.lang.String)
+     */
+    public URL getURL(final String parameterName) throws SQLException {
+        return _callableStatement.getURL(parameterName);
     }
 }
 
