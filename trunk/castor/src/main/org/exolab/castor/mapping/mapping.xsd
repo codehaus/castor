@@ -108,6 +108,7 @@
                <xsd:enumeration value="map"/>
                <xsd:enumeration value="enumerate"/>
                <xsd:enumeration value="sortedset"/>
+               <xsd:enumeration value="iterator"/>
             </xsd:restriction>
          </xsd:simpleType>
       </xsd:attribute>

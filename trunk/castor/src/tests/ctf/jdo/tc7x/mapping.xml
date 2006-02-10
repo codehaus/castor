@@ -4,7 +4,7 @@
 <mapping>
 
     <class name="ctf.jdo.tc7x.SelfReferentialParent" identity="id">
-        <map-to table="self_refer_parent" xml="entity1" />
+        <map-to table="tc7x_self_refer_parent" xml="entity1" />
         <field name="id" type="integer" >
             <sql name="id" type="integer"/>
         </field>
@@ -18,7 +18,7 @@
     </class>
 
     <class name="ctf.jdo.tc7x.SelfReferentialChild" identity="id" extends="ctf.jdo.tc7x.SelfReferentialParent">
-        <map-to table="self_refer_child" xml="child" />
+        <map-to table="tc7x_self_refer_child" xml="child" />
         <field name="id" type="integer" >
             <sql name="id" type="integer"/>
         </field>

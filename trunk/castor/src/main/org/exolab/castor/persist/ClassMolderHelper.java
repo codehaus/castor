@@ -138,6 +138,16 @@ public final class ClassMolderHelper {
                 }
             }
             return idList;
+        } else if (col instanceof Iterator) {
+            ArrayList idList = new ArrayList();
+            Iterator itor = (Iterator) col;
+            while (itor.hasNext()) {
+                Object id = molder.getIdentity(tx, itor.next());
+                if (id != null) {
+                    idList.add(id);
+                }
+            }
+            return idList;
         } else if (col instanceof Map) {
             ArrayList idList = new ArrayList();
             Iterator itor = ((Map) col).keySet().iterator();
@@ -183,6 +193,8 @@ public final class ClassMolderHelper {
             };
         } else if (object instanceof Collection) {
             return ((Collection) object).iterator();
+        } else if (object instanceof Iterator) {
+            return (Iterator) object;
         } else if (object instanceof Map) {
             return ((Map) object).values().iterator();
         } else if (object.getClass().isArray()) {
@@ -398,6 +410,37 @@ public final class ClassMolderHelper {
             return added;
         }
 
+        if (collection instanceof Iterator) {
+            if (orgIds == null || orgIds.size() == 0) {
+                if (collection == null) {
+                    return new ArrayList(0);
+                }
+                
+                Iterator iterator = (Iterator) collection;
+                Collection returnCollection = new ArrayList();
+                while (iterator.hasNext()) {
+                    returnCollection.add(iterator.next());
+                }
+                return returnCollection;
+                
+            }
+
+            if (collection == null) {
+                return new ArrayList(0);
+            }
+
+            Iterator newValuesIterator = (Iterator) collection;
+            ArrayList added = new ArrayList();
+            while (newValuesIterator.hasNext()) {
+                Object newValue = newValuesIterator.next();
+                Object newId = ch.getIdentity(tx, newValue);
+                if (newId == null || !orgIds.contains(newId)) {
+                    added.add(newValue);
+                }
+            }
+            return added;
+        }
+
         if (collection.getClass().isArray()) {
             if (orgIds == null || orgIds.size() == 0) {
                 if (collection == null) {
@@ -480,6 +523,33 @@ public final class ClassMolderHelper {
             Iterator newColItor = newCol.iterator();
             while (newColItor.hasNext()) {
                 Object newObject = newColItor.next();
+                Object newId = ch.getIdentity(tx, newObject);
+                if (newId != null) {
+                    newMap.put(newId, newObject);
+                }
+            }
+            while (orgItor.hasNext()) {
+                Object id = orgItor.next();
+                if (!newMap.containsKey(id)) {
+                    removed.add(id);
+                }
+            }
+            return removed;
+        }
+
+        if (collection instanceof Iterator) {
+            if (orgIds == null || orgIds.size() == 0) {
+                return new ArrayList(0);
+            }
+
+            Iterator collectionIterator = (Iterator) collection;
+            Iterator orgItor = orgIds.iterator();
+            ArrayList removed = new ArrayList(0);
+
+            // make a new map of key and value of the new collection
+            HashMap newMap = new HashMap();
+            while (collectionIterator.hasNext()) {
+                Object newObject = collectionIterator.next();
                 Object newId = ch.getIdentity(tx, newObject);
                 if (newId != null) {
                     newMap.put(newId, newObject);

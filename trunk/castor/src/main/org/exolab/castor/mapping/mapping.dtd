@@ -148,7 +148,7 @@
     create-method  CDATA  #IMPLIED
     transient      (true|false) "false"
     container      ( true | false ) #IMPLIED
-    collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate | sortedset )  #IMPLIED>
+    collection     ( array | arraylist | vector | hashtable | collection | set | map | enumerate | sortedset | iterator)  #IMPLIED>
 
 
 <!--
