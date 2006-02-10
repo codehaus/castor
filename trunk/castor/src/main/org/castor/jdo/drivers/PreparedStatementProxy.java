@@ -44,49 +44,54 @@ import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.util.LocalConfiguration;
 
 /**
  * Proxy class for JDBC PreparedStatement class, to allow information gathering
  * for the purpose of SQL statement logging.
+ * 
  * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @version $Revision$ $Date$
  * @since 1.0M3
  */
-public class PreparedStatementProxy implements PreparedStatement {
+public final class PreparedStatementProxy implements PreparedStatement {
 
-	/** Commons logger. */
-	private static final Log log = LogFactory.getLog (PreparedStatementProxy.class);
-	
+    /** Commons logger. */
+    private static final Log LOG = LogFactory.getLog(PreparedStatementProxy.class);
+    
     /** Has property of LocalConfiguration been read? */
-    private static boolean      _isConfigured = false;
+    private static boolean _isConfigured = false;
     
     /** Should connections been wrapped by a proxy? */
-    private static boolean      _useProxies = false;
+    private static boolean _useProxies = false;
     
-	/** PreparedStatement to be proxied. */
-	private PreparedStatement preparedStatement;
-	
-	/** Connection instance associated with this PreparedStatement */
-	private Connection connection;
-	
-	/** SQL Parameter mapping */
-	private Map parameters = new HashMap();
-	
-	/** The SQL statement to be executed  */
-	private String sqlStatement = null; 
+    /** PreparedStatement to be proxied. */
+    private PreparedStatement _preparedStatement;
+    
+    /** Connection instance associated with this PreparedStatement */
+    private Connection _connection;
+    
+    /** SQL Parameter mapping */
+    private Map _parameters = new HashMap();
+    
+    /** The SQL statement to be executed  */
+    private String _sqlStatement = null; 
 
-	/** List of batch statements associated with this instance. */
-	private List batchStatements = new ArrayList();
+    /** List of batch statements associated with this instance. */
+    private List _batchStatements = new ArrayList();
 
-	/**
-	 * Factory method for creating a PreparedStamentProxy
-	 * @param statement Prepared statement to be proxied.
-	 * @param sql SQL string.
-	 * @param connection JDBC connection
-	 * @return Prepared statement proxy.
-	 */
-	public static PreparedStatement newPreparedStatementProxy(
-            PreparedStatement statement, String sql, Connection connection) {
+    /**
+     * Factory method for creating a PreparedStamentProxy.
+     * 
+     * @param statement Prepared statement to be proxied.
+     * @param sql SQL string.
+     * @param connection JDBC connection.
+     * @return Prepared statement proxy.
+     */
+    public static PreparedStatement newPreparedStatementProxy(
+            final PreparedStatement statement, final String sql,
+            final Connection connection) {
         
         if (!_isConfigured) {
             String propertyValue = LocalConfiguration.getInstance().getProperty(
@@ -95,679 +100,643 @@ public class PreparedStatementProxy implements PreparedStatement {
             _isConfigured = true;
         }
 
-		if (!_useProxies) {
+        if (!_useProxies) {
             return statement;
-		} else {
+        } else {
             return new PreparedStatementProxy(statement, sql, connection);
         }
-	}
-	
-	/**
-	 * Creates an instance of this class.
-	 * @param statement Prepared statement to be proxied.
-	 * @param sql SQL string.
-	 * @param connection JDBC connection
-	 */
-	private PreparedStatementProxy(PreparedStatement statement, String sql, Connection connection) {
-		
-		if (log.isDebugEnabled()) {
-			log.debug ("Creating prepared statement proxy for SQL statement " + sql);
-		}
-		
-		this.preparedStatement = statement; 
-		this.sqlStatement = sql;
-		this.connection = connection;
-	}
-	
-	/**
-	 * @see PreparedStatement#addBatch()
-	 */
-	public void addBatch() throws SQLException {
-		preparedStatement.addBatch();
-	}
-	/**
-	 * @see PreparedStatement#addBatch(String)
-	 */
-	public void addBatch(String arg0) throws SQLException {
-		batchStatements.add (arg0);
-		preparedStatement.addBatch(arg0);
-	}
-	/**
-	 * @see PreparedStatement#cancel()
-	 */
-	public void cancel() throws SQLException {
-		preparedStatement.cancel();
-	}
-	/**
-	 * @see PreparedStatement#clearBatch()
-	 */
-	public void clearBatch() throws SQLException {
-		batchStatements.clear();
-		preparedStatement.clearBatch();
-	}
-	/**
-	 * @see PreparedStatement#clearParameters()
-	 */
-	public void clearParameters() throws SQLException {
-		parameters.clear();
-		preparedStatement.clearParameters();
-	}
-	/**
-	 * @see PreparedStatement#clearWarnings()
-	 */
-	public void clearWarnings() throws SQLException {
-		preparedStatement.clearWarnings();
-	}
-	/**
-	 * @see PreparedStatement#close()
-	 */
-	public void close() throws SQLException {
-		preparedStatement.close();
-	}
-	/*
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object arg0) {
-		return preparedStatement.equals(arg0);
-	}
-	/**
-	 * @see PreparedStatement#execute()
-	 */
-	public boolean execute() throws SQLException {
-		return preparedStatement.execute();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean execute(String arg0) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.execute(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean execute(String arg0, int arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.execute(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean execute(String arg0, int[] arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.execute(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean execute(String arg0, String[] arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.execute(arg0, arg1);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int[] executeBatch() throws SQLException {
-		return preparedStatement.executeBatch();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ResultSet executeQuery() throws SQLException {
-		return preparedStatement.executeQuery();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ResultSet executeQuery(String arg0) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.executeQuery(arg0);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int executeUpdate() throws SQLException {
-		return preparedStatement.executeUpdate();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int executeUpdate(String arg0) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.executeUpdate(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int executeUpdate(String arg0, int arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.executeUpdate(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int executeUpdate(String arg0, int[] arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.executeUpdate(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int executeUpdate(String arg0, String[] arg1) throws SQLException {
-		sqlStatement = arg0;
-		return preparedStatement.executeUpdate(arg0, arg1);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Connection getConnection() throws SQLException {
-		//return preparedStatement.getConnection();
-		return connection;
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getFetchDirection() throws SQLException {
-		return preparedStatement.getFetchDirection();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getFetchSize() throws SQLException {
-		return preparedStatement.getFetchSize();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ResultSet getGeneratedKeys() throws SQLException {
-		return preparedStatement.getGeneratedKeys();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getMaxFieldSize() throws SQLException {
-		return preparedStatement.getMaxFieldSize();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getMaxRows() throws SQLException {
-		return preparedStatement.getMaxRows();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ResultSetMetaData getMetaData() throws SQLException {
-		return preparedStatement.getMetaData();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean getMoreResults() throws SQLException {
-		return preparedStatement.getMoreResults();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean getMoreResults(int arg0) throws SQLException {
-		return preparedStatement.getMoreResults(arg0);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ParameterMetaData getParameterMetaData() throws SQLException {
-		return preparedStatement.getParameterMetaData();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getQueryTimeout() throws SQLException {
-		return preparedStatement.getQueryTimeout();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public ResultSet getResultSet() throws SQLException {
-		return preparedStatement.getResultSet();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getResultSetConcurrency() throws SQLException {
-		return preparedStatement.getResultSetConcurrency();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getResultSetHoldability() throws SQLException {
-		return preparedStatement.getResultSetHoldability();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getResultSetType() throws SQLException {
-		return preparedStatement.getResultSetType();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getUpdateCount() throws SQLException {
-		return preparedStatement.getUpdateCount();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public SQLWarning getWarnings() throws SQLException {
-		return preparedStatement.getWarnings();
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return preparedStatement.hashCode();
-	}
-	
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setArray(int arg0, Array arg1) throws SQLException {
-		parameters.put(new Integer (arg0), arg1);
-		preparedStatement.setArray(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setAsciiStream(int arg0, InputStream arg1, int arg2)
-			throws SQLException {
-		preparedStatement.setAsciiStream(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setBigDecimal(int arg0, BigDecimal arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setBigDecimal(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setBinaryStream(int arg0, InputStream arg1, int arg2)
-			throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setBinaryStream(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setBlob(int arg0, Blob arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setBlob(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setBoolean(int arg0, boolean arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Boolean (arg1));
-		preparedStatement.setBoolean(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setByte(int arg0, byte arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Byte(arg1));
-		preparedStatement.setByte(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setBytes(int arg0, byte[] arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setBytes(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setCharacterStream(int arg0, Reader arg1, int arg2)
-			throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setCharacterStream(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setClob(int arg0, Clob arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setClob(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setCursorName(String arg0) throws SQLException {
-		preparedStatement.setCursorName(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setDate(int arg0, Date arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setDate(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setDate(int arg0, Date arg1, Calendar arg2) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setDate(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setDouble(int arg0, double arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Double (arg1));
-		preparedStatement.setDouble(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setEscapeProcessing(boolean arg0) throws SQLException {
-		preparedStatement.setEscapeProcessing(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setFetchDirection(int arg0) throws SQLException {
-		preparedStatement.setFetchDirection(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setFetchSize(int arg0) throws SQLException {
-		preparedStatement.setFetchSize(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setFloat(int arg0, float arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Float (arg1));
-		preparedStatement.setFloat(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setInt(int arg0, int arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Integer (arg1));
-		preparedStatement.setInt(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setLong(int arg0, long arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Long (arg1));
-		preparedStatement.setLong(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setMaxFieldSize(int arg0) throws SQLException {
-		preparedStatement.setMaxFieldSize(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setMaxRows(int arg0) throws SQLException {
-		preparedStatement.setMaxRows(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setNull(int arg0, int arg1) throws SQLException {
-		parameters.put (new Integer (arg0), "null");
-		preparedStatement.setNull(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setNull(int arg0, int arg1, String arg2) throws SQLException {
-		parameters.put (new Integer (arg0), "null");
-		preparedStatement.setNull(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setObject(int arg0, Object arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setObject(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setObject(int arg0, Object arg1, int arg2) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setObject(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @param arg3
-	 * @throws java.sql.SQLException
-	 */
-	public void setObject(int arg0, Object arg1, int arg2, int arg3)
-			throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setObject(arg0, arg1, arg2, arg3);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setQueryTimeout(int arg0) throws SQLException {
-		preparedStatement.setQueryTimeout(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setRef(int arg0, Ref arg1) throws SQLException {
-		preparedStatement.setRef(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setShort(int arg0, short arg1) throws SQLException {
-		parameters.put (new Integer (arg0), new Short (arg1));
-		preparedStatement.setShort(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setString(int arg0, String arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setString(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setTime(int arg0, Time arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setTime(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setTime(int arg0, Time arg1, Calendar arg2) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setTime(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setTimestamp(int arg0, Timestamp arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setTimestamp(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setTimestamp(int arg0, Timestamp arg1, Calendar arg2)
-			throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setTimestamp(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @throws java.sql.SQLException
-	 */
-	public void setUnicodeStream(int arg0, InputStream arg1, int arg2)
-			throws SQLException {
-		preparedStatement.setUnicodeStream(arg0, arg1, arg2);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @throws java.sql.SQLException
-	 */
-	public void setURL(int arg0, URL arg1) throws SQLException {
-		parameters.put (new Integer (arg0), arg1);
-		preparedStatement.setURL(arg0, arg1);
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer ();
-		StringTokenizer tokenizer = new StringTokenizer( sqlStatement, "?" );
-		String partOfStatement;
-        List parameterValues = new ArrayList(parameters.keySet());
+    }
+    
+    /**
+     * Creates an instance of this class.
+     * 
+     * @param statement Prepared statement to be proxied.
+     * @param sql SQL string.
+     * @param connection JDBC connection.
+     */
+    private PreparedStatementProxy(final PreparedStatement statement,
+            final String sql, final Connection connection) {
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating prepared statement proxy for SQL statement " + sql);
+        }
+        
+        _preparedStatement = statement; 
+        _sqlStatement = sql;
+        _connection = connection;
+    }
+    
+    /**
+     * @see PreparedStatement#addBatch()
+     */
+    public void addBatch() throws SQLException {
+        _preparedStatement.addBatch();
+    }
+    
+    /**
+     * @see PreparedStatement#addBatch(String)
+     */
+    public void addBatch(final String arg0) throws SQLException {
+        _batchStatements.add (arg0);
+        _preparedStatement.addBatch(arg0);
+    }
+    
+    /**
+     * @see PreparedStatement#cancel()
+     */
+    public void cancel() throws SQLException {
+        _preparedStatement.cancel();
+    }
+    
+    /**
+     * @see PreparedStatement#clearBatch()
+     */
+    public void clearBatch() throws SQLException {
+        _batchStatements.clear();
+        _preparedStatement.clearBatch();
+    }
+    
+    /**
+     * @see PreparedStatement#clearParameters()
+     */
+    public void clearParameters() throws SQLException {
+        _parameters.clear();
+        _preparedStatement.clearParameters();
+    }
+    
+    /**
+     * @see PreparedStatement#clearWarnings()
+     */
+    public void clearWarnings() throws SQLException {
+        _preparedStatement.clearWarnings();
+    }
+    
+    /**
+     * @see PreparedStatement#close()
+     */
+    public void close() throws SQLException {
+        _preparedStatement.close();
+    }
+    
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(final Object arg0) {
+        return _preparedStatement.equals(arg0);
+    }
+    
+    /**
+     * @see PreparedStatement#execute()
+     */
+    public boolean execute() throws SQLException {
+        return _preparedStatement.execute();
+    }
+    
+    /**
+     * @see java.sql.Statement#execute(java.lang.String)
+     */
+    public boolean execute(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.execute(arg0);
+    }
+    
+    /**
+     * @see java.sql.Statement#execute(java.lang.String, int)
+     */
+    public boolean execute(final String arg0, final int arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.execute(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#execute(java.lang.String, int[])
+     */
+    public boolean execute(final String arg0, final int[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.execute(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#execute(java.lang.String, java.lang.String[])
+     */
+    public boolean execute(final String arg0, final String[] arg1) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.execute(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#executeBatch()
+     */
+    public int[] executeBatch() throws SQLException {
+        return _preparedStatement.executeBatch();
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#executeQuery()
+     */
+    public ResultSet executeQuery() throws SQLException {
+        return _preparedStatement.executeQuery();
+    }
+    
+    /**
+     * @see java.sql.Statement#executeQuery(java.lang.String)
+     */
+    public ResultSet executeQuery(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.executeQuery(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#executeUpdate()
+     */
+    public int executeUpdate() throws SQLException {
+        return _preparedStatement.executeUpdate();
+    }
+    
+    /**
+     * @see java.sql.Statement#executeUpdate(java.lang.String)
+     */
+    public int executeUpdate(final String arg0) throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.executeUpdate(arg0);
+    }
+    
+    /**
+     * @see java.sql.Statement#executeUpdate(java.lang.String, int)
+     */
+    public int executeUpdate(final String arg0, final int arg1)
+    throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.executeUpdate(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#executeUpdate(java.lang.String, int[])
+     */
+    public int executeUpdate(final String arg0, final int[] arg1)
+    throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.executeUpdate(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#executeUpdate(java.lang.String, java.lang.String[])
+     */
+    public int executeUpdate(final String arg0, final String[] arg1)
+    throws SQLException {
+        _sqlStatement = arg0;
+        return _preparedStatement.executeUpdate(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#getConnection()
+     */
+    public Connection getConnection() throws SQLException {
+        return _connection;
+    }
+    
+    /**
+     * @see java.sql.Statement#getFetchDirection()
+     */
+    public int getFetchDirection() throws SQLException {
+        return _preparedStatement.getFetchDirection();
+    }
+    
+    /**
+     * @see java.sql.Statement#getFetchSize()
+     */
+    public int getFetchSize() throws SQLException {
+        return _preparedStatement.getFetchSize();
+    }
+    
+    /**
+     * @see java.sql.Statement#getGeneratedKeys()
+     */
+    public ResultSet getGeneratedKeys() throws SQLException {
+        return _preparedStatement.getGeneratedKeys();
+    }
+    
+    /**
+     * @see java.sql.Statement#getMaxFieldSize()
+     */
+    public int getMaxFieldSize() throws SQLException {
+        return _preparedStatement.getMaxFieldSize();
+    }
+    
+    /**
+     * @see java.sql.Statement#getMaxRows()
+     */
+    public int getMaxRows() throws SQLException {
+        return _preparedStatement.getMaxRows();
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#getMetaData()
+     */
+    public ResultSetMetaData getMetaData() throws SQLException {
+        return _preparedStatement.getMetaData();
+    }
+    
+    /**
+     * @see java.sql.Statement#getMoreResults()
+     */
+    public boolean getMoreResults() throws SQLException {
+        return _preparedStatement.getMoreResults();
+    }
+    
+    /**
+     * @see java.sql.Statement#getMoreResults(int)
+     */
+    public boolean getMoreResults(final int arg0) throws SQLException {
+        return _preparedStatement.getMoreResults(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#getParameterMetaData()
+     */
+    public ParameterMetaData getParameterMetaData() throws SQLException {
+        return _preparedStatement.getParameterMetaData();
+    }
+    
+    /**
+     * @see java.sql.Statement#getQueryTimeout()
+     */
+    public int getQueryTimeout() throws SQLException {
+        return _preparedStatement.getQueryTimeout();
+    }
+    
+    /**
+     * @see java.sql.Statement#getResultSet()
+     */
+    public ResultSet getResultSet() throws SQLException {
+        return _preparedStatement.getResultSet();
+    }
+    
+    /**
+     * @see java.sql.Statement#getResultSetConcurrency()
+     */
+    public int getResultSetConcurrency() throws SQLException {
+        return _preparedStatement.getResultSetConcurrency();
+    }
+    
+    /**
+     * @see java.sql.Statement#getResultSetHoldability()
+     */
+    public int getResultSetHoldability() throws SQLException {
+        return _preparedStatement.getResultSetHoldability();
+    }
+    
+    /**
+     * @see java.sql.Statement#getResultSetType()
+     */
+    public int getResultSetType() throws SQLException {
+        return _preparedStatement.getResultSetType();
+    }
+    
+    /**
+     * @see java.sql.Statement#getUpdateCount()
+     */
+    public int getUpdateCount() throws SQLException {
+        return _preparedStatement.getUpdateCount();
+    }
+    
+    /**
+     * @see java.sql.Statement#getWarnings()
+     */
+    public SQLWarning getWarnings() throws SQLException {
+        return _preparedStatement.getWarnings();
+    }
+    
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return _preparedStatement.hashCode();
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setArray(int, java.sql.Array)
+     */
+    public void setArray(final int arg0, final Array arg1) throws SQLException {
+        _parameters.put(new Integer (arg0), arg1);
+        _preparedStatement.setArray(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setAsciiStream(int, java.io.InputStream, int)
+     */
+    public void setAsciiStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _preparedStatement.setAsciiStream(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setBigDecimal(int, java.math.BigDecimal)
+     */
+    public void setBigDecimal(final int arg0, final BigDecimal arg1)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setBigDecimal(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setBinaryStream(int, java.io.InputStream, int)
+     */
+    public void setBinaryStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setBinaryStream(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setBlob(int, java.sql.Blob)
+     */
+    public void setBlob(final int arg0, final Blob arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setBlob(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setBoolean(int, boolean)
+     */
+    public void setBoolean(final int arg0, final boolean arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Boolean (arg1));
+        _preparedStatement.setBoolean(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setByte(int, byte)
+     */
+    public void setByte(final int arg0, final byte arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Byte(arg1));
+        _preparedStatement.setByte(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setBytes(int, byte[])
+     */
+    public void setBytes(final int arg0, final byte[] arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setBytes(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setCharacterStream(int, java.io.Reader, int)
+     */
+    public void setCharacterStream(final int arg0, final Reader arg1, final int arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setCharacterStream(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setClob(int, java.sql.Clob)
+     */
+    public void setClob(final int arg0, final Clob arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setClob(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#setCursorName(java.lang.String)
+     */
+    public void setCursorName(final String arg0) throws SQLException {
+        _preparedStatement.setCursorName(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setDate(int, java.sql.Date)
+     */
+    public void setDate(final int arg0, final Date arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setDate(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setDate(int, java.sql.Date, java.util.Calendar)
+     */
+    public void setDate(final int arg0, final Date arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setDate(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setDouble(int, double)
+     */
+    public void setDouble(final int arg0, final double arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Double (arg1));
+        _preparedStatement.setDouble(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#setEscapeProcessing(boolean)
+     */
+    public void setEscapeProcessing(final boolean arg0) throws SQLException {
+        _preparedStatement.setEscapeProcessing(arg0);
+    }
+    
+    /**
+     * @see java.sql.Statement#setFetchDirection(int)
+     */
+    public void setFetchDirection(final int arg0) throws SQLException {
+        _preparedStatement.setFetchDirection(arg0);
+    }
+    
+    /**
+     * @see java.sql.Statement#setFetchSize(int)
+     */
+    public void setFetchSize(final int arg0) throws SQLException {
+        _preparedStatement.setFetchSize(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setFloat(int, float)
+     */
+    public void setFloat(final int arg0, final float arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Float (arg1));
+        _preparedStatement.setFloat(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setInt(int, int)
+     */
+    public void setInt(final int arg0, final int arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Integer (arg1));
+        _preparedStatement.setInt(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setLong(int, long)
+     */
+    public void setLong(final int arg0, final long arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Long (arg1));
+        _preparedStatement.setLong(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Statement#setMaxFieldSize(int)
+     */
+    public void setMaxFieldSize(final int arg0) throws SQLException {
+        _preparedStatement.setMaxFieldSize(arg0);
+    }
+    
+    /**
+     * @see java.sql.Statement#setMaxRows(int)
+     */
+    public void setMaxRows(final int arg0) throws SQLException {
+        _preparedStatement.setMaxRows(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setNull(int, int)
+     */
+    public void setNull(final int arg0, final int arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), "null");
+        _preparedStatement.setNull(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setNull(int, int, java.lang.String)
+     */
+    public void setNull(final int arg0, final int arg1, final String arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), "null");
+        _preparedStatement.setNull(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object)
+     */
+    public void setObject(final int arg0, final Object arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setObject(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int)
+     */
+    public void setObject(final int arg0, final Object arg1, final int arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setObject(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setObject(int, java.lang.Object, int, int)
+     */
+    public void setObject(final int arg0, final Object arg1,
+            final int arg2, final int arg3) throws SQLException {
+        
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setObject(arg0, arg1, arg2, arg3);
+    }
+    
+    /**
+     * @see java.sql.Statement#setQueryTimeout(int)
+     */
+    public void setQueryTimeout(final int arg0) throws SQLException {
+        _preparedStatement.setQueryTimeout(arg0);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setRef(int, java.sql.Ref)
+     */
+    public void setRef(final int arg0, final Ref arg1) throws SQLException {
+        _preparedStatement.setRef(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setShort(int, short)
+     */
+    public void setShort(final int arg0, final short arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), new Short (arg1));
+        _preparedStatement.setShort(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setString(int, java.lang.String)
+     */
+    public void setString(final int arg0, final String arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setString(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setTime(int, java.sql.Time)
+     */
+    public void setTime(final int arg0, final Time arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setTime(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setTime(int, java.sql.Time, java.util.Calendar)
+     */
+    public void setTime(final int arg0, final Time arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setTime(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setTimestamp(int, java.sql.Timestamp)
+     */
+    public void setTimestamp(final int arg0, final Timestamp arg1)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setTimestamp(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement
+     *      #setTimestamp(int, java.sql.Timestamp, java.util.Calendar)
+     */
+    public void setTimestamp(final int arg0, final Timestamp arg1, final Calendar arg2)
+    throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setTimestamp(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @deprecated
+     * @see java.sql.PreparedStatement#setUnicodeStream(int, java.io.InputStream, int)
+     */
+    public void setUnicodeStream(final int arg0, final InputStream arg1, final int arg2)
+    throws SQLException {
+        _preparedStatement.setUnicodeStream(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.sql.PreparedStatement#setURL(int, java.net.URL)
+     */
+    public void setURL(final int arg0, final URL arg1) throws SQLException {
+        _parameters.put (new Integer (arg0), arg1);
+        _preparedStatement.setURL(arg0, arg1);
+    }
+    
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer buffer = new StringBuffer ();
+        StringTokenizer tokenizer = new StringTokenizer(_sqlStatement, "?");
+        String partOfStatement;
+        List parameterValues = new ArrayList(_parameters.keySet());
         Collections.sort(parameterValues); 
-		Iterator iter = parameterValues.iterator();
-		Object key = null;
-		while ( tokenizer.hasMoreTokens() ) {
-			partOfStatement = tokenizer.nextToken();
-			if (iter.hasNext()) {
-				key = iter.next(); 
-				buffer.append (partOfStatement);
-				buffer.append  ("'" + parameters.get (key).toString() + "'");
-			} else {
-				buffer.append (partOfStatement);
-				buffer.append  ("?");
-			}
-		}
-		return buffer.toString();
-	}
-
+        Iterator iter = parameterValues.iterator();
+        Object key = null;
+        while (tokenizer.hasMoreTokens()) {
+            partOfStatement = tokenizer.nextToken();
+            if (iter.hasNext()) {
+                key = iter.next(); 
+                buffer.append(partOfStatement);
+                buffer.append("'" + _parameters.get (key).toString() + "'");
+            } else {
+                buffer.append(partOfStatement);
+                buffer.append("?");
+            }
+        }
+        return buffer.toString();
+    }
 }

@@ -27,54 +27,56 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
 import org.exolab.castor.util.LocalConfiguration;
 
 /**
  * Proxy class for JDBC Connection class, to allow information gathering
  * for the purpose of SQL statement logging.
+ * 
  * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @version $Revision$ $Date$
  * @since 1.0M3
  */
-public class ConnectionProxy implements java.sql.Connection {
+public final class ConnectionProxy implements java.sql.Connection {
 
-	/** Default calling location, equals 'unknwon'. */
-	private static final String DEFAULT_CALLED_BY = "unknown";
-	
-	/** Jakarta Common Log instance. */
-	private static final Log _log = LogFactory.getLog(ConnectionProxy.class);
-	
-	/** Has property of LocalConfiguration been read? */
-	private static boolean		_isConfigured = false;
-	
-	/** Should connections been wrapped by a proxy? */
-	private static boolean		_useProxies = false;
-	
-	/** 
-	 * The JDBC Connection instance to proxy.
-	 */
-	private Connection connection;
-	
-	/**
-	 * Name of the class that created this ConnectionProxy instance.
-	 */
-	private String calledBy;
-	
-	/**
-	 * Factory method for creating a ConnectionProxy.  
-	 * @param connection The JDBC connection to proxy.
-	 * @return The JDBC connection proxy.
-	 */
-	public static Connection newConnectionProxy(Connection connection) {
-		return newConnectionProxy(connection, DEFAULT_CALLED_BY);
-	}
+    /** Jakarta Common Log instance. */
+    private static final Log LOG = LogFactory.getLog(ConnectionProxy.class);
+    
+    /** Default calling location, equals 'unknwon'. */
+    private static final String DEFAULT_CALLED_BY = "unknown";
+    
+    /** Has property of LocalConfiguration been read? */
+    private static boolean _isConfigured = false;
+    
+    /** Should connections been wrapped by a proxy? */
+    private static boolean _useProxies = false;
+    
+    /** The JDBC Connection instance to proxy. */
+    private Connection _connection;
+    
+    /** Name of the class that created this ConnectionProxy instance. */
+    private String _calledBy;
+    
+    /**
+     * Factory method for creating a ConnectionProxy.  
+     * @param connection The JDBC connection to proxy.
+     * @return The JDBC connection proxy.
+     */
+    public static Connection newConnectionProxy(final Connection connection) {
+        return newConnectionProxy(connection, DEFAULT_CALLED_BY);
+    }
 
-	/**
-	 * Factory method for creating a ConnectionProxy.  
-	 * @param connection The JDBC connection to proxy.
-	 * @param calledBy Name of the class using creating and this proxy class. 
-	 * @return The JDBC connection proxy.
-	 */
-	public static Connection newConnectionProxy(Connection connection, String calledBy) {
+    /**
+     * Factory method for creating a ConnectionProxy.
+     * 
+     * @param connection The JDBC connection to proxy.
+     * @param calledBy Name of the class using creating and this proxy class. 
+     * @return The JDBC connection proxy.
+     */
+    public static Connection newConnectionProxy(final Connection connection,
+                                                final String calledBy) {
+        
         if (!_isConfigured) {
             String propertyValue = LocalConfiguration.getInstance().getProperty(
                     "org.exolab.castor.persist.useProxies", "true");
@@ -82,385 +84,348 @@ public class ConnectionProxy implements java.sql.Connection {
             _isConfigured = true;
         }
         
-		if (!_useProxies) {
+        if (!_useProxies) {
             return connection;
         } else {
             return new ConnectionProxy(connection, calledBy);
         }
-	}
+    }
 
-	/**
-	 * Creates an instance of ConnectionProxy. 
-	 * @param connection JDBC Connectio instance to be proxied.
-	 * @param calledBy Name of the class using creating and this proxy class. 
-	 */
-	private ConnectionProxy(Connection connection, String calledBy) {
-		this.connection = connection;
-		this.calledBy = calledBy;
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating instance of ConnectionProxy for calling class " + this.calledBy);
-		}
-	}
+    /**
+     * Creates an instance of ConnectionProxy.
+     * 
+     * @param connection JDBC Connectio instance to be proxied.
+     * @param calledBy Name of the class using creating and this proxy class. 
+     */
+    private ConnectionProxy(final Connection connection, final String calledBy) {
+        _connection = connection;
+        _calledBy = calledBy;
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Creating instance of ConnectionProxy for calling class "
+                    + _calledBy);
+        }
+    }
 
-	/**
-	 * @throws java.sql.SQLException
-	 */
-	public void clearWarnings() throws SQLException {
-		this.connection.clearWarnings();
-	}
-	/**
-	 * @throws java.sql.SQLException
-	 */
-	public void close() throws SQLException {
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Closing JDBC Connection instance.");
-		}
-		this.connection.close();
-	}
-	/**
-	 * @throws java.sql.SQLException
-	 */
-	public void commit() throws SQLException {
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Committing JDBC Connection instance.");
-		}
-		this.connection.commit();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Statement createStatement() throws SQLException {
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance.");
-		}
-		return this.connection.createStatement();
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Statement createStatement(int arg0, int arg1) throws SQLException {
-		return this.connection.createStatement(arg0, arg1);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Statement createStatement(int arg0, int arg1, int arg2)
-			throws SQLException {
-		return this.connection.createStatement(arg0, arg1, arg2);
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
-	public boolean equals(Object arg0) {
-		return this.connection.equals(arg0);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean getAutoCommit() throws SQLException {
-		return this.connection.getAutoCommit();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public String getCatalog() throws SQLException {
-		return this.connection.getCatalog();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getHoldability() throws SQLException {
-		return this.connection.getHoldability();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public DatabaseMetaData getMetaData() throws SQLException {
-		return this.connection.getMetaData();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public int getTransactionIsolation() throws SQLException {
-		return this.connection.getTransactionIsolation();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Map getTypeMap() throws SQLException {
-		return this.connection.getTypeMap();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public SQLWarning getWarnings() throws SQLException {
-		return this.connection.getWarnings();
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
-	public int hashCode() {
-		return this.connection.hashCode();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean isClosed() throws SQLException {
-		return this.connection.isClosed();
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public boolean isReadOnly() throws SQLException {
-		return this.connection.isReadOnly();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public String nativeSQL(String arg0) throws SQLException {
-		return this.connection.nativeSQL(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public CallableStatement prepareCall(String arg0) throws SQLException {
-        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0),arg0,this);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public CallableStatement prepareCall(String arg0, int arg1, int arg2)
-			throws SQLException {
-        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0, arg1, arg2),arg0,this);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @param arg3
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public CallableStatement prepareCall(String arg0, int arg1, int arg2,
-			int arg3) throws SQLException {
-        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0, arg1, arg2, arg3),arg0,this);
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0) 
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0), arg0, this);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0, int arg1)
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0, arg1), arg0, this);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0, int arg1, int arg2)
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0, arg1, arg2), arg0, this);
-	}
+    /**
+     * @see java.sql.Connection#clearWarnings()
+     */
+    public void clearWarnings() throws SQLException {
+        _connection.clearWarnings();
+    }
     
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @param arg2
-	 * @param arg3
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0, int arg1, int arg2,
-			int arg3) 
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0, arg1, arg2, arg3), arg0, this);
-	}
+    /**
+     * @see java.sql.Connection#close()
+     */
+    public void close() throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Closing JDBC Connection instance.");
+        }
+        _connection.close();
+    }
     
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0, int[] arg1)
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0, arg1), arg0, this);
-	}
-	/**
-	 * @param arg0
-	 * @param arg1
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public PreparedStatement prepareStatement(String arg0, String[] arg1)
-		throws SQLException 
-	{
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Creating JDBC Statement for Connection instance with " + arg0);
-		}
-		return PreparedStatementProxy.newPreparedStatementProxy(this.connection.prepareStatement(arg0, arg1), arg0, this);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void releaseSavepoint(Savepoint arg0) throws SQLException {
-		this.connection.releaseSavepoint(arg0);
-	}
-	/**
-	 * @throws java.sql.SQLException
-	 */
-	public void rollback() throws SQLException {
-		if (_log.isDebugEnabled()) {
-			_log.debug ("Rolling back JDBC Connection instance.");
-		}
-		this.connection.rollback();
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void rollback(Savepoint arg0) throws SQLException {
-		this.connection.rollback(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setAutoCommit(boolean arg0) throws SQLException {
-		this.connection.setAutoCommit(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setCatalog(String arg0) throws SQLException {
-		this.connection.setCatalog(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setHoldability(int arg0) throws SQLException {
-		this.connection.setHoldability(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setReadOnly(boolean arg0) throws SQLException {
-		this.connection.setReadOnly(arg0);
-	}
-	/**
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Savepoint setSavepoint() throws SQLException {
-		return this.connection.setSavepoint();
-	}
-	/**
-	 * @param arg0
-	 * @return
-	 * @throws java.sql.SQLException
-	 */
-	public Savepoint setSavepoint(String arg0) throws SQLException {
-		return this.connection.setSavepoint(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setTransactionIsolation(int arg0) throws SQLException {
-		this.connection.setTransactionIsolation(arg0);
-	}
-	/**
-	 * @param arg0
-	 * @throws java.sql.SQLException
-	 */
-	public void setTypeMap(Map arg0) throws SQLException {
-		this.connection.setTypeMap(arg0);
-	}
-	/* (non-Javadoc)
-	 * @see java.lang.Object#toString()
-	 */
-	public String toString() {
-		StringBuffer buffer = new StringBuffer ();
-		buffer.append (getClass().getName() + " created and called by " + this.calledBy);
-		return buffer.toString();
-	}
+    /**
+     * @see java.sql.Connection#commit()
+     */
+    public void commit() throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Committing JDBC Connection instance.");
+        }
+        _connection.commit();
+    }
+    
+    /**
+     * @see java.sql.Connection#createStatement()
+     */
+    public Statement createStatement() throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance.");
+        }
+        return _connection.createStatement();
+    }
+    
+    /**
+     * @see java.sql.Connection#createStatement(int, int)
+     */
+    public Statement createStatement(final int arg0, final int arg1)
+    throws SQLException {
+        return _connection.createStatement(arg0, arg1);
+    }
+    
+    /**
+     * @see java.sql.Connection#createStatement(int, int, int)
+     */
+    public Statement createStatement(final int arg0, final int arg1, final int arg2)
+    throws SQLException {
+        return _connection.createStatement(arg0, arg1, arg2);
+    }
+    
+    /**
+     * @see java.lang.Object#equals(java.lang.Object)
+     */
+    public boolean equals(final Object arg0) {
+        return _connection.equals(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#getAutoCommit()
+     */
+    public boolean getAutoCommit() throws SQLException {
+        return _connection.getAutoCommit();
+    }
+    
+    /**
+     * @see java.sql.Connection#getCatalog()
+     */
+    public String getCatalog() throws SQLException {
+        return _connection.getCatalog();
+    }
+
+    /**
+     * @see java.sql.Connection#getHoldability()
+     */
+    public int getHoldability() throws SQLException {
+        return _connection.getHoldability();
+    }
+    /**
+     * @see java.sql.Connection#getMetaData()
+     */
+    public DatabaseMetaData getMetaData() throws SQLException {
+        return _connection.getMetaData();
+    }
+    /**
+     * @see java.sql.Connection#getTransactionIsolation()
+     */
+    public int getTransactionIsolation() throws SQLException {
+        return _connection.getTransactionIsolation();
+    }
+    /**
+     * @see java.sql.Connection#getTypeMap()
+     */
+    public Map getTypeMap() throws SQLException {
+        return _connection.getTypeMap();
+    }
+    /**
+     * @see java.sql.Connection#getWarnings()
+     */
+    public SQLWarning getWarnings() throws SQLException {
+        return _connection.getWarnings();
+    }
+
+    /**
+     * @see java.lang.Object#hashCode()
+     */
+    public int hashCode() {
+        return _connection.hashCode();
+    }
+    
+    /**
+     * @see java.sql.Connection#isClosed()
+     */
+    public boolean isClosed() throws SQLException {
+        return _connection.isClosed();
+    }
+    
+    /**
+     * @see java.sql.Connection#isReadOnly()
+     */
+    public boolean isReadOnly() throws SQLException {
+        return _connection.isReadOnly();
+    }
+    
+    /**
+     * @see java.sql.Connection#nativeSQL(java.lang.String)
+     */
+    public String nativeSQL(final String arg0) throws SQLException {
+        return _connection.nativeSQL(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareCall(java.lang.String)
+     */
+    public CallableStatement prepareCall(final String arg0) throws SQLException {
+        return CallableStatementProxy.newCallableStatementProxy(
+                _connection.prepareCall(arg0), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareCall(java.lang.String, int, int)
+     */
+    public CallableStatement prepareCall(final String arg0,
+            final int arg1, final int arg2) throws SQLException {
+        
+        return CallableStatementProxy.newCallableStatementProxy(
+                _connection.prepareCall(arg0, arg1, arg2), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareCall(java.lang.String, int, int, int)
+     */
+    public CallableStatement prepareCall(final String arg0, final int arg1,
+            final int arg2, final int arg3) throws SQLException {
+        
+        return CallableStatementProxy.newCallableStatementProxy(
+                _connection.prepareCall(arg0, arg1, arg2, arg3), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String)
+     */
+    public PreparedStatement prepareStatement(final String arg0) throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String, int)
+     */
+    public PreparedStatement prepareStatement(final String arg0, final int arg1)
+    throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0, arg1), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int)
+     */
+    public PreparedStatement prepareStatement(final String arg0,
+            final int arg1, final int arg2) throws SQLException {
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0, arg1, arg2), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String, int, int, int)
+     */
+    public PreparedStatement prepareStatement(final String arg0, final int arg1,
+            final int arg2, final int arg3) throws SQLException {
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0, arg1, arg2, arg3), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String, int[])
+     */
+    public PreparedStatement prepareStatement(final String arg0, final int[] arg1)
+    throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0, arg1), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#prepareStatement(java.lang.String, java.lang.String[])
+     */
+    public PreparedStatement prepareStatement(final String arg0, final String[] arg1)
+    throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Creating JDBC Statement for Connection instance with " + arg0);
+        }
+        return PreparedStatementProxy.newPreparedStatementProxy(
+                _connection.prepareStatement(arg0, arg1), arg0, this);
+    }
+    
+    /**
+     * @see java.sql.Connection#releaseSavepoint(java.sql.Savepoint)
+     */
+    public void releaseSavepoint(final Savepoint arg0) throws SQLException {
+        _connection.releaseSavepoint(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#rollback()
+     */
+    public void rollback() throws SQLException {
+        if (LOG.isDebugEnabled()) {
+            LOG.debug ("Rolling back JDBC Connection instance.");
+        }
+        _connection.rollback();
+    }
+    
+    /**
+     * @see java.sql.Connection#rollback(java.sql.Savepoint)
+     */
+    public void rollback(final Savepoint arg0) throws SQLException {
+        _connection.rollback(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setAutoCommit(boolean)
+     */
+    public void setAutoCommit(final boolean arg0) throws SQLException {
+        _connection.setAutoCommit(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setCatalog(java.lang.String)
+     */
+    public void setCatalog(final String arg0) throws SQLException {
+        _connection.setCatalog(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setHoldability(int)
+     */
+    public void setHoldability(final int arg0) throws SQLException {
+        _connection.setHoldability(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setReadOnly(boolean)
+     */
+    public void setReadOnly(final boolean arg0) throws SQLException {
+        _connection.setReadOnly(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setSavepoint()
+     */
+    public Savepoint setSavepoint() throws SQLException {
+        return _connection.setSavepoint();
+    }
+    
+    /**
+     * @see java.sql.Connection#setSavepoint(java.lang.String)
+     */
+    public Savepoint setSavepoint(final String arg0) throws SQLException {
+        return _connection.setSavepoint(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setTransactionIsolation(int)
+     */
+    public void setTransactionIsolation(final int arg0) throws SQLException {
+        _connection.setTransactionIsolation(arg0);
+    }
+    
+    /**
+     * @see java.sql.Connection#setTypeMap(java.util.Map)
+     */
+    public void setTypeMap(final Map arg0) throws SQLException {
+        _connection.setTypeMap(arg0);
+    }
+
+    /**
+     * @see java.lang.Object#toString()
+     */
+    public String toString() {
+        StringBuffer buffer = new StringBuffer ();
+        buffer.append (getClass().getName() + " created and called by " + _calledBy);
+        return buffer.toString();
+    }
 }

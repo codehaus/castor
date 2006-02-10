@@ -1,5 +1,5 @@
 /*
- * Copyright 2005 Werner Guttmann, 
+ * Copyright 2005 Werner Guttmann
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,36 +25,23 @@ import org.exolab.castor.persist.spi.PersistenceFactory;
  * @version $Revision$ $Date$
  * @since 1.0M2
  */
-public final class PointbaseQueryExpression
-    extends JDBCQueryExpression
-{
+public final class PointbaseQueryExpression extends JDBCQueryExpression {
 
     /**
      * Craetes an instance of this class.
      * @param factory PersistenceFactory instance
      */
-    public PointbaseQueryExpression( PersistenceFactory factory )
-    {
-        super( factory );
+    public PointbaseQueryExpression(final PersistenceFactory factory) {
+        super(factory);
     }
 
     /**
      * @inheritDoc
      * @see org.exolab.castor.persist.spi.QueryExpression#getStatement(boolean)
      */
-    public String getStatement( boolean lock )
-    {
-        StringBuffer sql;
-
-        sql = getStandardStatement( lock, false );
-
-//        if (lock) {
-//            sql.append( " FOR UPDATE" );
-//       }
-        
-        return sql.toString();
+    public String getStatement(final boolean lock) {
+        return getStandardStatement(lock, false).toString();
     }
-
 }
 
 

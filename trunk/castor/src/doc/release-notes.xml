@@ -68,6 +68,26 @@
    &lt;/field&gt;                    
                 </code-panel>
 			</summary>
+                <bug id="1321" tool="jira">
+                    <description>
+		                Checkstyled recently added classes under org.castor.jdo.driver.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                   </reporter>
+                    <type>Enh.</type>
+                    <module>JDO</module>
+                    <date>20060211</date>
+                </bug>
 			<bugs>
                 <bug id="1315" tool="jira">
                     <description>
