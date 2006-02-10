@@ -1,4 +1,19 @@
-package org.exolab.castor.jdo.drivers;
+/*
+ * Copyright 2005 Werner Guttmann
+ *  
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.castor.jdo.drivers;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -15,10 +30,10 @@ import org.apache.commons.logging.LogFactory;
 import org.exolab.castor.util.LocalConfiguration;
 
 /**
- * @author Administrator
- *
- * To change the template for this generated type comment go to
- * Window - Preferences - Java - Code Generation - Code and Comments
+ * Proxy class for JDBC Connection class, to allow information gathering
+ * for the purpose of SQL statement logging.
+ * @author <a href="werner DOT guttmann AT gmx DOT net">Werner Guttmann</a>
+ * @since 1.0M3
  */
 public class ConnectionProxy implements java.sql.Connection {
 
@@ -230,7 +245,7 @@ public class ConnectionProxy implements java.sql.Connection {
 	 * @throws java.sql.SQLException
 	 */
 	public CallableStatement prepareCall(String arg0) throws SQLException {
-		return this.connection.prepareCall(arg0);
+        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0),arg0,this);
 	}
 	/**
 	 * @param arg0
@@ -241,7 +256,7 @@ public class ConnectionProxy implements java.sql.Connection {
 	 */
 	public CallableStatement prepareCall(String arg0, int arg1, int arg2)
 			throws SQLException {
-		return this.connection.prepareCall(arg0, arg1, arg2);
+        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0, arg1, arg2),arg0,this);
 	}
 	/**
 	 * @param arg0
@@ -253,7 +268,23 @@ public class ConnectionProxy implements java.sql.Connection {
 	 */
 	public CallableStatement prepareCall(String arg0, int arg1, int arg2,
 			int arg3) throws SQLException {
-		return this.connection.prepareCall(arg0, arg1, arg2, arg3);
+        return CallableStatementProxy.newCallableStatementProxy(this.connection.prepareCall(arg0, arg1, arg2, arg3),arg0,this);
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
 	}
 	/**
 	 * @param arg0

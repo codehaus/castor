@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1316 using contribution from Raúl Sanz de Acedo Pérez [rsanz@cein.es]
+       Added SQL statement logging support for JDBC CallableStatements.
+       Details: http://jira.codehaus.org/browse/CASTOR-1316
+       (Werner - 20060210)
+
 JDO:   Fixed bug CASTOR-1317 using contribution from Raúl Sanz de Acedo Pérez [rsanz@cein.es]
        Prevented DatabaseImpl.finalize() from logging when used with global transactions and
        database pooling enabled.

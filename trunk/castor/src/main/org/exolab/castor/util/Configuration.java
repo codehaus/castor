@@ -260,6 +260,15 @@ public abstract class Configuration {
          */
         public static final String PROPERTY_USE_JDBC30 = "org.castor.jdo.use.jdbc30";
         
+        /**
+         * Property specifying whether JDBC proxy classes should be used 
+         * <pre>
+         * org.exolab.castor.persist.useProxies
+         * </pre>
+         * @since 0.9.9
+         */
+        public static final String PROPERTY_USE_JDBC_PROXIES = "org.exolab.castor.persist.useProxies";
+        
     } //-- class: Property
 
 
