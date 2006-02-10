@@ -8,7 +8,7 @@ package utf.org.exolab.castor.jdo.drivers;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.exolab.castor.jdo.drivers.ConnectionProxy;
+import org.castor.jdo.drivers.ConnectionProxy;
 
 import junit.framework.TestCase;
 import java.sql.Connection;
