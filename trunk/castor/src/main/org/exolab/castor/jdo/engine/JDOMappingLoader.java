@@ -380,6 +380,13 @@ public class JDOMappingLoader extends MappingLoader {
                 String err = "Lazy loading not supported for collection type 'iterator'";
                 throw new MappingException(err);
             }
+
+            if (colType.getName().equals("java.util.Enumeration")
+                    && fieldMap.getLazy() == true) 
+            {
+                String err = "Lazy loading not supported for collection type 'enumerate'";
+                throw new MappingException(err);
+            }
         }
         
         TypeInfo typeInfo = getTypeInfo( fieldType, colHandler, fieldMap );

@@ -67,7 +67,40 @@
       &lt;sql ... /&gt;
    &lt;/field&gt;                    
                 </code-panel>
+
+				<h3>Added collection type 'enumerate' (java.util.Enumeration) to Castor JDO</h3>
+                
+                <p>It is now possible to define a one-to-many relation with a collection
+                   type of 'enumerate'.</p>
+                   
+                <code-panel>
+   &lt;field name="children" type="some.domain.custom.Class" collection="enumerate"&gt;
+      &lt;sql ... /&gt;
+   &lt;/field&gt;                    
+                </code-panel>
+
 			</summary>
+			<bugs>
+                <bug id="1314" tool="jira">
+                    <description>
+				       Added Castor JDO collection type 'enumerate' (java.util.Enumeration).
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060211</date>
+                </bug>
                 <bug id="1321" tool="jira">
                     <description>
 		                Checkstyled recently added classes under org.castor.jdo.driver.
@@ -88,7 +121,6 @@
                     <module>JDO</module>
                     <date>20060211</date>
                 </bug>
-			<bugs>
                 <bug id="1315" tool="jira">
                     <description>
 				       Added Castor JDO collection type 'iterator' (java.util.Iterator).

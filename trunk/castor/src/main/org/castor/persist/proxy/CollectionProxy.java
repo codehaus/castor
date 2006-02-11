@@ -19,7 +19,9 @@ package org.castor.persist.proxy;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -70,6 +72,8 @@ public abstract class CollectionProxy {
             return new MapProxy(fieldMolder, object, classLoader, new HashMap());
         } else if (cls == Iterator.class) {
             return new IteratorProxy(fieldMolder, object, classLoader, new ArrayList());
+        } else if (cls == Enumeration.class) {
+            return new EnumerationProxy(fieldMolder, object, classLoader, new ArrayList());
         } else if (cls == Map.class) {
             return new MapProxy(fieldMolder, object, classLoader, new HashMap());
         } else if (cls == SortedSet.class) {
@@ -134,6 +138,45 @@ public abstract class CollectionProxy {
         public void close() {
             if (!_fm.isAddable()) {
                 _fm.setValue(_object, _col, _cl);
+            }
+        }
+    }
+
+    private static final class EnumerationProxy extends CollectionProxy {
+        
+        private Collection _collection;
+
+        private FieldMolder _fm;
+
+        private Object _object;
+
+        private ClassLoader _cl;
+
+        private EnumerationProxy(final FieldMolder fm, final Object object,
+                final ClassLoader cl, final Collection collection) {
+            _cl = cl;
+            _fm = fm;
+            _collection = collection;
+            _object = object;
+        }
+
+        public Object getCollection() {
+            return Collections.enumeration(_collection);
+        }
+
+        public void add(final Object key, final Object value) {
+            if (!_fm.isAddable()) {
+                // [TODO] Find a better way to express this scenario where no
+                // setter is specified either.
+                _collection.add(value);
+            } else {
+                _fm.addValue(_object, value, _cl);
+            }
+        }
+
+        public void close() {
+            if (!_fm.isAddable()) {
+                _fm.setValue(_object, Collections.enumeration(_collection), _cl);
             }
         }
     }

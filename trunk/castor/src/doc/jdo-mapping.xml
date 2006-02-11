@@ -17,6 +17,7 @@
        <p><b>Release 1.0 M3</b>:<br/>
           <ul>
              <li>Added collection type 'iterator'.</li>
+             <li>Added collection type 'enumerate'.</li>
           </ul>
        </p>
     </section>
@@ -284,7 +285,7 @@
                         <th align="left">added in<br/>release</th>
                      </tr>
                      <tr bgcolor="#DEDEDE"><td>array</td><td>&lt;type_attribute>[]</td><td>&lt;type_attribute>[]</td><td></td></tr>
-                     <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td><td></td></tr>
+                     <tr><td>enumerate</td><td>java.util.Enumeration</td><td>-</td><td><font color="red">1.0 M3</font></td></tr>
                      <tr bgcolor="#DEDEDE"><td>collection</td><td>java.util.Collection</td><td>java.util.ArrayList </td><td></td></tr>
                      <tr><td>set</td><td>java.util.Set</td><td>java.util.HashSet</td><td></td></tr>
                      <tr bgcolor="#DEDEDE"><td>arraylist</td><td>java.util.ArrayList</td><td>java.util.ArrayList </td><td></td></tr>
@@ -309,8 +310,8 @@
            than one element of the specified type. This is how the 'to-many' portion of a relationship 
            is described.</p>
            
-        <p><b>Note</b>: It is not possible to use a collection of type 'iterator' with lazy
-            loading enabled.</p>
+        <p><b>Note</b>: It is not possible to use a collection of type 'iterator' or 'enumerate' 
+           with lazy loading enabled.</p>
 
 
         <p><b>2. Determine the signature of the method</b></p>

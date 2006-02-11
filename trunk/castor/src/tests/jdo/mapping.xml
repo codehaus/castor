@@ -468,6 +468,13 @@
     </field>
   </class>
 
+  <class name="jdo.TestColEnumeration" extends="jdo.TestCol">
+    <description>Class used for testing collection type 'enumerate'</description>
+    <map-to table="test_col" />
+    <field name="item" type="jdo.TestItem" collection="enumerate">
+    </field>
+  </class>
+
   <!-- Test many-to-many from entityA to entityB (but not from entityB to
        entityA) with lazy loading -->
 

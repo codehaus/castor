@@ -3,9 +3,11 @@ package org.exolab.castor.persist;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
@@ -148,7 +150,17 @@ public final class ClassMolderHelper {
                 }
             }
             return idList;
-        } else if (col instanceof Map) {
+        } else if (col instanceof Enumeration) {
+            ArrayList idList = new ArrayList();
+            Enumeration enumeration = (Enumeration) col;
+            while (enumeration.hasMoreElements()) {
+                Object id = molder.getIdentity(tx, enumeration.nextElement());
+                if (id != null) {
+                    idList.add(id);
+                }
+            }
+            return idList;
+       } else if (col instanceof Map) {
             ArrayList idList = new ArrayList();
             Iterator itor = ((Map) col).keySet().iterator();
             while (itor.hasNext()) {
@@ -193,6 +205,8 @@ public final class ClassMolderHelper {
             };
         } else if (object instanceof Collection) {
             return ((Collection) object).iterator();
+        } else if (object instanceof Enumeration) {
+            return Collections.list(((Enumeration) object)).iterator();
         } else if (object instanceof Iterator) {
             return (Iterator) object;
         } else if (object instanceof Map) {
@@ -441,6 +455,31 @@ public final class ClassMolderHelper {
             return added;
         }
 
+        if (collection instanceof Enumeration) {
+            if (orgIds == null || orgIds.size() == 0) {
+                if (collection == null) {
+                    return new ArrayList(0);
+                }
+                return Collections.list((Enumeration) collection);
+                
+            }
+
+            if (collection == null) {
+                return new ArrayList(0);
+            }
+
+            Enumeration newValues = (Enumeration) collection;
+            ArrayList added = new ArrayList();
+            while (newValues.hasMoreElements()) {
+                Object newValue = newValues.nextElement();
+                Object newId = ch.getIdentity(tx, newValue);
+                if (newId == null || !orgIds.contains(newId)) {
+                    added.add(newValue);
+                }
+            }
+            return added;
+        }
+
         if (collection.getClass().isArray()) {
             if (orgIds == null || orgIds.size() == 0) {
                 if (collection == null) {
@@ -500,6 +539,33 @@ public final class ClassMolderHelper {
             Map newMap = (Map) collection;
             Iterator orgItor = orgIds.iterator();
             ArrayList removed = new ArrayList(orgIds.size());
+            while (orgItor.hasNext()) {
+                Object id = orgItor.next();
+                if (!newMap.containsKey(id)) {
+                    removed.add(id);
+                }
+            }
+            return removed;
+        }
+
+        if (collection instanceof Enumeration) {
+            if (orgIds == null || orgIds.size() == 0) {
+                return new ArrayList(0);
+            }
+
+            Enumeration newCol = (Enumeration) collection;
+           Iterator orgItor = orgIds.iterator();
+            ArrayList removed = new ArrayList(0);
+
+            // make a new map of key and value of the new collection
+            HashMap newMap = new HashMap();
+            while (newCol.hasMoreElements()) {
+                Object newObject = newCol.nextElement();
+                Object newId = ch.getIdentity(tx, newObject);
+                if (newId != null) {
+                    newMap.put(newId, newObject);
+                }
+            }
             while (orgItor.hasNext()) {
                 Object id = orgItor.next();
                 if (!newMap.containsKey(id)) {
