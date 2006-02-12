@@ -22,18 +22,23 @@ package org.castor.jdo.util;
  * @version $Revision$ $Date$
  * @since 1.0 M2
  */
-public class ClassLoadingUtils {
+public final class ClassLoadingUtils {
+    /**
+     * Hide utility class constructor.
+     */
+    private ClassLoadingUtils() { }
 
     /**
      * Loads a class with a given name.
-     * @param classLoader The class loader to use; null if the default class loader should be used.
-     * @param classname Name of the class to be loaded
+     * 
+     * @param classLoader The class loader to use; null if the default class loader
+     *        should be used.
+     * @param classname Name of the class to be loaded.
      * @return The class loaded as specified by the class name.
      * @throws ClassNotFoundException If the given class can not be loaded.
      */
-      public static Class loadClass(final ClassLoader classLoader,
-              final String classname) throws ClassNotFoundException 
-      {
+      public static Class loadClass(final ClassLoader classLoader, final String classname)
+      throws ClassNotFoundException {
           Class classToLoad = null;
           if (classLoader == null) {
               classToLoad = Class.forName(classname);
@@ -42,5 +47,4 @@ public class ClassLoadingUtils {
           }
           return classToLoad;
       }
-
 }
