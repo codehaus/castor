@@ -380,14 +380,16 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     private String _description = DEFAULT_DESCRIPTION;
 
     /**
-     * The transactions to databases map for database pooling for J2EE transaction instances.
+     * The transactions to databases map for database pooling for J2EE transaction
+     * instances.
      * 
      * <p>This pool only affects JDOManager in a J2EE environment where a transaction 
-     * is associated with the thread that calls {@link #getDatabase}. If database pooling is 
-     * enabled, JDOManager will first search this pool for a Database instance that is mapped to 
-     * current transaction. If such a Database instance is found, the Database will be 
-     * returned; if not, a new one will be created, associated with the transaction 
-     * and return to the caller.
+     * is associated with the thread that calls {@link #getDatabase}. If database
+     * pooling is enabled, JDOManager will first search this pool for a Database
+     * instance that is mapped to current transaction. If such a Database instance is
+     * found, the Database will be returned; if not, a new one will be created,
+     * associated with the transaction and return to the caller.
+     * 
      * @see #setDatabasePoooling(boolean)
      */
     private TxDatabaseMap  _txDbPool;
@@ -633,9 +635,9 @@ implements DataObjects, Referenceable, ObjectFactory, Serializable {
     }
 
     /**
-     * Indicates if database pooling is enable or not. The use of this method only makes sense 
-     * in a J2EE container environment with global transaction coordinated by a J2EE transaction
-     * manager.
+     * Indicates if database pooling is enable or not. The use of this method only
+     * makes sense in a J2EE container environment with global transaction coordinated
+     * by a J2EE transaction manager.
      * 
      * @see    #setDatabasePooling(boolean)
      * @return True if pooling is enabled for this Database instance. 
