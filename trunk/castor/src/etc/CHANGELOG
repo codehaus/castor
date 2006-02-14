@@ -2,6 +2,12 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1293 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
+       Fixed NullPointerException in ClassDescriptorImpl caused by
+       Class.getClassLoader() returning null in some situations.
+       Details: http://jira.codehaus.org/browse/CASTOR-1293
+       (Ralf - 20060214)
+
 JDO:   Fixed bug CASTOR-1232 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
        Added additional snytax for specifying identity columns
        Details: http://jira.codehaus.org/browse/CASTOR-1232

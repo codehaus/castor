@@ -717,6 +717,7 @@ public class ClassDescriptorResolverImpl
         
         if (loader == null) loader = _loader;
         if (loader == null) loader = getClass().getClassLoader();
+        if (loader == null) loader = Thread.currentThread().getContextClassLoader();
         URL url = loader.getResource(filename);
         if (url != null) {
             try {
@@ -799,6 +800,7 @@ public class ClassDescriptorResolverImpl
         
         if (loader == null) loader = _loader;
         if (loader == null) loader = getClass().getClassLoader();
+        if (loader == null) loader = Thread.currentThread().getContextClassLoader();
         URL url = loader.getResource(filename);
         if (url != null) {
             try {
