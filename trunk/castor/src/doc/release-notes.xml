@@ -100,6 +100,27 @@
 
 			</summary>
 			<bugs>
+                <bug id="1293" tool="jira">
+                    <description>
+		                Fixed NullPointerException in ClassDescriptorImpl caused by
+                        Class.getClassLoader() returning null in some situations.
+                    </description>
+                    <contributor>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </contributor>
+                    <submitter>
+                        <name>Ralf Joachim</name>
+                        <email>ralf.joachim@syscon-world.de</email>
+                    </submitter>
+                    <reporter>
+                        <name>Rutger Lubbers</name>
+                        <email>rutger.lubbers@vodafone.com</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>XML</module>
+                    <date>20060214</date>
+                </bug>
                 <bug id="1232" tool="jira">
                     <description>
 				       Added additional snytax for specifying identity columns
