@@ -18,6 +18,7 @@
           <ul>
              <li>Added collection type 'iterator'.</li>
              <li>Added collection type 'enumerate'.</li>
+             <li>Added additional syntax for specifying the identity of a class.</li>
           </ul>
        </p>
     </section>
@@ -203,6 +204,7 @@
             direct         ( true | false )  "false"
             lazy           ( true | false )  "false"
             transient      ( true | false )  "false"
+            identity       ( true | false )  "false"
             get-method     NMTOKEN  #IMPLIED
             set-method     NMTOKEN  #IMPLIED
             create-method  NMTOKEN  #IMPLIED
@@ -377,6 +379,9 @@
              XML un-/marshalling). If you want this field to be ignored during any 
              persistence-related operations only, please use the 'transient' attribute at the 
              &lt;sql&gt; level.</li>
+
+          <li><b>identity:</b> If true, the field is part of the class identity. Please use this
+              as an alternative way of specifying the identity of an object.</li>
 
           <li><b>direct:</b> If true, Castor expects a public variable in the object
              and will modify it directly.</li>

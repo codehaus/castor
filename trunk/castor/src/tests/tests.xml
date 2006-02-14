@@ -25,6 +25,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -117,6 +118,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -212,6 +214,7 @@
     <!-- <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/> -->
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -304,6 +307,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -393,6 +397,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -488,6 +493,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -579,6 +585,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -670,6 +677,7 @@
     <!-- <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/> -->
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -762,6 +770,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>
@@ -855,6 +864,7 @@
     <case id="TC17" class="ctf.jdo.tc1x.TestTimeStamp"/>
     <case id="TC18" class="ctf.jdo.tc1x.TestPersistent"/>
     <case id="TC19" class="ctf.jdo.tc1x.TestInstanceFactory"/>
+    <case id="TC111" class="ctf.jdo.tc1x.TestIdentityPerFieldMapping"/>
 
     <!-- tc2x -->
     <case id="TC20" class="ctf.jdo.tc2x.TestKeyGenGeneric"/>

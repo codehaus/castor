@@ -282,6 +282,54 @@ go
 grant all on tc1x_pks_category to test
 go
 
+drop table tc1x_entity1
+go
+create table tc1x_entity1 (
+  id        int not null PRIMARY KEY,
+  name      varchar(200) not null
+)
+go
+
+insert into tc1x_entity1 (id, name) values (1, 'entity1')
+go
+
+drop table tc1x_child
+go
+create table tc1x_child (
+  id        int not null PRIMARY KEY,
+  descr     varchar(200) not null
+)
+go
+
+insert into tc1x_child (id, descr) values (1, 'child1')
+go
+
+drop table tc1x_entity_compound
+go
+create table tc1x_entity_compound (
+  id1       int not null,
+  id2       int not null,
+  name      varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+)
+go
+
+insert into tc1x_entity_compound (id1, id2, name) values (1, 1, 'entityCompound1')
+go
+
+drop table tc1x_child_compound
+go
+create table tc1x_child_compound (
+  id1       int not null,
+  id2       int not null,
+  descr     varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+)
+go
+
+insert into tc1x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1')
+go
+
 
 -- tc2x TESTS
 
