@@ -130,6 +130,16 @@ public class FieldMapping implements java.io.Serializable {
     private java.lang.String _comparator;
 
     /**
+     * Field _identity
+     */
+    private boolean _identity = false;
+
+    /**
+     * keeps track of state for field: _identity
+     */
+    private boolean _has_identity;
+
+    /**
      * Field _description
      */
     private java.lang.String _description;
@@ -186,6 +196,15 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._has_direct= false;
     } //-- void deleteDirect() 
+
+    /**
+     * Method deleteIdentity
+     * 
+     */
+    public void deleteIdentity()
+    {
+        this._has_identity= false;
+    } //-- void deleteIdentity() 
 
     /**
      * Method deleteLazy
@@ -331,6 +350,17 @@ public class FieldMapping implements java.io.Serializable {
     } //-- java.lang.String getHasMethod() 
 
     /**
+     * Returns the value of field 'identity'.
+     * 
+     * @return boolean
+     * @return the value of field 'identity'.
+     */
+    public boolean getIdentity()
+    {
+        return this._identity;
+    } //-- boolean getIdentity() 
+
+    /**
      * Returns the value of field 'lazy'.
      * 
      * @return boolean
@@ -441,6 +471,18 @@ public class FieldMapping implements java.io.Serializable {
     {
         return this._has_direct;
     } //-- boolean hasDirect() 
+
+    /**
+     * Method hasIdentity
+     * 
+     * 
+     * 
+     * @return boolean
+     */
+    public boolean hasIdentity()
+    {
+        return this._has_identity;
+    } //-- boolean hasIdentity() 
 
     /**
      * Method hasLazy
@@ -631,6 +673,17 @@ public class FieldMapping implements java.io.Serializable {
     {
         this._hasMethod = hasMethod;
     } //-- void setHasMethod(java.lang.String) 
+
+    /**
+     * Sets the value of field 'identity'.
+     * 
+     * @param identity the value of field 'identity'.
+     */
+    public void setIdentity(boolean identity)
+    {
+        this._identity = identity;
+        this._has_identity = true;
+    } //-- void setIdentity(boolean) 
 
     /**
      * Sets the value of field 'lazy'.

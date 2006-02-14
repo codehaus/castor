@@ -12,8 +12,11 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Vector;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.castor.persist.TransactionContext;
 import org.exolab.castor.mapping.ClassDescriptor;
+import org.exolab.castor.mapping.FieldDescriptor;
 import org.exolab.castor.mapping.MappingException;
 import org.exolab.castor.mapping.loader.MappingLoader;
 import org.exolab.castor.mapping.xml.ClassMapping;
@@ -22,6 +25,8 @@ import org.exolab.castor.persist.spi.Persistence;
 import org.exolab.castor.persist.spi.PersistenceFactory;
 
 public final class ClassMolderHelper {
+    
+    private static final Log LOG = LogFactory.getLog(ClassMolderHelper.class);
     
     private ClassMolderHelper() {
         // nothing to do
@@ -263,6 +268,7 @@ public final class ClassMolderHelper {
                 origin = (ClassMapping) origin.getExtends();
             }
             identities = origin.getIdentity();
+            identities = getIdentityColumnNames (identities, origin);
             extendFields = getFullFields(extend);
             thisFields = clsMap.getClassChoice().getFieldMapping();
 
@@ -289,6 +295,7 @@ public final class ClassMolderHelper {
             fieldList.toArray(fields);
         } else {
             identities = clsMap.getIdentity();
+            identities = getIdentityColumnNames(identities, clsMap);
             if (identities == null || identities.length == 0) {
                 throw new MappingException("Identity is null!");
             }
@@ -315,6 +322,52 @@ public final class ClassMolderHelper {
         return fields;
     }
 
+    public static String[] getIdentityColumnNames (String[] ids, ClassMapping clsMap) {
+        
+        String[] identityColumnNames = ids;
+        
+        if (ids == null || ids.length == 0)
+        {
+            int identityCount = 0;
+            FieldMapping[] fieldMappings = clsMap.getClassChoice().getFieldMapping();
+            for (int i = 0; i < fieldMappings.length; i++)
+            {
+                if (fieldMappings[i].hasIdentity())
+                {
+                    identityCount++;
+                }
+
+            }
+
+            if (LOG.isDebugEnabled())
+            {
+                LOG.debug("Class " + clsMap.getName() + " has " + identityCount + " identity fields");
+            }
+
+            List identityDescriptorList = new ArrayList();
+            if (identityCount > 0)
+            {
+                for (int i = 0; i < fieldMappings.length; i++)
+                {
+                    if (fieldMappings[i].hasIdentity())
+                    {
+                        identityDescriptorList.add(fieldMappings[i].getName());
+                    }
+                }
+                
+                Iterator idIter = identityDescriptorList.iterator();
+                int i = 0;
+                identityColumnNames = new String[identityDescriptorList.size()]; 
+                while (idIter.hasNext()) {
+                    identityColumnNames[i] = (String) idIter.next();
+                    i++;
+                }
+            }
+        }
+
+        return identityColumnNames;
+    }
+    
     /**
      * Get the all the id fields of a class
      * If the class, C, is a dependent class, then
@@ -340,6 +393,8 @@ public final class ClassMolderHelper {
         fmDepended = null;
 
         identities = base.getIdentity();
+        
+        identities = getIdentityColumnNames (identities, base);
 
         if (identities == null || identities.length == 0) {
             throw new MappingException("Identity is null!");

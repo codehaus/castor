@@ -55,6 +55,25 @@
 				<p>to automatically retrieve the value assigned due to 'SERIAL' column 
 				   during the insert operation.</p>
 
+				<h3>Added additional syntax for specifying identity columns</h3>
+				
+				<p>In addition to the current way of specifying the identity column(s) for a given
+				   class, it is now possible to declare a field to be part of the identity 
+				   as shown below:</p>
+				   
+				<code-panel>
+  &lt;class name="ctf.jdo.tc1x.Parent"&gt;
+    &lt;description&gt;Entite one&lt;/description&gt;
+    &lt;map-to table="tc1x_entity1" xml="entity1" /&gt;
+    &lt;field name="id" type="integer" identity="true"&gt;
+      &lt;sql name="id" type="integer"/&gt;
+    &lt;/field&gt;
+    &lt;field name="name" type="string"&gt;
+      &lt;sql name="name" type="char" /&gt;
+    &lt;/field&gt;
+  &lt;/class>
+				</code-panel>
+
 				<h3>Added collection type 'iterator' (java.util.Iterator) to Castor JDO</h3>
                 
                 <p>It is now possible to define a one-to-many relation with a collection
@@ -81,6 +100,26 @@
 
 			</summary>
 			<bugs>
+                <bug id="1232" tool="jira">
+                    <description>
+				       Added additional snytax for specifying identity columns
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060214</date>
+                </bug>
                 <bug id="1314" tool="jira">
                     <description>
 				       Added Castor JDO collection type 'enumerate' (java.util.Enumeration).

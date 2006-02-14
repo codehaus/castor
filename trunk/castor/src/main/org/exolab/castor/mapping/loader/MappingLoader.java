@@ -72,6 +72,7 @@ import org.exolab.castor.mapping.handlers.TransientFieldHandler;
 import org.exolab.castor.mapping.xml.MappingRoot;
 import org.exolab.castor.mapping.xml.ClassMapping;
 import org.exolab.castor.mapping.xml.FieldMapping;
+import org.exolab.castor.persist.ClassMolderHelper;
 import org.exolab.castor.util.Messages;
 
 
@@ -475,6 +476,8 @@ public abstract class MappingLoader implements MappingResolver {
             origin = (ClassMapping) origin.getExtends();
         }
         ids = origin.getIdentity();
+        ids = ClassMolderHelper.getIdentityColumnNames (ids, origin);
+        
         if (( ids != null ) && ( ids.length > 0)) {
 
             // Check that an XML mapping file do not declare more identity

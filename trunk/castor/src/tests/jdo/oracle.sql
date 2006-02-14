@@ -228,6 +228,42 @@ create table tc1x_pks_category (
 
 create unique index tc1x_pks_category_pk on tc1x_pks_category( id );
 
+drop table tc1x_entity1;
+create table tc1x_entity1 (
+  id        int not null PRIMARY KEY,
+  name      varchar(200) not null
+);
+
+insert into tc1x_entity1 (id, name) values (1, 'entity1');
+
+drop table tc1x_child;
+create table tc1x_child (
+  id        int not null PRIMARY KEY,
+  descr     varchar(200) not null
+);
+
+insert into tc1x_child (id, descr) values (1, 'child1');
+
+drop table tc1x_entity_compound;
+create table tc1x_entity_compound (
+  id1       int not null,
+  id2       int not null,
+  name      varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+);
+
+insert into tc1x_entity_compound (id1, id2, name) values (1, 1, 'entityCompound1');
+
+drop table tc1x_child_compound;
+create table tc1x_child_compound (
+  id1       int not null,
+  id2       int not null,
+  descr     varchar(200) not null,
+  PRIMARY KEY (id1, id2)
+);
+
+insert into tc1x_child_compound (id1, id2, descr) values (1, 1, 'childCompound1');
+
 
 -- tc2x TESTS
 
