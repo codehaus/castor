@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+JDO:   Fixed bug CASTOR-1322 using contribution from Werner Guttmann [werner.guttmann@gmx.net]
+       Fixed problem in Windows batch files related to directory names with spaces.
+       Details: http://jira.codehaus.org/browse/CASTOR-1322
+       (Werner - 20060215)
+
 XML:   Fixed bug CASTOR-1293 using contribution from Ralf Joachim [ralf.joachim@syscon-world.de]
        Fixed NullPointerException in ClassDescriptorImpl caused by
        Class.getClassLoader() returning null in some situations.
