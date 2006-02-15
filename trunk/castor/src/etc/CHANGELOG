@@ -2,6 +2,11 @@
 Version (CVS)
 -------------
 
+XML:   Fixed bug CASTOR-1325 using contribution from James Adams
+       Added how to wrap a collection with a wrapper element.
+       Details: http://jira.codehaus.org/browse/CASTOR-1325
+       (Ralf - 20060215)
+
 XML:   Fixed bug CASTOR-1324 using contribution from Thierry Guerin [thierry.guerin@prima-solutions.com]
        Added WeblogicXMLSerializerFactory.
        Details: http://jira.codehaus.org/browse/CASTOR-1324
