@@ -100,6 +100,26 @@
 
 			</summary>
 			<bugs>
+                <bug id="1322" tool="jira">
+                    <description>
+				       Fixed problem in Windows batch files related to directory names with spaces.
+                    </description>
+                    <contributor>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </contributor>
+                    <submitter>
+                        <name>Werner Guttmann</name>
+                        <email>werner.guttmann@gmx.net</email>
+                    </submitter>
+                    <reporter>
+                        <name>Stefan Lober</name>
+                        <email>stefan_lober@yahoo.de</email>
+                   </reporter>
+                    <type>Bug</type>
+                    <module>JDO</module>
+                    <date>20060215</date>
+                </bug>
                 <bug id="1293" tool="jira">
                     <description>
 		                Fixed NullPointerException in ClassDescriptorImpl caused by
